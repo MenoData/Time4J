@@ -31,9 +31,9 @@ import java.math.BigDecimal;
  * <p>Konvertierverfahren sind im allgemeinen nicht bijektiv. Das bedeutet,
  * da&szlig; z.B. zwar einem UTC-Zeitpunkt meist eindeutig ein UT1-, GPS- oder
  * TAI-Zeitpunkt zugeordnet werden kann (positive UTC-Schaltsekunden
- * vorausgesetzt), umgekehrt aber nicht. Noch wichtiger: Jede Konversion
- * erfolgt maximal in Millisekundengenauigkeit (oder schlechter), ist
- * also grunds&auml;tzlich ein N&auml;herungsverfahren. </p>
+ * vorausgesetzt), umgekehrt aber nicht. Noch wichtiger: Konversionen
+ * erfolgen oft in Millisekundengenauigkeit (oder schlechter), sind
+ * also grunds&auml;tzlich N&auml;herungsverfahren. </p>
  *
  * @author  Meno Hochschild
  */
@@ -110,10 +110,11 @@ public enum TimeScale {
     },
 
     /**
-     * <p>Internationale Atomuhrzeit, die ab 1971 den Namen TAI bekam und
-     * auf den SI-Sekunden einer Atomuhr basiert. </p>
+     * <p>Internationale Atomuhrzeit, die auf den SI-Sekunden einer Atomuhr
+     * basiert und eine monoton fortlaufende Skala relativ zu 1972-01-01
+     * darstellt. </p>
      *
-     * <p>Es  werden also keine Sekunden als Schaltsekunden interpretiert.
+     * <p>Es werden also keine Sekunden als Schaltsekunden interpretiert.
      * Somit ist diese Skala vom zivilen Alltag abgekoppelt und nur im
      * Wissenschaftsbetrieb von Bedeutung. Konsequent hat der astronomische
      * Tag in dieser Skala keine Bedeutung. </p>
@@ -131,27 +132,32 @@ public enum TimeScale {
      * ihren Namen auf einer Konferenz im Jahre 1971, drittens waren die
      * Vorg&auml;nger von TAI noch direkt mit UT2 synchronisiert, hatten
      * also noch einen etwas vagen astronomischen Bezug. Zum Datum 1972-01-01
-     * betr&auml;gt der Versatz zwischen UTC und TAI fest 10 Sekunden
-     * (UTC = TAI + 10) und &auml;ndert sich seitdem laufend mit jeder
-     * eingef&uuml;gten Schaltsekunde. Im Jahr 2013 ist dieser Versatz
+     * wurde der Versatz zwischen TAI und UTC genau auf 10 Sekunden festgelegt
+     * (TAI = UTC + 10). Diese Differenz gilt fest f&uuml;r alle Zeitangaben
+     * in Epochensekunden, weil sowohl TAI als auch UTC in reinen SI-Sekunden
+     * z&auml;hlen. Aber: Werden TAI und UTC zu Zeitstempeln in einer
+     * feldorientierten Notation (YYYY-MM-DD HH:MM:SS) aufgel&ouml;st,
+     * dann &auml;ndert sich der Versatz seit 1972 laufend mit jeder
+     * eingef&uuml;gten Schaltsekunde, weil ein TAI-Tag keine Schaltsekunden
+     * kennt. Im Jahr 2013 ist dieser Versatz zwischen TAI-Tag und UTC-Tag
      * auf 35 Sekunden angewachsen. </p>
      */
     TAI() {
         @Override
         public long getElapsedTime(UniversalTime ut) {
-            long elapsedTime =
-                LeapSeconds.getInstance().strip(ut.getEpochTime())
-                - UTC_OFFSET;
-            if (elapsedTime < 0) {
-                throw new IllegalArgumentException("TAI out of range: " + ut);
+            long utc = ut.getEpochTime();
+            if (utc < 0) {
+                throw new IllegalArgumentException(
+                    "TAI not supported before 1972: " + ut);
             } else {
-                return (elapsedTime - 10);
+                return (utc + 10);
             }
         }
         @Override
         public int getFractionalPart(UniversalTime ut) {
             if (ut.getEpochTime() < 0) {
-                throw new IllegalArgumentException("TAI out of range: " + ut);
+                throw new IllegalArgumentException(
+                    "TAI not supported before 1972: " + ut);
             } else {
                 return ut.getNanosecond();
             }
@@ -159,32 +165,33 @@ public enum TimeScale {
     },
 
     /**
-     * <p>Wird vom GPS-Navigationssystem verwendet und unterscheidet sich
-     * von der TAI-Skala nur um einen konstanten Versatz von 19 Sekunden
-     * (GPS = TAI - 19). </p>
+     * <p>Wird vom GPS-Navigationssystem verwendet und wird relativ zum Start
+     * von GPS in SI-Sekunden gez&auml;hlt. </p>
      *
-     * <p>GPS wurde am 6. Januar 1980 eingef&uuml;hrt. Alle Zeitangaben
-     * davor werden von Time4J mit einer Ausnahme quittiert. </p>
+     * <p>GPS wurde am 6. Januar 1980 eingef&uuml;hrt. Alle Zeitangaben davor
+     * werden von Time4J mit einer Ausnahme quittiert. Zwischen 1972 und 1980
+     * gab es 9 Schaltsekunden, deshalb gilt abgesehen vom unterschiedlichen
+     * Epochenbezug folgende Relation: GPS = UTC - 9 = TAI - 19. </p>
      *
      * @see     #TAI
      */
     GPS() {
         @Override
         public long getElapsedTime(UniversalTime ut) {
-            long elapsedTime =
-                LeapSeconds.getInstance().strip(ut.getEpochTime());
-            if (elapsedTime < GPS_START) {
+            long utc = ut.getEpochTime();
+            if (LeapSeconds.getInstance().strip(utc) < GPS_START) {
                 throw new IllegalArgumentException(
                     "GPS not supported before 1980-01-06: " + ut);
             } else {
-                return (elapsedTime - UTC_OFFSET + 9);
+                long gps =
+                    LeapSeconds.getInstance().isEnabled() ? (utc - 9) : utc;
+                return gps - GPS_START + 2 * 365 * 86400;
             }
         }
         @Override
         public int getFractionalPart(UniversalTime ut) {
-            long elapsedTime =
-                LeapSeconds.getInstance().strip(ut.getEpochTime());
-            if (elapsedTime < GPS_START) {
+            long utc = ut.getEpochTime();
+            if (LeapSeconds.getInstance().strip(utc) < GPS_START) {
                 throw new IllegalArgumentException(
                     "GPS not supported before 1980-01-06: " + ut);
             } else {
@@ -224,8 +231,7 @@ public enum TimeScale {
 //     */
 //    UT1;
 
-    private static final int UTC_OFFSET = 2 * 365 * 86400;
-    private static final long GPS_START = 315964800;
+    private static final long GPS_START = ((1980 - 1970) * 365 + 2 + 5) * 86400;
 
     //~ Methoden ----------------------------------------------------------
 
