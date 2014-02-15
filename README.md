@@ -15,10 +15,13 @@ Current state and introduction:
 
 On 2014-02-15 I have published the first release of Time4J as initial version v0.1-alpha. A development process of more than two years has preceded this big milestone. Although this is just the begin of release cycles, Time4J is now really useable for many applications. Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
-PlainDate = calendar date strictly following ISO-8601
-PlainTime = wall time (on an analogous clock) including 24:00-support
-PlainTimestamp = local timestamp as composition of calendar date and wall time
-Moment = global timestamp which refers to true UTC standard including leapsecond-support
+- PlainDate = calendar date strictly following ISO-8601
+
+- PlainTime = wall time (on an analogous clock) including 24:00-support
+
+- PlainTimestamp = local timestamp as composition of calendar date and wall time
+
+- Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
 Here some examples as a flavour of how Time4J-code looks like:
 
