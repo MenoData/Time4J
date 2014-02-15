@@ -16,11 +16,8 @@ Current state and introduction:
 On 2014-02-15 I have published the first release of Time4J as initial version v0.1-alpha. A development process of more than two years has preceded this big milestone. Although this is just the begin of release cycles, Time4J is now really useable for many applications. Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
 - PlainDate = calendar date strictly following ISO-8601
-
 - PlainTime = wall time (on an analogous clock) including 24:00-support
-
 - PlainTimestamp = local timestamp as composition of calendar date and wall time
-
 - Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
 Here some examples as a flavour of how Time4J-code looks like:
@@ -47,9 +44,9 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 
   System.out.println(
     "Japan-Time: " +
-    Formatters.localizedPattern("yyyy-MM-dd'T'HH:mm:ss")
+    Formatters.localizedPattern("yyyy-MM-dd'T'HH:mm:ssXX")
               .withTimezone(TZID.ASIA.TOKYO)
-              .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60
+              .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60+0900
 ```
 
 Design remarks:
@@ -69,7 +66,7 @@ f) In general Time4J does not try to invent things which are not in any real use
 Plans for next release:
 -----------------------
 
-There are still many features missing. For the next release especially more time zone support is planned, including the support of CLDR-features like "z" in format patterns for time zone names.
+There are still many features missing. For the next release especially more time zone support is planned, including the support of CLDR-features like "z" in format patterns for time zone names. A strong focus will also be more english translations and documentation.
 
 Downloads:
 ----------
