@@ -43,8 +43,8 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
   System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
 
   System.out.println(
-    "Japan-Time: " +
-    Formatters.localizedPattern("yyyy-MM-dd'T'HH:mm:ssXX")
+    "Japan-Time: "
+    + Formatters.localizedPattern("yyyy-MM-dd'T'HH:mm:ssXX")
               .withTimezone(TZID.ASIA.TOKYO)
               .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60+0900
 ```
