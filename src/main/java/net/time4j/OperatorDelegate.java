@@ -68,9 +68,9 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
         this.element = element;
         this.type = OperatorType.ROLLING;
 
-        if (element == PlainTime.CLOCK_HOUR_OF_DAY) {
+        if (e == PlainTime.CLOCK_HOUR_OF_DAY) {
             e = PlainTime.DIGITAL_HOUR_OF_DAY;
-        } else if (element == PlainTime.CLOCK_HOUR_OF_AMPM) {
+        } else if (e == PlainTime.CLOCK_HOUR_OF_AMPM) {
             e = PlainTime.DIGITAL_HOUR_OF_AMPM;
         }
 
@@ -210,19 +210,21 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
         boolean up
     ) {
 
+        Object compare = element; // stellt JDK-6 zufrieden
+
         if (
-            (element == PlainTime.MILLI_OF_SECOND)
-            || (element == PlainTime.MILLI_OF_DAY)
+            (compare == PlainTime.MILLI_OF_SECOND)
+            || (compare == PlainTime.MILLI_OF_DAY)
         ) {
             return new FractionOperator<T>('3', up);
         } else if (
-            (element == PlainTime.MICRO_OF_SECOND)
-            || (element == PlainTime.MICRO_OF_DAY)
+            (compare == PlainTime.MICRO_OF_SECOND)
+            || (compare == PlainTime.MICRO_OF_DAY)
         ) {
             return new FractionOperator<T>('6', up);
         } else if (
-            (element == PlainTime.NANO_OF_SECOND)
-            || (element == PlainTime.NANO_OF_DAY)
+            (compare == PlainTime.NANO_OF_SECOND)
+            || (compare == PlainTime.NANO_OF_DAY)
         ) {
             return new FractionOperator<T>('9', up);
         }

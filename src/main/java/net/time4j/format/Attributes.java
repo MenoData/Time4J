@@ -783,7 +783,9 @@ public final class Attributes
 
             this.attributes.put(key.name(), value);
 
-            if (key == Attributes.LENIENCY) {
+            Object compare = key; // stellt JDK-6 zufrieden
+
+            if (compare == Attributes.LENIENCY) {
                 switch (Leniency.class.cast(value)) {
                     case STRICT:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, false);

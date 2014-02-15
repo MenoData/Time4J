@@ -358,9 +358,9 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     // optional
-    private <V> ElementRule<?, V> getEpochRule(ChronoElement<V> element) {
+    private <V> ElementRule<?, ?> getEpochRule(ChronoElement<V> element) {
 
-        ElementRule<?, V> ret = null;
+        ElementRule<?, ?> ret = null;
 
         if (Calendrical.class.isAssignableFrom(this.chronoType)) {
             Chronology<?> foreign = null;
@@ -415,20 +415,16 @@ public class Chronology<T extends ChronoEntity<T>>
 
     }
 
-    private static
-    <S extends Calendrical<?, S>, T extends Calendrical<?, T>, V>
-    ElementRule<?, V> createRuleByEpoch(
-        ChronoElement<V> element,
-        Class<?> fc, // foreign chronology
-        Class<?> tc // this chronology
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static ElementRule<?, ?> createRuleByEpoch(
+        ChronoElement<?> element,
+        Class fc, // foreign chronology
+        Class tc // this chronology
     ) {
 
 
-        Class<S> fcc = cast(fc);
-        Class<T> tcc = cast(tc);
-        Chronology<S> engine = Chronology.lookup(fcc);
-        ElementRule<S, V> rule = engine.getRule(element, false);
-        return new TransformingRule<S, T, V>(rule, fcc, tcc);
+        ElementRule rule = Chronology.lookup(fc).getRule(element, false);
+        return new TransformingRule(rule, fc, tc);
 
     }
 
