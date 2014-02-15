@@ -8,7 +8,7 @@ Motivation:
 
 Time4J is thought as a complete and high-end replacement for old java classes around java.util.Date, java.util.Calendar and java.text.SimpleDateFormat. This project is also intended as first-class alternative to the popular libraries JodaTime and its successor JSR-310 (Threeten) since the target audience of Time4J will not only be business Java developers, but also developers with a more scientific background (for example extended time scale support including leap seconds or historically accurate dates).
 
-Although the new JSR-310 (built in Java 8) is certainly a very useful library for many business developers it also has some severe and intentional limitations. Time4J intends to fill all gaps in the future.
+Although the new JSR-310 (built in Java 8) is certainly a very useful library for many business developers it also has some severe and intentional limitations. Time4J intends to fill all gaps in the future so justifying its co-existence.
 
 Current state and introduction:
 -------------------------------
@@ -51,7 +51,7 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 
 Design remarks:
 
-a) Although Time4J is strongly generified users will not really use any generics in their application code as demonstrated in example code, but are more or less type-safe at compile-time. For example, it is impossible to add clock units to a calendar date.
+a) Safety: Although Time4J is strongly generified users will not really use any generics in their application code as demonstrated in example code, but are more or less type-safe at compile-time. For example, it is impossible to add clock units to a calendar date. This is in contrast to JSR-310 which heavily relies on runtime exceptions. Otherwise Time4J shares the advantages like immutability and non-tolerant null-handling.
 
 b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And if they want the default then they spell it so in methods like: "inSystemTimezone()" or "localizedPattern(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
 
