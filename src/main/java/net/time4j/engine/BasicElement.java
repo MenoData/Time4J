@@ -1,0 +1,202 @@
+/*
+ * -----------------------------------------------------------------------
+ * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
+ * -----------------------------------------------------------------------
+ * This file (BasicElement.java) is part of project Time4J.
+ *
+ * Time4J is free software: You can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Time4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Time4J. If not, see <http://www.gnu.org/licenses/>.
+ * -----------------------------------------------------------------------
+ */
+
+package net.time4j.engine;
+
+import java.io.Serializable;
+
+
+/**
+ * <p>Abstrakte Basisimplementierung eines chronologischen Elements, das
+ * einen Namen hat und bei Bedarf auch eigene Regeln definieren kann. </p>
+ *
+ * @param   <V> generic type of element values
+ * @author  Meno Hochschild
+ */
+public abstract class BasicElement<V>
+    implements ChronoElement<V>, Serializable {
+
+    //~ Instanzvariablen --------------------------------------------------
+
+    /**
+     * @serial  Elementname
+     */
+    private final String name;
+
+    //~ Konstruktoren -----------------------------------------------------
+
+    /**
+     * <p>Konstruktor f&uuml;r Subklassen, die eine so erzeugte Instanz
+     * in der Regel statischen Konstanten zuweisen und damit Singletons
+     * erzeugen k&ouml;nnen. </p>
+     *
+     * @param   name            name of element
+     * @throws  IllegalArgumentException if the name is empty or only
+     *          contains <i>white space</i> (spaces, tabs etc.)
+     * @see     ChronoElement#name()
+     */
+    protected BasicElement(String name) {
+        super();
+
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                "Element name is empty or contains only white space.");
+        }
+
+        this.name = name;
+
+    }
+
+    //~ Methoden ----------------------------------------------------------
+
+    @Override
+    public final String name() {
+
+        return this.name;
+
+    }
+
+    /**
+     * <p>Standardm&auml;&szlig;ig gibt es kein Formatsymbol. </p>
+     *
+     * <p>Um ein Formatsymbol zu definieren, m&uuml;ssen Subklassen diese
+     * Methode geeignet &uuml;berschreiben. Gleichzeitig sollte eine solche
+     * Elementinstanz mittels der Annotation {@code FormattableElement}
+     * das Symbol dokumentieren. </p>
+     *
+     * @return  ASCII-0 (placeholder for an undefined format symbol)
+     * @see     FormattableElement
+     */
+    @Override
+    public char getSymbol() {
+
+        return '\u0000';
+
+    }
+
+    /**
+     * <p>Chronologische Elemente verhalten sich standardm&auml;&szlig;ig
+     * strikt und nicht nachsichtig. </p>
+     *
+     * @return  {@code false}
+     */
+    @Override
+    public boolean isLenient() {
+
+        return false;
+
+    }
+
+    /**
+     * <p>Basiert auf der Gleichheit der Elementnamen UND Elementklassen. </p>
+     *
+     * @return  {@code true} if this instance and the argument are of same
+     *          class and have same names else {@code false}
+     */
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (this.getClass() == obj.getClass()) {
+            return this.name.equals(((BasicElement) obj).name);
+        } else {
+            // Verletzung des Liskov-Prinzips, siehe Effective Java, Seite 39.
+            // Aber hier gilt auch: Mit verschiedenen Klassen ist generell ein
+            // anderes Verhalten (z.B. verschiedene Elementregeln) verknüpft!
+            return false;
+        }
+
+    }
+
+    /**
+     * <p>Basiert auf dem Elementnamen. </p>
+     *
+     * @return  int
+     */
+    @Override
+    public int hashCode() {
+
+        return this.name.hashCode();
+
+    }
+
+    /**
+     * <p>Dient vornehmlich der Debugging-Unterst&uuml;tzung. </p>
+     *
+     * <p>F&uuml;r Anzeigezwecke sollte die Methode {@link #name()}
+     * verwendet werden. </p>
+     *
+     * @return  String
+     */
+    @Override
+    public String toString() {
+
+        String className = this.getClass().getName();
+        StringBuilder sb = new StringBuilder(className.length() + 32);
+        sb.append(className);
+        sb.append('@');
+        sb.append(this.name);
+        return sb.toString();
+
+    }
+
+    /**
+     * <p>Leitet eine optionale Elementregel f&uuml;r die angegebene
+     * Chronologie ab. </p>
+     *
+     * <p>Hinweis: Diese Implementierung liefert {@code null}. Subklassen,
+     * deren Elementinstanzen nicht in einer Chronologie registriert sind,
+     * m&uuml;ssen die Methode geeignet &uuml;berschreiben. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology  chronology an element rule is searched for
+     * @return  element rule or {@code null} if given chronology is unsupported
+     */
+    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(
+        Chronology<T> chronology
+    ) {
+
+        return null;
+
+    }
+
+    /**
+     * <p>Verweist auf ein anderes Element, das eine Basiseinheit in einer
+     * Chronologie haben kann. </p>
+     *
+     * <p>Diese Methode kann von nicht-registrierten Erweiterungselementen
+     * &uuml;berschrieben werden, um einer Chronologie zu helfen, welche
+     * Basiseinheit mit diesem Element zu verkn&uuml;pfen ist. </p>
+     *
+     * @return  parent element registered on a time axis for helping
+     *          retrieving a base unit for this element or {@code null}
+     * @see     TimeAxis#getBaseUnit(ChronoElement)
+     */
+    protected ChronoElement<?> getParent() {
+
+        return null;
+
+    }
+
+}
