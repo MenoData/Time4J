@@ -28,9 +28,17 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
+import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+import static net.time4j.Weekday.WEDNESDAY;
 
+  // When is next wednesday?
+  PlainDate today = ZonalClock.SYSTEM.today();
+  PlainDate nextWednesday =
+    today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
+  System.out.println(nextWednesday);
 
+  // What is the current time rounded down to multiples of 5 minutes?
   PlainTimestamp currentLocalTimestamp =
     SystemClock.inTimezone(TZID.EUROPE.BERLIN).now();
   PlainTime roundedTime =
@@ -39,6 +47,7 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
                          .with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
   System.out.println("Rounded wall time: " + roundedTime);
 
+  // How does last UTC-leapsecond look like in Japan?
   Moment leapsecondUTC =
     PlainDate.of(2012, Month.JUNE, 30)
     .atTime(PlainTime.atEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
@@ -75,7 +84,7 @@ There are still many features missing. For the next release especially more time
 Downloads and Requirements:
 ---------------------------
 
-You can find any downloads on the release page. Time4J will run at least under Java 6. If you want to build it yourself from sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
+You can find any downloads on the release page. Time4J will run at least under Java 6 or later. If you want to build it yourself from sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
 
 Tutorials:
 ----------
