@@ -24,7 +24,10 @@ Here some examples as a flavour of how Time4J-code looks like:
 
 ```java
 import net.time4j.*;
+import net.time4j.tz.TZID;
 import net.time4j.tz.TransitionStrategy;
+import net.time4j.tz.ZonalOffset;
+
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 
 
@@ -34,6 +37,7 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
     currentLocalTimestamp.getWallTime() // T22:06:52,688
                          .with(MINUTE_OF_HOUR.atFloor()) // T22:06
                          .with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
+  System.out.println("Rounded wall time: " + roundedTime);
 
   Moment leapsecondUTC =
     PlainDate.of(2012, Month.JUNE, 30)
