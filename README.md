@@ -72,10 +72,10 @@ Plans for next release:
 
 There are still many features missing. For the next release especially more time zone support is planned, including the support of CLDR-features like "z" in format patterns for time zone names. A strong focus will also be more english translations and documentation.
 
-Downloads:
-----------
+Downloads and Requirements:
+---------------------------
 
-You can find any downloads on the release page.
+You can find any downloads on the release page. Time4J will run at least under Java 6. If you want to build it yourself from sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
 
 Tutorials:
 ----------
