@@ -28,9 +28,17 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.PlainDate.DAY_OF_MONTH;
 import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static net.time4j.Weekday.WEDNESDAY;
+
+  // What is the last day of overnext month?
+  System.out.println(
+      ZonalClock.SYSTEM.today()
+          .plus(2, MONTHS)
+          .with(DAY_OF_MONTH.maximized()));
 
   // When is next wednesday?
   PlainDate today = ZonalClock.SYSTEM.today();
