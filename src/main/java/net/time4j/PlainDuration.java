@@ -24,12 +24,16 @@ package net.time4j;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AbstractDuration;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
+import net.time4j.tz.TZID;
+import net.time4j.tz.TransitionStrategy;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -963,6 +967,86 @@ public final class PlainDuration<U extends IsoUnit>
     }
 
     /**
+     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
+     * der UTC-Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
+     * wird. </p>
+     *
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #later()
+     */
+    public ChronoOperator<Moment> earlier() {
+
+        return this.earlier(ZonalOffset.UTC, TransitionStrategy.PUSH_FORWARD);
+
+    }
+
+    /**
+     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
+     * der angegebenen Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
+     * wird. </p>
+     *
+     * @param   timezone    time zone id
+     * @param   strategy    conflict resolving strategy
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #later(TZID,TransitionStrategy)
+     */
+    public ChronoOperator<Moment> earlier(
+        final TZID timezone,
+        final TransitionStrategy strategy
+    ) {
+
+        return new ChronoOperator<Moment>() {
+            @Override
+            public Moment apply(Moment entity) {
+                PlainTimestamp ts =
+                    entity.inTimezone(timezone).minus(PlainDuration.this);
+                return ts.inTimezone(timezone, strategy);
+            }
+        };
+
+    }
+
+    /**
+     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
+     * der UTC-Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
+     * wird. </p>
+     *
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #earlier()
+     */
+    public ChronoOperator<Moment> later() {
+
+        return this.later(ZonalOffset.UTC, TransitionStrategy.PUSH_FORWARD);
+
+    }
+
+    /**
+     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
+     * der angegebenen Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
+     * wird. </p>
+     *
+     * @param   timezone    time zone id
+     * @param   strategy    conflict resolving strategy
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #earlier(TZID,TransitionStrategy)
+     */
+    public ChronoOperator<Moment> later(
+        final TZID timezone,
+        final TransitionStrategy strategy
+    ) {
+
+        return new ChronoOperator<Moment>() {
+            @Override
+            public Moment apply(Moment entity) {
+                PlainTimestamp ts =
+                    entity.inTimezone(timezone).plus(PlainDuration.this);
+                return ts.inTimezone(timezone, strategy);
+            }
+        };
+
+    }
+
+    /**
      * <p>Basiert auf allen gespeicherten Zeitspannenelementen und dem
      * Vorzeichen. </p>
      *
@@ -1374,7 +1458,9 @@ public final class PlainDuration<U extends IsoUnit>
                 } else if (neg.booleanValue() != nsign) {
                     throw new IllegalStateException(
                         "Mixed signs in result time span not allowed: "
-                        + duration + " UNION " + timespan);
+                        + duration
+                        + " UNION "
+                        + (inverse ? "-" : "") + timespan);
                 }
             }
         }
