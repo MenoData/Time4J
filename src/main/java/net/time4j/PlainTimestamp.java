@@ -515,12 +515,28 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen Offset
+     * zu einem UTC-Zeitstempel. </p>
+     *
+     * @param   offset      fixed time zone offset
+     * @return  global timestamp  based on this local timestamp interpreted
+     *          at given time zone offset
+     */
+    public Moment atOffset(ZonalOffset offset) {
+
+        return this.inTimezone(offset, TransitionStrategy.PUSH_FORWARD);
+
+    }
+
+    /**
      * <p>Kombiniert diesen lokalen Zeitstempel mit der System-Zeitzone
      * zu einem UTC-Zeitstempel. </p>
      *
      * @return  global timestamp based on this local timestamp interpreted
      *          in system time zone
      * @see     TimeZone#ofSystem()
+     * @see     #inTimezone(TZID,TransitionStrategy)
+     * @see     #atOffset(ZonalOffset)
      */
     public Moment inSystemTimezone() {
 
@@ -540,6 +556,8 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given time zone
      * @see     TimeZone#of(TZID)
+     * @see     #inSystemTimezone()
+     * @see     #atOffset(ZonalOffset)
      */
     public Moment inTimezone(
         TZID tzid,
