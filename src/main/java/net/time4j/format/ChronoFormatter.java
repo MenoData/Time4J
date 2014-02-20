@@ -1944,8 +1944,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Collections.singletonList("Z"))}. </p>
          *
          * @return  this instance for method chaining
-         * @throws  IllegalStateException if the chronology is not compatible
-         *          with {@code UnixTime}
          */
         public Builder<T> addTimezoneOffset() {
 
@@ -1958,8 +1956,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>F&uuml;gt einen Zeitzonen-Offset in kanonischer Notation
          * hinzu. </p>
          *
-         * <p>In Abh&auml;ngigkeit von den Argumenten sind folgende Formate
-         * definiert: </p>
+         * <p>Anwendbar ist dieses Formatierungselement auch auf lokale
+         * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
+         * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
+         * {@code ChronoFormatter} mitgegeben wird. In Abh&auml;ngigkeit
+         * von den Argumenten sind folgende Formate definiert: </p>
          *
          * <div style="margin-top:5px;">
          * <table border="1">
@@ -2003,8 +2004,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   extended        extended or basic ISO-8601-mode
          * @param   zeroOffsets     list of replacement texts if offset is zero
          * @return  this instance for method chaining
-         * @throws  IllegalStateException if the chronology is not compatible
-         *          with {@code UnixTime}
          * @throws  IllegalArgumentException if replacement text consists
          *          of white-space only
          * @see     TimeZone#identifier()
@@ -2015,15 +2014,50 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             List<String> zeroOffsets
         ) {
 
-            Class<T> type = this.chronology.getChronoType();
-
-            if (!UnixTime.class.isAssignableFrom(type)) {
-                throw new IllegalStateException(
-                    "Cannot add time zone offset for a local type: " + type);
-            }
-
             this.appendProcessor(
                 new TimezoneOffsetProcessor(precision, extended, zeroOffsets));
+            return this;
+
+        }
+
+        /**
+         * <p>F&uuml;gt einen Zeitzonen-Offset in lokalisierter Notation
+         * hinzu. </p>
+         *
+         * <p>Anwendbar ist dieses Formatierungselement auch auf lokale
+         * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
+         * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
+         * {@code ChronoFormatter} mitgegeben wird. In Abh&auml;ngigkeit
+         * von den Argumenten sind folgende Formate definiert: </p>
+         *
+         * <div style="margin-top:5px;">
+         * <table border="1">
+         * <tr>
+         *  <th>ABBREVIATED</th>
+         *  <th>FULL</th>
+         * </tr>
+         * <tr>
+         *  <td>GMT&#x00B1;H[:mm]</td>
+         *  <td>GMT&#x00B1;HH:mm</td>
+         * </tr>
+         * </table>
+         * </div>
+         *
+         * <p>Hinweise: Die in eckigen Klammern angegebene Minutenkomponente
+         * ist im Kurzformat optional, erscheint also nur, wenn sie von
+         * {@code 0} verschieden ist. Das GMT-Pr&auml;fix darf beim Parsen
+         * auch als &quot;UTC&quot; oder &quot;UT&quot; vorliegen. Auch ist
+         * eine lokalisierte GMT-Notation m&ouml;glich, indem in den
+         * Ressourcendateien &quot;iso8601.properties&quot; ein Eintrag mit
+         * dem Schl&uuml;ssel &quot;prefixGMTOffset&quot; vorhanden ist. </p>
+         *
+         * @param   abbreviated     using shortest possible form?
+         * @return  this instance for method chaining
+         * @see     TimeZone#identifier()
+         */
+        public Builder<T> addLocalizedOffset(boolean abbreviated) {
+
+            this.appendProcessor(new LocalizedGMTProcessor(abbreviated));
             return this;
 
         }

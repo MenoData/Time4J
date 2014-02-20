@@ -46,6 +46,9 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static net.time4j.format.TextWidth.ABBREVIATED;
+import static net.time4j.format.TextWidth.SHORT;
+
 
 /**
  * <p>Quelle f&uuml;r lokalisierte kalendarische Informationen auf Enum-Basis
@@ -143,11 +146,7 @@ public final class CalendarText {
                 qo.put(
                     oc,
                     new Accessor(
-                        p.quarters(
-                            calendarType,
-                            locale,
-                            tw.ordinal(),
-                            oc.ordinal()),
+                        p.quarters(calendarType, locale, tw, oc),
                         locale));
             }
             qt.put(tw, qo);
@@ -165,11 +164,7 @@ public final class CalendarText {
                 wo.put(
                     oc,
                     new Accessor(
-                        p.weekdays(
-                            calendarType,
-                            locale,
-                            tw.ordinal(),
-                            oc.ordinal()),
+                        p.weekdays(calendarType, locale, tw, oc),
                         locale));
             }
             wt.put(tw, wo);
@@ -182,8 +177,7 @@ public final class CalendarText {
         for (TextWidth tw : TextWidth.values()) {
             et.put(
                 tw,
-                new Accessor(
-                    p.eras(calendarType, locale, tw.ordinal()), locale));
+                new Accessor(p.eras(calendarType, locale, tw), locale));
         }
 
         this.eras = Collections.unmodifiableMap(et);
@@ -193,8 +187,7 @@ public final class CalendarText {
         for (TextWidth tw : TextWidth.values()) {
             mt.put(
                 tw,
-                new Accessor(
-                    p.meridiems(calendarType, locale, tw.ordinal()), locale));
+                new Accessor(p.meridiems(calendarType, locale, tw), locale));
         }
 
         this.meridiems = Collections.unmodifiableMap(mt);
@@ -326,10 +319,10 @@ public final class CalendarText {
     /**
      * <p>Ermittelt eine sortierte Liste aller Quartalsnamen. </p>
      *
-     * <p>Die Liste ist wie das Enum {@code IsoQuarter} sortiert und verwendet
+     * <p>Die Liste ist wie das Enum {@code Quarter} sortiert und verwendet
      * dessen Ordinalindex als Listenindex. ISO-Systeme definieren den
      * Zeitraum Januar-M&auml;rz als erstes Quartal usw. und insgesamt
-     * 4 Quartale. </p>
+     * 4 Quartale pro Kalenderjahr. </p>
      *
      * @param   textWidth       text width of displayed quarter name
      * @param   outputContext   output context (stand-alone?)
@@ -433,9 +426,6 @@ public final class CalendarText {
      * diese Methode einfach den Namen des mit dem Element assoziierten
      * enum-Werts. </p>
      *
-     * <p>Notiz: ISO-Systeme rufen diese Methode nicht auf. Ein Versuch wird
-     * in der Regel mit einer {@code MissingResourceException} quittiert. </p>
-     *
      * @param   <V> generic type of element values based on enums
      * @param   element     element text forms are searched for
      * @param   variants    text form variants (optional)
@@ -452,7 +442,7 @@ public final class CalendarText {
             throw new MissingResourceException(
                 this.mre.getMessage(),
                 this.mre.getClassName(),
-                this.mre.getKey()); // kein Aufruf in ISO-Systemen
+                this.mre.getKey());
         }
 
         V[] enums = element.getType().getEnumConstants();
@@ -495,6 +485,24 @@ public final class CalendarText {
         }
 
         return new Accessor(tfs, this.textForms.getLocale());
+
+    }
+
+    /**
+     * <p>Liefert das lokalisierte GMT-Pr&auml;fix, das im
+     * <i>localized GMT format</i> von CLDR benutzt wird. </p>
+     *
+     * @return  localized GMT-String defaults to &quot;GMT&quot;
+     */
+    public static String getGMTPrefix(Locale locale) {
+
+        CalendarText ct = CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
+
+        if (ct.textForms == null) {
+            return "GMT";
+        }
+
+        return ct.textForms.getString("prefixGMTOffset");
 
     }
 
@@ -555,20 +563,10 @@ public final class CalendarText {
                 new EnumMap<OutputContext, Accessor>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 String[] ls =
-                    p.months(
-                        calendarType,
-                        locale,
-                        tw.ordinal(),
-                        oc.ordinal(),
-                        leapForm);
+                    p.months(calendarType, locale, tw, oc, leapForm);
                 if (leapForm && !usesDifferentLeapForm) {
                     String[] std =
-                        p.months(
-                            calendarType,
-                            locale,
-                            tw.ordinal(),
-                            oc.ordinal(),
-                            false);
+                        p.months(calendarType, locale, tw, oc, false);
                     usesDifferentLeapForm = !Arrays.equals(std, ls);
                 }
                 mo.put(oc, new Accessor(ls, locale));
@@ -657,10 +655,8 @@ public final class CalendarText {
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
-         * @param   textWidth       text width as ordinal number in enum
-         *                          {@link TextWidth}
-         * @param   outputContext   output context as ordinal number in enum
-         *                          {@link OutputContext}
+         * @param   textWidth       text width
+         * @param   outputContext   output context
          * @param   leapForm        use leap form (for example the hebrew
          *                          month &quot;Adar II&quot;)?
          * @return  unmodifiable sorted array of month names
@@ -668,8 +664,8 @@ public final class CalendarText {
         String[] months(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext,
+            TextWidth textWidth,
+            OutputContext outputContext,
             boolean leapForm
         );
 
@@ -678,17 +674,15 @@ public final class CalendarText {
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
-         * @param   textWidth       text width as ordinal number in enum
-         *                          {@link TextWidth}
-         * @param   outputContext   output context as ordinal number in enum
-         *                          {@link OutputContext}
+         * @param   textWidth       text width
+         * @param   outputContext   output context
          * @return  unmodifiable sorted array of quarter names
          */
         String[] quarters(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         );
 
         /**
@@ -696,18 +690,16 @@ public final class CalendarText {
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
-         * @param   textWidth       text width as ordinal number in enum
-         *                          {@link TextWidth}
-         * @param   outputContext   output context as ordinal number in enum
-         *                          {@link OutputContext}
+         * @param   textWidth       text width
+         * @param   outputContext   output context
          * @return  unmodifiable sorted array of weekday names
          *          in calendar specific order (ISO-8601 starts with monday)
          */
         String[] weekdays(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         );
 
         /**
@@ -715,14 +707,13 @@ public final class CalendarText {
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
-         * @param   textWidth       text width as ordinal number in enum
-         *                          {@link TextWidth}
+         * @param   textWidth       text width
          * @return  unmodifiable sorted array of era names
          */
         String[] eras(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         );
 
         /**
@@ -730,14 +721,13 @@ public final class CalendarText {
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
-         * @param   textWidth       text width as ordinal number in enum
-         *                          {@link TextWidth}
+         * @param   textWidth       text width
          * @return  unmodifiable sorted array of AM/PM-names
          */
         String[] meridiems(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         );
 
     }
@@ -954,28 +944,60 @@ public final class CalendarText {
         public String[] months(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext,
+            TextWidth textWidth,
+            OutputContext outputContext,
             boolean leapForm
         ) {
 
+            try {
+                ResourceBundle rb = getBundle(locale);
+
+                if (
+                    (rb != null)
+                    && (outputContext == OutputContext.STANDALONE)
+                    && "true".equals(rb.getObject("enableStandalone"))
+                ) {
+                    String[] names = new String[12];
+
+                    for (int m = 0; m < 12; m++) {
+                        StringBuilder skey = new StringBuilder();
+                        skey.append("MONTH_OF_YEAR(");
+                        skey.append(textWidth);
+                        skey.append('|');
+                        skey.append(outputContext);
+                        skey.append(")_");
+                        skey.append(m + 1);
+                        names[m] = rb.getString(skey.toString());
+                    }
+
+                    return names;
+                }
+            } catch (MissingResourceException ex) {
+                // continue standard case
+            }
+
+            // Normalfall
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
-            if (textWidth == TextWidth.WIDE.ordinal()) {
-                return dfs.getMonths();
-            } else if (textWidth == TextWidth.NARROW.ordinal()) {
-                String[] months = dfs.getShortMonths();
-                String[] ret = new String[months.length];
-                for (int i = 0, n = months.length; i < n; i++) {
-                    if (!months[i].isEmpty()) {
-                        ret[i] = toLatinLetter(months[i]);
-                    } else {
-                        ret[i] = String.valueOf(i + 1);
+            switch (textWidth) {
+                case WIDE:
+                    return dfs.getMonths();
+                case ABBREVIATED:
+                case SHORT:
+                    return dfs.getShortMonths();
+                case NARROW:
+                    String[] months = dfs.getShortMonths();
+                    String[] ret = new String[months.length];
+                    for (int i = 0, n = months.length; i < n; i++) {
+                        if (!months[i].isEmpty()) {
+                            ret[i] = toLatinLetter(months[i]);
+                        } else {
+                            ret[i] = String.valueOf(i + 1);
+                        }
                     }
-                }
-                return ret;
-            } else {
-                return dfs.getShortMonths();
+                    return ret;
+                default:
+                    throw new UnsupportedOperationException(textWidth.name());
             }
 
         }
@@ -984,16 +1006,50 @@ public final class CalendarText {
         public String[] quarters(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
 
-            // TODO: TextWidth.WIDE => "2nd quarter" etc. (properties-file?)
-            if (textWidth == TextWidth.NARROW.ordinal()) {
-                return new String[] {"1", "2", "3", "4"};
-            } else {
-                return new String[] {"Q1", "Q2", "Q3", "Q4"};
+            ResourceBundle rb = getBundle(locale);
+
+            if (rb != null) {
+                if (
+                    (outputContext == OutputContext.STANDALONE)
+                    && !"true".equals(rb.getObject("enableStandalone"))
+                ) {
+                    return quarters(
+                        calendarType, locale, textWidth, OutputContext.FORMAT);
+                }
+
+                String[] names = new String[4];
+                boolean useFallback = false;
+
+                for (int q = 0; q < 4; q++) {
+                    StringBuilder skey = new StringBuilder();
+                    skey.append("QUARTER_OF_YEAR(");
+                    skey.append(textWidth);
+                    if (outputContext == OutputContext.STANDALONE) {
+                        skey.append('|');
+                        skey.append(outputContext);
+                    }
+                    skey.append(")_");
+                    skey.append(q + 1);
+
+                    try {
+                        names[q] = rb.getString(skey.toString());
+                    } catch (MissingResourceException ex) {
+                        useFallback = true;
+                        break;
+                    }
+                }
+
+                if (!useFallback) {
+                    return names;
+                }
+
             }
+
+            return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
 
         }
 
@@ -1001,31 +1057,68 @@ public final class CalendarText {
         public String[] weekdays(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
+
+            ResourceBundle rb = getBundle(locale);
+
+            try {
+                if (
+                    (rb != null)
+                    && (outputContext == OutputContext.STANDALONE)
+                    && "true".equals(rb.getObject("enableStandalone"))
+                ) {
+                    String[] names = new String[7];
+
+                    for (int d = 0; d < 7; d++) {
+                        StringBuilder skey = new StringBuilder();
+                        skey.append("DAY_OF_WEEK(");
+                        skey.append(textWidth);
+                        skey.append('|');
+                        skey.append(outputContext);
+                        skey.append(")_");
+                        skey.append(d + 1);
+                        names[d] = rb.getString(skey.toString());
+                    }
+
+                    return names;
+                }
+            } catch (MissingResourceException ex) {
+                // continue standard case
+            }
 
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
             String[] result;
 
             switch (textWidth) {
-                case 0: // TextWidth.WIDE
+                case WIDE:
                     result = dfs.getWeekdays();
                     break;
-                case 1: // TextWidth.ABBREVIATED
+                case ABBREVIATED:
                     result = dfs.getShortWeekdays();
                     break;
-                case 2: // TextWidth.SHORT
+                case SHORT:
                     result = dfs.getShortWeekdays();
-                    if (result[1].length() >= 3) {
-                        String[] temp = new String[result.length];
-                        for (int i = 1; i < result.length; i++) {
-                            temp[i] = result[i].substring(0, 2);
+
+                    if (rb != null) {
+                        try {
+                            String[] names = new String[7];
+
+                            for (int d = 0; d < 7; d++) {
+                                StringBuilder skey = new StringBuilder();
+                                skey.append("DAY_OF_WEEK(SHORT)_");
+                                skey.append(d + 1);
+                                names[d] = rb.getString(skey.toString());
+                            }
+
+                            result = names;
+                        } catch (MissingResourceException mre) {
+                            // no-op
                         }
-                        result = temp;
                     }
                     break;
-                case 3: // TextWidth.NARROW
+                case NARROW:
                     String[] weekdays = dfs.getShortWeekdays();
                     String[] ret = new String[weekdays.length];
                     for (int i = 1; i < weekdays.length; i++) {
@@ -1060,12 +1153,12 @@ public final class CalendarText {
         public String[] eras(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         ) {
 
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
-            if (textWidth == TextWidth.NARROW.ordinal()) {
+            if (textWidth == TextWidth.NARROW) {
                 String[] eras = dfs.getEras();
                 String[] ret = new String[eras.length];
                 for (int i = 0, n = eras.length; i < n; i++) {
@@ -1090,12 +1183,12 @@ public final class CalendarText {
         public String[] meridiems(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         ) {
 
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
-            if (textWidth == TextWidth.NARROW.ordinal()) {
+            if (textWidth == TextWidth.NARROW) {
                 return new String[] {"A", "P"};
             } else {
                 return dfs.getAmPmStrings();
@@ -1115,6 +1208,19 @@ public final class CalendarText {
                 return String.valueOf(c);
             } else {
                 return input; // NARROW-Form nicht möglich => nichts ändern!
+            }
+
+        }
+
+        private static ResourceBundle getBundle(Locale locale) {
+
+            try {
+                return ResourceBundle.getBundle(
+                    "resources/" + ISO_CALENDAR_TYPE,
+                    locale,
+                    new PropertiesControl());
+            } catch (MissingResourceException ex) {
+                return null;
             }
 
         }
@@ -1140,12 +1246,12 @@ public final class CalendarText {
         public String[] months(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext,
+            TextWidth textWidth,
+            OutputContext outputContext,
             boolean leapForm
         ) {
 
-            if (textWidth == TextWidth.WIDE.ordinal()) {
+            if (textWidth == TextWidth.WIDE) {
                 return new String[] {
                     "01", "02", "03", "04", "05", "06",
                     "07", "08", "09", "10", "11", "12", "13"};
@@ -1161,11 +1267,11 @@ public final class CalendarText {
         public String[] quarters(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
 
-            if (textWidth == TextWidth.NARROW.ordinal()) {
+            if (textWidth == TextWidth.NARROW) {
                 return new String[] {"1", "2", "3", "4"};
             } else {
                 return new String[] {"Q1", "Q2", "Q3", "Q4"};
@@ -1177,8 +1283,8 @@ public final class CalendarText {
         public String[] weekdays(
             String calendarType,
             Locale locale,
-            int textWidth,
-            int outputContext
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
 
             return new String[] {"1", "2", "3", "4", "5", "6", "7"};
@@ -1189,10 +1295,10 @@ public final class CalendarText {
         public String[] eras(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         ) {
 
-            if (textWidth == TextWidth.NARROW.ordinal()) {
+            if (textWidth == TextWidth.NARROW) {
                 return new String[] {"B", "A"};
             } else {
                 return new String[] {"BC", "AD"};
@@ -1204,10 +1310,10 @@ public final class CalendarText {
         public String[] meridiems(
             String calendarType,
             Locale locale,
-            int textWidth
+            TextWidth textWidth
         ) {
 
-            if (textWidth == TextWidth.NARROW.ordinal()) {
+            if (textWidth == TextWidth.NARROW) {
                 return new String[] {"A", "P"};
             } else {
                 return new String[] {"AM", "PM"};

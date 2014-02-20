@@ -240,12 +240,16 @@ public enum PatternType
      *  <tr>
      *      <td>TIMEZONE_OFFSET</td>
      *      <td>Z</td>
-     *      <td>Wird in einem zuk&uuml;nftigen Release unterst&uuml;tzt.</td>
+     *      <td>1-3 Symbole =&gt; siehe xxxx, 4 Symbole =&gt; siehe OOOO,
+     *      5 Symbole = &gt; siehe XXXXX.</td>
      *  </tr>
      *  <tr>
      *      <td>LOCALIZED_GMT_OFFSET</td>
      *      <td>O</td>
-     *      <td>Wird in einem zuk&uuml;nftigen Release unterst&uuml;tzt.</td>
+     *      <td>Ein Symbol f&uuml;r die Kurzform oder 4 Symbole f&uuml;r die
+     *      Langform. Das GMT-Pr&auml;fix kann auch lokalisiert aus der
+     *      &quot;iso8601.properties&quot;-Ressource stammen, zum Schl&uuml;ssel
+     *      &quot;prefixGMTOffset&quot;.</td>
      *  </tr>
      *  <tr>
      *      <td>{generic non-location format of timezone}</td>
@@ -503,10 +507,39 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-            case 'Z':
-            case 'O':
-            case 'V':
                 // TODO: implement time zone name support
+                throw new UnsupportedOperationException(
+                    symbol + " will be supported in a future release.");
+            case 'Z':
+                if (count < 4) {
+                    builder.addTimezoneOffset(
+                        DisplayMode.LONG,
+                        false,
+                        Collections.singletonList("+0000"));
+                } else if (count == 4) {
+                    builder.addLocalizedOffset(false);
+                } else if (count == 5) {
+                    builder.addTimezoneOffset(
+                        DisplayMode.LONG,
+                        true,
+                        Collections.singletonList("Z"));
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
+            case 'O':
+                if (count == 1) {
+                    builder.addLocalizedOffset(true);
+                } else if (count == 4) {
+                    builder.addLocalizedOffset(false);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Count of pattern letters is not 1 or 4: " + count);
+                }
+                break;
+            case 'V':
+                // TODO: implement time zone id support
                 throw new UnsupportedOperationException(
                     symbol + " will be supported in a future release.");
             case 'X':

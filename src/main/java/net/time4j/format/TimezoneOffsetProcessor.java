@@ -37,6 +37,7 @@ import java.util.Set;
 import static net.time4j.tz.ZonalOffset.Sign.AHEAD_OF_UTC;
 import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
 
+
 /**
  * <p>Verarbeitet einen Zeitzonen-Offset. </p>
  *
@@ -249,7 +250,7 @@ final class TimezoneOffsetProcessor
                 ) {
                     parsedResult.put(ZonalElement.TIMEZONE_ID, ZonalOffset.UTC);
                     status.setPosition(pos + zl);
-                    return ;
+                    return;
                 }
             }
         }

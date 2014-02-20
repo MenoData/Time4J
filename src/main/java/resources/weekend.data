@@ -1,0 +1,11 @@
+# ------------------------------------------------------------------------------
+# Version analog zu CLDR-23
+# Die implizite Vorgabe Samstag und Sonntag als Wochenende taucht nicht auf
+# Format:
+# {'start'|'end'}-{'mon'|'tue'|'wed'|'thu'|'fri'|'sat'|'sun'}={ISO-3166-2-codes}
+# ------------------------------------------------------------------------------
+start-thu=AF DZ IR OM SA YE
+start-fri=AE BH EG IL IQ JO KW LY MA QA SD SY TN
+start-sun=IN
+end-fri=AF DZ IR OM SA YE
+end-sat=AE BH EG IL IQ JO KW LY MA QA SD SY TN
