@@ -531,80 +531,6 @@ public final class Moment
     }
 
     /**
-     * <p>Erzeugt eine formatierte Sicht dieser Instanz unter
-     * Ber&uuml;cksichtigung der angegebenen Zeitskala. </p>
-     *
-     * <pre>
-     *  Moment moment =
-     *      PlainDate.of(2012, Month.JUNE, 30)
-     *      .atTime(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
-     *      .inTimezone(ZonalOffset.UTC, TransitionStrategy.STRICT)
-     *      .plus(1, SI.SECONDS);
-     *
-     *  System.out.println(moment.format(TimeScale.POSIX));
-     *  // Ausgabe: POSIX-2012-06-30T23:59:59,999999999Z
-     *
-     *  System.out.println(moment.format(TimeScale.UTC));
-     *  // Ausgabe: UTC-2012-06-30T23:59:60,999999999Z
-     *
-     *  System.out.println(moment.format(TimeScale.TAI));
-     *  // Ausgabe: TAI-2012-07-01T00:00:34,999999999Z
-     *
-     *  System.out.println(moment.format(TimeScale.GPS));
-     *  // Ausgabe: GPS-2012-07-01T00:00:15,999999999Z
-     * </pre>
-     *
-     * @param   scale   time scale to be used for formatting
-     * @return  formatted string with date-time fields in time zone UTC
-     * @throws  IllegalArgumentException if this instance is out of range
-     *          for given time scale
-     * @see     #getElapsedTime(TimeScale)
-     */
-    public String format(TimeScale scale) {
-
-        StringBuilder sb = new StringBuilder(50);
-        sb.append(scale.name());
-        sb.append('-');
-
-        switch (scale) {
-            case POSIX:
-                sb.append(PlainTimestamp.from(this, ZonalOffset.UTC));
-                sb.append('Z');
-                break;
-            case UTC:
-                sb.append(this.toString());
-                break;
-            case TAI:
-                Moment tai =
-                    new Moment(
-                        this.getNanosecond(),
-                        MathUtils.safeAdd(
-                            this.getElapsedTime(TimeScale.TAI),
-                            POSIX_UTC_DELTA)
-                        );
-                sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
-                sb.append('Z');
-                break;
-            case GPS:
-                Moment gps =
-                    new Moment(
-                        this.getNanosecond(),
-                        MathUtils.safeAdd(
-                            this.getElapsedTime(TimeScale.GPS),
-                            POSIX_GPS_DELTA - 9)
-                        );
-                sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
-                sb.append('Z');
-                break;
-            default:
-                throw new UnsupportedOperationException(scale.name());
-        }
-
-        return sb.toString();
-
-    }
-
-    /**
      * <p>Erzeugt eine kanonische Darstellung im ISO-Format
      * [yyyy-MM-ddTHH:mm:ss,fffffffffZ]. </p>
      *
@@ -649,6 +575,80 @@ public final class Moment
 
         // UTC-Symbol anhängen
         sb.append('Z');
+
+        return sb.toString();
+
+    }
+
+    /**
+     * <p>Erzeugt eine formatierte Sicht dieser Instanz unter
+     * Ber&uuml;cksichtigung der angegebenen Zeitskala. </p>
+     *
+     * <pre>
+     *  Moment moment =
+     *      PlainDate.of(2012, Month.JUNE, 30)
+     *      .atTime(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
+     *      .inTimezone(ZonalOffset.UTC, TransitionStrategy.STRICT)
+     *      .plus(1, SI.SECONDS);
+     *
+     *  System.out.println(moment.toString(TimeScale.POSIX));
+     *  // Ausgabe: POSIX-2012-06-30T23:59:59,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.UTC));
+     *  // Ausgabe: UTC-2012-06-30T23:59:60,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.TAI));
+     *  // Ausgabe: TAI-2012-07-01T00:00:34,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.GPS));
+     *  // Ausgabe: GPS-2012-07-01T00:00:15,999999999Z
+     * </pre>
+     *
+     * @param   scale   time scale to be used for formatting
+     * @return  formatted string with date-time fields in time zone UTC
+     * @throws  IllegalArgumentException if this instance is out of range
+     *          for given time scale
+     * @see     #getElapsedTime(TimeScale)
+     */
+    public String toString(TimeScale scale) {
+
+        StringBuilder sb = new StringBuilder(50);
+        sb.append(scale.name());
+        sb.append('-');
+
+        switch (scale) {
+            case POSIX:
+                sb.append(PlainTimestamp.from(this, ZonalOffset.UTC));
+                sb.append('Z');
+                break;
+            case UTC:
+                sb.append(this.toString());
+                break;
+            case TAI:
+                Moment tai =
+                    new Moment(
+                        this.getNanosecond(),
+                        MathUtils.safeAdd(
+                            this.getElapsedTime(TimeScale.TAI),
+                            POSIX_UTC_DELTA)
+                        );
+                sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
+                sb.append('Z');
+                break;
+            case GPS:
+                Moment gps =
+                    new Moment(
+                        this.getNanosecond(),
+                        MathUtils.safeAdd(
+                            this.getElapsedTime(TimeScale.GPS),
+                            POSIX_GPS_DELTA - 9)
+                        );
+                sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
+                sb.append('Z');
+                break;
+            default:
+                throw new UnsupportedOperationException(scale.name());
+        }
 
         return sb.toString();
 

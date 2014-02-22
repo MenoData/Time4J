@@ -61,7 +61,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * <p>Eine Instanz kann entweder &uuml;ber einen {@code Builder} via
  * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaket-Klasse
- * {@link net.time4j.Formatters} liefert einige vordefinierte Format-Objekte,
+ * {@link net.time4j.TemporalFormatters} liefert einige vordefinierte Formate,
  * die dann mit den {@code with()}-Methoden geeignet angepasst werden
  * k&ouml;nnen. </p>
  *

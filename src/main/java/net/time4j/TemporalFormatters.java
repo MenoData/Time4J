@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (Formatters.java) is part of project Time4J.
+ * This file (TemporalFormatters.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextWidth;
@@ -49,7 +50,7 @@ import static net.time4j.PlainTime.WALL_TIME;
  *
  * @author  Meno Hochschild
  */
-public class Formatters {
+public class TemporalFormatters {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -57,63 +58,63 @@ public class Formatters {
      * <p>Definiert das <i>basic</i> ISO-8601-Format mit Jahr, Monat und
      * Tag des Monats im Muster &quot;uuuuMMdd&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> BASIC_CALENDAR_DATE;
+    public static final ChronoFormatter<PlainDate> ISO_BASIC_CALENDAR_DATE;
 
     /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format mit Jahr, Monat und
      * Tag des Monats im Muster &quot;uuuu-MM-dd&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> EXTENDED_CALENDAR_DATE;
+    public static final ChronoFormatter<PlainDate> ISO_EXTENDED_CALENDAR_DATE;
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format mit Jahr und
      * Tag des Jahres im Muster &quot;uuuuDDD&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> BASIC_ORDINAL_DATE;
+    public static final ChronoFormatter<PlainDate> ISO_BASIC_ORDINAL_DATE;
 
     /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format mit Jahr und
      * Tag des Jahres im Muster &quot;uuuu-DDD&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> EXTENDED_ORDINAL_DATE;
+    public static final ChronoFormatter<PlainDate> ISO_EXTENDED_ORDINAL_DATE;
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r ein
      * Wochendatum im Muster &quot;YYYYWwwE&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> BASIC_WEEKDATE;
+    public static final ChronoFormatter<PlainDate> ISO_BASIC_WEEKDATE;
 
     /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r ein
      * Wochendatum im Muster &quot;YYYY-Www-E&quot;. </p>
      */
-    public static final ChronoFormatter<PlainDate> EXTENDED_WEEKDATE;
+    public static final ChronoFormatter<PlainDate> ISO_EXTENDED_WEEKDATE;
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit nur mit Stunde und Minute im Muster &quot;HHmm&quot;. </p>
      */
-    public static final ChronoFormatter<PlainTime> ISO_TIME_HHMM;
-
-    /**
-     * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit nur mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
-     */
-    public static final ChronoFormatter<PlainTime> ISO_TIME_HH_MM;
+    public static final ChronoFormatter<PlainTime> ISO_BASIC_TIME_HH_MM;
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit inklusive Sekunde und optional Nanosekunde im Muster
      * &quot;HHmmss&quot;. </p>
      */
-    public static final ChronoFormatter<PlainTime> ISO_TIME_HHMMSS;
+    public static final ChronoFormatter<PlainTime> ISO_BASIC_TIME_HH_MM_SS;
+
+    /**
+     * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
+     * Uhrzeit nur mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
+     */
+    public static final ChronoFormatter<PlainTime> ISO_EXTENDED_TIME_HH_MM;
 
     /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit inklusive Sekunde und optional Nanosekunde im Muster
      * &quot;HH:mm:ss&quot;. </p>
      */
-    public static final ChronoFormatter<PlainTime> ISO_TIME_HH_MM_SS;
+    public static final ChronoFormatter<PlainTime> ISO_EXTENDED_TIME_HH_MM_SS;
 
     /**
      * <p>Definiert das RFC-1123-Format, das zum Beispiel in Mail-Headers
@@ -133,17 +134,17 @@ public class Formatters {
     public static final ChronoFormatter<Moment> RFC_1123;
 
     static {
-        BASIC_CALENDAR_DATE = calendarFormat(false);
-        EXTENDED_CALENDAR_DATE = calendarFormat(true);
-        BASIC_ORDINAL_DATE = ordinalFormat(false);
-        EXTENDED_ORDINAL_DATE = ordinalFormat(true);
-        BASIC_WEEKDATE = weekdateFormat(false);
-        EXTENDED_WEEKDATE = weekdateFormat(true);
+        ISO_BASIC_CALENDAR_DATE = calendarFormat(false);
+        ISO_EXTENDED_CALENDAR_DATE = calendarFormat(true);
+        ISO_BASIC_ORDINAL_DATE = ordinalFormat(false);
+        ISO_EXTENDED_ORDINAL_DATE = ordinalFormat(true);
+        ISO_BASIC_WEEKDATE = weekdateFormat(false);
+        ISO_EXTENDED_WEEKDATE = weekdateFormat(true);
 
-        ISO_TIME_HHMM = isoFormat(false, false);
-        ISO_TIME_HH_MM = isoFormat(false, true);
-        ISO_TIME_HHMMSS = isoFormat(true, false);
-        ISO_TIME_HH_MM_SS = isoFormat(true, true);
+        ISO_BASIC_TIME_HH_MM = isoFormat(false, false);
+        ISO_EXTENDED_TIME_HH_MM = isoFormat(false, true);
+        ISO_BASIC_TIME_HH_MM_SS = isoFormat(true, false);
+        ISO_EXTENDED_TIME_HH_MM_SS = isoFormat(true, true);
 
         RFC_1123 =
             ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
@@ -180,7 +181,7 @@ public class Formatters {
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private Formatters() {
+    private TemporalFormatters() {
         // no instantiation
     }
 
@@ -197,7 +198,7 @@ public class Formatters {
      * @param   timeFormat      walltime formatter
      * @return  composed format object for a plain timestamp
      */
-    public static ChronoFormatter<PlainTimestamp> compositeFormat(
+    public static ChronoFormatter<PlainTimestamp> compose(
         ChronoFormatter<PlainDate> dateFormat,
         ChronoFormatter<PlainTime> timeFormat
     ) {
@@ -213,14 +214,15 @@ public class Formatters {
     }
 
     /**
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen CLDR-Musters
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung und in der
      * System-Zeitzone. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen-Offsets
+     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
      * angepasst werden. </p>
      *
-     * @param   cldr    format pattern in CLDR-style
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
      * @return  format object for formatting {@code Moment}-objects
      *          using system locale and system time zone
      * @throws  IllegalArgumentException if resolving of pattern fails
@@ -228,13 +230,68 @@ public class Formatters {
      * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
      */
-    public static ChronoFormatter<Moment> localizedPattern(String cldr) {
+    public static ChronoFormatter<Moment> localized(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
 
         return ChronoFormatter
             .setUp(Moment.class, Locale.getDefault())
-            .addPattern(cldr, PatternType.CLDR)
+            .addPattern(formatPattern, patternType)
             .build()
             .withSystemTimezone();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Datumsformat mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType#CLDR
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainDate> localizedDate(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainDate.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Uhrzeitformat mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType#CLDR
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainTime> localizedTime(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTime.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build();
 
     }
 
