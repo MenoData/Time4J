@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (PlainDuration.java) is part of project Time4J.
+ * This file (Duration.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ import java.util.Map;
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-public final class PlainDuration<U extends IsoUnit>
+public final class Duration<U extends IsoUnit>
     extends AbstractDuration<U>
     implements Serializable {
 
@@ -108,7 +108,7 @@ public final class PlainDuration<U extends IsoUnit>
                 ChronoUnit o1,
                 ChronoUnit o2
             ) {
-                return PlainDuration.compare(o1, o2);
+                return Duration.compare(o1, o2);
             }
         };
 
@@ -120,7 +120,7 @@ public final class PlainDuration<U extends IsoUnit>
                 Item<? extends ChronoUnit> o1,
                 Item<? extends ChronoUnit> o2
             ) {
-                return PlainDuration.compare(o1.getUnit(), o2.getUnit());
+                return Duration.compare(o1.getUnit(), o2.getUnit());
             }
         };
 
@@ -173,8 +173,8 @@ public final class PlainDuration<U extends IsoUnit>
      */
     public static Normalizer<ClockUnit> STD_CLOCK_PERIOD = new TimeNormalizer();
 
-    private static final PlainDuration<IsoUnit> ZERO =
-        new PlainDuration<IsoUnit>(false);
+    private static final Duration<IsoUnit> ZERO =
+        new Duration<IsoUnit>(false);
 
     private static final long serialVersionUID = -6321211763598951499L;
 
@@ -198,7 +198,7 @@ public final class PlainDuration<U extends IsoUnit>
     //~ Konstruktoren -----------------------------------------------------
 
     // Standard-Konstruktor
-    private PlainDuration(
+    private Duration(
         List<Item<U>> items,
         boolean negative,
         boolean calendrical
@@ -220,8 +220,8 @@ public final class PlainDuration<U extends IsoUnit>
     }
 
     // Kopiekonstruktor (siehe negate())
-    private PlainDuration(
-        PlainDuration<U> duration,
+    private Duration(
+        Duration<U> duration,
         boolean inverse
     ) {
         super();
@@ -233,7 +233,7 @@ public final class PlainDuration<U extends IsoUnit>
     }
 
     // leere Zeitspanne
-    private PlainDuration(boolean calendrical) {
+    private Duration(boolean calendrical) {
         super();
 
         this.items = Collections.emptyList();
@@ -257,13 +257,13 @@ public final class PlainDuration<U extends IsoUnit>
      * @param   unit        single time unit
      * @return  new duration
      */
-    public static <U extends IsoUnit> PlainDuration<U> of(
+    public static <U extends IsoUnit> Duration<U> of(
         long amount,
         U unit
     ) {
 
         if (amount == 0) {
-            return new PlainDuration<U>(unit.isCalendrical());
+            return new Duration<U>(unit.isCalendrical());
         }
 
         List<Item<U>> items = new ArrayList<Item<U>>(1);
@@ -272,7 +272,7 @@ public final class PlainDuration<U extends IsoUnit>
                 ((amount < 0) ? MathUtils.safeNegate(amount) : amount),
                 unit)
             );
-        return new PlainDuration<U>(items, (amount < 0), unit.isCalendrical());
+        return new Duration<U>(items, (amount < 0), unit.isCalendrical());
 
     }
 
@@ -281,7 +281,7 @@ public final class PlainDuration<U extends IsoUnit>
      * eine neue ISO-konforme positive Zeitspanne für kombinierte Datums- und
      * Uhrzeiteinheiten. </p>
      *
-     * @return  help object for building a positive {@code PlainDuration}
+     * @return  help object for building a positive {@code Duration}
      */
     public static Builder ofPositive() {
 
@@ -294,7 +294,7 @@ public final class PlainDuration<U extends IsoUnit>
      * eine neue ISO-konforme negative Zeitspanne für kombinierte Datums- und
      * Uhrzeiteinheiten. </p>
      *
-     * @return  help object for building a negative {@code PlainDuration}
+     * @return  help object for building a negative {@code Duration}
      */
     public static Builder ofNegative() {
 
@@ -317,13 +317,13 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  IllegalArgumentException if any argument is negative
      * @see     #negate()
      */
-    public static PlainDuration<CalendarUnit> ofCalendarUnits(
+    public static Duration<CalendarUnit> ofCalendarUnits(
         int years,
         int months,
         int days
     ) {
 
-        return PlainDuration.ofCalendarUnits(years, months, days, false);
+        return Duration.ofCalendarUnits(years, months, days, false);
 
     }
 
@@ -343,13 +343,13 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  IllegalArgumentException if any argument is negative
      * @see     #negate()
      */
-    public static PlainDuration<ClockUnit> ofClockUnits(
+    public static Duration<ClockUnit> ofClockUnits(
         int hours,
         int minutes,
         int seconds
     ) {
 
-        return PlainDuration.ofClockUnits(hours, minutes, seconds, 0, false);
+        return Duration.ofClockUnits(hours, minutes, seconds, 0, false);
 
     }
 
@@ -372,7 +372,7 @@ public final class PlainDuration<U extends IsoUnit>
      *          if there are unit duplicates
      */
     public static <U extends IsoUnit>
-    TimeMetric<U, PlainDuration<U>> in(U... units) {
+    TimeMetric<U, Duration<U>> in(U... units) {
 
         if (units.length == 0) {
             throw new IllegalArgumentException("Missing units.");
@@ -407,9 +407,9 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     CalendarUnit#DAYS
      */
     public static
-    TimeMetric<CalendarUnit, PlainDuration<CalendarUnit>> inYearsMonthsDays() {
+    TimeMetric<CalendarUnit, Duration<CalendarUnit>> inYearsMonthsDays() {
 
-        return PlainDuration.in(
+        return Duration.in(
             CalendarUnit.YEARS,
             CalendarUnit.MONTHS,
             CalendarUnit.DAYS
@@ -432,9 +432,9 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     ClockUnit#NANOS
      */
     public static
-    TimeMetric<ClockUnit, PlainDuration<ClockUnit>> inClockUnits() {
+    TimeMetric<ClockUnit, Duration<ClockUnit>> inClockUnits() {
 
-        return PlainDuration.in(
+        return Duration.in(
             ClockUnit.HOURS,
             ClockUnit.MINUTES,
             ClockUnit.SECONDS,
@@ -563,7 +563,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     TimePoint#compareTo(TimePoint) TimePoint.compareTo(T)
      */
     public static <U extends IsoUnit, T extends TimePoint<? super U, T>>
-    Comparator<PlainDuration<U>> comparator(T base) {
+    Comparator<Duration<U>> comparator(T base) {
 
         return new LengthComparator<U, T>(base);
 
@@ -592,7 +592,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  ArithmeticException in case of long overflow
      * @see     #with(long, IsoUnit) with(long, U)
      */
-    public PlainDuration<U> plus(
+    public Duration<U> plus(
         long amount,
         U unit
     ) {
@@ -620,7 +620,7 @@ public final class PlainDuration<U extends IsoUnit>
 
         if (this.isEmpty()) {
             temp.add((item == null) ? new Item<U>(amount, unit) : item);
-            return new PlainDuration<U>(
+            return new Duration<U>(
                 temp,
                 negatedValue,
                 this.calendrical && unit.isCalendrical());
@@ -672,7 +672,7 @@ public final class PlainDuration<U extends IsoUnit>
             }
         }
 
-        return new PlainDuration<U>(
+        return new Duration<U>(
             temp,
             resultNegative,
             this.calendrical && unit.isCalendrical());
@@ -694,7 +694,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
-    public PlainDuration<U> minus(
+    public Duration<U> minus(
         long amount,
         U unit
     ) {
@@ -720,7 +720,7 @@ public final class PlainDuration<U extends IsoUnit>
      *          adding the partial amounts
      * @throws  ArithmeticException in case of long overflow
      */
-    public PlainDuration<U> plus(TimeSpan<? extends U> timespan) {
+    public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
         return add(this, timespan, false);
 
@@ -740,7 +740,7 @@ public final class PlainDuration<U extends IsoUnit>
      *          subtracting the partial amounts
      * @throws  ArithmeticException in case of long overflow
      */
-    public PlainDuration<U> minus(TimeSpan<? extends U> timespan) {
+    public Duration<U> minus(TimeSpan<? extends U> timespan) {
 
         return add(this, timespan, true);
 
@@ -760,7 +760,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
-    public PlainDuration<U> with(
+    public Duration<U> with(
         long amount,
         U unit
     ) {
@@ -815,7 +815,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #isNegative()
      * @see     #negate()
      */
-    public PlainDuration<U> abs() {
+    public Duration<U> abs() {
 
         if (this.isNegative()) {
             return this.negate();
@@ -844,7 +844,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #multipliedBy(int)
      */
     @Override
-    public PlainDuration<U> negate() {
+    public Duration<U> negate() {
 
         return this.multipliedBy(-1);
 
@@ -864,7 +864,7 @@ public final class PlainDuration<U extends IsoUnit>
      *          remains unaffected
      * @throws  ArithmeticException in case of long overflow
      */
-    public PlainDuration<U> multipliedBy(int factor) {
+    public Duration<U> multipliedBy(int factor) {
 
         if (
             this.isEmpty()
@@ -872,9 +872,9 @@ public final class PlainDuration<U extends IsoUnit>
         ) {
             return this;
         } else if (factor == 0) {
-            return new PlainDuration<U>(this.calendrical);
+            return new Duration<U>(this.calendrical);
         } else if (factor == -1) {
-            return new PlainDuration<U>(this, true);
+            return new Duration<U>(this, true);
         }
 
         List<Item<U>> newItems = new ArrayList<Item<U>>(this.count());
@@ -890,7 +890,7 @@ public final class PlainDuration<U extends IsoUnit>
             );
         }
 
-        return new PlainDuration<U>(
+        return new Duration<U>(
             newItems,
             ((factor < 0) ? !this.isNegative() : this.isNegative()),
             this.calendrical
@@ -905,19 +905,19 @@ public final class PlainDuration<U extends IsoUnit>
      *
      * <p><i>Vereinigung von Zeitspannen in Datum und Uhrzeit</i></p>
      * <pre>
-     *  PlainDuration&lt;CalendarUnit&gt; dateDuration =
-     *      PlainDuration.ofCalendarUnits(2, 7, 10);
-     *  PlainDuration&lt;ClockUnit&gt; timeDuration =
-     *      PlainDuration.ofClockUnits(0, 30, 0);
+     *  Duration&lt;CalendarUnit&gt; dateDuration =
+     *      Duration.ofCalendarUnits(2, 7, 10);
+     *  Duration&lt;ClockUnit&gt; timeDuration =
+     *      Duration.ofClockUnits(0, 30, 0);
      *  System.out.println(dateDuration.union(timeDuration)); // P2Y7M10DT30M
      * </pre>
      *
      * <p><i>Vereinigung als Addition von Zeitspannen</i></p>
      * <pre>
-     *  PlainDuration&lt;CalendarUnit&gt; p1 =
-     *      PlainDuration.ofCalendarUnits(0, 0, 10);
-     *  PlainDuration&lt;CalendarUnit&gt; p2 =
-     *      PlainDuration.of(3, CalendarUnit.WEEKS);
+     *  Duration&lt;CalendarUnit&gt; p1 =
+     *      Duration.ofCalendarUnits(0, 0, 10);
+     *  Duration&lt;CalendarUnit&gt; p2 =
+     *      Duration.of(3, CalendarUnit.WEEKS);
      *  System.out.println(p1.union(p2)); // P31D
      * </pre>
      *
@@ -944,7 +944,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
      */
-    public PlainDuration<IsoUnit> union(TimeSpan<? extends IsoUnit> timespan) {
+    public Duration<IsoUnit> union(TimeSpan<? extends IsoUnit> timespan) {
 
         return ZERO.plus(this).plus(timespan);
 
@@ -960,7 +960,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #STD_CALENDAR_PERIOD
      * @see     #STD_CLOCK_PERIOD
      */
-    public PlainDuration<U> with(Normalizer<U> normalizer) {
+    public Duration<U> with(Normalizer<U> normalizer) {
 
         return convert(normalizer.normalize(this));
 
@@ -999,7 +999,7 @@ public final class PlainDuration<U extends IsoUnit>
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
-                    entity.inTimezone(timezone).minus(PlainDuration.this);
+                    entity.inTimezone(timezone).minus(Duration.this);
                 return ts.inTimezone(timezone, strategy);
             }
         };
@@ -1039,7 +1039,7 @@ public final class PlainDuration<U extends IsoUnit>
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
-                    entity.inTimezone(timezone).plus(PlainDuration.this);
+                    entity.inTimezone(timezone).plus(Duration.this);
                 return ts.inTimezone(timezone, strategy);
             }
         };
@@ -1050,7 +1050,7 @@ public final class PlainDuration<U extends IsoUnit>
      * <p>Basiert auf allen gespeicherten Zeitspannenelementen und dem
      * Vorzeichen. </p>
      *
-     * @return  {@code true} if {@code obj} is also a {@code PlainDuration},
+     * @return  {@code true} if {@code obj} is also a {@code Duration},
      *          has the same units and amounts, the same sign and the same
      *          calendrical status else {@code false}
      * @see     #getTotalLength()
@@ -1061,8 +1061,8 @@ public final class PlainDuration<U extends IsoUnit>
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof PlainDuration) {
-            PlainDuration<?> that = PlainDuration.class.cast(obj);
+        } else if (obj instanceof Duration) {
+            Duration<?> that = Duration.class.cast(obj);
             return (
                 (this.negative == that.negative)
                 && (this.calendrical == that.calendrical)
@@ -1298,7 +1298,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #toString()
      * @see     #toString(boolean)
      */
-    public static PlainDuration<IsoUnit> parse(String duration)
+    public static Duration<IsoUnit> parse(String duration)
         throws ParseException {
 
         return parse(duration, IsoUnit.class);
@@ -1316,7 +1316,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #parseClockPeriod(String)
      */
     public static
-    PlainDuration<CalendarUnit> parseCalendarPeriod(String duration)
+    Duration<CalendarUnit> parseCalendarPeriod(String duration)
         throws ParseException {
 
         return parse(duration, CalendarUnit.class);
@@ -1334,7 +1334,7 @@ public final class PlainDuration<U extends IsoUnit>
      * @see     #parseCalendarPeriod(String)
      */
     public static
-    PlainDuration<ClockUnit> parseClockPeriod(String duration)
+    Duration<ClockUnit> parseClockPeriod(String duration)
         throws ParseException {
 
         return parse(duration, ClockUnit.class);
@@ -1362,8 +1362,8 @@ public final class PlainDuration<U extends IsoUnit>
 
     }
 
-    private static <U extends IsoUnit> PlainDuration<U> add(
-        PlainDuration<U> duration,
+    private static <U extends IsoUnit> Duration<U> add(
+        Duration<U> duration,
         TimeSpan<? extends U> timespan,
         boolean inverse
     ) {
@@ -1371,8 +1371,8 @@ public final class PlainDuration<U extends IsoUnit>
         if (duration.isEmpty()) {
             if (isEmpty(timespan)) {
                 return duration;
-            } else if (timespan instanceof PlainDuration) {
-                PlainDuration<U> result = cast(timespan);
+            } else if (timespan instanceof Duration) {
+                Duration<U> result = cast(timespan);
                 return (inverse ? result.negate() : result);
             }
         }
@@ -1478,11 +1478,11 @@ public final class PlainDuration<U extends IsoUnit>
             }
         }
 
-        return PlainDuration.create(map, neg.booleanValue(), calendrical);
+        return Duration.create(map, neg.booleanValue(), calendrical);
 
     }
 
-    private static PlainDuration<CalendarUnit> ofCalendarUnits(
+    private static Duration<CalendarUnit> ofCalendarUnits(
         long years,
         long months,
         long days,
@@ -1503,11 +1503,11 @@ public final class PlainDuration<U extends IsoUnit>
             items.add(new Item<CalendarUnit>(days, CalendarUnit.DAYS));
         }
 
-        return new PlainDuration<CalendarUnit>(items, negative, true);
+        return new Duration<CalendarUnit>(items, negative, true);
 
     }
 
-    private static PlainDuration<ClockUnit> ofClockUnits(
+    private static Duration<ClockUnit> ofClockUnits(
         long hours,
         long minutes,
         long seconds,
@@ -1533,18 +1533,18 @@ public final class PlainDuration<U extends IsoUnit>
             items.add(new Item<ClockUnit>(nanos, ClockUnit.NANOS));
         }
 
-        return new PlainDuration<ClockUnit>(items, negative, false);
+        return new Duration<ClockUnit>(items, negative, false);
 
     }
 
-    private static <U extends IsoUnit> PlainDuration<U> create(
+    private static <U extends IsoUnit> Duration<U> create(
         Map<U, Long> map,
         boolean negative,
         boolean calendrical
     ) {
 
         if (map.isEmpty()) {
-            return new PlainDuration<U>(calendrical);
+            return new Duration<U>(calendrical);
         }
 
         List<Item<U>> temp = new ArrayList<Item<U>>(map.size());
@@ -1608,7 +1608,7 @@ public final class PlainDuration<U extends IsoUnit>
             temp.add(new Item<U>(nanos, key));
         }
 
-        return new PlainDuration<U>(temp, negative, calendrical);
+        return new Duration<U>(temp, negative, calendrical);
 
     }
 
@@ -1668,7 +1668,7 @@ public final class PlainDuration<U extends IsoUnit>
                 new Item<U>(
                     MathUtils.safeMultiply(
                         temp.get(weekIndex).getAmount(), 7L),
-                    PlainDuration.<U>cast(CalendarUnit.DAYS)
+                    Duration.<U>cast(CalendarUnit.DAYS)
                 )
             );
 
@@ -1691,7 +1691,7 @@ public final class PlainDuration<U extends IsoUnit>
         if (amount != null) {
             temp.remove(CalendarUnit.WEEKS);
             temp.put(
-                PlainDuration.<U>cast(CalendarUnit.DAYS),
+                Duration.<U>cast(CalendarUnit.DAYS),
                 Long.valueOf(MathUtils.safeMultiply(amount.longValue(), 7L))
             );
             if (unit.equals(CalendarUnit.DAYS)) {
@@ -1759,9 +1759,9 @@ public final class PlainDuration<U extends IsoUnit>
     }
 
     private static <U extends IsoUnit>
-    PlainDuration<U> convert(TimeSpan<U> timespan) {
+    Duration<U> convert(TimeSpan<U> timespan) {
 
-        if (timespan instanceof PlainDuration) {
+        if (timespan instanceof Duration) {
             return cast(timespan);
         } else {
             boolean calendrical = true;
@@ -1770,7 +1770,7 @@ public final class PlainDuration<U extends IsoUnit>
                     calendrical = false;
                 }
             }
-            PlainDuration<U> zero = new PlainDuration<U>(calendrical);
+            Duration<U> zero = new Duration<U>(calendrical);
             return zero.plus(timespan);
         }
 
@@ -1792,7 +1792,7 @@ public final class PlainDuration<U extends IsoUnit>
 
     //~ Parse-Routinen ----------------------------------------------------
 
-    private static <U extends IsoUnit> PlainDuration<U> parse(
+    private static <U extends IsoUnit> Duration<U> parse(
         String duration,
         Class<U> type
     ) throws ParseException {
@@ -1850,7 +1850,7 @@ public final class PlainDuration<U extends IsoUnit>
                 }
             }
 
-            return new PlainDuration<U>(items, negative, calendrical);
+            return new Duration<U>(items, negative, calendrical);
 
         } catch (IndexOutOfBoundsException ex) {
             ParseException pe =
@@ -2074,10 +2074,10 @@ public final class PlainDuration<U extends IsoUnit>
      * <p>Lediglich die Wocheneinheit ist ausgenommen, da eine wochenbasierte
      * Zeitspanne nach dem ISO-Standard f&uuml;r sich alleine stehen sollte.
      * Eine wochenbasierte Zeitspanne kann auf einfache Weise mit dem Ausdruck
-     * {@code PlainDuration.of(amount, CalendarUnit.WEEKS)} erzeugt werden. </p>
+     * {@code Duration.of(amount, CalendarUnit.WEEKS)} erzeugt werden. </p>
      *
-     * <p>Eine Instanz wird mittels {@link PlainDuration#ofPositive()} oder
-     * {@link PlainDuration#ofNegative()} erzeugt. Diese Instanz ist nur zur
+     * <p>Eine Instanz wird mittels {@link Duration#ofPositive()} oder
+     * {@link Duration#ofNegative()} erzeugt. Diese Instanz ist nur zur
      * lokalen Verwendung in einem Thread gedacht, da keine Thread-Sicherheit
      * gegeben ist. </p>
      */
@@ -2271,15 +2271,15 @@ public final class PlainDuration<U extends IsoUnit>
         /**
          * <p>Erzeugt eine neue ISO-konforme Zeitspanne. </p>
          *
-         * @return  new {@code PlainDuration}
+         * @return  new {@code Duration}
          */
-        public PlainDuration<IsoUnit> build() {
+        public Duration<IsoUnit> build() {
 
             if (this.calendrical == null) {
                 throw new IllegalStateException("Not set any amount and unit.");
             }
 
-            return new PlainDuration<IsoUnit>(
+            return new Duration<IsoUnit>(
                 this.items,
                 this.negative,
                 this.calendrical.booleanValue()
@@ -2390,7 +2390,7 @@ public final class PlainDuration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public PlainDuration<IsoUnit>
+        public Duration<IsoUnit>
         normalize(TimeSpan<? extends IsoUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
@@ -2539,7 +2539,7 @@ public final class PlainDuration<U extends IsoUnit>
                 items.add(new Item<IsoUnit>(f, ClockUnit.NANOS));
             }
 
-            return new PlainDuration<IsoUnit>(
+            return new Duration<IsoUnit>(
                 items,
                 timespan.isNegative(),
                 false
@@ -2555,7 +2555,7 @@ public final class PlainDuration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public PlainDuration<CalendarUnit>
+        public Duration<CalendarUnit>
         normalize(TimeSpan<? extends CalendarUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
@@ -2624,15 +2624,15 @@ public final class PlainDuration<U extends IsoUnit>
                         MathUtils.safeMultiply(weeks, 7),
                         days
                     );
-                return PlainDuration.ofCalendarUnits(y, m, d, negative);
+                return Duration.ofCalendarUnits(y, m, d, negative);
             } else if (weeks != 0) {
                 if (negative) {
                     weeks = MathUtils.safeNegate(weeks);
                 }
-                return PlainDuration.of(weeks, CalendarUnit.WEEKS);
+                return Duration.of(weeks, CalendarUnit.WEEKS);
             }
 
-            return PlainDuration.of(0, CalendarUnit.DAYS);
+            return Duration.of(0, CalendarUnit.DAYS);
 
         }
 
@@ -2644,7 +2644,7 @@ public final class PlainDuration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public PlainDuration<ClockUnit>
+        public Duration<ClockUnit>
         normalize(TimeSpan<? extends ClockUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
@@ -2700,7 +2700,7 @@ public final class PlainDuration<U extends IsoUnit>
                 h = hours;
             }
 
-            return PlainDuration.ofClockUnits(
+            return Duration.ofClockUnits(
                 h,
                 n,
                 s,
@@ -2713,7 +2713,7 @@ public final class PlainDuration<U extends IsoUnit>
     }
 
     private static class Metric<U extends IsoUnit>
-        implements TimeMetric<U, PlainDuration<U>> {
+        implements TimeMetric<U, Duration<U>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -2747,13 +2747,13 @@ public final class PlainDuration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public <T extends TimePoint<? super U, T>> PlainDuration<U> between(
+        public <T extends TimePoint<? super U, T>> Duration<U> between(
             T start,
             T end
         ) {
 
             if (end.equals(start)) {
-                return new PlainDuration<U>(this.calendrical);
+                return new Duration<U>(this.calendrical);
             }
 
             T t1 = start;
@@ -2831,7 +2831,7 @@ public final class PlainDuration<U extends IsoUnit>
                 this.normalize(engine, this.sortedUnits, resultList);
             }
 
-            return new PlainDuration<U>(resultList, negative, this.calendrical);
+            return new Duration<U>(resultList, negative, this.calendrical);
 
         }
 
@@ -2980,7 +2980,7 @@ public final class PlainDuration<U extends IsoUnit>
 
     private static class LengthComparator
         <U extends IsoUnit, T extends TimePoint<? super U, T>>
-        implements Comparator<PlainDuration<U>> {
+        implements Comparator<Duration<U>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -3003,8 +3003,8 @@ public final class PlainDuration<U extends IsoUnit>
 
         @Override
         public int compare(
-            PlainDuration<U> d1,
-            PlainDuration<U> d2
+            Duration<U> d1,
+            Duration<U> d2
         ) {
 
             boolean sign1 = d1.isNegative();
