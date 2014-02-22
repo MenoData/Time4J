@@ -37,11 +37,7 @@ public class ZonalClock {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    /**
-     * <p>Zonale Uhr basierend auf den Systemeinstellungen beim Laden
-     * dieser Klasse. </p>
-     */
-    public static final ZonalClock SYSTEM = new ZonalClock();
+    private static final ZonalClock SYSTEM = new ZonalClock();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -113,6 +109,18 @@ public class ZonalClock {
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Zonale Uhr basierend auf den Systemeinstellungen beim Laden
+     * dieser Klasse. </p>
+     *
+     * @return  local clock in default system time zone
+     */
+    public static ZonalClock ofSystem() {
+
+        return SYSTEM;
+
+    }
 
     /**
      * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone. </p>

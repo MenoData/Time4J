@@ -137,18 +137,6 @@ public final class SystemClock
     }
 
     /**
-     * <p>Erzeugt eine lokale Uhr in der Standard-Zeitzone der JVM. </p>
-     *
-     * @return  local clock in default system time zone
-     * @see     ZonalClock#SYSTEM
-     */
-    public static ZonalClock inSystemTimezone() {
-
-        return ZonalClock.SYSTEM;
-
-    }
-
-    /**
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        time zone id
