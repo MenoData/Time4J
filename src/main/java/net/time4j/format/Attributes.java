@@ -68,25 +68,9 @@ public final class Attributes
      * und andere Aspekte wie Wochennummerierungen steuert. </p>
      *
      * <p>Standardwert ist {@code Locale.ROOT}. </p>
-     *
-     * @see     #LANGUAGE
      */
     public static final AttributeKey<Locale> LOCALE =
         PredefinedKey.valueOf("LOCALE", Locale.class);
-
-    /**
-     * <p>Gibt die Spracheinstellung an, die die Sprachausgabe von
-     * chronologischen Texten (Beispiel Monatsnamen) steuert. </p>
-     *
-     * <p>Im Gegensatz zu {@link #LOCALE} wird hier nur die Sprache gesetzt,
-     * nicht jedoch andere Aspekte wie Wochennummerierungen oder das
-     * l&auml;nderabh&auml;ngige Dezimaltrennzeichen beachtet. </p>
-     *
-     * <p>Vorgabe ist das Attribut {@code LOCALE}, sonst die Standardsprache
-     * {@code Locale.getDefault()}. </p>
-     */
-    public static final AttributeKey<Locale> LANGUAGE =
-        PredefinedKey.valueOf("LANGUAGE", Locale.class);
 
     /**
      * <p>Gibt die Zeitzonen-ID an. </p>
@@ -284,10 +268,6 @@ public final class Attributes
      *      <td>{@link Locale#ROOT}</td>
      *  </tr>
      *  <tr>
-     *      <td>{@link #LANGUAGE}</td>
-     *      <td>{@link Locale#ROOT}</td>
-     *  </tr>
-     *  <tr>
      *      <td>{@link #DECIMAL_SEPARATOR}</td>
      *      <td>Komma als Standard, sonst Punkt</td>
      *  </tr>
@@ -325,7 +305,7 @@ public final class Attributes
 
         Attributes.Builder builder = new Attributes.Builder();
         builder.setStandardAttributes();
-        builder.setLocale(Locale.ROOT);
+        builder.set(Locale.ROOT);
         builder.setCalendarType(ISO_CALENDAR_TYPE);
         return builder;
 
@@ -340,10 +320,6 @@ public final class Attributes
      * <table border="1" style="margin-top:5px;">
      *  <tr>
      *      <td>{@link #LOCALE}</td>
-     *      <td>{@link Locale#getDefault()}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #LANGUAGE}</td>
      *      <td>{@link Locale#getDefault()}</td>
      *  </tr>
      *  <tr>
@@ -398,10 +374,6 @@ public final class Attributes
      *      <td>{locale}-parameter</td>
      *  </tr>
      *  <tr>
-     *      <td>{@link #LANGUAGE}</td>
-     *      <td>{locale}-parameter</td>
-     *  </tr>
-     *  <tr>
      *      <td>{@link #DECIMAL_SEPARATOR}</td>
      *      <td>dependent on {locale}-parameter</td>
      *  </tr>
@@ -441,7 +413,7 @@ public final class Attributes
 
         Attributes.Builder builder = new Attributes.Builder();
         builder.setStandardAttributes();
-        builder.setLocale(locale);
+        builder.set(locale);
         return builder;
 
     }
@@ -600,16 +572,46 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets the time zone reference. </p>
+         *
+         * @param   tzid        time zone id
+         * @return  this instance for method chaining
+         * @see     #TIMEZONE_ID
+         */
+        public Builder setTimezone(TZID tzid) {
+
+            if (tzid == null) {
+                throw new NullPointerException("Missing time zone id.");
+            }
+
+            this.setInternal(TIMEZONE_ID, tzid);
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the system time zone reference. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     #TIMEZONE_ID
+         */
+        public Builder setSystemTimezone() {
+
+            return this.setTimezone(TimeZone.ofSystem().getID());
+
+        }
+
+        /**
          * <p>Setzt die Sprach- und L&auml;ndereinstellung. </p>
          *
-         * <p>Die Attribute {@link #ZERO_DIGIT}, {@link #DECIMAL_SEPARATOR}
-         * und {@link #LANGUAGE} werden automatisch mit angepasst. </p>
+         * <p>Die Attribute {@link #ZERO_DIGIT} und {@link #DECIMAL_SEPARATOR}
+         * werden automatisch mit angepasst. </p>
          *
          * @param   locale      new language and country setting
          * @return  this instance for method chaining
          * @see     #LOCALE
          */
-        public Builder setLocale(Locale locale) {
+        public Builder set(Locale locale) {
 
             if (
                 locale.getLanguage().isEmpty()
@@ -648,57 +650,8 @@ public final class Attributes
                 this.set(DECIMAL_SEPARATOR, symbols.decimalSeparator);
             }
 
-            this.setInternal(LANGUAGE, locale);
             this.setInternal(LOCALE, locale);
             return this;
-
-        }
-
-        /**
-         * <p>Setzt nur die Spracheinstellung. </p>
-         *
-         * @param   language    new language only setting
-         * @return  this instance for method chaining
-         * @see     #LANGUAGE
-         */
-        public Builder setLanguage(Locale language) {
-
-            if (language == null) {
-                throw new NullPointerException("Missing language.");
-            }
-
-            this.setInternal(LANGUAGE, language);
-            return this;
-
-        }
-
-        /**
-         * <p>Sets the time zone reference. </p>
-         *
-         * @param   tzid        time zone id
-         * @return  this instance for method chaining
-         * @see     #TIMEZONE_ID
-         */
-        public Builder setTimezone(TZID tzid) {
-
-            if (tzid == null) {
-                throw new NullPointerException("Missing time zone id.");
-            }
-
-            this.setInternal(TIMEZONE_ID, tzid);
-            return this;
-
-        }
-
-        /**
-         * <p>Sets the system time zone reference. </p>
-         *
-         * @return  this instance for method chaining
-         * @see     #TIMEZONE_ID
-         */
-        public Builder setSystemTimezone() {
-
-            return this.setTimezone(TimeZone.ofSystem().getID());
 
         }
 

@@ -225,7 +225,7 @@ public class Formatters {
      *          using system locale and system time zone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @see     PatternType#CLDR
-     * @see     ChronoFormatter#withLocale(Locale)
+     * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
      */
     public static ChronoFormatter<Moment> localizedPattern(String cldr) {

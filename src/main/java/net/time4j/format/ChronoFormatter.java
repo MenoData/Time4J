@@ -255,9 +255,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
      *
+     * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
+     * Formatstruktur &auml;ndern (zum Beispiel nicht ein lokalisiertes
+     * Wochenmodell wechseln), aber bestimmte Formateigenschaften wie
+     * die Sprachausgabe oder Textattribute individuell nur f&uuml;r diesen
+     * Lauf setzen. </p>
+     *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
-     * @param   attributes      control attributes
+     * @param   attributes      attributes for limited formatting control
      * @return  unmodifiable set of element positions in formatted text
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
@@ -317,6 +323,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
+    /**
+     * <p>Interpretiert den angegebenen Text ab der angegebenen Position. </p>
+     *
+     * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
+     * Formatstruktur &auml;ndern (zum Beispiel nicht ein lokalisiertes
+     * Wochenmodell wechseln), aber bestimmte Formateigenschaften wie
+     * die erwartetete Sprache oder Textattribute individuell nur f&uuml;r
+     * diesen Lauf setzen. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   status      parser information (always as new instance)
+     * @param   attributes  attributes for limited parsing control
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     */
     @Override
     public T parse(
         CharSequence text,
@@ -430,6 +452,45 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Erzeugt eine Kopie mit der alternativ angegebenen
+     * Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Hinweise: Sektionale Attribute werden grunds&auml;tzlich nicht
+     * &uuml;bersteuert. Ist die Einstellung gleich, wird keine Kopie, sondern
+     * diese Instanz zur&uuml;ckgegeben, andernfalls werden neben der Sprache
+     * automatisch die numerischen Symbole mit angepasst: </p>
+     *
+     * <ul>
+     *  <li>{@link Attributes#ZERO_DIGIT}</li>
+     *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     * </ul>
+     *
+     * <p>Angepasst werden bei Bedarf auch innere Formatelemente, die
+     * Bestandteil landesabh&auml;ngiger chronologischer Erweiterungen wie
+     * zum Beispiel {@link net.time4j.Weekmodel#weekOfYear()} sind (lokales
+     * Wochenmodell). </p>
+     *
+     * @param   locale      new language and country configuration
+     * @return  changed copy with given language and localized symbols while
+     *          this instance remains unaffected
+     * @see     Attributes#LOCALE
+     */
+    public ChronoFormatter<T> with(Locale locale) {
+
+        if (locale.equals(this.getDefaultAttributes().getLocale())) {
+            return this;
+        }
+
+        Attributes attrs =
+            new Attributes.Builder()
+            .setAll(this.defaultAttributes)
+            .set(locale)
+            .build();
+        return new ChronoFormatter<T>(this, attrs);
+
+    }
+
+    /**
      * <p>Erzeugt eine Kopie mit dem angegebenen Kalendertyp, der beim
      * Formatieren oder Parsen verwendet werden soll. </p>
      *
@@ -447,64 +508,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             new Attributes.Builder()
             .setAll(this.defaultAttributes)
             .setCalendarType(calendarType)
-            .build();
-        return new ChronoFormatter<T>(this, attrs);
-
-    }
-
-    /**
-     * <p>Erzeugt eine Kopie mit der alternativ angegebenen
-     * Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * <p>Hinweise: Sektionale Attribute werden grunds&auml;tzlich nicht
-     * &uuml;bersteuert. Ist die Einstellung gleich, wird keine Kopie, sondern
-     * diese Instanz zur&uuml;ckgegeben, andernfalls werden neben der Sprache
-     * automatisch die numerischen Symbole mit angepasst: </p>
-     *
-     * <ul>
-     *  <li>{@link Attributes#LANGUAGE}</li>
-     *  <li>{@link Attributes#ZERO_DIGIT}</li>
-     *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
-     * </ul>
-     *
-     * @param   locale      new language and country configuration
-     * @return  changed copy with given language and localized symbols while
-     *          this instance remains unaffected
-     * @see     Attributes#LOCALE
-     * @see     #withLanguage(Locale)
-     */
-    public ChronoFormatter<T> withLocale(Locale locale) {
-
-        if (locale.equals(this.getDefaultAttributes().getLocale())) {
-            return this;
-        }
-
-        Attributes attrs =
-            new Attributes.Builder()
-            .setAll(this.defaultAttributes)
-            .setLocale(locale)
-            .build();
-        return new ChronoFormatter<T>(this, attrs);
-
-    }
-
-    /**
-     * <p>Erzeugt eine Kopie mit der alternativ angegebenen
-     * Spracheinstellung zur Steuerung der Ausgaben von chronologischen
-     * Texten wie Monatsnamen. </p>
-     *
-     * @param   language    new language only setting
-     * @return  changed copy with given language while this instance remains
-     *          unaffected
-     * @see     Attributes#LANGUAGE
-     * @see     #withLocale(Locale)
-     */
-    public ChronoFormatter<T> withLanguage(Locale language) {
-
-        Attributes attrs =
-            new Attributes.Builder()
-            .setAll(this.defaultAttributes)
-            .setLanguage(language)
             .build();
         return new ChronoFormatter<T>(this, attrs);
 

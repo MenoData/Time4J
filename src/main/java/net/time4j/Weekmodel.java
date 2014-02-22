@@ -1053,7 +1053,7 @@ public final class Weekmodel
             CalendarText cnames =
                 CalendarText.getInstance(
                     attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                    attributes.get(Attributes.LANGUAGE, Locale.getDefault()));
+                    attributes.get(Attributes.LOCALE, Locale.ROOT));
 
             return cnames.getWeekdays(
                 attributes.get(

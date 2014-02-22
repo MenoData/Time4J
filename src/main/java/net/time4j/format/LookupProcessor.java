@@ -120,7 +120,7 @@ final class LookupProcessor<V extends Enum<V>>
                 Attributes.PARSE_CASE_INSENSITIVE,
                 Boolean.TRUE
             ).booleanValue();
-        Locale locale = query.get(Attributes.LANGUAGE, Locale.getDefault());
+        Locale locale = query.get(Attributes.LOCALE, Locale.getDefault());
         int len = text.length() - start;
 
         for (V value : type.getEnumConstants()) {

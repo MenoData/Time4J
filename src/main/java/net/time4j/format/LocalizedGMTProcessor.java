@@ -97,7 +97,7 @@ final class LocalizedGMTProcessor
         }
 
         Locale locale =
-            step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
+            step.getAttribute(Attributes.LOCALE, attributes, Locale.ROOT);
         String gmtPrefix = CalendarText.getGMTPrefix(locale);
 
         buffer.append(gmtPrefix);
@@ -176,7 +176,7 @@ final class LocalizedGMTProcessor
         }
 
         Locale locale =
-            step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
+            step.getAttribute(Attributes.LOCALE, attributes, Locale.ROOT);
         String gmtPrefix = CalendarText.getGMTPrefix(locale);
         String[] zeroOffsets = { "GMT", gmtPrefix, "UTC", "UT" };
         boolean found = false;
