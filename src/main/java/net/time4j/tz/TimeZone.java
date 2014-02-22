@@ -198,6 +198,7 @@ public abstract class TimeZone
      *
      * @return  default time zone data of system
      * @see     java.util.TimeZone#getDefault()
+     *          java.util.TimeZone.getDefault()
      */
     public static TimeZone ofSystem() {
 
@@ -260,7 +261,7 @@ public abstract class TimeZone
      * <p>Liefert die Zeitzonen-ID. </p>
      *
      * @return  time zone id
-     * @see     java.util.TimeZone#getID()
+     * @see     java.util.TimeZone#getID() java.util.TimeZone.getID()
      */
     public abstract TZID getID();
 
@@ -271,6 +272,7 @@ public abstract class TimeZone
      * @param   ut      unix time
      * @return  shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
+     *          java.util.TimeZone.getOffset(long)
      */
     public abstract ZonalOffset getOffset(UnixTime ut);
 
@@ -287,6 +289,7 @@ public abstract class TimeZone
      * @return  shift in seconds which yields unix time if subtracted
      *          from local time choosing later offset at gaps or overlaps
      * @see     java.util.TimeZone#getOffset(int, int, int, int, int, int)
+     *          java.util.TimeZone.getOffset(int, int, int, int, int, int)
      * @see     TransitionStrategy#PUSH_FORWARD
      */
     public abstract ZonalOffset getOffset(
@@ -324,6 +327,7 @@ public abstract class TimeZone
      * @return  {@code true} if the argument represents summer time
      *          else {@code false}
      * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
+     *          java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     public abstract boolean isDaylightSaving(UnixTime ut);
 
@@ -392,6 +396,7 @@ public abstract class TimeZone
      * @param   locale              language setting
      * @return  localized time zone name for display purposes
      * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
+     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
      * @see     Locale#getDefault()
      * @see     #getID()
      */
@@ -443,13 +448,6 @@ public abstract class TimeZone
 
         String zoneID = tzid.canonical();
 
-        if (
-            "Z".equals(zoneID)
-            || "UTC".equals(zoneID)
-        ) {
-            return ZonalOffset.UTC.getModel();
-        }
-
         // Suche im Cache
         TimeZone tz = null;
         NamedReference sref = CACHE.get(zoneID);
@@ -472,6 +470,8 @@ public abstract class TimeZone
             if (
                 test.getID().canonical().equals("GMT")
                 && !zoneID.equals("GMT")
+                && !zoneID.startsWith("UT")
+                && !zoneID.equals("Z")
             ) {
                 // JDK-Fallback => null
             } else {
