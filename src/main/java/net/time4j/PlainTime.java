@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
@@ -855,42 +854,20 @@ public final class PlainTime
     }
 
     /**
-     * <p>Addiert die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
-     * und z&auml;hlt dabei auch tageweise &Uuml;berl&auml;ufe. </p>
+     * <p>Rollt die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
+     * auf und z&auml;hlt dabei auch tageweise &Uuml;berl&auml;ufe. </p>
      *
      * @param   amount      amount to be added (maybe negative)
      * @param   unit        time unit
-     * @return  result of addition including possible day overflow
+     * @return  result of rolling including possible day overflow
      * @see     #plus(long, Object) plus(long, Unit)
      */
-    public DayCycles plusWithOverflow(
+    public DayCycles roll(
         long amount,
         ClockUnit unit
     ) {
 
         return ClockUnitRule.addToWithOverflow(this, amount, unit);
-
-    }
-
-    /**
-     * <p>Subtrahiert die angegebene Dauer mit Betrag und Einheit von dieser
-     * Uhrzeit und z&auml;hlt dabei auch tageweise &Uuml;berl&auml;ufe. </p>
-     *
-     * @param   amount      amount to be subtracted (maybe negative)
-     * @param   unit        time unit
-     * @return  result of subtraction including possible day overflow
-     * @see     #minus(long, Object) minus(long, Unit)
-     */
-    public DayCycles minusWithOverflow(
-        long amount,
-        ClockUnit unit
-    ) {
-
-        return ClockUnitRule.addToWithOverflow(
-            this,
-            MathUtils.safeNegate(amount),
-            unit
-        );
 
     }
 
@@ -1355,77 +1332,6 @@ public final class PlainTime
     }
 
     //~ Innere Klassen ----------------------------------------------------
-
-    /**
-     * <p>Verk&ouml;rpert das Additionsergebnis, wenn auch ein tageweiser
-     * &Uuml;berlauf gez&auml;hlt werden soll. </p>
-     *
-     * @author      Meno Hochschild
-     * @concurrency <immutable>
-     */
-    public static final class DayCycles
-        implements Serializable {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        private static final long serialVersionUID = -4124961309622141228L;
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        /**
-         * @serial  day overflow
-         */
-        private final long days;
-
-        /**
-         * @serial  wall time
-         */
-        private final PlainTime time;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        /**
-         * <p>Konstruiert eine neue Instanz mit &Uuml;berlauf und Uhrzeit. </p>
-         *
-         * @param   days    day overflow
-         * @param   time    wall time result of last calculation
-         */
-        DayCycles(
-            long days,
-            PlainTime time
-        ) {
-            super();
-
-            this.days = days;
-            this.time = time;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        /**
-         * <p>Ermittelt den tageweise &Uuml;berlauf im Additionsergebnis. </p>
-         *
-         * @return  count of day cycles ({@code 0} if without overflow)
-         */
-        public long getDayOverflow() {
-
-            return this.days;
-
-        }
-
-        /**
-         * <p>Ermittelt die Uhrzeit. </p>
-         *
-         * @return  wall time
-         */
-        public PlainTime getWallTime() {
-
-            return this.time;
-
-        }
-
-    }
 
     private static class ClockUnitRule
         implements UnitRule<PlainTime> {

@@ -1025,8 +1025,8 @@ public final class PlainTimestamp
                 d = timepoint.date.plus(amount, this.calendarUnit);
                 t = timepoint.time;
             } else {
-                PlainTime.DayCycles cycles =
-                    timepoint.time.plusWithOverflow(amount, this.clockUnit);
+                DayCycles cycles =
+                    timepoint.time.roll(amount, this.clockUnit);
                 d =
                     timepoint.date.plus(
                         cycles.getDayOverflow(),
