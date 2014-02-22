@@ -404,7 +404,7 @@ public abstract class TimeZone
         if (locale == null) {
             throw new NullPointerException("Missing locale.");
         }
-        
+
         String id = this.getID().canonical();
         java.util.TimeZone tz = OldStyleTimeZone.findZone(id);
 
@@ -442,6 +442,13 @@ public abstract class TimeZone
         }
 
         String zoneID = tzid.canonical();
+
+        if (
+            "Z".equals(zoneID)
+            || "UTC".equals(zoneID)
+        ) {
+            return ZonalOffset.UTC.getModel();
+        }
 
         // Suche im Cache
         TimeZone tz = null;

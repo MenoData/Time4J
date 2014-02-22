@@ -22,7 +22,6 @@
 package net.time4j.format;
 
 import net.time4j.base.UnixTime;
-import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
@@ -30,10 +29,13 @@ import net.time4j.tz.TimeZone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -44,11 +46,17 @@ import java.util.Set;
 final class TimezoneNameProcessor
     implements FormatProcessor<TZID> {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Map<Locale, Map<String, List<TZID>>> CACHE =
+        new ConcurrentHashMap<Locale, Map<String, List<TZID>>>();
+    private static final int MAX = 10;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final boolean abbreviated;
+    private final FormatProcessor<TZID> fallback;
     private final Set<TZID> preferredZones;
-    private final Set<Locale> preferredTerritories;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -65,8 +73,8 @@ final class TimezoneNameProcessor
         super();
 
         this.abbreviated = abbreviated;
+        this.fallback = new LocalizedGMTProcessor(abbreviated);
         this.preferredZones = preferredZones;
-        this.preferredTerritories = Collections.emptySet();
 
     }
 
@@ -81,20 +89,20 @@ final class TimezoneNameProcessor
         FormatStep step
     ) throws IOException {
 
-        int start = -1;
-        int printed = 0;
+        TZID tzid = formattable.get(TimeZone.identifier());
 
-        if (buffer instanceof CharSequence) {
-            start = ((CharSequence) buffer).length();
+        if (tzid == null) {
+            throw new IllegalArgumentException(
+                "Cannot extract time zone id from: " + formattable);
+        } else if (tzid instanceof ZonalOffset) {
+            this.fallback.print(
+                formattable, buffer, attributes, positions, step);
+            return;
         }
 
-        TZID tzid = formattable.get(TimeZone.identifier());
         String name;
 
-        if (tzid instanceof ZonalOffset) {
-            ZonalOffset offset = (ZonalOffset) tzid;
-            name = "GMT" + offset.toString(); // TODO: localized GMT format
-        } else if (formattable instanceof UnixTime) {
+        if (formattable instanceof UnixTime) {
             TimeZone zone = TimeZone.of(tzid);
             UnixTime ut = UnixTime.class.cast(formattable);
             name =
@@ -106,6 +114,13 @@ final class TimezoneNameProcessor
         } else {
             throw new IllegalArgumentException(
                 "Cannot extract time zone name from: " + formattable);
+        }
+
+        int start = -1;
+        int printed = 0;
+
+        if (buffer instanceof CharSequence) {
+            start = ((CharSequence) buffer).length();
         }
 
         buffer.append(name);
@@ -143,6 +158,77 @@ final class TimezoneNameProcessor
             return;
         }
 
+        Locale locale =
+            step.getAttribute(Attributes.LOCALE, attributes, Locale.ROOT);
+        StringBuilder name = new StringBuilder();
+
+        while (pos < len) {
+            char c = text.charAt(pos);
+
+            if (Character.isLetter(c)) {
+                name.append(c);
+                pos++;
+            } else {
+                break;
+            }
+        }
+
+        String key = name.toString().toUpperCase(locale);
+
+        if (
+            key.startsWith("GMT")
+            || key.startsWith("UT")
+        ) {
+            this.fallback.parse(text, status, attributes, parsedResult, step);
+            return;
+        }
+
+        Map<String, List<TZID>> cached = CACHE.get(locale);
+
+        if (cached == null) {
+            cached = this.fillCache(locale);
+        }
+
+        List<TZID> zones = cached.get(key);
+
+        if ((zones == null) || zones.isEmpty()) {
+            status.setError(
+                start,
+                "Unknown time zone name: " + key);
+            return;
+        } else if (zones.size() > 1) { // tz name not unique
+            List<TZID> candidates = new ArrayList<TZID>(zones);
+
+            for (TZID tz : zones) {
+                boolean found = false;
+
+                for (TZID p : this.preferredZones) {
+                    if (p.canonical().equals(tz.canonical())) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    candidates.remove(tz);
+                }
+            }
+
+            zones = candidates;
+        }
+
+        if (zones.size() == 1) {
+            parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
+            status.setPosition(pos);
+        } else if (zones.isEmpty()) {
+            status.setError(
+                start,
+                "Time zone id not found among preferred time zones.");
+        } else {
+            status.setError(
+                start,
+                "Time zone name is not unique: " + key);
+        }
 
     }
 
@@ -167,25 +253,45 @@ final class TimezoneNameProcessor
 
     }
 
-    private static ZonalOffset getOffset(
-        ChronoEntity<?> formattable,
-        FormatStep step,
-        Attributes attributes
-    ) {
+    private Map<String, List<TZID>> fillCache(Locale locale) {
 
-        AttributeQuery aq = step.getQuery(attributes);
+        List<TZID> zones;
+        Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
 
-        if (aq.contains(Attributes.TIMEZONE_ID)) {
-            TZID tzid = aq.get(Attributes.TIMEZONE_ID);
+        for (TZID tzid : TimeZone.getAvailableIDs()) {
+            TimeZone zone = TimeZone.of(tzid);
 
-            if (tzid instanceof ZonalOffset) {
-                return (ZonalOffset) tzid;
+            String winterTime =
+                zone.getDisplayName(false, this.abbreviated, locale)
+                    .toUpperCase(locale);
+            zones = map.get(winterTime);
+
+            if (zones == null) {
+                zones = new ArrayList<TZID>();
+                map.put(winterTime, zones);
             }
+
+            zones.add(tzid);
+
+            String summerTime =
+                zone.getDisplayName(true, this.abbreviated, locale)
+                    .toUpperCase(locale);
+
+            zones = map.get(summerTime);
+
+            if (zones == null) {
+                zones = new ArrayList<TZID>();
+                map.put(summerTime, zones);
+            }
+
+            zones.add(tzid);
         }
 
-        throw new IllegalArgumentException(
-            "Cannot extract time zone offset from format attributes for: "
-            + formattable);
+        if (CACHE.size() < MAX) {
+            CACHE.put(locale, map);
+        }
+
+        return map;
 
     }
 

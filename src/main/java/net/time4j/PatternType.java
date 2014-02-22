@@ -30,6 +30,7 @@ import net.time4j.format.DisplayMode;
 import net.time4j.format.OutputContext;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextWidth;
+import net.time4j.tz.TZID;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -235,7 +236,8 @@ public enum PatternType
      *  <tr>
      *      <td>TIMEZONE_NAME</td>
      *      <td>z</td>
-     *      <td>Wird in einem zuk&uuml;nftigen Release unterst&uuml;tzt.</td>
+     *      <td>1-3 Symbole f&uuml;r die Kurzform, 4 Symbole f&uuml;r den
+     *      langen Zeitzonennamen.</td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_OFFSET</td>
@@ -507,9 +509,18 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-                // TODO: implement time zone name support
-                throw new UnsupportedOperationException(
-                    symbol + " will be supported in a future release.");
+                TZID p = TZID.EUROPE.BERLIN;
+                Set<TZID> preferredZones =
+                    Collections.singleton(p);
+                if (count < 4) {
+                    builder.addTimezoneName(true, preferredZones);
+                } else if (count == 4) {
+                    builder.addTimezoneName(false, preferredZones);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
             case 'Z':
                 if (count < 4) {
                     builder.addTimezoneOffset(
