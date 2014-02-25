@@ -1938,6 +1938,25 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
+         *
+         * @param   abbreviated     abbreviations to be used?
+         * @param   preferredZones  preferred time zone ids for resolving
+         *                          duplicates
+         * @return  this instance for method chaining
+         */
+        public Builder<T> addTimezoneName(
+            boolean abbreviated,
+            Set<TZID> preferredZones
+        ) {
+
+            this.appendProcessor(
+                new TimezoneNameProcessor(abbreviated, preferredZones));
+            return this;
+
+        }
+
+        /**
          * <p>F&uuml;gt einen Zeitzonen-Offset in typischer ISO-8601-Notation
          * hinzu. </p>
          *
@@ -2023,25 +2042,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        /**
-         * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
-         *
-         * @param   abbreviated     abbreviations to be used?
-         * @param   preferredZones  preferred time zone ids for resolving
-         *                          duplicates
-         * @return  this instance for method chaining
-         */
-        public Builder<T> addTimezoneName(
-            boolean abbreviated,
-            Set<TZID> preferredZones
-        ) {
-
-            this.appendProcessor(
-                new TimezoneNameProcessor(abbreviated, preferredZones));
-            return this;
-
-        }
-        
         /**
          * <p>F&uuml;gt einen Zeitzonen-Offset in lokalisierter Notation
          * hinzu. </p>

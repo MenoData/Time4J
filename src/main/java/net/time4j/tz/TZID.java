@@ -47,7 +47,7 @@ package net.time4j.tz;
  * kapseln. </p>
  *
  * <p>Die vordefinierten Enum-Konstanten spiegeln aktuell die TZ-Version
- * <span style="text-decoration:underline;"><tt>2011n</tt></span> wider
+ * <span style="text-decoration:underline;"><tt>2013i</tt></span> wider
  * und sind in der Regel mit Zeitzonen verkn&uuml;pft, deren Regeln sich im
  * Laufe der Zeit ge&auml;ndert haben oder es aktuell tun. Die Enum-Konstanten
  * bedeuten <strong>NICHT</strong>, da&szlig; sie auch g&uuml;ltig
@@ -91,70 +91,75 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        ABIDJAN("Abidjan"),
-        ACCRA("Accra"),
-        ADDIS_ABABA("Addis_Ababa"),
-        ALGIERS("Algiers"),
-        ASMARA("Asmara"),
-        BAMAKO("Bamako"),
-        BANGUI("Bangui"),
-        BANJUL("Banjul"),
-        BISSAU("Bissau"),
-        BLANTYRE("Blantyre"),
-        BRAZZAVILLE("Brazzaville"),
-        BUJUMBURA("Bujumbura"),
-        CAIRO("Cairo"),
-        CASABLANCA("Casablanca"),
-        CEUTA("Ceuta"),
-        CONAKRY("Conakry"),
-        DAKAR("Dakar"),
-        DAR_ES_SALAAM("Dar_es_Salaam"),
-        DJIBOUTI("Djibouti"),
-        DOUALA("Douala"),
-        EL_AAIUN("El_Aaiun"),
-        FREETOWN("Freetown"),
-        GABORONE("Gaborone"),
-        HARARE("Harare"),
-        JOHANNESBURG("Johannesburg"),
-        JUBA("Juba"),
-        KAMPALA("Kampala"),
-        KHARTOUM("Khartoum"),
-        KIGALI("Kigali"),
-        KINSHASA("Kinshasa"),
-        LAGOS("Lagos"),
-        LIBREVILLE("Libreville"),
-        LOME("Lome"),
-        LUANDA("Luanda"),
-        LUBUMBASHI("Lubumbashi"),
-        LUSAKA("Lusaka"),
-        MALABO("Malabo"),
-        MAPUTO("Maputo"),
-        MASERU("Maseru"),
-        MBABANE("Mbabane"),
-        MOGADISHU("Mogadishu"),
-        MONROVIA("Monrovia"),
-        NAIROBI("Nairobi"),
-        NDJAMENA("Ndjamena"),
-        NIAMEY("Niamey"),
-        NOUAKCHOTT("Nouakchott"),
-        OUAGADOUGOU("Ouagadougou"),
-        PORTO_NOVO("Porto-Novo"),
-        SAO_TOME("Sao_Tome"),
-        TRIPOLI("Tripoli"),
-        TUNIS("Tunis"),
-        WINDHOEK("Windhoek");
+        ABIDJAN("Abidjan", "CI"),
+        ACCRA("Accra", "GH"),
+        ADDIS_ABABA("Addis_Ababa", "ET"),
+        ALGIERS("Algiers", "DZ"),
+        ASMARA("Asmara", "ER"),
+        BAMAKO("Bamako", "ML"),
+        BANGUI("Bangui", "CF"),
+        BANJUL("Banjul", "GM"),
+        BISSAU("Bissau", "GW"),
+        BLANTYRE("Blantyre", "MW"),
+        BRAZZAVILLE("Brazzaville", "CG"),
+        BUJUMBURA("Bujumbura", "BI"),
+        CAIRO("Cairo", "EG"),
+        CASABLANCA("Casablanca", "MA"),
+        CEUTA("Ceuta", "ES"),
+        CONAKRY("Conakry", "GN"),
+        DAKAR("Dakar", "SN"),
+        DAR_ES_SALAAM("Dar_es_Salaam", "TZ"),
+        DJIBOUTI("Djibouti", "DJ"),
+        DOUALA("Douala", "CM"),
+        EL_AAIUN("El_Aaiun", "EH"),
+        FREETOWN("Freetown", "SL"),
+        GABORONE("Gaborone", "BW"),
+        HARARE("Harare", "ZW"),
+        JOHANNESBURG("Johannesburg", "ZA"),
+        JUBA("Juba", "SS"),
+        KAMPALA("Kampala", "UG"),
+        KHARTOUM("Khartoum", "SD"),
+        KIGALI("Kigali", "RW"),
+        KINSHASA("Kinshasa", "CD"),
+        LAGOS("Lagos", "NG"),
+        LIBREVILLE("Libreville", "GA"),
+        LOME("Lome", "TG"),
+        LUANDA("Luanda", "AO"),
+        LUBUMBASHI("Lubumbashi", "CD"),
+        LUSAKA("Lusaka", "ZM"),
+        MALABO("Malabo", "GQ"),
+        MAPUTO("Maputo", "MZ"),
+        MASERU("Maseru", "LS"),
+        MBABANE("Mbabane", "SZ"),
+        MOGADISHU("Mogadishu", "SO"),
+        MONROVIA("Monrovia", "LR"),
+        NAIROBI("Nairobi", "KE"),
+        NDJAMENA("Ndjamena", "TD"),
+        NIAMEY("Niamey", "NE"),
+        NOUAKCHOTT("Nouakchott", "MR"),
+        OUAGADOUGOU("Ouagadougou", "BF"),
+        PORTO_NOVO("Porto-Novo", "BJ"),
+        SAO_TOME("Sao_Tome", "ST"),
+        TRIPOLI("Tripoli", "LY"),
+        TUNIS("Tunis", "TN"),
+        WINDHOEK("Windhoek", "NA");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private AFRICA(String city) {
+        private AFRICA(
+            String city,
+            String country
+        ) {
 
             this.id = "Africa/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -179,6 +184,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return this.country;
+
+        }
+
     }
 
     /**
@@ -189,135 +200,145 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        ADAK("Adak"),
-        ANCHORAGE("Anchorage"),
-        ANGUILLA("Anguilla"),
-        ANTIGUA("Antigua"),
-        ARAGUAINA("Araguaina"),
-        ARUBA("Aruba"),
-        ASUNCION("Asuncion"),
-        ATIKOKAN("Atikokan"),
-        BAHIA("Bahia"),
-        BAHIA_BANDERAS("Bahia_Banderas"),
-        BARBADOS("Barbados"),
-        BELEM("Belem"),
-        BELIZE("Belize"),
-        BLANC_SABLON("Blanc-Sablon"),
-        BOA_VISTA("Boa_Vista"),
-        BOGOTA("Bogota"),
-        BOISE("Boise"),
-        CAMBRIDGE_BAY("Cambridge_Bay"),
-        CAMPO_GRANDE("Campo_Grande"),
-        CANCUN("Cancun"),
-        CARACAS("Caracas"),
-        CAYENNE("Cayenne"),
-        CAYMAN("Cayman"),
-        CHICAGO("Chicago"),
-        CHIHUAHUA("Chihuahua"),
-        COSTA_RICA("Costa_Rica"),
-        CUIABA("Cuiaba"),
-        CURACAO("Curacao"),
-        DANMARKSHAVN("Danmarkshavn"),
-        DAWSON("Dawson"),
-        DAWSON_CREEK("Dawson_Creek"),
-        DENVER("Denver"),
-        DETROIT("Detroit"),
-        DOMINICA("Dominica"),
-        EDMONTON("Edmonton"),
-        EIRUNEPE("Eirunepe"),
-        EL_SALVADOR("El_Salvador"),
-        FORTALEZA("Fortaleza"),
-        GLACE_BAY("Glace_Bay"),
-        GODTHAB("Godthab"),
-        GOOSE_BAY("Goose_Bay"),
-        GRAND_TURK("Grand_Turk"),
-        GRENADA("Grenada"),
-        GUADELOUPE("Guadeloupe"),
-        GUATEMALA("Guatemala"),
-        GUAYAQUIL("Guayaquil"),
-        GUYANA("Guyana"),
-        HALIFAX("Halifax"),
-        HAVANA("Havana"),
-        HERMOSILLO("Hermosillo"),
-        INUVIK("Inuvik"),
-        IQALUIT("Iqaluit"),
-        JAMAICA("Jamaica"),
-        JUNEAU("Juneau"),
-        LA_PAZ("La_Paz"),
-        LIMA("Lima"),
-        LOS_ANGELES("Los_Angeles"),
-        MACEIO("Maceio"),
-        MANAGUA("Managua"),
-        MANAUS("Manaus"),
-        MARTINIQUE("Martinique"),
-        MATAMOROS("Matamoros"),
-        MAZATLAN("Mazatlan"),
-        MENOMINEE("Menominee"),
-        MERIDA("Merida"),
-        METLAKATLA("Metlakatla"),
-        MEXICO_CITY("Mexico_City"),
-        MIQUELON("Miquelon"),
-        MONCTON("Moncton"),
-        MONTERREY("Monterrey"),
-        MONTEVIDEO("Montevideo"),
-        MONTREAL("Montreal"),
-        MONTSERRAT("Montserrat"),
-        NASSAU("Nassau"),
-        NEW_YORK("New_York"),
-        NIPIGON("Nipigon"),
-        NOME("Nome"),
-        NORONHA("Noronha"),
-        OJINAGA("Ojinaga"),
-        PANAMA("Panama"),
-        PANGNIRTUNG("Pangnirtung"),
-        PARAMARIBO("Paramaribo"),
-        PHOENIX("Phoenix"),
-        PORT_OF_SPAIN("Port_of_Spain"),
-        PORT_AU_PRINCE("Port-au-Prince"),
-        PORTO_VELHO("Porto_Velho"),
-        PUERTO_RICO("Puerto_Rico"),
-        RAINY_RIVER("Rainy_River"),
-        RANKIN_INLET("Rankin_Inlet"),
-        RECIFE("Recife"),
-        REGINA("Regina"),
-        RESOLUTE("Resolute"),
-        RIO_BRANCO("Rio_Branco"),
-        SANTA_ISABEL("Santa_Isabel"),
-        SANTAREM("Santarem"),
-        SANTIAGO("Santiago"),
-        SANTO_DOMINGO("Santo_Domingo"),
-        SAO_PAULO("Sao_Paulo"),
-        SCORESBYSUND("Scoresbysund"),
-        SITKA("Sitka"),
-        ST_JOHNS("St_Johns"),
-        ST_KITTS("St_Kitts"),
-        ST_LUCIA("St_Lucia"),
-        ST_THOMAS("St_Thomas"),
-        ST_VINCENT("St_Vincent"),
-        SWIFT_CURRENT("Swift_Current"),
-        TEGUCIGALPA("Tegucigalpa"),
-        THULE("Thule"),
-        THUNDER_BAY("Thunder_Bay"),
-        TIJUANA("Tijuana"),
-        TORONTO("Toronto"),
-        TORTOLA("Tortola"),
-        VANCOUVER("Vancouver"),
-        WHITEHORSE("Whitehorse"),
-        WINNIPEG("Winnipeg"),
-        YAKUTAT("Yakutat"),
-        YELLOWKNIFE("Yellowknife");
+        ADAK("Adak", "US"),
+        ANCHORAGE("Anchorage", "US"),
+        ANGUILLA("Anguilla", "AI"),
+        ANTIGUA("Antigua", "AG"),
+        ARAGUAINA("Araguaina", "BR"),
+        ARUBA("Aruba", "AW"),
+        ASUNCION("Asuncion", "PY"),
+        ATIKOKAN("Atikokan", "CA"),
+        BAHIA("Bahia", "BR"),
+        BAHIA_BANDERAS("Bahia_Banderas", "MX"),
+        BARBADOS("Barbados", "BB"),
+        BELEM("Belem", "BR"),
+        BELIZE("Belize", "BZ"),
+        BLANC_SABLON("Blanc-Sablon", "CA"),
+        BOA_VISTA("Boa_Vista", "BR"),
+        BOGOTA("Bogota", "CO"),
+        BOISE("Boise", "US"),
+        CAMBRIDGE_BAY("Cambridge_Bay", "CA"),
+        CAMPO_GRANDE("Campo_Grande", "BR"),
+        CANCUN("Cancun", "MX"),
+        CARACAS("Caracas", "VE"),
+        CAYENNE("Cayenne", "GF"),
+        CAYMAN("Cayman", "KY"),
+        CHICAGO("Chicago", "US"),
+        CHIHUAHUA("Chihuahua", "MX"),
+        COSTA_RICA("Costa_Rica", "CR"),
+        CRESTON("Creston", "CA"),
+        CUIABA("Cuiaba", "BR"),
+        CURACAO("Curacao", "CW"),
+        DANMARKSHAVN("Danmarkshavn", "GL"),
+        DAWSON("Dawson", "CA"),
+        DAWSON_CREEK("Dawson_Creek", "CA"),
+        DENVER("Denver", "US"),
+        DETROIT("Detroit", "US"),
+        DOMINICA("Dominica", "DM"),
+        EDMONTON("Edmonton", "CA"),
+        EIRUNEPE("Eirunepe", "BR"),
+        EL_SALVADOR("El_Salvador", "SV"),
+        FORTALEZA("Fortaleza", "BR"),
+        GLACE_BAY("Glace_Bay", "CA"),
+        GODTHAB("Godthab", "GL"),
+        GOOSE_BAY("Goose_Bay", "CA"),
+        GRAND_TURK("Grand_Turk", "TC"),
+        GRENADA("Grenada", "GD"),
+        GUADELOUPE("Guadeloupe", "GP"),
+        GUATEMALA("Guatemala", "GT"),
+        GUAYAQUIL("Guayaquil", "EC"),
+        GUYANA("Guyana", "GY"),
+        HALIFAX("Halifax", "CA"),
+        HAVANA("Havana", "CU"),
+        HERMOSILLO("Hermosillo", "MX"),
+        INUVIK("Inuvik", "CA"),
+        IQALUIT("Iqaluit", "CA"),
+        JAMAICA("Jamaica", "JM"),
+        JUNEAU("Juneau", "US"),
+        LA_PAZ("La_Paz", "BO"),
+        LIMA("Lima", "PE"),
+        LOS_ANGELES("Los_Angeles", "US"),
+        LOWER_PRINCES("Lower_Princes", "SX"), // link to America/Curacao
+        KRALENDIJK("Kralendijk", "BQ"), // link to America/Curacao
+        MACEIO("Maceio", "BR"),
+        MANAGUA("Managua", "NI"),
+        MANAUS("Manaus", "BR"),
+        MARIGOT("Marigot", "MF"), // link to America/Port_of_Spain
+        MARTINIQUE("Martinique", "MQ"),
+        MATAMOROS("Matamoros", "MX"),
+        MAZATLAN("Mazatlan", "MX"),
+        MENOMINEE("Menominee", "US"),
+        MERIDA("Merida", "MX"),
+        METLAKATLA("Metlakatla", "US"),
+        MEXICO_CITY("Mexico_City", "MX"),
+        MIQUELON("Miquelon", "PM"),
+        MONCTON("Moncton", "CA"),
+        MONTERREY("Monterrey", "MX"),
+        MONTEVIDEO("Montevideo", "UY"),
+        MONTREAL("Montreal", "CA"),
+        MONTSERRAT("Montserrat", "MS"),
+        NASSAU("Nassau", "BS"),
+        NEW_YORK("New_York", "US"),
+        NIPIGON("Nipigon", "CA"),
+        NOME("Nome", "US"),
+        NORONHA("Noronha", "BR"),
+        OJINAGA("Ojinaga", "MX"),
+        PANAMA("Panama", "PA"),
+        PANGNIRTUNG("Pangnirtung", "CA"),
+        PARAMARIBO("Paramaribo", "SR"),
+        PHOENIX("Phoenix", "US"),
+        PORT_OF_SPAIN("Port_of_Spain", "TT"),
+        PORT_AU_PRINCE("Port-au-Prince", "HT"),
+        PORTO_VELHO("Porto_Velho", "BR"),
+        PUERTO_RICO("Puerto_Rico", "PR"),
+        RAINY_RIVER("Rainy_River", "CA"),
+        RANKIN_INLET("Rankin_Inlet", "CA"),
+        RECIFE("Recife", "BR"),
+        REGINA("Regina", "CA"),
+        RESOLUTE("Resolute", "CA"),
+        RIO_BRANCO("Rio_Branco", "BR"),
+        SANTA_ISABEL("Santa_Isabel", "MX"),
+        SANTAREM("Santarem", "BR"),
+        SANTIAGO("Santiago", "CL"),
+        SANTO_DOMINGO("Santo_Domingo", "DO"),
+        SAO_PAULO("Sao_Paulo", "BR"),
+        SCORESBYSUND("Scoresbysund", "GL"),
+        SITKA("Sitka", "US"),
+        ST_BARTHELEMY("St_Barthelemy", "BL"), // link to America/Port_of_Spain
+        ST_JOHNS("St_Johns", "CA"),
+        ST_KITTS("St_Kitts", "KN"),
+        ST_LUCIA("St_Lucia", "LC"),
+        ST_THOMAS("St_Thomas", "VI"),
+        ST_VINCENT("St_Vincent", "VC"),
+        SWIFT_CURRENT("Swift_Current", "CA"),
+        TEGUCIGALPA("Tegucigalpa", "HN"),
+        THULE("Thule", "GL"),
+        THUNDER_BAY("Thunder_Bay", "CA"),
+        TIJUANA("Tijuana", "MX"),
+        TORONTO("Toronto", "CA"),
+        TORTOLA("Tortola", "VG"),
+        VANCOUVER("Vancouver", "CA"),
+        WHITEHORSE("Whitehorse", "CA"),
+        WINNIPEG("Winnipeg", "CA"),
+        YAKUTAT("Yakutat", "US"),
+        YELLOWKNIFE("Yellowknife", "CA");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private AMERICA(String city) {
+        private AMERICA(
+            String city,
+            String country
+        ) {
 
             this.id = "America/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -339,6 +360,12 @@ public interface TZID {
         public String getCity() {
 
             return this.city;
+
+        }
+
+        String getCountry() {
+
+            return this.country;
 
         }
 
@@ -401,6 +428,12 @@ public interface TZID {
 
             }
 
+            String getCountry() {
+
+                return "AR";
+
+            }
+
         }
 
         /**
@@ -455,6 +488,12 @@ public interface TZID {
 
             }
 
+            String getCountry() {
+
+                return "US";
+
+            }
+
         }
 
         /**
@@ -500,6 +539,12 @@ public interface TZID {
             public String getCity() {
 
                 return this.city;
+
+            }
+
+            String getCountry() {
+
+                return "US";
 
             }
 
@@ -552,6 +597,12 @@ public interface TZID {
 
             }
 
+            String getCountry() {
+
+                return "US";
+
+            }
+
         }
 
     }
@@ -564,28 +615,33 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        CASEY("Casey"),
-        DAVIS("Davis"),
-        DUMONTDURVILLE("DumontDUrville"),
-        MACQUARIE("Macquarie"),
-        MAWSON("Mawson"),
-        MCMURDO("McMurdo"),
-        PALMER("Palmer"),
-        ROTHERA("Rothera"),
-        SYOWA("Syowa"),
-        VOSTOK("Vostok");
+        CASEY("Casey", "AQ"),
+        DAVIS("Davis", "AQ"),
+        DUMONTDURVILLE("DumontDUrville", "AQ"),
+        MACQUARIE("Macquarie", "AU"),
+        MAWSON("Mawson", "AQ"),
+        MCMURDO("McMurdo", "AQ"),
+        PALMER("Palmer", "AQ"),
+        ROTHERA("Rothera", "AQ"),
+        SYOWA("Syowa", "AQ"),
+        VOSTOK("Vostok", "AQ");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private ANTARCTICA(String city) {
+        private ANTARCTICA(
+            String city,
+            String country
+        ) {
 
             this.id = "Antarctica/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -610,6 +666,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return this.country;
+
+        }
+
     }
 
     /**
@@ -620,98 +682,102 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        ADEN("Aden"),
-        ALMATY("Almaty"),
-        AMMAN("Amman"),
-        ANADYR("Anadyr"),
-        AQTAU("Aqtau"),
-        AQTOBE("Aqtobe"),
-        ASHGABAT("Ashgabat"),
-        BAGHDAD("Baghdad"),
-        BAHRAIN("Bahrain"),
-        BAKU("Baku"),
-        BANGKOK("Bangkok"),
-        BEIRUT("Beirut"),
-        BISHKEK("Bishkek"),
-        BRUNEI("Brunei"),
-        CHOIBALSAN("Choibalsan"),
-        CHONGQING("Chongqing"),
-        COLOMBO("Colombo"),
-        DAMASCUS("Damascus"),
-        DHAKA("Dhaka"),
-        DILI("Dili"),
-        DUBAI("Dubai"),
-        DUSHANBE("Dushanbe"),
-        GAZA("Gaza"),
-        HARBIN("Harbin"),
-        HEBRON("Hebron"),
-        HO_CHI_MINH("Ho_Chi_Minh"),
-        HONG_KONG("Hong_Kong"),
-        HOVD("Hovd"),
-        IRKUTSK("Irkutsk"),
-        JAKARTA("Jakarta"),
-        JAYAPURA("Jayapura"),
-        JERUSALEM("Jerusalem"),
-        KABUL("Kabul"),
-        KAMCHATKA("Kamchatka"),
-        KARACHI("Karachi"),
-        KASHGAR("Kashgar"),
-        KATHMANDU("Kathmandu"),
-        KOLKATA("Kolkata"),
-        KRASNOYARSK("Krasnoyarsk"),
-        KUALA_LUMPUR("Kuala_Lumpur"),
-        KUCHING("Kuching"),
-        KUWAIT("Kuwait"),
-        MACAU("Macau"),
-        MAGADAN("Magadan"),
-        MAKASSAR("Makassar"),
-        MANILA("Manila"),
-        MUSCAT("Muscat"),
-        NICOSIA("Nicosia"),
-        NOVOKUZNETSK("Novokuznetsk"),
-        NOVOSIBIRSK("Novosibirsk"),
-        OMSK("Omsk"),
-        ORAL("Oral"),
-        PHNOM_PENH("Phnom_Penh"),
-        PONTIANAK("Pontianak"),
-        PYONGYANG("Pyongyang"),
-        QATAR("Qatar"),
-        QYZYLORDA("Qyzylorda"),
-        RANGOON("Rangoon"),
-        RIYADH("Riyadh"),
-        RIYADH87("Riyadh87"),
-        RIYADH88("Riyadh88"),
-        RIYADH89("Riyadh89"),
-        SAKHALIN("Sakhalin"),
-        SAMARKAND("Samarkand"),
-        SEOUL("Seoul"),
-        SHANGHAI("Shanghai"),
-        SINGAPORE("Singapore"),
-        TAIPEI("Taipei"),
-        TASHKENT("Tashkent"),
-        TBILISI("Tbilisi"),
-        TEHRAN("Tehran"),
-        THIMPHU("Thimphu"),
-        TOKYO("Tokyo"),
-        ULAANBAATAR("Ulaanbaatar"),
-        URUMQI("Urumqi"),
-        VIENTIANE("Vientiane"),
-        VLADIVOSTOK("Vladivostok"),
-        YAKUTSK("Yakutsk"),
-        YEKATERINBURG("Yekaterinburg"),
-        YEREVAN("Yerevan");
+        ADEN("Aden", "YE"),
+        ALMATY("Almaty", "KZ"),
+        AMMAN("Amman", "JO"),
+        ANADYR("Anadyr", "RU"),
+        AQTAU("Aqtau", "KZ"),
+        AQTOBE("Aqtobe", "KZ"),
+        ASHGABAT("Ashgabat", "TM"),
+        BAGHDAD("Baghdad", "IQ"),
+        BAHRAIN("Bahrain", "BH"),
+        BAKU("Baku", "AZ"),
+        BANGKOK("Bangkok", "TH"),
+        BEIRUT("Beirut", "LB"),
+        BISHKEK("Bishkek", "KG"),
+        BRUNEI("Brunei", "BN"),
+        CHOIBALSAN("Choibalsan", "MN"),
+        CHONGQING("Chongqing", "CN"),
+        COLOMBO("Colombo", "LK"),
+        DAMASCUS("Damascus", "SY"),
+        DHAKA("Dhaka", "BD"),
+        DILI("Dili", "TL"),
+        DUBAI("Dubai", "AE"),
+        DUSHANBE("Dushanbe", "TJ"),
+        GAZA("Gaza", "PS"),
+        HARBIN("Harbin", "CN"),
+        HEBRON("Hebron", "PS"),
+        HO_CHI_MINH("Ho_Chi_Minh", "VN"),
+        HONG_KONG("Hong_Kong", "HK"),
+        HOVD("Hovd", "MN"),
+        IRKUTSK("Irkutsk", "RU"),
+        JAKARTA("Jakarta", "ID"),
+        JAYAPURA("Jayapura", "ID"),
+        JERUSALEM("Jerusalem", "IL"),
+        KABUL("Kabul", "AF"),
+        KAMCHATKA("Kamchatka", "RU"),
+        KARACHI("Karachi", "PK"),
+        KASHGAR("Kashgar", "CN"),
+        KATHMANDU("Kathmandu", "NP"),
+        KHANDYGA("Khandyga", "RU"),
+        KOLKATA("Kolkata", "IN"),
+        KRASNOYARSK("Krasnoyarsk", "RU"),
+        KUALA_LUMPUR("Kuala_Lumpur", "MY"),
+        KUCHING("Kuching", "MY"),
+        KUWAIT("Kuwait", "KW"),
+        MACAU("Macau", "MO"),
+        MAGADAN("Magadan", "RU"),
+        MAKASSAR("Makassar", "ID"),
+        MANILA("Manila", "PH"),
+        MUSCAT("Muscat", "OM"),
+        NICOSIA("Nicosia", "CY"),
+        NOVOKUZNETSK("Novokuznetsk", "RU"),
+        NOVOSIBIRSK("Novosibirsk", "RU"),
+        OMSK("Omsk", "RU"),
+        ORAL("Oral", "KZ"),
+        PHNOM_PENH("Phnom_Penh", "KH"),
+        PONTIANAK("Pontianak", "ID"),
+        PYONGYANG("Pyongyang", "KP"),
+        QATAR("Qatar", "QA"),
+        QYZYLORDA("Qyzylorda", "KZ"),
+        RANGOON("Rangoon", "MM"),
+        RIYADH("Riyadh", "SA"),
+        SAKHALIN("Sakhalin", "RU"),
+        SAMARKAND("Samarkand", "UZ"),
+        SEOUL("Seoul", "KR"),
+        SHANGHAI("Shanghai", "CN"),
+        SINGAPORE("Singapore", "SG"),
+        TAIPEI("Taipei", "TW"),
+        TASHKENT("Tashkent", "UZ"),
+        TBILISI("Tbilisi", "GE"),
+        TEHRAN("Tehran", "IR"),
+        THIMPHU("Thimphu", "BT"),
+        TOKYO("Tokyo", "JP"),
+        ULAANBAATAR("Ulaanbaatar", "MN"),
+        URUMQI("Urumqi", "CN"),
+        UST_NERA("Ust-Nera", "RU"),
+        VIENTIANE("Vientiane", "LA"),
+        VLADIVOSTOK("Vladivostok", "RU"),
+        YAKUTSK("Yakutsk", "RU"),
+        YEKATERINBURG("Yekaterinburg", "RU"),
+        YEREVAN("Yerevan", "AM");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private ASIA(String city) {
+        private ASIA(
+            String city,
+            String country
+        ) {
 
             this.id = "Asia/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -736,6 +802,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return this.country;
+
+        }
+
     }
 
     /**
@@ -746,28 +818,33 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        AZORES("Azores"),
-        BERMUDA("Bermuda"),
-        CANARY("Canary"),
-        CAPE_VERDE("Cape_Verde"),
-        FAROE("Faroe"),
-        MADEIRA("Madeira"),
-        REYKJAVIK("Reykjavik"),
-        SOUTH_GEORGIA("South_Georgia"),
-        ST_HELENA("St_Helena"),
-        STANLEY("Stanley");
+        AZORES("Azores", "PT"),
+        BERMUDA("Bermuda", "BM"),
+        CANARY("Canary", "ES"),
+        CAPE_VERDE("Cape_Verde", "CV"),
+        FAROE("Faroe", "FO"),
+        MADEIRA("Madeira", "PT"),
+        REYKJAVIK("Reykjavik", "IS"),
+        SOUTH_GEORGIA("South_Georgia", "GS"),
+        ST_HELENA("St_Helena", "SH"),
+        STANLEY("Stanley", "FK");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private ATLANTIC(String city) {
+        private ATLANTIC(
+            String city,
+            String country
+        ) {
 
             this.id = "Atlantic/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -789,6 +866,12 @@ public interface TZID {
         public String getCity() {
 
             return this.city;
+
+        }
+
+        String getCountry() {
+
+            return this.country;
 
         }
 
@@ -850,6 +933,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return "AU";
+
+        }
+
     }
 
     /**
@@ -860,61 +949,78 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        AMSTERDAM("Amsterdam"),
-        ANDORRA("Andorra"),
-        ATHENS("Athens"),
-        BELGRADE("Belgrade"),
-        BERLIN("Berlin"),
-        BRUSSELS("Brussels"),
-        BUCHAREST("Bucharest"),
-        BUDAPEST("Budapest"),
-        CHISINAU("Chisinau"),
-        COPENHAGEN("Copenhagen"),
-        DUBLIN("Dublin"),
-        GIBRALTAR("Gibraltar"),
-        HELSINKI("Helsinki"),
-        ISTANBUL("Istanbul"),
-        KALININGRAD("Kaliningrad"),
-        KIEV("Kiev"),
-        LISBON("Lisbon"),
-        LONDON("London"),
-        LUXEMBOURG("Luxembourg"),
-        MADRID("Madrid"),
-        MALTA("Malta"),
-        MINSK("Minsk"),
-        MONACO("Monaco"),
-        MOSCOW("Moscow"),
-        OSLO("Oslo"),
-        PARIS("Paris"),
-        PRAGUE("Prague"),
-        RIGA("Riga"),
-        ROME("Rome"),
-        SAMARA("Samara"),
-        SIMFEROPOL("Simferopol"),
-        SOFIA("Sofia"),
-        STOCKHOLM("Stockholm"),
-        TALLINN("Tallinn"),
-        TIRANE("Tirane"),
-        UZHGOROD("Uzhgorod"),
-        VADUZ("Vaduz"),
-        VIENNA("Vienna"),
-        VILNIUS("Vilnius"),
-        VOLGOGRAD("Volgograd"),
-        WARSAW("Warsaw"),
-        ZAPOROZHYE("Zaporozhye"),
-        ZURICH("Zurich");
+        AMSTERDAM("Amsterdam", "NL"),
+        ANDORRA("Andorra", "AD"),
+        ATHENS("Athens", "GR"),
+        BELGRADE("Belgrade", "RS"),
+        BERLIN("Berlin", "DE"),
+        BRATISLAVA("Bratislava", "SK"), // link to Europe/Prague
+        BRUSSELS("Brussels", "BE"),
+        BUCHAREST("Bucharest", "RO"),
+        BUDAPEST("Budapest", "HU"),
+        CHISINAU("Chisinau", "MD"),
+        COPENHAGEN("Copenhagen", "DK"),
+        DUBLIN("Dublin", "IE"),
+        GIBRALTAR("Gibraltar", "GI"),
+        GUERNSEY("Guernsey", "GG"), // link to Europe/London
+        HELSINKI("Helsinki", "FI"),
+        ISLE_OF_MAN("Isle_of_Man", "IM"), // link to Europe/London
+        ISTANBUL("Istanbul", "TR"),
+        JERSEY("Jersey", "JE"), // link to Europe/London
+        KALININGRAD("Kaliningrad", "RU"),
+        KIEV("Kiev", "UA"),
+        LISBON("Lisbon", "PT"),
+        LJUBLJANA("Ljubljana", "SI"), // link to Europe/Belgrade
+        LONDON("London", "GB"),
+        LUXEMBOURG("Luxembourg", "LU"),
+        MADRID("Madrid", "ES"),
+        MALTA("Malta", "MT"),
+        MARIEHAMN("Mariehamn", "AX"), // link to Europe/Helsinki
+        MINSK("Minsk", "BY"),
+        MONACO("Monaco", "MC"),
+        MOSCOW("Moscow", "RU"),
+        OSLO("Oslo", "NO"),
+        PARIS("Paris", "FR"),
+        PODGORICA("Podgorica", "ME"), // link to Europe/Belgrade
+        PRAGUE("Prague", "CZ"),
+        RIGA("Riga", "LV"),
+        ROME("Rome", "IT"),
+        SAMARA("Samara", "RU"),
+        SAN_MARINO("San_Marino", "SM"), // link to Europe/Rome
+        SARAJEVO("Sarajevo", "BA"), // link to Europe/Belgrade
+        SIMFEROPOL("Simferopol", "UA"),
+        SOFIA("Sofia", "BG"),
+        SKOPJE("Skopje", "MK"), // link to Europe/Belgrade
+        STOCKHOLM("Stockholm", "SE"),
+        TALLINN("Tallinn", "EE"),
+        TIRANE("Tirane", "AL"),
+        UZHGOROD("Uzhgorod", "UA"),
+        VADUZ("Vaduz", "LI"),
+        VATICAN("Vatican", "VA"), // link to Europe/Rome
+        VIENNA("Vienna", "AT"),
+        VILNIUS("Vilnius", "LT"),
+        VOLGOGRAD("Volgograd", "RU"),
+        WARSAW("Warsaw", "PL"),
+        ZAGREB("Zagreb", "HR"), // link to Europe/Belgrade
+        ZAPOROZHYE("Zaporozhye", "UA"),
+        ZURICH("Zurich", "CH");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private EUROPE(String city) {
+        private EUROPE(
+            String city,
+            String country
+        ) {
 
             this.id = "Europe/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -939,6 +1045,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return this.country;
+
+        }
+
     }
 
     /**
@@ -949,29 +1061,34 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        ANTANANARIVO("Antananarivo"),
-        CHAGOS("Chagos"),
-        CHRISTMAS("Christmas"),
-        COCOS("Cocos"),
-        COMORO("Comoro"),
-        KERGUELEN("Kerguelen"),
-        MAHE("Mahe"),
-        MALDIVES("Maldives"),
-        MAURITIUS("Mauritius"),
-        MAYOTTE("Mayotte"),
-        REUNION("Reunion");
+        ANTANANARIVO("Antananarivo", "MG"),
+        CHAGOS("Chagos", "IO"),
+        CHRISTMAS("Christmas", "CX"),
+        COCOS("Cocos", "CC"),
+        COMORO("Comoro", "KM"),
+        KERGUELEN("Kerguelen", "TF"),
+        MAHE("Mahe", "SC"),
+        MALDIVES("Maldives", "MV"),
+        MAURITIUS("Mauritius", "MU"),
+        MAYOTTE("Mayotte", "YT"),
+        REUNION("Reunion", "RE");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private INDIAN(String city) {
+        private INDIAN(
+            String city,
+            String country
+        ) {
 
             this.id = "Indian/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -996,6 +1113,12 @@ public interface TZID {
 
         }
 
+        String getCountry() {
+
+            return this.country;
+
+        }
+
     }
 
     /**
@@ -1006,56 +1129,61 @@ public interface TZID {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        APIA("Apia"),
-        AUCKLAND("Auckland"),
-        CHATHAM("Chatham"),
-        CHUUK("Chuuk"),
-        EASTER("Easter"),
-        EFATE("Efate"),
-        ENDERBURY("Enderbury"),
-        FAKAOFO("Fakaofo"),
-        FIJI("Fiji"),
-        FUNAFUTI("Funafuti"),
-        GALAPAGOS("Galapagos"),
-        GAMBIER("Gambier"),
-        GUADALCANAL("Guadalcanal"),
-        GUAM("Guam"),
-        HONOLULU("Honolulu"),
-        JOHNSTON("Johnston"),
-        KIRITIMATI("Kiritimati"),
-        KOSRAE("Kosrae"),
-        KWAJALEIN("Kwajalein"),
-        MAJURO("Majuro"),
-        MARQUESAS("Marquesas"),
-        MIDWAY("Midway"),
-        NAURU("Nauru"),
-        NIUE("Niue"),
-        NORFOLK("Norfolk"),
-        NOUMEA("Noumea"),
-        PAGO_PAGO("Pago_Pago"),
-        PALAU("Palau"),
-        PITCAIRN("Pitcairn"),
-        POHNPEI("Pohnpei"),
-        PORT_MORESBY("Port_Moresby"),
-        RAROTONGA("Rarotonga"),
-        SAIPAN("Saipan"),
-        TAHITI("Tahiti"),
-        TARAWA("Tarawa"),
-        TONGATAPU("Tongatapu"),
-        WAKE("Wake"),
-        WALLIS("Wallis");
+        APIA("Apia", "WS"),
+        AUCKLAND("Auckland", "NZ"),
+        CHATHAM("Chatham", "NZ"),
+        CHUUK("Chuuk", "FM"),
+        EASTER("Easter", "CL"),
+        EFATE("Efate", "VU"),
+        ENDERBURY("Enderbury", "KI"),
+        FAKAOFO("Fakaofo", "TK"),
+        FIJI("Fiji", "FJ"),
+        FUNAFUTI("Funafuti", "TV"),
+        GALAPAGOS("Galapagos", "EC"),
+        GAMBIER("Gambier", "PF"),
+        GUADALCANAL("Guadalcanal", "SB"),
+        GUAM("Guam", "GU"),
+        HONOLULU("Honolulu", "US"),
+        JOHNSTON("Johnston", "UM"),
+        KIRITIMATI("Kiritimati", "KI"),
+        KOSRAE("Kosrae", "FM"),
+        KWAJALEIN("Kwajalein", "MH"),
+        MAJURO("Majuro", "MH"),
+        MARQUESAS("Marquesas", "PF"),
+        MIDWAY("Midway", "UM"),
+        NAURU("Nauru", "NR"),
+        NIUE("Niue", "NU"),
+        NORFOLK("Norfolk", "NF"),
+        NOUMEA("Noumea", "NC"),
+        PAGO_PAGO("Pago_Pago", "AS"),
+        PALAU("Palau", "PW"),
+        PITCAIRN("Pitcairn", "PN"),
+        POHNPEI("Pohnpei", "FM"),
+        PORT_MORESBY("Port_Moresby", "PG"),
+        RAROTONGA("Rarotonga", "CK"),
+        SAIPAN("Saipan", "MP"),
+        TAHITI("Tahiti", "PF"),
+        TARAWA("Tarawa", "KI"),
+        TONGATAPU("Tongatapu", "TO"),
+        WAKE("Wake", "UM"),
+        WALLIS("Wallis", "WF");
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final String id;
         private final String city;
+        private final String country;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private PACIFIC(String city) {
+        private PACIFIC(
+            String city,
+            String country
+        ) {
 
             this.id = "Pacific/" + city;
             this.city = city;
+            this.country = country;
 
         }
 
@@ -1077,6 +1205,12 @@ public interface TZID {
         public String getCity() {
 
             return this.city;
+
+        }
+
+        String getCountry() {
+
+            return this.country;
 
         }
 

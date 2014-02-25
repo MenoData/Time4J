@@ -31,6 +31,7 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -74,7 +75,7 @@ final class TimezoneNameProcessor
 
         this.abbreviated = abbreviated;
         this.fallback = new LocalizedGMTProcessor(abbreviated);
-        this.preferredZones = preferredZones;
+        this.preferredZones = new LinkedHashSet<TZID>(preferredZones);
 
     }
 
@@ -160,6 +161,8 @@ final class TimezoneNameProcessor
 
         Locale locale =
             step.getAttribute(Attributes.LOCALE, attributes, Locale.ROOT);
+        Leniency leniency =
+            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
         StringBuilder name = new StringBuilder();
 
         while (pos < len) {
@@ -196,7 +199,10 @@ final class TimezoneNameProcessor
                 start,
                 "Unknown time zone name: " + key);
             return;
-        } else if (zones.size() > 1) { // tz name not unique
+        } else if (
+            (zones.size() > 1)
+            && !leniency.isLax()
+        ) { // tz name not unique
             List<TZID> candidates = new ArrayList<TZID>(zones);
 
             for (TZID tz : zones) {
@@ -217,13 +223,16 @@ final class TimezoneNameProcessor
             zones = candidates;
         }
 
-        if (zones.size() == 1) {
-            parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
-            status.setPosition(pos);
-        } else if (zones.isEmpty()) {
+        if (zones.isEmpty()) {
             status.setError(
                 start,
                 "Time zone id not found among preferred time zones.");
+        } else if (
+            (zones.size() == 1)
+            || leniency.isLax()
+        ) {
+            parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
+            status.setPosition(pos);
         } else {
             status.setError(
                 start,

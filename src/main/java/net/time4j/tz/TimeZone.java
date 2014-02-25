@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -67,6 +68,7 @@ public abstract class TimeZone
     private static int SOFT_LIMIT = 11;
 
     private static final Map<String, TZID> PREDEFINED;
+    private static final Map<String, Set<TZID>> TERRITORIES;
     private static final Provider PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
     private static final ReferenceQueue<TimeZone> QUEUE;
@@ -95,16 +97,63 @@ public abstract class TimeZone
         areas.add(TZID.INDIAN.class);
         areas.add(TZID.PACIFIC.class);
 
-        Map<String, TZID> temp = new HashMap<String, TZID>();
-        temp.put(ZonalOffset.UTC.canonical(), ZonalOffset.UTC);
+        Map<String, TZID> temp1 = new HashMap<String, TZID>();
+        temp1.put(ZonalOffset.UTC.canonical(), ZonalOffset.UTC);
 
         for (Class<? extends TZID> area : areas) {
             for (TZID tzid : area.getEnumConstants()) {
-                temp.put(tzid.canonical(), tzid);
+                temp1.put(tzid.canonical(), tzid);
             }
         }
 
-        PREDEFINED = Collections.unmodifiableMap(temp);
+        PREDEFINED = Collections.unmodifiableMap(temp1);
+
+        Map<String, Set<TZID>> temp2 = new HashMap<String, Set<TZID>>();
+        for (TZID.AFRICA tz : TZID.AFRICA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.AMERICA tz : TZID.AMERICA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.AMERICA.ARGENTINA tz : TZID.AMERICA.ARGENTINA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.AMERICA.INDIANA tz : TZID.AMERICA.INDIANA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.AMERICA.KENTUCKY tz : TZID.AMERICA.KENTUCKY.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (
+            TZID.AMERICA.NORTH_DAKOTA tz
+            : TZID.AMERICA.NORTH_DAKOTA.values()
+        ) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.ANTARCTICA tz : TZID.ANTARCTICA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.ASIA tz : TZID.ASIA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.ATLANTIC tz : TZID.ATLANTIC.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.AUSTRALIA tz : TZID.AUSTRALIA.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.EUROPE tz : TZID.EUROPE.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.INDIAN tz : TZID.INDIAN.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        for (TZID.PACIFIC tz : TZID.PACIFIC.values()) {
+            addTerritory(temp2, tz.getCountry(), tz);
+        }
+        TZID svalbard = new NamedID("Arctic/Longyearbyen");
+        temp2.put("SJ", Collections.singleton(svalbard));
+        TERRITORIES = Collections.unmodifiableMap(temp2);
 
         ServiceLoader<Provider> sl = ServiceLoader.load(Provider.class);
         Provider loaded = null;
@@ -176,6 +225,25 @@ public abstract class TimeZone
     public static List<TZID> getAvailableIDs() {
 
         return NAME_DATA.availables;
+
+    }
+
+    /**
+     * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
+     * bevorzugten Zeitzonenkennungen. </p>
+     *
+     * @param   locale  ISO-3166-alpha-2-country to be evaluated
+     * @return  unmodifiable list of preferred time zone ids
+     */
+    public static Set<TZID> getPreferredIDs(Locale locale) {
+
+        Set<TZID> p = TERRITORIES.get(locale.getCountry());
+
+        if (p == null) {
+            return Collections.emptySet();
+        } else {
+            return Collections.unmodifiableSet(p);
+        }
 
     }
 
@@ -554,6 +622,23 @@ public abstract class TimeZone
         } else {
             return new HistorizedTimeZone(tzid, history);
         }
+
+    }
+
+    private static void addTerritory(
+        Map<String, Set<TZID>> map,
+        String country,
+        TZID tz
+    ) {
+
+        Set<TZID> preferred = map.get(country);
+
+        if (preferred == null) {
+            preferred = new LinkedHashSet<TZID>();
+            map.put(country, preferred);
+        }
+
+        preferred.add(tz);
 
     }
 

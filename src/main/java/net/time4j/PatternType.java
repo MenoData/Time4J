@@ -31,6 +31,7 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.TZID;
+import net.time4j.tz.TimeZone;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -509,9 +510,7 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-                TZID p = TZID.EUROPE.BERLIN;
-                Set<TZID> preferredZones =
-                    Collections.singleton(p);
+                Set<TZID> preferredZones = TimeZone.getPreferredIDs(locale);
                 if (count < 4) {
                     builder.addTimezoneName(true, preferredZones);
                 } else if (count == 4) {
