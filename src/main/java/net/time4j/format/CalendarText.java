@@ -218,7 +218,7 @@ public final class CalendarText {
      * und Sprache zur&uuml;ck. </p>
      *
      * @param   calendarType    name of calendar system
-     * @param   locale      language
+     * @param   locale          language
      * @return  {@code CalendarText} object maybe cached
      * @see     CalendarType
      */
@@ -536,7 +536,7 @@ public final class CalendarText {
      * als Ausweichoption zur&uuml;ckgegeben. </p>
      *
      * @param   chronology      chronology to be evaluated
-     * @return  calendar type
+     * @return  calendar type, never {@code null}
      */
     static String extractCalendarType(Chronology<?> chronology) {
 

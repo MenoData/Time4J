@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
+import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
@@ -60,8 +61,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * chronologischen Text und einem chronologischen Wert des Typs T. </p>
  *
  * <p>Eine Instanz kann entweder &uuml;ber einen {@code Builder} via
- * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaket-Klasse
- * {@link net.time4j.TemporalFormatters} liefert einige vordefinierte Formate,
+ * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaketklassen
+ * wie {@link net.time4j.PlainDate} etc. liefern einige vordefinierte Formate,
  * die dann mit den {@code with()}-Methoden geeignet angepasst werden
  * k&ouml;nnen. </p>
  *
@@ -102,8 +103,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         this.chronology = chronology;
         this.defaultAttributes =
-            Attributes
-                .forLocale(locale)
+            Attributes.createDefaults(locale)
                 .setCalendarType(CalendarText.extractCalendarType(chronology))
                 .build();
         this.steps = Collections.unmodifiableList(steps);
@@ -150,7 +150,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 // Beispiel: week-of-year in Abhängigkeit von LOCALE
                 for (ChronoExtension ext : this.chronology.getExtensions()) {
                     Set<ChronoElement<?>> elements =
-                        ext.getElements(defaultAttributes);
+                        ext.getElements(
+                            defaultAttributes.getLocale(),
+                            defaultAttributes);
 
                     for (ChronoElement<?> e : elements) {
                         if (e.name().equals(element.name())) {
@@ -187,14 +189,74 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Ermittelt die Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Falls ein Bezug zu ISO-8601 ohne eine konkrete Sprache vorliegt,
+     * liefert die Methode {@code Locale.ROOT}. </p>
+     *
+     * @return  Locale (empty if related to ISO-8601, never {@code null})
+     */
+    public Locale getLocale() {
+
+        return this.getDefaultAttributes().getLocale();
+
+    }
+
+    /**
      * <p>Ermittelt die Standardattribute, welche genau dann wirksam sind,
      * wenn sie nicht durch sektionale Attribute &uuml;berschrieben werden. </p>
      *
      * <p>Die Standard-Attribute k&ouml;nnen &uuml;ber eine geeignete
-     * {@code with()}-Methode ge&auml;ndert werden. </p>
+     * {@code with()}-Methode ge&auml;ndert werden. Folgende Attribute
+     * werden vordefiniert: </p>
+     *
+     * <table border="1" style="margin-top:5px;">
+     *  <tr>
+     *      <td>{@link Attributes#CALENDAR_TYPE}</td>
+     *      <td>dependent on associated chronology</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#LANGUAGE}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#DECIMAL_SEPARATOR}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#ZERO_DIGIT}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#LENIENCY}</td>
+     *      <td>{@link Leniency#SMART}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PARSE_CASE_INSENSITIVE}</td>
+     *      <td>{@code true}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PARSE_PARTIAL_COMPARE}</td>
+     *      <td>{@code false}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#TEXT_WIDTH}</td>
+     *      <td>{@link TextWidth#WIDE}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#OUTPUT_CONTEXT}</td>
+     *      <td>{@link OutputContext#FORMAT}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PAD_CHAR}</td>
+     *      <td>Leerzeichen (SPACE)</td>
+     *  </tr>
+     * </table>
      *
      * @return  default control attributes valid for the whole formatter
      *          (can be overridden by sectional attributes)
+     * @see     #getChronology()
+     * @see     #getLocale()
      */
     public Attributes getDefaultAttributes() {
 
@@ -214,7 +276,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
 
         try {
-            this.print(formattable, buffer, this.getDefaultAttributes(), false);
+            this.print(formattable, buffer, this.defaultAttributes, false);
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe); // cannot happen
         }
@@ -243,7 +305,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return this.print(
                 formattable,
                 buffer,
-                this.getDefaultAttributes(),
+                this.defaultAttributes,
                 true
             );
         } catch (IOException ioe) {
@@ -290,7 +352,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public T parse(CharSequence text) throws ParseException {
 
         ParseLog status = new ParseLog();
-        T result = this.parse(text, status, this.getDefaultAttributes());
+        T result = this.parse(text, status, this.defaultAttributes);
 
         if (result == null) {
             throw new ParseException(
@@ -319,7 +381,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ParseLog status
     ) {
 
-        return this.parse(text, status, this.getDefaultAttributes());
+        return this.parse(text, status, this.defaultAttributes);
 
     }
 
@@ -375,7 +437,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 2: Auflösung von Elementwerten in chronologischen Erweiterungen
         for (ChronoExtension ext : this.chronology.getExtensions()) {
-            if (!ext.getElements(attributes).isEmpty()) {
+            if (!ext.getElements(this.getLocale(), attributes).isEmpty()) {
                 parsed = ext.resolve(parsed);
             }
         }
@@ -458,9 +520,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Hinweise: Sektionale Attribute werden grunds&auml;tzlich nicht
      * &uuml;bersteuert. Ist die Einstellung gleich, wird keine Kopie, sondern
      * diese Instanz zur&uuml;ckgegeben, andernfalls werden neben der Sprache
-     * automatisch die numerischen Symbole mit angepasst: </p>
+     * automatisch die Sprache und die numerischen Symbole mit angepasst: </p>
      *
      * <ul>
+     *  <li>{@link Attributes#LANGUAGE}</li>
      *  <li>{@link Attributes#ZERO_DIGIT}</li>
      *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
      * </ul>
@@ -473,41 +536,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
      *          this instance remains unaffected
-     * @see     Attributes#LOCALE
      */
     public ChronoFormatter<T> with(Locale locale) {
 
-        if (locale.equals(this.getDefaultAttributes().getLocale())) {
+        if (locale.equals(this.defaultAttributes.getLocale())) {
             return this;
         }
 
         Attributes attrs =
             new Attributes.Builder()
             .setAll(this.defaultAttributes)
-            .set(locale)
-            .build();
-        return new ChronoFormatter<T>(this, attrs);
-
-    }
-
-    /**
-     * <p>Erzeugt eine Kopie mit dem angegebenen Kalendertyp, der beim
-     * Formatieren oder Parsen verwendet werden soll. </p>
-     *
-     * @param   calendarType    new type of calendar for resource lookup
-     * @return  changed copy with the new or changed attribute while
-     *          this instance remains unaffected
-     */
-    public ChronoFormatter<T> withCalendarType(String calendarType) {
-
-        if (calendarType == null) {
-            throw new NullPointerException("Missing calendar type.");
-        }
-
-        Attributes attrs =
-            new Attributes.Builder()
-            .setAll(this.defaultAttributes)
-            .setCalendarType(calendarType)
+            .setLocale(locale)
             .build();
         return new ChronoFormatter<T>(this, attrs);
 
@@ -741,20 +780,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Konstruiert ein Hilfsobjekt zum Bauen eines Zeitformats. </p>
      *
      * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
-     * @param   chronoType  reified chronological type
+     * @param   type        reified chronological type
      * @param   locale      format locale
      * @return  new {@code Builder}-instance
      * @throws  IllegalArgumentException if given chronological type is not
      *          formattable that is if no chronology can be derived from type
      * @see     Chronology#lookup(Class)
-     * @see     Attributes#forLocale(Locale)
      */
     public static <T extends ChronoEntity<T>> ChronoFormatter.Builder<T> setUp(
-        Class<T> chronoType,
+        Class<T> type,
         Locale locale
     ) {
 
-        return new Builder<T>(chronoType, locale);
+        return new Builder<T>(type, locale);
 
     }
 
@@ -1084,7 +1122,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             int maxDigits
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 false,
                 minDigits,
@@ -1123,7 +1161,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             SignPolicy signPolicy
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 false,
                 minDigits,
@@ -1164,7 +1202,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *  int maxDigits = 6;
          *
          *  ChronoFormatter&lt;PlainTime&gt; formatter =
-         *      ChronoFormatter.setUp(PlainTime.class)
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
          *      .addInteger(
          *          element,
          *          minDigits,
@@ -1200,7 +1238,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             int defaultValue
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 false,
                 minDigits,
@@ -1238,7 +1276,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             SignPolicy signPolicy
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 false,
                 minDigits,
@@ -1270,7 +1308,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             int digits
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 true,
                 digits,
@@ -1312,7 +1350,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             int defaultValue
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 true,
                 digits,
@@ -1366,7 +1404,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <pre>
          *  ChronoFormatter&lt;PlainDate&gt; formatter =
-         *      ChronoFormatter.setUp(PlainDate.class)
+         *      ChronoFormatter.setUp(PlainDate.class, Locale.US)
          *      .addNumerical(Weekmodel.of(Locale.US).localDayOfWeek(), 1, 1)
          *      .build();
          *  System.out.println(
@@ -1399,7 +1437,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             V defaultValue
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 false,
                 minDigits,
@@ -1468,7 +1506,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             V defaultValue
         ) {
 
-            return this.appendNumber(
+            return this.addNumber(
                 element,
                 true,
                 digits,
@@ -1518,7 +1556,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *  int maxDigits = 6;
          *
          *  ChronoFormatter&lt;PlainTime&gt; formatter =
-         *      ChronoFormatter.setUp(PlainTime.class)
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
          *      .addFraction(
          *          element,
          *          minDigits,
@@ -1553,7 +1591,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             this.checkElement(element);
             this.ensureOnlyOneFractional();
-            this.appendProcessor(
+            this.addProcessor(
                 new FractionProcessor(
                     element,
                     minDigits,
@@ -1598,7 +1636,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addLiteral(String literal) {
 
-            this.appendProcessor(new LiteralProcessor(literal));
+            this.addProcessor(new LiteralProcessor(literal));
             return this;
 
         }
@@ -1617,7 +1655,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addLiteral(AttributeKey<Character> attribute) {
 
-            this.appendProcessor(new LiteralProcessor(attribute));
+            this.addProcessor(new LiteralProcessor(attribute));
             return this;
 
         }
@@ -1761,7 +1799,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addText(TextElement<?> element) {
 
             this.checkElement(element);
-            this.appendProcessor(TextProcessor.create(element), null);
+            this.addProcessor(TextProcessor.create(element), null);
             return this;
 
         }
@@ -1807,12 +1845,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (element instanceof TextElement) {
                 TextElement<?> te = TextElement.class.cast(element);
-                this.appendProcessor(
+                this.addProcessor(
                     TextProcessor.create(te),
                     defaultValue);
             } else {
                 Map<V, String> empty = Collections.emptyMap();
-                this.appendProcessor(
+                this.addProcessor(
                     new LookupProcessor<V>(element, empty),
                     defaultValue); // String-Ressource ist enum.toString()
             }
@@ -1841,7 +1879,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.appendProcessor(
+            this.addProcessor(
                 new LookupProcessor<V>(element, lookup),
                 defaultValue);
             return this;
@@ -1889,7 +1927,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.appendProcessor(
+            this.addProcessor(
                 new CustomizedProcessor<V>(element, printer, parser));
             return this;
 
@@ -1920,11 +1958,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             FormatProcessor<?> processor = new TwoDigitYearProcessor(element);
 
             if (this.reservedIndex == -1) {
-                this.appendProcessor(processor);
+                this.addProcessor(processor);
             } else {
                 int ri = this.reservedIndex;
                 FormatStep numStep = this.steps.get(ri);
-                this.appendProcessor(processor);
+                this.addProcessor(processor);
                 FormatStep lastStep = this.steps.get(this.steps.size() - 1);
 
                 if (numStep.getSection() == lastStep.getSection()) {
@@ -1950,7 +1988,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Set<TZID> preferredZones
         ) {
 
-            this.appendProcessor(
+            this.addProcessor(
                 new TimezoneNameProcessor(abbreviated, preferredZones));
             return this;
 
@@ -2036,7 +2074,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             List<String> zeroOffsets
         ) {
 
-            this.appendProcessor(
+            this.addProcessor(
                 new TimezoneOffsetProcessor(precision, extended, zeroOffsets));
             return this;
 
@@ -2079,7 +2117,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addLocalizedOffset(boolean abbreviated) {
 
-            this.appendProcessor(new LocalizedGMTProcessor(abbreviated));
+            this.addProcessor(new LocalizedGMTProcessor(abbreviated));
             return this;
 
         }
@@ -2092,7 +2130,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <pre>
          *  ChronoFormatter formatter =
-         *      ChronoFormatter.setUp(PlainTime.class)
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
          *      .addInteger(PlainTime.CLOCK_HOUR_OF_AMPM, 1, 2)
          *      .addLiteral(' ')
          *      .addText(PlainTime.AM_PM_OF_DAY)
@@ -2110,7 +2148,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addAny() {
 
             this.resetPadding();
-            this.appendProcessor(AnyProcessor.INSTANCE);
+            this.addProcessor(AnyProcessor.INSTANCE);
             return this;
 
         }
@@ -2181,27 +2219,66 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
-         * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler in der
-         * Verarbeitung nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
+         * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
+         * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
          * werden. </p>
          *
          * @return  this instance for method chaining
          */
         public Builder<T> startOptionalSection() {
 
+            return this.startOptionalSection(null);
+
+        }
+
+        /**
+         * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
+         * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
+         * werden. </p>
+         *
+         * @param   printCondition  optional condition for printing
+         * @return  this instance for method chaining
+         */
+        public Builder<T> startOptionalSection(
+            final ChronoCondition<ChronoEntity<?>> printCondition
+        ) {
+
             this.resetPadding();
             Attributes.Builder ab = new Attributes.Builder();
             Attributes previous = null;
+            ChronoCondition<ChronoEntity<?>> cc = null;
 
             if (!this.stack.isEmpty()) {
                 previous = this.stack.getLast();
                 ab.setAll(previous);
+                cc = previous.getCondition();
             }
 
             ab.set(Attributes.LEVEL, getLevel(previous) + 1);
             ab.set(Attributes.SECTION, ++this.sectionID);
-            this.stack.addLast(ab.set(Attributes.OPTIONAL, true).build());
+            ab.set(Attributes.OPTIONAL, true);
 
+            if (printCondition != null) {
+                final ChronoCondition<ChronoEntity<?>> old = cc;
+
+                if (old == null) {
+                    cc = printCondition;
+                } else {
+                    cc =
+                        new ChronoCondition<ChronoEntity<?>>(){
+                            @Override
+                            public boolean test(ChronoEntity<?> context) {
+                                return (
+                                    old.test(context)
+                                    && printCondition.test(context));
+                            }
+                        };
+                }
+
+                ab.setCondition(cc);
+            }
+
+            this.stack.addLast(ab.build());
             return this;
 
         }
@@ -2370,7 +2447,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private <V> Builder<T> appendNumber(
+        private <V> Builder<T> addNumber(
             ChronoElement<V> element,
             boolean adjacent,
             int minDigits,
@@ -2392,11 +2469,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (adjacent) {
                 if (this.reservedIndex == -1) {
-                    this.appendProcessor(np, defaultValue);
+                    this.addProcessor(np, defaultValue);
                 } else {
                     int ri = this.reservedIndex;
                     FormatStep numStep = this.steps.get(ri);
-                    this.appendProcessor(np, defaultValue);
+                    this.addProcessor(np, defaultValue);
                     FormatStep lastStep = this.steps.get(this.steps.size() - 1);
 
                     if (numStep.getSection() == lastStep.getSection()) {
@@ -2421,7 +2498,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         + "element. Consider \"appendFixedXXX\"().");
                 }
 
-                this.appendProcessor(np, defaultValue);
+                this.addProcessor(np, defaultValue);
                 this.reservedIndex = this.steps.size() - 1;
             }
 
@@ -2429,13 +2506,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private void appendProcessor(FormatProcessor<?> processor) {
+        private void addProcessor(FormatProcessor<?> processor) {
 
-            this.appendProcessor(processor, null);
+            this.addProcessor(processor, null);
 
         }
 
-        private void appendProcessor(
+        private void addProcessor(
             FormatProcessor<?> processor,
             Object replacement
         ) {
@@ -2592,7 +2669,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             try {
                 Attributes attrs = this.formatter.getDefaultAttributes();
-                String calendarType = attrs.getCalendarType();
+                String calendarType =
+                    attrs.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
                 T formattable =
                     this.formatter.getChronology().getChronoType().cast(obj);
                 Set<ElementPosition> positions =
@@ -2628,7 +2706,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public AttributedCharacterIterator formatToCharacterIterator(Object o) {
 
             String calendarType =
-                this.formatter.getDefaultAttributes().getCalendarType();
+                this.formatter
+                    .getDefaultAttributes()
+                    .get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
 
             if (calendarType.equals(ISO_CALENDAR_TYPE)) {
                 try {

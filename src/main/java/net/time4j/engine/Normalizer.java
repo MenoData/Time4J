@@ -39,7 +39,7 @@ public interface Normalizer<U> {
      *
      * @param   timespan    time span to be normalized
      * @return  normalized copy of argument which itself remains unaffected
-     * @see     net.time4j.PlainDuration#with(Normalizer)
+     * @see     net.time4j.Duration#with(Normalizer)
      */
     public TimeSpan<U> normalize(TimeSpan<? extends U> timespan);
 

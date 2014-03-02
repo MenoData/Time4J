@@ -23,6 +23,8 @@ package net.time4j.format;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
 import net.time4j.tz.TimeZone;
 import net.time4j.tz.TransitionStrategy;
@@ -37,7 +39,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 import static net.time4j.format.Leniency.LAX;
 import static net.time4j.format.Leniency.SMART;
 import static net.time4j.format.Leniency.STRICT;
@@ -65,12 +66,12 @@ public final class Attributes
     /**
      * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
      * Sprachausgabe von chronologischen Texten (Beispiel Monatsnamen)
-     * und andere Aspekte wie Wochennummerierungen steuert. </p>
+     * steuert. </p>
      *
-     * <p>Standardwert ist {@code Locale.ROOT}. </p>
+     * <p>Standardwert: {@code Locale.ROOT}. </p>
      */
-    public static final AttributeKey<Locale> LOCALE =
-        PredefinedKey.valueOf("LOCALE", Locale.class);
+    public static final AttributeKey<Locale> LANGUAGE =
+        PredefinedKey.valueOf("LANGUAGE", Locale.class);
 
     /**
      * <p>Gibt die Zeitzonen-ID an. </p>
@@ -197,6 +198,16 @@ public final class Attributes
         PredefinedKey.valueOf("PIVOT_YEAR", Integer.class);
 
     /**
+     * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
+     * Sprachausgabe von chronologischen Texten (Beispiel Monatsnamen)
+     * und andere Aspekte wie Wochennummerierungen steuert. </p>
+     *
+     * <p>Standardwert: {@code Locale.ROOT}. </p>
+     */
+    static final AttributeKey<Locale> LOCALE =
+        PredefinedKey.valueOf("_LOCALE", Locale.class);
+
+    /**
      * <p>Steuert, ob eine optionale Sektion vorliegt, in der eventuelle Fehler
      * beim Parsen nicht zum Abbruch f&uuml;hren, sondern nur zum Ignorieren
      * der interpretierten Werte. </p>
@@ -240,213 +251,23 @@ public final class Attributes
     //~ Instanzvariablen --------------------------------------------------
 
     private final Map<String, Object> attributes;
+    private final ChronoCondition<ChronoEntity<?>> printCondition;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private Attributes(Map<String, Object> map) {
+    private Attributes(
+        Map<String, Object> map,
+        ChronoCondition<ChronoEntity<?>> printCondition
+    ) {
         super();
 
         this.attributes =
             Collections.unmodifiableMap(new HashMap<String, Object>(map));
+        this.printCondition = printCondition;
 
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Konstruiert einen {@code Builder} mit ISO-8601-Bezug. </p>
-     *
-     * <p>Folgende Attribute werden vordefiniert. </p>
-     *
-     * <table border="1" style="margin-top:5px;">
-     *  <tr>
-     *      <td>{@link #CALENDAR_TYPE}</td>
-     *      <td>{@link CalendarText#ISO_CALENDAR_TYPE}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #LOCALE}</td>
-     *      <td>{@link Locale#ROOT}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #DECIMAL_SEPARATOR}</td>
-     *      <td>Komma als Standard, sonst Punkt</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #ZERO_DIGIT}</td>
-     *      <td>0</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #LENIENCY}</td>
-     *      <td>{@link Leniency#SMART}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_CASE_INSENSITIVE}</td>
-     *      <td>{@code true}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_PARTIAL_COMPARE}</td>
-     *      <td>{@code false}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #TEXT_WIDTH}</td>
-     *      <td>{@link TextWidth#WIDE}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link Attributes#OUTPUT_CONTEXT}</td>
-     *      <td>{@link OutputContext#FORMAT}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PAD_CHAR}</td>
-     *      <td>Leerzeichen (SPACE)</td>
-     *  </tr>
-     * </table>
-     */
-    public static Attributes.Builder forISO8601() {
-
-        Attributes.Builder builder = new Attributes.Builder();
-        builder.setStandardAttributes();
-        builder.set(Locale.ROOT);
-        builder.setCalendarType(ISO_CALENDAR_TYPE);
-        return builder;
-
-    }
-
-    /**
-     * <p>Konstruiert einen {@code Builder} mit der Sprach- und
-     * L&auml;ndereinstellung des Systems. </p>
-     *
-     * <p>Folgende Attribute werden vordefiniert. </p>
-     *
-     * <table border="1" style="margin-top:5px;">
-     *  <tr>
-     *      <td>{@link #LOCALE}</td>
-     *      <td>{@link Locale#getDefault()}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #DECIMAL_SEPARATOR}</td>
-     *      <td>dependent on default locale</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #ZERO_DIGIT}</td>
-     *      <td>dependent on default locale</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #LENIENCY}</td>
-     *      <td>{@link Leniency#SMART}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_CASE_INSENSITIVE}</td>
-     *      <td>{@code true}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_PARTIAL_COMPARE}</td>
-     *      <td>{@code false}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #TEXT_WIDTH}</td>
-     *      <td>{@link TextWidth#WIDE}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #OUTPUT_CONTEXT}</td>
-     *      <td>{@link OutputContext#FORMAT}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PAD_CHAR}</td>
-     *      <td>Leerzeichen (SPACE)</td>
-     *  </tr>
-     * </table>
-     */
-    public static Attributes.Builder forSystemLocale() {
-
-        return Attributes.forLocale(Locale.getDefault());
-
-    }
-
-    /**
-     * <p>Konstruiert einen {@code Builder} mit der angegebenen Sprach- und
-     * L&auml;ndereinstellung. </p>
-     *
-     * <p>Folgende Attribute werden vordefiniert. </p>
-     *
-     * <table border="1" style="margin-top:5px;">
-     *  <tr>
-     *      <td>{@link #LOCALE}</td>
-     *      <td>{locale}-parameter</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #DECIMAL_SEPARATOR}</td>
-     *      <td>dependent on {locale}-parameter</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #ZERO_DIGIT}</td>
-     *      <td>dependent on {locale}-parameter</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #LENIENCY}</td>
-     *      <td>{@link Leniency#SMART}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_CASE_INSENSITIVE}</td>
-     *      <td>{@code true}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PARSE_PARTIAL_COMPARE}</td>
-     *      <td>{@code false}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #TEXT_WIDTH}</td>
-     *      <td>{@link TextWidth#WIDE}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #OUTPUT_CONTEXT}</td>
-     *      <td>{@link OutputContext#FORMAT}</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link #PAD_CHAR}</td>
-     *      <td>Leerzeichen (SPACE)</td>
-     *  </tr>
-     * </table>
-     *
-     * @param   locale  Sprach- und L&auml;ndereinstellung
-     */
-    public static Attributes.Builder forLocale(Locale locale) {
-
-        Attributes.Builder builder = new Attributes.Builder();
-        builder.setStandardAttributes();
-        builder.set(locale);
-        return builder;
-
-    }
-
-    /**
-     * <p>Ermittelt den CLDR-Kalendertyp. </p>
-     *
-     * <p>Falls das Attribut nicht explizit vorhanden ist, wird der Kalendertyp
-     * &quot;iso8601&quot; angenommen. </p>
-     *
-     * @return  String (never {@code null})
-     * @see     #CALENDAR_TYPE
-     */
-    public String getCalendarType() {
-
-        return this.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
-
-    }
-
-    /**
-     * <p>Ermittelt die Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * <p>Falls ein Bezug zu ISO-8601 ohne eine konkrete Sprache vorliegt,
-     * liefert die Methode ein {@code Locale.ROOT}. </p>
-     *
-     * @return  Locale (empty if related to ISO-8601, never {@code null})
-     * @see     #LOCALE
-     */
-    public Locale getLocale() {
-
-        return this.get(Attributes.LOCALE, Locale.ROOT);
-
-    }
 
     @Override
     public boolean contains(AttributeKey<?> key) {
@@ -526,17 +347,52 @@ public final class Attributes
 
     }
 
+    /**
+     * <p>Ermittelt die Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Falls ein Bezug zu ISO-8601 ohne eine konkrete Sprache vorliegt,
+     * liefert die Methode ein {@code Locale.ROOT}. </p>
+     *
+     * @return  Locale (empty if related to ISO-8601, never {@code null})
+     * @see     #LOCALE
+     */
+    Locale getLocale() {
+
+        return this.get(Attributes.LOCALE, Locale.ROOT);
+
+    }
+
+    /**
+     * <p>Ermittelt eine Print-Bedingung. </p>
+     *
+     * @return  print condition object maybe {@code null}
+     */
+    ChronoCondition<ChronoEntity<?>> getCondition() {
+
+        return this.printCondition;
+
+    }
+
+    /**
+     * <p>Konstruiert einen {@code Builder} mit der angegebenen Sprach- und
+     * L&auml;ndereinstellung. </p>
+     *
+     * @param   locale  Sprach- und L&auml;ndereinstellung
+     * @return  builder instance with some predefined localized attributes
+     */
+    static Attributes.Builder createDefaults(Locale locale) {
+
+        Attributes.Builder builder = new Attributes.Builder();
+        builder.setStandardAttributes();
+        builder.setLocale(locale);
+        return builder;
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     /**
      * <p>Baut eine Menge von Formatattributen. </p>
-     *
-     * <p>Eine Instanz wird &uuml;ber eine Fabrikmethode in {@code Attributes}
-     * beschafft. </p>
-     *
-     * @see     #forISO8601()
-     * @see     #forSystemLocale()
-     * @see     #forLocale(Locale)
      */
     public static final class Builder {
 
@@ -544,13 +400,14 @@ public final class Attributes
 
         private final Map<String, Object> attributes =
             new HashMap<String, Object>();
+        private ChronoCondition<ChronoEntity<?>> printCondition = null;
 
         //~ Konstruktoren -------------------------------------------------
 
         /**
          * <p>Konstruktor. </p>
          */
-        Builder() {
+        public Builder() {
             super();
 
         }
@@ -558,15 +415,28 @@ public final class Attributes
         //~ Methoden ------------------------------------------------------
 
         /**
-         * <p>Setzt den Kalendertyp. </p>
+         * <p>Sets the calendar type. </p>
          *
-         * @param   calendarType    new calendar type for resource lookup
+         * @param   calendarType    calendar type for resource lookup
          * @return  this instance for method chaining
-         * @see     #CALENDAR_TYPE
          */
         public Builder setCalendarType(String calendarType) {
 
-            this.setInternal(Attributes.CALENDAR_TYPE, calendarType);
+            this.setInternal(CALENDAR_TYPE, calendarType);
+            return this;
+
+        }
+
+        /**
+         * <p>Setzt die Spracheinstellung. </p>
+         *
+         * @param   locale      new language setting
+         * @return  this instance for method chaining
+         * @see     #LANGUAGE
+         */
+        public Builder setLanguage(Locale locale) {
+
+            this.setInternal(LANGUAGE, locale);
             return this;
 
         }
@@ -580,10 +450,6 @@ public final class Attributes
          */
         public Builder setTimezone(TZID tzid) {
 
-            if (tzid == null) {
-                throw new NullPointerException("Missing time zone id.");
-            }
-
             this.setInternal(TIMEZONE_ID, tzid);
             return this;
 
@@ -594,64 +460,11 @@ public final class Attributes
          *
          * @return  this instance for method chaining
          * @see     #TIMEZONE_ID
+         * @see     TimeZone#ofSystem()
          */
         public Builder setSystemTimezone() {
 
             return this.setTimezone(TimeZone.ofSystem().getID());
-
-        }
-
-        /**
-         * <p>Setzt die Sprach- und L&auml;ndereinstellung. </p>
-         *
-         * <p>Die Attribute {@link #ZERO_DIGIT} und {@link #DECIMAL_SEPARATOR}
-         * werden automatisch mit angepasst. </p>
-         *
-         * @param   locale      new language and country setting
-         * @return  this instance for method chaining
-         * @see     #LOCALE
-         */
-        public Builder set(Locale locale) {
-
-            if (
-                locale.getLanguage().isEmpty()
-                && locale.getCountry().isEmpty()
-            ) {
-                locale = Locale.ROOT;
-                this.set(ZERO_DIGIT, '0');
-                this.set(DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
-            } else {
-                NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
-
-                if (symbols == null) {
-                    symbols = DEFAULT_NUMBER_SYMBOLS;
-
-                    for (Locale test : NumberFormat.getAvailableLocales()) {
-                        if (locale.equals(test)) {
-                            final DecimalFormatSymbols dfs =
-                                DecimalFormatSymbols.getInstance(locale);
-                            symbols =
-                                new NumericalSymbols(
-                                    dfs.getZeroDigit(),
-                                    dfs.getDecimalSeparator()
-                                );
-                            break;
-                        }
-                    }
-
-                    NumericalSymbols old =
-                        NUMBER_SYMBOL_CACHE.putIfAbsent(locale, symbols);
-                    if (old != null) {
-                        symbols = old;
-                    }
-                }
-
-                this.set(ZERO_DIGIT, symbols.zeroDigit);
-                this.set(DECIMAL_SEPARATOR, symbols.decimalSeparator);
-            }
-
-            this.setInternal(LOCALE, locale);
-            return this;
 
         }
 
@@ -762,8 +575,7 @@ public final class Attributes
         }
 
         /**
-         * <p>&Uuml;bernimmt alle angegebenen Attribute mit Ausnahme des
-         * Kalendertyps. </p>
+         * <p>&Uuml;bernimmt alle angegebenen Attribute. </p>
          *
          * <p>Existiert ein Formatattribut schon, wird es
          * &uuml;berschrieben. </p>
@@ -783,10 +595,18 @@ public final class Attributes
          *
          * @param   key     attribute key to be removed
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given attribute is internal
          */
         public Builder remove(AttributeKey<?> key) {
 
-            this.attributes.remove(key.name());
+            String name = key.name();
+
+            if (name.startsWith("_")) {
+                throw new IllegalArgumentException(
+                    "Internal attribute cannot be removed: " + name);
+            }
+
+            this.attributes.remove(name);
             return this;
 
         }
@@ -795,15 +615,77 @@ public final class Attributes
          * <p>Erzeugt eine neue unver&auml;nderliche Instanz der
          * Formatattribute. </p>
          *
-         * <p>Falls Kalendertyp oder {@code Locale}-Einstellung fehlen, werden
-         * als Standardwerte {@link CalendarText#ISO_CALENDAR_TYPE} und
-         * {@code Locale.ROOT} verwendet. </p>
-         *
          * @return  new instance of {@code Attributes}
          */
         public Attributes build() {
 
-            return new Attributes(this.attributes);
+            return new Attributes(this.attributes, this.printCondition);
+
+        }
+
+        /**
+         * <p>Setzt die Sprach- und L&auml;ndereinstellung. </p>
+         *
+         * <p>Die Attribute {@link #ZERO_DIGIT}, {@link #DECIMAL_SEPARATOR}
+         * und {@link #LANGUAGE} werden automatisch mit angepasst. </p>
+         *
+         * @param   locale      new language and country setting
+         * @return  this instance for method chaining
+         * @see     #LOCALE
+         */
+        Builder setLocale(Locale locale) {
+
+            if (
+                locale.getLanguage().isEmpty()
+                && locale.getCountry().isEmpty()
+            ) {
+                locale = Locale.ROOT;
+                this.set(ZERO_DIGIT, '0');
+                this.set(DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
+            } else {
+                NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
+
+                if (symbols == null) {
+                    symbols = DEFAULT_NUMBER_SYMBOLS;
+
+                    for (Locale test : NumberFormat.getAvailableLocales()) {
+                        if (locale.equals(test)) {
+                            final DecimalFormatSymbols dfs =
+                                DecimalFormatSymbols.getInstance(locale);
+                            symbols =
+                                new NumericalSymbols(
+                                    dfs.getZeroDigit(),
+                                    dfs.getDecimalSeparator()
+                                );
+                            break;
+                        }
+                    }
+
+                    NumericalSymbols old =
+                        NUMBER_SYMBOL_CACHE.putIfAbsent(locale, symbols);
+                    if (old != null) {
+                        symbols = old;
+                    }
+                }
+
+                this.set(ZERO_DIGIT, symbols.zeroDigit);
+                this.set(DECIMAL_SEPARATOR, symbols.decimalSeparator);
+            }
+
+            this.setInternal(LOCALE, locale);
+            this.setInternal(LANGUAGE, locale);
+            return this;
+
+        }
+
+        /**
+         * <p>Setzt eine Print-Bedingung. </p>
+         *
+         * @param   printCondition  condition object
+         */
+        void setCondition(ChronoCondition<ChronoEntity<?>> printCondition) {
+
+            this.printCondition = printCondition;
 
         }
 
@@ -812,7 +694,7 @@ public final class Attributes
             this.set(LENIENCY, Leniency.SMART);
             this.set(TEXT_WIDTH, TextWidth.WIDE);
             this.set(OUTPUT_CONTEXT, OutputContext.FORMAT);
-            this.set(PAD_CHAR, Character.valueOf(' '));
+            this.set(PAD_CHAR, ' ');
 
             return this;
 
@@ -824,10 +706,10 @@ public final class Attributes
         ) {
 
             if (value == null) {
-                this.attributes.remove(key.name());
-            } else {
-                this.attributes.put(key.name(), value);
+                throw new NullPointerException("Missing attribute value.");
             }
+
+            this.attributes.put(key.name(), value);
 
         }
 

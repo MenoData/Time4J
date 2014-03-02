@@ -64,7 +64,7 @@ public interface IsoUnit
      * wurde ein Punkt verlangt. </p>
      *
      * @return  char (ASCII-NULL wenn undefiniert)
-     * @see     PlainDuration#toString()
+     * @see     Duration#toString()
      */
     char getSymbol();
 

@@ -25,9 +25,10 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
-import net.time4j.format.Attributes;
 
+import java.util.Locale;
 import java.util.Set;
+
 
 /**
  * <p>Wochenmodell-Erweiterung. </p>
@@ -40,15 +41,12 @@ class WeekExtension
     //~ Methoden ------------------------------------------------------
 
     @Override
-    public Set<ChronoElement<?>> getElements(AttributeQuery attributes) {
+    public Set<ChronoElement<?>> getElements(
+        Locale locale,
+        AttributeQuery attributes
+    ) {
 
-        Weekmodel model = (
-            attributes.contains(Attributes.LOCALE)
-            ? Weekmodel.of(attributes.get(Attributes.LOCALE))
-            : Weekmodel.ISO
-        );
-
-        return model.getElements();
+        return Weekmodel.of(locale).getElements();
 
     }
 

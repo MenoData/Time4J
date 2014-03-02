@@ -21,6 +21,7 @@
 
 package net.time4j.engine;
 
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -41,10 +42,14 @@ public interface ChronoExtension {
      * f&uuml;r die gegebene Konfiguration die Erweiterung nicht relevant
      * ist. </p>
      *
+     * @param   locale          language and country setting
      * @param   attributes      configuration attributes
      * @return  extended element model
      */
-    Set<ChronoElement<?>> getElements(AttributeQuery attributes);
+    Set<ChronoElement<?>> getElements(
+        Locale locale,
+        AttributeQuery attributes
+    );
 
     /**
      * <p>Aktualisiert bei Bedarf die angegebene Wertquelle, um die Werte von

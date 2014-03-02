@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 
@@ -45,7 +46,7 @@ final class FormatStep {
     private final FormatProcessor<?> processor;
     private final int level;
     private final int section;
-    private final Attributes attributes;
+    private final Attributes sectionalAttrs;
     private final Object replacement;
     private final int reserved;
     private final int padLeft;
@@ -118,7 +119,7 @@ final class FormatStep {
         this.processor = processor;
         this.level = level;
         this.section = section;
-        this.attributes = attributes;
+        this.sectionalAttrs = attributes;
         this.replacement = replacement;
         this.reserved = reserved;
         this.padLeft = padLeft;
@@ -144,6 +145,10 @@ final class FormatStep {
         Attributes attributes,
         Set<ElementPosition> positions
     ) throws IOException {
+
+        if (!this.isPrinting(formattable)) {
+            return;
+        }
 
         if (
             (this.padLeft == 0)
@@ -417,7 +422,7 @@ final class FormatStep {
             proc,
             this.level,
             this.section,
-            this.attributes,
+            this.sectionalAttrs,
             this.replacement,
             this.reserved,
             this.padLeft,
@@ -439,7 +444,7 @@ final class FormatStep {
             this.processor,
             this.level,
             this.section,
-            this.attributes,
+            this.sectionalAttrs,
             this.replacement,
             this.reserved + reserved,
             this.padLeft,
@@ -464,7 +469,7 @@ final class FormatStep {
             this.processor,
             this.level,
             this.section,
-            this.attributes,
+            this.sectionalAttrs,
             this.replacement,
             this.reserved,
             this.padLeft + padLeft,
@@ -490,11 +495,11 @@ final class FormatStep {
         A defaultValue
     ) {
 
-        Attributes current = this.attributes;
+        Attributes current = this.sectionalAttrs;
 
         if (
-            (this.attributes == null)
-            || !this.attributes.contains(key)
+            (this.sectionalAttrs == null)
+            || !this.sectionalAttrs.contains(key)
         ) {
             current = defaultAttrs;
         }
@@ -517,7 +522,7 @@ final class FormatStep {
      */
     AttributeQuery getQuery(final Attributes defaultAttrs) {
 
-        if (this.attributes == null) {
+        if (this.sectionalAttrs == null) {
             return defaultAttrs; // Optimierung
         }
 
@@ -541,7 +546,7 @@ final class FormatStep {
             }
 
             private AttributeQuery getQuery(AttributeKey<?> key) {
-                Attributes current = FormatStep.this.attributes;
+                Attributes current = FormatStep.this.sectionalAttrs;
 
                 if (!current.contains(key)) {
                     current = defaultAttrs;
@@ -569,7 +574,7 @@ final class FormatStep {
                 this.processor.equals(that.processor)
                 && (this.level == that.level)
                 && (this.section == that.section)
-                && isEqual(this.attributes, that.attributes)
+                && isEqual(this.sectionalAttrs, that.sectionalAttrs)
                 && isEqual(this.replacement, that.replacement)
                 && (this.reserved == that.reserved)
                 && (this.padLeft == that.padLeft)
@@ -589,7 +594,10 @@ final class FormatStep {
 
         return (
             7 * this.processor.hashCode()
-            + 31 * ((this.attributes == null) ? 0 : this.attributes.hashCode())
+            + 31 * (
+                (this.sectionalAttrs == null)
+                ? 0
+                : this.sectionalAttrs.hashCode())
         );
 
     }
@@ -607,9 +615,9 @@ final class FormatStep {
         sb.append(this.level);
         sb.append(", section=");
         sb.append(this.section);
-        if (this.attributes != null) {
+        if (this.sectionalAttrs != null) {
             sb.append(", attributes=");
-            sb.append(this.attributes);
+            sb.append(this.sectionalAttrs);
         }
         if (this.replacement != null) {
             sb.append(", replacement=");
@@ -715,6 +723,16 @@ final class FormatStep {
 
         return "Pad width mismatched: "
             + this.getProcessor().getElement().name();
+
+    }
+
+    private boolean isPrinting(ChronoEntity<?> formattable) {
+        ChronoCondition<ChronoEntity<?>> printCondition =
+            this.sectionalAttrs.getCondition();
+        return (
+            (printCondition == null)
+            || printCondition.test(formattable)
+        );
 
     }
 

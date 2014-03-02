@@ -204,9 +204,7 @@ public class TemporalFormatters {
     ) {
 
         return ChronoFormatter
-            .setUp(
-                PlainTimestamp.class,
-                dateFormat.getDefaultAttributes().getLocale())
+            .setUp(PlainTimestamp.class, dateFormat.getLocale())
             .addCustomized(CALENDAR_DATE, dateFormat)
             .addCustomized(WALL_TIME, timeFormat)
             .build();

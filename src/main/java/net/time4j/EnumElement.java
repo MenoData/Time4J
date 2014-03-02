@@ -237,7 +237,7 @@ final class EnumElement<V extends Enum<V>>
         CalendarText cnames =
             CalendarText.getInstance(
                 attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LOCALE, Locale.ROOT));
+                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
         TextWidth textWidth =
             attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);

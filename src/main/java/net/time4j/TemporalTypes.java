@@ -366,7 +366,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             context =
                 Chronology.lookup(this.targetType).createFrom(
                     SystemClock.INSTANCE,
-                    Attributes.forSystemLocale().build());
+                    new Attributes.Builder().setSystemTimezone().build());
         }
 
         return this.rule.withValue(context, value, this.isLenient());
