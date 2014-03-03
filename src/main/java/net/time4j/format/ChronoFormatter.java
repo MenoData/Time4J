@@ -424,12 +424,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return null;
         }
 
-        Leniency mode = attributes.get(Attributes.LENIENCY, Leniency.SMART);
+        Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
         int index = status.getPosition();
 
         if (
             (index < text.length())
-            && !mode.isLax()
+            && !leniency.isLax()
         ) {
             status.setError(index, "Unparsed: " + sub(index, text));
             return null;
@@ -463,10 +463,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 4: Konsistenzprüfung
         if (result instanceof ChronoEntity) {
-            if (
-                (mode == Leniency.STRICT)
-                || (mode == Leniency.SMART)
-            ) {
+            if (!leniency.isLax()) {
                 TZID tzid = parsed.get(TimeZone.identifier()); // eventuell null
 
                 // Zeitzonenkonversion ergibt immer Unterschied zwischen
@@ -500,6 +497,36 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                             result = null;
                             break;
                         }
+                    }
+                }
+
+                if (
+                    leniency.isStrict()
+                    && (result instanceof UnixTime)
+                ) {
+                    if (
+                        (tzid == null)
+                        && attributes.contains(Attributes.TIMEZONE_ID)
+                    ) {
+                        tzid = attributes.get(Attributes.TIMEZONE_ID);
+                    }
+
+                    UnixTime ut = UnixTime.class.cast(result);
+                    boolean dst = TimeZone.of(tzid).isDaylightSaving(ut);
+
+                    if (dst != status.isDaylightSaving()) {
+                        StringBuilder reason = new StringBuilder(256);
+                        reason.append("Conflict found: ");
+                        reason.append("Parsed entity is ");
+                        if (!dst) {
+                            reason.append("not ");
+                        }
+                        reason.append("daylight-saving, but time zone name ");
+                        reason.append("has not the appropriate form in {");
+                        reason.append(text.toString());
+                        reason.append("}.");
+                        status.setError(text.length(), reason.toString());
+                        result = null;
                     }
                 }
             }
@@ -1977,6 +2004,36 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         /**
          * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
+         *
+         * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
+         * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
+         * Kleinschreibung der Zeitzonennamen spielt beim Parsen keine
+         * Rolle. </p>
+         *
+         * @param   abbreviated     abbreviations to be used?
+         * @return  this instance for method chaining
+         * @see     TimeZone#getPreferredIDs(Locale)
+         * @see     #addTimezoneName(boolean,Set)
+         */
+        public Builder<T> addTimeZoneName(boolean abbreviated) {
+
+            Locale loc = this.locale;
+
+            if (!this.stack.isEmpty()) {
+                loc = this.stack.getLast().get(Attributes.LOCALE, loc);
+            }
+
+            return this.addTimezoneName(
+                abbreviated,
+                TimeZone.getPreferredIDs(loc));
+
+        }
+
+        /**
+         * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
+         *
+         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen spielt
+         * beim Parsen keine Rolle. </p>
          *
          * @param   abbreviated     abbreviations to be used?
          * @param   preferredZones  preferred time zone ids for resolving

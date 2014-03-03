@@ -30,6 +30,7 @@ import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -49,8 +51,8 @@ final class TimezoneNameProcessor
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<Locale, Map<String, List<TZID>>> CACHE =
-        new ConcurrentHashMap<Locale, Map<String, List<TZID>>>();
+    private static final ConcurrentMap<Locale, TZNames> CACHE =
+        new ConcurrentHashMap<Locale, TZNames>();
     private static final int MAX = 10;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -163,6 +165,8 @@ final class TimezoneNameProcessor
             step.getAttribute(Attributes.LOCALE, attributes, Locale.ROOT);
         Leniency leniency =
             step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
+
+        // Zeitzonennamen einlesen (nur Buchstaben)
         StringBuilder name = new StringBuilder();
 
         while (pos < len) {
@@ -178,6 +182,7 @@ final class TimezoneNameProcessor
 
         String key = name.toString().toUpperCase(locale);
 
+        // fallback-case (fixed offset)
         if (
             key.startsWith("GMT")
             || key.startsWith("UT")
@@ -186,13 +191,33 @@ final class TimezoneNameProcessor
             return;
         }
 
-        Map<String, List<TZID>> cached = CACHE.get(locale);
+        // Zeitzonennamen im Cache suchen und ggf. Cache füllen
+        TZNames tzNames = CACHE.get(locale);
 
-        if (cached == null) {
-            cached = this.fillCache(locale);
+        if (tzNames == null) {
+            Map<String, List<TZID>> stdNames = this.getTZNames(locale, false);
+            Map<String, List<TZID>> dstNames = this.getTZNames(locale, true);
+            tzNames = new TZNames(stdNames, dstNames);
+
+            if (CACHE.size() < MAX) {
+                TZNames tmp = CACHE.putIfAbsent(locale, tzNames);
+
+                if (tmp != null) {
+                    tzNames = tmp;
+                }
+            }
         }
 
-        List<TZID> zones = cached.get(key);
+        // Zeitzonen-IDs bestimmen
+        boolean daylightSaving = false;
+        List<TZID> zones = null;
+
+        if (tzNames.stdNames.containsKey(key)) {
+            zones = tzNames.stdNames.get(key);
+        } else if (tzNames.dstNames.containsKey(key)) {
+            daylightSaving = true;
+            zones = tzNames.dstNames.get(key);
+        }
 
         if ((zones == null) || zones.isEmpty()) {
             status.setError(
@@ -233,6 +258,9 @@ final class TimezoneNameProcessor
         ) {
             parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
             status.setPosition(pos);
+            if (daylightSaving) {
+                status.setDaylightSaving();
+            }
         } else {
             status.setError(
                 start,
@@ -262,7 +290,10 @@ final class TimezoneNameProcessor
 
     }
 
-    private Map<String, List<TZID>> fillCache(Locale locale) {
+    private Map<String, List<TZID>> getTZNames(
+        Locale locale,
+        boolean daylightSaving
+    ) {
 
         List<TZID> zones;
         Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
@@ -270,37 +301,44 @@ final class TimezoneNameProcessor
         for (TZID tzid : TimeZone.getAvailableIDs()) {
             TimeZone zone = TimeZone.of(tzid);
 
-            String winterTime =
-                zone.getDisplayName(false, this.abbreviated, locale)
+            String tzName =
+                zone.getDisplayName(daylightSaving, this.abbreviated, locale)
                     .toUpperCase(locale);
-            zones = map.get(winterTime);
+            zones = map.get(tzName);
 
             if (zones == null) {
                 zones = new ArrayList<TZID>();
-                map.put(winterTime, zones);
-            }
-
-            zones.add(tzid);
-
-            String summerTime =
-                zone.getDisplayName(true, this.abbreviated, locale)
-                    .toUpperCase(locale);
-
-            zones = map.get(summerTime);
-
-            if (zones == null) {
-                zones = new ArrayList<TZID>();
-                map.put(summerTime, zones);
+                map.put(tzName, zones);
             }
 
             zones.add(tzid);
         }
 
-        if (CACHE.size() < MAX) {
-            CACHE.put(locale, map);
-        }
+        return Collections.unmodifiableMap(map);
 
-        return map;
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class TZNames {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final Map<String, List<TZID>> stdNames;
+        private final Map<String, List<TZID>> dstNames;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        TZNames(
+            Map<String, List<TZID>> stdNames,
+            Map<String, List<TZID>> dstNames
+        ) {
+            super();
+
+            this.stdNames = stdNames;
+            this.dstNames = dstNames;
+
+        }
 
     }
 

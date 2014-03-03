@@ -55,6 +55,7 @@ public class ParseLog {
     private int errorIndex;
     private String errorMessage;
     private ChronoEntity<?> rawValues;
+    private boolean daylightSaving;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -83,6 +84,7 @@ public class ParseLog {
         this.errorIndex = -1;
         this.errorMessage = "";
         this.rawValues = EMPTY_RAW_DATA;
+        this.daylightSaving = false;
 
     }
 
@@ -158,6 +160,9 @@ public class ParseLog {
         sb.append(this.errorMessage);
         sb.append("\", raw-values=");
         sb.append(this.rawValues);
+        if (this.daylightSaving) {
+            sb.append(", daylight-saving=true");
+        }
         sb.append(']');
         return sb.toString();
 
@@ -250,6 +255,26 @@ public class ParseLog {
         }
 
         this.rawValues = rawValues;
+
+    }
+
+    /**
+     * <p>Ein Zeitzonenname wurde als <i>daylightSaving</i> erkannt. </p>
+     */
+    void setDaylightSaving() {
+
+        this.daylightSaving = true;
+
+    }
+
+    /**
+     * <p>Wurde eine Sommerzeitform als Zeitzonenname gelesen? </p>
+     *
+     * @return  boolean
+     */
+    boolean isDaylightSaving() {
+
+        return this.daylightSaving;
 
     }
 
