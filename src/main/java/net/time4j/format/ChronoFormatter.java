@@ -61,8 +61,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * chronologischen Text und einem chronologischen Wert des Typs T. </p>
  *
  * <p>Eine Instanz kann entweder &uuml;ber einen {@code Builder} via
- * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaketklassen
- * wie {@link net.time4j.PlainDate} etc. liefern einige vordefinierte Formate,
+ * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaket-Klasse
+ * {@link net.time4j.TemporalFormatters} liefert einige vordefinierte Formate,
  * die dann mit den {@code with()}-Methoden geeignet angepasst werden
  * k&ouml;nnen. </p>
  *

@@ -21,6 +21,9 @@
 
 package net.time4j;
 
+import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
@@ -53,6 +56,13 @@ import static net.time4j.PlainTime.WALL_TIME;
 public class TemporalFormatters {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final NonZeroCondition NON_ZERO_SECOND =
+        new NonZeroCondition(PlainTime.SECOND_OF_MINUTE);
+    private static final NonZeroCondition NON_ZERO_FRACTION =
+        new NonZeroCondition(PlainTime.NANO_OF_SECOND);
+    private static final ChronoCondition<ChronoEntity<?>> SECOND_PART =
+        NON_ZERO_SECOND.or(NON_ZERO_FRACTION);
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format mit Jahr, Monat und
@@ -92,29 +102,19 @@ public class TemporalFormatters {
 
     /**
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit nur mit Stunde und Minute im Muster &quot;HHmm&quot;. </p>
+     * Uhrzeit mit Stunde und Minute im Muster &quot;HHmm&quot;. </p>
+     *
+     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional. </p>
      */
     public static final ChronoFormatter<PlainTime> ISO_BASIC_TIME_HH_MM;
 
     /**
-     * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit inklusive Sekunde und optional Nanosekunde im Muster
-     * &quot;HHmmss&quot;. </p>
-     */
-    public static final ChronoFormatter<PlainTime> ISO_BASIC_TIME_HH_MM_SS;
-
-    /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit nur mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
+     * Uhrzeit mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
+     *
+     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional. </p>
      */
     public static final ChronoFormatter<PlainTime> ISO_EXTENDED_TIME_HH_MM;
-
-    /**
-     * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit inklusive Sekunde und optional Nanosekunde im Muster
-     * &quot;HH:mm:ss&quot;. </p>
-     */
-    public static final ChronoFormatter<PlainTime> ISO_EXTENDED_TIME_HH_MM_SS;
 
     /**
      * <p>Definiert das RFC-1123-Format, das zum Beispiel in Mail-Headers
@@ -141,10 +141,8 @@ public class TemporalFormatters {
         ISO_BASIC_WEEKDATE = weekdateFormat(false);
         ISO_EXTENDED_WEEKDATE = weekdateFormat(true);
 
-        ISO_BASIC_TIME_HH_MM = isoFormat(false, false);
-        ISO_EXTENDED_TIME_HH_MM = isoFormat(false, true);
-        ISO_BASIC_TIME_HH_MM_SS = isoFormat(true, false);
-        ISO_EXTENDED_TIME_HH_MM_SS = isoFormat(true, true);
+        ISO_BASIC_TIME_HH_MM = timeFormat(false);
+        ISO_EXTENDED_TIME_HH_MM = timeFormat(true);
 
         RFC_1123 =
             ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
@@ -355,10 +353,7 @@ public class TemporalFormatters {
 
     }
 
-    private static ChronoFormatter<PlainTime> isoFormat(
-        boolean full,
-        boolean extended
-    ) {
+    private static ChronoFormatter<PlainTime> timeFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTime> builder =
             ChronoFormatter
@@ -370,19 +365,66 @@ public class TemporalFormatters {
         }
 
         builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        builder.startOptionalSection(SECOND_PART);
 
-        if (full) {
-            if (extended) {
-                builder.addLiteral(':');
-            }
-
-            builder.addFixedInteger(SECOND_OF_MINUTE, 2);
-            builder.startOptionalSection();
-            builder.addFixedInteger(NANO_OF_SECOND, 9);
-            builder.endSection();
+        if (extended) {
+            builder.addLiteral(':');
         }
 
+        builder.addFixedInteger(SECOND_OF_MINUTE, 2);
+        builder.startOptionalSection(NON_ZERO_FRACTION);
+        builder.addLiteral(Attributes.DECIMAL_SEPARATOR);
+        builder.addFixedInteger(NANO_OF_SECOND, 9);
+        builder.endSection();
+        builder.endSection();
+
         return builder.build();
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class NonZeroCondition
+        implements ChronoCondition<ChronoEntity<?>> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final ChronoElement<Integer> element;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        NonZeroCondition(ChronoElement<Integer> element) {
+            super();
+
+            this.element = element;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean test(ChronoEntity<?> context) {
+
+            return (
+                !context.contains(this.element)
+                || (context.get(this.element).intValue() != 0)
+            );
+
+        }
+
+        ChronoCondition<ChronoEntity<?>> or(final NonZeroCondition other) {
+
+            return new ChronoCondition<ChronoEntity<?>>() {
+                @Override
+                public boolean test(ChronoEntity<?> context) {
+                    return (
+                        NonZeroCondition.this.test(context)
+                        || other.test(context)
+                    );
+                }
+            };
+
+        }
 
     }
 

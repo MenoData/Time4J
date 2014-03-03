@@ -727,6 +727,11 @@ final class FormatStep {
     }
 
     private boolean isPrinting(ChronoEntity<?> formattable) {
+
+        if (this.sectionalAttrs == null) {
+            return true;
+        }
+
         ChronoCondition<ChronoEntity<?>> printCondition =
             this.sectionalAttrs.getCondition();
         return (
