@@ -463,7 +463,7 @@ public final class Moment
      * @return  local timestamp in system time zone (leap seconds will
      *          always be lost)
      */
-    public PlainTimestamp inSystemTimezone() {
+    public PlainTimestamp inStdTimezone() {
 
         return this.inTimezone(TimeZone.ofSystem());
 
@@ -1565,7 +1565,7 @@ public final class Moment
                     attributes.get(Attributes.LENIENCY, Leniency.SMART);
 
                 if (leniency.isLax()) {
-                    result = ts.inSystemTimezone();
+                    result = ts.inStdTimezone();
                 }
             }
 

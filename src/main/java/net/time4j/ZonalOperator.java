@@ -53,7 +53,7 @@ public interface ZonalOperator<T>
      *          applicable on instances of {@code Moment}
      * @see     TransitionStrategy#PUSH_FORWARD
      */
-    ChronoOperator<Moment> inSystemTimezone();
+    ChronoOperator<Moment> inStdTimezone();
 
     /**
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit

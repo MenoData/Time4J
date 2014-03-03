@@ -235,7 +235,7 @@ public class TemporalFormatters {
             .setUp(Moment.class, Locale.getDefault())
             .addPattern(formatPattern, patternType)
             .build()
-            .withSystemTimezone();
+            .withStdTimezone();
 
     }
 

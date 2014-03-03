@@ -588,7 +588,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with the system time zone while
      *          this instance remains unaffected
      */
-    public ChronoFormatter<T> withSystemTimezone() {
+    public ChronoFormatter<T> withStdTimezone() {
 
         return this.withTimezone(TimeZone.ofSystem().getID());
 

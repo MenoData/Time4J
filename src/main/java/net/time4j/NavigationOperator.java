@@ -137,7 +137,7 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
     }
 
     @Override
-    public ChronoOperator<Moment> inSystemTimezone() {
+    public ChronoOperator<Moment> inStdTimezone() {
 
         return new Moment.Operator(this.onTimestamp(), this.element, this.mode);
 

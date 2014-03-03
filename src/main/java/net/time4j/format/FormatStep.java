@@ -57,10 +57,10 @@ final class FormatStep {
     /**
      * <p>Konstruktor mit Delegationsobjekt und Attributen. </p>
      *
-     * @param   processor   processor all formatting work will be delegated to
-     * @param   level       level of optional processing
-     * @param   section     identifies the optional attribute section
-     * @param   attributes  sectional control attributes (optional)
+     * @param   processor       processor which will process all formatting work
+     * @param   level           level of optional processing
+     * @param   section         identifies the optional attribute section
+     * @param   sectionalAttrs  sectional control attributes (optional)
      * @param   replacement value to be used if parsing fails (optional)
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
@@ -68,10 +68,10 @@ final class FormatStep {
         FormatProcessor<?> processor,
         int level,
         int section,
-        Attributes attributes,
+        Attributes sectionalAttrs,
         Object replacement
     ) {
-        this(processor, level, section, attributes, replacement, 0, 0, 0);
+        this(processor, level, section, sectionalAttrs, replacement, 0, 0, 0);
 
     }
 
@@ -79,7 +79,7 @@ final class FormatStep {
         FormatProcessor<?> processor,
         int level,
         int section,
-        Attributes attributes,
+        Attributes sectionalAttrs,
         Object replacement,
         int reserved,
         int padLeft,
@@ -119,7 +119,7 @@ final class FormatStep {
         this.processor = processor;
         this.level = level;
         this.section = section;
-        this.sectionalAttrs = attributes;
+        this.sectionalAttrs = sectionalAttrs;
         this.replacement = replacement;
         this.reserved = reserved;
         this.padLeft = padLeft;

@@ -462,7 +462,7 @@ public final class Attributes
          * @see     #TIMEZONE_ID
          * @see     TimeZone#ofSystem()
          */
-        public Builder setSystemTimezone() {
+        public Builder setStdTimezone() {
 
             return this.setTimezone(TimeZone.ofSystem().getID());
 

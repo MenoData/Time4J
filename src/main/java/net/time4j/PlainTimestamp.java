@@ -538,7 +538,7 @@ public final class PlainTimestamp
      * @see     #inTimezone(TZID,TransitionStrategy)
      * @see     #atOffset(ZonalOffset)
      */
-    public Moment inSystemTimezone() {
+    public Moment inStdTimezone() {
 
         return this.inTimezone(
             TimeZone.ofSystem(),
@@ -556,7 +556,7 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given time zone
      * @see     TimeZone#of(TZID)
-     * @see     #inSystemTimezone()
+     * @see     #inStdTimezone()
      * @see     #atOffset(ZonalOffset)
      */
     public Moment inTimezone(
