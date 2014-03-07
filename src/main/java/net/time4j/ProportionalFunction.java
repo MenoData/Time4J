@@ -32,7 +32,6 @@ import java.math.RoundingMode;
 /**
  * <p>Ermittelt eine Verh&auml;ltniszahl. </p>
  *
- * @param       <T> generic type of temporal context
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */

@@ -34,7 +34,6 @@ import java.math.BigDecimal;
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf Integer-Basis. </p>
  *
- * @param       <U> generic type of time units
  * @param       <T> generic target type for a {@code ChronoOperator}
  * @author      Meno Hochschild
  * @concurrency <immutable>

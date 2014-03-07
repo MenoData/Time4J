@@ -377,7 +377,7 @@ final class FractionProcessor
      * geparste {@code BigDecimal}-Wert in den neuen Elementwert
      * &uuml;bersetzt und damit das Ergebnis angepasst. </p>
      *
-     * @param   result  prototypical result of parsing
+     * @param   entity  prototypical result of parsing
      * @param   parsed  intermediate buffer for parsed values
      * @return  updated result object
      */

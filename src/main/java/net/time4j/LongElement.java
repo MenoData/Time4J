@@ -34,8 +34,6 @@ import java.math.BigDecimal;
 /**
  * <p>Repr&auml;sentiert ein Uhrzeitelement vom long-Typ. </p>
  *
- * @param       <U> generic type of time units
- * @param       <T> generic target type for a {@code ChronoOperator}
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
@@ -168,8 +166,8 @@ final class LongElement
      * <p>Erzeugt ein neues Uhrzeitelement ohne Formatsymbol. </p>
      *
      * @param   name        name of element
-     * @param   dmin        default minimum
-     * @param   dmax        default maximum
+     * @param   defaultMin  default minimum
+     * @param   defaultMax  default maximum
      */
     static LongElement create(
         String name,

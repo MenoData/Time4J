@@ -1104,7 +1104,7 @@ public final class PlainTime
      *                      if the other argumenta equal to {@code 0}
      * @param   minute      minute in the range {@code 0-59}
      * @param   second      second in the range {@code 0-59}
-     * @param   nanos       nanosecond in the range {@code 0-999,999,999}
+     * @param   nano        nanosecond in the range {@code 0-999,999,999}
      * @return  new or cached wall time
      * @throws  IllegalArgumentException if any argument is out of range
      */

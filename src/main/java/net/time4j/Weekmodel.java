@@ -746,7 +746,7 @@ public final class Weekmodel
     /**
      * <p>Liegt eine 7-Tage-Woche vor? </p>
      *
-     * @param   chronology      chronology with a calendar system
+     * @param   chrono      chronology with a calendar system
      * @return  {@code true} if given chronology has a seven-day-week
      *          else {@code false}
      */
