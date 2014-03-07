@@ -461,7 +461,7 @@ public class Chronology<T extends ChronoEntity<T>>
          * <p>Konstruiert eine neue Instanz. </p>
          *
          * @param   chronoType      chronological type
-         * @param   chronoMerger    creates a new instance of T from another
+         * @param   merger          creates a new instance of T from another
          *                          source (clock or parsed values)
          */
         Builder(
