@@ -30,6 +30,7 @@ import net.time4j.tz.TimeZone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,12 +40,21 @@ import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
 
 
 /**
- * <p>Verarbeitet einen Zeitzonen-Offset. </p>
+ * <p>Verarbeitet einen festen Zeitzonen-Offset. </p>
  *
  * @author  Meno Hochschild
  */
 final class TimezoneOffsetProcessor
     implements FormatProcessor<TZID> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Spezial-Instanz nur zum Parsen im LONG-extended-Format ohne
+     * Ersatztext (Formatieren nicht m&ouml;glich). </p>
+     */
+    static final TimezoneOffsetProcessor EXTENDED_LONG_PARSER =
+        new TimezoneOffsetProcessor();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -85,6 +95,15 @@ final class TimezoneOffsetProcessor
         this.precision = precision;
         this.extended = extended;
         this.zeroOffsets = zeroOffsets;
+
+    }
+
+    private TimezoneOffsetProcessor() {
+        super();
+
+        this.precision = DisplayMode.LONG;
+        this.extended = true;
+        this.zeroOffsets = Collections.emptyList();
 
     }
 

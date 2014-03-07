@@ -503,6 +503,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 if (
                     leniency.isStrict()
                     && (result instanceof UnixTime)
+                    && (status.getDSTInfo() != null)
                 ) {
                     if (
                         (tzid == null)
@@ -514,7 +515,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     UnixTime ut = UnixTime.class.cast(result);
                     boolean dst = TimeZone.of(tzid).isDaylightSaving(ut);
 
-                    if (dst != status.isDaylightSaving()) {
+                    if (dst != status.getDSTInfo().booleanValue()) {
                         StringBuilder reason = new StringBuilder(256);
                         reason.append("Conflict found: ");
                         reason.append("Parsed entity is ");
@@ -2003,6 +2004,36 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>F&uuml;gt eine Zeitzonen-ID hinzu. </p>
+         *
+         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonen-ID ist
+         * relevant. Unterst&uuml;tzt werden alle IDs, die von
+         * {@link TimeZone#getAvailableIDs()} geliefert werden - mit
+         * Ausnahme von alten IDs wie &quot;Asia/Riyadh87&quot; oder
+         * &quot;CST6CDT&quot;, die Ziffern enthalten. Offset-IDs wie
+         * die kanonische Form von {@code ZonalOffset} oder &quot;GMT&quot;
+         * werden ebenfalls unterst&uuml;tzt. Eine Ausnahme sind hier
+         * veraltete IDs wie &quot;Etc/GMT+12&quot;. </p>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException wenn die zugrundeliegende Chronologie
+         *          nicht dem Typ {@link net.time4j.base.UnixTime} entspricht
+         */
+        public Builder<T> addTimeZoneID() {
+
+            Class<?> chronoType = this.getChronology().getChronoType();
+
+            if (UnixTime.class.isAssignableFrom(chronoType)) {
+                this.addProcessor(TimezoneIDProcessor.INSTANCE);
+                return this;
+            } else {
+                throw new IllegalStateException(
+                    "Only unix timestamps can have a time zone id.");
+            }
+
+        }
+
+        /**
          * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
@@ -2121,8 +2152,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   extended        extended or basic ISO-8601-mode
          * @param   zeroOffsets     list of replacement texts if offset is zero
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if replacement text consists
-         *          of white-space only
+         * @throws  IllegalArgumentException if any replacement text consists
+         *          of white-space only or if given replacement list is empty
          * @see     TimeZone#identifier()
          */
         public Builder<T> addTimezoneOffset(

@@ -260,9 +260,10 @@ public enum PatternType
      *      <td>Nicht unterst&uuml;tzt.</td>
      *  </tr>
      *  <tr>
-     *      <td>TIMEZONE_ID</td>
+     *      <td>{@link net.time4j.tz.TimeZone#identifier() TIMEZONE_ID}</td>
      *      <td>V</td>
-     *      <td>Wird in einem zuk&uuml;nftigen Release unterst&uuml;tzt.</td>
+     *      <td>Es werden immer zwei Symbole erwartet. Dieses Symbol kann
+     *      nur auf den Typ {@link Moment} angewandt werden.</td>
      *  </tr>
      *  <tr>
      *      <td>{@link net.time4j.tz.TimeZone#identifier() TIMEZONE_OFFSET}</td>
@@ -549,9 +550,17 @@ public enum PatternType
                 }
                 break;
             case 'V':
-                // TODO: implement time zone id support
-                throw new UnsupportedOperationException(
-                    symbol + " will be supported in a future release.");
+                if (count == 2) {
+                    try {
+                        builder.addTimeZoneID();
+                    } catch (IllegalStateException ise) {
+                        throw new IllegalArgumentException(ise.getMessage());
+                    }
+                } else {
+                    throw new IllegalArgumentException(
+                        "Count of pattern letters is not 2: " + count);
+                }
+                break;
             case 'X':
                 addOffset(builder, count, true);
                 break;

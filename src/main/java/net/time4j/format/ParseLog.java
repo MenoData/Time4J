@@ -55,7 +55,7 @@ public class ParseLog {
     private int errorIndex;
     private String errorMessage;
     private ChronoEntity<?> rawValues;
-    private boolean daylightSaving;
+    private Boolean daylightSaving;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -84,7 +84,7 @@ public class ParseLog {
         this.errorIndex = -1;
         this.errorMessage = "";
         this.rawValues = EMPTY_RAW_DATA;
-        this.daylightSaving = false;
+        this.daylightSaving = null;
 
     }
 
@@ -160,8 +160,9 @@ public class ParseLog {
         sb.append(this.errorMessage);
         sb.append("\", raw-values=");
         sb.append(this.rawValues);
-        if (this.daylightSaving) {
-            sb.append(", daylight-saving=true");
+        if (this.daylightSaving != null) {
+            sb.append(", daylight-saving=");
+            sb.append(this.daylightSaving);
         }
         sb.append(']');
         return sb.toString();
@@ -261,18 +262,19 @@ public class ParseLog {
     /**
      * <p>Ein Zeitzonenname wurde als <i>daylightSaving</i> erkannt. </p>
      */
-    void setDaylightSaving() {
+    void setDaylightSaving(boolean dst) {
 
-        this.daylightSaving = true;
+        this.daylightSaving = Boolean.valueOf(dst);
 
     }
 
     /**
-     * <p>Wurde eine Sommerzeitform als Zeitzonenname gelesen? </p>
+     * <p>Wurde eine Sommer- oder Winterzeitform als Zeitzonenname gelesen? </p>
      *
-     * @return  boolean
+     * @return  {@code Boolean.TRUE} wenn Sommerzeit, {@code Boolean.FALSE}
+     *          wenn Winterzeit (Normalzeit), sonst {@code null}
      */
-    boolean isDaylightSaving() {
+    Boolean getDSTInfo() {
 
         return this.daylightSaving;
 

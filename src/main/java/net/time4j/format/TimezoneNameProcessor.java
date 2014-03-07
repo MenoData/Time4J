@@ -258,9 +258,7 @@ final class TimezoneNameProcessor
         ) {
             parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
             status.setPosition(pos);
-            if (daylightSaving) {
-                status.setDaylightSaving();
-            }
+            status.setDaylightSaving(daylightSaving);
         } else {
             status.setError(
                 start,
