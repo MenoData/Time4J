@@ -107,10 +107,6 @@ public enum CalendarUnit
         public double getLength() {
             return 2629746.0; // 365.2425 * 86400.0 / 12.0
         }
-        @Override
-        public IsoDateUnit withCarryOver() {
-            return this;
-        }
     },
 
     /** Zeiteinheit &quot;Wochen&quot; (Symbol W) */
