@@ -83,12 +83,12 @@ d) Another way of manipulation is date/time-arithmetic along a time axis. All fo
 
 e) Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. As result of this dualism Time4J also does not separate between specialized JSR-310-time spans like "Period" or "Duration" but just has one duration class, namely "Duration", applicable on "PlainDate", "PlainTime" and "PlainTimestamp".
 
-f) In general Time4J does not try to invent things which are not in any real use. For example users will not find era arithmetic like in JSR-310 or an purely academic UTC-SLS implementation. On the other side Time4J does indeed try to model the reality as exact as possible, even the rare feature of leap seconds.
-
 Plans for next release v0.3-alpha:
 ----------------------------------
 
-There are still many features missing. For the next release especially historic era support and intervals are planned, maybe also more timezone features. A strong focus will also be more english translations and documentation.
+There are still many features missing. For the next pre-release especially historic era support is planned in order to complete CLDR-Unicode-support for ISO-8601-system. Intervals would also be very nice but will rather be introduced in v0.4-alpha, maybe also more timezone features. A strong focus will also be more english translations and documentation.
+
+Be aware of the fact that Time4J is in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such breaks on CLDR/formatting area).
 
 Downloads and Requirements:
 ---------------------------
