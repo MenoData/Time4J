@@ -1579,7 +1579,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <p>Beispiel: </p>
          * <pre>
-         *  ChronoElement&lt;Integer&gt; element = PlainTime.MILLI_OF_SECOND;
+         *  ChronoElement&lt;Integer&gt; element = PlainTime.MICRO_OF_SECOND;
          *  int minDigits = 3;
          *  int maxDigits = 6;
          *
@@ -1588,7 +1588,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *      .addFraction(
          *          element,
          *          minDigits,
-         *          maxDigits
+         *          maxDigits,
+         *          true
          *      ).build();
          *  System.out.println(
          *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
