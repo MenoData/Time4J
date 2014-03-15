@@ -637,8 +637,8 @@ public final class PlainDate
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum und der
      * angegebenen Uhrzeit. </p>
      *
-     * <p>Wenn {@link PlainTime#atEndOfDay() T24:00} angegeben wird, dann
-     * wird der Zeitstempel automatisch so normalisiert, da&szlig; er auf
+     * <p>Wenn {@link PlainTime#midnightAtEndOfDay() T24:00} angegeben wird,
+     * dann wird der Zeitstempel automatisch so normalisiert, da&szlig; er auf
      * den n&auml;chsten Tag verweist. </p>
      *
      * @param   time    wall time

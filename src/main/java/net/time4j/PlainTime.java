@@ -483,7 +483,8 @@ public final class PlainTime
      *  import static net.time4j.ClockUnit.HOURS;
      *  import static net.time4j.PlainTime.NANO_OF_DAY;
      *
-     *  PlainTime time = PlainTime.atStartOfDay().plus(6, HOURS); // T06:00
+     *  PlainTime time =
+     *      PlainTime.midnightAtStartOfDay().plus(6, HOURS); // T06:00
      *  System.out.println(
      *      time.get(NANO_OF_DAY.ratio())
      *          .multiply(BigDecimal.valueOf(100)).stripTrailingZeros()
@@ -760,8 +761,9 @@ public final class PlainTime
      * <p>Liefert Mitternacht zu Beginn des Tages. </p>
      *
      * @return  midnight at the start of day T00:00
+     * @see     #midnightAtEndOfDay()
      */
-    public static PlainTime atStartOfDay() {
+    public static PlainTime midnightAtStartOfDay() {
 
         return PlainTime.MIN;
 
@@ -771,8 +773,9 @@ public final class PlainTime
      * <p>Liefert Mitternacht zum Ende des Tages. </p>
      *
      * @return  midnight at the end of day T24:00
+     * @see     #midnightAtStartOfDay()
      */
-    public static PlainTime atEndOfDay() {
+    public static PlainTime midnightAtEndOfDay() {
 
         return PlainTime.MAX;
 
@@ -2661,7 +2664,7 @@ public final class PlainTime
                 Integer m = Integer.valueOf(minute);
                 Integer s = Integer.valueOf(second);
                 Integer n = Integer.valueOf(nanosecond);
-                return PlainTime.atStartOfDay()
+                return PlainTime.midnightAtStartOfDay()
                     .with(ISO_HOUR.setLenient(h))
                     .with(MINUTE_OF_HOUR.setLenient(m))
                     .with(SECOND_OF_MINUTE.setLenient(s))
