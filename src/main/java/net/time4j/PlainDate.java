@@ -41,7 +41,9 @@ import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.tz.TZID;
 import net.time4j.tz.TimeZone;
+import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -630,6 +632,24 @@ public final class PlainDate
     public PlainTimestamp atStartOfDay() {
 
         return this.atTime(PlainTime.MIN);
+
+    }
+
+    /**
+     * <p>Erzeugt einen globalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
+     * Uhrzeit in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid        time zone id
+     * @return  global timestamp based on composition of this date and earliest
+     *          wall time in given time zone
+     * @see     #atTime(PlainTime)
+     */
+    public Moment atStartOfDay(TZID tzid) {
+
+        return this.atStartOfDay().inTimezone(
+            tzid,
+            TransitionStrategy.PUSH_FORWARD
+        );
 
     }
 
