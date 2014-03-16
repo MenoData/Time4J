@@ -66,20 +66,18 @@ public enum PatternType
      *      <th>Description</th>
      *  </tr>
      *  <tr>
-     *      <td>CALENDAR_ERA</td>
+     *      <td>ERA (nicht registriert)</td>
      *      <td>G</td>
-     *      <td>Wird in einem zuk&uuml;nftigen Release unterst&uuml;tzt.</td>
+     *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
+     *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
+     *      Buchstabensymbol.</td>
      *  </tr>
      *  <tr>
-     *      <td>YEAR_OF_ERA</td>
+     *      <td>YEAR_OF_ERA (nicht registriert)</td>
      *      <td>y</td>
-     *      <td>In Abwesenheit einer &Auml;ra gleichbedeutend mit dem
-     *      proleptischen ISO-Jahr {@link PlainDate#YEAR}. Die Anzahl der
-     *      Symbole regelt normalerweise die minimale Ziffernzahl. Ist sie
-     *      jedoch 2, dann wird das Jahr zweistellig angezeigt - mit Verwendung
-     *      des Attributs {@link Attributes#PIVOT_YEAR}. Ein positives
-     *      Vorzeichen wird genau dann ausgegeben, wenn das Jahr mehr als
-     *      Stellen hat als an Symbolen vorgegeben. </td>
+     *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
+     *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
+     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
@@ -93,7 +91,9 @@ public enum PatternType
      *      <td>{@link PlainDate#YEAR}</td>
      *      <td>u</td>
      *      <td>Proleptisches ISO-Kalenderjahr. Diese Jahresangabe erfolgt
-     *      nie mit Kippjahr, auch nicht f&uuml;r &quot;uu&quot;. </td>
+     *      nie mit Kippjahr, auch nicht f&uuml;r &quot;uu&quot;. Ein
+     *      positives Vorzeichen wird genau dann ausgegeben, wenn das Jahr
+     *      mehr Stellen hat als an Symbolen vorgegeben.</td>
      *  </tr>
      *  <tr>
      *      <td>CYCLIC_YEAR</td>
@@ -313,24 +313,26 @@ public enum PatternType
 
         switch (symbol) {
             case 'G':
-                // TODO: implement era support
-                throw new UnsupportedOperationException(
-                    "Eras will be supported in a future release.");
+                TextWidth eraWidth;
+                if (count <= 3) {
+                    eraWidth = TextWidth.ABBREVIATED;
+                } else if (count == 4) {
+                    eraWidth = TextWidth.WIDE;
+                } else if (count == 5) {
+                    eraWidth = TextWidth.NARROW;
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
+                builder.addText(PlainDate.ERA);
+                builder.endSection();
+                break;
             case 'y':
                 if (count == 2) {
-                    builder.addTwoDigitYear(PlainDate.YEAR);
-                } else if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
+                    builder.addTwoDigitYear(PlainDate.YEAR_OF_ERA);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addInteger(PlainDate.YEAR_OF_ERA, count, 9);
                 }
                 break;
             case 'Y':

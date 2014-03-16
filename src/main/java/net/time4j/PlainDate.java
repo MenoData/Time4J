@@ -41,6 +41,7 @@ import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.Leniency;
 import net.time4j.tz.TZID;
 import net.time4j.tz.TimeZone;
 import net.time4j.tz.TransitionStrategy;
@@ -370,6 +371,33 @@ public final class PlainDate
     public static final OrdinalWeekdayElement<PlainDate> WEEKDAY_IN_MONTH =
         WeekdayInMonthElement.INSTANCE;
 
+    /**
+     * <p>Element mit der &Auml;ra des proleptischen gregorianischen
+     * Kalenders. </p>
+     */
+    @FormattableElement(format = "G")
+    static final ChronoElement<SimpleEra> ERA =
+        new EnumElement<SimpleEra>(
+            "ERA",
+            SimpleEra.class,
+            SimpleEra.BC,
+            SimpleEra.AD,
+            EnumElement.ERA,
+            'G');
+
+    /**
+     * <p>Element mit dem Jahr der &Auml;ra des proleptischen gregorianischen
+     * Kalenders. </p>
+     */
+    @FormattableElement(format = "y")
+    static final ChronoElement<Integer> YEAR_OF_ERA =
+        IntegerElement.createDateElement(
+            "YEAR_OF_ERA",
+            IntegerElement.YEAR_OF_ERA,
+            1,
+            GregorianMath.MAX_YEAR,
+            'y');
+
     // Dient der Serialisierungsunterstützung.
     private static final long serialVersionUID = -6698431452072325688L;
 
@@ -392,6 +420,8 @@ public final class PlainDate
         fill(constants, DAY_OF_YEAR);
         fill(constants, DAY_OF_QUARTER);
         fill(constants, WEEKDAY_IN_MONTH);
+        fill(constants, ERA);
+        fill(constants, YEAR_OF_ERA);
         ELEMENTS = Collections.unmodifiableMap(constants);
 
         TRANSFORMER = new Transformer();
@@ -446,6 +476,7 @@ public final class PlainDate
                 WEEKDAY_IN_MONTH,
                 new WIMRule(WEEKDAY_IN_MONTH),
                 CalendarUnit.WEEKS)
+            // TODO: .appendExtension(new HistoryExtension())
             .appendExtension(new WeekExtension());
         registerUnits(builder);
         ENGINE = builder.build();
@@ -1356,6 +1387,26 @@ public final class PlainDate
 
             if (entity.contains(YEAR)) {
                 year = entity.get(YEAR);
+            } else if (entity.contains(YEAR_OF_ERA)) {
+                if (entity.contains(ERA)) {
+                    int yearOfEra = entity.get(YEAR_OF_ERA).intValue();
+                    switch (entity.get(ERA)) {
+                        case AD:
+                            year = Integer.valueOf(yearOfEra);
+                            break;
+                        case BC:
+                            year = Integer.valueOf(1 - yearOfEra);
+                            break;
+                        default:
+                            // no year;
+                    }
+                } else {
+                    Leniency leniency =
+                        attributes.get(Attributes.LENIENCY, Leniency.SMART);
+                    if (!leniency.isStrict()) {
+                        year = entity.get(YEAR_OF_ERA);
+                    }
+                }
             }
 
             if (year != null) {

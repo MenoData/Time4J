@@ -132,14 +132,21 @@ final class OldStyleTimeZone
             return this.fixedOffset;
         }
 
-        int era = (
-            localDate.getYear() > 0
-            ? GregorianCalendar.AD
-            : GregorianCalendar.BC);
-        int year = localDate.getYear();
+        int era;
+        int yearOfEra;
+
+        if (localDate.getYear() > 0) {
+            era = GregorianCalendar.AD;
+            yearOfEra = localDate.getYear();
+        } else {
+            era = GregorianCalendar.BC;
+            yearOfEra = 1 - localDate.getYear();
+        }
+        
         int month = localDate.getMonth();
         int dom = localDate.getDayOfMonth();
-        int dow = GregorianMath.getDayOfWeek(year, month, dom) + 1;
+        int dow =
+            GregorianMath.getDayOfWeek(localDate.getYear(), month, dom) + 1;
 
         if (dow == 8) {
             dow = Calendar.SUNDAY;
@@ -152,7 +159,7 @@ final class OldStyleTimeZone
         ) * 1000;
 
         return fromOffsetMillis(
-            this.tz.getOffset(era, year, month - 1, dom, dow, millis));
+            this.tz.getOffset(era, yearOfEra, month - 1, dom, dow, millis));
 
     }
 

@@ -833,66 +833,60 @@ public final class CalendarText {
 
             V[] enums = valueType.getEnumConstants();
             int len = this.textForms.size();
-
-            CharSequence textForm = parseable;
             int start = status.getPosition();
-            int end = start;
+            int end = parseable.length();
 
-            while (
-                (end < parseable.length())
-                && Character.isLetter(parseable.charAt(end))
-            ) {
-                end++;
-            }
-
-            if (caseInsensitive) {
-                textForm = textForm.subSequence(start, end);
-                textForm = textForm.toString().toLowerCase(this.locale);
-                start = 0;
-                end = textForm.length();
-            }
+            int maxEq = 0;
+            V candidate = null;
 
             for (int i = 0; i < enums.length; i++) {
                 String s = (
                     (i >= len)
                     ? enums[i].name()
                     : this.textForms.get(i));
-
-                if (caseInsensitive) {
-                    s = s.toLowerCase(this.locale);
-                }
-
+                int pos = start;
+                int n = s.length();
                 boolean eq = true;
 
-                if (partialCompare) { // s.startsWith(textForm)
-                    for (int j = 0; start + j < end; j++) {
-                        if (
-                            (j >= s.length())
-                            || (s.charAt(j) != textForm.charAt(start + j))
-                        ) {
-                            eq = false;
-                            break;
+                for (int j = 0; eq && (j < n); j++) {
+                    if (start + j >= end) {
+                        eq = false;
+                    } else {
+                        char c = parseable.charAt(start + j);
+                        char t = s.charAt(j);
+
+                        if (caseInsensitive) {
+                            eq = this.compareIgnoreCase(c, t);
+                        } else {
+                            eq = (c == t);
                         }
-                    }
-                } else if (s.length() != end - start) { // s.equals(textForm)
-                    eq = false;
-                } else {
-                    for (int j = 0; start + j < end; j++) {
-                        if (s.charAt(j) != textForm.charAt(start + j)) {
-                            eq = false;
-                            break;
+
+                        if (eq) {
+                            pos++;
                         }
                     }
                 }
 
                 if (eq) {
-                    status.setPosition(status.getPosition() + end - start);
+                    assert pos == start + n;
+                    status.setPosition(pos);
                     return enums[i];
+                } else if (
+                    partialCompare
+                    && (maxEq < pos - start)
+                ) {
+                    maxEq = pos - start;
+                    candidate = enums[i];
                 }
             }
 
-            status.setError(status.getPosition());
-            return null;
+            if (candidate == null) {
+                status.setError(start);
+            } else {
+                status.setPosition(start + maxEq);
+            }
+
+            return candidate;
 
         }
 
@@ -916,6 +910,26 @@ public final class CalendarText {
             }
             sb.append('}');
             return sb.toString();
+
+        }
+
+        private boolean compareIgnoreCase(char c1, char c2) {
+
+            if (c1 >= 'a' && c1 <= 'z') {
+                c1 = (char) (c1 - 'a' + 'A');
+            }
+
+            if (c2 >= 'a' && c2 <= 'z') {
+                c2 = (char) (c2 - 'a' + 'A');
+            }
+
+            if (c1 >= 'A' && c1 <= 'Z') {
+                return (c1 == c2);
+            }
+
+            String s1 = String.valueOf(c1).toUpperCase(this.locale);
+            String s2 = String.valueOf(c2).toUpperCase(this.locale);
+            return s1.equals(s2);
 
         }
 

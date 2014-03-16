@@ -23,6 +23,8 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.Chronology;
+import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
@@ -60,6 +62,8 @@ final class EnumElement<V extends Enum<V>>
     static final int DAY_OF_WEEK = 102;
     /** Element-Index. */
     static final int QUARTER_OF_YEAR = 103;
+    /** Element-Index. */
+    static final int ERA = 104;
 
     private static final long serialVersionUID = 2055272540517425102L;
 
@@ -180,6 +184,10 @@ final class EnumElement<V extends Enum<V>>
     @Override
     public int numerical(V value) {
 
+        if (this.index == ERA) {
+            return value.ordinal();
+        }
+
         return (value.ordinal() + 1);
 
     }
@@ -218,6 +226,24 @@ final class EnumElement<V extends Enum<V>>
             caseInsensitive,
             partialCompare
         );
+
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(
+        Chronology<T> chronology
+    ) {
+
+        if (
+            (this.index == ERA)
+            && chronology.isRegistered(PlainDate.CALENDAR_DATE)
+        ) {
+            ElementRule<T, SimpleEra> rule = new SimpleEra.Rule<T>();
+            return (ElementRule<T, V>) rule;
+        }
+
+        return null;
 
     }
 
@@ -262,6 +288,8 @@ final class EnumElement<V extends Enum<V>>
                     attributes.get(
                         Attributes.OUTPUT_CONTEXT,
                         OutputContext.FORMAT));
+            case ERA:
+                return cnames.getEras(textWidth);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
