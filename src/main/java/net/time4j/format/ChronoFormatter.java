@@ -143,7 +143,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             FormatStep step = copy.get(i);
             ChronoElement<?> element = step.getProcessor().getElement();
 
-            if (!this.chronology.isRegistered(element)) {
+            if (
+                (element != null) // no literal steps etc.
+                && !this.chronology.isRegistered(element)
+            ) {
 
                 boolean found = false;
 
