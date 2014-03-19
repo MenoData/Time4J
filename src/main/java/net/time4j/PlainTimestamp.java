@@ -39,6 +39,7 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.ChronoFormatter;
 import net.time4j.format.Leniency;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
@@ -504,6 +505,30 @@ public final class PlainTimestamp
     public String toString() {
 
         return this.date.toString() + this.time.toString();
+
+    }
+
+    /**
+     * <p>Erstellt ein neues Formatobjekt, das eine Komposition der angegebenen
+     * Datums- und Uhrzeitformate darstellt. </p>
+     *
+     * <p>Die Sprach- und L&auml;ndereinstellung wird vom Datumsformat
+     * &uuml;bernommen. </p>
+     *
+     * @param   dateFormatter   calendar date formatter
+     * @param   timeFormatter   walltime formatter
+     * @return  composite formatter object for a plain timestamp
+     */
+    public static ChronoFormatter<PlainTimestamp> formatter(
+        ChronoFormatter<PlainDate> dateFormatter,
+        ChronoFormatter<PlainTime> timeFormatter
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTimestamp.class, dateFormatter.getLocale())
+            .addCustomized(CALENDAR_DATE, dateFormatter)
+            .addCustomized(WALL_TIME, timeFormatter)
+            .build();
 
     }
 

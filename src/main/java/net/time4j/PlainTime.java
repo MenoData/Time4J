@@ -37,6 +37,9 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPattern;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.tz.TimeZone;
 import net.time4j.tz.ZonalOffset;
@@ -47,9 +50,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -871,6 +876,114 @@ public final class PlainTime
     ) {
 
         return ClockUnitRule.addToWithOverflow(this, amount, unit);
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainTime> localFormatter(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTime.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using system locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainTime> localFormatter(DisplayMode mode) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getTimeInstance(style);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(PlainTime.class, Locale.getDefault())
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    public static ChronoFormatter<PlainTime> formatter(
+        String formatPattern,
+        ChronoPattern patternType,
+        Locale locale
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTime.class, locale)
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    public static ChronoFormatter<PlainTime> formatter(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getTimeInstance(style, locale);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(PlainTime.class, locale)
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build();
 
     }
 

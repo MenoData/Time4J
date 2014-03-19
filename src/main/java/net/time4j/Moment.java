@@ -40,7 +40,11 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPattern;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.TextWidth;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
@@ -56,9 +60,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -138,6 +145,7 @@ public final class Moment
      */
     public static final Moment UNIX_EPOCH = new Moment(0, 0, TimeScale.POSIX);
 
+    private static final ChronoFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
         new Moment(86400, TimeScale.UTC);
     private static final Set<ChronoElement<?>> HIGH_TIME_ELEMENTS;
@@ -200,6 +208,38 @@ public final class Moment
         }
 
         ENGINE = builder.build();
+
+        FORMATTER_RFC_1123 =
+            ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
+            .startSection(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
+            .startOptionalSection()
+            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
+            .addText(PlainDate.DAY_OF_WEEK)
+            .endSection()
+            .addLiteral(", ")
+            .endSection()
+            .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
+            .addLiteral(' ')
+            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
+            .addText(PlainDate.MONTH_OF_YEAR)
+            .endSection()
+            .addLiteral(' ')
+            .addFixedInteger(PlainDate.YEAR, 4)
+            .addLiteral(' ')
+            .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
+            .addLiteral(':')
+            .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
+            .startOptionalSection()
+            .addLiteral(':')
+            .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
+            .endSection()
+            .addLiteral(' ')
+            .addTimezoneOffset(
+                DisplayMode.MEDIUM,
+                false,
+                Arrays.asList("GMT", "UT", "Z"))
+            .endSection()
+            .build();
     }
 
     private static final long serialVersionUID = 1L;
@@ -482,6 +522,151 @@ public final class Moment
 
     }
 
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung und in der
+     * System-Zeitzone. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
+     * angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code Moment}-objects
+     *          using system locale and system time zone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     */
+    public static ChronoFormatter<Moment> localFormatter(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(Moment.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build()
+            .withStdTimezone();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * in der Standard-Sprach- und L&auml;ndereinstellung und in der
+     * System-Zeitzone. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
+     * angepasst werden. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code Moment}-objects
+     *          using system locale and system time zone
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     */
+    public static ChronoFormatter<Moment> localFormatter(DisplayMode mode) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getDateTimeInstance(style, style);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(Moment.class, Locale.getDefault())
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build()
+            .withStdTimezone();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. Eine
+     * Zeitzone ist nicht angegeben, was bedeutet, da&szlig; beim Formatieren
+     * die UTC-Zeitzone verwendet wird und beim Parsen eine Zeitzoneninformation
+     * im zu interpretierenden Text vorhanden sein mu&szlig;. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code Moment}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    public static ChronoFormatter<Moment> formatter(
+        String formatPattern,
+        ChronoPattern patternType,
+        Locale locale
+    ) {
+
+        return ChronoFormatter
+            .setUp(Moment.class, locale)
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. Eine
+     * Zeitzone ist nicht angegeben, was bedeutet, da&szlig; beim Formatieren
+     * die UTC-Zeitzone verwendet wird und beim Parsen eine Zeitzoneninformation
+     * im zu interpretierenden Text vorhanden sein mu&szlig;. </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code Moment}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    public static ChronoFormatter<Moment> formatter(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(Moment.class, locale)
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build();
+
+    }
+
+    /**
+     * <p>Definiert das RFC-1123-Format, das zum Beispiel in Mail-Headers
+     * verwendet wird. </p>
+     *
+     * <p>Entspricht &quot;[EEE, ]d MMM yyyy HH:mm[:ss] XX&quot;, wobei
+     * der Zeitzonen-Offset XX so modifiziert ist, da&szlig; im Fall eines
+     * Null-Offsets bevorzugt der Ausdruck &quot;GMT&quot; benutzt wird. Als
+     * Null-Offset werden auch &quot;UT&quot; oder &quot;Z&quot; akzeptiert.
+     * Die Textelemente werden ohne Beachtung der Gro&szlig;- oder
+     * Kleinschreibung in Englisch interpretiert. </p>
+     *
+     * <p>Zu beachten: Im Gegensatz zum RFC-1123-Standard unterst&uuml;tzt die
+     * Methode keine milit&auml;rischen Zeitzonen (A-Y) oder nordamerikanischen
+     * Zeitzonennamen (EST, EDT, CST, CDT, MST, MDT, PST, PDT). </p>
+     *
+     * @return  formatter object for RFC-1123 (technical internet-timestamp)
+     */
+    public static ChronoFormatter<Moment> formatterRFC1123() {
+
+        return FORMATTER_RFC_1123;
+
+    }
+
     @Override
     public int compareTo(Moment moment) {
 
@@ -589,7 +774,7 @@ public final class Moment
      *      PlainDate.of(2012, Month.JUNE, 30)
      *      .atTime(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
      *      .inTimezone(ZonalOffset.UTC, TransitionStrategy.STRICT)
-     *      .plus(1, SI.SECONDS);
+     *      .plus(1, SI.SECONDS); // move to leap second
      *
      *  System.out.println(moment.toString(TimeScale.POSIX));
      *  // Ausgabe: POSIX-2012-06-30T23:59:59,999999999Z
@@ -1625,10 +1810,8 @@ public final class Moment
             AttributeQuery attributes
         ) {
 
-            TZID tzid = ZonalOffset.UTC;
-
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                tzid = attributes.get(Attributes.TIMEZONE_ID);
+                TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
 
                 if (tzid != ZonalOffset.UTC) {
                     return new ZonalTimestamp(context, tzid);

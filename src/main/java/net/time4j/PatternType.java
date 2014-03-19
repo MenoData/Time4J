@@ -33,9 +33,16 @@ import net.time4j.format.TextWidth;
 import net.time4j.tz.TZID;
 import net.time4j.tz.TimeZone;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
+
+import static net.time4j.format.DisplayMode.FULL;
+import static net.time4j.format.DisplayMode.LONG;
+import static net.time4j.format.DisplayMode.MEDIUM;
+import static net.time4j.format.DisplayMode.SHORT;
 
 
 /**
@@ -94,11 +101,6 @@ public enum PatternType
      *      nie mit Kippjahr, auch nicht f&uuml;r &quot;uu&quot;. Ein
      *      positives Vorzeichen wird genau dann ausgegeben, wenn das Jahr
      *      mehr Stellen hat als an Symbolen vorgegeben.</td>
-     *  </tr>
-     *  <tr>
-     *      <td>CYCLIC_YEAR</td>
-     *      <td>U</td>
-     *      <td>Wird in ISO-8601 nicht unterst&uuml;tzt. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -255,18 +257,13 @@ public enum PatternType
      *      &quot;prefixGMTOffset&quot;.</td>
      *  </tr>
      *  <tr>
-     *      <td>{generic non-location format of timezone}</td>
-     *      <td>v</td>
-     *      <td>Nicht unterst&uuml;tzt.</td>
-     *  </tr>
-     *  <tr>
-     *      <td>{@link net.time4j.tz.TimeZone#identifier() TIMEZONE_ID}</td>
+     *      <td>TIMEZONE_ID</td>
      *      <td>V</td>
      *      <td>Es werden immer zwei Symbole erwartet. Dieses Symbol kann
      *      nur auf den Typ {@link Moment} angewandt werden.</td>
      *  </tr>
      *  <tr>
-     *      <td>{@link net.time4j.tz.TimeZone#identifier() TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET}</td>
      *      <td>X</td>
      *      <td>Ein Symbol: &#x00B1;HH[mm], zwei Symbole: &#x00B1;HHmm, drei
      *      Symbole: &#x00B1;HH:mm, vier Symbole: &#x00B1;HHmm[ss[.{fraction}]],
@@ -275,7 +272,7 @@ public enum PatternType
      *      &quot;Z&quot; verwendet. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link net.time4j.tz.TimeZone#identifier() TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET}</td>
      *      <td>x</td>
      *      <td>Wie X, aber ohne das Spezialzeichen &quot;Z&quot;, wenn der
      *      Zeitzonen-Offset gleich {@code 0} ist. </td>
@@ -283,7 +280,101 @@ public enum PatternType
      * </table>
      * </div>
      */
-    CLDR;
+    CLDR,
+
+    /**
+     * <p>Folgt der Formatmusterbeschreibung der Klasse
+     * {@link java.text.SimpleDateFormat}, die sich stark, aber
+     * nicht exakt an CLDR orientiert. </p>
+     *
+     * <p>Die erlaubte Anzahl der Symbole ist in der Regel nach oben offen.
+     * Unterschiede zu {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_DAY_OF_WEEK</td>
+     *      <td>u</td>
+     *      <td>Entspricht der Wochentagsnummerierung des
+     *      ISO-8601-Formats ({@code Weekmodel.ISO.localDayOfWeek()}),
+     *      also: Mo=1, Di=2, Mi=3, Do=4, Fr=5, Sa=6, So=7. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#boundedWeekOfMonth()}</td>
+     *      <td>W</td>
+     *      <td>Ein Symbol f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Monats. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#MILLI_OF_SECOND}</td>
+     *      <td>S</td>
+     *      <td>Keine fraktionale, sondern nur integrale Darstellung der
+     *      Millisekunde. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>QUARTER_OF_YEAR</td>
+     *      <td>Q</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>QUARTER_OF_YEAR</td>
+     *      <td>q</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MODIFIED_JULIAN_DATE</td>
+     *      <td>g</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{local-day-of-week-number}</td>
+     *      <td>e</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{local-day-of-week-number}</td>
+     *      <td>c</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RFC_822_TIMEZONE_OFFSET</td>
+     *      <td>Z</td>
+     *      <td>Entspricht CLDR-xx.</td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCALIZED_GMT_OFFSET</td>
+     *      <td>O</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_ID</td>
+     *      <td>V</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
+     *      <td>X</td>
+     *      <td>Wie in CLDR, aber nur mit maximal drei Symbolen. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
+     *      <td>x</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     */
+    SIMPLE_DATE_FORMAT;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -297,10 +388,52 @@ public enum PatternType
 
         switch (this) {
             case CLDR:
-                return cldr(builder, locale, symbol, count);
+                return cldr(builder, locale, symbol, count, false);
+            case SIMPLE_DATE_FORMAT:
+                return sdf(builder, locale, symbol, count);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
+
+    }
+
+    /**
+     * <p>Hilfsmethode zum Konvertieren des Anzeigestils in eine
+     * {@code DateFormat}-Konstante. </p>
+     *
+     * @param   mode    Anzeigestil von Time4J
+     * @return  JDK-Anzeigestil
+     */
+    static int getFormatStyle(DisplayMode mode) {
+
+        switch (mode) {
+            case FULL:
+                return DateFormat.FULL;
+            case LONG:
+                return DateFormat.LONG;
+            case MEDIUM:
+                return DateFormat.MEDIUM;
+            case SHORT:
+                return DateFormat.SHORT;
+            default:
+                throw new UnsupportedOperationException("Unknown: " + mode);
+        }
+
+    }
+
+    /**
+     * <p>Hilfsmethode zum Bestimmen des Formatmusters. </p>
+     *
+     * @param   df      allgemeine JDK-Formatinstanz
+     * @return  JDK-Formatmuster
+     */
+    static String getFormatPattern(DateFormat df) {
+
+        if (df instanceof SimpleDateFormat) {
+            return SimpleDateFormat.class.cast(df).toPattern();
+        }
+
+        throw new IllegalStateException("Cannot retrieve format pattern.");
 
     }
 
@@ -308,7 +441,8 @@ public enum PatternType
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
-        int count
+        int count,
+        boolean sdf
     ) {
 
         switch (symbol) {
@@ -316,7 +450,7 @@ public enum PatternType
                 TextWidth eraWidth;
                 if (count <= 3) {
                     eraWidth = TextWidth.ABBREVIATED;
-                } else if (count == 4) {
+                } else if ((count == 4) || sdf) {
                     eraWidth = TextWidth.WIDE;
                 } else if (count == 5) {
                     eraWidth = TextWidth.NARROW;
@@ -367,10 +501,6 @@ public enum PatternType
                         SignPolicy.SHOW_WHEN_BIG_NUMBER);
                 }
                 break;
-            case 'U':
-                // TODO: Chinese calendar => builder.getChronology() auswerten
-                throw new UnsupportedOperationException(
-                    "Cyclic year not supported for ISO-8601.");
             case 'Q':
                 addQuarterOfYear(builder, count);
                 break;
@@ -384,7 +514,7 @@ public enum PatternType
                 }
                 break;
             case 'M':
-                addMonth(builder, count);
+                addMonth(builder, Math.min(count, sdf ? 4 : count));
                 break;
             case 'L':
                 builder.startSection(
@@ -396,7 +526,8 @@ public enum PatternType
                 }
                 break;
             case 'w':
-                addNumber(Weekmodel.of(locale).weekOfYear(), builder, count);
+                addNumber(
+                    Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
                 break;
             case 'W':
                 if (count == 1) {
@@ -408,21 +539,21 @@ public enum PatternType
                 }
                 break;
             case 'd':
-                addNumber(PlainDate.DAY_OF_MONTH, builder, count);
+                addNumber(PlainDate.DAY_OF_MONTH, builder, count, sdf);
                 break;
             case 'D':
                 if (count < 3) {
                     builder.addInteger(PlainDate.DAY_OF_YEAR, count, 3);
-                } else if (count == 3) {
-                    builder.addFixedInteger(PlainDate.DAY_OF_YEAR, 3);
+                } else if ((count == 3) || sdf) {
+                    builder.addFixedInteger(PlainDate.DAY_OF_YEAR, count);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
                 }
                 break;
             case 'F':
-                if (count == 1) {
-                    builder.addFixedInteger(PlainDate.WEEKDAY_IN_MONTH, 1);
+                if ((count == 1) || sdf) {
+                    builder.addFixedInteger(PlainDate.WEEKDAY_IN_MONTH, count);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
@@ -439,7 +570,7 @@ public enum PatternType
                 TextWidth width;
                 if (count <= 3) {
                     width = TextWidth.ABBREVIATED;
-                } else if (count == 4) {
+                } else if ((count == 4) || sdf) {
                     width = TextWidth.WIDE;
                 } else if (count == 5) {
                     width = TextWidth.NARROW;
@@ -458,7 +589,7 @@ public enum PatternType
                     builder.addFixedNumerical(
                         Weekmodel.of(locale).localDayOfWeek(), count);
                 } else {
-                    cldr(builder, locale, 'E', count);
+                    cldr(builder, locale, 'E', count, sdf);
                 }
                 break;
             case 'c':
@@ -473,14 +604,14 @@ public enum PatternType
                         builder.addFixedNumerical(
                             Weekmodel.of(locale).localDayOfWeek(), 1);
                     } else {
-                        cldr(builder, locale, 'E', count);
+                        cldr(builder, locale, 'E', count, sdf);
                     }
                 } finally {
                     builder.endSection();
                 }
                 break;
             case 'a':
-                if (count == 1) {
+                if ((count == 1) || sdf) {
                     builder.addText(PlainTime.AM_PM_OF_DAY);
                 } else {
                     throw new IllegalArgumentException(
@@ -488,22 +619,22 @@ public enum PatternType
                 }
                 break;
             case 'h':
-                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, builder, count);
+                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, builder, count, sdf);
                 break;
             case 'H':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, builder, count);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, builder, count, sdf);
                 break;
             case 'K':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, builder, count);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, builder, count, sdf);
                 break;
             case 'k':
-                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, builder, count);
+                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, builder, count, sdf);
                 break;
             case 'm':
-                addNumber(PlainTime.MINUTE_OF_HOUR, builder, count);
+                addNumber(PlainTime.MINUTE_OF_HOUR, builder, count, sdf);
                 break;
             case 's':
-                addNumber(PlainTime.SECOND_OF_MINUTE, builder, count);
+                addNumber(PlainTime.SECOND_OF_MINUTE, builder, count, sdf);
                 break;
             case 'S':
                 builder.addFraction(
@@ -516,7 +647,7 @@ public enum PatternType
                 Set<TZID> preferredZones = TimeZone.getPreferredIDs(locale);
                 if (count < 4) {
                     builder.addTimezoneName(true, preferredZones);
-                } else if (count == 4) {
+                } else if ((count == 4) || sdf) {
                     builder.addTimezoneName(false, preferredZones);
                 } else {
                     throw new IllegalArgumentException(
@@ -578,6 +709,55 @@ public enum PatternType
 
     }
 
+    private Set<ChronoElement<?>> sdf(
+        ChronoFormatter.Builder<?> builder,
+        Locale locale,
+        char symbol,
+        int count
+    ) {
+
+        switch (symbol) {
+            case 'W':
+                builder.addFixedInteger(
+                    Weekmodel.of(locale).boundedWeekOfMonth(),
+                    count);
+                break;
+            case 'u':
+                builder.addFixedNumerical(PlainDate.DAY_OF_WEEK, count);
+                break;
+            case 'S':
+                builder.addFixedInteger(PlainTime.MILLI_OF_SECOND, count);
+                break;
+            case 'Z':
+                addOffset(builder, 2, false);
+                break;
+            case 'Q':
+            case 'q':
+            case 'L':
+            case 'g':
+            case 'e':
+            case 'c':
+            case 'O':
+            case 'V':
+            case 'x':
+                throw new IllegalArgumentException(
+                    "CLDR pattern symbol not supported"
+                    + " in SimpleDateFormat-style: "
+                    + symbol);
+            case 'X':
+                if (count >= 4) {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                return cldr(builder, locale, 'X', count, true);
+            default:
+                return cldr(builder, locale, symbol, count, true);
+        }
+
+        return Collections.emptySet();
+
+    }
+
     private static void addOffset(
         ChronoFormatter.Builder<?> builder,
         int count,
@@ -625,13 +805,14 @@ public enum PatternType
     private static void addNumber(
         ChronoElement<Integer> element,
         ChronoFormatter.Builder<?> builder,
-        int count
+        int count,
+        boolean sdf
     ) {
 
         if (count == 1) {
             builder.addInteger(element, 1, 2);
-        } else if (count == 2) {
-            builder.addFixedInteger(element, 2);
+        } else if ((count == 2) || sdf) {
+            builder.addFixedInteger(element, count);
         } else {
             throw new IllegalArgumentException(
                 "Too many pattern letters: " + count);

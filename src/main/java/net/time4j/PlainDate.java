@@ -41,6 +41,9 @@ import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPattern;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.tz.TZID;
 import net.time4j.tz.TimeZone;
@@ -51,6 +54,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
+import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -718,6 +722,25 @@ public final class PlainDate
 
     }
 
+    /**
+     * <p>Entspricht {@code atTime(PlainTime.of(hour, minute, second))}. </p>
+     *
+     * @param   hour        hour of day in range (0-24)
+     * @param   minute      minute of hour in range (0-59)
+     * @param   second      second of hour in range (0-59)
+     * @return  local timestamp as composition of this date and given time
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    public PlainTimestamp atTime(
+        int hour,
+        int minute,
+        int second
+    ) {
+
+        return this.atTime(PlainTime.of(hour, minute, second));
+
+    }
+
     @Override
     public int getYear() {
 
@@ -766,6 +789,114 @@ public final class PlainDate
     public boolean isWeekend(Locale country) {
 
         return this.matches(Weekmodel.of(country).weekend());
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainDate> localFormatter(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainDate.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using system locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainDate> localFormatter(DisplayMode mode) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getDateInstance(style);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(PlainDate.class, Locale.getDefault())
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    public static ChronoFormatter<PlainDate> formatter(
+        String formatPattern,
+        ChronoPattern patternType,
+        Locale locale
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainDate.class, locale)
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
+     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    public static ChronoFormatter<PlainDate> formatter(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        int style = PatternType.getFormatStyle(mode);
+        DateFormat df = DateFormat.getDateInstance(style, locale);
+        String pattern = PatternType.getFormatPattern(df);
+
+        return ChronoFormatter
+            .setUp(PlainDate.class, locale)
+            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
+            .build();
 
     }
 
