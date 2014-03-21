@@ -21,6 +21,8 @@
 
 package net.time4j;
 
+import net.time4j.base.WallTime;
+import net.time4j.engine.ChronoCondition;
 import net.time4j.format.CalendarText;
 import net.time4j.format.TextWidth;
 
@@ -34,7 +36,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author  Meno Hochschild
  */
-public enum Meridiem {
+public enum Meridiem
+    implements ChronoCondition<WallTime> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -81,11 +84,24 @@ public enum Meridiem {
      * @param   locale  language of text to be printed
      * @return  localized text in given language
      */
-    public String toString(Locale locale) {
+    public String getDisplayName(Locale locale) {
 
         CalendarText names =
             CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
         return names.getMeridiems(TextWidth.WIDE).print(this);
+
+    }
+
+    @Override
+    public boolean test(WallTime context) {
+
+        int hour = context.getHour();
+
+        return (
+            (this == AM)
+            ? ((hour < 12) || (hour == 24))
+            : ((hour >= 12) && (hour < 24))
+        );
 
     }
 

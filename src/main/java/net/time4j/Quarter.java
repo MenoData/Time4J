@@ -21,13 +21,24 @@
 
 package net.time4j;
 
+import net.time4j.base.GregorianDate;
+import net.time4j.engine.ChronoCondition;
+import net.time4j.format.CalendarText;
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
+
+import java.util.Locale;
+
+import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
+
 
 /**
  * <p>Repr&auml;sentiert ein Quartal (meist eines Jahres). </p>
  *
  * @author  Meno Hochschild
  */
-public enum Quarter {
+public enum Quarter
+    implements ChronoCondition<GregorianDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -121,6 +132,54 @@ public enum Quarter {
 
         return Quarter.valueOf(
             (this.ordinal() + (quarters % 4 + 4)) % 4 + 1);
+
+    }
+
+    /**
+     * <p>Liefert eine Beschreibung in der angegebenen Sprache in Langform
+     * und entspricht {@code getDisplayName(locale, true)}. </p>
+     *
+     * @param   locale      language setting
+     * @return  descriptive text (long form, never {@code null})
+     * @see     #getDisplayName(Locale, boolean)
+     */
+    public String getDisplayName(Locale locale) {
+
+        return this.getDisplayName(locale, true);
+
+    }
+
+    /**
+     * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
+     *
+     * <p>&Uuml;ber das zweite Argument kann gesteuert werden, ob eine kurze
+     * oder eine lange Form des Beschreibungstexts ausgegeben werden soll. Das
+     * ist besonders sinnvoll in Benutzeroberfl&auml;chen, wo zwischen der
+     * Beschriftung und der detaillierten Erl&auml;uterung einer graphischen
+     * Komponente unterschieden wird. </p>
+     *
+     * @param   locale      language setting
+     * @param   longText    {@code true} if the long form is required else
+     *                      {@code false} for the short form
+     * @return  short or long descriptive text (never {@code null})
+     */
+    public String getDisplayName(
+        Locale locale,
+        boolean longText
+    ) {
+
+        CalendarText names =
+            CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
+        TextWidth tw = (longText ? TextWidth.WIDE : TextWidth.ABBREVIATED);
+        return names.getQuarters(tw, OutputContext.FORMAT).print(this);
+
+    }
+
+    @Override
+    public boolean test(GregorianDate context) {
+
+        int month = context.getMonth();
+        return (this.getValue() == ((month - 1) / 3) + 1);
 
     }
 
