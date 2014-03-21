@@ -33,7 +33,7 @@ import java.util.Locale;
  * eine Instanz erzeugt, die auf den im JDK enthaltenen Informationen und
  * auf den CLDR-23-Daten des Unicode-Konsortiums beruht. Speziell die ein
  * Wochenende definierenden Daten werden bevorzugt aus der Textdatei
- * &quot;resources/weekend.data&quot; geladen. </p>
+ * &quot;data/weekend.data&quot; geladen. </p>
  *
  * <p>SPEZIFIKATION: Implementierungen m&uuml;ssen einen parameterlosen
  * Konstruktor haben. </p>

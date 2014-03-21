@@ -61,7 +61,7 @@ import static net.time4j.format.TextWidth.SHORT;
  * der Schnittstelle {@code java.text.DateFormatSymbols} ausgewichen. </p>
  *
  * <p>Dar&uuml;berhinaus kann eine Instanz von {@code CalendarText} auch
- * auf UTF-8-Textressourcen im Verzeichnis &quot;resources&quot; innerhalb des
+ * auf UTF-8-Textressourcen im Verzeichnis &quot;data&quot; innerhalb des
  * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. </p>
  *
  * @author      Meno Hochschild
@@ -113,7 +113,7 @@ public final class CalendarText {
         try {
             rb =
                 ResourceBundle.getBundle(
-                    "resources/" + calendarType,
+                    "data/" + calendarType,
                     locale,
                     new PropertiesControl());
         } catch (MissingResourceException ex) {
@@ -268,7 +268,7 @@ public final class CalendarText {
                 }
 
                 if (p == null) {
-                    // TODO: Provider mit Zugriff auf resources/calendar-type!
+                    // TODO: Provider mit Zugriff auf data/calendar-type!
                     p = new FallbackProvider();
                 }
             }
@@ -625,7 +625,7 @@ public final class CalendarText {
      * Erg&auml;nzen oder &Uuml;berschreiben von JDK-Vorgaben bez&uuml;glich
      * der Standardelemente Monat, Wochentag etc. Kalenderspezifische Texte,
      * die gar nicht im JDK vorhanden sind, werden stattdessen mit Hilfe von
-     * properties-Dateien im resources-Verzeichnis bereitgestellt. </p>
+     * properties-Dateien im data-Verzeichnis bereitgestellt. </p>
      *
      * @author  Meno Hochschild
      * @spec    Implementations must have a public no-arg constructor.
@@ -1230,7 +1230,7 @@ public final class CalendarText {
 
             try {
                 return ResourceBundle.getBundle(
-                    "resources/" + ISO_CALENDAR_TYPE,
+                    "data/" + ISO_CALENDAR_TYPE,
                     locale,
                     new PropertiesControl());
             } catch (MissingResourceException ex) {

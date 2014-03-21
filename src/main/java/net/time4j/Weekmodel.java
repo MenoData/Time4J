@@ -2447,7 +2447,7 @@ public final class Weekmodel
             super();
 
             InputStream is = null;
-            String name = "resources/weekend.data";
+            String name = "data/weekend.data";
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
             if (cl != null) {

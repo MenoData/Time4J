@@ -53,14 +53,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * <p>Als Quelle dient entweder eine &uuml;ber einen {@code ServiceLoader}
  * gefundene Implementierung des SPI-Interface {@code Provider} oder
- * bei Nichtvorhandensein eine interne Standard-Implementierung, die auf die
- * Datei &quot;leapseconds.data&quot; zugreift. Diese Datei mu&szlig; im
- * Klassenpfad liegen (direkt an der Wurzel und nicht in Subpaketen). Sie
- * hat das Format einer CSV-ASCII-Textdatei, worin zwei Spalten mit Komma
- * getrennt vorkommen. Die erste Spalte definiert den Tag nach der Umstellung
- * im ISO-8601-Format als reines Datum ohne Uhrzeitanteil (z.B. 1972-07-01).
- * Die zweite Spalte repr&auml;sentiert das Vorzeichen der Schaltsekunde
- * (+/-). </p>
+ * bei Nichtvorhandensein eine interne Standard-Implementierung, die auf
+ * die Datei &quot;leapseconds.data&quot; zugreift. Diese Datei mu&szlig;
+ * im Klassenpfad liegen (im data-Ordner). Sie hat das Format einer
+ * CSV-ASCII-Textdatei, worin zwei Spalten mit Komma getrennt vorkommen.
+ * Die erste Spalte definiert den Tag nach der Umstellung im ISO-8601-Format
+ * als reines Datum ohne Uhrzeitanteil (z.B. 1972-07-01). Die zweite Spalte
+ * repr&auml;sentiert das Vorzeichen der Schaltsekunde (+/-). </p>
  *
  * <p>Geladen wird die Quelle bevorzugt &uuml;ber den Kontext-ClassLoader.
  * Wird die Quelle nicht gefunden, so wird angenommen, da&szlig; keine
@@ -1018,7 +1017,7 @@ public final class LeapSeconds
 
             this.table = new LinkedHashMap<GregorianDate, Integer>(50);
             InputStream is = null;
-            String name = "resources/leapseconds.data";
+            String name = "data/leapseconds.data";
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
             if (cl != null) {
