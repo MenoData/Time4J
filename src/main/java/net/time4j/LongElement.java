@@ -156,9 +156,12 @@ final class LongElement
     }
 
     @Override
-    protected Long getRollMax() {
+    public ChronoOperator<PlainTime> rolledBy(long units) {
 
-        return this.defaultMax;
+        return new OperatorDelegate<Long, PlainTime>(
+            this,
+            units,
+            this.defaultMax);
 
     }
 

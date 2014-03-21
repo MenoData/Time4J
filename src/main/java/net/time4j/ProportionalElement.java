@@ -140,7 +140,7 @@ public interface ProportionalElement<V extends Number, T>
      *      PlainTime.of(18, 38).with(MINUTE_OF_HOUR.roundedDown(15)));
      *  // Ausgabe: T18:30
      * </pre>
-     * 
+     *
      * @param   stepwidth   controls the limits within the rounding will occur
      * @return  rounding operator in floor mode
      * @see     #roundedUp(int)

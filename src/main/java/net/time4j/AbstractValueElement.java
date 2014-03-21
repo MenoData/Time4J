@@ -119,22 +119,4 @@ abstract class AbstractValueElement
 
     }
 
-    public ChronoOperator<T> rolledBy(long units) {
-
-        return new OperatorDelegate<V, T>(this, units, this.getRollMax());
-
-    }
-
-    /**
-     * <p>Gibt das Rollmaximum an. </p>
-     *
-     * @return  rolling maximum or {@code null} if context-dependent maximum
-     *          is sufficient
-     */
-    protected V getRollMax() {
-
-        return null;
-
-    }
-
 }
