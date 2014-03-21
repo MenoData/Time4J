@@ -31,6 +31,8 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.TimeZone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.ObjectStreamException;
 import java.util.Comparator;
@@ -46,14 +48,15 @@ import java.util.Comparator;
  * @param   <S> source type in other library
  * @param   <T> target type in Time4J
  * @author  Meno Hochschild
- * @version EXPERIMENTAL AND NOT YET FINISHED
  */
-// TODO: a) deprecated-Methoden der JDK-Typen prüfen
-// TODO: b) alternativen Ansatz mit Zeitzonenkonversion prüfen
 public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     extends BasicElement<S> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final boolean WITH_SQL_UTC_CONVERSION =
+        Boolean.getBoolean("net.time4j.sql.utc.conversion");
+    private static final PlainDate UNIX_DATE = PlainDate.of(0, EpochDays.UNIX);
 
     private static final long serialVersionUID = 1081658250255619999L;
     private static final int MIO = 1000000;
@@ -107,16 +110,14 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
      * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
      * {@code PlainDate}. </p>
      *
-     * <p>Die Konversion ber&uuml;cksichtigt KEINE Zeitzonen und setzt
-     * somit voraus, da&szlig; ein SQL-DATE java-seitig ebenfalls ohne
-     * Zeitzonenkalkulation erzeugt wurde. Dieses Verfahren hat den gro&szlig;en
-     * Vorteil, die Daten ungeachtet m&ouml;glicher Zeitzonenumstellungen in
-     * der Datenbank vollst&auml;ndig zu erhalten, so wie sie gespeichert
-     * wurden. Vorausgesetzt wird letztlich, da&szlig; {@code PlainDate}-Objekte
-     * reine Datumsangaben ohne Zeitzone sind und daher nur in lokalen
-     * Anwendungsszenarien verwendet und gespeichert werden d&uuml;rfen. </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die
+     * Konversion NICHT die Standardzeitzone des Systems und setzt somit voraus,
+     * da&szlig; ein SQL-DATE java-seitig ebenfalls ohne Zeitzonenkalkulation
+     * erzeugt wurde. Das ist de facto der Fall, wenn auf dem Application-Server
+     * UTC die Standardzeitzone ist. </p>
      *
-     * <p>Beispiel: </p>
+     * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
      * <pre>
      *  java.sql.Date sqlValue = new java.sql.Date(86400 * 1000);
@@ -163,17 +164,14 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
      * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
      * {@code PlainTime}. </p>
      *
-     * <p>Die Konversion ber&uuml;cksichtigt KEINE Zeitzonen und setzt
-     * somit voraus, da&szlig; ein SQL-TIME java-seitig ebenfalls ohne
-     * Zeitzonenkalkulation erzeugt wurde. Dieses Verfahren hat den
-     * gro&szlig;en Vorteil, die Daten ungeachtet m&ouml;glicher
-     * Zeitzonenumstellungen in der Datenbank vollst&auml;ndig zu
-     * erhalten, so wie sie gespeichert wurden. Vorausgesetzt wird letztlich,
-     * da&szlig; {@code PlainTime}-Objekte reine Uhrzeitangaben ohne Zeitzone
-     * sind und daher nur in lokalen Anwendungsszenarien verwendet und
-     * gespeichert werden d&uuml;rfen. </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die
+     * Konversion NICHT die Standardzeitzone des Systems und setzt somit voraus,
+     * da&szlig; ein SQL-TIME java-seitig ebenfalls ohne Zeitzonenkalkulation
+     * erzeugt wurde. Das ist de facto der Fall, wenn auf dem Application-Server
+     * UTC die Standardzeitzone ist. </p>
      *
-     * <p>Beispiel: </p>
+     * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
      * <pre>
      *  java.sql.Time sqlValue = new java.sql.Time(43200 * 1000);
@@ -216,17 +214,14 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
      * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
      * {@code PlainTimestamp}. </p>
      *
-     * <p>Die Konversion ber&uuml;cksichtigt KEINE Zeitzonen und setzt
-     * somit voraus, da&szlig; ein SQL-TIMESTAMP java-seitig ebenfalls ohne
-     * Zeitzonenkalkulation erzeugt wurde. Dieses Verfahren hat den
-     * gro&szlig;en Vorteil, die Daten ungeachtet m&ouml;glicher
-     * Zeitzonenumstellungen in der Datenbank vollst&auml;ndig zu
-     * erhalten, so wie sie gespeichert wurden. Vorausgesetzt wird letztlich,
-     * da&szlig; {@code PlainTimestamp}-Objekte immer ohne Zeitzone definiert
-     * sind und daher nur in lokalen Anwendungsszenarien verwendet und
-     * gespeichert werden d&uuml;rfen. Ein Informationsverlust kann auftreten,
-     * wenn die Datenbank nicht in Nanosekundenpr&auml;zision speichert.
-     * Anwendungsbeispiel: </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die
+     * Konversion NICHT die Standardzeitzone des Systems und setzt somit voraus,
+     * da&szlig; ein SQL-TIMESTAMP java-seitig auch ohne Zeitzonenkalkulation
+     * erzeugt wurde. Das ist de facto der Fall, wenn auf dem Application-Server
+     * UTC die Standardzeitzone ist. </p>
+     *
+     * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
      * <pre>
      *  java.sql.Timestamp sqlValue = new java.sql.Timestamp(86401 * 1000);
@@ -542,9 +537,17 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
                     "SQL-Date is only defined in year range of 1900-9999.");
             }
 
-            return new java.sql.Date(
+            long millis = // localMillis
                 MathUtils.safeMultiply(
-                    context.getDaysSinceUTC() + 2 * 365, 86400 * 1000));
+                    context.getDaysSinceUTC() + 2 * 365, 86400 * 1000);
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(context, PlainTime.MIN);
+                millis -= offset.getIntegralAmount() * 1000;
+            }
+
+            return new java.sql.Date(millis);
 
         }
 
@@ -555,8 +558,20 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             boolean lenient
         ) {
 
+            long millis = value.getTime(); // UTC zone
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime =
+                    new Moment(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
+
             return PlainDate.ENGINE.getCalendarSystem().transform(
-                MathUtils.floorDivide(value.getTime(), 86400 * 1000) - 2 * 365);
+                MathUtils.floorDivide(millis, 86400 * 1000) - 2 * 365);
 
         }
 
@@ -608,8 +623,16 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         @Override
         public java.sql.Time getValue(PlainTime context) {
 
-            return new java.sql.Time(
-                context.get(PlainTime.MILLI_OF_DAY).intValue());
+            long millis = // local millis
+                context.get(PlainTime.MILLI_OF_DAY).intValue();
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(UNIX_DATE, context);
+                millis -= offset.getIntegralAmount() * 1000;
+            }
+
+            return new java.sql.Time(millis);
 
         }
 
@@ -620,9 +643,21 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             boolean lenient
         ) {
 
+            long millis = value.getTime(); // UTC zone
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime =
+                    new Moment(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
+
             return PlainTime.MIN.with(
                 PlainTime.MILLI_OF_DAY,
-                MathUtils.floorModulo(value.getTime(), 86400 * 1000)
+                MathUtils.floorModulo(millis, 86400 * 1000)
             );
 
         }
@@ -675,12 +710,19 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         @Override
         public java.sql.Timestamp getValue(PlainTimestamp context) {
 
-            long dateMillis =
+            long dateMillis = // local millis
                 MathUtils.safeMultiply(
                     context.getCalendarDate().getDaysSinceUTC() + 2 * 365,
                     86400 * 1000);
-            long timeMillis =
+            long timeMillis = // local millis
                 context.get(PlainTime.MILLI_OF_DAY).intValue();
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(context, context);
+                timeMillis -= offset.getIntegralAmount() * 1000;
+            }
+
             java.sql.Timestamp ret =
                 new java.sql.Timestamp(
                     MathUtils.safeAdd(dateMillis, timeMillis));
@@ -696,13 +738,25 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             boolean lenient
         ) {
 
+            long millis = value.getTime(); // UTC zone
+
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime =
+                    new Moment(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
+                ZonalOffset offset =
+                    TimeZone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
+
             PlainDate date =
                 PlainDate.of(
-                    MathUtils.floorDivide(value.getTime(), 86400 * 1000),
+                    MathUtils.floorDivide(millis, 86400 * 1000),
                     EpochDays.UNIX);
             PlainTime time =
                 PlainTime.createFromMillis(
-                    MathUtils.floorModulo(value.getTime(), 86400 * 1000));
+                    MathUtils.floorModulo(millis, 86400 * 1000));
             PlainTimestamp ts = new PlainTimestamp(date, time);
             return ts.with(PlainTime.NANO_OF_SECOND, value.getNanos());
 
