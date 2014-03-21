@@ -21,7 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
 
@@ -37,8 +36,8 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoElement<Integer> element;
-    private final boolean up;
+    private final ProportionalElement<Integer, T> element;
+    private final Boolean up;
     private final double stepwidth;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -47,12 +46,14 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
      * <p>Konstruktor. </p>
      *
      * @param   element     referencing element
-     * @param   up          {@code true} if ceiling mode else {@code false}
+     * @param   up          {@code Boolean.TRUE} if ceiling mode,
+     *                      {@code null} if half rounding
+     *                      {@code Boolean.FALSE} if floor mode
      * @param   stepwidth   controls limits of rounding
      */
     IntRoundingOperator(
-        ChronoElement<Integer> element,
-        boolean up,
+        ProportionalElement<Integer, T> element,
+        Boolean up,
         int stepwidth
     ) {
         super();
@@ -71,27 +72,18 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
         double value = entity.get(this.element).doubleValue();
         double nv;
 
-        if (this.up) {
-             nv = Math.ceil(value / this.stepwidth) * this.stepwidth;
+        if (this.up == null) {
+            double high = Math.ceil(value / this.stepwidth) * this.stepwidth;
+            double low = Math.floor(value / this.stepwidth) * this.stepwidth;
+            nv = ((value - low < high - value) ? low : high);
+        } else if (this.up.booleanValue()) {
+            nv = Math.ceil(value / this.stepwidth) * this.stepwidth;
         } else {
-             nv = Math.floor(value / this.stepwidth) * this.stepwidth;
+            nv = Math.floor(value / this.stepwidth) * this.stepwidth;
         }
 
         Integer num = Integer.valueOf((int) nv);
-
-        int min = entity.getMinimum(this.element).intValue();
-
-        if (min > num.intValue()) {
-            return entity.with(this.element, entity.getMinimum(this.element));
-        }
-
-        int max = entity.getMaximum(this.element).intValue();
-
-        if (max < num.intValue()) {
-            return entity.with(this.element, entity.getMaximum(this.element));
-        }
-
-        return entity.with(this.element, num);
+        return entity.with(this.element.setLenient(num));
 
     }
 

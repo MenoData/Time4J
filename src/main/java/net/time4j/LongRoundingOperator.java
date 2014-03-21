@@ -21,7 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoOperator;
 
 
@@ -36,8 +35,8 @@ final class LongRoundingOperator
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoElement<Long> element;
-    private final boolean up;
+    private final ProportionalElement<Long, PlainTime> element;
+    private final Boolean up;
     private final double stepwidth;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -46,12 +45,14 @@ final class LongRoundingOperator
      * <p>Konstruktor. </p>
      *
      * @param   element     referencing element
-     * @param   up          {@code true} if ceiling mode else {@code false}
+     * @param   up          {@code Boolean.TRUE} if ceiling mode,
+     *                      {@code null} if half rounding
+     *                      {@code Boolean.FALSE} if floor mode
      * @param   stepwidth   controls limits of rounding
      */
     LongRoundingOperator(
-        ChronoElement<Long> element,
-        boolean up,
+        ProportionalElement<Long, PlainTime> element,
+        Boolean up,
         int stepwidth
     ) {
         super();
@@ -70,27 +71,18 @@ final class LongRoundingOperator
         double value = entity.get(this.element).doubleValue();
         double nv;
 
-        if (this.up) {
-             nv = Math.ceil(value / this.stepwidth) * this.stepwidth;
+        if (this.up == null) {
+            double high = Math.ceil(value / this.stepwidth) * this.stepwidth;
+            double low = Math.floor(value / this.stepwidth) * this.stepwidth;
+            nv = ((value - low < high - value) ? low : high);
+        } else if (this.up.booleanValue()) {
+            nv = Math.ceil(value / this.stepwidth) * this.stepwidth;
         } else {
-             nv = Math.floor(value / this.stepwidth) * this.stepwidth;
+            nv = Math.floor(value / this.stepwidth) * this.stepwidth;
         }
 
         Long num = Long.valueOf((long) nv);
-
-        long min = entity.getMinimum(this.element).longValue();
-
-        if (min > num.longValue()) {
-            return entity.with(this.element, entity.getMinimum(this.element));
-        }
-
-        long max = entity.getMaximum(this.element).longValue();
-
-        if (max < num.longValue()) {
-            return entity.with(this.element, entity.getMaximum(this.element));
-        }
-
-        return entity.with(this.element, num);
+        return entity.with(this.element.setLenient(num));
 
     }
 

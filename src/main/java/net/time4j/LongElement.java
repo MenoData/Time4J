@@ -138,7 +138,18 @@ final class LongElement
 
         return new LongRoundingOperator(
             this,
-            true,
+            Boolean.TRUE,
+            stepwidth
+        );
+
+    }
+
+    @Override
+    public ChronoOperator<PlainTime> roundedHalf(int stepwidth) {
+
+        return new LongRoundingOperator(
+            this,
+            null,
             stepwidth
         );
 
@@ -149,7 +160,7 @@ final class LongElement
 
         return new LongRoundingOperator(
             this,
-            false,
+            Boolean.FALSE,
             stepwidth
         );
 

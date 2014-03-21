@@ -197,7 +197,18 @@ final class IntegerElement<T extends ChronoEntity<T>>
 
         return new IntRoundingOperator<T>(
             this,
-            true,
+            Boolean.TRUE,
+            stepwidth
+        );
+
+    }
+
+    @Override
+    public ChronoOperator<T> roundedHalf(int stepwidth) {
+
+        return new IntRoundingOperator<T>(
+            this,
+            null,
             stepwidth
         );
 
@@ -208,7 +219,7 @@ final class IntegerElement<T extends ChronoEntity<T>>
 
         return new IntRoundingOperator<T>(
             this,
-            false,
+            Boolean.FALSE,
             stepwidth
         );
 
