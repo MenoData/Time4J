@@ -907,7 +907,8 @@ public final class Moment
         int minute = minutes % 60;
         int second = timeOfDay % 60;
         int nano = this.getNanosecond();
-        return new PlainTime(hour, minute, second, nano);
+        
+        return PlainTime.of(hour, minute, second, nano);
 
     }
 

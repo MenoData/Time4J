@@ -307,7 +307,7 @@ final class SPX
                 }
             }
 
-            return new PlainTime(hour, minute, second, nano);
+            return PlainTime.of(hour, minute, second, nano);
         }
 
     }

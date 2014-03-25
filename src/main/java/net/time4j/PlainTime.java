@@ -693,26 +693,7 @@ public final class PlainTime
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Konstruktor mit Stunde, Minute, Sekunde und Nanosekunde. </p>
-     *
-     * <p>Wenn Nanosekunden gar nicht angegeben werden sollen, empfiehlt sich
-     * die Verwendung einer Fabrikmethode wie {@code of(...)}. Ist die
-     * Nanosekunde relevant, dann kann sie mittels des Ausdrucks
-     * {@code get(PlainTime.NANO_OF_SECOND)} abgefragt werden. </p>
-     *
-     * @param   hour        hour in the range {@code 0-23} or {@code 24}
-     *                      if the other argumenta equal to {@code 0}
-     * @param   minute      minute in the range {@code 0-59}
-     * @param   second      second in the range {@code 0-59}
-     * @param   nanosecond  nanosecond in the range {@code 0-999,999,999}
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @see     #of(int)
-     * @see     #of(int, int)
-     * @see     #of(int, int, int)
-     * @see     #NANO_OF_SECOND
-     */
-    public PlainTime(
+    private PlainTime(
         int hour,
         int minute,
         int second,
@@ -843,6 +824,37 @@ public final class PlainTime
         }
 
         return new PlainTime(hour, minute, second, 0);
+
+    }
+
+    /**
+     * <p>Erzeugt eine neue Uhrzeit mit Stunde, Minute, Sekunde und
+     * Nanosekunde. </p>
+     *
+     * @param   hour        hour in the range {@code 0-23} or {@code 24}
+     *                      if the other argumenta equal to {@code 0}
+     * @param   minute      minute in the range {@code 0-59}
+     * @param   second      second in the range {@code 0-59}
+     * @param   nanosecond  nanosecond in the range {@code 0-999,999,999}
+     * @return  new or cached wall time
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int)
+     * @see     #of(int, int)
+     * @see     #of(int, int, int)
+     * @see     #NANO_OF_SECOND
+     */
+    public static PlainTime of(
+        int hour,
+        int minute,
+        int second,
+        int nanosecond
+    ) {
+
+        if ((minute | second | nanosecond) == 0) {
+            return PlainTime.of(hour);
+        }
+
+        return new PlainTime(hour, minute, second, nanosecond);
 
     }
 
@@ -1210,32 +1222,6 @@ public final class PlainTime
     static Object lookupElement(String elementName) {
 
         return ELEMENTS.get(elementName);
-
-    }
-
-    /**
-     * <p>Erzeugt eine neue Uhrzeit mit Stunde, Minute, Sekunde und Nanos. </p>
-     *
-     * @param   hour        hour in the range {@code 0-23} or {@code 24}
-     *                      if the other argumenta equal to {@code 0}
-     * @param   minute      minute in the range {@code 0-59}
-     * @param   second      second in the range {@code 0-59}
-     * @param   nano        nanosecond in the range {@code 0-999,999,999}
-     * @return  new or cached wall time
-     * @throws  IllegalArgumentException if any argument is out of range
-     */
-    static PlainTime of(
-        int hour,
-        int minute,
-        int second,
-        int nano
-    ) {
-
-        if ((minute | second | nano) == 0) {
-            return PlainTime.of(hour);
-        } else {
-            return new PlainTime(hour, minute, second, nano);
-        }
 
     }
 
