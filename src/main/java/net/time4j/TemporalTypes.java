@@ -475,7 +475,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             long millis = value.getTime();
             long seconds = MathUtils.floorDivide(millis, 1000);
             int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
-            return new Moment(seconds, nanos, TimeScale.POSIX);
+            return Moment.of(seconds, nanos, TimeScale.POSIX);
 
         }
 
@@ -562,7 +562,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 Moment unixTime =
-                    new Moment(
+                    Moment.of(
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =
@@ -647,7 +647,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 Moment unixTime =
-                    new Moment(
+                    Moment.of(
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =
@@ -742,7 +742,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 Moment unixTime =
-                    new Moment(
+                    Moment.of(
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =

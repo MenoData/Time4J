@@ -170,7 +170,7 @@ public final class SystemClock
             Moment getTime() {
                 long millis = getMillis();
                 int nanos = ((int) (millis % 1000)) * MIO;
-                return new Moment(
+                return Moment.of(
                     millis / 1000,
                     nanos,
                     TimeScale.POSIX);
@@ -193,7 +193,7 @@ public final class SystemClock
             @Override
             Moment getTime() {
                 long nanos = getNanos();
-                return new Moment(
+                return Moment.of(
                     nanos / MRD,
                     (int) (nanos % MRD),
                     TimeScale.POSIX);

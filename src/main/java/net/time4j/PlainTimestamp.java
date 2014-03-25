@@ -731,7 +731,7 @@ public final class PlainTimestamp
             Moment.checkNegativeLS(posixTime, this);
         }
 
-        return new Moment(posixTime, posixNanos, TimeScale.POSIX);
+        return Moment.of(posixTime, posixNanos, TimeScale.POSIX);
 
     }
 

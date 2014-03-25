@@ -147,7 +147,7 @@ public final class Moment
 
     private static final ChronoFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
-        new Moment(86400, TimeScale.UTC);
+        new Moment(86400, 0, TimeScale.UTC);
     private static final Set<ChronoElement<?>> HIGH_TIME_ELEMENTS;
     private static final Map<ChronoElement<?>, Integer> LOW_TIME_ELEMENTS;
 
@@ -251,46 +251,7 @@ public final class Moment
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Entspricht {@code new Moment(elapsedTime, 0, scale)}. </p>
-     *
-     * @param   elapsedTime     elapsed seconds on given time scale
-     * @param   scale           time scale reference
-     * @throws  IllegalArgumentException if elapsed time is out of range limits
-     *          beyond year +/-999,999,999 or out of time scale range
-     * @throws  IllegalStateException if time scale is not POSIX but
-     *          leap second support is switched off by configuration
-     * @see     LeapSeconds#isEnabled()
-     */
-    public Moment(
-        long elapsedTime,
-        TimeScale scale
-    ) {
-        this(elapsedTime, 0, scale);
-
-    }
-
-    /**
-     * <p>Konstruiert einen neuen UTC-Zeitstempel mit Hilfe von
-     * Zeitkoordinaten auf der angegebenen Zeitskala. </p>
-     *
-     * <p>Die angegebene verstrichene Zeit {@code elapsedTime} wird intern
-     * in die UTC-Epochenzeit umgerechnet, sollte eine andere Zeitskala als
-     * UTC angegeben sein. Die Zeitskala TAI wird erst ab der UTC-Epoche
-     * 1972-01-01 unterst&uuml;tzt, die Zeitskala GPS erst ab 1980-01-06. </p>
-     *
-     * @param   elapsedTime     elapsed seconds on given time scale
-     * @param   nanosecond      nanosecond fraction of last second
-     * @param   scale           time scale reference
-     * @throws  IllegalArgumentException if the nanosecond is not in the range
-     *          {@code 0 <= nanosecond <= 999,999,999} or if elapsed time is
-     *          out of supported range limits beyond year +/-999,999,999 or
-     *          out of time scale range
-     * @throws  IllegalStateException if time scale is not POSIX but
-     *          leap second support is switched off by configuration
-     * @see     LeapSeconds#isEnabled()
-     */
-    public Moment(
+    private Moment(
         long elapsedTime,
         int nanosecond,
         TimeScale scale
@@ -367,6 +328,66 @@ public final class Moment
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Entspricht {@code Moment.of(elapsedTime, 0, scale)}. </p>
+     *
+     * @param   elapsedTime     elapsed seconds on given time scale
+     * @param   scale           time scale reference
+     * @return  new moment instance
+     * @throws  IllegalArgumentException if elapsed time is out of range limits
+     *          beyond year +/-999,999,999 or out of time scale range
+     * @throws  IllegalStateException if time scale is not POSIX but
+     *          leap second support is switched off by configuration
+     * @see     LeapSeconds#isEnabled()
+     */
+    public static Moment of(
+        long elapsedTime,
+        TimeScale scale
+    ) {
+
+        return Moment.of(elapsedTime, 0, scale);
+
+    }
+
+    /**
+     * <p>Konstruiert einen neuen UTC-Zeitstempel mit Hilfe von
+     * Zeitkoordinaten auf der angegebenen Zeitskala. </p>
+     *
+     * <p>Die angegebene verstrichene Zeit {@code elapsedTime} wird intern
+     * in die UTC-Epochenzeit umgerechnet, sollte eine andere Zeitskala als
+     * UTC angegeben sein. Die Zeitskala TAI wird erst ab der UTC-Epoche
+     * 1972-01-01 unterst&uuml;tzt, die Zeitskala GPS erst ab 1980-01-06. </p>
+     *
+     * @param   elapsedTime     elapsed seconds on given time scale
+     * @param   nanosecond      nanosecond fraction of last second
+     * @param   scale           time scale reference
+     * @return  new moment instance
+     * @throws  IllegalArgumentException if the nanosecond is not in the range
+     *          {@code 0 <= nanosecond <= 999,999,999} or if elapsed time is
+     *          out of supported range limits beyond year +/-999,999,999 or
+     *          out of time scale range
+     * @throws  IllegalStateException if time scale is not POSIX but
+     *          leap second support is switched off by configuration
+     * @see     LeapSeconds#isEnabled()
+     */
+    public static Moment of(
+        long elapsedTime,
+        int nanosecond,
+        TimeScale scale
+    ) {
+
+        if (
+            (elapsedTime == 0)
+            && (nanosecond == 0)
+            && (scale == TimeScale.POSIX)
+        ) {
+            return Moment.UNIX_EPOCH;
+        }
+
+        return new Moment(elapsedTime, nanosecond, scale);
+
+    }
 
     @Override
     public long getPosixTime() {
@@ -907,7 +928,7 @@ public final class Moment
         int minute = minutes % 60;
         int second = timeOfDay % 60;
         int nano = this.getNanosecond();
-        
+
         return PlainTime.of(hour, minute, second, nano);
 
     }
@@ -937,7 +958,7 @@ public final class Moment
             return Moment.class.cast(ut);
         }
 
-        return new Moment(ut.getElapsedTime(UTC), ut.getNanosecond(UTC), UTC);
+        return Moment.of(ut.getElapsedTime(UTC), ut.getNanosecond(UTC), UTC);
 
     }
 
@@ -1386,7 +1407,7 @@ public final class Moment
                             context.getNanosecond(),
                             TimeScale.UTC);
                     } else {
-                        return new Moment(
+                        return Moment.of(
                             MathUtils.safeAdd(context.posixTime, amount),
                             context.getNanosecond(),
                             TimeScale.POSIX
@@ -1405,7 +1426,7 @@ public final class Moment
                             TimeScale.UTC
                         );
                     } else {
-                        return new Moment(
+                        return Moment.of(
                             MathUtils.safeAdd(context.posixTime, second),
                             nano,
                             TimeScale.POSIX
@@ -1686,7 +1707,7 @@ public final class Moment
             if (ut instanceof UniversalTime) {
                 return Moment.from(UniversalTime.class.cast(ut));
             } else{
-                return new Moment(
+                return Moment.of(
                     ut.getPosixTime(),
                     ut.getNanosecond(),
                     TimeScale.POSIX);
