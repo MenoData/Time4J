@@ -41,18 +41,18 @@ public class RoundingTest {
             PlainTime.of(18, 37).with(MINUTE_OF_HOUR.roundedHalf(15)),
             is(PlainTime.of(18, 30)));
 
-        PlainDate d1 = new PlainDate(2014, 3, 21);
+        PlainDate d1 = PlainDate.of(2014, 3, 21);
         assertThat(
             d1.with(PlainDate.DAY_OF_MONTH.roundedHalf(10)),
-            is(new PlainDate(2014, 3, 20)));
-        PlainDate d2 = new PlainDate(2014, 3, 31);
+            is(PlainDate.of(2014, 3, 20)));
+        PlainDate d2 = PlainDate.of(2014, 3, 31);
         assertThat(
             d2.with(PlainDate.DAY_OF_MONTH.roundedHalf(4)),
-            is(new PlainDate(2014, 4, 1)));
-        PlainDate d3 = new PlainDate(2014, 3, 29);
+            is(PlainDate.of(2014, 4, 1)));
+        PlainDate d3 = PlainDate.of(2014, 3, 29);
         assertThat(
             d3.with(PlainDate.DAY_OF_MONTH.roundedHalf(4)),
-            is(new PlainDate(2014, 3, 28)));
+            is(PlainDate.of(2014, 3, 28)));
     }
 
     @Test

@@ -494,21 +494,7 @@ public final class PlainDate
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Erzeugt ein neues ISO-konformes Kalenderdatum. </p>
-     *
-     * <p>Eine gute Alternative zum Konstruktor sind die Fabrikmethoden, deren
-     * Namen auf &quot;of&quot; lauten. </p>
-     *
-     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
-     * @param   month       gregorian month in range (1-12)
-     * @param   dayOfMonth  day of month in range (1-31)
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @see     #of(int, Month, int)
-     * @see     #of(int, int)
-     * @see     #of(int, int, Weekday)
-     */
-    public PlainDate(
+    private PlainDate(
         int year,
         int month,
         int dayOfMonth
@@ -529,10 +515,34 @@ public final class PlainDate
      * <p>Erzeugt ein neues ISO-konformes Kalenderdatum. </p>
      *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @return  new or cached calendar date instance
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int, Month, int)
+     * @see     #of(int, int)
+     * @see     #of(int, int, Weekday)
+     */
+    public static PlainDate of(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        // TODO: konfigurierbaren Cache einbauen?
+        return new PlainDate(year, month, dayOfMonth);
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues ISO-konformes Kalenderdatum. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
      * @param   month       gregorian month in range (January-December)
      * @param   dayOfMonth  day of month in range (1-31)
      * @return  new or cached calendar date instance
      * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int, int, int)
      */
     public static PlainDate of(
         int year,
@@ -1373,17 +1383,6 @@ public final class PlainDate
         }
 
         sb.append(value);
-
-    }
-
-    private static PlainDate of(
-        int year,
-        int month,
-        int dayOfMonth
-    ) {
-
-        // TODO: konfigurierbaren Cache einbauen?
-        return new PlainDate(year, month, dayOfMonth);
 
     }
 
