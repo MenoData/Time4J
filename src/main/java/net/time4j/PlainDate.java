@@ -711,7 +711,7 @@ public final class PlainDate
      */
     public PlainTimestamp atTime(PlainTime time) {
 
-        return new PlainTimestamp(this, time);
+        return PlainTimestamp.of(this, time);
 
     }
 

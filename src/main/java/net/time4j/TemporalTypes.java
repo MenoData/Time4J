@@ -757,7 +757,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             PlainTime time =
                 PlainTime.createFromMillis(
                     MathUtils.floorModulo(millis, 86400 * 1000));
-            PlainTimestamp ts = new PlainTimestamp(date, time);
+            PlainTimestamp ts = PlainTimestamp.of(date, time);
             return ts.with(PlainTime.NANO_OF_SECOND, value.getNanos());
 
         }

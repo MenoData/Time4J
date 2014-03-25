@@ -282,18 +282,7 @@ public final class PlainTimestamp
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Erzeugt eine neue Instanz mit Datum und Uhrzeit. </p>
-     *
-     * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
-     * der resultierende Zeitstempel auf Mitternacht des Folgetags zeigt. </p>
-     *
-     * @param   date    calendar date component
-     * @param   time    wall time component (24:00 will always be normalized)
-     * @see     #of(int, int, int, int, int)
-     * @see     #of(int, int, int, int, int, int)
-     */
-    public PlainTimestamp(
+    private PlainTimestamp(
         PlainDate date,
         PlainTime time
     ) {
@@ -314,7 +303,31 @@ public final class PlainTimestamp
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Erzeugt eine neue Instanz mit Datum und Uhrzeit. </p>
+     *
+     * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
+     * der resultierende Zeitstempel auf Mitternacht des Folgetags zeigt. </p>
+     *
+     * @param   date    calendar date component
+     * @param   time    wall time component (24:00 will always be normalized)
+     * @return  timestamp as composition of date and time
+     * @see     #of(int, int, int, int, int)
+     * @see     #of(int, int, int, int, int, int)
+     */
+    public static PlainTimestamp of(
+        PlainDate date,
+        PlainTime time
+    ) {
+
+        return new PlainTimestamp(date, time);
+
+    }
+
+    /**
      * <p>Erzeugt einen neuen minutengenauen Zeitstempel. </p>
+     *
+     * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
+     * der resultierende Zeitstempel auf Mitternacht des Folgetags zeigt. </p>
      *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
      * @param   month       gregorian month in range (1-12)
@@ -339,6 +352,9 @@ public final class PlainTimestamp
     /**
      * <p>Erzeugt einen neuen sekundengenauen Zeitstempel. </p>
      *
+     * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
+     * der resultierende Zeitstempel auf Mitternacht des Folgetags zeigt. </p>
+     *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
      * @param   month       gregorian month in range (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
@@ -357,7 +373,7 @@ public final class PlainTimestamp
         int second
     ) {
 
-        return new PlainTimestamp(
+        return PlainTimestamp.of(
             PlainDate.of(year, Month.valueOf(month), dayOfMonth),
             PlainTime.of(hour, minute, second)
         );
@@ -651,7 +667,7 @@ public final class PlainTimestamp
                 localNanos
             );
 
-        return new PlainTimestamp(date, time);
+        return PlainTimestamp.of(date, time);
 
     }
 
@@ -846,7 +862,7 @@ public final class PlainTimestamp
             if (time == null) {
                 return null;
             } else {
-                return new PlainTimestamp(date, time);
+                return PlainTimestamp.of(date, time);
             }
 
         }
@@ -964,7 +980,7 @@ public final class PlainTimestamp
                 return context;
             } else if (this.element.isDateElement()) {
                 PlainDate date = context.date.with(this.element, value);
-                return new PlainTimestamp(date, context.time);
+                return PlainTimestamp.of(date, context.time);
             } else if (this.element.isTimeElement()) {
                 if (Number.class.isAssignableFrom(this.element.getType())) {
                     long min = this.toNumber(this.element.getDefaultMinimum());
@@ -977,7 +993,7 @@ public final class PlainTimestamp
                 }
 
                 PlainTime time = context.time.with(this.element, value);
-                return new PlainTimestamp(context.date, time);
+                return PlainTimestamp.of(context.date, time);
             }
 
             throw new ChronoException(
@@ -1059,7 +1075,7 @@ public final class PlainTimestamp
                 t = cycles.getWallTime();
             }
 
-            return new PlainTimestamp(d, t);
+            return PlainTimestamp.of(d, t);
 
         }
 

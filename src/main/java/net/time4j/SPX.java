@@ -417,7 +417,7 @@ final class SPX
             (date instanceof PlainDate)
             && (time instanceof PlainTime)
         ) {
-            return new PlainTimestamp(
+            return PlainTimestamp.of(
                 (PlainDate) date,
                 (PlainTime) time
             );
