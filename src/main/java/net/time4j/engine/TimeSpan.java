@@ -182,14 +182,7 @@ public interface TimeSpan<U> {
 
         //~ Konstruktoren -------------------------------------------------
 
-        /**
-         * <p>Konstruiert ein neues Zeitspannenelement. </p>
-         *
-         * @param   amount  amount in units {@code >= 0}
-         * @param   unit    time unit
-         * @throws  IllegalArgumentException if amount is negative
-         */
-        public Item(
+        private Item(
             long amount,
             U unit
         ) {
@@ -208,6 +201,23 @@ public interface TimeSpan<U> {
         }
 
         //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Konstruiert ein neues Zeitspannenelement. </p>
+         *
+         * @param   amount  amount in units {@code >= 0}
+         * @param   unit    time unit
+         * @return  new timespan item
+         * @throws  IllegalArgumentException if amount is negative
+         */
+        public static <U> Item<U> of(
+            long amount,
+            U unit
+        ) {
+
+            return new Item<U>(amount, unit);
+
+        }
 
         /**
          * <p>Liefert den positiven Betrag. </p>

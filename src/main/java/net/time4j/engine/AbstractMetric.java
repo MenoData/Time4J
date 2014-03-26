@@ -206,7 +206,7 @@ public abstract class AbstractMetric
                 amount = t1.until(t2, unit);
 
                 if (amount > 0) {
-                    resultList.add(new TimeSpan.Item<U>(amount, unit));
+                    resultList.add(TimeSpan.Item.of(amount, unit));
                 } else if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
@@ -320,7 +320,7 @@ public abstract class AbstractMetric
         U unit
     ) {
 
-        TimeSpan.Item<U> item = new TimeSpan.Item<U>(amount, unit);
+        TimeSpan.Item<U> item = TimeSpan.Item.of(amount, unit);
         int insert = 0;
 
         for (int i = 0, n = items.size(); i < n; i++) {

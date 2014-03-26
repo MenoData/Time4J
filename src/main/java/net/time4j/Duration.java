@@ -268,7 +268,7 @@ public final class Duration<U extends IsoUnit>
 
         List<Item<U>> items = new ArrayList<Item<U>>(1);
         items.add(
-            new Item<U>(
+            Item.of(
                 ((amount < 0) ? MathUtils.safeNegate(amount) : amount),
                 unit)
             );
@@ -619,7 +619,7 @@ public final class Duration<U extends IsoUnit>
         }
 
         if (this.isEmpty()) {
-            temp.add((item == null) ? new Item<U>(amount, unit) : item);
+            temp.add((item == null) ? Item.of(amount, unit) : item);
             return new Duration<U>(
                 temp,
                 negatedValue,
@@ -641,7 +641,7 @@ public final class Duration<U extends IsoUnit>
 
         if (index < 0) {
             if (this.isNegative() == negatedValue) {
-                temp.add(new Item<U>(amount, unit));
+                temp.add(Item.of(amount, unit));
             } else {
                 this.throwMixedSignsException(originalAmount, originalUnit);
             }
@@ -665,7 +665,7 @@ public final class Duration<U extends IsoUnit>
                 || (this.isNegative() == (sum < 0))
             ) {
                 long absSum = ((sum < 0) ? MathUtils.safeNegate(sum) : sum);
-                temp.set(index, new Item<U>(absSum, unit));
+                temp.set(index, Item.of(absSum, unit));
                 resultNegative = (sum < 0);
             } else {
                 this.throwMixedSignsException(originalAmount, originalUnit);
@@ -883,7 +883,7 @@ public final class Duration<U extends IsoUnit>
         for (int i = 0, n = this.count(); i < n; i++) {
             Item<U> item = this.getTotalLength().get(i);
             newItems.add(
-                new Item<U>(
+                Item.of(
                     MathUtils.safeMultiply(item.getAmount(), scalar),
                     item.getUnit()
                 )
@@ -1492,15 +1492,15 @@ public final class Duration<U extends IsoUnit>
         List<Item<CalendarUnit>> items = new ArrayList<Item<CalendarUnit>>(3);
 
         if (years != 0) {
-            items.add(new Item<CalendarUnit>(years, CalendarUnit.YEARS));
+            items.add(Item.of(years, CalendarUnit.YEARS));
         }
 
         if (months != 0) {
-            items.add(new Item<CalendarUnit>(months, CalendarUnit.MONTHS));
+            items.add(Item.of(months, CalendarUnit.MONTHS));
         }
 
         if (days != 0) {
-            items.add(new Item<CalendarUnit>(days, CalendarUnit.DAYS));
+            items.add(Item.of(days, CalendarUnit.DAYS));
         }
 
         return new Duration<CalendarUnit>(items, negative, true);
@@ -1518,19 +1518,19 @@ public final class Duration<U extends IsoUnit>
         List<Item<ClockUnit>> items = new ArrayList<Item<ClockUnit>>(4);
 
         if (hours != 0) {
-            items.add(new Item<ClockUnit>(hours, ClockUnit.HOURS));
+            items.add(Item.of(hours, ClockUnit.HOURS));
         }
 
         if (minutes != 0) {
-            items.add(new Item<ClockUnit>(minutes, ClockUnit.MINUTES));
+            items.add(Item.of(minutes, ClockUnit.MINUTES));
         }
 
         if (seconds != 0) {
-            items.add(new Item<ClockUnit>(seconds, ClockUnit.SECONDS));
+            items.add(Item.of(seconds, ClockUnit.SECONDS));
         }
 
         if (nanos != 0) {
-            items.add(new Item<ClockUnit>(nanos, ClockUnit.NANOS));
+            items.add(Item.of(nanos, ClockUnit.NANOS));
         }
 
         return new Duration<ClockUnit>(items, negative, false);
@@ -1580,7 +1580,7 @@ public final class Duration<U extends IsoUnit>
             } else if (key == ClockUnit.NANOS) {
                 nanos = MathUtils.safeAdd(nanos, amount);
             } else {
-                temp.add(new Item<U>(amount, key));
+                temp.add(Item.of(amount, key));
             }
         }
 
@@ -1596,16 +1596,16 @@ public final class Duration<U extends IsoUnit>
         }
 
         if (weeks != 0) {
-            temp.add(new Item<U>(weeks, weekUnit));
+            temp.add(Item.of(weeks, weekUnit));
         }
 
         if (days != 0) {
-            temp.add(new Item<U>(days, dayUnit));
+            temp.add(Item.of(days, dayUnit));
         }
 
         if (nanos != 0) {
             U key = cast(ClockUnit.NANOS);
-            temp.add(new Item<U>(nanos, key));
+            temp.add(Item.of(nanos, key));
         }
 
         return new Duration<U>(temp, negative, calendrical);
@@ -1665,7 +1665,7 @@ public final class Duration<U extends IsoUnit>
         if (weekIndex >= 0) {
             temp.set(
                 weekIndex,
-                new Item<U>(
+                Item.of(
                     MathUtils.safeMultiply(
                         temp.get(weekIndex).getAmount(), 7L),
                     Duration.<U>cast(CalendarUnit.DAYS)
@@ -1729,7 +1729,7 @@ public final class Duration<U extends IsoUnit>
             return null;
         }
 
-        return new Item<U>(amount, unit);
+        return Item.of(amount, unit);
 
     }
 
@@ -2036,7 +2036,7 @@ public final class Duration<U extends IsoUnit>
         ) {
             if (amount != 0) {
                 U reified = cast(unit);
-                items.add(new Item<U>(amount, reified));
+                items.add(Item.of(amount, reified));
             }
             return unit;
         } else if (unit.getLength() == last.getLength()) {
@@ -2300,7 +2300,7 @@ public final class Duration<U extends IsoUnit>
             }
 
             if (amount != 0) {
-                Item<IsoUnit> item = new Item<IsoUnit>(amount, unit);
+                Item<IsoUnit> item = Item.of(amount, unit);
                 this.items.add(item);
             }
 
@@ -2316,17 +2316,19 @@ public final class Duration<U extends IsoUnit>
             this.calendrical = Boolean.FALSE;
 
             if (amount >= 0) {
+                IsoUnit unit = ClockUnit.NANOS;
+
                 for (int i = this.items.size() - 1; i >= 0; i--) {
                     Item<IsoUnit> item = this.items.get(i);
                     if (item.getUnit().equals(ClockUnit.NANOS)) {
                         this.items.set(
                             i,
-                            new Item<IsoUnit>(
+                            Item.of(
                                 MathUtils.safeAdd(
                                     MathUtils.safeMultiply(amount, factor),
                                     item.getAmount()
                                 ),
-                                ClockUnit.NANOS
+                                unit
                             )
                         );
                         return;
@@ -2335,9 +2337,9 @@ public final class Duration<U extends IsoUnit>
 
                 if (amount != 0) {
                     this.items.add(
-                        new Item<IsoUnit>(
+                        Item.of(
                             MathUtils.safeMultiply(amount, factor),
-                            ClockUnit.NANOS
+                            unit
                         )
                     );
                 }
@@ -2484,7 +2486,7 @@ public final class Duration<U extends IsoUnit>
                                 unit.toString());
                     }
                 } else {
-                    items.add(new Item<IsoUnit>(amount, unit));
+                    items.add(Item.of(amount, unit));
                 }
             }
 
@@ -2501,6 +2503,8 @@ public final class Duration<U extends IsoUnit>
                 days = MathUtils.safeAdd(days, hours / 24);
             }
 
+            IsoUnit unit;
+
             if ((years | months | days) != 0) {
                 long y = MathUtils.safeAdd(years, months / 12);
                 long m = months % 12;
@@ -2511,32 +2515,40 @@ public final class Duration<U extends IsoUnit>
                     );
 
                 if (y != 0) {
-                    items.add(new Item<IsoUnit>(y, CalendarUnit.YEARS));
+                    unit = CalendarUnit.YEARS;
+                    items.add(Item.of(y, unit));
                 }
                 if (m != 0) {
-                    items.add(new Item<IsoUnit>(m, CalendarUnit.MONTHS));
+                    unit = CalendarUnit.MONTHS;
+                    items.add(Item.of(m, unit));
                 }
                 if (d != 0) {
-                    items.add(new Item<IsoUnit>(d, CalendarUnit.DAYS));
+                    unit = CalendarUnit.DAYS;
+                    items.add(Item.of(d, unit));
                 }
             } else if (weeks != 0) {
-                items.add(new Item<IsoUnit>(weeks, CalendarUnit.WEEKS));
+                unit = CalendarUnit.WEEKS;
+                items.add(Item.of(weeks, unit));
             }
 
             if (h != 0) {
-                items.add(new Item<IsoUnit>(h, ClockUnit.HOURS));
+                unit = ClockUnit.HOURS;
+                items.add(Item.of(h, unit));
             }
 
             if (n != 0) {
-                items.add(new Item<IsoUnit>(n, ClockUnit.MINUTES));
+                unit = ClockUnit.MINUTES;
+                items.add(Item.of(n, unit));
             }
 
             if (s != 0) {
-                items.add(new Item<IsoUnit>(s, ClockUnit.SECONDS));
+                unit = ClockUnit.SECONDS;
+                items.add(Item.of(s, unit));
             }
 
             if (f != 0) {
-                items.add(new Item<IsoUnit>(f, ClockUnit.NANOS));
+                unit = ClockUnit.NANOS;
+                items.add(Item.of(f, unit));
             }
 
             return new Duration<IsoUnit>(
@@ -2816,7 +2828,7 @@ public final class Duration<U extends IsoUnit>
                     amount = t1.until(t2, unit);
 
                     if (amount > 0) {
-                        resultList.add(new TimeSpan.Item<U>(amount, unit));
+                        resultList.add(Item.of(amount, unit));
                     } else if (amount < 0) {
                         throw new IllegalStateException(
                             "Implementation error: "
@@ -2914,13 +2926,13 @@ public final class Duration<U extends IsoUnit>
         }
 
         private static <U> void putItem(
-            List<TimeSpan.Item<U>> items,
+            List<Item<U>> items,
             Comparator<? super U> comparator,
             long amount,
             U unit
         ) {
 
-            TimeSpan.Item<U> item = new TimeSpan.Item<U>(amount, unit);
+            Item<U> item = Item.of(amount, unit);
             int insert = 0;
 
             for (int i = 0, n = items.size(); i < n; i++) {
@@ -2942,7 +2954,7 @@ public final class Duration<U extends IsoUnit>
         }
 
         private static <U> void removeItem(
-            List<TimeSpan.Item<U>> items,
+            List<Item<U>> items,
             U unit
         ) {
 
