@@ -83,17 +83,7 @@ public final class ZonalOffset
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Konstruktor. </p>
-     *
-     * <p>Beide Argumente m&uuml;ssen das gleiche Vorzeichen haben. </p>
-     *
-     * @param   total       total shift in seconds
-     * @param   fraction    fraction of second
-     * @throws  IllegalArgumentException if any arguments are out of range
-     *                                   or have different signs
-     */
-    public ZonalOffset(
+    private ZonalOffset(
         int total,
         int fraction
     ) {
@@ -442,7 +432,31 @@ public final class ZonalOffset
      */
     public static ZonalOffset ofTotalSeconds(int total) {
 
-        if (total == 0) {
+        return ZonalOffset.ofTotalSeconds(total, 0);
+
+    }
+
+    /**
+     * <p>Konstruiert eine Verschiebung der lokalen Zeit relativ zur
+     * UTC-Zeitzone in integralen oder fraktionalen Sekunden. </p>
+     *
+     * @param   total       total shift in seconds defined in range
+     *                      {@code -18 * 3600 <= total <= 18 * 3600}
+     * @param   fraction    fraction of second
+     * @return  zonal offset in (sub-)second precision
+     * @throws  IllegalArgumentException if any arguments are out of range
+     *                                   or have different signs
+     * @see     #getIntegralAmount()
+     * @see     #getFractionalAmount()
+     */
+    public static ZonalOffset ofTotalSeconds(
+        int total,
+        int fraction
+    ) {
+
+        if (fraction != 0) {
+            return new ZonalOffset(total, fraction);
+        } else if (total == 0) {
             return UTC;
         } else if ((total % (15 * 60)) == 0) { // Viertelstundenintervall
             Integer value = Integer.valueOf(total);

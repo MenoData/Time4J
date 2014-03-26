@@ -142,7 +142,7 @@ final class OldStyleTimeZone
             era = GregorianCalendar.BC;
             yearOfEra = 1 - localDate.getYear();
         }
-        
+
         int month = localDate.getMonth();
         int dom = localDate.getDayOfMonth();
         int dow =
@@ -294,7 +294,7 @@ final class OldStyleTimeZone
         if ((offsetMillis % 1000) == 0) {
             return ZonalOffset.ofTotalSeconds(offsetMillis / 1000);
         } else {
-            return new ZonalOffset(
+            return ZonalOffset.ofTotalSeconds(
                 offsetMillis / 1000,
                 (offsetMillis % 1000) * 1000000
             );

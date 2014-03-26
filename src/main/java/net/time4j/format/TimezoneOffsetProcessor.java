@@ -432,7 +432,7 @@ final class TimezoneOffsetProcessor
                 fraction = -fraction;
             }
 
-            offset = new ZonalOffset(total, fraction);
+            offset = ZonalOffset.ofTotalSeconds(total, fraction);
         }
 
         parsedResult.put(ZonalElement.TIMEZONE_ID, offset);

@@ -167,11 +167,7 @@ final class SPX
             fraction = in.readInt();
         }
 
-        if (fraction == 0) {
-            return ZonalOffset.ofTotalSeconds(offset);
-        } else {
-            return new ZonalOffset(offset, fraction);
-        }
+        return ZonalOffset.ofTotalSeconds(offset, fraction);
 
     }
 
