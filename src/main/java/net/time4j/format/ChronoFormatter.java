@@ -2237,6 +2237,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *  // Output: T17:45
          * </pre>
          *
+         * <p>Hinweis: Wird der Modus {@code Leniency.LAX} verwendet, ist
+         * diese Methode nicht notwendig. </p>
+         *
          * @return  this instance for method chaining
          */
         public Builder<T> addAny() {
