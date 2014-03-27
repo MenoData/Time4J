@@ -329,8 +329,9 @@ public final class LeapSeconds
                     "New leap second must be after last leap second.");
             }
 
+            GregorianDate newLS = new IsoDate(year, month, dayOfMonth);
             int shift = (negativeLS ? -1 : 1);
-            this.list.add(createLSE(date, shift, last));
+            this.list.add(createLSE(newLS, shift, last));
             this.reverseVolatile = this.initReverse();
         }
 
