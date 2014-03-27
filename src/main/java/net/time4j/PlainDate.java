@@ -773,17 +773,35 @@ public final class PlainDate
     }
 
     /**
-     * <p>Liegt das Datum bez&uuml;glich der System-Landesvorgabe
-     * an einem Wochenende? </p>
+     * <p>Ermittelt die L&auml;nge des aktuellen Monats in Tagen. </p>
      *
-     * @return  {@code true} if in system country this date is on weekend
-     *          else {@code false}
-     * @see     Weekmodel#weekend()
-     * @see     Locale#getDefault()
+     * @return  int im Bereich 28-31
      */
-    public boolean isWeekend() {
+    public int lengthOfMonth() {
 
-        return this.isWeekend(Locale.getDefault());
+        return GregorianMath.getLengthOfMonth(this.year, this.month);
+
+    }
+
+    /**
+     * <p>Ermittelt die L&auml;nge des aktuellen Jahres in Tagen. </p>
+     *
+     * @return  365 oder 366 wenn das aktuelle Jahr ein Schaltjahr ist
+     */
+    public int lengthOfYear() {
+
+        return this.isLeapYear() ? 366 : 365;
+
+    }
+
+    /**
+     * <p>Liegt dieses Datum in einem Schaltjahr? </p>
+     *
+     * @return  boolean
+     */
+    public boolean isLeapYear() {
+
+        return GregorianMath.isLeapYear(this.year);
 
     }
 
@@ -794,7 +812,6 @@ public final class PlainDate
      * @return  {@code true} if in given country this date is on weekend
      *          else {@code false}
      * @see     Weekmodel#weekend()
-     * @see     Locale#getCountry()
      */
     public boolean isWeekend(Locale country) {
 
