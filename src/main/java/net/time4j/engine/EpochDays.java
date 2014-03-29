@@ -87,7 +87,7 @@ public enum EpochDays
      *
      * <p>Wird von MS-Excel in Windows-Betriebssystemen verwendet. </p>
      */
-    EXCEL(2415020),
+    EXCEL(2415019),
 
     /**
      * <p>Anzahl der Tage relativ zum ISO-Datum [1601-01-01] als Tag 1. </p>
@@ -120,7 +120,7 @@ public enum EpochDays
      * <p>Anzahl der Tage relativ zum gregorianischen Umstellungsdatum
      * [1582-10-15] als Tag 1. </p>
      */
-    LILIAN_DAY_NUMBER(2299160);
+    LILIAN_DAY_NUMBER(2299159);
 
     //~ Instanzvariablen --------------------------------------------------
 
