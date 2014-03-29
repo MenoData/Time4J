@@ -78,7 +78,7 @@ public abstract class AbstractMetric
      * @throws  IllegalArgumentException if any time unit is given more than
      *          once or if there is no time unit at all
      */
-    protected AbstractMetric(
+    public AbstractMetric(
         boolean normalizing,
         U... units
     ) {
@@ -114,7 +114,7 @@ public abstract class AbstractMetric
      * @param   units           time units to be used for calculating time span
      * @throws  IllegalArgumentException if there is not time unit at all
      */
-    protected AbstractMetric(
+    public AbstractMetric(
         boolean normalizing,
         Set<U> units
     ) {
