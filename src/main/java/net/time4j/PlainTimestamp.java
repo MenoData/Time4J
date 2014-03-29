@@ -609,6 +609,18 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * <p>Existiert dieser Zeitstempel in der angegebenen Zeitzone? </p>
+     *
+     * @param   tzid    time zone id
+     * @return  {@code true} if this timestamp is valid in given time zone
+     */
+    public boolean isValid(TZID tzid) {
+
+        return !TimeZone.of(tzid).isInvalid(this, this);
+
+    }
+
     // TODO: Implementieren!
 //    public ZonalOffset getEarlierOffsetAtOverlap(TZID tzid) {
 //
