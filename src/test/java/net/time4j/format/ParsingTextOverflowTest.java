@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class ParsingTextOverflow {
+public class ParsingTextOverflowTest {
 
     private ChronoFormatter<PlainDate> formatter;
     private ChronoFormatter<PlainDate> formatterAny;
