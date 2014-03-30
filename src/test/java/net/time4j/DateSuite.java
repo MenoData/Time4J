@@ -10,8 +10,15 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         EpochDaysTest.class,
         GregorianTransformationTest.class,
+        LeapYearOrdinalDateTest.class,
+        LeapYearRangeArithmeticTest.class,
         LeapYearTest.class,
-        RoundingTest.class
+        MonthRangeArithmeticTest.class,
+        RoundingTest.class,
+        StdDayArithmeticTest.class,
+        StdYearOrdinalDateTest.class,
+        StdYearRangeArithmeticTest.class,
+        YearMonthArithmeticTest.class
     }
 )
 public class DateSuite {
