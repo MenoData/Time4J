@@ -25,6 +25,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.UTC),
             is(-2 * 365L));
+        assertThat(
+            PlainDate.of(1972, 1, 1).get(EpochDays.UTC),
+            is(0L));
     }
 
     @Test
@@ -55,6 +58,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.MODIFIED_JULIAN_DATE),
             is(0L + (1970 - 1859) * 365 + 27 + 45));
+        assertThat(
+            PlainDate.of(1858, 11, 17).get(EpochDays.MODIFIED_JULIAN_DATE),
+            is(0L));
     }
 
     @Test
@@ -71,6 +77,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.ANSI),
             is(1L + (1970 - 1601) * 365 + 3 * 24 + 17));
+        assertThat(
+            PlainDate.of(1601, 1, 1).get(EpochDays.ANSI),
+            is(1L));
     }
 
     @Test
@@ -87,6 +96,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.EXCEL),
             is(1L + (1970 - 1900) * 365 + 17));
+        assertThat(
+            PlainDate.of(1900, 1, 1).get(EpochDays.EXCEL),
+            is(1L));
     }
 
     @Test
@@ -103,6 +115,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.RATA_DIE),
             is(1L + (1970 - 1) * 365 + 19 * 24 + 17 + 4));
+        assertThat(
+            PlainDate.of(1, 1, 1).get(EpochDays.RATA_DIE),
+            is(1L));
     }
 
     @Test
@@ -119,6 +134,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.LILIAN_DAY_NUMBER),
             is(1L + (1970 - 1583) * 365 + 3 * 24 + 22 + 78));
+        assertThat(
+            PlainDate.of(1582, 10, 15).get(EpochDays.LILIAN_DAY_NUMBER),
+            is(1L));
         System.out.println("LDN: " // 141427
                 + PlainDate.of(1582, 10, 15)
                 .until(PlainDate.of(1970, 1), CalendarUnit.DAYS));
@@ -138,6 +156,9 @@ public class EpochDaysTest {
         assertThat(
             PlainDate.of(1970, 1).get(EpochDays.JULIAN_DAY_NUMBER),
             is(0L + (1970 + 4712) * 365 + 66 * 24 + 20 + 16 + 38));
+        assertThat(
+            PlainDate.of(-4713, 11, 24).get(EpochDays.JULIAN_DAY_NUMBER),
+            is(0L));
         System.out.println("JDN: " // 2440588
                 + PlainDate.of(-4713, 11, 24)
                 .until(PlainDate.of(1970, 1), CalendarUnit.DAYS));
