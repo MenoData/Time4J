@@ -69,4 +69,57 @@ public class StdDayArithmeticTest {
             is(PlainDate.of(2011, 10, 31)));
     }
 
+    @Test
+    public void daysBetween() {
+        assertThat(
+            DAYS.between(
+                PlainDate.of(2011, 12, 30),
+                PlainDate.of(2014, 1, 3)),
+            is(735L));
+        assertThat(
+            DAYS.between(
+                PlainDate.of(2013, 12, 30),
+                PlainDate.of(2014, 1, 3)),
+            is(4L));
+        assertThat(
+            DAYS.between(
+                PlainDate.of(2014, 1, 3),
+                PlainDate.of(2011, 12, 30)),
+            is(-735L));
+        assertThat(
+            DAYS.between(
+                PlainDate.of(2014, 1, 3),
+                PlainDate.of(2013, 12, 30)),
+            is(-4L));
+    }
+
+    @Test
+    public void weeksBetween() {
+        assertThat(
+            WEEKS.between(
+                PlainDate.of(2011, 12, 30),
+                PlainDate.of(2014, 1, 3)),
+            is(735L / 7));
+        assertThat(
+            WEEKS.between(
+                PlainDate.of(2012, 2, 20),
+                PlainDate.of(2012, 3, 5)),
+            is(2L));
+        assertThat(
+            WEEKS.between(
+                PlainDate.of(2012, 2, 20),
+                PlainDate.of(2012, 3, 4)),
+            is(1L));
+        assertThat(
+            WEEKS.between(
+                PlainDate.of(2012, 3, 4),
+                PlainDate.of(2012, 2, 20)),
+            is(-1L));
+        assertThat(
+            WEEKS.between(
+                PlainDate.of(2012, 3, 5),
+                PlainDate.of(2012, 2, 20)),
+            is(-2L));
+    }
+
 }

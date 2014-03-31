@@ -272,4 +272,139 @@ public class YearMonthArithmeticTest {
             PlainDate.of(2014, 12, 31).minus(1, QUARTERS),
             is(PlainDate.of(2014, 9, 30)));
     }
+
+    @Test
+    public void quartersBetween() {
+        assertThat(
+            QUARTERS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 3, 20)),
+            is(2L));
+        assertThat(
+            QUARTERS.between(
+                PlainDate.of(2014, 12, 31),
+                PlainDate.of(2014, 9, 30)),
+            is(-1L));
+        assertThat(
+            QUARTERS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 3, 19)),
+            is(1L));
+        assertThat(
+            QUARTERS.between(
+                PlainDate.of(2014, 12, 29),
+                PlainDate.of(2014, 9, 30)),
+            is(0L));
+    }
+
+    @Test
+    public void monthsBetween() {
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 9, 1),
+                PlainDate.of(2014, 9, 30)),
+            is(0L));
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 9, 30),
+                PlainDate.of(2014, 9, 1)),
+            is(0L));
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 3, 20)),
+            is(6L));
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 12, 31),
+                PlainDate.of(2014, 9, 30)),
+            is(-3L));
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 3, 19)),
+            is(5L));
+        assertThat(
+            MONTHS.between(
+                PlainDate.of(2014, 12, 29),
+                PlainDate.of(2014, 9, 30)),
+            is(-2L));
+    }
+
+    @Test
+    public void yearsBetween() {
+        assertThat(
+            YEARS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 9, 20)),
+            is(1L));
+        assertThat(
+            YEARS.between(
+                PlainDate.of(2014, 9, 20),
+                PlainDate.of(2015, 9, 19)),
+            is(0L));
+        assertThat(
+            YEARS.between(
+                PlainDate.of(2014, 12, 31),
+                PlainDate.of(2014, 9, 30)),
+            is(0L));
+        assertThat(
+            YEARS.between(
+                PlainDate.of(2014, 12, 29),
+                PlainDate.of(2011, 9, 30)),
+            is(-3L));
+        assertThat(
+            YEARS.between(
+                PlainDate.of(2014, 12, 29),
+                PlainDate.of(2011, 12, 30)),
+            is(-2L));
+    }
+
+    @Test
+    public void decadesBetween() {
+        assertThat(
+            DECADES.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(2004, 9, 20)),
+            is(9L));
+        assertThat(
+            DECADES.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(2004, 9, 19)),
+            is(8L));
+    }
+
+    @Test
+    public void centuriesBetween() {
+        assertThat(
+            CENTURIES.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(2014, 9, 20)),
+            is(1L));
+        assertThat(
+            CENTURIES.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(2014, 9, 19)),
+            is(0L));
+    }
+
+    @Test
+    public void millenniaBetween() {
+        assertThat(
+            MILLENNIA.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(3914, 9, 20)),
+            is(2L));
+        assertThat(
+            MILLENNIA.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(3914, 9, 19)),
+            is(1L));
+        assertThat(
+            MILLENNIA.between(
+                PlainDate.of(1914, 9, 20),
+                PlainDate.of(3014, 9, 19)),
+            is(1L));
+    }
+
 }
