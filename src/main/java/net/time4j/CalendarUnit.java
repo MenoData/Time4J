@@ -376,7 +376,7 @@ public enum CalendarUnit
                     amount = monthDelta(d1, d2) / 12;
                     break;
                 case QUARTERS:
-                    amount = monthDelta(d1, d2) / 4;
+                    amount = monthDelta(d1, d2) / 3;
                     break;
                 case MONTHS:
                     amount = monthDelta(d1, d2);
