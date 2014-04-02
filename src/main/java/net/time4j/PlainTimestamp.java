@@ -1101,7 +1101,7 @@ public final class PlainTimestamp
 
             if (this.calendarUnit != null) {
                 delta = this.calendarUnit.between(start.date, end.date);
-
+                
                 if (delta != 0) {
                     PlainTime t1 = start.time;
                     PlainTime t2 = end.time;
@@ -1112,16 +1112,59 @@ public final class PlainTimestamp
                         delta++;
                     }
                 }
+            } else if (start.date.isAfter(end.date)) {
+                delta = -between(end, start);
             } else {
                 long days = start.date.until(end.date, CalendarUnit.DAYS);
 
-                delta =
-                    MathUtils.safeAdd(
-                        this.clockUnit.convert(
-                            MathUtils.safeMultiply(days, 24),
-                            ClockUnit.HOURS),
-                        this.clockUnit.between(start.time, end.time)
-                    );
+                if (days == 0) {
+                    return this.clockUnit.between(start.time, end.time);
+                } else if (this.clockUnit.compareTo(ClockUnit.SECONDS) <= 0) {
+                    // HOURS, MINUTES, SECONDS
+                    delta =
+                        MathUtils.safeAdd(
+                            MathUtils.safeMultiply(days, 86400),
+                            MathUtils.safeSubtract(
+                                end.time.get(SECOND_OF_DAY).longValue(),
+                                start.time.get(SECOND_OF_DAY).longValue()
+                            )
+                        );
+                    if (start.time.getNanosecond() > end.time.getNanosecond()) {
+                        delta--;
+                    }
+                } else {
+                    // MILLIS, MICROS, NANOS
+                    delta =
+                        MathUtils.safeAdd(
+                            MathUtils.safeMultiply(days, 86400L * MRD),
+                            MathUtils.safeSubtract(
+                                end.time.get(NANO_OF_DAY).longValue(),
+                                start.time.get(NANO_OF_DAY).longValue()
+                            )
+                        );
+                }
+
+                switch (this.clockUnit) {
+                    case HOURS:
+                        delta = delta / 3600;
+                        break;
+                    case MINUTES:
+                        delta = delta / 60;
+                        break;
+                    case SECONDS:
+                        break;
+                    case MILLIS:
+                        delta = delta / 1000000;
+                        break;
+                    case MICROS:
+                        delta = delta / 1000;
+                        break;
+                    case NANOS:
+                        break;
+                    default:
+                        throw new UnsupportedOperationException(
+                            this.clockUnit.name());
+                }
             }
 
             return delta;

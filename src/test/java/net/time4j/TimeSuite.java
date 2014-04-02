@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         HourArithmeticTest.class,
-        TimeArithmeticTest.class
+        TimeArithmeticTest.class,
+        TimestampArithmeticTest.class
     }
 )
 public class TimeSuite {

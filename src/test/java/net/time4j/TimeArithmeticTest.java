@@ -12,7 +12,7 @@ import static net.time4j.ClockUnit.MILLIS;
 import static net.time4j.ClockUnit.MINUTES;
 import static net.time4j.ClockUnit.NANOS;
 import static net.time4j.ClockUnit.SECONDS;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 
@@ -258,6 +258,24 @@ public class TimeArithmeticTest {
                 PlainTime.of(0)
             ),
             is(-17L * 3600 - 45 * 60 - 10));
+        assertThat(
+            SECONDS.between(
+                PlainTime.of(2, 30, 5, 123),
+                PlainTime.of(2, 30, 8, 122)
+            ),
+            is(2L));
+        assertThat(
+            SECONDS.between(
+                PlainTime.of(2, 30, 5, 123),
+                PlainTime.of(2, 30, 8, 123)
+            ),
+            is(3L));
+        assertThat(
+            SECONDS.between(
+                PlainTime.of(2, 30, 5, 123),
+                PlainTime.of(2, 30, 8, 124)
+            ),
+            is(3L));
     }
 
     @Test
