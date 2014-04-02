@@ -9,7 +9,7 @@ import org.junit.runners.JUnit4;
 import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.YEARS;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 

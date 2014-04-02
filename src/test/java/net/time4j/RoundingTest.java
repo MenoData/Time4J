@@ -6,7 +6,7 @@ import org.junit.runners.JUnit4;
 
 import static net.time4j.PlainTime.CLOCK_HOUR_OF_DAY;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 

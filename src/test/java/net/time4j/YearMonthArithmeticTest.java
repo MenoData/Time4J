@@ -12,7 +12,7 @@ import static net.time4j.CalendarUnit.MILLENNIA;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.QUARTERS;
 import static net.time4j.CalendarUnit.YEARS;
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 
