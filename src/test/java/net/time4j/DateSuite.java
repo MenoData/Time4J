@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        DateComparisonTest.class,
         EpochDaysTest.class,
         GregorianTransformationTest.class,
         LeapYearOrdinalDateTest.class,
@@ -15,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LeapYearTest.class,
         MonthRangeArithmeticTest.class,
         RoundingTest.class,
+        SpecialUnitTest.class,
         StdDayArithmeticTest.class,
         StdYearOrdinalDateTest.class,
         StdYearRangeArithmeticTest.class,

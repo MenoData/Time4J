@@ -958,6 +958,28 @@ public final class PlainDate
 
     }
 
+    @Override
+    protected int compareByTime(Calendrical<?, ?> date) {
+
+        if (date instanceof PlainDate) { // Optimierung
+            PlainDate d1 = this;
+            PlainDate d2 = (PlainDate) date;
+
+            int delta = d1.year - d2.year;
+            if (delta == 0) {
+                delta = d1.month - d2.month;
+                if (delta == 0) {
+                    delta = d1.dayOfMonth - d2.dayOfMonth;
+                }
+            }
+
+            return delta;
+        }
+
+        return super.compareByTime(date); // basiert auf Epochentagen
+
+    }
+
     /**
      * <p>Liefert die Tage seit der UTC-Epoche. </p>
      *

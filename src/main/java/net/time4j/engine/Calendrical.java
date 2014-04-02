@@ -81,21 +81,21 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     @Override
     public boolean isBefore(Calendrical<?, ?> date) {
 
-        return (this.getEpochDays() < date.getEpochDays());
+        return (this.compareByTime(date) < 0);
 
     }
 
     @Override
     public boolean isAfter(Calendrical<?, ?> date) {
 
-        return (this.getEpochDays() > date.getEpochDays());
+        return (this.compareByTime(date) > 0);
 
     }
 
     @Override
     public boolean isSimultaneous(Calendrical<?, ?> date) {
 
-        return (this.getEpochDays() == date.getEpochDays());
+        return (this.compareByTime(date) == 0);
 
     }
 
@@ -128,6 +128,21 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
                 "Cannot compare different types of dates, "
                 + "use instance of EpochDays as comparator instead.");
         }
+
+        return this.compareByTime(date);
+
+    }
+
+    /**
+     * <p>Definiert eine rein zeitliche Ordnung. </p>
+     *
+     * <p>Diese Implementierung wertet die zeitliche Position auf dem
+     * gemeinsamen Zeitstrahl aus, also die Epochentage. </p>
+     *
+     * @return  negative, zero or positive integer if this instance is earlier,
+     *          simultaneous or later than given date
+     */
+    protected int compareByTime(Calendrical<?, ?> date) {
 
         long d1 = this.getEpochDays();
         long d2 = date.getEpochDays();
