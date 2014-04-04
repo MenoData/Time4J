@@ -9,13 +9,15 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         DateComparisonTest.class,
+        DateCreationTest.class,
         EpochDaysTest.class,
         GregorianTransformationTest.class,
         LeapYearOrdinalDateTest.class,
         LeapYearRangeArithmeticTest.class,
         LeapYearTest.class,
+        LengthOfMonthTest.class,
+        MiscDatePropertiesTest.class,
         MonthRangeArithmeticTest.class,
-        RoundingTest.class,
         SpecialUnitTest.class,
         StdDayArithmeticTest.class,
         StdYearOrdinalDateTest.class,

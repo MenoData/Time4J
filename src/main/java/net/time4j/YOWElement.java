@@ -492,6 +492,10 @@ final class YOWElement
             Integer value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             int v = value.intValue();
 
             return (

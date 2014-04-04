@@ -2036,7 +2036,7 @@ public final class PlainDate
 
         private static int getMaximumOfQuarterDay(PlainDate context) {
 
-            int q = ((context.month - 1) / 4) + 1;
+            int q = ((context.month - 1) / 3) + 1;
 
             if (q == 1) {
                 return (GregorianMath.isLeapYear(context.year) ? 91 : 90);
@@ -2088,7 +2088,7 @@ public final class PlainDate
                     ret = context.getDayOfWeek();
                     break;
                 case EnumElement.QUARTER_OF_YEAR:
-                    ret = Quarter.valueOf(((context.month - 1) / 4) + 1);
+                    ret = Quarter.valueOf(((context.month - 1) / 3) + 1);
                     break;
                 default:
                     throw new UnsupportedOperationException(
@@ -2137,7 +2137,7 @@ public final class PlainDate
                 case EnumElement.DAY_OF_WEEK:
                     return context.withDayOfWeek(Weekday.class.cast(value));
                 case EnumElement.QUARTER_OF_YEAR:
-                    int q1 = ((context.month - 1) / 4) + 1;
+                    int q1 = ((context.month - 1) / 3) + 1;
                     int q2 = Quarter.class.cast(value).getValue();
                     return context.plus((q2 - q1), CalendarUnit.QUARTERS);
                 default:
