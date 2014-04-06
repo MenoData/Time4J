@@ -76,4 +76,11 @@ public class SpecialUnitTest {
             is(PlainDate.of(2012, 5, 1)));
     }
 
+    @Test
+    public void weekBasedYears() {
+        assertThat(
+            PlainDate.of(2000, 2, 29).plus(14, CalendarUnit.weekBasedYears()),
+            is(PlainDate.of(2014, 2, 25)));
+    }
+
 }

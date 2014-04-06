@@ -294,6 +294,24 @@ public enum CalendarUnit
 
     }
 
+    /**
+     * <p>Definiert eine spezielle Zeiteinheit f&uuml;r wochenbasierte Jahre,
+     * die an den Wochen-Zyklus gebunden sind.
+     *
+     * <pre>
+     *  PlainDate start = PlainDate.of(2000, 2, 29); // 2000-W09-2
+     *  System.out.println(start.plus(14, CalendarUnit.weekBasedYears()));
+     *  // Ausgabe: 2014-02-25 (= 2014-W09-2)
+     * </pre>
+     *
+     * @return  calendar unit for week-based years
+     */
+    public static IsoDateUnit weekBasedYears() {
+
+        return YOWElement.YOWUnit.WEEK_BASED_YEARS;
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     /**
