@@ -39,4 +39,12 @@ public class LeapYearOrdinalDateTest {
             PlainDate.of(2012, this.doy),
             is(PlainDate.of(2012, this.month, this.dom)));
     }
+
+    @Test
+    public void withDayOfYear() {
+        assertThat(
+            PlainDate.of(2012, 1).with(PlainDate.DAY_OF_YEAR, this.doy),
+            is(PlainDate.of(2012, this.month, this.dom)));
+    }
+
 }

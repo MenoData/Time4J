@@ -40,4 +40,11 @@ public class StdYearOrdinalDateTest {
             is(PlainDate.of(2011, this.month, this.dom)));
     }
 
+    @Test
+    public void withDayOfYear() {
+        assertThat(
+            PlainDate.of(2011, 1).with(PlainDate.DAY_OF_YEAR, this.doy),
+            is(PlainDate.of(2011, this.month, this.dom)));
+    }
+
 }
