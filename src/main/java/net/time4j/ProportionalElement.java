@@ -84,40 +84,6 @@ public interface ProportionalElement<V extends Number, T>
     ChronoOperator<T> setLenient(V value);
 
     /**
-     * <p>Rollt dieses chronologische Element um eine Anzahl von Werten
-     * innerhalb seines Wertbereichs zwischen Minimum und Maximum
-     * (Odometer-Prinzip). </p>
-     *
-     * <p>&Auml;hnlich wie die Addition von Zeiteinheiten zu einem Zeitpunkt,
-     * aber mit dem Unterschied, da&szlig; erstens die Methode auf Elementen
-     * statt Zeiteinheiten definiert ist, zweitens mit gr&ouml;&szlig;eren
-     * Zeiteinheiten verkn&uuml;pfte Elemente nicht beeinflusst werden
-     * und drittens das Rollverhalten im Gegensatz zur Addition in der
-     * Regel von den Elementwertgrenzen abh&auml;ngt. </p>
-     *
-     * <pre>
-     *  import static net.time4j.PlainDate.MONTH_OF_YEAR;
-     *
-     *  System.out.println(
-     *      PlainDate.of(2011, 5, 31).with(MONTH_OF_YEAR.rolledBy(1)));
-     *  // Ausgabe: 2011-06-30
-     *  System.out.println(
-     *      PlainDate.of(2011, 5, 31).with(MONTH_OF_YEAR.rolledBy(8)));
-     *  // Ausgabe: 2011-01-31 (gleiches Jahr!)
-     * </pre>
-     *
-     * <p>Der Operator wirft eine {@code ChronoException}, wenn er auf einen
-     * Zeitpunkt angewandt wird, dessen Zeitachse keine Basiseinheit zu diesem
-     * Element kennt. </p>
-     *
-     * @param   units       count of base units to be added, rolling when
-     *                      element minimum (or maximum) has been reached
-     * @return  rolling operator requiring a base unit in given chronology
-     * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
-     */
-    ChronoOperator<T> rolledBy(long units);
-
-    /**
      * <p>Rundet dieses chronologische Element so auf, da&szlig; sein
      * numerischer Wert m&ouml;glichst ein ganzzahliges Vielfaches der
      * angegebenen Schrittweite annimmt. </p>

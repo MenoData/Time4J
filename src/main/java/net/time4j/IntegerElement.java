@@ -226,13 +226,6 @@ final class IntegerElement<T extends ChronoEntity<T>>
     }
 
     @Override
-    public ChronoOperator<T> rolledBy(long units) {
-
-        return new OperatorDelegate<Integer, T>(this, units, this.getRollMax());
-
-    }
-
-    @Override
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(
         Chronology<T> chronology
     ) {
@@ -385,20 +378,6 @@ final class IntegerElement<T extends ChronoEntity<T>>
             CLOCK_KIND,
             (has24Hours ? 'k' : 'h')
         );
-
-    }
-
-    private Integer getRollMax() {
-
-        switch (this.index) {
-            case ISO_HOUR:
-            case MINUTE_OF_DAY:
-            case SECOND_OF_DAY:
-            case MILLI_OF_DAY:
-                return this.defaultMax;
-            default:
-                return null;
-        }
 
     }
 

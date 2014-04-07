@@ -31,7 +31,7 @@ enum OperatorType {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     MINIMIZE, MAXIMIZE, DECREMENT, INCREMENT, FLOOR, CEILING,
-    LENIENT, ROLLING, WIM, YOW,
+    LENIENT, WIM, YOW,
     NAV_NEXT, NAV_PREVIOUS, NAV_NEXT_OR_SAME, NAV_PREVIOUS_OR_SAME;
 
 }

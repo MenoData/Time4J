@@ -166,16 +166,6 @@ final class LongElement
 
     }
 
-    @Override
-    public ChronoOperator<PlainTime> rolledBy(long units) {
-
-        return new OperatorDelegate<Long, PlainTime>(
-            this,
-            units,
-            this.defaultMax);
-
-    }
-
     /**
      * <p>Erzeugt ein neues Uhrzeitelement ohne Formatsymbol. </p>
      *

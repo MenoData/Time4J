@@ -51,39 +51,6 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
     //~ Konstruktoren -----------------------------------------------------
 
     /**
-     * <p>Konstruiert einen Operator zum Rollen auf Elementen. </p>
-     *
-     * @param   element         element an operator will be applied on
-     * @param   units           count of base units to be rolled
-     * @see     OperatorType#ROLLING
-     */
-    OperatorDelegate(
-        ChronoElement<V> element,
-        long units,
-        V rollMax
-    ) {
-        super();
-
-        ChronoElement<?> e = element;
-        this.element = element;
-        this.type = OperatorType.ROLLING;
-
-        if (e == PlainTime.CLOCK_HOUR_OF_DAY) {
-            e = PlainTime.DIGITAL_HOUR_OF_DAY;
-        } else if (e == PlainTime.CLOCK_HOUR_OF_AMPM) {
-            e = PlainTime.DIGITAL_HOUR_OF_AMPM;
-        }
-
-        assert (element.getType() == e.getType());
-
-        this.opCache = createRollingOperator(e, units, rollMax);
-        this.tsCache = createRollingOperator(e, units, rollMax);
-        this.moCache =
-            new Moment.Operator(this.tsCache, this.element, this.type);
-
-    }
-
-    /**
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * @param   element         element an operator will be applied on
@@ -187,20 +154,6 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
     public ChronoOperator<PlainTimestamp> onTimestamp() {
 
         return this.tsCache;
-
-    }
-
-    private static <V, T extends ChronoEntity<T>>
-    ChronoOperator<T> createRollingOperator(
-        ChronoElement<V> element,
-        long units,
-        Object rollMax
-    ) {
-
-        return AdvancedElement.roll(
-            element,
-            units,
-            element.getType().cast(rollMax));
 
     }
 
