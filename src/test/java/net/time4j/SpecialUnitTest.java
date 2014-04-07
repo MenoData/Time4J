@@ -9,6 +9,7 @@ import org.junit.runners.JUnit4;
 import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -81,6 +82,11 @@ public class SpecialUnitTest {
         assertThat(
             PlainDate.of(2000, 2, 29).plus(14, CalendarUnit.weekBasedYears()),
             is(PlainDate.of(2014, 2, 25)));
+        IsoDateUnit unit =
+            PlainDate.of(1, 1).getChronology().getBaseUnit(YEAR_OF_WEEKDATE);
+        assertThat(
+            (unit == CalendarUnit.weekBasedYears()),
+            is(true));
     }
 
 }

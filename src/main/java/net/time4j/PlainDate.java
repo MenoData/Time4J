@@ -219,9 +219,11 @@ public final class PlainDate
      *
      * <pre>
      *  PlainDate date = PlainDate.of(2014, JANUARY, 2); // Donnerstag
-     *  IsoDateUnit unit = date.getChronology().getBaseUnit(YEAR_OF_WEEKDATE);
+     *  IsoDateUnit unit = CalendarUnit.weekBasedYears();
      *  System.out.println(date.plus(1, unit)); // Ausgabe: 2015-01-01
      * </pre>
+     *
+     * @see     CalendarUnit#weekBasedYears()
      */
     @FormattableElement(format = "Y")
     public static final AdjustableElement<Integer, PlainDate> YEAR_OF_WEEKDATE =
