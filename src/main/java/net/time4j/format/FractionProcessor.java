@@ -213,7 +213,7 @@ final class FractionProcessor
         int effectiveMin = 0;
         int effectiveMax = 9;
 
-        if (leniency == Leniency.STRICT) {
+        if (leniency.isStrict()) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }

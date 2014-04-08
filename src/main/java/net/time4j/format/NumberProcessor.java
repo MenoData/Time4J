@@ -53,7 +53,7 @@ final class NumberProcessor<V>
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * @param   element         element to be formatted
-     * @param   adjacent        adjacent value parsing mode
+     * @param   adjacent        adjacent digit parsing mode
      * @param   minDigits       minimum count of digits
      * @param   maxDigits       maximum count of digits
      * @param   signPolicy      sign policy
@@ -86,7 +86,7 @@ final class NumberProcessor<V>
             && (minDigits != maxDigits)
         ) {
             throw new IllegalArgumentException(
-                "Variable width in adjacent mode: "
+                "Variable width in adjacent digit parsing mode: "
                 + maxDigits + " != " + minDigits);
         } else if (signPolicy == null) {
             throw new NullPointerException("Missing sign policy.");
@@ -478,7 +478,7 @@ final class NumberProcessor<V>
         sb.append(this.getClass().getName());
         sb.append("[element=");
         sb.append(this.element.name());
-        sb.append(", adjacent=");
+        sb.append(", adjacent-digit-parsing=");
         sb.append(this.adjacent);
         sb.append(", min-digits=");
         sb.append(this.minDigits);

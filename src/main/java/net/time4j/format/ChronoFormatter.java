@@ -1364,7 +1364,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
          * wird die hier definierte feste Breite beim Parsen vorreserviert,
          * so da&szlig; vorangehende numerische Elemente nicht zuviele
-         * Ziffern interpretieren (<i>adjacent value parsing</i>). </p>
+         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
          *
          * @param   element         chronological element
          * @param   digits          fixed count of digits in range 1-9
@@ -1519,7 +1519,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
          * wird die hier definierte feste Breite beim Parsen vorreserviert,
          * so da&szlig; vorangehende numerische Elemente nicht zuviele
-         * Ziffern interpretieren (<i>adjacent value parsing</i>). </p>
+         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
          *
          * @param   <V> generic type of element values
          * @param   element         chronological element
@@ -1600,6 +1600,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
          *  // Ausgabe in den USA: .012345
          * </pre>
+         *
+         * <p>Hinweis: Direkt hinter einem fraktionalen Element darf kein
+         * anderes numerisches Element folgen. </p>
          *
          * @param   element             chronological element
          * @param   minDigits           minimum count of digits after decimal
@@ -1979,7 +1982,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
          * wird die hier definierte feste Breite beim Parsen vorreserviert,
          * so da&szlig; vorangehende numerische Elemente nicht zuviele
-         * Ziffern interpretieren (<i>adjacent value parsing</i>). </p>
+         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
          *
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)
@@ -1987,6 +1990,21 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @see     Attributes#PIVOT_YEAR
          */
         public Builder<T> addTwoDigitYear(ChronoElement<Integer> element) {
+
+            FormatStep last = (
+                this.steps.isEmpty()
+                ? null
+                : this.steps.get(this.steps.size() - 1)
+            );
+
+            if (
+                (last != null)
+                && last.isFractional()
+            ) {
+                throw new IllegalStateException(
+                    "Two-digit-year-element can't be inserted after fractional "
+                    + "element.");
+            }
 
             this.checkElement(element);
             FormatProcessor<?> processor = new TwoDigitYearProcessor(element);
@@ -2555,6 +2573,21 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             this.checkElement(element);
 
+            FormatStep last = (
+                this.steps.isEmpty()
+                ? null
+                : this.steps.get(this.steps.size() - 1)
+            );
+
+            if (
+                (last != null)
+                && last.isFractional()
+            ) {
+                throw new IllegalStateException(
+                    "Numerical element can't be inserted after fractional "
+                    + "element.");
+            }
+
             NumberProcessor<V> np =
                 new NumberProcessor<V>(
                     element,
@@ -2578,23 +2611,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         this.steps.set(ri, numStep.reserve(minDigits));
                     }
                 }
+            } else if (
+                (last != null)
+                && last.isNumerical()
+            ) {
+                throw new IllegalStateException(
+                    "Non-adjacent numerical element with variable "
+                    + "width can't be inserted after another numerical "
+                    + "element. Consider \"appendFixedXXX()\".");
             } else {
-                FormatStep last = (
-                    this.steps.isEmpty()
-                    ? null
-                    : this.steps.get(this.steps.size() - 1)
-                );
-
-                if (
-                    (last != null)
-                    && last.isNumerical()
-                ) {
-                    throw new IllegalStateException(
-                        "Non-adjacent numerical element with variable "
-                        + "width can't be inserted after another numerical "
-                        + "element. Consider \"appendFixedXXX\"().");
-                }
-
                 this.addProcessor(np, defaultValue);
                 this.reservedIndex = this.steps.size() - 1;
             }
