@@ -46,6 +46,7 @@ final class FractionProcessor
     private final ChronoElement<Integer> element;
     private final int minDigits;
     private final int maxDigits;
+    private final boolean fixedWidth;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -68,6 +69,7 @@ final class FractionProcessor
         this.element = element;
         this.minDigits = minDigits;
         this.maxDigits = maxDigits;
+        this.fixedWidth = (!decimalSeparator && (minDigits == maxDigits));
 
         this.decimalSeparator = (
             decimalSeparator
@@ -213,7 +215,10 @@ final class FractionProcessor
         int effectiveMin = 0;
         int effectiveMax = 9;
 
-        if (leniency.isStrict()) {
+        if (
+            leniency.isStrict()
+            || this.fixedWidth
+        ) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }

@@ -1579,7 +1579,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen. Zu
          * beachten: Ist kein strikter Parse-Modus angegeben, dann wird
          * unabh&auml;ngig von den hier angegebenen Argumenten stets
-         * {@code minDigits == 0} und {@code maxDigits == 9} angenommen. </li>
+         * {@code minDigits == 0} und {@code maxDigits == 9} angenommen,
+         * es sei denn, es wurde implizit eine feste Breite mittels
+         * {@code minDigits == maxDigits} und ohne Dezimaltrennzeichen
+         * angegeben (dann gilt <i>adjacent digit parsing</i>). </li>
          * </ol>
          *
          * <p>Beispiel: </p>
@@ -1627,15 +1630,35 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.ensureOnlyOneFractional(decimalSeparator);
-            this.addProcessor(
+            boolean fixedWidth =
+                (!decimalSeparator && (minDigits == maxDigits));
+            this.ensureOnlyOneFractional(fixedWidth, decimalSeparator);
+
+            FormatProcessor<?> processor =
                 new FractionProcessor(
                     element,
                     minDigits,
                     maxDigits,
                     decimalSeparator
-                )
-            );
+                );
+
+            if (
+                (this.reservedIndex != -1)
+                && fixedWidth
+            ) {
+                int ri = this.reservedIndex;
+                FormatStep numStep = this.steps.get(ri);
+                this.addProcessor(processor);
+                FormatStep lastStep = this.steps.get(this.steps.size() - 1);
+
+                if (numStep.getSection() == lastStep.getSection()) {
+                    this.reservedIndex = ri;
+                    this.steps.set(ri, numStep.reserve(minDigits));
+                }
+            } else {
+                this.addProcessor(processor);
+            }
+
             return this;
         }
 
@@ -2689,7 +2712,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private void ensureOnlyOneFractional(boolean decimalSeparator) {
+        private void ensureOnlyOneFractional(
+            boolean fixedWidth,
+            boolean decimalSeparator
+        ) {
 
             for (FormatStep step : this.steps) {
                 if (step.isFractional()) {
@@ -2699,11 +2725,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             if (
-                !decimalSeparator
+                !fixedWidth
+                && !decimalSeparator
                 && (this.reservedIndex != -1)
             ) {
                 throw new IllegalArgumentException(
-                    "Cannot add fractional element without decimal separator "
+                    "Cannot add fractional element with variable width "
                     + "after another numerical element with variable width.");
             }
 

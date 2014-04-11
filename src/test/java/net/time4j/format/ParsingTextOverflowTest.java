@@ -93,7 +93,9 @@ public class ParsingTextOverflowTest {
         PlainDate expected = null;
         assertThat(date, is(expected));
         assertThat(plog.getErrorIndex(), is(6));
-        assertThat(plog.getErrorMessage(), is("Not enough digits found."));
+        assertThat(
+            plog.getErrorMessage(),
+            is("Not enough digits found for: YEAR_OF_ERA"));
     }
 
     @Test(expected=ParseException.class)
