@@ -27,6 +27,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
+import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.tz.TZID;
 import net.time4j.tz.TransitionStrategy;
@@ -206,7 +207,7 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
 
     private Calendrical<?, ?> adjustDate(Calendrical<?, ?> date) {
 
-        if (Weekmodel.hasSevenDayWeek(date.getChronology())) {
+        if (hasSevenDayWeek(date.getChronology())) {
             long utcDays = date.get(EpochDays.UTC);
             int oldValue = Weekmodel.getDayOfWeek(utcDays).getValue();
             int newValue = this.delta(oldValue);
@@ -222,6 +223,26 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
         } else {
             return null;
         }
+
+    }
+
+    private static boolean hasSevenDayWeek(Chronology<?> chrono) {
+
+        if (Calendrical.class.isAssignableFrom(chrono.getChronoType())) {
+            for (ChronoElement<?> element : chrono.getRegisteredElements()) {
+                if (element.name().equals("DAY_OF_WEEK")) {
+                    Object[] enums = element.getType().getEnumConstants();
+                    if (
+                        (enums != null)
+                        && (enums.length == 7)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
 
     }
 

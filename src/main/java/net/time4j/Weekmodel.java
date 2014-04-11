@@ -25,8 +25,6 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.CalendarSystem;
-import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -78,16 +76,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * <p>Au&szlig;erdem werden einige wochenbezogene Elemente zur Verf&uuml;gung
  * gestellt, die mit allen Klassen umgehen k&ouml;nnen, die ein ISO-Datum
  * enthalten ({@code Timestamp}-Klassen und {@code PlainDate}). </p>
- *
- * <p>Alle chronologischen Wochenelemente sind zus&auml;tzlich auch auf andere
- * Datumsklassen anwendbar, sofern diese kompatibel zu {@code Calendrical}
- * sind. Voraussetzung ist aber, da&szlig; sie ein Element mit dem Namen
- * &quot;DAY_OF_WEEK&quot; kennen, das einen Enum-Werttyp mit genau 7 Konstanten
- * definiert. Die Elemente {@code weekOfYear()} und {@code boundedWeekOfYear()}
- * verlangen au&szlig;erdem ein registriertes Element mit dem Namen
- * &quot;DAY_OF_YEAR&quot;, die Elemente {@code weekOfMonth} und
- * {@code boundedWeekOfMonth()} ein registriertes Element mit dem
- * Namen &quot;DAY_OF_MONTH&quot;. </p>
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
@@ -454,24 +442,6 @@ public final class Weekmodel
     }
 
     /**
-     * <p>Gleichwertig mit {@code weekOfYear()} bis auf die Tatsache,
-     * da&szlig; mit chronologie-spezifischen Operatoren gearbeitet werden
-     * soll. </p>
-     *
-     * @param   <D> defines the target type for a {@code ChronoOperator}
-     * @param   chronology      contains the calendar system in question
-     * @return  localized week of year
-     * @see     #weekOfYear()
-     */
-    public <D extends Calendrical<?, D>>
-    AdjustableElement<Integer, D> weekOfYear(Chronology<D> chronology) {
-
-        return new CalendarWeekElement<D>(
-            "WEEK_OF_YEAR", CALENDAR_WEEK_OF_YEAR);
-
-    }
-
-    /**
      * <p>Liefert ein Element f&uuml;r die Woche des Monats mit einer
      * lokalisierten Wochennummer. </p>
      *
@@ -489,24 +459,6 @@ public final class Weekmodel
     public AdjustableElement<Integer, PlainDate> weekOfMonth() {
 
         return this.womElement;
-
-    }
-
-    /**
-     * <p>Gleichwertig mit {@code weekOfMonth()} bis auf die Tatsache,
-     * da&szlig; mit chronologie-spezifischen Operatoren gearbeitet werden
-     * soll. </p>
-     *
-     * @param   <D> defines the target type for a {@code ChronoOperator}
-     * @param   chronology      contains the calendar system in question
-     * @return  localized week of month
-     * @see     #weekOfMonth()
-     */
-    public <D extends Calendrical<?, D>>
-    AdjustableElement<Integer, D> weekOfMonth(Chronology<D> chronology) {
-
-        return new CalendarWeekElement<D>(
-            "WEEK_OF_MONTH", CALENDAR_WEEK_OF_MONTH);
 
     }
 
@@ -531,23 +483,6 @@ public final class Weekmodel
     public NavigableElement<Weekday, PlainDate> localDayOfWeek() {
 
         return this.dayOfWeekElement;
-
-    }
-
-    /**
-     * <p>Gleichwertig mit {@code localDayOfWeek()} bis auf die Tatsache,
-     * da&szlig; mit chronologie-spezifischen Operatoren gearbeitet werden
-     * soll. </p>
-     *
-     * @param   <D> defines the target type for a {@code ChronoOperator}
-     * @param   chronology      contains the calendar system in question
-     * @return  day of week with localized order for given chronology
-     * @see     #localDayOfWeek()
-     */
-    public <D extends Calendrical<?, D>>
-    NavigableElement<Weekday, D> localDayOfWeek(Chronology<D> chronology) {
-
-        return new DayOfWeekElement<D>();
 
     }
 
@@ -578,24 +513,6 @@ public final class Weekmodel
     }
 
     /**
-     * <p>Gleichwertig mit {@code boundedWeekOfYear()} bis auf die Tatsache,
-     * da&szlig; mit chronologie-spezifischen Operatoren gearbeitet werden
-     * soll. </p>
-     *
-     * @param   <D> defines the target type for a {@code ChronoOperator}
-     * @param   chronology      contains the calendar system in question
-     * @return  week of year within the limits of calendar year
-     * @see     #boundedWeekOfYear()
-     */
-    public <D extends Calendrical<?, D>>
-    AdjustableElement<Integer, D> boundedWeekOfYear(Chronology<D> chronology) {
-
-        return new CalendarWeekElement<D>(
-            "BOUNDED_WEEK_OF_YEAR", BOUNDED_WEEK_OF_YEAR);
-
-    }
-
-    /**
      * <p>Liefert ein Element f&uuml;r die Woche des Monats mit einer
      * lokalisierten Wochennummer, begrenzt auf den aktuellen Monat. </p>
      *
@@ -620,24 +537,6 @@ public final class Weekmodel
     public AdjustableElement<Integer, PlainDate> boundedWeekOfMonth() {
 
         return this.boundWomElement;
-
-    }
-
-    /**
-     * <p>Gleichwertig mit {@code boundedWeekOfMonth()} bis auf die Tatsache,
-     * da&szlig; mit chronologie-spezifischen Operatoren gearbeitet werden
-     * soll. </p>
-     *
-     * @param   <D> defines the target type for a {@code ChronoOperator}
-     * @param   chronology      contains the calendar system in question
-     * @return  week of month within the limits of calendar month
-     * @see     #boundedWeekOfMonth()
-     */
-    public <D extends Calendrical<?, D>>
-    AdjustableElement<Integer, D> boundedWeekOfMonth(Chronology<D> chronology) {
-
-        return new CalendarWeekElement<D>(
-            "BOUNDED_WEEK_OF_MONTH", BOUNDED_WEEK_OF_MONTH);
 
     }
 
@@ -744,33 +643,6 @@ public final class Weekmodel
     }
 
     /**
-     * <p>Liegt eine 7-Tage-Woche vor? </p>
-     *
-     * @param   chrono      chronology with a calendar system
-     * @return  {@code true} if given chronology has a seven-day-week
-     *          else {@code false}
-     */
-    static boolean hasSevenDayWeek(Chronology<?> chrono) {
-
-        if (Calendrical.class.isAssignableFrom(chrono.getChronoType())) {
-            for (ChronoElement<?> element : chrono.getRegisteredElements()) {
-                if (element.name().equals("DAY_OF_WEEK")) {
-                    Object[] enums = element.getType().getEnumConstants();
-                    if (
-                        (enums != null)
-                        && (enums.length == 7)
-                    ) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-
-    }
-
-    /**
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The format
      *              is bit-compressed. Two data bytes are used, sometimes
@@ -826,24 +698,6 @@ public final class Weekmodel
         throws IOException, ClassNotFoundException {
 
         throw new InvalidObjectException("Serialization proxy required.");
-
-    }
-
-    private static <D extends ChronoEntity<D>> int getInt(
-        ChronoElement<?> element,
-        D context
-    ) {
-
-        return Integer.class.cast(context.get(element)).intValue();
-
-    }
-
-    private static <D extends ChronoEntity<D>> int getMax(
-        ChronoElement<?> element,
-        D context
-    ) {
-
-        return Integer.class.cast(context.getMaximum(element)).intValue();
 
     }
 
@@ -1032,9 +886,7 @@ public final class Weekmodel
         ElementRule<T, Weekday> derive(Chronology<T> chronology) {
 
             if (chronology.isRegistered(CALENDAR_DATE)) {
-                return new DRule1<T>(this);
-            } else if (hasSevenDayWeek(chronology)) {
-                return new DRule2<T>(this, chronology.getCalendarSystem());
+                return new DRule<T>(this);
             } else {
                 return null;
             }
@@ -1079,7 +931,7 @@ public final class Weekmodel
 
     }
 
-    private abstract static class DRule<T extends ChronoEntity<T>>
+    private static class DRule<T extends ChronoEntity<T>>
         implements ElementRule<T, Weekday> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -1145,20 +997,6 @@ public final class Weekmodel
 
         }
 
-    }
-
-    private static class DRule1<T extends ChronoEntity<T>>
-        extends DRule<T> {
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private DRule1(DayOfWeekElement<?> element) {
-            super(element);
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
         @Override
         public Weekday getValue(T context) {
 
@@ -1186,56 +1024,6 @@ public final class Weekmodel
             int neu = value.getValue(this.element.getModel());
             date = date.withDaysSinceUTC(utcDays + neu - old);
             return context.with(CALENDAR_DATE, date);
-
-        }
-
-    }
-
-    private static class DRule2<D extends ChronoEntity<D>>
-        extends DRule<D> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final CalendarSystem<D> calsys;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private DRule2(
-            DayOfWeekElement<?> element,
-            CalendarSystem<D> calsys
-        ) {
-            super(element);
-
-            this.calsys = calsys;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(D context) {
-
-            return getDayOfWeek(this.calsys.transform(context));
-
-        }
-
-        @Override
-        public D withValue(
-            D context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            long utcDays = this.calsys.transform(context);
-            Weekday current = getDayOfWeek(utcDays);
-
-            if (value == current) {
-                return context;
-            }
-
-            int old = current.getValue(this.element.getModel());
-            int neu = value.getValue(this.element.getModel());
-            return this.calsys.transform(utcDays + neu - old);
 
         }
 
@@ -1365,29 +1153,9 @@ public final class Weekmodel
 
             if (chronology.isRegistered(CALENDAR_DATE)) {
                 if (this.isBounded()) {
-                    return new BWRule1<T>(this);
+                    return new BWRule<T>(this);
                 } else {
-                    return new CWRule1<T>(this);
-                }
-            } else if (hasSevenDayWeek(chronology)) {
-                String search = (
-                    this.isYearRelated()
-                    ? "DAY_OF_YEAR"
-                    : "DAY_OF_MONTH");
-                CalendarSystem<T> calsys = chronology.getCalendarSystem();
-
-                for (ChronoElement<?> e : chronology.getRegisteredElements()) {
-                    if (e.name().equals(search)) {
-                        if (e.getType() == Integer.class) {
-                            if (this.isBounded()) {
-                                return new BWRule2<T>(this, e, calsys);
-                            } else {
-                                return new CWRule2<T>(this, e, calsys);
-                            }
-                        } else {
-                            break;
-                        }
-                    }
+                    return new CWRule<T>(this);
                 }
             }
 
@@ -1435,7 +1203,7 @@ public final class Weekmodel
 
     }
 
-    private static class CWRule1<T extends ChronoEntity<T>>
+    private static class CWRule<T extends ChronoEntity<T>>
         implements ElementRule<T, Integer> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -1444,7 +1212,7 @@ public final class Weekmodel
 
         //~ Konstruktoren -------------------------------------------------
 
-        private CWRule1(CalendarWeekElement<?> owner) {
+        private CWRule(CalendarWeekElement<?> owner) {
             super();
 
             this.owner = owner;
@@ -1698,255 +1466,7 @@ public final class Weekmodel
 
     }
 
-    private static class CWRule2<D extends ChronoEntity<D>>
-        implements ElementRule<D, Integer> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final CalendarWeekElement<?> owner;
-        private final ChronoElement<?> dayElement;
-        private final CalendarSystem<D> calsys;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private CWRule2(
-            CalendarWeekElement<?> owner,
-            ChronoElement<?> dayElement,
-            CalendarSystem<D> calsys
-        ) {
-            super();
-
-            this.owner = owner;
-            this.dayElement = dayElement;
-            this.calsys = calsys;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Integer getMinimum(D context) {
-
-            return Integer.valueOf(1);
-
-        }
-
-        @Override
-        public Integer getMaximum(D context) {
-
-            return Integer.valueOf(this.getMaxCalendarWeek(context));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(D context) {
-
-            return this.getChild(context);
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(D context) {
-
-            return this.getChild(context);
-
-        }
-
-        private ChronoElement<?> getChild(D context) {
-
-            return this.owner.getModel().localDayOfWeek();
-
-        }
-
-        @Override
-        public Integer getValue(D context) {
-
-            return Integer.valueOf(this.getCalendarWeek(context));
-
-        }
-
-        @Override
-        public boolean isValid(
-            D context,
-            Integer value
-        ) {
-
-            if (value == null) {
-                return false;
-            }
-
-            int v = value.intValue();
-            return ((v >= 1) && (v <= this.getMaxCalendarWeek(context)));
-
-        }
-
-        @Override
-        public D withValue(
-            D context,
-            Integer value,
-            boolean lenient
-        ) {
-
-            int v = value.intValue();
-
-            if (
-                !lenient
-                && !this.isValid(context, value)
-            ) {
-                throw new IllegalArgumentException(
-                    "Invalid value: " + v + " (context=" + context + ")");
-            }
-
-            return this.setCalendarWeek(context, v);
-
-        }
-
-        // letzte Kalenderwoche im Jahr/Monat
-        private int getMaxCalendarWeek(D context) {
-
-            int scaledDay = getInt(this.dayElement, context);
-            int wCurrent = getFirstCalendarWeekAsDay(context, 0);
-
-            if (wCurrent <= scaledDay) {
-                int wNext =
-                    getFirstCalendarWeekAsDay(context, 1)
-                    + getLengthOfYM(context, 0);
-                return (wNext - wCurrent) / 7;
-            } else {
-                int wPrevious = getFirstCalendarWeekAsDay(context, -1);
-                wCurrent = wCurrent + getLengthOfYM(context, -1);
-                return (wCurrent - wPrevious) / 7;
-            }
-
-        }
-
-        // Ermittelt den Beginn der ersten Kalenderwoche eines Jahres/Monats
-        // auf einer day-of-year/month-Skala (kann auch <= 0 sein).
-        private int getFirstCalendarWeekAsDay(
-            D context,
-            int shift // -1 = Vorjahr/-monat, 0 = aktuell, +1 = Folgejahr/-monat
-        ) {
-
-            Weekday wd = this.getWeekdayStart(context, shift);
-            Weekmodel model = this.owner.getModel();
-            int dow = wd.getValue(model);
-
-            return (
-                (dow <= 8 - model.getMinimalDaysInFirstWeek())
-                ? 2 - dow
-                : 9 - dow
-            );
-
-        }
-
-        // Wochentag des ersten Tags des Jahres/Monats
-        private Weekday getWeekdayStart(
-            D context,
-            int shift // -1 = Vorjahr/-monat, 0 = aktuell, +1 = Folgejahr/-monat
-        ) {
-
-            int scaledDay = getInt(this.dayElement, context);
-            int lastDay;
-
-            switch (shift) {
-                case -1:
-                    long utcDays =
-                        this.calsys.transform(context) - scaledDay;
-                    lastDay =
-                        getInt(
-                            this.dayElement,
-                            this.calsys.transform(utcDays)
-                        );
-                    return getDayOfWeek(utcDays - lastDay + 1);
-                case 0:
-                    return getDayOfWeek(
-                        this.calsys.transform(context) - scaledDay + 1);
-                case 1:
-                    lastDay = getMax(this.dayElement, context);
-                    return getDayOfWeek(
-                        this.calsys.transform(context)
-                        + lastDay + 1 - scaledDay);
-                default:
-                    throw new AssertionError("Unexpected: " + shift);
-            }
-
-        }
-
-        // Länge eines Jahres/Monats in Tagen
-        private int getLengthOfYM(
-            D context,
-            int shift // -1 = Vorjahr/-monat, 0 = aktuell, +1 = Folgejahr/-monat
-        ) {
-
-            int scaledDay = getInt(this.dayElement, context);
-            int lastDay;
-
-            switch (shift) {
-                case -1:
-                    return getMax(
-                        this.dayElement,
-                        this.calsys.transform(
-                            this.calsys.transform(context) - scaledDay)
-                    );
-                case 0:
-                    return getMax(this.dayElement, context);
-                case 1:
-                    lastDay = getMax(this.dayElement, context);
-                    return getMax(
-                        this.dayElement,
-                        this.calsys.transform(
-                            this.calsys.transform(context)
-                            + lastDay + 1 - scaledDay)
-                    );
-                default:
-                    throw new AssertionError("Unexpected: " + shift);
-            }
-
-        }
-
-        private int getCalendarWeek(D context) {
-
-            int scaledDay = getInt(this.dayElement, context);
-            int wCurrent = getFirstCalendarWeekAsDay(context, 0);
-
-            if (wCurrent <= scaledDay) {
-                int wNext =
-                    getFirstCalendarWeekAsDay(context, 1)
-                    + getLengthOfYM(context, 0);
-                if (wNext <= scaledDay) {
-                    return 1;
-                } else {
-                    return ((scaledDay - wCurrent) / 7) + 1;
-                }
-            } else {
-                int wPrevious = getFirstCalendarWeekAsDay(context, -1);
-                int dayCurrent = scaledDay + getLengthOfYM(context, -1);
-                return ((dayCurrent - wPrevious) / 7) + 1;
-            }
-
-        }
-
-        private D setCalendarWeek(
-            D context,
-            int value
-        ) {
-
-            int old = this.getCalendarWeek(context);
-
-            if (value == old) {
-                return context;
-            } else {
-                return this.calsys.transform(
-                    this.calsys.transform(context)
-                    + 7 * (value - old)
-                );
-            }
-
-        }
-
-    }
-
-    private static class BWRule1<T extends ChronoEntity<T>>
+    private static class BWRule<T extends ChronoEntity<T>>
         implements ElementRule<T, Integer> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -1955,7 +1475,7 @@ public final class Weekmodel
 
         //~ Konstruktoren -------------------------------------------------
 
-        private BWRule1(CalendarWeekElement<?> owner) {
+        private BWRule(CalendarWeekElement<?> owner) {
             super();
 
             this.owner = owner;
@@ -2166,214 +1686,6 @@ public final class Weekmodel
                     date.getMonth()
                 );
             }
-
-        }
-
-    }
-
-    private static class BWRule2<D extends ChronoEntity<D>>
-        implements ElementRule<D, Integer> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final CalendarWeekElement<?> owner;
-        private final ChronoElement<?> dayElement;
-        private final CalendarSystem<D> calsys;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private BWRule2(
-            CalendarWeekElement<?> owner,
-            ChronoElement<?> dayElement,
-            CalendarSystem<D> calsys
-        ) {
-            super();
-
-            this.owner = owner;
-            this.dayElement = dayElement;
-            this.calsys = calsys;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Integer getValue(D context) {
-
-            return Integer.valueOf(this.getWeek(context));
-
-        }
-
-        @Override
-        public Integer getMinimum(D context) {
-
-            return Integer.valueOf(this.getMinWeek(context));
-
-        }
-
-        @Override
-        public Integer getMaximum(D context) {
-
-            return Integer.valueOf(this.getMaxWeek(context));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(D context) {
-
-            return this.getChild(context, false);
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(D context) {
-
-            return this.getChild(context, true);
-
-        }
-
-        private ChronoElement<?> getChild(
-            D context,
-            boolean ceiling
-        ) {
-
-            ChronoElement<Weekday> dow =
-                this.owner.getModel().localDayOfWeek();
-            int weeknum = this.getValue(context).intValue();
-            int curDay = getInt(this.dayElement, context);
-
-            if (ceiling) {
-                D ctx = context.with(dow, context.getMaximum(dow));
-                if (getInt(this.dayElement, ctx) < curDay) {
-                    return this.dayElement;
-                }
-            } else if (weeknum == 0) {
-                D ctx = context.with(dow, context.getMinimum(dow));
-                if (getInt(this.dayElement, ctx) > curDay) {
-                    return this.dayElement;
-                }
-            }
-
-            return dow;
-
-        }
-
-        @Override
-        public boolean isValid(
-            D context,
-            Integer value
-        ) {
-
-            if (value == null) {
-                return false;
-            }
-
-            int v = value.intValue();
-
-            return (
-                (v >= this.getMinWeek(context))
-                && (v <= this.getMaxWeek(context))
-            );
-
-        }
-
-        @Override
-        public D withValue(
-            D context,
-            Integer value,
-            boolean lenient
-        ) {
-
-            int v = value.intValue();
-
-            if (
-                !lenient
-                && !this.isValid(context, value)
-            ) {
-                throw new IllegalArgumentException(
-                    "Invalid value: " + v + " (context=" + context + ")");
-            }
-
-            return this.setWeek(context, v);
-
-        }
-
-        private int getWeek(D context) {
-
-            return this.getWeek(context, 0);
-
-        }
-
-        private int getMinWeek(D context) {
-
-            return this.getWeek(context, -1);
-
-        }
-
-        private int getMaxWeek(D context) {
-
-            return this.getWeek(context, 1);
-
-        }
-
-        private int getWeek(
-            D context,
-            int mode // -1 = Jahres-/Monatsanfang, 0 = aktueller Tag, 1 = Ende
-        ) {
-
-            int scaledDay = getInt(this.dayElement, context);
-            Weekday wd =
-                getDayOfWeek(this.calsys.transform(context) - scaledDay + 1);
-            int dow = wd.getValue(this.owner.getModel());
-
-            int wstart = (
-                (dow <= 8 - this.owner.getModel().getMinimalDaysInFirstWeek())
-                ? 2 - dow
-                : 9 - dow
-            );
-
-            int refday;
-
-            switch (mode) {
-                case -1:
-                    refday = 1;
-                    break;
-                case 0:
-                    refday = scaledDay;
-                    break;
-                case 1:
-                    refday = this.getLengthOfYM(context);
-                    break;
-                default:
-                    throw new AssertionError("Unexpected: " + mode);
-            }
-
-            return MathUtils.floorDivide((refday - wstart), 7) + 1;
-
-        }
-
-        private D setWeek(
-            D context,
-            int value
-        ) {
-
-            int old = this.getWeek(context);
-
-            if (value == old) {
-                return context;
-            } else {
-                return this.calsys.transform(
-                    this.calsys.transform(context)
-                    + 7 * (value - old)
-                );
-            }
-
-        }
-
-        // Länge eines Jahres/Monats in Tagen
-        private int getLengthOfYM(D context) {
-
-            return getMax(this.dayElement, context);
 
         }
 

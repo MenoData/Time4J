@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         StdDayArithmeticTest.class,
         StdYearOrdinalDateTest.class,
         StdYearRangeArithmeticTest.class,
+        WeekmodelTest.class,
         YearMonthArithmeticTest.class
     }
 )
