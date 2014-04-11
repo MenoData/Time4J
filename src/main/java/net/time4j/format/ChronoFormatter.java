@@ -1143,7 +1143,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     SignPolicy#SHOW_NEVER
@@ -1182,7 +1182,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addInteger(ChronoElement, int, int, SignPolicy, int)
@@ -1258,7 +1258,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
@@ -1298,7 +1298,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-18} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          */
@@ -1410,7 +1410,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addNumerical(ChronoElement, int, int, Enum)
@@ -1455,7 +1455,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is appended
+         * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     NumericalElement#numerical(java.lang.Object)
@@ -1627,7 +1627,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.ensureOnlyOneFractional();
+            this.ensureOnlyOneFractional(decimalSeparator);
             this.addProcessor(
                 new FractionProcessor(
                     element,
@@ -1979,10 +1979,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Fehlt das Attribut, wird Time4J standardm&auml;&szlig; 20 Jahre
          * in der Zukunft das Kippjahr setzen. </p>
          *
-         * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
-         * wird die hier definierte feste Breite beim Parsen vorreserviert,
-         * so da&szlig; vorangehende numerische Elemente nicht zuviele
-         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
+         * <p>Folgt diese Methode direkt nach anderen numerischen Elementen
+         * mit variabler Breite, wird die hier definierte feste Breite beim
+         * Parsen vorreserviert, so da&szlig; vorangehende numerische Elemente
+         * nicht zuviele Ziffern interpretieren (<i>adjacent digit parsing</i>).
+         * Andernfalls k&ouml;nnen auch mehr als zwei Ziffern interpretiert
+         * werden, sofern kein strikter Modus vorliegt mit der Folge, da&szlig;
+         * eine solche Jahreszahl als absolutes Jahr interpretiert wird. </p>
          *
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)
@@ -1991,30 +1994,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addTwoDigitYear(ChronoElement<Integer> element) {
 
-            FormatStep last = (
-                this.steps.isEmpty()
-                ? null
-                : this.steps.get(this.steps.size() - 1)
-            );
-
-            if (
-                (last != null)
-                && last.isFractional()
-            ) {
-                throw new IllegalStateException(
-                    "Two-digit-year-element can't be inserted after fractional "
-                    + "element.");
-            }
-
             this.checkElement(element);
+            this.checkAfterFraction(element);
             FormatProcessor<?> processor = new TwoDigitYearProcessor(element);
 
             if (this.reservedIndex == -1) {
                 this.addProcessor(processor);
+                this.reservedIndex = this.steps.size() - 1;
             } else {
                 int ri = this.reservedIndex;
                 FormatStep numStep = this.steps.get(ri);
+                this.startSection(Attributes.LENIENCY, Leniency.STRICT);
                 this.addProcessor(processor);
+                this.endSection();
                 FormatStep lastStep = this.steps.get(this.steps.size() - 1);
 
                 if (numStep.getSection() == lastStep.getSection()) {
@@ -2564,7 +2556,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         private <V> Builder<T> addNumber(
             ChronoElement<V> element,
-            boolean adjacent,
+            boolean fixedWidth,
             int minDigits,
             int maxDigits,
             SignPolicy signPolicy,
@@ -2572,32 +2564,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-
-            FormatStep last = (
-                this.steps.isEmpty()
-                ? null
-                : this.steps.get(this.steps.size() - 1)
-            );
-
-            if (
-                (last != null)
-                && last.isFractional()
-            ) {
-                throw new IllegalStateException(
-                    "Numerical element can't be inserted after fractional "
-                    + "element.");
-            }
+            FormatStep last = this.checkAfterFraction(element);
 
             NumberProcessor<V> np =
                 new NumberProcessor<V>(
                     element,
-                    adjacent,
+                    fixedWidth,
                     minDigits,
                     maxDigits,
                     signPolicy
                 );
 
-            if (adjacent) {
+            if (fixedWidth) {
                 if (this.reservedIndex == -1) {
                     this.addProcessor(np, defaultValue);
                 } else {
@@ -2616,9 +2594,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 && last.isNumerical()
             ) {
                 throw new IllegalStateException(
-                    "Non-adjacent numerical element with variable "
-                    + "width can't be inserted after another numerical "
-                    + "element. Consider \"appendFixedXXX()\".");
+                    "Numerical element with variable width can't be inserted "
+                    + "after another numerical element. "
+                    + "Consider \"addFixedXXX()\" instead.");
             } else {
                 this.addProcessor(np, defaultValue);
                 this.reservedIndex = this.steps.size() - 1;
@@ -2711,13 +2689,43 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private void ensureOnlyOneFractional() {
+        private void ensureOnlyOneFractional(boolean decimalSeparator) {
 
             for (FormatStep step : this.steps) {
                 if (step.isFractional()) {
                     throw new IllegalArgumentException(
                         "Cannot define more than one fractional element.");
                 }
+            }
+
+            if (
+                !decimalSeparator
+                && (this.reservedIndex != -1)
+            ) {
+                throw new IllegalArgumentException(
+                    "Cannot add fractional element without decimal separator "
+                    + "after another numerical element with variable width.");
+            }
+
+        }
+
+        private FormatStep checkAfterFraction(ChronoElement<?> element) {
+
+            FormatStep last = (
+                this.steps.isEmpty()
+                ? null
+                : this.steps.get(this.steps.size() - 1)
+            );
+
+            if (
+                (last != null)
+                && last.isFractional()
+            ) {
+                throw new IllegalStateException(
+                    element.name()
+                    + " can't be inserted after fractional element.");
+            } else {
+                return last;
             }
 
         }

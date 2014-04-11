@@ -155,12 +155,19 @@ final class TwoDigitYearProcessor
 
         int len = text.length();
         int start = status.getPosition();
-        int pos = start;
 
-        if (pos >= len) {
-            status.setError(pos, "Missing digits for: " + this.element.name());
+        if (start >= len) {
+            status.setError(
+                start,
+                "Missing digits for: " + this.element.name());
             return;
         }
+
+        Leniency leniency =
+            step.getAttribute(
+                Attributes.LENIENCY,
+                attributes,
+                Leniency.SMART);
 
         char zeroDigit =
             step.getAttribute(
@@ -170,13 +177,13 @@ final class TwoDigitYearProcessor
             ).charValue();
 
         int reserved = step.getReserved();
-        int effectiveMax = 2;
+        int effectiveMax = leniency.isStrict() ? 2 : 9;
 
         if (reserved > 0) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
-            for (int i = pos; i < len; i++) {
+            for (int i = start; i < len; i++) {
                 int digit = text.charAt(i) - zeroDigit;
 
                 if ((digit >= 0) && (digit <= 9)) {
@@ -186,13 +193,14 @@ final class TwoDigitYearProcessor
                 }
             }
 
-            effectiveMax = Math.min(2, digitCount - reserved);
+            effectiveMax = Math.min(effectiveMax, digitCount - reserved);
         }
 
-        int minPos = pos + 2;
-        int maxPos = Math.min(len, pos + effectiveMax);
+        int minPos = start + 2;
+        int maxPos = Math.min(len, start + effectiveMax);
         int yearOfCentury = 0;
         boolean first = true;
+        int pos = start;
 
         while (pos < maxPos) {
             int digit = text.charAt(pos) - zeroDigit;
@@ -210,19 +218,26 @@ final class TwoDigitYearProcessor
         }
 
         if (pos < minPos) {
-            status.setError(start, "Not enough digits found.");
+            status.setError(
+                start,
+                "Not enough digits found for: " + this.element.name());
             return;
         }
 
-        assert ((yearOfCentury >= 0) && (yearOfCentury <= 99));
+        int value;
 
-        int pivotYear =
-            step.getAttribute(
-                Attributes.PIVOT_YEAR,
-                attributes,
-                DEFAULT_PIVOT_YEAR);
+        if (pos == start + 2) {
+            int pivotYear =
+                step.getAttribute(
+                    Attributes.PIVOT_YEAR,
+                    attributes,
+                    DEFAULT_PIVOT_YEAR);
+            assert ((yearOfCentury >= 0) && (yearOfCentury <= 99));
+            value = toYear(yearOfCentury, pivotYear);
+        } else {
+            value = yearOfCentury; // absolutes Jahr (kein Kippjahr)
+        }
 
-        int value = toYear(yearOfCentury, pivotYear);
         parsedResult.put(this.element, Integer.valueOf(value));
         status.setPosition(pos);
 

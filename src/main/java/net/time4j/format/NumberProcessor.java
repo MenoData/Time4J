@@ -42,7 +42,7 @@ final class NumberProcessor<V>
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoElement<V> element;
-    private final boolean adjacent;
+    private final boolean fixedWidth;
     private final int minDigits;
     private final int maxDigits;
     private final SignPolicy signPolicy;
@@ -53,14 +53,15 @@ final class NumberProcessor<V>
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * @param   element         element to be formatted
-     * @param   adjacent        adjacent digit parsing mode
+     * @param   fixedWidth      fixed-width-mode
      * @param   minDigits       minimum count of digits
      * @param   maxDigits       maximum count of digits
      * @param   signPolicy      sign policy
+     * @throws  IllegalArgumentException in case of inconsistencies
      */
     NumberProcessor(
         ChronoElement<V> element,
-        boolean adjacent,
+        boolean fixedWidth,
         int minDigits,
         int maxDigits,
         SignPolicy signPolicy
@@ -68,13 +69,15 @@ final class NumberProcessor<V>
         super();
 
         this.element = element;
-        this.adjacent = adjacent;
+        this.fixedWidth = fixedWidth;
         this.minDigits = minDigits;
         this.maxDigits = maxDigits;
         this.signPolicy = signPolicy;
 
         if (element == null) {
             throw new NullPointerException("Missing element.");
+        } else if (signPolicy == null) {
+            throw new NullPointerException("Missing sign policy.");
         } else if (minDigits < 1) {
             throw new IllegalArgumentException(
                 "Not positive: " + minDigits);
@@ -82,14 +85,18 @@ final class NumberProcessor<V>
             throw new IllegalArgumentException(
                 "Max smaller than min: " + maxDigits + " < " + minDigits);
         } else if (
-            adjacent
+            fixedWidth
             && (minDigits != maxDigits)
         ) {
             throw new IllegalArgumentException(
-                "Variable width in adjacent digit parsing mode: "
+                "Variable width in fixed-width-mode: "
                 + maxDigits + " != " + minDigits);
-        } else if (signPolicy == null) {
-            throw new NullPointerException("Missing sign policy.");
+        } else if (
+            fixedWidth
+            && (signPolicy != SignPolicy.SHOW_NEVER)
+        ) {
+            throw new IllegalArgumentException(
+                "Sign policy must be SHOW_NEVER in fixed-width-mode.");
         }
 
         int scale = this.getScale();
@@ -258,7 +265,7 @@ final class NumberProcessor<V>
         int effectiveMax = this.getScale();
 
         if (
-            this.adjacent
+            this.fixedWidth
             || leniency.isStrict()
         ) {
             effectiveMin = this.minDigits;
@@ -283,7 +290,7 @@ final class NumberProcessor<V>
         ) {
             if (
                 (this.signPolicy == SignPolicy.SHOW_NEVER)
-                && leniency.isStrict()
+                && (this.fixedWidth || leniency.isStrict())
             ) {
                 status.setError(
                     start,
@@ -325,7 +332,10 @@ final class NumberProcessor<V>
 
         int reserved = step.getReserved();
 
-        if (reserved > 0) {
+        if (
+            !this.fixedWidth
+            && (reserved > 0)
+        ) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
@@ -364,9 +374,11 @@ final class NumberProcessor<V>
 
         if (
             (pos < minPos)
-            && leniency.isStrict()
+            && (this.fixedWidth || leniency.isStrict())
         ) {
-            status.setError(start, "Not enough digits found.");
+            status.setError(
+                start,
+                "Not enough digits found for: " + this.element.name());
             return;
         }
 
@@ -428,7 +440,12 @@ final class NumberProcessor<V>
             }
 
             if (value == null) {
-                status.setError(start, "No enum found for: " + total);
+                status.setError(
+                    start,
+                    "["
+                        + this.element.name()
+                        + "] No enum found for value: "
+                        + total);
                 return;
             }
         } else {
@@ -450,7 +467,7 @@ final class NumberProcessor<V>
             NumberProcessor<?> that = (NumberProcessor<?>) obj;
             return (
                 this.element.equals(that.element)
-                && (this.adjacent == that.adjacent)
+                && (this.fixedWidth == that.fixedWidth)
                 && (this.minDigits == that.minDigits)
                 && (this.maxDigits == that.maxDigits)
                 && (this.signPolicy == that.signPolicy)
@@ -478,8 +495,8 @@ final class NumberProcessor<V>
         sb.append(this.getClass().getName());
         sb.append("[element=");
         sb.append(this.element.name());
-        sb.append(", adjacent-digit-parsing=");
-        sb.append(this.adjacent);
+        sb.append(", fixed-width-mode=");
+        sb.append(this.fixedWidth);
         sb.append(", min-digits=");
         sb.append(this.minDigits);
         sb.append(", max-digits=");
@@ -507,7 +524,7 @@ final class NumberProcessor<V>
 
         return new NumberProcessor<V>(
             element,
-            this.adjacent,
+            this.fixedWidth,
             this.minDigits,
             this.maxDigits,
             this.signPolicy
