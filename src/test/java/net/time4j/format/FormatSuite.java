@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         AdjacentDigitParsingTest.class,
+        CalendricalNamesTest.class,
         MiscellaneousTest.class,
         ParsingTextOverflowTest.class
     }
