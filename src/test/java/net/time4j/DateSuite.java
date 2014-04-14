@@ -18,10 +18,13 @@ import org.junit.runners.Suite.SuiteClasses;
         LengthOfMonthTest.class,
         MiscDatePropertiesTest.class,
         MonthRangeArithmeticTest.class,
+        MonthValueTest.class,
+        QuarterValueTest.class,
         SpecialUnitTest.class,
         StdDayArithmeticTest.class,
         StdYearOrdinalDateTest.class,
         StdYearRangeArithmeticTest.class,
+        WeekdayValueTest.class,
         WeekmodelTest.class,
         YearMonthArithmeticTest.class
     }
