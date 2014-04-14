@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        RoundingTest.class
+        RoundingTest.class,
+        YOWOperatorTest.class
     }
 )
 public class OperatorSuite {

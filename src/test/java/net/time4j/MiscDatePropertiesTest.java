@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.Chronology;
 
 import java.util.Locale;
@@ -94,6 +95,28 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getDefaultMinimumCalendarDate() {
+        assertThat(
+            CALENDAR_DATE.getDefaultMinimum(),
+            is(PlainDate.of(GregorianMath.MIN_YEAR, 1, 1)));
+    }
+
+    @Test
+    public void getDefaultMaximumCalendarDate() {
+        assertThat(
+            CALENDAR_DATE.getDefaultMaximum(),
+            is(PlainDate.of(GregorianMath.MAX_YEAR, 12, 31)));
+    }
+
+    @Test
+    public void getBaseUnitCalendarDate() {
+        IsoUnit unit = CalendarUnit.DAYS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(CALENDAR_DATE),
+            is(unit));
+    }
+
+    @Test
     public void getMinimumCalendarDate() {
         assertThat(
             PlainDate.of(2012, 2, 28).getMinimum(CALENDAR_DATE),
@@ -143,6 +166,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2000, 1).get(YEAR),
             is(2000));
+    }
+
+    @Test
+    public void getDefaultMinimumYear() {
+        assertThat(
+            YEAR.getDefaultMinimum(),
+            is(GregorianMath.MIN_YEAR));
+    }
+
+    @Test
+    public void getDefaultMaximumYear() {
+        assertThat(
+            YEAR.getDefaultMaximum(),
+            is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void getBaseUnitYear() {
+        IsoUnit unit = CalendarUnit.YEARS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(YEAR),
+            is(unit));
     }
 
     @Test
@@ -237,6 +282,28 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getDefaultMinimumYearOfWeekdate() {
+        assertThat(
+            YEAR_OF_WEEKDATE.getDefaultMinimum(),
+            is(GregorianMath.MIN_YEAR));
+    }
+
+    @Test
+    public void getDefaultMaximumYearOfWeekdate() {
+        assertThat(
+            YEAR_OF_WEEKDATE.getDefaultMaximum(),
+            is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void getBaseUnitYearOfWeekdate() {
+        PlainDate d = PlainDate.MAX;
+        assertThat(
+            d.getChronology().getBaseUnit(YEAR_OF_WEEKDATE),
+            is(CalendarUnit.weekBasedYears()));
+    }
+
+    @Test
     public void getMinimumYearOfWeekdate() {
         assertThat(
             PlainDate.of(2012, 2, 28).getMinimum(YEAR_OF_WEEKDATE),
@@ -310,6 +377,28 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getDefaultMinimumQuarterOfYear() {
+        assertThat(
+            QUARTER_OF_YEAR.getDefaultMinimum(),
+            is(Quarter.Q1));
+    }
+
+    @Test
+    public void getDefaultMaximumQuarterOfYear() {
+        assertThat(
+            QUARTER_OF_YEAR.getDefaultMaximum(),
+            is(Quarter.Q4));
+    }
+
+    @Test
+    public void getBaseUnitQuarterOfYear() {
+        IsoUnit unit = CalendarUnit.QUARTERS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(QUARTER_OF_YEAR),
+            is(unit));
+    }
+
+    @Test
     public void getMinimumQuarterOfYear() {
         assertThat(
             PlainDate.of(2012, 2, 28).getMinimum(QUARTER_OF_YEAR),
@@ -350,6 +439,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2014, 111).get(MONTH_OF_YEAR),
             is(Month.APRIL));
+    }
+
+    @Test
+    public void getDefaultMinimumMonthOfYear() {
+        assertThat(
+            MONTH_OF_YEAR.getDefaultMinimum(),
+            is(Month.JANUARY));
+    }
+
+    @Test
+    public void getDefaultMaximumMonthOfYear() {
+        assertThat(
+            MONTH_OF_YEAR.getDefaultMaximum(),
+            is(Month.DECEMBER));
+    }
+
+    @Test
+    public void getBaseUnitMonthOfYear() {
+        IsoUnit unit = CalendarUnit.MONTHS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(MONTH_OF_YEAR),
+            is(unit));
     }
 
     @Test
@@ -396,6 +507,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2014, 111).get(MONTH_AS_NUMBER),
             is(4));
+    }
+
+    @Test
+    public void getDefaultMinimumMonthAsNumber() {
+        assertThat(
+            MONTH_AS_NUMBER.getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumMonthAsNumber() {
+        assertThat(
+            MONTH_AS_NUMBER.getDefaultMaximum(),
+            is(12));
+    }
+
+    @Test
+    public void getBaseUnitMonthAsNumber() {
+        IsoUnit unit = CalendarUnit.MONTHS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(MONTH_AS_NUMBER),
+            is(unit));
     }
 
     @Test
@@ -467,6 +600,28 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getDefaultMinimumWeekdayInMonth() {
+        assertThat(
+            WEEKDAY_IN_MONTH.getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumWeekdayInMonth() {
+        assertThat(
+            WEEKDAY_IN_MONTH.getDefaultMaximum(),
+            is(5));
+    }
+
+    @Test
+    public void getBaseUnitWeekdayInMonth() {
+        IsoUnit unit = CalendarUnit.WEEKS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(WEEKDAY_IN_MONTH),
+            is(unit));
+    }
+
+    @Test
     public void getMinimumWeekdayInMonth() {
         assertThat(
             PlainDate.of(2012, 2, 28).getMinimum(WEEKDAY_IN_MONTH),
@@ -518,6 +673,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2014, 111).get(DAY_OF_MONTH),
             is(21));
+    }
+
+    @Test
+    public void getDefaultMinimumDayOfMonth() {
+        assertThat(
+            DAY_OF_MONTH.getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumDayOfMonth() {
+        assertThat(
+            DAY_OF_MONTH.getDefaultMaximum(),
+            is(31));
+    }
+
+    @Test
+    public void getBaseUnitDayOfMonth() {
+        IsoUnit unit = CalendarUnit.DAYS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_MONTH),
+            is(unit));
     }
 
     @Test
@@ -616,6 +793,28 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getDefaultMinimumDayOfYear() {
+        assertThat(
+            DAY_OF_YEAR.getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumDayOfYear() {
+        assertThat(
+            DAY_OF_YEAR.getDefaultMaximum(),
+            is(365));
+    }
+
+    @Test
+    public void getBaseUnitDayOfYear() {
+        IsoUnit unit = CalendarUnit.DAYS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_YEAR),
+            is(unit));
+    }
+
+    @Test
     public void getMinimumDayOfYear() {
         assertThat(
             PlainDate.of(2014, 12, 31).getMinimum(DAY_OF_YEAR),
@@ -678,6 +877,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2014, 4, 21).get(DAY_OF_WEEK),
             is(Weekday.MONDAY));
+    }
+
+    @Test
+    public void getDefaultMinimumDayOfWeek() {
+        assertThat(
+            DAY_OF_WEEK.getDefaultMinimum(),
+            is(Weekday.MONDAY));
+    }
+
+    @Test
+    public void getDefaultMaximumDayOfWeek() {
+        assertThat(
+            DAY_OF_WEEK.getDefaultMaximum(),
+            is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void getBaseUnitDayOfWeek() {
+        IsoUnit unit = CalendarUnit.DAYS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_WEEK),
+            is(unit));
     }
 
     @Test
@@ -764,6 +985,28 @@ public class MiscDatePropertiesTest {
         assertThat(
             PlainDate.of(2014, 12, 31).get(DAY_OF_QUARTER),
             is(92));
+    }
+
+    @Test
+    public void getDefaultMinimumDayOfQuarter() {
+        assertThat(
+            DAY_OF_QUARTER.getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumDayOfQuarter() {
+        assertThat(
+            DAY_OF_QUARTER.getDefaultMaximum(),
+            is(92));
+    }
+
+    @Test
+    public void getBaseUnitDayOfQuarter() {
+        IsoUnit unit = CalendarUnit.DAYS;
+        assertThat(
+            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_QUARTER),
+            is(unit));
     }
 
     @Test
