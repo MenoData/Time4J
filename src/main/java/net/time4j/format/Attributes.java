@@ -103,10 +103,11 @@ public final class Attributes
      *  <tr>
      *      <th>LENIENCY</th>
      *      <th>PARSE_CASE_INSENSITIVE</th>
-     *      <th>PARSE_PARTIAL_COMPARE</th></tr>
-     *  <tr><td>STRICT</td><td>false</td><td>false</td></tr>
-     *  <tr><td>SMART</td><td>true</td><td>false</td></tr>
-     *  <tr><td>LAX</td><td>true</td><td>true</td></tr>
+     *      <th>PARSE_PARTIAL_COMPARE</th>
+     *      <th>TRAILING_CHARACTERS</th></tr>
+     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td></tr>
+     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td></tr>
+     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td></tr>
      * </table>
      *
      * <p>Standardwert: {@link Leniency#SMART} </p>
@@ -196,6 +197,31 @@ public final class Attributes
      */
     public static final AttributeKey<Integer> PIVOT_YEAR =
         PredefinedKey.valueOf("PIVOT_YEAR", Integer.class);
+
+    /**
+     * <p>Steuert, ob beim Parsen verbleibende Zeichen der Texteingabe
+     * toleriert werden. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  ChronoFormatter formatter =
+     *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+     *      .addInteger(PlainTime.CLOCK_HOUR_OF_AMPM, 1, 2)
+     *      .addLiteral(' ')
+     *      .addText(PlainTime.AM_PM_OF_DAY)
+     *      .padPrevious(3)
+     *      .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
+     *      .build()
+     *      .with(Attributes.TRAILING_CHARACTERS, true);
+     *  System.out.println(formatter.parse("5 PM 45xyz"));
+     *  // Output: T17:45
+     * </pre>
+     *
+     * <p>Standardwert: {@code false} </p>
+     */
+    public static final AttributeKey<Boolean> TRAILING_CHARACTERS =
+        PredefinedKey.valueOf("TRAILING_CHARACTERS", Boolean.class);
 
     /**
      * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
@@ -556,14 +582,17 @@ public final class Attributes
                     case STRICT:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, false);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, false);
+                        this.set(Attributes.TRAILING_CHARACTERS, false);
                         break;
                     case SMART:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, true);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, false);
+                        this.set(Attributes.TRAILING_CHARACTERS, false);
                         break;
                     case LAX:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, true);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, true);
+                        this.set(Attributes.TRAILING_CHARACTERS, true);
                         break;
                     default:
                         throw new UnsupportedOperationException(value.name());

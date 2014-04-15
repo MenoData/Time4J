@@ -434,9 +434,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (
             (index < text.length())
-            && !leniency.isLax()
+            && !attributes.get(
+                Attributes.TRAILING_CHARACTERS,
+                Boolean.FALSE).booleanValue()
         ) {
-            status.setError(index, "Unparsed: " + sub(index, text));
+            status.setError(
+                index,
+                "Unparsed trailing characters: " + sub(index, text));
             return null;
         }
 
@@ -2245,40 +2249,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addLocalizedOffset(boolean abbreviated) {
 
             this.addProcessor(new LocalizedGMTProcessor(abbreviated));
-            return this;
-
-        }
-
-        /**
-         * <p>Diese Methode kann zum Schlu&szlig; aufgerufen werden, um
-         * beim Interpretieren den Rest eines Texts zu ignorieren. </p>
-         *
-         * <p>Beispiel: </p>
-         *
-         * <pre>
-         *  ChronoFormatter formatter =
-         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
-         *      .addInteger(PlainTime.CLOCK_HOUR_OF_AMPM, 1, 2)
-         *      .addLiteral(' ')
-         *      .addText(PlainTime.AM_PM_OF_DAY)
-         *      .padPrevious(3)
-         *      .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
-         *      .addAny() // ohne diesen Aufruf bricht das Parsen ab
-         *      .build()
-         *      .with(Attributes.LENIENCY, Leniency.STRICT);
-         *  System.out.println(formatter.parse("5 PM 45xyz"));
-         *  // Output: T17:45
-         * </pre>
-         *
-         * <p>Hinweis: Wird der Modus {@code Leniency.LAX} verwendet, ist
-         * diese Methode nicht notwendig. </p>
-         *
-         * @return  this instance for method chaining
-         */
-        public Builder<T> addAny() {
-
-            this.resetPadding();
-            this.addProcessor(AnyProcessor.INSTANCE);
             return this;
 
         }
