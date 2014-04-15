@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         DateComparisonTest.class,
         DateCreationTest.class,
+        DateElementTest.class,
         EpochDaysTest.class,
         GregorianTransformationTest.class,
         LeapYearOrdinalDateTest.class,
@@ -21,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MonthValueTest.class,
         QuarterValueTest.class,
         SpecialUnitTest.class,
+        StdDateOperatorTest.class,
         StdDayArithmeticTest.class,
         StdYearOrdinalDateTest.class,
         StdYearRangeArithmeticTest.class,
