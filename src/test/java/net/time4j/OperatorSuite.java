@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        NavigationOperatorTest.class,
         OrdinalWeekdayTest.class,
         RoundingTest.class,
         YOWOperatorTest.class

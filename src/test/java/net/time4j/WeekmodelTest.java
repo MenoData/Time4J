@@ -160,6 +160,56 @@ public class WeekmodelTest {
     }
 
     @Test
+    public void withWeekOfYear() {
+        assertThat(
+            PlainDate.of(2014, 1, 1).with(Weekmodel.ISO.weekOfYear(), 0),
+            is(PlainDate.of(2013, 12, 25)));
+        assertThat(
+            PlainDate.of(2014, 1, 1).with(Weekmodel.ISO.weekOfYear(), 52),
+            is(PlainDate.of(2014, 12, 24)));
+        assertThat(
+            PlainDate.of(2015, 1, 1).with(Weekmodel.ISO.weekOfYear(), 53),
+            is(PlainDate.of(2015, 12, 31)));
+        assertThat(
+            PlainDate.of(2015, 1, 1).with(Weekmodel.ISO.weekOfYear(), 54),
+            is(PlainDate.of(2016, 1, 7)));
+    }
+
+    @Test
+    public void withBoundedWeekOfYear() {
+        assertThat(
+            PlainDate.of(2014, 1, 1)
+                .with(Weekmodel.ISO.boundedWeekOfYear(), -1),
+            is(PlainDate.of(2013, 12, 18)));
+        assertThat(
+            PlainDate.of(2015, 1, 1)
+                .with(Weekmodel.ISO.boundedWeekOfYear(), 55),
+            is(PlainDate.of(2016, 1, 14)));
+    }
+
+    @Test
+    public void withWeekOfMonth() {
+        assertThat(
+            PlainDate.of(2014, 4, 1).with(Weekmodel.ISO.weekOfMonth(), 0),
+            is(PlainDate.of(2014, 3, 25)));
+        assertThat(
+            PlainDate.of(2014, 4, 1).with(Weekmodel.ISO.weekOfMonth(), 6),
+            is(PlainDate.of(2014, 5, 6)));
+    }
+
+    @Test
+    public void withBoundedWeekOfMonth() {
+        assertThat(
+            PlainDate.of(2014, 4, 1)
+                .with(Weekmodel.ISO.boundedWeekOfMonth(), -1),
+            is(PlainDate.of(2014, 3, 18)));
+        assertThat(
+            PlainDate.of(2014, 4, 1).with(
+                Weekmodel.ISO.boundedWeekOfMonth(), 6),
+            is(PlainDate.of(2014, 5, 6)));
+    }
+
+    @Test
     public void maximizedISOWeekOfYear() {
         Weekmodel model = Weekmodel.ISO;
 
@@ -1121,6 +1171,62 @@ public class WeekmodelTest {
         assertThat(
             Weekmodel.of(Locale.US).localDayOfWeek().getDefaultMaximum(),
             is(Weekday.SATURDAY));
+    }
+
+    @Test
+    public void nextLocalDayOfWeek() {
+        NavigableElement<Weekday, PlainDate> element =
+            Weekmodel.of(Locale.US).localDayOfWeek();
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToNext(Weekday.FRIDAY)),
+            is(PlainDate.of(2014, 4, 25)));
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToNext(Weekday.MONDAY)),
+            is(PlainDate.of(2014, 4, 28)));
+    }
+
+    @Test
+    public void previousLocalDayOfWeek() {
+        NavigableElement<Weekday, PlainDate> element =
+            Weekmodel.of(Locale.US).localDayOfWeek();
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToPrevious(Weekday.FRIDAY)),
+            is(PlainDate.of(2014, 4, 18)));
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToPrevious(Weekday.MONDAY)),
+            is(PlainDate.of(2014, 4, 14)));
+    }
+
+    @Test
+    public void nextOrSameLocalDayOfWeek() {
+        NavigableElement<Weekday, PlainDate> element =
+            Weekmodel.of(Locale.US).localDayOfWeek();
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToNextOrSame(Weekday.FRIDAY)),
+            is(PlainDate.of(2014, 4, 25)));
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToNextOrSame(Weekday.MONDAY)),
+            is(PlainDate.of(2014, 4, 21)));
+    }
+
+    @Test
+    public void previousOrSameLocalDayOfWeek() {
+        NavigableElement<Weekday, PlainDate> element =
+            Weekmodel.of(Locale.US).localDayOfWeek();
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToPreviousOrSame(Weekday.FRIDAY)),
+            is(PlainDate.of(2014, 4, 18)));
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(element.setToPreviousOrSame(Weekday.MONDAY)),
+            is(PlainDate.of(2014, 4, 21)));
     }
 
 }
