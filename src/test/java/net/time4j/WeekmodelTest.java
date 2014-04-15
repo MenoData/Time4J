@@ -872,4 +872,255 @@ public class WeekmodelTest {
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
     }
 
+    @Test
+    public void isLenientWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().isLenient(),
+            is(true));
+    }
+
+    @Test
+    public void isDateElementWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().isDateElement(),
+            is(true));
+    }
+
+    @Test
+    public void isTimeElementWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().isTimeElement(),
+            is(false));
+    }
+
+    @Test
+    public void nameWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().name(),
+            is("WEEK_OF_YEAR"));
+    }
+
+    @Test
+    public void getSymbolWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().getSymbol(),
+            is('w'));
+    }
+
+    @Test
+    public void getDefaultMinimumWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.weekOfYear().getDefaultMaximum(),
+            is(52));
+    }
+
+    @Test
+    public void isLenientWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().isLenient(),
+            is(true));
+    }
+
+    @Test
+    public void isDateElementWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().isDateElement(),
+            is(true));
+    }
+
+    @Test
+    public void isTimeElementWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().isTimeElement(),
+            is(false));
+    }
+
+    @Test
+    public void nameWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().name(),
+            is("WEEK_OF_MONTH"));
+    }
+
+    @Test
+    public void getSymbolWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().getSymbol(),
+            is('W'));
+    }
+
+    @Test
+    public void getDefaultMinimumWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.weekOfMonth().getDefaultMaximum(),
+            is(5));
+    }
+
+    @Test
+    public void isLenientBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().isLenient(),
+            is(true));
+    }
+
+    @Test
+    public void isDateElementBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().isDateElement(),
+            is(true));
+    }
+
+    @Test
+    public void isTimeElementBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().isTimeElement(),
+            is(false));
+    }
+
+    @Test
+    public void nameBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().name(),
+            is("BOUNDED_WEEK_OF_YEAR"));
+    }
+
+    @Test
+    public void getSymbolBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().getSymbol(),
+            is('\u0000'));
+    }
+
+    @Test
+    public void getDefaultMinimumBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumBoundedWeekOfYear() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfYear().getDefaultMaximum(),
+            is(52));
+    }
+
+    @Test
+    public void isLenientBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().isLenient(),
+            is(true));
+    }
+
+    @Test
+    public void isDateElementBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().isDateElement(),
+            is(true));
+    }
+
+    @Test
+    public void isTimeElementBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().isTimeElement(),
+            is(false));
+    }
+
+    @Test
+    public void nameBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().name(),
+            is("BOUNDED_WEEK_OF_MONTH"));
+    }
+
+    @Test
+    public void getSymbolBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().getSymbol(),
+            is('\u0000'));
+    }
+
+    @Test
+    public void getDefaultMinimumBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().getDefaultMinimum(),
+            is(1));
+    }
+
+    @Test
+    public void getDefaultMaximumBoundedWeekOfMonth() {
+        assertThat(
+            Weekmodel.ISO.boundedWeekOfMonth().getDefaultMaximum(),
+            is(5));
+    }
+
+    @Test
+    public void isLenientLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().isLenient(),
+            is(false));
+    }
+
+    @Test
+    public void isDateElementLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().isDateElement(),
+            is(true));
+    }
+
+    @Test
+    public void isTimeElementLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().isTimeElement(),
+            is(false));
+    }
+
+    @Test
+    public void nameLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().name(),
+            is("LOCAL_DAY_OF_WEEK"));
+    }
+
+    @Test
+    public void getSymbolLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().getSymbol(),
+            is('e'));
+    }
+
+    @Test
+    public void getDefaultMinimumLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().getDefaultMinimum(),
+            is(Weekday.MONDAY));
+        assertThat(
+            Weekmodel.of(Locale.US).localDayOfWeek().getDefaultMinimum(),
+            is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void getDefaultMaximumLocalDayOfWeek() {
+        assertThat(
+            Weekmodel.ISO.localDayOfWeek().getDefaultMaximum(),
+            is(Weekday.SUNDAY));
+        assertThat(
+            Weekmodel.of(Locale.US).localDayOfWeek().getDefaultMaximum(),
+            is(Weekday.SATURDAY));
+    }
+
 }
