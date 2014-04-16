@@ -100,6 +100,7 @@ final class IntegerElement<T extends ChronoEntity<T>>
     private transient final Integer defaultMax;
     private transient final int kind;
     private transient final char symbol;
+    private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -118,6 +119,21 @@ final class IntegerElement<T extends ChronoEntity<T>>
         this.defaultMax = defaultMax;
         this.kind = kind;
         this.symbol = symbol;
+
+        boolean extendedRange;
+
+        switch (index) {
+            case ISO_HOUR:
+            case MINUTE_OF_DAY:
+            case SECOND_OF_DAY:
+            case MILLI_OF_DAY:
+                extendedRange = true;
+                break;
+            default:
+                extendedRange = false;
+        }
+
+        this.rf = new ProportionalFunction(this, extendedRange);
 
     }
 
@@ -175,20 +191,7 @@ final class IntegerElement<T extends ChronoEntity<T>>
     @Override
     public ChronoFunction<ChronoEntity<?>, BigDecimal> ratio() {
 
-        boolean closedRange;
-
-        switch (this.index) {
-            case ISO_HOUR:
-            case MINUTE_OF_DAY:
-            case SECOND_OF_DAY:
-            case MILLI_OF_DAY:
-                closedRange = true;
-                break;
-            default:
-                closedRange = false;
-        }
-
-        return new ProportionalFunction(this, closedRange);
+        return this.rf;
 
     }
 

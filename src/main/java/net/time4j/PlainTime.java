@@ -1237,6 +1237,26 @@ public final class PlainTime
 
     }
 
+    /**
+     * <p>Wird von der {@code ratio()}-Function des angegebenenElements
+     * aufgerufen. </p>
+     *
+     * @param   context     walltime context
+     * @param   element     reference time element
+     * @return  {@code true} if element maximum is reduced else {@code false}
+     */
+    boolean hasReducedRange(ChronoElement<?> element) {
+
+        return (
+            ((element == MILLI_OF_DAY) && ((this.nano % MIO) != 0))
+            || ((element == ISO_HOUR) && !this.isFullHour())
+            || ((element == MINUTE_OF_DAY) && !this.isFullMinute())
+            || ((element == SECOND_OF_DAY) && (this.nano != 0))
+            || ((element == MICRO_OF_DAY) && ((this.nano % KILO) != 0))
+        );
+
+    }
+
     private static void fill(
         Map<String, Object> map,
         ChronoElement<?> element
@@ -2115,12 +2135,7 @@ public final class PlainTime
                 }
             }
 
-            if (
-                ((this.element == MILLI_OF_DAY) && ((context.nano % MIO) != 0))
-                || ((this.element == ISO_HOUR) && !context.isFullHour())
-                || ((this.element == MINUTE_OF_DAY) && !context.isFullMinute())
-                || ((this.element == SECOND_OF_DAY) && (context.nano != 0))
-            ) {
+            if (context.hasReducedRange(this.element)) {
                 return Integer.valueOf(this.max - 1);
             }
 

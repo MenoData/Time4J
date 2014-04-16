@@ -41,7 +41,7 @@ final class ProportionalFunction
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoElement<? extends Number> element;
-    private final boolean closedRange;
+    private final boolean extendedRange;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -49,16 +49,16 @@ final class ProportionalFunction
      * <p>Erzeugt eine neue Abfrage. </p>
      *
      * @param   element         element this query is related to
-     * @param   closedRange     is the range closed to ceiling?
+     * @param   extendedRange   is the range extended due to T24:00?
      */
     ProportionalFunction(
         ChronoElement<? extends Number> element,
-        boolean closedRange
+        boolean extendedRange
     ) {
         super();
 
         this.element = element;
-        this.closedRange = closedRange;
+        this.extendedRange = extendedRange;
 
     }
 
@@ -75,7 +75,15 @@ final class ProportionalFunction
             value = max; // Schutz gegen Anomalien
         }
 
-        if (this.closedRange) {
+        if (value == min) {
+            return BigDecimal.ZERO;
+        }
+
+        if (
+            this.extendedRange
+            && (context instanceof PlainTime)
+            && !PlainTime.class.cast(context).hasReducedRange(this.element)
+        ) {
             if (value == max) {
                 return BigDecimal.ONE;
             }

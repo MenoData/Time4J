@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         NavigationOperatorTest.class,
         OrdinalWeekdayTest.class,
+        RatioTest.class,
         RoundingTest.class,
         StdDateOperatorTest.class,
         YOWOperatorTest.class

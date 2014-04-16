@@ -51,6 +51,7 @@ final class LongElement
     private transient final Long defaultMin;
     private transient final Long defaultMax;
     private transient final char symbol;
+    private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -65,6 +66,8 @@ final class LongElement
         this.defaultMin = Long.valueOf(defaultMin);
         this.defaultMax = Long.valueOf(defaultMax);
         this.symbol = symbol;
+
+        this.rf = new ProportionalFunction(this, true);
 
     }
 
@@ -128,7 +131,7 @@ final class LongElement
     @Override
     public ChronoFunction<ChronoEntity<?>, BigDecimal> ratio() {
 
-        return new ProportionalFunction(this, true);
+        return this.rf;
 
     }
 
