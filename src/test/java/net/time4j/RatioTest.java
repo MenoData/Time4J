@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 public class RatioTest {
 
     @Test
-    public void nanoOfDay() {
+    public void nanoOfDayRatio() {
         assertThat(
            PlainTime.midnightAtStartOfDay().get(NANO_OF_DAY.ratio()),
            is(BigDecimal.ZERO));
@@ -30,7 +30,7 @@ public class RatioTest {
     }
 
     @Test
-    public void microOfDay() {
+    public void microOfDayRatio() {
         BigDecimal expected = new BigDecimal("0.250000000011574");
         assertThat(
            PlainTime.of(6, 0, 0, 1000).get(MICRO_OF_DAY.ratio()),
@@ -44,7 +44,7 @@ public class RatioTest {
     }
 
     @Test
-    public void milliOfDay() {
+    public void milliOfDayRatio() {
         BigDecimal expected = new BigDecimal("0.2500115625");
         assertThat(
            PlainTime.of(6, 0, 0, 999000000).get(MILLI_OF_DAY.ratio()),
@@ -58,28 +58,28 @@ public class RatioTest {
     }
 
     @Test
-    public void nanoOfSecond() {
+    public void nanoOfSecondRatio() {
         assertThat(
            PlainTime.of(6, 0, 0, 123456789).get(NANO_OF_SECOND.ratio()),
            is(new BigDecimal("0.123456789")));
     }
 
     @Test
-    public void microOfSecond() {
+    public void microOfSecondRatio() {
         assertThat(
            PlainTime.of(6, 0, 0, 123456789).get(MICRO_OF_SECOND.ratio()),
            is(new BigDecimal("0.123456")));
     }
 
     @Test
-    public void milliOfSecond() {
+    public void milliOfSecondRatio() {
         assertThat(
            PlainTime.of(6, 0, 0, 123456789).get(MILLI_OF_SECOND.ratio()),
            is(new BigDecimal("0.123")));
     }
 
     @Test
-    public void secondOfDay() {
+    public void secondOfDayRatio() {
         BigDecimal expected = new BigDecimal("0.281481481481481");
         assertThat(
            PlainTime.of(6, 45, 20).get(SECOND_OF_DAY.ratio()),
@@ -90,7 +90,7 @@ public class RatioTest {
     }
 
     @Test
-    public void minuteOfDay() {
+    public void minuteOfDayRatio() {
         BigDecimal expected = new BigDecimal("0.258333333333333");
         assertThat(
            PlainTime.of(6, 12).get(MINUTE_OF_DAY.ratio()),
@@ -101,49 +101,49 @@ public class RatioTest {
     }
 
     @Test
-    public void secondOfMinute() {
+    public void secondOfMinuteRatio() {
         assertThat(
            PlainTime.of(6, 0, 30, 123456789).get(SECOND_OF_MINUTE.ratio()),
            is(new BigDecimal("0.5")));
     }
 
     @Test
-    public void minuteOfHour() {
+    public void minuteOfHourRatio() {
         assertThat(
            PlainTime.of(6, 12, 30).get(MINUTE_OF_HOUR.ratio()),
            is(new BigDecimal("0.2")));
     }
 
     @Test
-    public void digitalHourOfDay() {
+    public void digitalHourOfDayRatio() {
         assertThat(
            PlainTime.of(6, 12, 30).get(DIGITAL_HOUR_OF_DAY.ratio()),
            is(new BigDecimal("0.25")));
     }
 
     @Test
-    public void digitalHourOfAmPm() {
+    public void digitalHourOfAmPmRatio() {
         assertThat(
            PlainTime.of(6, 12, 30).get(DIGITAL_HOUR_OF_AMPM.ratio()),
            is(new BigDecimal("0.5")));
     }
 
     @Test
-    public void clockHourOfDay() {
+    public void clockHourOfDayRatio() {
         assertThat(
            PlainTime.of(6, 12, 30).get(CLOCK_HOUR_OF_DAY.ratio()),
            is(new BigDecimal("0.208333333333333")));
     }
 
     @Test
-    public void clockHourOfAmPm() {
+    public void clockHourOfAmPmRatio() {
         assertThat(
            PlainTime.of(6, 12, 30).get(CLOCK_HOUR_OF_AMPM.ratio()),
            is(new BigDecimal("0.416666666666667")));
     }
 
     @Test
-    public void isoHour() {
+    public void isoHourRatio() {
         assertThat(
            PlainTime.midnightAtStartOfDay().get(ISO_HOUR.ratio()),
            is(BigDecimal.ZERO));
@@ -159,14 +159,14 @@ public class RatioTest {
     }
 
     @Test
-    public void monthAsNumber() {
+    public void monthAsNumberRatio() {
         assertThat(
            PlainDate.of(2014, 4, 20).get(PlainDate.MONTH_AS_NUMBER.ratio()),
            is(new BigDecimal("0.25")));
     }
 
     @Test
-    public void dayOfYear() {
+    public void dayOfYearRatio() {
         assertThat(
            PlainDate.of(2014, 4, 20).get(PlainDate.DAY_OF_YEAR.ratio()),
            is(new BigDecimal("0.298630136986301")));
@@ -176,14 +176,14 @@ public class RatioTest {
     }
 
     @Test
-    public void dayOfQuarter() {
+    public void dayOfQuarterRatio() {
         assertThat(
            PlainDate.of(2014, 4, 20).get(PlainDate.DAY_OF_QUARTER.ratio()),
            is(new BigDecimal("0.208791208791209")));
     }
 
     @Test
-    public void dayOfMonth() {
+    public void dayOfMonthRatio() {
         assertThat(
            PlainDate.of(2014, 4, 21).get(PlainDate.DAY_OF_MONTH.ratio()),
            is(new BigDecimal("0.666666666666667")));

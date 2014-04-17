@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OrdinalWeekdayTest.class,
         RatioTest.class,
         RoundingTest.class,
+        SetLenientTest.class,
         StdDateOperatorTest.class,
         YOWOperatorTest.class
     }
