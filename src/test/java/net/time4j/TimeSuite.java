@@ -11,6 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
         HourArithmeticTest.class,
         MiscTimePropertiesTest.class,
         TimeArithmeticTest.class,
+        TimeComparisonTest.class,
+        TimeCreationTest.class,
         TimeElementTest.class,
         TimestampArithmeticTest.class
     }
