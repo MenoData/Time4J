@@ -163,21 +163,21 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
         boolean up
     ) {
 
-        Object compare = element; // stellt JDK-6 zufrieden
+        String compare = element.name();
 
         if (
-            (compare == PlainTime.MILLI_OF_SECOND)
-            || (compare == PlainTime.MILLI_OF_DAY)
+            compare.equals("MILLI_OF_SECOND")
+            || compare.equals("MILLI_OF_DAY")
         ) {
             return new FractionOperator<T>('3', up);
         } else if (
-            (compare == PlainTime.MICRO_OF_SECOND)
-            || (compare == PlainTime.MICRO_OF_DAY)
+            compare.equals("MICRO_OF_SECOND")
+            || compare.equals("MICRO_OF_DAY")
         ) {
             return new FractionOperator<T>('6', up);
         } else if (
-            (compare == PlainTime.NANO_OF_SECOND)
-            || (compare == PlainTime.NANO_OF_DAY)
+            compare.equals("NANO_OF_SECOND")
+            || compare.equals("NANO_OF_DAY")
         ) {
             return new FractionOperator<T>('9', up);
         }

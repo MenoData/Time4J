@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(Parameterized.class)
-public class OrdinalWeekdayTest {
+public class OrdinalWeekdayOperatorTest {
 
  	@Parameters(name= "{index}: PlainDate.of(2013, {1}, {2}) => {0}")
  	public static Iterable<Object[]> data() {
@@ -44,7 +44,7 @@ public class OrdinalWeekdayTest {
     private int expectedMonth;
     private int expectedDom;
 
-    public OrdinalWeekdayTest(
+    public OrdinalWeekdayOperatorTest(
         int wd,
         int month,
         int dom,

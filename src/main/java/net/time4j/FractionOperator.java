@@ -71,19 +71,20 @@ final class FractionOperator<T extends ChronoEntity<T>>
     @Override
     public T apply(T entity) {
 
-        int nano;
+        if (this.fraction == '9') {
+            return entity;
+        }
+
+        int nano = entity.get(NANO_OF_SECOND);
+        int max = entity.getMaximum(NANO_OF_SECOND);
 
         switch (this.fraction) {
             case '3':
-                nano = entity.get(NANO_OF_SECOND);
                 nano = (nano / MIO) * MIO + (this.up ? 999999 : 0);
-                return entity.with(NANO_OF_SECOND, nano);
+                return entity.with(NANO_OF_SECOND, Math.min(max, nano));
             case '6':
-                nano = entity.get(NANO_OF_SECOND);
                 nano = (nano / KILO) * KILO + (this.up ? 999 : 0);
-                return entity.with(NANO_OF_SECOND, nano);
-            case '9':
-                return entity;
+                return entity.with(NANO_OF_SECOND, Math.min(max, nano));
             default:
                 throw new UnsupportedOperationException(
                     "Unknown: " + this.fraction);
