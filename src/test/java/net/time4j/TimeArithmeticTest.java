@@ -23,6 +23,53 @@ public class TimeArithmeticTest {
         PlainTime.of(17, 45, 10, 123456789);
 
     @Test
+    public void rollAnyTimeBy5Hours() {
+        DayCycles cycles = ANY_TIME.roll(5, HOURS);
+        assertThat(cycles.getDayOverflow(), is(0L));
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(22, 45, 10, 123456789)));
+    }
+
+    @Test
+    public void rollAnyTimeBy7Hours() {
+        DayCycles cycles = ANY_TIME.roll(7, HOURS);
+        assertThat(cycles.getDayOverflow(), is(1L));
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(0, 45, 10, 123456789)));
+    }
+
+    @Test
+    public void rollAnyTimeBy24Hours() {
+        DayCycles cycles = ANY_TIME.roll(24, HOURS);
+        assertThat(cycles.getDayOverflow(), is(1L));
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(17, 45, 10, 123456789)));
+    }
+
+    @Test
+    public void rollEndingMidnightBy48HoursForward() {
+        DayCycles cycles = PlainTime.midnightAtEndOfDay().roll(48, HOURS);
+        assertThat(cycles.getDayOverflow(), is(2L));
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(24)));
+    }
+
+    @Test
+    public void rollEndingMidnightBy48HoursBack() {
+        DayCycles cycles = PlainTime.midnightAtEndOfDay().roll(-48, HOURS);
+        assertThat(
+            cycles.getDayOverflow(),
+            is(-2L)); // a) T24->T0 => Overflow=-1, b) T0-24hours => Overflow=-1
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(0)));
+    }
+
+    @Test
     public void plus24Hours() {
         assertThat(
             PlainTime.of(0).plus(24, HOURS),
