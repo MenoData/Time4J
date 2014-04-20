@@ -86,6 +86,12 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void getStartOfDay() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.getStartOfDay(), is(0));
+    }
+
+    @Test
     public void getCalendarDate() {
         PlainDate any = PlainDate.of(2000, 1);
         assertThat(
