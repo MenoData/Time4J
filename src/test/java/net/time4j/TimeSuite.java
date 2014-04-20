@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         HourArithmeticTest.class,
+        MeridiemValueTest.class,
         MiscTimePropertiesTest.class,
         TimeArithmeticTest.class,
         TimeComparisonTest.class,

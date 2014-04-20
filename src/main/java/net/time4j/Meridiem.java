@@ -67,7 +67,7 @@ public enum Meridiem
      * @throws  IllegalArgumentException if the hour is out of range
      * @see     PlainTime#AM_PM_OF_DAY
      */
-    public static Meridiem valueOf(int hour) {
+    public static Meridiem ofHour(int hour) {
 
         if ((hour >= 0) && (hour <= 24)) {
             return (((hour < 12) || (hour == 24)) ? AM : PM);

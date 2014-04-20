@@ -492,7 +492,7 @@ public final class PlainTime
      *      PlainTime.midnightAtStartOfDay().plus(6, HOURS); // T06:00
      *  System.out.println(
      *      time.get(NANO_OF_DAY.ratio())
-     *          .multiply(BigDecimal.valueOf(100)).stripTrailingZeros()
+     *          .multiply(BigDecimal.ofHour(100)).stripTrailingZeros()
      *      + "% of day are over.");
      *  // Ausgabe: 25% of day are over.
      * </pre>
@@ -1818,7 +1818,7 @@ public final class PlainTime
         @Override
         public Meridiem getValue(PlainTime context) {
 
-            return Meridiem.valueOf(context.hour);
+            return Meridiem.ofHour(context.hour);
 
         }
 
