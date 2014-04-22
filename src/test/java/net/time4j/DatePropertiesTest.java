@@ -1,13 +1,16 @@
 package net.time4j;
 
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 
+import java.math.BigDecimal;
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static net.time4j.PlainDate.*;
+import static net.time4j.PlainTime.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -994,6 +997,720 @@ public class DatePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withDayOfQuarter0() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, 0);
+    }
+
+    @Test
+    public void containsPrecision() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(PRECISION),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getPrecision() {
+        PlainDate.of(2014, 4, 21).get(PRECISION);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumPrecision() {
+        PlainDate.of(2014, 4, 21).getMinimum(PRECISION);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumPrecision() {
+        PlainDate.of(2014, 4, 21).getMaximum(PRECISION);
+    }
+
+    @Test
+    public void isValidPrecision() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(PRECISION, ClockUnit.HOURS),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withPrecision() {
+        PlainDate.of(2014, 4, 21).with(PRECISION, ClockUnit.HOURS);
+    }
+
+    @Test
+    public void containsDecimalHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(DECIMAL_HOUR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalHour() {
+        PlainDate.of(2014, 4, 21).get(DECIMAL_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalHour() {
+        PlainDate.of(2014, 4, 21).getMinimum(DECIMAL_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalHour() {
+        PlainDate.of(2014, 4, 21).getMaximum(DECIMAL_HOUR);
+    }
+
+    @Test
+    public void isValidDecimalHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(DECIMAL_HOUR, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalHour() {
+        PlainDate.of(2014, 4, 21).with(DECIMAL_HOUR, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsDecimalMinute() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(DECIMAL_MINUTE),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalMinute() {
+        PlainDate.of(2014, 4, 21).get(DECIMAL_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalMinute() {
+        PlainDate.of(2014, 4, 21).getMinimum(DECIMAL_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalMinute() {
+        PlainDate.of(2014, 4, 21).getMaximum(DECIMAL_MINUTE);
+    }
+
+    @Test
+    public void isValidDecimalMinute() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalMinute() {
+        PlainDate.of(2014, 4, 21).with(DECIMAL_MINUTE, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsDecimalSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(DECIMAL_SECOND),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalSecond() {
+        PlainDate.of(2014, 4, 21).get(DECIMAL_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalSecond() {
+        PlainDate.of(2014, 4, 21).getMinimum(DECIMAL_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalSecond() {
+        PlainDate.of(2014, 4, 21).getMaximum(DECIMAL_SECOND);
+    }
+
+    @Test
+    public void isValidDecimalSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalSecond() {
+        PlainDate.of(2014, 4, 21).with(DECIMAL_SECOND, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsWallTime() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(WALL_TIME),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getWallTime() {
+        PlainDate.of(2014, 4, 21).get(WALL_TIME);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumWallTime() {
+        PlainDate.of(2014, 4, 21).getMinimum(WALL_TIME);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumWallTime() {
+        PlainDate.of(2014, 4, 21).getMaximum(WALL_TIME);
+    }
+
+    @Test
+    public void isValidWallTime() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(WALL_TIME, PlainTime.of(0)),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withWallTime() {
+        PlainDate.of(2014, 4, 21).with(WALL_TIME, PlainTime.of(0));
+    }
+
+    @Test
+    public void containsAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(AM_PM_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getAmPm() {
+        PlainDate.of(2014, 4, 21).get(AM_PM_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumAmPm() {
+        PlainDate.of(2014, 4, 21).getMinimum(AM_PM_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumAmPm() {
+        PlainDate.of(2014, 4, 21).getMaximum(AM_PM_OF_DAY);
+    }
+
+    @Test
+    public void isValidAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(AM_PM_OF_DAY, Meridiem.AM),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withAmPm() {
+        PlainDate.of(2014, 4, 21).with(AM_PM_OF_DAY, Meridiem.AM);
+    }
+
+    @Test
+    public void containsClockHourOfAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(CLOCK_HOUR_OF_AMPM),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getClockHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).get(CLOCK_HOUR_OF_AMPM);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumClockHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).getMinimum(CLOCK_HOUR_OF_AMPM);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumClockHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).getMaximum(CLOCK_HOUR_OF_AMPM);
+    }
+
+    @Test
+    public void isValidClockHourOfAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(CLOCK_HOUR_OF_AMPM, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withClockHourAmPm() {
+        PlainDate.of(2014, 4, 21).with(CLOCK_HOUR_OF_AMPM, 1);
+    }
+
+    @Test
+    public void containsDigitalHourOfAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(DIGITAL_HOUR_OF_AMPM),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDigitalHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).get(DIGITAL_HOUR_OF_AMPM);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDigitalHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).getMinimum(DIGITAL_HOUR_OF_AMPM);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDigitalHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).getMaximum(DIGITAL_HOUR_OF_AMPM);
+    }
+
+    @Test
+    public void isValidDigitalHourOfAmPm() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(DIGITAL_HOUR_OF_AMPM, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDigitalHourOfAmPm() {
+        PlainDate.of(2014, 4, 21).with(DIGITAL_HOUR_OF_AMPM, 1);
+    }
+
+    @Test
+    public void containsClockHourOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(CLOCK_HOUR_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getClockHourOfDay() {
+        PlainDate.of(2014, 4, 21).get(CLOCK_HOUR_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumClockHourOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(CLOCK_HOUR_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumClockHourOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(CLOCK_HOUR_OF_DAY);
+    }
+
+    @Test
+    public void isValidClockHourOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(CLOCK_HOUR_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withClockHourDay() {
+        PlainDate.of(2014, 4, 21).with(CLOCK_HOUR_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsDigitalHourOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(DIGITAL_HOUR_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDigitalHourOfDay() {
+        PlainDate.of(2014, 4, 21).get(DIGITAL_HOUR_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDigitalHourOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(DIGITAL_HOUR_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDigitalHourOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(DIGITAL_HOUR_OF_DAY);
+    }
+
+    @Test
+    public void isValidDigitalHourOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(DIGITAL_HOUR_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDigitalHourOfDay() {
+        PlainDate.of(2014, 4, 21).with(DIGITAL_HOUR_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsIsoHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(ISO_HOUR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getIsoHour() {
+        PlainDate.of(2014, 4, 21).get(ISO_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumIsoHour() {
+        PlainDate.of(2014, 4, 21).getMinimum(ISO_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumIsoHour() {
+        PlainDate.of(2014, 4, 21).getMaximum(ISO_HOUR);
+    }
+
+    @Test
+    public void isValidIsoHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(ISO_HOUR, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withIsoHour() {
+        PlainDate.of(2014, 4, 21).with(ISO_HOUR, 1);
+    }
+
+    @Test
+    public void containsMinuteOfHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MINUTE_OF_HOUR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinuteOfHour() {
+        PlainDate.of(2014, 4, 21).get(MINUTE_OF_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMinuteOfHour() {
+        PlainDate.of(2014, 4, 21).getMinimum(MINUTE_OF_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMinuteOfHour() {
+        PlainDate.of(2014, 4, 21).getMaximum(MINUTE_OF_HOUR);
+    }
+
+    @Test
+    public void isValidMinuteOfHour() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MINUTE_OF_HOUR, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMinuteOfHour() {
+        PlainDate.of(2014, 4, 21).with(MINUTE_OF_HOUR, 1);
+    }
+
+    @Test
+    public void containsSecondOfMinute() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(SECOND_OF_MINUTE),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getSecondOfMinute() {
+        PlainDate.of(2014, 4, 21).get(SECOND_OF_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumSecondOfMinute() {
+        PlainDate.of(2014, 4, 21).getMinimum(SECOND_OF_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumSecondOfMinute() {
+        PlainDate.of(2014, 4, 21).getMaximum(SECOND_OF_MINUTE);
+    }
+
+    @Test
+    public void isValidSecondOfMinute() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(SECOND_OF_MINUTE, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withSecondOfMinute() {
+        PlainDate.of(2014, 4, 21).with(SECOND_OF_MINUTE, 1);
+    }
+
+    @Test
+    public void containsMinuteOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MINUTE_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinuteOfDay() {
+        PlainDate.of(2014, 4, 21).get(MINUTE_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMinuteOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(MINUTE_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMinuteOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(MINUTE_OF_DAY);
+    }
+
+    @Test
+    public void isValidMinuteOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MINUTE_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMinuteOfDay() {
+        PlainDate.of(2014, 4, 21).with(MINUTE_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsSecondOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(SECOND_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getSecondOfDay() {
+        PlainDate.of(2014, 4, 21).get(SECOND_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumSecondOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(SECOND_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumSecondOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(SECOND_OF_DAY);
+    }
+
+    @Test
+    public void isValidSecondOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(SECOND_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withSecondOfDay() {
+        PlainDate.of(2014, 4, 21).with(SECOND_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsMilliOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MILLI_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMilliOfDay() {
+        PlainDate.of(2014, 4, 21).get(MILLI_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMilliOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(MILLI_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMilliOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(MILLI_OF_DAY);
+    }
+
+    @Test
+    public void isValidMilliOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MILLI_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMilliOfDay() {
+        PlainDate.of(2014, 4, 21).with(MILLI_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsMicroOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MICRO_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMicroOfDay() {
+        PlainDate.of(2014, 4, 21).get(MICRO_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMicroOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(MICRO_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMicroOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(MICRO_OF_DAY);
+    }
+
+    @Test
+    public void isValidMicroOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MICRO_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMicroOfDay() {
+        PlainDate.of(2014, 4, 21).with(MICRO_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsNanoOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(NANO_OF_DAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getNanoOfDay() {
+        PlainDate.of(2014, 4, 21).get(NANO_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumNanoOfDay() {
+        PlainDate.of(2014, 4, 21).getMinimum(NANO_OF_DAY);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumNanoOfDay() {
+        PlainDate.of(2014, 4, 21).getMaximum(NANO_OF_DAY);
+    }
+
+    @Test
+    public void isValidNanoOfDay() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(NANO_OF_DAY, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withNanoOfDay() {
+        PlainDate.of(2014, 4, 21).with(NANO_OF_DAY, 1);
+    }
+
+    @Test
+    public void containsMilliOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MILLI_OF_SECOND),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMilliOfSecond() {
+        PlainDate.of(2014, 4, 21).get(MILLI_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMilliOfSecond() {
+        PlainDate.of(2014, 4, 21).getMinimum(MILLI_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMilliOfSecond() {
+        PlainDate.of(2014, 4, 21).getMaximum(MILLI_OF_SECOND);
+    }
+
+    @Test
+    public void isValidMilliOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MILLI_OF_SECOND, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMilliOfSecond() {
+        PlainDate.of(2014, 4, 21).with(MILLI_OF_SECOND, 1);
+    }
+
+    @Test
+    public void containsMicroOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(MICRO_OF_SECOND),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMicroOfSecond() {
+        PlainDate.of(2014, 4, 21).get(MICRO_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMicroOfSecond() {
+        PlainDate.of(2014, 4, 21).getMinimum(MICRO_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMicroOfSecond() {
+        PlainDate.of(2014, 4, 21).getMaximum(MICRO_OF_SECOND);
+    }
+
+    @Test
+    public void isValidMicroOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(MICRO_OF_SECOND, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMicroOfSecond() {
+        PlainDate.of(2014, 4, 21).with(MICRO_OF_SECOND, 1);
+    }
+
+    @Test
+    public void containsNanoOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).contains(NANO_OF_SECOND),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getNanoOfSecond() {
+        PlainDate.of(2014, 4, 21).get(NANO_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumNanoOfSecond() {
+        PlainDate.of(2014, 4, 21).getMinimum(NANO_OF_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumNanoOfSecond() {
+        PlainDate.of(2014, 4, 21).getMaximum(NANO_OF_SECOND);
+    }
+
+    @Test
+    public void isValidNanoOfSecond() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).isValid(NANO_OF_SECOND, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withNanoOfSecond() {
+        PlainDate.of(2014, 4, 21).with(NANO_OF_SECOND, 1);
     }
 
 }

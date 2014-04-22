@@ -1,11 +1,13 @@
 package net.time4j;
 
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -1631,6 +1633,11 @@ public class TimePropertiesTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
+    public void withMicroOfDayLongMax() {
+        PlainTime.of(18, 44).with(MICRO_OF_DAY, Long.MAX_VALUE);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfDayMaxIfNoFullMicro() {
         PlainTime.of(23, 45, 30, 123456001).with(
             MICRO_OF_DAY,
@@ -1820,6 +1827,386 @@ public class TimePropertiesTest {
     @Test(expected=NullPointerException.class)
     public void withNanoOfDayNull() {
         PlainTime.of(18, 44).with(NANO_OF_DAY, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withNanoOfDayLongMax() {
+        PlainTime.of(18, 44).with(NANO_OF_DAY, Long.MAX_VALUE);
+    }
+
+    @Test
+    public void containsDayOfMonth() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(DAY_OF_MONTH),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDayOfMonth() {
+        PlainTime.of(21, 10, 45).get(DAY_OF_MONTH);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDayOfMonth() {
+        PlainTime.of(21, 10, 45).getMinimum(DAY_OF_MONTH);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDayOfMonth() {
+        PlainTime.of(21, 10, 45).getMaximum(DAY_OF_MONTH);
+    }
+
+    @Test
+    public void isValidDayOfMonth() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(DAY_OF_MONTH, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDayOfMonth() {
+        PlainTime.of(21, 10, 45).with(DAY_OF_MONTH, 1);
+    }
+
+    @Test
+    public void containsDayOfWeek() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(DAY_OF_WEEK),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDayOfWeek() {
+        PlainTime.of(21, 10, 45).get(DAY_OF_WEEK);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDayOfWeek() {
+        PlainTime.of(21, 10, 45).getMinimum(DAY_OF_WEEK);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDayOfWeek() {
+        PlainTime.of(21, 10, 45).getMaximum(DAY_OF_WEEK);
+    }
+
+    @Test
+    public void isValidDayOfWeek() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(DAY_OF_WEEK, Weekday.MONDAY),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDayOfWeek() {
+        PlainTime.of(21, 10, 45).with(DAY_OF_WEEK, Weekday.MONDAY);
+    }
+
+    @Test
+    public void containsDayOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(DAY_OF_YEAR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDayOfYear() {
+        PlainTime.of(21, 10, 45).get(DAY_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDayOfYear() {
+        PlainTime.of(21, 10, 45).getMinimum(DAY_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDayOfYear() {
+        PlainTime.of(21, 10, 45).getMaximum(DAY_OF_YEAR);
+    }
+
+    @Test
+    public void isValidDayOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(DAY_OF_YEAR, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDayOfYear() {
+        PlainTime.of(21, 10, 45).with(DAY_OF_YEAR, 1);
+    }
+
+    @Test
+    public void containsDayOfQuarter() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(DAY_OF_QUARTER),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDayOfQuarter() {
+        PlainTime.of(21, 10, 45).get(DAY_OF_QUARTER);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDayOfQuarter() {
+        PlainTime.of(21, 10, 45).getMinimum(DAY_OF_QUARTER);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDayOfQuarter() {
+        PlainTime.of(21, 10, 45).getMaximum(DAY_OF_QUARTER);
+    }
+
+    @Test
+    public void isValidDayOfQuarter() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(DAY_OF_QUARTER, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDayOfQuarter() {
+        PlainTime.of(21, 10, 45).with(DAY_OF_QUARTER, 1);
+    }
+
+    @Test
+    public void containsQuarterOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(QUARTER_OF_YEAR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getQuarterOfYear() {
+        PlainTime.of(21, 10, 45).get(QUARTER_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumQuarterOfYear() {
+        PlainTime.of(21, 10, 45).getMinimum(QUARTER_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumQuarterOfYear() {
+        PlainTime.of(21, 10, 45).getMaximum(QUARTER_OF_YEAR);
+    }
+
+    @Test
+    public void isValidQuarterOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(QUARTER_OF_YEAR, Quarter.Q1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withQuarterOfYear() {
+        PlainTime.of(21, 10, 45).with(QUARTER_OF_YEAR, Quarter.Q1);
+    }
+
+    @Test
+    public void containsMonthAsNumber() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(MONTH_AS_NUMBER),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMonthAsNumber() {
+        PlainTime.of(21, 10, 45).get(MONTH_AS_NUMBER);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMonthAsNumber() {
+        PlainTime.of(21, 10, 45).getMinimum(MONTH_AS_NUMBER);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMonthAsNumber() {
+        PlainTime.of(21, 10, 45).getMaximum(MONTH_AS_NUMBER);
+    }
+
+    @Test
+    public void isValidMonthAsNumber() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(MONTH_AS_NUMBER, 8),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMonthAsNumber() {
+        PlainTime.of(21, 10, 45).with(MONTH_AS_NUMBER, 8);
+    }
+
+    @Test
+    public void containsMonthOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(MONTH_OF_YEAR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMonthOfYear() {
+        PlainTime.of(21, 10, 45).get(MONTH_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumMonthOfYear() {
+        PlainTime.of(21, 10, 45).getMinimum(MONTH_OF_YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumMonthOfYear() {
+        PlainTime.of(21, 10, 45).getMaximum(MONTH_OF_YEAR);
+    }
+
+    @Test
+    public void isValidMonthOfYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(MONTH_OF_YEAR, Month.AUGUST),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withMonthOfYear() {
+        PlainTime.of(21, 10, 45).with(MONTH_OF_YEAR, Month.AUGUST);
+    }
+
+    @Test
+    public void containsCalendarDate() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(CALENDAR_DATE),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getCalendarDate() {
+        PlainTime.of(21, 10, 45).get(CALENDAR_DATE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumCalendarDate() {
+        PlainTime.of(21, 10, 45).getMinimum(CALENDAR_DATE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumCalendarDate() {
+        PlainTime.of(21, 10, 45).getMaximum(CALENDAR_DATE);
+    }
+
+    @Test
+    public void isValidCalendarDate() {
+        assertThat(
+            PlainTime.of(21, 10, 45)
+                .isValid(CALENDAR_DATE, PlainDate.of(2014, 1)),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withCalendarDate() {
+        PlainTime.of(21, 10, 45).with(CALENDAR_DATE, PlainDate.of(2014, 1));
+    }
+
+    @Test
+    public void containsWeekdayInMonth() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(WEEKDAY_IN_MONTH),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getWeekdayInMonth() {
+        PlainTime.of(21, 10, 45).get(WEEKDAY_IN_MONTH);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumWeekdayInMonth() {
+        PlainTime.of(21, 10, 45).getMinimum(WEEKDAY_IN_MONTH);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumWeekdayInMonth() {
+        PlainTime.of(21, 10, 45).getMaximum(WEEKDAY_IN_MONTH);
+    }
+
+    @Test
+    public void isValidWeekdayInMonth() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(WEEKDAY_IN_MONTH, 1),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withWeekdayInMonth() {
+        PlainTime.of(21, 10, 45).with(WEEKDAY_IN_MONTH, 1);
+    }
+
+    @Test
+    public void containsYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(YEAR),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getYear() {
+        PlainTime.of(21, 10, 45).get(YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumYear() {
+        PlainTime.of(21, 10, 45).getMinimum(YEAR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumYear() {
+        PlainTime.of(21, 10, 45).getMaximum(YEAR);
+    }
+
+    @Test
+    public void isValidYear() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(YEAR, 2012),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withYear() {
+        PlainTime.of(21, 10, 45).with(YEAR, 2012);
+    }
+
+    @Test
+    public void containsYearOfWeekdate() {
+        assertThat(
+            PlainTime.of(21, 10, 45).contains(YEAR_OF_WEEKDATE),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getYearOfWeekdate() {
+        PlainTime.of(21, 10, 45).get(YEAR_OF_WEEKDATE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumYearOfWeekdate() {
+        PlainTime.of(21, 10, 45).getMinimum(YEAR_OF_WEEKDATE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumYearOfWeekdate() {
+        PlainTime.of(21, 10, 45).getMaximum(YEAR_OF_WEEKDATE);
+    }
+
+    @Test
+    public void isValidYearOfWeekdate() {
+        assertThat(
+            PlainTime.of(21, 10, 45).isValid(YEAR_OF_WEEKDATE, 2012),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withYearOfWeekdate() {
+        PlainTime.of(21, 10, 45).with(YEAR_OF_WEEKDATE, 2012);
     }
 
 }

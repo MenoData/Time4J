@@ -974,6 +974,11 @@ public final class PlainTimestamp
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
                     return ((min <= val) && (max >= val));
+                } else if (
+                    this.element.equals(WALL_TIME)
+                    && PlainTime.MAX.equals(value)
+                ) {
+                    return false;
                 } else {
                     return context.time.isValid(this.element, value);
                 }

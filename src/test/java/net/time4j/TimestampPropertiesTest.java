@@ -1,19 +1,16 @@
 package net.time4j;
 
+import net.time4j.base.GregorianMath;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 
+import java.math.BigDecimal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static net.time4j.PlainTime.AM_PM_OF_DAY;
-import static net.time4j.PlainTime.ISO_HOUR;
-import static net.time4j.PlainTime.MICRO_OF_DAY;
-import static net.time4j.PlainTime.MILLI_OF_DAY;
-import static net.time4j.PlainTime.MINUTE_OF_DAY;
-import static net.time4j.PlainTime.NANO_OF_DAY;
-import static net.time4j.PlainTime.SECOND_OF_DAY;
-import static net.time4j.PlainTime.WALL_TIME;
+import static net.time4j.PlainDate.*;
+import static net.time4j.PlainTime.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -161,13 +158,18 @@ public class TimestampPropertiesTest {
     public void isValidWallTime() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(WALL_TIME, PlainTime.of(9, 15)), is(true));
-        assertThat(anyTS.isValid(WALL_TIME, PlainTime.of(24)), is(true));
     }
 
     @Test
     public void isValidWallTimeNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(WALL_TIME, null), is(false));
+    }
+
+    @Test
+    public void isValidWallTime24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(WALL_TIME, PlainTime.of(24)), is(false));
     }
 
     @Test
@@ -288,13 +290,18 @@ public class TimestampPropertiesTest {
     public void isValidMinuteOfDay() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MINUTE_OF_DAY, 1439), is(true));
-        assertThat(anyTS.isValid(MINUTE_OF_DAY, 1440), is(false));
     }
 
     @Test
     public void isValidMinuteOfDayNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MINUTE_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidMinuteOfDay1440() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MINUTE_OF_DAY, 1440), is(false));
     }
 
     @Test
@@ -353,13 +360,18 @@ public class TimestampPropertiesTest {
     public void isValidSecondOfDay() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(SECOND_OF_DAY, 86399), is(true));
-        assertThat(anyTS.isValid(SECOND_OF_DAY, 86400), is(false));
     }
 
     @Test
     public void isValidSecondOfDayNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(SECOND_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidSecondOfDay86400() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(SECOND_OF_DAY, 86400), is(false));
     }
 
     @Test
@@ -420,13 +432,18 @@ public class TimestampPropertiesTest {
     public void isValidMilliOfDay() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MILLI_OF_DAY, 86399999), is(true));
-        assertThat(anyTS.isValid(MILLI_OF_DAY, 86400000), is(false));
     }
 
     @Test
     public void isValidMilliOfDayNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MILLI_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidMilliOfDayT24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MILLI_OF_DAY, 86400000), is(false));
     }
 
     @Test
@@ -445,7 +462,7 @@ public class TimestampPropertiesTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withMilliOfDay86400000() {
+    public void withMilliOfDayT24() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MILLI_OF_DAY, 86400000);
     }
 
@@ -489,13 +506,18 @@ public class TimestampPropertiesTest {
     public void isValidMicroOfDay() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MICRO_OF_DAY, 86399999999L), is(true));
-        assertThat(anyTS.isValid(MICRO_OF_DAY, 86400000000L), is(false));
     }
 
     @Test
     public void isValidMicroOfDayNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(MICRO_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidMicroOfDayT24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MICRO_OF_DAY, 86400000000L), is(false));
     }
 
     @Test
@@ -514,7 +536,7 @@ public class TimestampPropertiesTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withMicroOfDay86400000() {
+    public void withMicroOfDayT24() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MICRO_OF_DAY, 86400 * MIO);
     }
 
@@ -558,13 +580,18 @@ public class TimestampPropertiesTest {
     public void isValidNanoOfDay() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(NANO_OF_DAY, 86399 * MRD), is(true));
-        assertThat(anyTS.isValid(NANO_OF_DAY, 86400 * MRD), is(false));
     }
 
     @Test
     public void isValidNanoOfDayNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(NANO_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidNanoOfDayT24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(NANO_OF_DAY, 86400 * MRD), is(false));
     }
 
     @Test
@@ -583,7 +610,7 @@ public class TimestampPropertiesTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withNanoOfDay86400MRD() {
+    public void withNanoOfDayT24() {
         PlainTimestamp.of(2014, 4, 21, 9, 15)
             .with(NANO_OF_DAY, 86400 * MRD);
     }
@@ -626,13 +653,18 @@ public class TimestampPropertiesTest {
     public void isValidIsoHour() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
         assertThat(anyTS.isValid(ISO_HOUR, 23), is(true));
-        assertThat(anyTS.isValid(ISO_HOUR, 24), is(false));
     }
 
     @Test
     public void isValidIsoHourNull() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
         assertThat(anyTS.isValid(ISO_HOUR, null), is(false));
+    }
+
+    @Test
+    public void isValidIsoHour24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.isValid(ISO_HOUR, 24), is(false));
     }
 
     @Test
@@ -651,6 +683,1290 @@ public class TimestampPropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withIsoHour24() {
         PlainTimestamp.of(2014, 4, 21, 0, 0).with(ISO_HOUR, 24);
+    }
+
+    @Test
+    public void containsMinuteOfHour() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.contains(MINUTE_OF_HOUR), is(true));
+    }
+
+    @Test
+    public void getMinuteOfHour() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 11, 45, 30).get(MINUTE_OF_HOUR),
+            is(45));
+    }
+
+    @Test
+    public void getBaseUnitMinuteOfHour() {
+        IsoUnit unit = ClockUnit.MINUTES;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(MINUTE_OF_HOUR),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumMinuteOfHour() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(MINUTE_OF_HOUR), is(0));
+    }
+
+    @Test
+    public void getMaximumMinuteOfHour() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.getMaximum(MINUTE_OF_HOUR), is(59));
+    }
+
+    @Test
+    public void isValidMinuteOfHour() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MINUTE_OF_HOUR, 59), is(true));
+    }
+
+    @Test
+    public void isValidMinuteOfHourNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MINUTE_OF_HOUR, null), is(false));
+    }
+
+    @Test
+    public void isValidMinuteOfHour60() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MINUTE_OF_HOUR, 60), is(false));
+    }
+
+    @Test
+    public void withMinuteOfHour() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15, 30)
+                .with(MINUTE_OF_HOUR, 59),
+            is(PlainTimestamp.of(2014, 4, 21, 9, 59, 30)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withMinuteOfHourNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MINUTE_OF_HOUR, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withMinuteOfHour60() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MINUTE_OF_HOUR, 60);
+    }
+
+    @Test
+    public void containsSecondOfMinute() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.contains(SECOND_OF_MINUTE), is(true));
+    }
+
+    @Test
+    public void getSecondOfMinute() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 11, 45, 30).get(SECOND_OF_MINUTE),
+            is(30));
+    }
+
+    @Test
+    public void getBaseUnitSecondOfMinute() {
+        IsoUnit unit = ClockUnit.SECONDS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(SECOND_OF_MINUTE),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumSecondOfMinute() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(SECOND_OF_MINUTE), is(0));
+    }
+
+    @Test
+    public void getMaximumSecondOfMinute() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.getMaximum(SECOND_OF_MINUTE), is(59));
+    }
+
+    @Test
+    public void isValidSecondOfMinute() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(SECOND_OF_MINUTE, 59), is(true));
+    }
+
+    @Test
+    public void isValidSecondOfMinuteNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(SECOND_OF_MINUTE, null), is(false));
+    }
+
+    @Test
+    public void isValidSecondOfMinute60() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(SECOND_OF_MINUTE, 60), is(false));
+    }
+
+    @Test
+    public void withSecondOfMinute() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(SECOND_OF_MINUTE, 59),
+            is(PlainTimestamp.of(2014, 4, 21, 9, 15, 59)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withSecondOfMinuteNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(SECOND_OF_MINUTE, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withSecondOfMinute60() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(SECOND_OF_MINUTE, 60);
+    }
+
+    @Test
+    public void containsMilliOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.contains(MILLI_OF_SECOND), is(true));
+    }
+
+    @Test
+    public void getMilliOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(11, 45, 30, 123456789);
+        assertThat(
+            PlainTimestamp.of(date, time).get(MILLI_OF_SECOND),
+            is(123));
+    }
+
+    @Test
+    public void getBaseUnitMilliOfSecond() {
+        IsoUnit unit = ClockUnit.MILLIS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(MILLI_OF_SECOND),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumMilliOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(MILLI_OF_SECOND), is(0));
+    }
+
+    @Test
+    public void getMaximumMilliOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.getMaximum(MILLI_OF_SECOND), is(999));
+    }
+
+    @Test
+    public void isValidMilliOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MILLI_OF_SECOND, 999), is(true));
+    }
+
+    @Test
+    public void isValidMilliOfSecondNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MILLI_OF_SECOND, null), is(false));
+    }
+
+    @Test
+    public void isValidMilliOfSecond1000() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MILLI_OF_SECOND, 1000), is(false));
+    }
+
+    @Test
+    public void withMilliOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(9, 15, 0, 999000000);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(MILLI_OF_SECOND, 999),
+            is(PlainTimestamp.of(date, time)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withMilliOfSecondNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MILLI_OF_SECOND, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withMilliOfSecond1000() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MILLI_OF_SECOND, 1000);
+    }
+
+    @Test
+    public void containsMicroOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.contains(MICRO_OF_SECOND), is(true));
+    }
+
+    @Test
+    public void getMicroOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(11, 45, 30, 123456789);
+        assertThat(
+            PlainTimestamp.of(date, time).get(MICRO_OF_SECOND),
+            is(123456));
+    }
+
+    @Test
+    public void getBaseUnitMicroOfSecond() {
+        IsoUnit unit = ClockUnit.MICROS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(MICRO_OF_SECOND),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumMicroOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(MICRO_OF_SECOND), is(0));
+    }
+
+    @Test
+    public void getMaximumMicroOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.getMaximum(MICRO_OF_SECOND), is(999999));
+    }
+
+    @Test
+    public void isValidMicroOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MICRO_OF_SECOND, 999999), is(true));
+    }
+
+    @Test
+    public void isValidMicroOfSecondNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MICRO_OF_SECOND, null), is(false));
+    }
+
+    @Test
+    public void isValidMicroOfSecondMIO() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(MICRO_OF_SECOND, 1000000), is(false));
+    }
+
+    @Test
+    public void withMicroOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(9, 15, 0, 999999000);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(MICRO_OF_SECOND, 999999),
+            is(PlainTimestamp.of(date, time)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withMicroOfSecondNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MICRO_OF_SECOND, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withMicroOfSecondMIO() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(MICRO_OF_SECOND, 1000000);
+    }
+
+    @Test
+    public void containsNanoOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.contains(NANO_OF_SECOND), is(true));
+    }
+
+    @Test
+    public void getNanoOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(11, 45, 30, 123456789);
+        assertThat(
+            PlainTimestamp.of(date, time).get(NANO_OF_SECOND),
+            is(123456789));
+    }
+
+    @Test
+    public void getBaseUnitNanoOfSecond() {
+        IsoUnit unit = ClockUnit.NANOS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(NANO_OF_SECOND),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumNanoOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(NANO_OF_SECOND), is(0));
+    }
+
+    @Test
+    public void getMaximumNanoOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.getMaximum(NANO_OF_SECOND), is(999999999));
+    }
+
+    @Test
+    public void isValidNanoOfSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(NANO_OF_SECOND, 999999999), is(true));
+    }
+
+    @Test
+    public void isValidNanoOfSecondNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(NANO_OF_SECOND, null), is(false));
+    }
+
+    @Test
+    public void isValidNanoOfSecondMRD() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(NANO_OF_SECOND, 1000000000), is(false));
+    }
+
+    @Test
+    public void withNanoOfSecond() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(9, 15, 0, 123456789);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(NANO_OF_SECOND, 123456789),
+            is(PlainTimestamp.of(date, time)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withNanoOfSecondNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(NANO_OF_SECOND, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withNanoOfSecondMRD() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(NANO_OF_SECOND, 1000000000);
+    }
+
+    @Test
+    public void containsClockHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(CLOCK_HOUR_OF_AMPM), is(true));
+    }
+
+    @Test
+    public void getClockHourOfAmPm() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(CLOCK_HOUR_OF_AMPM),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 13, 45).get(CLOCK_HOUR_OF_AMPM),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 0, 45).get(CLOCK_HOUR_OF_AMPM),
+            is(12));
+    }
+
+    @Test
+    public void getBaseUnitClockHourOfAmPm() {
+        IsoUnit unit = ClockUnit.HOURS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(CLOCK_HOUR_OF_AMPM),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumClockHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(CLOCK_HOUR_OF_AMPM), is(1));
+    }
+
+    @Test
+    public void getMaximumClockHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.getMaximum(CLOCK_HOUR_OF_AMPM), is(12));
+    }
+
+    @Test
+    public void isValidClockHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_AMPM, 12), is(true));
+    }
+
+    @Test
+    public void isValidClockHourOfAmPmNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_AMPM, null), is(false));
+    }
+
+    @Test
+    public void isValidClockHourOfAmPm0() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 0);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_AMPM, 0), is(false));
+    }
+
+    @Test
+    public void withClockHourOfAmPm() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(CLOCK_HOUR_OF_AMPM, 12),
+            is(PlainTimestamp.of(2014, 4, 21, 0, 15)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withClockHourOfAmPmNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(CLOCK_HOUR_OF_AMPM, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withClockHourOfAmPm0() {
+        PlainTimestamp.of(2014, 4, 21, 0, 0).with(CLOCK_HOUR_OF_AMPM, 0);
+    }
+
+    @Test
+    public void containsClockHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(CLOCK_HOUR_OF_DAY), is(true));
+    }
+
+    @Test
+    public void getClockHourOfDay() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(CLOCK_HOUR_OF_DAY),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 13, 45).get(CLOCK_HOUR_OF_DAY),
+            is(13));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 0, 45).get(CLOCK_HOUR_OF_DAY),
+            is(24));
+    }
+
+    @Test
+    public void getBaseUnitClockHourOfDay() {
+        IsoUnit unit = ClockUnit.HOURS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(CLOCK_HOUR_OF_DAY),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumClockHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(CLOCK_HOUR_OF_DAY), is(1));
+    }
+
+    @Test
+    public void getMaximumClockHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.getMaximum(CLOCK_HOUR_OF_DAY), is(24));
+    }
+
+    @Test
+    public void isValidClockHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_DAY, 24), is(true));
+    }
+
+    @Test
+    public void isValidClockHourOfDayNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidClockHourOfDay0() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 0);
+        assertThat(anyTS.isValid(CLOCK_HOUR_OF_DAY, 0), is(false));
+    }
+
+    @Test
+    public void withClockHourOfDay() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(CLOCK_HOUR_OF_DAY, 24),
+            is(PlainTimestamp.of(2014, 4, 21, 0, 15)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withClockHourOfDayNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(CLOCK_HOUR_OF_DAY, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withClockHourOfDay0() {
+        PlainTimestamp.of(2014, 4, 21, 0, 0).with(CLOCK_HOUR_OF_DAY, 0);
+    }
+
+    @Test
+    public void containsDigitalHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(DIGITAL_HOUR_OF_AMPM), is(true));
+    }
+
+    @Test
+    public void getDigitalHourOfAmPm() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(DIGITAL_HOUR_OF_AMPM),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 13, 45).get(DIGITAL_HOUR_OF_AMPM),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 12, 45).get(DIGITAL_HOUR_OF_AMPM),
+            is(0));
+    }
+
+    @Test
+    public void getBaseUnitDigitalHourOfAmPm() {
+        IsoUnit unit = ClockUnit.HOURS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumDigitalHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(DIGITAL_HOUR_OF_AMPM), is(0));
+    }
+
+    @Test
+    public void getMaximumDigitalHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.getMaximum(DIGITAL_HOUR_OF_AMPM), is(11));
+    }
+
+    @Test
+    public void isValidDigitalHourOfAmPm() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_AMPM, 0), is(true));
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_AMPM, 11), is(true));
+    }
+
+    @Test
+    public void isValidDigitalHourOfAmPmNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_AMPM, null), is(false));
+    }
+
+    @Test
+    public void isValidDigitalHourOfAmPm12() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 0);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_AMPM, 12), is(false));
+    }
+
+    @Test
+    public void withDigitalHourOfAmPm() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(DIGITAL_HOUR_OF_AMPM, 11),
+            is(PlainTimestamp.of(2014, 4, 21, 11, 15)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withDigitalHourOfAmPmNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(DIGITAL_HOUR_OF_AMPM, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDigitalHourOfAmPm12() {
+        PlainTimestamp.of(2014, 4, 21, 0, 0).with(DIGITAL_HOUR_OF_AMPM, 12);
+    }
+
+    @Test
+    public void containsDigitalHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(DIGITAL_HOUR_OF_DAY), is(true));
+    }
+
+    @Test
+    public void getDigitalHourOfDay() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(DIGITAL_HOUR_OF_DAY),
+            is(1));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 13, 45).get(DIGITAL_HOUR_OF_DAY),
+            is(13));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 0, 45).get(DIGITAL_HOUR_OF_DAY),
+            is(0));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 23, 45).get(DIGITAL_HOUR_OF_DAY),
+            is(23));
+    }
+
+    @Test
+    public void getBaseUnitDigitalHourOfDay() {
+        IsoUnit unit = ClockUnit.HOURS;
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(
+            anyTS.getChronology().getBaseUnit(DIGITAL_HOUR_OF_DAY),
+            is(unit));
+    }
+
+    @Test
+    public void getMinimumDigitalHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
+        assertThat(anyTS.getMinimum(DIGITAL_HOUR_OF_DAY), is(0));
+    }
+
+    @Test
+    public void getMaximumDigitalHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.getMaximum(DIGITAL_HOUR_OF_DAY), is(23));
+    }
+
+    @Test
+    public void isValidDigitalHourOfDay() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_DAY, 0), is(true));
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_DAY, 23), is(true));
+    }
+
+    @Test
+    public void isValidDigitalHourOfDayNull() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_DAY, null), is(false));
+    }
+
+    @Test
+    public void isValidDigitalHourOfDay24() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 0);
+        assertThat(anyTS.isValid(DIGITAL_HOUR_OF_DAY, 24), is(false));
+    }
+
+    @Test
+    public void withDigitalHourOfDay() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15)
+                .with(DIGITAL_HOUR_OF_DAY, 23),
+            is(PlainTimestamp.of(2014, 4, 21, 23, 15)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withDigitalHourOfDayNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(DIGITAL_HOUR_OF_DAY, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDigitalHourOfDay24() {
+        PlainTimestamp.of(2014, 4, 21, 0, 0).with(DIGITAL_HOUR_OF_DAY, 24);
+    }
+
+    @Test
+    public void containsPrecision() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(PRECISION), is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getPrecision() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).get(PRECISION);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumPrecision() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(PRECISION);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumPrecision() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(PRECISION);
+    }
+
+    @Test
+    public void isValidPrecision() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(PRECISION, ClockUnit.HOURS),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withPrecision() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).with(PRECISION, ClockUnit.HOURS);
+    }
+
+    @Test
+    public void containsDecimalHour() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(DECIMAL_HOUR), is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalHour() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalHour() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_HOUR);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalHour() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_HOUR);
+    }
+
+    @Test
+    public void isValidDecimalHour() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_HOUR, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalHour() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45)
+            .with(DECIMAL_HOUR, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsDecimalMinute() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(DECIMAL_MINUTE), is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalMinute() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalMinute() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_MINUTE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalMinute() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_MINUTE);
+    }
+
+    @Test
+    public void isValidDecimalMinute() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalMinute() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45)
+            .with(DECIMAL_MINUTE, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsDecimalSecond() {
+        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
+        assertThat(anyTS.contains(DECIMAL_SECOND), is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getDecimalSecond() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMinimumDecimalSecond() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_SECOND);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void getMaximumDecimalSecond() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_SECOND);
+    }
+
+    @Test
+    public void isValidDecimalSecond() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(false));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withDecimalSecond() {
+        PlainTimestamp.of(2014, 4, 21, 1, 45)
+            .with(DECIMAL_SECOND, BigDecimal.ZERO);
+    }
+
+    @Test
+    public void containsDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 24, 8, 15).contains(DAY_OF_MONTH),
+            is(true));
+    }
+
+    @Test
+    public void getDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 24, 8, 15).get(DAY_OF_MONTH),
+            is(24));
+    }
+
+    @Test
+    public void getMinimumDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 24, 8, 15).getMinimum(DAY_OF_MONTH),
+            is(1));
+    }
+
+    @Test
+    public void getMaximumDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 24, 8, 15).getMaximum(DAY_OF_MONTH),
+            is(29));
+    }
+
+    @Test
+    public void isValidDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).isValid(DAY_OF_MONTH, 11),
+            is(true));
+    }
+
+    @Test
+    public void withDayOfMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).with(DAY_OF_MONTH, 11),
+            is(PlainTimestamp.of(2012, 2, 11, 8, 15)));
+    }
+
+    @Test
+    public void containsDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).contains(DAY_OF_WEEK),
+            is(true));
+    }
+
+    @Test
+    public void getDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).get(DAY_OF_WEEK),
+            is(Weekday.WEDNESDAY));
+    }
+
+    @Test
+    public void getMinimumDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMinimum(DAY_OF_WEEK),
+            is(Weekday.MONDAY));
+    }
+
+    @Test
+    public void getMaximumDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMaximum(DAY_OF_WEEK),
+            is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void isValidDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15)
+                .isValid(DAY_OF_WEEK, Weekday.MONDAY),
+            is(true));
+    }
+
+    @Test
+    public void withDayOfWeek() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15)
+                .with(DAY_OF_WEEK, Weekday.MONDAY),
+            is(PlainTimestamp.of(2012, 2, 27, 8, 15)));
+    }
+
+    @Test
+    public void containsDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).contains(DAY_OF_YEAR),
+            is(true));
+    }
+
+    @Test
+    public void getDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).get(DAY_OF_YEAR),
+            is(60));
+    }
+
+    @Test
+    public void getMinimumDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMinimum(DAY_OF_YEAR),
+            is(1));
+    }
+
+    @Test
+    public void getMaximumDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMaximum(DAY_OF_YEAR),
+            is(366));
+    }
+
+    @Test
+    public void isValidDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).isValid(DAY_OF_YEAR, 1),
+            is(true));
+    }
+
+    @Test
+    public void withDayOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).with(DAY_OF_YEAR, 1),
+            is(PlainTimestamp.of(2012, 1, 1, 8, 15)));
+    }
+
+    @Test
+    public void containsDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).contains(DAY_OF_QUARTER),
+            is(true));
+    }
+
+    @Test
+    public void getDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).get(DAY_OF_QUARTER),
+            is(60));
+    }
+
+    @Test
+    public void getMinimumDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMinimum(DAY_OF_QUARTER),
+            is(1));
+    }
+
+    @Test
+    public void getMaximumDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMaximum(DAY_OF_QUARTER),
+            is(91));
+    }
+
+    @Test
+    public void isValidDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).isValid(DAY_OF_QUARTER, 32),
+            is(true));
+    }
+
+    @Test
+    public void withDayOfQuarter() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).with(DAY_OF_QUARTER, 32),
+            is(PlainTimestamp.of(2012, 2, 1, 8, 15)));
+    }
+
+    @Test
+    public void containsQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).contains(QUARTER_OF_YEAR),
+            is(true));
+    }
+
+    @Test
+    public void getQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).get(QUARTER_OF_YEAR),
+            is(Quarter.Q1));
+    }
+
+    @Test
+    public void getMinimumQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMinimum(QUARTER_OF_YEAR),
+            is(Quarter.Q1));
+    }
+
+    @Test
+    public void getMaximumQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMaximum(QUARTER_OF_YEAR),
+            is(Quarter.Q4));
+    }
+
+    @Test
+    public void isValidQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15)
+                .isValid(QUARTER_OF_YEAR, Quarter.Q2),
+            is(true));
+    }
+
+    @Test
+    public void withQuarterOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15)
+                .with(QUARTER_OF_YEAR, Quarter.Q2),
+            is(PlainTimestamp.of(2012, 6, 30, 8, 15)));
+    }
+
+    @Test
+    public void containsMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).contains(MONTH_AS_NUMBER),
+            is(true));
+    }
+
+    @Test
+    public void getMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).get(MONTH_AS_NUMBER),
+            is(3));
+    }
+
+    @Test
+    public void getMinimumMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMinimum(MONTH_AS_NUMBER),
+            is(1));
+    }
+
+    @Test
+    public void getMaximumMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMaximum(MONTH_AS_NUMBER),
+            is(12));
+    }
+
+    @Test
+    public void isValidMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).isValid(MONTH_AS_NUMBER, 6),
+            is(true));
+    }
+
+    @Test
+    public void withMonthAsNumber() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).with(MONTH_AS_NUMBER, 6),
+            is(PlainTimestamp.of(2012, 6, 30, 8, 15)));
+    }
+
+    @Test
+    public void containsMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).contains(MONTH_OF_YEAR),
+            is(true));
+    }
+
+    @Test
+    public void getMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).get(MONTH_OF_YEAR),
+            is(Month.MARCH));
+    }
+
+    @Test
+    public void getMinimumMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMinimum(MONTH_OF_YEAR),
+            is(Month.JANUARY));
+    }
+
+    @Test
+    public void getMaximumMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15).getMaximum(MONTH_OF_YEAR),
+            is(Month.DECEMBER));
+    }
+
+    @Test
+    public void isValidMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15)
+                .isValid(MONTH_OF_YEAR, Month.JUNE),
+            is(true));
+    }
+
+    @Test
+    public void withMonthOfYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 3, 31, 8, 15)
+                .with(MONTH_OF_YEAR, Month.JUNE),
+            is(PlainTimestamp.of(2012, 6, 30, 8, 15)));
+    }
+
+    @Test
+    public void containsCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).contains(CALENDAR_DATE),
+            is(true));
+    }
+
+    @Test
+    public void getCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).get(CALENDAR_DATE),
+            is(PlainDate.of(2012, 2, 22)));
+    }
+
+    @Test
+    public void getMinimumCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).getMinimum(CALENDAR_DATE),
+            is(PlainDate.MIN));
+    }
+
+    @Test
+    public void getMaximumCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).getMaximum(CALENDAR_DATE),
+            is(PlainDate.MAX));
+    }
+
+    @Test
+    public void isValidCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15)
+                .isValid(CALENDAR_DATE, PlainDate.of(2014, 1)),
+            is(true));
+    }
+
+    @Test
+    public void withCalendarDate() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15)
+                .with(CALENDAR_DATE, PlainDate.of(2014, 1)),
+            is(PlainTimestamp.of(2014, 1, 1, 8, 15)));
+    }
+
+    @Test
+    public void containsWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).contains(WEEKDAY_IN_MONTH),
+            is(true));
+    }
+
+    @Test
+    public void getWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).get(WEEKDAY_IN_MONTH),
+            is(4));
+    }
+
+    @Test
+    public void getMinimumWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).getMinimum(WEEKDAY_IN_MONTH),
+            is(1));
+    }
+
+    @Test
+    public void getMaximumWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).getMinimum(WEEKDAY_IN_MONTH),
+            is(1));
+    }
+
+    @Test
+    public void isValidWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).isValid(WEEKDAY_IN_MONTH, 5),
+            is(true));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 23, 8, 15).isValid(WEEKDAY_IN_MONTH, 5),
+            is(false));
+    }
+
+    @Test
+    public void withWeekdayInMonth() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 22, 8, 15).with(WEEKDAY_IN_MONTH, 5),
+            is(PlainTimestamp.of(2012, 2, 29, 8, 15)));
+    }
+
+    @Test
+    public void containsYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).contains(YEAR),
+            is(true));
+    }
+
+    @Test
+    public void getYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).get(YEAR),
+            is(2012));
+    }
+
+    @Test
+    public void getMinimumYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMinimum(YEAR),
+            is(GregorianMath.MIN_YEAR));
+    }
+
+    @Test
+    public void getMaximumYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).getMaximum(YEAR),
+            is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void isValidYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).isValid(YEAR, 2013),
+            is(true));
+    }
+
+    @Test
+    public void withYear() {
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 8, 15).with(YEAR, 2013),
+            is(PlainTimestamp.of(2013, 2, 28, 8, 15)));
+    }
+
+    @Test
+    public void containsYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2014, 1, 1, 21, 10).contains(YEAR_OF_WEEKDATE),
+            is(true));
+    }
+
+    @Test
+    public void getYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2013, 12, 30, 8, 15).get(YEAR_OF_WEEKDATE),
+            is(2014));
+    }
+
+    @Test
+    public void getMinimumYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2014, 1, 1, 8, 15).getMinimum(YEAR_OF_WEEKDATE),
+            is(GregorianMath.MIN_YEAR));
+    }
+
+    @Test
+    public void getMaximumYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2014, 1, 1, 8, 15).getMaximum(YEAR_OF_WEEKDATE),
+            is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void isValidYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2014, 1, 1, 8, 15)
+                .isValid(YEAR_OF_WEEKDATE, 2013),
+            is(true));
+    }
+
+    @Test
+    public void withYearOfWeekdate() {
+        assertThat(
+            PlainTimestamp.of(2014, 1, 1, 8, 15).with(YEAR_OF_WEEKDATE, 2013),
+            is(PlainTimestamp.of(2013, 1, 2, 8, 15)));
     }
 
 }
