@@ -321,9 +321,9 @@ public final class PlainTime
     /**
      * <p>Element mit der ISO-8601-Stunde im Bereich {@code 0-24}. </p>
      *
-     * <p>Im Kontext von {@code PlainTime} ist das Maximum {@code 24} und
-     * steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das Maximum in jedem
-     * anderen Kontext {@code 23}. </p>
+     * <p>Im Kontext von {@code PlainTime} mit vollen Stunden ist das Maximum
+     * {@code 24} und steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das
+     * Maximum in jedem anderen Kontext {@code 23}. </p>
      *
      * @see     #getHour()
      */
@@ -354,9 +354,9 @@ public final class PlainTime
     /**
      * <p>Element mit der Minute des Tages im Bereich {@code 0-1440}. </p>
      *
-     * <p>Im Kontext von {@code PlainTime} ist das Maximum {@code 1440} und
-     * steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das Maximum in jedem
-     * anderen Kontext {@code 1439}. </p>
+     * <p>Im Kontext von {@code PlainTime} mit vollen Minuten ist das Maximum
+     * {@code 1440} und steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das
+     * Maximum in jedem anderen Kontext {@code 1439}. </p>
      */
     public static final
     ProportionalElement<Integer, PlainTime> MINUTE_OF_DAY =
@@ -391,9 +391,9 @@ public final class PlainTime
      * <p>Element mit der Sekunde des Tages im Bereich
      * {@code 0-86400}. </p>
      *
-     * <p>Im Kontext von {@code PlainTime} entspricht das Maximum {@code 86400}
-     * der Uhrzeit T24:00, in jedem anderen Kontext gilt {@code 86399}.
-     * UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
+     * <p>Im Kontext von {@code PlainTime} mit vollen Sekunden entspricht das
+     * Maximum {@code 86400} der Uhrzeit T24:00, in jedem anderen Kontext gilt
+     * {@code 86399}. UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
     ProportionalElement<Integer, PlainTime> SECOND_OF_DAY =
@@ -445,10 +445,10 @@ public final class PlainTime
      * <p>Element mit der Tageszeit in Millisekunden im
      * Bereich {@code 0-86400000}. </p>
      *
-     * <p>Im Kontext von {@code PlainTime} ist das Maximum {@code 86400000}
-     * (entsprechend der Uhrzeit T24:00), in jedem anderen Kontext ist das
-     * Maximum der Wert {@code 86399999}. UTC-Schaltsekunden werden nicht
-     * mitgez&auml;hlt. </p>
+     * <p>Im Kontext von {@code PlainTime} mit vollen Millisekunden ist das
+     * Maximum {@code 86400000} (entsprechend der Uhrzeit T24:00), in jedem
+     * anderen Kontext ist das Maximum der Wert {@code 86399999}.
+     * UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     @FormattableElement(format = "A")
     public static final
@@ -464,10 +464,10 @@ public final class PlainTime
      * <p>Element mit der Tageszeit in Mikrosekunden im
      * Bereich {@code 0-86400000000}. </p>
      *
-     * <p>Im Kontext von {@code PlainTime} ist das Maximum {@code 86400000000}
-     * (entsprechend der Uhrzeit T24:00), in jedem anderen Kontext ist das
-     * Maximum der Wert {@code 86399999999}. UTC-Schaltsekunden werden nicht
-     * mitgez&auml;hlt. </p>
+     * <p>Im Kontext von {@code PlainTime} mit vollen Mikrosekunden ist das
+     * Maximum {@code 86400000000} (entsprechend der Uhrzeit T24:00), in jedem
+     * anderen Kontext ist das Maximum der Wert {@code 86399999999}.
+     * UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
     ProportionalElement<Long, PlainTime> MICRO_OF_DAY =

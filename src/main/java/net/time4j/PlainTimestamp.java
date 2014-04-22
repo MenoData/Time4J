@@ -374,7 +374,7 @@ public final class PlainTimestamp
     ) {
 
         return PlainTimestamp.of(
-            PlainDate.of(year, Month.valueOf(month), dayOfMonth),
+            PlainDate.of(year, month, dayOfMonth),
             PlainTime.of(hour, minute, second)
         );
 
@@ -967,6 +967,9 @@ public final class PlainTimestamp
                 return context.date.isValid(this.element, value);
             } else if (this.element.isTimeElement()) {
                 if (Number.class.isAssignableFrom(this.element.getType())) {
+                    if (value == null) {
+                        return false;
+                    }
                     long min = this.toNumber(this.element.getDefaultMinimum());
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
@@ -1002,6 +1005,12 @@ public final class PlainTimestamp
                         throw new IllegalArgumentException(
                             "Out of range: " + value);
                     }
+                } else if (
+                    this.element.equals(WALL_TIME)
+                    && value.equals(PlainTime.MAX)
+                ) {
+                    throw new IllegalArgumentException(
+                        "Out of range: " + value);
                 }
 
                 PlainTime time = context.time.with(this.element, value);
@@ -1101,7 +1110,7 @@ public final class PlainTimestamp
 
             if (this.calendarUnit != null) {
                 delta = this.calendarUnit.between(start.date, end.date);
-                
+
                 if (delta != 0) {
                     PlainTime t1 = start.time;
                     PlainTime t2 = end.time;
