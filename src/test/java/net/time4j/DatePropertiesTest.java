@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class MiscDatePropertiesTest {
+public class DatePropertiesTest {
 
     @Test
     public void lengthOfYear() {
@@ -92,6 +92,12 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
+    public void containsCalendarDate() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(CALENDAR_DATE), is(true));
+    }
+
+    @Test
     public void getCalendarDate() {
         PlainDate any = PlainDate.of(2000, 1);
         assertThat(
@@ -139,7 +145,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withCalendarDate1() {
+    public void withCalendarDate() {
         PlainDate any = PlainDate.of(2000, 1);
         PlainDate value = PlainDate.of(2014, 4, 5);
         assertThat(
@@ -148,8 +154,14 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withCalendarDate2() {
+    public void withCalendarDateNull() {
         PlainDate.of(2000, 1).with(CALENDAR_DATE, null);
+    }
+
+    @Test
+    public void containsYear() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(YEAR), is(true));
     }
 
     @Test
@@ -199,7 +211,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withYear1() {
+    public void withYear() {
         PlainDate date = PlainDate.of(2000, 2, 29);
         assertThat(
             date.with(YEAR, 2014),
@@ -207,7 +219,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withYear2() {
+    public void withYearMax() {
         PlainDate date = PlainDate.of(2000, 2, 29);
         assertThat(
             date.with(YEAR, 999999999),
@@ -215,7 +227,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withYear3() {
+    public void withYearMin() {
         PlainDate date = PlainDate.of(2000, 2, 29);
         assertThat(
             date.with(YEAR, -999999999),
@@ -223,18 +235,24 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withYear4() {
+    public void withYearNull() {
         PlainDate.of(2000, 1).with(YEAR, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withYear5() {
+    public void withYear1000000000() {
         PlainDate.of(2000, 1).with(YEAR, -1000000000);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withYear6() {
+    public void withYear_1000000000() {
         PlainDate.of(2000, 1).with(YEAR, 1000000000);
+    }
+
+    @Test
+    public void containsYearOfWeekdate() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(YEAR_OF_WEEKDATE), is(true));
     }
 
     @Test
@@ -314,13 +332,19 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withYearOfWeekdate3() {
+    public void withYearOfWeekdateNull() {
         PlainDate.of(2000, 1).with(YEAR_OF_WEEKDATE, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withYearOfWeekdate4() {
+    public void withYearOfWeekdate1234567890() {
         PlainDate.of(2000, 1).with(YEAR_OF_WEEKDATE, 1234567890);
+    }
+
+    @Test
+    public void containsQuarterOfYear() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(QUARTER_OF_YEAR), is(true));
     }
 
     @Test
@@ -372,15 +396,21 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withQuarterOfYear1() {
+    public void withQuarterOfYear() {
         assertThat(
             PlainDate.of(2014, 3, 31).with(QUARTER_OF_YEAR, Quarter.Q4),
             is(PlainDate.of(2014, 12, 31)));
     }
 
     @Test(expected=NullPointerException.class)
-    public void withQuarterOfYear2() {
+    public void withQuarterOfYearNull() {
         PlainDate.of(2000, 1).with(QUARTER_OF_YEAR, null);
+    }
+
+    @Test
+    public void containsMonthOfYear() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(MONTH_OF_YEAR), is(true));
     }
 
     @Test
@@ -423,7 +453,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withMonthOfYear1() {
+    public void withMonthOfYear() {
         assertThat(
             PlainDate.of(2014, 3, 31).with(MONTH_OF_YEAR, Month.APRIL),
             is(PlainDate.of(2014, 4, 30)));
@@ -433,8 +463,14 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withMonthOfYear2() {
+    public void withMonthOfYearNull() {
         PlainDate.of(2000, 1).with(MONTH_OF_YEAR, null);
+    }
+
+    @Test
+    public void containsMonthAsNumber() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(MONTH_AS_NUMBER), is(true));
     }
 
     @Test
@@ -486,25 +522,31 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withMonthAsNumber1() {
+    public void withMonthAsNumber() {
         assertThat(
             PlainDate.of(2014, 3, 31).with(MONTH_AS_NUMBER, 11),
             is(PlainDate.of(2014, 11, 30)));
     }
 
     @Test(expected=NullPointerException.class)
-    public void withMonthAsNumber2() {
+    public void withMonthAsNumberNull() {
         PlainDate.of(2000, 1).with(MONTH_AS_NUMBER, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withMonthAsNumber3() {
+    public void withMonthAsNumber0() {
         PlainDate.of(2000, 1).with(MONTH_AS_NUMBER, 0);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withMonthAsNumber4() {
+    public void withMonthAsNumber13() {
         PlainDate.of(2000, 1).with(MONTH_AS_NUMBER, 13);
+    }
+
+    @Test
+    public void containsWeekdayInMonth() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(WEEKDAY_IN_MONTH), is(true));
     }
 
     @Test
@@ -559,20 +601,26 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withWeekdayInMonth1() {
+    public void withWeekdayInMonth() {
         assertThat(
             PlainDate.of(2012, 2, 28).with(WEEKDAY_IN_MONTH, 1),
             is(PlainDate.of(2012, 2, 7)));
     }
 
     @Test(expected=NullPointerException.class)
-    public void withWeekdayInMonth2() {
+    public void withWeekdayInMonthNull() {
         PlainDate.of(2012, 2, 28).with(WEEKDAY_IN_MONTH, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withWeekdayInMonth3() {
+    public void withWeekdayInMonth5Feb() {
         PlainDate.of(2012, 2, 28).with(WEEKDAY_IN_MONTH, 5);
+    }
+
+    @Test
+    public void containsDayOfMonth() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(DAY_OF_MONTH), is(true));
     }
 
     @Test
@@ -654,7 +702,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withDayOfMonth1() {
+    public void withDayOfMonth() {
         assertThat(
             PlainDate.of(2012, 2, 28).with(DAY_OF_MONTH, 29),
             is(PlainDate.of(2012, 2, 29)));
@@ -664,18 +712,24 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withDayOfMonth2() {
+    public void withDayOfMonthNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_MONTH, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfMonth3() {
+    public void withDayOfMonth0() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_MONTH, 0);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfMonth4() {
+    public void withDayOfMonth30Feb() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_MONTH, 30);
+    }
+
+    @Test
+    public void containsDayOfYear() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(DAY_OF_YEAR), is(true));
     }
 
     @Test
@@ -727,7 +781,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withDayOfYear1() {
+    public void withDayOfYear() {
         assertThat(
             PlainDate.of(2012, 2, 28).with(DAY_OF_YEAR, 366),
             is(PlainDate.of(2012, 12, 31)));
@@ -737,18 +791,24 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withDayOfYear2() {
+    public void withDayOfYearNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_YEAR, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfYear3() {
+    public void withDayOfYear0() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_YEAR, 0);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfYear4() {
+    public void withDayOfYear367() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_YEAR, 367);
+    }
+
+    @Test
+    public void containsDayOfWeek() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(DAY_OF_WEEK), is(true));
     }
 
     @Test
@@ -791,7 +851,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withDayOfWeek1() {
+    public void withDayOfWeek() {
         assertThat(
             PlainDate.of(2012, 2, 29).with(DAY_OF_WEEK, Weekday.MONDAY),
             is(PlainDate.of(2012, 2, 27)));
@@ -816,7 +876,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withDayOfWeek2() {
+    public void withDayOfWeekAtYearBorder() {
         assertThat(
             PlainDate.of(2014, 1, 1).with(DAY_OF_WEEK, Weekday.MONDAY),
             is(PlainDate.of(2013, 12, 30)));
@@ -826,8 +886,14 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withDayOfWeek3() {
+    public void withDayOfWeekNull() {
         PlainDate.of(2000, 1).with(DAY_OF_WEEK, null);
+    }
+
+    @Test
+    public void containsDayOfQuarter() {
+        PlainDate any = PlainDate.of(2000, 1);
+        assertThat(any.contains(DAY_OF_QUARTER), is(true));
     }
 
     @Test
@@ -903,7 +969,7 @@ public class MiscDatePropertiesTest {
     }
 
     @Test
-    public void withDayOfQuarter1() {
+    public void withDayOfQuarter() {
         assertThat(
             PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, 91),
             is(PlainDate.of(2012, 3, 31)));
@@ -916,17 +982,17 @@ public class MiscDatePropertiesTest {
     }
 
     @Test(expected=NullPointerException.class)
-    public void withDayOfQuarter2() {
+    public void withDayOfQuarterNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfQuarter3() {
+    public void withDayOfQuarter92Q1() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, 92);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withDayOfQuarter4() {
+    public void withDayOfQuarter0() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, 0);
     }
 

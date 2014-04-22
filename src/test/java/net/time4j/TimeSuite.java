@@ -10,12 +10,15 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         HourArithmeticTest.class,
         MeridiemValueTest.class,
-        MiscTimePropertiesTest.class,
+        TimePropertiesTest.class,
         TimeArithmeticTest.class,
         TimeComparisonTest.class,
         TimeCreationTest.class,
         TimeElementTest.class,
-        TimestampArithmeticTest.class
+        TimestampArithmeticTest.class,
+        TimestampComparisonTest.class,
+        TimestampCreationTest.class,
+        TimestampPropertiesTest.class
     }
 )
 public class TimeSuite {

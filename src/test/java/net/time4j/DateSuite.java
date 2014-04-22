@@ -18,7 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LeapYearRangeArithmeticTest.class,
         LeapYearTest.class,
         LengthOfMonthTest.class,
-        MiscDatePropertiesTest.class,
+        DatePropertiesTest.class,
         MonthRangeArithmeticTest.class,
         MonthValueTest.class,
         QuarterValueTest.class,

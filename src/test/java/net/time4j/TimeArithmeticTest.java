@@ -50,9 +50,22 @@ public class TimeArithmeticTest {
     }
 
     @Test
+    public void rollStartingMidnightBy48HoursForward() {
+        DayCycles cycles = PlainTime.midnightAtStartOfDay().roll(48, HOURS);
+        assertThat(
+            cycles.getDayOverflow(),
+            is(2L)); // a) T0->T24 => Overflow=+1, b) T24+24hours => Overflow=+1
+        assertThat(
+            cycles.getWallTime(),
+            is(PlainTime.of(24)));
+    }
+
+    @Test
     public void rollEndingMidnightBy48HoursForward() {
         DayCycles cycles = PlainTime.midnightAtEndOfDay().roll(48, HOURS);
-        assertThat(cycles.getDayOverflow(), is(2L));
+        assertThat(
+            cycles.getDayOverflow(),
+            is(2L));
         assertThat(
             cycles.getWallTime(),
             is(PlainTime.of(24)));

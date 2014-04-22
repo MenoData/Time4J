@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class MiscTimePropertiesTest {
+public class TimePropertiesTest {
 
     @Test
     public void midnightAtStartOfDay() {
@@ -83,6 +83,12 @@ public class MiscTimePropertiesTest {
     }
 
     @Test
+    public void containsWallTime() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(WALL_TIME), is(true));
+    }
+
+    @Test
     public void getWallTime() {
         PlainTime any = PlainTime.of(10, 1);
         assertThat(
@@ -140,6 +146,12 @@ public class MiscTimePropertiesTest {
     @Test(expected=NullPointerException.class)
     public void withWallTimeNull() {
         PlainTime.of(18, 44).with(WALL_TIME, null);
+    }
+
+    @Test
+    public void containsPrecision() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(PRECISION), is(true));
     }
 
     @Test
@@ -250,6 +262,12 @@ public class MiscTimePropertiesTest {
     }
 
     @Test
+    public void containsAmPm() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(AM_PM_OF_DAY), is(true));
+    }
+
+    @Test
     public void getAmPm() {
         assertThat(
             PlainTime.of(10, 1).get(AM_PM_OF_DAY),
@@ -319,6 +337,12 @@ public class MiscTimePropertiesTest {
     @Test(expected=NullPointerException.class)
     public void withAmPmNull() {
         PlainTime.of(18, 44).with(AM_PM_OF_DAY, null);
+    }
+
+    @Test
+    public void containsDigitalHourOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(DIGITAL_HOUR_OF_DAY), is(true));
     }
 
     @Test
@@ -406,6 +430,12 @@ public class MiscTimePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfDay24() {
         PlainTime.of(18).with(DIGITAL_HOUR_OF_DAY, 24);
+    }
+
+    @Test
+    public void containsDigitalHourOfAmPm() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(DIGITAL_HOUR_OF_AMPM), is(true));
     }
 
     @Test
@@ -502,6 +532,12 @@ public class MiscTimePropertiesTest {
     }
 
     @Test
+    public void containsClockHourOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(CLOCK_HOUR_OF_DAY), is(true));
+    }
+
+    @Test
     public void getClockHourOfDay() {
         assertThat(
             PlainTime.of(10, 1).get(CLOCK_HOUR_OF_DAY),
@@ -589,6 +625,12 @@ public class MiscTimePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfDay0() {
         PlainTime.of(18).with(CLOCK_HOUR_OF_DAY, 0);
+    }
+
+    @Test
+    public void containsClockHourOfAmPm() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(CLOCK_HOUR_OF_AMPM), is(true));
     }
 
     @Test
@@ -685,6 +727,12 @@ public class MiscTimePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfAmPm0() {
         PlainTime.of(18).with(CLOCK_HOUR_OF_AMPM, 0);
+    }
+
+    @Test
+    public void containsIsoHour() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(ISO_HOUR), is(true));
     }
 
     @Test
@@ -800,7 +848,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(18).with(ISO_HOUR, 25);
     }
 
-   @Test
+    @Test
+    public void containsMinuteOfHour() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MINUTE_OF_HOUR), is(true));
+    }
+
+    @Test
     public void getMinuteOfHour() {
         assertThat(
             PlainTime.of(10, 1).get(MINUTE_OF_HOUR),
@@ -889,7 +943,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(24).with(MINUTE_OF_HOUR, 1);
     }
 
-   @Test
+    @Test
+    public void containsSecondOfMinute() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(SECOND_OF_MINUTE), is(true));
+    }
+
+    @Test
     public void getSecondOfMinute() {
         assertThat(
             PlainTime.of(10, 12, 30).get(SECOND_OF_MINUTE),
@@ -978,7 +1038,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(24).with(SECOND_OF_MINUTE, 1);
     }
 
-   @Test
+    @Test
+    public void containsMinuteOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MINUTE_OF_DAY), is(true));
+    }
+
+    @Test
     public void getMinuteOfDay() {
         assertThat(
             PlainTime.of(10, 1).get(MINUTE_OF_DAY),
@@ -1077,7 +1143,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(18, 44, 1).with(MINUTE_OF_DAY, 1440);
     }
 
-   @Test
+    @Test
+    public void containsSecondOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(SECOND_OF_DAY), is(true));
+    }
+
+    @Test
     public void getSecondOfDay() {
         assertThat(
             PlainTime.of(10, 12, 30).get(SECOND_OF_DAY),
@@ -1167,7 +1239,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(23, 45, 0, 1).with(SECOND_OF_DAY, 86400);
     }
 
-   @Test
+    @Test
+    public void containsMilliOfSecond() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MILLI_OF_SECOND), is(true));
+    }
+
+    @Test
     public void getMilliOfSecond() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(MILLI_OF_SECOND),
@@ -1259,7 +1337,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(24).with(MILLI_OF_SECOND, 1);
     }
 
-   @Test
+    @Test
+    public void containsMilliOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MILLI_OF_DAY), is(true));
+    }
+
+    @Test
     public void getMilliOfDay() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(MILLI_OF_DAY),
@@ -1353,7 +1437,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(23, 45, 0, 123000001).with(MILLI_OF_DAY, 86400 * 1000);
     }
 
-   @Test
+    @Test
+    public void containsMicroOfSecond() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MICRO_OF_SECOND), is(true));
+    }
+
+    @Test
     public void getMicroOfSecond() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(MICRO_OF_SECOND),
@@ -1445,7 +1535,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(24).with(MICRO_OF_SECOND, 1);
     }
 
-   @Test
+    @Test
+    public void containsMicroOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(MICRO_OF_DAY), is(true));
+    }
+
+    @Test
     public void getMicroOfDay() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(MICRO_OF_DAY),
@@ -1541,7 +1637,13 @@ public class MiscTimePropertiesTest {
             86400 * 1000000L);
     }
 
-   @Test
+    @Test
+    public void containsNanoOfSecond() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(NANO_OF_SECOND), is(true));
+    }
+
+    @Test
     public void getNanoOfSecond() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(NANO_OF_SECOND),
@@ -1633,7 +1735,13 @@ public class MiscTimePropertiesTest {
         PlainTime.of(24).with(NANO_OF_SECOND, 1);
     }
 
-   @Test
+    @Test
+    public void containsNanoOfDay() {
+        PlainTime any = PlainTime.of(9, 15);
+        assertThat(any.contains(NANO_OF_DAY), is(true));
+    }
+
+    @Test
     public void getNanoOfDay() {
         assertThat(
             PlainTime.of(10, 12, 30, 123456789).get(NANO_OF_DAY),
