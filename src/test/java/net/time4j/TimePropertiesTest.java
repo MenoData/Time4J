@@ -2264,6 +2264,10 @@ public class TimePropertiesTest {
             PlainTime.midnightAtStartOfDay()
                 .isValid(DECIMAL_HOUR, BigDecimal.valueOf(12.5)),
             is(true));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, new BigDecimal("24.1")),
+            is(false));
     }
 
     @Test
@@ -2310,7 +2314,12 @@ public class TimePropertiesTest {
             is(PlainTime.midnightAtEndOfDay()));
     }
 
-    @Test
+    @Test(expected=IllegalArgumentException.class)
+    public void withDecimalHour25() {
+        PlainTime.of(4).with(DECIMAL_HOUR, new BigDecimal("25"));
+    }
+
+   @Test
     public void containsDecimalMinute() {
         PlainTime any = PlainTime.of(12, 26, 52, 987654321);
         assertThat(any.contains(DECIMAL_MINUTE), is(true));
@@ -2358,6 +2367,10 @@ public class TimePropertiesTest {
             PlainTime.midnightAtEndOfDay()
                 .isValid(DECIMAL_MINUTE, BigDecimal.ONE),
             is(false));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_MINUTE, new BigDecimal("60")),
+            is(false));
     }
 
     @Test
@@ -2375,6 +2388,11 @@ public class TimePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withDecimalMinuteIfT24() {
         PlainTime.midnightAtEndOfDay().with(DECIMAL_MINUTE, BigDecimal.ONE);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDecimalMinute60() {
+        PlainTime.of(4, 15).with(DECIMAL_MINUTE, new BigDecimal("60"));
     }
 
     @Test
@@ -2431,6 +2449,10 @@ public class TimePropertiesTest {
             PlainTime.midnightAtEndOfDay()
                 .isValid(DECIMAL_SECOND, BigDecimal.ONE),
             is(false));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_SECOND, new BigDecimal("60")),
+            is(false));
     }
 
     @Test
@@ -2452,6 +2474,11 @@ public class TimePropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withDecimalSecondIfT24() {
         PlainTime.midnightAtEndOfDay().with(DECIMAL_SECOND, BigDecimal.ONE);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDecimalSecond60() {
+        PlainTime.of(4).with(DECIMAL_SECOND, new BigDecimal("60"));
     }
 
 }

@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        DecimalElementTest.class,
         HourArithmeticTest.class,
         MeridiemValueTest.class,
         TimeArithmeticTest.class,
