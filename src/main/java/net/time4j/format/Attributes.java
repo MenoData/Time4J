@@ -273,6 +273,8 @@ public final class Attributes
             new ConcurrentHashMap<Locale, NumericalSymbols>();
     private static final NumericalSymbols DEFAULT_NUMBER_SYMBOLS =
         new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
+    private static final AttributeQuery EMPTY =
+        new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -294,6 +296,17 @@ public final class Attributes
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Repr&auml;sentiert eine leere Menge von Formatattributen. </p>
+     *
+     * @return  empty attribute query
+     */
+    public static AttributeQuery empty() {
+
+        return EMPTY;
+
+    }
 
     @Override
     public boolean contains(AttributeKey<?> key) {

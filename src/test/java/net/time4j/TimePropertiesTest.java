@@ -2319,7 +2319,7 @@ public class TimePropertiesTest {
         PlainTime.of(4).with(DECIMAL_HOUR, new BigDecimal("25"));
     }
 
-   @Test
+    @Test
     public void containsDecimalMinute() {
         PlainTime any = PlainTime.of(12, 26, 52, 987654321);
         assertThat(any.contains(DECIMAL_MINUTE), is(true));

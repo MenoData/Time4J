@@ -4,6 +4,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
+import net.time4j.format.Attributes;
 
 import java.math.BigDecimal;
 import org.junit.Test;
@@ -66,7 +67,7 @@ public class DecimalElementTest {
         PlainTime result =
             Chronology.lookup(PlainTime.class).createFrom(
             vs,
-            null
+            Attributes.empty()
         );
         assertThat(result, is(PlainTime.of(10, 2, 45, 0)));
     }
