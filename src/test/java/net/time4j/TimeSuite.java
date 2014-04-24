@@ -10,11 +10,11 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         HourArithmeticTest.class,
         MeridiemValueTest.class,
-        TimePropertiesTest.class,
         TimeArithmeticTest.class,
         TimeComparisonTest.class,
         TimeCreationTest.class,
         TimeElementTest.class,
+        TimePropertiesTest.class,
         TimestampArithmeticTest.class,
         TimestampComparisonTest.class,
         TimestampCreationTest.class,

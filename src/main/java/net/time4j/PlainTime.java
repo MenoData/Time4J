@@ -129,7 +129,7 @@ public final class PlainTime
     private static final BigDecimal DECIMAL_MRD = new BigDecimal(MRD);
 
     private static final BigDecimal DECIMAL_24_0 =
-        new BigDecimal("24.000000000000000");
+        new BigDecimal("24");
     private static final BigDecimal DECIMAL_59_9 =
         new BigDecimal("59.999999999999999");
 

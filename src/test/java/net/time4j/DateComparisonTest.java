@@ -1,5 +1,7 @@
 package net.time4j;
 
+import net.time4j.base.GregorianDate;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -10,6 +12,58 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class DateComparisonTest {
+
+    @Test
+    public void equalsMethod() {
+        PlainDate d1 = PlainDate.of(1, 1);
+        Object d2 = PlainDate.of(1, 1, 1);
+        Object d3 = null;
+        Object d4 = PlainDate.of(2014, 1, 1);
+        Object d5 =
+            new GregorianDate() {
+                @Override
+                public int getYear() {
+                    return 1;
+                }
+                @Override
+                public int getMonth() {
+                    return 1;
+                }
+                @Override
+                public int getDayOfMonth() {
+                    return 1;
+                }
+            };
+        assertThat(d1.equals(d2), is(true));
+        assertThat(d1.equals(d3), is(false));
+        assertThat(d1.equals(d4), is(false));
+        assertThat(d1.equals(d5), is(false));
+    }
+
+    @Test
+    public void hashCodeMethod() {
+        PlainDate d1 = PlainDate.of(1, 1);
+        Object d2 = PlainDate.of(1, 1, 1);
+        Object d3 = PlainDate.of(2014, 1, 1);
+        Object d4 =
+            new GregorianDate() {
+                @Override
+                public int getYear() {
+                    return 1;
+                }
+                @Override
+                public int getMonth() {
+                    return 1;
+                }
+                @Override
+                public int getDayOfMonth() {
+                    return 1;
+                }
+            };
+        assertThat(d1.hashCode() == d2.hashCode(), is(true));
+        assertThat(d1.hashCode() == d3.hashCode(), is(false));
+        assertThat(d1.hashCode() == d4.hashCode(), is(false));
+    }
 
     @Test
     public void isBefore() {

@@ -12,6 +12,32 @@ import static org.junit.Assert.assertThat;
 public class TimestampComparisonTest {
 
     @Test
+    public void equalsMethod() {
+        PlainTimestamp d1 = PlainTimestamp.of(2014, 1, 1, 19, 45, 30);
+        Object d2 =
+            PlainTimestamp.of(
+                PlainDate.of(2014, 1, 1),
+                PlainTime.of(19, 45, 30));
+        Object d3 = PlainTimestamp.of(2014, 1, 2, 19, 45, 31);
+        Object d4 = null;
+        assertThat(d1.equals(d2), is(true));
+        assertThat(d1.equals(d3), is(false));
+        assertThat(d1.equals(d4), is(false));
+    }
+
+    @Test
+    public void hashCodeMethod() {
+        PlainTimestamp d1 = PlainTimestamp.of(2014, 1, 1, 19, 45, 30);
+        Object d2 =
+            PlainTimestamp.of(
+                PlainDate.of(2014, 1, 1),
+                PlainTime.of(19, 45, 30));
+        Object d3 = PlainTimestamp.of(2014, 1, 2, 19, 45, 31);
+        assertThat(d1.hashCode() == d2.hashCode(), is(true));
+        assertThat(d1.hashCode() == d3.hashCode(), is(false));
+    }
+
+    @Test
     public void isBefore() {
         assertThat(
             PlainTimestamp.of(2012, 2, 29, 23, 59, 59)

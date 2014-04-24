@@ -3,6 +3,7 @@ package net.time4j;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 
+import java.math.BigDecimal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -2207,6 +2208,250 @@ public class TimePropertiesTest {
     @Test(expected=ChronoException.class)
     public void withYearOfWeekdate() {
         PlainTime.of(21, 10, 45).with(YEAR_OF_WEEKDATE, 2012);
+    }
+
+    @Test
+    public void containsDecimalHour() {
+        PlainTime any = PlainTime.of(12, 26, 52, 987654321);
+        assertThat(any.contains(DECIMAL_HOUR), is(true));
+    }
+
+    @Test
+    public void getDecimalHour() {
+        assertThat(
+            PlainTime.of(12, 26, 52, 987654321).get(DECIMAL_HOUR),
+            is(new BigDecimal("12.448052126200277")));
+        assertThat(
+            PlainTime.of(12, 30).get(DECIMAL_HOUR),
+            is(new BigDecimal("12.5")));
+    }
+
+    @Test
+    public void getDecimalHourT00() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay().get(DECIMAL_HOUR),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void getDecimalHourT24() {
+        assertThat(
+            PlainTime.midnightAtEndOfDay().get(DECIMAL_HOUR),
+            is(new BigDecimal("24")));
+    }
+
+    @Test
+    public void getMinimumDecimalHour() {
+        assertThat(
+            PlainTime.of(21, 45).getMinimum(DECIMAL_HOUR),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void getMaximumDecimalHour() {
+        assertThat(
+            PlainTime.of(21, 45).getMaximum(DECIMAL_HOUR),
+            is(new BigDecimal("24")));
+    }
+
+    @Test
+    public void isValidDecimalHour() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, new BigDecimal("12.448052126200277")),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, BigDecimal.valueOf(12.5)),
+            is(true));
+    }
+
+    @Test
+    public void isValidDecimalHourT24() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, new BigDecimal(24.0)),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, new BigDecimal("24")),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_HOUR, new BigDecimal("24.000")),
+            is(true));
+    }
+
+    @Test
+    public void withDecimalHour() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .with(DECIMAL_HOUR, new BigDecimal("12.448052126200277")),
+            is(PlainTime.of(12, 26, 52, 987654321)));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .with(DECIMAL_HOUR, BigDecimal.valueOf(12.5)),
+            is(PlainTime.of(12, 30)));
+    }
+
+    @Test
+    public void withDecimalHourT24() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .with(DECIMAL_HOUR, new BigDecimal(24.0)),
+            is(PlainTime.midnightAtEndOfDay()));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .with(DECIMAL_HOUR, new BigDecimal("24")),
+            is(PlainTime.midnightAtEndOfDay()));
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .with(DECIMAL_HOUR, new BigDecimal("24.000")),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void containsDecimalMinute() {
+        PlainTime any = PlainTime.of(12, 26, 52, 987654321);
+        assertThat(any.contains(DECIMAL_MINUTE), is(true));
+    }
+
+    @Test
+    public void getDecimalMinute() {
+        assertThat(
+            PlainTime.of(12, 26, 52, 987654321).get(DECIMAL_MINUTE),
+            is(new BigDecimal("26.883127572016666")));
+    }
+
+    @Test
+    public void getMinimumDecimalMinute() {
+        assertThat(
+            PlainTime.of(21, 45).getMinimum(DECIMAL_MINUTE),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void getMaximumDecimalMinute() {
+        assertThat(
+            PlainTime.of(21, 45).getMaximum(DECIMAL_MINUTE),
+            is(new BigDecimal("59.999999999999999")));
+    }
+
+    @Test
+    public void getMaximumDecimalMinuteT24() {
+        assertThat(
+            PlainTime.midnightAtEndOfDay().getMaximum(DECIMAL_MINUTE),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void isValidDecimalMinute() {
+        assertThat(
+            PlainTime.midnightAtStartOfDay()
+                .isValid(DECIMAL_MINUTE, new BigDecimal("26.883127572016666")),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .isValid(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .isValid(DECIMAL_MINUTE, BigDecimal.ONE),
+            is(false));
+    }
+
+    @Test
+    public void withDecimalMinute() {
+        assertThat(
+            PlainTime.of(12)
+                .with(DECIMAL_MINUTE, new BigDecimal("26.883127572016666")),
+            is(PlainTime.of(12, 26, 52, 987654321)));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .with(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(PlainTime.of(24)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDecimalMinuteIfT24() {
+        PlainTime.midnightAtEndOfDay().with(DECIMAL_MINUTE, BigDecimal.ONE);
+    }
+
+    @Test
+    public void containsDecimalSecond() {
+        PlainTime any = PlainTime.of(12, 26, 52, 987654321);
+        assertThat(any.contains(DECIMAL_SECOND), is(true));
+    }
+
+    @Test
+    public void getDecimalSecond() {
+        assertThat(
+            PlainTime.of(12, 26, 52, 987654321).get(DECIMAL_SECOND),
+            is(new BigDecimal("52.987654321")));
+        assertThat(
+            PlainTime.MAX.minus(1, ClockUnit.NANOS).get(DECIMAL_SECOND),
+            is(new BigDecimal("59.999999999")));
+        assertThat(
+            PlainTime.midnightAtEndOfDay().get(DECIMAL_SECOND),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void getMinimumDecimalSecond() {
+        assertThat(
+            PlainTime.of(21, 45).getMinimum(DECIMAL_SECOND),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void getMaximumDecimalSecond() {
+        assertThat(
+            PlainTime.of(21, 45).getMaximum(DECIMAL_SECOND),
+            is(new BigDecimal("59.999999999999999")));
+    }
+
+    @Test
+    public void getMaximumDecimalSecondT24() {
+        assertThat(
+            PlainTime.midnightAtEndOfDay().getMaximum(DECIMAL_SECOND),
+            is(BigDecimal.ZERO));
+    }
+
+    @Test
+    public void isValidDecimalSecond() {
+        assertThat(
+            PlainTime.of(12, 26, 52, 987654321)
+                .isValid(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .isValid(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(true));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .isValid(DECIMAL_SECOND, BigDecimal.ONE),
+            is(false));
+    }
+
+    @Test
+    public void withDecimalSecond() {
+        assertThat(
+            PlainTime.of(12, 26)
+                .with(DECIMAL_SECOND, new BigDecimal("52.987654321000000")),
+            is(PlainTime.of(12, 26, 52, 987654321)));
+        assertThat(
+            PlainTime.of(12, 26)
+                .with(DECIMAL_SECOND, new BigDecimal("59.999999999")),
+            is(PlainTime.of(12, 26, 59, 999999999)));
+        assertThat(
+            PlainTime.midnightAtEndOfDay()
+                .with(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(PlainTime.of(24)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withDecimalSecondIfT24() {
+        PlainTime.midnightAtEndOfDay().with(DECIMAL_SECOND, BigDecimal.ONE);
     }
 
 }

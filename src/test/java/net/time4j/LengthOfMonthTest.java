@@ -46,8 +46,6 @@ public class LengthOfMonthTest {
             assertThat(
                 PlainDate.of(2012, this.month, 1).lengthOfMonth(),
                 is(29));
-            System.out.println("Test results based on year 2014.");
-            System.out.println("2012-FEBRUARY => 29");
         }
     }
 

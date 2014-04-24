@@ -1,5 +1,7 @@
 package net.time4j;
 
+import net.time4j.base.WallTime;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -10,6 +12,58 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class TimeComparisonTest {
+
+    @Test
+    public void equalsMethod() {
+        PlainTime d1 = PlainTime.of(19, 45, 30);
+        Object d2 = PlainTime.of(19, 45, 30, 0);
+        Object d3 = PlainTime.of(19, 45, 30, 1);
+        Object d4 = null;
+        Object d5 =
+            new WallTime() {
+                @Override
+                public int getHour() {
+                    return 19;
+                }
+                @Override
+                public int getMinute() {
+                    return 45;
+                }
+                @Override
+                public int getSecond() {
+                    return 30;
+                }
+            };
+        assertThat(d1.equals(d2), is(true));
+        assertThat(d1.equals(d3), is(false));
+        assertThat(d1.equals(d4), is(false));
+        assertThat(d1.equals(d5), is(false));
+    }
+
+    @Test
+    public void hashCodeMethod() {
+        PlainTime d1 = PlainTime.of(19, 45, 30);
+        Object d2 = PlainTime.of(19, 45, 30, 0);
+        Object d3 = PlainTime.of(19, 45, 30, 1);
+        Object d4 =
+            new WallTime() {
+                @Override
+                public int getHour() {
+                    return 19;
+                }
+                @Override
+                public int getMinute() {
+                    return 45;
+                }
+                @Override
+                public int getSecond() {
+                    return 30;
+                }
+            };
+        assertThat(d1.hashCode() == d2.hashCode(), is(true));
+        assertThat(d1.hashCode() == d3.hashCode(), is(false));
+        assertThat(d1.hashCode() == d4.hashCode(), is(false));
+    }
 
     @Test
     public void isBefore() {

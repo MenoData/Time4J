@@ -54,6 +54,14 @@ public class TimestampCreationTest {
             is(PlainTimestamp.of(date, time)));
     }
 
+    @Test
+    public void ofYearMonthDayHour24() {
+        PlainDate date = PlainDate.of(2014, Month.APRIL, 22);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 24, 0),
+            is(PlainTimestamp.of(date, PlainTime.midnightAtStartOfDay())));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void ofYearMonthDayHourMinuteSecondOverflow() {
         PlainTimestamp.of(2014, 4, 21, 19, 45, 60);

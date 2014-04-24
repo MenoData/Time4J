@@ -101,6 +101,10 @@ import static net.time4j.PlainTime.*;
  * nutzbar. Als Zeiteinheiten kommen vor allem {@link CalendarUnit} und
  * {@link ClockUnit} in Betracht. </p>
  *
+ * <p>Notiz: Unterst&uuml;tzung f&uuml;r den speziellen Zeitwert T24:00 gibt es
+ * nur in den Fabrikmethoden, die dann diesen Wert zum n&auml;chsten Tag hin
+ * normalisieren, nicht aber in den Elementen. </p>
+ *
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
