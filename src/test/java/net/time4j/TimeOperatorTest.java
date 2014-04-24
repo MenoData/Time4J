@@ -74,6 +74,10 @@ public class TimeOperatorTest {
             PlainTime.of(19, 45, 30, 123456789)
                 .with(CLOCK_HOUR_OF_AMPM.atFloor()),
             is(PlainTime.of(19)));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 19, 45, 30)
+                .with(CLOCK_HOUR_OF_AMPM.atFloor().onTimestamp()),
+            is(PlainTimestamp.of(2014, 4, 21, 19, 0)));
     }
 
     @Test
@@ -89,6 +93,12 @@ public class TimeOperatorTest {
             PlainTime.of(19, 45, 30, 123456789)
                 .with(CLOCK_HOUR_OF_AMPM.atCeiling()),
             is(PlainTime.of(19, 59, 59, 999999999)));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 19, 45, 30)
+                .with(CLOCK_HOUR_OF_AMPM.atCeiling().onTimestamp()),
+            is(
+                PlainTimestamp.of(2014, 4, 21, 19, 59, 59)
+                .with(NANO_OF_SECOND, 999999999)));
     }
 
     @Test

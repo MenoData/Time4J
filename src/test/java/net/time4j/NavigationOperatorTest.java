@@ -158,4 +158,148 @@ public class NavigationOperatorTest {
             is(PlainDate.of(2014, 4, 21)));
     }
 
+    @Test
+    public void nextDayOfWeekOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToNext(Weekday.FRIDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 25).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToNext(Weekday.MONDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 28).atStartOfDay()));
+    }
+
+    @Test
+    public void previousDayOfWeekOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToPrevious(Weekday.FRIDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 18).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToPrevious(Weekday.MONDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 14).atStartOfDay()));
+    }
+
+    @Test
+    public void nextOrSameDayOfWeekOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToNextOrSame(Weekday.FRIDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 25).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToNextOrSame(Weekday.MONDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void previousOrSameDayOfWeekOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToPreviousOrSame(Weekday.FRIDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 18).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                DAY_OF_WEEK.setToPreviousOrSame(Weekday.MONDAY).onTimestamp()),
+            is(PlainDate.of(2014, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void nextMonthOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToNext(Month.MARCH).onTimestamp()),
+            is(PlainDate.of(2015, 3, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToNext(Month.APRIL).onTimestamp()),
+            is(PlainDate.of(2015, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void previousMonthOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToPrevious(Month.MARCH).onTimestamp()),
+            is(PlainDate.of(2014, 3, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToPrevious(Month.APRIL).onTimestamp()),
+            is(PlainDate.of(2013, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void nextOrSameMonthOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToNextOrSame(Month.MARCH).onTimestamp()),
+            is(PlainDate.of(2015, 3, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21)
+                .with(MONTH_OF_YEAR.setToNextOrSame(Month.APRIL)),
+            is(PlainDate.of(2014, 4, 21)));
+    }
+
+    @Test
+    public void previousOrSameMonthOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToPreviousOrSame(Month.MARCH).onTimestamp()),
+            is(PlainDate.of(2014, 3, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                MONTH_OF_YEAR.setToPreviousOrSame(Month.APRIL).onTimestamp()),
+            is(PlainDate.of(2014, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void nextQuarterOfYearOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToNext(Quarter.Q3).onTimestamp()),
+            is(PlainDate.of(2014, 7, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToNext(Quarter.Q2).onTimestamp()),
+            is(PlainDate.of(2015, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void previousQuarterOfYearOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToPrevious(Quarter.Q3).onTimestamp()),
+            is(PlainDate.of(2013, 7, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToPrevious(Quarter.Q2).onTimestamp()),
+            is(PlainDate.of(2013, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void nextOrSameQuarterOfYearOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToNextOrSame(Quarter.Q3).onTimestamp()),
+            is(PlainDate.of(2014, 7, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToNextOrSame(Quarter.Q2).onTimestamp()),
+            is(PlainDate.of(2014, 4, 21).atStartOfDay()));
+    }
+
+    @Test
+    public void previousOrSameQuarterOfYearOnTimestamp() {
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToPreviousOrSame(Quarter.Q3).onTimestamp()),
+            is(PlainDate.of(2013, 7, 21).atStartOfDay()));
+        assertThat(
+            PlainDate.of(2014, 4, 21).atStartOfDay().with(
+                QUARTER_OF_YEAR.setToPreviousOrSame(Quarter.Q2).onTimestamp()),
+            is(PlainDate.of(2014, 4, 21).atStartOfDay()));
+    }
+
 }

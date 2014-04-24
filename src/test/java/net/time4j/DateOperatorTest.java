@@ -24,6 +24,10 @@ public class DateOperatorTest {
         assertThat(
             PlainDate.of(2012, 2, 29).with(YEAR.minimized()),
             is(PlainDate.of(-999999999, 2, 28)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 0, 0).with(
+                YEAR.minimized().onTimestamp()),
+            is(PlainTimestamp.of(-999999999, 2, 28, 0, 0)));
     }
 
     @Test
@@ -31,6 +35,10 @@ public class DateOperatorTest {
         assertThat(
             PlainDate.of(2012, 2, 29).with(YEAR.maximized()),
             is(PlainDate.of(999999999, 2, 28)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 29, 10, 45).with(
+                YEAR.maximized().onTimestamp()),
+            is(PlainTimestamp.of(999999999, 2, 28, 10, 45)));
     }
 
     @Test
@@ -41,6 +49,10 @@ public class DateOperatorTest {
         assertThat(
             PlainDate.of(2012, 2, 29).with(YEAR.incremented()),
             is(PlainDate.of(2013, 2, 28)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 1, 12, 45).with(
+                YEAR.incremented().onTimestamp()),
+            is(PlainTimestamp.of(2013, 2, 1, 12, 45)));
     }
 
     @Test
@@ -51,6 +63,10 @@ public class DateOperatorTest {
         assertThat(
             PlainDate.of(2012, 2, 29).with(YEAR.decremented()),
             is(PlainDate.of(2011, 2, 28)));
+        assertThat(
+            PlainTimestamp.of(2012, 3, 1, 12, 45).with(
+                YEAR.decremented().onTimestamp()),
+            is(PlainTimestamp.of(2011, 3, 1, 12, 45)));
     }
 
     @Test

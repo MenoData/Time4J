@@ -114,4 +114,72 @@ public class OrdinalWeekdayOperatorTest {
             is(expected));
     }
 
+    @Test
+    public void setToFirstOnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2013, this.month, this.dom).atStartOfDay();
+        assertThat(
+            ts.with(
+                PlainDate.WEEKDAY_IN_MONTH.setToFirst(this.dow).onTimestamp()),
+            is(
+                PlainDate.of(2013, this.expectedMonth, this.expectedDom)
+                .atStartOfDay()));
+    }
+
+    @Test
+    public void setToSecondOnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2013, this.month, this.dom).atStartOfDay();
+        assertThat(
+            ts.with(
+                PlainDate.WEEKDAY_IN_MONTH.setToSecond(this.dow).onTimestamp()),
+            is(
+                PlainDate.of(2013, this.expectedMonth, this.expectedDom)
+                .plus(1, CalendarUnit.WEEKS)
+                .atStartOfDay()));
+    }
+
+    @Test
+    public void setToThirdOnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2013, this.month, this.dom).atStartOfDay();
+        assertThat(
+            ts.with(
+                PlainDate.WEEKDAY_IN_MONTH.setToThird(this.dow).onTimestamp()),
+            is(
+                PlainDate.of(2013, this.expectedMonth, this.expectedDom)
+                .plus(2, CalendarUnit.WEEKS)
+                .atStartOfDay()));
+    }
+
+    @Test
+    public void setToFourthOnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2013, this.month, this.dom).atStartOfDay();
+        assertThat(
+            ts.with(
+                PlainDate.WEEKDAY_IN_MONTH.setToFourth(this.dow).onTimestamp()),
+            is(
+                PlainDate.of(2013, this.expectedMonth, this.expectedDom)
+                .plus(3, CalendarUnit.WEEKS)
+                .atStartOfDay()));
+    }
+
+    @Test
+    public void setToLastOnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2013, this.month, this.dom).atStartOfDay();
+        PlainTimestamp expected =
+            PlainDate.of(2013, this.expectedMonth, this.expectedDom)
+                .plus(4, CalendarUnit.WEEKS)
+                .atStartOfDay();
+        if (expected.getMonth() != this.expectedMonth) {
+            expected = expected.minus(1, CalendarUnit.WEEKS);
+        }
+        assertThat(
+            ts.with(
+                PlainDate.WEEKDAY_IN_MONTH.setToLast(this.dow).onTimestamp()),
+            is(expected));
+    }
+
 }

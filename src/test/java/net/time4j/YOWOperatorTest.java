@@ -66,4 +66,75 @@ public class YOWOperatorTest {
             is(PlainDate.of(2004, 53, Weekday.SUNDAY)));
     }
 
+    @Test
+    public void minimizedOnTimestamp() {
+         // [1997-W01-2])
+        PlainTimestamp ts =
+            PlainDate.of(1996, 12, 31).atStartOfDay();
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.minimized().onTimestamp()),
+            is(PlainDate.of(-999999999, 1, 2).atStartOfDay()));
+    }
+
+    @Test
+    public void maximizedOnTimestamp() {
+         // [1997-W01-2])
+        PlainTimestamp ts =
+            PlainDate.of(1996, 12, 31).atStartOfDay();
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.maximized().onTimestamp()),
+            is(PlainDate.of(999999999, 1, 5).atStartOfDay()));
+    }
+
+    @Test
+    public void decrementedOnTimestamp() {
+         // [1997-W01-2])
+        PlainTimestamp ts =
+            PlainDate.of(1996, 12, 31).atStartOfDay();
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.decremented().onTimestamp()),
+            is(PlainDate.of(1996, 1, 2).atStartOfDay())); // 1996-W01-2
+    }
+
+    @Test
+    public void incrementedNormalOnTimestamp() {
+         // [1997-W01-2])
+        PlainTimestamp ts =
+            PlainDate.of(1996, 12, 31).atStartOfDay();
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.incremented().onTimestamp()),
+            is(PlainDate.of(1997, 12, 30).atStartOfDay())); // 1998-W01-2
+    }
+
+    @Test
+    public void incrementedKW53OnTimestamp() {
+        PlainTimestamp ts =
+            PlainDate.of(2004, 53, Weekday.MONDAY).atStartOfDay();
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.incremented().onTimestamp()),
+            is(PlainDate.of(2005, 12, 26).atStartOfDay())); // 2005-W52-1
+    }
+
+    @Test
+    public void atFloorOnTimestamp() {
+        PlainTimestamp ts =
+            PlainTimestamp.of(2004, 5, 1, 12, 45);
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.atFloor().onTimestamp()),
+            is(PlainDate.of(2004, 1, Weekday.MONDAY).atStartOfDay()));
+    }
+
+    @Test
+    public void atCeilingOnTimestamp() {
+        PlainTimestamp ts =
+            PlainTimestamp.of(2004, 5, 1, 12, 45);
+        PlainTimestamp expected =
+            PlainDate
+                .of(2004, 53, Weekday.SUNDAY)
+                .atTime(PlainTime.of(23, 59, 59, 999999999));
+        assertThat(
+            ts.with(YEAR_OF_WEEKDATE.atCeiling().onTimestamp()),
+            is(expected));
+    }
+
 }
