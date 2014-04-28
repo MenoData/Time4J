@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         DateSuite.class,
+        DurationSuite.class,
         OperatorSuite.class,
         TimeSuite.class,
         FormatSuite.class

@@ -37,8 +37,10 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.Normalizer;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoFormatter;
@@ -99,7 +101,7 @@ import java.util.Set;
 @CalendarType("iso8601")
 public final class PlainDate
     extends Calendrical<IsoDateUnit, PlainDate>
-    implements GregorianDate {
+    implements GregorianDate, Normalizer<CalendarUnit> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -943,6 +945,14 @@ public final class PlainDate
         format2Digits(sb, this.month);
         format2Digits(sb, this.dayOfMonth);
         return sb.toString();
+
+    }
+
+    @Override
+    public Duration<CalendarUnit> normalize(
+        TimeSpan<? extends CalendarUnit> timespan) {
+
+        return this.until(this.plus(timespan), Duration.inYearsMonthsDays());
 
     }
 
