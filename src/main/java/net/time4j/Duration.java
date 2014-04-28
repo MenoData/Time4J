@@ -1092,22 +1092,6 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
-     * <p>Liefert eine kanonische Darstellung analog zur
-     * ISO-8601-Definition. </p>
-     *
-     * <p>Entspricht {@code toString(false)}. </p>
-     *
-     * @see     #toString(boolean)
-     * @see     #parse(String)
-     */
-    @Override
-    public String toString() {
-
-        return this.toString(false);
-
-    }
-
-    /**
      * <p>Liefert eine kanonische Darstellung, die optional mit einem negativen
      * Vorzeichen beginnt, dann mit dem Buchstaben &quot;P&quot; fortsetzt,
      * gefolgt von einer Reihe von alphanumerischen Zeichen analog zur
@@ -1122,11 +1106,7 @@ public final class Duration<U extends IsoUnit>
      * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot; hat
      * (Sekunde als universelles Zeitma&szlig;). Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen das Komma entsprechend der
-     * Empfehlung des ISO-Standards gew&auml;hlt, es sei denn, &uuml;ber den
-     * xml-Parameter wurde die Verwendung f&uuml;r XML geregelt (dort ist nur
-     * ein Punkt zul&auml;ssig). Speziell f&uuml;r XML gilt auch, da&szlig;
-     * ein vorhandenes Wochenfeld zu Tagen auf der Basis (1 Woche = 7 Tage)
-     * normalisiert wird. </p>
+     * Empfehlung des ISO-Standards gew&auml;hlt. </p>
      *
      * <p>Hinweis: Die ISO-Empfehlung, ein Komma als Dezimaltrennzeichen zu
      * verwenden, kann mit Hilfe der bool'schen System-Property
@@ -1134,15 +1114,138 @@ public final class Duration<U extends IsoUnit>
      * werden, da&szlig; die angels&auml;chsiche Variante mit Punkt statt
      * Komma verwendet wird. </p>
      *
-     * @param   xml     Is a XML-Schema-compatible output required?
+     * @see     #toStringXML()
+     * @see     #parse(String)
+     */
+    @Override
+    public String toString() {
+
+        return this.toString(false);
+
+    }
+
+    /**
+     * <p>Liefert eine XML-konforme Darstellung, die optional mit einem
+     * negativen Vorzeichen beginnt, dann mit dem Buchstaben &quot;P&quot;
+     * fortsetzt, gefolgt von einer Reihe von alphanumerischen Zeichen analog
+     * zur ISO8601-Definition. </p>
+     *
+     * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
+     * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
+     * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot; hat
+     * (Sekunde als universelles Zeitma&szlig;). Hat der Sekundenteil einen
+     * Bruchteil, wird als Dezimaltrennzeichen der Punkt anders als in der
+     * Empfehlung des ISO-Standards gew&auml;hlt. Es gilt auch, da&szlig;
+     * ein vorhandenes Wochenfeld zu Tagen auf der Basis (1 Woche = 7 Tage)
+     * normalisiert wird. </p>
+     *
      * @return  String
-     * @throws  ChronoException if in xml-mode any special units shall be
+     * @throws  ChronoException if any special units shall be
      *          output, but units of type {@code CalendarUnit} will be
      *          translated to xml-compatible units if necessary
      * @see     #parse(String)
      * @see     IsoUnit#getSymbol()
      */
-    public String toString(boolean xml) {
+    public String toStringXML() {
+
+        return this.toString(true);
+
+    }
+
+    /**
+     * <p>Parst eine kanonische ISO-konforme Darstellung zu einer
+     * Zeitspanne. </p>
+     *
+     * <p>Syntax in RegExp-&auml;hnlicher Notation: </p>
+     *
+     * <pre>
+     *  amount := [0-9]+
+     *  fraction := [,\.]{amount}
+     *  years-months-days := ({amount}Y)?({amount}M)?({amount}D)?
+     *  weeks := ({amount}W)?
+     *  date := {years-months-days} | {weeks}
+     *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
+     *  duration := P{date}(T{time})? | PT{time}
+     * </pre>
+     *
+     * <p>Die in {@link CalendarUnit} definierten Zeiteinheiten MILLENNIA,
+     * CENTURIES, DECADES und QUARTERS werden mitsamt ihren Symbolen ebenfalls
+     * unterst&uuml;tzt. </p>
+     *
+     * <p>Weiterhin gilt die Einschr&auml;nkung, da&szlig; die Symbole P und T
+     * mindestens ein Zeitfeld nach sich ziehen m&uuml;ssen. Alle Felder mit
+     * {@code 0}-Betr&auml;gen werden beim Parsen ignoriert. Das einzig erlaubte
+     * Dezimalfeld der Sekunden kann sowohl einen Punkt wie auch ein Komma
+     * als Dezimaltrennzeichen haben. Im ISO-Standard ist das Komma das
+     * bevorzugte Zeichen, in XML-Schema nur der Punkt zul&auml;ssig. Speziell
+     * f&uuml;r die Verwendung in XML-Schema (Typ xs:duration) ist zu beachten,
+     * da&szlig; Wochenfelder anders als im ISO-Standard nicht vorkommen. Die
+     * Methode {@code toString(true)} ber&uuml;cksichtigt diese Besonderheiten
+     * von XML-Schema (abgesehen davon, da&szlig; XML-Schema potentiell
+     * unbegrenzt gro&szlig;e Zahlen zul&auml;&szlig;t, aber Time4J eine
+     * Zeitspanne nur im long-Bereich mit maximal Nanosekunden-Genauigkeit
+     * definiert). </p>
+     *
+     * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     *
+     * <pre>
+     *  date := -P7Y4M3D (negativ: 7 Jahre, 4 Monate, 3 Tage)
+     *  time := PT3H2M1,4S (positiv: 3 Stunden, 2 Minuten, 1400 Millisekunden)
+     *  date-time := P1Y1M5DT15H59M10.400S (Punkt als Dezimaltrennzeichen)
+     * </pre>
+     *
+     * @param   duration        duration in ISO-8601-format
+     * @return  parsed duration in all possible units of date and time
+     * @throws  ParseException if parsing fails
+     * @see     #parseCalendarPeriod(String)
+     * @see     #parseClockPeriod(String)
+     * @see     #toString()
+     * @see     #toString(boolean)
+     */
+    public static Duration<IsoUnit> parse(String duration)
+        throws ParseException {
+
+        return parse(duration, IsoUnit.class);
+
+    }
+
+    /**
+     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
+     * Datumskomponenten zu einer Zeitspanne. </p>
+     *
+     * @param   duration        duration in ISO-8601-format
+     * @return  parsed calendrical duration
+     * @throws  ParseException if parsing fails
+     * @see     #parse(String)
+     * @see     #parseClockPeriod(String)
+     */
+    public static
+    Duration<CalendarUnit> parseCalendarPeriod(String duration)
+        throws ParseException {
+
+        return parse(duration, CalendarUnit.class);
+
+    }
+
+    /**
+     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
+     * Uhrzeitkomponenten zu einer Zeitspanne. </p>
+     *
+     * @param   duration        duration in ISO-8601-format
+     * @return  parsed time-only duration
+     * @throws  ParseException if parsing fails
+     * @see     #parse(String)
+     * @see     #parseCalendarPeriod(String)
+     */
+    public static
+    Duration<ClockUnit> parseClockPeriod(String duration)
+        throws ParseException {
+
+        return parse(duration, ClockUnit.class);
+
+    }
+
+    private String toString(boolean xml) {
 
         if (this.isEmpty()) {
             return (this.calendrical ? "P0D" : "PT0S");
@@ -1245,99 +1348,6 @@ public final class Duration<U extends IsoUnit>
         }
 
         return sb.toString();
-
-    }
-
-    /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung zu einer
-     * Zeitspanne. </p>
-     *
-     * <p>Syntax in RegExp-&auml;hnlicher Notation: </p>
-     *
-     * <pre>
-     *  amount := [0-9]+
-     *  fraction := [,\.]{amount}
-     *  years-months-days := ({amount}Y)?({amount}M)?({amount}D)?
-     *  weeks := ({amount}W)?
-     *  date := {years-months-days} | {weeks}
-     *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
-     *  duration := P{date}(T{time})? | PT{time}
-     * </pre>
-     *
-     * <p>Die in {@link CalendarUnit} definierten Zeiteinheiten MILLENNIA,
-     * CENTURIES, DECADES und QUARTERS werden mitsamt ihren Symbolen ebenfalls
-     * unterst&uuml;tzt. </p>
-     *
-     * <p>Weiterhin gilt die Einschr&auml;nkung, da&szlig; die Symbole P und T
-     * mindestens ein Zeitfeld nach sich ziehen m&uuml;ssen. Alle Felder mit
-     * {@code 0}-Betr&auml;gen werden beim Parsen ignoriert. Das einzig erlaubte
-     * Dezimalfeld der Sekunden kann sowohl einen Punkt wie auch ein Komma
-     * als Dezimaltrennzeichen haben. Im ISO-Standard ist das Komma das
-     * bevorzugte Zeichen, in XML-Schema nur der Punkt zul&auml;ssig. Speziell
-     * f&uuml;r die Verwendung in XML-Schema (Typ xs:duration) ist zu beachten,
-     * da&szlig; Wochenfelder anders als im ISO-Standard nicht vorkommen. Die
-     * Methode {@code toString(true)} ber&uuml;cksichtigt diese Besonderheiten
-     * von XML-Schema (abgesehen davon, da&szlig; XML-Schema potentiell
-     * unbegrenzt gro&szlig;e Zahlen zul&auml;&szlig;t, aber Time4J eine
-     * Zeitspanne nur im long-Bereich mit maximal Nanosekunden-Genauigkeit
-     * definiert). </p>
-     *
-     * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
-     *
-     * <pre>
-     *  date := -P7Y4M3D (negativ: 7 Jahre, 4 Monate, 3 Tage)
-     *  time := PT3H2M1,4S (positiv: 3 Stunden, 2 Minuten, 1400 Millisekunden)
-     *  date-time := P1Y1M5DT15H59M10.400S (Punkt als Dezimaltrennzeichen)
-     * </pre>
-     *
-     * @param   duration        duration in ISO-8601-format
-     * @return  parsed duration in all possible units of date and time
-     * @throws  ParseException if parsing fails
-     * @see     #parseCalendarPeriod(String)
-     * @see     #parseClockPeriod(String)
-     * @see     #toString()
-     * @see     #toString(boolean)
-     */
-    public static Duration<IsoUnit> parse(String duration)
-        throws ParseException {
-
-        return parse(duration, IsoUnit.class);
-
-    }
-
-    /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
-     * Datumskomponenten zu einer Zeitspanne. </p>
-     *
-     * @param   duration        duration in ISO-8601-format
-     * @return  parsed calendrical duration
-     * @throws  ParseException if parsing fails
-     * @see     #parse(String)
-     * @see     #parseClockPeriod(String)
-     */
-    public static
-    Duration<CalendarUnit> parseCalendarPeriod(String duration)
-        throws ParseException {
-
-        return parse(duration, CalendarUnit.class);
-
-    }
-
-    /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
-     * Uhrzeitkomponenten zu einer Zeitspanne. </p>
-     *
-     * @param   duration        duration in ISO-8601-format
-     * @return  parsed time-only duration
-     * @throws  ParseException if parsing fails
-     * @see     #parse(String)
-     * @see     #parseCalendarPeriod(String)
-     */
-    public static
-    Duration<ClockUnit> parseClockPeriod(String duration)
-        throws ParseException {
-
-        return parse(duration, ClockUnit.class);
 
     }
 

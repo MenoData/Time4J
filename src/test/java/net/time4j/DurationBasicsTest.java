@@ -741,8 +741,8 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
         String formatted1 =
-            datePeriod.union(timePeriod).negate().toString(true);
-        String formatted2 = Duration.parse(formatted1).toString(true);
+            datePeriod.union(timePeriod).negate().toStringXML();
+        String formatted2 = Duration.parse(formatted1).toStringXML();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
     }
@@ -750,7 +750,7 @@ public class DurationBasicsTest {
     @Test
     public void testToStringXML2() throws ParseException {
         assertThat(
-            Duration.of(13, WEEKS).toString(true),
+            Duration.of(13, WEEKS).toStringXML(),
             is("P91D")); // 13 * 7
     }
 
