@@ -173,9 +173,10 @@ public final class Duration<U extends IsoUnit>
      */
     public static Normalizer<ClockUnit> STD_CLOCK_PERIOD = new TimeNormalizer();
 
-    private static final Duration<IsoUnit> ZERO =
-        new Duration<IsoUnit>(false);
-
+    private static final Duration<IsoUnit> ZERO = new Duration<IsoUnit>(false);
+    private static final int PRINT_STYLE_NORMAL = 0;
+    private static final int PRINT_STYLE_ISO = 1;
+    private static final int PRINT_STYLE_XML = 2;
     private static final long serialVersionUID = -6321211763598951499L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -576,9 +577,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Die Methode ber&uuml;cksichtigt auch das Vorzeichen der Zeitspanne.
      * Beispiel in Pseudo-Code: {@code [P5M].plus(-6, CalendarUnit.MONTHS)} wird
      * zu {@code [-P1M]}. Ist der zu addierende Betrag {@code 0}, liefert die
-     * Methode einfach diese Instanz selbst. Um eine gemischte Zeitspanne mit
-     * Wochen und anderen Datumselementen zu verhindern, werden Wochen bei
-     * Bedarf automatisch zu Tagen normalisiert. </p>
+     * Methode einfach diese Instanz selbst. </p>
      *
      * <p>Notiz: Gemischte Vorzeichen im Ergebnis sind nicht zul&auml;ssig und
      * werden mit einem Abbruch quittiert. Zum Beispiel ist folgender Ausdruck
@@ -597,7 +596,10 @@ public final class Duration<U extends IsoUnit>
         U unit
     ) {
 
-        checkUnit(unit);
+        if (unit == null) {
+            throw new NullPointerException("Missing chronological unit.");
+        }
+
         long originalAmount = amount;
         U originalUnit = unit;
         boolean negatedValue = false;
@@ -609,9 +611,9 @@ public final class Duration<U extends IsoUnit>
             negatedValue = true;
         }
 
-        // Millis, Micros und Weeks ersetzen
+        // Millis und Micros ersetzen
         List<Item<U>> temp = new ArrayList<Item<U>>(this.getTotalLength());
-        Item<U> item = replaceItem(this.getTotalLength(), amount, unit);
+        Item<U> item = replaceFraction(amount, unit);
 
         if (item != null) {
             amount = item.getAmount();
@@ -626,20 +628,11 @@ public final class Duration<U extends IsoUnit>
                 this.calendrical && unit.isCalendrical());
         }
 
-        int index = -1;
-
-        if (unit.isCalendrical() && (unit != CalendarUnit.WEEKS)) {
-            index = replaceWeeksForDays(temp, unit);
-        }
-
-        if (index == -1) {
-            index = this.getIndex(unit);
-        }
-
         // Items aktualisieren
+        int index = this.getIndex(unit);
         boolean resultNegative = this.isNegative();
 
-        if (index < 0) {
+        if (index < 0) { // Einheit nicht vorhanden
             if (this.isNegative() == negatedValue) {
                 temp.add(Item.of(amount, unit));
             } else {
@@ -767,27 +760,14 @@ public final class Duration<U extends IsoUnit>
 
         long absAmount =
             ((amount < 0) ? MathUtils.safeNegate(amount) : amount);
-        Item<U> item = replaceItem(this.getTotalLength(), absAmount, unit);
+        Item<U> item = replaceFraction(absAmount, unit);
 
         if (item != null) {
             absAmount = item.getAmount();
             unit = item.getUnit();
         }
 
-        long oldAmount;
-
-        if (
-            unit.equals(CalendarUnit.DAYS)
-            && this.contains(CalendarUnit.WEEKS)
-        ) {
-            oldAmount =
-                MathUtils.safeMultiply(
-                    this.getPartialAmount(CalendarUnit.WEEKS),
-                    7L
-                );
-        } else {
-            oldAmount = this.getPartialAmount(unit);
-        }
+        long oldAmount = this.getPartialAmount(unit);
 
         return this.plus(
             MathUtils.safeSubtract(
@@ -917,13 +897,9 @@ public final class Duration<U extends IsoUnit>
      *  Duration&lt;CalendarUnit&gt; p1 =
      *      Duration.ofCalendarUnits(0, 0, 10);
      *  Duration&lt;CalendarUnit&gt; p2 =
-     *      Duration.of(3, CalendarUnit.WEEKS);
+     *      Duration.of(21, CalendarUnit.DAYS);
      *  System.out.println(p1.union(p2)); // P31D
      * </pre>
-     *
-     * <p>Um eine gemischte Zeitspanne mit Wochen und anderen Datumselementen
-     * zu verhindern, werden Wochen bei Bedarf automatisch zu Tagen
-     * normalisiert (siehe auch letztes Beispiel). </p>
      *
      * <p>Falls die Vorzeichen beider Zeitspannen verschieden sind, m&uuml;ssen
      * im Ergebnis trotzdem die Vorzeichen aller Betr&auml;ge gleich sein, damit
@@ -1103,8 +1079,9 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
      * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
-     * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot; hat
-     * (Sekunde als universelles Zeitma&szlig;). Hat der Sekundenteil einen
+     * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot;
+     * (Sekunde als universelles Zeitma&szlig;) oder im rein kalendarischen
+     * Fall das Format &quot;P0D&quot; hat. Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen das Komma entsprechend der
      * Empfehlung des ISO-Standards gew&auml;hlt. </p>
      *
@@ -1114,13 +1091,47 @@ public final class Duration<U extends IsoUnit>
      * werden, da&szlig; die angels&auml;chsiche Variante mit Punkt statt
      * Komma verwendet wird. </p>
      *
+     * @see     #toStringISO()
      * @see     #toStringXML()
      * @see     #parse(String)
      */
     @Override
     public String toString() {
 
-        return this.toString(false);
+        return this.toString(PRINT_STYLE_NORMAL);
+
+    }
+
+    /**
+     * <p>Liefert eine ISO-konforme Darstellung, die mit dem Buchstaben
+     * &quot;P&quot; beginnt, gefolgt von einer Reihe von alphanumerischen
+     * Zeichen analog zur ISO8601-Definition. </p>
+     *
+     * <p>Ein negatives Vorzeichen ist im ISO-8601-Standard nicht vorgesehen.
+     * In diesem Fall wirft die Methode eine Ausnahme. Eine leere Zeitspanne
+     * hat das Format &quot;PT0S&quot; oder im rein kalendarischen
+     * Fall das Format &quot;P0D&quot;. Hat der Sekundenteil einen
+     * Bruchteil, wird als Dezimaltrennzeichen das Komma entsprechend der
+     * Empfehlung des ISO-Standards gew&auml;hlt. </p>
+     *
+     * <p>Hinweis: Die ISO-Empfehlung, ein Komma als Dezimaltrennzeichen zu
+     * verwenden, kann mit Hilfe der bool'schen System-Property
+     * &quot;net.time4j.format.iso.decimal.dot&quot; so ge&auml;ndert
+     * werden, da&szlig; die angels&auml;chsiche Variante mit Punkt statt
+     * Komma verwendet wird. Es gilt auch, da&szlig; ein vorhandenes Wochenfeld
+     * zu Tagen auf der Basis (1 Woche = 7 Tage) normalisiert wird, wenn
+     * zugleich auch andere Kalendereinheiten vorhanden sind. </p>
+     *
+     * @return  String
+     * @throws  ChronoException if this duration is negative or if any special
+     *          units shall be output, but units of type {@code CalendarUnit}
+     *          will be translated to iso-compatible units if necessary
+     * @see     #parse(String)
+     * @see     IsoUnit#getSymbol()
+     */
+    public String toStringISO() {
+
+        return this.toString(PRINT_STYLE_ISO);
 
     }
 
@@ -1132,8 +1143,9 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
      * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
-     * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot; hat
-     * (Sekunde als universelles Zeitma&szlig;). Hat der Sekundenteil einen
+     * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot;
+     * (Sekunde als universelles Zeitma&szlig;) oder im rein kalendarischen
+     * Fall das Format &quot;P0D&quot; hat. Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen der Punkt anders als in der
      * Empfehlung des ISO-Standards gew&auml;hlt. Es gilt auch, da&szlig;
      * ein vorhandenes Wochenfeld zu Tagen auf der Basis (1 Woche = 7 Tage)
@@ -1148,24 +1160,24 @@ public final class Duration<U extends IsoUnit>
      */
     public String toStringXML() {
 
-        return this.toString(true);
+        return this.toString(PRINT_STYLE_XML);
 
     }
 
     /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung zu einer
-     * Zeitspanne. </p>
+     * <p>Parst eine kanonische Darstellung zu einer Dauer. </p>
      *
      * <p>Syntax in RegExp-&auml;hnlicher Notation: </p>
      *
      * <pre>
+     *  sign := [-]?
      *  amount := [0-9]+
      *  fraction := [,\.]{amount}
      *  years-months-days := ({amount}Y)?({amount}M)?({amount}D)?
      *  weeks := ({amount}W)?
      *  date := {years-months-days} | {weeks}
      *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
-     *  duration := P{date}(T{time})? | PT{time}
+     *  duration := {sign}P{date}(T{time})? | PT{time}
      * </pre>
      *
      * <p>Die in {@link CalendarUnit} definierten Zeiteinheiten MILLENNIA,
@@ -1180,7 +1192,7 @@ public final class Duration<U extends IsoUnit>
      * bevorzugte Zeichen, in XML-Schema nur der Punkt zul&auml;ssig. Speziell
      * f&uuml;r die Verwendung in XML-Schema (Typ xs:duration) ist zu beachten,
      * da&szlig; Wochenfelder anders als im ISO-Standard nicht vorkommen. Die
-     * Methode {@code toString(true)} ber&uuml;cksichtigt diese Besonderheiten
+     * Methode {@code toStringXML()} ber&uuml;cksichtigt diese Besonderheiten
      * von XML-Schema (abgesehen davon, da&szlig; XML-Schema potentiell
      * unbegrenzt gro&szlig;e Zahlen zul&auml;&szlig;t, aber Time4J eine
      * Zeitspanne nur im long-Bereich mit maximal Nanosekunden-Genauigkeit
@@ -1194,13 +1206,15 @@ public final class Duration<U extends IsoUnit>
      *  date-time := P1Y1M5DT15H59M10.400S (Punkt als Dezimaltrennzeichen)
      * </pre>
      *
-     * @param   duration        duration in ISO-8601-format
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
      * @return  parsed duration in all possible units of date and time
      * @throws  ParseException if parsing fails
      * @see     #parseCalendarPeriod(String)
      * @see     #parseClockPeriod(String)
      * @see     #toString()
-     * @see     #toString(boolean)
+     * @see     #toStringISO()
+     * @see     #toStringXML()
      */
     public static Duration<IsoUnit> parse(String duration)
         throws ParseException {
@@ -1210,10 +1224,11 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
-     * Datumskomponenten zu einer Zeitspanne. </p>
+     * <p>Parst eine kanonische Darstellung nur mit
+     * Datumskomponenten zu einer Dauer. </p>
      *
-     * @param   duration        duration in ISO-8601-format
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
      * @return  parsed calendrical duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
@@ -1228,10 +1243,11 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
-     * <p>Parst eine kanonische ISO-konforme Darstellung nur mit
-     * Uhrzeitkomponenten zu einer Zeitspanne. </p>
+     * <p>Parst eine kanonische Darstellung nur mit
+     * Uhrzeitkomponenten zu einer Dauer. </p>
      *
-     * @param   duration        duration in ISO-8601-format
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
      * @return  parsed time-only duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
@@ -1245,12 +1261,20 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private String toString(boolean xml) {
+    private String toString(int style) {
+
+        if (
+            (style == PRINT_STYLE_ISO)
+            && this.isNegative()
+        ) {
+            throw new ChronoException("Negative sign not allowed in ISO-8601.");
+        }
 
         if (this.isEmpty()) {
             return (this.calendrical ? "P0D" : "PT0S");
         }
 
+        boolean xml = (style == PRINT_STYLE_XML);
         StringBuilder sb = new StringBuilder();
 
         if (this.isNegative()) {
@@ -1261,6 +1285,7 @@ public final class Duration<U extends IsoUnit>
         boolean timeAppended = false;
         long nanos = 0;
         long seconds = 0;
+        long weeksAsDays = 0;
 
         for (
             int index = 0, limit = this.getTotalLength().size();
@@ -1284,17 +1309,42 @@ public final class Duration<U extends IsoUnit>
             } else if (symbol == 'S') {
                 seconds = amount;
             } else {
-                if (xml) {
+                if (
+                    xml
+                    || (style == PRINT_STYLE_ISO)
+                ) {
                     switch (symbol) {
                         case 'D':
+                            if (weeksAsDays != 0) {
+                                amount = MathUtils.safeAdd(amount, weeksAsDays);
+                                weeksAsDays = 0;
+                            }
+                            sb.append(amount);
+                            break;
                         case 'M':
                         case 'Y':
                         case 'H':
                             sb.append(amount);
                             break;
                         case 'W':
-                            sb.append(MathUtils.safeMultiply(amount, 7));
-                            symbol = 'D';
+                            if (limit == 1) {
+                                if (xml) {
+                                    sb.append(
+                                        MathUtils.safeMultiply(amount, 7));
+                                    symbol = 'D';
+                                } else {
+                                    sb.append(amount);
+                                }
+                            } else {
+                                weeksAsDays = MathUtils.safeMultiply(amount, 7);
+                                if (this.getIndex(CalendarUnit.DAYS) < 0) {
+                                    sb.append(weeksAsDays);
+                                    weeksAsDays = 0;
+                                    symbol = 'D';
+                                } else {
+                                    continue;
+                                }
+                            }
                             break;
                         case 'Q':
                             sb.append(MathUtils.safeMultiply(amount, 3));
@@ -1313,9 +1363,11 @@ public final class Duration<U extends IsoUnit>
                             symbol = 'Y';
                             break;
                         default:
+                            String mode = xml ? "XML" : "ISO";
                             throw new ChronoException(
-                                "Special units cannot be output in xml-mode: "
-                                + this.toString(false));
+                                "Special units cannot be output in "
+                                + mode + "-mode: "
+                                + this.toString(PRINT_STYLE_NORMAL));
                     }
                 } else {
                     sb.append(amount);
@@ -1418,27 +1470,16 @@ public final class Duration<U extends IsoUnit>
                 calendrical = false;
             }
 
-            // Millis, Micros und Weeks ersetzen
-            Item<U> item =
-                replaceItem(duration.getTotalLength(), amount, unit);
+            // Millis und Micros ersetzen
+            Item<U> item = replaceFraction(amount, unit);
 
             if (item != null) {
                 amount = item.getAmount();
                 unit = item.getUnit();
             }
 
-            boolean overwrite = false;
-
-            if (unit.isCalendrical() && (unit != CalendarUnit.WEEKS)) {
-                overwrite = replaceWeeksForDays(map, unit);
-            }
-
-            if (!overwrite) {
-                overwrite = map.containsKey(unit);
-            }
-
             // Items aktualisieren
-            if (overwrite) {
+            if (map.containsKey(unit)) {
                 map.put(
                     unit,
                     Long.valueOf(
@@ -1558,12 +1599,7 @@ public final class Duration<U extends IsoUnit>
         }
 
         List<Item<U>> temp = new ArrayList<Item<U>>(map.size());
-        long weeks = 0;
-        long days = 0;
         long nanos = 0;
-
-        U weekUnit = null;
-        U dayUnit = null;
 
         for (Map.Entry<U, Long> entry : map.entrySet()) {
             long amount = entry.getValue().longValue();
@@ -1571,12 +1607,6 @@ public final class Duration<U extends IsoUnit>
 
             if (amount == 0) {
                 continue;
-            } else if (key == CalendarUnit.WEEKS) {
-                weeks = amount;
-                weekUnit = key;
-            } else if (key == CalendarUnit.DAYS) {
-                days = amount;
-                dayUnit = key;
             } else if (key == ClockUnit.MILLIS) {
                 nanos =
                     MathUtils.safeAdd(
@@ -1592,25 +1622,6 @@ public final class Duration<U extends IsoUnit>
             } else {
                 temp.add(Item.of(amount, key));
             }
-        }
-
-        if (
-            (days != 0)
-            && (weeks != 0)
-        ) {
-            days =
-                MathUtils.safeAdd(
-                    days,
-                    MathUtils.safeMultiply(weeks, 7));
-            weeks = 0;
-        }
-
-        if (weeks != 0) {
-            temp.add(Item.of(weeks, weekUnit));
-        }
-
-        if (days != 0) {
-            temp.add(Item.of(days, dayUnit));
         }
 
         if (nanos != 0) {
@@ -1665,57 +1676,8 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static <U extends IsoUnit> int replaceWeeksForDays(
-        List<Item<U>> temp,
-        U unit
-    ) {
-
-        int weekIndex = getIndex(CalendarUnit.WEEKS, temp);
-
-        if (weekIndex >= 0) {
-            temp.set(
-                weekIndex,
-                Item.of(
-                    MathUtils.safeMultiply(
-                        temp.get(weekIndex).getAmount(), 7L),
-                    Duration.<U>cast(CalendarUnit.DAYS)
-                )
-            );
-
-            if (unit.equals(CalendarUnit.DAYS)) {
-                return weekIndex; // Summenbildung: oldDays + amount
-            }
-        }
-
-        return -1;
-
-    }
-
-    private static <U extends IsoUnit> boolean replaceWeeksForDays(
-        Map<U, Long> temp,
-        U unit
-    ) {
-
-        Long amount = temp.get(CalendarUnit.WEEKS);
-
-        if (amount != null) {
-            temp.remove(CalendarUnit.WEEKS);
-            temp.put(
-                Duration.<U>cast(CalendarUnit.DAYS),
-                Long.valueOf(MathUtils.safeMultiply(amount.longValue(), 7L))
-            );
-            if (unit.equals(CalendarUnit.DAYS)) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
-
     // optional
-    private static <U extends IsoUnit> Item<U> replaceItem(
-        List<Item<U>> items,
+    private static <U extends IsoUnit> Item<U> replaceFraction(
         long amount,
         U unit
     ) {
@@ -1726,28 +1688,11 @@ public final class Duration<U extends IsoUnit>
         } else if (unit.equals(ClockUnit.MICROS)) {
             amount = MathUtils.safeMultiply(amount, 1000L);
             unit = cast(ClockUnit.NANOS);
-        } else if (unit.equals(CalendarUnit.WEEKS)) {
-            for (int i = 0, n = items.size(); i < n; i++) {
-                U test = items.get(i).getUnit();
-                if (test.isCalendrical() && (test != CalendarUnit.WEEKS)) {
-                    amount = MathUtils.safeMultiply(amount, 7L);
-                    unit = cast(CalendarUnit.DAYS);
-                    break;
-                }
-            }
         } else {
             return null;
         }
 
         return Item.of(amount, unit);
-
-    }
-
-    private void checkUnit(ChronoUnit unit) {
-
-        if (unit == null) {
-            throw new NullPointerException("Missing chronological unit.");
-        }
 
     }
 
@@ -1889,8 +1834,6 @@ public final class Duration<U extends IsoUnit>
         ChronoUnit last = null;
         int index = from;
         boolean decimal = false;
-        int dateElements = 0;
-        boolean weekSymbol = false;
 
         for (int i = from; i < to; i++) {
             char c = duration.charAt(i);
@@ -1946,14 +1889,8 @@ public final class Duration<U extends IsoUnit>
                 num = null;
                 ChronoUnit unit = (
                     date
-                    ? parseDateSymbol(c, dateElements, weekSymbol, duration, i)
+                    ? parseDateSymbol(c, duration, i)
                     : parseTimeSymbol(c, duration, i));
-                if (date) {
-                    if (unit.equals(CalendarUnit.WEEKS)) {
-                        weekSymbol = true;
-                    }
-                    dateElements++;
-                }
                 last = addParsedItem(unit, last, amount, duration, i, items);
             }
 
@@ -1967,8 +1904,6 @@ public final class Duration<U extends IsoUnit>
 
     private static CalendarUnit parseDateSymbol(
         char c,
-        int dateElements,
-        boolean weekSymbol,
         String duration,
         int index
     ) throws ParseException {
@@ -1987,23 +1922,9 @@ public final class Duration<U extends IsoUnit>
             case 'M':
                 return CalendarUnit.MONTHS;
             case 'W':
-                if (dateElements > 0) {
-                    throw new ParseException(
-                        "Mixed date symbols with weeks not supported: "
-                        + duration,
-                        index);
-                } else {
-                    return CalendarUnit.WEEKS;
-                }
+                return CalendarUnit.WEEKS;
             case 'D':
-                if (weekSymbol) {
-                    throw new ParseException(
-                        "Mixed date symbols with weeks not supported: "
-                        + duration,
-                        index);
-                } else {
-                    return CalendarUnit.DAYS;
-                }
+                return CalendarUnit.DAYS;
             default:
                 throw new ParseException(
                     "Symbol \'" + c + "\' not supported: " + duration, index);

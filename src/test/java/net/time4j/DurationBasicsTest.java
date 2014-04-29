@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
@@ -475,14 +476,14 @@ public class DurationBasicsTest {
             datePeriod.negate().plus(3, MONTHS),
             is(Duration.ofCalendarUnits(12, 1, 3).negate()));
         assertThat(
-            datePeriod.plus(1, WEEKS),
-            is(Duration.ofCalendarUnits(12, 4, 10)));
+            datePeriod.plus(1, WEEKS).toString(),
+            is("P12Y4M1W3D"));
         assertThat(
-            Duration.of(4, WEEKS).plus(1, YEARS),
-            is(Duration.ofCalendarUnits(1, 0, 28)));
+            Duration.of(4, WEEKS).plus(1, YEARS).toString(),
+            is("P1Y4W"));
         assertThat(
-            Duration.of(4, WEEKS).plus(1, DAYS),
-            is(Duration.ofCalendarUnits(0, 0, 29)));
+            Duration.of(4, WEEKS).plus(1, DAYS).toString(),
+            is("P4W1D"));
     }
 
     @Test
@@ -551,17 +552,14 @@ public class DurationBasicsTest {
             datePeriod.with(0, MONTHS),
             is(Duration.ofCalendarUnits(12, 0, 3)));
         assertThat(
-            Duration.ofCalendarUnits(12, 4, 10).with(1, WEEKS),
-            is(Duration.ofCalendarUnits(12, 4, 7)));
+            Duration.ofCalendarUnits(12, 4, 10).with(1, WEEKS).toString(),
+            is("P12Y4M1W10D"));
         assertThat(
-            Duration.ofCalendarUnits(12, 4, 14).with(2, WEEKS),
-            is(Duration.ofCalendarUnits(12, 4, 14)));
+            Duration.of(4, WEEKS).with(3, DAYS).toString(),
+            is("P4W3D"));
         assertThat(
-            Duration.of(4, WEEKS).with(3, DAYS),
-            is(Duration.ofCalendarUnits(0, 0, 3)));
-        assertThat(
-            Duration.of(4, WEEKS).with(3, MONTHS),
-            is(Duration.ofCalendarUnits(0, 3, 28)));
+            Duration.of(4, WEEKS).with(3, MONTHS).toString(),
+            is("P3M4W"));
         assertThat(
             Duration.of(4, WEEKS).with(-2, WEEKS),
             is(Duration.of(-2, WEEKS)));
@@ -665,14 +663,14 @@ public class DurationBasicsTest {
         p1 = Duration.ofCalendarUnits(0, 0, 2);
         p2 = Duration.of(1, WEEKS);
         assertThat(
-            p1.plus(p2),
-            is(Duration.ofCalendarUnits(0, 0, 9)));
+            p1.plus(p2).toString(),
+            is("P1W2D"));
         assertThat(
-            p2.plus(p1),
-            is(Duration.ofCalendarUnits(0, 0, 9)));
+            p2.plus(p1).toString(),
+            is("P1W2D"));
         assertThat(
-            p2.plus(Duration.ofCalendarUnits(1, 0, 2)),
-            is(Duration.ofCalendarUnits(1, 0, 9)));
+            p2.plus(Duration.ofCalendarUnits(1, 0, 2)).toString(),
+            is("P1Y1W2D"));
         assertThat(
             Duration.of(0, SECONDS).plus(createClockPeriod()),
             is(Duration.of(0, SECONDS).plus(123000, NANOS)));
@@ -687,17 +685,6 @@ public class DurationBasicsTest {
             p1.minus(p2),
             is(Duration.ofCalendarUnits(0, 4, 10).negate()));
 
-        p1 = Duration.ofCalendarUnits(0, 0, 2);
-        p2 = Duration.of(1, WEEKS);
-        assertThat(
-            p1.minus(p2),
-            is(Duration.ofCalendarUnits(0, 0, 5).negate()));
-        assertThat(
-            p2.minus(p1),
-            is(Duration.ofCalendarUnits(0, 0, 5)));
-        assertThat(
-            p2.minus(Duration.ofCalendarUnits(1, 0, 8)),
-            is(Duration.ofCalendarUnits(1, 0, 1).negate()));
         assertThat(
             Duration.of(0, SECONDS).minus(createClockPeriod()),
             is(Duration.of(0, SECONDS).minus(123000, NANOS)));
@@ -724,13 +711,38 @@ public class DurationBasicsTest {
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
 
-        period = "P13W";
-        datePeriod = Duration.of(13, CalendarUnit.WEEKS);
+        period = "P13W2D";
+        datePeriod = Duration.of(13, WEEKS).plus(2, DAYS);
         assertThat(datePeriod.toString(), is(period));
 
         period = "PT2,123456789S";
         timePeriod = Duration.of(2, SECONDS).plus(123456789, NANOS);
         assertThat(timePeriod.toString(), is(period));
+    }
+
+    @Test
+    public void testToStringISO1() throws Exception {
+        String period = "P12Y4M3DT150H2M0,075800000S";
+        Duration<CalendarUnit> datePeriod =
+            Duration.ofCalendarUnits(12, 4, 3);
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
+        String formatted1 = datePeriod.union(timePeriod).toString();
+        String formatted2 = Duration.parse(formatted1).toString();
+        assertThat(formatted1, is(period));
+        assertThat(formatted2, is(period)); // roundtrip
+
+        period = "P93D";
+        datePeriod = Duration.of(13, WEEKS).plus(2, DAYS);
+        assertThat(datePeriod.toStringISO(), is(period));
+
+        period = "P3W";
+        datePeriod = Duration.of(3, WEEKS);
+        assertThat(datePeriod.toStringISO(), is(period));
+
+        period = "PT2,123456789S";
+        timePeriod = Duration.of(2, SECONDS).plus(123456789, NANOS);
+        assertThat(timePeriod.toStringISO(), is(period));
     }
 
     @Test
@@ -752,6 +764,21 @@ public class DurationBasicsTest {
         assertThat(
             Duration.of(13, WEEKS).toStringXML(),
             is("P91D")); // 13 * 7
+    }
+
+    @Test(expected=ChronoException.class)
+    public void testToStringISONegative() throws Exception {
+        Duration.of(3, DAYS).negate().toStringISO();
+    }
+
+    @Test(expected=ChronoException.class)
+    public void testToStringISOSpecialUnit() throws Exception {
+        Duration.of(3, DAYS.atEndOfMonth()).toStringISO();
+    }
+
+    @Test(expected=ChronoException.class)
+    public void testToStringXMLSpecialUnit() throws Exception {
+        Duration.of(3, DAYS.atEndOfMonth()).toStringXML();
     }
 
     @Test
@@ -785,28 +812,16 @@ public class DurationBasicsTest {
         datePeriod = Duration.ofCalendarUnits(0, 4, 3);
         expResult = datePeriod.union(Duration.of(0, SECONDS));
         assertThat(Duration.parse(period), is(expResult));
-    }
 
-    @Test(expected=ParseException.class)
-    public void parseWithWrongMixedDate1() throws Exception {
-        try {
-            String period = "P12Y4M2W";
-            Duration.parse(period); // Wochenfeld mit anderen Datumsfeldern
-        } catch (ParseException pe) {
-            assertThat(pe.getErrorOffset(), is(7));
-            throw pe;
-        }
-    }
+        period = "P12Y4M2W";
+        datePeriod = Duration.ofCalendarUnits(12, 4, 0).plus(2, WEEKS);
+        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        assertThat(Duration.parse(period), is(expResult));
 
-    @Test(expected=ParseException.class)
-    public void parseWithWrongMixedDate2() throws Exception {
-        try {
-            String period = "P2W3D";
-            Duration.parse(period); // Wochenfeld mit anderen Datumsfeldern
-        } catch (ParseException pe) {
-            assertThat(pe.getErrorOffset(), is(4));
-            throw pe;
-        }
+        period = "P2W3D";
+        datePeriod = Duration.of(3, DAYS).plus(2, WEEKS);
+        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        assertThat(Duration.parse(period), is(expResult));
     }
 
     @Test(expected=ParseException.class)

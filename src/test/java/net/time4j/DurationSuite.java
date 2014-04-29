@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         DurationBasicsTest.class,
-        DurationNormalizerTest.class
+        DurationNormalizerTest.class,
+        DurationUntilTest.class
     }
 )
 public class DurationSuite {
