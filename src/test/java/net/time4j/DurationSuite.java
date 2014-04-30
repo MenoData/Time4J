@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        ClockDurationTest.class,
         DurationArithmeticTest.class,
         DurationBasicsTest.class,
         DurationNormalizerTest.class,

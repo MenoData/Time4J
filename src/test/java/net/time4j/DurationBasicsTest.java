@@ -700,7 +700,7 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testToString() throws Exception {
+    public void testToString() throws ParseException {
         String period = "-P12Y4M3DT150H2M0,075800000S";
         Duration<CalendarUnit> datePeriod =
             Duration.ofCalendarUnits(12, 4, 3);
@@ -721,7 +721,14 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testToStringISO1() throws Exception {
+    public void testToStringSpecialUnit() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.MONTHS.atEndOfMonth());
+        assertThat(datePeriod.toString(), is("P4{M-END_OF_MONTH}"));
+    }
+
+    @Test
+    public void testToStringISO() throws ParseException {
         String period = "P12Y4M3DT150H2M0,075800000S";
         Duration<CalendarUnit> datePeriod =
             Duration.ofCalendarUnits(12, 4, 3);
@@ -760,24 +767,24 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testToStringXML2() throws ParseException {
+    public void testToStringXML2() {
         assertThat(
             Duration.of(13, WEEKS).toStringXML(),
             is("P91D")); // 13 * 7
     }
 
     @Test(expected=ChronoException.class)
-    public void testToStringISONegative() throws Exception {
+    public void testToStringISONegative() {
         Duration.of(3, DAYS).negate().toStringISO();
     }
 
     @Test(expected=ChronoException.class)
-    public void testToStringISOSpecialUnit() throws Exception {
+    public void testToStringISOSpecialUnit() {
         Duration.of(3, DAYS.atEndOfMonth()).toStringISO();
     }
 
     @Test(expected=ChronoException.class)
-    public void testToStringXMLSpecialUnit() throws Exception {
+    public void testToStringXMLSpecialUnit() {
         Duration.of(3, DAYS.atEndOfMonth()).toStringXML();
     }
 
