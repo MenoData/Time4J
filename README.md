@@ -13,14 +13,16 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-02-15 I have published the first release of Time4J as initial version v0.1-alpha. A development process of more than two years has preceded this big milestone. Although this is just the begin of release cycles, Time4J is now really useable for many applications, especially with the newest pre-release v0.2-alpha. Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
+On 2014-02-15 I have published the first release of Time4J as initial version v0.1-alpha. A development process of more than two years has preceded this big milestone. Although this is just the begin of release cycles and there will still be some backwards incompatible changes due to alpha-state until a future version v1.0, Time4J is now really useful for many date-and-time-applications, especially with the coming almost-stable pre-release v0.3-alpha (expected in the begin of June). 
+
+Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
 - PlainDate = calendar date strictly following ISO-8601
 - PlainTime = wall time (on an analogous clock) including 24:00-support
 - PlainTimestamp = local timestamp as composition of calendar date and wall time
 - Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like:
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v0.3-alpha):
 
 ```java
 import net.time4j.*;
@@ -46,7 +48,7 @@ import static net.time4j.Weekday.WEDNESDAY;
     today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
   System.out.println(nextWednesday);
 
-  // What is the current time rounded down to multiples of 5 minutes?
+  // What is the current wall time rounded down to multiples of 5 minutes?
   PlainTimestamp currentLocalTimestamp =
     SystemClock.inTimezone(TZID.EUROPE.BERLIN).now();
   PlainTime roundedTime =
@@ -58,37 +60,39 @@ import static net.time4j.Weekday.WEDNESDAY;
   // How does last UTC-leapsecond look like in Japan?
   Moment leapsecondUTC =
     PlainDate.of(2012, Month.JUNE, 30)
-    .atTime(PlainTime.atEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
+    .atTime(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
     .atOffset(ZonalOffset.UTC)
     .minus(1, SI.SECONDS);
   System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
 
   System.out.println(
     "Japan-Time: "
-    + TemporalFormatters.localizedPattern("yyyy-MM-dd'T'HH:mm:ssXX")
-              .withTimezone(TZID.ASIA.TOKYO)
-              .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60+0900
+    + Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
+            .withTimezone(TZID.ASIA.TOKYO)
+            .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60+0900
 ```
 
 Design remarks:
 
 a) Safety: Although Time4J is strongly generified users will not really use any generics in their application code as demonstrated in example code, but are more or less type-safe at compile-time. For example, it is impossible to add clock units to a calendar date. This is in contrast to JSR-310 which heavily relies on runtime exceptions. Otherwise Time4J shares the advantages like immutability and non-tolerant null-handling.
 
-b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inStdTimezone()" or "localizedPattern(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
+b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inStdTimezone()" or "localFormatter(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
 
 c) Time4J offers a lot of manipulations of date and time by an element-centric approach. Every basic type like 
-"PlainTime" registers some elements (similar to fields in other libraries) which serve as access key to chronological partial data. These elements like "MINUTE_OF_HOUR" offer many different manipulation methods, called operators using the strategy pattern idea. With this design it is possible to manipulate a "PlainTime" in 171 different ways regarding the elements. Another advantage of this design: Despite the size of features the count of methods in most classes is still not too big, "PlainTime" has only 38 methods including the inherited methods from super classes.
+"PlainTime" registers some elements (similar to fields in other libraries) which serve as access key to chronological partial data. These elements like "MINUTE_OF_HOUR" offer many different manipulation methods, called operators using the strategy pattern idea. With this design it is possible to manipulate a "PlainTime" in more than 170 different ways. Another advantage of this design: Despite the size of features the count of methods in most classes is still not too big, "PlainTime" has less than 45 methods including the inherited methods from super classes.
 
 d) Another way of manipulation is date/time-arithmetic along a time axis. All four basic types have their time axis. For example roughly spoken "Moment" is defined as an elapsed count of SI-seconds since UTC epoch while a calendar date (here: "PlainDate") maps dates to julian days - another kind of time axis. The essentials of this time arithmetic are realized via the abstract super class "TimePoint". So all four basic types inherit methods like "plus(n, units)", "until(...)" etc for supporting adding, subtracting and evaluating durations.
 
-e) Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. As result of this dualism Time4J also does not separate between specialized JSR-310-time spans like "Period" or "Duration" but just has one duration class, namely "Duration", applicable on "PlainDate", "PlainTime" and "PlainTimestamp".
+e) Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. In a similar way a UTC-moment has both a technical counter (the number of SI-seconds since UTC-epoch) AND a human representation visible in its canonical output produced by toString()-method (example: 2014-04-21T19:45:30Z).
 
-Plans for next release v0.3-alpha:
+Plans for next releases:
 ----------------------------------
 
-There are still many features missing. For the next pre-release especially historic era support is planned in order to complete CLDR-Unicode-support for ISO-8601-system. Intervals would also be very nice but will rather be introduced in v0.4-alpha, maybe also more timezone features. A strong focus will also be more english translations and documentation.
+There are no fixed predictions when some features will introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/issues/milestones.
 
-Be aware of the fact that Time4J is in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such breaks on CLDR/formatting area).
+While the main focus of the next pre-releases until v1.0 are standard business use cases, reliablity and stability, you can expect after v1.0 more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
+
+Be aware of the fact that Time4J is currently in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such bigger breaks - especially on CLDR/formatting area).
 
 Downloads and Requirements:
 ---------------------------
