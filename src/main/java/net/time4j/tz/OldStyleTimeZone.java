@@ -23,6 +23,7 @@ package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -132,31 +133,46 @@ final class OldStyleTimeZone
             return this.fixedOffset;
         }
 
+        int year = localDate.getYear();
+        int month = localDate.getMonth();
+        int dom = localDate.getDayOfMonth();
+
         int era;
         int yearOfEra;
 
-        if (localDate.getYear() > 0) {
-            era = GregorianCalendar.AD;
-            yearOfEra = localDate.getYear();
-        } else {
-            era = GregorianCalendar.BC;
-            yearOfEra = 1 - localDate.getYear();
+        if (localTime.getHour() == 24) {
+            long mjd = MathUtils.safeAdd(GregorianMath.toMJD(localDate), 1);
+            long pd = GregorianMath.toPackedDate(mjd);
+            year = GregorianMath.readYear(pd);
+            month = GregorianMath.readMonth(pd);
+            dom = GregorianMath.readDayOfMonth(pd);
         }
 
-        int month = localDate.getMonth();
-        int dom = localDate.getDayOfMonth();
-        int dow =
-            GregorianMath.getDayOfWeek(localDate.getYear(), month, dom) + 1;
+        if (year > 0) {
+            era = GregorianCalendar.AD;
+            yearOfEra = year;
+        } else {
+            era = GregorianCalendar.BC;
+            yearOfEra = 1 - year;
+        }
+
+        int dow = GregorianMath.getDayOfWeek(year, month, dom) + 1;
 
         if (dow == 8) {
             dow = Calendar.SUNDAY;
         }
 
-        int millis = (
-            localTime.getHour() * 3600
-            + localTime.getMinute() * 60
-            + localTime.getSecond()
-        ) * 1000;
+        int millis;
+
+        if (localTime.getHour() == 24) {
+            millis = 0;
+        } else {
+            millis = (
+                localTime.getHour() * 3600
+                + localTime.getMinute() * 60
+                + localTime.getSecond()
+            ) * 1000;
+        }
 
         return fromOffsetMillis(
             this.tz.getOffset(era, yearOfEra, month - 1, dom, dow, millis));
