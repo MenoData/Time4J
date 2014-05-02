@@ -35,7 +35,10 @@ import net.time4j.tz.TimeZone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.ObjectStreamException;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -69,8 +72,8 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Br&uuml;cke zwischen einem traditionellen JDK-Timestamp und der
-     * Klasse {@code Moment}. </p>
+     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel des Typs
+     * {@code java.util.Date} und der Klasse {@code Moment}. </p>
      *
      * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der
      * unterst&uuml;tzte Wertbereich ist etwas kleiner als in der Klasse
@@ -78,14 +81,15 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
      *
      * <pre>
      *  java.util.Date instant = new java.util.Date(86401 * 1000);
-     *  Moment ut = TemporalTypes.JDK_DATE.transform(instant);
-     *  System.out.println(ut.get(TemporalTypes.JDK_DATE).equals(instant));
+     *  Moment ut = TemporalTypes.JAVA_UTIL_DATE.transform(instant);
+     *  System.out.println(
+     *      ut.get(TemporalTypes.JAVA_UTIL_DATE).equals(instant));
      *  // Ausgabe: true
      * </pre>
      */
-    public static final TemporalTypes<java.util.Date, Moment> JDK_DATE =
+    public static final TemporalTypes<java.util.Date, Moment> JAVA_UTIL_DATE =
         new TemporalTypes<java.util.Date, Moment>(
-            "JDK_DATE",
+            "JAVA_UTIL_DATE",
             java.util.Date.class,
             Moment.class,
             new JavaUtilDateRule(),
@@ -95,13 +99,52 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
                     ChronoEntity<?> o1,
                     ChronoEntity<?> o2
                 ) {
-                    java.util.Date ts1 = o1.get(JDK_DATE);
-                    java.util.Date ts2 = o2.get(JDK_DATE);
+                    java.util.Date ts1 = o1.get(JAVA_UTIL_DATE);
+                    java.util.Date ts2 = o2.get(JAVA_UTIL_DATE);
                     return ts1.compareTo(ts2);
                 }
             },
             new java.util.Date(Long.MIN_VALUE),
             new java.util.Date(Long.MAX_VALUE),
+            true,
+            true
+        );
+
+    /**
+     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel als
+     * Anzahl der Millisekunden seit der UNIX-Epoche und der Klasse
+     * {@code Moment}. </p>
+     *
+     * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der
+     * unterst&uuml;tzte Wertbereich ist etwas kleiner als in der Klasse
+     * {@code Moment}. Beispiel: </p>
+     *
+     * <pre>
+     *  long instant = 86401 * 1000L;
+     *  Moment ut = TemporalTypes.MILLIS_SINCE_UNIX.transform(instant);
+     *  System.out.println(ut);
+     *  // Ausgabe: 1970-01-02T00:00:01Z
+     * </pre>
+     */
+    public static final TemporalTypes<Long, Moment> MILLIS_SINCE_UNIX =
+        new TemporalTypes<Long, Moment>(
+            "MILLIS_SINCE_UNIX",
+            Long.class,
+            Moment.class,
+            new MillisSinceUnixRule(),
+            new Comparator<ChronoEntity<?>>() {
+                @Override
+                public int compare(
+                    ChronoEntity<?> o1,
+                    ChronoEntity<?> o2
+                ) {
+                    Long ts1 = o1.get(MILLIS_SINCE_UNIX);
+                    Long ts2 = o2.get(MILLIS_SINCE_UNIX);
+                    return ts1.compareTo(ts2);
+                }
+            },
+            Long.MIN_VALUE,
+            Long.MAX_VALUE,
             true,
             true
         );
@@ -256,6 +299,19 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             true,
             true
         );
+
+    private static final Map<String, TemporalTypes<?, ?>> CACHE;
+
+    static {
+        Map<String, TemporalTypes<?, ?>> map =
+            new HashMap<String, TemporalTypes<?, ?>>();
+        fill(map, TemporalTypes.JAVA_UTIL_DATE);
+        fill(map, TemporalTypes.MILLIS_SINCE_UNIX);
+        fill(map, TemporalTypes.SQL_DATE);
+        fill(map, TemporalTypes.SQL_TIME);
+        fill(map, TemporalTypes.SQL_TIMESTAMP);
+        CACHE = Collections.unmodifiableMap(map);
+    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -423,24 +479,22 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
     }
 
+    private static void fill(
+        Map<String, TemporalTypes<?, ?>> map,
+        TemporalTypes<?, ?> tt
+    ) {
+
+        map.put(tt.name(), tt);
+
+    }
+
     /**
      * @serialData  Resolves to singleton constants if possible.
      */
     private Object readResolve() throws ObjectStreamException {
 
-        String n = this.name();
-
-        if (n.equals(TemporalTypes.JDK_DATE.name())) {
-            return TemporalTypes.JDK_DATE;
-        } else if (n.equals(TemporalTypes.SQL_DATE.name())) {
-            return TemporalTypes.SQL_DATE;
-        } else if (n.equals(TemporalTypes.SQL_TIME.name())) {
-            return TemporalTypes.SQL_TIME;
-        } else if (n.equals(TemporalTypes.SQL_TIMESTAMP.name())) {
-            return TemporalTypes.SQL_TIMESTAMP;
-        } else {
-            return this;
-        }
+        Object instance = CACHE.get(this.name());
+        return ((instance == null) ? this : instance);
 
     }
 
@@ -449,19 +503,17 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     private static class JavaUtilDateRule
         implements ElementRule<Moment, java.util.Date> {
 
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final ElementRule<Moment, Long> rule =
+            new MillisSinceUnixRule();
+
         //~ Methoden ------------------------------------------------------
 
         @Override
         public java.util.Date getValue(Moment context) {
 
-            long posixTime = context.getPosixTime();
-            int fraction = context.getNanosecond();
-
-            return new java.util.Date(
-                MathUtils.safeAdd(
-                    MathUtils.safeMultiply(posixTime, 1000),
-                    fraction / MIO)
-                );
+            return new java.util.Date(this.rule.getValue(context));
 
         }
 
@@ -472,10 +524,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             boolean lenient
         ) {
 
-            long millis = value.getTime();
-            long seconds = MathUtils.floorDivide(millis, 1000);
-            int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
-            return Moment.of(seconds, nanos, TimeScale.POSIX);
+            return this.rule.withValue(
+                context,
+                Long.valueOf(value.getTime()),
+                lenient
+            );
 
         }
 
@@ -492,14 +545,86 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         @Override
         public java.util.Date getMinimum(Moment context) {
 
-            return TemporalTypes.JDK_DATE.getDefaultMinimum();
+            return TemporalTypes.JAVA_UTIL_DATE.getDefaultMinimum();
 
         }
 
         @Override
         public java.util.Date getMaximum(Moment context) {
 
-            return TemporalTypes.JDK_DATE.getDefaultMaximum();
+            return TemporalTypes.JAVA_UTIL_DATE.getDefaultMaximum();
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(Moment context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(Moment context) {
+
+            return null;
+
+        }
+
+    }
+
+    private static class MillisSinceUnixRule
+        implements ElementRule<Moment, Long> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Long getValue(Moment context) {
+
+            long posixTime = context.getPosixTime();
+            int fraction = context.getNanosecond();
+
+            return MathUtils.safeAdd(
+                MathUtils.safeMultiply(posixTime, 1000),
+                fraction / MIO
+            );
+
+        }
+
+        @Override
+        public Moment withValue(
+            Moment context,
+            Long value,
+            boolean lenient
+        ) {
+
+            long millis = value.longValue();
+            long seconds = MathUtils.floorDivide(millis, 1000);
+            int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
+            return Moment.of(seconds, nanos, TimeScale.POSIX);
+
+        }
+
+        @Override
+        public boolean isValid(
+            Moment context,
+            Long value
+        ) {
+
+            return (value != null); // jeder long-Wert ist gültig
+
+        }
+
+        @Override
+        public Long getMinimum(Moment context) {
+
+            return TemporalTypes.MILLIS_SINCE_UNIX.getDefaultMinimum();
+
+        }
+
+        @Override
+        public Long getMaximum(Moment context) {
+
+            return TemporalTypes.MILLIS_SINCE_UNIX.getDefaultMaximum();
 
         }
 
