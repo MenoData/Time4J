@@ -60,7 +60,7 @@ public abstract class TimeZone
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
-        Boolean.getBoolean("allow.system.tz.override");
+        Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
     private static volatile NameData NAME_DATA = null;
     private static volatile TimeZone SYSTEM_TZ_CURRENT = null;
@@ -253,8 +253,8 @@ public abstract class TimeZone
      * <p>Der verwendete Algorithmus basiert vorrangig auf der
      * System-Property &quot;user.timezone&quot;, dann erst auf der
      * Methode {@code java.util.TimeZone.getDefault()}. Ist zus&auml;tzlich
-     * die Property &quot;allow.system.tz.override&quot; auf den Wert
-     * &quot;true&quot; gesetzt, dann kann nach einer Kombination aus
+     * die Property &quot;net.time4j.allow.system.tz.override&quot; auf den
+     * Wert &quot;true&quot; gesetzt, dann kann nach einer Kombination aus
      * {@code java.util.TimeZone.setDefault()} und der Methode
      * {@link Cache#refresh()} in dieser Klasse die Standard-Zeitzone
      * auch ge&auml;ndert werden, sonst wird sie einmalig beim Laden

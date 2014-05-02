@@ -42,7 +42,7 @@ public class LeapSecondTest {
     public void isEnabled() {
         assertThat(
             LeapSeconds.getInstance().isEnabled(),
-            is(!Boolean.getBoolean("time4j.utc.leapseconds.suppressed"))
+            is(!Boolean.getBoolean("net.time4j.scale.leapseconds.suppressed"))
         );
     }
 
@@ -50,7 +50,7 @@ public class LeapSecondTest {
     public void isExtensible() {
         assertThat(
             LeapSeconds.getInstance().isExtensible(),
-            is(!Boolean.getBoolean("time4j.utc.leapseconds.final")
+            is(!Boolean.getBoolean("net.time4j.scale.leapseconds.final")
                 && LeapSeconds.getInstance().isEnabled())
         );
     }

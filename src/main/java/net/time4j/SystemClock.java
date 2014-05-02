@@ -31,7 +31,7 @@ import net.time4j.tz.TZID;
  * <p>Repr&auml;sentiert eine Uhr, die auf dem Taktgeber des Betriebssystems
  * basiert. </p>
  *
- * <p>Mit der System-Property &quot;net.time4j.SystemClock.nanoTime&quot;
+ * <p>Mit der System-Property &quot;net.time4j.systemclock.nanoTime&quot;
  * kann gesteuert werden, ob diese Uhr intern auf dem Ausdruck
  * {@link System#nanoTime()} (wenn Property auf {@code true} gesetzt)
  * oder {@link System#currentTimeMillis()} (Standard) basiert. </p>
@@ -49,7 +49,7 @@ public final class SystemClock
     private static final boolean HIGH_PRECISION;
 
     static {
-        HIGH_PRECISION = Boolean.getBoolean("net.time4j.SystemClock.nanoTime");
+        HIGH_PRECISION = Boolean.getBoolean("net.time4j.systemclock.nanoTime");
 
         if (HIGH_PRECISION) {
             long millis = System.currentTimeMillis();
