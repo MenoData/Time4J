@@ -77,7 +77,7 @@ public class DurationArithmeticTest {
     @Test
     public void minusDuration() {
         assertThat(
-            this.start.minus(this.duration.negate()),
+            this.start.minus(this.duration.inverse()),
             is(this.end));
     }
 
@@ -101,7 +101,7 @@ public class DurationArithmeticTest {
             this.start.until(this.end, Duration.in(MONTHS, DAYS));
         Duration<CalendarUnit> p2 =
             this.end.until(this.start, Duration.in(MONTHS, DAYS));
-        assertThat(p1, is(p2.negate()));
+        assertThat(p1, is(p2.inverse()));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class DurationArithmeticTest {
             this.start.until(this.end, Duration.in(YEARS, MONTHS, DAYS));
         Duration<CalendarUnit> p2 =
             this.end.until(this.start, Duration.in(YEARS, MONTHS, DAYS));
-        assertThat(p1, is(p2.negate()));
+        assertThat(p1, is(p2.inverse()));
     }
 
     @Test

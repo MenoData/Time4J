@@ -28,7 +28,7 @@ public class ClockDurationTest {
             is(
                 Duration.ofClockUnits(0, 59, 57)
                 .plus(999999999, ClockUnit.NANOS)
-                .negate()));
+                .inverse()));
     }
 
     @Test

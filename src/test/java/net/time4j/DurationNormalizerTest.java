@@ -46,7 +46,7 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(47, 59, 60).plus(1075800000, NANOS);
         Duration<IsoUnit> test =
-            datePeriod.union(timePeriod).negate();
+            datePeriod.union(timePeriod).inverse();
         assertThat(
             test.with(Duration.STD_PERIOD),
             is(

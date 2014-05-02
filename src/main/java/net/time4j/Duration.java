@@ -65,7 +65,7 @@ import java.util.Map;
  *
  * <p>Alle Instanzen sind <i>immutable</i>, aber ge&auml;nderte Kopien lassen
  * sich &uuml;ber die Methoden {@code plus()}, {@code minus()}, {@code with()},
- * {@code union()}, {@code multipliedBy()}, {@code abs()} und {@code negate()}
+ * {@code union()}, {@code multipliedBy()}, {@code abs()} und {@code inverse()}
  * erzeugen. Hierbei werden die Zeiteinheiten {@code ClockUnit.MILLIS} und
  * {@code ClockUnit.MICROS} intern immer zu Nanosekunden normalisiert. Ansonsten
  * mu&szlig; eine Normalisierung explizit mittels {@code with(Normalizer)}
@@ -75,7 +75,7 @@ import java.util.Map;
  * genommen nicht Bestandteil des ISO-Standards, ist aber Bestandteil der
  * XML-Schema-Spezifikation und legt die Lage zweier Zeitpunkte relativ
  * zueinander fest. Eine Manipulation des Vorzeichens ist mit der Methode
- * {@code negate()} m&ouml;glich. </p>
+ * {@code inverse()} m&ouml;glich. </p>
  *
  * <p>Die Zeitarithmetik behandelt die Addition und Subtraktion einer Zeitspanne
  * bezogen auf einen Zeitpunkt abh&auml;ngig vom Vorzeichen der Zeitspanne wie
@@ -220,7 +220,7 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    // Kopiekonstruktor (siehe negate())
+    // Kopiekonstruktor (siehe inverse())
     private Duration(
         Duration<U> duration,
         boolean inverse
@@ -308,7 +308,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Alle Argumente d&uuml;rfen nicht negativ sein. Ist ein Argument
      * gleich {@code 0}, wird es ignoriert. Wird eine negative Zeitspanne
-     * gew&uuml;nscht, kann auf dem Ergebnis einfach {@code negate()}
+     * gew&uuml;nscht, kann auf dem Ergebnis einfach {@code inverse()}
      * aufgerufen werden. </p>
      *
      * @param   years       amount in years
@@ -316,7 +316,7 @@ public final class Duration<U extends IsoUnit>
      * @param   days        amount in days
      * @return  new duration
      * @throws  IllegalArgumentException if any argument is negative
-     * @see     #negate()
+     * @see     #inverse()
      */
     public static Duration<CalendarUnit> ofCalendarUnits(
         int years,
@@ -334,7 +334,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Alle Argumente d&uuml;rfen nicht negativ sein. Ist ein Argument
      * gleich {@code 0}, wird es ignoriert. Wird eine negative Zeitspanne
-     * gew&uuml;nscht, kann auf dem Ergebnis einfach {@code negate()}
+     * gew&uuml;nscht, kann auf dem Ergebnis einfach {@code inverse()}
      * aufgerufen werden. </p>
      *
      * @param   hours       amount in hours
@@ -342,7 +342,7 @@ public final class Duration<U extends IsoUnit>
      * @param   seconds     amount in seconds
      * @return  new duration
      * @throws  IllegalArgumentException if any argument is negative
-     * @see     #negate()
+     * @see     #inverse()
      */
     public static Duration<ClockUnit> ofClockUnits(
         int hours,
@@ -793,12 +793,12 @@ public final class Duration<U extends IsoUnit>
      * @return  new positive duration if this duration is negative else this
      *          duration unchanged
      * @see     #isNegative()
-     * @see     #negate()
+     * @see     #inverse()
      */
     public Duration<U> abs() {
 
         if (this.isNegative()) {
-            return this.negate();
+            return this.inverse();
         } else {
             return this;
         }
@@ -811,12 +811,12 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Ein zweifacher Aufruf dieser Methode liefert wieder eine
      * inhaltlich gleiche Instanz. Also gilt immer folgende Beziehung:
-     * {@code this.negate().negate().equals(this) == true}. Liegt der
+     * {@code this.inverse().inverse().equals(this) == true}. Liegt der
      * Sonderfall einer leeren Zeitspanne vor, dann ist diese Methode ohne
      * Wirkung und liefert nur die gleiche Instanz zur&uuml;ck. Entspricht
      * dem Ausdruck {@code multipliedBy(-1)}. </p>
      *
-     * <p>Beispiel: {@code [-P5M].negate()} wird zu {@code [P5M]}. </p>
+     * <p>Beispiel: {@code [-P5M].inverse()} wird zu {@code [P5M]}. </p>
      *
      * @return  new negative duration if this duration is positive else a new
      *          positive duration with the same partial amounts and units
@@ -824,7 +824,7 @@ public final class Duration<U extends IsoUnit>
      * @see     #multipliedBy(int)
      */
     @Override
-    public Duration<U> negate() {
+    public Duration<U> inverse() {
 
         return this.multipliedBy(-1);
 
@@ -1436,7 +1436,7 @@ public final class Duration<U extends IsoUnit>
                 return duration;
             } else if (timespan instanceof Duration) {
                 Duration<U> result = cast(timespan);
-                return (inverse ? result.negate() : result);
+                return (inverse ? result.inverse() : result);
             }
         }
 

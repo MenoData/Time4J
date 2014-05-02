@@ -74,7 +74,7 @@ import java.util.List;
  * <ul><li>ERSTE INVARIANZ:
  *  {@code t1.plus(t1.until(t2)).equals(t2) == true}
  * </li><li>ZWEITE INVARIANZ:
- *  {@code t2.until(t1).equals(t1.until(t2).negate()) == true}
+ *  {@code t2.until(t1).equals(t1.until(t2).inverse()) == true}
  * </li></ul>
  *
  * <p><strong>Zu beachten:</strong> Allgemein gilt die DRITTE INVARIANZ
@@ -183,7 +183,7 @@ public abstract class AbstractDuration<U extends ChronoUnit>
      *
      * @return  inverted duration
      */
-    public abstract AbstractDuration<U> negate();
+    public abstract AbstractDuration<U> inverse();
 
     @Override
     public boolean isPositive() {
