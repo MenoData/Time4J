@@ -108,6 +108,14 @@ public class DurationBasicsTest {
     }
 
     @Test
+    public void getPartialAmountWeekBasedYears() {
+        IsoDateUnit unit = CalendarUnit.weekBasedYears();
+        assertThat(
+            Duration.of(2, unit).getPartialAmount(unit),
+            is(2L));
+    }
+
+    @Test
     public void ofSingleUnitPositive7Weeks() {
         Duration<CalendarUnit> result = Duration.of(7, WEEKS);
         assertThat(result.toString(), is("P7W"));
@@ -721,10 +729,38 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testToStringSpecialUnit() {
+    public void testToStringWithSpecialUnitAtEndOfMonth() {
         Duration<IsoDateUnit> datePeriod =
             Duration.of(4, CalendarUnit.MONTHS.atEndOfMonth());
         assertThat(datePeriod.toString(), is("P4{M-END_OF_MONTH}"));
+    }
+
+    @Test
+    public void testToStringWithSpecialUnitNextValidDate() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.MONTHS.nextValidDate());
+        assertThat(datePeriod.toString(), is("P4{M-NEXT_VALID_DATE}"));
+    }
+
+    @Test
+    public void testToStringWithSpecialUnitUnlessInvalid() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.YEARS.unlessInvalid());
+        assertThat(datePeriod.toString(), is("P4{Y-UNLESS_INVALID}"));
+    }
+
+    @Test
+    public void testToStringWithSpecialUnitCarryOver() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.YEARS.withCarryOver());
+        assertThat(datePeriod.toString(), is("P4{Y-CARRY_OVER}"));
+    }
+
+    @Test
+    public void testToStringWithSpecialUnitWeekBasedYears() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.weekBasedYears());
+        assertThat(datePeriod.toString(), is("P4{WEEK_BASED_YEARS}"));
     }
 
     @Test
@@ -838,6 +874,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // P fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -849,6 +886,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Einheitensymbol fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(3));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -860,6 +898,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Zeitfeld fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -871,6 +910,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Uhrzeitfeld fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(5));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -882,6 +922,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // falsche Reihenfolge der Einheiten
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(6));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -893,6 +934,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // falsches Symbol Z
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(11));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -904,6 +946,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // doppeltes Symbol H ohne Betrag
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(12));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -915,6 +958,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // doppeltes Symbol H mit Betrag
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(13));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -926,6 +970,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(16));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -937,6 +982,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(14));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -948,6 +994,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(15));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -959,6 +1006,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Vorzeichenfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -970,6 +1018,7 @@ public class DurationBasicsTest {
             Duration.parse(period); // Vorzeichenfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(4));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -981,6 +1030,19 @@ public class DurationBasicsTest {
             Duration.parse(period); // Leerzeichen am Ende
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(6));
+            System.out.println(pe.getMessage());
+            throw pe;
+        }
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseSpecialUnits() throws Exception {
+        try {
+            String period = "P4{Y-CARRY_OVER}";
+            Duration.parse(period);
+        } catch (ParseException pe) {
+            assertThat(pe.getErrorOffset(), is(2));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -992,6 +1054,7 @@ public class DurationBasicsTest {
             Duration.parseCalendarPeriod(period);
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(6));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -1003,6 +1066,7 @@ public class DurationBasicsTest {
             Duration.parseCalendarPeriod(period);
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -1014,6 +1078,7 @@ public class DurationBasicsTest {
             Duration.parseClockPeriod(period);
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
+            System.out.println(pe.getMessage());
             throw pe;
         }
     }
@@ -1035,6 +1100,25 @@ public class DurationBasicsTest {
         assertThat(test1.equals(null), is(false));
         assertThat(Duration.of(0, DAYS).equals(null), is(false));
         assertThat(test3.equals(Duration.of(0, DAYS)), is(true));
+    }
+
+    @Test
+    public void testEqualsWithSpecialUnits() throws ParseException {
+        assertThat(
+            Duration.of(1, YEARS)
+                .equals(Duration.of(1, CalendarUnit.weekBasedYears())),
+            is(false));
+        assertThat(
+            Duration.of(1, MONTHS)
+                .equals(Duration.of(1, MONTHS.unlessInvalid())),
+            is(false));
+        Duration<IsoUnit> period =
+            Duration.ofPositive().months(4).days(3).build()
+            .plus(Duration.of(2, CalendarUnit.weekBasedYears()));
+        Duration<?> expected =
+            Duration.ofCalendarUnits(0, 4, 3)
+            .union(Duration.of(2, CalendarUnit.weekBasedYears()));
+        assertThat(period.equals(expected), is(true));
     }
 
     @Test

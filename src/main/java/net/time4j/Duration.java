@@ -1182,7 +1182,8 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Die in {@link CalendarUnit} definierten Zeiteinheiten MILLENNIA,
      * CENTURIES, DECADES und QUARTERS werden mitsamt ihren Symbolen ebenfalls
-     * unterst&uuml;tzt. </p>
+     * unterst&uuml;tzt, nicht aber spezielle Zeiteinheiten wie zum Beispiel
+     * {@code CalendarUnit.weekBasedYears()}. </p>
      *
      * <p>Weiterhin gilt die Einschr&auml;nkung, da&szlig; die Symbole P und T
      * mindestens ein Zeitfeld nach sich ziehen m&uuml;ssen. Alle Felder mit
@@ -1208,7 +1209,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   duration        duration in canonical, ISO-8601-compatible or
      *                          XML-schema-compatible format
-     * @return  parsed duration in all possible units of date and time
+     * @return  parsed duration in all possible standard units of date and time
      * @throws  ParseException if parsing fails
      * @see     #parseCalendarPeriod(String)
      * @see     #parseClockPeriod(String)

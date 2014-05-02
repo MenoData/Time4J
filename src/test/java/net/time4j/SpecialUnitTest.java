@@ -30,6 +30,22 @@ public class SpecialUnitTest {
             is(PlainDate.of(2011, 7, 31)));
     }
 
+    @Test
+    public void atEndOfMonthAsDuration() {
+        assertThat(
+            PlainDate.of(2011, 2, 28)
+                .plus(Duration.of(1, YEARS.atEndOfMonth())),
+            is(PlainDate.of(2012, 2, 29)));
+        assertThat(
+            PlainDate.of(2011, 7, 1)
+                .plus(Duration.of(7, MONTHS.atEndOfMonth())),
+            is(PlainDate.of(2012, 2, 29)));
+        assertThat(
+            PlainDate.of(2011, 6, 30)
+                .plus(Duration.of(7, DAYS.atEndOfMonth())),
+            is(PlainDate.of(2011, 7, 31)));
+    }
+
     @Test(expected=ChronoException.class)
     public void unlessInvalidAbort() {
         PlainDate.of(2014, 1, 29).plus(1, MONTHS.unlessInvalid());
@@ -87,6 +103,21 @@ public class SpecialUnitTest {
         assertThat(
             (unit == CalendarUnit.weekBasedYears()),
             is(true));
+    }
+
+    @Test
+    public void weekBasedYearsAsDuration() {
+        Duration<IsoDateUnit> duration1 =
+            Duration.of(14, CalendarUnit.weekBasedYears());
+        assertThat(
+            PlainDate.of(2000, 2, 29).plus(duration1),
+            is(PlainDate.of(2014, 2, 25)));
+        Duration<IsoDateUnit> duration2 =
+            duration1.plus(4, DAYS);
+        System.out.println(duration2);
+        assertThat(
+            PlainDate.of(2000, 2, 29).plus(duration2),
+            is(PlainDate.of(2014, 3, 1)));
     }
 
 }
