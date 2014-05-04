@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.format.FormatSuite;
+import net.time4j.tz.ZoneSuite;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -13,8 +14,10 @@ import org.junit.runners.Suite.SuiteClasses;
         DateSuite.class,
         DurationSuite.class,
         OperatorSuite.class,
+        FormatSuite.class,
+        TemporalTypesTest.class,
         TimeSuite.class,
-        FormatSuite.class
+        ZoneSuite.class
     }
 )
 public class AllSuite {

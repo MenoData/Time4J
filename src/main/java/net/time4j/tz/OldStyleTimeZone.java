@@ -36,20 +36,24 @@ import java.util.Locale;
 
 /**
  * <p>Eine Zeitzonenimplementierung, die an {@link java.util.TimeZone}
- * delegiert. </p>
+ * delegiert und daher auf allen Plattformen existieren sollte. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <threadsafe>
  */
 final class OldStyleTimeZone
-    extends TimeZone
-    implements TZID {
+    extends TimeZone {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final long serialVersionUID = -8432968264242113551L;
 
     //~ Instanzvariablen --------------------------------------------------
+
+    /**
+     * @serial      time zone id
+     */
+    private final TZID id;
 
     /**
      * @serial      time zone of old JDK
@@ -64,32 +68,42 @@ final class OldStyleTimeZone
     /**
      * <p>Konstruktor f&uuml;r eine beliebige Zeitzone. </p>
      *
-     * @param   id      time zone id
+     * @param   resolved    time zone id with preference for enums
+     * @param   rawID       original time zone id
      */
-    OldStyleTimeZone(String id) {
-        this(findZone(id));
+    OldStyleTimeZone(TZID resolved, String rawID) {
+        this(resolved, findZone(rawID));
 
     }
 
     // benutzt unter anderem in der Deserialisierung
-    private OldStyleTimeZone(java.util.TimeZone zone) {
+    private OldStyleTimeZone(
+        TZID resolved,
+        java.util.TimeZone zone
+    ) {
         super();
 
+        this.id = resolved;
         this.tz = (java.util.TimeZone) zone.clone();
+
+        if (!resolved.canonical().equals(this.tz.getID())) {
+            throw new IllegalArgumentException(
+                "Time zone ID could not be resolved: " + resolved.canonical());
+        }
 
         if (this.tz.useDaylightTime()) {
             this.fixedOffset = null;
         } else {
-            String tzid = this.tz.getID();
+            String zoneID = this.tz.getID();
 
             boolean fixed = (
-                tzid.startsWith("GMT")
-                || tzid.startsWith("Etc/")
-                || tzid.equals("Greenwich")
-                || tzid.equals("UCT")
-                || tzid.equals("UTC")
-                || tzid.equals("Universal")
-                || tzid.equals("Zulu")
+                zoneID.startsWith("GMT")
+                || zoneID.startsWith("Etc/")
+                || zoneID.equals("Greenwich")
+                || zoneID.equals("UCT")
+                || zoneID.equals("UTC")
+                || zoneID.equals("Universal")
+                || zoneID.equals("Zulu")
             );
 
             if (fixed) {
@@ -108,7 +122,7 @@ final class OldStyleTimeZone
     @Override
     public TZID getID() {
 
-        return this;
+        return this.id;
 
     }
 
@@ -227,13 +241,6 @@ final class OldStyleTimeZone
     }
 
     @Override
-    public String canonical() {
-
-        return this.tz.getID();
-
-    }
-
-    @Override
     public boolean equals(Object obj) {
 
         if (obj instanceof OldStyleTimeZone) {
@@ -305,6 +312,17 @@ final class OldStyleTimeZone
 
     }
 
+    /**
+     * <p>Liefert die interne ID. </p>
+     *
+     * @return  String
+     */
+    String getInternalID() {
+
+        return this.tz.getID();
+
+    }
+
     private static ZonalOffset fromOffsetMillis(int offsetMillis) {
 
         if ((offsetMillis % 1000) == 0) {
@@ -324,7 +342,7 @@ final class OldStyleTimeZone
      */
     private Object readResolve() throws ObjectStreamException {
 
-        return new OldStyleTimeZone(this.tz);
+        return new OldStyleTimeZone(this.id, this.tz);
 
     }
 

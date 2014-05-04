@@ -711,8 +711,9 @@ public final class PlainTimestamp
             case STRICT:
                 if (tz.isInvalid(this, this)) {
                     throw new ChronoException(
-                        tz.getID()
-                        + "Invalid local timestamp at: "
+                        "["
+                        + tz.getID().canonical()
+                        + "] Invalid local timestamp at: "
                         + this);
                 } else {
                     offset = tz.getOffset(this, this);

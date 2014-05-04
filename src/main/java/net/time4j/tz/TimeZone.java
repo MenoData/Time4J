@@ -497,10 +497,14 @@ public abstract class TimeZone
 
     private static TimeZone getDefaultTZ() {
 
-        return TimeZone.of(
-            new NamedID(java.util.TimeZone.getDefault().getID()),
-            ZonalOffset.UTC
-        );
+        String zoneID = java.util.TimeZone.getDefault().getID();
+        TZID tzid = PREDEFINED.get(zoneID);
+
+        if (tzid == null) {
+            tzid = new NamedID(zoneID);
+        }
+
+        return TimeZone.of(tzid, ZonalOffset.UTC);
 
     }
 
@@ -531,12 +535,28 @@ public abstract class TimeZone
             return tz;
         }
 
+        // enums bevorzugen
+        TZID resolved = PREDEFINED.get(zoneID);
+
+        if (resolved == null) {
+            resolved = new NamedID(zoneID);
+        }
+
         // java.util.TimeZone hat keine öffentliche Historie
         if (PROVIDER instanceof OldStyleTZProvider) {
-            TimeZone test = new OldStyleTimeZone(zoneID);
+            OldStyleTimeZone test = null;
+
+            try {
+                test = new OldStyleTimeZone(resolved, zoneID);
+            } catch (RuntimeException re) {
+                if (wantsException) {
+                    throw re;
+                }
+            }
 
             if (
-                test.getID().canonical().equals("GMT")
+                (test != null)
+                && test.getInternalID().equals("GMT")
                 && !zoneID.equals("GMT")
                 && !zoneID.startsWith("UT")
                 && !zoneID.equals("Z")
@@ -550,9 +570,9 @@ public abstract class TimeZone
 
             if (history == null) {
                 // Alias-Suche + Fallback-Option
-                tz = TimeZone.getZoneByAlias(tzid, zoneID);
+                tz = TimeZone.getZoneByAlias(resolved, zoneID);
             } else {
-                tz = new HistorizedTimeZone(tzid, history);
+                tz = new HistorizedTimeZone(resolved, history);
             }
         }
 
@@ -916,6 +936,25 @@ public abstract class TimeZone
         public String canonical() {
 
             return this.tzid;
+
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (obj instanceof NamedID) {
+                NamedID that = (NamedID) obj;
+                return this.tzid.equals(that.tzid);
+            } else {
+                return false;
+            }
+
+        }
+
+        @Override
+        public int hashCode() {
+
+            return this.tzid.hashCode();
 
         }
 
