@@ -43,7 +43,7 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.Leniency;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
@@ -579,14 +579,14 @@ public final class PlainTimestamp
      *
      * @return  global timestamp based on this local timestamp interpreted
      *          in system time zone
-     * @see     TimeZone#ofSystem()
+     * @see     Timezone#ofSystem()
      * @see     #inTimezone(TZID,TransitionStrategy)
      * @see     #atOffset(ZonalOffset)
      */
     public Moment inStdTimezone() {
 
         return this.inTimezone(
-            TimeZone.ofSystem(),
+            Timezone.ofSystem(),
             TransitionStrategy.PUSH_FORWARD
         );
 
@@ -600,7 +600,7 @@ public final class PlainTimestamp
      * @param   strategy    conflict resolving strategy
      * @return  global timestamp based on this local timestamp interpreted
      *          in given time zone
-     * @see     TimeZone#of(TZID)
+     * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
      * @see     #atOffset(ZonalOffset)
      */
@@ -609,7 +609,7 @@ public final class PlainTimestamp
         TransitionStrategy strategy
     ) {
 
-        return this.inTimezone(TimeZone.of(tzid), strategy);
+        return this.inTimezone(Timezone.of(tzid), strategy);
 
     }
 
@@ -621,7 +621,7 @@ public final class PlainTimestamp
      */
     public boolean isValid(TZID tzid) {
 
-        return !TimeZone.of(tzid).isInvalid(this, this);
+        return !Timezone.of(tzid).isInvalid(this, this);
 
     }
 
@@ -698,7 +698,7 @@ public final class PlainTimestamp
      *                          falls in a gap on local timeline (DST-change)
      */
     Moment inTimezone(
-        TimeZone tz,
+        Timezone tz,
         TransitionStrategy strategy
     ) {
 
@@ -832,12 +832,12 @@ public final class PlainTimestamp
             final AttributeQuery attributes
         ) {
 
-            TimeZone zone;
+            Timezone zone;
 
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                zone = TimeZone.of(attributes.get(Attributes.TIMEZONE_ID));
+                zone = Timezone.of(attributes.get(Attributes.TIMEZONE_ID));
             } else {
-                zone = TimeZone.ofSystem();
+                zone = Timezone.ofSystem();
             }
 
             final UnixTime ut = clock.currentTime();

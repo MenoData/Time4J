@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (OldStyleTimeZone.java) is part of project Time4J.
+ * This file (PlatformTimezone.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ import java.util.Locale;
  * @author      Meno Hochschild
  * @concurrency <threadsafe>
  */
-final class OldStyleTimeZone
-    extends TimeZone {
+final class PlatformTimezone
+    extends Timezone {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -71,13 +71,13 @@ final class OldStyleTimeZone
      * @param   resolved    time zone id with preference for enums
      * @param   rawID       original time zone id
      */
-    OldStyleTimeZone(TZID resolved, String rawID) {
+    PlatformTimezone(TZID resolved, String rawID) {
         this(resolved, findZone(rawID));
 
     }
 
     // benutzt unter anderem in der Deserialisierung
-    private OldStyleTimeZone(
+    private PlatformTimezone(
         TZID resolved,
         java.util.TimeZone zone
     ) {
@@ -243,8 +243,8 @@ final class OldStyleTimeZone
     @Override
     public boolean equals(Object obj) {
 
-        if (obj instanceof OldStyleTimeZone) {
-            OldStyleTimeZone that = (OldStyleTimeZone) obj;
+        if (obj instanceof PlatformTimezone) {
+            PlatformTimezone that = (PlatformTimezone) obj;
             if (!this.tz.equals(that.tz)) {
                 return false;
             } else if (this.fixedOffset == null) {
@@ -342,7 +342,7 @@ final class OldStyleTimeZone
      */
     private Object readResolve() throws ObjectStreamException {
 
-        return new OldStyleTimeZone(this.id, this.tz);
+        return new PlatformTimezone(this.id, this.tz);
 
     }
 

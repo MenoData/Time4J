@@ -31,7 +31,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.scale.TimeScale;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.ObjectStreamException;
@@ -668,7 +668,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(context, PlainTime.MIN);
+                    Timezone.ofSystem().getOffset(context, PlainTime.MIN);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -691,7 +691,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(unixTime);
+                    Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
 
@@ -753,7 +753,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(UNIX_DATE, context);
+                    Timezone.ofSystem().getOffset(UNIX_DATE, context);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -776,7 +776,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(unixTime);
+                    Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
 
@@ -844,7 +844,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(context, context);
+                    Timezone.ofSystem().getOffset(context, context);
                 timeMillis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -871,7 +871,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
                         MathUtils.floorDivide(millis, 1000),
                         TimeScale.POSIX);
                 ZonalOffset offset =
-                    TimeZone.ofSystem().getOffset(unixTime);
+                    Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
 

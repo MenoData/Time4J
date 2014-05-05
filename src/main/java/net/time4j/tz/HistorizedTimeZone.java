@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (HistorizedTimeZone.java) is part of project Time4J.
+ * This file (HistorizedTimezone.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ import java.util.List;
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-final class HistorizedTimeZone
-    extends TimeZone {
+final class HistorizedTimezone
+    extends Timezone {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -64,7 +64,7 @@ final class HistorizedTimeZone
      * @param   id          time zone id
      * @param   history     offset transition model
      */
-    HistorizedTimeZone(
+    HistorizedTimezone(
         TZID id,
         TransitionHistory history
     ) {
@@ -154,8 +154,8 @@ final class HistorizedTimeZone
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof HistorizedTimeZone) {
-            HistorizedTimeZone that = (HistorizedTimeZone) obj;
+        } else if (obj instanceof HistorizedTimezone) {
+            HistorizedTimezone that = (HistorizedTimezone) obj;
             return (
                 this.id.canonical().equals(that.id.canonical())
                 && this.history.equals(that.history)

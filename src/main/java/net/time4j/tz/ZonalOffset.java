@@ -256,7 +256,8 @@ public final class ZonalOffset
      * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
      * @param   arcSeconds  arc second part ({@code 0 <= arcSeconds <= 59})
      * @return  zonal offset in decimal precision
-     * @throws  IllegalArgumentException if range check fails
+     * @throws  IllegalArgumentException if range check fails (also if total
+     *          absolute offset goes beyond 180 degrees)
      * @see     #atLongitude(BigDecimal)
      */
     public static ZonalOffset atLongitude(
@@ -652,9 +653,9 @@ public final class ZonalOffset
      *
      * @return  time zone data with fixed shift
      */
-    SingleOffsetTimeZone getModel() {
+    SingleOffsetTimezone getModel() {
 
-        return new SingleOffsetTimeZone(this);
+        return new SingleOffsetTimezone(this);
 
     }
 

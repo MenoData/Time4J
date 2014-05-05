@@ -23,28 +23,28 @@ public class PlatformTimezoneTest {
 
     @Test
     public void getOffsetOfUnixTimeSTD() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);
         assertThat(tz.getOffset(utc).canonical(), is("UTC+01:00"));
     }
 
     @Test
     public void getOffsetOfUnixTimeDST() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         Moment utc = Moment.of((40 * 365 + 180) * 86400, TimeScale.POSIX);
         assertThat(tz.getOffset(utc).canonical(), is("UTC+02:00"));
     }
 
     @Test
     public void isDaylightSavingSTD() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);
         assertThat(tz.isDaylightSaving(utc), is(false));
     }
 
     @Test
     public void isDaylightSavingDST() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         Moment utc = Moment.of((40 * 365 + 180) * 86400, TimeScale.POSIX);
         assertThat(tz.isDaylightSaving(utc), is(true));
     }
@@ -52,7 +52,7 @@ public class PlatformTimezoneTest {
     @Test
     public void getOffsetOfLocalDateTimeWithWinterDST() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         ZonalOffset offset =
             tz.getOffset(date, PlainTime.midnightAtStartOfDay());
         assertThat(
@@ -63,7 +63,7 @@ public class PlatformTimezoneTest {
     @Test
     public void getOffsetOfLocalDateTimeWithSummerDST() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         ZonalOffset offset =
             tz.getOffset(date, PlainTime.of(3));
         assertThat(
@@ -74,7 +74,7 @@ public class PlatformTimezoneTest {
     @Test
     public void getOffsetOfLocalDateWithTimeInGap() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         ZonalOffset offset =
             tz.getOffset(date, PlainTime.of(2, 30));
         assertThat(
@@ -85,7 +85,7 @@ public class PlatformTimezoneTest {
     @Test
     public void getOffsetOfLocalDateWithTimeInOverlap() {
         GregorianDate date = PlainDate.of(2014, 10, 26);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         ZonalOffset offset =
             tz.getOffset(date, PlainTime.of(2, 30));
         assertThat(
@@ -96,7 +96,7 @@ public class PlatformTimezoneTest {
     @Test
     public void getOffsetOfLocalDateWithTimeT24() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         ZonalOffset offset =
             tz.getOffset(date, PlainTime.midnightAtEndOfDay());
         assertThat(
@@ -107,7 +107,7 @@ public class PlatformTimezoneTest {
     @Test
     public void isInvalidBeforeGap() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
             tz.isInvalid(date, PlainTime.of(1, 59)),
             is(false));
@@ -116,7 +116,7 @@ public class PlatformTimezoneTest {
     @Test
     public void isInvalidInGap() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
             tz.isInvalid(date, PlainTime.of(2, 0)),
             is(true));
@@ -128,7 +128,7 @@ public class PlatformTimezoneTest {
     @Test
     public void isInvalidAfterGap() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
             tz.isInvalid(date, PlainTime.of(3, 0)),
             is(false));
@@ -136,15 +136,15 @@ public class PlatformTimezoneTest {
 
     @Test
     public void getAvailableIDs() {
-        List<TZID> zoneIDs = TimeZone.getAvailableIDs();
+        List<TZID> zoneIDs = Timezone.getAvailableIDs();
         assertThat(zoneIDs.size() > 1, is(true));
         assertThat(zoneIDs.contains(ZonalOffset.UTC), is(true));
-        assertThat(zoneIDs.contains(TimeZone.ofSystem().getID()), is(true));
+        assertThat(zoneIDs.contains(Timezone.ofSystem().getID()), is(true));
     }
 
     @Test
     public void getDisplayName() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
             tz.getDisplayName(true, false, Locale.GERMAN),
             is("Mitteleuropäische Sommerzeit"));
@@ -161,14 +161,14 @@ public class PlatformTimezoneTest {
 
     @Test
     public void getHistory() {
-        TimeZone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(tz.getHistory(), is(nullValue()));
     }
 
     @Test
     public void getID() {
         TZID id = TZID.ASIA.TOKYO;
-        TimeZone tz = loadFromPlatform(id);
+        Timezone tz = loadFromPlatform(id);
         assertThat(tz.getID(), is(id));
     }
 
@@ -176,23 +176,23 @@ public class PlatformTimezoneTest {
     public void getPreferredIDs() {
         TZID tzid = TZID.EUROPE.BERLIN;
         assertThat(
-            TimeZone.getPreferredIDs(Locale.GERMANY),
+            Timezone.getPreferredIDs(Locale.GERMANY),
             is(Collections.singleton(tzid)));
     }
 
     @Test
     public void ofTZID() {
         TZID tzid = TZID.EUROPE.BERLIN;
-        TimeZone expected = loadFromPlatform(tzid);
-        assertThat(TimeZone.of(tzid), is(expected));
+        Timezone expected = loadFromPlatform(tzid);
+        assertThat(Timezone.of(tzid), is(expected));
     }
 
     @Test
     public void ofTZIDFallback() {
         TZID tzid = TZID.EUROPE.BERLIN;
-        TimeZone expected = loadFromPlatform(tzid);
+        Timezone expected = loadFromPlatform(tzid);
         assertThat(
-            TimeZone.of(
+            Timezone.of(
                 new TZID() {
                     @Override
                     public String canonical() {
@@ -203,8 +203,8 @@ public class PlatformTimezoneTest {
             is(expected));
     }
 
-    private static TimeZone loadFromPlatform(TZID tzid) {
-        return new OldStyleTimeZone(tzid, tzid.canonical());
+    private static Timezone loadFromPlatform(TZID tzid) {
+        return new PlatformTimezone(tzid, tzid.canonical());
     }
 
 }

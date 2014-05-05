@@ -26,7 +26,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -92,7 +92,7 @@ class ParsedValues
     @SuppressWarnings("unchecked")
     public <R> R get(ChronoFunction<? super ParsedValues, R> function) {
 
-        if (function == TimeZone.identifier()) {
+        if (function == Timezone.identifier()) {
             return (R) this.map.get(ZonalElement.TIMEZONE_ID);
         }
 

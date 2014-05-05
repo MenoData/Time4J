@@ -28,7 +28,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
@@ -48,7 +48,7 @@ final class ZonalTimestamp
     //~ Instanzvariablen --------------------------------------------------
 
     private final Moment moment;
-    private final TimeZone zone;
+    private final Timezone zone;
     private transient final PlainTimestamp timestamp;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -68,9 +68,9 @@ final class ZonalTimestamp
         super();
 
         if (tzid == null) {
-            this.zone = TimeZone.ofSystem();
+            this.zone = Timezone.ofSystem();
         } else {
-            this.zone = TimeZone.of(tzid);
+            this.zone = Timezone.of(tzid);
         }
 
         ZonalOffset offset = this.zone.getOffset(moment);
@@ -156,7 +156,7 @@ final class ZonalTimestamp
     @SuppressWarnings("unchecked")
     public <R> R get(ChronoFunction<? super ZonalTimestamp, R> function) {
 
-        if (function == TimeZone.identifier()) {
+        if (function == Timezone.identifier()) {
             return (R) this.zone.getID();
         }
 

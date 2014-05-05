@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 
@@ -65,8 +65,8 @@ enum ZonalElement
         ChronoEntity<?> o2
     ) {
 
-        TZID t1 = o1.get(TimeZone.identifier());
-        TZID t2 = o2.get(TimeZone.identifier());
+        TZID t1 = o1.get(Timezone.identifier());
+        TZID t2 = o2.get(Timezone.identifier());
 
         return t1.canonical().compareTo(t2.canonical());
 

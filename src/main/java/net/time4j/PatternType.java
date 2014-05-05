@@ -31,7 +31,7 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -644,7 +644,7 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-                Set<TZID> preferredZones = TimeZone.getPreferredIDs(locale);
+                Set<TZID> preferredZones = Timezone.getPreferredIDs(locale);
                 if (count < 4) {
                     builder.addTimezoneName(true, preferredZones);
                 } else if ((count == 4) || sdf) {
@@ -685,7 +685,7 @@ public enum PatternType
             case 'V':
                 if (count == 2) {
                     try {
-                        builder.addTimeZoneID();
+                        builder.addTimezoneID();
                     } catch (IllegalStateException ise) {
                         throw new IllegalArgumentException(ise.getMessage());
                     }

@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -57,7 +57,7 @@ enum TimezoneIDProcessor
         FormatStep step
     ) throws IOException {
 
-        TZID tzid = formattable.get(TimeZone.identifier());
+        TZID tzid = formattable.get(Timezone.identifier());
 
         if (tzid == null) {
             throw new IllegalArgumentException(
@@ -171,7 +171,7 @@ enum TimezoneIDProcessor
         }
 
         // binäre Suche
-        List<TZID> zones = TimeZone.getAvailableIDs();
+        List<TZID> zones = Timezone.getAvailableIDs();
         int low = 0;
         int high = zones.size() - 1;
 

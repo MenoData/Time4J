@@ -49,7 +49,7 @@ import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
@@ -526,7 +526,7 @@ public final class Moment
      */
     public PlainTimestamp inStdTimezone() {
 
-        return this.inTimezone(TimeZone.ofSystem());
+        return this.inTimezone(Timezone.ofSystem());
 
     }
 
@@ -539,7 +539,7 @@ public final class Moment
      */
     public PlainTimestamp inTimezone(TZID tzid) {
 
-        return this.inTimezone(TimeZone.of(tzid));
+        return this.inTimezone(Timezone.of(tzid));
 
     }
 
@@ -892,7 +892,7 @@ public final class Moment
 
     }
 
-    private PlainTimestamp inTimezone(TimeZone tz) {
+    private PlainTimestamp inTimezone(Timezone tz) {
 
         ZonalOffset offset = tz.getOffset(this);
         return PlainTimestamp.from(this, offset);
@@ -1308,10 +1308,10 @@ public final class Moment
             }
 
             // lokale Transformation
-            TimeZone tz = (
+            Timezone tz = (
                 (this.tzid == null)
-                ? TimeZone.ofSystem()
-                : TimeZone.of(this.tzid));
+                ? Timezone.ofSystem()
+                : Timezone.of(this.tzid));
 
             PlainTimestamp ts = moment.inTimezone(tz).with(this.delegate);
             Moment result = ts.inTimezone(tz, this.strategy);
@@ -1749,7 +1749,7 @@ public final class Moment
                 return null;
             }
 
-            TZID tzid = parsedValues.get(TimeZone.identifier());
+            TZID tzid = parsedValues.get(Timezone.identifier());
 
             if (
                 (tzid == null)
@@ -1782,7 +1782,7 @@ public final class Moment
                 if (tzid instanceof ZonalOffset) {
                     offset = (ZonalOffset) tzid;
                 } else {
-                    offset = TimeZone.of(tzid).getOffset(result);
+                    offset = Timezone.of(tzid).getOffset(result);
                 }
 
                 if (

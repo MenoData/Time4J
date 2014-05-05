@@ -26,7 +26,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 
 import java.text.DecimalFormatSymbols;
@@ -499,11 +499,11 @@ public final class Attributes
          *
          * @return  this instance for method chaining
          * @see     #TIMEZONE_ID
-         * @see     TimeZone#ofSystem()
+         * @see     Timezone#ofSystem()
          */
         public Builder setStdTimezone() {
 
-            return this.setTimezone(TimeZone.ofSystem().getID());
+            return this.setTimezone(Timezone.ofSystem().getID());
 
         }
 

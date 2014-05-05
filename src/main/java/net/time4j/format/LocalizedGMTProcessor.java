@@ -26,7 +26,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -82,13 +82,13 @@ final class LocalizedGMTProcessor
             start = ((CharSequence) buffer).length();
         }
 
-        TZID tzid = formattable.get(TimeZone.identifier());
+        TZID tzid = formattable.get(Timezone.identifier());
         ZonalOffset offset;
 
         if (tzid instanceof ZonalOffset) {
             offset = (ZonalOffset) tzid;
         } else if (formattable instanceof UnixTime) {
-            offset = TimeZone.of(tzid).getOffset((UnixTime) formattable);
+            offset = Timezone.of(tzid).getOffset((UnixTime) formattable);
         } else if (tzid == null) {
             offset = getOffset(formattable, step, attributes);
         } else {

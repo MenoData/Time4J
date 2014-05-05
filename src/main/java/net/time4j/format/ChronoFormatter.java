@@ -30,7 +30,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -473,7 +473,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         // Phase 4: Konsistenzprüfung
         if (result instanceof ChronoEntity) {
             if (!leniency.isLax()) {
-                TZID tzid = parsed.get(TimeZone.identifier()); // eventuell null
+                TZID tzid = parsed.get(Timezone.identifier()); // eventuell null
 
                 // Zeitzonenkonversion ergibt immer Unterschied zwischen
                 // lokaler und globaler Zeit => nicht prüfen!
@@ -522,7 +522,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     }
 
                     UnixTime ut = UnixTime.class.cast(result);
-                    boolean dst = TimeZone.of(tzid).isDaylightSaving(ut);
+                    boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
 
                     if (dst != status.getDSTInfo().booleanValue()) {
                         StringBuilder reason = new StringBuilder(256);
@@ -620,14 +620,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     /**
      * <p>Entspricht {@link #withTimezone(TZID)
-     * withTimezone(TimeZone.ofSystem().getID())}. </p>
+     * withTimezone(Timezone.ofSystem().getID())}. </p>
      *
      * @return  changed copy with the system time zone while
      *          this instance remains unaffected
      */
     public ChronoFormatter<T> withStdTimezone() {
 
-        return this.withTimezone(TimeZone.ofSystem().getID());
+        return this.withTimezone(Timezone.ofSystem().getID());
 
     }
 
@@ -798,7 +798,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#WEEK_OF_YEAR}</li>
      *  <li>{@link net.time4j.Weekmodel#localDayOfWeek()} =&gt;
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
-     *  <li>{@link net.time4j.tz.TimeZone#identifier()} =&gt;
+     *  <li>{@link net.time4j.tz.Timezone#identifier()} =&gt;
      *  {@link java.text.DateFormat.Field#TIME_ZONE}</li>
      * </ul>
      *
@@ -2051,7 +2051,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonen-ID ist
          * relevant. Unterst&uuml;tzt werden alle IDs, die von
-         * {@link TimeZone#getAvailableIDs()} geliefert werden - mit
+         * {@link Timezone#getAvailableIDs()} geliefert werden - mit
          * Ausnahme von alten IDs wie &quot;Asia/Riyadh87&quot; oder
          * &quot;CST6CDT&quot;, die Ziffern enthalten. Offset-IDs wie
          * die kanonische Form von {@code ZonalOffset} oder &quot;GMT&quot;
@@ -2062,7 +2062,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalStateException wenn die zugrundeliegende Chronologie
          *          nicht dem Typ {@link net.time4j.base.UnixTime} entspricht
          */
-        public Builder<T> addTimeZoneID() {
+        public Builder<T> addTimezoneID() {
 
             Class<?> chronoType = this.getChronology().getChronoType();
 
@@ -2086,10 +2086,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * @param   abbreviated     abbreviations to be used?
          * @return  this instance for method chaining
-         * @see     TimeZone#getPreferredIDs(Locale)
+         * @see     Timezone#getPreferredIDs(Locale)
          * @see     #addTimezoneName(boolean,Set)
          */
-        public Builder<T> addTimeZoneName(boolean abbreviated) {
+        public Builder<T> addTimezoneName(boolean abbreviated) {
 
             Locale loc = this.locale;
 
@@ -2099,7 +2099,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             return this.addTimezoneName(
                 abbreviated,
-                TimeZone.getPreferredIDs(loc));
+                Timezone.getPreferredIDs(loc));
 
         }
 
@@ -2197,7 +2197,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any replacement text consists
          *          of white-space only or if given replacement list is empty
-         * @see     TimeZone#identifier()
+         * @see     Timezone#identifier()
          */
         public Builder<T> addTimezoneOffset(
             DisplayMode precision,
@@ -2244,7 +2244,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * @param   abbreviated     using shortest possible form?
          * @return  this instance for method chaining
-         * @see     TimeZone#identifier()
+         * @see     Timezone#identifier()
          */
         public Builder<T> addLocalizedOffset(boolean abbreviated) {
 

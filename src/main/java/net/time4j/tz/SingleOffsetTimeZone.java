@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (SingleOffsetTimeZone.java) is part of project Time4J.
+ * This file (SingleOffsetTimezone.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ import java.util.Locale;
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-final class SingleOffsetTimeZone
-    extends TimeZone
+final class SingleOffsetTimezone
+    extends Timezone
     implements TransitionHistory {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -62,7 +62,7 @@ final class SingleOffsetTimeZone
      *
      * @param   offset  fixed shift of local time relative to UTC
      */
-    SingleOffsetTimeZone(ZonalOffset offset) {
+    SingleOffsetTimezone(ZonalOffset offset) {
         super();
 
         if (offset == null) {
@@ -195,8 +195,8 @@ final class SingleOffsetTimeZone
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof SingleOffsetTimeZone) {
-            SingleOffsetTimeZone that = (SingleOffsetTimeZone) obj;
+        } else if (obj instanceof SingleOffsetTimezone) {
+            SingleOffsetTimezone that = (SingleOffsetTimezone) obj;
             return this.offset.equals(that.offset);
         } else {
             return false;

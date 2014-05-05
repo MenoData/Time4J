@@ -41,7 +41,7 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -2684,12 +2684,12 @@ public final class PlainTime
             final AttributeQuery attributes
         ) {
 
-            TimeZone zone;
+            Timezone zone;
 
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                zone = TimeZone.of(attributes.get(Attributes.TIMEZONE_ID));
+                zone = Timezone.of(attributes.get(Attributes.TIMEZONE_ID));
             } else {
-                zone = TimeZone.ofSystem();
+                zone = Timezone.ofSystem();
             }
 
             final UnixTime ut = clock.currentTime();

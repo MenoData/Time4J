@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (TimeZone.java) is part of project Time4J.
+ * This file (Timezone.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ import java.util.concurrent.ConcurrentMap;
  * @concurrency All static methods are thread-safe while this class is
  *              immutable as long as the underlying time zone data are.
  */
-public abstract class TimeZone
+public abstract class Timezone
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -63,7 +63,7 @@ public abstract class TimeZone
         Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
     private static volatile NameData NAME_DATA = null;
-    private static volatile TimeZone SYSTEM_TZ_CURRENT = null;
+    private static volatile Timezone SYSTEM_TZ_CURRENT = null;
     private static volatile boolean ACTIVE = true;
     private static int SOFT_LIMIT = 11;
 
@@ -71,15 +71,15 @@ public abstract class TimeZone
     private static final Map<String, Set<TZID>> TERRITORIES;
     private static final Provider PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
-    private static final ReferenceQueue<TimeZone> QUEUE;
-    private static final LinkedList<TimeZone> LAST_USED;
+    private static final ReferenceQueue<Timezone> QUEUE;
+    private static final LinkedList<Timezone> LAST_USED;
 
-    private static final TimeZone SYSTEM_TZ_ORIGINAL;
+    private static final Timezone SYSTEM_TZ_ORIGINAL;
 
     static {
         CACHE = new ConcurrentHashMap<String, NamedReference>();
-        QUEUE = new ReferenceQueue<TimeZone>();
-        LAST_USED = new LinkedList<TimeZone>(); // strong references
+        QUEUE = new ReferenceQueue<Timezone>();
+        LAST_USED = new LinkedList<Timezone>(); // strong references
 
         List<Class<? extends TZID>> areas =
             new ArrayList<Class<? extends TZID>>();
@@ -170,11 +170,11 @@ public abstract class TimeZone
 
         PROVIDER = (
             (loaded == null)
-            ? new OldStyleTZProvider()
+            ? new PlatformTZProvider()
             : loaded
         );
 
-        TimeZone systemTZ = null;
+        Timezone systemTZ = null;
 
         try {
             String zoneID = System.getProperty("user.timezone");
@@ -185,14 +185,14 @@ public abstract class TimeZone
             ) {
                 systemTZ = ZonalOffset.UTC.getModel();
             } else if (zoneID != null) {
-                systemTZ = TimeZone.getTZ(new NamedID(zoneID), false);
+                systemTZ = Timezone.getTZ(new NamedID(zoneID), false);
             }
         } catch (SecurityException se) {
             // OK, dann Zugriff auf j.u.TimeZone.getDefault()
         }
 
         if (systemTZ == null) {
-            SYSTEM_TZ_ORIGINAL = TimeZone.getDefaultTZ();
+            SYSTEM_TZ_ORIGINAL = Timezone.getDefaultTZ();
         } else {
             SYSTEM_TZ_ORIGINAL = systemTZ;
         }
@@ -210,7 +210,7 @@ public abstract class TimeZone
     /**
      * <p>Nur zur paket-privaten Verwendung. </p>
      */
-    TimeZone() {
+    Timezone() {
         super();
 
     }
@@ -268,7 +268,7 @@ public abstract class TimeZone
      * @see     java.util.TimeZone#getDefault()
      *          java.util.TimeZone.getDefault()
      */
-    public static TimeZone ofSystem() {
+    public static Timezone ofSystem() {
 
         if (ALLOW_SYSTEM_TZ_OVERRIDE) {
             return SYSTEM_TZ_CURRENT;
@@ -286,9 +286,9 @@ public abstract class TimeZone
      * @throws  ChronoException wenn die angegebene Zeitzone nicht geladen
      *          werden kann
      */
-    public static TimeZone of(TZID tzid) {
+    public static Timezone of(TZID tzid) {
 
-        return TimeZone.getTZ(tzid, true);
+        return Timezone.getTZ(tzid, true);
 
     }
 
@@ -306,18 +306,18 @@ public abstract class TimeZone
      * @param   fallback    alternative time zone id
      * @return  time zone data
      */
-    public static TimeZone of(
+    public static Timezone of(
         TZID tzid,
         TZID fallback
     ) {
 
-        TimeZone ret = TimeZone.getTZ(tzid, false);
+        Timezone ret = Timezone.getTZ(tzid, false);
 
         if (ret == null) {
-            ret = TimeZone.getTZ(fallback, false);
+            ret = Timezone.getTZ(fallback, false);
 
             if (ret == null) {
-                ret = TimeZone.ofSystem();
+                ret = Timezone.ofSystem();
             }
         }
 
@@ -415,11 +415,11 @@ public abstract class TimeZone
     public static String getProviderInfo() {
 
         StringBuilder sb = new StringBuilder(128);
-        sb.append(TimeZone.class.getName());
+        sb.append(Timezone.class.getName());
         sb.append("[provider=");
         sb.append(PROVIDER.getName());
 
-        if (!(PROVIDER instanceof OldStyleTZProvider)) {
+        if (!(PROVIDER instanceof PlatformTZProvider)) {
             sb.append(",location=");
             sb.append(PROVIDER.getLocation());
             sb.append(",version=");
@@ -441,7 +441,7 @@ public abstract class TimeZone
      *
      * <pre>
      *  net.time4j.Moment moment = ...;
-     *  System.out.println(moment.get(TimeZone.identifier()));
+     *  System.out.println(moment.get(Timezone.identifier()));
      *  // Ausgabe: Z (ZonalOffset.UTC)
      * </pre>
      *
@@ -479,7 +479,7 @@ public abstract class TimeZone
         }
 
         String id = this.getID().canonical();
-        java.util.TimeZone tz = OldStyleTimeZone.findZone(id);
+        java.util.TimeZone tz = PlatformTimezone.findZone(id);
 
         if (tz.getID().equals(id)) {
             return tz.getDisplayName(
@@ -495,7 +495,7 @@ public abstract class TimeZone
 
     }
 
-    private static TimeZone getDefaultTZ() {
+    private static Timezone getDefaultTZ() {
 
         String zoneID = java.util.TimeZone.getDefault().getID();
         TZID tzid = PREDEFINED.get(zoneID);
@@ -504,11 +504,11 @@ public abstract class TimeZone
             tzid = new NamedID(zoneID);
         }
 
-        return TimeZone.of(tzid, ZonalOffset.UTC);
+        return Timezone.of(tzid, ZonalOffset.UTC);
 
     }
 
-    private static TimeZone getTZ(
+    private static Timezone getTZ(
         TZID tzid,
         boolean wantsException
     ) {
@@ -521,7 +521,7 @@ public abstract class TimeZone
         String zoneID = tzid.canonical();
 
         // Suche im Cache
-        TimeZone tz = null;
+        Timezone tz = null;
         NamedReference sref = CACHE.get(zoneID);
 
         if (sref != null) {
@@ -543,11 +543,11 @@ public abstract class TimeZone
         }
 
         // java.util.TimeZone hat keine öffentliche Historie
-        if (PROVIDER instanceof OldStyleTZProvider) {
-            OldStyleTimeZone test = null;
+        if (PROVIDER instanceof PlatformTZProvider) {
+            PlatformTimezone test = null;
 
             try {
-                test = new OldStyleTimeZone(resolved, zoneID);
+                test = new PlatformTimezone(resolved, zoneID);
             } catch (RuntimeException re) {
                 if (wantsException) {
                     throw re;
@@ -570,9 +570,9 @@ public abstract class TimeZone
 
             if (history == null) {
                 // Alias-Suche + Fallback-Option
-                tz = TimeZone.getZoneByAlias(resolved, zoneID);
+                tz = Timezone.getZoneByAlias(resolved, zoneID);
             } else {
-                tz = new HistorizedTimeZone(resolved, history);
+                tz = new HistorizedTimezone(resolved, history);
             }
         }
 
@@ -594,7 +594,7 @@ public abstract class TimeZone
                 );
 
             if (oldRef == null) {
-                synchronized (TimeZone.class) {
+                synchronized (Timezone.class) {
                     LAST_USED.addFirst(tz);
 
                     while (LAST_USED.size() >= SOFT_LIMIT) {
@@ -602,7 +602,7 @@ public abstract class TimeZone
                     }
                 }
             } else {
-                TimeZone oldZone = oldRef.get();
+                Timezone oldZone = oldRef.get();
 
                 if (oldZone != null) {
                     tz = oldZone;
@@ -614,7 +614,7 @@ public abstract class TimeZone
 
     }
 
-    private static TimeZone getZoneByAlias(
+    private static Timezone getZoneByAlias(
         TZID tzid,
         String zoneID
     ) {
@@ -640,7 +640,7 @@ public abstract class TimeZone
         if (history == null) {
             return null;
         } else {
-            return new HistorizedTimeZone(tzid, history);
+            return new HistorizedTimezone(tzid, history);
         }
 
     }
@@ -670,7 +670,7 @@ public abstract class TimeZone
      * Zeitzonendaten liefert. </p>
      *
      * <p>Implementierungen sind in der Regel zustandslos und halten keinen
-     * Cache. Letzterer sollte der Klasse {@code TimeZone} vorbehalten sein.
+     * Cache. Letzterer sollte der Klasse {@code Timezone} vorbehalten sein.
      * Weil dieses Interface per {@code java.util.ServiceLoader} genutzt wird,
      * mu&szlig; eine konkrete Implementierung einen &ouml;ffentlichen
      * Konstruktor ohne Argumente definieren. </p>
@@ -704,7 +704,7 @@ public abstract class TimeZone
         /**
          * <p>L&auml;dt die Zeitzonendaten zur angegebenen Zonen-ID. </p>
          *
-         * <p>Diese Methode wird von {@code TimeZone} aufgerufen. Das zweite
+         * <p>Diese Methode wird von {@code Timezone} aufgerufen. Das zweite
          * Argument ist normalerweise {@code false}, so da&szlig; es sich um
          * eine exakte Suchanforderung handelt. Nur wenn die Methode
          * {@code isFallbackEnabled()} den Wert {@code true} zur&uuml;ckgibt
@@ -792,7 +792,7 @@ public abstract class TimeZone
          */
         public static void refresh() {
 
-            synchronized (TimeZone.class) {
+            synchronized (Timezone.class) {
                 while (QUEUE.poll() != null) {}
                 LAST_USED.clear();
             }
@@ -801,7 +801,7 @@ public abstract class TimeZone
             CACHE.clear();
 
             if (ALLOW_SYSTEM_TZ_OVERRIDE) {
-                SYSTEM_TZ_CURRENT = TimeZone.getDefaultTZ();
+                SYSTEM_TZ_CURRENT = Timezone.getDefaultTZ();
             }
 
         }
@@ -845,7 +845,7 @@ public abstract class TimeZone
                 CACHE.remove(ref.tzid);
             }
 
-            synchronized (TimeZone.class) {
+            synchronized (Timezone.class) {
                 SOFT_LIMIT = minimumCacheSize + 1;
                 int n = LAST_USED.size() - minimumCacheSize;
 
@@ -888,7 +888,7 @@ public abstract class TimeZone
     }
 
     private static class NamedReference
-        extends SoftReference<TimeZone> {
+        extends SoftReference<Timezone> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -897,8 +897,8 @@ public abstract class TimeZone
         //~ Konstruktoren -------------------------------------------------
 
         NamedReference(
-            TimeZone tz,
-            ReferenceQueue<TimeZone> queue
+            Timezone tz,
+            ReferenceQueue<Timezone> queue
         ) {
             super(tz, queue);
             this.tzid = tz.getID();
@@ -1023,7 +1023,7 @@ public abstract class TimeZone
 
     }
 
-    private static class OldStyleTZProvider
+    private static class PlatformTZProvider
         implements Provider {
 
         //~ Methoden ------------------------------------------------------

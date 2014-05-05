@@ -24,7 +24,7 @@ package net.time4j;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 
@@ -42,7 +42,7 @@ public class ZonalClock {
     //~ Instanzvariablen --------------------------------------------------
 
     private final TimeSource<?> timeSource;
-    private final TimeZone timeZone;
+    private final Timezone timeZone;
     private final TZID tzid;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -71,7 +71,7 @@ public class ZonalClock {
      *
      * <p>Ist der dritte Parameter auf {@code true} gesetzt, wird die
      * assoziierte Zeitzone immer frisch geladen, so da&szlig; auch ein
-     * {@link net.time4j.tz.TimeZone.Cache#refresh() dynamic update} der
+     * {@link net.time4j.tz.Timezone.Cache#refresh() dynamic update} der
      * Zeitzone ber&uuml;cksichtigt wird. </p>
      *
      * @param   timeSource  source for current world time (UTC)
@@ -94,7 +94,7 @@ public class ZonalClock {
         }
 
         this.timeSource = timeSource;
-        this.timeZone = (dynamic ? null : TimeZone.of(tzid));
+        this.timeZone = (dynamic ? null : Timezone.of(tzid));
         this.tzid = (dynamic ? tzid : null);
 
     }
@@ -103,7 +103,7 @@ public class ZonalClock {
         super();
 
         this.timeSource = SystemClock.INSTANCE;
-        this.timeZone = TimeZone.ofSystem();
+        this.timeZone = Timezone.ofSystem();
         this.tzid = null;
 
     }
@@ -182,10 +182,10 @@ public class ZonalClock {
 
     private ZonalOffset getOffset(UnixTime ut) {
 
-        TimeZone zone = (
+        Timezone zone = (
             (this.tzid == null)
             ? this.timeZone
-            : TimeZone.of(this.tzid)
+            : Timezone.of(this.tzid)
         );
 
         return zone.getOffset(ut);

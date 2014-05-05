@@ -25,7 +25,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TimeZone;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -92,7 +92,7 @@ final class TimezoneNameProcessor
         FormatStep step
     ) throws IOException {
 
-        TZID tzid = formattable.get(TimeZone.identifier());
+        TZID tzid = formattable.get(Timezone.identifier());
 
         if (tzid == null) {
             throw new IllegalArgumentException(
@@ -106,7 +106,7 @@ final class TimezoneNameProcessor
         String name;
 
         if (formattable instanceof UnixTime) {
-            TimeZone zone = TimeZone.of(tzid);
+            Timezone zone = Timezone.of(tzid);
             UnixTime ut = UnixTime.class.cast(formattable);
             name =
                 zone.getDisplayName(
@@ -296,8 +296,8 @@ final class TimezoneNameProcessor
         List<TZID> zones;
         Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
 
-        for (TZID tzid : TimeZone.getAvailableIDs()) {
-            TimeZone zone = TimeZone.of(tzid);
+        for (TZID tzid : Timezone.getAvailableIDs()) {
+            Timezone zone = Timezone.of(tzid);
 
             String tzName =
                 zone.getDisplayName(daylightSaving, this.abbreviated, locale)
