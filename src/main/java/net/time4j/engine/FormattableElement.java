@@ -83,20 +83,4 @@ public @interface FormattableElement {
      */
     String standalone() default "";
 
-    /**
-     * <p>Ist eine numerische Ausgabe als Ganzzahl m&ouml;glich? </p>
-     *
-     * @return  {@code true} if numerical output is possible else {@code false}
-     * @see     net.time4j.format.NumericalElement
-     */
-    boolean numerical() default false; // TODO: Verwendungen prüfen
-
-    /**
-     * <p>Ist eine textuelle Ausgabe m&ouml;glich? </p>
-     *
-     * @return  {@code true} if textual output is possible else {@code false}
-     * @see     net.time4j.format.TextElement
-     */
-    boolean textual() default false; // TODO: Verwendungen prüfen
-
 }

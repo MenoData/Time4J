@@ -1464,7 +1464,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @see     Chronology#isSupported(ChronoElement)
          * @see     NumericalElement#numerical(java.lang.Object)
          *          NumericalElement.numerical(V)
-         * @see     net.time4j.engine.FormattableElement#numerical()
          * @see     SignPolicy#SHOW_NEVER
          */
         public <V extends Enum<V>> Builder<T> addNumerical(
