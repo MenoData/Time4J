@@ -157,8 +157,8 @@ public interface ElementRule<T, V> {
      *          not valid dependent on the given time context
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #isValid(Object, Object) isValid(T, V)
-     * @see     AdvancedElement#lenient(Comparable)
-     *          AdvancedElement.lenient(V)
+     * @see     AdvancedElement#setLenient(Comparable, Class)
+     *          AdvancedElement.setLenient(Comparable, Class)
      * @see     ChronoElement#isLenient()
      * @see     net.time4j.ProportionalElement#setLenient(Number)
      */
@@ -177,7 +177,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#floor()
+     * @see     AdvancedElement#atFloor(Class)
      */
     ChronoElement<?> getChildAtFloor(T context);
 
@@ -190,7 +190,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#ceiling()
+     * @see     AdvancedElement#atCeiling(Class)
      */
     ChronoElement<?> getChildAtCeiling(T context);
 

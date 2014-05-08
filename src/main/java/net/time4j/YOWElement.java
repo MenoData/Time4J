@@ -31,8 +31,6 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.NumericalElement;
-import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 
 import java.io.ObjectStreamException;
 
@@ -47,8 +45,8 @@ import static net.time4j.PlainTime.WALL_TIME;
  * @concurrency <immutable>
  */
 final class YOWElement
-    extends AbstractValueElement<Integer, PlainDate>
-    implements AdjustableElement<Integer, PlainDate>,
+    extends AbstractDateElement<Integer>
+    implements AdjustableElement<Integer, DateOperator>,
                NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -65,16 +63,16 @@ final class YOWElement
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final ZonalOperator<PlainDate> previousAdjuster;
-    private transient final ZonalOperator<PlainDate> nextAdjuster;
+    private transient final DateOperator previousAdjuster;
+    private transient final DateOperator nextAdjuster;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private YOWElement(String name) {
         super(name);
 
-        this.previousAdjuster = new YOWRollingAdjuster<PlainDate>(-1);
-        this.nextAdjuster = new YOWRollingAdjuster<PlainDate>(1);
+        this.previousAdjuster = new YOWRollingAdjuster(-1);
+        this.nextAdjuster = new YOWRollingAdjuster(1);
 
     }
 
@@ -130,14 +128,14 @@ final class YOWElement
     }
 
     @Override
-    public ZonalOperator<PlainDate> decremented() {
+    public DateOperator decremented() {
 
         return this.previousAdjuster;
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> incremented() {
+    public DateOperator incremented() {
 
         return this.nextAdjuster;
 
@@ -289,28 +287,40 @@ final class YOWElement
 
     }
 
-    private static class YOWRollingAdjuster<T extends ChronoEntity<T>>
-        implements ZonalOperator<T> {
+    private static class YOWRollingAdjuster
+        extends DateOperator {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final long amount;
+        private final ChronoOperator<PlainTimestamp> yowTS;
 
         //~ Konstruktoren -------------------------------------------------
 
         private YOWRollingAdjuster(long amount) {
-            super();
+            super(OP_YOW);
 
             this.amount = amount;
+
+            this.yowTS =
+                new ChronoOperator<PlainTimestamp>() {
+                    @Override
+                    public PlainTimestamp apply(PlainTimestamp entity) {
+                        UnitRule<PlainTimestamp> rule = YOWElement.unitRule();
+                        return rule.addTo(
+                            entity,
+                            YOWRollingAdjuster.this.amount);
+                    }
+                };
 
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public T apply(T entity) {
+        public PlainDate apply(PlainDate entity) {
 
-            UnitRule<T> rule = YOWElement.unitRule();
+            UnitRule<PlainDate> rule = YOWElement.unitRule();
             return rule.addTo(entity, this.amount);
 
         }
@@ -319,30 +329,14 @@ final class YOWElement
         public ChronoOperator<Moment> inStdTimezone() {
 
             return new Moment.Operator(
-                this.onTimestamp(), YOWElement.INSTANCE, OperatorType.YOW);
+                this.yowTS, YOWElement.INSTANCE, OP_YOW);
 
         }
 
         @Override
-        public ChronoOperator<Moment> inTimezone(
-            TZID tzid,
-            TransitionStrategy strategy
-        ) {
+        ChronoOperator<PlainTimestamp> onTimestamp() {
 
-            return new Moment.Operator(
-                this.onTimestamp(),
-                tzid,
-                strategy,
-                YOWElement.INSTANCE,
-                OperatorType.YOW
-            );
-
-        }
-
-        @Override
-        public ChronoOperator<PlainTimestamp> onTimestamp() {
-
-            return new YOWRollingAdjuster<PlainTimestamp>(this.amount);
+            return this.yowTS;
 
         }
 

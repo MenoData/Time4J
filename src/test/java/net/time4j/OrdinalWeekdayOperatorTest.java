@@ -119,8 +119,7 @@ public class OrdinalWeekdayOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(2013, this.month, this.dom).atStartOfDay();
         assertThat(
-            ts.with(
-                PlainDate.WEEKDAY_IN_MONTH.setToFirst(this.dow).onTimestamp()),
+            ts.with(PlainDate.WEEKDAY_IN_MONTH.setToFirst(this.dow)),
             is(
                 PlainDate.of(2013, this.expectedMonth, this.expectedDom)
                 .atStartOfDay()));
@@ -131,8 +130,7 @@ public class OrdinalWeekdayOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(2013, this.month, this.dom).atStartOfDay();
         assertThat(
-            ts.with(
-                PlainDate.WEEKDAY_IN_MONTH.setToSecond(this.dow).onTimestamp()),
+            ts.with(PlainDate.WEEKDAY_IN_MONTH.setToSecond(this.dow)),
             is(
                 PlainDate.of(2013, this.expectedMonth, this.expectedDom)
                 .plus(1, CalendarUnit.WEEKS)
@@ -144,8 +142,7 @@ public class OrdinalWeekdayOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(2013, this.month, this.dom).atStartOfDay();
         assertThat(
-            ts.with(
-                PlainDate.WEEKDAY_IN_MONTH.setToThird(this.dow).onTimestamp()),
+            ts.with(PlainDate.WEEKDAY_IN_MONTH.setToThird(this.dow)),
             is(
                 PlainDate.of(2013, this.expectedMonth, this.expectedDom)
                 .plus(2, CalendarUnit.WEEKS)
@@ -157,8 +154,7 @@ public class OrdinalWeekdayOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(2013, this.month, this.dom).atStartOfDay();
         assertThat(
-            ts.with(
-                PlainDate.WEEKDAY_IN_MONTH.setToFourth(this.dow).onTimestamp()),
+            ts.with(PlainDate.WEEKDAY_IN_MONTH.setToFourth(this.dow)),
             is(
                 PlainDate.of(2013, this.expectedMonth, this.expectedDom)
                 .plus(3, CalendarUnit.WEEKS)
@@ -177,8 +173,7 @@ public class OrdinalWeekdayOperatorTest {
             expected = expected.minus(1, CalendarUnit.WEEKS);
         }
         assertThat(
-            ts.with(
-                PlainDate.WEEKDAY_IN_MONTH.setToLast(this.dow).onTimestamp()),
+            ts.with(PlainDate.WEEKDAY_IN_MONTH.setToLast(this.dow)),
             is(expected));
     }
 

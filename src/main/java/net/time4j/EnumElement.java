@@ -49,10 +49,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @concurrency <immutable>
  */
 final class EnumElement<V extends Enum<V>>
-    extends AbstractValueElement<V, PlainDate>
-    implements NavigableElement<V, PlainDate>,
-               NumericalElement<V>,
-               TextElement<V> {
+    extends AbstractDateElement<V>
+    implements NavigableElement<V>, NumericalElement<V>, TextElement<V> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -150,34 +148,34 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToNext(V value) {
+    public DateOperator setToNext(V value) {
 
-        return new NavigationOperator<V, PlainDate>(
-            this, OperatorType.NAV_NEXT, value);
-
-    }
-
-    @Override
-    public ZonalOperator<PlainDate> setToPrevious(V value) {
-
-        return new NavigationOperator<V, PlainDate>(
-            this, OperatorType.NAV_PREVIOUS, value);
+        return new NavigationOperator<V>(
+            this, ElementOperator.OP_NAV_NEXT, value);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToNextOrSame(V value) {
+    public DateOperator setToPrevious(V value) {
 
-        return new NavigationOperator<V, PlainDate>(
-            this, OperatorType.NAV_NEXT_OR_SAME, value);
+        return new NavigationOperator<V>(
+            this, ElementOperator.OP_NAV_PREVIOUS, value);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToPreviousOrSame(V value) {
+    public DateOperator setToNextOrSame(V value) {
 
-        return new NavigationOperator<V, PlainDate>(
-            this, OperatorType.NAV_PREVIOUS_OR_SAME, value);
+        return new NavigationOperator<V>(
+            this, ElementOperator.OP_NAV_NEXT_OR_SAME, value);
+
+    }
+
+    @Override
+    public DateOperator setToPreviousOrSame(V value) {
+
+        return new NavigationOperator<V>(
+            this, ElementOperator.OP_NAV_PREVIOUS_OR_SAME, value);
 
     }
 

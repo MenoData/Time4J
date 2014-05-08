@@ -38,8 +38,8 @@ import java.math.BigDecimal;
  * @concurrency <immutable>
  */
 final class LongElement
-    extends AbstractValueElement<Long, PlainTime>
-    implements ProportionalElement<Long, PlainTime>,
+    extends AbstractTimeElement<Long>
+    implements ProportionalElement<Long, TimeOperator, PlainTime>,
                NumericalElement<Long> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -139,7 +139,7 @@ final class LongElement
     @Override
     public ChronoOperator<PlainTime> roundedUp(int stepwidth) {
 
-        return new LongRoundingOperator(
+        return new RoundingOperator<PlainTime>(
             this,
             Boolean.TRUE,
             stepwidth
@@ -150,7 +150,7 @@ final class LongElement
     @Override
     public ChronoOperator<PlainTime> roundedHalf(int stepwidth) {
 
-        return new LongRoundingOperator(
+        return new RoundingOperator<PlainTime>(
             this,
             null,
             stepwidth
@@ -161,7 +161,7 @@ final class LongElement
     @Override
     public ChronoOperator<PlainTime> roundedDown(int stepwidth) {
 
-        return new LongRoundingOperator(
+        return new RoundingOperator<PlainTime>(
             this,
             Boolean.FALSE,
             stepwidth

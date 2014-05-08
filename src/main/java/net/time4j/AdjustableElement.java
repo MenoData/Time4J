@@ -29,10 +29,10 @@ import net.time4j.engine.ChronoElement;
  * Standardmanipulationen. </p>
  *
  * @param   <V> generic type of element values
- * @param   <T> generic operator target type
+ * @param   <O> generic operator type
  * @author  Meno Hochschild
  */
-public interface AdjustableElement<V, T>
+public interface AdjustableElement<V, O>
     extends ChronoElement<V> {
 
     //~ Methoden ----------------------------------------------------------
@@ -42,14 +42,14 @@ public interface AdjustableElement<V, T>
      *
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> minimized();
+    O minimized();
 
     /**
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementmaximum. </p>
      *
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> maximized();
+    O maximized();
 
     /**
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
@@ -63,7 +63,7 @@ public interface AdjustableElement<V, T>
      *          and requiring a base unit in given chronology for decrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
-    ZonalOperator<T> decremented();
+    O decremented();
 
     /**
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
@@ -77,7 +77,7 @@ public interface AdjustableElement<V, T>
      *          and requiring a base unit in given chronology for incrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
-    ZonalOperator<T> incremented();
+    O incremented();
 
     /**
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
@@ -85,7 +85,7 @@ public interface AdjustableElement<V, T>
      *
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> atFloor();
+    O atFloor();
 
     /**
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
@@ -93,6 +93,6 @@ public interface AdjustableElement<V, T>
      *
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> atCeiling();
+    O atCeiling();
 
 }

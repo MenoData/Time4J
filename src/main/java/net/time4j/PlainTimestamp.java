@@ -448,6 +448,34 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * <p>Passt diesen Zeitstempel mit Hilfe des angegebenen datumsbezogenen
+     * Operators an. </p>
+     *
+     * @param   operator    date operator
+     * @return  changed copy of this timestamp
+     * @see     ChronoEntity#with(net.time4j.engine.ChronoOperator)
+     */
+    public PlainTimestamp with(DateOperator operator) {
+
+        return this.with(operator.onTimestamp());
+
+    }
+
+    /**
+     * <p>Passt diesen Zeitstempel mit Hilfe des angegebenen uhrzeitbezogenen
+     * Operators an. </p>
+     *
+     * @param   operator    time operator
+     * @return  changed copy of this timestamp
+     * @see     ChronoEntity#with(net.time4j.engine.ChronoOperator)
+     */
+    public PlainTimestamp with(TimeOperator operator) {
+
+        return this.with(operator.onTimestamp());
+
+    }
+
     @Override
     public boolean isBefore(PlainTimestamp timestamp) {
 

@@ -74,9 +74,13 @@ public class TimeOperatorTest {
             PlainTime.of(19, 45, 30, 123456789)
                 .with(CLOCK_HOUR_OF_AMPM.atFloor()),
             is(PlainTime.of(19)));
+    }
+
+    @Test
+    public void clockHourOfAmPmAtFloorOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 19, 45, 30)
-                .with(CLOCK_HOUR_OF_AMPM.atFloor().onTimestamp()),
+                .with(CLOCK_HOUR_OF_AMPM.atFloor()),
             is(PlainTimestamp.of(2014, 4, 21, 19, 0)));
     }
 
@@ -93,9 +97,13 @@ public class TimeOperatorTest {
             PlainTime.of(19, 45, 30, 123456789)
                 .with(CLOCK_HOUR_OF_AMPM.atCeiling()),
             is(PlainTime.of(19, 59, 59, 999999999)));
+    }
+
+    @Test
+    public void clockHourOfAmPmAtCeilingOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 19, 45, 30)
-                .with(CLOCK_HOUR_OF_AMPM.atCeiling().onTimestamp()),
+                .with(CLOCK_HOUR_OF_AMPM.atCeiling()),
             is(
                 PlainTimestamp.of(2014, 4, 21, 19, 59, 59)
                 .with(NANO_OF_SECOND, 999999999)));
@@ -288,6 +296,14 @@ public class TimeOperatorTest {
     }
 
     @Test
+    public void digitalHourOfDayMinimizedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 19, 45, 30)
+                .with(DIGITAL_HOUR_OF_DAY.minimized()),
+            is(PlainTimestamp.of(2014, 5, 7, 0, 45, 30)));
+    }
+
+    @Test
     public void digitalHourOfDayMinimizedIfHour24() {
         assertThat(
             PlainTime.of(24).with(DIGITAL_HOUR_OF_DAY.minimized()),
@@ -299,6 +315,14 @@ public class TimeOperatorTest {
         assertThat(
             PlainTime.of(19, 45, 30).with(DIGITAL_HOUR_OF_DAY.maximized()),
             is(PlainTime.of(23, 45, 30)));
+    }
+
+    @Test
+    public void digitalHourOfDayMaximizedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 19, 45, 30)
+                .with(DIGITAL_HOUR_OF_DAY.maximized()),
+            is(PlainTimestamp.of(2014, 5, 7, 23, 45, 30)));
     }
 
     @Test
@@ -316,6 +340,14 @@ public class TimeOperatorTest {
     }
 
     @Test
+    public void digitalHourOfDayDecrementedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 0, 45)
+                .with(DIGITAL_HOUR_OF_DAY.decremented()),
+            is(PlainTimestamp.of(2014, 5, 6, 23, 45)));
+    }
+
+    @Test
     public void digitalHourOfDayDecrementedIfHour24() {
         assertThat(
             PlainTime.of(24).with(DIGITAL_HOUR_OF_DAY.decremented()),
@@ -327,6 +359,14 @@ public class TimeOperatorTest {
         assertThat(
             PlainTime.of(19, 45, 30).with(DIGITAL_HOUR_OF_DAY.incremented()),
             is(PlainTime.of(20, 45, 30)));
+    }
+
+    @Test
+    public void digitalHourOfDayIncrementedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 23, 45)
+                .with(DIGITAL_HOUR_OF_DAY.incremented()),
+            is(PlainTimestamp.of(2014, 5, 8, 0, 45)));
     }
 
     @Test
@@ -374,6 +414,14 @@ public class TimeOperatorTest {
     }
 
     @Test
+    public void isoHourMinimizedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 19, 45, 30)
+                .with(ISO_HOUR.minimized()),
+            is(PlainTimestamp.of(2014, 5, 7, 0, 45, 30)));
+    }
+
+    @Test
     public void isoHourMinimizedIfFullHour() {
         assertThat(
             PlainTime.of(13).with(ISO_HOUR.minimized()),
@@ -388,6 +436,14 @@ public class TimeOperatorTest {
         assertThat(
             PlainTime.of(19, 45, 30).with(ISO_HOUR.maximized()),
             is(PlainTime.of(23, 45, 30)));
+    }
+
+    @Test
+    public void isoHourMaximizedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 19, 0)
+                .with(ISO_HOUR.maximized()),
+            is(PlainTimestamp.of(2014, 5, 7, 23, 0)));
     }
 
     @Test
@@ -411,6 +467,14 @@ public class TimeOperatorTest {
     }
 
     @Test
+    public void isoHourDecrementedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 0, 45, 30)
+                .with(ISO_HOUR.decremented()),
+            is(PlainTimestamp.of(2014, 5, 6, 23, 45, 30)));
+    }
+
+    @Test
     public void isoHourDecrementedIfFullHour() {
         assertThat(
             PlainTime.of(0).with(ISO_HOUR.decremented()),
@@ -428,6 +492,14 @@ public class TimeOperatorTest {
         assertThat(
             PlainTime.of(19, 45, 30).with(ISO_HOUR.incremented()),
             is(PlainTime.of(20, 45, 30)));
+    }
+
+    @Test
+    public void isoHourIncrementedOnTimestamp() {
+        assertThat(
+            PlainTimestamp.of(2014, 5, 7, 23, 45, 30)
+                .with(ISO_HOUR.incremented()),
+            is(PlainTimestamp.of(2014, 5, 8, 0, 45, 30)));
     }
 
     @Test

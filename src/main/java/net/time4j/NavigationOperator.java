@@ -21,35 +21,28 @@
 
 package net.time4j;
 
-import net.time4j.base.MathUtils;
-import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.Chronology;
-import net.time4j.engine.EpochDays;
-import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 
 
 /**
  * <p>Spezialoperator zum Navigieren zu bestimmten Elementwerten. </p>
  *
  * @param       <V> generic enum type of element values
- * @param       <T> generic target type for a {@code ChronoOperator}
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
-    implements ZonalOperator<T> {
+final class NavigationOperator<V extends Enum<V>>
+    extends DateOperator {
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoElement<V> element;
-    private final OperatorType mode;
     private final V value;
     private final int len;
+    private final ChronoOperator<PlainTimestamp> navTS;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -62,26 +55,53 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
      */
     NavigationOperator(
         ChronoElement<V> element,
-        OperatorType mode,
+        int mode,
         V value
     ) {
-        super();
+        super(mode);
 
         if (value == null) {
             throw new NullPointerException("Missing value.");
         }
 
         this.element = element;
-        this.mode = mode;
         this.value = value;
         this.len = element.getType().getEnumConstants().length;
+
+        this.navTS =
+            new ChronoOperator<PlainTimestamp>() {
+                @Override
+                public PlainTimestamp apply(PlainTimestamp entity) {
+                    return doApply(entity);
+                }
+            };
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public T apply(T entity) {
+    public PlainDate apply(PlainDate entity) {
+
+        return this.doApply(entity);
+
+    }
+
+    @Override
+    public ChronoOperator<Moment> inStdTimezone() {
+
+        return new Moment.Operator(this.navTS, this.element, this.getType());
+
+    }
+
+    @Override
+    ChronoOperator<PlainTimestamp> onTimestamp() {
+
+        return this.navTS;
+
+    }
+
+    private <T extends ChronoEntity<T>> T doApply(T entity) {
 
         if (entity.contains(PlainDate.CALENDAR_DATE)) {
             PlainDate date = entity.get(PlainDate.CALENDAR_DATE);
@@ -98,36 +118,25 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
                         date.getChronology().getBaseUnit(this.element))
                 );
             }
-        } else if (
-            (entity instanceof Calendrical)
-            && this.element.name().equals("LOCAL_DAY_OF_WEEK")
-        ) {
-            // Spezialmodus für Weekmodel#localDayOfWeek()
-            Calendrical<?, ?> date = Calendrical.class.cast(entity);
-            Calendrical<?, ?> result =  this.adjustDate(date);
-
-            if (result != null) {
-                return entity.getChronology().getChronoType().cast(result);
-            }
         }
 
         String navigation;
 
-        switch (this.mode) {
-            case NAV_NEXT:
+        switch (this.getType()) {
+            case OP_NAV_NEXT:
                 navigation = "setToNext";
                 break;
-            case NAV_PREVIOUS:
+            case OP_NAV_PREVIOUS:
                 navigation = "setToPrevious";
                 break;
-            case NAV_NEXT_OR_SAME:
+            case OP_NAV_NEXT_OR_SAME:
                 navigation = "setToNextOrSame";
                 break;
-            case NAV_PREVIOUS_OR_SAME:
+            case OP_NAV_PREVIOUS_OR_SAME:
                 navigation = "setToPreviousOrSame";
                 break;
             default:
-                throw new AssertionError("Unknown: " + this.mode);
+                throw new AssertionError("Unknown: " + this.getType());
         }
 
         throw new ChronoException(
@@ -137,112 +146,36 @@ final class NavigationOperator<V extends Enum<V>, T extends ChronoEntity<T>>
 
     }
 
-    @Override
-    public ChronoOperator<Moment> inStdTimezone() {
-
-        return new Moment.Operator(this.onTimestamp(), this.element, this.mode);
-
-    }
-
-    @Override
-    public ChronoOperator<Moment> inTimezone(
-        TZID tzid,
-        TransitionStrategy strategy
-    ) {
-
-        return new Moment.Operator(
-            this.onTimestamp(),
-            tzid,
-            strategy,
-            this.element,
-            this.mode
-        );
-
-    }
-
-    // TODO: cachen?
-    @Override
-    public ChronoOperator<PlainTimestamp> onTimestamp() {
-
-        return new NavigationOperator<V, PlainTimestamp>(
-            this.element,
-            this.mode,
-            this.value
-        );
-
-    }
-
     private int delta(int oldOrdinal) {
 
         int newOrdinal = this.value.ordinal();
 
-        switch (this.mode) {
-            case NAV_NEXT:
+        switch (this.getType()) {
+            case OP_NAV_NEXT:
                 if (newOrdinal <= oldOrdinal) {
                     newOrdinal += this.len;
                 }
                 break;
-            case NAV_PREVIOUS:
+            case OP_NAV_PREVIOUS:
                 if (newOrdinal >= oldOrdinal) {
                     newOrdinal -= this.len;
                 }
                 break;
-            case NAV_NEXT_OR_SAME:
+            case OP_NAV_NEXT_OR_SAME:
                 if (newOrdinal < oldOrdinal) {
                     newOrdinal += this.len;
                 }
                 break;
-            case NAV_PREVIOUS_OR_SAME:
+            case OP_NAV_PREVIOUS_OR_SAME:
                 if (newOrdinal > oldOrdinal) {
                     newOrdinal -= this.len;
                 }
                 break;
             default:
-                throw new AssertionError("Unknown: " + this.mode);
+                throw new AssertionError("Unknown: " + this.getType());
         }
 
         return newOrdinal;
-
-    }
-
-    private Calendrical<?, ?> adjustDate(Calendrical<?, ?> date) {
-
-        if (hasSevenDayWeek(date.getChronology())) {
-            long utcDays = date.get(EpochDays.UTC);
-            int oldValue = Weekmodel.getDayOfWeek(utcDays).getValue();
-            int newValue = this.delta(oldValue);
-
-            if (newValue == oldValue) {
-                return date;
-            } else {
-                return date.with(
-                    EpochDays.UTC,
-                    MathUtils.safeAdd(utcDays, newValue - oldValue)
-                );
-            }
-        } else {
-            return null;
-        }
-
-    }
-
-    private static boolean hasSevenDayWeek(Chronology<?> chrono) {
-
-        if (Calendrical.class.isAssignableFrom(chrono.getChronoType())) {
-            for (ChronoElement<?> element : chrono.getRegisteredElements()) {
-                if (element.name().equals("DAY_OF_WEEK")) {
-                    Object[] enums = element.getType().getEnumConstants();
-                    if (
-                        (enums != null)
-                        && (enums.length == 7)
-                    ) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
 
     }
 

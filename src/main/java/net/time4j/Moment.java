@@ -1215,7 +1215,7 @@ public final class Moment
         private final TZID tzid;
         private final TransitionStrategy strategy;
         private final ChronoElement<?> element;
-        private final OperatorType type;
+        private final int type;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1230,7 +1230,7 @@ public final class Moment
         Operator(
             ChronoOperator<PlainTimestamp> delegate,
             ChronoElement<?> element,
-            OperatorType type
+            int type
         ) {
             super();
 
@@ -1256,7 +1256,7 @@ public final class Moment
             TZID tzid,
             TransitionStrategy strategy,
             ChronoElement<?> element,
-            OperatorType type
+            int type
         ) {
             super();
 
@@ -1283,13 +1283,13 @@ public final class Moment
             if (
                 LOW_TIME_ELEMENTS.containsKey(this.element)
                 && moment.isAfter(START_LS_CHECK)
-                && ((this.type == OperatorType.DECREMENT)
-                    || (this.type == OperatorType.INCREMENT))
+                && ((this.type == ElementOperator.OP_DECREMENT)
+                    || (this.type == ElementOperator.OP_INCREMENT))
             ) {
                 int step = LOW_TIME_ELEMENTS.get(this.element).intValue();
                 int sign = 1;
 
-                if (this.type == OperatorType.DECREMENT) {
+                if (this.type == ElementOperator.OP_DECREMENT) {
                     sign = -1;
                 }
 
@@ -1317,7 +1317,7 @@ public final class Moment
             Moment result = ts.inTimezone(tz, this.strategy);
 
             // hier kann niemals die Schaltsekunde erreicht werden
-            if (this.type == OperatorType.FLOOR) {
+            if (this.type == ElementOperator.OP_FLOOR) {
                 return result;
             }
 
@@ -1338,14 +1338,14 @@ public final class Moment
             ) {
                 if (
                     moment.isLeapSecond()
-                    || (this.type == OperatorType.CEILING)
+                    || (this.type == ElementOperator.OP_CEILING)
                 ) {
                     return moveEventuallyToLS(result);
                 }
             } else if (this.element == SECOND_OF_MINUTE) {
                 if (
-                    (this.type == OperatorType.MAXIMIZE)
-                    || (this.type == OperatorType.CEILING)
+                    (this.type == ElementOperator.OP_MAXIMIZE)
+                    || (this.type == ElementOperator.OP_CEILING)
                 ) {
                     return moveEventuallyToLS(result);
                 }
@@ -1355,9 +1355,9 @@ public final class Moment
                 || (this.element == NANO_OF_SECOND)
             ) {
                 switch (this.type) {
-                    case MINIMIZE:
-                    case MAXIMIZE:
-                    case CEILING:
+                    case ElementOperator.OP_MINIMIZE:
+                    case ElementOperator.OP_MAXIMIZE:
+                    case ElementOperator.OP_CEILING:
                         if (moment.isLeapSecond()) {
                             result = result.plus(1, SI.SECONDS);
                         }

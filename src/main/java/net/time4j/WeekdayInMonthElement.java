@@ -27,10 +27,10 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.format.NumericalElement;
-import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 
 import java.io.ObjectStreamException;
+
+import static net.time4j.ElementOperator.OP_WIM;
 
 
 /**
@@ -45,9 +45,8 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class WeekdayInMonthElement
-    extends AbstractValueElement<Integer, PlainDate>
-    implements OrdinalWeekdayElement<PlainDate>,
-               NumericalElement<Integer> {
+    extends AbstractDateElement<Integer>
+    implements OrdinalWeekdayElement, NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -129,46 +128,46 @@ final class WeekdayInMonthElement
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToFirst(Weekday dayOfWeek) {
+    public DateOperator setToFirst(Weekday dayOfWeek) {
 
         return this.setTo(1, dayOfWeek);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToSecond(Weekday dayOfWeek) {
+    public DateOperator setToSecond(Weekday dayOfWeek) {
 
         return this.setTo(2, dayOfWeek);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToThird(Weekday dayOfWeek) {
+    public DateOperator setToThird(Weekday dayOfWeek) {
 
         return this.setTo(3, dayOfWeek);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToFourth(Weekday dayOfWeek) {
+    public DateOperator setToFourth(Weekday dayOfWeek) {
 
         return this.setTo(4, dayOfWeek);
 
     }
 
     @Override
-    public ZonalOperator<PlainDate> setToLast(Weekday dayOfWeek) {
+    public DateOperator setToLast(Weekday dayOfWeek) {
 
         return this.setTo(LAST, dayOfWeek);
 
     }
 
-    private ZonalOperator<PlainDate> setTo(
+    private DateOperator setTo(
         final int ordinal,
         final Weekday dayOfWeek
     ) {
 
-        return new SpecialOperator<PlainDate>(ordinal, dayOfWeek);
+        return new SpecialOperator(ordinal, dayOfWeek);
 
     }
 
@@ -180,13 +179,14 @@ final class WeekdayInMonthElement
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class SpecialOperator<T extends ChronoEntity<T>>
-        implements ZonalOperator<T> {
+    private static class SpecialOperator
+        extends DateOperator {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final int ordinal;
         private final Weekday dayOfWeek;
+        private final ChronoOperator<PlainTimestamp> specialTS;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -194,7 +194,7 @@ final class WeekdayInMonthElement
             int ordinal,
             Weekday dayOfWeek
         ) {
-            super();
+            super(OP_WIM);
 
             if (dayOfWeek == null) {
                 throw new NullPointerException("Missing value.");
@@ -203,12 +203,44 @@ final class WeekdayInMonthElement
             this.ordinal = ordinal;
             this.dayOfWeek = dayOfWeek;
 
+            this.specialTS =
+                new ChronoOperator<PlainTimestamp>() {
+                    @Override
+                    public PlainTimestamp apply(PlainTimestamp entity) {
+                        return doApply(entity);
+                    }
+                };
+
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public T apply(T entity) {
+        public PlainDate apply(PlainDate entity) {
+
+            return this.doApply(entity);
+
+        }
+
+        @Override
+        public ChronoOperator<Moment> inStdTimezone() {
+
+            return new Moment.Operator(
+                this.specialTS,
+                WeekdayInMonthElement.INSTANCE,
+                OP_WIM
+            );
+
+        }
+
+        @Override
+        ChronoOperator<PlainTimestamp> onTimestamp() {
+
+            return this.specialTS;
+
+        }
+
+        private <T extends ChronoEntity<T>> T doApply(T entity) {
 
             if (entity.contains(PlainDate.CALENDAR_DATE)) {
                 PlainDate date = entity.get(PlainDate.CALENDAR_DATE);
@@ -235,42 +267,6 @@ final class WeekdayInMonthElement
                     + entity);
             }
 
-        }
-
-        @Override
-        public ChronoOperator<Moment> inStdTimezone() {
-
-            return new Moment.Operator(
-                this.onTimestamp(),
-                WeekdayInMonthElement.INSTANCE,
-                OperatorType.WIM
-            );
-
-        }
-
-        @Override
-        public ChronoOperator<Moment> inTimezone(
-            TZID tzid,
-            TransitionStrategy strategy
-        ) {
-
-            return new Moment.Operator(
-                this.onTimestamp(),
-                tzid,
-                strategy,
-                WeekdayInMonthElement.INSTANCE,
-                OperatorType.WIM
-            );
-
-        }
-
-        @Override
-        public ChronoOperator<PlainTimestamp> onTimestamp() {
-
-            return new SpecialOperator<PlainTimestamp>(
-                this.ordinal,
-                this.dayOfWeek
-            );
         }
 
     }

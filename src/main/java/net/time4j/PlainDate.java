@@ -194,10 +194,10 @@ public final class PlainDate
      * mathematische Extrapolation nicht geeignet. </p>
      */
     @FormattableElement(format = "u")
-    public static final AdjustableElement<Integer, PlainDate> YEAR =
-        IntegerElement.createDateElement(
+    public static final AdjustableElement<Integer, DateOperator> YEAR =
+        IntegerDateElement.create(
             "YEAR",
-            IntegerElement.YEAR,
+            IntegerDateElement.YEAR,
             GregorianMath.MIN_YEAR,
             GregorianMath.MAX_YEAR,
             'u');
@@ -228,14 +228,15 @@ public final class PlainDate
      * @see     CalendarUnit#weekBasedYears()
      */
     @FormattableElement(format = "Y")
-    public static final AdjustableElement<Integer, PlainDate> YEAR_OF_WEEKDATE =
+    public static final
+    AdjustableElement<Integer, DateOperator> YEAR_OF_WEEKDATE =
         YOWElement.INSTANCE;
 
     /**
      * <p>Element mit dem Quartal des Jahres (Wertebereich {@code Q1-Q4}). </p>
      */
     @FormattableElement(format = "Q", standalone="q")
-    public static final NavigableElement<Quarter, PlainDate> QUARTER_OF_YEAR =
+    public static final NavigableElement<Quarter> QUARTER_OF_YEAR =
         new EnumElement<Quarter>(
             "QUARTER_OF_YEAR",
             Quarter.class,
@@ -277,7 +278,7 @@ public final class PlainDate
      * </pre>
      */
     @FormattableElement(format = "M", standalone="L")
-    public static final NavigableElement<Month, PlainDate> MONTH_OF_YEAR =
+    public static final NavigableElement<Month> MONTH_OF_YEAR =
         new EnumElement<Month>(
             "MONTH_OF_YEAR",
             Month.class,
@@ -295,10 +296,10 @@ public final class PlainDate
      * @see     #MONTH_OF_YEAR
      */
     public static final
-    ProportionalElement<Integer, PlainDate> MONTH_AS_NUMBER =
-        IntegerElement.createDateElement(
+    ProportionalElement<Integer, DateOperator, PlainDate> MONTH_AS_NUMBER =
+        IntegerDateElement.create(
             "MONTH_AS_NUMBER",
-            IntegerElement.MONTH,
+            IntegerDateElement.MONTH,
             1,
             12,
             '\u0000');
@@ -308,10 +309,11 @@ public final class PlainDate
      * (Wertebereich {@code 1-28/29/30/31}). </p>
      */
     @FormattableElement(format = "d")
-    public static final ProportionalElement<Integer, PlainDate> DAY_OF_MONTH =
-        IntegerElement.createDateElement(
+    public static final
+    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_MONTH =
+        IntegerDateElement.create(
             "DAY_OF_MONTH",
-            IntegerElement.DAY_OF_MONTH,
+            IntegerDateElement.DAY_OF_MONTH,
             1,
             31,
             'd');
@@ -327,7 +329,7 @@ public final class PlainDate
      * verwendet werden. </p>
      */
     @FormattableElement(format = "E")
-    public static final NavigableElement<Weekday, PlainDate> DAY_OF_WEEK =
+    public static final NavigableElement<Weekday> DAY_OF_WEEK =
         new EnumElement<Weekday>(
             "DAY_OF_WEEK",
             Weekday.class,
@@ -340,10 +342,11 @@ public final class PlainDate
      * <p>Element mit dem Tag des Jahres (Wertebereich {@code 1-365/366}). </p>
      */
     @FormattableElement(format = "D")
-    public static final ProportionalElement<Integer, PlainDate> DAY_OF_YEAR =
-        IntegerElement.createDateElement(
+    public static final
+    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_YEAR =
+        IntegerDateElement.create(
             "DAY_OF_YEAR",
-            IntegerElement.DAY_OF_YEAR,
+            IntegerDateElement.DAY_OF_YEAR,
             1,
             365,
             'D');
@@ -352,10 +355,11 @@ public final class PlainDate
      * <p>Element mit dem Tag des Quartals
      * (Wertebereich {@code 1-90/91/92}). </p>
      */
-    public static final ProportionalElement<Integer, PlainDate> DAY_OF_QUARTER =
-        IntegerElement.createDateElement(
+    public static final
+    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_QUARTER =
+        IntegerDateElement.create(
             "DAY_OF_QUARTER",
-            IntegerElement.DAY_OF_QUARTER,
+            IntegerDateElement.DAY_OF_QUARTER,
             1,
             92,
             '\u0000');
@@ -376,7 +380,7 @@ public final class PlainDate
      * </pre>
      */
     @FormattableElement(format = "F")
-    public static final OrdinalWeekdayElement<PlainDate> WEEKDAY_IN_MONTH =
+    public static final OrdinalWeekdayElement WEEKDAY_IN_MONTH =
         WeekdayInMonthElement.INSTANCE;
 
     /**
@@ -399,9 +403,9 @@ public final class PlainDate
      */
     @FormattableElement(format = "y")
     static final ChronoElement<Integer> YEAR_OF_ERA =
-        IntegerElement.createDateElement(
+        IntegerDateElement.create(
             "YEAR_OF_ERA",
-            IntegerElement.YEAR_OF_ERA,
+            IntegerDateElement.YEAR_OF_ERA,
             1,
             GregorianMath.MAX_YEAR,
             'y');
@@ -1844,8 +1848,8 @@ public final class PlainDate
 
             this.element = element;
 
-            if (element instanceof IntegerElement) {
-                this.index = ((IntegerElement) element).getIndex();
+            if (element instanceof IntegerDateElement) {
+                this.index = ((IntegerDateElement) element).getIndex();
             } else {
                 this.index = -1;
             }
@@ -1858,15 +1862,15 @@ public final class PlainDate
         public Integer getValue(PlainDate context) {
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return Integer.valueOf(context.year);
-                case IntegerElement.MONTH:
+                case IntegerDateElement.MONTH:
                     return Integer.valueOf(context.month);
-                case IntegerElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_MONTH:
                     return Integer.valueOf(context.dayOfMonth);
-                case IntegerElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_YEAR:
                     return Integer.valueOf(context.getDayOfYear());
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(context.getDayOfQuarter());
                 default:
                     throw new UnsupportedOperationException(
@@ -1885,9 +1889,9 @@ public final class PlainDate
             int v = value.intValue();
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return context.withYear(v);
-                case IntegerElement.MONTH:
+                case IntegerDateElement.MONTH:
                     if (lenient) {
                         return context.plus(
                             (v - context.month),
@@ -1895,7 +1899,7 @@ public final class PlainDate
                     } else {
                         return context.withMonth(v);
                     }
-                case IntegerElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_MONTH:
                     if (lenient) {
                         return context.plus(
                             (v - context.dayOfMonth),
@@ -1903,7 +1907,7 @@ public final class PlainDate
                     } else {
                         return context.withDayOfMonth(v);
                     }
-                case IntegerElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_YEAR:
                     if (lenient) {
                         return context.plus(
                             (v - context.getDayOfYear()),
@@ -1911,7 +1915,7 @@ public final class PlainDate
                     } else {
                         return context.withDayOfYear(v);
                     }
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     if (
                         lenient
                         || ((v >= 1) && (v <= getMaximumOfQuarterDay(context)))
@@ -1943,23 +1947,23 @@ public final class PlainDate
             int v = value.intValue();
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return (
                         (v >= GregorianMath.MIN_YEAR)
                         && (v <= GregorianMath.MAX_YEAR)
                     );
-                case IntegerElement.MONTH:
+                case IntegerDateElement.MONTH:
                     return ((v >= 1) && (v <= 12));
-                case IntegerElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_MONTH:
                     int mlen =
                         GregorianMath.getLengthOfMonth(
                             context.year,
                             context.month);
                     return ((v >= 1) && (v <= mlen));
-                case IntegerElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_YEAR:
                     boolean leapyear = GregorianMath.isLeapYear(context.year);
                     return ((v >= 1) && (v <= (leapyear ? 366 : 365)));
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     int max = getMaximumOfQuarterDay(context);
                     return ((v >= 1) && (v <= max));
                 default:
@@ -1973,12 +1977,12 @@ public final class PlainDate
         public Integer getMinimum(PlainDate context) {
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return MIN_YEAR;
-                case IntegerElement.MONTH:
-                case IntegerElement.DAY_OF_MONTH:
-                case IntegerElement.DAY_OF_YEAR:
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.MONTH:
+                case IntegerDateElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(1);
                 default:
                     throw new UnsupportedOperationException(
@@ -1991,21 +1995,21 @@ public final class PlainDate
         public Integer getMaximum(PlainDate context) {
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return MAX_YEAR;
-                case IntegerElement.MONTH:
+                case IntegerDateElement.MONTH:
                     return Integer.valueOf(12);
-                case IntegerElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_MONTH:
                     return Integer.valueOf(
                         GregorianMath.getLengthOfMonth(
                             context.year,
                             context.month));
-                case IntegerElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_YEAR:
                     return (
                         GregorianMath.isLeapYear(context.year)
                         ? LEAP_YEAR_LEN
                         : STD_YEAR_LEN);
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(getMaximumOfQuarterDay(context));
                 default:
                     throw new UnsupportedOperationException(
@@ -2031,13 +2035,13 @@ public final class PlainDate
         private ChronoElement<?> getChild(PlainDate context) {
 
             switch (this.index) {
-                case IntegerElement.YEAR:
+                case IntegerDateElement.YEAR:
                     return MONTH_AS_NUMBER;
-                case IntegerElement.MONTH:
+                case IntegerDateElement.MONTH:
                     return DAY_OF_MONTH;
-                case IntegerElement.DAY_OF_MONTH:
-                case IntegerElement.DAY_OF_YEAR:
-                case IntegerElement.DAY_OF_QUARTER:
+                case IntegerDateElement.DAY_OF_MONTH:
+                case IntegerDateElement.DAY_OF_YEAR:
+                case IntegerDateElement.DAY_OF_QUARTER:
                     return null;
                 default:
                     throw new UnsupportedOperationException(

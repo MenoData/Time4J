@@ -221,8 +221,8 @@ public final class PlainTime
      */
     @FormattableElement(format = "h")
     public static final
-    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_AMPM =
-        IntegerElement.createClockElement("CLOCK_HOUR_OF_AMPM", false);
+    ProportionalElement<Integer, TimeOperator, PlainTime> CLOCK_HOUR_OF_AMPM =
+        IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_AMPM", false);
 
     /**
      * <p>Element mit der Stunde im Bereich {@code 1-24} (analoge Anzeige). </p>
@@ -249,8 +249,8 @@ public final class PlainTime
      */
     @FormattableElement(format = "k")
     public static final
-    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_DAY =
-        IntegerElement.createClockElement("CLOCK_HOUR_OF_DAY", true);
+    ProportionalElement<Integer, TimeOperator, PlainTime> CLOCK_HOUR_OF_DAY =
+        IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_DAY", true);
 
     /**
      * <p>Element mit der digitalen Halbtagsstunde im Bereich {@code 0-11}. </p>
@@ -277,10 +277,10 @@ public final class PlainTime
      */
     @FormattableElement(format = "K")
     public static final
-    ProportionalElement<Integer, PlainTime> DIGITAL_HOUR_OF_AMPM =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> DIGITAL_HOUR_OF_AMPM =
+        IntegerTimeElement.createTimeElement(
             "DIGITAL_HOUR_OF_AMPM",
-            IntegerElement.DIGITAL_HOUR_OF_AMPM,
+            IntegerTimeElement.DIGITAL_HOUR_OF_AMPM,
             0,
             11,
             'K');
@@ -310,10 +310,10 @@ public final class PlainTime
      */
     @FormattableElement(format = "H")
     public static final
-    ProportionalElement<Integer, PlainTime> DIGITAL_HOUR_OF_DAY =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> DIGITAL_HOUR_OF_DAY =
+        IntegerTimeElement.createTimeElement(
             "DIGITAL_HOUR_OF_DAY",
-            IntegerElement.DIGITAL_HOUR_OF_DAY,
+            IntegerTimeElement.DIGITAL_HOUR_OF_DAY,
             0,
             23,
             'H');
@@ -328,10 +328,10 @@ public final class PlainTime
      * @see     #getHour()
      */
     public static final
-    ProportionalElement<Integer, PlainTime> ISO_HOUR =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> ISO_HOUR =
+        IntegerTimeElement.createTimeElement(
             "ISO_HOUR",
-            IntegerElement.ISO_HOUR,
+            IntegerTimeElement.ISO_HOUR,
             0,
             23,
             '\u0000');
@@ -343,10 +343,10 @@ public final class PlainTime
      */
     @FormattableElement(format = "m")
     public static final
-    ProportionalElement<Integer, PlainTime> MINUTE_OF_HOUR =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> MINUTE_OF_HOUR =
+        IntegerTimeElement.createTimeElement(
             "MINUTE_OF_HOUR",
-            IntegerElement.MINUTE_OF_HOUR,
+            IntegerTimeElement.MINUTE_OF_HOUR,
             0,
             59,
             'm');
@@ -359,10 +359,10 @@ public final class PlainTime
      * Maximum in jedem anderen Kontext {@code 1439}. </p>
      */
     public static final
-    ProportionalElement<Integer, PlainTime> MINUTE_OF_DAY =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> MINUTE_OF_DAY =
+        IntegerTimeElement.createTimeElement(
             "MINUTE_OF_DAY",
-            IntegerElement.MINUTE_OF_DAY,
+            IntegerTimeElement.MINUTE_OF_DAY,
             0,
             1439,
             '\u0000');
@@ -379,10 +379,10 @@ public final class PlainTime
      */
     @FormattableElement(format = "s")
     public static final
-    ProportionalElement<Integer, PlainTime> SECOND_OF_MINUTE =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> SECOND_OF_MINUTE =
+        IntegerTimeElement.createTimeElement(
             "SECOND_OF_MINUTE",
-            IntegerElement.SECOND_OF_MINUTE,
+            IntegerTimeElement.SECOND_OF_MINUTE,
             0,
             59,
             's');
@@ -396,10 +396,10 @@ public final class PlainTime
      * {@code 86399}. UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
-    ProportionalElement<Integer, PlainTime> SECOND_OF_DAY =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> SECOND_OF_DAY =
+        IntegerTimeElement.createTimeElement(
             "SECOND_OF_DAY",
-            IntegerElement.SECOND_OF_DAY,
+            IntegerTimeElement.SECOND_OF_DAY,
             0,
             86399,
             '\u0000');
@@ -408,10 +408,10 @@ public final class PlainTime
      * <p>Element mit der Millisekunde im Bereich {@code 0-999}. </p>
      */
     public static final
-    ProportionalElement<Integer, PlainTime> MILLI_OF_SECOND =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> MILLI_OF_SECOND =
+        IntegerTimeElement.createTimeElement(
             "MILLI_OF_SECOND",
-            IntegerElement.MILLI_OF_SECOND,
+            IntegerTimeElement.MILLI_OF_SECOND,
             0,
             999,
             '\u0000');
@@ -420,10 +420,10 @@ public final class PlainTime
      * <p>Element mit der Mikrosekunde im Bereich {@code 0-999999}. </p>
      */
     public static final
-    ProportionalElement<Integer, PlainTime> MICRO_OF_SECOND =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> MICRO_OF_SECOND =
+        IntegerTimeElement.createTimeElement(
             "MICRO_OF_SECOND",
-            IntegerElement.MICRO_OF_SECOND,
+            IntegerTimeElement.MICRO_OF_SECOND,
             0,
             999999,
             '\u0000');
@@ -433,13 +433,13 @@ public final class PlainTime
      */
     @FormattableElement(format = "S")
     public static final
-    ProportionalElement<Integer, PlainTime> NANO_OF_SECOND =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> NANO_OF_SECOND =
+        IntegerTimeElement.createTimeElement(
             "NANO_OF_SECOND",
-            IntegerElement.NANO_OF_SECOND,
+            IntegerTimeElement.NANO_OF_SECOND,
             0,
             999999999,
-            'S'); // TODO: Verwendung des Formatsymbols prüfen
+            'S');
 
     /**
      * <p>Element mit der Tageszeit in Millisekunden im
@@ -452,10 +452,10 @@ public final class PlainTime
      */
     @FormattableElement(format = "A")
     public static final
-    ProportionalElement<Integer, PlainTime> MILLI_OF_DAY =
-        IntegerElement.createTimeElement(
+    ProportionalElement<Integer, TimeOperator, PlainTime> MILLI_OF_DAY =
+        IntegerTimeElement.createTimeElement(
             "MILLI_OF_DAY",
-            IntegerElement.MILLI_OF_DAY,
+            IntegerTimeElement.MILLI_OF_DAY,
             0,
             86399999,
             'A');
@@ -470,7 +470,7 @@ public final class PlainTime
      * UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
-    ProportionalElement<Long, PlainTime> MICRO_OF_DAY =
+    ProportionalElement<Long, TimeOperator, PlainTime> MICRO_OF_DAY =
         LongElement.create("MICRO_OF_DAY", 0L, 86399999999L);
 
     /**
@@ -498,7 +498,7 @@ public final class PlainTime
      * </pre>
      */
     public static final
-    ProportionalElement<Long, PlainTime> NANO_OF_DAY =
+    ProportionalElement<Long, TimeOperator, PlainTime> NANO_OF_DAY =
         LongElement.create("NANO_OF_DAY", 0L, 86399999999999L);
 
     /**
@@ -1913,8 +1913,8 @@ public final class PlainTime
 
             this.element = element;
 
-            if (element instanceof IntegerElement) {
-                this.index = ((IntegerElement) element).getIndex();
+            if (element instanceof IntegerTimeElement) {
+                this.index = ((IntegerTimeElement) element).getIndex();
             } else {
                 this.index = -1;
             }
@@ -1932,52 +1932,52 @@ public final class PlainTime
             int ret;
 
             switch (this.index) {
-                case IntegerElement.CLOCK_HOUR_OF_AMPM:
+                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
                     ret = (context.hour % 12);
                     if (ret == 0) {
                         ret = 12;
                     }
                     break;
-                case IntegerElement.CLOCK_HOUR_OF_DAY:
+                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
                     ret = context.hour % 24;
                     if (ret == 0) {
                         ret = 24;
                     }
                     break;
-                case IntegerElement.DIGITAL_HOUR_OF_AMPM:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
                     ret = (context.hour % 12);
                     break;
-                case IntegerElement.DIGITAL_HOUR_OF_DAY:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
                     ret = context.hour % 24;
                     break;
-                case IntegerElement.ISO_HOUR:
+                case IntegerTimeElement.ISO_HOUR:
                     ret = context.hour;
                     break;
-                case IntegerElement.MINUTE_OF_HOUR:
+                case IntegerTimeElement.MINUTE_OF_HOUR:
                     ret = context.minute;
                     break;
-                case IntegerElement.MINUTE_OF_DAY:
+                case IntegerTimeElement.MINUTE_OF_DAY:
                     ret = context.hour * 60 + context.minute;
                     break;
-                case IntegerElement.SECOND_OF_MINUTE:
+                case IntegerTimeElement.SECOND_OF_MINUTE:
                     ret = context.second;
                     break;
-                case IntegerElement.SECOND_OF_DAY:
+                case IntegerTimeElement.SECOND_OF_DAY:
                     ret =
                         context.hour * 3600
                         + context.minute * 60
                         + context.second;
                     break;
-                case IntegerElement.MILLI_OF_SECOND:
+                case IntegerTimeElement.MILLI_OF_SECOND:
                     ret = (context.nano / MIO);
                     break;
-                case IntegerElement.MICRO_OF_SECOND:
+                case IntegerTimeElement.MICRO_OF_SECOND:
                     ret = (context.nano / KILO);
                     break;
-                case IntegerElement.NANO_OF_SECOND:
+                case IntegerTimeElement.NANO_OF_SECOND:
                     ret = context.nano;
                     break;
-                case IntegerElement.MILLI_OF_DAY:
+                case IntegerTimeElement.MILLI_OF_DAY:
                     ret = (int) (context.getNanoOfDay() / MIO);
                     break;
                 default:
@@ -2012,48 +2012,48 @@ public final class PlainTime
             int v = value.intValue();
 
             switch (this.index) {
-                case IntegerElement.CLOCK_HOUR_OF_AMPM:
+                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
                     v = ((v == 12) ? 0 : v);
                     h = (isAM(context) ? v : (v + 12));
                     break;
-                case IntegerElement.CLOCK_HOUR_OF_DAY:
+                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
                     h = ((v == 24) ? 0 : v);
                     break;
-                case IntegerElement.DIGITAL_HOUR_OF_AMPM:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
                     h = (isAM(context) ? v : (v + 12));
                     break;
-                case IntegerElement.DIGITAL_HOUR_OF_DAY:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
                     h = v;
                     break;
-                case IntegerElement.ISO_HOUR:
+                case IntegerTimeElement.ISO_HOUR:
                     h = v;
                     break;
-                case IntegerElement.MINUTE_OF_HOUR:
+                case IntegerTimeElement.MINUTE_OF_HOUR:
                     m = v;
                     break;
-                case IntegerElement.MINUTE_OF_DAY:
+                case IntegerTimeElement.MINUTE_OF_DAY:
                     h = v / 60;
                     m = v % 60;
                     break;
-                case IntegerElement.SECOND_OF_MINUTE:
+                case IntegerTimeElement.SECOND_OF_MINUTE:
                     s = v;
                     break;
-                case IntegerElement.SECOND_OF_DAY:
+                case IntegerTimeElement.SECOND_OF_DAY:
                     h = v / 3600;
                     int remainder = v % 3600;
                     m = remainder / 60;
                     s = remainder % 60;
                     break;
-                case IntegerElement.MILLI_OF_SECOND:
+                case IntegerTimeElement.MILLI_OF_SECOND:
                     f = v * MIO + (context.nano % MIO);
                     break;
-                case IntegerElement.MICRO_OF_SECOND:
+                case IntegerTimeElement.MICRO_OF_SECOND:
                     f = v * KILO + (context.nano % KILO);
                     break;
-                case IntegerElement.NANO_OF_SECOND:
+                case IntegerTimeElement.NANO_OF_SECOND:
                     f = v;
                     break;
-                case IntegerElement.MILLI_OF_DAY:
+                case IntegerTimeElement.MILLI_OF_DAY:
                     return PlainTime.createFromMillis(v, context.nano % MIO);
                 default:
                     throw new UnsupportedOperationException(
@@ -2082,13 +2082,13 @@ public final class PlainTime
 
             if (v == this.max) {
                 switch (this.index) {
-                    case IntegerElement.ISO_HOUR:
+                    case IntegerTimeElement.ISO_HOUR:
                         return context.isFullHour();
-                    case IntegerElement.MINUTE_OF_DAY:
+                    case IntegerTimeElement.MINUTE_OF_DAY:
                         return context.isFullMinute();
-                    case IntegerElement.SECOND_OF_DAY:
+                    case IntegerTimeElement.SECOND_OF_DAY:
                         return (context.nano == 0);
-                    case IntegerElement.MILLI_OF_DAY:
+                    case IntegerTimeElement.MILLI_OF_DAY:
                         return ((context.nano % MIO) == 0);
                     default:
                         // no-op
@@ -2097,11 +2097,11 @@ public final class PlainTime
 
             if (context.hour == 24) {
                 switch (this.index) {
-                    case IntegerElement.MINUTE_OF_HOUR:
-                    case IntegerElement.SECOND_OF_MINUTE:
-                    case IntegerElement.MILLI_OF_SECOND:
-                    case IntegerElement.MICRO_OF_SECOND:
-                    case IntegerElement.NANO_OF_SECOND:
+                    case IntegerTimeElement.MINUTE_OF_HOUR:
+                    case IntegerTimeElement.SECOND_OF_MINUTE:
+                    case IntegerTimeElement.MILLI_OF_SECOND:
+                    case IntegerTimeElement.MICRO_OF_SECOND:
+                    case IntegerTimeElement.NANO_OF_SECOND:
                         return (v == 0);
                     default:
                         // no-op
@@ -2124,11 +2124,11 @@ public final class PlainTime
 
             if (context.hour == 24) {
                 switch (this.index) {
-                    case IntegerElement.MINUTE_OF_HOUR:
-                    case IntegerElement.SECOND_OF_MINUTE:
-                    case IntegerElement.MILLI_OF_SECOND:
-                    case IntegerElement.MICRO_OF_SECOND:
-                    case IntegerElement.NANO_OF_SECOND:
+                    case IntegerTimeElement.MINUTE_OF_HOUR:
+                    case IntegerTimeElement.SECOND_OF_MINUTE:
+                    case IntegerTimeElement.MILLI_OF_SECOND:
+                    case IntegerTimeElement.MICRO_OF_SECOND:
+                    case IntegerTimeElement.NANO_OF_SECOND:
                         return Integer.valueOf(0);
                     default:
                         // no-op
@@ -2160,17 +2160,17 @@ public final class PlainTime
         private ChronoElement<?> getChild(PlainTime context) {
 
             switch (this.index) {
-                case IntegerElement.CLOCK_HOUR_OF_AMPM:
-                case IntegerElement.CLOCK_HOUR_OF_DAY:
-                case IntegerElement.DIGITAL_HOUR_OF_AMPM:
-                case IntegerElement.DIGITAL_HOUR_OF_DAY:
-                case IntegerElement.ISO_HOUR:
+                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
+                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
+                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
+                case IntegerTimeElement.ISO_HOUR:
                     return MINUTE_OF_HOUR;
-                case IntegerElement.MINUTE_OF_HOUR:
-                case IntegerElement.MINUTE_OF_DAY:
+                case IntegerTimeElement.MINUTE_OF_HOUR:
+                case IntegerTimeElement.MINUTE_OF_DAY:
                     return SECOND_OF_MINUTE;
-                case IntegerElement.SECOND_OF_MINUTE:
-                case IntegerElement.SECOND_OF_DAY:
+                case IntegerTimeElement.SECOND_OF_MINUTE:
+                case IntegerTimeElement.SECOND_OF_DAY:
                     return NANO_OF_SECOND;
                 default:
                     return null;

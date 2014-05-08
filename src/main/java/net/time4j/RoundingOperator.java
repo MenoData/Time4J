@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (IntRoundingOperator.java) is part of project Time4J.
+ * This file (RoundingOperator.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,14 +31,15 @@ import net.time4j.engine.ChronoOperator;
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-final class IntRoundingOperator<T extends ChronoEntity<T>>
+final class RoundingOperator<T extends ChronoEntity<T>>
     implements ChronoOperator<T> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ProportionalElement<Integer, T> element;
+    private final ProportionalElement<?, ?, T> element;
     private final Boolean up;
     private final double stepwidth;
+    private final boolean longBased;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -51,8 +52,8 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
      *                      {@code Boolean.FALSE} if floor mode
      * @param   stepwidth   controls limits of rounding
      */
-    IntRoundingOperator(
-        ProportionalElement<Integer, T> element,
+    RoundingOperator(
+        final ProportionalElement<?, ?, T> element,
         Boolean up,
         int stepwidth
     ) {
@@ -61,6 +62,7 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
         this.element = element;
         this.up = up;
         this.stepwidth = stepwidth;
+        this.longBased = element.getType().equals(Long.class);
 
     }
 
@@ -82,8 +84,25 @@ final class IntRoundingOperator<T extends ChronoEntity<T>>
             nv = Math.floor(value / this.stepwidth) * this.stepwidth;
         }
 
-        Integer num = Integer.valueOf((int) nv);
-        return entity.with(this.element.setLenient(num));
+        Number num;
+
+        if (this.longBased) {
+            num = Long.valueOf((long) nv);
+        } else {
+            num = Integer.valueOf((int) nv);
+        }
+
+        return entity.with(lenient(this.element, num));
+
+    }
+
+    private static <V extends Number, T extends ChronoEntity<T>>
+    ChronoOperator<T> lenient(
+        ProportionalElement<V, ?, T> element,
+        Number num
+    ) {
+
+        return element.setLenient(element.getType().cast(num));
 
     }
 

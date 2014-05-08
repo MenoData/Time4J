@@ -27,11 +27,10 @@ package net.time4j;
  * Elementwerts unter Ber&uuml;cksichtigung des aktuellen Werts. </p>
  *
  * @param   <V> generic enum type of element values
- * @param   <T> generic operator target type
  * @author  Meno Hochschild
  */
-public interface NavigableElement<V extends Enum<V>, T>
-    extends AdjustableElement<V, T> {
+public interface NavigableElement<V extends Enum<V>>
+    extends AdjustableElement<V, DateOperator> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -55,7 +54,7 @@ public interface NavigableElement<V extends Enum<V>, T>
      * @param   value   new element value which is after current value
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToNext(V value);
+    DateOperator setToNext(V value);
 
     /**
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor dem
@@ -77,7 +76,7 @@ public interface NavigableElement<V extends Enum<V>, T>
      * @param   value   new element value which is before current value
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToPrevious(V value);
+    DateOperator setToPrevious(V value);
 
     /**
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert setzt, der nach
@@ -90,7 +89,7 @@ public interface NavigableElement<V extends Enum<V>, T>
      *                  or the same
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToNextOrSame(V value);
+    DateOperator setToNextOrSame(V value);
 
     /**
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor oder
@@ -103,6 +102,6 @@ public interface NavigableElement<V extends Enum<V>, T>
      *                  or the same
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToPreviousOrSame(V value);
+    DateOperator setToPreviousOrSame(V value);
 
 }

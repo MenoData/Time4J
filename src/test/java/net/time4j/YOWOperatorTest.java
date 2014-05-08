@@ -72,7 +72,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(1996, 12, 31).atStartOfDay();
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.minimized().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.minimized()),
             is(PlainDate.of(-999999999, 1, 2).atStartOfDay()));
     }
 
@@ -82,7 +82,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(1996, 12, 31).atStartOfDay();
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.maximized().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.maximized()),
             is(PlainDate.of(999999999, 1, 5).atStartOfDay()));
     }
 
@@ -92,7 +92,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(1996, 12, 31).atStartOfDay();
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.decremented().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.decremented()),
             is(PlainDate.of(1996, 1, 2).atStartOfDay())); // 1996-W01-2
     }
 
@@ -102,7 +102,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(1996, 12, 31).atStartOfDay();
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.incremented().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.incremented()),
             is(PlainDate.of(1997, 12, 30).atStartOfDay())); // 1998-W01-2
     }
 
@@ -111,7 +111,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainDate.of(2004, 53, Weekday.MONDAY).atStartOfDay();
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.incremented().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.incremented()),
             is(PlainDate.of(2005, 12, 26).atStartOfDay())); // 2005-W52-1
     }
 
@@ -120,7 +120,7 @@ public class YOWOperatorTest {
         PlainTimestamp ts =
             PlainTimestamp.of(2004, 5, 1, 12, 45);
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.atFloor().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.atFloor()),
             is(PlainDate.of(2004, 1, Weekday.MONDAY).atStartOfDay()));
     }
 
@@ -133,7 +133,7 @@ public class YOWOperatorTest {
                 .of(2004, 53, Weekday.SUNDAY)
                 .atTime(PlainTime.of(23, 59, 59, 999999999));
         assertThat(
-            ts.with(YEAR_OF_WEEKDATE.atCeiling().onTimestamp()),
+            ts.with(YEAR_OF_WEEKDATE.atCeiling()),
             is(expected));
     }
 

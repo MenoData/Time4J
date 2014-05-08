@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (OperatorDelegate.java) is part of project Time4J.
+ * This file (TimeOperator.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,29 +22,23 @@
 package net.time4j;
 
 import net.time4j.engine.AdvancedElement;
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 
 
 /**
- * <p>Delegationsoperator. </p>
+ * <p>Definiert eine Manipulation von Uhrzeitobjekten nach
+ * dem Strategy-Entwurfsmuster. </p>
  *
- * @param       <V> generic type of element values
- * @param       <T> generic target type for a {@code ChronoOperator}
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
-    implements ZonalOperator<T> {
+public class TimeOperator
+    extends ElementOperator<PlainTime> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoElement<V> element;
-    private final OperatorType type;
-    private final ChronoOperator<T> opCache;
+    private final ChronoOperator<PlainTime> opCache;
     private final ChronoOperator<PlainTimestamp> tsCache;
     private final ChronoOperator<Moment> moCache;
 
@@ -56,9 +50,9 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
      * @param   element         element an operator will be applied on
      * @param   type            type of operator
      */
-    OperatorDelegate(
-        AdvancedElement<V> element,
-        OperatorType type
+    TimeOperator(
+        AdvancedElement<?> element,
+        int type
     ) {
         this(element, type, null);
 
@@ -71,47 +65,44 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
      * @param   type            operator type
      * @param   value           value of element
      */
-    OperatorDelegate(
-        final AdvancedElement<V> element,
-        final OperatorType type,
-        final V value // optional
+    TimeOperator(
+        final AdvancedElement<?> element,
+        final int type,
+        final Object value // optional
     ) {
-        super();
-
-        this.element = element;
-        this.type = type;
+        super(element, type);
 
         switch (type) {
-            case MINIMIZE:
-                this.opCache = element.min();
-                this.tsCache = element.min();
+            case OP_MINIMIZE:
+                this.opCache = element.minimized(PlainTime.class);
+                this.tsCache = element.minimized(PlainTimestamp.class);
                 break;
-            case MAXIMIZE:
-                this.opCache = element.max();
-                this.tsCache = element.max();
+            case OP_MAXIMIZE:
+                this.opCache = element.maximized(PlainTime.class);
+                this.tsCache = element.maximized(PlainTimestamp.class);
                 break;
-            case DECREMENT:
-                this.opCache = element.previous();
-                this.tsCache = element.previous();
+            case OP_DECREMENT:
+                this.opCache = element.decremented(PlainTime.class);
+                this.tsCache = element.decremented(PlainTimestamp.class);
                 break;
-            case INCREMENT:
-                this.opCache = element.next();
-                this.tsCache = element.next();
+            case OP_INCREMENT:
+                this.opCache = element.incremented(PlainTime.class);
+                this.tsCache = element.incremented(PlainTimestamp.class);
                 break;
-            case FLOOR:
-                this.opCache = createChildOperator(element, false);
-                this.tsCache = createChildOperator(element, false);
+            case OP_FLOOR:
+                this.opCache = child(element, false, PlainTime.class);
+                this.tsCache = child(element, false, PlainTimestamp.class);
                 break;
-            case CEILING:
-                this.opCache = createChildOperator(element, true);
-                this.tsCache = createChildOperator(element, true);
+            case OP_CEILING:
+                this.opCache = child(element, true, PlainTime.class);
+                this.tsCache = child(element, true, PlainTimestamp.class);
                 break;
-            case LENIENT:
-                this.opCache = element.lenient(value);
-                this.tsCache = element.lenient(value);
+            case OP_LENIENT:
+                this.opCache = lenient(element, value, PlainTime.class);
+                this.tsCache = lenient(element, value, PlainTimestamp.class);
                 break;
             default:
-                throw new UnsupportedOperationException(type.name());
+                throw new AssertionError("Unknown: " + this.getType());
         }
 
         this.moCache = new Moment.Operator(this.tsCache, element, type);
@@ -121,7 +112,7 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public T apply(T entity) {
+    public PlainTime apply(PlainTime entity) {
 
         return this.opCache.apply(entity);
 
@@ -135,32 +126,17 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
     }
 
     @Override
-    public ChronoOperator<Moment> inTimezone(
-        TZID tzid,
-        TransitionStrategy strategy
-    ) {
-
-        return new Moment.Operator(
-            this.tsCache,
-            tzid,
-            strategy,
-            this.element,
-            this.type
-        );
-
-    }
-
-    @Override
-    public ChronoOperator<PlainTimestamp> onTimestamp() {
+    ChronoOperator<PlainTimestamp> onTimestamp() {
 
         return this.tsCache;
 
     }
 
-    private static <T extends ChronoEntity<T>, V extends Comparable<V>>
-    ChronoOperator<T> createChildOperator(
+    private static <V extends Comparable<V>, T extends ChronoEntity<T>>
+    ChronoOperator<T> child(
         AdvancedElement<V> element,
-        boolean up
+        boolean up,
+        Class<T> context
     ) {
 
         String compare = element.name();
@@ -183,10 +159,21 @@ final class OperatorDelegate<V extends Comparable<V>, T extends ChronoEntity<T>>
         }
 
         if (up) {
-            return element.ceiling();
+            return element.atCeiling(context);
         } else {
-            return element.floor();
+            return element.atFloor(context);
         }
+
+    }
+
+    private static <V extends Comparable<V>, T extends ChronoEntity<T>>
+    ChronoOperator<T> lenient(
+        AdvancedElement<V> element,
+        Object value,
+        Class<T> context
+    ) {
+
+        return element.setLenient(element.getType().cast(value), context);
 
     }
 

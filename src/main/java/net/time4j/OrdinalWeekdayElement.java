@@ -30,11 +30,10 @@ package net.time4j;
  * den vom Interface {@code AdjustableElement} geerbten Methoden
  * weitere Spezialmethoden zum Setzen des Wochentags im Monat. </p>
  *
- * @param   <T> generic operator target type
  * @author  Meno Hochschild
  */
-public interface OrdinalWeekdayElement<T>
-    extends AdjustableElement<Integer, T> {
+public interface OrdinalWeekdayElement
+    extends AdjustableElement<Integer, DateOperator> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -45,7 +44,7 @@ public interface OrdinalWeekdayElement<T>
      * @param   dayOfWeek   first day of week in month
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToFirst(Weekday dayOfWeek);
+    DateOperator setToFirst(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den zweiten angegebenen
@@ -54,7 +53,7 @@ public interface OrdinalWeekdayElement<T>
      * @param   dayOfWeek   second day of week in month
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToSecond(Weekday dayOfWeek);
+    DateOperator setToSecond(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den dritten angegebenen
@@ -63,7 +62,7 @@ public interface OrdinalWeekdayElement<T>
      * @param   dayOfWeek   third day of week in month
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToThird(Weekday dayOfWeek);
+    DateOperator setToThird(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den vierten angegebenen
@@ -72,7 +71,7 @@ public interface OrdinalWeekdayElement<T>
      * @param   dayOfWeek   fourth day of week in month
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToFourth(Weekday dayOfWeek);
+    DateOperator setToFourth(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den letzten angegebenen
@@ -81,6 +80,6 @@ public interface OrdinalWeekdayElement<T>
      * @param   dayOfWeek   last day of week in month
      * @return  operator directly applicable on local types without time zone
      */
-    ZonalOperator<T> setToLast(Weekday dayOfWeek);
+    DateOperator setToLast(Weekday dayOfWeek);
 
 }

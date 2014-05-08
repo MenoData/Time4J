@@ -134,15 +134,15 @@ public final class Weekmodel
 
     // Elemente kompatibel zu PlainDate
     private transient final
-        AdjustableElement<Integer, PlainDate> woyElement;
+        AdjustableElement<Integer, DateOperator> woyElement;
     private transient final
-        AdjustableElement<Integer, PlainDate> womElement;
+        AdjustableElement<Integer, DateOperator> womElement;
     private transient final
-        AdjustableElement<Integer, PlainDate> boundWoyElement;
+        AdjustableElement<Integer, DateOperator> boundWoyElement;
     private transient final
-        AdjustableElement<Integer, PlainDate> boundWomElement;
+        AdjustableElement<Integer, DateOperator> boundWomElement;
     private transient final
-        NavigableElement<Weekday, PlainDate> dayOfWeekElement;
+        NavigableElement<Weekday> dayOfWeekElement;
     private transient final Set<ChronoElement<?>> elements;
 
     // Bedingungsausdruck
@@ -179,18 +179,18 @@ public final class Weekmodel
         this.endOfWeekend = endOfWeekend;
 
         this.woyElement =
-            new CalendarWeekElement<PlainDate>(
+            new CalendarWeekElement(
                 "WEEK_OF_YEAR", CALENDAR_WEEK_OF_YEAR);
         this.womElement =
-            new CalendarWeekElement<PlainDate>(
+            new CalendarWeekElement(
                 "WEEK_OF_MONTH", CALENDAR_WEEK_OF_MONTH);
         this.boundWoyElement =
-            new CalendarWeekElement<PlainDate>(
+            new CalendarWeekElement(
                 "BOUNDED_WEEK_OF_YEAR", BOUNDED_WEEK_OF_YEAR);
         this.boundWomElement =
-            new CalendarWeekElement<PlainDate>(
+            new CalendarWeekElement(
                 "BOUNDED_WEEK_OF_MONTH", BOUNDED_WEEK_OF_MONTH);
-        this.dayOfWeekElement = new DayOfWeekElement<PlainDate>();
+        this.dayOfWeekElement = new DayOfWeekElement();
 
         this.weekendCondition =
             new ChronoCondition<GregorianDate>() {
@@ -435,7 +435,7 @@ public final class Weekmodel
      * @return  localized week of year
      */
     @FormattableElement(format = "w")
-    public AdjustableElement<Integer, PlainDate> weekOfYear() {
+    public AdjustableElement<Integer, DateOperator> weekOfYear() {
 
         return this.woyElement;
 
@@ -456,7 +456,7 @@ public final class Weekmodel
      * @see     #weekOfYear()
      */
     @FormattableElement(format = "W")
-    public AdjustableElement<Integer, PlainDate> weekOfMonth() {
+    public AdjustableElement<Integer, DateOperator> weekOfMonth() {
 
         return this.womElement;
 
@@ -480,7 +480,7 @@ public final class Weekmodel
      * @return  day of week with localized order
      */
     @FormattableElement(format = "e", standalone = "c")
-    public NavigableElement<Weekday, PlainDate> localDayOfWeek() {
+    public NavigableElement<Weekday> localDayOfWeek() {
 
         return this.dayOfWeekElement;
 
@@ -506,7 +506,7 @@ public final class Weekmodel
      *
      * @return  week of year within the limits of calendar year
      */
-    public AdjustableElement<Integer, PlainDate> boundedWeekOfYear() {
+    public AdjustableElement<Integer, DateOperator> boundedWeekOfYear() {
 
         return this.boundWoyElement;
 
@@ -534,7 +534,7 @@ public final class Weekmodel
      * @return  week of month within the limits of calendar month
      * @see     #boundedWeekOfYear()
      */
-    public AdjustableElement<Integer, PlainDate> boundedWeekOfMonth() {
+    public AdjustableElement<Integer, DateOperator> boundedWeekOfMonth() {
 
         return this.boundWomElement;
 
@@ -703,9 +703,9 @@ public final class Weekmodel
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private class DayOfWeekElement<T extends ChronoEntity<T>>
-        extends AbstractValueElement<Weekday, T>
-        implements NavigableElement<Weekday, T>,
+    private class DayOfWeekElement
+        extends AbstractDateElement<Weekday>
+        implements NavigableElement<Weekday>,
                    NumericalElement<Weekday>,
                    TextElement<Weekday> {
 
@@ -784,44 +784,44 @@ public final class Weekmodel
         }
 
         @Override
-        public ZonalOperator<T> setToNext(Weekday value) {
+        public DateOperator setToNext(Weekday value) {
 
-            return new NavigationOperator<Weekday, T>(
+            return new NavigationOperator<Weekday>(
                 this,
-                OperatorType.NAV_NEXT,
+                ElementOperator.OP_NAV_NEXT,
                 value
             );
 
         }
 
         @Override
-        public ZonalOperator<T> setToPrevious(Weekday value) {
+        public DateOperator setToPrevious(Weekday value) {
 
-            return new NavigationOperator<Weekday, T>(
+            return new NavigationOperator<Weekday>(
                 this,
-                OperatorType.NAV_PREVIOUS,
+                ElementOperator.OP_NAV_PREVIOUS,
                 value
             );
 
         }
 
         @Override
-        public ZonalOperator<T> setToNextOrSame(Weekday value) {
+        public DateOperator setToNextOrSame(Weekday value) {
 
-            return new NavigationOperator<Weekday, T>(
+            return new NavigationOperator<Weekday>(
                 this,
-                OperatorType.NAV_NEXT_OR_SAME,
+                ElementOperator.OP_NAV_NEXT_OR_SAME,
                 value
             );
 
         }
 
         @Override
-        public ZonalOperator<T> setToPreviousOrSame(Weekday value) {
+        public DateOperator setToPreviousOrSame(Weekday value) {
 
-            return new NavigationOperator<Weekday, T>(
+            return new NavigationOperator<Weekday>(
                 this,
-                OperatorType.NAV_PREVIOUS_OR_SAME,
+                ElementOperator.OP_NAV_PREVIOUS_OR_SAME,
                 value
             );
 
@@ -936,11 +936,11 @@ public final class Weekmodel
 
         //~ Instanzvariablen ----------------------------------------------
 
-        final DayOfWeekElement<?> element;
+        final DayOfWeekElement element;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private DRule(DayOfWeekElement<?> element) {
+        private DRule(DayOfWeekElement element) {
             super();
 
             this.element = element;
@@ -1029,9 +1029,9 @@ public final class Weekmodel
 
     }
 
-    private class CalendarWeekElement<T extends ChronoEntity<T>>
-        extends AbstractValueElement<Integer, T>
-        implements AdjustableElement<Integer, T>,
+    private class CalendarWeekElement
+        extends AbstractDateElement<Integer>
+        implements AdjustableElement<Integer, DateOperator>,
                    NumericalElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -1208,11 +1208,11 @@ public final class Weekmodel
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final CalendarWeekElement<?> owner;
+        private final CalendarWeekElement owner;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private CWRule(CalendarWeekElement<?> owner) {
+        private CWRule(CalendarWeekElement owner) {
             super();
 
             this.owner = owner;
@@ -1471,11 +1471,11 @@ public final class Weekmodel
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final CalendarWeekElement<?> owner;
+        private final CalendarWeekElement owner;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private BWRule(CalendarWeekElement<?> owner) {
+        private BWRule(CalendarWeekElement owner) {
             super();
 
             this.owner = owner;

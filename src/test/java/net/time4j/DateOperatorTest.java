@@ -26,7 +26,7 @@ public class DateOperatorTest {
             is(PlainDate.of(-999999999, 2, 28)));
         assertThat(
             PlainTimestamp.of(2012, 2, 29, 0, 0).with(
-                YEAR.minimized().onTimestamp()),
+                YEAR.minimized()),
             is(PlainTimestamp.of(-999999999, 2, 28, 0, 0)));
     }
 
@@ -37,7 +37,7 @@ public class DateOperatorTest {
             is(PlainDate.of(999999999, 2, 28)));
         assertThat(
             PlainTimestamp.of(2012, 2, 29, 10, 45).with(
-                YEAR.maximized().onTimestamp()),
+                YEAR.maximized()),
             is(PlainTimestamp.of(999999999, 2, 28, 10, 45)));
     }
 
@@ -51,7 +51,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2013, 2, 28)));
         assertThat(
             PlainTimestamp.of(2012, 2, 1, 12, 45).with(
-                YEAR.incremented().onTimestamp()),
+                YEAR.incremented()),
             is(PlainTimestamp.of(2013, 2, 1, 12, 45)));
     }
 
@@ -65,7 +65,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2011, 2, 28)));
         assertThat(
             PlainTimestamp.of(2012, 3, 1, 12, 45).with(
-                YEAR.decremented().onTimestamp()),
+                YEAR.decremented()),
             is(PlainTimestamp.of(2011, 3, 1, 12, 45)));
     }
 
@@ -76,7 +76,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 1, 1)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(YEAR.atFloor().onTimestamp()),
+                .with(YEAR.atFloor()),
             is(PlainTimestamp.of(2012, 1, 1, 0, 0)));
     }
 
@@ -87,7 +87,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 12, 31)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(YEAR.atCeiling().onTimestamp()),
+                .with(YEAR.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 12, 31, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -140,7 +140,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 3, 1)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(MONTH_OF_YEAR.atFloor().onTimestamp()),
+                .with(MONTH_OF_YEAR.atFloor()),
             is(PlainTimestamp.of(2012, 3, 1, 0, 0)));
     }
 
@@ -151,7 +151,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 3, 31)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(MONTH_OF_YEAR.atCeiling().onTimestamp()),
+                .with(MONTH_OF_YEAR.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 3, 31, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -204,7 +204,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 3, 1)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(MONTH_AS_NUMBER.atFloor().onTimestamp()),
+                .with(MONTH_AS_NUMBER.atFloor()),
             is(PlainTimestamp.of(2012, 3, 1, 0, 0)));
     }
 
@@ -215,7 +215,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 3, 31)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(MONTH_AS_NUMBER.atCeiling().onTimestamp()),
+                .with(MONTH_AS_NUMBER.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 3, 31, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -262,7 +262,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 1, 1)));
         assertThat(
             PlainTimestamp.of(2012, 3, 4, 12, 45)
-                .with(QUARTER_OF_YEAR.atFloor().onTimestamp()),
+                .with(QUARTER_OF_YEAR.atFloor()),
             is(PlainTimestamp.of(2012, 1, 1, 0, 0)));
     }
 
@@ -273,7 +273,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 3, 31)));
         assertThat(
             PlainTimestamp.of(2012, 2, 4, 12, 45)
-                .with(QUARTER_OF_YEAR.atCeiling().onTimestamp()),
+                .with(QUARTER_OF_YEAR.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 3, 31, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -320,7 +320,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 4, 4)));
         assertThat(
             PlainTimestamp.of(2012, 4, 4, 12, 45)
-                .with(DAY_OF_WEEK.atFloor().onTimestamp()),
+                .with(DAY_OF_WEEK.atFloor()),
             is(PlainTimestamp.of(2012, 4, 4, 0, 0)));
     }
 
@@ -331,7 +331,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 2, 4)));
         assertThat(
             PlainTimestamp.of(2012, 2, 4, 12, 45)
-                .with(DAY_OF_WEEK.atCeiling().onTimestamp()),
+                .with(DAY_OF_WEEK.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 2, 4, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -378,7 +378,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 4, 4)));
         assertThat(
             PlainTimestamp.of(2012, 4, 4, 12, 45)
-                .with(DAY_OF_QUARTER.atFloor().onTimestamp()),
+                .with(DAY_OF_QUARTER.atFloor()),
             is(PlainTimestamp.of(2012, 4, 4, 0, 0)));
     }
 
@@ -389,7 +389,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 2, 4)));
         assertThat(
             PlainTimestamp.of(2012, 2, 4, 12, 45)
-                .with(DAY_OF_QUARTER.atCeiling().onTimestamp()),
+                .with(DAY_OF_QUARTER.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 2, 4, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -436,7 +436,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 4, 4)));
         assertThat(
             PlainTimestamp.of(2012, 4, 4, 12, 45)
-                .with(DAY_OF_YEAR.atFloor().onTimestamp()),
+                .with(DAY_OF_YEAR.atFloor()),
             is(PlainTimestamp.of(2012, 4, 4, 0, 0)));
     }
 
@@ -447,7 +447,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 2, 4)));
         assertThat(
             PlainTimestamp.of(2012, 2, 4, 12, 45)
-                .with(DAY_OF_YEAR.atCeiling().onTimestamp()),
+                .with(DAY_OF_YEAR.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 2, 4, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
@@ -503,7 +503,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 4, 4)));
         assertThat(
             PlainTimestamp.of(2012, 4, 4, 12, 45)
-                .with(DAY_OF_MONTH.atFloor().onTimestamp()),
+                .with(DAY_OF_MONTH.atFloor()),
             is(PlainTimestamp.of(2012, 4, 4, 0, 0)));
     }
 
@@ -514,7 +514,7 @@ public class DateOperatorTest {
             is(PlainDate.of(2012, 2, 4)));
         assertThat(
             PlainTimestamp.of(2012, 2, 4, 12, 45)
-                .with(DAY_OF_MONTH.atCeiling().onTimestamp()),
+                .with(DAY_OF_MONTH.atCeiling()),
             is(
                 PlainTimestamp.of(2012, 2, 4, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
