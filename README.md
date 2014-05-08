@@ -38,12 +38,12 @@ import static net.time4j.Weekday.WEDNESDAY;
 
   // What is the last day of overnext month?
   System.out.println(
-      ZonalClock.ofSystem().today()
+      SystemClock.inStdTimezone().today()
           .plus(2, MONTHS)
           .with(DAY_OF_MONTH.maximized()));
 
   // When is next wednesday?
-  PlainDate today = ZonalClock.ofSystem().today();
+  PlainDate today = SystemClock.inStdTimezone().today();
   PlainDate nextWednesday =
     today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
   System.out.println(nextWednesday);
