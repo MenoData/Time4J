@@ -29,10 +29,10 @@ import net.time4j.engine.ChronoElement;
  * Standardmanipulationen. </p>
  *
  * @param   <V> generic type of element values
- * @param   <O> generic operator type
+ * @param   <T> generic type of target entity an operator is applied to
  * @author  Meno Hochschild
  */
-public interface AdjustableElement<V, O>
+public interface AdjustableElement<V, T>
     extends ChronoElement<V> {
 
     //~ Methoden ----------------------------------------------------------
@@ -42,14 +42,14 @@ public interface AdjustableElement<V, O>
      *
      * @return  operator directly applicable on local types without timezone
      */
-    O minimized();
+    ElementOperator<T> minimized();
 
     /**
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementmaximum. </p>
      *
      * @return  operator directly applicable on local types without timezone
      */
-    O maximized();
+    ElementOperator<T> maximized();
 
     /**
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
@@ -63,7 +63,7 @@ public interface AdjustableElement<V, O>
      *          and requiring a base unit in given chronology for decrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
-    O decremented();
+    ElementOperator<T> decremented();
 
     /**
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
@@ -77,7 +77,7 @@ public interface AdjustableElement<V, O>
      *          and requiring a base unit in given chronology for incrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
-    O incremented();
+    ElementOperator<T> incremented();
 
     /**
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
@@ -85,7 +85,7 @@ public interface AdjustableElement<V, O>
      *
      * @return  operator directly applicable on local types without timezone
      */
-    O atFloor();
+    ElementOperator<T> atFloor();
 
     /**
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
@@ -93,6 +93,6 @@ public interface AdjustableElement<V, O>
      *
      * @return  operator directly applicable on local types without timezone
      */
-    O atCeiling();
+    ElementOperator<T> atCeiling();
 
 }

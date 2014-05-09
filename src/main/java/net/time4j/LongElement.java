@@ -39,7 +39,7 @@ import java.math.BigDecimal;
  */
 final class LongElement
     extends AbstractTimeElement<Long>
-    implements ProportionalElement<Long, TimeOperator, PlainTime>,
+    implements ProportionalElement<Long, PlainTime>,
                NumericalElement<Long> {
 
     //~ Statische Felder/Initialisierungen --------------------------------

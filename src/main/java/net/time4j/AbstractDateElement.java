@@ -37,19 +37,19 @@ import java.util.Map;
  */
 abstract class AbstractDateElement<V extends Comparable<V>>
     extends AdvancedElement<V>
-    implements AdjustableElement<V, DateOperator> {
+    implements AdjustableElement<V, PlainDate> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final Map<Integer, DateOperator> cache;
+    private transient final Map<Integer, ElementOperator<PlainDate>> cache;
 
     //~ Konstruktoren -----------------------------------------------------
 
     AbstractDateElement(String name) {
         super(name);
 
-        Map<Integer, DateOperator> ops =
-            new HashMap<Integer, DateOperator>();
+        Map<Integer, ElementOperator<PlainDate>> ops =
+            new HashMap<Integer, ElementOperator<PlainDate>>();
         ops.put(
             ElementOperator.OP_MINIMIZE,
             new DateOperator(this, ElementOperator.OP_MINIMIZE));
@@ -75,48 +75,48 @@ abstract class AbstractDateElement<V extends Comparable<V>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public DateOperator minimized() {
+    public ElementOperator<PlainDate> minimized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));
 
     }
 
     @Override
-    public DateOperator maximized() {
+    public ElementOperator<PlainDate> maximized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MAXIMIZE));
 
     }
 
     @Override
-    public DateOperator decremented() {
+    public ElementOperator<PlainDate> decremented() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_DECREMENT));
 
     }
 
     @Override
-    public DateOperator incremented() {
+    public ElementOperator<PlainDate> incremented() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_INCREMENT));
 
     }
 
     @Override
-    public DateOperator atFloor() {
+    public ElementOperator<PlainDate> atFloor() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_FLOOR));
 
     }
 
     @Override
-    public DateOperator atCeiling() {
+    public ElementOperator<PlainDate> atCeiling() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_CEILING));
 
     }
 
-    public DateOperator setLenient(V value) {
+    public ElementOperator<PlainDate> setLenient(V value) {
 
         return new DateOperator(this, ElementOperator.OP_LENIENT, value);
 

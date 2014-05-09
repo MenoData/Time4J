@@ -221,7 +221,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "h")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> CLOCK_HOUR_OF_AMPM =
+    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_AMPM =
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_AMPM", false);
 
     /**
@@ -249,7 +249,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "k")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> CLOCK_HOUR_OF_DAY =
+    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_DAY =
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_DAY", true);
 
     /**
@@ -277,7 +277,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "K")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> DIGITAL_HOUR_OF_AMPM =
+    ProportionalElement<Integer, PlainTime> DIGITAL_HOUR_OF_AMPM =
         IntegerTimeElement.createTimeElement(
             "DIGITAL_HOUR_OF_AMPM",
             IntegerTimeElement.DIGITAL_HOUR_OF_AMPM,
@@ -310,7 +310,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "H")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> DIGITAL_HOUR_OF_DAY =
+    ProportionalElement<Integer, PlainTime> DIGITAL_HOUR_OF_DAY =
         IntegerTimeElement.createTimeElement(
             "DIGITAL_HOUR_OF_DAY",
             IntegerTimeElement.DIGITAL_HOUR_OF_DAY,
@@ -327,8 +327,7 @@ public final class PlainTime
      *
      * @see     #getHour()
      */
-    public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> ISO_HOUR =
+    public static final ProportionalElement<Integer, PlainTime> ISO_HOUR =
         IntegerTimeElement.createTimeElement(
             "ISO_HOUR",
             IntegerTimeElement.ISO_HOUR,
@@ -342,8 +341,7 @@ public final class PlainTime
      * @see     #getMinute()
      */
     @FormattableElement(format = "m")
-    public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> MINUTE_OF_HOUR =
+    public static final ProportionalElement<Integer, PlainTime> MINUTE_OF_HOUR =
         IntegerTimeElement.createTimeElement(
             "MINUTE_OF_HOUR",
             IntegerTimeElement.MINUTE_OF_HOUR,
@@ -358,8 +356,7 @@ public final class PlainTime
      * {@code 1440} und steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das
      * Maximum in jedem anderen Kontext {@code 1439}. </p>
      */
-    public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> MINUTE_OF_DAY =
+    public static final ProportionalElement<Integer, PlainTime> MINUTE_OF_DAY =
         IntegerTimeElement.createTimeElement(
             "MINUTE_OF_DAY",
             IntegerTimeElement.MINUTE_OF_DAY,
@@ -379,7 +376,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "s")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> SECOND_OF_MINUTE =
+    ProportionalElement<Integer, PlainTime> SECOND_OF_MINUTE =
         IntegerTimeElement.createTimeElement(
             "SECOND_OF_MINUTE",
             IntegerTimeElement.SECOND_OF_MINUTE,
@@ -396,7 +393,7 @@ public final class PlainTime
      * {@code 86399}. UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> SECOND_OF_DAY =
+    ProportionalElement<Integer, PlainTime> SECOND_OF_DAY =
         IntegerTimeElement.createTimeElement(
             "SECOND_OF_DAY",
             IntegerTimeElement.SECOND_OF_DAY,
@@ -408,7 +405,7 @@ public final class PlainTime
      * <p>Element mit der Millisekunde im Bereich {@code 0-999}. </p>
      */
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> MILLI_OF_SECOND =
+    ProportionalElement<Integer, PlainTime> MILLI_OF_SECOND =
         IntegerTimeElement.createTimeElement(
             "MILLI_OF_SECOND",
             IntegerTimeElement.MILLI_OF_SECOND,
@@ -420,7 +417,7 @@ public final class PlainTime
      * <p>Element mit der Mikrosekunde im Bereich {@code 0-999999}. </p>
      */
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> MICRO_OF_SECOND =
+    ProportionalElement<Integer, PlainTime> MICRO_OF_SECOND =
         IntegerTimeElement.createTimeElement(
             "MICRO_OF_SECOND",
             IntegerTimeElement.MICRO_OF_SECOND,
@@ -433,7 +430,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "S")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> NANO_OF_SECOND =
+    ProportionalElement<Integer, PlainTime> NANO_OF_SECOND =
         IntegerTimeElement.createTimeElement(
             "NANO_OF_SECOND",
             IntegerTimeElement.NANO_OF_SECOND,
@@ -452,7 +449,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "A")
     public static final
-    ProportionalElement<Integer, TimeOperator, PlainTime> MILLI_OF_DAY =
+    ProportionalElement<Integer, PlainTime> MILLI_OF_DAY =
         IntegerTimeElement.createTimeElement(
             "MILLI_OF_DAY",
             IntegerTimeElement.MILLI_OF_DAY,
@@ -470,7 +467,7 @@ public final class PlainTime
      * UTC-Schaltsekunden werden nicht mitgez&auml;hlt. </p>
      */
     public static final
-    ProportionalElement<Long, TimeOperator, PlainTime> MICRO_OF_DAY =
+    ProportionalElement<Long, PlainTime> MICRO_OF_DAY =
         LongElement.create("MICRO_OF_DAY", 0L, 86399999999L);
 
     /**
@@ -498,7 +495,7 @@ public final class PlainTime
      * </pre>
      */
     public static final
-    ProportionalElement<Long, TimeOperator, PlainTime> NANO_OF_DAY =
+    ProportionalElement<Long, PlainTime> NANO_OF_DAY =
         LongElement.create("NANO_OF_DAY", 0L, 86399999999999L);
 
     /**

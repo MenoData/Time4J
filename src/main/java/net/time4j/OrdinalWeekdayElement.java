@@ -33,7 +33,7 @@ package net.time4j;
  * @author  Meno Hochschild
  */
 public interface OrdinalWeekdayElement
-    extends AdjustableElement<Integer, DateOperator> {
+    extends AdjustableElement<Integer, PlainDate> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -44,7 +44,7 @@ public interface OrdinalWeekdayElement
      * @param   dayOfWeek   first day of week in month
      * @return  operator directly applicable on local types without timezone
      */
-    DateOperator setToFirst(Weekday dayOfWeek);
+    ElementOperator<PlainDate> setToFirst(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den zweiten angegebenen
@@ -53,7 +53,7 @@ public interface OrdinalWeekdayElement
      * @param   dayOfWeek   second day of week in month
      * @return  operator directly applicable on local types without timezone
      */
-    DateOperator setToSecond(Weekday dayOfWeek);
+    ElementOperator<PlainDate> setToSecond(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den dritten angegebenen
@@ -62,7 +62,7 @@ public interface OrdinalWeekdayElement
      * @param   dayOfWeek   third day of week in month
      * @return  operator directly applicable on local types without timezone
      */
-    DateOperator setToThird(Weekday dayOfWeek);
+    ElementOperator<PlainDate> setToThird(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den vierten angegebenen
@@ -71,7 +71,7 @@ public interface OrdinalWeekdayElement
      * @param   dayOfWeek   fourth day of week in month
      * @return  operator directly applicable on local types without timezone
      */
-    DateOperator setToFourth(Weekday dayOfWeek);
+    ElementOperator<PlainDate> setToFourth(Weekday dayOfWeek);
 
     /**
      * <p>Definiert einen Versteller, der ein Datum auf den letzten angegebenen
@@ -80,6 +80,6 @@ public interface OrdinalWeekdayElement
      * @param   dayOfWeek   last day of week in month
      * @return  operator directly applicable on local types without timezone
      */
-    DateOperator setToLast(Weekday dayOfWeek);
+    ElementOperator<PlainDate> setToLast(Weekday dayOfWeek);
 
 }

@@ -134,13 +134,13 @@ public final class Weekmodel
 
     // Elemente kompatibel zu PlainDate
     private transient final
-        AdjustableElement<Integer, DateOperator> woyElement;
+        AdjustableElement<Integer, PlainDate> woyElement;
     private transient final
-        AdjustableElement<Integer, DateOperator> womElement;
+        AdjustableElement<Integer, PlainDate> womElement;
     private transient final
-        AdjustableElement<Integer, DateOperator> boundWoyElement;
+        AdjustableElement<Integer, PlainDate> boundWoyElement;
     private transient final
-        AdjustableElement<Integer, DateOperator> boundWomElement;
+        AdjustableElement<Integer, PlainDate> boundWomElement;
     private transient final
         NavigableElement<Weekday> dayOfWeekElement;
     private transient final Set<ChronoElement<?>> elements;
@@ -435,7 +435,7 @@ public final class Weekmodel
      * @return  localized week of year
      */
     @FormattableElement(format = "w")
-    public AdjustableElement<Integer, DateOperator> weekOfYear() {
+    public AdjustableElement<Integer, PlainDate> weekOfYear() {
 
         return this.woyElement;
 
@@ -456,7 +456,7 @@ public final class Weekmodel
      * @see     #weekOfYear()
      */
     @FormattableElement(format = "W")
-    public AdjustableElement<Integer, DateOperator> weekOfMonth() {
+    public AdjustableElement<Integer, PlainDate> weekOfMonth() {
 
         return this.womElement;
 
@@ -506,7 +506,7 @@ public final class Weekmodel
      *
      * @return  week of year within the limits of calendar year
      */
-    public AdjustableElement<Integer, DateOperator> boundedWeekOfYear() {
+    public AdjustableElement<Integer, PlainDate> boundedWeekOfYear() {
 
         return this.boundWoyElement;
 
@@ -534,7 +534,7 @@ public final class Weekmodel
      * @return  week of month within the limits of calendar month
      * @see     #boundedWeekOfYear()
      */
-    public AdjustableElement<Integer, DateOperator> boundedWeekOfMonth() {
+    public AdjustableElement<Integer, PlainDate> boundedWeekOfMonth() {
 
         return this.boundWomElement;
 
@@ -784,7 +784,7 @@ public final class Weekmodel
         }
 
         @Override
-        public DateOperator setToNext(Weekday value) {
+        public ElementOperator<PlainDate> setToNext(Weekday value) {
 
             return new NavigationOperator<Weekday>(
                 this,
@@ -795,7 +795,7 @@ public final class Weekmodel
         }
 
         @Override
-        public DateOperator setToPrevious(Weekday value) {
+        public ElementOperator<PlainDate> setToPrevious(Weekday value) {
 
             return new NavigationOperator<Weekday>(
                 this,
@@ -806,7 +806,7 @@ public final class Weekmodel
         }
 
         @Override
-        public DateOperator setToNextOrSame(Weekday value) {
+        public ElementOperator<PlainDate> setToNextOrSame(Weekday value) {
 
             return new NavigationOperator<Weekday>(
                 this,
@@ -817,7 +817,7 @@ public final class Weekmodel
         }
 
         @Override
-        public DateOperator setToPreviousOrSame(Weekday value) {
+        public ElementOperator<PlainDate> setToPreviousOrSame(Weekday value) {
 
             return new NavigationOperator<Weekday>(
                 this,
@@ -1031,7 +1031,7 @@ public final class Weekmodel
 
     private class CalendarWeekElement
         extends AbstractDateElement<Integer>
-        implements AdjustableElement<Integer, DateOperator>,
+        implements AdjustableElement<Integer, PlainDate>,
                    NumericalElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------

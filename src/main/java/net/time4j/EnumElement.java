@@ -148,7 +148,7 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public DateOperator setToNext(V value) {
+    public ElementOperator<PlainDate> setToNext(V value) {
 
         return new NavigationOperator<V>(
             this, ElementOperator.OP_NAV_NEXT, value);
@@ -156,7 +156,7 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public DateOperator setToPrevious(V value) {
+    public ElementOperator<PlainDate> setToPrevious(V value) {
 
         return new NavigationOperator<V>(
             this, ElementOperator.OP_NAV_PREVIOUS, value);
@@ -164,7 +164,7 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public DateOperator setToNextOrSame(V value) {
+    public ElementOperator<PlainDate> setToNextOrSame(V value) {
 
         return new NavigationOperator<V>(
             this, ElementOperator.OP_NAV_NEXT_OR_SAME, value);
@@ -172,7 +172,7 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public DateOperator setToPreviousOrSame(V value) {
+    public ElementOperator<PlainDate> setToPreviousOrSame(V value) {
 
         return new NavigationOperator<V>(
             this, ElementOperator.OP_NAV_PREVIOUS_OR_SAME, value);

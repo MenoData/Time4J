@@ -33,7 +33,7 @@ import net.time4j.engine.ChronoOperator;
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
-public class DateOperator
+final class DateOperator
     extends ElementOperator<PlainDate> {
 
     //~ Instanzvariablen --------------------------------------------------

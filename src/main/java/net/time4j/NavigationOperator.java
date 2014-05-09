@@ -21,7 +21,7 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
+import net.time4j.engine.AdvancedElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
@@ -35,11 +35,10 @@ import net.time4j.engine.ChronoOperator;
  * @concurrency <immutable>
  */
 final class NavigationOperator<V extends Enum<V>>
-    extends DateOperator {
+    extends ElementOperator<PlainDate> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoElement<V> element;
     private final V value;
     private final int len;
     private final ChronoOperator<PlainTimestamp> navTS;
@@ -54,17 +53,16 @@ final class NavigationOperator<V extends Enum<V>>
      * @param   value       target value of navigation
      */
     NavigationOperator(
-        ChronoElement<V> element,
+        AdvancedElement<V> element,
         int mode,
         V value
     ) {
-        super(mode);
+        super(element, mode);
 
         if (value == null) {
             throw new NullPointerException("Missing value.");
         }
 
-        this.element = element;
         this.value = value;
         this.len = element.getType().getEnumConstants().length;
 
@@ -88,13 +86,6 @@ final class NavigationOperator<V extends Enum<V>>
     }
 
     @Override
-    public ZonalOperator inStdTimezone() {
-
-        return new Moment.Operator(this.navTS, this.element, this.getType());
-
-    }
-
-    @Override
     ChronoOperator<PlainTimestamp> onTimestamp() {
 
         return this.navTS;
@@ -105,7 +96,8 @@ final class NavigationOperator<V extends Enum<V>>
 
         if (entity.contains(PlainDate.CALENDAR_DATE)) {
             PlainDate date = entity.get(PlainDate.CALENDAR_DATE);
-            int oldOrdinal = date.get(this.element).ordinal();
+            Object enumValue = date.get(this.getElement());
+            int oldOrdinal = Enum.class.cast(enumValue).ordinal();
             int newOrdinal = this.delta(oldOrdinal);
 
             if (newOrdinal == oldOrdinal) {
@@ -115,7 +107,7 @@ final class NavigationOperator<V extends Enum<V>>
                     PlainDate.CALENDAR_DATE,
                     date.plus(
                         (newOrdinal - oldOrdinal),
-                        date.getChronology().getBaseUnit(this.element))
+                        date.getChronology().getBaseUnit(this.getElement()))
                 );
             }
         }
@@ -142,7 +134,7 @@ final class NavigationOperator<V extends Enum<V>>
         throw new ChronoException(
             navigation
             + "()-operation not supported on: "
-            + this.element.name());
+            + this.getElement().name());
 
     }
 

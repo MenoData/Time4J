@@ -609,7 +609,7 @@ public class WeekmodelTest {
 
     @Test
     public void maximizedUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 2).with(element.maximized()),
@@ -618,7 +618,7 @@ public class WeekmodelTest {
 
     @Test
     public void minimizedUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 2).with(element.minimized()),
@@ -627,7 +627,7 @@ public class WeekmodelTest {
 
     @Test
     public void decrementedUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 2).with(element.decremented()),
@@ -636,7 +636,7 @@ public class WeekmodelTest {
 
     @Test
     public void incrementedUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 2).with(element.incremented()),
@@ -645,7 +645,7 @@ public class WeekmodelTest {
 
     @Test
     public void flooredUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 1).with(element.atFloor()),
@@ -654,7 +654,7 @@ public class WeekmodelTest {
 
     @Test
     public void ceilingUSBoundedWeekOfYear() {
-        AdjustableElement<Integer, DateOperator> element =
+        AdjustableElement<Integer, PlainDate> element =
             Weekmodel.of(Locale.US).boundedWeekOfYear();
         assertThat(
             PlainDate.of(2000, 12, 1).with(element.atCeiling()),
@@ -901,7 +901,7 @@ public class WeekmodelTest {
 
     @Test
     public void flooredUSLocalDayOfWeek() {
-        AdjustableElement<Weekday, DateOperator> element =
+        AdjustableElement<Weekday, PlainDate> element =
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainTimestamp.of(2012, 4, 17, 13, 47, 0).with(element.atFloor()),
@@ -910,7 +910,7 @@ public class WeekmodelTest {
 
     @Test
     public void ceilingUSLocalDayOfWeek() {
-        AdjustableElement<Weekday, DateOperator> element =
+        AdjustableElement<Weekday, PlainDate> element =
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainTimestamp.of(2012, 4, 17, 13, 47, 0).with(element.atCeiling()),

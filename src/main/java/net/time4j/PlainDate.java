@@ -193,7 +193,7 @@ public final class PlainDate
      * mathematische Extrapolation nicht geeignet. </p>
      */
     @FormattableElement(format = "u")
-    public static final AdjustableElement<Integer, DateOperator> YEAR =
+    public static final AdjustableElement<Integer, PlainDate> YEAR =
         IntegerDateElement.create(
             "YEAR",
             IntegerDateElement.YEAR,
@@ -227,8 +227,7 @@ public final class PlainDate
      * @see     CalendarUnit#weekBasedYears()
      */
     @FormattableElement(format = "Y")
-    public static final
-    AdjustableElement<Integer, DateOperator> YEAR_OF_WEEKDATE =
+    public static final AdjustableElement<Integer, PlainDate> YEAR_OF_WEEKDATE =
         YOWElement.INSTANCE;
 
     /**
@@ -295,7 +294,7 @@ public final class PlainDate
      * @see     #MONTH_OF_YEAR
      */
     public static final
-    ProportionalElement<Integer, DateOperator, PlainDate> MONTH_AS_NUMBER =
+    ProportionalElement<Integer, PlainDate> MONTH_AS_NUMBER =
         IntegerDateElement.create(
             "MONTH_AS_NUMBER",
             IntegerDateElement.MONTH,
@@ -308,8 +307,7 @@ public final class PlainDate
      * (Wertebereich {@code 1-28/29/30/31}). </p>
      */
     @FormattableElement(format = "d")
-    public static final
-    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_MONTH =
+    public static final ProportionalElement<Integer, PlainDate> DAY_OF_MONTH =
         IntegerDateElement.create(
             "DAY_OF_MONTH",
             IntegerDateElement.DAY_OF_MONTH,
@@ -341,8 +339,7 @@ public final class PlainDate
      * <p>Element mit dem Tag des Jahres (Wertebereich {@code 1-365/366}). </p>
      */
     @FormattableElement(format = "D")
-    public static final
-    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_YEAR =
+    public static final ProportionalElement<Integer, PlainDate> DAY_OF_YEAR =
         IntegerDateElement.create(
             "DAY_OF_YEAR",
             IntegerDateElement.DAY_OF_YEAR,
@@ -354,8 +351,7 @@ public final class PlainDate
      * <p>Element mit dem Tag des Quartals
      * (Wertebereich {@code 1-90/91/92}). </p>
      */
-    public static final
-    ProportionalElement<Integer, DateOperator, PlainDate> DAY_OF_QUARTER =
+    public static final ProportionalElement<Integer, PlainDate> DAY_OF_QUARTER =
         IntegerDateElement.create(
             "DAY_OF_QUARTER",
             IntegerDateElement.DAY_OF_QUARTER,

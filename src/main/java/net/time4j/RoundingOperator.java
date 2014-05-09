@@ -36,7 +36,7 @@ final class RoundingOperator<T extends ChronoEntity<T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ProportionalElement<?, ?, T> element;
+    private final ProportionalElement<?, T> element;
     private final Boolean up;
     private final double stepwidth;
     private final boolean longBased;
@@ -53,7 +53,7 @@ final class RoundingOperator<T extends ChronoEntity<T>>
      * @param   stepwidth   controls limits of rounding
      */
     RoundingOperator(
-        final ProportionalElement<?, ?, T> element,
+        final ProportionalElement<?, T> element,
         Boolean up,
         int stepwidth
     ) {
@@ -98,7 +98,7 @@ final class RoundingOperator<T extends ChronoEntity<T>>
 
     private static <V extends Number, T extends ChronoEntity<T>>
     ChronoOperator<T> lenient(
-        ProportionalElement<V, ?, T> element,
+        ProportionalElement<V, T> element,
         Number num
     ) {
 

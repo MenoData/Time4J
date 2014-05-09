@@ -128,41 +128,41 @@ final class WeekdayInMonthElement
     }
 
     @Override
-    public DateOperator setToFirst(Weekday dayOfWeek) {
+    public ElementOperator<PlainDate> setToFirst(Weekday dayOfWeek) {
 
         return this.setTo(1, dayOfWeek);
 
     }
 
     @Override
-    public DateOperator setToSecond(Weekday dayOfWeek) {
+    public ElementOperator<PlainDate> setToSecond(Weekday dayOfWeek) {
 
         return this.setTo(2, dayOfWeek);
 
     }
 
     @Override
-    public DateOperator setToThird(Weekday dayOfWeek) {
+    public ElementOperator<PlainDate> setToThird(Weekday dayOfWeek) {
 
         return this.setTo(3, dayOfWeek);
 
     }
 
     @Override
-    public DateOperator setToFourth(Weekday dayOfWeek) {
+    public ElementOperator<PlainDate> setToFourth(Weekday dayOfWeek) {
 
         return this.setTo(4, dayOfWeek);
 
     }
 
     @Override
-    public DateOperator setToLast(Weekday dayOfWeek) {
+    public ElementOperator<PlainDate> setToLast(Weekday dayOfWeek) {
 
         return this.setTo(LAST, dayOfWeek);
 
     }
 
-    private DateOperator setTo(
+    private ElementOperator<PlainDate> setTo(
         final int ordinal,
         final Weekday dayOfWeek
     ) {
@@ -180,7 +180,7 @@ final class WeekdayInMonthElement
     //~ Innere Klassen ----------------------------------------------------
 
     private static class SpecialOperator
-        extends DateOperator {
+        extends ElementOperator<PlainDate> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -194,7 +194,7 @@ final class WeekdayInMonthElement
             int ordinal,
             Weekday dayOfWeek
         ) {
-            super(OP_WIM);
+            super(WeekdayInMonthElement.INSTANCE, OP_WIM);
 
             if (dayOfWeek == null) {
                 throw new NullPointerException("Missing value.");
@@ -219,17 +219,6 @@ final class WeekdayInMonthElement
         public PlainDate apply(PlainDate entity) {
 
             return this.doApply(entity);
-
-        }
-
-        @Override
-        public ZonalOperator inStdTimezone() {
-
-            return new Moment.Operator(
-                this.specialTS,
-                WeekdayInMonthElement.INSTANCE,
-                OP_WIM
-            );
 
         }
 

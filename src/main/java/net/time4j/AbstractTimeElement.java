@@ -37,19 +37,19 @@ import java.util.Map;
  */
 abstract class AbstractTimeElement<V extends Comparable<V>>
     extends AdvancedElement<V>
-    implements AdjustableElement<V, TimeOperator> {
+    implements AdjustableElement<V, PlainTime> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final Map<Integer, TimeOperator> cache;
+    private transient final Map<Integer, ElementOperator<PlainTime>> cache;
 
     //~ Konstruktoren -----------------------------------------------------
 
     AbstractTimeElement(String name) {
         super(name);
 
-        Map<Integer, TimeOperator> ops =
-            new HashMap<Integer, TimeOperator>();
+        Map<Integer, ElementOperator<PlainTime>> ops =
+            new HashMap<Integer, ElementOperator<PlainTime>>();
         ops.put(
             ElementOperator.OP_MINIMIZE,
             new TimeOperator(this, ElementOperator.OP_MINIMIZE));
@@ -75,48 +75,48 @@ abstract class AbstractTimeElement<V extends Comparable<V>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public TimeOperator minimized() {
+    public ElementOperator<PlainTime> minimized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));
 
     }
 
     @Override
-    public TimeOperator maximized() {
+    public ElementOperator<PlainTime> maximized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MAXIMIZE));
 
     }
 
     @Override
-    public TimeOperator decremented() {
+    public ElementOperator<PlainTime> decremented() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_DECREMENT));
 
     }
 
     @Override
-    public TimeOperator incremented() {
+    public ElementOperator<PlainTime> incremented() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_INCREMENT));
 
     }
 
     @Override
-    public TimeOperator atFloor() {
+    public ElementOperator<PlainTime> atFloor() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_FLOOR));
 
     }
 
     @Override
-    public TimeOperator atCeiling() {
+    public ElementOperator<PlainTime> atCeiling() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_CEILING));
 
     }
 
-    public TimeOperator setLenient(V value) {
+    public ElementOperator<PlainTime> setLenient(V value) {
 
         return new TimeOperator(this, ElementOperator.OP_LENIENT, value);
 

@@ -43,7 +43,7 @@ import java.math.BigDecimal;
  */
 final class IntegerDateElement
     extends AbstractDateElement<Integer>
-    implements ProportionalElement<Integer, DateOperator, PlainDate>,
+    implements ProportionalElement<Integer, PlainDate>,
                NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------

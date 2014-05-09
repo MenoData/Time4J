@@ -33,12 +33,11 @@ import java.math.BigDecimal;
  * interpretieren kann. </p>
  *
  * @param   <V> generic number type of element values
- * @param   <O> generic operator type
- * @param   <T> generic operator target type
+ * @param   <T> generic type of target entity an operator is applied to
  * @author  Meno Hochschild
  */
-public interface ProportionalElement<V extends Number, O, T>
-    extends AdjustableElement<V, O> {
+public interface ProportionalElement<V extends Number, T>
+    extends AdjustableElement<V, T> {
 
     //~ Methoden ----------------------------------------------------------
 

@@ -46,7 +46,7 @@ import static net.time4j.PlainTime.WALL_TIME;
  */
 final class YOWElement
     extends AbstractDateElement<Integer>
-    implements AdjustableElement<Integer, DateOperator>,
+    implements AdjustableElement<Integer, PlainDate>,
                NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -63,8 +63,8 @@ final class YOWElement
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final DateOperator previousAdjuster;
-    private transient final DateOperator nextAdjuster;
+    private transient final ElementOperator<PlainDate> previousAdjuster;
+    private transient final ElementOperator<PlainDate> nextAdjuster;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -128,14 +128,14 @@ final class YOWElement
     }
 
     @Override
-    public DateOperator decremented() {
+    public ElementOperator<PlainDate> decremented() {
 
         return this.previousAdjuster;
 
     }
 
     @Override
-    public DateOperator incremented() {
+    public ElementOperator<PlainDate> incremented() {
 
         return this.nextAdjuster;
 
@@ -288,7 +288,7 @@ final class YOWElement
     }
 
     private static class YOWRollingAdjuster
-        extends DateOperator {
+        extends ElementOperator<PlainDate> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -298,7 +298,7 @@ final class YOWElement
         //~ Konstruktoren -------------------------------------------------
 
         private YOWRollingAdjuster(long amount) {
-            super(OP_YOW);
+            super(YOWElement.INSTANCE, OP_YOW);
 
             this.amount = amount;
 
@@ -322,14 +322,6 @@ final class YOWElement
 
             UnitRule<PlainDate> rule = YOWElement.unitRule();
             return rule.addTo(entity, this.amount);
-
-        }
-
-        @Override
-        public ZonalOperator inStdTimezone() {
-
-            return new Moment.Operator(
-                this.yowTS, YOWElement.INSTANCE, OP_YOW);
 
         }
 
