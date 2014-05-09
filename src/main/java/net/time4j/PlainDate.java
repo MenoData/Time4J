@@ -49,7 +49,6 @@ import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -676,6 +675,23 @@ public final class PlainDate
     }
 
     /**
+     * <p>Allgemeine Konversionsmethode. </p>
+     *
+     * @param   date    ISO-date
+     * @return  PlainDate
+     */
+    public static PlainDate from(GregorianDate date) {
+
+        if (date instanceof PlainDate) {
+            return (PlainDate) date;
+        } else {
+            return PlainDate.of(
+                date.getYear(), date.getMonth(), date.getDayOfMonth());
+        }
+
+    }
+
+    /**
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zu Mitternacht
      * am Beginn des Tages. </p>
      *
@@ -690,19 +706,17 @@ public final class PlainDate
 
     /**
      * <p>Erzeugt einen globalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
-     * Uhrzeit in der angegebenen Zeitzone. </p>
+     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
      *
-     * @param   tzid        time zone id
+     * @param   tzid        timezone id
      * @return  global timestamp based on composition of this date and earliest
-     *          wall time in given time zone
+     *          wall time in given timezone
      * @see     #atTime(PlainTime)
      */
     public Moment atStartOfDay(TZID tzid) {
 
-        return this.atStartOfDay().inTimezone(
-            tzid,
-            TransitionStrategy.PUSH_FORWARD
-        );
+        // TODO: TransitionStrategy#laterOffset() benutzen?
+        return this.atStartOfDay().inTimezone(tzid);
 
     }
 

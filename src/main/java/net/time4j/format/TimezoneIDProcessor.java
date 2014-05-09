@@ -61,7 +61,7 @@ enum TimezoneIDProcessor
 
         if (tzid == null) {
             throw new IllegalArgumentException(
-                "Cannot extract time zone id from: " + formattable);
+                "Cannot extract timezone id from: " + formattable);
         }
 
         int start = -1;
@@ -103,7 +103,7 @@ enum TimezoneIDProcessor
         int pos = start;
 
         if (pos >= len) {
-            status.setError(start, "Missing time zone name.");
+            status.setError(start, "Missing timezone name.");
             return;
         }
 
@@ -139,7 +139,7 @@ enum TimezoneIDProcessor
 
         // Offset prüfen
         if (key.isEmpty()) {
-            status.setError(start, "Missing valid time zone id.");
+            status.setError(start, "Missing valid timezone id.");
             return;
         } else if (key.startsWith("Etc/GMT")) {
             status.setError(
@@ -191,7 +191,7 @@ enum TimezoneIDProcessor
             }
         }
 
-        status.setError(start, "Cannot parse to time zone id: " + key);
+        status.setError(start, "Cannot parse to timezone id: " + key);
 
     }
 

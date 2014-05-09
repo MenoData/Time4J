@@ -874,6 +874,23 @@ public final class PlainTime
     }
 
     /**
+     * <p>Allgemeine Konversionsmethode. </p>
+     *
+     * @param   time    ISO-time
+     * @return  PlainTime
+     */
+    public static PlainTime from(WallTime time) {
+
+        if (time instanceof PlainTime) {
+            return (PlainTime) time;
+        } else {
+            return PlainTime.of(
+                time.getHour(), time.getMinute(), time.getSecond());
+        }
+
+    }
+
+    /**
      * <p>Rollt die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
      * auf und z&auml;hlt dabei auch tageweise &Uuml;berl&auml;ufe. </p>
      *

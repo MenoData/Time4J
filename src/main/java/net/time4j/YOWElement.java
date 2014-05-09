@@ -326,7 +326,7 @@ final class YOWElement
         }
 
         @Override
-        public ChronoOperator<Moment> inStdTimezone() {
+        public ZonalOperator inStdTimezone() {
 
             return new Moment.Operator(
                 this.yowTS, YOWElement.INSTANCE, OP_YOW);

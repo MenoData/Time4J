@@ -37,7 +37,7 @@ public interface UnixTime {
      * [1970-01-01T00:00:00Z] in der UTC-Zeitzone. </p>
      *
      * @return  count of seconds since UNIX-epoch at [1970-01-01T00:00:00Z]
-     *          without leap seconds in the time zone UTC (Greenwich)
+     *          without leap seconds in the timezone UTC (Greenwich)
      */
     long getPosixTime();
 

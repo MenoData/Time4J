@@ -32,7 +32,6 @@ import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.Serializable;
@@ -948,11 +947,11 @@ public final class Duration<U extends IsoUnit>
      * wird. </p>
      *
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #later()
+     * @see     #laterAtUTC()
      */
-    public ChronoOperator<Moment> earlier() {
+    public ChronoOperator<Moment> earlierAtUTC() {
 
-        return this.earlier(ZonalOffset.UTC, TransitionStrategy.PUSH_FORWARD);
+        return this.earlier(ZonalOffset.UTC);
 
     }
 
@@ -961,22 +960,18 @@ public final class Duration<U extends IsoUnit>
      * der angegebenen Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
      * wird. </p>
      *
-     * @param   timezone    time zone id
-     * @param   strategy    conflict resolving strategy
+     * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #later(TZID,TransitionStrategy)
+     * @see     #later(TZID)
      */
-    public ChronoOperator<Moment> earlier(
-        final TZID timezone,
-        final TransitionStrategy strategy
-    ) {
+    public ChronoOperator<Moment> earlier(final TZID timezone) {
 
         return new ChronoOperator<Moment>() {
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
                     entity.inTimezone(timezone).minus(Duration.this);
-                return ts.inTimezone(timezone, strategy);
+                return ts.inTimezone(timezone);
             }
         };
 
@@ -988,11 +983,11 @@ public final class Duration<U extends IsoUnit>
      * wird. </p>
      *
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier()
+     * @see     #earlierAtUTC()
      */
-    public ChronoOperator<Moment> later() {
+    public ChronoOperator<Moment> laterAtUTC() {
 
-        return this.later(ZonalOffset.UTC, TransitionStrategy.PUSH_FORWARD);
+        return this.later(ZonalOffset.UTC);
 
     }
 
@@ -1001,22 +996,18 @@ public final class Duration<U extends IsoUnit>
      * der angegebenen Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
      * wird. </p>
      *
-     * @param   timezone    time zone id
-     * @param   strategy    conflict resolving strategy
+     * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier(TZID,TransitionStrategy)
+     * @see     #earlier(TZID)
      */
-    public ChronoOperator<Moment> later(
-        final TZID timezone,
-        final TransitionStrategy strategy
-    ) {
+    public ChronoOperator<Moment> later(final TZID timezone) {
 
         return new ChronoOperator<Moment>() {
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
                     entity.inTimezone(timezone).plus(Duration.this);
-                return ts.inTimezone(timezone, strategy);
+                return ts.inTimezone(timezone);
             }
         };
 

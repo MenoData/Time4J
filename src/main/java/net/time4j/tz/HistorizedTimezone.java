@@ -47,7 +47,7 @@ final class HistorizedTimezone
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial  time zone id
+     * @serial  timezone id
      */
     private final TZID id;
 
@@ -61,7 +61,7 @@ final class HistorizedTimezone
     /**
      * <p>Standard-Konstruktor. </p>
      *
-     * @param   id          time zone id
+     * @param   id          timezone id
      * @param   history     offset transition model
      */
     HistorizedTimezone(
@@ -71,9 +71,9 @@ final class HistorizedTimezone
         super();
 
         if (id == null) {
-            throw new NullPointerException("Missing time zone id.");
+            throw new NullPointerException("Missing timezone id.");
         } else if (history == null) {
-            throw new NullPointerException("Missing time zone history.");
+            throw new NullPointerException("Missing timezone history.");
         }
 
         this.id = id;

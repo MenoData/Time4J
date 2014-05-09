@@ -139,7 +139,7 @@ public final class SystemClock
     /**
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
      *
-     * @return  local clock in standard time zone
+     * @return  local clock in standard timezone
      */
     public static ZonalClock inStdTimezone() {
 
@@ -150,8 +150,8 @@ public final class SystemClock
     /**
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
      *
-     * @param   tzid        time zone id
-     * @return  local clock in given time zone
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
      */
     public static ZonalClock inTimezone(TZID tzid) {
 

@@ -136,7 +136,7 @@ final class TimezoneOffsetProcessor
             offset = getOffset(formattable, step, attributes);
         } else {
             throw new IllegalArgumentException(
-                "Cannot extract time zone offset from: " + formattable);
+                "Cannot extract timezone offset from: " + formattable);
         }
 
         int total = offset.getIntegralAmount();
@@ -246,7 +246,7 @@ final class TimezoneOffsetProcessor
         int pos = start;
 
         if (pos >= len) {
-            status.setError(start, "Missing time zone offset.");
+            status.setError(start, "Missing timezone offset.");
             return;
         }
 
@@ -283,7 +283,7 @@ final class TimezoneOffsetProcessor
         } else if (c == '-') {
             sign = BEHIND_UTC;
         } else {
-            status.setError(start, "Missing sign of time zone offset.");
+            status.setError(start, "Missing sign of timezone offset.");
             return;
         }
 
@@ -299,7 +299,7 @@ final class TimezoneOffsetProcessor
         if (hours == -1000) {
             status.setError(
                 pos,
-                "Hour part in time zone offset "
+                "Hour part in timezone offset "
                 + "does not match expected pattern HH.");
             return;
         }
@@ -320,7 +320,7 @@ final class TimezoneOffsetProcessor
             } else {
                 status.setError(
                     pos,
-                    "Missing minute part in time zone offset.");
+                    "Missing minute part in timezone offset.");
             }
             return;
         }
@@ -339,7 +339,7 @@ final class TimezoneOffsetProcessor
                 status.setPosition(pos);
                 return;
             } else if (leniency.isStrict()) {
-                status.setError(pos, "Colon expected in time zone offset.");
+                status.setError(pos, "Colon expected in timezone offset.");
                 return;
             }
         }
@@ -358,7 +358,7 @@ final class TimezoneOffsetProcessor
             } else {
                 status.setError(
                     pos,
-                    "Minute part in time zone offset "
+                    "Minute part in timezone offset "
                     + "does not match expected pattern mm.");
             }
             return;
@@ -374,7 +374,7 @@ final class TimezoneOffsetProcessor
                 if (text.charAt(pos) == ':') {
                     pos++;
                 } else if (leniency.isStrict()) {
-                    status.setError(pos, "Colon expected in time zone offset.");
+                    status.setError(pos, "Colon expected in timezone offset.");
                     return;
                 }
             }
@@ -385,7 +385,7 @@ final class TimezoneOffsetProcessor
                 if (this.precision == DisplayMode.FULL) {
                     status.setError(
                         pos,
-                        "Second part in time zone offset "
+                        "Second part in timezone offset "
                         + "does not match expected pattern ss.");
                     return;
                 } else {
@@ -410,7 +410,7 @@ final class TimezoneOffsetProcessor
                                 status.setError(
                                     pos,
                                     "9 digits in fractional part of "
-                                    + "time zone offset expected.");
+                                    + "timezone offset expected.");
                                 return;
                             }
                         }
@@ -478,7 +478,7 @@ final class TimezoneOffsetProcessor
         }
 
         throw new IllegalArgumentException(
-            "Cannot extract time zone offset from format attributes for: "
+            "Cannot extract timezone offset from format attributes for: "
             + formattable);
 
     }

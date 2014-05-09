@@ -40,14 +40,14 @@ public interface AdjustableElement<V, O>
     /**
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementminimum. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     O minimized();
 
     /**
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementmaximum. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     O maximized();
 
@@ -59,7 +59,7 @@ public interface AdjustableElement<V, O>
      * Zeitpunkt angewandt wird, dessen Zeitachse keine Basiseinheit zu diesem
      * Element kennt. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      *          and requiring a base unit in given chronology for decrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -73,7 +73,7 @@ public interface AdjustableElement<V, O>
      * Zeitpunkt angewandt wird, dessen Zeitachse keine Basiseinheit zu diesem
      * Element kennt. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      *          and requiring a base unit in given chronology for incrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -83,7 +83,7 @@ public interface AdjustableElement<V, O>
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
      * Elements auf ihr Minimum gesetzt werden. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     O atFloor();
 
@@ -91,7 +91,7 @@ public interface AdjustableElement<V, O>
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
      * Elements auf ihr Maximum gesetzt werden. </p>
      *
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     O atCeiling();
 

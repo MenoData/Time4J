@@ -29,7 +29,6 @@ import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
 import static net.time4j.PlainTime.SECOND_OF_MINUTE;
@@ -57,7 +56,7 @@ final class ZonalTimestamp
      * <p>Erzeugt einen zonalen Zeitstempel. </p>
      *
      * @param   moment          global timestamp
-     * @param   tzid            time zone id (optional)
+     * @param   tzid            timezone id (optional)
      * @throws  IllegalArgumentException if leapsecond shall be formatted
      *          with non-full-minute-timezone-offset
      */
@@ -136,10 +135,7 @@ final class ZonalTimestamp
             PlainTimestamp ts = this.timestamp.with(element, max);
 
             if (!this.zone.isInvalid(ts, ts)) {
-                Moment transformed =
-                    ts.inTimezone(
-                        this.zone,
-                        TransitionStrategy.PUSH_FORWARD);
+                Moment transformed = ts.inTimezone(this.zone);
                 Moment test = transformed.plus(1, SI.SECONDS);
 
                 if (test.isLeapSecond()) {

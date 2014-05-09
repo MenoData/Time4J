@@ -42,7 +42,7 @@ public class ZonalClock {
     //~ Instanzvariablen --------------------------------------------------
 
     private final TimeSource<?> timeSource;
-    private final Timezone timeZone;
+    private final Timezone timezone;
     private final TZID tzid;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -54,8 +54,8 @@ public class ZonalClock {
      * <p>Entspricht {@code new ZonalClock(timeSource, tzid, false)}. </p>
      *
      * @param   timeSource  source for current world time (UTC)
-     * @param   tzid        time zone id
-     * @throws  ChronoException if given time zone cannot be loaded
+     * @param   tzid        timezone id
+     * @throws  ChronoException if given timezone cannot be loaded
      */
     public ZonalClock(
         TimeSource<?> timeSource,
@@ -75,10 +75,10 @@ public class ZonalClock {
      * Zeitzone ber&uuml;cksichtigt wird. </p>
      *
      * @param   timeSource  source for current world time (UTC)
-     * @param   tzid        time zone id
-     * @param   dynamic     shall the time zone data always be reloaded, even
+     * @param   tzid        timezone id
+     * @param   dynamic     shall the timezone data always be reloaded, even
      *                      after a dynamic update?
-     * @throws  ChronoException if given time zone cannot be loaded
+     * @throws  ChronoException if given timezone cannot be loaded
      */
     public ZonalClock(
         TimeSource<?> timeSource,
@@ -90,11 +90,11 @@ public class ZonalClock {
         if (timeSource == null) {
             throw new NullPointerException("Missing time source.");
         } else if (tzid == null) {
-            throw new NullPointerException("Missing time zone id.");
+            throw new NullPointerException("Missing timezone id.");
         }
 
         this.timeSource = timeSource;
-        this.timeZone = (dynamic ? null : Timezone.of(tzid));
+        this.timezone = (dynamic ? null : Timezone.of(tzid));
         this.tzid = (dynamic ? tzid : null);
 
     }
@@ -103,7 +103,7 @@ public class ZonalClock {
         super();
 
         this.timeSource = SystemClock.INSTANCE;
-        this.timeZone = Timezone.ofSystem();
+        this.timezone = Timezone.ofSystem();
         this.tzid = null;
 
     }
@@ -114,7 +114,7 @@ public class ZonalClock {
      * <p>Zonale Uhr basierend auf den Systemeinstellungen beim Laden
      * dieser Klasse. </p>
      *
-     * @return  local clock in default system time zone
+     * @return  local clock in default system timezone
      */
     public static ZonalClock ofSystem() {
 
@@ -151,11 +151,11 @@ public class ZonalClock {
     /**
      * <p>Liefert die assoziierte Zeitzone. </p>
      *
-     * @return  time zone id
+     * @return  timezone id
      */
     public TZID getTimezone() {
 
-        return ((this.tzid == null) ? this.timeZone.getID() : this.tzid);
+        return ((this.tzid == null) ? this.timezone.getID() : this.tzid);
 
     }
 
@@ -163,8 +163,8 @@ public class ZonalClock {
      * <p>Erzeugt eine neue zonale Uhr mit der angegebenen Zeitzone, aber
      * der gleichen Zeitquelle wie in dieser Instanz. </p>
      *
-     * @param   tzid    time zone id
-     * @return  local clock in given time zone
+     * @param   tzid    timezone id
+     * @return  local clock in given timezone
      */
     public ZonalClock withTimezone(TZID tzid) {
 
@@ -184,7 +184,7 @@ public class ZonalClock {
 
         Timezone zone = (
             (this.tzid == null)
-            ? this.timeZone
+            ? this.timezone
             : Timezone.of(this.tzid)
         );
 

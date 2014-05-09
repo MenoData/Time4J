@@ -21,6 +21,10 @@
 
 package net.time4j.tz;
 
+import net.time4j.base.GregorianDate;
+import net.time4j.base.UnixTime;
+import net.time4j.base.WallTime;
+
 
 /**
  * <p>Dient der Aufl&ouml;sung von lokalen Zeitangaben zu einer UTC-Weltzeit,
@@ -28,41 +32,24 @@ package net.time4j.tz;
  * Konflikte auftreten. </p>
  *
  * @author  Meno Hochschild
+ * @see     net.time4j.ZonalOperator#STRICT_MODE
  */
-public enum TransitionStrategy {
+public interface TransitionStrategy {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    /**
-     * <p>W&auml;hlt die jeweils n&auml;chste g&uuml;ltige Verschiebung. </p>
-     *
-     * <p>Diese Strategie wird auch vom JDK gew&auml;hlt. Zum Beispiel sieht
-     * der Wechsel von der Winterzeit zur Sommerzeit und zur&uuml;ck in der
-     * Zeitzone &quot;Europe/Berlin&quot; so aus: </p>
-     *
-     * <dl>
-     * <dt>Wechsel Winterzeit zu Sommerzeit mit einer ung&uuml;ltigen
-     * lokalen Zeit:</dt>
-     * <dd>[2013-03-31T01:30+01:00] (setze 1 Stunde sp&auml;ter)</dd>
-     * <dd>=&gt; [2013-03-31T02:30+01:00] // ung&uuml;ltig!</dd>
-     * <dd>=&gt; [2013-03-31T03:30+02:00] // Sommerzeit</dd>
-     * <dt>Wechsel Sommerzeit zu Winterzeit mit einer zweideutigen
-     * lokalen Zeit:</dt>
-     * <dd>[2013-10-27T01:30+02:00] (setze 1 Stunde sp&auml;ter)</dd>
-     * <dd>=&gt; [2013-10-27T02:30+02:00] // Sommerzeit</dd>
-     * <dd>=&gt; [2013-10-27T02:30+01:00] // Winterzeit</dd>
-     * </dl>
-     */
-    PUSH_FORWARD,
+    //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Wirft f&uuml;r ung&uuml;ltige lokale Zeiten eine
-     * {@code ChronoException} und verh&auml;lt sich sonst wie
-     * {@link #PUSH_FORWARD}. </p>
+     * <p>Konvertiert eine lokale Zeitangabe in einen globalen Zeitstempel. </p>
+     *
+     * @param   localDate   local calendar date in given timezone
+     * @param   localTime   local wall time in given timezone
+     * @param   timezone    timezone data containing offset history
+     * @return  global unix timestamp
      */
-    STRICT;
-
-//    EARLIER_OFFSET,
-//    LATER_OFFSET;
+    UnixTime resolve(
+        GregorianDate localDate,
+        WallTime localTime,
+        Timezone timezone
+    );
 
 }

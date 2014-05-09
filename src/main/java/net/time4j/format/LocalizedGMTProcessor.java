@@ -93,7 +93,7 @@ final class LocalizedGMTProcessor
             offset = getOffset(formattable, step, attributes);
         } else {
             throw new IllegalArgumentException(
-                "Cannot extract time zone offset from: " + formattable);
+                "Cannot extract timezone offset from: " + formattable);
         }
 
         Locale locale =
@@ -333,7 +333,7 @@ final class LocalizedGMTProcessor
         }
 
         throw new IllegalArgumentException(
-            "Cannot extract time zone offset from format attributes for: "
+            "Cannot extract timezone offset from format attributes for: "
             + formattable);
 
     }

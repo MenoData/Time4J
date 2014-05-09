@@ -591,13 +591,13 @@ public final class PlainTimestamp
      * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen Offset
      * zu einem UTC-Zeitstempel. </p>
      *
-     * @param   offset      fixed time zone offset
+     * @param   offset      fixed timezone offset
      * @return  global timestamp  based on this local timestamp interpreted
-     *          at given time zone offset
+     *          at given timezone offset
      */
     public Moment atOffset(ZonalOffset offset) {
 
-        return this.inTimezone(offset, TransitionStrategy.PUSH_FORWARD);
+        return this.inTimezone(Timezone.of(offset));
 
     }
 
@@ -606,17 +606,14 @@ public final class PlainTimestamp
      * zu einem UTC-Zeitstempel. </p>
      *
      * @return  global timestamp based on this local timestamp interpreted
-     *          in system time zone
+     *          in system timezone
      * @see     Timezone#ofSystem()
-     * @see     #inTimezone(TZID,TransitionStrategy)
+     * @see     #inTimezone(TZID)
      * @see     #atOffset(ZonalOffset)
      */
     public Moment inStdTimezone() {
 
-        return this.inTimezone(
-            Timezone.ofSystem(),
-            TransitionStrategy.PUSH_FORWARD
-        );
+        return this.inTimezone(Timezone.ofSystem());
 
     }
 
@@ -624,10 +621,27 @@ public final class PlainTimestamp
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
      * zu einem UTC-Zeitstempel. </p>
      *
-     * @param   tzid        time zone id
+     * @param   tzid        timezone id
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @see     Timezone#of(TZID)
+     * @see     #inStdTimezone()
+     * @see     #atOffset(ZonalOffset)
+     */
+    public Moment inTimezone(TZID tzid) {
+
+        return this.inTimezone(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
+     * zu einem UTC-Zeitstempel. </p>
+     *
+     * @param   tzid        timezone id
      * @param   strategy    conflict resolving strategy
      * @return  global timestamp based on this local timestamp interpreted
-     *          in given time zone
+     *          in given timezone selecting given transition strategy
      * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
      * @see     #atOffset(ZonalOffset)
@@ -637,30 +651,22 @@ public final class PlainTimestamp
         TransitionStrategy strategy
     ) {
 
-        return this.inTimezone(Timezone.of(tzid), strategy);
+        return Moment.from(
+            strategy.resolve(this.date, this.time, Timezone.of(tzid)));
 
     }
 
     /**
      * <p>Existiert dieser Zeitstempel in der angegebenen Zeitzone? </p>
      *
-     * @param   tzid    time zone id
-     * @return  {@code true} if this timestamp is valid in given time zone
+     * @param   tzid    timezone id
+     * @return  {@code true} if this timestamp is valid in given timezone
      */
     public boolean isValid(TZID tzid) {
 
-        return !Timezone.of(tzid).isInvalid(this, this);
+        return !Timezone.of(tzid).isInvalid(this.date, this.time);
 
     }
-
-    // TODO: Implementieren!
-//    public ZonalOffset getEarlierOffsetAtOverlap(TZID tzid) {
-//
-//    }
-//
-//    public ZonalOffset getLaterOffsetAtOverlap(TZID tzid) {
-//
-//    }
 
     @Override
     protected PlainTimestamp getContext() {
@@ -719,42 +725,14 @@ public final class PlainTimestamp
      * <p>Wandelt diesen lokalen Zeitstempel mit Hilfe der angegebenen Zeitzone
      * in eine UTC-Zeit um. </p>
      *
-     * @param   tz          time zone data
-     * @param   strategy    conflict resolving strategy
+     * @param   tz          timezone data
      * @return  universal time
      * @throws  ChronoException if given strategy is strict and this timestamp
      *                          falls in a gap on local timeline (DST-change)
      */
-    Moment inTimezone(
-        Timezone tz,
-        TransitionStrategy strategy
-    ) {
+    Moment inTimezone(Timezone tz) {
 
-        ZonalOffset offset;
-
-        switch (strategy) {
-            case PUSH_FORWARD:
-                offset = tz.getOffset(this, this);
-                break;
-            case STRICT:
-                if (tz.isInvalid(this, this)) {
-                    throw new ChronoException(
-                        "["
-                        + tz.getID().canonical()
-                        + "] Invalid local timestamp at: "
-                        + this);
-                } else {
-                    offset = tz.getOffset(this, this);
-                    break;
-                }
-            // TODO: EARLIER_OFFSET und LATER_OFFSET unterstützen
-//            case EARLIER_OFFSET:
-//            case LATER_OFFSET:
-            default:
-                throw new UnsupportedOperationException(
-                    "Not supported: " + strategy.name());
-        }
-
+        ZonalOffset offset = tz.getOffset(this, this);
         long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
         localSeconds += (this.time.getHour() * 3600);
         localSeconds += (this.time.getMinute() * 60);
@@ -770,10 +748,6 @@ public final class PlainTimestamp
         } else if (posixNanos >= MRD) {
             posixNanos -= MRD;
             posixTime++;
-        }
-
-        if (strategy == TransitionStrategy.STRICT) {
-            Moment.checkNegativeLS(posixTime, this);
         }
 
         return Moment.of(posixTime, posixNanos, TimeScale.POSIX);

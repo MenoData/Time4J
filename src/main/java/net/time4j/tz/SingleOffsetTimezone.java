@@ -66,7 +66,7 @@ final class SingleOffsetTimezone
         super();
 
         if (offset == null) {
-            throw new NullPointerException("Missing time zone offset.");
+            throw new NullPointerException("Missing timezone offset.");
         }
 
         this.offset = offset;

@@ -42,7 +42,7 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   first day of week in month
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToFirst(Weekday dayOfWeek);
 
@@ -51,7 +51,7 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   second day of week in month
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToSecond(Weekday dayOfWeek);
 
@@ -60,7 +60,7 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   third day of week in month
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToThird(Weekday dayOfWeek);
 
@@ -69,7 +69,7 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   fourth day of week in month
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToFourth(Weekday dayOfWeek);
 
@@ -78,7 +78,7 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   last day of week in month
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToLast(Weekday dayOfWeek);
 

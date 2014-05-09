@@ -223,7 +223,7 @@ final class WeekdayInMonthElement
         }
 
         @Override
-        public ChronoOperator<Moment> inStdTimezone() {
+        public ZonalOperator inStdTimezone() {
 
             return new Moment.Operator(
                 this.specialTS,

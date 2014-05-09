@@ -632,7 +632,7 @@ public final class ZonalOffset
      * @return  String in format &quot;UTC&#x00B1;hh:mm&quot; or
      *          &quot;UTC&#x00B1;hh:mm:ss&quot; if there is a second part
      *          or &quot;UTC&#x00B1;hh:mm:ss.fffffffff&quot; if any fractional
-     *          part exists or &quot;Z&quot; in time zone UTC
+     *          part exists or &quot;Z&quot; in timezone UTC
      */
     @Override
     public String canonical() {
@@ -651,7 +651,7 @@ public final class ZonalOffset
     /**
      * <p>Liefert die Verschiebung als Zeitzonenmodell. </p>
      *
-     * @return  time zone data with fixed shift
+     * @return  timezone data with fixed shift
      */
     SingleOffsetTimezone getModel() {
 

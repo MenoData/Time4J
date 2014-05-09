@@ -75,7 +75,7 @@ enum ZonalElement
     /**
      * <p>Als Standardminimum gilt der Offset -14:00. </p>
      *
-     * @return  smallest time zone offset according to XML Schema
+     * @return  smallest timezone offset according to XML Schema
      */
     @Override
     public TZID getDefaultMinimum() {
@@ -87,7 +87,7 @@ enum ZonalElement
     /**
      * <p>Als Standardmaximum gilt der Offset +14:00. </p>
      *
-     * @return  largest time zone offset according to XML Schema
+     * @return  largest timezone offset according to XML Schema
      */
     @Override
     public TZID getDefaultMaximum() {

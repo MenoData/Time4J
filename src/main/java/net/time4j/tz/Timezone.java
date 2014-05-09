@@ -52,7 +52,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Meno Hochschild
  * @concurrency All static methods are thread-safe while this class is
- *              immutable as long as the underlying time zone data are.
+ *              immutable as long as the underlying timezone data are.
  */
 public abstract class Timezone
     implements Serializable {
@@ -220,7 +220,7 @@ public abstract class Timezone
     /**
      * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen. </p>
      *
-     * @return  unmodifiable list of available time zone ids in ascending order
+     * @return  unmodifiable list of available timezone ids in ascending order
      */
     public static List<TZID> getAvailableIDs() {
 
@@ -233,7 +233,7 @@ public abstract class Timezone
      * bevorzugten Zeitzonenkennungen. </p>
      *
      * @param   locale  ISO-3166-alpha-2-country to be evaluated
-     * @return  unmodifiable list of preferred time zone ids
+     * @return  unmodifiable list of preferred timezone ids
      */
     public static Set<TZID> getPreferredIDs(Locale locale) {
 
@@ -264,7 +264,7 @@ public abstract class Timezone
      * falschen Property-Werts in &quot;user.timezone&quot; nicht interpretiert
      * werden, f&auml;llt diese Methode auf die UTC-Zeitzone zur&uuml;ck. </p>
      *
-     * @return  default time zone data of system
+     * @return  default timezone data of system
      * @see     java.util.TimeZone#getDefault()
      *          java.util.TimeZone.getDefault()
      */
@@ -281,10 +281,9 @@ public abstract class Timezone
     /**
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
      *
-     * @param   tzid    time zone id
-     * @return  time zone data
-     * @throws  ChronoException wenn die angegebene Zeitzone nicht geladen
-     *          werden kann
+     * @param   tzid    timezone id
+     * @return  timezone data
+     * @throws  ChronoException if given timezone cannot be loaded
      */
     public static Timezone of(TZID tzid) {
 
@@ -302,9 +301,9 @@ public abstract class Timezone
      * Im Gegensatz zu {@link #of(TZID)} wirft diese Methode niemals eine
      * Ausnahme. </p>
      *
-     * @param   tzid        preferred time zone id
-     * @param   fallback    alternative time zone id
-     * @return  time zone data
+     * @param   tzid        preferred timezone id
+     * @param   fallback    alternative timezone id
+     * @return  timezone data
      */
     public static Timezone of(
         TZID tzid,
@@ -328,7 +327,7 @@ public abstract class Timezone
     /**
      * <p>Liefert die Zeitzonen-ID. </p>
      *
-     * @return  time zone id
+     * @return  timezone id
      * @see     java.util.TimeZone#getID() java.util.TimeZone.getID()
      */
     public abstract TZID getID();
@@ -349,16 +348,16 @@ public abstract class Timezone
      * Zeitpunkt in Sekunden. </p>
      *
      * <p>Als Konfliktstrategie f&uuml;r L&uuml;cken oder &Uuml;berlappungen
-     * auf dem lokalen Zeitstrahl wird {@code TransitionStrategy.PUSH_FORWARD}
-     * verwendet. Dieses Verhalten ist zum JDK konform. </p>
+     * auf dem lokalen Zeitstrahl wird die Standardstrategie verwendet, von
+     * der lokalen Zeit den n&auml;chstdefinierten Offset zu subtrahieren.
+     * Dieses Verhalten ist zum JDK konform. </p>
      *
-     * @param   localDate   local date in time zone
-     * @param   localTime   local wall time in time zone
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
      * @return  shift in seconds which yields unix time if subtracted
      *          from local time choosing later offset at gaps or overlaps
      * @see     java.util.TimeZone#getOffset(int, int, int, int, int, int)
      *          java.util.TimeZone.getOffset(int, int, int, int, int, int)
-     * @see     TransitionStrategy#PUSH_FORWARD
      */
     public abstract ZonalOffset getOffset(
         GregorianDate localDate,
@@ -373,8 +372,8 @@ public abstract class Timezone
      * von der Winter- zur Sommerzeit eine bestimmte Uhrzeit nicht existiert,
      * weil die Uhr vorgestellt wurde. </p>
      *
-     * @param   localDate   local date in time zone
-     * @param   localTime   local wall time in time zone
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
      * @return  {@code true} if the local time is not defined due to
      *          transition gaps else {@code false}
      */
@@ -445,7 +444,7 @@ public abstract class Timezone
      *  // Ausgabe: Z (ZonalOffset.UTC)
      * </pre>
      *
-     * @return  singleton-query for time zone id
+     * @return  singleton-query for timezone id
      */
     public static ChronoFunction<ChronoEntity<?>, TZID> identifier() {
 
@@ -462,7 +461,7 @@ public abstract class Timezone
      * @param   daylightSaving      asking for summer time version
      * @param   abbreviated         asking for abbreviation
      * @param   locale              language setting
-     * @return  localized time zone name for display purposes
+     * @return  localized timezone name for display purposes
      * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
      *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
      * @see     Locale#getDefault()
@@ -579,7 +578,7 @@ public abstract class Timezone
         // Ungültige ID?
         if (tz == null) {
             if (wantsException) {
-                throw new ChronoException("Unknown time zone: " + zoneID);
+                throw new ChronoException("Unknown timezone: " + zoneID);
             } else {
                 return null;
             }
@@ -685,7 +684,7 @@ public abstract class Timezone
         /**
          * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen. </p>
          *
-         * @return  unmodifiable set of time zone ids
+         * @return  unmodifiable set of timezone ids
          * @see     java.util.TimeZone#getAvailableIDs()
          */
         Set<String> getAvailableIDs();
@@ -697,7 +696,7 @@ public abstract class Timezone
          *
          * <p>Beispiel: &quot;PST&quot; => &quot;America/Los_Angeles&quot;. </p>
          *
-         * @return  map from all time zone aliases to canoncial ids
+         * @return  map from all timezone aliases to canoncial ids
          */
         Map<String, String> getAliases();
 
@@ -712,11 +711,11 @@ public abstract class Timezone
          * waren, kann ein erneuter Aufruf mit dem zweiten Argument
          * {@code true} erfolgen. </p>
          *
-         * @param   zoneID      time zone id (z.B. &quot;Europe/Berlin&quot;)
-         * @param   fallback    fallback allowed if a time zone id cannot be
+         * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
+         * @param   fallback    fallback allowed if a timezone id cannot be
          *                      found, not even by alias?
-         * @return  time zone history or {@code null} if there are no data
-         * @throws  IllegalStateException if time zone database is broken
+         * @return  timezone history or {@code null} if there are no data
+         * @throws  IllegalStateException if timezone database is broken
          * @see     #getAvailableIDs()
          * @see     #getAliases()
          * @see     #isFallbackEnabled()
@@ -836,7 +835,7 @@ public abstract class Timezone
 
             if (minimumCacheSize < 0) {
                 throw new IllegalArgumentException(
-                    "Negative time zone cache size: " + minimumCacheSize);
+                    "Negative timezone cache size: " + minimumCacheSize);
             }
 
             NamedReference ref;
@@ -917,7 +916,7 @@ public abstract class Timezone
         //~ Instanzvariablen ----------------------------------------------
 
         /**
-         * @serial  time zone id
+         * @serial  timezone id
          */
         private final String tzid;
 

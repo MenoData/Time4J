@@ -87,8 +87,7 @@ public final class Attributes
      * <p>Gibt die Konfliktstrategie an, die bei der Aufl&ouml;sung von nicht
      * eindeutigen lokalen Zeitstempeln zu verwenden ist. </p>
      *
-     * <p>Fehlt das Attribut, wird {@link TransitionStrategy#PUSH_FORWARD}
-     * angenommen. </p>
+     * <p>Fehlt das Attribut, wird eine Standardstrategie angenommen. </p>
      */
     public static final AttributeKey<TransitionStrategy> TRANSITION_STRATEGY =
         PredefinedKey.valueOf("TRANSITION_STRATEGY", TransitionStrategy.class);
@@ -481,9 +480,9 @@ public final class Attributes
         }
 
         /**
-         * <p>Sets the time zone reference. </p>
+         * <p>Sets the timezone reference. </p>
          *
-         * @param   tzid        time zone id
+         * @param   tzid        timezone id
          * @return  this instance for method chaining
          * @see     #TIMEZONE_ID
          */
@@ -495,7 +494,7 @@ public final class Attributes
         }
 
         /**
-         * <p>Sets the system time zone reference. </p>
+         * <p>Sets the system timezone reference. </p>
          *
          * @return  this instance for method chaining
          * @see     #TIMEZONE_ID

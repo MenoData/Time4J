@@ -531,7 +531,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         if (!dst) {
                             reason.append("not ");
                         }
-                        reason.append("daylight-saving, but time zone name ");
+                        reason.append("daylight-saving, but timezone name ");
                         reason.append("has not the appropriate form in {");
                         reason.append(text.toString());
                         reason.append("}.");
@@ -599,7 +599,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * Ersatzwert, wenn im zu interpretierenden Text keine Zeitzone
      * gefunden werden konnte. </p>
      *
-     * @param   timezone    time zone id
+     * @param   timezone    timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
      */
@@ -622,7 +622,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Entspricht {@link #withTimezone(TZID)
      * withTimezone(Timezone.ofSystem().getID())}. </p>
      *
-     * @return  changed copy with the system time zone while
+     * @return  changed copy with the system timezone while
      *          this instance remains unaffected
      */
     public ChronoFormatter<T> withStdTimezone() {
@@ -2070,7 +2070,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 return this;
             } else {
                 throw new IllegalStateException(
-                    "Only unix timestamps can have a time zone id.");
+                    "Only unix timestamps can have a timezone id.");
             }
 
         }
@@ -2109,7 +2109,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * beim Parsen keine Rolle. </p>
          *
          * @param   abbreviated     abbreviations to be used?
-         * @param   preferredZones  preferred time zone ids for resolving
+         * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
          */

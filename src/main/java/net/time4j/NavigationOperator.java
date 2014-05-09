@@ -88,7 +88,7 @@ final class NavigationOperator<V extends Enum<V>>
     }
 
     @Override
-    public ChronoOperator<Moment> inStdTimezone() {
+    public ZonalOperator inStdTimezone() {
 
         return new Moment.Operator(this.navTS, this.element, this.getType());
 

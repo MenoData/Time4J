@@ -67,7 +67,7 @@ final class TimezoneNameProcessor
      * <p>Erzeugt eine neue Instanz. </p>
      *
      * @param   abbreviated     abbreviations to be used?
-     * @param   preferredZones  preferred time zone ids for resolving duplicates
+     * @param   preferredZones  preferred timezone ids for resolving duplicates
      */
     TimezoneNameProcessor(
         boolean abbreviated,
@@ -96,7 +96,7 @@ final class TimezoneNameProcessor
 
         if (tzid == null) {
             throw new IllegalArgumentException(
-                "Cannot extract time zone id from: " + formattable);
+                "Cannot extract timezone id from: " + formattable);
         } else if (tzid instanceof ZonalOffset) {
             this.fallback.print(
                 formattable, buffer, attributes, positions, step);
@@ -116,7 +116,7 @@ final class TimezoneNameProcessor
                         Attributes.LOCALE, attributes, Locale.ROOT));
         } else {
             throw new IllegalArgumentException(
-                "Cannot extract time zone name from: " + formattable);
+                "Cannot extract timezone name from: " + formattable);
         }
 
         int start = -1;
@@ -157,7 +157,7 @@ final class TimezoneNameProcessor
         int pos = start;
 
         if (pos >= len) {
-            status.setError(start, "Missing time zone name.");
+            status.setError(start, "Missing timezone name.");
             return;
         }
 
@@ -222,7 +222,7 @@ final class TimezoneNameProcessor
         if ((zones == null) || zones.isEmpty()) {
             status.setError(
                 start,
-                "Unknown time zone name: " + key);
+                "Unknown timezone name: " + key);
             return;
         } else if (
             (zones.size() > 1)
@@ -251,7 +251,7 @@ final class TimezoneNameProcessor
         if (zones.isEmpty()) {
             status.setError(
                 start,
-                "Time zone id not found among preferred time zones.");
+                "Time zone id not found among preferred timezones.");
         } else if (
             (zones.size() == 1)
             || leniency.isLax()

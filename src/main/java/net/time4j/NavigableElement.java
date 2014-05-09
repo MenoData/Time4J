@@ -52,7 +52,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is after current value
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToNext(V value);
 
@@ -74,7 +74,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is before current value
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToPrevious(V value);
 
@@ -87,7 +87,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either after current value
      *                  or the same
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToNextOrSame(V value);
 
@@ -100,7 +100,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either before current value
      *                  or the same
-     * @return  operator directly applicable on local types without time zone
+     * @return  operator directly applicable on local types without timezone
      */
     DateOperator setToPreviousOrSame(V value);
 

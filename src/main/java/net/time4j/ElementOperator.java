@@ -25,7 +25,6 @@ import net.time4j.engine.AdvancedElement;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.tz.TZID;
-import net.time4j.tz.TransitionStrategy;
 
 
 /**
@@ -93,11 +92,14 @@ public abstract class ElementOperator<T>
      * von (Sub-)Sekundenelementen, bei denen ggf. direkt auf dem globalen
      * Zeitstrahl operiert wird. </p>
      *
-     * @return  operator with the default system time zone reference,
+     * @return  operator with the default system timezone reference,
      *          applicable on instances of {@code Moment}
-     * @see     TransitionStrategy#PUSH_FORWARD
      */
-    public abstract ChronoOperator<Moment> inStdTimezone();
+    public ZonalOperator inStdTimezone() {
+
+        return new Moment.Operator(this.onTimestamp(), this.element, this.type);
+
+    }
 
     /**
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit
@@ -110,22 +112,22 @@ public abstract class ElementOperator<T>
      * von (Sub-)Sekundenelementen, bei denen ggf. direkt auf dem globalen
      * Zeitstrahl operiert wird. </p>
      *
-     * @param   tzid        time zone id
-     * @param   strategy    conflict resolving strategy
-     * @return  operator with the given time zone reference, applicable on
+     * @param   tzid        timezone id
+     * @return  operator with the given timezone reference, applicable on
      *          instances of {@code Moment}
      */
-    public final ChronoOperator<Moment> inTimezone(
-        TZID tzid,
-        TransitionStrategy strategy
-    ) {
+    public final ZonalOperator inTimezone(TZID tzid) {
+
+        if (tzid == null) {
+            throw new NullPointerException("Missing timezone id.");
+        }
 
         return new Moment.Operator(
             this.onTimestamp(),
-            tzid,
-            strategy,
             this.element,
-            this.type
+            this.type,
+            tzid,
+            null
         );
 
     }

@@ -57,7 +57,7 @@ public interface ChronoMerger<T> {
      *
      * @param   clock           source for current time
      * @param   attributes      configuration attributes which might contain
-     *                          the time zone to translate current time to
+     *                          the timezone to translate current time to
      *                          local time
      * @return  new time context or {@code null} if given data are insufficient
      */

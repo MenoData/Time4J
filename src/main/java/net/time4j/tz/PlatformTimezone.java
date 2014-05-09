@@ -51,12 +51,12 @@ final class PlatformTimezone
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial      time zone id
+     * @serial      timezone id
      */
     private final TZID id;
 
     /**
-     * @serial      time zone of old JDK
+     * @serial      timezone of old JDK
      */
     private final java.util.TimeZone tz;
 
@@ -68,8 +68,8 @@ final class PlatformTimezone
     /**
      * <p>Konstruktor f&uuml;r eine beliebige Zeitzone. </p>
      *
-     * @param   resolved    time zone id with preference for enums
-     * @param   rawID       original time zone id
+     * @param   resolved    timezone id with preference for enums
+     * @param   rawID       original timezone id
      */
     PlatformTimezone(TZID resolved, String rawID) {
         this(resolved, findZone(rawID));
@@ -295,8 +295,8 @@ final class PlatformTimezone
     /**
      * <p>Findet die JDK-Zeitzone. </p>
      *
-     * @param   id  time zone id
-     * @return  OLD-JDK time zone
+     * @param   id  timezone id
+     * @return  OLD-JDK timezone
      */
     static java.util.TimeZone findZone(String id) {
 

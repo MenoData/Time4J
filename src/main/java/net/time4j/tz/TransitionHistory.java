@@ -65,8 +65,8 @@ public interface TransitionHistory {
      * Zeit in eine L&uuml;cke oder eine &Uuml;berlappung auf dem lokalen
      * Zeitstrahl f&auml;llt. </p>
      *
-     * @param   localDate   local date in time zone
-     * @param   localTime   local wall time in time zone
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      * @see     #getValidOffsets(GregorianDate,WallTime)
@@ -86,8 +86,8 @@ public interface TransitionHistory {
      * zu zwei verschiedenen Zeitpunkten auf der POSIX-Zeitskala geh&ouml;rt.
      * Ansonsten wird die Liste genau eine passende Verschiebung enthalten. </p>
      *
-     * @param   localDate   local date in time zone
-     * @param   localTime   local wall time in time zone
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts which fits the given local time
      * @see     #getConflictTransition(GregorianDate,WallTime)
      */
