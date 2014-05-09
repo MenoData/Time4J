@@ -111,18 +111,6 @@ public class ZonalClock {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Zonale Uhr basierend auf den Systemeinstellungen beim Laden
-     * dieser Klasse. </p>
-     *
-     * @return  local clock in default system timezone
-     */
-    public static ZonalClock ofSystem() {
-
-        return SYSTEM;
-
-    }
-
-    /**
      * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone. </p>
      *
      * @return  current local timestamp
@@ -177,6 +165,18 @@ public class ZonalClock {
             tzid,
             (this.tzid != null)
         );
+
+    }
+
+    /**
+     * <p>Zonale Uhr basierend auf den Systemeinstellungen beim Laden
+     * dieser Klasse. </p>
+     *
+     * @return  local clock in default system timezone
+     */
+    static ZonalClock ofSystem() {
+
+        return SYSTEM;
 
     }
 
