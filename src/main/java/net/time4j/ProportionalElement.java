@@ -79,9 +79,17 @@ public interface ProportionalElement<V extends Number, T>
      *  // Ausgabe: 2012-01-31 (Addition von 13 - 5 = 8 Monaten)
      * </pre>
      *
+     * <p>Nachsichtigkeit bedeutet nicht, da&szlig; eine Ausnahme
+     * unm&ouml;glich ist. Zum Beispiel kann das Setzen von extremen Werten
+     * wie {@code Long.MIN_VALUE} eine {@code ArithmeticException} verursachen.
+     * Auch kann etwa das Setzen des Elements {@code SECOND_OF_MINUTE}
+     * auf einen {@code Moment} angewandt eine {@code ChronoException}
+     * ausl&ouml;sen, wenn damit ein Wechsel von der UTC-&Auml;ra in die
+     * UT-&Auml;ra vor 1972 verbunden ist. </p>
+     *
      * @return  lenient operator
      */
-    ChronoOperator<T> setLenient(V value);
+    ElementOperator<T> setLenient(V value);
 
     /**
      * <p>Rundet dieses chronologische Element so auf, da&szlig; sein

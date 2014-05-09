@@ -63,7 +63,7 @@ final class TimeOperator
      *
      * @param   element         element an operator will be applied on
      * @param   type            operator type
-     * @param   value           value of element
+     * @param   value           lenient value of element
      */
     TimeOperator(
         final AdvancedElement<?> element,
@@ -98,8 +98,8 @@ final class TimeOperator
                 this.tsCache = child(element, true, PlainTimestamp.class);
                 break;
             case OP_LENIENT:
-                this.opCache = lenient(element, value, PlainTime.class);
-                this.tsCache = lenient(element, value, PlainTimestamp.class);
+                this.opCache = lenient(element, value);
+                this.tsCache = lenientTS(element, value);
                 break;
             default:
                 throw new AssertionError("Unknown: " + this.getType());
@@ -166,14 +166,30 @@ final class TimeOperator
 
     }
 
-    private static <V extends Comparable<V>, T extends ChronoEntity<T>>
-    ChronoOperator<T> lenient(
+    private static <V extends Comparable<V>>
+    ChronoOperator<PlainTime> lenient(
         AdvancedElement<V> element,
-        Object value,
-        Class<T> context
+        Object value
     ) {
 
-        return element.setLenient(element.getType().cast(value), context);
+        return element.setLenient(
+            element.getType().cast(value),
+            PlainTime.class);
+
+    }
+
+    private static <V extends Comparable<V>>
+    ChronoOperator<PlainTimestamp> lenientTS(
+        AdvancedElement<V> element,
+        Object value
+    ) {
+
+        return new LenientOperator(
+            element.setLenient(
+                element.getType().cast(value),
+                PlainTimestamp.class),
+            Number.class.cast(value)
+        );
 
     }
 

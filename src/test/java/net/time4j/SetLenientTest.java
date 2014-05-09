@@ -126,6 +126,9 @@ public class SetLenientTest {
         assertThat(
            PlainTime.of(6, 12, 30).with(CLOCK_HOUR_OF_DAY.setLenient(25)),
            is(PlainTime.of(1, 12, 30)));
+        assertThat(
+           PlainTime.of(1, 12, 30).with(CLOCK_HOUR_OF_DAY.setLenient(48)),
+           is(PlainTime.of(0, 12, 30)));
     }
 
     @Test
@@ -172,6 +175,14 @@ public class SetLenientTest {
            PlainDate.of(2014, 4, 20)
                 .with(PlainDate.DAY_OF_MONTH.setLenient(32)),
            is(PlainDate.of(2014, 5, 2)));
+    }
+
+    @Test
+    public void clockHourOfDayLenientOnTimestamp() {
+        assertThat(
+           PlainTimestamp.of(2014, 5, 9, 1, 12, 30)
+                .with(CLOCK_HOUR_OF_DAY.setLenient(48)),
+           is(PlainTimestamp.of(2014, 5, 10, 0, 12, 30)));
     }
 
 }

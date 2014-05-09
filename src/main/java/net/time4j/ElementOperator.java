@@ -40,7 +40,6 @@ public abstract class ElementOperator<T>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    static final int OP_UNDEFINED = -1;
     static final int OP_MINIMIZE = 0;
     static final int OP_MAXIMIZE = 1;
     static final int OP_DECREMENT = 2;
@@ -69,8 +68,8 @@ public abstract class ElementOperator<T>
      * @param   type            operator type
      */
     ElementOperator(
-        final AdvancedElement<?> element,
-        final int type
+        AdvancedElement<?> element,
+        int type
     ) {
         super();
 

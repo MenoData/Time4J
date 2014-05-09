@@ -1293,24 +1293,33 @@ public final class Moment
                 LOW_TIME_ELEMENTS.containsKey(this.element)
                 && moment.isAfter(START_LS_CHECK)
                 && ((this.type == ElementOperator.OP_DECREMENT)
-                    || (this.type == ElementOperator.OP_INCREMENT))
+                    || (this.type == ElementOperator.OP_INCREMENT)
+                    || (this.type == ElementOperator.OP_LENIENT))
             ) {
                 int step = LOW_TIME_ELEMENTS.get(this.element).intValue();
-                int sign = 1;
+                long amount = 1;
 
                 if (this.type == ElementOperator.OP_DECREMENT) {
-                    sign = -1;
+                    amount = -1;
+                } else if (this.type == ElementOperator.OP_LENIENT) {
+                    long oldValue =
+                        Number.class.cast(moment.get(this.element)).longValue();
+                    long newValue =
+                        LenientOperator.class.cast(this.delegate).getValue();
+                    amount = MathUtils.safeSubtract(newValue, oldValue);
                 }
 
                 switch (step) {
                     case 1:
-                        return moment.plus(sign, SECONDS);
+                        return moment.plus(amount, SECONDS);
                     case 1000:
-                        return moment.plus(MIO * sign, NANOSECONDS);
+                        return moment.plus(
+                            MathUtils.safeMultiply(MIO, amount), NANOSECONDS);
                     case MIO:
-                        return moment.plus(1000 * sign, NANOSECONDS);
+                        return moment.plus(
+                            MathUtils.safeMultiply(1000, amount), NANOSECONDS);
                     case MRD:
-                        return moment.plus(sign, NANOSECONDS);
+                        return moment.plus(amount, NANOSECONDS);
                     default:
                         throw new AssertionError();
                 }
@@ -1632,6 +1641,8 @@ public final class Moment
             V value,
             boolean lenient
         ) {
+
+            assert (lenient == false);
 
             if (!this.isValid(context, value)) {
                 throw new IllegalArgumentException("Out of range: " + value);

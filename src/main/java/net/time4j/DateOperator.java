@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.AdvancedElement;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
 
 
@@ -45,20 +44,6 @@ final class DateOperator
     //~ Konstruktoren -----------------------------------------------------
 
     /**
-     * <p>Nur f&uuml;r Subklassen von Bedeutung. </p>
-     *
-     * @param   type            type of operator
-     */
-    DateOperator(int type) {
-        super(null, type);
-
-        this.opCache = null;
-        this.tsCache = null;
-        this.moCache = null;
-
-    }
-
-    /**
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * @param   element         element an operator will be applied on
@@ -77,12 +62,12 @@ final class DateOperator
      *
      * @param   element         element an operator will be applied on
      * @param   type            operator type
-     * @param   value           value of element
+     * @param   value           lenient value of element
      */
     DateOperator(
-        final AdvancedElement<?> element,
-        final int type,
-        final Object value // optional
+        AdvancedElement<?> element,
+        int type,
+        Object value // optional
     ) {
         super(element, type);
 
@@ -112,8 +97,8 @@ final class DateOperator
                 this.tsCache = element.atCeiling(PlainTimestamp.class);
                 break;
             case OP_LENIENT:
-                this.opCache = lenient(element, value, PlainDate.class);
-                this.tsCache = lenient(element, value, PlainTimestamp.class);
+                this.opCache = lenient(element, value);
+                this.tsCache = lenientTS(element, value);
                 break;
             default:
                 throw new AssertionError("Unknown: " + this.getType());
@@ -146,14 +131,30 @@ final class DateOperator
 
     }
 
-    private static <V extends Comparable<V>, T extends ChronoEntity<T>>
-    ChronoOperator<T> lenient(
+    private static <V extends Comparable<V>>
+    ChronoOperator<PlainDate> lenient(
         AdvancedElement<V> element,
-        Object value,
-        Class<T> context
+        Object value
     ) {
 
-        return element.setLenient(element.getType().cast(value), context);
+        return element.setLenient(
+            element.getType().cast(value),
+            PlainDate.class);
+
+    }
+
+    private static <V extends Comparable<V>>
+    ChronoOperator<PlainTimestamp> lenientTS(
+        AdvancedElement<V> element,
+        Object value
+    ) {
+
+        return new LenientOperator(
+            element.setLenient(
+                element.getType().cast(value),
+                PlainTimestamp.class),
+            Number.class.cast(value)
+        );
 
     }
 

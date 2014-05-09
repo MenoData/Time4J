@@ -1898,38 +1898,24 @@ public final class PlainDate
 
             int v = value.intValue();
 
+            if (lenient) { // nur auf numerischen Elementen definiert
+                IsoDateUnit unit = ENGINE.getBaseUnit(this.element);
+                int old = Number.class.cast(this.getValue(context)).intValue();
+                int amount = MathUtils.safeSubtract(v, old);
+                return context.plus(amount, unit);
+            }
+
             switch (this.index) {
                 case IntegerDateElement.YEAR:
                     return context.withYear(v);
                 case IntegerDateElement.MONTH:
-                    if (lenient) {
-                        return context.plus(
-                            (v - context.month),
-                            CalendarUnit.MONTHS);
-                    } else {
-                        return context.withMonth(v);
-                    }
+                    return context.withMonth(v);
                 case IntegerDateElement.DAY_OF_MONTH:
-                    if (lenient) {
-                        return context.plus(
-                            (v - context.dayOfMonth),
-                            CalendarUnit.DAYS);
-                    } else {
-                        return context.withDayOfMonth(v);
-                    }
+                    return context.withDayOfMonth(v);
                 case IntegerDateElement.DAY_OF_YEAR:
-                    if (lenient) {
-                        return context.plus(
-                            (v - context.getDayOfYear()),
-                            CalendarUnit.DAYS);
-                    } else {
-                        return context.withDayOfYear(v);
-                    }
+                    return context.withDayOfYear(v);
                 case IntegerDateElement.DAY_OF_QUARTER:
-                    if (
-                        lenient
-                        || ((v >= 1) && (v <= getMaximumOfQuarterDay(context)))
-                    ) {
+                    if ((v >= 1) && (v <= getMaximumOfQuarterDay(context))) {
                         return context.plus(
                             (v - context.getDayOfQuarter()),
                             CalendarUnit.DAYS);
@@ -2285,12 +2271,9 @@ public final class PlainDate
                 lenient
                 || ((wim >= 1) && (wim <= max))
             ) {
-                return context.plus(
-                    wim - old,
-                    CalendarUnit.WEEKS);
+                return context.plus(wim - old, CalendarUnit.WEEKS);
             } else {
-                throw new IllegalArgumentException(
-                    "Out of range: " + value);
+                throw new IllegalArgumentException("Out of range: " + value);
             }
 
         }
