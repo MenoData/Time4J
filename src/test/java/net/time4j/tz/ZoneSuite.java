@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         OffsetTest.class,
-        PlatformTimezoneTest.class
+        PlatformTimezoneTest.class,
+        TZIDTest.class
     }
 )
 public class ZoneSuite {

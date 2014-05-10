@@ -41,10 +41,10 @@ package net.time4j.tz;
  * in Betracht gezogen werden, insbesondere dann, wenn eine Verschiebung
  * zu einem gegebenen Zeitpunkt schon bekannt ist. </p>
  *
- * Ein (lexikalischer) Vergleich von IDs ist NICHT via {@code equals()},
- * sondern nur &uuml;ber die Methode {@link #canonical()} statthaft, weil
- * ein {@code TZID} lediglich dem Zweck dient, einen kanonischen Namen zu
- * kapseln. </p>
+ * Ein (lexikalischer) Vergleich von IDs sollte immer &uuml;ber die Methode
+ * {@link #canonical()} gemacht werden, weil ein {@code TZID} nur dem Zweck
+ * dient, einen kanonischen Namen zu kapseln. <strong>Der Vergleich &uuml;ber
+ * die Objekt-Methode {@code equals()} ist nicht erlaubt. </strong></p>
  *
  * <p>Die vordefinierten Enum-Konstanten spiegeln aktuell die TZ-Version
  * <span style="text-decoration:underline;"><tt>2013i</tt></span> wider
