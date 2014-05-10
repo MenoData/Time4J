@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static net.time4j.PlainTime.CLOCK_HOUR_OF_DAY;
+import static net.time4j.PlainTime.DIGITAL_HOUR_OF_DAY;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -22,13 +22,13 @@ public class RoundingTest {
             PlainTime.of(18, 46).with(MINUTE_OF_HOUR.roundedUp(15)),
             is(PlainTime.of(19)));
         assertThat(
-            PlainTime.of(22, 30).with(CLOCK_HOUR_OF_DAY.roundedUp(3)),
+            PlainTime.of(22, 30).with(DIGITAL_HOUR_OF_DAY.roundedUp(3)),
             is(PlainTime.of(0, 30)));
         assertThat(
-            PlainTime.of(18, 30).with(CLOCK_HOUR_OF_DAY.roundedUp(3)),
+            PlainTime.of(18, 30).with(DIGITAL_HOUR_OF_DAY.roundedUp(3)),
             is(PlainTime.of(18, 30)));
         assertThat(
-            PlainTime.of(19, 30).with(CLOCK_HOUR_OF_DAY.roundedUp(3)),
+            PlainTime.of(19, 30).with(DIGITAL_HOUR_OF_DAY.roundedUp(3)),
             is(PlainTime.of(21, 30)));
     }
 
@@ -64,13 +64,13 @@ public class RoundingTest {
             PlainTime.of(18, 8).with(MINUTE_OF_HOUR.roundedDown(15)),
             is(PlainTime.of(18)));
         assertThat(
-            PlainTime.of(2, 30).with(CLOCK_HOUR_OF_DAY.roundedDown(3)),
+            PlainTime.of(2, 30).with(DIGITAL_HOUR_OF_DAY.roundedDown(3)),
             is(PlainTime.of(0, 30)));
         assertThat(
-            PlainTime.of(18, 30).with(CLOCK_HOUR_OF_DAY.roundedDown(3)),
+            PlainTime.of(18, 30).with(DIGITAL_HOUR_OF_DAY.roundedDown(3)),
             is(PlainTime.of(18, 30)));
         assertThat(
-            PlainTime.of(17, 30).with(CLOCK_HOUR_OF_DAY.roundedDown(3)),
+            PlainTime.of(17, 30).with(DIGITAL_HOUR_OF_DAY.roundedDown(3)),
             is(PlainTime.of(15, 30)));
     }
 }

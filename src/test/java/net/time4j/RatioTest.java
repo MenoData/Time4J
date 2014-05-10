@@ -129,20 +129,6 @@ public class RatioTest {
     }
 
     @Test
-    public void clockHourOfDayRatio() {
-        assertThat(
-           PlainTime.of(6, 12, 30).get(CLOCK_HOUR_OF_DAY.ratio()),
-           is(new BigDecimal("0.208333333333333")));
-    }
-
-    @Test
-    public void clockHourOfAmPmRatio() {
-        assertThat(
-           PlainTime.of(6, 12, 30).get(CLOCK_HOUR_OF_AMPM.ratio()),
-           is(new BigDecimal("0.416666666666667")));
-    }
-
-    @Test
     public void isoHourRatio() {
         assertThat(
            PlainTime.midnightAtStartOfDay().get(ISO_HOUR.ratio()),

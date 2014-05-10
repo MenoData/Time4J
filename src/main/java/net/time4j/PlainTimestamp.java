@@ -991,33 +991,11 @@ public final class PlainTimestamp
             if (value.equals(this.getValue(context))) {
                 return context;
             } else if (lenient) { // nur auf numerischen Elementen definiert
-                if (this.element == CLOCK_HOUR_OF_AMPM) {
-                    int v = Integer.class.cast(value).intValue();
-                    if (MathUtils.floorModulo(v, 12) == 0) {
-                        v = MathUtils.safeSubtract(v, 12);
-                    }
-                    return context.plus(
-                        MathUtils.safeSubtract(
-                            v,
-                            context.get(DIGITAL_HOUR_OF_AMPM)),
-                        ClockUnit.HOURS);
-                } else if (this.element == CLOCK_HOUR_OF_DAY) {
-                    int v = Integer.class.cast(value).intValue();
-                    if (MathUtils.floorModulo(v, 24) == 0) {
-                        v = MathUtils.safeSubtract(v, 24);
-                    }
-                    return context.plus(
-                        MathUtils.safeSubtract(
-                            v,
-                            context.get(DIGITAL_HOUR_OF_DAY)),
-                        ClockUnit.HOURS);
-                } else {
-                    IsoUnit unit = ENGINE.getBaseUnit(this.element);
-                    long oldValue = this.toNumber(this.getValue(context));
-                    long newValue = this.toNumber(value);
-                    long amount = MathUtils.safeSubtract(newValue, oldValue);
-                    return context.plus(amount, unit);
-                }
+                IsoUnit unit = ENGINE.getBaseUnit(this.element);
+                long oldValue = this.toNumber(this.getValue(context));
+                long newValue = this.toNumber(value);
+                long amount = MathUtils.safeSubtract(newValue, oldValue);
+                return context.plus(amount, unit);
             } else if (this.element.isDateElement()) {
                 PlainDate date = context.date.with(this.element, value);
                 return PlainTimestamp.of(date, context.time);

@@ -221,7 +221,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "h")
     public static final
-    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_AMPM =
+    AdjustableElement<Integer, PlainTime> CLOCK_HOUR_OF_AMPM =
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_AMPM", false);
 
     /**
@@ -249,7 +249,7 @@ public final class PlainTime
      */
     @FormattableElement(format = "k")
     public static final
-    ProportionalElement<Integer, PlainTime> CLOCK_HOUR_OF_DAY =
+    AdjustableElement<Integer, PlainTime> CLOCK_HOUR_OF_DAY =
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_DAY", true);
 
     /**
@@ -2204,24 +2204,6 @@ public final class PlainTime
             ) {
                 return context.plus(
                     MathUtils.safeSubtract(value, context.get(this.element)),
-                    ClockUnit.HOURS);
-            } else if (this.element == CLOCK_HOUR_OF_AMPM) {
-                if (MathUtils.floorModulo(value, 12) == 0) {
-                    value = MathUtils.safeSubtract(value, 12);
-                }
-                return context.plus(
-                    MathUtils.safeSubtract(
-                        value,
-                        context.get(DIGITAL_HOUR_OF_AMPM)),
-                    ClockUnit.HOURS);
-            } else if (this.element == CLOCK_HOUR_OF_DAY) {
-                if (MathUtils.floorModulo(value, 24) == 0) {
-                    value = MathUtils.safeSubtract(value, 24);
-                }
-                return context.plus(
-                    MathUtils.safeSubtract(
-                        value,
-                        context.get(DIGITAL_HOUR_OF_DAY)),
                     ClockUnit.HOURS);
             } else if (this.element == MINUTE_OF_HOUR) {
                 return context.plus(

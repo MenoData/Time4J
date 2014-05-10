@@ -122,23 +122,6 @@ public class SetLenientTest {
     }
 
     @Test
-    public void clockHourOfDayLenient() {
-        assertThat(
-           PlainTime.of(6, 12, 30).with(CLOCK_HOUR_OF_DAY.setLenient(25)),
-           is(PlainTime.of(1, 12, 30)));
-        assertThat(
-           PlainTime.of(1, 12, 30).with(CLOCK_HOUR_OF_DAY.setLenient(48)),
-           is(PlainTime.of(0, 12, 30)));
-    }
-
-    @Test
-    public void clockHourOfAmPmLenient() {
-        assertThat(
-           PlainTime.of(6, 12, 30).with(CLOCK_HOUR_OF_AMPM.setLenient(14)),
-           is(PlainTime.of(14, 12, 30)));
-    }
-
-    @Test
     public void isoHourLenient() {
         assertThat(
            PlainTime.of(6, 12, 30).with(ISO_HOUR.setLenient(25)),
@@ -178,11 +161,11 @@ public class SetLenientTest {
     }
 
     @Test
-    public void clockHourOfDayLenientOnTimestamp() {
+    public void digitalHourOfDayLenientOnTimestamp() {
         assertThat(
            PlainTimestamp.of(2014, 5, 9, 1, 12, 30)
-                .with(CLOCK_HOUR_OF_DAY.setLenient(48)),
-           is(PlainTimestamp.of(2014, 5, 10, 0, 12, 30)));
+                .with(DIGITAL_HOUR_OF_DAY.setLenient(48)),
+           is(PlainTimestamp.of(2014, 5, 11, 0, 12, 30)));
     }
 
 }
