@@ -419,11 +419,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<Map<ChronoElement<?>, Object>> data =
-            new LinkedList<Map<ChronoElement<?>, Object>>();
-        ParsedValues parsed =
-            this.parseElements(text, status, attributes, data);
-        status.setRawValues(parsed);
+        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
+        ParsedValues parsed = null;
+
+        try {
+            parsed = this.parseElements(text, status, attributes, data);
+            parsed.withNoAmbivalentCheck();
+            status.setRawValues(parsed);
+        } catch (AmbivalentValueException ex) {
+            if (!status.isError()) {
+                status.setError(status.getPosition(), ex.getMessage());
+            }
+        }
 
         if (status.isError()) {
             return null;
@@ -913,7 +920,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         ChronoEntity<?> entity =
-            formattable.getChronology().preformat(formattable, attributes);
+            this.chronology.preformat(formattable, attributes);
 
         try {
             for (FormatStep step : this.steps) {
@@ -941,11 +948,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         CharSequence text,
         ParseLog status,
         Attributes attributes,
-        Deque<Map<ChronoElement<?>, Object>> data
+        Deque<NonAmbivalentMap> data
     ) {
 
-        Map<ChronoElement<?>, Object> values =
-            new HashMap<ChronoElement<?>, Object>();
+        NonAmbivalentMap values = new NonAmbivalentMap();
         values.put(null, Integer.valueOf(status.getPosition()));
         data.push(values);
         int previous = 0;
@@ -960,7 +966,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             // Start einer optionalen Sektion: Stack erweitern
             while (level > previous) {
-                values = new HashMap<ChronoElement<?>, Object>();
+                values = new NonAmbivalentMap();
                 values.put(null, Integer.valueOf(status.getPosition()));
                 data.push(values);
                 level--;

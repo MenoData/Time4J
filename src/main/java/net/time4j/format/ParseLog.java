@@ -21,11 +21,7 @@
 
 package net.time4j.format;
 
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-
-import java.util.Collections;
-import java.util.Map;
 
 
 /**
@@ -45,8 +41,7 @@ public class ParseLog {
     private static final ChronoEntity<?> EMPTY_RAW_DATA;
 
     static {
-        Map<ChronoElement<?>, Object> map = Collections.emptyMap();
-        EMPTY_RAW_DATA = new ParsedValues(map);
+        EMPTY_RAW_DATA = new ParsedValues();
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -250,10 +245,6 @@ public class ParseLog {
      * @param   rawValues       parsed values
      */
     void setRawValues(ChronoEntity<?> rawValues) {
-
-        if (rawValues == null) {
-            throw new NullPointerException("Missing raw data.");
-        }
 
         this.rawValues = rawValues;
 
