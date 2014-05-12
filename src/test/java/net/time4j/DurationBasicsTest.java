@@ -196,7 +196,7 @@ public class DurationBasicsTest {
     @Test
     public void ofSingleUnitZeroWeeks() {
         Duration<CalendarUnit> result = Duration.of(0, WEEKS);
-        assertThat(result.toString(), is("P0D"));
+        assertThat(result.toString(), is("PT0S"));
         assertThat(result.getTotalLength().size(), is(0));
         assertThat(result.isPositive(), is(false));
         assertThat(result.isNegative(), is(false));
@@ -206,7 +206,7 @@ public class DurationBasicsTest {
     @Test
     public void ofSingleUnitZeroDays() {
         Duration<CalendarUnit> result = Duration.of(0, DAYS);
-        assertThat(result.toString(), is("P0D"));
+        assertThat(result.toString(), is("PT0S"));
         assertThat(result.getTotalLength().size(), is(0));
         assertThat(result.isPositive(), is(false));
         assertThat(result.isNegative(), is(false));

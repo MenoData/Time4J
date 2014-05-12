@@ -114,6 +114,9 @@ public final class Duration<U extends IsoUnit>
     private static final long MRD = 1000000000L;
     private static final long MIO = 1000000L;
 
+    @SuppressWarnings("rawtypes")
+    private static final Duration ZERO = new Duration();
+
     private static final
     Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
         new Comparator<Item<? extends ChronoUnit>>() {
@@ -175,7 +178,6 @@ public final class Duration<U extends IsoUnit>
      */
     public static Normalizer<ClockUnit> STD_CLOCK_PERIOD = new TimeNormalizer();
 
-    private static final Duration<IsoUnit> ZERO = new Duration<IsoUnit>(false);
     private static final int PRINT_STYLE_NORMAL = 0;
     private static final int PRINT_STYLE_ISO = 1;
     private static final int PRINT_STYLE_XML = 2;
@@ -200,18 +202,12 @@ public final class Duration<U extends IsoUnit>
      */
     private final boolean negative;
 
-    /**
-     * @serial  marks a calendrical only time span
-     */
-    private final boolean calendrical;
-
     //~ Konstruktoren -----------------------------------------------------
 
     // Standard-Konstruktor
     private Duration(
         List<Item<U>> items,
-        boolean negative,
-        boolean calendrical
+        boolean negative
     ) {
         super();
 
@@ -225,7 +221,6 @@ public final class Duration<U extends IsoUnit>
         }
 
         this.negative = (empty ? false : negative);
-        this.calendrical = calendrical;
 
     }
 
@@ -238,21 +233,32 @@ public final class Duration<U extends IsoUnit>
 
         this.items = duration.items;
         this.negative = (inverse ? !duration.negative : duration.negative);
-        this.calendrical = duration.calendrical;
 
     }
 
     // leere Zeitspanne
-    private Duration(boolean calendrical) {
+    private Duration() {
         super();
 
         this.items = Collections.emptyList();
         this.negative = false;
-        this.calendrical = calendrical;
 
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Liefert eine leere Zeitspanne ohne Einheiten. </p>
+     *
+     * @param   <U> generic unit type
+     * @return  empty duration
+     */
+    @SuppressWarnings("unchecked")
+    public static <U extends IsoUnit> Duration<U> ofZero() {
+
+        return (Duration<U>) ZERO;
+
+    }
 
     /**
      * <p>Erzeugt eine neue Zeitspanne, die auf nur einer Zeiteinheit
@@ -273,7 +279,7 @@ public final class Duration<U extends IsoUnit>
     ) {
 
         if (amount == 0) {
-            return new Duration<U>(unit.isCalendrical());
+            return ofZero();
         }
 
         List<Item<U>> items = new ArrayList<Item<U>>(1);
@@ -282,7 +288,7 @@ public final class Duration<U extends IsoUnit>
                 ((amount < 0) ? MathUtils.safeNegate(amount) : amount),
                 unit)
             );
-        return new Duration<U>(items, (amount < 0), unit.isCalendrical());
+        return new Duration<U>(items, (amount < 0));
 
     }
 
@@ -608,10 +614,7 @@ public final class Duration<U extends IsoUnit>
 
         if (this.isEmpty()) {
             temp.add((item == null) ? Item.of(amount, unit) : item);
-            return new Duration<U>(
-                temp,
-                negatedValue,
-                this.calendrical && unit.isCalendrical());
+            return new Duration<U>(temp, negatedValue);
         }
 
         // Items aktualisieren
@@ -651,10 +654,7 @@ public final class Duration<U extends IsoUnit>
             }
         }
 
-        return new Duration<U>(
-            temp,
-            resultNegative,
-            this.calendrical && unit.isCalendrical());
+        return new Duration<U>(temp, resultNegative);
 
     }
 
@@ -838,7 +838,7 @@ public final class Duration<U extends IsoUnit>
         ) {
             return this;
         } else if (factor == 0) {
-            return new Duration<U>(this.calendrical);
+            return ofZero();
         } else if (factor == -1) {
             return new Duration<U>(this, true);
         }
@@ -858,8 +858,7 @@ public final class Duration<U extends IsoUnit>
 
         return new Duration<U>(
             newItems,
-            ((factor < 0) ? !this.isNegative() : this.isNegative()),
-            this.calendrical
+            ((factor < 0) ? !this.isNegative() : this.isNegative())
         );
 
     }
@@ -908,7 +907,8 @@ public final class Duration<U extends IsoUnit>
      */
     public Duration<IsoUnit> union(TimeSpan<? extends IsoUnit> timespan) {
 
-        return ZERO.plus(this).plus(timespan);
+        Duration<IsoUnit> zero = ofZero();
+        return zero.plus(this).plus(timespan);
 
     }
 
@@ -1019,7 +1019,6 @@ public final class Duration<U extends IsoUnit>
             Duration<?> that = Duration.class.cast(obj);
             return (
                 (this.negative == that.negative)
-                && (this.calendrical == that.calendrical)
                 && this.getTotalLength().equals(that.getTotalLength())
             );
         } else {
@@ -1058,8 +1057,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
      * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
      * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot;
-     * (Sekunde als universelles Zeitma&szlig;) oder im rein kalendarischen
-     * Fall das Format &quot;P0D&quot; hat. Hat der Sekundenteil einen
+     * (Sekunde als universelles Zeitma&szlig;) hat. Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen das Komma entsprechend der
      * Empfehlung des ISO-Standards gew&auml;hlt. </p>
      *
@@ -1087,8 +1085,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Ein negatives Vorzeichen ist im ISO-8601-Standard nicht vorgesehen.
      * In diesem Fall wirft die Methode eine Ausnahme. Eine leere Zeitspanne
-     * hat das Format &quot;PT0S&quot; oder im rein kalendarischen
-     * Fall das Format &quot;P0D&quot;. Hat der Sekundenteil einen
+     * hat das Format &quot;PT0S&quot;. Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen das Komma entsprechend der
      * Empfehlung des ISO-Standards gew&auml;hlt. </p>
      *
@@ -1122,8 +1119,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
      * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
      * w&auml;hrend eine leere Zeitspanne das Format &quot;PT0S&quot;
-     * (Sekunde als universelles Zeitma&szlig;) oder im rein kalendarischen
-     * Fall das Format &quot;P0D&quot; hat. Hat der Sekundenteil einen
+     * (Sekunde als universelles Zeitma&szlig;) hat. Hat der Sekundenteil einen
      * Bruchteil, wird als Dezimaltrennzeichen der Punkt anders als in der
      * Empfehlung des ISO-Standards gew&auml;hlt. Es gilt auch, da&szlig;
      * ein vorhandenes Wochenfeld zu Tagen auf der Basis (1 Woche = 7 Tage)
@@ -1250,7 +1246,7 @@ public final class Duration<U extends IsoUnit>
         }
 
         if (this.isEmpty()) {
-            return (this.calendrical ? "P0D" : "PT0S");
+            return "PT0S";
         }
 
         boolean xml = (style == PRINT_STYLE_XML);
@@ -1316,7 +1312,7 @@ public final class Duration<U extends IsoUnit>
                                 }
                             } else {
                                 weeksAsDays = MathUtils.safeMultiply(amount, 7);
-                                if (this.getIndex(CalendarUnit.DAYS) < 0) {
+                                if (this.getIndex(DAYS) < 0) {
                                     sb.append(weeksAsDays);
                                     weeksAsDays = 0;
                                     symbol = 'D';
@@ -1418,7 +1414,6 @@ public final class Duration<U extends IsoUnit>
             }
         }
 
-        boolean calendrical = duration.calendrical;
         Map<U, Long> map = new HashMap<U, Long>();
 
         for (int i = 0, n = duration.count(); i < n; i++) {
@@ -1444,10 +1439,6 @@ public final class Duration<U extends IsoUnit>
             TimeSpan.Item<? extends U> e = timespan.getTotalLength().get(i);
             U unit = e.getUnit();
             long amount = e.getAmount();
-
-            if (calendrical && !unit.isCalendrical()) {
-                calendrical = false;
-            }
 
             // Millis und Micros ersetzen
             Item<U> item = replaceFraction(amount, unit);
@@ -1508,7 +1499,7 @@ public final class Duration<U extends IsoUnit>
             }
         }
 
-        return Duration.create(map, neg.booleanValue(), calendrical);
+        return Duration.create(map, neg.booleanValue());
 
     }
 
@@ -1522,18 +1513,18 @@ public final class Duration<U extends IsoUnit>
         List<Item<CalendarUnit>> items = new ArrayList<Item<CalendarUnit>>(3);
 
         if (years != 0) {
-            items.add(Item.of(years, CalendarUnit.YEARS));
+            items.add(Item.of(years, YEARS));
         }
 
         if (months != 0) {
-            items.add(Item.of(months, CalendarUnit.MONTHS));
+            items.add(Item.of(months, MONTHS));
         }
 
         if (days != 0) {
-            items.add(Item.of(days, CalendarUnit.DAYS));
+            items.add(Item.of(days, DAYS));
         }
 
-        return new Duration<CalendarUnit>(items, negative, true);
+        return new Duration<CalendarUnit>(items, negative);
 
     }
 
@@ -1548,33 +1539,32 @@ public final class Duration<U extends IsoUnit>
         List<Item<ClockUnit>> items = new ArrayList<Item<ClockUnit>>(4);
 
         if (hours != 0) {
-            items.add(Item.of(hours, ClockUnit.HOURS));
+            items.add(Item.of(hours, HOURS));
         }
 
         if (minutes != 0) {
-            items.add(Item.of(minutes, ClockUnit.MINUTES));
+            items.add(Item.of(minutes, MINUTES));
         }
 
         if (seconds != 0) {
-            items.add(Item.of(seconds, ClockUnit.SECONDS));
+            items.add(Item.of(seconds, SECONDS));
         }
 
         if (nanos != 0) {
-            items.add(Item.of(nanos, ClockUnit.NANOS));
+            items.add(Item.of(nanos, NANOS));
         }
 
-        return new Duration<ClockUnit>(items, negative, false);
+        return new Duration<ClockUnit>(items, negative);
 
     }
 
     private static <U extends IsoUnit> Duration<U> create(
         Map<U, Long> map,
-        boolean negative,
-        boolean calendrical
+        boolean negative
     ) {
 
         if (map.isEmpty()) {
-            return new Duration<U>(calendrical);
+            return ofZero();
         }
 
         List<Item<U>> temp = new ArrayList<Item<U>>(map.size());
@@ -1586,17 +1576,17 @@ public final class Duration<U extends IsoUnit>
 
             if (amount == 0) {
                 continue;
-            } else if (key == ClockUnit.MILLIS) {
+            } else if (key == MILLIS) {
                 nanos =
                     MathUtils.safeAdd(
                         nanos,
                         MathUtils.safeMultiply(amount, MIO));
-            } else if (key == ClockUnit.MICROS) {
+            } else if (key == MICROS) {
                 nanos =
                     MathUtils.safeAdd(
                         nanos,
                         MathUtils.safeMultiply(amount, 1000));
-            } else if (key == ClockUnit.NANOS) {
+            } else if (key == NANOS) {
                 nanos = MathUtils.safeAdd(nanos, amount);
             } else {
                 temp.add(Item.of(amount, key));
@@ -1604,11 +1594,11 @@ public final class Duration<U extends IsoUnit>
         }
 
         if (nanos != 0) {
-            U key = cast(ClockUnit.NANOS);
+            U key = cast(NANOS);
             temp.add(Item.of(nanos, key));
         }
 
-        return new Duration<U>(temp, negative, calendrical);
+        return new Duration<U>(temp, negative);
 
     }
 
@@ -1661,12 +1651,12 @@ public final class Duration<U extends IsoUnit>
         U unit
     ) {
 
-        if (unit.equals(ClockUnit.MILLIS)) {
+        if (unit.equals(MILLIS)) {
             amount = MathUtils.safeMultiply(amount, MIO);
-            unit = cast(ClockUnit.NANOS);
-        } else if (unit.equals(ClockUnit.MICROS)) {
+            unit = cast(NANOS);
+        } else if (unit.equals(MICROS)) {
             amount = MathUtils.safeMultiply(amount, 1000L);
-            unit = cast(ClockUnit.NANOS);
+            unit = cast(NANOS);
         } else {
             return null;
         }
@@ -1698,13 +1688,7 @@ public final class Duration<U extends IsoUnit>
         if (timespan instanceof Duration) {
             return cast(timespan);
         } else {
-            boolean calendrical = true;
-            for (Item<U> item : timespan.getTotalLength()) {
-                if (!item.getUnit().isCalendrical()) {
-                    calendrical = false;
-                }
-            }
-            Duration<U> zero = new Duration<U>(calendrical);
+            Duration<U> zero = ofZero();
             return zero.plus(timespan);
         }
 
@@ -1784,7 +1768,7 @@ public final class Duration<U extends IsoUnit>
                 }
             }
 
-            return new Duration<U>(items, negative, calendrical);
+            return new Duration<U>(items, negative);
 
         } catch (IndexOutOfBoundsException ex) {
             ParseException pe =
@@ -1831,7 +1815,7 @@ public final class Duration<U extends IsoUnit>
                 } else {
                     endOfItem = true;
                     long amount = parseAmount(duration, num.toString(), index);
-                    ChronoUnit unit = ClockUnit.SECONDS;
+                    ChronoUnit unit = SECONDS;
                     last =
                         addParsedItem(unit, last, amount, duration, i, items);
                     num = null;
@@ -1855,7 +1839,7 @@ public final class Duration<U extends IsoUnit>
                 }
                 endOfItem = true;
                 long amount = parseAmount(duration, num.toString(), index);
-                ChronoUnit unit = ClockUnit.NANOS;
+                ChronoUnit unit = NANOS;
                 num = null;
                 last = addParsedItem(unit, last, amount, duration, i, items);
             } else {
@@ -1889,21 +1873,21 @@ public final class Duration<U extends IsoUnit>
 
         switch (c) {
             case 'I':
-                return CalendarUnit.MILLENNIA;
+                return MILLENNIA;
             case 'C':
-                return CalendarUnit.CENTURIES;
+                return CENTURIES;
             case 'E':
-                return CalendarUnit.DECADES;
+                return DECADES;
             case 'Y':
-                return CalendarUnit.YEARS;
+                return YEARS;
             case 'Q':
-                return CalendarUnit.QUARTERS;
+                return QUARTERS;
             case 'M':
-                return CalendarUnit.MONTHS;
+                return MONTHS;
             case 'W':
-                return CalendarUnit.WEEKS;
+                return WEEKS;
             case 'D':
-                return CalendarUnit.DAYS;
+                return DAYS;
             default:
                 throw new ParseException(
                     "Symbol \'" + c + "\' not supported: " + duration, index);
@@ -1919,11 +1903,11 @@ public final class Duration<U extends IsoUnit>
 
         switch (c) {
             case 'H':
-                return ClockUnit.HOURS;
+                return HOURS;
             case 'M':
-                return ClockUnit.MINUTES;
+                return MINUTES;
             case 'S':
-                return ClockUnit.SECONDS;
+                return SECONDS;
             default:
                 throw new ParseException(
                     "Symbol \'" + c + "\' not supported: " + duration, index);
@@ -1998,7 +1982,6 @@ public final class Duration<U extends IsoUnit>
         private final List<Item<IsoUnit>> items;
         private final boolean negative;
 
-        private Boolean calendrical = null;
         private boolean millisSet = false;
         private boolean microsSet = false;
         private boolean nanosSet = false;
@@ -2030,10 +2013,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder years(int num) {
 
-            this.set(num, CalendarUnit.YEARS);
-            if (this.calendrical == null) {
-                this.calendrical = Boolean.TRUE;
-            }
+            this.set(num, YEARS);
             return this;
 
         }
@@ -2048,10 +2028,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder months(int num) {
 
-            this.set(num, CalendarUnit.MONTHS);
-            if (this.calendrical == null) {
-                this.calendrical = Boolean.TRUE;
-            }
+            this.set(num, MONTHS);
             return this;
 
         }
@@ -2066,10 +2043,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder days(int num) {
 
-            this.set(num, CalendarUnit.DAYS);
-            if (this.calendrical == null) {
-                this.calendrical = Boolean.TRUE;
-            }
+            this.set(num, DAYS);
             return this;
 
         }
@@ -2084,8 +2058,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder hours(int num) {
 
-            this.set(num, ClockUnit.HOURS);
-            this.calendrical = Boolean.FALSE;
+            this.set(num, HOURS);
             return this;
 
         }
@@ -2100,8 +2073,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder minutes(int num) {
 
-            this.set(num, ClockUnit.MINUTES);
-            this.calendrical = Boolean.FALSE;
+            this.set(num, MINUTES);
             return this;
 
         }
@@ -2116,8 +2088,7 @@ public final class Duration<U extends IsoUnit>
          */
         public Builder seconds(int num) {
 
-            this.set(num, ClockUnit.SECONDS);
-            this.calendrical = Boolean.FALSE;
+            this.set(num, SECONDS);
             return this;
 
         }
@@ -2185,14 +2156,13 @@ public final class Duration<U extends IsoUnit>
          */
         public Duration<IsoUnit> build() {
 
-            if (this.calendrical == null) {
+            if (this.items.isEmpty()) {
                 throw new IllegalStateException("Not set any amount and unit.");
             }
 
             return new Duration<IsoUnit>(
                 this.items,
-                this.negative,
-                this.calendrical.booleanValue()
+                this.negative
             );
 
         }
@@ -2223,14 +2193,12 @@ public final class Duration<U extends IsoUnit>
             long factor
         ) {
 
-            this.calendrical = Boolean.FALSE;
-
             if (amount >= 0) {
-                IsoUnit unit = ClockUnit.NANOS;
+                IsoUnit unit = NANOS;
 
                 for (int i = this.items.size() - 1; i >= 0; i--) {
                     Item<IsoUnit> item = this.items.get(i);
-                    if (item.getUnit().equals(ClockUnit.NANOS)) {
+                    if (item.getUnit().equals(NANOS)) {
                         this.items.set(
                             i,
                             Item.of(
@@ -2265,7 +2233,7 @@ public final class Duration<U extends IsoUnit>
 
             if (this.millisSet) {
                 throw new IllegalStateException(
-                    "Called twice for: " + ClockUnit.MILLIS.name());
+                    "Called twice for: " + MILLIS.name());
             }
 
             this.millisSet = true;
@@ -2276,7 +2244,7 @@ public final class Duration<U extends IsoUnit>
 
             if (this.microsSet) {
                 throw new IllegalStateException(
-                    "Called twice for: " + ClockUnit.MICROS.name());
+                    "Called twice for: " + MICROS.name());
             }
 
             this.microsSet = true;
@@ -2287,7 +2255,7 @@ public final class Duration<U extends IsoUnit>
 
             if (this.nanosSet) {
                 throw new IllegalStateException(
-                    "Called twice for: " + ClockUnit.NANOS.name());
+                    "Called twice for: " + NANOS.name());
             }
 
             this.nanosSet = true;
@@ -2425,46 +2393,45 @@ public final class Duration<U extends IsoUnit>
                     );
 
                 if (y != 0) {
-                    unit = CalendarUnit.YEARS;
+                    unit = YEARS;
                     items.add(Item.of(y, unit));
                 }
                 if (m != 0) {
-                    unit = CalendarUnit.MONTHS;
+                    unit = MONTHS;
                     items.add(Item.of(m, unit));
                 }
                 if (d != 0) {
-                    unit = CalendarUnit.DAYS;
+                    unit = DAYS;
                     items.add(Item.of(d, unit));
                 }
             } else if (weeks != 0) {
-                unit = CalendarUnit.WEEKS;
+                unit = WEEKS;
                 items.add(Item.of(weeks, unit));
             }
 
             if (h != 0) {
-                unit = ClockUnit.HOURS;
+                unit = HOURS;
                 items.add(Item.of(h, unit));
             }
 
             if (n != 0) {
-                unit = ClockUnit.MINUTES;
+                unit = MINUTES;
                 items.add(Item.of(n, unit));
             }
 
             if (s != 0) {
-                unit = ClockUnit.SECONDS;
+                unit = SECONDS;
                 items.add(Item.of(s, unit));
             }
 
             if (f != 0) {
-                unit = ClockUnit.NANOS;
+                unit = NANOS;
                 items.add(Item.of(f, unit));
             }
 
             return new Duration<IsoUnit>(
                 items,
-                timespan.isNegative(),
-                false
+                timespan.isNegative()
             );
 
         }
@@ -2551,10 +2518,10 @@ public final class Duration<U extends IsoUnit>
                 if (negative) {
                     weeks = MathUtils.safeNegate(weeks);
                 }
-                return Duration.of(weeks, CalendarUnit.WEEKS);
+                return Duration.of(weeks, WEEKS);
             }
 
-            return Duration.of(0, CalendarUnit.DAYS);
+            return Duration.of(0, DAYS);
 
         }
 
@@ -2664,7 +2631,7 @@ public final class Duration<U extends IsoUnit>
         @Override
         protected Duration<U> createEmptyTimeSpan() {
 
-            return new Duration<U>(this.calendrical);
+            return ofZero();
 
         }
 
@@ -2674,7 +2641,7 @@ public final class Duration<U extends IsoUnit>
             boolean negative
         ) {
 
-            return new Duration<U>(items, negative, this.calendrical);
+            return new Duration<U>(items, negative);
 
         }
 
