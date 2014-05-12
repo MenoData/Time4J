@@ -1,0 +1,113 @@
+/*
+ * -----------------------------------------------------------------------
+ * Copyright © 2013 Meno Hochschild, <http://www.menodata.de/>
+ * -----------------------------------------------------------------------
+ * This file (IgnorableWhitespaceProcessor.java) is part of project Time4J.
+ *
+ * Time4J is free software: You can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Time4J is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Time4J. If not, see <http://www.gnu.org/licenses/>.
+ * -----------------------------------------------------------------------
+ */
+
+package net.time4j.format;
+
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
+
+/**
+ * <p>Verarbeitet ignorierbare nicht-anzeigbare Zeichen. </p>
+ *
+ * @author  Meno Hochschild
+ */
+enum IgnorableWhitespaceProcessor
+    implements FormatProcessor<Void> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    SINGLETON;
+
+    //~ Methoden ----------------------------------------------------------
+
+    @Override
+    public void print(
+        ChronoEntity<?> formattable,
+        Appendable buffer,
+        Attributes attributes,
+        Set<ElementPosition> positions,
+        FormatStep step
+    ) throws IOException {
+
+        buffer.append(' ');
+
+    }
+
+    @Override
+    public void parse(
+        CharSequence text,
+        ParseLog status,
+        Attributes attributes,
+        Map<ChronoElement<?>, Object> parsedResult,
+        FormatStep step
+    ) {
+
+        int offset = status.getPosition();
+
+        while (offset < text.length()) {
+            char c = text.charAt(offset);
+
+            if (Character.isWhitespace(c)) {
+                offset++;
+            } else {
+                break;
+            }
+        }
+
+        status.setPosition(offset);
+
+    }
+
+    @Override
+    public String toString() {
+
+        return "{IGNORABLE_WHITE_SPACE}";
+
+    }
+
+    // optional
+    @Override
+    public ChronoElement<Void> getElement() {
+
+        return null;
+
+    }
+
+    @Override
+    public FormatProcessor<Void> withElement(ChronoElement<Void> element) {
+
+        return this;
+
+    }
+
+    @Override
+    public boolean isNumerical() {
+
+        return false;
+
+    }
+
+}

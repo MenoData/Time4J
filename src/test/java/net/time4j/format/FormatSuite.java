@@ -12,7 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
         CalendricalNamesTest.class,
         DuplicateElementTest.class,
         MiscellaneousTest.class,
-        ParsingTextOverflowTest.class
+        ParsingTextOverflowTest.class,
+        WhitespaceTest.class
     }
 )
 public class FormatSuite {

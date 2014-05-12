@@ -1730,6 +1730,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Definiert optionale nicht-anzeigbare Zeichen. </p>
+         *
+         * <p>Beim Formatieren wird ein Leerzeichen ausgegeben, beim Parsen
+         * eine beliebig lange Kette von nicht-anzeigbaren Zeichen ignoriert
+         * und &uuml;bersprungen. </p>
+         *
+         * @return  this instance for method chaining
+         */
+        public Builder<T> addIgnorableWhitespace() {
+
+            this.addProcessor(IgnorableWhitespaceProcessor.SINGLETON);
+            return this;
+
+        }
+
+        /**
          * <p>Verarbeitet ein beliebiges Formatmuster des angegebenen Typs. </p>
          *
          * <p>Als Formatsymbole werden die Buchstaben a-z und A-Z erkannt. Die
