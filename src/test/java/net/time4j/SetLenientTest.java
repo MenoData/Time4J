@@ -168,4 +168,40 @@ public class SetLenientTest {
            is(PlainTimestamp.of(2014, 5, 11, 0, 12, 30)));
     }
 
+    @Test
+    public void digitalHourOfAmPmLenientOnTimestamp() {
+        assertThat(
+           PlainTimestamp.of(2014, 5, 9, 1, 12, 30)
+                .with(DIGITAL_HOUR_OF_AMPM.setLenient(48)),
+           is(PlainTimestamp.of(2014, 5, 11, 0, 12, 30)));
+    }
+
+    @Test
+    public void isoHourLenientOnTimestamp() {
+        assertThat(
+           PlainTimestamp.of(2014, 5, 9, 1, 12, 30)
+                .with(ISO_HOUR.setLenient(48)),
+           is(PlainTimestamp.of(2014, 5, 11, 0, 12, 30)));
+    }
+
+    @Test
+    public void minuteOfHourLenientOnTimestamp() {
+        assertThat(
+           PlainTimestamp.of(2014, 5, 9, 23, 59, 30)
+                .with(MINUTE_OF_HOUR.setLenient(60)),
+           is(PlainTimestamp.of(2014, 5, 10, 0, 0, 30)));
+    }
+
+    @Test
+    public void dayOfMonthLenientOnTimestamp() {
+        assertThat(
+           PlainTimestamp.of(2014, 5, 9, 23, 59, 30)
+                .with(PlainDate.DAY_OF_MONTH.setLenient(33)),
+           is(PlainTimestamp.of(2014, 6, 2, 23, 59, 30)));
+        assertThat(
+           PlainTimestamp.of(2012, 2, 9, 23, 59, 30)
+                .with(PlainDate.DAY_OF_MONTH.setLenient(33)),
+           is(PlainTimestamp.of(2012, 3, 4, 23, 59, 30)));
+    }
+
 }
