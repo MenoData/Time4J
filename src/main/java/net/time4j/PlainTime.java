@@ -1163,8 +1163,20 @@ public final class PlainTime
 
     }
 
+    /**
+     * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
+     * chronologischen Regeln enth&auml;lt. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    public static TimeAxis<IsoTimeUnit, PlainTime> axis() {
+
+        return ENGINE;
+
+    }
+
     @Override
-    public TimeAxis<IsoTimeUnit, PlainTime> getChronology() {
+    protected TimeAxis<IsoTimeUnit, PlainTime> getChronology() {
 
         return ENGINE;
 

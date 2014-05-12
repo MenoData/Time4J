@@ -84,10 +84,6 @@ public abstract class AbstractMetric
     ) {
         super();
 
-        if (units.length == 0) {
-            throw new IllegalArgumentException("Missing units.");
-        }
-
         for (int i = 0; i < units.length - 1; i++) {
             for (int j = i + 1; j < units.length; j++) {
                 if (units[i].equals(units[j])) {
@@ -134,8 +130,23 @@ public abstract class AbstractMetric
 
     //~ Methoden ----------------------------------------------------------
 
+    /**
+     * <p>Vergleicht Zeiteinheiten absteigend nach ihrer L&auml;nge. </p>
+     *
+     * @param   u1  first time unit
+     * @param   u2  second time unit
+     * @return  negative, zero or positive if u1 is greater, equal to
+     *          or smaller than u2
+     */
     @Override
-    public final <T extends TimePoint<? super U, T>> P between(
+    public int compare(U u1, U u2) {
+
+        return Double.compare(u2.getLength(), u1.getLength()); // descending
+
+    }
+
+    @Override
+    public <T extends TimePoint<? super U, T>> P between(
         T start,
         T end
     ) {
@@ -156,8 +167,7 @@ public abstract class AbstractMetric
             negative = true;
         }
 
-        List<TimeSpan.Item<U>> resultList =
-            new ArrayList<TimeSpan.Item<U>>(10);
+        List<TimeSpan.Item<U>> resultList = new ArrayList<TimeSpan.Item<U>>(10);
         TimeAxis<? super U, T> engine = start.getChronology();
         U unit = null;
         long amount = 0;
@@ -173,11 +183,9 @@ public abstract class AbstractMetric
 
             // Aktuelle Zeiteinheit bestimmen
             unit = this.sortedUnits.get(index);
-            double length = engine.getLength(unit);
 
             if (
-                !Double.isNaN(length)
-                && (length < 1.0)
+                (this.getLength(engine, unit) < 1.0)
                 && (index < endIndex - 1)
             ) {
                 amount = 0; // Millis oder Mikros vor Nanos nicht berechnen
@@ -190,8 +198,7 @@ public abstract class AbstractMetric
                     U nextUnit = this.sortedUnits.get(k);
                     factor *= this.getFactor(engine, unit, nextUnit);
                     if (
-                        (factor > 1)
-                        && (factor < MIO)
+                        (factor < MIO)
                         && engine.isConvertible(unit, nextUnit)
                     ) {
                         unit = nextUnit;
@@ -210,8 +217,8 @@ public abstract class AbstractMetric
                 } else if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
-                        + "Cannot compute timespan due to illegal negative "
-                        + "timespan amounts.");
+                        + "Cannot compute timespan "
+                        + "due to illegal negative timespan amounts.");
                 }
             }
             index++;
@@ -258,8 +265,7 @@ public abstract class AbstractMetric
                 U nextUnit = sortedUnits.get(i - 1);
                 long factor = this.getFactor(engine, nextUnit, currentUnit);
                 if (
-                    (factor > 1)
-                    && (factor < MIO)
+                    (factor < MIO)
                     && engine.isConvertible(nextUnit, currentUnit)
                 ) {
                     TimeSpan.Item<U> currentItem =
@@ -361,7 +367,18 @@ public abstract class AbstractMetric
         U unit2
     ) {
 
-        return Math.round(engine.getLength(unit1) / engine.getLength(unit2));
+        double d1 = this.getLength(engine, unit1);
+        double d2 = this.getLength(engine, unit2);
+        return Math.round(d1 / d2);
+
+    }
+
+    private <T extends TimePoint<? super U, T>> double getLength(
+        TimeAxis<? super U, T> engine,
+        U unit
+    ) {
+
+        return engine.getLength(unit);
 
     }
 

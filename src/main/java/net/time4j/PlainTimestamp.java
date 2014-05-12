@@ -565,8 +565,20 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
+     * chronologischen Regeln enth&auml;lt. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    public static TimeAxis<IsoUnit, PlainTimestamp> axis() {
+
+        return ENGINE;
+
+    }
+
     @Override
-    public TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
+    protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
 
         return ENGINE;
 

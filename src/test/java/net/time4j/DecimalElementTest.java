@@ -60,7 +60,7 @@ public class DecimalElementTest {
                 throw new UnsupportedOperationException();
             }
             @Override
-            public Chronology getChronology() {
+            protected Chronology getChronology() {
                 throw new UnsupportedOperationException();
             }
         };

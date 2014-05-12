@@ -186,7 +186,7 @@ final class ZonalTimestamp
     }
 
     @Override
-    public Chronology<ZonalTimestamp> getChronology() {
+    protected Chronology<ZonalTimestamp> getChronology() {
 
         throw new UnsupportedOperationException(
             "Zonal timestamps have no defined chronology.");

@@ -368,7 +368,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
      *          must document this rare case)
      * @see     Chronology.Builder
      */
-    public abstract Chronology<T> getChronology();
+    protected abstract Chronology<T> getChronology();
 
     /**
      * <p>Liefert den Selbstbezug. </p>

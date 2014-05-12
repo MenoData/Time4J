@@ -23,11 +23,11 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AbstractDuration;
+import net.time4j.engine.AbstractMetric;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Normalizer;
-import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
@@ -37,12 +37,26 @@ import net.time4j.tz.ZonalOffset;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static net.time4j.CalendarUnit.CENTURIES;
+import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.DECADES;
+import static net.time4j.CalendarUnit.MILLENNIA;
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.QUARTERS;
+import static net.time4j.CalendarUnit.WEEKS;
+import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.MICROS;
+import static net.time4j.ClockUnit.MILLIS;
+import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.ClockUnit.SECONDS;
 
 
 /**
@@ -99,17 +113,6 @@ public final class Duration<U extends IsoUnit>
 
     private static final long MRD = 1000000000L;
     private static final long MIO = 1000000L;
-
-    private static final Comparator<ChronoUnit> UNIT_COMPARATOR =
-        new Comparator<ChronoUnit>() {
-            @Override
-            public int compare(
-                ChronoUnit o1,
-                ChronoUnit o2
-            ) {
-                return Duration.compare(o1, o2);
-            }
-        };
 
     private static final
     Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
@@ -177,6 +180,13 @@ public final class Duration<U extends IsoUnit>
     private static final int PRINT_STYLE_ISO = 1;
     private static final int PRINT_STYLE_XML = 2;
     private static final long serialVersionUID = -6321211763598951499L;
+
+    private static final
+    TimeMetric<CalendarUnit, Duration<CalendarUnit>> YMD_METRIC =
+        Duration.in(YEARS, MONTHS, DAYS);
+    private static final
+    TimeMetric<ClockUnit, Duration<ClockUnit>> CLOCK_METRIC =
+        Duration.in(HOURS, MINUTES, SECONDS, NANOS);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -374,21 +384,7 @@ public final class Duration<U extends IsoUnit>
     public static <U extends IsoUnit>
     TimeMetric<U, Duration<U>> in(U... units) {
 
-        if (units.length == 0) {
-            throw new IllegalArgumentException("Missing units.");
-        }
-
-        for (int i = 0; i < units.length - 1; i++) {
-            for (int j = i + 1; j < units.length; j++) {
-                if (units[i].equals(units[j])) {
-                    throw new IllegalArgumentException(
-                        "Duplicate unit: " + units[i]);
-                }
-            }
-        }
-
-        Arrays.sort(units, UNIT_COMPARATOR);
-        return new Metric<U>((units.length > 1), Arrays.asList(units));
+        return new Metric<U>(units);
 
     }
 
@@ -409,11 +405,7 @@ public final class Duration<U extends IsoUnit>
     public static
     TimeMetric<CalendarUnit, Duration<CalendarUnit>> inYearsMonthsDays() {
 
-        return Duration.in(
-            CalendarUnit.YEARS,
-            CalendarUnit.MONTHS,
-            CalendarUnit.DAYS
-        );
+        return YMD_METRIC;
 
     }
 
@@ -434,12 +426,7 @@ public final class Duration<U extends IsoUnit>
     public static
     TimeMetric<ClockUnit, Duration<ClockUnit>> inClockUnits() {
 
-        return Duration.in(
-            ClockUnit.HOURS,
-            ClockUnit.MINUTES,
-            ClockUnit.SECONDS,
-            ClockUnit.NANOS
-        );
+        return CLOCK_METRIC;
 
     }
 
@@ -2648,21 +2635,16 @@ public final class Duration<U extends IsoUnit>
     }
 
     private static class Metric<U extends IsoUnit>
-        implements TimeMetric<U, Duration<U>> {
+        extends AbstractMetric<U, Duration<U>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final List<U> sortedUnits;
         private final boolean calendrical;
-        private boolean normalizing;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private Metric(
-            boolean normalizing,
-            List<U> units
-        ) {
-            super();
+        private Metric(U... units) {
+            super((units.length > 1), units);
 
             boolean c = true;
 
@@ -2674,240 +2656,25 @@ public final class Duration<U extends IsoUnit>
             }
 
             this.calendrical = c;
-            this.sortedUnits = Collections.unmodifiableList(units);
-            this.normalizing = normalizing;
 
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public <T extends TimePoint<? super U, T>> Duration<U> between(
-            T start,
-            T end
-        ) {
+        protected Duration<U> createEmptyTimeSpan() {
 
-            if (end.equals(start)) {
-                return new Duration<U>(this.calendrical);
-            }
-
-            T t1 = start;
-            T t2 = end;
-            boolean negative = false;
-
-            // Lage von Start und Ende bestimmen
-            if (t1.compareTo(t2) > 0) {
-                T temp = t1;
-                t1 = end;
-                t2 = temp;
-                negative = true;
-            }
-
-            List<TimeSpan.Item<U>> resultList =
-                new ArrayList<TimeSpan.Item<U>>(10);
-            TimeAxis<? super U, T> engine = start.getChronology();
-            U unit = null;
-            long amount = 0;
-            int index = 0;
-            int endIndex = this.sortedUnits.size();
-
-            while (index < endIndex) {
-
-                // Nächste Subtraktion vorbereiten
-                if (amount != 0) {
-                    t1 = t1.plus(amount, unit);
-                }
-
-                // Aktuelle Zeiteinheit bestimmen
-                unit = resolve(this.sortedUnits.get(index));
-
-                if (
-                    (this.getLength(engine, unit) < 1.0)
-                    && (index < endIndex - 1)
-                ) {
-                    amount = 0; // Millis oder Mikros vor Nanos nicht berechnen
-                } else {
-                    // konvertierbare Einheiten zusammenfassen
-                    int k = index + 1;
-                    long factor = 1;
-
-                    while (k < endIndex) {
-                        U nextUnit = this.sortedUnits.get(k);
-                        factor *= this.getFactor(engine, unit, nextUnit);
-                        if (
-                            !Double.isNaN(factor)
-                            && (factor < MIO)
-                            && engine.isConvertible(unit, nextUnit)
-                        ) {
-                            unit = nextUnit;
-                        } else {
-                            break;
-                        }
-                        k++;
-                    }
-                    index = k - 1;
-
-                    // Differenz in einer Einheit berechnen
-                    amount = t1.until(t2, unit);
-
-                    if (amount > 0) {
-                        resultList.add(Item.of(amount, unit));
-                    } else if (amount < 0) {
-                        throw new IllegalStateException(
-                            "Implementation error: "
-                            + "Cannot compute timespan "
-                            + "due to illegal negative timespan amounts.");
-                    }
-                }
-                index++;
-            }
-
-            if (this.normalizing) {
-                this.normalize(engine, this.sortedUnits, resultList);
-            }
-
-            return new Duration<U>(resultList, negative, this.calendrical);
+            return new Duration<U>(this.calendrical);
 
         }
 
-        @SuppressWarnings("unchecked")
-        private static <U> U resolve(U unit) {
-
-            if (unit instanceof OverflowUnit) {
-                return (U) ((OverflowUnit) unit).getCalendarUnit();
-            }
-
-            return unit;
-
-        }
-
-        private <T extends TimePoint<? super U, T>> void normalize(
-            TimeAxis<? super U, T> engine,
-            List<U> sortedUnits,
-            List<TimeSpan.Item<U>> resultList
-        ) {
-
-            for (int i = sortedUnits.size() - 1; i >= 0; i--) {
-                if (i > 0) {
-                    U currentUnit = sortedUnits.get(i);
-                    U nextUnit = sortedUnits.get(i - 1);
-                    long factor = this.getFactor(engine, nextUnit, currentUnit);
-                    if (
-                        !Double.isNaN(factor)
-                        && (factor < MIO)
-                        && engine.isConvertible(nextUnit, currentUnit)
-                    ) {
-                        TimeSpan.Item<U> currentItem =
-                            getItem(resultList, currentUnit);
-                        if (currentItem != null) {
-                            long currentValue = currentItem.getAmount();
-                            long overflow = currentValue / factor;
-                            if (overflow > 0) {
-                                long a = currentValue % factor;
-                                if (a == 0) {
-                                    removeItem(resultList, currentUnit);
-                                } else {
-                                    putItem(resultList, engine, a, currentUnit);
-                                }
-                                TimeSpan.Item<U> nextItem =
-                                    getItem(resultList, nextUnit);
-                                if (nextItem == null) {
-                                    putItem(
-                                        resultList, engine, overflow, nextUnit);
-                                } else {
-                                    putItem(
-                                        resultList,
-                                        engine,
-                                        MathUtils.safeAdd(
-                                            nextItem.getAmount(),
-                                            overflow),
-                                        nextUnit
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        private static <U> TimeSpan.Item<U> getItem(
+        @Override
+        protected Duration<U> createTimeSpan(
             List<TimeSpan.Item<U>> items,
-            U unit
+            boolean negative
         ) {
 
-            for (int i = 0, n = items.size(); i < n; i++) {
-                TimeSpan.Item<U> item = items.get(i);
-                if (item.getUnit().equals(unit)) {
-                    return item;
-                }
-            }
-
-            return null;
-
-        }
-
-        private static <U> void putItem(
-            List<Item<U>> items,
-            Comparator<? super U> comparator,
-            long amount,
-            U unit
-        ) {
-
-            Item<U> item = Item.of(amount, unit);
-            int insert = 0;
-
-            for (int i = 0, n = items.size(); i < n; i++) {
-                U u = items.get(i).getUnit();
-
-                if (u.equals(unit)) {
-                    items.set(i, item);
-                    return;
-                } else if (
-                    (insert == i)
-                    && (comparator.compare(u, unit) < 0)
-                ) {
-                    insert++;
-                }
-            }
-
-            items.add(insert, item);
-
-        }
-
-        private static <U> void removeItem(
-            List<Item<U>> items,
-            U unit
-        ) {
-
-            for (int i = 0, n = items.size(); i < n; i++) {
-                if (items.get(i).getUnit().equals(unit)) {
-                    items.remove(i);
-                    return;
-                }
-            }
-
-        }
-
-        private <T extends TimePoint<? super U, T>> long getFactor(
-            TimeAxis<? super U, T> engine,
-            U unit1,
-            U unit2
-        ) {
-
-            double d1 = this.getLength(engine, unit1);
-            double d2 = this.getLength(engine, unit2);
-            return Math.round(d1 / d2);
-
-        }
-
-        private <T extends TimePoint<? super U, T>> double getLength(
-            TimeAxis<? super U, T> engine,
-            U unit
-        ) {
-
-            return engine.getLength(unit);
+            return new Duration<U>(items, negative, this.calendrical);
 
         }
 

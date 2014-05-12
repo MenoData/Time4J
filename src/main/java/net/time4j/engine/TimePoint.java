@@ -351,7 +351,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @see     TimeAxis.Builder
      */
     @Override
-    public abstract TimeAxis<U, T> getChronology();
+    protected abstract TimeAxis<U, T> getChronology();
 
     // Einheitsregel
     private UnitRule<T> getRule(U unit) {

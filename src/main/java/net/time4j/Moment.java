@@ -859,8 +859,20 @@ public final class Moment
 
     }
 
+    /**
+     * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
+     * chronologischen Regeln enth&auml;lt. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    public static TimeAxis<SI, Moment> axis() {
+
+        return ENGINE;
+
+    }
+
     @Override
-    public TimeAxis<SI, Moment> getChronology() {
+    protected TimeAxis<SI, Moment> getChronology() {
 
         return ENGINE;
 
