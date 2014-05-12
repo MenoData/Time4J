@@ -114,7 +114,7 @@ import java.io.Serializable;
  *  sein. </li>
  * </ul>
  *
- * @param   <U> generic type of time units compatible to {@link ChronoUnit})
+ * @param   <U> generic type of time units compatible to {@link ChronoUnit}
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
  * @see     Chronology
@@ -299,6 +299,42 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
     ) {
 
         return this.getRule(unit).between(this.getContext(), end);
+
+    }
+
+    /**
+     * <p>Bestimmt das Minimum der beiden Argumente. </p>
+     *
+     * @param   <U> generic type of time units compatible to {@link ChronoUnit}
+     * @param   <T> generic type of self reference
+     * @param   t1      first time point
+     * @param   t2      second time point
+     * @return  minimum of t1 and t2
+     */
+    public static <U, T extends TimePoint<U, T>> T min(
+        T t1,
+        T t2
+    ) {
+
+        return (t1.compareTo(t2) > 0) ? t2 : t1;
+
+    }
+
+    /**
+     * <p>Bestimmt das Maximum der beiden Argumente. </p>
+     *
+     * @param   <U> generic type of time units compatible to {@link ChronoUnit}
+     * @param   <T> generic type of self reference
+     * @param   t1      first time point
+     * @param   t2      second time point
+     * @return  maximum of t1 and t2
+     */
+    public static <U, T extends TimePoint<U, T>> T max(
+        T t1,
+        T t2
+    ) {
+
+        return (t1.compareTo(t2) > 0) ? t1 : t2;
 
     }
 

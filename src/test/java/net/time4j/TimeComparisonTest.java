@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.base.WallTime;
+import net.time4j.engine.TimePoint;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -123,6 +124,24 @@ public class TimeComparisonTest {
             PlainTime.of(23, 59, 59, 999999998)
                 .compareTo(PlainTime.of(23, 59, 59, 999999999)) > 0,
             is(false));
+    }
+
+    @Test
+    public void min() {
+        PlainTime t1 = PlainTime.of(22, 4, 21);
+        PlainTime t2 = PlainTime.of(22, 5, 20);
+        assertThat(
+            TimePoint.min(t1, t2),
+            is(t1));
+    }
+
+    @Test
+    public void max() {
+        PlainTime t1 = PlainTime.of(22, 4, 21);
+        PlainTime t2 = PlainTime.of(23, 5, 20);
+        assertThat(
+            TimePoint.max(t1, t2),
+            is(t2));
     }
 
 }

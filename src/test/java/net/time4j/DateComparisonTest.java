@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.engine.TimePoint;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -131,5 +132,32 @@ public class DateComparisonTest {
             PlainDate.of(2012, 2, 29).compareTo(PlainDate.of(2013, 1, 1)) > 0,
             is(false));
     }
+
+    @Test
+    public void min() {
+        PlainDate d1 = PlainDate.of(2014, 4, 21);
+        PlainDate d2 = PlainDate.of(2014, 5, 20);
+        assertThat(
+            TimePoint.min(d1, d2),
+            is(d1));
+    }
+
+    @Test
+    public void max() {
+        PlainDate d1 = PlainDate.of(2014, 4, 21);
+        PlainDate d2 = PlainDate.of(2014, 5, 20);
+        assertThat(
+            TimePoint.max(d1, d2),
+            is(d2));
+    }
+
+//    @Test
+//    public void minNonCompilable() {
+//        PlainDate d1 = PlainDate.of(2014, 4, 21);
+//        PlainTime d2 = PlainTime.of(2014, 5, 20);
+//        assertThat(
+//            TimePoint.min(d1, d2),
+//            is(d1));
+//    }
 
 }
