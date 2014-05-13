@@ -47,7 +47,6 @@ final class FormatStep {
     private final int level;
     private final int section;
     private final Attributes sectionalAttrs;
-    private final Object replacement;
     private final int reserved;
     private final int padLeft;
     private final int padRight;
@@ -61,17 +60,15 @@ final class FormatStep {
      * @param   level           level of optional processing
      * @param   section         identifies the optional attribute section
      * @param   sectionalAttrs  sectional control attributes (optional)
-     * @param   replacement value to be used if parsing fails (optional)
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
     FormatStep(
         FormatProcessor<?> processor,
         int level,
         int section,
-        Attributes sectionalAttrs,
-        Object replacement
+        Attributes sectionalAttrs
     ) {
-        this(processor, level, section, sectionalAttrs, replacement, 0, 0, 0);
+        this(processor, level, section, sectionalAttrs, 0, 0, 0);
 
     }
 
@@ -80,7 +77,6 @@ final class FormatStep {
         int level,
         int section,
         Attributes sectionalAttrs,
-        Object replacement,
         int reserved,
         int padLeft,
         int padRight
@@ -104,23 +100,10 @@ final class FormatStep {
                 "Invalid pad-width: " + padRight);
         }
 
-        if (replacement != null) {
-            ChronoElement<?> element = processor.getElement();
-
-            if (element == null) {
-                throw new IllegalArgumentException(
-                    "Replacement value requires a chronological element.");
-            } else if (!element.getType().isInstance(replacement)) {
-                throw new IllegalArgumentException(
-                    "Incompatible replacement value: " + replacement);
-            }
-        }
-
         this.processor = processor;
         this.level = level;
         this.section = section;
         this.sectionalAttrs = sectionalAttrs;
-        this.replacement = replacement;
         this.reserved = reserved;
         this.padLeft = padLeft;
         this.padRight = padRight;
@@ -410,7 +393,7 @@ final class FormatStep {
      * @param   element     new element reference
      * @return  copy of this instance maybe modified
      */
-    FormatStep update(ChronoElement<?> element) {
+    FormatStep updateElement(ChronoElement<?> element) {
 
         FormatProcessor<?> proc = update(this.processor, element);
 
@@ -423,7 +406,6 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
-            this.replacement,
             this.reserved,
             this.padLeft,
             this.padRight
@@ -445,7 +427,6 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
-            this.replacement,
             this.reserved + reserved,
             this.padLeft,
             this.padRight
@@ -470,7 +451,6 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
-            this.replacement,
             this.reserved,
             this.padLeft + padLeft,
             this.padRight + padRight
@@ -575,7 +555,6 @@ final class FormatStep {
                 && (this.level == that.level)
                 && (this.section == that.section)
                 && isEqual(this.sectionalAttrs, that.sectionalAttrs)
-                && isEqual(this.replacement, that.replacement)
                 && (this.reserved == that.reserved)
                 && (this.padLeft == that.padLeft)
                 && (this.padRight == that.padRight)
@@ -618,10 +597,6 @@ final class FormatStep {
         if (this.sectionalAttrs != null) {
             sb.append(", attributes=");
             sb.append(this.sectionalAttrs);
-        }
-        if (this.replacement != null) {
-            sb.append(", replacement=");
-            sb.append(this.replacement);
         }
         sb.append(", reserved=");
         sb.append(this.reserved);
@@ -679,15 +654,6 @@ final class FormatStep {
             );
         } catch (RuntimeException re) {
             status.setError(current, re.getMessage());
-        }
-
-        // Ersatzwert-Auflösung
-        if (
-            status.isError()
-            && (this.replacement != null)
-        ) {
-            parsedResult.put(this.processor.getElement(), this.replacement);
-            status.clearError();
         }
 
     }

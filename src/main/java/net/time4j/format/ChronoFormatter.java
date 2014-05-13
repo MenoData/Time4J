@@ -84,6 +84,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final Chronology<T> chronology;
     private final Attributes defaultAttributes;
     private final List<FormatStep> steps;
+    private final Map<ChronoElement<?>, Object> defaults;
     private final FractionProcessor fracproc;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -109,6 +110,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 .setCalendarType(CalendarText.extractCalendarType(chronology))
                 .build();
         this.steps = Collections.unmodifiableList(steps);
+        this.defaults = Collections.emptyMap();
 
         FractionProcessor fp = null;
 
@@ -123,7 +125,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    // Aufruf durch with-Methoden
+    // Aufruf durch withAttribute-Methoden
     private ChronoFormatter(
         ChronoFormatter<T> formatter,
         Attributes defaultAttributes
@@ -136,6 +138,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         this.chronology = formatter.chronology;
         this.defaultAttributes = defaultAttributes;
+        this.defaults =
+            Collections.unmodifiableMap(
+                new NonAmbivalentMap(formatter.defaults));
         this.fracproc = formatter.fracproc;
 
         int len = formatter.steps.size();
@@ -162,7 +167,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     for (ChronoElement<?> e : elements) {
                         if (e.name().equals(element.name())) {
                             if (e != element) {
-                                copy.set(i, step.update(e));
+                                copy.set(i, step.updateElement(e));
                             }
                             found = true;
                             break;
@@ -176,6 +181,34 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
         }
 
+        this.steps = Collections.unmodifiableList(copy);
+
+    }
+
+    // Aufruf durch withDefault
+    private ChronoFormatter(
+        ChronoFormatter<T> formatter,
+        ChronoElement<?> element,
+        Object replacement
+    ) {
+        super();
+
+        if (element == null) {
+            throw new NullPointerException("Missing element.");
+        } else if (replacement == null) {
+            throw new NullPointerException("Missing default value.");
+        }
+
+        this.chronology = formatter.chronology;
+        this.defaultAttributes = formatter.defaultAttributes;
+        this.fracproc = formatter.fracproc;
+
+        Map<ChronoElement<?>, Object> map =
+            new NonAmbivalentMap(formatter.defaults);
+        map.put(element, replacement);
+        this.defaults = Collections.unmodifiableMap(map);
+
+        List<FormatStep> copy = new ArrayList<FormatStep>(formatter.steps);
         this.steps = Collections.unmodifiableList(copy);
 
     }
@@ -424,7 +457,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         try {
             parsed = this.parseElements(text, status, attributes, data);
-            parsed.withNoAmbivalentCheck();
+            parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
             if (!status.isError()) {
@@ -436,7 +469,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return null;
         }
 
-        Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
         int index = status.getPosition();
 
         if (
@@ -451,14 +483,21 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return null;
         }
 
-        // Phase 2: Auflösung von Elementwerten in chronologischen Erweiterungen
+        // Phase 2: Anreicherung mit Default-Werten
+        for (ChronoElement<?> e : this.defaults.keySet()) {
+            if (!parsed.contains(e)) {
+                fill(parsed, e, this.defaults.get(e));
+            }
+        }
+
+        // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
         for (ChronoExtension ext : this.chronology.getExtensions()) {
             if (!ext.getElements(this.getLocale(), attributes).isEmpty()) {
                 parsed = ext.resolve(parsed);
             }
         }
 
-        // Phase 3: Transformation der Elementwerte zum Typ T (ChronoMerger)
+        // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
         T result = null;
 
         try {
@@ -477,8 +516,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             result = this.fracproc.update(result, parsed);
         }
 
-        // Phase 4: Konsistenzprüfung
+        // Phase 5: Konsistenzprüfung
         if (result instanceof ChronoEntity) {
+            Leniency leniency =
+                attributes.get(Attributes.LENIENCY, Leniency.SMART);
+
             if (!leniency.isLax()) {
                 TZID tzid = parsed.get(Timezone.identifier()); // eventuell null
 
@@ -635,6 +677,34 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public ChronoFormatter<T> withStdTimezone() {
 
         return this.withTimezone(Timezone.ofSystem().getID());
+
+    }
+
+    /**
+     * <p>Legt einen Standard-Ersatzwert f&uuml;r das angegebene Element
+     * fest, wenn die Interpretation sonst nicht funktioniert. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;PlainDate&gt; fmt =
+     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
+     *               .withDefault(PlainDate.YEAR, 2012);
+     *  PlainDate date = fmt.parse("05-21");
+     *  System.out.println(date); // 2012-05-21
+     * </pre>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   value       replacement value (optional)
+     * @return  changed copy with new replacement value
+     */
+    public <V> ChronoFormatter<T> withDefault(
+        ChronoElement<V> element,
+        V value
+    ) {
+
+        return new ChronoFormatter<T>(this, element, value);
 
     }
 
@@ -1068,6 +1138,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
+    // wildcard capture
+    private static <V> void fill(
+        ChronoEntity<?> entity,
+        ChronoElement<V> element,
+        Object value
+    ) {
+
+        entity.with(element, element.getType().cast(value));
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     /**
@@ -1142,8 +1223,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * angegebene chronologische Element. </p>
          *
          * <p>Entspricht {@code addInteger(element, minDigits, maxDigits,
-         * SignPolicy.SHOW_NEVER, defaultValue}, aber ohne Ersatzwert beim
-         * Parsen. </p>
+         * SignPolicy.SHOW_NEVER}. </p>
          *
          * @param   element         chronological element
          * @param   minDigits       minimum count of digits in range 1-9
@@ -1157,7 +1237,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          * @see     SignPolicy#SHOW_NEVER
-         * @see     #addInteger(ChronoElement, int, int, SignPolicy, int)
+         * @see     #addInteger(ChronoElement, int, int, SignPolicy)
          */
         public Builder<T> addInteger(
             ChronoElement<Integer> element,
@@ -1170,47 +1250,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 false,
                 minDigits,
                 maxDigits,
-                SignPolicy.SHOW_NEVER,
-                null
-            );
-
-        }
-
-        /**
-         * <p>Definiert ein Ganzzahlformat f&uuml;r das
-         * angegebene chronologische Element. </p>
-         *
-         * <p>Entspricht {@code addInteger(element, minDigits, maxDigits,
-         * signPolicy, defaultValue}, aber ohne Ersatzwert beim Parsen. </p>
-         *
-         * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
-         * @param   signPolicy      controls output of numeric sign
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
-         *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is added
-         *          multiple times in a row
-         * @see     Chronology#isSupported(ChronoElement)
-         * @see     #addInteger(ChronoElement, int, int, SignPolicy, int)
-         */
-        public Builder<T> addInteger(
-            ChronoElement<Integer> element,
-            int minDigits,
-            int maxDigits,
-            SignPolicy signPolicy
-        ) {
-
-            return this.addNumber(
-                element,
-                false,
-                minDigits,
-                maxDigits,
-                signPolicy,
-                null
+                SignPolicy.SHOW_NEVER
             );
 
         }
@@ -1250,8 +1290,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          element,
          *          minDigits,
          *          maxDigits,
-         *          SignPolicy.SHOW_ALWAYS,
-         *          0)
+         *          SignPolicy.SHOW_ALWAYS)
          *      .build();
          *  System.out.println(
          *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
@@ -1262,7 +1301,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   minDigits       minimum count of digits in range 1-9
          * @param   maxDigits       maximum count of digits in range 1-9
          * @param   signPolicy      controls output of numeric sign
-         * @param   defaultValue    replacement value in parsing (optional)
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
@@ -1277,8 +1315,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ChronoElement<Integer> element,
             int minDigits,
             int maxDigits,
-            SignPolicy signPolicy,
-            int defaultValue
+            SignPolicy signPolicy
         ) {
 
             return this.addNumber(
@@ -1286,8 +1323,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 false,
                 minDigits,
                 maxDigits,
-                signPolicy,
-                Integer.valueOf(defaultValue)
+                signPolicy
             );
 
         }
@@ -1297,7 +1333,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * chronologische Element. </p>
          *
          * <p>Wie {@link #addInteger(ChronoElement, int, int,
-         * SignPolicy, int)}, aber auf long-Basis. </p>
+         * SignPolicy)}, aber auf long-Basis. </p>
          *
          * @param   element         chronological element
          * @param   minDigits       minimum count of digits in range 1-18
@@ -1324,8 +1360,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 false,
                 minDigits,
                 maxDigits,
-                signPolicy,
-                null
+                signPolicy
             );
 
         }
@@ -1334,8 +1369,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester
          * Breite f&uuml;r das angegebene chronologische Element. </p>
          *
-         * <p>Entspricht {@code addFixedInteger(element, digits)}, aber
-         * ohne Ersatzwert beim Parsen. </p>
+         * <p>Entspricht im wesentlichen der Methode
+         * {@code addInteger(element, digits, digits, SignPolicy.SHOW_NEVER)}
+         * mit folgendem wichtigen Unterschied: </p>
+         *
+         * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
+         * wird die hier definierte feste Breite beim Parsen vorreserviert,
+         * so da&szlig; vorangehende numerische Elemente nicht zuviele
+         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
          *
          * @param   element         chronological element
          * @param   digits          fixed count of digits in range 1-9
@@ -1344,7 +1385,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          range {@code 1-9} or if given element is not supported
          *          by chronology
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     #addFixedInteger(ChronoElement, int, int)
+         * @see     SignPolicy#SHOW_NEVER
+         * @see     #addInteger(ChronoElement, int, int, SignPolicy)
          */
         public Builder<T> addFixedInteger(
             ChronoElement<Integer> element,
@@ -1356,83 +1398,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 true,
                 digits,
                 digits,
-                SignPolicy.SHOW_NEVER,
-                null
+                SignPolicy.SHOW_NEVER
             );
-
-        }
-
-        /**
-         * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester
-         * Breite f&uuml;r das angegebene chronologische Element. </p>
-         *
-         * <p>Entspricht im wesentlichen der Methode
-         * {@code addInteger(element, digits, digits,
-         * SignPolicy.SHOW_NEVER, defaultValue)} mit folgendem
-         * wichtigen Unterschied: </p>
-         *
-         * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
-         * wird die hier definierte feste Breite beim Parsen vorreserviert,
-         * so da&szlig; vorangehende numerische Elemente nicht zuviele
-         * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
-         *
-         * @param   element         chronological element
-         * @param   digits          fixed count of digits in range 1-9
-         * @param   defaultValue    replacement value in parsing (optional)
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if {@code digits} is out of
-         *          range {@code 1-9} or if given element is not supported
-         *          by chronology
-         * @see     Chronology#isSupported(ChronoElement)
-         * @see     SignPolicy#SHOW_NEVER
-         * @see     #addInteger(ChronoElement, int, int, SignPolicy, int)
-         */
-        public Builder<T> addFixedInteger(
-            ChronoElement<Integer> element,
-            int digits,
-            int defaultValue
-        ) {
-
-            return this.addNumber(
-                element,
-                true,
-                digits,
-                digits,
-                SignPolicy.SHOW_NEVER,
-                Integer.valueOf(defaultValue)
-            );
-
-        }
-
-        /**
-         * <p>Definiert ein Ganzzahlformat ohne Vorzeichen f&uuml;r das
-         * angegebene chronologische Aufz&auml;hlungselement. </p>
-         *
-         * <p>Entspricht
-         * {@code addNumerical(element, minDigits, maxDigits, null)}. </p>
-         *
-         * @param   <V> generic type of element values
-         * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
-         *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
-         * @throws  IllegalStateException if a numerical element is added
-         *          multiple times in a row
-         * @see     Chronology#isSupported(ChronoElement)
-         * @see     #addNumerical(ChronoElement, int, int, Enum)
-         *          addNumerical(ChronoElement, int, int, V)
-         */
-        public <V extends Enum<V>> Builder<T> addNumerical(
-            ChronoElement<V> element,
-            int minDigits,
-            int maxDigits
-        ) {
-
-            return this.addNumerical(element, minDigits, maxDigits, null);
 
         }
 
@@ -1459,7 +1426,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element         chronological element
          * @param   minDigits       minimum count of digits in range 1-9
          * @param   maxDigits       maximum count of digits in range 1-9
-         * @param   defaultValue    replacement value in parsing (optional)
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
@@ -1475,8 +1441,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public <V extends Enum<V>> Builder<T> addNumerical(
             ChronoElement<V> element,
             int minDigits,
-            int maxDigits,
-            V defaultValue
+            int maxDigits
         ) {
 
             return this.addNumber(
@@ -1484,8 +1449,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 false,
                 minDigits,
                 maxDigits,
-                SignPolicy.SHOW_NEVER,
-                defaultValue
+                SignPolicy.SHOW_NEVER
             );
 
         }
@@ -1494,35 +1458,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester Breite
          * f&uuml;r das angegebene chronologische Aufz&auml;hlungselement. </p>
          *
-         * <p>Entspricht {@code addFixedNumerical(element, digits, null)},
-         * aber ohne Ersatzwert beim Parsen. </p>
-         *
-         * @param   <V> generic type of element values
-         * @param   element         chronological element
-         * @param   digits          fixed count of digits in range 1-9
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if {@code digits} is out of
-         *          range {@code 1-9} or if given element is not supported
-         *          by chronology
-         * @see     Chronology#isSupported(ChronoElement)
-         * @see     #addFixedNumerical(ChronoElement, int, Enum)
-         *          addFixedNumerical(ChronoElement, int, V)
-         */
-        public <V extends Enum<V>> Builder<T> addFixedNumerical(
-            ChronoElement<V> element,
-            int digits
-        ) {
-
-            return this.addFixedNumerical(element, digits, null);
-
-        }
-
-        /**
-         * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester Breite
-         * f&uuml;r das angegebene chronologische Aufz&auml;hlungselement. </p>
-         *
          * <p>Entspricht im wesentlichen der Methode
-         * {@code addNumerical(element, digits, digits, defaultValue)} mit
+         * {@code addNumerical(element, digits, digits)} mit
          * folgendem wichtigen Unterschied: </p>
          *
          * <p>Folgt diese Methode direkt nach anderen numerischen Elementen,
@@ -1533,19 +1470,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   <V> generic type of element values
          * @param   element         chronological element
          * @param   digits          fixed count of digits in range 1-9
-         * @param   defaultValue    replacement value in parsing (optional)
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
          *          range {@code 1-9} or if given element is not supported
          *          by chronology
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     #addNumerical(ChronoElement, int, int, Enum)
-         *          addNumerical(ChronoElement, int, int, V)
+         * @see     #addNumerical(ChronoElement, int, int)
+         *          addNumerical(ChronoElement, int, int)
          */
         public <V extends Enum<V>> Builder<T> addFixedNumerical(
             ChronoElement<V> element,
-            int digits,
-            V defaultValue
+            int digits
         ) {
 
             return this.addNumber(
@@ -1553,8 +1488,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 true,
                 digits,
                 digits,
-                SignPolicy.SHOW_NEVER,
-                defaultValue
+                SignPolicy.SHOW_NEVER
             );
 
         }
@@ -1859,7 +1793,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         for (ChronoElement<?> e : replacement) {
                             if (e.name().equals(element.name())) {
                                 if (e != element) {
-                                    this.steps.set(i, step.update(e));
+                                    this.steps.set(i, step.updateElement(e));
                                 }
                                 break;
                             }
@@ -1884,7 +1818,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addText(TextElement<?> element) {
 
             this.checkElement(element);
-            this.addProcessor(TextProcessor.create(element), null);
+            this.addProcessor(TextProcessor.create(element));
             return this;
 
         }
@@ -1892,52 +1826,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /**
          * <p>Definiert ein Textformat f&uuml;r das angegebene Element. </p>
          *
-         * <p>Entspricht {@link #addText(ChronoElement, Enum)
-         * addText(element, null)}. </p>
-         *
          * @param   <V> generic type of element values
          * @param   element         chronological element
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
-         * @see     Chronology#isSupported(ChronoElement)
-         */
-        public <V extends Enum<V>>
-        Builder<T> addText(ChronoElement<V> element) {
-
-            return this.addText(element, null);
-
-        }
-
-        /**
-         * <p>Definiert ein Textformat f&uuml;r das angegebene Element
-         * mit optionalem Ersatzwert. </p>
-         *
-         * @param   <V> generic type of element values
-         * @param   element         chronological element
-         * @param   defaultValue    replacement value in parsing (optional)
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
          *          supported by chronology
          * @see     Chronology#isSupported(ChronoElement)
          */
         public <V extends Enum<V>> Builder<T> addText(
-            ChronoElement<V> element,
-            V defaultValue
+            ChronoElement<V> element
         ) {
 
             this.checkElement(element);
 
             if (element instanceof TextElement) {
                 TextElement<?> te = TextElement.class.cast(element);
-                this.addProcessor(
-                    TextProcessor.create(te),
-                    defaultValue);
+                this.addProcessor(TextProcessor.create(te));
             } else {
+                // String-Ressource ist enum.toString()
                 Map<V, String> empty = Collections.emptyMap();
-                this.addProcessor(
-                    new LookupProcessor<V>(element, empty),
-                    defaultValue); // String-Ressource ist enum.toString()
+                this.addProcessor(new LookupProcessor<V>(element, empty));
             }
 
             return this;
@@ -1951,7 +1859,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   <V> generic type of element values
          * @param   element         chronological element
          * @param   lookup          text resources for lookup
-         * @param   defaultValue    replacement value in parsing (optional)
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
          *          supported by chronology
@@ -1959,14 +1866,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public <V extends Enum<V>> Builder<T> addText(
             ChronoElement<V> element,
-            Map<V, String> lookup,
-            V defaultValue
+            Map<V, String> lookup
         ) {
 
             this.checkElement(element);
-            this.addProcessor(
-                new LookupProcessor<V>(element, lookup),
-                defaultValue);
+            this.addProcessor(new LookupProcessor<V>(element, lookup));
             return this;
 
         }
@@ -2573,8 +2477,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             boolean fixedWidth,
             int minDigits,
             int maxDigits,
-            SignPolicy signPolicy,
-            V defaultValue
+            SignPolicy signPolicy
         ) {
 
             this.checkElement(element);
@@ -2591,11 +2494,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (fixedWidth) {
                 if (this.reservedIndex == -1) {
-                    this.addProcessor(np, defaultValue);
+                    this.addProcessor(np);
                 } else {
                     int ri = this.reservedIndex;
                     FormatStep numStep = this.steps.get(ri);
-                    this.addProcessor(np, defaultValue);
+                    this.addProcessor(np);
                     FormatStep lastStep = this.steps.get(this.steps.size() - 1);
 
                     if (numStep.getSection() == lastStep.getSection()) {
@@ -2612,7 +2515,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     + "after another numerical element. "
                     + "Consider \"addFixedXXX()\" instead.");
             } else {
-                this.addProcessor(np, defaultValue);
+                this.addProcessor(np);
                 this.reservedIndex = this.steps.size() - 1;
             }
 
@@ -2621,15 +2524,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         private void addProcessor(FormatProcessor<?> processor) {
-
-            this.addProcessor(processor, null);
-
-        }
-
-        private void addProcessor(
-            FormatProcessor<?> processor,
-            Object replacement
-        ) {
 
             this.reservedIndex = -1;
             Attributes attrs = null;
@@ -2642,8 +2536,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 section = getSection(attrs);
             }
 
-            FormatStep step =
-                new FormatStep(processor, level, section, attrs, replacement);
+            FormatStep step = new FormatStep(processor, level, section, attrs);
 
             if (this.leftPadWidth > 0) {
                 step = step.pad(this.leftPadWidth, 0);

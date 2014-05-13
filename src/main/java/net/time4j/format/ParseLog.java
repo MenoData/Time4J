@@ -36,14 +36,6 @@ import net.time4j.engine.ChronoEntity;
  */
 public class ParseLog {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ChronoEntity<?> EMPTY_RAW_DATA;
-
-    static {
-        EMPTY_RAW_DATA = new ParsedValues();
-    }
-
     //~ Instanzvariablen --------------------------------------------------
 
     private int position;
@@ -78,7 +70,7 @@ public class ParseLog {
         this.position = offset;
         this.errorIndex = -1;
         this.errorMessage = "";
-        this.rawValues = EMPTY_RAW_DATA;
+        this.rawValues = null;
         this.daylightSaving = null;
 
     }
@@ -136,7 +128,7 @@ public class ParseLog {
      */
     public ChronoEntity<?> getRawValues() {
 
-        return this.rawValues;
+        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
 
     }
 
@@ -154,7 +146,7 @@ public class ParseLog {
         sb.append(", error-message=\"");
         sb.append(this.errorMessage);
         sb.append("\", raw-values=");
-        sb.append(this.rawValues);
+        sb.append(this.getRawValues());
         if (this.daylightSaving != null) {
             sb.append(", daylight-saving=");
             sb.append(this.daylightSaving);
@@ -188,7 +180,7 @@ public class ParseLog {
 
         this.position = 0;
         this.clearError();
-        this.rawValues = EMPTY_RAW_DATA;
+        this.rawValues = null;
 
     }
 

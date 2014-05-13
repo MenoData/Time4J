@@ -24,6 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.ChronoElement;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -40,6 +41,18 @@ class NonAmbivalentMap
     //~ Instanzvariablen --------------------------------------------------
 
     private boolean checking = true;
+
+    //~ Konstruktoren -----------------------------------------------------
+
+    NonAmbivalentMap() {
+        super();
+
+    }
+
+    NonAmbivalentMap(Map<? extends ChronoElement<?>, ? extends Object> map) {
+        super(map);
+
+    }
 
     //~ Methoden ----------------------------------------------------------
 

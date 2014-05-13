@@ -28,9 +28,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.Timezone;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -56,7 +54,7 @@ class ParsedValues
     ParsedValues() {
         super();
 
-        this.map = null;
+        this.map = new NonAmbivalentMap();
 
     }
 
@@ -78,21 +76,14 @@ class ParsedValues
     @Override
     public boolean contains(ChronoElement<?> element) {
 
-        return (
-            (this.map != null)
-            && this.map.containsKey(element)
-        );
+        return this.map.containsKey(element);
 
     }
 
     @Override
     public <V> V get(ChronoElement<V> element) {
 
-        V value = null;
-
-        if (this.map != null) {
-            value = element.getType().cast(this.map.get(element));
-        }
+        V value = element.getType().cast(this.map.get(element));
 
         if (value == null) {
             throw new ChronoException("No value found for: " + element.name());
@@ -107,11 +98,7 @@ class ParsedValues
     public <R> R get(ChronoFunction<? super ParsedValues, R> function) {
 
         if (function == Timezone.identifier()) {
-            if (this.map == null) {
-                return null;
-            } else {
-                return (R) this.map.get(ZonalElement.TIMEZONE_ID);
-            }
+            return (R) this.map.get(ZonalElement.TIMEZONE_ID);
         }
 
         return super.get(function);
@@ -128,7 +115,7 @@ class ParsedValues
             throw new NullPointerException("Missing chronological element.");
         }
 
-        return (this.map != null);
+        return true;
 
     }
 
@@ -140,8 +127,6 @@ class ParsedValues
 
         if (element == null) {
             throw new NullPointerException("Missing chronological element.");
-        } else if (this.map == null) {
-            throw new ChronoException("Parsed values are empty.");
         } else if (value == null) {
             this.map.remove(element);
         } else {
@@ -184,11 +169,7 @@ class ParsedValues
             return true;
         } else if (obj instanceof ParsedValues) {
             ParsedValues that = (ParsedValues) obj;
-            if (this.map == null) {
-                return (that.map == null);
-            } else {
-                return this.map.equals(that.map);
-            }
+            return this.map.equals(that.map);
         } else {
             return false;
         }
@@ -201,7 +182,7 @@ class ParsedValues
     @Override
     public int hashCode() {
 
-        return (this.map == null) ? 0 : this.map.hashCode();
+        return this.map.hashCode();
 
     }
 
@@ -215,18 +196,16 @@ class ParsedValues
         StringBuilder sb = new StringBuilder(128);
         sb.append('{');
 
-        if (this.map != null) {
-            for (ChronoElement<?> key : this.map.keySet()) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(", ");
-                }
-
-                sb.append(key.name());
-                sb.append('=');
-                sb.append(this.map.get(key));
+        for (ChronoElement<?> key : this.map.keySet()) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(", ");
             }
+
+            sb.append(key.name());
+            sb.append('=');
+            sb.append(this.map.get(key));
         }
 
         sb.append('}');
@@ -236,27 +215,22 @@ class ParsedValues
 
     /**
      * <p>Liefert alle enthaltenen Elemente. </p>
+     *
+     * @return  Iterator
      */
     @Override
     public Iterator<ChronoElement<?>> iterator() {
 
-        if (this.map == null) {
-            List<ChronoElement<?>> list = Collections.emptyList();
-            return list.iterator();
-        }
-
-        return Collections.unmodifiableSet(this.map.keySet()).iterator();
+        return this.map.keySet().iterator();
 
     }
 
     /**
      * <p>Schaltet die Pr&uuml;fung von ambivalenten Werten ab. </p>
      */
-    void withNoAmbivalentCheck() {
+    void setNoAmbivalentCheck() {
 
-        if (this.map != null) {
-            this.map.setChecking(false);
-        }
+        this.map.setChecking(false);
 
     }
 

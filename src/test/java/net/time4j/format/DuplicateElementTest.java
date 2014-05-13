@@ -41,9 +41,7 @@ public class DuplicateElementTest {
                 .addLiteral(')')
                 .build();
         try {
-            assertThat(
-                fmt.parse("04102014 (05)"),
-                is(PlainDate.of(2014, 10, 4)));
+            fmt.parse("04102014 (05)");
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(10));
             throw pe;
