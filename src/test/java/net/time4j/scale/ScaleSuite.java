@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        LeapSecondTest.class
+        LeapSecondTest.class,
+        TimeScaleTest.class
     }
 )
 public class ScaleSuite {

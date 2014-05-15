@@ -109,7 +109,7 @@ public final class Moment
     private static final long POSIX_UTC_DELTA =
         2 * 365 * 86400;
     private static final long POSIX_GPS_DELTA =
-        POSIX_UTC_DELTA + UTC_GPS_DELTA;
+        POSIX_UTC_DELTA + UTC_GPS_DELTA - 9; // -9 => without leap seconds
 
     private static final int MIO = 1000000;
     private static final int MRD = 1000000000;
@@ -846,7 +846,7 @@ public final class Moment
                         this.getNanosecond(),
                         MathUtils.safeAdd(
                             this.getElapsedTime(TimeScale.GPS),
-                            POSIX_GPS_DELTA - 9)
+                            POSIX_GPS_DELTA)
                         );
                 sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
                 sb.append('Z');
