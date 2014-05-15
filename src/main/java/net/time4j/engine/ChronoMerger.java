@@ -80,13 +80,14 @@ public interface ChronoMerger<T> {
      * nachdem ein Text elementweise in chronologische Werte aufgel&ouml;st
      * wurde. </p>
      *
-     * @param   parsedValues    interpreted elements with their values
+     * @param   entity          any chronological entity like parsed
+     *                          elements with their values
      * @param   attributes      configuration attributes given by parser
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
      */
     T createFrom(
-        ChronoEntity<?> parsedValues,
+        ChronoEntity<?> entity,
         AttributeQuery attributes
     );
 

@@ -170,7 +170,7 @@ public class Chronology<T extends ChronoEntity<T>>
 
     @Override
     public T createFrom(
-        ChronoEntity<?> parsedValues,
+        ChronoEntity<?> entity,
         AttributeQuery attributes
     ) {
 
@@ -178,7 +178,7 @@ public class Chronology<T extends ChronoEntity<T>>
             throw new NullPointerException("Missing attributes.");
         }
 
-        return this.merger.createFrom(parsedValues, attributes);
+        return this.merger.createFrom(entity, attributes);
 
     }
 

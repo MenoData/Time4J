@@ -41,6 +41,7 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -2711,6 +2712,18 @@ public final class PlainTime
             ChronoEntity<?> entity,
             AttributeQuery attributes
         ) {
+
+            if (entity instanceof UnixTime) {
+                Moment ut = Moment.from(UnixTime.class.cast(entity));
+
+                TZID tzid = ZonalOffset.UTC;
+
+                if (attributes.contains(Attributes.TIMEZONE_ID)) {
+                    tzid = attributes.get(Attributes.TIMEZONE_ID);
+                }
+
+                return ut.inTimezone(tzid).getWallTime();
+            }
 
             // Uhrzeit bereits vorhanden? -------------------------------------
             if (entity.contains(WALL_TIME)) {

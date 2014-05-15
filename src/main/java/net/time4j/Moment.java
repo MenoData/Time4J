@@ -388,6 +388,31 @@ public final class Moment
 
     }
 
+    /**
+     * <p>Allgemeine Konversionsmethode. </p>
+     *
+     * @param   ut      UNIX-timestamp
+     * @return  corresponding {@code Moment}
+     */
+    public static Moment from(UnixTime ut) {
+
+        if (ut instanceof Moment) {
+            return Moment.class.cast(ut);
+        } else if (ut instanceof UniversalTime) {
+            UniversalTime utc = UniversalTime.class.cast(ut);
+            return Moment.of(
+                utc.getElapsedTime(UTC),
+                utc.getNanosecond(UTC),
+                UTC);
+        } else {
+            return Moment.of(
+                ut.getPosixTime(),
+                ut.getNanosecond(),
+                TimeScale.POSIX);
+        }
+
+    }
+
     @Override
     public long getPosixTime() {
 
@@ -899,31 +924,6 @@ public final class Moment
             throw new ChronoException(
                 "Illegal local timestamp due to "
                 + "negative leap second: " + ts);
-        }
-
-    }
-
-    /**
-     * <p>Allgemeine Konversionsmethode. </p>
-     *
-     * @param   ut      UNIX-timestamp
-     * @return  Moment
-     */
-    static Moment from(UnixTime ut) {
-
-        if (ut instanceof Moment) {
-            return Moment.class.cast(ut);
-        } else if (ut instanceof UniversalTime) {
-            UniversalTime utc = UniversalTime.class.cast(ut);
-            return Moment.of(
-                utc.getElapsedTime(UTC),
-                utc.getNanosecond(UTC),
-                UTC);
-        } else {
-            return Moment.of(
-                ut.getPosixTime(),
-                ut.getNanosecond(),
-                TimeScale.POSIX);
         }
 
     }
@@ -1750,18 +1750,22 @@ public final class Moment
 
         @Override
         public Moment createFrom(
-            ChronoEntity<?> parsedValues,
+            ChronoEntity<?> entity,
             AttributeQuery attributes
         ) {
+
+            if (entity instanceof UnixTime) {
+                return Moment.from(UnixTime.class.cast(entity));
+            }
 
             Moment result = null;
 
             boolean leapsecond =
-                parsedValues.contains(SECOND_OF_MINUTE)
-                && (parsedValues.get(SECOND_OF_MINUTE).intValue() == 60);
+                entity.contains(SECOND_OF_MINUTE)
+                && (entity.get(SECOND_OF_MINUTE).intValue() == 60);
 
             if (leapsecond) { // temporär, wird später kompensiert
-                parsedValues.with(SECOND_OF_MINUTE, Integer.valueOf(59));
+                entity.with(SECOND_OF_MINUTE, Integer.valueOf(59));
             }
 
             PlainTimestamp ts = null;
@@ -1769,12 +1773,12 @@ public final class Moment
             try {
                 ts =
                     PlainTimestamp.ENGINE.createFrom(
-                        parsedValues,
+                        entity,
                         attributes
                     );
             } finally {
                 if (leapsecond) { // Restauration
-                    parsedValues.with(SECOND_OF_MINUTE, Integer.valueOf(60));
+                    entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
                 }
             }
 
@@ -1782,7 +1786,7 @@ public final class Moment
                 return null;
             }
 
-            TZID tzid = parsedValues.get(Timezone.identifier());
+            TZID tzid = entity.get(Timezone.identifier());
 
             if (
                 (tzid == null)
