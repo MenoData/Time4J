@@ -90,9 +90,19 @@ import static net.time4j.scale.TimeScale.UTC;
  * {@code PlainDate} und {@code PlainTime} registriert sind (mit Ausnahme
  * der Dezimalelemente), au&szlig;erdem werden alle Elemente von
  * {@link Weekmodel} mit unterst&uuml;tzt. Die Elemente erlauben den
- * Zugriff bezogen auf die Zeitzone UTC. Falls &uuml;ber sie zonale
- * Operatoren zur Verf&uuml;gung stehen, sind auch Manipulationen
- * in beliebigen Zeitzonen m&ouml;glich. </p>
+ * Zugriff bezogen auf die Zeitzone UTC. Wird zum Beispiel ein {@code Moment}
+ * nach seiner aktuellen Uhrzeit gefragt, dann wird die Uhrzeit in der
+ * UTC-Zeitzone zur&uuml;ckgegeben. Das steht im Kontrast zu den JDK-Klassen
+ * {@code java.util.Date} (Zugriff auf die lokale Standard-Zeitzone) und
+ * {@code java.time.Instant} (kein Element- bzw. Feldzugriff m&ouml;glich).
+ * Ein {@code Moment} bietet also eine duale Sicht sowohl auf einen
+ * maschinellen Z&auml;hler als auch auf ein Tupel von Datums- und Zeitwerten,
+ * immer in der Zeitzone UTC. </p>
+ *
+ * <p>Ein {@code Moment} kann die Datums- und Zeitwerte auch in einer anderen
+ * Zeitzone liefern, wenn die Methode {@link #inTimezone(TZID)} aufgerufen
+ * wird. Falls &uuml;ber die Elemente zonale Operatoren zur Verf&uuml;gung
+ * stehen, sind auch Manipulationen in beliebigen Zeitzonen m&ouml;glich. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
