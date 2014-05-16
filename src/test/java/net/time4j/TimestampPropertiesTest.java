@@ -23,10 +23,9 @@ public class TimestampPropertiesTest {
     private static final long MRD = 1000000000L;
 
     @Test
-    public void getChronology() {
-        PlainTimestamp any = PlainTimestamp.of(2014, 4, 21, 0, 0);
+    public void axis() {
         assertThat(
-            (any.getChronology() == Chronology.lookup(PlainTimestamp.class)),
+            (PlainTimestamp.axis() == Chronology.lookup(PlainTimestamp.class)),
             is(true));
     }
 
@@ -132,9 +131,8 @@ public class TimestampPropertiesTest {
 
     @Test
     public void getBaseUnitWallTime() {
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(WALL_TIME),
+            PlainTimestamp.axis().getBaseUnit(WALL_TIME),
             is(nullValue()));
     }
 
@@ -209,9 +207,8 @@ public class TimestampPropertiesTest {
 
     @Test
     public void getBaseUnitAmPm() {
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(AM_PM_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(AM_PM_OF_DAY),
             is(nullValue()));
     }
 
@@ -268,9 +265,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMinuteOfDay() {
         IsoUnit unit = ClockUnit.MINUTES;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MINUTE_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(MINUTE_OF_DAY),
             is(unit));
     }
 
@@ -338,9 +334,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitSecondOfDay() {
         IsoUnit unit = ClockUnit.SECONDS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(SECOND_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(SECOND_OF_DAY),
             is(unit));
     }
 
@@ -410,9 +405,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMilliOfDay() {
         IsoUnit unit = ClockUnit.MILLIS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MILLI_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(MILLI_OF_DAY),
             is(unit));
     }
 
@@ -484,9 +478,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMicroOfDay() {
         IsoUnit unit = ClockUnit.MICROS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MICRO_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(MICRO_OF_DAY),
             is(unit));
     }
 
@@ -558,9 +551,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitNanoOfDay() {
         IsoUnit unit = ClockUnit.NANOS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(NANO_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(NANO_OF_DAY),
             is(unit));
     }
 
@@ -631,9 +623,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitIsoHour() {
         IsoUnit unit = ClockUnit.HOURS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(ISO_HOUR),
+            PlainTimestamp.axis().getBaseUnit(ISO_HOUR),
             is(unit));
     }
 
@@ -701,9 +692,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMinuteOfHour() {
         IsoUnit unit = ClockUnit.MINUTES;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MINUTE_OF_HOUR),
+            PlainTimestamp.axis().getBaseUnit(MINUTE_OF_HOUR),
             is(unit));
     }
 
@@ -771,9 +761,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitSecondOfMinute() {
         IsoUnit unit = ClockUnit.SECONDS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(SECOND_OF_MINUTE),
+            PlainTimestamp.axis().getBaseUnit(SECOND_OF_MINUTE),
             is(unit));
     }
 
@@ -843,9 +832,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMilliOfSecond() {
         IsoUnit unit = ClockUnit.MILLIS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MILLI_OF_SECOND),
+            PlainTimestamp.axis().getBaseUnit(MILLI_OF_SECOND),
             is(unit));
     }
 
@@ -917,9 +905,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitMicroOfSecond() {
         IsoUnit unit = ClockUnit.MICROS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(MICRO_OF_SECOND),
+            PlainTimestamp.axis().getBaseUnit(MICRO_OF_SECOND),
             is(unit));
     }
 
@@ -991,9 +978,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitNanoOfSecond() {
         IsoUnit unit = ClockUnit.NANOS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(NANO_OF_SECOND),
+            PlainTimestamp.axis().getBaseUnit(NANO_OF_SECOND),
             is(unit));
     }
 
@@ -1069,9 +1055,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitClockHourOfAmPm() {
         IsoUnit unit = ClockUnit.HOURS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(CLOCK_HOUR_OF_AMPM),
+            PlainTimestamp.axis().getBaseUnit(CLOCK_HOUR_OF_AMPM),
             is(unit));
     }
 
@@ -1145,9 +1130,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitClockHourOfDay() {
         IsoUnit unit = ClockUnit.HOURS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(CLOCK_HOUR_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(CLOCK_HOUR_OF_DAY),
             is(unit));
     }
 
@@ -1221,9 +1205,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitDigitalHourOfAmPm() {
         IsoUnit unit = ClockUnit.HOURS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
+            PlainTimestamp.axis().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
             is(unit));
     }
 
@@ -1301,9 +1284,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getBaseUnitDigitalHourOfDay() {
         IsoUnit unit = ClockUnit.HOURS;
-        PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
         assertThat(
-            anyTS.getChronology().getBaseUnit(DIGITAL_HOUR_OF_DAY),
+            PlainTimestamp.axis().getBaseUnit(DIGITAL_HOUR_OF_DAY),
             is(unit));
     }
 
@@ -1863,8 +1845,8 @@ public class TimestampPropertiesTest {
     @Test
     public void getMaximumWeekdayInMonth() {
         assertThat(
-            PlainTimestamp.of(2012, 2, 22, 8, 15).getMinimum(WEEKDAY_IN_MONTH),
-            is(1));
+            PlainTimestamp.of(2012, 2, 22, 8, 15).getMaximum(WEEKDAY_IN_MONTH),
+            is(5));
     }
 
     @Test

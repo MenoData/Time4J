@@ -67,7 +67,6 @@ import static net.time4j.PlainTime.*;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
- *  <li>{@link PlainDate#CALENDAR_DATE}</li>
  *  <li>{@link PlainDate#YEAR}</li>
  *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
  *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
@@ -78,7 +77,6 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
  *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
  *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
- *  <li>{@link PlainTime#WALL_TIME}</li>
  *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
@@ -660,6 +658,10 @@ public final class PlainTimestamp
      * @return  {@code true} if this timestamp is valid in given timezone
      */
     public boolean isValid(TZID tzid) {
+
+        if (tzid == null) {
+            return false;
+        }
 
         return !Timezone.of(tzid).isInvalid(this.date, this.time);
 

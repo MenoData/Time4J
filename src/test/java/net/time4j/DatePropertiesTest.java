@@ -81,10 +81,9 @@ public class DatePropertiesTest {
     }
 
     @Test
-    public void getChronology() {
-        PlainDate any = PlainDate.of(2000, 1);
+    public void axis() {
         assertThat(
-            (any.getChronology() == Chronology.lookup(PlainDate.class)),
+            (PlainDate.axis() == Chronology.lookup(PlainDate.class)),
             is(true));
     }
 
@@ -112,7 +111,7 @@ public class DatePropertiesTest {
     public void getBaseUnitCalendarDate() {
         IsoUnit unit = CalendarUnit.DAYS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(CALENDAR_DATE),
+            PlainDate.axis().getBaseUnit(CALENDAR_DATE),
             is(unit));
     }
 
@@ -178,7 +177,7 @@ public class DatePropertiesTest {
     public void getBaseUnitYear() {
         IsoUnit unit = CalendarUnit.YEARS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(YEAR),
+            PlainDate.axis().getBaseUnit(YEAR),
             is(unit));
     }
 
@@ -281,9 +280,8 @@ public class DatePropertiesTest {
 
     @Test
     public void getBaseUnitYearOfWeekdate() {
-        PlainDate d = PlainDate.MAX;
         assertThat(
-            d.getChronology().getBaseUnit(YEAR_OF_WEEKDATE),
+            PlainDate.axis().getBaseUnit(YEAR_OF_WEEKDATE),
             is(CalendarUnit.weekBasedYears()));
     }
 
@@ -370,7 +368,7 @@ public class DatePropertiesTest {
     public void getBaseUnitQuarterOfYear() {
         IsoUnit unit = CalendarUnit.QUARTERS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(QUARTER_OF_YEAR),
+            PlainDate.axis().getBaseUnit(QUARTER_OF_YEAR),
             is(unit));
     }
 
@@ -427,7 +425,7 @@ public class DatePropertiesTest {
     public void getBaseUnitMonthOfYear() {
         IsoUnit unit = CalendarUnit.MONTHS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(MONTH_OF_YEAR),
+            PlainDate.axis().getBaseUnit(MONTH_OF_YEAR),
             is(unit));
     }
 
@@ -487,7 +485,7 @@ public class DatePropertiesTest {
     public void getBaseUnitMonthAsNumber() {
         IsoUnit unit = CalendarUnit.MONTHS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(MONTH_AS_NUMBER),
+            PlainDate.axis().getBaseUnit(MONTH_AS_NUMBER),
             is(unit));
     }
 
@@ -569,7 +567,7 @@ public class DatePropertiesTest {
     public void getBaseUnitWeekdayInMonth() {
         IsoUnit unit = CalendarUnit.WEEKS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(WEEKDAY_IN_MONTH),
+            PlainDate.axis().getBaseUnit(WEEKDAY_IN_MONTH),
             is(unit));
     }
 
@@ -637,7 +635,7 @@ public class DatePropertiesTest {
     public void getBaseUnitDayOfMonth() {
         IsoUnit unit = CalendarUnit.DAYS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_MONTH),
+            PlainDate.axis().getBaseUnit(DAY_OF_MONTH),
             is(unit));
     }
 
@@ -746,7 +744,7 @@ public class DatePropertiesTest {
     public void getBaseUnitDayOfYear() {
         IsoUnit unit = CalendarUnit.DAYS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_YEAR),
+            PlainDate.axis().getBaseUnit(DAY_OF_YEAR),
             is(unit));
     }
 
@@ -825,7 +823,7 @@ public class DatePropertiesTest {
     public void getBaseUnitDayOfWeek() {
         IsoUnit unit = CalendarUnit.DAYS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_WEEK),
+            PlainDate.axis().getBaseUnit(DAY_OF_WEEK),
             is(unit));
     }
 
@@ -925,7 +923,7 @@ public class DatePropertiesTest {
     public void getBaseUnitDayOfQuarter() {
         IsoUnit unit = CalendarUnit.DAYS;
         assertThat(
-            PlainDate.MAX.getChronology().getBaseUnit(DAY_OF_QUARTER),
+            PlainDate.axis().getBaseUnit(DAY_OF_QUARTER),
             is(unit));
     }
 

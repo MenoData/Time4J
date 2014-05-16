@@ -78,7 +78,6 @@ import java.util.Set;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
- *  <li>{@link #WALL_TIME}</li>
  *  <li>{@link #AM_PM_OF_DAY}</li>
  *  <li>{@link #CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
@@ -156,8 +155,7 @@ public final class PlainTime
      *
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
-    public static final ChronoElement<PlainTime> WALL_TIME =
-        TimeElement.INSTANCE;
+    static final ChronoElement<PlainTime> WALL_TIME = TimeElement.INSTANCE;
 
     /**
      * <p>Element mit dem Tagesabschnitt relativ zur Mittagszeit (Vormittag

@@ -195,8 +195,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (element == null) {
             throw new NullPointerException("Missing element.");
-        } else if (replacement == null) {
-            throw new NullPointerException("Missing default value.");
         }
 
         this.chronology = formatter.chronology;
@@ -205,7 +203,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         Map<ChronoElement<?>, Object> map =
             new NonAmbivalentMap(formatter.defaults);
-        map.put(element, replacement);
+
+        if (replacement == null) {
+            map.remove(element);
+        } else {
+            map.put(element, replacement);
+        }
+
         this.defaults = Collections.unmodifiableMap(map);
 
         List<FormatStep> copy = new ArrayList<FormatStep>(formatter.steps);
@@ -696,7 +700,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * @param   <V> generic element value type
      * @param   element     chronological element to be updated
-     * @param   value       replacement value (optional)
+     * @param   value       replacement value or {@code null}
+     *                      if the default value shall be deregistered
      * @return  changed copy with new replacement value
      */
     public <V> ChronoFormatter<T> withDefault(
@@ -924,6 +929,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return (
                 this.chronology.equals(that.chronology)
                 && this.defaultAttributes.equals(that.defaultAttributes)
+                && this.defaults.equals(that.defaults)
                 && this.steps.equals(that.steps)
             );
         } else {
@@ -956,6 +962,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         sb.append(this.chronology.getChronoType().getName());
         sb.append(", default-attributes=");
         sb.append(this.defaultAttributes);
+        sb.append(", default-values=");
+        sb.append(this.defaults);
         sb.append(", processors=");
         boolean first = true;
         for (FormatStep d : this.steps) {

@@ -78,10 +78,9 @@ public class TimePropertiesTest {
     }
 
     @Test
-    public void getChronology() {
-        PlainTime any = PlainTime.of(10, 1);
+    public void axis() {
         assertThat(
-            (any.getChronology() == Chronology.lookup(PlainTime.class)),
+            (PlainTime.axis() == Chronology.lookup(PlainTime.class)),
             is(true));
     }
 
@@ -102,7 +101,7 @@ public class TimePropertiesTest {
     @Test
     public void getBaseUnitWallTime() {
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(WALL_TIME),
+            PlainTime.axis().getBaseUnit(WALL_TIME),
             is(nullValue()));
     }
 
@@ -182,7 +181,7 @@ public class TimePropertiesTest {
     @Test
     public void getBaseUnitPrecision() {
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(PRECISION),
+            PlainTime.axis().getBaseUnit(PRECISION),
             is(nullValue()));
     }
 
@@ -289,7 +288,7 @@ public class TimePropertiesTest {
     @Test
     public void getBaseUnitAmPm() {
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(AM_PM_OF_DAY),
+            PlainTime.axis().getBaseUnit(AM_PM_OF_DAY),
             is(nullValue()));
     }
 
@@ -368,7 +367,7 @@ public class TimePropertiesTest {
     public void getBaseUnitDigitalHourOfDay() {
         IsoTimeUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(DIGITAL_HOUR_OF_DAY),
+            PlainTime.axis().getBaseUnit(DIGITAL_HOUR_OF_DAY),
             is(unit));
     }
 
@@ -464,7 +463,7 @@ public class TimePropertiesTest {
     public void getBaseUnitDigitalHourOfAmPm() {
         IsoTimeUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
+            PlainTime.axis().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
             is(unit));
     }
 
@@ -563,7 +562,7 @@ public class TimePropertiesTest {
     public void getBaseUnitClockHourOfDay() {
         IsoTimeUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(CLOCK_HOUR_OF_DAY),
+            PlainTime.axis().getBaseUnit(CLOCK_HOUR_OF_DAY),
             is(unit));
     }
 
@@ -659,7 +658,7 @@ public class TimePropertiesTest {
     public void getBaseUnitClockHourOfAmPm() {
         IsoTimeUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(CLOCK_HOUR_OF_AMPM),
+            PlainTime.axis().getBaseUnit(CLOCK_HOUR_OF_AMPM),
             is(unit));
     }
 
@@ -761,7 +760,7 @@ public class TimePropertiesTest {
     public void getBaseUnitIsoHour() {
         IsoTimeUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(ISO_HOUR),
+            PlainTime.axis().getBaseUnit(ISO_HOUR),
             is(unit));
     }
 
@@ -874,7 +873,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMinuteOfHour() {
         IsoTimeUnit unit = ClockUnit.MINUTES;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MINUTE_OF_HOUR),
+            PlainTime.axis().getBaseUnit(MINUTE_OF_HOUR),
             is(unit));
     }
 
@@ -969,7 +968,7 @@ public class TimePropertiesTest {
     public void getBaseUnitSecondOfMinute() {
         IsoTimeUnit unit = ClockUnit.SECONDS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(SECOND_OF_MINUTE),
+            PlainTime.axis().getBaseUnit(SECOND_OF_MINUTE),
             is(unit));
     }
 
@@ -1070,7 +1069,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMinuteOfDay() {
         IsoTimeUnit unit = ClockUnit.MINUTES;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MINUTE_OF_DAY),
+            PlainTime.axis().getBaseUnit(MINUTE_OF_DAY),
             is(unit));
     }
 
@@ -1172,7 +1171,7 @@ public class TimePropertiesTest {
     public void getBaseUnitSecondOfDay() {
         IsoTimeUnit unit = ClockUnit.SECONDS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(SECOND_OF_DAY),
+            PlainTime.axis().getBaseUnit(SECOND_OF_DAY),
             is(unit));
     }
 
@@ -1265,7 +1264,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMilliOfSecond() {
         IsoTimeUnit unit = ClockUnit.MILLIS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MILLI_OF_SECOND),
+            PlainTime.axis().getBaseUnit(MILLI_OF_SECOND),
             is(unit));
     }
 
@@ -1366,7 +1365,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMilliOfDay() {
         IsoTimeUnit unit = ClockUnit.MILLIS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MILLI_OF_DAY),
+            PlainTime.axis().getBaseUnit(MILLI_OF_DAY),
             is(unit));
     }
 
@@ -1463,7 +1462,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMicroOfSecond() {
         IsoTimeUnit unit = ClockUnit.MICROS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MICRO_OF_SECOND),
+            PlainTime.axis().getBaseUnit(MICRO_OF_SECOND),
             is(unit));
     }
 
@@ -1564,7 +1563,7 @@ public class TimePropertiesTest {
     public void getBaseUnitMicroOfDay() {
         IsoTimeUnit unit = ClockUnit.MICROS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(MICRO_OF_DAY),
+            PlainTime.axis().getBaseUnit(MICRO_OF_DAY),
             is(unit));
     }
 
@@ -1668,7 +1667,7 @@ public class TimePropertiesTest {
     public void getBaseUnitNanoOfSecond() {
         IsoTimeUnit unit = ClockUnit.NANOS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(NANO_OF_SECOND),
+            PlainTime.axis().getBaseUnit(NANO_OF_SECOND),
             is(unit));
     }
 
@@ -1769,7 +1768,7 @@ public class TimePropertiesTest {
     public void getBaseUnitNanoOfDay() {
         IsoTimeUnit unit = ClockUnit.NANOS;
         assertThat(
-            PlainTime.MAX.getChronology().getBaseUnit(NANO_OF_DAY),
+            PlainTime.axis().getBaseUnit(NANO_OF_DAY),
             is(unit));
     }
 

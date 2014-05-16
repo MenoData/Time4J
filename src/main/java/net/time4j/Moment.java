@@ -88,12 +88,12 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * <p>Registriert sind alle Elemente, die in den lokalen Klassen
  * {@code PlainDate} und {@code PlainTime} registriert sind (mit Ausnahme
- * der Dezimalelemente), au&szlig;erdem werden alle Elemente von
- * {@link Weekmodel} mit unterst&uuml;tzt. Die Elemente erlauben den
+ * der Dezimalelemente und {@code PRECISION}), au&szlig;erdem werden alle
+ * Elemente von {@link Weekmodel} unterst&uuml;tzt. Die Elemente erlauben den
  * Zugriff bezogen auf die Zeitzone UTC. Wird zum Beispiel ein {@code Moment}
- * nach seiner aktuellen Uhrzeit gefragt, dann wird die Uhrzeit in der
+ * nach seiner aktuellen Stunde gefragt, dann wird die Stunde in der
  * UTC-Zeitzone zur&uuml;ckgegeben. Das steht im Kontrast zu den JDK-Klassen
- * {@code java.util.Date} (Zugriff auf die lokale Standard-Zeitzone) und
+ * {@code java.util.Date} (Zugriff auf die lokale Zeitzone) und
  * {@code java.time.Instant} (kein Element- bzw. Feldzugriff m&ouml;glich).
  * Ein {@code Moment} bietet also eine duale Sicht sowohl auf einen
  * maschinellen Z&auml;hler als auch auf ein Tupel von Datums- und Zeitwerten,
@@ -204,14 +204,20 @@ public final class Moment
             Chronology.lookup(PlainDate.class).getRegisteredElements();
 
         for (ChronoElement<?> element : dateElements) {
-            doAppend(builder, element);
+            if (!element.name().equals("CALENDAR_DATE")) {
+                doAppend(builder, element);
+            }
         }
 
         Set<ChronoElement<?>> timeElements =
             Chronology.lookup(PlainTime.class).getRegisteredElements();
 
         for (ChronoElement<?> element : timeElements) {
-            if (!element.name().startsWith("DECIMAL")) {
+            if (
+                !element.name().startsWith("DECIMAL")
+                && !element.name().equals("PRECISION")
+                && !element.name().equals("WALL_TIME")
+            ) {
                 doAppend(builder, element);
             }
         }
@@ -1641,6 +1647,9 @@ public final class Moment
                 return context.getDateUTC().isValid(this.element, value);
             } else if (this.element.isTimeElement()) {
                 if (Number.class.isAssignableFrom(this.element.getType())) {
+                    if (value == null) {
+                        return false;
+                    }
                     long min =
                         Number.class.cast(this.getMinimum(context)).longValue();
                     long max =
@@ -1666,8 +1675,12 @@ public final class Moment
 
             assert (lenient == false);
 
-            if (!this.isValid(context, value)) {
-                throw new IllegalArgumentException("Out of range: " + value);
+            if (value == null) {
+                throw new NullPointerException("Missing value.");
+            } else if (!this.isValid(context, value)) {
+                throw new IllegalArgumentException(
+                    value + " invalid on [" + this.element.name()
+                    + "] in context: " + context);
             }
 
             if (

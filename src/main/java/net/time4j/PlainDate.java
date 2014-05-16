@@ -78,7 +78,6 @@ import java.util.Set;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
- *  <li>{@link #CALENDAR_DATE}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_QUARTER}</li>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -157,8 +156,7 @@ public final class PlainDate
      * <p>Element mit dem Datum im Wertebereich {@code [-999999999-01-01]}
      * bis {@code [+999999999-12-31]}. </p>
      */
-    public static final ChronoElement<PlainDate> CALENDAR_DATE =
-        DateElement.INSTANCE;
+    static final ChronoElement<PlainDate> CALENDAR_DATE = DateElement.INSTANCE;
 
     /**
      * <p>Element mit dem proleptischen ISO-Jahr ohne &Auml;ra-Bezug mit dem
