@@ -193,7 +193,7 @@ public class OffsetTest {
     @Test
     public void ofHours() {
         ZonalOffset offset =
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 5);
+            ZonalOffset.ofHours(ZonalOffset.Sign.BEHIND_UTC, 5);
         assertThat(
             offset.getAbsoluteHours(),
             is(5));
@@ -211,7 +211,7 @@ public class OffsetTest {
     @Test
     public void ofHoursMinutes() {
         ZonalOffset offset =
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 5, 30);
+            ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.BEHIND_UTC, 5, 30);
         assertThat(
             offset.getAbsoluteHours(),
             is(5));
@@ -226,40 +226,22 @@ public class OffsetTest {
             is(ZonalOffset.Sign.BEHIND_UTC));
     }
 
-    @Test
-    public void ofHoursMinutesSeconds() {
-        ZonalOffset offset =
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 5, 30, 45);
-        assertThat(
-            offset.getAbsoluteHours(),
-            is(5));
-        assertThat(
-            offset.getAbsoluteMinutes(),
-            is(30));
-        assertThat(
-            offset.getAbsoluteSeconds(),
-            is(45));
-        assertThat(
-            offset.getSign(),
-            is(ZonalOffset.Sign.BEHIND_UTC));
-    }
-
     @Test(expected=IllegalArgumentException.class)
     public void ofHoursMinutesWithDifferentSigns() {
-        ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, -9, 15);
+        ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.BEHIND_UTC, -9, 15);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void ofHoursMinutesOutOfRange() {
-        ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 18, 1);
+        ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.BEHIND_UTC, 18, 1);
     }
 
     @Test
     public void compareTo() {
         ZonalOffset offset1 =
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 4);
+            ZonalOffset.ofHours(ZonalOffset.Sign.BEHIND_UTC, 4);
         ZonalOffset offset2 =
-            ZonalOffset.of(ZonalOffset.Sign.AHEAD_OF_UTC, 3);
+            ZonalOffset.ofHours(ZonalOffset.Sign.AHEAD_OF_UTC, 3);
         assertThat(
             offset1.compareTo(offset2) < 0,
             is(true));
@@ -274,11 +256,11 @@ public class OffsetTest {
             ZonalOffset.ofTotalSeconds(0).canonical(),
             is("Z"));
         assertThat(
-            ZonalOffset.of(ZonalOffset.Sign.AHEAD_OF_UTC, 2, 15).canonical(),
+            ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.AHEAD_OF_UTC, 2, 15).canonical(),
             is("UTC+02:15"));
         assertThat(
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 5, 30, 45).canonical(),
-            is("UTC-05:30:45"));
+            ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.BEHIND_UTC, 5, 30).canonical(),
+            is("UTC-05:30"));
         assertThat(
             ZonalOffset.ofTotalSeconds(3600, 500000000).canonical(),
             is("UTC+01:00:00.500000000"));
@@ -290,11 +272,11 @@ public class OffsetTest {
             ZonalOffset.UTC.toString(),
             is("+00:00"));
         assertThat(
-            ZonalOffset.of(ZonalOffset.Sign.AHEAD_OF_UTC, 2, 15).toString(),
+            ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.AHEAD_OF_UTC, 2, 15).toString(),
             is("+02:15"));
         assertThat(
-            ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 5, 30, 45).toString(),
-            is("-05:30:45"));
+            ZonalOffset.ofHoursMinutes(ZonalOffset.Sign.BEHIND_UTC, 5, 30).toString(),
+            is("-05:30"));
         assertThat(
             ZonalOffset.ofTotalSeconds(3600, 500000000).toString(),
             is("+01:00:00.500000000"));

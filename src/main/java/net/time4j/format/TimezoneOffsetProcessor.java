@@ -315,7 +315,7 @@ final class TimezoneOffsetProcessor
             if (this.precision == DisplayMode.SHORT) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
-                    ZonalOffset.of(sign, hours));
+                    ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
                 status.setError(
@@ -335,7 +335,7 @@ final class TimezoneOffsetProcessor
             } else if (this.precision == DisplayMode.SHORT) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
-                    ZonalOffset.of(sign, hours));
+                    ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
                 return;
             } else if (leniency.isStrict()) {
@@ -353,7 +353,7 @@ final class TimezoneOffsetProcessor
             ) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
-                    ZonalOffset.of(sign, hours));
+                    ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
                 status.setError(
@@ -422,8 +422,11 @@ final class TimezoneOffsetProcessor
 
         ZonalOffset offset;
 
-        if (fraction == 0) {
-            offset = ZonalOffset.of(sign, hours, minutes, seconds);
+        if (
+            (seconds == 0)
+            && (fraction == 0)
+        ) {
+            offset = ZonalOffset.ofHoursMinutes(sign, hours, minutes);
         } else {
             int total = hours * 3600 + minutes * 60 + seconds;
 

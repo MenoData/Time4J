@@ -248,7 +248,7 @@ final class LocalizedGMTProcessor
             if (this.abbreviated) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
-                    ZonalOffset.of(sign, hours));
+                    ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
                 status.setError(
@@ -270,7 +270,7 @@ final class LocalizedGMTProcessor
         } else if (this.abbreviated) {
             parsedResult.put(
                 ZonalElement.TIMEZONE_ID,
-                ZonalOffset.of(sign, hours));
+                ZonalOffset.ofHours(sign, hours));
             status.setPosition(pos);
             return;
         } else if (leniency.isStrict()) {
@@ -289,7 +289,7 @@ final class LocalizedGMTProcessor
         }
 
         pos += 2;
-        ZonalOffset offset = ZonalOffset.of(sign, hours, minutes);
+        ZonalOffset offset = ZonalOffset.ofHoursMinutes(sign, hours, minutes);
         parsedResult.put(ZonalElement.TIMEZONE_ID, offset);
         status.setPosition(pos);
 

@@ -80,7 +80,7 @@ enum ZonalElement
     @Override
     public TZID getDefaultMinimum() {
 
-        return ZonalOffset.of(ZonalOffset.Sign.BEHIND_UTC, 14);
+        return ZonalOffset.ofHours(ZonalOffset.Sign.BEHIND_UTC, 14);
 
     }
 
@@ -92,7 +92,7 @@ enum ZonalElement
     @Override
     public TZID getDefaultMaximum() {
 
-        return ZonalOffset.of(ZonalOffset.Sign.AHEAD_OF_UTC, 14);
+        return ZonalOffset.ofHours(ZonalOffset.Sign.AHEAD_OF_UTC, 14);
 
     }
 

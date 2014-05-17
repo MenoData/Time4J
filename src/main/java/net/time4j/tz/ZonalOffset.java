@@ -310,20 +310,20 @@ public final class ZonalOffset
      * <p>Statische Fabrikmethode f&uuml;r eine Zeitverschiebung, die den
      * angegebenen vollen Stundenanteil hat. </p>
      *
-     * <p>Entspricht {@code of(sign, hours, 0, 0}. </p>
+     * <p>Entspricht {@code ofHoursMinutes(sign, hours, 0}. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
      * @param   hours       hour part ({@code 0 <= hours <= 18})
      * @return  zonal offset in hour precision
      * @throws  IllegalArgumentException if range check fails
-     * @see     #of(Sign, int, int, int)
+     * @see     #ofHoursMinutes(Sign, int, int)
      */
-    public static ZonalOffset of(
+    public static ZonalOffset ofHours(
         Sign sign,
         int hours
     ) {
 
-        return of(sign, hours, 0, 0);
+        return ofHoursMinutes(sign, hours, 0);
 
     }
 
@@ -338,53 +338,20 @@ public final class ZonalOffset
      * Bereich {@code -18:00 <= [total-offset] <= +18:00}. Bei der Berechnung
      * der gesamten Verschiebung wird das Vorzeichen nicht nur auf den Stunden-,
      * sondern auch auf den Minutenteil mit &uuml;bertragen. Beispiel: Der
-     * Ausdruck {@code ZonalOffset.of(BEHIND_UTC, 4, 30)} hat die
+     * Ausdruck {@code ZonalOffset.ofHoursMinutes(BEHIND_UTC, 4, 30)} hat die
      * String-Darstellung {@code -04:30} und eine Gesamtverschiebung in
      * Sekunden von {@code -(4 * 3600 + 30 * 60) = 16200}. </p>
      *
-     * @param   sign        sign of shift relative to zero meridian
+     * @param   sign        sign ofHoursMinutes shift relative to zero meridian
      * @param   hours       hour part ({@code 0 <= hours <= 18})
      * @param   minutes     minute part ({@code 0 <= minutes <= 59})
      * @return  zonal offset in minute precision
      * @throws  IllegalArgumentException if range check fails
-     * @see     #of(Sign, int, int, int)
      */
-    public static ZonalOffset of(
+    public static ZonalOffset ofHoursMinutes(
         Sign sign,
         int hours,
         int minutes
-    ) {
-
-        return of(sign, hours, minutes, 0);
-
-    }
-
-    /**
-     * <p>Statische Fabrikmethode f&uuml;r eine Verschiebung, die die
-     * angegebenen Zeitanteile hat. </p>
-     *
-     * <p>Die angegebenen Zahlenwerte entsprechen exakt den numerischen
-     * Bestandteilen der kanonischen Darstellung &#x00B1;hh:mm:ss&quot;.
-     * Nur Werte im Bereich {@code -18:00:00 <= [total-offset] <= +18:00:00}
-     * sind erlaubt. Bei der Berechnung der gesamten Verschiebung wird das
-     * Vorzeichen nicht nur auf den Stunden-, sondern auch auf den Minuten-
-     * und den Sekundenteil mit &uuml;bertragen. Beispiel: Der Ausdruck
-     * {@code ZonalOffset.of(BEHIND_UTC, 4, 30, 7)} hat die Darstellung
-     * {@code -04:30:07} und eine Gesamtverschiebung in Sekunden von
-     * {@code -(4 * 3600 + 30 * 60 + 7) = 16207}. </p>
-     *
-     * @param   sign        sign of shift relative to zero meridian
-     * @param   hours       hour part ({@code 0 <= hours <= 18})
-     * @param   minutes     minute part ({@code 0 <= minutes <= 59})
-     * @param   seconds     second part ({@code 0 <= seconds <= 59})
-     * @return  zonal offset in second precision
-     * @throws  IllegalArgumentException if range check fails
-     */
-    public static ZonalOffset of(
-        Sign sign,
-        int hours,
-        int minutes,
-        int seconds
     ) {
 
         if (sign == null) {
@@ -392,26 +359,22 @@ public final class ZonalOffset
         } else if ((hours < 0) || (hours > 18)) {
             throw new IllegalArgumentException(
                 "Hour part out of range (0 <= hours <= 18) in: "
-                + format(hours, minutes, seconds));
+                + format(hours, minutes));
         } else if ((minutes < 0) || (minutes > 59)) {
             throw new IllegalArgumentException(
                 "Minute part out of range (0 <= minutes <= 59) in: "
-                + format(hours, minutes, seconds));
-        } else if ((seconds < 0) || (seconds > 59)) {
-            throw new IllegalArgumentException(
-                "Second part out of range (0 <= seconds <= 59) in: "
-                + format(hours, minutes, seconds));
+                + format(hours, minutes));
         } else if (
             (hours == 18)
-            && ((minutes != 0) || (seconds != 0))
+            && (minutes != 0)
         ) {
             throw new IllegalArgumentException(
                 "Time zone offset out of range "
                 + "(-18:00:00 <= offset <= 18:00:00) in: "
-                + format(hours, minutes, seconds));
+                + format(hours, minutes));
         }
 
-        int total = hours * 3600 + minutes * 60 + seconds;
+        int total = hours * 3600 + minutes * 60;
 
         if (sign == Sign.BEHIND_UTC) {
             total = -total;
@@ -661,8 +624,7 @@ public final class ZonalOffset
 
     private static String format(
         int hours,
-        int minutes,
-        int seconds
+        int minutes
     ) {
 
         StringBuilder sb = new StringBuilder();
@@ -670,8 +632,6 @@ public final class ZonalOffset
         sb.append(hours);
         sb.append(",minutes=");
         sb.append(minutes);
-        sb.append(",seconds=");
-        sb.append(seconds);
         sb.append(']');
         return sb.toString();
 

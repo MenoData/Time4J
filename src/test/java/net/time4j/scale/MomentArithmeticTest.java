@@ -32,7 +32,7 @@ public class MomentArithmeticTest {
             utc,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).atOffset(ZonalOffset.of(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0).atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
         long t1 =
             PlainDate.of(2014, Month.MARCH, 30).atStartOfDay(timezone)
                 .getPosixTime();
