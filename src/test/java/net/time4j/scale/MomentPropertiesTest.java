@@ -11,7 +11,6 @@ import net.time4j.Quarter;
 import net.time4j.SI;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.ZonalOffset;
@@ -59,38 +58,6 @@ public class MomentPropertiesTest {
         assertThat(
             this.utc.toString(),
             is("2012-06-30T23:59:60,123456789Z"));
-    }
-
-    @Test
-    public void containsCalendarDate() {
-        boolean found = false;
-        for (ChronoElement<?> e : Moment.axis().getRegisteredElements()) {
-            if (
-                e.isDateElement()
-                && PlainDate.axis().isRegistered(e)
-                && e.name().equals("CALENDAR_DATE")
-            ) {
-                found = true;
-                break;
-            }
-        }
-        assertThat(found, is(false));
-    }
-
-    @Test
-    public void containsWallTime() {
-        boolean found = false;
-        for (ChronoElement<?> e : Moment.axis().getRegisteredElements()) {
-            if (
-                e.isTimeElement()
-                && PlainTime.axis().isRegistered(e)
-                && e.name().equals("WALL_TIME")
-            ) {
-                found = true;
-                break;
-            }
-        }
-        assertThat(found, is(false));
     }
 
     @Test
@@ -866,7 +833,7 @@ public class MomentPropertiesTest {
             this.utc.with(CLOCK_HOUR_OF_AMPM, 12),
             is(
                 PlainDate.of(2012, 6, 30)
-                .atTime(PlainTime.of(12, 59, 59, 123456789))
+                .at(PlainTime.of(12, 59, 59, 123456789))
                 .inTimezone(ZonalOffset.UTC)));
     }
 
@@ -1573,7 +1540,7 @@ public class MomentPropertiesTest {
             this.utc.with(YEAR, 2013),
             is(
                 PlainDate.of(2013, 6, 30)
-                .atTime(PlainTime.of(23, 59, 59, 123456789))
+                .at(PlainTime.of(23, 59, 59, 123456789))
                 .inTimezone(ZonalOffset.UTC)));
     }
 
@@ -1618,7 +1585,7 @@ public class MomentPropertiesTest {
             this.utc.with(YEAR_OF_WEEKDATE, 2013),
             is(
                 PlainDate.of(2013, 6, 29) // gleiche KW + gleicher Wochentag
-                .atTime(PlainTime.of(23, 59, 59, 123456789))
+                .at(PlainTime.of(23, 59, 59, 123456789))
                 .inTimezone(ZonalOffset.UTC)));
     }
 

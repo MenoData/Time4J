@@ -10,6 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         LeapSecondTest.class,
+        MomentArithmeticTest.class,
+        MomentCreationTest.class,
         MomentPropertiesTest.class,
         TimeScaleTest.class
     }

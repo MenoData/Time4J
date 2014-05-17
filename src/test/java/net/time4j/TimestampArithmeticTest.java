@@ -69,7 +69,7 @@ public class TimestampArithmeticTest {
             PlainTimestamp.of(2012, 1, 31, 12, 45).plus(36000001, MILLIS),
             is(
                 PlainDate.of(2012, 1, 31)
-                .atTime(PlainTime.of(22, 45, 0, 1000000))));
+                .at(PlainTime.of(22, 45, 0, 1000000))));
     }
 
     @Test

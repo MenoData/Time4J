@@ -690,11 +690,11 @@ public final class PlainDate
      * am Beginn des Tages. </p>
      *
      * @return  local timestamp as composition of this date and midnight
-     * @see     #atTime(PlainTime)
+     * @see     #at(PlainTime)
      */
     public PlainTimestamp atStartOfDay() {
 
-        return this.atTime(PlainTime.MIN);
+        return this.at(PlainTime.MIN);
 
     }
 
@@ -705,7 +705,7 @@ public final class PlainDate
      * @param   tzid        timezone id
      * @return  global timestamp based on composition of this date and earliest
      *          wall time in given timezone
-     * @see     #atTime(PlainTime)
+     * @see     #at(PlainTime)
      */
     public Moment atStartOfDay(TZID tzid) {
 
@@ -725,14 +725,14 @@ public final class PlainDate
      * @param   time    wall time
      * @return  local timestamp as composition of this date and given time
      */
-    public PlainTimestamp atTime(PlainTime time) {
+    public PlainTimestamp at(PlainTime time) {
 
         return PlainTimestamp.of(this, time);
 
     }
 
     /**
-     * <p>Entspricht {@code atTime(PlainTime.of(hour, minute))}. </p>
+     * <p>Entspricht {@code at(PlainTime.of(hour, minute))}. </p>
      *
      * @param   hour        hour of day in range (0-24)
      * @param   minute      minute of hour in range (0-59)
@@ -744,12 +744,12 @@ public final class PlainDate
         int minute
     ) {
 
-        return this.atTime(PlainTime.of(hour, minute));
+        return this.at(PlainTime.of(hour, minute));
 
     }
 
     /**
-     * <p>Entspricht {@code atTime(PlainTime.of(hour, minute, second))}. </p>
+     * <p>Entspricht {@code at(PlainTime.of(hour, minute, second))}. </p>
      *
      * @param   hour        hour of day in range (0-24)
      * @param   minute      minute of hour in range (0-59)
@@ -763,7 +763,7 @@ public final class PlainDate
         int second
     ) {
 
-        return this.atTime(PlainTime.of(hour, minute, second));
+        return this.at(PlainTime.of(hour, minute, second));
 
     }
 

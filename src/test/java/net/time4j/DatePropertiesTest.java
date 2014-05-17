@@ -19,6 +19,22 @@ import static org.junit.Assert.assertThat;
 public class DatePropertiesTest {
 
     @Test
+    public void registrationOfCalendarDate() {
+        assertThat(
+            Moment.axis().isRegistered(CALENDAR_DATE),
+            is(false));
+        assertThat(
+            PlainTime.axis().isRegistered(CALENDAR_DATE),
+            is(false));
+        assertThat(
+            PlainDate.axis().isRegistered(CALENDAR_DATE),
+            is(true));
+        assertThat(
+            PlainTimestamp.axis().isRegistered(CALENDAR_DATE),
+            is(true));
+    }
+
+    @Test
     public void lengthOfYear() {
         assertThat(PlainDate.of(2000, 1).lengthOfYear(), is(366));
         assertThat(PlainDate.of(2001, 1).lengthOfYear(), is(365));

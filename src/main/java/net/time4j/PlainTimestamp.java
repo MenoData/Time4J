@@ -459,6 +459,30 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * <p>Passt die Datumskomponente an. </p>
+     *
+     * @param   date    new calendar date component
+     * @return  changed copy of this timestamp
+     */
+    public PlainTimestamp with(PlainDate date) {
+
+        return this.with(CALENDAR_DATE, date);
+
+    }
+
+    /**
+     * <p>Passt die Uhrzeitkomponente an. </p>
+     *
+     * @param   time    new wall time component
+     * @return  changed copy of this timestamp
+     */
+    public PlainTimestamp with(PlainTime time) {
+
+        return this.with(WALL_TIME, time);
+
+    }
+
     @Override
     public boolean isBefore(PlainTimestamp timestamp) {
 
@@ -584,7 +608,7 @@ public final class PlainTimestamp
 
     /**
      * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen Offset
-     * zu einem UTC-Zeitstempel. </p>
+     * zu einem globalen Zeitstempel. </p>
      *
      * @param   offset      fixed timezone offset
      * @return  global timestamp  based on this local timestamp interpreted
@@ -593,6 +617,19 @@ public final class PlainTimestamp
     public Moment atOffset(ZonalOffset offset) {
 
         return this.inTimezone(Timezone.of(offset));
+
+    }
+
+    /**
+     * <p>Kombiniert diesen lokalen Zeitstempel mit der UTC-Zeitzone zu
+     * einem globalen Zeitstempel. </p>
+     *
+     * @return  global timestamp  based on this local timestamp interpreted
+     *          at offset UTC+00:00
+     */
+    public Moment atUTC() {
+
+        return this.atOffset(ZonalOffset.UTC);
 
     }
 

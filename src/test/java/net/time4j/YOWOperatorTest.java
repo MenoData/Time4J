@@ -131,7 +131,7 @@ public class YOWOperatorTest {
         PlainTimestamp expected =
             PlainDate
                 .of(2004, 53, Weekday.SUNDAY)
-                .atTime(PlainTime.of(23, 59, 59, 999999999));
+                .at(PlainTime.of(23, 59, 59, 999999999));
         assertThat(
             ts.with(YEAR_OF_WEEKDATE.atCeiling()),
             is(expected));

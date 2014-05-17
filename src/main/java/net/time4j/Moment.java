@@ -833,7 +833,7 @@ public final class Moment
      * <pre>
      *  Moment moment =
      *      PlainDate.of(2012, Month.JUNE, 30)
-     *      .atTime(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
+     *      .at(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
      *      .inTimezone(ZonalOffset.UTC, TransitionStrategy.STRICT)
      *      .plus(1, SI.SECONDS); // move to leap second
      *

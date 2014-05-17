@@ -19,6 +19,22 @@ import static org.junit.Assert.assertThat;
 public class TimePropertiesTest {
 
     @Test
+    public void registrationOfWallTime() {
+        assertThat(
+            Moment.axis().isRegistered(WALL_TIME),
+            is(false));
+        assertThat(
+            PlainDate.axis().isRegistered(WALL_TIME),
+            is(false));
+        assertThat(
+            PlainTime.axis().isRegistered(WALL_TIME),
+            is(true));
+        assertThat(
+            PlainTimestamp.axis().isRegistered(WALL_TIME),
+            is(true));
+    }
+
+    @Test
     public void midnightAtStartOfDay() {
         PlainTime start = PlainTime.midnightAtStartOfDay();
         assertThat(start.getHour(), is(0));
