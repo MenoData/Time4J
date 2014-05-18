@@ -32,7 +32,6 @@ import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.tz.TZID;
-import net.time4j.tz.ZonalOffset;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -930,20 +929,6 @@ public final class Duration<U extends IsoUnit>
 
     /**
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
-     * der UTC-Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
-     * wird. </p>
-     *
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #laterAtUTC()
-     */
-    public ChronoOperator<Moment> earlierAtUTC() {
-
-        return this.earlier(ZonalOffset.UTC);
-
-    }
-
-    /**
-     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
      * der angegebenen Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
      * wird. </p>
      *
@@ -961,20 +946,6 @@ public final class Duration<U extends IsoUnit>
                 return ts.inTimezone(timezone);
             }
         };
-
-    }
-
-    /**
-     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
-     * der UTC-Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
-     * wird. </p>
-     *
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlierAtUTC()
-     */
-    public ChronoOperator<Moment> laterAtUTC() {
-
-        return this.later(ZonalOffset.UTC);
 
     }
 

@@ -24,8 +24,6 @@ package net.time4j;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.TimePoint;
 
-import java.util.concurrent.TimeUnit;
-
 
 /**
  * <p>Repr&auml;sentiert die meistgebr&auml;chlichen Zeiteinheiten einer
@@ -186,58 +184,6 @@ public enum ClockUnit
             );
         } else {
             return (sourceDuration / FACTORS[o2 - o1]);
-        }
-
-    }
-
-    /**
-     * <p>Konvertiert die angegebene Zeitdauer in einen Betrag gez&auml;hlt
-     * in dieser Zeiteinheit. </p>
-     *
-     * <p>Konversionen von genaueren zu weniger genauen Zeiteinheiten
-     * f&uuml;hren im allgemeinen zu Verlusten an Information. Zum Beispiel
-     * wird die Konversion von <tt>999</tt> Millisekunden <tt>0</tt> Sekunden
-     * ergeben. Umgekehrt kann die Konversion von groben zu feinen Einheiten
-     * zu einem &Uuml;berlauf f&uuml;hren. </p>
-     *
-     * <p>Beispiel: Um 44 Sekunden zu Millisekunden zu konvertieren, wird der
-     * Ausdruck {@code ClockUnit.MILLIS.convert(44L, TimeUnit.SECONDS)}
-     * angewandt. <strong>WARNUNG:</strong> Sind auch Minuten, Stunden und Tage
-     * zu konvertieren, dann werden weder Zeitzoneneffekte (Sommer- oder
-     * Winterzeitumstellungen mit ge&auml;nderter Tagesl&auml;nge) noch
-     * UTC-Schaltsekunden ber&uuml;cksichtigt, d.h., eine Minute hat hier
-     * immer genau 60 Sekunden, ein Tag immer genau 24 Stunden. </p>
-     *
-     * @param   sourceDuration  amount of duration to be converted
-     * @param   sourceUnit      time unit of duration to be converted
-     * @return  converted duration expressed in this unit
-     * @throws  ArithmeticException in case of long overflow
-     */
-    public long convert(
-        long sourceDuration,
-        TimeUnit sourceUnit
-    ) {
-
-        switch (sourceUnit) {
-            case DAYS:
-                return this.convert(
-                    MathUtils.safeMultiply(sourceDuration, 24),
-                    ClockUnit.HOURS
-                );
-            case HOURS:
-                return this.convert(sourceDuration, ClockUnit.HOURS);
-            case MINUTES:
-                return this.convert(sourceDuration, ClockUnit.MINUTES);
-            case SECONDS:
-                return this.convert(sourceDuration, ClockUnit.SECONDS);
-            case MILLISECONDS:
-                return this.convert(sourceDuration, ClockUnit.MILLIS);
-            case MICROSECONDS:
-                return this.convert(sourceDuration, ClockUnit.MICROS);
-            case NANOSECONDS:
-                return this.convert(sourceDuration, ClockUnit.NANOS);
-            default:
-                throw new UnsupportedOperationException(sourceUnit.name());
         }
 
     }

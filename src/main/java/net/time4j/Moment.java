@@ -68,6 +68,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static net.time4j.PlainTime.*;
 import static net.time4j.SI.NANOSECONDS;
@@ -86,23 +87,67 @@ import static net.time4j.scale.TimeScale.UTC;
  * Klasse speichert im Gegensatz zum JDK die Epochenzeit nicht in Milli-,
  * sondern in Nanosekunden auf 96-Bit-Basis. </p>
  *
- * <p>Registriert sind alle Elemente, die in den lokalen Klassen
- * {@code PlainDate} und {@code PlainTime} registriert sind (mit Ausnahme
- * der Dezimalelemente und {@code PRECISION}), au&szlig;erdem werden alle
- * Elemente von {@link Weekmodel} unterst&uuml;tzt. Die Elemente erlauben den
- * Zugriff bezogen auf die Zeitzone UTC. Wird zum Beispiel ein {@code Moment}
- * nach seiner aktuellen Stunde gefragt, dann wird die Stunde in der
- * UTC-Zeitzone zur&uuml;ckgegeben. Das steht im Kontrast zu den JDK-Klassen
- * {@code java.util.Date} (Zugriff auf die lokale Zeitzone) und
- * {@code java.time.Instant} (kein Element- bzw. Feldzugriff m&ouml;glich).
- * Ein {@code Moment} bietet also eine duale Sicht sowohl auf einen
- * maschinellen Z&auml;hler als auch auf ein Tupel von Datums- und Zeitwerten,
- * immer in der Zeitzone UTC. </p>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente mit
+ * Zugriff in der UTC-Zeitzone: </p>
+ *
+ * <ul>
+ *  <li>{@link PlainDate#YEAR}</li>
+ *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
+ *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_AS_NUMBER}</li>
+ *  <li>{@link PlainDate#DAY_OF_MONTH}</li>
+ *  <li>{@link PlainDate#DAY_OF_QUARTER}</li>
+ *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
+ *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
+ *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#ISO_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
+ *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
+ *  <li>{@link PlainTime#SECOND_OF_DAY}</li>
+ *  <li>{@link PlainTime#MILLI_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MICRO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#NANO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
+ *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
+ *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ * </ul>
+ *
+ * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}
+ * nutzbar. Die Elemente erlauben den Zugriff bezogen auf die Zeitzone UTC.
+ * Wird zum Beispiel ein {@code Moment} nach seiner aktuellen Stunde gefragt,
+ * dann wird die Stunde in der UTC-Zeitzone zur&uuml;ckgegeben. Das steht im
+ * Kontrast zu den JDK-Klassen {@code java.util.Date} (Zugriff auf die lokale
+ * Zeitzone) und {@code java.time.Instant} (kein Element- bzw. Feldzugriff
+ * m&ouml;glich). Ein {@code Moment} bietet also eine duale Sicht sowohl auf
+ * einen maschinellen Z&auml;hler als auch auf ein Tupel von Datums- und
+ * Zeitwerten, immer in der Zeitzone UTC. </p>
  *
  * <p>Ein {@code Moment} kann die Datums- und Zeitwerte auch in einer anderen
  * Zeitzone liefern, wenn die Methode {@link #inTimezone(TZID)} aufgerufen
  * wird. Falls &uuml;ber die Elemente zonale Operatoren zur Verf&uuml;gung
  * stehen, sind auch Manipulationen in beliebigen Zeitzonen m&ouml;glich. </p>
+ *
+ * <h3>Zeitarithmetik</h3>
+ *
+ * <p>Als Zeiteinheiten kommen vor allem {@link SI} (mit Z&auml;hlung
+ * von Schaltsekunden) und {@link TimeUnit} in Betracht. Letztere Einheit
+ * kann verwendet werden, wenn eine bessere Interoperabilit&auml;t mit
+ * externen APIs notwendig ist, die UTC-Schaltsekunden ignorieren. Beide
+ * Arten von Zeiteinheiten werden in den Methoden {@code plus(long, unit)},
+ * {@code minus(long, unit)} und {@code until(Moment, unit)} verwendet. </p>
+ *
+ * <p>Au&szlig;erdem gibt es die M&ouml;glichkeit, lokale Zeiteinheiten wie
+ * in {@code ClockUnit} definiert bezogen auf eine Zeitzone anzuwenden. Ein
+ * Einstiegspunkt daf&uuml;r ist mit den {@code Duration}-Methoden
+ * {@link Duration#earlier(TZID)} und {@link Duration#later(TZID)}
+ * vorhanden. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -580,6 +625,127 @@ public final class Moment
     public PlainTimestamp inTimezone(TZID tzid) {
 
         return this.inTimezone(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Addiert einen Betrag in der angegegebenen Zeiteinheit auf die
+     * POSIX-Zeit dieses Zeitstempels. </p>
+     *
+     * @param   amount  amount in units to be added
+     * @param   unit    time unit defined in posix time space
+     * @return  changed copy of this instance, not leapsecond-aware
+     */
+    public Moment plus(
+        long amount,
+        TimeUnit unit
+    ) {
+
+        if (unit.compareTo(TimeUnit.SECONDS) >= 0) {
+            long secs = MathUtils.safeMultiply(amount, unit.toSeconds(1));
+            return Moment.of(
+                MathUtils.safeAdd(this.getPosixTime(), secs),
+                this.getNanosecond(),
+                TimeScale.POSIX
+            );
+        } else { // MILLIS, MICROS, NANOS
+            long nanos = MathUtils.safeMultiply(amount, unit.toNanos(1));
+            long sum = MathUtils.safeAdd(this.getNanosecond(), nanos);
+            int nano = MathUtils.floorModulo(sum, MRD);
+            long second = MathUtils.floorDivide(sum, MRD);
+
+            return Moment.of(
+                MathUtils.safeAdd(this.getPosixTime(), second),
+                nano,
+                TimeScale.POSIX
+            );
+        }
+
+    }
+
+    /**
+     * <p>Subtrahiert einen Betrag in der angegegebenen Zeiteinheit von der
+     * POSIX-Zeit dieses Zeitstempels. </p>
+     *
+     * @param   amount  amount in units to be subtracted
+     * @param   unit    time unit defined in posix time space
+     * @return  changed copy of this instance, not leapsecond-aware
+     */
+    public Moment minus(
+        long amount,
+        TimeUnit unit
+    ) {
+
+        return this.plus(MathUtils.safeNegate(amount), unit);
+
+    }
+
+    /**
+     * <p>Bestimmt den zeitlichen Abstand zu einem Endzeitpunkt in der
+     * angegebenen Zeiteinheit auf der POSIX-Zeitskala. </p>
+     *
+     * @param   end     end time point
+     * @param   unit    time unit defined in posix time space
+     * @return  count of units between this instance and end time point,
+     *          not counting leapseconds
+     */
+    public long until(
+        Moment end,
+        TimeUnit unit
+    ) {
+
+        long delta = 0;
+
+        if (unit.compareTo(TimeUnit.SECONDS) >= 0) {
+            delta = (end.getPosixTime() - this.getPosixTime());
+            if (delta < 0) {
+                if (end.getNanosecond() > this.getNanosecond()) {
+                    delta++;
+                }
+            } else if (delta > 0) {
+                if (end.getNanosecond() < this.getNanosecond()) {
+                    delta--;
+                }
+            }
+        } else { // MILLIS, MICROS, NANOS
+            delta =
+                MathUtils.safeAdd(
+                    MathUtils.safeMultiply(
+                        MathUtils.safeSubtract(
+                            end.getPosixTime(),
+                            this.getPosixTime()
+                        ),
+                        MRD
+                    ),
+                    end.getNanosecond() - this.getNanosecond()
+                 );
+        }
+
+        switch (unit) {
+            case DAYS:
+                delta = delta / 86400;
+                break;
+            case HOURS:
+                delta = delta / 3600;
+                break;
+            case MINUTES:
+                delta = delta / 60;
+                break;
+            case SECONDS:
+                break;
+            case MILLISECONDS:
+                delta = delta / MIO;
+                break;
+            case MICROSECONDS:
+                delta = delta / 1000;
+                break;
+            case NANOSECONDS:
+                break;
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+        return delta;
 
     }
 
