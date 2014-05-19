@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OperatorSuite.class,
         FormatSuite.class,
         ScaleSuite.class,
+        SerializationTest.class,
         TemporalTypesTest.class,
         TimeSuite.class,
         ZoneSuite.class

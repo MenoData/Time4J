@@ -302,7 +302,7 @@ public final class Moment
             .build();
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3192884724477742274L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -318,53 +318,55 @@ public final class Moment
     ) {
         super();
 
-        LeapSeconds ls = LeapSeconds.getInstance();
-
         if (scale == POSIX) {
             this.posixTime = elapsedTime;
             this.fraction = nanosecond;
-        } else if (ls.isEnabled()) {
-            long utcTime;
+        } else {
+            LeapSeconds ls = LeapSeconds.getInstance();
 
-            if (scale == UTC) {
-                utcTime = elapsedTime;
-            } else if (scale == TAI) {
-                utcTime = MathUtils.safeSubtract(elapsedTime, 10);
+            if (ls.isEnabled()) {
+                long utcTime;
 
-                if (utcTime < 0) {
-                    throw new IllegalArgumentException(
-                        "TAI not supported before 1972-01-01: " + elapsedTime);
+                if (scale == UTC) {
+                    utcTime = elapsedTime;
+                } else if (scale == TAI) {
+                    utcTime = MathUtils.safeSubtract(elapsedTime, 10);
+
+                    if (utcTime < 0) {
+                        throw new IllegalArgumentException(
+                            "TAI not supported before 1972-01-01: " + elapsedTime);
+                    }
+                } else if (scale == GPS) {
+                    utcTime = MathUtils.safeAdd(elapsedTime, UTC_GPS_DELTA);
+
+                    if (utcTime < UTC_GPS_DELTA) {
+                        throw new IllegalArgumentException(
+                            "GPS not supported before 1980-01-06: " + elapsedTime);
+                    }
+                } else {
+                    throw new UnsupportedOperationException(
+                        "Not yet implemented: " + scale.name());
                 }
-            } else if (scale == GPS) {
-                utcTime = MathUtils.safeAdd(elapsedTime, UTC_GPS_DELTA);
 
-                if (utcTime < UTC_GPS_DELTA) {
-                    throw new IllegalArgumentException(
-                        "GPS not supported before 1980-01-06: " + elapsedTime);
+                long unix = ls.strip(utcTime);
+                long diff = (utcTime - ls.enhance(unix));
+                this.posixTime = unix;
+
+                if (
+                    (diff == 0)
+                    || (unix == MAX_LIMIT)
+                ) {
+                    this.fraction = nanosecond;
+                } else if (diff == 1) { // positive Schaltsekunde
+                    this.fraction = (nanosecond | POSITIVE_LEAP_MASK);
+                } else {
+                    throw new IllegalStateException(
+                        "Cannot handle leap shift of " + elapsedTime + ".");
                 }
-            } else {
-                throw new UnsupportedOperationException(
-                    "Not yet implemented: " + scale.name());
-            }
-
-            long unix = ls.strip(utcTime);
-            long diff = (utcTime - ls.enhance(unix));
-            this.posixTime = unix;
-
-            if (
-                (diff == 0)
-                || (unix == MAX_LIMIT)
-            ) {
-                this.fraction = nanosecond;
-            } else if (diff == 1) { // positive Schaltsekunde
-                this.fraction = (nanosecond | POSITIVE_LEAP_MASK);
             } else {
                 throw new IllegalStateException(
-                    "Cannot handle leap shift of " + elapsedTime + ".");
+                    "Leap seconds are not supported by configuration.");
             }
-        } else {
-            throw new IllegalStateException(
-                "Leap seconds are not supported by configuration.");
         }
 
         checkUnixTime(this.posixTime);
@@ -1269,14 +1271,14 @@ public final class Moment
      *      header |= 1;
      *  }
      *
-     *  int fraction = getFractionalPart();
+     *  int fraction = getNanosecond();
      *
      *  if (fraction > 0) {
      *      header |= 2;
      *  }
      *
      *  out.writeByte(header);
-     *  out.writeLong(get(IsoElement.UNIX_TIME));
+     *  out.writeLong(getPosixTime());
      *
      *  if (fraction > 0) {
      *      out.writeInt(fraction);

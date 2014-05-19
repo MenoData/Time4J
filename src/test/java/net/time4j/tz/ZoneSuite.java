@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        DatelineBorderTest.class,
         OffsetTest.class,
         PlatformTimezoneTest.class,
         TZIDTest.class
