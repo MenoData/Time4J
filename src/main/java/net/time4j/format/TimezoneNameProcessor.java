@@ -51,7 +51,9 @@ final class TimezoneNameProcessor
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ConcurrentMap<Locale, TZNames> CACHE =
+    private static final ConcurrentMap<Locale, TZNames> CACHE_ABBREVIATIONS =
+        new ConcurrentHashMap<Locale, TZNames>();
+    private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
     private static final int MAX = 10;
 
@@ -166,13 +168,16 @@ final class TimezoneNameProcessor
         Leniency leniency =
             step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
-        // Zeitzonennamen einlesen (nur Buchstaben)
+        // short evaluation
         StringBuilder name = new StringBuilder();
 
         while (pos < len) {
             char c = text.charAt(pos);
 
-            if (Character.isLetter(c)) {
+            if (
+                Character.isLetter(c)
+                || (!this.abbreviated && Character.isWhitespace(c))
+            ) {
                 name.append(c);
                 pos++;
             } else {
@@ -180,7 +185,7 @@ final class TimezoneNameProcessor
             }
         }
 
-        String key = name.toString().toUpperCase(locale);
+        String key = name.toString();
 
         // fallback-case (fixed offset)
         if (
@@ -192,15 +197,22 @@ final class TimezoneNameProcessor
         }
 
         // Zeitzonennamen im Cache suchen und ggf. Cache füllen
-        TZNames tzNames = CACHE.get(locale);
+        ConcurrentMap<Locale, TZNames> cache = (
+            this.abbreviated
+            ? CACHE_ABBREVIATIONS
+            : CACHE_ZONENAMES);
+
+        TZNames tzNames = cache.get(locale);
 
         if (tzNames == null) {
-            Map<String, List<TZID>> stdNames = this.getTZNames(locale, false);
-            Map<String, List<TZID>> dstNames = this.getTZNames(locale, true);
+            Map<String, List<TZID>> stdNames =
+                this.getTimezoneNameMap(locale, false);
+            Map<String, List<TZID>> dstNames =
+                this.getTimezoneNameMap(locale, true);
             tzNames = new TZNames(stdNames, dstNames);
 
-            if (CACHE.size() < MAX) {
-                TZNames tmp = CACHE.putIfAbsent(locale, tzNames);
+            if (cache.size() < MAX) {
+                TZNames tmp = cache.putIfAbsent(locale, tzNames);
 
                 if (tmp != null) {
                     tzNames = tmp;
@@ -210,16 +222,27 @@ final class TimezoneNameProcessor
 
         // Zeitzonen-IDs bestimmen
         boolean daylightSaving = false;
-        List<TZID> zones = null;
+        List<TZID> zones = tzNames.search(key, false);
 
-        if (tzNames.stdNames.containsKey(key)) {
-            zones = tzNames.stdNames.get(key);
-        } else if (tzNames.dstNames.containsKey(key)) {
-            daylightSaving = true;
-            zones = tzNames.dstNames.get(key);
+        if (zones.isEmpty()) {
+            zones = tzNames.search(key, true);
+            if (zones.isEmpty()) {
+                int[] lenbuf = new int[1];
+                lenbuf[0] = 0;
+                zones = tzNames.search(text, start, false, lenbuf);
+                if (zones.isEmpty()) {
+                    zones = tzNames.search(text, start, true, lenbuf);
+                    if (!zones.isEmpty()) {
+                        daylightSaving = true;
+                    }
+                }
+                pos = start + lenbuf[0];
+            } else {
+                daylightSaving = true;
+            }
         }
 
-        if ((zones == null) || zones.isEmpty()) {
+        if (zones.isEmpty()) {
             status.setError(
                 start,
                 "Unknown timezone name: " + key);
@@ -288,7 +311,7 @@ final class TimezoneNameProcessor
 
     }
 
-    private Map<String, List<TZID>> getTZNames(
+    private Map<String, List<TZID>> getTimezoneNameMap(
         Locale locale,
         boolean daylightSaving
     ) {
@@ -300,8 +323,7 @@ final class TimezoneNameProcessor
             Timezone zone = Timezone.of(tzid);
 
             String tzName =
-                zone.getDisplayName(daylightSaving, this.abbreviated, locale)
-                    .toUpperCase(locale);
+                zone.getDisplayName(daylightSaving, this.abbreviated, locale);
             zones = map.get(tzName);
 
             if (zones == null) {
@@ -335,6 +357,71 @@ final class TimezoneNameProcessor
 
             this.stdNames = stdNames;
             this.dstNames = dstNames;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        // quick search via hash-access
+        List<TZID> search(
+            String key,
+            boolean daylightSaving
+        ) {
+
+            Map<String, List<TZID>> names = (
+                daylightSaving
+                ? this.dstNames
+                : this.stdNames);
+
+            if (names.containsKey(key)) {
+                return names.get(key);
+            }
+
+            return Collections.emptyList();
+
+        }
+
+        // slow linear search
+        List<TZID> search(
+            CharSequence text,
+            int start,
+            boolean daylightSaving,
+            int[] lenbuf
+        ) {
+
+            Map<String, List<TZID>> names = (
+                daylightSaving
+                ? this.dstNames
+                : this.stdNames);
+
+            int len = text.length();
+
+            for (String name : names.keySet()) {
+                int pos = start;
+                boolean found = true;
+                int count = name.length();
+
+                while (pos < start + count) {
+                    if (pos >= len) {
+                        found = false;
+                        break;
+                    }
+
+                    if (name.charAt(pos - start) == text.charAt(pos)) {
+                        pos++;
+                    } else {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    lenbuf[0] = count;
+                    return names.get(name);
+                }
+            }
+
+            return Collections.emptyList();
 
         }
 

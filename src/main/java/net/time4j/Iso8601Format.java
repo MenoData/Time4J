@@ -24,10 +24,11 @@ package net.time4j;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.SignPolicy;
 
+import java.util.Collections;
 import java.util.Locale;
 
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -98,17 +99,59 @@ public class Iso8601Format {
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde und Minute im Muster &quot;HHmm&quot;. </p>
      *
-     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional. </p>
+     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional.
+     * Auch die Anzahl der Dezimalstellen ist variabel. </p>
      */
-    public static final ChronoFormatter<PlainTime> BASIC_TIME_HH_MM;
+    public static final ChronoFormatter<PlainTime> BASIC_WALL_TIME;
 
     /**
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
      *
-     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional. </p>
+     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional.
+     * Auch die Anzahl der Dezimalstellen ist variabel. </p>
      */
-    public static final ChronoFormatter<PlainTime> EXTENDED_TIME_HH_MM;
+    public static final ChronoFormatter<PlainTime> EXTENDED_WALL_TIME;
+
+    /**
+     * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
+     * aus Kalenderdatum und Uhrzeit mit Stunde und Minute im Muster
+     * &quot;uuuuMMdd'T'HHmm[ss[SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
+     * Dezimalstellen ist variabel. </p>
+     */
+    public static final ChronoFormatter<PlainTimestamp> BASIC_DATE_TIME;
+
+    /**
+     * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
+     * Kombination aus Kalenderdatum und Uhrzeit mit Stunde und Minute
+     * im Muster &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
+     * Dezimalstellen ist variabel. </p>
+     */
+    public static final ChronoFormatter<PlainTimestamp> EXTENDED_DATE_TIME;
+
+    /**
+     * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
+     * aus Kalenderdatum, Uhrzeit mit Stunde und Minute und Offset im Muster
+     * &quot;uuuuMMdd'T'HHmm[ss[SSSSSSSSS]]X&quot;. </p>
+     *
+     * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
+     * Dezimalstellen ist variabel. </p>
+     */
+    public static final ChronoFormatter<Moment> BASIC_DATE_TIME_OFFSET;
+
+    /**
+     * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
+     * Kombination aus Kalenderdatum, Uhrzeit mit Stunde und Minute und Offset
+     * im Muster &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]X&quot;. </p>
+     *
+     * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
+     * Dezimalstellen ist variabel. </p>
+     */
+    public static final ChronoFormatter<Moment> EXTENDED_DATE_TIME_OFFSET;
 
     static {
         BASIC_CALENDAR_DATE = calendarFormat(false);
@@ -118,8 +161,14 @@ public class Iso8601Format {
         BASIC_WEEK_DATE = weekdateFormat(false);
         EXTENDED_WEEK_DATE = weekdateFormat(true);
 
-        BASIC_TIME_HH_MM = timeFormat(false);
-        EXTENDED_TIME_HH_MM = timeFormat(true);
+        BASIC_WALL_TIME = timeFormat(false);
+        EXTENDED_WALL_TIME = timeFormat(true);
+
+        BASIC_DATE_TIME = timestampFormat(false);
+        EXTENDED_DATE_TIME = timestampFormat(true);
+
+        BASIC_DATE_TIME_OFFSET = momentFormat(false);
+        EXTENDED_DATE_TIME_OFFSET = momentFormat(true);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -134,20 +183,9 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
-            .setUp(PlainDate.class, Locale.ROOT)
-            .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedInteger(MONTH_AS_NUMBER, 2);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        return builder.addFixedInteger(DAY_OF_MONTH, 2).build();
+            .setUp(PlainDate.class, Locale.ROOT);
+        addCalendarDate(builder, extended);
+        return builder.build();
 
     }
 
@@ -204,6 +242,84 @@ public class Iso8601Format {
         }
 
         builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        addSeconds(builder, extended);
+        return builder.build();
+
+    }
+
+    private static ChronoFormatter<PlainTimestamp> timestampFormat(
+        boolean extended
+    ) {
+
+        ChronoFormatter.Builder<PlainTimestamp> builder =
+            ChronoFormatter
+            .setUp(PlainTimestamp.class, Locale.ROOT);
+        addCalendarDate(builder, extended);
+        builder.addLiteral('T');
+        builder.addFixedInteger(ISO_HOUR, 2);
+
+        if (extended) {
+            builder.addLiteral(':');
+        }
+
+        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        addSeconds(builder, extended);
+        return builder.build();
+
+    }
+
+    private static ChronoFormatter<Moment> momentFormat(boolean extended) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter
+            .setUp(Moment.class, Locale.ROOT);
+
+        addCalendarDate(builder, extended);
+        builder.addLiteral('T');
+        builder.addFixedInteger(ISO_HOUR, 2);
+
+        if (extended) {
+            builder.addLiteral(':');
+        }
+
+        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        addSeconds(builder, extended);
+
+        builder.addTimezoneOffset(
+            DisplayMode.SHORT,
+            extended,
+            Collections.singletonList("Z"));
+
+        return builder.build();
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addCalendarDate(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
+
+        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedInteger(DAY_OF_MONTH, 2);
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addSeconds(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
+
         builder.startOptionalSection(SECOND_PART);
 
         if (extended) {
@@ -212,12 +328,9 @@ public class Iso8601Format {
 
         builder.addFixedInteger(SECOND_OF_MINUTE, 2);
         builder.startOptionalSection(NON_ZERO_FRACTION);
-        builder.addLiteral(Attributes.DECIMAL_SEPARATOR);
-        builder.addFixedInteger(NANO_OF_SECOND, 9);
+        builder.addFraction(NANO_OF_SECOND, 0, 9, true);
         builder.endSection();
         builder.endSection();
-
-        return builder.build();
 
     }
 

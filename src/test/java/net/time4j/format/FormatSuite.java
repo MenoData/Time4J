@@ -12,6 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
         CalendricalNamesTest.class,
         DefaultValueTest.class,
         DuplicateElementTest.class,
+        FormatPatternTest.class,
+        Iso8601FormatTest.class,
         MiscellaneousTest.class,
         ParsingTextOverflowTest.class,
         WhitespaceTest.class

@@ -98,7 +98,10 @@ public abstract class Timezone
         areas.add(TZID.PACIFIC.class);
 
         Map<String, TZID> temp1 = new HashMap<String, TZID>();
-        temp1.put(ZonalOffset.UTC.canonical(), ZonalOffset.UTC);
+        temp1.put("Z", ZonalOffset.UTC);
+        temp1.put("UT", ZonalOffset.UTC);
+        temp1.put("UTC", ZonalOffset.UTC);
+        temp1.put("GMT", ZonalOffset.UTC);
 
         for (Class<? extends TZID> area : areas) {
             for (TZID tzid : area.getEnumConstants()) {
@@ -980,23 +983,16 @@ public abstract class Timezone
 
             Set<String> ids = provider.getAvailableIDs();
             List<TZID> list = new ArrayList<TZID>();
-            boolean hasUTC = false;
+            list.add(ZonalOffset.UTC);
 
             for (String id : ids) {
                 TZID tzid = PREDEFINED.get(id);
 
                 if (tzid == null) {
                     list.add(new NamedID(id));
-                } else {
-                    if (tzid == ZonalOffset.UTC) {
-                        hasUTC = true;
-                    }
+                } else if (tzid != ZonalOffset.UTC) {
                     list.add(tzid);
                 }
-            }
-
-            if (!hasUTC) {
-                list.add(ZonalOffset.UTC);
             }
 
             Collections.sort(

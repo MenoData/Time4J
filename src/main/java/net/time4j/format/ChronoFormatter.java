@@ -2014,8 +2014,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
-         * Kleinschreibung der Zeitzonennamen spielt beim Parsen keine
-         * Rolle. </p>
+         * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
          *
          * @param   abbreviated     abbreviations to be used?
          * @return  this instance for method chaining
@@ -2039,8 +2038,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /**
          * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
          *
-         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen spielt
-         * beim Parsen keine Rolle. </p>
+         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
+         * beachtet. </p>
          *
          * @param   abbreviated     abbreviations to be used?
          * @param   preferredZones  preferred timezone ids for resolving
