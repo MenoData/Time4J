@@ -234,14 +234,8 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainTime> builder =
             ChronoFormatter
-            .setUp(PlainTime.class, Locale.ROOT)
-            .addFixedInteger(ISO_HOUR, 2);
-
-        if (extended) {
-            builder.addLiteral(':');
-        }
-
-        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+            .setUp(PlainTime.class, Locale.ROOT);
+        addHoursAndMinutes(builder, extended);
         addSeconds(builder, extended);
         return builder.build();
 
@@ -256,13 +250,7 @@ public class Iso8601Format {
             .setUp(PlainTimestamp.class, Locale.ROOT);
         addCalendarDate(builder, extended);
         builder.addLiteral('T');
-        builder.addFixedInteger(ISO_HOUR, 2);
-
-        if (extended) {
-            builder.addLiteral(':');
-        }
-
-        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        addHoursAndMinutes(builder, extended);
         addSeconds(builder, extended);
         return builder.build();
 
@@ -276,13 +264,7 @@ public class Iso8601Format {
 
         addCalendarDate(builder, extended);
         builder.addLiteral('T');
-        builder.addFixedInteger(ISO_HOUR, 2);
-
-        if (extended) {
-            builder.addLiteral(':');
-        }
-
-        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        addHoursAndMinutes(builder, extended);
         addSeconds(builder, extended);
 
         builder.addTimezoneOffset(
@@ -312,6 +294,21 @@ public class Iso8601Format {
         }
 
         builder.addFixedInteger(DAY_OF_MONTH, 2);
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addHoursAndMinutes(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
+
+        builder.addFixedInteger(ISO_HOUR, 2);
+
+        if (extended) {
+            builder.addLiteral(':');
+        }
+
+        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
 
     }
 

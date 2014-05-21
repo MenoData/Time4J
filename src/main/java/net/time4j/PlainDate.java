@@ -708,7 +708,7 @@ public final class PlainDate
     public Moment atStartOfDay(TZID tzid) {
 
         // TODO: TransitionStrategy#laterOffset() benutzen?
-        return this.atStartOfDay().inTimezone(tzid);
+        return this.atStartOfDay().at(tzid);
 
     }
 

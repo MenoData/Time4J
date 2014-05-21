@@ -40,6 +40,7 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPattern;
 import net.time4j.format.Leniency;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
@@ -54,6 +55,7 @@ import java.io.ObjectStreamException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -562,6 +564,60 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainTimestamp}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    public static ChronoFormatter<PlainTimestamp> localFormatter(
+        String formatPattern,
+        ChronoPattern patternType
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTimestamp.class, Locale.getDefault())
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
+     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainTimestamp}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    public static ChronoFormatter<PlainTimestamp> formatter(
+        String formatPattern,
+        ChronoPattern patternType,
+        Locale locale
+    ) {
+
+        return ChronoFormatter
+            .setUp(PlainTimestamp.class, locale)
+            .addPattern(formatPattern, patternType)
+            .build();
+
+    }
+
+    /**
      * <p>Erstellt ein neues Formatobjekt, das eine Komposition der angegebenen
      * Datums- und Uhrzeitformate darstellt. </p>
      *
@@ -605,20 +661,6 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen Offset
-     * zu einem globalen Zeitstempel. </p>
-     *
-     * @param   offset      fixed timezone offset
-     * @return  global timestamp  based on this local timestamp interpreted
-     *          at given timezone offset
-     */
-    public Moment atOffset(ZonalOffset offset) {
-
-        return this.inTimezone(Timezone.of(offset));
-
-    }
-
-    /**
      * <p>Kombiniert diesen lokalen Zeitstempel mit der UTC-Zeitzone zu
      * einem globalen Zeitstempel. </p>
      *
@@ -627,7 +669,7 @@ public final class PlainTimestamp
      */
     public Moment atUTC() {
 
-        return this.atOffset(ZonalOffset.UTC);
+        return this.at(ZonalOffset.UTC);
 
     }
 
@@ -638,10 +680,9 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in system timezone
      * @see     Timezone#ofSystem()
-     * @see     #inTimezone(TZID)
-     * @see     #atOffset(ZonalOffset)
+     * @see     #at(TZID)
      */
-    public Moment inStdTimezone() {
+    public Moment atStdTimezone() {
 
         return this.inTimezone(Timezone.ofSystem());
 
@@ -655,10 +696,9 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(TZID)
-     * @see     #inStdTimezone()
-     * @see     #atOffset(ZonalOffset)
+     * @see     #atStdTimezone()
      */
-    public Moment inTimezone(TZID tzid) {
+    public Moment at(TZID tzid) {
 
         return this.inTimezone(Timezone.of(tzid));
 
@@ -673,10 +713,9 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone selecting given transition strategy
      * @see     Timezone#of(TZID)
-     * @see     #inStdTimezone()
-     * @see     #atOffset(ZonalOffset)
+     * @see     #atStdTimezone()
      */
-    public Moment inTimezone(
+    public Moment at(
         TZID tzid,
         TransitionStrategy strategy
     ) {

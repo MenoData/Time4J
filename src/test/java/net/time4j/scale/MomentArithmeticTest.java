@@ -33,7 +33,7 @@ public class MomentArithmeticTest {
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0).at(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class MomentArithmeticTest {
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0).at(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -70,14 +70,14 @@ public class MomentArithmeticTest {
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atTime(5, 0)
-            .inTimezone(timezone);
+            .at(timezone);
         Moment end = start.minus(4, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
+                .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
     }
 
     @Test

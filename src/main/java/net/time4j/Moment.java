@@ -1877,7 +1877,7 @@ public final class Moment
 
             PlainTimestamp ts = context.inTimezone(ZonalOffset.UTC);
             ts = ts.with(this.element, value);
-            Moment result = ts.inTimezone(ZonalOffset.UTC);
+            Moment result = ts.at(ZonalOffset.UTC);
 
             if (
                 this.element.isDateElement()
@@ -1989,18 +1989,18 @@ public final class Moment
             if (tzid != null) {
                 if (attributes.contains(Attributes.TRANSITION_STRATEGY)) {
                     result =
-                        ts.inTimezone(
+                        ts.at(
                             tzid,
                             attributes.get(Attributes.TRANSITION_STRATEGY)
                         );
                 } else {
-                    result = ts.inTimezone(tzid);
+                    result = ts.at(tzid);
                 }
             } else {
                 Leniency leniency =
                     attributes.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
-                    result = ts.inStdTimezone();
+                    result = ts.atStdTimezone();
                 }
             }
 

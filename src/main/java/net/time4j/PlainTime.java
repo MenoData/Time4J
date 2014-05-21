@@ -1070,6 +1070,17 @@ public final class PlainTime
     }
 
     /**
+     * <p>Liegt Mitternacht vor (am Anfang oder am Ende eines Tages)? </p>
+     *
+     * @return  boolean
+     */
+    public boolean isMidnight() {
+
+        return (this.isFullHour() && ((this.hour % 24) == 0));
+
+    }
+
+    /**
      * <p>Definiert eine nat&uuml;rliche Ordnung, die auf der zeitlichen
      * Position basiert. </p>
      *
