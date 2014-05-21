@@ -587,8 +587,7 @@ public final class PlainTime
     private static final ElementRule<PlainTime, BigDecimal> S_DECIMAL_RULE =
         new BigDecimalElementRule(DECIMAL_SECOND, DECIMAL_59_9);
 
-    /** Zeitachse einer analogen Uhr. */
-    static final TimeAxis<IsoTimeUnit, PlainTime> ENGINE;
+    private static final TimeAxis<IsoTimeUnit, PlainTime> ENGINE;
 
     static {
         TimeAxis.Builder<IsoTimeUnit, PlainTime> builder =
@@ -1419,6 +1418,32 @@ public final class PlainTime
                 new ClockUnitRule(unit),
                 unit.getLength(),
                 convertibles);
+        }
+
+    }
+
+    private static long floorMod(
+        long value,
+        long divisor
+    ) {
+
+        long num =
+            (value >= 0)
+            ? (value / divisor)
+            : (((value + 1) / divisor) - 1);
+        return (value - divisor * num);
+
+    }
+
+    private static long floorDiv(
+        long value,
+        long divisor
+    ) {
+
+        if (value >= 0) {
+            return (value / divisor);
+        } else {
+            return ((value + 1) / divisor) - 1;
         }
 
     }
@@ -2422,19 +2447,6 @@ public final class PlainTime
 
         }
 
-        private static long floorMod(
-            long value,
-            long divisor
-        ) {
-
-            long num =
-                (value >= 0)
-                ? (value / divisor)
-                : (((value + 1) / divisor) - 1);
-            return (value - divisor * num);
-
-        }
-
     }
 
     private static class BigDecimalElementRule
@@ -2711,6 +2723,9 @@ public final class PlainTime
             AttributeQuery attributes
         ) {
 
+            Leniency leniency =
+                attributes.get(Attributes.LENIENCY, Leniency.SMART);
+
             if (entity instanceof UnixTime) {
                 Moment ut = Moment.from(UnixTime.class.cast(entity));
 
@@ -2733,13 +2748,25 @@ public final class PlainTime
                 return PlainTime.of(entity.get(DECIMAL_HOUR));
             }
 
-            Integer h = readHour(entity);
+            int hour = 0;
 
-            if (h == null) {
-                return readSpecialCases(entity);
+            if (entity.contains(ISO_HOUR)) {
+                hour = entity.get(ISO_HOUR).intValue();
+            } else {
+                Integer h = readHour(entity);
+                if (h == null) {
+                    return readSpecialCases(entity);
+                }
+                hour = h.intValue();
+                if (
+                    (hour == 24)
+                    && !leniency.isLax()
+                ) {
+                    throw new IllegalArgumentException(
+                        "Time 24:00 not allowed, "
+                        + "use lax mode or ISO_HOUR in smart mode instead.");
+                }
             }
-
-            int hour = h.intValue();
 
             // Minutenteil ----------------------------------------------------
             if (entity.contains(DECIMAL_MINUTE)) {
@@ -2757,9 +2784,6 @@ public final class PlainTime
             }
 
             // Sekundenteil ---------------------------------------------------
-            Leniency leniency =
-                attributes.get(Attributes.LENIENCY, Leniency.SMART);
-
             if (entity.contains(DECIMAL_SECOND)) {
                 return S_DECIMAL_RULE.withValue(
                     PlainTime.of(hour, minute),
@@ -2793,15 +2817,26 @@ public final class PlainTime
             }
 
             // Ergebnis aus Stunde, Minute, Sekunde und Nano ------------------
-            if (leniency == Leniency.LAX) {
-                Integer m = Integer.valueOf(minute);
-                Integer s = Integer.valueOf(second);
-                Integer n = Integer.valueOf(nanosecond);
-                return PlainTime.midnightAtStartOfDay()
-                    .with(ISO_HOUR.setLenient(h))
-                    .with(MINUTE_OF_HOUR.setLenient(m))
-                    .with(SECOND_OF_MINUTE.setLenient(s))
-                    .with(NANO_OF_SECOND.setLenient(n));
+            if (leniency.isLax()) {
+                long total =
+                    MathUtils.safeAdd(
+                        MathUtils.safeMultiply(
+                            MathUtils.safeAdd(
+                                MathUtils.safeAdd(
+                                    MathUtils.safeMultiply(hour, 3600L),
+                                    MathUtils.safeMultiply(minute, 60L)),
+                                second
+                            ),
+                            MRD
+                        ),
+                        nanosecond
+                    );
+                long nanoOfDay = floorMod(total, 86400L * MRD);
+                long overflow = floorDiv(total, 86400L * MRD);
+                if (entity.isValid(LongElement.DAY_OVERFLOW, overflow)) {
+                    entity.with(LongElement.DAY_OVERFLOW, overflow);
+                }
+                return PlainTime.createFromNanos(nanoOfDay);
             } else {
                 return PlainTime.of(hour, minute, second, nanosecond);
             }
@@ -2812,9 +2847,7 @@ public final class PlainTime
 
             int hour;
 
-            if (entity.contains(ISO_HOUR)) {
-                hour = entity.get(ISO_HOUR).intValue();
-            } else if (entity.contains(DIGITAL_HOUR_OF_DAY)) {
+            if (entity.contains(DIGITAL_HOUR_OF_DAY)) {
                 hour = entity.get(DIGITAL_HOUR_OF_DAY).intValue();
             } else if (entity.contains(CLOCK_HOUR_OF_DAY)) {
                 hour = entity.get(CLOCK_HOUR_OF_DAY).intValue();

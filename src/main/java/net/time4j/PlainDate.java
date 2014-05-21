@@ -408,9 +408,7 @@ public final class PlainDate
 
     private static final Map<String, Object> ELEMENTS;
     private static final CalendarSystem<PlainDate> TRANSFORMER;
-
-    /** Zeitachse eines ISO-Kalenderdatums. */
-    static final TimeAxis<IsoDateUnit, PlainDate> ENGINE;
+    private static final TimeAxis<IsoDateUnit, PlainDate> ENGINE;
 
     static {
         Map<String, Object> constants = new HashMap<String, Object>();
@@ -1600,6 +1598,8 @@ public final class PlainDate
                 return TRANSFORMER.transform(utcDays);
             }
 
+            Leniency leniency =
+                attributes.get(Attributes.LENIENCY, Leniency.SMART);
             Integer year = null;
 
             if (entity.contains(YEAR)) {
@@ -1618,8 +1618,6 @@ public final class PlainDate
                             // no year;
                     }
                 } else {
-                    Leniency leniency =
-                        attributes.get(Attributes.LENIENCY, Leniency.SMART);
                     if (!leniency.isStrict()) {
                         year = entity.get(YEAR_OF_ERA);
                     }
@@ -1627,35 +1625,44 @@ public final class PlainDate
             }
 
             if (year != null) {
-                Month month = null;
+                Integer month = null;
                 if (entity.contains(MONTH_OF_YEAR)) {
-                    month = entity.get(MONTH_OF_YEAR);
+                    month =
+                        Integer.valueOf(entity.get(MONTH_OF_YEAR).getValue());
                 } else if (entity.contains(MONTH_AS_NUMBER)) {
-                    Integer mNum = entity.get(MONTH_AS_NUMBER);
-                    month = Month.valueOf(mNum.intValue());
+                    month = entity.get(MONTH_AS_NUMBER);
                 }
 
                 if (
                     (month != null)
                     && entity.contains(DAY_OF_MONTH)
                 ) {
-                    Integer dayOfMonth = entity.get(DAY_OF_MONTH);
+                    Integer dom = entity.get(DAY_OF_MONTH);
 
-                    // Standardszenario
-                    return PlainDate.of(
-                        year.intValue(),
-                        month,
-                        dayOfMonth.intValue());
+                    if (leniency.isLax()) {
+                        PlainDate d = PlainDate.of(year.intValue(), 1, 1);
+                        d = d.with(MONTH_AS_NUMBER.setLenient(month));
+                        return d.with(DAY_OF_MONTH.setLenient(dom));
+                    } else {
+                        // Standardszenario
+                        return PlainDate.of(
+                            year.intValue(),
+                            month.intValue(),
+                            dom.intValue());
+                    }
 
                 }
 
                 if (entity.contains(DAY_OF_YEAR)) {
-                    Integer dayOfYear = entity.get(DAY_OF_YEAR);
+                    Integer doy = entity.get(DAY_OF_YEAR);
 
-                    // Ordinaldatum
-                    return PlainDate.of(
-                        year.intValue(),
-                        dayOfYear.intValue());
+                    if (leniency.isLax()) {
+                        PlainDate d = PlainDate.of(year.intValue(), 1);
+                        return d.with(DAY_OF_YEAR.setLenient(doy));
+                    } else {
+                        // Ordinaldatum
+                        return PlainDate.of(year.intValue(), doy.intValue());
+                    }
                 }
 
                 if (

@@ -525,7 +525,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Leniency leniency =
                 attributes.get(Attributes.LENIENCY, Leniency.SMART);
 
-            if (!leniency.isLax()) {
+            if (leniency.isStrict()) {
                 TZID tzid = parsed.get(Timezone.identifier()); // eventuell null
 
                 // Zeitzonenkonversion ergibt immer Unterschied zwischen

@@ -1001,8 +1001,8 @@ public final class Moment
      * <pre>
      *  Moment moment =
      *      PlainDate.of(2012, Month.JUNE, 30)
-     *      .at(PlainTime.of(23).with(PlainTime.ISO_HOUR.atCeiling()))
-     *      .inTimezone(ZonalOffset.UTC, TransitionStrategy.STRICT)
+     *      .at(PlainTime.of(23, 59, 59, 999999999))
+     *      .atUTC()
      *      .plus(1, SI.SECONDS); // move to leap second
      *
      *  System.out.println(moment.toString(TimeScale.POSIX));
@@ -1963,7 +1963,7 @@ public final class Moment
 
             try {
                 ts =
-                    PlainTimestamp.ENGINE.createFrom(
+                    PlainTimestamp.axis().createFrom(
                         entity,
                         attributes
                     );

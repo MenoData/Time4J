@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
@@ -44,28 +45,34 @@ final class LongElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /**
+     * Zeiger auf den Tages&uuml;berlauf.
+     */
+    static final ChronoElement<Long> DAY_OVERFLOW = new LongElement();
+
     private static final long serialVersionUID = 5930990958663061693L;
 
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final Long defaultMin;
     private transient final Long defaultMax;
-    private transient final char symbol;
     private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
 
     //~ Konstruktoren -----------------------------------------------------
 
+    private LongElement() {
+        this("DAY_OVERFLOW", Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
     private LongElement(
         String name,
         long defaultMin,
-        long defaultMax,
-        char symbol
+        long defaultMax
     ) {
         super(name);
 
         this.defaultMin = Long.valueOf(defaultMin);
         this.defaultMax = Long.valueOf(defaultMax);
-        this.symbol = symbol;
 
         this.rf = new ProportionalFunction(this, true);
 
@@ -77,13 +84,6 @@ final class LongElement
     public Class<Long> getType() {
 
         return Long.class;
-
-    }
-
-    @Override
-    public char getSymbol() {
-
-        return this.symbol;
 
     }
 
@@ -182,7 +182,7 @@ final class LongElement
         long defaultMax
     ) {
 
-        return new LongElement(name, defaultMin, defaultMax, '\u0000');
+        return new LongElement(name, defaultMin, defaultMax);
 
     }
 
@@ -191,7 +191,11 @@ final class LongElement
         Object element = PlainTime.lookupElement(this.name());
 
         if (element == null) {
-            throw new InvalidObjectException(this.name());
+            if (this.name().equals("DAY_OVERFLOW")) {
+                return DAY_OVERFLOW;
+            } else {
+                throw new InvalidObjectException(this.name());
+            }
         } else {
             return element;
         }

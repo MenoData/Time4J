@@ -121,9 +121,7 @@ public final class PlainTimestamp
         new PlainTimestamp(PlainDate.MAX, WALL_TIME.getDefaultMaximum());
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
-
-    /** Zeitachse eines ISO-Zeitstempels. */
-    static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
+    private static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
 
     static {
         Map<Object, ChronoElement<?>> children =
@@ -907,7 +905,7 @@ public final class PlainTimestamp
             if (entity.contains(CALENDAR_DATE)) {
                 date = entity.get(CALENDAR_DATE);
             } else {
-                date = PlainDate.ENGINE.createFrom(entity, attributes);
+                date = PlainDate.axis().createFrom(entity, attributes);
             }
 
             if (date == null) {
@@ -915,8 +913,7 @@ public final class PlainTimestamp
             } else if (entity.contains(WALL_TIME)) {
                 time = entity.get(WALL_TIME);
             } else {
-                time = PlainTime.ENGINE.createFrom(entity, attributes);
-
+                time = PlainTime.axis().createFrom(entity, attributes);
                 if (time == null) {
                     Leniency leniency =
                         attributes.get(Attributes.LENIENCY, Leniency.SMART);
@@ -929,6 +926,12 @@ public final class PlainTimestamp
             if (time == null) {
                 return null;
             } else {
+                if (entity.contains(LongElement.DAY_OVERFLOW)) {
+                    date =
+                        date.plus(
+                            entity.get(LongElement.DAY_OVERFLOW).longValue(),
+                            CalendarUnit.DAYS);
+                }
                 return PlainTimestamp.of(date, time);
             }
 

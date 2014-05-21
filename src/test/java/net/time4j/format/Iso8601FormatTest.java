@@ -3,6 +3,7 @@ package net.time4j.format;
 import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.Weekday;
 import net.time4j.tz.ZonalOffset;
@@ -399,9 +400,41 @@ public class Iso8601FormatTest {
     public void parseExtendedDateTimeSmart24() throws ParseException {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME
-                .with(Attributes.LENIENCY, Leniency.LAX)
+                .with(Attributes.LENIENCY, Leniency.SMART)
                 .parse("2012-06-30T24:00"),
             is(PlainDate.of(2012, 7, 1).atStartOfDay()));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseExtendedDateTimeSmart27() throws ParseException {
+        Iso8601Format.EXTENDED_DATE_TIME
+            .with(Attributes.LENIENCY, Leniency.SMART)
+            .parse("2012-06-30T27:45");
+    }
+
+    @Test
+    public void parseExtendedDateTimeLax27() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_DATE_TIME
+                .with(Attributes.LENIENCY, Leniency.LAX)
+                .parse("2012-06-30T27:45"),
+            is(PlainTimestamp.of(2012, 7, 1, 3, 45)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseExtendedDateSmartApril31() throws ParseException {
+        Iso8601Format.EXTENDED_CALENDAR_DATE
+            .with(Attributes.LENIENCY, Leniency.SMART)
+            .parse("2012-04-31");
+    }
+
+    @Test
+    public void parseExtendedDateLaxApril31() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_CALENDAR_DATE
+                .with(Attributes.LENIENCY, Leniency.LAX)
+                .parse("2012-04-31"),
+            is(PlainDate.of(2012, 5, 1)));
     }
 
 }
