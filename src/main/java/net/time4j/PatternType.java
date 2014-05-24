@@ -163,7 +163,8 @@ public enum PatternType
      *      <td>g</td>
      *      <td>Die Anzahl der Symbole regelt wie &uuml;blich die minimale
      *      Anzahl der Stellen des modifizierten julianischen Jahres, also
-     *      der Anzahl der Tage seit 1858-11-17. </td>
+     *      der Anzahl der Tage seit 1858-11-17. Wird nur von reinen
+     *      Datumsklassen wie {@code PlainDate} unterst&uuml;tzt. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#DAY_OF_WEEK}</td>

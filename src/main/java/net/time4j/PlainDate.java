@@ -1691,14 +1691,20 @@ public final class PlainDate
             if (
                 entity.contains(YEAR_OF_WEEKDATE)
                 && entity.contains(Weekmodel.ISO.weekOfYear())
-                && entity.contains(DAY_OF_WEEK)
             ) {
                 Integer yearOfWeekdate =
                     entity.get(YEAR_OF_WEEKDATE);
                 Integer weekOfYear =
                     entity.get(Weekmodel.ISO.weekOfYear());
-                Weekday dayOfWeek =
-                    entity.get(DAY_OF_WEEK);
+                Weekday dayOfWeek = null;
+
+                if (entity.contains(DAY_OF_WEEK)) {
+                    dayOfWeek = entity.get(DAY_OF_WEEK);
+                } else if (entity.contains(Weekmodel.ISO.localDayOfWeek())) {
+                    dayOfWeek = entity.get(Weekmodel.ISO.localDayOfWeek());
+                } else {
+                    return null;
+                }
 
                 // Wochendatum
                 return PlainDate.of(

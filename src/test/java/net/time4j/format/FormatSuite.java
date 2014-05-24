@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AdjacentDigitParsingTest.class,
         CalendricalNamesTest.class,
+        DatePatternTest.class,
         DateTimePatternTest.class,
         DefaultValueTest.class,
         DuplicateElementTest.class,
