@@ -27,7 +27,7 @@ package net.time4j.engine;
  * Parse-Vorgangs. </p>
  *
  * @author  Meno Hochschild
- * @see     ChronoMerger#createFrom(ChronoEntity, AttributeQuery)
+ * @see     ChronoMerger#createFrom(ChronoEntity, AttributeQuery, boolean)
  */
 public interface AttributeQuery {
 

@@ -924,7 +924,8 @@ public final class PlainTimestamp
         @Override
         public PlainTimestamp createFrom(
             ChronoEntity<?> entity,
-            AttributeQuery attributes
+            AttributeQuery attributes,
+            boolean preparsing
         ) {
 
             if (entity instanceof UnixTime) {
@@ -937,12 +938,6 @@ public final class PlainTimestamp
                 }
 
                 return ut.inTimezone(tzid);
-            }
-
-            boolean preparsing = entity.contains(Moment.axis().element());
-
-            if (preparsing) {
-                entity.with(Moment.axis().element(), null);
             }
 
             boolean leapsecond =
@@ -960,7 +955,7 @@ public final class PlainTimestamp
             if (entity.contains(CALENDAR_DATE)) {
                 date = entity.get(CALENDAR_DATE);
             } else {
-                date = PlainDate.axis().createFrom(entity, attributes);
+                date = PlainDate.axis().createFrom(entity, attributes, false);
             }
 
             if (date == null) {
@@ -968,7 +963,7 @@ public final class PlainTimestamp
             } else if (entity.contains(WALL_TIME)) {
                 time = entity.get(WALL_TIME);
             } else {
-                time = PlainTime.axis().createFrom(entity, attributes);
+                time = PlainTime.axis().createFrom(entity, attributes, false);
                 if (time == null) {
                     Leniency leniency =
                         attributes.get(Attributes.LENIENCY, Leniency.SMART);

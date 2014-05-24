@@ -83,12 +83,14 @@ public interface ChronoMerger<T> {
      * @param   entity          any chronological entity like parsed
      *                          elements with their values
      * @param   attributes      configuration attributes given by parser
+     * @param   preparsing      preparsing phase active?
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
      */
     T createFrom(
         ChronoEntity<?> entity,
-        AttributeQuery attributes
+        AttributeQuery attributes,
+        boolean preparsing
     );
 
     /**

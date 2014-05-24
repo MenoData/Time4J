@@ -469,7 +469,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ParsedValues parsed = status.getRawValues0();
 
             try {
-                result = this.chronology.createFrom(parsed, attributes);
+                result = this.chronology.createFrom(parsed, attributes, false);
             } catch (RuntimeException re) {
                 status.setError(
                     text.length(),
@@ -971,19 +971,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
-        if (
-            preparsing
-            && (cf.chronology instanceof TimeAxis)
-        ) {
-            TimeAxis<?, ?> axis = TimeAxis.class.cast(cf.chronology);
-            ChronoElement<?> self = axis.element();
-            updateSelf(parsed, self, axis.getMinimum());
-        }
-
         T result = null;
 
         try {
-            result = chronology.createFrom(parsed, attributes);
+            result = chronology.createFrom(parsed, attributes, preparsing);
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),

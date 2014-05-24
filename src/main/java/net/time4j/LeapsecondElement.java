@@ -24,19 +24,13 @@ package net.time4j;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoEntity;
 
-import java.io.IOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-
 
 /**
  * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
- * @serial      exclude
  */
-@SuppressWarnings("serial")
 final class LeapsecondElement
     extends BasicElement<Boolean> {
 
@@ -46,6 +40,8 @@ final class LeapsecondElement
      * Singleton-Instanz.
      */
     static final LeapsecondElement INSTANCE = new LeapsecondElement();
+
+    private static final long serialVersionUID = -5143702899727667978L;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -98,16 +94,6 @@ final class LeapsecondElement
     public boolean isTimeElement() {
 
         return false;
-
-    }
-
-    /**
-     * @serialData  Blocks because serialization is not supported.
-     * @throws      NotSerializableException (always)
-     */
-    private void readObject(ObjectInputStream in) throws IOException {
-
-        throw new NotSerializableException();
 
     }
 

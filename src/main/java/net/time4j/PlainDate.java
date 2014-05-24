@@ -1571,7 +1571,8 @@ public final class PlainDate
         @Override
         public PlainDate createFrom(
             ChronoEntity<?> entity,
-            AttributeQuery attributes
+            AttributeQuery attributes,
+            boolean preparsing
         ) {
 
             if (entity instanceof UnixTime) {

@@ -728,7 +728,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             T min,
             T max
         ) {
-            super("SELF");
+            super(type.getName() + "-AXIS");
 
             this.type = type;
             this.min = min;

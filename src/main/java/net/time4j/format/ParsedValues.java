@@ -28,6 +28,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.Timezone;
 
+import java.io.Serializable;
 import java.util.Map;
 
 
@@ -39,7 +40,12 @@ import java.util.Map;
  * @concurrency <mutable>
  */
 class ParsedValues
-    extends ChronoEntity<ParsedValues> {
+    extends ChronoEntity<ParsedValues>
+    implements Serializable {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final long serialVersionUID = 6400471321200669320L;
 
     //~ Instanzvariablen --------------------------------------------------
 

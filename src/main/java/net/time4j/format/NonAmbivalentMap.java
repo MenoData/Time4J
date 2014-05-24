@@ -34,9 +34,12 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  */
-@SuppressWarnings("serial")
 class NonAmbivalentMap
     extends HashMap<ChronoElement<?>, Object> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final long serialVersionUID = 1245025551222311435L;
 
     //~ Instanzvariablen --------------------------------------------------
 

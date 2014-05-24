@@ -1942,7 +1942,8 @@ public final class Moment
         @Override
         public Moment createFrom(
             ChronoEntity<?> entity,
-            AttributeQuery attributes
+            AttributeQuery attrs,
+            boolean pp
         ) {
 
             if (entity instanceof UnixTime) {
@@ -1955,7 +1956,6 @@ public final class Moment
 
             if (entity.contains(LeapsecondElement.INSTANCE)) {
                 leapsecond = true;
-                entity.with(LeapsecondElement.INSTANCE, null);
                 entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
             }
 
@@ -1964,9 +1964,8 @@ public final class Moment
 
             if (entity.contains(self)) {
                 ts = entity.get(self);
-                entity.with(self, null);
             } else {
-                ts = PlainTimestamp.axis().createFrom(entity, attributes);
+                ts = PlainTimestamp.axis().createFrom(entity, attrs, pp);
             }
 
             if (ts == null) {
@@ -1977,24 +1976,24 @@ public final class Moment
 
             if (
                 (tzid == null)
-                && attributes.contains(Attributes.TIMEZONE_ID)
+                && attrs.contains(Attributes.TIMEZONE_ID)
             ) {
-                tzid = attributes.get(Attributes.TIMEZONE_ID); // Ersatzwert
+                tzid = attrs.get(Attributes.TIMEZONE_ID); // Ersatzwert
             }
 
             if (tzid != null) {
-                if (attributes.contains(Attributes.TRANSITION_STRATEGY)) {
+                if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
                     result =
                         ts.at(
                             tzid,
-                            attributes.get(Attributes.TRANSITION_STRATEGY)
+                            attrs.get(Attributes.TRANSITION_STRATEGY)
                         );
                 } else {
                     result = ts.at(tzid);
                 }
             } else {
                 Leniency leniency =
-                    attributes.get(Attributes.LENIENCY, Leniency.SMART);
+                    attrs.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
                     result = ts.atStdTimezone();
                 }
@@ -2031,7 +2030,7 @@ public final class Moment
                 }
 
                 Leniency leniency =
-                    attributes.get(Attributes.LENIENCY, Leniency.SMART);
+                    attrs.get(Attributes.LENIENCY, Leniency.SMART);
 
                 if (leniency.isLax()) {
                     result = test;

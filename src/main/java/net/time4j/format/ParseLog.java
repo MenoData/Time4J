@@ -124,7 +124,7 @@ public class ParseLog {
     /**
      * <p>Liefert die interpretierten Rohdaten. </p>
      *
-     * @return  parsed values
+     * @return  parsed values as mutable serializable map-like entity
      */
     public ChronoEntity<?> getRawValues() {
 

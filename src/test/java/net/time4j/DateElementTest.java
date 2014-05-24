@@ -362,4 +362,18 @@ public class DateElementTest {
         assertThat(DAY_OF_WEEK.getSymbol(), is('E'));
     }
 
+    @Test
+    public void nameOfAxisElement() {
+        assertThat(
+            PlainDate.axis().element().name(),
+            is("net.time4j.PlainDate-AXIS"));
+    }
+
+    @Test
+    public void equalsOfAxisElement() {
+        assertThat(
+            PlainDate.axis().element().equals(PlainTime.axis().element()),
+            is(false));
+    }
+
 }
