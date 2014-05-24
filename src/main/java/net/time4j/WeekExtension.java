@@ -51,9 +51,9 @@ class WeekExtension
     }
 
     @Override
-    public <T extends ChronoEntity<T>> T resolve(T parsedValues) {
+    public <T extends ChronoEntity<T>> T resolve(T entity) {
 
-        return parsedValues; // no-op
+        return entity; // no-op
 
     }
 

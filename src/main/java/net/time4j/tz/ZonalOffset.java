@@ -285,7 +285,7 @@ public final class ZonalOffset
         if (arcMinutes != 0) {
             BigDecimal arcMin =
                 BigDecimal.valueOf(arcMinutes)
-                    .setScale(9)
+                    .setScale(15)
                     .divide(DECIMAL_60, RoundingMode.HALF_UP);
             longitude = longitude.add(arcMin);
         }
@@ -293,7 +293,7 @@ public final class ZonalOffset
         if (arcSeconds != 0) {
             BigDecimal arcSec =
                 BigDecimal.valueOf(arcSeconds)
-                    .setScale(9)
+                    .setScale(15)
                     .divide(DECIMAL_3600, RoundingMode.HALF_UP);
             longitude = longitude.add(arcSec);
         }

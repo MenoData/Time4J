@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Temporal;
@@ -938,6 +939,21 @@ public final class PlainTimestamp
                 return ut.inTimezone(tzid);
             }
 
+            boolean preparsing = entity.contains(Moment.axis().element());
+
+            if (preparsing) {
+                entity.with(Moment.axis().element(), null);
+            }
+
+            boolean leapsecond =
+                preparsing
+                && entity.contains(SECOND_OF_MINUTE)
+                && (entity.get(SECOND_OF_MINUTE).intValue() == 60);
+
+            if (leapsecond) { // temporär, wird später kompensiert
+                entity.with(SECOND_OF_MINUTE, Integer.valueOf(59));
+            }
+
             PlainDate date = null;
             PlainTime time = null;
 
@@ -971,6 +987,13 @@ public final class PlainTimestamp
                             entity.get(LongElement.DAY_OVERFLOW).longValue(),
                             CalendarUnit.DAYS);
                 }
+
+                if (leapsecond) {
+                    entity.with(
+                        LeapsecondElement.INSTANCE,
+                        Boolean.TRUE);
+                }
+
                 return PlainTimestamp.of(date, time);
             }
 
@@ -983,6 +1006,13 @@ public final class PlainTimestamp
         ) {
 
             return context;
+
+        }
+
+        @Override
+        public Chronology<?> preparser() {
+
+            return null;
 
         }
 

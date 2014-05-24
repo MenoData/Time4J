@@ -35,6 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static net.time4j.format.DisplayMode.FULL;
+import static net.time4j.format.DisplayMode.LONG;
+import static net.time4j.format.DisplayMode.MEDIUM;
+import static net.time4j.format.DisplayMode.SHORT;
 import static net.time4j.tz.ZonalOffset.Sign.AHEAD_OF_UTC;
 import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
 
@@ -101,7 +105,7 @@ final class TimezoneOffsetProcessor
     private TimezoneOffsetProcessor() {
         super();
 
-        this.precision = DisplayMode.LONG;
+        this.precision = LONG;
         this.extended = true;
         this.zeroOffsets = Collections.emptyList();
 
@@ -166,7 +170,7 @@ final class TimezoneOffsetProcessor
             printed += hours.length();
 
             if (
-                (this.precision != DisplayMode.SHORT)
+                (this.precision != SHORT)
                 || (m != 0)
             ) {
                 if (this.extended) {
@@ -183,9 +187,9 @@ final class TimezoneOffsetProcessor
                 buffer.append(minutes);
                 printed += minutes.length();
 
-                if (this.precision != DisplayMode.MEDIUM) {
+                if (this.precision != MEDIUM) {
                     if (
-                        (this.precision == DisplayMode.FULL)
+                        (this.precision == FULL)
                         || ((s | fraction) != 0)
                     ) {
                         if (this.extended) {
@@ -312,7 +316,7 @@ final class TimezoneOffsetProcessor
         }
 
         if (pos >= len) {
-            if (this.precision == DisplayMode.SHORT) {
+            if (this.precision == SHORT) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
@@ -332,7 +336,7 @@ final class TimezoneOffsetProcessor
         if (this.extended) {
             if (text.charAt(pos) == ':') {
                 pos++;
-            } else if (this.precision == DisplayMode.SHORT) {
+            } else if (this.precision == SHORT) {
                 parsedResult.put(
                     ZonalElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
@@ -348,7 +352,7 @@ final class TimezoneOffsetProcessor
 
         if (minutes == -1000) {
             if (
-                (this.precision == DisplayMode.SHORT)
+                (this.precision == SHORT)
                 && !this.extended
             ) {
                 parsedResult.put(
@@ -367,8 +371,8 @@ final class TimezoneOffsetProcessor
         pos += 2;
 
         if (
-            (this.precision == DisplayMode.LONG)
-            || (this.precision == DisplayMode.FULL)
+            (pos < len)
+            && ((this.precision == LONG) || (this.precision == FULL))
         ) {
             if (this.extended) {
                 if (text.charAt(pos) == ':') {
@@ -382,7 +386,7 @@ final class TimezoneOffsetProcessor
             seconds = parseNum(text, pos, Leniency.STRICT);
 
             if (seconds == -1000) {
-                if (this.precision == DisplayMode.FULL) {
+                if (this.precision == FULL) {
                     status.setError(
                         pos,
                         "Second part in timezone offset "

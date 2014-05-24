@@ -61,14 +61,15 @@ public interface ChronoExtension {
      * aus der Wertquelle zu l&ouml;schen. Zu beachten: Das Argument hat als
      * Ausnahmefall keine Chronologie. </p>
      *
-     * @param   parsedValues    interpreted elements with their values (note
-     *                          that it has no chronology and allows the
-     *                          virtual value {@code null} to be set as
-     *                          indication for removing associated element)
+     * @param   entity  any kind of map from chronological elements to
+     *                  their values (note that the main use case of parsed
+     *                  data has no chronology and allows the virtual value
+     *                  {@code null} to be set as indication for removing
+     *                  associated element)
      * @return  eventually changed argument
      * @see     ChronoEntity#with(ChronoElement, Object)
      *          ChronoEntity.with(ChronoElement, V)
      */
-    <T extends ChronoEntity<T>> T resolve(T parsedValues);
+    <T extends ChronoEntity<T>> T resolve(T entity);
 
 }

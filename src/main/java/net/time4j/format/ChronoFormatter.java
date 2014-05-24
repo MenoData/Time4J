@@ -29,9 +29,9 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.TimeAxis;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.text.AttributedCharacterIterator;
@@ -450,156 +450,44 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Attributes attributes
     ) {
 
-        if (status.getPosition() >= text.length()) {
-            throw new IndexOutOfBoundsException(
-                "[" + status.getPosition() + "]: " + text.toString());
-        }
-
-        // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
-        ParsedValues parsed = null;
-
-        try {
-            parsed = this.parseElements(text, status, attributes, data);
-            parsed.setNoAmbivalentCheck();
-            status.setRawValues(parsed);
-        } catch (AmbivalentValueException ex) {
-            if (!status.isError()) {
-                status.setError(status.getPosition(), ex.getMessage());
-            }
-        }
-
-        if (status.isError()) {
-            return null;
-        }
-
-        int index = status.getPosition();
-
-        if (
-            (index < text.length())
-            && !attributes.get(
-                Attributes.TRAILING_CHARACTERS,
-                Boolean.FALSE).booleanValue()
-        ) {
-            status.setError(
-                index,
-                "Unparsed trailing characters: " + sub(index, text));
-            return null;
-        }
-
-        // Phase 2: Anreicherung mit Default-Werten
-        for (ChronoElement<?> e : this.defaults.keySet()) {
-            if (!parsed.contains(e)) {
-                fill(parsed, e, this.defaults.get(e));
-            }
-        }
-
-        // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
-        for (ChronoExtension ext : this.chronology.getExtensions()) {
-            if (!ext.getElements(this.getLocale(), attributes).isEmpty()) {
-                parsed = ext.resolve(parsed);
-            }
-        }
-
-        // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
         T result = null;
+        Chronology<?> preparser = this.chronology.preparser();
 
-        try {
-            result = this.chronology.createFrom(parsed, attributes);
-        } catch (RuntimeException re) {
-            status.setError(
-                text.length(),
-                re.getMessage() + getDescription(data.peek()));
-            return null;
-        }
-
-        if (
-            (this.fracproc != null)
-            && (result != null)
-        ) { // Sonderfall Bruchzahlelement
-            result = this.fracproc.update(result, parsed);
-        }
-
-        // Phase 5: Konsistenzprüfung
-        if (result instanceof ChronoEntity) {
-            Leniency leniency =
-                attributes.get(Attributes.LENIENCY, Leniency.SMART);
-
-            if (leniency.isStrict()) {
-                TZID tzid = parsed.get(Timezone.identifier()); // eventuell null
-
-                // Zeitzonenkonversion ergibt immer Unterschied zwischen
-                // lokaler und globaler Zeit => nicht prüfen!
-                if (
-                    !(result instanceof UnixTime)
-                    || (tzid == ZonalOffset.UTC)
-                ) {
-                    ChronoEntity<?> entity = ChronoEntity.class.cast(result);
-
-                    for (ChronoElement<?> e : parsed) {
-                        Object value = parsed.get(e);
-
-                        if (
-                            entity.contains(e)
-                            && !entity.get(e).equals(value)
-                        ) {
-                            StringBuilder reason = new StringBuilder(256);
-                            reason.append("Conflict found: ");
-                            reason.append("Text {");
-                            reason.append(text.toString());
-                            reason.append("} with element ");
-                            reason.append(e.name());
-                            reason.append(" {");
-                            reason.append(value);
-                            reason.append("}, but parsed entity ");
-                            reason.append("has element value {");
-                            reason.append(entity.get(e));
-                            reason.append("}.");
-                            status.setError(text.length(), reason.toString());
-                            result = null;
-                            break;
-                        }
-                    }
-                }
-
-                if (
-                    leniency.isStrict()
-                    && (result instanceof UnixTime)
-                    && (status.getDSTInfo() != null)
-                ) {
-                    if (
-                        (tzid == null)
-                        && attributes.contains(Attributes.TIMEZONE_ID)
-                    ) {
-                        tzid = attributes.get(Attributes.TIMEZONE_ID);
-                    }
-
-                    UnixTime ut = UnixTime.class.cast(result);
-                    boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
-
-                    if (dst != status.getDSTInfo().booleanValue()) {
-                        StringBuilder reason = new StringBuilder(256);
-                        reason.append("Conflict found: ");
-                        reason.append("Parsed entity is ");
-                        if (!dst) {
-                            reason.append("not ");
-                        }
-                        reason.append("daylight-saving, but timezone name ");
-                        reason.append("has not the appropriate form in {");
-                        reason.append(text.toString());
-                        reason.append("}.");
-                        status.setError(text.length(), reason.toString());
-                        result = null;
-                    }
-                }
-            }
+        if (preparser == null) {
+            return parse(
+                this, this.chronology, text, status, attributes, false);
         } else {
-            String reason = "Insufficient data:" + getDescription(data.peek());
-            status.setError(text.length(), reason);
-            result = null;
-        }
+            Object obj = parse(this, preparser, text, status, attributes, true);
 
-        return result;
+            if (
+                (obj == null)
+                || status.isError()
+            ) {
+                return null;
+            }
+
+            ParsedValues parsed = status.getRawValues0();
+
+            try {
+                result = this.chronology.createFrom(parsed, attributes);
+            } catch (RuntimeException re) {
+                status.setError(
+                    text.length(),
+                    re.getMessage() + getDescription(parsed.toMap()));
+                return null;
+            }
+
+            if (result == null) {
+                if (!status.isError()) {
+                    status.setError(
+                        text.length(),
+                        "Insufficient data:" + getDescription(parsed.toMap()));
+                }
+                return null;
+            }
+
+            return checkConsistency(parsed, result, text, status, attributes);
+        }
 
     }
 
@@ -1019,6 +907,198 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         } else {
             return Collections.emptySet();
         }
+
+    }
+
+    private static <T extends ChronoEntity<T>> T parse(
+        ChronoFormatter<?> cf,
+        Chronology<T> chronology,
+        CharSequence text,
+        ParseLog status,
+        Attributes attributes,
+        boolean preparsing
+    ) {
+
+        if (status.getPosition() >= text.length()) {
+            throw new IndexOutOfBoundsException(
+                "[" + status.getPosition() + "]: " + text.toString());
+        }
+
+        // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
+        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
+        ParsedValues parsed = null;
+
+        try {
+            parsed = cf.parseElements(text, status, attributes, data);
+            parsed.setNoAmbivalentCheck();
+            status.setRawValues(parsed);
+        } catch (AmbivalentValueException ex) {
+            if (!status.isError()) {
+                status.setError(status.getPosition(), ex.getMessage());
+            }
+        }
+
+        if (status.isError()) {
+            return null;
+        }
+
+        int index = status.getPosition();
+
+        if (
+            (index < text.length())
+            && !attributes.get(
+                Attributes.TRAILING_CHARACTERS,
+                Boolean.FALSE).booleanValue()
+        ) {
+            status.setError(
+                index,
+                "Unparsed trailing characters: " + sub(index, text));
+            return null;
+        }
+
+        // Phase 2: Anreicherung mit Default-Werten
+        for (ChronoElement<?> e : cf.defaults.keySet()) {
+            if (!parsed.contains(e)) {
+                fill(parsed, e, cf.defaults.get(e));
+            }
+        }
+
+        // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
+        for (ChronoExtension ext : chronology.getExtensions()) {
+            if (!ext.getElements(cf.getLocale(), attributes).isEmpty()) {
+                parsed = ext.resolve(parsed);
+            }
+        }
+
+        // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
+        if (
+            preparsing
+            && (cf.chronology instanceof TimeAxis)
+        ) {
+            TimeAxis<?, ?> axis = TimeAxis.class.cast(cf.chronology);
+            ChronoElement<?> self = axis.element();
+            updateSelf(parsed, self, axis.getMinimum());
+        }
+
+        T result = null;
+
+        try {
+            result = chronology.createFrom(parsed, attributes);
+        } catch (RuntimeException re) {
+            status.setError(
+                text.length(),
+                re.getMessage() + getDescription(data.peek()));
+            return null;
+        }
+
+        if (
+            (cf.fracproc != null)
+            && (result != null)
+        ) { // Sonderfall Bruchzahlelement
+            result = cf.fracproc.update(result, parsed);
+        }
+
+        if (
+            preparsing
+            && (result != null)
+            && (chronology instanceof TimeAxis)
+        ) {
+            ChronoElement<?> self = TimeAxis.class.cast(chronology).element();
+            updateSelf(parsed, self, result);
+        }
+
+        // Phase 5: Konsistenzprüfung
+        if (result instanceof ChronoEntity) {
+            return checkConsistency(parsed, result, text, status, attributes);
+        } else {
+            String reason = "Insufficient data:" + getDescription(data.peek());
+            status.setError(text.length(), reason);
+            return null;
+        }
+
+    }
+
+    private static <T> void updateSelf(
+        ParsedValues parsed,
+        ChronoElement<T> element,
+        Object result
+    ) {
+
+        parsed.with(element, element.getType().cast(result));
+
+    }
+
+    private static <T extends ChronoEntity<T>> T checkConsistency(
+        ParsedValues parsed,
+        T result,
+        CharSequence text,
+        ParseLog status,
+        Attributes attributes
+    ) {
+
+        Leniency leniency =
+            attributes.get(Attributes.LENIENCY, Leniency.SMART);
+
+        if (leniency.isStrict()) {
+            // Zeitzonenkonversion ergibt immer Unterschied zwischen
+            // lokaler und globaler Zeit => nicht prüfen!
+            if (result instanceof UnixTime) {
+                if (status.getDSTInfo() != null) {
+                    TZID tzid = parsed.get(Timezone.identifier());
+
+                    if ( // TODO: Notwendigkeit prüfen (assert tzid != null)
+                        (tzid == null)
+                        && attributes.contains(Attributes.TIMEZONE_ID)
+                    ) {
+                        tzid = attributes.get(Attributes.TIMEZONE_ID);
+                    }
+
+                    UnixTime ut = UnixTime.class.cast(result);
+                    boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
+
+                    if (dst != status.getDSTInfo().booleanValue()) {
+                        StringBuilder reason = new StringBuilder(256);
+                        reason.append("Conflict found: ");
+                        reason.append("Parsed entity is ");
+                        if (!dst) {
+                            reason.append("not ");
+                        }
+                        reason.append("daylight-saving, but timezone name");
+                        reason.append(" has not the appropriate form in {");
+                        reason.append(text.toString());
+                        reason.append("}.");
+                        status.setError(text.length(), reason.toString());
+                        result = null;
+                    }
+                }
+            } else {
+                for (ChronoElement<?> e : parsed.toMap().keySet()) {
+                    Object value = parsed.get(e);
+
+                    if (
+                        result.contains(e)
+                        && !result.get(e).equals(value)
+                    ) {
+                        StringBuilder reason = new StringBuilder(256);
+                        reason.append("Conflict found: ");
+                        reason.append("Text {");
+                        reason.append(text.toString());
+                        reason.append("} with element ");
+                        reason.append(e.name());
+                        reason.append(" {");
+                        reason.append(value);
+                        reason.append("}, but parsed entity ");
+                        reason.append("has element value {");
+                        reason.append(result.get(e));
+                        reason.append("}.");
+                        status.setError(text.length(), reason.toString());
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return result;
 
     }
 

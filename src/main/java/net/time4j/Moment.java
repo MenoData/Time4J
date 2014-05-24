@@ -1950,27 +1950,23 @@ public final class Moment
             }
 
             Moment result = null;
+            PlainTimestamp ts = null;
+            boolean leapsecond = false;
 
-            boolean leapsecond =
-                entity.contains(SECOND_OF_MINUTE)
-                && (entity.get(SECOND_OF_MINUTE).intValue() == 60);
-
-            if (leapsecond) { // temporär, wird später kompensiert
-                entity.with(SECOND_OF_MINUTE, Integer.valueOf(59));
+            if (entity.contains(LeapsecondElement.INSTANCE)) {
+                leapsecond = true;
+                entity.with(LeapsecondElement.INSTANCE, null);
+                entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
             }
 
-            PlainTimestamp ts = null;
+            ChronoElement<PlainTimestamp> self =
+                PlainTimestamp.axis().element();
 
-            try {
-                ts =
-                    PlainTimestamp.axis().createFrom(
-                        entity,
-                        attributes
-                    );
-            } finally {
-                if (leapsecond) { // Restauration
-                    entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
-                }
+            if (entity.contains(self)) {
+                ts = entity.get(self);
+                entity.with(self, null);
+            } else {
+                ts = PlainTimestamp.axis().createFrom(entity, attributes);
             }
 
             if (ts == null) {
@@ -2069,6 +2065,13 @@ public final class Moment
             }
 
             return context;
+
+        }
+
+        @Override
+        public Chronology<?> preparser() {
+
+            return PlainTimestamp.axis();
 
         }
 

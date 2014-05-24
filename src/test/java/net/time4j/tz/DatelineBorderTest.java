@@ -33,7 +33,7 @@ public class DatelineBorderTest {
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class DatelineBorderTest {
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class DatelineBorderTest {
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .atOffset(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test

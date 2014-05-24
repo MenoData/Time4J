@@ -103,4 +103,12 @@ public interface ChronoMerger<T> {
         AttributeQuery attributes
     );
 
+    /**
+     * <p>Diese Methode definiert eine Kindschronologie, wenn eine
+     * Vorinterpretierung des chronologischen Texts notwendig ist. </p>
+     *
+     * @return  preparsing chronology or {@code null}
+     */
+    Chronology<?> preparser();
+
 }

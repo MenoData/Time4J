@@ -41,7 +41,7 @@ public class ParseLog {
     private int position;
     private int errorIndex;
     private String errorMessage;
-    private ChronoEntity<?> rawValues;
+    private ParsedValues rawValues;
     private Boolean daylightSaving;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -127,6 +127,17 @@ public class ParseLog {
      * @return  parsed values
      */
     public ChronoEntity<?> getRawValues() {
+
+        return this.getRawValues0();
+
+    }
+
+    /**
+     * <p>Interne Methode. </p>
+     *
+     * @return  parsed values
+     */
+    ParsedValues getRawValues0() {
 
         return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
 
@@ -236,7 +247,7 @@ public class ParseLog {
      *
      * @param   rawValues       parsed values
      */
-    void setRawValues(ChronoEntity<?> rawValues) {
+    void setRawValues(ParsedValues rawValues) {
 
         this.rawValues = rawValues;
 

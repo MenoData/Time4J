@@ -164,6 +164,10 @@ public class Chronology<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) {
 
+        if (attributes == null) {
+            throw new NullPointerException("Missing attributes.");
+        }
+
         return this.merger.createFrom(clock, attributes);
 
     }
@@ -189,6 +193,13 @@ public class Chronology<T extends ChronoEntity<T>>
     ) {
 
         return this.merger.preformat(context, attributes);
+
+    }
+
+    @Override
+    public Chronology<?> preparser() {
+
+        return this.merger.preparser();
 
     }
 

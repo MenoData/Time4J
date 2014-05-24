@@ -28,7 +28,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.Timezone;
 
-import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -39,8 +39,7 @@ import java.util.Iterator;
  * @concurrency <mutable>
  */
 class ParsedValues
-    extends ChronoEntity<ParsedValues>
-    implements Iterable<ChronoElement<?>> {
+    extends ChronoEntity<ParsedValues> {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -216,12 +215,11 @@ class ParsedValues
     /**
      * <p>Liefert alle enthaltenen Elemente. </p>
      *
-     * @return  Iterator
+     * @return  internal {@code Map}
      */
-    @Override
-    public Iterator<ChronoElement<?>> iterator() {
+    Map<ChronoElement<?>, Object> toMap() {
 
-        return this.map.keySet().iterator();
+        return this.map;
 
     }
 

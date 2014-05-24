@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2012 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (TimeElement.java) is part of project Time4J.
+ * This file (LeapsecondElement.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,54 +24,56 @@ package net.time4j;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoEntity;
 
-import java.io.ObjectStreamException;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
 
 
 /**
- * <p>Repr&auml;sentiert eine Uhrzeitkomponente. </p>
+ * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
+ * @serial      exclude
  */
-final class TimeElement
-    extends BasicElement<PlainTime> {
+@SuppressWarnings("serial")
+final class LeapsecondElement
+    extends BasicElement<Boolean> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
      * Singleton-Instanz.
      */
-    static final TimeElement INSTANCE = new TimeElement();
-
-    private static final long serialVersionUID = -3712256393866098916L;
+    static final LeapsecondElement INSTANCE = new LeapsecondElement();
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private TimeElement() {
-        super("WALL_TIME");
+    private LeapsecondElement() {
+        super("LEAPSECOND");
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public Class<PlainTime> getType() {
+    public Class<Boolean> getType() {
 
-        return PlainTime.class;
-
-    }
-
-    @Override
-    public PlainTime getDefaultMinimum() {
-
-        return PlainTime.MIN;
+        return Boolean.class;
 
     }
 
     @Override
-    public PlainTime getDefaultMaximum() {
+    public Boolean getDefaultMinimum() {
 
-        return PlainTime.of(23, 59, 59, 999999999);
+        return Boolean.FALSE;
+
+    }
+
+    @Override
+    public Boolean getDefaultMaximum() {
+
+        return Boolean.TRUE;
 
     }
 
@@ -95,13 +97,17 @@ final class TimeElement
     @Override
     public boolean isTimeElement() {
 
-        return true;
+        return false;
 
     }
 
-    private Object readResolve() throws ObjectStreamException {
+    /**
+     * @serialData  Blocks because serialization is not supported.
+     * @throws      NotSerializableException (always)
+     */
+    private void readObject(ObjectInputStream in) throws IOException {
 
-        return INSTANCE;
+        throw new NotSerializableException();
 
     }
 

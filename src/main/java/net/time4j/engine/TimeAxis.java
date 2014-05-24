@@ -53,6 +53,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     private final T min;
     private final T max;
     private final CalendarSystem<T> calendarSystem;
+    private final ChronoElement<T> self;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -80,6 +81,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         this.min = min;
         this.max = max;
         this.calendarSystem = calendarSystem;
+        this.self = new SelfElement<T>(chronoType, min, max);
 
     }
 
@@ -317,6 +319,18 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         } else {
             return this.calendarSystem;
         }
+
+    }
+
+    /**
+     * <p>Liefert diese Zeitachse als chronologisches Element mit
+     * Selbstbezug. </p>
+     *
+     * @return  self-referencing element
+     */
+    public ChronoElement<T> element() {
+
+        return this.self;
 
     }
 
@@ -688,6 +702,160 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                     }
                 }
             }
+
+        }
+
+    }
+
+    private static class SelfElement<T extends TimePoint<?, T>>
+        extends BasicElement<T>
+        implements ElementRule<T, T> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = 4777240530511579802L;
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final Class<T> type;
+        private final T min;
+        private final T max;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        SelfElement(
+            Class<T> type,
+            T min,
+            T max
+        ) {
+            super("SELF");
+
+            this.type = type;
+            this.min = min;
+            this.max = max;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Class<T> getType() {
+
+            return this.type;
+
+        }
+
+        @Override
+        public int compare(
+            ChronoEntity<?> o1,
+            ChronoEntity<?> o2
+        ) {
+
+            T t1 = o1.get(this);
+            T t2 = o2.get(this);
+            return t1.compareTo(t2);
+
+        }
+
+        @Override
+        public T getDefaultMinimum() {
+
+            return this.min;
+
+        }
+
+        @Override
+        public T getDefaultMaximum() {
+
+            return this.max;
+
+        }
+
+        @Override
+        public boolean isDateElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public boolean isTimeElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public T getValue(T context) {
+
+            return context;
+
+        }
+
+        @Override
+        public T getMinimum(T context) {
+
+            return this.getDefaultMinimum();
+
+        }
+
+        @Override
+        public T getMaximum(T context) {
+
+            return this.getDefaultMaximum();
+
+        }
+
+        @Override
+        public boolean isValid(
+            T context,
+            T value
+        ) {
+
+            return (value != null);
+
+        }
+
+        @Override
+        public T withValue(
+            T context,
+            T value,
+            boolean lenient
+        ) {
+
+            if (value == null) {
+                throw new NullPointerException("Missing value.");
+            }
+
+            return value;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(T context) {
+
+            throw new UnsupportedOperationException();
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(T context) {
+
+            throw new UnsupportedOperationException();
+
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <X extends ChronoEntity<X>> ElementRule<X, T> derive(
+            Chronology<X> chronology
+        ) {
+
+            if (chronology.getChronoType().equals(this.type)) {
+                return (ElementRule<X, T>) this;
+            }
+
+            return null;
 
         }
 

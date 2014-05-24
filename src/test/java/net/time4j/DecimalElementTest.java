@@ -66,9 +66,8 @@ public class DecimalElementTest {
         };
         PlainTime result =
             Chronology.lookup(PlainTime.class).createFrom(
-            vs,
-            Attributes.empty()
-        );
+                vs,
+                Attributes.empty());
         assertThat(result, is(PlainTime.of(10, 2, 45, 0)));
     }
 
