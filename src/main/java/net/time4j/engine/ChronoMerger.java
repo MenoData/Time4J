@@ -77,8 +77,8 @@ public interface ChronoMerger<T> {
      * des Jahres konstruiert werden. </p>
      *
      * <p>Gew&ouml;hnlich ruft ein Textinterpretierer diese Methode auf,
-     * nachdem ein Text elementweise in chronologische Werte aufgel&ouml;st
-     * wurde. </p>
+     * nachdem ein Text elementweise in chronologische Elemente und Werte
+     * aufgel&ouml;st wurde. </p>
      *
      * @param   entity          any chronological entity like parsed
      *                          elements with their values

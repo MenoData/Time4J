@@ -53,32 +53,34 @@ public class AdjacentDigitParsingTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void adjacentVariableYearMonthDayFraction1() throws ParseException {
+    public void adjacentVariableYearMonthDayHourFraction1() throws ParseException {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter
                 .setUp(PlainTimestamp.class, Locale.ROOT)
                 .addInteger(PlainDate.YEAR, 4, 9)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
+                .addFixedInteger(PlainTime.ISO_HOUR, 2)
                 .addFraction(PlainTime.NANO_OF_SECOND, 3, 6, false)
                 .build();
         formatter.parse("20000229174521123456");
     }
 
     @Test
-    public void adjacentVariableYearMonthDayFraction2() throws ParseException {
+    public void adjacentVariableYearMonthDayHourFraction2() throws ParseException {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter
                 .setUp(PlainTimestamp.class, Locale.ROOT)
                 .addInteger(PlainDate.YEAR, 4, 9)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
+                .addFixedInteger(PlainTime.ISO_HOUR, 2)
                 .addFraction(PlainTime.NANO_OF_SECOND, 6, 6, false)
                 .build();
         assertThat(
-            formatter.parse("20000229123456"),
+            formatter.parse("2000022917123456"),
             is(PlainTimestamp
-                .of(2000, 2, 29, 0, 0)
+                .of(2000, 2, 29, 17, 0)
                 .with(PlainTime.NANO_OF_SECOND, 123456000)));
     }
 

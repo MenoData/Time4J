@@ -1,5 +1,8 @@
 package net.time4j;
 
+import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
+
 import java.math.BigDecimal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,6 +72,23 @@ public class TimeCreationTest {
     @Test(expected=IllegalArgumentException.class)
     public void ofHourMinuteEx() {
         PlainTime.of(24, 1);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void merge() {
+        PlainTime.axis().createFrom(
+            Moment.UNIX_EPOCH, Attributes.empty(), false);
+    }
+
+    @Test
+    public void mergeLax() {
+        assertThat(
+            PlainTime.axis().createFrom(
+                Moment.UNIX_EPOCH,
+                new Attributes.Builder()
+                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                false),
+        is(PlainTime.midnightAtStartOfDay()));
     }
 
 }

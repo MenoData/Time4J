@@ -1,5 +1,8 @@
 package net.time4j;
 
+import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -65,6 +68,23 @@ public class TimestampCreationTest {
     @Test(expected=IllegalArgumentException.class)
     public void ofYearMonthDayHourMinuteSecondOverflow() {
         PlainTimestamp.of(2014, 4, 21, 19, 45, 60);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void merge() {
+        PlainTimestamp.axis().createFrom(
+            Moment.UNIX_EPOCH, Attributes.empty(), false);
+    }
+
+    @Test
+    public void mergeLax() {
+        assertThat(
+            PlainTimestamp.axis().createFrom(
+                Moment.UNIX_EPOCH,
+                new Attributes.Builder()
+                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                false),
+        is(PlainTimestamp.of(1970, 1, 1, 0, 0)));
     }
 
 }

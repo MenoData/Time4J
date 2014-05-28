@@ -2,6 +2,8 @@ package net.time4j;
 
 import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
+import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -265,6 +267,23 @@ public class DateCreationTest {
             PlainDate.of(min, EpochDays.UTC),
             is(PlainDate.of(-999999999, 1, 1)));
         assertThat(EpochDays.UTC.getDefaultMinimum(), is(min));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void merge() {
+        PlainDate.axis().createFrom(
+            Moment.UNIX_EPOCH, Attributes.empty(), false);
+    }
+
+    @Test
+    public void mergeLax() {
+        assertThat(
+            PlainDate.axis().createFrom(
+                Moment.UNIX_EPOCH,
+                new Attributes.Builder()
+                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                false),
+        is(PlainDate.of(1970, 1, 1)));
     }
 
 }

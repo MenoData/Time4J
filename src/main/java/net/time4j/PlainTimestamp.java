@@ -928,13 +928,18 @@ public final class PlainTimestamp
             boolean preparsing
         ) {
 
+            Leniency leniency =
+                attributes.get(Attributes.LENIENCY, Leniency.SMART);
+
             if (entity instanceof UnixTime) {
                 Moment ut = Moment.from(UnixTime.class.cast(entity));
-
                 TZID tzid = ZonalOffset.UTC;
 
                 if (attributes.contains(Attributes.TIMEZONE_ID)) {
                     tzid = attributes.get(Attributes.TIMEZONE_ID);
+                } else if (!leniency.isLax()) {
+                    throw new IllegalArgumentException(
+                        "Missing timezone attribute for type conversion.");
                 }
 
                 return ut.inTimezone(tzid);
@@ -964,12 +969,11 @@ public final class PlainTimestamp
                 time = entity.get(WALL_TIME);
             } else {
                 time = PlainTime.axis().createFrom(entity, attributes, false);
-                if (time == null) {
-                    Leniency leniency =
-                        attributes.get(Attributes.LENIENCY, Leniency.SMART);
-                    if (!leniency.isStrict()) {
-                        time = PlainTime.MIN;
-                    }
+                if (
+                    (time == null)
+                    && leniency.isLax()
+                ) {
+                    time = PlainTime.MIN;
                 }
             }
 
