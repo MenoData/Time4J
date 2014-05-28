@@ -61,14 +61,10 @@ public enum ClockUnit
     },
 
     /**
-     * <p>Zeiteinheit &quot;Sekunden&quot; (Symbol S). </p>
+     * <p>Zeiteinheit &quot;Sekunden&quot; (Symbol S) entsprechend der
+     * Stellung des Sekundenzeigers auf einer analogen Uhr. </p>
      *
-     * <p>Zu beachten: Von wahren SI-Zeiteinheiten kann in Time4J erst ab
-     * 1972-01-01T00:00:00Z gesprochen werden. Davor speichert Time4J Zeiten
-     * in UT1. Eine SI-Sekunde wird als das 9192631770-fache der Periodendauer
-     * der dem &Uuml;bergang zwischen den beiden Hyperfeinstrukturniveaus des
-     * Grundzustands von Atomen des Nuklids Cs-133 entsprechenden Strahlung
-     * definiert. </p>
+     * @see     SI
      */
     SECONDS() {
         @Override
