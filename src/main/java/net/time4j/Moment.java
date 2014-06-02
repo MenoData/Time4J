@@ -1996,6 +1996,7 @@ public final class Moment
                     attrs.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
                     result = ts.atStdTimezone();
+                    tzid = Timezone.ofSystem().getID();
                 }
             }
 

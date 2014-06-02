@@ -71,7 +71,7 @@ public interface ChronoMerger<T> {
      * chronologischen Daten. </p>
      *
      * <p>Typischerweise wird mit verschiedenen Priorit&auml;ten das Argument
-     * {@code parsedValues} nach Elementen abgefragt, die gruppenweise einen
+     * {@code entity} nach Elementen abgefragt, die gruppenweise einen
      * Zeitwert konstruieren. Zum Beispiel kann ein Datum entweder &uuml;ber
      * die Epochentage, die Gruppe Jahr-Monat-Tag oder die Gruppe Jahr und Tag
      * des Jahres konstruiert werden. </p>
