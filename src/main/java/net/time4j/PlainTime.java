@@ -61,14 +61,45 @@ import java.util.Set;
 
 
 /**
+ * <p>Represents a plain wall time without any timezone or date component
+ * as defined in ISO-8601 up to nanosecond precision. </p>
+ *
+ * <p>This type also supports the special value 24:00 in its state space.
+ * That value means midnight at the end of day and can be both set and
+ * queried. </p>
+ *
+ * <p>Following elements which are declared as constants are registered by
+ * this class: </p>
+ *
+ * <ul>
+ *  <li>{@link #AM_PM_OF_DAY}</li>
+ *  <li>{@link #CLOCK_HOUR_OF_AMPM}</li>
+ *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
+ *  <li>{@link #DIGITAL_HOUR_OF_AMPM}</li>
+ *  <li>{@link #DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link #ISO_HOUR}</li>
+ *  <li>{@link #MINUTE_OF_HOUR}</li>
+ *  <li>{@link #MINUTE_OF_DAY}</li>
+ *  <li>{@link #SECOND_OF_MINUTE}</li>
+ *  <li>{@link #SECOND_OF_DAY}</li>
+ *  <li>{@link #MILLI_OF_SECOND}</li>
+ *  <li>{@link #MICRO_OF_SECOND}</li>
+ *  <li>{@link #NANO_OF_SECOND}</li>
+ *  <li>{@link #MILLI_OF_DAY}</li>
+ *  <li>{@link #MICRO_OF_DAY}</li>
+ *  <li>{@link #NANO_OF_DAY}</li>
+ *  <li>{@link #PRECISION}</li>
+ *  <li>{@link #DECIMAL_HOUR}</li>
+ *  <li>{@link #DECIMAL_MINUTE}</li>
+ *  <li>{@link #DECIMAL_SECOND}</li>
+ * </ul>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine reine Uhrzeit ohne Zeitzonen- oder Datumsteil
  * nach dem ISO-8601-Standard in maximal Nanosekundengenauigkeit. </p>
- *
- * <p>Hinweis: UTC-Schaltsekunden k&ouml;nnen mangels Datumsbezug
- * nicht unterst&uuml;tzt werden. Wird z.B. ein {@code Moment}
- * nach seiner Uhrzeit als {@code PlainTime} statt direkt der UTC-Sekunde
- * gefragt, so wird eine eventuelle Schaltsekunde auf den Wert {@code 59}
- * zur&uuml;ckgesetzt. </p>
  *
  * <p>Diese Klasse unterst&uuml;tzt auch den Spezialwert T24:00 in ihrem
  * Zustandsraum, w&auml;hrend die Klasse {@code PlainTimestamp} den Wert
@@ -158,6 +189,39 @@ public final class PlainTime
     static final ChronoElement<PlainTime> WALL_TIME = TimeElement.INSTANCE;
 
     /**
+     * <p>Element with the half day section relative to noon (ante meridiem
+     * or post meridiem). </p>
+     *
+     * <p>This element handles the value 24:00 in the same way as 00:00, hence
+     * does not make any difference between start and end of day. In detail
+     * the mapping from hours to meridiem values looks like following: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <tr>
+     *  <td>AM_PM_OF_DAY</td><td>AM</td><td>AM</td><td>...</td><td>AM</td>
+     *  <td>PM</td><td>PM</td><td>...</td><td>PM</td><td>AM</td>
+     * </tr>
+     * <tr>
+     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
+     * </tr>
+     * </table>
+     * </div>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.AM_PM_OF_DAY;
+     *
+     *  PlainTime time = PlainTime.of(12, 45, 20);
+     *  System.out.println(time.get(AM_PM_OF_DAY));
+     *  // Ausgabe: PM
+     * </pre>
+     *
+     * <p>This element does not define a base unit. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Tagesabschnitt relativ zur Mittagszeit (Vormittag
      * oder Nachmittag). </p>
      *
@@ -195,6 +259,30 @@ public final class PlainTime
         AmPmElement.AM_PM_OF_DAY;
 
     /**
+     * <p>Element with the hour of half day in the value range {@code 1-12}
+     * (dial on an analogue watch). </p>
+     *
+     * <p>This element handles the value 24:00 in the same way as 00:00, hence
+     * does not make any difference between start and end of day. This is a
+     * limitation which preserves the compatibility with CLDR and the class
+     * {@code java.text.SimpleDateFormat}. In order to support the full
+     * hour range users can use the element {@link #ISO_HOUR}. In detail
+     * the mapping to ISO-hours looks like following: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <tr>
+     *  <td>CLOCK_HOUR_OF_AMPM</td><td>12</td><td>1</td><td>...</td><td>11</td>
+     *  <td>12</td><td>1</td><td>...</td><td>11</td><td>12</td>
+     * </tr>
+     * <tr>
+     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Element mit der Halbtagsstunde im Bereich {@code 1-12}
      * (Ziffernblattanzeige einer analogen Uhr). </p>
      *
@@ -224,6 +312,30 @@ public final class PlainTime
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_AMPM", false);
 
     /**
+     * <p>Element with the hour in the value range {@code 1-24} (analogue
+     * display). </p>
+     *
+     * <p>This element handles the value 24:00 in the same way as 00:00, hence
+     * does not make any difference between start and end of day. This is a
+     * limitation which preserves the compatibility with CLDR and the class
+     * {@code java.text.SimpleDateFormat}. In order to support the full
+     * hour range users can use the element {@link #ISO_HOUR}. In detail
+     * the mapping to ISO-hours looks like following: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <tr>
+     *  <td>CLOCK_HOUR_OF_DAY</td><td>24</td><td>1</td><td>...</td><td>11</td>
+     *  <td>12</td><td>13</td><td>...</td><td>23</td><td>24</td>
+     * </tr>
+     * <tr>
+     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Element mit der Stunde im Bereich {@code 1-24} (analoge Anzeige). </p>
      *
      * <p>Dieses Element behandelt die Zeit T24:00 genauso wie T00:00, macht
@@ -252,6 +364,30 @@ public final class PlainTime
         IntegerTimeElement.createClockElement("CLOCK_HOUR_OF_DAY", true);
 
     /**
+     * <p>Element with the digital hour of half day in the value range
+     * {@code 0-11}. </p>
+     *
+     * <p>This element handles the value 24:00 in the same way as 00:00, hence
+     * does not make any difference between start and end of day. This is a
+     * limitation which preserves the compatibility with CLDR and the class
+     * {@code java.text.SimpleDateFormat}. In order to support the full
+     * hour range users can use the element {@link #ISO_HOUR}. In detail
+     * the mapping to ISO-hours looks like following: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <tr>
+     *  <td>DIGITAL_HOUR_OF_AMPM</td><td>0</td><td>1</td><td>...</td><td>11</td>
+     *  <td>0</td><td>1</td><td>...</td><td>11</td><td>0</td>
+     * </tr>
+     * <tr>
+     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Element mit der digitalen Halbtagsstunde im Bereich {@code 0-11}. </p>
      *
      * <p>Dieses Element behandelt die Zeit T24:00 genauso wie T00:00, macht
@@ -285,6 +421,29 @@ public final class PlainTime
             'K');
 
     /**
+     * <p>Element with the digital hour in the value range {@code 0-23}. </p>
+     *
+     * <p>This element handles the value 24:00 in the same way as 00:00, hence
+     * does not make any difference between start and end of day. This is a
+     * limitation which preserves the compatibility with CLDR and the class
+     * {@code java.text.SimpleDateFormat}. In order to support the full
+     * hour range users can use the element {@link #ISO_HOUR}. In detail
+     * the mapping to ISO-hours looks like following: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <tr>
+     *  <td>DIGITAL_HOUR_OF_DAY</td><td>0</td><td>1</td><td>...</td><td>11</td>
+     *  <td>12</td><td>13</td><td>...</td><td>23</td><td>0</td>
+     * </tr>
+     * <tr>
+     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Element mit der digitalen Stunde im Bereich {@code 0-23}. </p>
      *
      * <p>Dieses Element behandelt die Zeit T24:00 genauso wie T00:00, macht
@@ -318,6 +477,16 @@ public final class PlainTime
             'H');
 
     /**
+     * <p>Element with the ISO-8601-hour of day in the value range
+     * {@code 0-24}. </p>
+     *
+     * <p>Given a context of {@code PlainTime} with full hours, the maximum
+     * is{@code 24} and stands for the time 24:00 (midnight at end of day),
+     * else the maximum is {@code 23} in every different context. </p>
+     *
+     * @see     #getHour()
+     */
+    /*[deutsch]
      * <p>Element mit der ISO-8601-Stunde im Bereich {@code 0-24}. </p>
      *
      * <p>Im Kontext von {@code PlainTime} mit vollen Stunden ist das Maximum
@@ -335,6 +504,11 @@ public final class PlainTime
             '\u0000');
 
     /**
+     * <p>Element with the minute of hour in the value range {@code 0-59}. </p>
+     *
+     * @see     #getMinute()
+     */
+    /*[deutsch]
      * <p>Element mit der Minute im Bereich {@code 0-59}. </p>
      *
      * @see     #getMinute()
@@ -349,6 +523,13 @@ public final class PlainTime
             'm');
 
     /**
+     * <p>Element with the minute of day in the value range {@code 0-1440}. </p>
+     *
+     * <p>Given a context of {@code PlainTime} with full minutes, the maximum
+     * is{@code 1440} and stands for the time 24:00 (midnight at end of day),
+     * else the maximum is {@code 1439} in every different context. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Minute des Tages im Bereich {@code 0-1440}. </p>
      *
      * <p>Im Kontext von {@code PlainTime} mit vollen Minuten ist das Maximum
@@ -364,6 +545,17 @@ public final class PlainTime
             '\u0000');
 
     /**
+     * <p>Element with the second of minute in the value range
+     * {@code 0-59}. </p>
+     *
+     * <p>This element does not know any leapseconds in a local context and
+     * refers to a normal analogue clock. If this element is used in
+     * UTC-context ({@link Moment}) however then the value range is
+     * {@code 0-58/59/60} instead. </p>
+     *
+     * @see     #getSecond()
+     */
+    /*[deutsch]
      * <p>Element mit der Sekunde im Bereich {@code 0-59}. </p>
      *
      * <p>Dieses Element kennt im lokalen Kontext keine UTC-Schaltsekunden und
@@ -384,6 +576,15 @@ public final class PlainTime
             's');
 
     /**
+     * <p>Element with the second of day in the value range
+     * {@code 0-86400}. </p>
+     *
+     * <p>Given a context of {@code PlainTime} with full seconds, the maximum
+     * is{@code 86400} and stands for the time 24:00 (midnight at end of day),
+     * else the maximum is {@code 86399} in every different context. Leapseconds
+     * are never counted. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Sekunde des Tages im Bereich
      * {@code 0-86400}. </p>
      *
@@ -401,6 +602,9 @@ public final class PlainTime
             '\u0000');
 
     /**
+     * <p>Element with the millisecond in the value range {@code 0-999}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Millisekunde im Bereich {@code 0-999}. </p>
      */
     public static final
@@ -413,6 +617,9 @@ public final class PlainTime
             '\u0000');
 
     /**
+     * <p>Element with the microsecond in the value range {@code 0-999999}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Mikrosekunde im Bereich {@code 0-999999}. </p>
      */
     public static final
@@ -425,6 +632,10 @@ public final class PlainTime
             '\u0000');
 
     /**
+     * <p>Element with the nanosecond in the value range
+     * {@code 0-999999999}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Nanosekunde im Bereich {@code 0-999999999}. </p>
      */
     @FormattableElement(format = "S")
@@ -438,6 +649,15 @@ public final class PlainTime
             'S');
 
     /**
+     * <p>Element with the day time in milliseconds in the value range
+     * {@code 0-86400000}. </p>
+     *
+     * <p>Given a context of {@code PlainTime} with full milliseconds, the
+     * maximum is {@code 86400000} and stands for the time 24:00 (midnight at
+     * end of day), else the maximum is {@code 86399999} in every different
+     * context. Leapseconds are never counted. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Tageszeit in Millisekunden im
      * Bereich {@code 0-86400000}. </p>
      *
@@ -457,6 +677,15 @@ public final class PlainTime
             'A');
 
     /**
+     * <p>Element with the day time in microseconds in the value range
+     * {@code 0-86400000000}. </p>
+     *
+     * <p>Given a context of {@code PlainTime} with full microseconds, the
+     * maximum is {@code 86400000000} and stands for the time 24:00 (midnight
+     * at end of day), else the maximum is {@code 86399999999} in every
+     * different context. Leapseconds are never counted. </p>
+     */
+    /*[deutsch]
      * <p>Element mit der Tageszeit in Mikrosekunden im
      * Bereich {@code 0-86400000000}. </p>
      *
@@ -470,6 +699,30 @@ public final class PlainTime
         LongElement.create("MICRO_OF_DAY", 0L, 86399999999L);
 
     /**
+     * <p>Element with the day time in nanoseconds in the value range
+     * {@code 0-86400000000000}. </p>
+     *
+     * <p>Given any context of {@code PlainTime}, the maximum is always
+     * {@code 86400000000000} and stands for the time 24:00 (midnight
+     * at end of day), else the maximum is {@code 86399999999999} in every
+     * different context. Leapseconds are never counted. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.ClockUnit.HOURS;
+     *  import static net.time4j.PlainTime.NANO_OF_DAY;
+     *
+     *  PlainTime time =
+     *      PlainTime.midnightAtStartOfDay().plus(6, HOURS); // T06:00
+     *  System.out.println(
+     *      time.get(NANO_OF_DAY.ratio())
+     *          .multiply(BigDecimal.ofHour(100)).stripTrailingZeros()
+     *      + "% of day are over.");
+     *  // Output: 25% of day are over.
+     * </pre>
+     */
+    /*[deutsch]
      * <p>Element mit der Tageszeit in Nanosekunden im
      * Bereich {@code 0-86400000000000}. </p>
      *
@@ -498,6 +751,13 @@ public final class PlainTime
         LongElement.create("NANO_OF_DAY", 0L, 86399999999999L);
 
     /**
+     * <p>Decimal hour in the value range {@code 0.0} inclusive until
+     * {@code 24.0} inclusive. </p>
+     *
+     * <p>This element does not define any base unit and is only supported
+     * by the class {@code PlainTime}. </p>
+     */
+    /*[deutsch]
      * <p>Dezimal-Stunde im Wertebereich {@code 0.0} inklusive bis
      * {@code 24.0} inklusive. </p>
      *
@@ -508,6 +768,13 @@ public final class PlainTime
         new DecimalTimeElement("DECIMAL_HOUR", DECIMAL_24_0);
 
     /**
+     * <p>Decimal minute in the value range {@code 0.0} inclusive until
+     * {@code 60.0} exclusive. </p>
+     *
+     * <p>This element does not define any base unit and is only supported
+     * by the class {@code PlainTime}. </p>
+     */
+    /*[deutsch]
      * <p>Dezimal-Minute im Wertebereich {@code 0.0} inklusive bis
      * {@code 60.0} exklusive. </p>
      *
@@ -518,6 +785,13 @@ public final class PlainTime
         new DecimalTimeElement("DECIMAL_MINUTE", DECIMAL_59_9);
 
     /**
+     * <p>Decimal second in the value range {@code 0.0} inclusive until
+     * {@code 60.0} exclusive. </p>
+     *
+     * <p>This element does not define any base unit and is only supported
+     * by the class {@code PlainTime}. </p>
+     */
+    /*[deutsch]
      * <p>Dezimal-Sekunde im Wertebereich {@code 0.0} inklusive bis
      * {@code 60.0} exklusive. </p>
      *
@@ -528,6 +802,26 @@ public final class PlainTime
         new DecimalTimeElement("DECIMAL_SECOND", DECIMAL_59_9);
 
     /**
+     * <p>Defines the precision as the smallest non-zero time element and
+     * truncates time parts of higher precision if necessary. </p>
+     *
+     * <p>Setting higher precisions than available is without any effect.
+     * But setting lower precisions can truncate data however. Examples: </p>
+     *
+     * <pre>
+     *  // reading of precision -------------------------------------
+     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  System.out.println(time.get(PRECISION)); // Output: MICROS
+     *
+     *  // setting of precision -------------------------------------
+     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  System.out.println(time.with(PRECISION, ClockUnit.MILLIS));
+     *  // Output: T12:26:52,987
+     * </pre>
+     *
+     * <p>This element does not define any base unit. </p>
+     */
+    /*[deutsch]
      * <p>Definiert die Genauigkeit als das kleinste von {@code 0} verschiedene
      * Uhrzeitelement und schneidet bei Bedarf zu genaue Zeitanteile ab. </p>
      *
@@ -739,6 +1033,12 @@ public final class PlainTime
     }
 
     /**
+     * <p>Yields midnight at the start of the day. </p>
+     *
+     * @return  midnight at the start of day T00:00
+     * @see     #midnightAtEndOfDay()
+     */
+    /*[deutsch]
      * <p>Liefert Mitternacht zu Beginn des Tages. </p>
      *
      * @return  midnight at the start of day T00:00
@@ -751,7 +1051,15 @@ public final class PlainTime
     }
 
     /**
-     * <p>Liefert Mitternacht zum Ende des Tages. </p>
+     * <p>Yields midnight at the end of the day, that is midnight at
+     * the start of the following day. </p>
+     *
+     * @return  midnight at the end of day T24:00
+     * @see     #midnightAtStartOfDay()
+     */
+    /*[deutsch]
+     * <p>Liefert Mitternacht zum Ende des Tages, das ist Mitternacht zum
+     * Start des Folgetags. </p>
      *
      * @return  midnight at the end of day T24:00
      * @see     #midnightAtStartOfDay()
@@ -763,6 +1071,13 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a wall time as full hour. </p>
+     *
+     * @param   hour    iso-hour of day in the range {@code 0-24}
+     * @return  cached full hour
+     * @throws  IllegalArgumentException if given hour is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Uhrzeit als volle Stunde. </p>
      *
      * @param   hour    iso-hour of day in the range {@code 0-24}
@@ -777,6 +1092,15 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a wall time with hour and minute. </p>
+     *
+     * @param   hour    hour of day in the range {@code 0-23} or
+     *                  {@code 24} if the given minute equals to {@code 0}
+     * @param   minute  minute in the range {@code 0-59}
+     * @return  new or cached wall time
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Uhrzeit mit Stunde und Minute. </p>
      *
      * @param   hour    hour of day in the range {@code 0-23} or
@@ -799,6 +1123,16 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a wall time with hour, minute and second. </p>
+     *
+     * @param   hour        hour in the range {@code 0-23} or {@code 24}
+     *                      if the other arguments are equal to {@code 0}
+     * @param   minute      minute in the range {@code 0-59}
+     * @param   second      second in the range {@code 0-59}
+     * @return  new or cached wall time
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Uhrzeit mit Stunde, Minute und Sekunde. </p>
      *
      * @param   hour        hour in the range {@code 0-23} or {@code 24}
@@ -823,6 +1157,21 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a wall time with hour, minute, second and nanosecond. </p>
+     *
+     * @param   hour        hour in the range {@code 0-23} or {@code 24}
+     *                      if the other argumenta equal to {@code 0}
+     * @param   minute      minute in the range {@code 0-59}
+     * @param   second      second in the range {@code 0-59}
+     * @param   nanosecond  nanosecond in the range {@code 0-999,999,999}
+     * @return  new or cached wall time
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int)
+     * @see     #of(int, int)
+     * @see     #of(int, int, int)
+     * @see     #NANO_OF_SECOND
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Uhrzeit mit Stunde, Minute, Sekunde und
      * Nanosekunde. </p>
      *
@@ -854,6 +1203,14 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a wall time by given decimal hour. </p>
+     *
+     * @param   decimal    decimal hour of day in the range {@code [0.0-24.0]}
+     * @return  new or cached wall time
+     * @throws  IllegalArgumentException if the argument is out of range
+     * @see     #DECIMAL_HOUR
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Uhrzeit auf Basis der angegebenen
      * Dezimalstunde. </p>
      *
@@ -869,6 +1226,12 @@ public final class PlainTime
     }
 
     /**
+     * <p>Common conversion method. </p>
+     *
+     * @param   time    ISO-time
+     * @return  PlainTime
+     */
+    /*[deutsch]
      * <p>Allgemeine Konversionsmethode. </p>
      *
      * @param   time    ISO-time
@@ -886,6 +1249,15 @@ public final class PlainTime
     }
 
     /**
+     * <p>Rolls this time by the given duration (as amount and unit) and
+     * also counts possible day overflow. </p>
+     *
+     * @param   amount      amount to be added (maybe negative)
+     * @param   unit        time unit
+     * @return  result of rolling including possible day overflow
+     * @see     #plus(long, Object) plus(long, Unit)
+     */
+    /*[deutsch]
      * <p>Rollt die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
      * auf und z&auml;hlt dabei auch tageweise &Uuml;berl&auml;ufe. </p>
      *
@@ -904,6 +1276,20 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern in the
+     * default locale for formatting and parsing plain times. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -930,6 +1316,18 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode in the
+     * default locale for formatting and parsing plain times. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using system locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -955,6 +1353,21 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern and locale
+     * for formatting and parsing plain times. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -983,6 +1396,19 @@ public final class PlainTime
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode and locale
+     * for formatting and parsing plain times. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code PlainTime}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -1012,6 +1438,10 @@ public final class PlainTime
     }
 
     /**
+     * <p>Compares the full state, that is hour, minute, second and nanosecond
+     * of this instance and given argument. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht alle Zeitzustandsattribute, n&auml;mlich Stunde, Minute,
      * Sekunde und Nanosekunde. </p>
      */
@@ -1034,7 +1464,7 @@ public final class PlainTime
 
     }
 
-    /**
+    /*[deutsch]
      * <p>Basiert auf allen Zeitzustandsattributen. </p>
      */
     @Override
@@ -1070,6 +1500,11 @@ public final class PlainTime
     }
 
     /**
+     * <p>Is this instance at midnight, either at start or at end of day? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Liegt Mitternacht vor (am Anfang oder am Ende eines Tages)? </p>
      *
      * @return  boolean
@@ -1081,6 +1516,15 @@ public final class PlainTime
     }
 
     /**
+     * <p>Defines a natural order which is solely based on the timeline
+     * order. </p>
+     *
+     * <p>The natural order is consistent with {@code equals()}. </p>
+     *
+     * @see     #isBefore(PlainTime)
+     * @see     #isAfter(PlainTime)
+     */
+    /*[deutsch]
      * <p>Definiert eine nat&uuml;rliche Ordnung, die auf der zeitlichen
      * Position basiert. </p>
      *
@@ -1109,6 +1553,25 @@ public final class PlainTime
     }
 
     /**
+     * <p>Dependent on the precision of this instance, this method yields a
+     * canonical representation in one of following formats (CLDR-syntax): </p>
+     *
+     * <ul>
+     *  <li>'T'HH</li>
+     *  <li>'T'HH:mm</li>
+     *  <li>'T'HH:mm:ss</li>
+     *  <li>'T'HH:mm:ss,SSS</li>
+     *  <li>'T'HH:mm:ss,SSSSSS</li>
+     *  <li>'T'HH:mm:ss,SSSSSSSSS</li>
+     * </ul>
+     *
+     * <p>The fraction part will be preceded by a comma as recommended by ISO
+     * unless the system property &quot;net.time4j.format.iso.decimal.dot&quot;
+     * was set to &quot;true&quot;. </p>
+     *
+     * @return  canonical ISO-8601-formatted string
+     */
+    /*[deutsch]
      * <p>Liefert je nach Genauigkeit einen String in einem der folgenden
      * Formate (CLDR-Syntax): </p>
      *
@@ -1173,6 +1636,12 @@ public final class PlainTime
     }
 
     /**
+     * <p>Provides a static access to the associated time axis respective
+     * chronology which contains the chronological rules. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *

@@ -67,6 +67,39 @@ import java.util.Set;
 
 
 /**
+ * <p>Represents a plain calendar date in conformance to ISO-8601-standard. </p>
+ *
+ * <p>The value range also contains negative years down to {@code -999999999}.
+ * These years cannot be interpreted in a historical way, as in general no past
+ * year, too. Instead such related dates can and must rather be interpreted
+ * as a different way of counting days - like epoch days. The rules of
+ * gregorian calendar are applied in a proleptic way that is backwards into
+ * the past even before the earliest introduction of gregorian calendar in
+ * Rome (a non-historical mathematical abstraction). </p>
+ *
+ * <p>Following elements which are declared as constants are registered by
+ * this class: </p>
+ *
+ * <ul>
+ *  <li>{@link #DAY_OF_MONTH}</li>
+ *  <li>{@link #DAY_OF_QUARTER}</li>
+ *  <li>{@link #DAY_OF_WEEK}</li>
+ *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_NUMBER}</li>
+ *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #QUARTER_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link #YEAR}</li>
+ *  <li>{@link #YEAR_OF_WEEKDATE}</li>
+ * </ul>
+ *
+ * <p>Furthermore, all elements of class {@link Weekmodel} and class
+ * {@link EpochDays} are supported. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert ein reines Kalenderdatum im ISO-8601-Standard. </p>
  *
  * <p>Der Wertebereich fasst auch negative Jahre bis zu {@code -999999999}.
@@ -160,6 +193,38 @@ public final class PlainDate
     static final ChronoElement<PlainDate> CALENDAR_DATE = DateElement.INSTANCE;
 
     /**
+     * <p>Element with the proleptic iso-year without any era reference and
+     * the value range {@code -999999999} until {@code 999999999}. </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.YEAR;
+     *
+     *  PlainDate date = PlainDate.of(2012, 2, 29);
+     *  System.out.println(date.get(YEAR)); // Ausgabe: 2012
+     *
+     *  date = date.with(YEAR, 2014);
+     *  System.out.println(date); // Ausgabe: 2014-02-28
+     *
+     *  date = date.with(YEAR.incremented()); // n&auml;chstes Jahr
+     *  System.out.println(date); // Ausgabe: 2015-02-28
+     *
+     *  date = date.with(YEAR.atCeiling()); // letzter Tag des Jahres
+     *  System.out.println(date); // Ausgabe: 2015-12-31
+     *
+     *  date = date.with(YEAR.atFloor()); // erster Tag des Jahres
+     *  System.out.println(date); // Ausgabe: 2015-01-01
+     * </pre>
+     *
+     * <p>The term &quot;proleptic&quot; means that the rules of the gregorian
+     * calendar and the associated way of year counting is applied backward
+     * even before the introduction of gregorian calendar. The year {@code 0}
+     * is permitted - and negative years, too. For historical year numbers,
+     * this mathematical extrapolation is not recommended and usually
+     * wrong. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem proleptischen ISO-Jahr ohne &Auml;ra-Bezug mit dem
      * Wertebereich {@code -999999999} bis {@code 999999999}. </p>
      *
@@ -201,6 +266,32 @@ public final class PlainDate
             'u');
 
     /**
+     * <p>Defines an element for the week-based year in an
+     * ISO-8601-weekdate. </p>
+     *
+     * <p>The week-based year is usually the same as the calendar year.
+     * However, at the begin or end of a calendar year the situation is
+     * different because the first week of the weekdate can start after
+     * New Year and the last week of the weekdate can end before the last
+     * day of the calendar year. Examples: </p>
+     *
+     * <ul><li>Sunday, [1995-01-01] =&gt; [1994-W52-7]</li>
+     * <li>Tuesday, [1996-31-12] =&gt; [1997-W01-2]</li></ul>
+     *
+     * <p>Note: This element has a special basic unit which can be used such
+     * that the day of the week will be conserved instead of the day of month
+     * after adding one week-based year: </p>
+     *
+     * <pre>
+     *  PlainDate date = PlainDate.of(2014, JANUARY, 2); // Thursday
+     *  IsoDateUnit unit = CalendarUnit.weekBasedYears();
+     *  System.out.println(date.plus(1, unit)); // output: 2015-01-01
+     * </pre>
+     *
+     * @see     CalendarUnit#weekBasedYears()
+     * @see     Weekmodel#ISO
+     */
+    /*[deutsch]
      * <p>Definiert ein Element f&uuml;r das wochenbasierte Jahr in einem
      * ISO-Wochendatum. </p>
      *
@@ -224,12 +315,17 @@ public final class PlainDate
      * </pre>
      *
      * @see     CalendarUnit#weekBasedYears()
+     * @see     Weekmodel#ISO
      */
     @FormattableElement(format = "Y")
     public static final AdjustableElement<Integer, PlainDate> YEAR_OF_WEEKDATE =
         YOWElement.INSTANCE;
 
     /**
+     * <p>Element with the quarter of year in the value range
+     * {@code Q1-Q4}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Quartal des Jahres (Wertebereich {@code Q1-Q4}). </p>
      */
     @FormattableElement(format = "Q", standalone="q")
@@ -243,7 +339,39 @@ public final class PlainDate
             'Q');
 
     /**
-     *  <p>Element mit dem Monat als Enum
+     * <p>Element with the calendar month as enum in the value range
+     * {@code JANUARY-DECEMBER}). </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.MONTH_OF_YEAR;
+     *  import static net.time4j.Month.*;
+     *
+     *  PlainDate date = PlainDate.of(2012, 2, 29);
+     *  System.out.println(date.get(MONTH_OF_YEAR)); // output: February
+     *
+     *  date = date.with(MONTH_OF_YEAR, APRIL);
+     *  System.out.println(date); // output: 2012-04-29
+     *
+     *  date = date.with(MONTH_OF_YEAR.incremented()); // next month
+     *  System.out.println(date); // output: 2012-05-29
+     *
+     *  date = date.with(MONTH_OF_YEAR.maximized()); // last month of year
+     *  System.out.println(date); // output: 2012-12-29
+     *
+     *  date = date.with(MONTH_OF_YEAR.atCeiling()); // last day of month
+     *  System.out.println(date); // output: 2012-12-31
+     *
+     *  date = date.with(MONTH_OF_YEAR.atFloor()); // first day of month
+     *  System.out.println(date); // output: 2012-12-01
+     *
+     *  date = date.with(MONTH_OF_YEAR.setToNext(JULY)); // move to July
+     *  System.out.println(date); // output: 2013-07-01
+     * </pre>
+     */
+    /*[deutsch]
+     * <p>Element mit dem Monat als Enum
      * (Wertebereich {@code JANUARY-DECEMBER}). </p>
      *
      * <p>Beispiele: </p>
@@ -285,10 +413,39 @@ public final class PlainDate
             'M');
 
     /**
+     * <p>Element with the calendar month in numerical form and the value range
+     * {@code 1-12}. </p>
+     *
+     * <p>Normally the enum-variant is recommended due to clarity and
+     * type-safety. The enum-form can also be formatted as text. However,
+     * if users want to set any month number in a lenient way with possible
+     * carry-over then they can do it like in following example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.MONTH_AS_NUMBER;
+     *
+     *  PlainDate date = PlainDate.of(2012, 2, 29);
+     *  date = date.with(MONTH_AS_NUMBER.setLenient(13);
+     *  System.out.println(date); // Ausgabe: 2013-01-29
+     * </pre>
+     *
+     * @see     #MONTH_OF_YEAR
+     */
+    /*[deutsch]
      * <p>Element mit dem Monat in Nummernform (Wertebereich {@code 1-12}). </p>
      *
      * <p>Im allgemeinen empfiehlt sich wegen der Typsicherheit und sprachlichen
-     * Klarheit die enum-Form, die zudem auch als Text formatierbar ist. </p>
+     * Klarheit die enum-Form, die zudem auch als Text formatierbar ist. Wenn
+     * Anwender jedoch irgendeine Monatsnummer nachsichtig mit m&ouml;glichem
+     * &Uuml;berlauf setzen wollen, k&ouml;nnen sie es wie folgt tun: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.MONTH_AS_NUMBER;
+     *
+     *  PlainDate date = PlainDate.of(2012, 2, 29);
+     *  date = date.with(MONTH_AS_NUMBER.setLenient(13);
+     *  System.out.println(date); // Ausgabe: 2013-01-29
+     * </pre>
      *
      * @see     #MONTH_OF_YEAR
      */
@@ -302,6 +459,10 @@ public final class PlainDate
             '\u0000');
 
     /**
+     * <p>Element with the day of month in the value range
+     * {@code 1-28/29/30/31}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Tag des Monats
      * (Wertebereich {@code 1-28/29/30/31}). </p>
      */
@@ -315,6 +476,17 @@ public final class PlainDate
             'd');
 
     /**
+     * <p>Element with the day of week in the value range
+     * {@code MONDAY-SUNDAY}. </p>
+     *
+     * <p>A localized form is available by {@link Weekmodel#localDayOfWeek()}.
+     * In US sunday is considered as first day of week, different from
+     * definition used here (monday as start of calendar week according to
+     * ISO-8601). Therefore, if users need localized weekday-numbers, users
+     * can use the expression {@code Weekmodel.of(Locale.US).localDayOfWeek()}
+     * in a country like US. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Tag der Woche
      * (Wertebereich {@code MONDAY-SUNDAY}). </p>
      *
@@ -335,6 +507,10 @@ public final class PlainDate
             'E');
 
     /**
+     * <p>Element with the day of year in the value range
+     * {@code 1-365/366}). </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Tag des Jahres (Wertebereich {@code 1-365/366}). </p>
      */
     @FormattableElement(format = "D")
@@ -347,6 +523,10 @@ public final class PlainDate
             'D');
 
     /**
+     * <p>Element with the day within a quarter of year in the value range
+     * {@code 1-90/91/92}. </p>
+     */
+    /*[deutsch]
      * <p>Element mit dem Tag des Quartals
      * (Wertebereich {@code 1-90/91/92}). </p>
      */
@@ -359,6 +539,21 @@ public final class PlainDate
             '\u0000');
 
     /**
+     * <p>Element with the ordinal day-of-week within given calendar month
+     * in the value range {@code 1-5}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
+     *  import static net.time4j.Weekday.*;
+     *
+     *  PlainDate date = PlainDate.of(2013, 3, 1); // first of march 2013
+     *  System.out.println(date.with(WEEKDAY_IN_MONTH.setToThird(WEDNESDAY)));
+     *  // output: 2013-03-20 (third Wednesday in march)
+     * </pre>
+     */
+    /*[deutsch]
      * <p>Element mit dem x-ten Wochentag im Monat
      * (Wertebereich {@code 1-5}). </p>
      *
@@ -512,6 +707,18 @@ public final class PlainDate
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates a new calendar date conforming to ISO-8601. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @return  new or cached calendar date instance
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int, Month, int)
+     * @see     #of(int, int)
+     * @see     #of(int, int, Weekday)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues ISO-konformes Kalenderdatum. </p>
      *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
@@ -535,6 +742,16 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new calendar date conforming to ISO-8601. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   month       gregorian month in range (January-December)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @return  new or cached calendar date instance
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(int, int, int)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues ISO-konformes Kalenderdatum. </p>
      *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
@@ -555,6 +772,14 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new ordinal date conforming to ISO-8601. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   dayOfYear   day of year in the range (1-366)
+     * @return  new or cached ordinal date instance
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues ISO-konformes Ordinaldatum. </p>
      *
      * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
@@ -592,6 +817,15 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new week-date conforming to ISO-8601. </p>
+     *
+     * @param   yearOfWeekdate  week-based-year according to ISO-definition
+     * @param   weekOfYear      week of year in the range (1-52/53)
+     * @param   dayOfWeek       day of week in the range (MONDAY-SUNDAY)
+     * @return  new or cached week date instance
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues ISO-konformes Wochendatum. </p>
      *
      * @param   yearOfWeekdate  week-based-year according to ISO-definition
@@ -652,6 +886,12 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new date based on count of days since given epoch. </p>
+     *
+     * @return  found calendar date based on given epoch days
+     * @throws  IllegalArgumentException if first argument is out of range
+     */
+    /*[deutsch]
      * <p>Erzeugt ein Datum zur gegebenen Anzahl von Tagen seit einer
      * Epoche. </p>
      *
@@ -668,7 +908,14 @@ public final class PlainDate
     }
 
     /**
-     * <p>Allgemeine Konversionsmethode. </p>
+     * <p>Common conversion method for proleptic gregorian dates. </p>
+     *
+     * @param   date    ISO-date
+     * @return  PlainDate
+     */
+    /*[deutsch]
+     * <p>Allgemeine Konversionsmethode f&uuml;r ein proleptisches
+     * gregorianisches Datum. </p>
      *
      * @param   date    ISO-date
      * @return  PlainDate
@@ -685,6 +932,13 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new local timestamp with this date at midnight at the
+     * begin of associated day. </p>
+     *
+     * @return  local timestamp as composition of this date and midnight
+     * @see     #at(PlainTime)
+     */
+    /*[deutsch]
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zu Mitternacht
      * am Beginn des Tages. </p>
      *
@@ -698,6 +952,15 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new global timestamp with this date at the earliest defined
+     * wall time in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  global timestamp based on composition of this date and earliest
+     *          wall time in given timezone
+     * @see     #at(PlainTime)
+     */
+    /*[deutsch]
      * <p>Erzeugt einen globalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
      * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
      *
@@ -714,6 +977,16 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new local timestamp with this date and given wall time. </p>
+     *
+     * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
+     * then the resulting timestamp will automatically be normalized such
+     * that the timestamp will contain the following day instead. </p>
+     *
+     * @param   time    wall time
+     * @return  local timestamp as composition of this date and given time
+     */
+    /*[deutsch]
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum und der
      * angegebenen Uhrzeit. </p>
      *
@@ -731,6 +1004,14 @@ public final class PlainDate
     }
 
     /**
+     * <p>Is equivalent to {@code at(PlainTime.of(hour, minute))}. </p>
+     *
+     * @param   hour        hour of day in range (0-24)
+     * @param   minute      minute of hour in range (0-59)
+     * @return  local timestamp as composition of this date and given time
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Entspricht {@code at(PlainTime.of(hour, minute))}. </p>
      *
      * @param   hour        hour of day in range (0-24)
@@ -748,6 +1029,15 @@ public final class PlainDate
     }
 
     /**
+     * <p>Is equivalent to {@code at(PlainTime.of(hour, minute, second))}. </p>
+     *
+     * @param   hour        hour of day in range (0-24)
+     * @param   minute      minute of hour in range (0-59)
+     * @param   second      second of hour in range (0-59)
+     * @return  local timestamp as composition of this date and given time
+     * @throws  IllegalArgumentException if any argument is out of range
+     */
+    /*[deutsch]
      * <p>Entspricht {@code at(PlainTime.of(hour, minute, second))}. </p>
      *
      * @param   hour        hour of day in range (0-24)
@@ -788,9 +1078,14 @@ public final class PlainDate
     }
 
     /**
-     * <p>Ermittelt die L&auml;nge des aktuellen Monats in Tagen. </p>
+     * <p>Calculates the length of associated month in days. </p>
      *
-     * @return  int im Bereich 28-31
+     * @return  int in value range {@code 28-31}
+     */
+    /*[deutsch]
+     * <p>Ermittelt die L&auml;nge des assoziierten Monats in Tagen. </p>
+     *
+     * @return  int im Bereich {@code 28-31}
      */
     public int lengthOfMonth() {
 
@@ -799,9 +1094,14 @@ public final class PlainDate
     }
 
     /**
-     * <p>Ermittelt die L&auml;nge des aktuellen Jahres in Tagen. </p>
+     * <p>Calculates the length of associated year in days. </p>
      *
-     * @return  365 oder 366 wenn das aktuelle Jahr ein Schaltjahr ist
+     * @return  {@code 365} or {@code 366} if associated year is a leap year
+     */
+    /*[deutsch]
+     * <p>Ermittelt die L&auml;nge des assoziierten Jahres in Tagen. </p>
+     *
+     * @return  {@code 365} or {@code 366} wenn das Jahr ein Schaltjahr ist
      */
     public int lengthOfYear() {
 
@@ -810,6 +1110,11 @@ public final class PlainDate
     }
 
     /**
+     * <p>Is the year of this date a leap year? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Liegt dieses Datum in einem Schaltjahr? </p>
      *
      * @return  boolean
@@ -821,6 +1126,14 @@ public final class PlainDate
     }
 
     /**
+     * <p>Does this date fall on a week-end in given country? </p>
+     *
+     * @param   country     country setting with two-letter ISO-3166-code
+     * @return  {@code true} if in given country this date is on weekend
+     *          else {@code false}
+     * @see     Weekmodel#weekend()
+     */
+    /*[deutsch]
      * <p>Liegt das Datum im angegebenen Land an einem Wochenende? </p>
      *
      * @param   country     country setting with two-letter ISO-3166-code
@@ -835,6 +1148,20 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern in the
+     * default locale for formatting and parsing plain dates. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -861,6 +1188,18 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode in the
+     * default locale for formatting and parsing plain dates. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using system locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -886,6 +1225,21 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern and locale
+     * for formatting and parsing plain dates. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -914,6 +1268,19 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode and locale
+     * for formatting and parsing plain dates. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code PlainDate}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -943,6 +1310,12 @@ public final class PlainDate
     }
 
     /**
+     * <p>Creates a canonical representation of the form
+     * &quot;YYYY-MM-DD&quot; as documented in ISO-8601. </p>
+     *
+     * @return  canonical ISO-8601-formatted string
+     */
+    /*[deutsch]
      * <p>Erzeugt eine kanonische Darstellung im Format
      * &quot;yyyy-MM-dd&quot;. </p>
      *
@@ -968,6 +1341,12 @@ public final class PlainDate
     }
 
     /**
+     * <p>Provides a static access to the associated chronology on base of
+     * epoch days which contains the chronological rules. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *
@@ -1087,8 +1466,7 @@ public final class PlainDate
     }
 
     /**
-     * <p>Executes an addition of {@code amount} in calendar units to given
-     * context. </p>
+     * <p>Additionsmethode. </p>
      *
      * @param   unit        calendar unit
      * @param   context     calendar date

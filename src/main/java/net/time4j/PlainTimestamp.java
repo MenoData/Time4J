@@ -65,6 +65,52 @@ import static net.time4j.PlainTime.*;
 
 
 /**
+ * <p>Represents a plain composition of calendar date and wall time as defined
+ * in ISO-8601, but without any timezone. </p>
+ *
+ * <p>Following elements which are declared as constants are registered by
+ * this class: </p>
+ *
+ * <ul>
+ *  <li>{@link PlainDate#YEAR}</li>
+ *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
+ *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_AS_NUMBER}</li>
+ *  <li>{@link PlainDate#DAY_OF_MONTH}</li>
+ *  <li>{@link PlainDate#DAY_OF_QUARTER}</li>
+ *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
+ *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
+ *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#ISO_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
+ *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
+ *  <li>{@link PlainTime#SECOND_OF_DAY}</li>
+ *  <li>{@link PlainTime#MILLI_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MICRO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#NANO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
+ *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
+ *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ * </ul>
+ *
+ * <p>Furthermore, all elements of class {@link Weekmodel} are supported. As
+ * timestamp units can be used: {@link CalendarUnit} and {@link ClockUnit}. </p>
+ *
+ * <p>Note: The special time value 24:00 is only supported in the factory
+ * methods which normalize the resulting timestamp to midnight of the following
+ * day. In element access and manipulations this value is not supported. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Komposition aus Datum und Uhrzeit nach dem ISO-8601-Standard. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
@@ -306,6 +352,19 @@ public final class PlainTimestamp
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates a new local timestamp with calendar date and wall time. </p>
+     *
+     * <p>The special time value 24:00 will automatically normalized such
+     * that the resulting timestamp is on starting midnight of following
+     * day. </p>
+     *
+     * @param   date    calendar date component
+     * @param   time    wall time component (24:00 will always be normalized)
+     * @return  timestamp as composition of date and time
+     * @see     #of(int, int, int, int, int)
+     * @see     #of(int, int, int, int, int, int)
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Instanz mit Datum und Uhrzeit. </p>
      *
      * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
@@ -327,6 +386,21 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Creates a new local timestamp in minute precision. </p>
+     *
+     * <p>The special time value 24:00 will automatically normalized such
+     * that the resulting timestamp is on starting midnight of following
+     * day. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @param   hour        hour in the range {@code 0-23} or {@code 24}
+     *                      if minute and second are equal to {@code 0}
+     * @param   minute      minute in the range {@code 0-59}
+     * @return  timestamp as composition of date and time
+     */
+    /*[deutsch]
      * <p>Erzeugt einen neuen minutengenauen Zeitstempel. </p>
      *
      * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
@@ -353,6 +427,22 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Creates a new local timestamp in second precision. </p>
+     *
+     * <p>The special time value 24:00 will automatically normalized such
+     * that the resulting timestamp is on starting midnight of following
+     * day. </p>
+     *
+     * @param   year        proleptic iso year [(-999,999,999)-999,999,999]
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @param   hour        hour in the range {@code 0-23} or {@code 24}
+     *                      if minute and second are equal to {@code 0}
+     * @param   minute      minute in the range {@code 0-59}
+     * @param   second      second in the range {@code 0-59}
+     * @return  timestamp as composition of date and time
+     */
+    /*[deutsch]
      * <p>Erzeugt einen neuen sekundengenauen Zeitstempel. </p>
      *
      * <p>Der Spezialwert T24:00 wird automatisch so normalisiert, da&szlig;
@@ -384,6 +474,11 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Provides the calendar date part. </p>
+     *
+     * @return  calendar date component
+     */
+    /*[deutsch]
      * <p>Liefert die Datumskomponente. </p>
      *
      * @return  calendar date component
@@ -395,6 +490,11 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Provides the wall time part. </p>
+     *
+     * @return  wall time component
+     */
+    /*[deutsch]
      * <p>Liefert die Uhrzeitkomponente. </p>
      *
      * @return  wall time component
@@ -448,6 +548,13 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Adjusts this timestamp by given operator. </p>
+     *
+     * @param   operator    element-related operator
+     * @return  changed copy of this timestamp
+     * @see     ChronoEntity#with(net.time4j.engine.ChronoOperator)
+     */
+    /*[deutsch]
      * <p>Passt diesen Zeitstempel mit Hilfe des angegebenen Operators an. </p>
      *
      * @param   operator    element-related operator
@@ -461,6 +568,12 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Adjusts the calendar part of this timestamp. </p>
+     *
+     * @param   date    new calendar date component
+     * @return  changed copy of this timestamp
+     */
+    /*[deutsch]
      * <p>Passt die Datumskomponente an. </p>
      *
      * @param   date    new calendar date component
@@ -473,6 +586,12 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Adjusts the wall time part of this timestamp. </p>
+     *
+     * @param   time    new wall time component
+     * @return  changed copy of this timestamp
+     */
+    /*[deutsch]
      * <p>Passt die Uhrzeitkomponente an. </p>
      *
      * @param   time    new wall time component
@@ -506,6 +625,14 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Defines the temporal order of date and time as natural order. </p>
+     *
+     * <p>The comparison is consistent with {@code equals()}. </p>
+     *
+     * @see     #isBefore(PlainTimestamp)
+     * @see     #isAfter(PlainTimestamp)
+     */
+    /*[deutsch]
      * <p>Definiert eine nat&uuml;rliche Ordnung, die auf der zeitlichen
      * Position basiert. </p>
      *
@@ -549,6 +676,16 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Creates a canonical representation of the form
+     * &quot;yyyy-MM-dd'T'HH:mm:ss,fffffffff&quot;. </p>
+     *
+     * <p>Dependent on the precision (that is last non-zero part of time)
+     * the time representation might be shorter. </p>
+     *
+     * @return  canonical ISO-8601-formatted string
+     * @see     PlainTime#toString()
+     */
+    /*[deutsch]
      * <p>Erzeugt eine kanonische Darstellung im Format
      * &quot;yyyy-MM-dd'T'HH:mm:ss,fffffffff&quot;. </p>
      *
@@ -565,6 +702,20 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern in the
+     * default locale for formatting and parsing plain timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code PlainTimestamp}-objects
+     *          using system locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -591,6 +742,21 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern and locale
+     * for formatting and parsing plain timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code PlainTimestamp}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -619,30 +785,12 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Erstellt ein neues Formatobjekt, das eine Komposition der angegebenen
-     * Datums- und Uhrzeitformate darstellt. </p>
+     * <p>Provides a static access to the associated time axis respective
+     * chronology which contains the chronological rules. </p>
      *
-     * <p>Die Sprach- und L&auml;ndereinstellung wird vom Datumsformat
-     * &uuml;bernommen. </p>
-     *
-     * @param   dateFormatter   calendar date formatter
-     * @param   timeFormatter   walltime formatter
-     * @return  composite formatter object for a plain timestamp
+     * @return  chronological system as time axis (never {@code null})
      */
-    public static ChronoFormatter<PlainTimestamp> formatter(
-        ChronoFormatter<PlainDate> dateFormatter,
-        ChronoFormatter<PlainTime> timeFormatter
-    ) {
-
-        return ChronoFormatter
-            .setUp(PlainTimestamp.class, dateFormatter.getLocale())
-            .addCustomized(CALENDAR_DATE, dateFormatter)
-            .addCustomized(WALL_TIME, timeFormatter)
-            .build();
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *
@@ -662,6 +810,13 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Combines this local timestamp with the timezone UTC to a global
+     * timestamp. </p>
+     *
+     * @return  global timestamp  based on this local timestamp interpreted
+     *          at offset UTC+00:00
+     */
+    /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der UTC-Zeitzone zu
      * einem globalen Zeitstempel. </p>
      *
@@ -675,6 +830,15 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Combines this local timestamp with the system timezone to a global
+     * timestamp. </p>
+     *
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in system timezone
+     * @see     Timezone#ofSystem()
+     * @see     #at(TZID)
+     */
+    /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der System-Zeitzone
      * zu einem UTC-Zeitstempel. </p>
      *
@@ -690,6 +854,16 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Combines this local timestamp with given timezone to a global
+     * timestamp. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @see     Timezone#of(TZID)
+     * @see     #atStdTimezone()
+     */
+    /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
      * zu einem UTC-Zeitstempel. </p>
      *
@@ -706,15 +880,29 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
-     * zu einem UTC-Zeitstempel. </p>
+     * <p>Combines this local timestamp with given timezone to a global
+     * timestamp by applying a special strategy for handling local gaps or
+     * overlaps due to timezone adjustments like daylight-saving. </p>
      *
      * @param   tzid        timezone id
      * @param   strategy    conflict resolving strategy
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone selecting given transition strategy
      * @see     Timezone#of(TZID)
-     * @see     #atStdTimezone()
+     * @see     #at(TZID)
+     */
+    /*[deutsch]
+     * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
+     * zu einem UTC-Zeitstempel, indem eine spezielle Strategie f&uuml;r
+     * ung&uuml;ltige oder mehrdeutige lokale Angaben gew&auml;hlt wird,
+     * wenn zum Beispiel Sommerzeit-Umstellungen geschehen. </p>
+     *
+     * @param   tzid        timezone id
+     * @param   strategy    conflict resolving strategy
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone selecting given transition strategy
+     * @see     Timezone#of(TZID)
+     * @see     #at(TZID)
      */
     public Moment at(
         TZID tzid,
@@ -727,6 +915,12 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Does this local timestamp exist in given timezone? </p>
+     *
+     * @param   tzid    timezone id
+     * @return  {@code true} if this timestamp is valid in given timezone
+     */
+    /*[deutsch]
      * <p>Existiert dieser Zeitstempel in der angegebenen Zeitzone? </p>
      *
      * @param   tzid    timezone id
@@ -932,16 +1126,18 @@ public final class PlainTimestamp
                 attributes.get(Attributes.LENIENCY, Leniency.SMART);
 
             if (entity instanceof UnixTime) {
-                Moment ut = Moment.from(UnixTime.class.cast(entity));
-                TZID tzid = ZonalOffset.UTC;
+                TZID tzid;
 
                 if (attributes.contains(Attributes.TIMEZONE_ID)) {
                     tzid = attributes.get(Attributes.TIMEZONE_ID);
-                } else if (!leniency.isLax()) {
+                } else if (leniency.isLax()) {
+                    tzid = ZonalOffset.UTC;
+                } else {
                     throw new IllegalArgumentException(
                         "Missing timezone attribute for type conversion.");
                 }
 
+                Moment ut = Moment.from(UnixTime.class.cast(entity));
                 return ut.inTimezone(tzid);
             }
 
@@ -987,7 +1183,10 @@ public final class PlainTimestamp
                             CalendarUnit.DAYS);
                 }
 
-                if (leapsecond) {
+                if (
+                    leapsecond
+                    && entity.isValid(LeapsecondElement.INSTANCE, Boolean.TRUE)
+                ) {
                     entity.with(
                         LeapsecondElement.INSTANCE,
                         Boolean.TRUE);
