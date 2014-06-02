@@ -86,11 +86,6 @@ final class PlatformTimezone
         this.id = resolved;
         this.tz = (java.util.TimeZone) zone.clone();
 
-        if (!resolved.canonical().equals(this.tz.getID())) {
-            throw new IllegalArgumentException(
-                "Time zone ID could not be resolved: " + resolved.canonical());
-        }
-
         if (this.tz.useDaylightTime()) {
             this.fixedOffset = null;
         } else {
@@ -313,13 +308,13 @@ final class PlatformTimezone
     }
 
     /**
-     * <p>Liefert die interne ID. </p>
+     * <p>Liegt die GMT-Zeitzone vor. </p>
      *
-     * @return  String
+     * @return  {@code true} if this zone is &quot;GMT&quot; else {@code false}
      */
-    String getInternalID() {
+    boolean isGMT() {
 
-        return this.tz.getID();
+        return this.tz.getID().equals("GMT");
 
     }
 

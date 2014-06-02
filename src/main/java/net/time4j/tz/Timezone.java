@@ -284,11 +284,24 @@ public abstract class Timezone
     /**
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
      *
-     * @param   tzid    timezone id
+     * @param   tzid    timezone id as interface
      * @return  timezone data
      * @throws  ChronoException if given timezone cannot be loaded
      */
     public static Timezone of(TZID tzid) {
+
+        return Timezone.getTZ(tzid, true);
+
+    }
+
+    /**
+     * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
+     *
+     * @param   tzid    timezone id as String
+     * @return  timezone data
+     * @throws  ChronoException if given timezone cannot be loaded
+     */
+    public static Timezone of(String tzid) {
 
         return Timezone.getTZ(tzid, true);
 
@@ -520,7 +533,14 @@ public abstract class Timezone
             return ((ZonalOffset) tzid).getModel();
         }
 
-        String zoneID = tzid.canonical();
+        return Timezone.getTZ(tzid.canonical(), wantsException);
+
+    }
+
+    private static Timezone getTZ(
+        String zoneID,
+        boolean wantsException
+    ) {
 
         // Suche im Cache
         Timezone tz = null;
@@ -546,24 +566,15 @@ public abstract class Timezone
 
         // java.util.TimeZone hat keine öffentliche Historie
         if (PROVIDER instanceof PlatformTZProvider) {
-            PlatformTimezone test = null;
-
-            try {
-                test = new PlatformTimezone(resolved, zoneID);
-            } catch (RuntimeException re) {
-                if (wantsException) {
-                    throw re;
-                }
-            }
+            PlatformTimezone test = new PlatformTimezone(resolved, zoneID);
 
             if (
-                (test != null)
-                && test.getInternalID().equals("GMT")
+                test.isGMT()
                 && !zoneID.equals("GMT")
                 && !zoneID.startsWith("UT")
                 && !zoneID.equals("Z")
             ) {
-                // JDK-Fallback => null
+                // JDK-Fallback verhindern => null
             } else {
                 tz = test;
             }
