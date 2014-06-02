@@ -847,7 +847,7 @@ public final class PlainTimestamp
      * @see     Timezone#ofSystem()
      * @see     #at(TZID)
      */
-    public Moment atStdTimezone() {
+    public Moment atSystem() {
 
         return this.inTimezone(Timezone.ofSystem());
 
@@ -861,7 +861,7 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(TZID)
-     * @see     #atStdTimezone()
+     * @see     #atSystem()
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
@@ -871,9 +871,33 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(TZID)
-     * @see     #atStdTimezone()
+     * @see     #atSystem()
      */
     public Moment at(TZID tzid) {
+
+        return this.inTimezone(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Combines this local timestamp with given timezone to a global
+     * timestamp. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @see     Timezone#of(String)
+     */
+    /*[deutsch]
+     * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
+     * zu einem UTC-Zeitstempel. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @see     Timezone#of(String)
+     */
+    public Moment atZone(String tzid) {
 
         return this.inTimezone(Timezone.of(tzid));
 

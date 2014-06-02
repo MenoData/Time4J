@@ -48,7 +48,6 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
-import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -948,31 +947,6 @@ public final class PlainDate
     public PlainTimestamp atStartOfDay() {
 
         return this.at(PlainTime.MIN);
-
-    }
-
-    /**
-     * <p>Creates a new global timestamp with this date at the earliest defined
-     * wall time in given timezone. </p>
-     *
-     * @param   tzid        timezone id
-     * @return  global timestamp based on composition of this date and earliest
-     *          wall time in given timezone
-     * @see     #at(PlainTime)
-     */
-    /*[deutsch]
-     * <p>Erzeugt einen globalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
-     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
-     *
-     * @param   tzid        timezone id
-     * @return  global timestamp based on composition of this date and earliest
-     *          wall time in given timezone
-     * @see     #at(PlainTime)
-     */
-    public Moment atStartOfDay(TZID tzid) {
-
-        // TODO: TransitionStrategy#laterOffset() benutzen?
-        return this.atStartOfDay().at(tzid);
 
     }
 

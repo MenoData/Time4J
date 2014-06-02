@@ -73,10 +73,10 @@ public class MomentCreationTest {
     public void epochUTC() {
         assertThat(
             Moment.of(1277942424, TimeScale.UTC),
-            is(PlainDate.of(2012, 6, 30).atStartOfDay(ZonalOffset.UTC)));
+            is(PlainDate.of(2012, 6, 30).atStartOfDay().atUTC()));
         assertThat(
             Moment.of(0, TimeScale.UTC),
-            is(PlainDate.of(1972, 1, 1).atStartOfDay(ZonalOffset.UTC)));
+            is(PlainDate.of(1972, 1, 1).atStartOfDay().atUTC()));
     }
 
     @Test

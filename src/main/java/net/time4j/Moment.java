@@ -80,6 +80,78 @@ import static net.time4j.scale.TimeScale.UTC;
 
 
 /**
+ * <p>Represents an instant/moment on the universal timeline with reference
+ * to the timezone UTC (UTC+00:00 / Greenwich-meridian). </p>
+ *
+ * <p>The JDK-equivalent is traditionally the class {@code java.util.Date}.
+ * In contrast to that old class this class stores the elapsed time not just
+ * in millisecond but in nanosecond precision on 96-bit base. </p>
+ *
+ * <p>Following elements which are declared as constants are registered by
+ * this class: </p>
+ *
+ * <ul>
+ *  <li>{@link PlainDate#YEAR}</li>
+ *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
+ *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_OF_YEAR}</li>
+ *  <li>{@link PlainDate#MONTH_AS_NUMBER}</li>
+ *  <li>{@link PlainDate#DAY_OF_MONTH}</li>
+ *  <li>{@link PlainDate#DAY_OF_QUARTER}</li>
+ *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
+ *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
+ *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
+ *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link PlainTime#ISO_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
+ *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
+ *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
+ *  <li>{@link PlainTime#SECOND_OF_DAY}</li>
+ *  <li>{@link PlainTime#MILLI_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MICRO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#NANO_OF_SECOND}</li>
+ *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
+ *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
+ *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ * </ul>
+ *
+ * <p>Furthermore, all elements of class {@link Weekmodel} are supported.
+ * The elements allow the access to values relative to the timezone UTC.
+ * If a {@code Moment} is queried for its hour then it will yield the hour
+ * in the timezone UTC. This is different from the JDK-classes
+ * {@code java.util.Date} (accessing the default timezone) and
+ * {@code java.time.Instant} (no element access possible). A {@code Moment}
+ * offers a dual view both on a machine counter as well as on a tuple of
+ * date- and time-values, always in the timezone UTC. </p>
+ *
+ * <p>A {@code Moment} is also capable of delivering the date- and time-values
+ * in a different timezone if the method {@link #inTimezone(TZID)} is called.
+ * If zonal operators are defined by any elements then manipulations of related
+ * data are possible in any timezone. </p>
+ *
+ * <h3>Time arithmetic</h3>
+ *
+ * <p>The main time units are defined by {@link SI} (counting possible
+ * UTC-leapseconds) and {@link TimeUnit}. Latter unit type can be used
+ * if a better interoperability is needed for external APIs which ignore
+ * leapseconds. Both kinds of time units can be used in the methods
+ * {@code plus(long, unit)}, {@code minus(long, unit)} and
+ * {@code until(Moment, unit)}. </p>
+ *
+ * <p>Furthermore, there is the option to use local time units like
+ * {@code ClockUnit} which count the virtual ticks on an analogue clock
+ * and are ignorant of daylight-saving switches. As entry point users can
+ * use the {@code Duration}-methods {@link Duration#earlier(TZID)} and
+ * {@link Duration#later(TZID)}. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert einen Zeitpunkt auf der Weltzeitlinie mit Bezug
  * auf die UTC-Zeitzone (UTC+00:00 / Greenwich-Meridian). </p>
  *
@@ -195,6 +267,9 @@ public final class Moment
         new Moment(MAX_LIMIT, MRD - 1, TimeScale.POSIX);
 
     /**
+     * <p>Start of UNIX-era = [1970-01-01T00:00:00,000000000Z]. </p>
+     */
+    /*[deutsch]
      * <p>Start der UNIX-&Auml;ra = [1970-01-01T00:00:00,000000000Z]. </p>
      */
     public static final Moment UNIX_EPOCH = new Moment(0, 0, TimeScale.POSIX);
@@ -392,6 +467,18 @@ public final class Moment
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Equivalent to {@code Moment.of(elapsedTime, 0, scale)}. </p>
+     *
+     * @param   elapsedTime     elapsed seconds on given time scale
+     * @param   scale           time scale reference
+     * @return  new moment instance
+     * @throws  IllegalArgumentException if elapsed time is out of range limits
+     *          beyond year +/-999,999,999 or out of time scale range
+     * @throws  IllegalStateException if time scale is not POSIX but
+     *          leap second support is switched off by configuration
+     * @see     LeapSeconds#isEnabled()
+     */
+    /*[deutsch]
      * <p>Entspricht {@code Moment.of(elapsedTime, 0, scale)}. </p>
      *
      * @param   elapsedTime     elapsed seconds on given time scale
@@ -413,6 +500,27 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a new UTC-timestamp by given time coordinates on given
+     * time scale. </p>
+     *
+     * <p>The given elapsed time {@code elapsedTime} will be internally
+     * transformed into the UTC-epochtime, should another time scale than UTC
+     * be given. The time scale TAI will only be supported earliest at UTC
+     * start 1972-01-01, the time scale GPS earliest at 1980-01-06. </p>
+     *
+     * @param   elapsedTime     elapsed seconds on given time scale
+     * @param   nanosecond      nanosecond fraction of last second
+     * @param   scale           time scale reference
+     * @return  new moment instance
+     * @throws  IllegalArgumentException if the nanosecond is not in the range
+     *          {@code 0 <= nanosecond <= 999,999,999} or if elapsed time is
+     *          out of supported range limits beyond year +/-999,999,999 or
+     *          out of time scale range
+     * @throws  IllegalStateException if time scale is not POSIX but
+     *          leap second support is switched off by configuration
+     * @see     LeapSeconds#isEnabled()
+     */
+    /*[deutsch]
      * <p>Konstruiert einen neuen UTC-Zeitstempel mit Hilfe von
      * Zeitkoordinaten auf der angegebenen Zeitskala. </p>
      *
@@ -452,6 +560,12 @@ public final class Moment
     }
 
     /**
+     * <p>Common conversion method. </p>
+     *
+     * @param   ut      UNIX-timestamp
+     * @return  corresponding {@code Moment}
+     */
+    /*[deutsch]
      * <p>Allgemeine Konversionsmethode. </p>
      *
      * @param   ut      UNIX-timestamp
@@ -564,6 +678,14 @@ public final class Moment
     }
 
     /**
+     * <p>Represents this timestamp as decimal value in given time scale. </p>
+     *
+     * @param   scale       time scale reference
+     * @return  decimal value in given time scale as seconds inclusive fraction
+     * @throws  IllegalArgumentException if this instance is out of range
+     *          for given time scale
+     */
+    /*[deutsch]
      * <p>Stellt diese Zeit als Dezimalwert in der angegebenen Zeitskala
      * dar. </p>
      *
@@ -606,10 +728,19 @@ public final class Moment
     }
 
     /**
+     * <p>Converts this instance to a local timestamp in the system
+     * timezone. </p>
+     *
+     * @return  local timestamp in system timezone (leap seconds will
+     *          always be lost)
+     * @see     Timezone#ofSystem()
+     */
+    /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
      *
      * @return  local timestamp in system timezone (leap seconds will
      *          always be lost)
+     * @see     Timezone#ofSystem()
      */
     public PlainTimestamp inStdTimezone() {
 
@@ -618,6 +749,13 @@ public final class Moment
     }
 
     /**
+     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local timestamp in given timezone (leap seconds will
+     *          always be lost)
+     */
+    /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
      *
      * @param   tzid    timezone id
@@ -631,6 +769,34 @@ public final class Moment
     }
 
     /**
+     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local timestamp in given timezone (leap seconds will
+     *          always be lost)
+     */
+    /*[deutsch]
+     * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local timestamp in given timezone (leap seconds will
+     *          always be lost)
+     */
+    public PlainTimestamp inTimezone(String tzid) {
+
+        return this.inTimezone(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Adds an amount of given timeunit to this timestamp
+     * on the POSIX time scale. </p>
+     *
+     * @param   amount  amount in units to be added
+     * @param   unit    time unit defined in posix time space
+     * @return  changed copy of this instance, not leapsecond-aware
+     */
+    /*[deutsch]
      * <p>Addiert einen Betrag in der angegegebenen Zeiteinheit auf die
      * POSIX-Zeit dieses Zeitstempels. </p>
      *
@@ -666,6 +832,14 @@ public final class Moment
     }
 
     /**
+     * <p>Subtracts an amount of given timeunit from this timestamp
+     * on the POSIX time scale. </p>
+     *
+     * @param   amount  amount in units to be subtracted
+     * @param   unit    time unit defined in posix time space
+     * @return  changed copy of this instance, not leapsecond-aware
+     */
+    /*[deutsch]
      * <p>Subtrahiert einen Betrag in der angegegebenen Zeiteinheit von der
      * POSIX-Zeit dieses Zeitstempels. </p>
      *
@@ -683,6 +857,15 @@ public final class Moment
     }
 
     /**
+     * <p>Calculates the time distance between this timestamp and given
+     * end timestamp in given timeunit on the POSIX time scale. </p>
+     *
+     * @param   end     end time point
+     * @param   unit    time unit defined in posix time space
+     * @return  count of units between this instance and end time point,
+     *          not counting leapseconds
+     */
+    /*[deutsch]
      * <p>Bestimmt den zeitlichen Abstand zu einem Endzeitpunkt in der
      * angegebenen Zeiteinheit auf der POSIX-Zeitskala. </p>
      *
@@ -752,6 +935,22 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern in the
+     * default locale for formatting and parsing UTC-timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales and timezones
+     * however. </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @return  format object for formatting {@code Moment}-objects
+     *          using system locale and system timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     ChronoFormatter#with(Locale)
+     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung und in der
      * System-Zeitzone. </p>
@@ -782,6 +981,20 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode in the
+     * default locale for formatting and parsing UTC-timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales and timezones
+     * however. </p>
+     *
+     * @param   mode        formatting style
+     * @return  format object for formatting {@code Moment}-objects
+     *          using system locale and system timezone
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     ChronoFormatter#with(Locale)
+     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * in der Standard-Sprach- und L&auml;ndereinstellung und in der
      * System-Zeitzone. </p>
@@ -811,13 +1024,35 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a new formatter which uses the given pattern and locale
+     * for formatting and parsing UTC-timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales and timezones
+     * however. Without any explicit timezone the timezone UTC will be used
+     * in printing and parsing requires a timezone information in the text
+     * to be parsed. However, if a timezone is explicitly used, this zone
+     * will be used in printing while it serves as replacement value during
+     * parsing (if the text is missing a timezone information). </p>
+     *
+     * @param   formatPattern   format definition as pattern
+     * @param   patternType     pattern dialect
+     * @param   locale          locale setting
+     * @return  format object for formatting {@code Moment}-objects
+     *          using given locale
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     PatternType
+     * @see     #localFormatter(String,ChronoPattern)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
      * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. Eine
      * Zeitzone ist nicht angegeben, was bedeutet, da&szlig; beim Formatieren
      * die UTC-Zeitzone verwendet wird und beim Parsen eine Zeitzoneninformation
-     * im zu interpretierenden Text vorhanden sein mu&szlig;. </p>
+     * im zu interpretierenden Text vorhanden sein mu&szlig;. Wird eine
+     * Zeitzone angegeben, dann wird diese beim Formatieren benutzt und
+     * dient beim Parsen als Ersatzwert. </p>
      *
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
@@ -842,6 +1077,24 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a new formatter which uses the given display mode and locale
+     * for formatting and parsing UTC-timestamps. </p>
+     *
+     * <p>Note: The formatter can be adjusted to other locales and timezones
+     * however. Without any explicit timezone the timezone UTC will be used
+     * in printing and parsing requires a timezone information in the text
+     * to be parsed. However, if a timezone is explicitly used, this zone
+     * will be used in printing while it serves as replacement value during
+     * parsing (if the text is missing a timezone information). </p>
+     *
+     * @param   mode        formatting style
+     * @param   locale      locale setting
+     * @return  format object for formatting {@code Moment}-objects
+     *          using given locale
+     * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @see     #localFormatter(DisplayMode)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
@@ -874,6 +1127,22 @@ public final class Moment
     }
 
     /**
+     * <p>Defines the RFC-1123-format which is for example used in mail
+     * headers. </p>
+     *
+     * <p>Equivalent to the pattern &quot;[EEE, ]d MMM yyyy HH:mm[:ss] XX&quot;
+     * where the timezone offset XX is modified such that in case of zero
+     * offset the expression &quot;GMT&quot; is preferred. As zero offset
+     * will also be accepted &quot;UT&quot; or &quot;Z&quot;. The text elements
+     * will always be interpreted in English and are case-insensitive. </p>
+     *
+     * <p>Note: In contrast to the RFC-1123-standard this method does not
+     * support military timezone abbreviations (A-Y) or north-american
+     * timezone names (EST, EDT, CST, CDT, MST, MDT, PST, PDT). </p>
+     *
+     * @return  formatter object for RFC-1123 (technical internet-timestamp)
+     */
+    /*[deutsch]
      * <p>Definiert das RFC-1123-Format, das zum Beispiel in Mail-Headers
      * verwendet wird. </p>
      *
@@ -945,12 +1214,22 @@ public final class Moment
     }
 
     /**
+     * <p>Provides a canonical representation in the ISO-format
+     * [yyyy-MM-ddTHH:mm:ss,fffffffffZ]. </p>
+     *
+     * <p>Example:
+     * The expression {@code Moment.of(1341100824, 210, TimeScale.UTC)}
+     * has the representation &quot;2012-06-30T23:59:60,000000210Z&quot;. </p>
+     *
+     * @return  ISO-8601-formatted string
+     */
+    /*[deutsch]
      * <p>Erzeugt eine kanonische Darstellung im ISO-Format
      * [yyyy-MM-ddTHH:mm:ss,fffffffffZ]. </p>
      *
      * <p>Beispiel:
-     * Der Ausdruck {@code new Moment(1341100824, 210, TimeScale.UTC)}
-     * hat die Darstellung [2012-06-30T23:59:60,000000210Z]. </p>
+     * Der Ausdruck {@code Moment.of(1341100824, 210, TimeScale.UTC)}
+     * hat die Darstellung &quot;2012-06-30T23:59:60,000000210Z&quot;. </p>
      *
      * @return  ISO-8601-formatted string
      */
@@ -995,6 +1274,36 @@ public final class Moment
     }
 
     /**
+     * <p>Creates a formatted view of this instance taking in account
+     * given time scale. </p>
+     *
+     * <pre>
+     *  Moment moment =
+     *      PlainDate.of(2012, Month.JUNE, 30)
+     *      .at(PlainTime.of(23, 59, 59, 999999999))
+     *      .atUTC()
+     *      .plus(1, SI.SECONDS); // move to leap second
+     *
+     *  System.out.println(moment.toString(TimeScale.POSIX));
+     *  // Output: POSIX-2012-06-30T23:59:59,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.UTC));
+     *  // Output: UTC-2012-06-30T23:59:60,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.TAI));
+     *  // Output: TAI-2012-07-01T00:00:34,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.GPS));
+     *  // Output: GPS-2012-07-01T00:00:15,999999999Z
+     * </pre>
+     *
+     * @param   scale   time scale to be used for formatting
+     * @return  formatted string with date-time fields in timezone UTC
+     * @throws  IllegalArgumentException if this instance is out of range
+     *          for given time scale
+     * @see     #getElapsedTime(TimeScale)
+     */
+    /*[deutsch]
      * <p>Erzeugt eine formatierte Sicht dieser Instanz unter
      * Ber&uuml;cksichtigung der angegebenen Zeitskala. </p>
      *
@@ -1069,6 +1378,12 @@ public final class Moment
     }
 
     /**
+     * <p>Provides a static access to the associated time axis respective
+     * chronology which contains the chronological rules. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *
@@ -1995,7 +2310,7 @@ public final class Moment
                 Leniency leniency =
                     attrs.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
-                    result = ts.atStdTimezone();
+                    result = ts.atSystem();
                     tzid = Timezone.ofSystem().getID();
                 }
             }

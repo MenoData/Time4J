@@ -27,7 +27,7 @@ public class MomentArithmeticTest {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay(timezone)
+                .atStartOfDay().at(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         assertThat(
             end,
@@ -41,13 +41,16 @@ public class MomentArithmeticTest {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay(timezone)
+                .atStartOfDay().at(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         Moment end =
             start.with(Duration.of(5, ClockUnit.HOURS).earlier(timezone));
         assertThat(
             end,
-            is(PlainDate.of(2014, Month.MARCH, 30).atStartOfDay(timezone)));
+            is(
+                PlainDate.of(2014, Month.MARCH, 30)
+                .atStartOfDay()
+                .at(timezone)));
     }
 
     @Test
@@ -55,7 +58,8 @@ public class MomentArithmeticTest {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay(timezone)
+                .atStartOfDay()
+                .at(timezone)
                 .plus(4, TimeUnit.HOURS);
         assertThat(
             end,
@@ -84,10 +88,11 @@ public class MomentArithmeticTest {
     public void hourShiftBerlin() {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment start =
-            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay(timezone);
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(timezone);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay(timezone)
+                .atStartOfDay()
+                .at(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         assertThat(start.until(end, TimeUnit.HOURS), is(4L)); // DST-jump
     }
