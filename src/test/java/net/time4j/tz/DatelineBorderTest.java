@@ -26,51 +26,51 @@ public class DatelineBorderTest {
     public void plusCalendarDaysSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         assertThat(
             end,
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test
     public void plusPosixDaysSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .plus(1, TimeUnit.DAYS);
         assertThat(
             end,
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test
     public void plusPosixHoursSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .plus(24, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2011, Month.DECEMBER, 31)
                     .at(PlainTime.midnightAtStartOfDay())
-                    .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
+                    .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 14))));
     }
 
     @Test
     public void standardOffsetChangeSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         assertThat(
             Timezone.of(timezone).getOffset(start),
@@ -84,9 +84,9 @@ public class DatelineBorderTest {
     public void daysShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         // crossing international dateline border
         assertThat(start.until(end, TimeUnit.DAYS), is(1L));
@@ -96,9 +96,9 @@ public class DatelineBorderTest {
     public void hoursShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         // crossing international dateline border
         assertThat(start.until(end, TimeUnit.HOURS), is(24L));
@@ -108,9 +108,9 @@ public class DatelineBorderTest {
     public void minutesShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         // crossing international dateline border
         assertThat(start.until(end, TimeUnit.MINUTES), is(1440L));
@@ -120,9 +120,9 @@ public class DatelineBorderTest {
     public void secondsShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         // crossing international dateline border
         assertThat(start.until(end, TimeUnit.SECONDS), is(86400L));
@@ -141,7 +141,7 @@ public class DatelineBorderTest {
     public void dayBeforeShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment start =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone);
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone);
         assertThat(
             start.inTimezone(timezone),
             is(PlainTimestamp.of(2011, 12, 29, 0, 0)));
@@ -151,7 +151,7 @@ public class DatelineBorderTest {
     public void dayAfterShiftSamoa() {
         TZID timezone = TZID.PACIFIC.APIA;
         Moment end =
-            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(timezone)
+            PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(timezone));
         assertThat(
             end.inTimezone(timezone),

@@ -24,6 +24,7 @@ package net.time4j.format;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -110,10 +111,10 @@ final class TimezoneNameProcessor
         if (formattable instanceof UnixTime) {
             Timezone zone = Timezone.of(tzid);
             UnixTime ut = UnixTime.class.cast(formattable);
+
             name =
                 zone.getDisplayName(
-                    zone.isDaylightSaving(ut),
-                    this.abbreviated,
+                    this.getStyle(zone.isDaylightSaving(ut)),
                     step.getAttribute(
                         Attributes.LOCALE, attributes, Locale.ROOT));
         } else {
@@ -323,7 +324,7 @@ final class TimezoneNameProcessor
             Timezone zone = Timezone.of(tzid);
 
             String tzName =
-                zone.getDisplayName(daylightSaving, this.abbreviated, locale);
+                zone.getDisplayName(this.getStyle(daylightSaving), locale);
             zones = map.get(tzName);
 
             if (zones == null) {
@@ -335,6 +336,22 @@ final class TimezoneNameProcessor
         }
 
         return Collections.unmodifiableMap(map);
+
+    }
+
+    private NameStyle getStyle(boolean daylightSaving) {
+
+        if (daylightSaving) {
+            return (
+                this.abbreviated
+                ? NameStyle.SHORT_DAYLIGHT_TIME
+                : NameStyle.LONG_DAYLIGHT_TIME);
+        } else {
+            return (
+                this.abbreviated
+                ? NameStyle.SHORT_STANDARD_TIME
+                : NameStyle.LONG_STANDARD_TIME);
+        }
 
     }
 

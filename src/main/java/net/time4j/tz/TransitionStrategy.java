@@ -32,7 +32,7 @@ import net.time4j.base.WallTime;
  * Konflikte auftreten. </p>
  *
  * @author  Meno Hochschild
- * @see     net.time4j.ZonalOperator#STRICT_MODE
+ * @spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionStrategy {
 
@@ -41,10 +41,18 @@ public interface TransitionStrategy {
     /**
      * <p>Konvertiert eine lokale Zeitangabe in einen globalen Zeitstempel. </p>
      *
+     * <p>Ein direkter Aufruf der Methode kann manchmal nur sekundengenau
+     * sein, wenn {@code WallTime} keinen unmittelbaren Zugriff auf den
+     * Sekundenbruchteil gestattet. Es ist deshalb immer besser, stattdessen
+     * {@code PlainTimestamp#at(Timezone)} mit einer strategie-behafteten
+     * Zeitzone zu verwenden. </p>
+     *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
      * @return  global unix timestamp
+     * @see     net.time4j.PlainTimestamp#at(Timezone)
+     * @see     Timezone#with(TransitionStrategy)
      */
     UnixTime resolve(
         GregorianDate localDate,

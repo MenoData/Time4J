@@ -943,7 +943,7 @@ public final class Duration<U extends IsoUnit>
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
                     entity.inTimezone(timezone).minus(Duration.this);
-                return ts.at(timezone);
+                return ts.atTimezone(timezone);
             }
         };
 
@@ -965,7 +965,7 @@ public final class Duration<U extends IsoUnit>
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
                     entity.inTimezone(timezone).plus(Duration.this);
-                return ts.at(timezone);
+                return ts.atTimezone(timezone);
             }
         };
 

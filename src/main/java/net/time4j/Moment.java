@@ -505,8 +505,8 @@ public final class Moment
      *
      * <p>The given elapsed time {@code elapsedTime} will be internally
      * transformed into the UTC-epochtime, should another time scale than UTC
-     * be given. The time scale TAI will only be supported earliest at UTC
-     * start 1972-01-01, the time scale GPS earliest at 1980-01-06. </p>
+     * be given. The time scale TAI will only be supported earliest on UTC
+     * start 1972-01-01, the time scale GPS earliest on 1980-01-06. </p>
      *
      * @param   elapsedTime     elapsed seconds on given time scale
      * @param   nanosecond      nanosecond fraction of last second
@@ -744,7 +744,7 @@ public final class Moment
      */
     public PlainTimestamp inStdTimezone() {
 
-        return this.inTimezone(Timezone.ofSystem());
+        return this.in(Timezone.ofSystem());
 
     }
 
@@ -764,27 +764,28 @@ public final class Moment
      */
     public PlainTimestamp inTimezone(TZID tzid) {
 
-        return this.inTimezone(Timezone.of(tzid));
+        return this.in(Timezone.of(tzid));
 
     }
 
     /**
      * <p>Converts this instance to a local timestamp in given timezone. </p>
      *
-     * @param   tzid    timezone id
+     * @param   tz      timezone
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
      *
-     * @param   tzid    timezone id
+     * @param   tz      timezone
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      */
-    public PlainTimestamp inTimezone(String tzid) {
+    public PlainTimestamp in(Timezone tz) {
 
-        return this.inTimezone(Timezone.of(tzid));
+        ZonalOffset offset = tz.getOffset(this);
+        return PlainTimestamp.from(this, offset);
 
     }
 
@@ -1427,13 +1428,6 @@ public final class Moment
 
     }
 
-    private PlainTimestamp inTimezone(Timezone tz) {
-
-        ZonalOffset offset = tz.getOffset(this);
-        return PlainTimestamp.from(this, offset);
-
-    }
-
     private long getEpochTime() {
 
         if (LeapSeconds.getInstance().isEnabled()) {
@@ -1732,15 +1726,14 @@ public final class Moment
      * @concurrency <immutable>
      */
     static final class Operator
-        extends ZonalOperator {
+        implements ChronoOperator<Moment> {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final ChronoOperator<PlainTimestamp> delegate;
         private final ChronoElement<?> element;
         private final int type;
-        private final TZID tzid;
-        private final TransitionStrategy strategy;
+        private final Timezone tz;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1762,8 +1755,7 @@ public final class Moment
             this.delegate = delegate;
             this.element = element;
             this.type = type;
-            this.tzid = null;
-            this.strategy = null;
+            this.tz = null;
 
         }
 
@@ -1774,23 +1766,20 @@ public final class Moment
          * @param   delegate    delegating operator
          * @param   element     element reference
          * @param   type        operator type
-         * @param   tzid        timezone id
-         * @param   strategy    conflict resolving strategy
+         * @param   tz          timezone
          */
         Operator(
             ChronoOperator<PlainTimestamp> delegate,
             ChronoElement<?> element,
             int type,
-            TZID tzid,
-            TransitionStrategy strategy
+            Timezone tz
         ) {
             super();
 
             this.delegate = delegate;
             this.element = element;
             this.type = type;
-            this.tzid = tzid;
-            this.strategy = strategy;
+            this.tz = tz;
 
         }
 
@@ -1838,18 +1827,12 @@ public final class Moment
 
             // lokale Transformation
             Timezone tz = (
-                (this.tzid == null)
+                (this.tz == null)
                 ? Timezone.ofSystem()
-                : Timezone.of(this.tzid));
+                : this.tz);
 
-            PlainTimestamp ts = moment.inTimezone(tz).with(this.delegate);
-            Moment result;
-
-            if (this.strategy == null) {
-                result = ts.inTimezone(tz);
-            } else {
-                result = Moment.from(this.strategy.resolve(ts, ts, tz));
-            }
+            PlainTimestamp ts = moment.in(tz).with(this.delegate);
+            Moment result = ts.at(tz);
 
             // hier kann niemals die Schaltsekunde erreicht werden
             if (this.type == ElementOperator.OP_FLOOR) {
@@ -1858,7 +1841,7 @@ public final class Moment
 
             // Schaltsekundenprüfung, weil lokale Transformation keine LS kennt
             if (result.isNegativeLS()) {
-                if (this.strategy == ZonalOperator.STRICT_MODE) {
+                if (this.tz.getStrategy() == Timezone.STRICT_MODE) {
                     throw new ChronoException(
                         "Illegal local timestamp due to "
                         + "negative leap second: " + ts);
@@ -1903,23 +1886,6 @@ public final class Moment
             }
 
             return result;
-
-        }
-
-        @Override
-        public ChronoOperator<Moment> select(TransitionStrategy strategy) {
-
-            if (strategy == null) {
-                throw new NullPointerException("Missing transition strategy.");
-            }
-
-            return new Operator(
-                this.delegate,
-                this.element,
-                this.type,
-                this.tzid,
-                strategy
-            );
 
         }
 
@@ -2192,7 +2158,7 @@ public final class Moment
 
             PlainTimestamp ts = context.inTimezone(ZonalOffset.UTC);
             ts = ts.with(this.element, value);
-            Moment result = ts.at(ZonalOffset.UTC);
+            Moment result = ts.atTimezone(ZonalOffset.UTC);
 
             if (
                 this.element.isDateElement()
@@ -2298,19 +2264,17 @@ public final class Moment
 
             if (tzid != null) {
                 if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
-                    result =
-                        ts.at(
-                            tzid,
-                            attrs.get(Attributes.TRANSITION_STRATEGY)
-                        );
+                    TransitionStrategy strategy =
+                        attrs.get(Attributes.TRANSITION_STRATEGY);
+                    result = ts.at(Timezone.of(tzid).with(strategy));
                 } else {
-                    result = ts.at(tzid);
+                    result = ts.atTimezone(tzid);
                 }
             } else {
                 Leniency leniency =
                     attrs.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
-                    result = ts.atSystem();
+                    result = ts.atStdTimezone();
                     tzid = Timezone.ofSystem().getID();
                 }
             }

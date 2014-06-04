@@ -25,7 +25,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.transform(TimeScale.UTC),
             is(new BigDecimal("252892809.123456789")));
@@ -40,7 +40,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 1, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.transform(TimeScale.GPS),
             is(new BigDecimal("1.123456789")));
@@ -55,7 +55,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 5),
                 PlainTime.of(23, 59, 50, 123456789)
-            ).at(ZonalOffset.UTC); // 10 secs before GPS epoch
+            ).atTimezone(ZonalOffset.UTC); // 10 secs before GPS epoch
         assertThat(
             utc.transform(TimeScale.TAI),
             is(new BigDecimal("252892809.123456789")));
@@ -70,7 +70,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.transform(TimeScale.POSIX),
             is(new BigDecimal("315964800.123456789")));
@@ -85,7 +85,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getElapsedTime(TimeScale.UTC),
             is(315964800 + 9 - 2 * 365 * 86400L));
@@ -97,7 +97,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 5),
                 PlainTime.of(23, 59, 50, 123456789)
-            ).at(ZonalOffset.UTC); // 10 secs before GPS epoch
+            ).atTimezone(ZonalOffset.UTC); // 10 secs before GPS epoch
         assertThat(
             utc.getElapsedTime(TimeScale.TAI),
             is(315964800 + 9 - 2 * 365 * 86400L));
@@ -109,7 +109,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 1, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getElapsedTime(TimeScale.GPS),
             is(1L));
@@ -121,7 +121,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getElapsedTime(TimeScale.POSIX),
             is(315964800L));
@@ -133,7 +133,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getNanosecond(TimeScale.UTC),
             is(123456789));
@@ -145,7 +145,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getNanosecond(TimeScale.GPS),
             is(123456789));
@@ -157,7 +157,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getNanosecond(TimeScale.TAI),
             is(123456789));
@@ -169,7 +169,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 6),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc.getNanosecond(TimeScale.POSIX),
             is(123456789));
@@ -181,7 +181,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
         assertThat(
             utc.toString(TimeScale.UTC),
             is("UTC-2012-06-30T23:59:60,123456789Z"));
@@ -193,7 +193,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
         assertThat(
             utc1.toString(TimeScale.GPS),
             is("GPS-2012-07-01T00:00:15,123456789Z"));
@@ -201,7 +201,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 7, 1),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc2.toString(TimeScale.GPS),
             is("GPS-2012-07-01T00:00:16,123456789Z"));
@@ -213,7 +213,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
         assertThat(
             utc1.toString(TimeScale.TAI),
             is("TAI-2012-07-01T00:00:34,123456789Z"));
@@ -221,7 +221,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 7, 1),
                 PlainTime.of(0, 0, 0, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         assertThat(
             utc2.toString(TimeScale.TAI),
             is("TAI-2012-07-01T00:00:35,123456789Z"));
@@ -233,7 +233,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
         assertThat(
             utc.toString(TimeScale.POSIX),
             is("POSIX-2012-06-30T23:59:59,123456789Z"));
@@ -245,7 +245,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 5),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         utc.getElapsedTime(TimeScale.GPS);
     }
 
@@ -255,7 +255,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 5),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         utc.getNanosecond(TimeScale.GPS);
     }
 
@@ -265,7 +265,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1971, 12, 31),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         utc.getElapsedTime(TimeScale.TAI);
     }
 
@@ -275,7 +275,7 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1971, 12, 31),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC);
+            ).atTimezone(ZonalOffset.UTC);
         utc.getNanosecond(TimeScale.TAI);
     }
 

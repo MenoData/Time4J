@@ -1,5 +1,7 @@
 package net.time4j.tz;
 
+import net.time4j.PlainTimestamp;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -51,6 +53,15 @@ public class TZIDTest {
         assertThat(
             tzid.canonical().equals(TZID.EUROPE.BERLIN.canonical()),
             is(true));
+    }
+
+    @Test
+    public void brazilRoundtrip() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 7, 1, 12, 0);
+        assertThat(
+            ts.at(Timezone.of("Brazil/Acre"))
+              .inTimezone(TZID.AMERICA.RIO_BRANCO),
+            is(ts));
     }
 
 }

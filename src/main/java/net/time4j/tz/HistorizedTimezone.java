@@ -56,6 +56,11 @@ final class HistorizedTimezone
      */
     private final TransitionHistory history;
 
+    /**
+     * @serial  transition strategy
+     */
+    private final TransitionStrategy strategy;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -68,16 +73,35 @@ final class HistorizedTimezone
         TZID id,
         TransitionHistory history
     ) {
+        this(id, history, Timezone.DEFAULT_CONFLICT_STRATEGY);
+
+    }
+
+    /**
+     * <p>Erweiterter Konstruktor. </p>
+     *
+     * @param   id          timezone id
+     * @param   history     offset transition model
+     * @param   strategy    transition strategy
+     */
+    HistorizedTimezone(
+        TZID id,
+        TransitionHistory history,
+        TransitionStrategy strategy
+    ) {
         super();
 
         if (id == null) {
             throw new NullPointerException("Missing timezone id.");
         } else if (history == null) {
             throw new NullPointerException("Missing timezone history.");
+        } else if (strategy == null) {
+            throw new NullPointerException("Missing transition strategy.");
         }
 
         this.id = id;
         this.history = history;
+        this.strategy = strategy;
 
     }
 
@@ -159,6 +183,7 @@ final class HistorizedTimezone
             return (
                 this.id.canonical().equals(that.id.canonical())
                 && this.history.equals(that.history)
+                && this.strategy.equals(that.strategy)
             );
         } else {
             return false;
@@ -183,8 +208,24 @@ final class HistorizedTimezone
         sb.append(this.id.canonical());
         sb.append(",history={");
         sb.append(this.history);
-        sb.append("}]");
+        sb.append("},strategy=");
+        sb.append(this.strategy);
+        sb.append(']');
         return sb.toString();
+
+    }
+
+    @Override
+    public TransitionStrategy getStrategy() {
+
+        return this.strategy;
+
+    }
+
+    @Override
+    public Timezone with(TransitionStrategy strategy) {
+
+        return new HistorizedTimezone(this.id, this.history, strategy);
 
     }
 
@@ -201,6 +242,8 @@ final class HistorizedTimezone
             throw new InvalidObjectException("Missing id.");
         } else if (this.history == null) {
             throw new InvalidObjectException("Missing history.");
+        } else if (this.strategy == null) {
+            throw new InvalidObjectException("Missing strategy.");
         }
 
     }

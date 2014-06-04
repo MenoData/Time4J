@@ -27,7 +27,7 @@ public class MomentCreationTest {
                 PlainTimestamp.of(
                     PlainDate.of(2012, 6, 30),
                     PlainTime.of(23, 59, 59)
-                ).at(ZonalOffset.UTC).plus(1, SI.SECONDS)));
+                ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS)));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class MomentCreationTest {
                 PlainTimestamp.of(
                     PlainDate.of(2012, 6, 30),
                     PlainTime.of(23, 59, 59, 123456789)
-                ).at(ZonalOffset.UTC).plus(1, SI.SECONDS)));
+                ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS)));
     }
 
     @Test

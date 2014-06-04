@@ -825,7 +825,7 @@ public final class PlainTimestamp
      */
     public Moment atUTC() {
 
-        return this.at(ZonalOffset.UTC);
+        return this.atTimezone(ZonalOffset.UTC);
 
     }
 
@@ -836,7 +836,7 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in system timezone
      * @see     Timezone#ofSystem()
-     * @see     #at(TZID)
+     * @see     #atTimezone(TZID)
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der System-Zeitzone
@@ -845,11 +845,11 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in system timezone
      * @see     Timezone#ofSystem()
-     * @see     #at(TZID)
+     * @see     #atTimezone(TZID)
      */
-    public Moment atSystem() {
+    public Moment atStdTimezone() {
 
-        return this.inTimezone(Timezone.ofSystem());
+        return this.at(Timezone.ofSystem());
 
     }
 
@@ -861,7 +861,7 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(TZID)
-     * @see     #atSystem()
+     * @see     #atStdTimezone()
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
@@ -871,11 +871,11 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(TZID)
-     * @see     #atSystem()
+     * @see     #atStdTimezone()
      */
-    public Moment at(TZID tzid) {
+    public Moment atTimezone(TZID tzid) {
 
-        return this.inTimezone(Timezone.of(tzid));
+        return this.at(Timezone.of(tzid));
 
     }
 
@@ -883,7 +883,7 @@ public final class PlainTimestamp
      * <p>Combines this local timestamp with given timezone to a global
      * timestamp. </p>
      *
-     * @param   tzid        timezone id
+     * @param   tz      timezone
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(String)
@@ -892,49 +892,32 @@ public final class PlainTimestamp
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
      * zu einem UTC-Zeitstempel. </p>
      *
-     * @param   tzid        timezone id
+     * @param   tz      timezone
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @see     Timezone#of(String)
      */
-    public Moment atZone(String tzid) {
+    public Moment at(Timezone tz) {
 
-        return this.inTimezone(Timezone.of(tzid));
+        TransitionStrategy strategy = tz.getStrategy();
 
-    }
+        if (strategy == Timezone.DEFAULT_CONFLICT_STRATEGY) {
+            return this.resolveDefault(tz);
+        } else if (strategy == Timezone.STRICT_MODE) {
+            if (tz.isInvalid(this.date, this.time)) {
+                throw new IllegalArgumentException(
+                    "Invalid local timestamp due to timezone transition: "
+                    + this
+                    + " [" + tz.getID() + "]"
+                );
+            }
 
-    /**
-     * <p>Combines this local timestamp with given timezone to a global
-     * timestamp by applying a special strategy for handling local gaps or
-     * overlaps due to timezone adjustments like daylight-saving. </p>
-     *
-     * @param   tzid        timezone id
-     * @param   strategy    conflict resolving strategy
-     * @return  global timestamp based on this local timestamp interpreted
-     *          in given timezone selecting given transition strategy
-     * @see     Timezone#of(TZID)
-     * @see     #at(TZID)
-     */
-    /*[deutsch]
-     * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
-     * zu einem UTC-Zeitstempel, indem eine spezielle Strategie f&uuml;r
-     * ung&uuml;ltige oder mehrdeutige lokale Angaben gew&auml;hlt wird,
-     * wenn zum Beispiel Sommerzeit-Umstellungen geschehen. </p>
-     *
-     * @param   tzid        timezone id
-     * @param   strategy    conflict resolving strategy
-     * @return  global timestamp based on this local timestamp interpreted
-     *          in given timezone selecting given transition strategy
-     * @see     Timezone#of(TZID)
-     * @see     #at(TZID)
-     */
-    public Moment at(
-        TZID tzid,
-        TransitionStrategy strategy
-    ) {
-
-        return Moment.from(
-            strategy.resolve(this.date, this.time, Timezone.of(tzid)));
+            Moment result = this.resolveDefault(tz);
+            Moment.checkNegativeLS(result.getPosixTime(), this);
+            return result;
+        } else {
+            return Moment.from(strategy.resolve(this.date, this.time, tz));
+        }
 
     }
 
@@ -1013,18 +996,9 @@ public final class PlainTimestamp
 
     }
 
-    /**
-     * <p>Wandelt diesen lokalen Zeitstempel mit Hilfe der angegebenen Zeitzone
-     * in eine UTC-Zeit um. </p>
-     *
-     * @param   tz          timezone data
-     * @return  universal time
-     * @throws  ChronoException if given strategy is strict and this timestamp
-     *                          falls in a gap on local timeline (DST-change)
-     */
-    Moment inTimezone(Timezone tz) {
+    private Moment resolveDefault(Timezone tz) {
 
-        ZonalOffset offset = tz.getOffset(this, this);
+        ZonalOffset offset = tz.getOffset(this.date, this.time);
         long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
         localSeconds += (this.time.getHour() * 3600);
         localSeconds += (this.time.getMinute() * 60);

@@ -135,7 +135,7 @@ final class ZonalTimestamp
             PlainTimestamp ts = this.timestamp.with(element, max);
 
             if (!this.zone.isInvalid(ts, ts)) {
-                Moment transformed = ts.inTimezone(this.zone);
+                Moment transformed = ts.at(this.zone);
                 Moment test = transformed.plus(1, SI.SECONDS);
 
                 if (test.isLeapSecond()) {

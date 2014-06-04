@@ -481,7 +481,7 @@ public final class PlainTime
      * {@code 0-24}. </p>
      *
      * <p>Given a context of {@code PlainTime} with full hours, the maximum
-     * is{@code 24} and stands for the time 24:00 (midnight at end of day),
+     * is {@code 24} and stands for the time 24:00 (midnight at end of day),
      * else the maximum is {@code 23} in every different context. </p>
      *
      * @see     #getHour()
@@ -526,7 +526,7 @@ public final class PlainTime
      * <p>Element with the minute of day in the value range {@code 0-1440}. </p>
      *
      * <p>Given a context of {@code PlainTime} with full minutes, the maximum
-     * is{@code 1440} and stands for the time 24:00 (midnight at end of day),
+     * is {@code 1440} and stands for the time 24:00 (midnight at end of day),
      * else the maximum is {@code 1439} in every different context. </p>
      */
     /*[deutsch]
@@ -580,7 +580,7 @@ public final class PlainTime
      * {@code 0-86400}. </p>
      *
      * <p>Given a context of {@code PlainTime} with full seconds, the maximum
-     * is{@code 86400} and stands for the time 24:00 (midnight at end of day),
+     * is {@code 86400} and stands for the time 24:00 (midnight at end of day),
      * else the maximum is {@code 86399} in every different context. Leapseconds
      * are never counted. </p>
      */

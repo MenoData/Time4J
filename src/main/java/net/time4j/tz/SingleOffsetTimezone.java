@@ -226,12 +226,29 @@ final class SingleOffsetTimezone
 
     @Override
     public String getDisplayName(
-        boolean daylightSaving,
-        boolean abbreviated,
+        NameStyle style,
         Locale locale
     ) {
 
-        return (abbreviated ? this.offset.toString() : this.offset.canonical());
+        return (
+            style.isAbbreviation()
+            ? this.offset.toString()
+            : this.offset.canonical()
+        );
+
+    }
+
+    @Override
+    public TransitionStrategy getStrategy() {
+
+        return DEFAULT_CONFLICT_STRATEGY;
+
+    }
+
+    @Override
+    public Timezone with(TransitionStrategy strategy) {
+
+        return this;
 
     }
 

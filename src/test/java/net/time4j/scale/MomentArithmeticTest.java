@@ -27,13 +27,13 @@ public class MomentArithmeticTest {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().at(timezone)
+                .atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).at(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0).atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class MomentArithmeticTest {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().at(timezone)
+                .atStartOfDay().atTimezone(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         Moment end =
             start.with(Duration.of(5, ClockUnit.HOURS).earlier(timezone));
@@ -50,7 +50,7 @@ public class MomentArithmeticTest {
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(timezone)));
+                .atTimezone(timezone)));
     }
 
     @Test
@@ -59,13 +59,13 @@ public class MomentArithmeticTest {
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(timezone)
+                .atTimezone(timezone)
                 .plus(4, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).at(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0).atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -74,25 +74,25 @@ public class MomentArithmeticTest {
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atTime(5, 0)
-            .at(timezone);
+            .atTimezone(timezone);
         Moment end = start.minus(4, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
+                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
     }
 
     @Test
     public void hourShiftBerlin() {
         TZID timezone = TZID.EUROPE.BERLIN;
         Moment start =
-            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(timezone);
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().atTimezone(timezone);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(timezone)
+                .atTimezone(timezone)
                 .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
         assertThat(start.until(end, TimeUnit.HOURS), is(4L)); // DST-jump
     }

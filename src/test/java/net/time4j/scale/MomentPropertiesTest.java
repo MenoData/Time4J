@@ -49,7 +49,7 @@ public class MomentPropertiesTest {
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
                 PlainTime.of(23, 59, 59, 123456789)
-            ).at(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            ).atTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
 
     }
 
@@ -104,7 +104,7 @@ public class MomentPropertiesTest {
             is(
                 PlainTimestamp.of(2012, 6, 30, 11, 59, 59)
                 .plus(123456789, ClockUnit.NANOS)
-                .at(ZonalOffset.UTC)));
+                .atTimezone(ZonalOffset.UTC)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -596,7 +596,7 @@ public class MomentPropertiesTest {
     @Test(expected=IllegalArgumentException.class)
     public void withSecondOfMinute60() {
         PlainTimestamp.of(2010, 4, 21, 9, 15)
-            .at(ZonalOffset.UTC)
+            .atTimezone(ZonalOffset.UTC)
             .with(SECOND_OF_MINUTE, 60);
     }
 
@@ -834,7 +834,7 @@ public class MomentPropertiesTest {
             is(
                 PlainDate.of(2012, 6, 30)
                 .at(PlainTime.of(12, 59, 59, 123456789))
-                .at(ZonalOffset.UTC)));
+                .atTimezone(ZonalOffset.UTC)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -1541,7 +1541,7 @@ public class MomentPropertiesTest {
             is(
                 PlainDate.of(2013, 6, 30)
                 .at(PlainTime.of(23, 59, 59, 123456789))
-                .at(ZonalOffset.UTC)));
+                .atTimezone(ZonalOffset.UTC)));
     }
 
     @Test
@@ -1586,7 +1586,7 @@ public class MomentPropertiesTest {
             is(
                 PlainDate.of(2013, 6, 29) // gleiche KW + gleicher Wochentag
                 .at(PlainTime.of(23, 59, 59, 123456789))
-                .at(ZonalOffset.UTC)));
+                .atTimezone(ZonalOffset.UTC)));
     }
 
 }

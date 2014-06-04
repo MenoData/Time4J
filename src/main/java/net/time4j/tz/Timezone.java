@@ -22,11 +22,14 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
+import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.EpochDays;
 
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
@@ -58,6 +61,26 @@ public abstract class Timezone
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Diese auch vom JDK verwendete Standardstrategie zieht von einem
+     * beliebigen lokalen Zeitstempel den jeweils n&auml;chstdefinierten
+     * Offset ab, um die globale Zeit zu erhalten. </p>
+     *
+     * @see     #getOffset(GregorianDate,WallTime)
+     */
+    public static final TransitionStrategy DEFAULT_CONFLICT_STRATEGY =
+        Strategy.DEFAULT;
+
+    /**
+     * <p>Legt bei Transformationen von lokalen Zeitstempeln zu UTC fest,
+     * da&szlig; nur in der Zeitzone g&uuml;ltige Zeitstempel zugelassen
+     * werden. </p>
+     *
+     * <p>Ansonsten wird die {@link #DEFAULT_CONFLICT_STRATEGY
+     * Standardstrategie} verwendet. </p>
+     */
+    public static final TransitionStrategy STRICT_MODE = Strategy.STRICT;
 
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
         Boolean.getBoolean("net.time4j.allow.system.tz.override");
@@ -364,9 +387,9 @@ public abstract class Timezone
      * Zeitpunkt in Sekunden. </p>
      *
      * <p>Als Konfliktstrategie f&uuml;r L&uuml;cken oder &Uuml;berlappungen
-     * auf dem lokalen Zeitstrahl wird die Standardstrategie verwendet, von
-     * der lokalen Zeit den n&auml;chstdefinierten Offset zu subtrahieren.
-     * Dieses Verhalten ist zum JDK konform. </p>
+     * auf dem lokalen Zeitstrahl wird die Standardstrategie verwendet, den
+     * n&auml;chstdefinierten Offset zu ermitteln. Dieses Verhalten ist zum
+     * JDK konform. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -469,13 +492,36 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Ermittelt die Strategie zur Aufl&ouml;sung von lokalen
+     * Zeitstempeln. </p>
+     *
+     * @return  transition strategy for resolving local timestamps
+     * @see     #with(TransitionStrategy)
+     */
+    public abstract TransitionStrategy getStrategy();
+
+    /**
+     * <p>Erzeugt eine Kopie dieser Zeitzone, die zur Aufl&ouml;sung von
+     * lokalen Zeitstempeln die angegebene Strategie nutzt. </p>
+     *
+     * <p>Hat diese Zeitzone einen festen Offset, wird die Strategie
+     * ignoriert, da hier nie eine Konfliktsituation auftreten kann.
+     * Wenn andererseits eine Zeitzone keine &ouml;ffentliche Historie
+     * kennt, dann werden nur {@link #DEFAULT_CONFLICT_STRATEGY} und
+     * {@link #STRICT_MODE} unterst&uuml;tzt. </p>
+     *
+     * @param   strategy    transition strategy for resolving local timestamps
+     * @return  copy of this timezone with given strategy
+     */
+    public abstract Timezone with(TransitionStrategy strategy);
+
+    /**
      * <p>Liefert den anzuzeigenden Zeitzonennamen. </p>
      *
      * <p>Ist der Zeitzonenname nicht ermittelbar, wird die ID der Zeitzone
      * geliefert. </p>
      *
-     * @param   daylightSaving      asking for summer time version
-     * @param   abbreviated         asking for abbreviation
+     * @param   style               name style
      * @param   locale              language setting
      * @return  localized timezone name for display purposes
      * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
@@ -484,8 +530,7 @@ public abstract class Timezone
      * @see     #getID()
      */
     public String getDisplayName(
-        boolean daylightSaving,
-        boolean abbreviated,
+        NameStyle style,
         Locale locale
     ) {
 
@@ -498,8 +543,8 @@ public abstract class Timezone
 
         if (tz.getID().equals(id)) {
             return tz.getDisplayName(
-                daylightSaving,
-                abbreviated
+                style.isDaylightSaving(),
+                style.isAbbreviation()
                     ? java.util.TimeZone.SHORT
                     : java.util.TimeZone.LONG,
                 locale
@@ -1090,6 +1135,63 @@ public abstract class Timezone
         ) {
 
             return null; // keine öffentliche Historie
+
+        }
+
+    }
+
+    private static enum Strategy
+        implements TransitionStrategy {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        DEFAULT, STRICT;
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public UnixTime resolve(
+            GregorianDate date,
+            WallTime time,
+            Timezone tz
+        ) {
+
+            if (
+                (this == STRICT)
+                && tz.isInvalid(date, time)
+            ) {
+                throw new IllegalArgumentException(
+                    "Invalid local timestamp due to timezone transition: "
+                    + date + time
+                    + " [" + tz.getID() + "]"
+                );
+            }
+
+            // Folgender Code wird nur bei direktem Aufruf genutzt,
+            // nicht aber via PlainTimestamp und ist lediglich sekundengenau!
+            long days =
+                EpochDays.UNIX.transform(
+                    GregorianMath.toMJD(date),
+                    EpochDays.MODIFIED_JULIAN_DATE);
+
+            long localSeconds = MathUtils.safeMultiply(days, 86400);
+            localSeconds += (time.getHour() * 3600);
+            localSeconds += (time.getMinute() * 60);
+            localSeconds += time.getSecond();
+
+            ZonalOffset offset = tz.getOffset(date, time);
+            final long posixTime = localSeconds - offset.getIntegralAmount();
+
+            return new UnixTime() {
+                @Override
+                public long getPosixTime() {
+                    return posixTime;
+                }
+                @Override
+                public int getNanosecond() {
+                    return 0;
+                }
+            };
 
         }
 

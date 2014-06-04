@@ -60,6 +60,11 @@ final class PlatformTimezone
      */
     private final java.util.TimeZone tz;
 
+    /**
+     * @serial      strict resolving of offset transitions
+     */
+    private final boolean strict;
+
     // nur nicht-null bei fester Verschiebung
     private transient final ZonalOffset fixedOffset;
 
@@ -72,19 +77,21 @@ final class PlatformTimezone
      * @param   rawID       original timezone id
      */
     PlatformTimezone(TZID resolved, String rawID) {
-        this(resolved, findZone(rawID));
+        this(resolved, findZone(rawID), false);
 
     }
 
     // benutzt unter anderem in der Deserialisierung
     private PlatformTimezone(
         TZID resolved,
-        java.util.TimeZone zone
+        java.util.TimeZone zone,
+        boolean strict
     ) {
         super();
 
         this.id = resolved;
         this.tz = (java.util.TimeZone) zone.clone();
+        this.strict = strict;
 
         if (this.tz.useDaylightTime()) {
             this.fixedOffset = null;
@@ -274,16 +281,37 @@ final class PlatformTimezone
 
     @Override
     public String getDisplayName(
-        boolean daylightSaving,
-        boolean abbreviated,
+        NameStyle style,
         Locale locale
     ) {
 
         return this.tz.getDisplayName(
-            daylightSaving,
-            abbreviated ? java.util.TimeZone.SHORT : java.util.TimeZone.LONG,
+            style.isDaylightSaving(),
+            style.isAbbreviation()
+                ? java.util.TimeZone.SHORT
+                : java.util.TimeZone.LONG,
             locale
         );
+
+    }
+
+    @Override
+    public TransitionStrategy getStrategy() {
+
+        return this.strict ? STRICT_MODE : DEFAULT_CONFLICT_STRATEGY;
+
+    }
+
+    @Override
+    public Timezone with(TransitionStrategy strategy) {
+
+        if (strategy == DEFAULT_CONFLICT_STRATEGY) {
+            return new PlatformTimezone(this.id, this.tz, false);
+        } else if (strategy == STRICT_MODE) {
+            return new PlatformTimezone(this.id, this.tz, true);
+        }
+
+        throw new UnsupportedOperationException(strategy.toString());
 
     }
 
@@ -337,7 +365,7 @@ final class PlatformTimezone
      */
     private Object readResolve() throws ObjectStreamException {
 
-        return new PlatformTimezone(this.id, this.tz);
+        return new PlatformTimezone(this.id, this.tz, this.strict);
 
     }
 

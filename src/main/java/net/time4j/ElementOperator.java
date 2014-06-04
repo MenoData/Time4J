@@ -25,6 +25,7 @@ import net.time4j.engine.AdvancedElement;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 
 /**
@@ -94,7 +95,7 @@ public abstract class ElementOperator<T>
      * @return  operator with the default system timezone reference,
      *          applicable on instances of {@code Moment}
      */
-    public ZonalOperator inStdTimezone() {
+    public ChronoOperator<Moment> inStdTimezone() {
 
         return new Moment.Operator(this.onTimestamp(), this.element, this.type);
 
@@ -115,18 +116,43 @@ public abstract class ElementOperator<T>
      * @return  operator with the given timezone reference, applicable on
      *          instances of {@code Moment}
      */
-    public final ZonalOperator inTimezone(TZID tzid) {
+    public final ChronoOperator<Moment> inTimezone(TZID tzid) {
 
-        if (tzid == null) {
-            throw new NullPointerException("Missing timezone id.");
+        return new Moment.Operator(
+            this.onTimestamp(),
+            this.element,
+            this.type,
+            Timezone.of(tzid)
+        );
+
+    }
+
+    /**
+     * <p>Erzeugt einen Operator, der einen {@link Moment} mit
+     * Hilfe einer Zeitzonenreferenz anpassen kann. </p>
+     *
+     * <p>Hinweis: Der Operator wandelt meist den gegebenen {@code Moment}
+     * in einen lokalen Zeitstempel um, bearbeitet dann diese lokale
+     * Darstellung und konvertiert das Ergebnis in einen neuen {@code Moment}
+     * zur&uuml;ck. Ein Spezialfall sind Inkrementierungen und Dekrementierungen
+     * von (Sub-)Sekundenelementen, bei denen ggf. direkt auf dem globalen
+     * Zeitstrahl operiert wird. </p>
+     *
+     * @param   tz          timezone
+     * @return  operator with the given timezone reference, applicable on
+     *          instances of {@code Moment}
+     */
+    public final ChronoOperator<Moment> in(Timezone tz) {
+
+        if (tz == null) {
+            throw new NullPointerException("Missing timezone.");
         }
 
         return new Moment.Operator(
             this.onTimestamp(),
             this.element,
             this.type,
-            tzid,
-            null
+            tz
         );
 
     }

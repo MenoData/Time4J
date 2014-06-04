@@ -3,6 +3,7 @@ package net.time4j.tz;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
 import net.time4j.scale.TimeScale;
 
@@ -134,6 +135,23 @@ public class PlatformTimezoneTest {
             is(false));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void withStrictModeDirectUse() {
+        Timezone.STRICT_MODE.resolve(
+            PlainDate.of(2014, 3, 30),
+            PlainTime.of(2, 30),
+            loadFromPlatform(TZID.EUROPE.BERLIN));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withStrictModeIndirectUse() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        PlainTimestamp.of(
+            PlainDate.of(2014, 3, 30),
+            PlainTime.of(2, 30)
+        ).at(tz.with(Timezone.STRICT_MODE));
+    }
+
     @Test
     public void getAvailableIDs() {
         List<TZID> zoneIDs = Timezone.getAvailableIDs();
@@ -143,19 +161,34 @@ public class PlatformTimezoneTest {
     }
 
     @Test
-    public void getDisplayName() {
+    public void getDisplayName_LONG_DAYLIGHT_TIME() {
         Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
-            tz.getDisplayName(true, false, Locale.GERMAN),
+            tz.getDisplayName(NameStyle.LONG_DAYLIGHT_TIME, Locale.GERMAN),
             is("Mitteleuropäische Sommerzeit"));
+    }
+
+    @Test
+    public void getDisplayName_SHORT_DAYLIGHT_TIME() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
-            tz.getDisplayName(true, true, Locale.GERMAN),
+            tz.getDisplayName(NameStyle.SHORT_DAYLIGHT_TIME, Locale.GERMAN),
             is("MESZ"));
+    }
+
+    @Test
+    public void getDisplayName_LONG_STANDARD_TIME() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
-            tz.getDisplayName(false, false, Locale.GERMAN),
+            tz.getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.GERMAN),
             is("Mitteleuropäische Zeit"));
+    }
+
+    @Test
+    public void getDisplayName_SHORT_STANDARD_TIME() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
         assertThat(
-            tz.getDisplayName(false, true, Locale.GERMAN),
+            tz.getDisplayName(NameStyle.SHORT_STANDARD_TIME, Locale.GERMAN),
             is("MEZ"));
     }
 

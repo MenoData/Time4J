@@ -39,7 +39,7 @@ final class DateOperator
 
     private final ChronoOperator<PlainDate> opCache;
     private final ChronoOperator<PlainTimestamp> tsCache;
-    private final ZonalOperator moCache;
+    private final ChronoOperator<Moment> moCache;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -118,7 +118,7 @@ final class DateOperator
     }
 
     @Override
-    public ZonalOperator inStdTimezone() {
+    public ChronoOperator<Moment> inStdTimezone() {
 
         return this.moCache;
 
