@@ -25,6 +25,14 @@ import net.time4j.engine.ChronoElement;
 
 
 /**
+ * <p>Extends a chronological element by some standard ways of
+ * manipulation. </p>
+ *
+ * @param   <V> generic type of element values
+ * @param   <T> generic type of target entity an operator is applied to
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Erweitert ein chronologisches Element um diverse
  * Standardmanipulationen. </p>
  *
@@ -38,6 +46,11 @@ public interface AdjustableElement<V, T>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Sets any local entity to the minimum of this element. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementminimum. </p>
      *
      * @return  operator directly applicable on local types without timezone
@@ -45,6 +58,11 @@ public interface AdjustableElement<V, T>
     ElementOperator<T> minimized();
 
     /**
+     * <p>Sets any local entity to the maximum of this element. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementmaximum. </p>
      *
      * @return  operator directly applicable on local types without timezone
@@ -52,6 +70,17 @@ public interface AdjustableElement<V, T>
     ElementOperator<T> maximized();
 
     /**
+     * <p>Adjusts any local entity such that this element gets the previous
+     * value. </p>
+     *
+     * <p>The operator throws a {@code ChronoException} if there is no
+     * base unit available for this element. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     *          and requiring a base unit in given chronology for decrementing
+     * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
      * den vorherigen Wert bekommt. </p>
      *
@@ -66,6 +95,17 @@ public interface AdjustableElement<V, T>
     ElementOperator<T> decremented();
 
     /**
+     * <p>Adjusts any local entity such that this element gets the next
+     * value. </p>
+     *
+     * <p>The operator throws a {@code ChronoException} if there is no
+     * base unit available for this element. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     *          and requiring a base unit in given chronology for incrementing
+     * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
      * den n&auml;chsten Wert bekommt. </p>
      *
@@ -80,6 +120,11 @@ public interface AdjustableElement<V, T>
     ElementOperator<T> incremented();
 
     /**
+     * <p>Rounds down an entity by setting all child elements to minimum. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
      * Elements auf ihr Minimum gesetzt werden. </p>
      *
@@ -88,6 +133,11 @@ public interface AdjustableElement<V, T>
     ElementOperator<T> atFloor();
 
     /**
+     * <p>Rounds up an entity by setting all child elements to maximum. </p>
+     *
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
      * Elements auf ihr Maximum gesetzt werden. </p>
      *
