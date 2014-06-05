@@ -153,6 +153,31 @@ public class PlatformTimezoneTest {
     }
 
     @Test
+    public void withDefaultConflictStrategyDirectUse() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        assertThat(
+            Timezone.DEFAULT_CONFLICT_STRATEGY.resolve(
+                PlainDate.of(2014, 3, 30),
+                PlainTime.of(2, 30),
+                tz
+            ).getPosixTime(),
+            is(
+                PlainTimestamp.of(2014, 3, 30, 2, 30)
+                .at(tz).getPosixTime()));
+    }
+
+    @Test
+    public void withDefaultConflictStrategyIndirectUse() {
+        Timezone tz = loadFromPlatform(TZID.EUROPE.BERLIN);
+        assertThat(
+            PlainTimestamp.of(
+                PlainDate.of(2014, 3, 30),
+                PlainTime.of(2, 30)
+            ).at(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY)),
+            is(PlainTimestamp.of(2014, 3, 30, 2, 30).at(tz)));
+    }
+
+    @Test
     public void getAvailableIDs() {
         List<TZID> zoneIDs = Timezone.getAvailableIDs();
         assertThat(zoneIDs.size() > 1, is(true));

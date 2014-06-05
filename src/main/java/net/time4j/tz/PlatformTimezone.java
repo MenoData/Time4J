@@ -305,7 +305,9 @@ final class PlatformTimezone
     @Override
     public Timezone with(TransitionStrategy strategy) {
 
-        if (strategy == DEFAULT_CONFLICT_STRATEGY) {
+        if (this.getStrategy() == strategy) {
+            return this;
+        } else if (strategy == DEFAULT_CONFLICT_STRATEGY) {
             return new PlatformTimezone(this.id, this.tz, false);
         } else if (strategy == STRICT_MODE) {
             return new PlatformTimezone(this.id, this.tz, true);

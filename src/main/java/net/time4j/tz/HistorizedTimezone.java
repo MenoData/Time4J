@@ -225,6 +225,10 @@ final class HistorizedTimezone
     @Override
     public Timezone with(TransitionStrategy strategy) {
 
+        if (this.strategy == strategy) {
+            return this;
+        }
+        
         return new HistorizedTimezone(this.id, this.history, strategy);
 
     }
