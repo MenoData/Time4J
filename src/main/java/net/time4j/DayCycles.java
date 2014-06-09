@@ -25,7 +25,15 @@ import java.io.Serializable;
 
 
 /**
- * <p>Verk&ouml;rpert das Additionsergebnis auf einer Uhrzeit, wenn auch ein
+ * <p>Represents the rolling result of a plain time if a possible day overflow
+ * is to be taken into account. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ * @see         PlainTime#roll(long,ClockUnit)
+ */
+/*[deutsch]
+ * <p>Verk&ouml;rpert das Rollergebnis auf einer Uhrzeit, wenn auch ein
  * tageweiser &Uuml;berlauf gez&auml;hlt werden soll. </p>
  *
  * @author      Meno Hochschild
@@ -67,6 +75,11 @@ public final class DayCycles implements Serializable {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets the day overflow after rolling a plain time. </p>
+     *
+     * @return  count of day cycles ({@code 0} if without overflow)
+     */
+    /*[deutsch]
      * <p>Ermittelt den tageweise &Uuml;berlauf im Additionsergebnis. </p>
      *
      * @return  count of day cycles ({@code 0} if without overflow)
@@ -76,6 +89,11 @@ public final class DayCycles implements Serializable {
     }
 
     /**
+     * <p>Gets the rolled wall time. </p>
+     *
+     * @return  wall time
+     */
+    /*[deutsch]
      * <p>Ermittelt die Uhrzeit. </p>
      *
      * @return  wall time

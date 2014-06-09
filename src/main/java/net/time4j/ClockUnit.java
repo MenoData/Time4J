@@ -26,8 +26,15 @@ import net.time4j.engine.TimePoint;
 
 
 /**
+ * <p>Represents the most common time units on an ISO-8601-conforming
+ * analogue clock counting the scale ticks. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert die meistgebr&auml;chlichen Zeiteinheiten einer
- * ISO-konformen Uhrzeit. </p>
+ * ISO-konformen Uhrzeit, entsprechend den Skalenstrichen auf einer
+ * analogen Uhr. </p>
  *
  * @author  Meno Hochschild
  */
@@ -36,7 +43,8 @@ public enum ClockUnit
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    /** Zeiteinheit &quot;Stunden&quot; (Symbol H) */
+    /** Time unit &quot;hours&quot; (symbol H) */
+    /*[deutsch] Zeiteinheit &quot;Stunden&quot; (Symbol H) */
     HOURS() {
         @Override
         public char getSymbol() {
@@ -48,7 +56,8 @@ public enum ClockUnit
         }
     },
 
-    /** Zeiteinheit &quot;Minuten&quot; (Symbol M) */
+    /** Time unit &quot;minutes&quot; (symbol M) */
+    /*[deutsch] Zeiteinheit &quot;Minuten&quot; (Symbol M) */
     MINUTES() {
         @Override
         public char getSymbol() {
@@ -61,6 +70,12 @@ public enum ClockUnit
     },
 
     /**
+     * <p>Time unit &quot;seconds&quot; (symbol S) according to the
+     * position of the second pointer on an analogue clock. </p>
+     *
+     * @see     SI
+     */
+    /*[deutsch]
      * <p>Zeiteinheit &quot;Sekunden&quot; (Symbol S) entsprechend der
      * Stellung des Sekundenzeigers auf einer analogen Uhr. </p>
      *
@@ -77,7 +92,8 @@ public enum ClockUnit
         }
     },
 
-    /** Zeiteinheit &quot;Millisekunden&quot; (Symbol 3) */
+    /** Time unit &quot;milliseconds&quot; (symbol 3) */
+    /*[deutsch] Zeiteinheit &quot;Millisekunden&quot; (Symbol 3) */
     MILLIS() {
         @Override
         public char getSymbol() {
@@ -89,7 +105,8 @@ public enum ClockUnit
         }
     },
 
-    /** Zeiteinheit &quot;Mikrosekunden&quot; (Symbol 6) */
+    /** Time unit &quot;microseconds&quot; (symbol 6) */
+    /*[deutsch] Zeiteinheit &quot;Mikrosekunden&quot; (Symbol 6) */
     MICROS() {
         @Override
         public char getSymbol() {
@@ -101,7 +118,8 @@ public enum ClockUnit
         }
     },
 
-    /** Zeiteinheit &quot;Nanosekunden&quot; (Symbol 9) */
+    /** Time unit &quot;nanoseconds&quot; (symbol 9) */
+    /*[deutsch] Zeiteinheit &quot;Nanosekunden&quot; (Symbol 9) */
     NANOS() {
         @Override
         public char getSymbol() {
@@ -121,6 +139,15 @@ public enum ClockUnit
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Calculates the temporal distance between given wall times
+     * in this unit. </p>
+     *
+     * @param   <T> generic type of time point
+     * @param   start   starting time
+     * @param   end     ending time
+     * @return  duration as count of this unit
+     */
+    /*[deutsch]
      * <p>Ermittelt den zeitlichen Abstand zwischen den angegebenen
      * Zeitangaben gemessen in dieser Einheit. </p>
      *
@@ -139,6 +166,27 @@ public enum ClockUnit
     }
 
     /**
+     * <p>Converts the given duration to a temporal amount measured in
+     * this unit. </p>
+     *
+     * <p>Conversions from more precise to less precise units are usually
+     * associated with a loss of information. For example the conversion
+     * of <tt>999</tt> milliseconds results to <tt>0</tt> seconds. In reverse,
+     * the conversion of less precise to more precise units can result in
+     * a numerical overflow. </p>
+     *
+     * <p>Example: In order to convert 44 minutes to milliseconds, the
+     * expression {@code ClockUnit.MILLIS.convert(44L, ClockUnit.MINUTES)}
+     * is applied. Note: If hours or minutes are to be converted then
+     * UTC-leapseconds will be ignored that is a minute has here always
+     * 60 seconds. </p>
+     *
+     * @param   sourceDuration  amount of duration to be converted
+     * @param   sourceUnit      time unit of duration to be converted
+     * @return  converted duration expressed in this unit
+     * @throws  ArithmeticException in case of long overflow
+     */
+    /*[deutsch]
      * <p>Konvertiert die angegebene Zeitdauer in einen Betrag gez&auml;hlt
      * in dieser Zeiteinheit. </p>
      *
@@ -185,6 +233,11 @@ public enum ClockUnit
     }
 
     /**
+     * <p>A wall time unit is never calendrical. </p>
+     *
+     * @return  {@code false}
+     */
+    /*[deutsch]
      * <p>Eine Uhrzeiteinheit ist nicht kalendarisch. </p>
      *
      * @return  {@code false}
