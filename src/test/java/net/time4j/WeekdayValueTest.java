@@ -1,6 +1,9 @@
 package net.time4j;
 
 
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
+
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -92,12 +95,14 @@ public class WeekdayValueTest {
     }
 
     @Test
-    public void getDisplayName_2args() {
+    public void getDisplayName_3args() {
         assertThat(
-            Weekday.TUESDAY.getDisplayName(Locale.GERMAN, false),
+            Weekday.TUESDAY.getDisplayName(
+                Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
             is("Di"));
         assertThat(
-            Weekday.TUESDAY.getDisplayName(Locale.GERMAN, true),
+            Weekday.TUESDAY.getDisplayName(
+                Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
             is("Dienstag"));
     }
 

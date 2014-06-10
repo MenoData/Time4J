@@ -1,6 +1,9 @@
 package net.time4j;
 
 
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
+
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,19 +86,19 @@ public class MonthValueTest {
     }
 
     @Test
-    public void atStartOfQuarter() {
-        assertThat(Month.atStartOfQuarter(Quarter.Q1), is(Month.JANUARY));
-        assertThat(Month.atStartOfQuarter(Quarter.Q2), is(Month.APRIL));
-        assertThat(Month.atStartOfQuarter(Quarter.Q3), is(Month.JULY));
-        assertThat(Month.atStartOfQuarter(Quarter.Q4), is(Month.OCTOBER));
+    public void atStartOfQuarterYear() {
+        assertThat(Month.atStartOfQuarterYear(Quarter.Q1), is(Month.JANUARY));
+        assertThat(Month.atStartOfQuarterYear(Quarter.Q2), is(Month.APRIL));
+        assertThat(Month.atStartOfQuarterYear(Quarter.Q3), is(Month.JULY));
+        assertThat(Month.atStartOfQuarterYear(Quarter.Q4), is(Month.OCTOBER));
     }
 
     @Test
-    public void atEndOfQuarter() {
-        assertThat(Month.atEndOfQuarter(Quarter.Q1), is(Month.MARCH));
-        assertThat(Month.atEndOfQuarter(Quarter.Q2), is(Month.JUNE));
-        assertThat(Month.atEndOfQuarter(Quarter.Q3), is(Month.SEPTEMBER));
-        assertThat(Month.atEndOfQuarter(Quarter.Q4), is(Month.DECEMBER));
+    public void atEndOfQuarterYear() {
+        assertThat(Month.atEndOfQuarterYear(Quarter.Q1), is(Month.MARCH));
+        assertThat(Month.atEndOfQuarterYear(Quarter.Q2), is(Month.JUNE));
+        assertThat(Month.atEndOfQuarterYear(Quarter.Q3), is(Month.SEPTEMBER));
+        assertThat(Month.atEndOfQuarterYear(Quarter.Q4), is(Month.DECEMBER));
     }
 
     @Test
@@ -104,12 +107,14 @@ public class MonthValueTest {
     }
 
     @Test
-    public void getDisplayName_2args() {
+    public void getDisplayName_3args() {
         assertThat(
-            Month.FEBRUARY.getDisplayName(Locale.GERMAN, true),
+            Month.FEBRUARY.getDisplayName(
+                Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
             is("Februar"));
         assertThat(
-            Month.FEBRUARY.getDisplayName(Locale.GERMAN, false),
+            Month.FEBRUARY.getDisplayName(
+                Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
             is("Feb"));
     }
 

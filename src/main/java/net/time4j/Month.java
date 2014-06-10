@@ -38,6 +38,11 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
+ * <p>Enumeration of months in ISO-8601-calendar. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Aufz&auml;hlung der Monate in ISO-Systemen. </p>
  *
  * @author  Meno Hochschild
@@ -47,40 +52,52 @@ public enum Month
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    /** Januar mit dem numerischen ISO-Wert {@code 1}. */
+    /** January with the numerical ISO-value {@code 1}. */
+    /*[deutsch] Januar mit dem numerischen ISO-Wert {@code 1}. */
     JANUARY,
 
-    /** Februar mit dem numerischen ISO-Wert {@code 2}. */
+    /** February with the numerical ISO-value {@code 2}. */
+    /*[deutsch] Februar mit dem numerischen ISO-Wert {@code 2}. */
     FEBRUARY,
 
-    /** M&auml;rz mit dem numerischen ISO-Wert {@code 3}. */
+    /** March with the numerical ISO-value {@code 3}. */
+    /*[deutsch] M&auml;rz mit dem numerischen ISO-Wert {@code 3}. */
     MARCH,
 
-    /** April mit dem numerischen ISO-Wert {@code 4}. */
+    /** April with the numerical ISO-value {@code 4}. */
+    /*[deutsch] April mit dem numerischen ISO-Wert {@code 4}. */
     APRIL,
 
-    /** Mai mit dem numerischen ISO-Wert {@code 5}. */
+    /** May with the numerical ISO-value {@code 5}. */
+    /*[deutsch] Mai mit dem numerischen ISO-Wert {@code 5}. */
     MAY,
 
-    /** Juni mit dem numerischen ISO-Wert {@code 6}. */
+    /** June with the numerical ISO-value {@code 6}. */
+    /*[deutsch] Juni mit dem numerischen ISO-Wert {@code 6}. */
     JUNE,
 
-    /** Juli mit dem numerischen ISO-Wert {@code 7}. */
+    /** July with the numerical ISO-value {@code 7}. */
+    /*[deutsch] Juli mit dem numerischen ISO-Wert {@code 7}. */
     JULY,
 
-    /** August mit dem numerischen ISO-Wert {@code 8}. */
+    /** August with the numerical ISO-value {@code 8}. */
+    /*[deutsch] August mit dem numerischen ISO-Wert {@code 8}. */
     AUGUST,
 
-    /** September mit dem numerischen ISO-Wert {@code 9}. */
+    /** September with the numerical ISO-value {@code 9}. */
+    /*[deutsch] September mit dem numerischen ISO-Wert {@code 9}. */
     SEPTEMBER,
 
-    /** Oktober mit dem numerischen ISO-Wert {@code 10}. */
+    /** October with the numerical ISO-value {@code 10}. */
+    /*[deutsch] Oktober mit dem numerischen ISO-Wert {@code 10}. */
     OCTOBER,
 
-    /** November mit dem numerischen ISO-Wert {@code 11}. */
+    /** November with the numerical ISO-value {@code 11}. */
+    /*[deutsch] November mit dem numerischen ISO-Wert {@code 11}. */
     NOVEMBER,
 
-    /** Dezember mit dem numerischen ISO-Wert {@code 12}. */
+    /** December with the numerical ISO-value {@code 12}. */
+    /*[deutsch] Dezember mit dem numerischen ISO-Wert {@code 12}. */
     DECEMBER;
 
     private static final Month[] ENUMS = Month.values(); // Cache
@@ -88,6 +105,14 @@ public enum Month
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets the enum-constant which corresponds to the given numerical
+     * value. </p>
+     *
+     * @param   month   gregorian month in the range [1-12]
+     * @return  month of year as enum
+     * @throws  IllegalArgumentException if given argument is out of range
+     */
+    /*[deutsch]
      * <p>Liefert die zum kalendarischen Integer-Wert passende
      * Enum-Konstante. </p>
      *
@@ -106,6 +131,11 @@ public enum Month
     }
 
     /**
+     * <p>Gets the corresponding numerical value. </p>
+     *
+     * @return  number of month in the range [1-12]
+     */
+    /**
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert. </p>
      *
      * @return  number of month in the range [1-12]
@@ -117,6 +147,11 @@ public enum Month
     }
 
     /**
+     * <p>Calculates the corresponding quarter of year. </p>
+     *
+     * @return  quarter of year
+     */
+    /*[deutsch]
      * <p>Ermittelt das zugeh&ouml;rige Quartal. </p>
      *
      * @return  quarter of year
@@ -143,11 +178,16 @@ public enum Month
     }
 
     /**
+     * <p>Gets the first month of given quarter of year. </p>
+     *
+     * @return  first month in given quarteryear
+     */
+    /*[deutsch]
      * <p>Liefert den ersten Monat des angegebenen Quartals. </p>
      *
      * @return  first month in given quarteryear
      */
-    public static Month atStartOfQuarter(Quarter quarterOfYear) {
+    public static Month atStartOfQuarterYear(Quarter quarterOfYear) {
 
         switch (quarterOfYear) {
             case Q1:
@@ -163,11 +203,16 @@ public enum Month
     }
 
     /**
+     * <p>Gets the last month of given quarter of year. </p>
+     *
+     * @return  last month in given quarteryear
+     */
+    /*[deutsch]
      * <p>Liefert den letzten Monat des angegebenen Quartals. </p>
      *
      * @return  last month in given quarteryear
      */
-    public static Month atEndOfQuarter(Quarter quarterOfYear) {
+    public static Month atEndOfQuarterYear(Quarter quarterOfYear) {
 
         switch (quarterOfYear) {
             case Q1:
@@ -183,6 +228,13 @@ public enum Month
     }
 
     /**
+     * <p>Calculates the maximum length of this month in days dependent on
+     * given year (taking into account leap years). </p>
+     *
+     * @param   year    proleptic iso year
+     * @return  length of month in days
+     */
+    /*[deutsch]
      * <p>Ermittelt die maximale L&auml;nge des Monats in Tagen abh&auml;ngig
      * vom angegebenen Jahr (mit Beachtung der Schaltjahre). </p>
      *
@@ -196,6 +248,13 @@ public enum Month
     }
 
     /**
+     * <p>Rolls to the next month. </p>
+     *
+     * <p>The result is January if applied on December. </p>
+     *
+     * @return  next month (rolling at December)
+     */
+    /*[deutsch]
      * <p>Ermittelt den n&auml;chsten Monat. </p>
      *
      * <p>Auf den Dezember angewandt ist das Ergebnis der Januar. </p>
@@ -209,6 +268,13 @@ public enum Month
     }
 
     /**
+     * <p>Rolls to the previous month. </p>
+     *
+     * <p>The result is December if applied on January. </p>
+     *
+     * @return  previous month (rolling at January)
+     */
+    /*[deutsch]
      * <p>Ermittelt den vorherigen Monat. </p>
      *
      * <p>Auf den Januar angewandt ist das Ergebnis der Dezember. </p>
@@ -222,6 +288,12 @@ public enum Month
     }
 
     /**
+     * <p>Rolls this month by given amount of months. </p>
+     *
+     * @param   months      count of months (maybe negative)
+     * @return  result of rolling operation
+     */
+    /*[deutsch]
      * <p>Rollt um die angegebene Anzahl von Monaten vor oder zur&uuml;ck. </p>
      *
      * @param   months      count of months (maybe negative)
@@ -234,42 +306,69 @@ public enum Month
     }
 
     /**
-     * <p>Liefert eine Beschreibung in der angegebenen Sprache in Langform
-     * und entspricht {@code getDisplayName(locale, true)}. </p>
+     * <p>Equivalent to the expression
+     * {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}.
+     * </p>
      *
      * @param   locale      language setting
      * @return  descriptive text (long form, never {@code null})
-     * @see     #getDisplayName(Locale, boolean)
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
+     */
+    /*[deutsch]
+     * <p>Entspricht dem Ausdruck
+     * {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}.
+     * </p>
+     *
+     * @param   locale      language setting
+     * @return  descriptive text (long form, never {@code null})
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
      */
     public String getDisplayName(Locale locale) {
 
-        return this.getDisplayName(locale, true);
+        return this.getDisplayName(
+            locale, TextWidth.WIDE, OutputContext.FORMAT);
 
     }
 
     /**
+     * <p>Gets the description text dependent on the locale and style
+     * parameters. </p>
+     *
+     * <p>The second argument controls the width of description while the
+     * third argument is only relevant for languages which make a difference
+     * between stand-alone forms and embedded text forms (does not matter in
+     * English). </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @param   context     output context
+     * @return  descriptive text for given locale and style (never {@code null})
+     */
+    /*[deutsch]
      * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
      *
      * <p>&Uuml;ber das zweite Argument kann gesteuert werden, ob eine kurze
      * oder eine lange Form des Beschreibungstexts ausgegeben werden soll. Das
      * ist besonders sinnvoll in Benutzeroberfl&auml;chen, wo zwischen der
      * Beschriftung und der detaillierten Erl&auml;uterung einer graphischen
-     * Komponente unterschieden wird. </p>
+     * Komponente unterschieden wird. Das dritte Argument ist in Sprachen von
+     * Belang, die verschiedene grammatikalische Formen f&uuml;r die Ausgabe
+     * als alleinstehend oder eingebettet in formatierten Text kennen. </p>
      *
      * @param   locale      language setting
-     * @param   longText    {@code true} if the long form is required else
-     *                      {@code false} for the short form
-     * @return  short or long descriptive text (never {@code null})
+     * @param   width       text width
+     * @param   context     output context
+     * @return  descriptive text for given locale and style (never {@code null})
      */
     public String getDisplayName(
         Locale locale,
-        boolean longText
+        TextWidth width,
+        OutputContext context
     ) {
 
         CalendarText names =
             CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
-        TextWidth tw = (longText ? TextWidth.WIDE : TextWidth.ABBREVIATED);
-        return names.getMonths(tw, OutputContext.FORMAT, false).print(this);
+        return names.getMonths(width, context, false).print(this);
 
     }
 
