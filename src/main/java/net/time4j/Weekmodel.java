@@ -65,17 +65,36 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
+ * <p>Defines rules for the localized handling of weekdays and calendar weeks
+ * on the base of a seven-day-week. </p>
+ *
+ * <ul>
+ *  <li>1st rule: Which day of week is the first day of calendar week?</li>
+ *  <li>2nd rule: What is the minimum count of days in the first calendar
+ *  week of the year?</li>
+ * </ul>
+ *
+ * <p>Furthermore, a {@code Weekmodel} contains some week-related elements
+ * which can be used in all types containing an ISO-8601-date
+ * ({@code PlainTimestamp} and {@code PlainDate}). </p>
+ *
+ * @author      Meno Hochschild
+ * @see         WeekdataProvider
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Definiert Regeln f&uuml;r den lokalisierten Umgang mit Wochentagen
  * und Kalenderwochen auf einer 7-Tage-Wochenbasis. </p>
  *
  * <ul>
  *  <li>1. Regel: Welcher Wochentag ist der erste Tag der Woche?</li>
- *  <li>2. Regel: Was ist die minimale Anzahl der Tage der ersten Woche?</li>
+ *  <li>2. Regel: Was ist die minimale Anzahl der Tage der ersten Woche
+ *  des Kalendarjahres?</li>
  * </ul>
  *
  * <p>Au&szlig;erdem werden einige wochenbezogene Elemente zur Verf&uuml;gung
  * gestellt, die mit allen Klassen umgehen k&ouml;nnen, die ein ISO-Datum
- * enthalten ({@code Timestamp}-Klassen und {@code PlainDate}). </p>
+ * enthalten ({@code PlainTimestamp} und {@code PlainDate}). </p>
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
@@ -95,6 +114,14 @@ public final class Weekmodel
         new ConcurrentHashMap<Locale, Weekmodel>();
 
     /**
+     * <p>Standard week rules as defined by ISO-8601. </p>
+     *
+     * <p>Monday is considered as first day of calendar week. And the first
+     * calendar week of year must contain at least four days respective
+     * contain the first Thursday of year. Saturday and Sunday are considered
+     * as weekend. </p>
+     */
+    /*[deutsch]
      * <p>Standard-Wochenregeln f&uuml;r die ISO-8601-Norm. </p>
      *
      * <p>Nach der ISO-8601-Norm ist der Montag der erste Tag der Woche, und
@@ -216,6 +243,17 @@ public final class Weekmodel
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates a new week model with the given rules and the
+     * weekend-definition Saturday/Sunday. </p>
+     *
+     * @param   firstDayOfWeek          localized first day of week
+     * @param   minimalDaysInFirstWeek  required minimum count of days for
+     *                                  the first week of year in range (1-7)
+     * @return  specific week model with weekend on saturday and sunday
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Wochenmodell mit den angegebenen Einstellungen
      * und der Wochenenddefinition Samstag/Sonntag. </p>
      *
@@ -241,6 +279,18 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Creates a new week model with the given rules. </p>
+     *
+     * @param   firstDayOfWeek          localized first day of week
+     * @param   minimalDaysInFirstWeek  required minimum count of days for
+     *                                  the first week of year in range (1-7)
+     * @param   startOfWeekend          first day of weekend
+     * @param   endOfWeekend            last day of weekend
+     * @return  specific week model
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #of(Locale)
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Wochenmodell mit den angegebenen Einstellungen. </p>
      *
      * @param   firstDayOfWeek          localized first day of week
@@ -278,6 +328,12 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Gets a suitable weekmodel for the default locale of system. </p>
+     *
+     * @return  week model in system locale
+     * @see     Locale#getDefault()
+     */
+    /*[deutsch]
      * <p>Ermittelt ein geeignetes Wochenmodell f&uuml;r die aktuelle
      * Landeseinstellung des Systems. </p>
      *
@@ -291,6 +347,12 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Gets a suitable weekmodel for the given country. </p>
+     *
+     * @param   locale      country setting
+     * @return  localized week model
+     */
+    /*[deutsch]
      * <p>Ermittelt ein geeignetes Wochenmodell f&uuml;r das angegebene
      * Land. </p>
      *
@@ -332,6 +394,18 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines the first day of the calendar week in this model. </p>
+     *
+     * <p>The first day of week is not required to be identical with the
+     * first working day. It rather marks the the first column a graphical
+     * localized calendar. However, in ISO-8601 the first day of week and
+     * the first working day (equal to first day after weekend) are
+     * identical. </p>
+     *
+     * @return  start of week
+     * @see     #getFirstWorkday()
+     */
+    /*[deutsch]
      * <p>Definiert den ersten Tag einer Kalenderwoche. </p>
      *
      * <p>Der erste Tag der Woche mu&szlig; nicht mit dem ersten Arbeitstag
@@ -350,6 +424,17 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines the minimum count of days the first calendar week of year
+     * (or month) must contain. </p>
+     *
+     * <p>If this method yields {@code 1} then the first calendar week of
+     * year always contains the first of January. If the return value is
+     * {@code 7} instead then only the first full seven-day-week is the
+     * first calendar week of year. In ISO-8601 the value is {@code 4}. </p>
+     *
+     * @return  required count of days for first week of year in the range (1-7)
+     */
+    /*[deutsch]
      * <p>Definiert die minimale Anzahl von Tagen, die die erste Kalenderwoche
      * eines Jahres oder Monats enthalten mu&szlig;. </p>
      *
@@ -367,9 +452,18 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines the first day of the weekend. </p>
+     *
+     * <p>In ISO-8601 Saturday is considered as start of weekend (note: not
+     * explicitly mentioned in ISO-paper). </p>
+     *
+     * @return  start of weekend
+     */
+    /*[deutsch]
      * <p>Definiert den ersten Tag des Wochenendes. </p>
      *
-     * <p>Im ISO-8601-Standard ist der Samstag der Beginn des Wochenendes. </p>
+     * <p>Im ISO-8601-Standard ist der Samstag der Beginn des Wochenendes
+     * (zu beachten: nicht explizit im ISO-Papier erw&auml;hnt). </p>
      *
      * @return  start of weekend
      */
@@ -380,9 +474,18 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines the last day of weekend. </p>
+     *
+     * <p>In ISO-8601 Sunday is considered as end of weekend (note: not
+     * explicitly mentioned in ISO-paper). </p>
+     *
+     * @return  end of weekend
+     */
+    /*[deutsch]
      * <p>Definiert den letzten Tag des Wochenendes. </p>
      *
-     * <p>Im ISO-8601-Standard ist der Sonntag das Ende des Wochenendes. </p>
+     * <p>Im ISO-8601-Standard ist der Sonntag das Ende des Wochenendes
+     * (zu beachten: nicht explizit im ISO-Papier erw&auml;hnt). </p>
      *
      * @return  end of weekend
      */
@@ -393,6 +496,16 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Gets the first working day as first day after end of weekend. </p>
+     *
+     * <p>Note: The last working day of week is not well defined however
+     * and needs to be defined by the application itself. For example
+     * Saturday is considered as start of weekend but also handled as legal
+     * working day in most countries. </p>
+     *
+     * @return  first day after weekend
+     */
+    /*[deutsch]
      * <p>Ermittelt den ersten Arbeitstag als den Tag nach dem Ende des
      * Wochenendes. </p>
      *
@@ -411,6 +524,30 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines an element for the calendar week of year with a localized
+     * week number. </p>
+     *
+     * <p>In ISO-8601 the value range is given by {@code 1-52/53}. Reference
+     * year is the week-based year, not the calendar year. Therefore the
+     * maximum of this element is equivalent to the last calendar week of the
+     * week-based year. Examples: </p>
+     *
+     * <pre>
+     *  PlainDate date1 = PlainDate.of(2012, 12, 31); // Monday
+     *  System.out.println(date1.get(Weekmodel.ISO.weekOfYear()));
+     *  // Output: 1 (first calendar week of year 2013)
+     *
+     *  PlainDate date2 = PlainDate.of(2000, 1, 2); // Sunday
+     *  System.out.println(date2.get(Weekmodel.ISO.weekOfYear()));
+     *  // Output: 52 (last calendar week of year 1999)
+     * </pre>
+     *
+     * <p>Note: This element uses the lenient mode if new values are to be set
+     * ({@code isLenient() == true}). </p>
+     *
+     * @return  localized week of year
+     */
+    /*[deutsch]
      * <p>Liefert ein Element f&uuml;r die Woche des Jahres mit einer
      * lokalisierten Wochennummer. </p>
      *
@@ -442,6 +579,19 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines an element for the calendar week of month with a localized
+     * week number. </p>
+     *
+     * <p>In ISO-8601 the value range is given by {@code 1-4/5}. The behaviour
+     * is fully conform to the week of year - like in CLDR standard. </p>
+     *
+     * <p>Note: This element uses the lenient mode if new values are to be set
+     * ({@code isLenient() == true}). </p>
+     *
+     * @return  localized week of month
+     * @see     #weekOfYear()
+     */
+    /*[deutsch]
      * <p>Liefert ein Element f&uuml;r die Woche des Monats mit einer
      * lokalisierten Wochennummer. </p>
      *
@@ -463,6 +613,21 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines an element for the weekday with a localized day number in
+     * the value range {@code 1-7}. </p>
+     *
+     * <p>This element defines localized weekday numbers in numerical formatting
+     * and also a localized sorting order of weekdays, but still manages values
+     * of type {@code Weekday}. However, the value range with its minimum and
+     * maximum is localized, too, i.e. the element defines as minium the value
+     * {@code getFirstDayOfWeek()}. </p>
+     *
+     * <p>In contrast the element {@link PlainDate#DAY_OF_WEEK} defines a
+     * strict ISO-8601-conforming order and ISO-weekday-numbers. </p>
+     *
+     * @return  day of week with localized order
+     */
+    /*[deutsch]
      * <p>Liefert ein Element f&uuml;r den Wochentag mit einer lokalisierten
      * Wochentagsnummer im Wertebereich {@code 1-7}. </p>
      *
@@ -487,6 +652,24 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines an element for the week of year with a localized week number,
+     * constrained to the current calendar year. </p>
+     *
+     * <p>In ISO-8601-calendars the value range is {@code 0/1-52/53}, in other
+     * weekmodels the maximum value can also be {@code 54}. In contrast to
+     * {@link #weekOfYear()} this week can be shortened (less than seven days)
+     * at the start or end of a calendar year. If the week normally belongs
+     * to the previous year or to the following year then the bounded week
+     * gets the value {@code 0} resp. for the end of year the incremented
+     * maximum value. This behaviour is a simplifying deviation from
+     * CLDR-standard. </p>
+     *
+     * <p>Note: This element uses the lenient mode if new values are to be set
+     * ({@code isLenient() == true}). </p>
+     *
+     * @return  week of year within the limits of calendar year
+     */
+    /*[deutsch]
      * <p>Liefert ein Element f&uuml;r die Woche des Jahres mit einer
      * lokalisierten Wochennummer, begrenzt auf das aktuelle Jahr. </p>
      *
@@ -513,6 +696,25 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines an element for the week of month with a localized week number,
+     * constrained to the current calendar month. </p>
+     *
+     * <p>In ISO-8601-calendars the value range is {@code 0/1-4/5}, in other
+     * weekmodels the maximum value can also be {@code 6}. In contrast to
+     * {@link #weekOfMonth()} this week can be shortened (less than seven days)
+     * at the start or end of a calendar month. If the week normally belongs
+     * to the previous month or to the following month then the bounded week
+     * gets the value {@code 0} resp. for the end of month the incremented
+     * maximum value. This behaviour is a simplifying deviation from
+     * CLDR-standard but is the same as defined in the JDK. </p>
+     *
+     * <p>Note: This element uses the lenient mode if new values are to be set
+     * ({@code isLenient() == true}). </p>
+     *
+     * @return  week of month within the limits of calendar month
+     * @see     #boundedWeekOfYear()
+     */
+    /*[deutsch]
      * <p>Liefert ein Element f&uuml;r die Woche des Monats mit einer
      * lokalisierten Wochennummer, begrenzt auf den aktuellen Monat. </p>
      *
@@ -541,6 +743,23 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines a chronological condition if a date matches a weekend. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  PlainDate date = new PlainDate(2013, 3, 30); // Saturday
+     *  System.out.println(date.matches(Weekmodel.ISO.weekend()));
+     *  // Output: true
+     *
+     *  Locale yemen = new Locale("ar", "YE");
+     *  System.out.println(date.matches(Weekmodel.of(yemen).weekend()));
+     *  // Output: false (in Yemen the weekend matches Thursday and Friday)
+     * </pre>
+     *
+     * @return  test for weekend
+     */
+    /*[deutsch]
      * <p>Definiert eine Bedingung, ob ein Datum am Wochenende liegt. </p>
      *
      * <p>Beispiel: </p>
@@ -564,6 +783,9 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Compares on the base of internal week rules. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht auf Basis der internen Wochenregeln. </p>
      */
     @Override
@@ -586,6 +808,9 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Defines the hash value. </p>
+     */
+    /*[deutsch]
      * <p>Liefert den Hash-Code. </p>
      */
     @Override
@@ -599,6 +824,9 @@ public final class Weekmodel
     }
 
     /**
+     * <p>Debugging-support. </p>
+     */
+    /*[deutsch]
      * <p>Debugging-Unterst&uuml;tzung. </p>
      */
     @Override

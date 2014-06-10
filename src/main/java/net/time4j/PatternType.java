@@ -46,6 +46,11 @@ import static net.time4j.format.DisplayMode.SHORT;
 
 
 /**
+ * <p>Collection of different format patterns. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Sammlung von verschiedenen Standard-Formatmustern. </p>
  *
  * @author  Meno Hochschild
@@ -56,6 +61,225 @@ public enum PatternType
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Follows the standard
+     * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a>
+     * of unicode-consortium. </p>
+     *
+     * <p>If not explicitly stated otherwise the count of symbols always
+     * controls the minimum count of digits in case of a numerical element.
+     * Is an element shorter then the zero digit will be used for padding. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ERA (not registered)</td>
+     *      <td>G</td>
+     *      <td>One to three symbols indicate an abbreviation, four symbols
+     *      indicate the long form and five symbols stand for a letter. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_ERA (not registered)</td>
+     *      <td>y</td>
+     *      <td>The count of symbols normally controls the minimum count of
+     *      digits. If it is 2 however then the year will be printed with
+     *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}.
+     *      </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
+     *      <td>Y</td>
+     *      <td>Represents the year in an ISO-8601 week date and behaves
+     *      like the calendar year in formatting. The week-based year can
+     *      deviate from the calendar year however because it is bound to
+     *      the week cycle. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR}</td>
+     *      <td>u</td>
+     *      <td>Proleptic ISO-8601 calendar year. This year never uses
+     *      a pivot year, also not for &quot;uu&quot;. A positive sign
+     *      will be used exactly if the year has more digits than given
+     *      by count of symbols. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
+     *      <td>Q</td>
+     *      <td>One or two symbols for the numerical form, three symbols
+     *      for the abbreviation and four for the full name. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
+     *      <td>q</td>
+     *      <td>Like Q, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>M</td>
+     *      <td>One or two symbols for the numerical form, three symbols
+     *      for the abbreviation, four for the full name and five for
+     *      a letter symbol (NARROW). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>L</td>
+     *      <td>Like M, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#weekOfYear()}</td>
+     *      <td>w</td>
+     *      <td>One or two symbols for the country-dependent week of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#weekOfMonth()}</td>
+     *      <td>W</td>
+     *      <td>One symbol for the country-dependent week of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#DAY_OF_MONTH}</td>
+     *      <td>d</td>
+     *      <td>One or two symbols for the day of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#DAY_OF_YEAR}</td>
+     *      <td>D</td>
+     *      <td>One, two or three symbols for the day of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#WEEKDAY_IN_MONTH}</td>
+     *      <td>F</td>
+     *      <td>One symbol for the weekday in month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
+     *      <td>g</td>
+     *      <td>The count of symbols usually controls the minimum count of
+     *      digits of modified julian year, that is the count of days relative
+     *      to 1858-11-17. Is only supported by calendrical types like
+     *      {@code PlainDate}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#DAY_OF_WEEK}</td>
+     *      <td>E</td>
+     *      <td>One to three symbols for the abbreviation, four for the full
+     *      name, five for a letter symbol or six for the short form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>e</td>
+     *      <td>Like E, but if there are only one or two symbols then the
+     *      formatter will choose the localized numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>c</td>
+     *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
+     *      <td>a</td>
+     *      <td>One symbol for the text form. The attribute
+     *      {@link Attributes#TEXT_WIDTH} can have impact on the length
+     *      of the text form however. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</td>
+     *      <td>h</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</td>
+     *      <td>H</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</td>
+     *      <td>K</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#CLOCK_HOUR_OF_DAY}</td>
+     *      <td>k</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#MINUTE_OF_HOUR}</td>
+     *      <td>m</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#SECOND_OF_MINUTE}</td>
+     *      <td>s</td>
+     *      <td>One or two symbols for the numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#NANO_OF_SECOND}</td>
+     *      <td>S</td>
+     *      <td>The count of symbols (1-9) controls the minimum and maximum
+     *      count of digits to be printed. The decimal separation char will
+     *      not be printed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#MILLI_OF_DAY}</td>
+     *      <td>A</td>
+     *      <td>The count of symbols (1-9) controls the minimum
+     *      count of digits to be printed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_NAME</td>
+     *      <td>z</td>
+     *      <td>1-3 symbols for the abbreviation, 4 symbols for the full
+     *      timezone name.</td>
+     *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_OFFSET</td>
+     *      <td>Z</td>
+     *      <td>1-3 symbols =&gt; see xxxx, 4 symbols =&gt; see OOOO,
+     *      5 symbols = &gt; see XXXXX.</td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCALIZED_GMT_OFFSET</td>
+     *      <td>O</td>
+     *      <td>One symbol for the abbreviation or 4 symbols for the long
+     *      variant. The GMT-prefix can also be available in a localized
+     *      version from the resource file &quot;iso8601.properties&quot;,
+     *      given the key &quot;prefixGMTOffset&quot;. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_ID</td>
+     *      <td>V</td>
+     *      <td>The count of pattern symbols must always be 2. This symbol
+     *      can only be applied on the type {@link Moment}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>X</td>
+     *      <td>One symbol: &#x00B1;HH[mm], two symbols: &#x00B1;HHmm, three
+     *      symbols: &#x00B1;HH:mm, four symbols: &#x00B1;HHmm[ss[.{fraction}]],
+     *      five symbols: &#x00B1;HH:mm[:ss[.{fraction}]]. If the timezone
+     *      offset is equal to {@code 0} then the letter &quot;Z&quot; will
+     *      be used. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>x</td>
+     *      <td>Like X but without the special char &quot;Z&quot; if the
+     *      timezone offset is equal to {@code 0}. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Folgt der Norm
      * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a>
      * des Unicode-Konsortiums. </p>
@@ -70,14 +294,14 @@ public enum PatternType
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>
-     *      <th>Description</th>
+     *      <th>Beschreibung</th>
      *  </tr>
      *  <tr>
      *      <td>ERA (nicht registriert)</td>
      *      <td>G</td>
      *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
      *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
-     *      Buchstabensymbol.</td>
+     *      Buchstabensymbol. </td>
      *  </tr>
      *  <tr>
      *      <td>YEAR_OF_ERA (nicht registriert)</td>
@@ -100,7 +324,7 @@ public enum PatternType
      *      <td>Proleptisches ISO-Kalenderjahr. Diese Jahresangabe erfolgt
      *      nie mit Kippjahr, auch nicht f&uuml;r &quot;uu&quot;. Ein
      *      positives Vorzeichen wird genau dann ausgegeben, wenn das Jahr
-     *      mehr Stellen hat als an Symbolen vorgegeben.</td>
+     *      mehr Stellen hat als an Symbolen vorgegeben. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -255,13 +479,13 @@ public enum PatternType
      *      <td>Ein Symbol f&uuml;r die Kurzform oder 4 Symbole f&uuml;r die
      *      Langform. Das GMT-Pr&auml;fix kann auch lokalisiert aus der
      *      &quot;iso8601.properties&quot;-Ressource stammen, zum Schl&uuml;ssel
-     *      &quot;prefixGMTOffset&quot;.</td>
+     *      &quot;prefixGMTOffset&quot;. </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
      *      <td>V</td>
      *      <td>Es werden immer zwei Symbole erwartet. Dieses Symbol kann
-     *      nur auf den Typ {@link Moment} angewandt werden.</td>
+     *      nur auf den Typ {@link Moment} angewandt werden. </td>
      *  </tr>
      *  <tr>
      *      <td>ISO_TIMEZONE_OFFSET}</td>
@@ -284,6 +508,96 @@ public enum PatternType
     CLDR,
 
     /**
+     * <p>Follows the format pattern description of class
+     * {@link java.text.SimpleDateFormat}, which is very near, but not
+     * exactly the same as CLDR. </p>
+     *
+     * <p>The permitted count of digits is usually unlimited. Deviations
+     * from {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_DAY_OF_WEEK</td>
+     *      <td>u</td>
+     *      <td>Corresponds to the weekday-numbering of ISO-8601-standard
+     *      ({@code Weekmodel.ISO.localDayOfWeek()}), that is:
+     *      Mo=1, Di=2, Mi=3, Do=4, Fr=5, Sa=6, So=7. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#boundedWeekOfMonth()}</td>
+     *      <td>W</td>
+     *      <td>One symbol for the country-dependent week of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#MILLI_OF_SECOND}</td>
+     *      <td>S</td>
+     *      <td>No fractional but only integral display of millisecond. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>QUARTER_OF_YEAR</td>
+     *      <td>Q</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>QUARTER_OF_YEAR</td>
+     *      <td>q</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MODIFIED_JULIAN_DATE</td>
+     *      <td>g</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{local-day-of-week-number}</td>
+     *      <td>e</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{local-day-of-week-number}</td>
+     *      <td>c</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RFC_822_TIMEZONE_OFFSET</td>
+     *      <td>Z</td>
+     *      <td>Equivalent to CLDR-xx.</td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCALIZED_GMT_OFFSET</td>
+     *      <td>O</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_ID</td>
+     *      <td>V</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
+     *      <td>X</td>
+     *      <td>Like in CLDR, but with only three symbols as upper limit. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
+     *      <td>x</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
      * <p>Folgt der Formatmusterbeschreibung der Klasse
      * {@link java.text.SimpleDateFormat}, die sich stark, aber
      * nicht exakt an CLDR orientiert. </p>
@@ -296,7 +610,7 @@ public enum PatternType
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>
-     *      <th>Description</th>
+     *      <th>Beschreibung</th>
      *  </tr>
      *  <tr>
      *      <td>ISO_DAY_OF_WEEK</td>

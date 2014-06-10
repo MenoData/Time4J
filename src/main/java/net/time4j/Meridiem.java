@@ -32,6 +32,11 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
+ * <p>Represents the half day relative to noon. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert vor- oder nachmittags. </p>
  *
  * @author  Meno Hochschild
@@ -42,6 +47,12 @@ public enum Meridiem
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Marks the wall time from midnight (at start of day) until
+     * before noon (ante meridiem). </p>
+     *
+     * <p>The numerical value is {@code 0}. </p>
+     */
+    /*[deutsch]
      * <p>Bezeichnet die Uhrzeit ab Mitternacht bis vor dem Mittag
      * (ante meridiem). </p>
      *
@@ -50,6 +61,11 @@ public enum Meridiem
     AM,
 
     /**
+     * <p>Marks the wall time at or after noon (post meridiem). </p>
+     *
+     * <p>The numerical value is {@code 1}. </p>
+     */
+    /*[deutsch]
      * <p>Bezeichnet die Uhrzeit nach oder gleich dem Mittag
      * (post meridiem). </p>
      *
@@ -60,7 +76,16 @@ public enum Meridiem
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * Ermittelt den Tagesabschnitt auf Basis der angegebenen Tagesstunde. </p>
+     * <p>Calculates the meridiem value dependent on given hour of day. </p>
+     *
+     * @param   hour    ISO-hour in the range {@code 0 <= hour <= 24}
+     * @return  half of day (ante meridiem or post meridiem)
+     * @throws  IllegalArgumentException if the hour is out of range
+     * @see     PlainTime#AM_PM_OF_DAY
+     */
+    /*[deutsch]
+     * <p>Ermittelt den Tagesabschnitt auf Basis der angegebenen
+     * Tagesstunde. </p>
      *
      * @param   hour    ISO-hour in the range {@code 0 <= hour <= 24}
      * @return  half of day (ante meridiem or post meridiem)
@@ -79,6 +104,12 @@ public enum Meridiem
     }
 
     /**
+     * <p>Gets a descriptive text in given language. </p>
+     *
+     * @param   locale  language of text to be printed
+     * @return  localized text in given language
+     */
+    /*[deutsch]
      * <p>Gibt eine Textdarstellung in der angegebenen Sprache aus. </p>
      *
      * @param   locale  language of text to be printed

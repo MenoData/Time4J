@@ -25,6 +25,19 @@ import net.time4j.engine.ChronoUnit;
 
 
 /**
+ * <p>Defines the SI-second as the duration of 9,192,631,770 periods of the
+ * radiation corresponding to the transition between the two hyperfine levels
+ * of the ground state of the caesium 133 atom. </p>
+ *
+ * <p>SI-seconds were first officially defined  in 1967 so that any reference
+ * before that date are meaningless. Time4J supports SI-seconds first with
+ * the start of UTC epoch <strong>1972-01-01</strong> because especially the
+ * class {@code Moment} stores everything before 1972 in mean solar
+ * seconds. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert die SI-Sekunde als das 9.192.631.770-fache der Periodendauer
  * der dem &Uuml;bergang zwischen den beiden Hyperfeinstrukturniveaus des
  * Grundzustands von Atomen des Nuklids C&auml;sium-133 entsprechenden
