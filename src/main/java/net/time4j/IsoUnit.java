@@ -25,8 +25,14 @@ import net.time4j.engine.ChronoUnit;
 
 
 /**
+ * <p>Represents a unit suitable for timestamps which are compositions of
+ * date and time ({@code PlainTimestamp}). </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine f&uuml;r aus Datum und Uhrzeit zusammengesetzte
- * ISO-konforme Zeitstempel geeignete Zeiteinheit. </p>
+ * ISO-konforme Zeitstempel ({@code PlainTimestamp}) geeignete Zeiteinheit. </p>
  *
  * @author  Meno Hochschild
  */
@@ -36,6 +42,36 @@ public interface IsoUnit
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets the format symbol which is used to display this time unit
+     * in canonical representations of timespans. </p>
+     *
+     * <p>Canonical timespan formats follow ISO-8601. For example, the day
+     * unit is represented by the symbol D. Note that the letters P and T
+     * must not be used because these special characters are for structuring,
+     * the display. In ISO-8601 following symbols are defined: </p>
+     *
+     * <ul>
+     *  <li>Y - year</li>
+     *  <li>M - month or minute</li>
+     *  <li>W - week</li>
+     *  <li>D - day</li>
+     *  <li>H - hour</li>
+     *  <li>S - second</li>
+     *  <li>P - qualifies a timespan (period)</li>
+     *  <li>T - separates date and time part</li>
+     * </ul>
+     *
+     * <p>If this method yields as special case a digit 1-9 then Time4J expects
+     * a fractional display of preceding second unit S that is nanoseconds,
+     * microseconds and milliseconds. Time4J will use the comma as decimal
+     * separation char in the canonical display as recommended by ISO-8601
+     * unless the system property &quot;net.time4j.format.iso.decimal.dot&quot;
+     * is set to {@code true} (which causes the usage of a dot). </p>
+     *
+     * @return  char (ASCII-NULL if undefined)
+     * @see     Duration#toString()
+     */
+    /*[deutsch]
      * <p>Liefert das Formatsymbol, mit dem diese Instanz in kanonischen
      * Darstellungen von Zeitspannen repr&auml;sentiert wird. </p>
      *
