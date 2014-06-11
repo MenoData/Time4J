@@ -59,6 +59,44 @@ import static net.time4j.ClockUnit.SECONDS;
 
 
 /**
+ * <p>ISO-8601-compatible duration between two time points. </p>
+ *
+ * <p>Instances can be created by following factory methods: </p>
+ *
+ * <ul>
+ *  <li>{@link #of(long, IsoUnit) of(long, U)}</li>
+ *  <li>{@link #ofCalendarUnits(int, int, int)}</li>
+ *  <li>{@link #ofClockUnits(int, int, int)}</li>
+ *  <li>{@link #ofPositive()} (<i>builder</i>-pattern)</li>
+ *  <li>{@link #ofNegative()} (<i>builder</i>-pattern)</li>
+ *  <li>{@link #parse(String)}</li>
+ *  <li>{@link #parseCalendarPeriod(String)}</li>
+ *  <li>{@link #parseClockPeriod(String)}</li>
+ * </ul>
+ *
+ * <p>All instances are <i>immutable</i>, but changed copies can be created
+ * by using the methods {@code plus()}, {@code minus()}, {@code with()},
+ * {@code union()}, {@code multipliedBy()}, {@code abs()} and {@code inverse()}.
+ * The time units {@code ClockUnit.MILLIS} and {@code ClockUnit.MICROS} will
+ * automatically normalized to nanoseconds. In every other case a normalization
+ * must be  explicitly triggered by {@code with(Normalizer)}. </p>
+ *
+ * <p>Note: The definition of an optional negative sign is not part of
+ * ISO-8061, but part of the XML-schema-specification and defines the
+ * position of two time point relative to each other. A manipulation of
+ * the sign is possible with the method {@code inverse()}. </p>
+ *
+ * <p>The time arithmetic handles the addition of a duration to a time point
+ * and the subtraction of a duration from a time point as dependent on the
+ * sign of the duration as described in the
+ * <a href="engine/AbstractDuration.html#algorithm">standard algorithm</a>
+ * of the super class. </p>
+ *
+ * @param       <U> generic type of time units
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>ISO-konforme Zeitspanne zwischen zwei Zeitpunkten. </p>
  *
  * <p>Instanzen k&ouml;nnen &uuml;ber folgende Fabrikmethoden erzeugt
@@ -129,6 +167,23 @@ public final class Duration<U extends IsoUnit>
         };
 
     /**
+     * <p>Normalizes the duration items on the base of
+     * {@code 1 year = 12 months} and {@code 1 day = 24 hours} and
+     * {@code 1 hour = 60 minutes} and {@code 1 minute = 60 seconds} -
+     * without converting days to months. </p>
+     *
+     * <p>Attention: Timezone-dependent changes of length of day or
+     * leapseconds are ignored. That is why this normalization should
+     * only be applied on ISO-timestamps without timezone reference.
+     * Only time units of enum types {@link CalendarUnit} and
+     * {@link ClockUnit} can be normalized. </p>
+     *
+     * <p>Weeks will be normalized to days if weeks do not represent
+     * the only calendrical duration items. </p>
+     *
+     * @see     PlainTimestamp
+     */
+    /*[deutsch]
      * <p>Normalisiert die Zeitspannenelemente einer Zeitspanne auf der Basis
      * {@code 1 Jahr = 12 Monate} und {@code 1 Tag = 24 Stunden} und
      * {@code 1 Stunde = 60 Minuten} und {@code 1 Minute = 60 Sekunden},
@@ -149,6 +204,16 @@ public final class Duration<U extends IsoUnit>
     public static Normalizer<IsoUnit> STD_PERIOD = new TimestampNormalizer();
 
     /**
+     * <p>Normalizes the calendrical items of a duration on the base
+     * {@code 1 year = 12 months} - without converting the days to months. </p>
+     *
+     * <p>Weeks will be normalized to days if weeks do not represent
+     * the only calendrical duration items. Only time units of type
+     * {@link CalendarUnit} will be normalized. </p>
+     *
+     * @see     PlainDate
+     */
+    /*[deutsch]
      * <p>Normalisiert die Datumselemente einer Zeitspanne auf der Basis
      * {@code 1 Jahr = 12 Monate}, jedoch ohne die Tage zu Monaten zu
      * konvertieren. </p>
@@ -163,6 +228,18 @@ public final class Duration<U extends IsoUnit>
         new DateNormalizer();
 
     /**
+     * <p>Normalizes the wall time items of a duration on the base
+     * {@code 1 day = 24 hours} und {@code 1 hour = 60 minutes} and
+     * {@code 1 minute = 60 seconds}. </p>
+     *
+     * <p>Attention: Timezone-dependent changes of length of day or
+     * leapseconds are ignored. That is why this normalization should
+     * only be applied on ISO-timestamps without timezone reference.
+     * Only time units of enum type {@link ClockUnit} can be normalized. </p>
+     *
+     * @see     PlainTime
+     */
+    /*[deutsch]
      * <p>Normalisiert die Uhrzeitelemente einer Zeitspanne auf der Basis
      * {@code 1 Tag = 24 Stunden} und {@code 1 Stunde = 60 Minuten} und
      * {@code 1 Minute = 60 Sekunden}. </p>
@@ -197,7 +274,7 @@ public final class Duration<U extends IsoUnit>
     private final List<Item<U>> items;
 
     /**
-     * @serial  marks a negative time span
+     * @serial  marks a negative duration
      */
     private final boolean negative;
 
@@ -247,6 +324,12 @@ public final class Duration<U extends IsoUnit>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets an empty duration without units. </p>
+     *
+     * @param   <U> generic unit type
+     * @return  empty duration
+     */
+    /*[deutsch]
      * <p>Liefert eine leere Zeitspanne ohne Einheiten. </p>
      *
      * @param   <U> generic unit type
@@ -260,12 +343,24 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a new duration which only knows one unit. </p>
+     *
+     * <p>Is the given amount is negative then the duration will be
+     * negative, too. Is the amount equal to {@code 0} then an empty
+     * duration will be returned. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   amount      amount as count of units
+     * @param   unit        single time unit
+     * @return  new duration
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne, die auf nur einer Zeiteinheit
      * beruht. </p>
      *
      * <p>Ist der angegebene Betrag negativ, so wird auch die Zeitspanne
      * negativ sein. Ist er {@code 0}, wird eine leere Zeitspanne
-     * generiert. </p>
+     * zur&uuml;ckgegeben. </p>
      *
      * @param   <U> generic unit type
      * @param   amount      amount as count of units
@@ -292,6 +387,12 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Konstructs a new positive duration for combined date- and time items
+     * by applying the builder pattern. </p>
+     *
+     * @return  help object for building a positive {@code Duration}
+     */
+    /*[deutsch]
      * <p>Konstruiert &uuml;ber den Umweg des <i>builder</i>-Entwurfsmusters
      * eine neue ISO-konforme positive Zeitspanne für kombinierte Datums- und
      * Uhrzeiteinheiten. </p>
@@ -305,6 +406,12 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Konstructs a new negative duration for combined date- and time items
+     * by applying the builder pattern. </p>
+     *
+     * @return  help object for building a negative {@code Duration}
+     */
+    /*[deutsch]
      * <p>Konstruiert &uuml;ber den Umweg des <i>builder</i>-Entwurfsmusters
      * eine neue ISO-konforme negative Zeitspanne für kombinierte Datums- und
      * Uhrzeiteinheiten. </p>
@@ -318,6 +425,20 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a positive duration in years, months and days. </p>
+     *
+     * <p>All arguments must not be negative. Is any argument equal to
+     * {@code 0} then it will be ignored. If a negative duration is needed
+     * then an application can simply call {@code inverse()} on the result. </p>
+     *
+     * @param   years       amount in years
+     * @param   months      amount in months
+     * @param   days        amount in days
+     * @return  new duration
+     * @throws  IllegalArgumentException if any argument is negative
+     * @see     #inverse()
+     */
+    /*[deutsch]
      * <p>Erzeugt eine positive Zeitspanne in Jahren, Monaten und Tagen. </p>
      *
      * <p>Alle Argumente d&uuml;rfen nicht negativ sein. Ist ein Argument
@@ -343,6 +464,20 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a positive duratioon in hours, minutes and seconds. </p>
+     *
+     * <p>All arguments must not be negative. Is any argument equal to
+     * {@code 0} then it will be ignored. If a negative duration is needed
+     * then an application can simply call {@code inverse()} on the result. </p>
+     *
+     * @param   hours       amount in hours
+     * @param   minutes     amount in minutes
+     * @param   seconds     amount in seconds
+     * @return  new duration
+     * @throws  IllegalArgumentException if any argument is negative
+     * @see     #inverse()
+     */
+    /*[deutsch]
      * <p>Erzeugt eine positive Zeitspanne in Stunden, Minuten und
      * Sekunden. </p>
      *
@@ -369,6 +504,23 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Constructs a metric for any kind of standard units in
+     * normalized form. </p>
+     *
+     * <p><strong>IMPORTANT:</strong> If the smallest unit is missing which
+     * fits the precision of timepoints to be compared then a remainder of
+     * subtraction will exist. The result of distance calculation will not
+     * express the full temporal distance in this case. For the completeness
+     * of calculation, the day unit is required if the distance between
+     * two dates is needed. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   units       time units to be used in calculation
+     * @return  immutable metric for calculating a duration in given units
+     * @throws  IllegalArgumentException if any time unit is missing or
+     *          if there are unit duplicates
+     */
+    /*[deutsch]
      * <p>Konstruiert eine Metrik f&uuml;r beliebige Standard-Zeiteinheiten
      * in normalisierter Form. </p>
      *
@@ -394,6 +546,19 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Constructs a metric in years, months and days. </p>
+     *
+     * <p>Finally the resulting duration will be normalized such that
+     * smaller units will be converted to bigger units if possible. </p>
+     *
+     * @return  immutable metric for calculating a duration in years,
+     *          months and days
+     * @see     #in(IsoUnit[]) in(U[])
+     * @see     CalendarUnit#YEARS
+     * @see     CalendarUnit#MONTHS
+     * @see     CalendarUnit#DAYS
+     */
+    /*[deutsch]
      * <p>Konstruiert eine Metrik in Jahren, Monaten und Tagen. </p>
      *
      * <p>Am Ende wird die Darstellung automatisch normalisiert, also kleine
@@ -415,6 +580,19 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Constructs a metric in hours, minutes, seconds and nanoseconds. </p>
+     *
+     * <p>Finally the resulting duration will be normalized such that
+     * smaller units will be converted to bigger units if possible. </p>
+     *
+     * @return  immutable metric for calculating a duration in clock units
+     * @see     #in(IsoUnit[]) in(U[])
+     * @see     ClockUnit#HOURS
+     * @see     ClockUnit#MINUTES
+     * @see     ClockUnit#SECONDS
+     * @see     ClockUnit#NANOS
+     */
+    /*[deutsch]
      * <p>Konstruiert eine Metrik in Stunden, Minuten, Sekunden und Nanos. </p>
      *
      * <p>Am Ende wird die Darstellung automatisch normalisiert, also kleine
@@ -450,6 +628,17 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Queries if this duration contains given time unit. </p>
+     *
+     * <p>Any time unit is also part of this duration if it is a fractional
+     * part of a second (digit symbol) which is to be converted first. </p>
+     *
+     * @param   unit    time unit to be checked (optional)
+     * @return  {@code true} if this duration contains given unit
+     *          else {@code false}
+     * @see     #getPartialAmount(ChronoUnit) getPartialAmount(U)
+     */
+    /*[deutsch]
      * <p>Ist die angegebene Zeiteinheit in dieser Zeitspanne enthalten? </p>
      *
      * <p>Eine Zeiteinheit ist auch dann enthalten, wenn sie als
@@ -486,6 +675,19 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets the partial amount associated with given time unit. </p>
+     *
+     * <p>If this duration does not contain given time unit then this method
+     * will yield the value {@code 0}. Fractional parts of seconds which
+     * are known by their numerical symbols will automatically be converted.
+     * That means if a duration stores nanoseconds, but is queried for
+     * microseconds then the nanosecond amount will be multiplied by factor
+     * {@code 1000} and finally returned. </p>
+     *
+     * @param   unit    time unit the amount is queried for (optional)
+     * @return  non-negative amount associated with given unit ({@code >= 0})
+     */
+    /*[deutsch]
      * <p>Liefert den Betrag zu einer Zeiteinheit. </p>
      *
      * <p>Wenn die angegebene Zeiteinheit nicht in der Zeitspanne enthalten ist,
@@ -538,6 +740,21 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a {@code Comparator} which compares durations based on
+     * their lengths. </p>
+     *
+     * <p>Internally, the comparing algorithm uses the expression
+     * {@code base.plus(duration1).compareTo(base.plus(duration2))}.
+     * The given basis time point is necessary because some durations
+     * with flexible units like months have else no fixed length. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   <T> generic type of time point
+     * @param   base    base time point which durations will use for comparison
+     * @return  {@code Comparator} for plain durations
+     * @see     TimePoint#compareTo(TimePoint) TimePoint.compareTo(T)
+     */
+    /*[deutsch]
      * <p>Liefert ein Hilfsobjekt zum Vergleichen von Zeitspannenobjekten
      * auf Basis ihrer L&auml;nge. </p>
      *
@@ -562,17 +779,54 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a copy of this duration where given amount will be added
+     * to the partial amount of this duration in given unit. </p>
+     *
+     * <p>The method also takes in account the sign of the duration.
+     * Example: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.of(5, MONTHS).plus(-6, MONTHS));
+     *  // output: -P1M
+     * </pre>
+     *
+     * <p>Notes: Is the amount to be added equal to {@code 0} then the method
+     * will simply yield this duration. Mixed signs are not permitted and will
+     * be rejected by an exception. For example following expression is not
+     * allowed: </p>
+     *
+     * <pre>
+     *  Duration.of(-1, MONTHS).plus(30, DAYS); // throws IllegalStateException
+     * </pre>
+     *
+     * @param   amount      temporal amount to be added (maybe negative)
+     * @param   unit        associated time unit
+     * @return  new changed duration while this duration remains unaffected
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          adding the partial amounts
+     * @throws  ArithmeticException in case of long overflow
+     * @see     #with(long, IsoUnit) with(long, U)
+     */
+    /*[deutsch]
      * <p>Liefert eine Kopie dieser Instanz, in der der angegebene Betrag zum
      * mit der angegebenen Zeiteinheit assoziierten Feldwert addiert wird. </p>
      *
      * <p>Die Methode ber&uuml;cksichtigt auch das Vorzeichen der Zeitspanne.
-     * Beispiel in Pseudo-Code: {@code [P5M].plus(-6, CalendarUnit.MONTHS)} wird
-     * zu {@code [-P1M]}. Ist der zu addierende Betrag {@code 0}, liefert die
-     * Methode einfach diese Instanz selbst. </p>
+     * Beispiel: </p>
      *
-     * <p>Notiz: Gemischte Vorzeichen im Ergebnis sind nicht zul&auml;ssig und
-     * werden mit einem Abbruch quittiert. Zum Beispiel ist folgender Ausdruck
-     * nicht erlaubt: {@code [-P1M].plus(30, CalendarUnit.DAYS)}</p>
+     * <pre>
+     *  System.out.println(Duration.of(5, MONTHS).plus(-6, MONTHS));
+     *  // output: -P1M
+     * </pre>
+     *
+     * <p>Notiz: Ist der zu addierende Betrag gleich {@code 0}, liefert die
+     * Methode einfach diese Instanz selbst zur&uuml;ck. Gemischte Vorzeichen
+     * im Ergebnis sind nicht zul&auml;ssig und werden mit einem Abbruch
+     * quittiert: </p>
+     *
+     * <pre>
+     *  Duration.of(-1, MONTHS).plus(30, DAYS); // throws IllegalStateException
+     * </pre>
      *
      * @param   amount      temporal amount to be added (maybe negative)
      * @param   unit        associated time unit
@@ -658,6 +912,20 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a copy of this duration where given amount will be subtracted
+     * from the partial amount of this duration in given unit. </p>
+     *
+     * <p>Equivalent to {@code plus(-amount, unit)}. </p>
+     *
+     * @param   amount      temporal amount to be subtracted (maybe negative)
+     * @param   unit        associated time unit
+     * @return  new changed duration while this duration remains unaffected
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          subtracting the partial amounts
+     * @throws  ArithmeticException in case of long overflow
+     * @see     #plus(long, IsoUnit) plus(long, U)
+     */
+    /*[deutsch]
      * <p>Liefert eine Kopie dieser Instanz, in der der angegebene Betrag
      * vom mit der angegebenen Zeiteinheit assoziierten Feldwert subtrahiert
      * wird. </p>
@@ -682,6 +950,21 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a duration as union of this instance and given timespan
+     * where partial amounts of equal units will be summed up. </p>
+     *
+     * <p>In contrast to {@code union()}, this method only handles timespans
+     * with the same unit type. Further details can be seen in the description
+     * of {@link #union(TimeSpan)}. </p>
+     *
+     * @param   timespan    other time span this duration will be merged
+     *                      with by adding the partial amounts
+     * @return  new merged duration
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          adding the partial amounts
+     * @throws  ArithmeticException in case of long overflow
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
      * angegebenen Zeitspanne, wobei Betr&auml;ge zu gleichen Zeiteinheiten
      * addiert werden. </p>
@@ -705,8 +988,22 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a duration as union of this instance and given timespan
+     * where partial amounts of other timespan related to equal units will be
+     * subtracted from this duration. </p>
+     *
+     * <p>Further details see {@link #plus(TimeSpan)}. </p>
+     *
+     * @param   timespan    other time span this duration will be merged
+     *                      with by subtracting the partial amounts
+     * @return  new merged duration
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          subtracting the partial amounts
+     * @throws  ArithmeticException in case of long overflow
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
-     * angegebenen Zeitspanne, wobei die Betr&auml;ge ds Arguments zu
+     * angegebenen Zeitspanne, wobei die Betr&auml;ge des Arguments zu
      * gleichen Zeiteinheiten subtrahiert werden. </p>
      *
      * <p>Weitere Details siehe {@link #plus(TimeSpan)}. </p>
@@ -725,6 +1022,20 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a copy of this duration where the partial amount associated
+     * with given time unit is changed. </p>
+     *
+     * <p>Equivalent to {@code plus(amount - getAmount(unit), unit)}. </p>
+     *
+     * @param   amount      temporal amount to be set (maybe negative)
+     * @param   unit        associated time unit
+     * @return  new changed duration while this duration remains unaffected
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          setting the partial amounts
+     * @throws  ArithmeticException in case of long overflow
+     * @see     #plus(long, IsoUnit) plus(long, U)
+     */
+    /*[deutsch]
      * <p>Liefert eine Kopie dieser Instanz mit dem angegebenen ge&auml;nderten
      * Wert. </p>
      *
@@ -771,9 +1082,29 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets the absolute always non-negative copy of this duration. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.of(-5, MONTHS).abs());
+     *  // output: P5M
+     * </pre>
+     *
+     * @return  new positive duration if this duration is negative else this
+     *          duration unchanged
+     * @see     #isNegative()
+     * @see     #inverse()
+     */
+    /*[deutsch]
      * <p>Liefert die absolute immer positive Variante dieser Zeitspanne. </p>
      *
-     * <p>Beispiel: {@code [-P5M].abs()} wird zu {@code [P5M]}. </p>
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.of(-5, MONTHS).abs());
+     *  // output: P5M
+     * </pre>
      *
      * @return  new positive duration if this duration is negative else this
      *          duration unchanged
@@ -791,6 +1122,33 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a copy of this duration with reversed sign. </p>
+     *
+     * <p>A double call of this method will yield an equal duration so
+     * following invariant holds: </p>
+     *
+     * <pre>
+     *  System.out.println(this.inverse().inverse().equals(this));
+     *  // output: true
+     * </pre>
+     *
+     * <p>For the special case of an empty duration, this method has no
+     * effect and just returns the same instance. The method is equivalent
+     * to the expression {@code multipliedBy(-1)}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.of(-5, MONTHS).inverse());
+     *  // output: P5M
+     * </pre>
+     *
+     * @return  new negative duration if this duration is positive else a new
+     *          positive duration with the same partial amounts and units
+     * @see     #isNegative()
+     * @see     #multipliedBy(int)
+     */
+    /*[deutsch]
      * <p>Liefert eine Kopie dieser Instanz, die das negative &Auml;quivalent
      * darstellt. </p>
      *
@@ -816,6 +1174,19 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Multiplies all partial amounts of this duration by given factor. </p>
+     *
+     * <p>Is the factor equal to {@code 0} then the new duration is empty.
+     * If the factor {@code 1} is specified then the method will just yield
+     * this instance unaffected. In the case of a negative factor the sign
+     * will also be inverted. </p>
+     *
+     * @param   factor  multiplication factor
+     * @return  new duration with all amounts multiplied while this duration
+     *          remains unaffected
+     * @throws  ArithmeticException in case of long overflow
+     */
+    /*[deutsch]
      * <p>Multipliziert alle enthaltenen Betr&auml;ge mit dem angegebenen
      * Faktor. </p>
      *
@@ -863,6 +1234,48 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a duration as union of this instance and given timespan
+     * where partial amounts of equal units will be summed up. </p>
+     *
+     * <p><i>union of timespans with date and time units</i></p>
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; dateDuration =
+     *      Duration.ofCalendarUnits(2, 7, 10);
+     *  Duration&lt;ClockUnit&gt; timeDuration =
+     *      Duration.ofClockUnits(0, 30, 0);
+     *  System.out.println(dateDuration.union(timeDuration)); // P2Y7M10DT30M
+     * </pre>
+     *
+     * <p><i>union as addition of timespans</i></p>
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; p1 =
+     *      Duration.ofCalendarUnits(0, 0, 10);
+     *  Duration&lt;CalendarUnit&gt; p2 =
+     *      Duration.of(21, CalendarUnit.DAYS);
+     *  System.out.println(p1.union(p2)); // P31D
+     * </pre>
+     *
+     * <p>If the signs of both timespans are different then the signs of
+     * all partial amounts must be equal in the result in order to define
+     * the sign of the whole result in a unique way. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; duration =
+     *      Duration.of(4, DAYS)
+     *      .union(Duration.ofCalendarUnits(0, 1, 34))
+     *      .inverse(); // [-P1M30D] (OK)
+     *  Duration&lt;CalendarUnit&gt; duration =
+     *      Duration.ofCalendarUnits(0, 5, 4)
+     *      .union(Duration.ofCalendarUnits(0, 1, 34))
+     *      .inverse(); // [P+1M-30D] (throws IllegalStateException)
+     * </pre>
+     *
+     * @param   timespan    other time span this duration is to be merged with
+     * @return  new merged duration with {@code IsoUnit} as unit type
+     * @throws  IllegalStateException if the result gets mixed signs by
+     *          adding the partial amounts
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
      * angegebenen Zeitspanne, wobei Betr&auml;ge zu gleichen Zeiteinheiten
      * addiert werden. </p>
@@ -892,13 +1305,6 @@ public final class Duration<U extends IsoUnit>
      * Vereinigung [P5M4D] union [-P4M34D] zum Abbruch, weil [P+1M-30D] keine
      * sinnvolle Vorzeichenregelung erlaubt. </p>
      *
-     * <p>Notiz: Anders als in {@code javax.xml.datatype.Duration} ist die
-     * Anforderung an gleiche Vorzeichen hier h&auml;rter, weil diese Klasse
-     * auch zur Verwendung in Zeitzonenkontexten vorgesehen ist, wo kein
-     * Verla&szlig; auf feste Umrechnungen à la 1 Tag = 24 Stunden besteht.
-     * Allerdings besteht die M&ouml;glichkeit, Zeitspannen vor der Vereinigung
-     * geeignet zu normalisieren. </p>
-     *
      * @param   timespan    other time span this duration is to be merged with
      * @return  new merged duration with {@code IsoUnit} as unit type
      * @throws  IllegalStateException if the result gets mixed signs by
@@ -912,6 +1318,15 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Normalizes this duration by given normalizer. </p>
+     *
+     * @param   normalizer  help object for normalizing this duration
+     * @return  new normalized duration while this duration remains unaffected
+     * @see     #STD_PERIOD
+     * @see     #STD_CALENDAR_PERIOD
+     * @see     #STD_CLOCK_PERIOD
+     */
+    /*[deutsch]
      * <p>Normalisiert diese Zeitspanne &uuml;ber den angegebenen
      * Mechanismus. </p>
      *
@@ -928,6 +1343,14 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Operates on a {@code Moment} such that in given timezone, the earlier
+     * defined local timestamp will be computed. </p>
+     *
+     * @param   timezone    timezone id
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #later(TZID)
+     */
+    /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
      * der angegebenen Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
      * wird. </p>
@@ -950,9 +1373,40 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Operates on a {@code Moment} such that in given timezone, the later
+     * defined local timestamp will be computed. </p>
+     *
+     * <pre>
+     *  TZID berlin = TZID.EUROPE.BERLIN;
+     *  Moment start =
+     *      PlainDate.of(2014, Month.MARCH, 30)
+     *      .atStartOfDay().atTimezone(berlin);
+     *  Moment end =
+     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
+     *  System.out.println(start.until(end, TimeUnit.HOURS));
+     *  // output: 4 (5 local hour ticks equal to 4 physical hours)
+     * <pre>
+     *
+     * @param   timezone    timezone id
+     * @return  operator applicable on {@code Moment}-objects
+     * @see     #earlier(TZID)
+     */
+    /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
      * der angegebenen Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
      * wird. </p>
+     *
+     * <pre>
+     *  TZID berlin = TZID.EUROPE.BERLIN;
+     *  Moment start =
+     *      PlainDate.of(2014, Month.MARCH, 30)
+     *      .atStartOfDay().atTimezone(berlin);
+     *  Moment end =
+     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
+     *  System.out.println(start.until(end, TimeUnit.HOURS));
+     *  // Ausgabe: 4
+     *  // (5 lokale Stunden &auml;quivalent zu 4 physikalischen Stunden)
+     * <pre>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
@@ -972,6 +1426,15 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Based on all stored duration items and the sign. </p>
+     *
+     * @return  {@code true} if {@code obj} is also a {@code Duration},
+     *          has the same units and amounts, the same sign and the same
+     *          calendrical status else {@code false}
+     * @see     #getTotalLength()
+     * @see     #isNegative()
+     */
+    /*[deutsch]
      * <p>Basiert auf allen gespeicherten Zeitspannenelementen und dem
      * Vorzeichen. </p>
      *
@@ -999,6 +1462,9 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Computes the hash code. </p>
+     */
+    /*[deutsch]
      * <p>Basiert auf allen gespeicherten Zeitspannenelementen und dem
      * Vorzeichen passend zur Definition von {@code equals()}. </p>
      */
@@ -1016,6 +1482,32 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a canonical representation which optionally starts with a
+     * negative sign then continues with the letter &quot;P&quot;, followed
+     * by a sequence of alphanumerical chars similar to the definition given
+     * in ISO-8601. </p>
+     *
+     * <p>Example: In ISO-8601 a duration of one month, three days and four
+     * hours is described as &quot;P1M3DT4H&quot;. The special char
+     * &quot;T&quot; separates date and time part. </p>
+     *
+     * <p>Is the duration negative then the representation will have a
+     * preceding minus sign as specified by XML-schema (for example
+     * &quot;-P2D&quot;) while an empty duration will always have the
+     * format &quot;PT0S&quot; (second as universal unit). If the second
+     * part is also fractional then this method will use the comma as
+     * decimal separator char as recommended by ISO-8601. </p>
+     *
+     * <p>Note: The latter ISO-recommendation to use the comma as decimal
+     * separator char can be overriden by setting the system property
+     * &quot;net.time4j.format.iso.decimal.dot&quot; to &quot;true&quot;
+     * so that the english variation of a dot will be choosen instead. </p>
+     *
+     * @see     #toStringISO()
+     * @see     #toStringXML()
+     * @see     #parse(String)
+     */
+    /*[deutsch]
      * <p>Liefert eine kanonische Darstellung, die optional mit einem negativen
      * Vorzeichen beginnt, dann mit dem Buchstaben &quot;P&quot; fortsetzt,
      * gefolgt von einer Reihe von alphanumerischen Zeichen analog zur
@@ -1050,6 +1542,31 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a canonical representation which starts with the letter
+     * &quot;P&quot;, followed by a sequence of alphanumerical chars as
+     * defined in ISO-8601. </p>
+     *
+     * <p>A negative sign is not defined in ISO-8601 and will be rejected
+     * by this method with an exception. An empty duration will always have
+     * the format &quot;PT0S&quot; (second as universal unit). If the second
+     * part is also fractional then this method will use the comma as
+     * decimal separator char as recommended by ISO-8601. </p>
+     *
+     * <p>Note: The latter ISO-recommendation to use the comma as decimal
+     * separator char can be overriden by setting the system property
+     * &quot;net.time4j.format.iso.decimal.dot&quot; to &quot;true&quot;
+     * so that the english variation of a dot will be choosen instead.
+     * Furthermore, weeks are normalized to days if there are other
+     * calendrical units like years or months. </p>
+     *
+     * @return  String
+     * @throws  ChronoException if this duration is negative or if any special
+     *          units shall be output, but units of type {@code CalendarUnit}
+     *          will be translated to iso-compatible units if necessary
+     * @see     #parse(String)
+     * @see     IsoUnit#getSymbol()
+     */
+    /*[deutsch]
      * <p>Liefert eine ISO-konforme Darstellung, die mit dem Buchstaben
      * &quot;P&quot; beginnt, gefolgt von einer Reihe von alphanumerischen
      * Zeichen analog zur ISO8601-Definition. </p>
@@ -1082,6 +1599,27 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Gets a canonical representation conforming to XML-schema which
+     * optionally starts with a negative sign then continues with the letter
+     * &quot;P&quot;, followed by a sequence of alphanumerical chars similar
+     * to the definition given in ISO-8601. </p>
+     *
+     * <p>Is the duration negative then the representation will have a
+     * preceding minus sign as specified by XML-schema (for example
+     * &quot;-P2D&quot;) while an empty duration will always have the
+     * format &quot;PT0S&quot; (second as universal unit). If the second
+     * part is also fractional then this method will use the dot as
+     * decimal separator char (deviating specification in XML-schema).
+     * Weeks will always be normalized to days. </p>
+     *
+     * @return  String
+     * @throws  ChronoException if any special units shall be
+     *          output, but units of type {@code CalendarUnit} will be
+     *          translated to xml-compatible units if necessary
+     * @see     #parse(String)
+     * @see     IsoUnit#getSymbol()
+     */
+    /*[deutsch]
      * <p>Liefert eine XML-konforme Darstellung, die optional mit einem
      * negativen Vorzeichen beginnt, dann mit dem Buchstaben &quot;P&quot;
      * fortsetzt, gefolgt von einer Reihe von alphanumerischen Zeichen analog
@@ -1110,6 +1648,57 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Parses a canonical representation to a duration. </p>
+     *
+     * <p>Syntax in a notation similar to regular expressions: </p>
+     *
+     * <pre>
+     *  sign := [-]?
+     *  amount := [0-9]+
+     *  fraction := [,\.]{amount}
+     *  years-months-days := ({amount}Y)?({amount}M)?({amount}D)?
+     *  weeks := ({amount}W)?
+     *  date := {years-months-days} | {weeks}
+     *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
+     *  duration := {sign}P{date}(T{time})? | PT{time}
+     * </pre>
+     *
+     * <p>The units MILLENNIA, CENTURIES, DECADES and QUARTERS defined in
+     * {@link CalendarUnit} are supported but not special units like
+     * {@code CalendarUnit.weekBasedYears()}. </p>
+     *
+     * <p>Furthermore there is the constraint that the symbols P and T
+     * must be followed by at least one duration item of amount and unit.
+     * All items with zero amount will be ignored however. The only item
+     * which is allowed to have a fractional part can contain a comma as
+     * well as a dot as decimal separator. In ISO-8601 the comma is the
+     * preferred char, in XML-schema only the dot is allowed. If this
+     * parser is used in context of XML-schema (type xs:duration) it must
+     * be stated that week items are missing in contrast to ISO-8601. The
+     * method {@code toStringXML()} takes in account these characteristics
+     * of XML-schema (leaving aside the fact that XML-schema is potentially
+     * design for unlimited big amounts but Time4J can define durations
+     * only in long range with nanosecond precision at best). </p>
+     *
+     * <p>Examples for supported formats: </p>
+     *
+     * <pre>
+     *  date := -P7Y4M3D (negative: 7 years, 4 months, 3 days)
+     *  time := PT3H2M1,4S (positive: 3 hours, 2 minutes, 1400 milliseconds)
+     *  date-time := P1Y1M5DT15H59M10.400S (dot as decimal separator)
+     * </pre>
+     *
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
+     * @return  parsed duration in all possible standard units of date and time
+     * @throws  ParseException if parsing fails
+     * @see     #parseCalendarPeriod(String)
+     * @see     #parseClockPeriod(String)
+     * @see     #toString()
+     * @see     #toStringISO()
+     * @see     #toStringXML()
+     */
+    /*[deutsch]
      * <p>Parst eine kanonische Darstellung zu einer Dauer. </p>
      *
      * <p>Syntax in RegExp-&auml;hnlicher Notation: </p>
@@ -1170,6 +1759,17 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Parses a canonical representation with only date units to a
+     * calendrical duration. </p>
+     *
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
+     * @return  parsed calendrical duration
+     * @throws  ParseException if parsing fails
+     * @see     #parse(String)
+     * @see     #parseClockPeriod(String)
+     */
+    /*[deutsch]
      * <p>Parst eine kanonische Darstellung nur mit
      * Datumskomponenten zu einer Dauer. </p>
      *
@@ -1189,6 +1789,17 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Parses a canonical representation with only wall time units to a
+     * time-only duration. </p>
+     *
+     * @param   duration        duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format
+     * @return  parsed time-only duration
+     * @throws  ParseException if parsing fails
+     * @see     #parse(String)
+     * @see     #parseCalendarPeriod(String)
+     */
+    /*[deutsch]
      * <p>Parst eine kanonische Darstellung nur mit
      * Uhrzeitkomponenten zu einer Dauer. </p>
      *
@@ -1933,6 +2544,20 @@ public final class Duration<U extends IsoUnit>
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Builder class for constructing a duration conforming to ISO-8601
+     * which consists of years, months, days and any wall time units. </p>
+     *
+     * <p>The week unit is not possible in builder because this unit should
+     * be stand-alone according to ISO-8601. A week-based duration can be
+     * created by expression {@code Duration.of(amount, CalendarUnit.WEEKS)}
+     * however. </p>
+     *
+     * <p>A builder instance must be created by {@link Duration#ofPositive()}
+     * or {@link Duration#ofNegative()}. Note that the builder is only be
+     * designed for single-thread-environments that is always creating a
+     * new builder instance per thread. </p>
+     */
+    /*[deutsch]
      * <p>Hilfsobjekt zum Bauen einer ISO-konformen Zeitspanne bestehend aus
      * Jahren, Monaten, Tagen und allen Uhrzeiteinheiten. </p>
      *
@@ -1975,12 +2600,22 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Adds a year item. </p>
+         *
+         * @param   num     count of years {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#YEARS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Jahren. </p>
          *
          * @param   num     count of years {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#YEARS
          */
         public Builder years(int num) {
 
@@ -1990,12 +2625,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a month item. </p>
+         *
+         * @param   num     count of months {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#MONTHS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Monaten. </p>
          *
          * @param   num     count of months {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#MONTHS
          */
         public Builder months(int num) {
 
@@ -2005,12 +2650,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a day item. </p>
+         *
+         * @param   num     count of days {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#DAYS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Tagen. </p>
          *
          * @param   num     count of days {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     CalendarUnit#DAYS
          */
         public Builder days(int num) {
 
@@ -2020,12 +2675,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a hour item. </p>
+         *
+         * @param   num     count of hours {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     ClockUnit#HOURS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Stunden. </p>
          *
          * @param   num     count of hours {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     ClockUnit#HOURS
          */
         public Builder hours(int num) {
 
@@ -2035,12 +2700,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a minute item. </p>
+         *
+         * @param   num     count of minutes {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     ClockUnit#MINUTES
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Minuten. </p>
          *
          * @param   num     count of minutes {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     ClockUnit#MINUTES
          */
         public Builder minutes(int num) {
 
@@ -2050,12 +2725,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a second item. </p>
+         *
+         * @param   num     count of seconds {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     ClockUnit#SECONDS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Sekunden. </p>
          *
          * @param   num     count of seconds {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     ClockUnit#SECONDS
          */
         public Builder seconds(int num) {
 
@@ -2065,6 +2750,16 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a millisecond item. </p>
+         *
+         * <p>The argument will automatically be normalized to nanoseconds. </p>
+         *
+         * @param   num     count of milliseconds {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Millisekunden. </p>
          *
          * <p>Es wird eine Normalisierung durchgef&uuml;hrt, indem das Argument
@@ -2085,6 +2780,16 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a microsecond item. </p>
+         *
+         * <p>The argument will automatically be normalized to nanoseconds. </p>
+         *
+         * @param   num     count of microseconds {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Mikrosekunden. </p>
          *
          * <p>Es wird eine Normalisierung durchgef&uuml;hrt, indem das Argument
@@ -2105,12 +2810,22 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Adds a nanosecond item. </p>
+         *
+         * @param   num     count of nanoseconds {@code >= 0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is negative
+         * @throws  IllegalStateException if already called
+         * @see     ClockUnit#NANOS
+         */
+        /*[deutsch]
          * <p>Erzeugt eine L&auml;nge in Nanosekunden. </p>
          *
          * @param   num     count of nanoseconds {@code >= 0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if the argument is negative
          * @throws  IllegalStateException if already called
+         * @see     ClockUnit#NANOS
          */
         public Builder nanos(int num) {
 
@@ -2121,6 +2836,11 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Creates a new duration conforming to ISO-8601. </p>
+         *
+         * @return  new {@code Duration}
+         */
+        /*[deutsch]
          * <p>Erzeugt eine neue ISO-konforme Zeitspanne. </p>
          *
          * @return  new {@code Duration}
@@ -2575,25 +3295,10 @@ public final class Duration<U extends IsoUnit>
     private static class Metric<U extends IsoUnit>
         extends AbstractMetric<U, Duration<U>> {
 
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final boolean calendrical;
-
         //~ Konstruktoren -------------------------------------------------
 
         private Metric(U... units) {
             super((units.length > 1), units);
-
-            boolean c = true;
-
-            for (U unit : units) {
-                if (!unit.isCalendrical()) {
-                    c = false;
-                    break;
-                }
-            }
-
-            this.calendrical = c;
 
         }
 
