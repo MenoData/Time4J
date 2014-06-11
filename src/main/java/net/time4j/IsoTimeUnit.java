@@ -23,6 +23,18 @@ package net.time4j;
 
 
 /**
+ * <p>Represents a wall time unit conforming to ISO-8601. </p>
+ *
+ * <p>Most applications will simply use a standard unit of type
+ * {@code ClockUnit}. Other units must implement the interface
+ * {@link net.time4j.engine.UnitRule.Source} appropriately and
+ * also make sure that the length of time unit is always smaller
+ * than the length of a day. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     ClockUnit
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine ISO-konforme Uhrzeiteinheit. </p>
  *
  * <p>Die meisten Anwendungen werden einfach eine Standardeinheit vom
