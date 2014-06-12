@@ -23,8 +23,15 @@ package net.time4j;
 
 
 /**
- * <p>Definiert weitere Operatoren zum gezielten Setzen eines neuen
- * Elementwerts unter Ber&uuml;cksichtigung des aktuellen Werts. </p>
+ * <p>Defines additional enum-based operators for setting new element values
+ * taking into account the old element value. </p>
+ *
+ * @param   <V> generic enum type of element values
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
+ * <p>Definiert weitere enum-basierte Operatoren zum gezielten Setzen eines
+ * neuen Elementwerts unter Ber&uuml;cksichtigung des aktuellen Werts. </p>
  *
  * @param   <V> generic enum type of element values
  * @author  Meno Hochschild
@@ -35,6 +42,25 @@ public interface NavigableElement<V extends Enum<V>>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Moves a time point to the first given element value which is after
+     * the current element value. </p>
+     *
+     * <p>Example for a date which shall be moved to a special weekday: </p>
+     *
+     * <pre>
+     *  import static net.time4j.Month.MARCH;
+     *  import static net.time4j.PlainDate.DAY_OF_WEEK;
+     *  import static net.time4j.Weekday.MONDAY;
+     *
+     *  PlainDate date = PlainDate.of(2013, MARCH, 7); // Thursday
+     *  System.out.println(date.with(DAY_OF_WEEK.setToNext(MONDAY)));
+     *  // output: 2013-03-11 (first monday after march 7th)
+     * </pre>
+     *
+     * @param   value   new element value which is after current value
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der nach dem
      * aktuellen Wert liegt. </p>
      *
@@ -57,6 +83,25 @@ public interface NavigableElement<V extends Enum<V>>
     ElementOperator<PlainDate> setToNext(V value);
 
     /**
+     * <p>Moves a time point to the first given element value which is before
+     * the current element value. </p>
+     *
+     * <p>Example for a date which shall be moved to a special weekday: </p>
+     *
+     * <pre>
+     *  import static net.time4j.IsoElement.DAY_OF_WEEK;
+     *  import static net.time4j.Month.MARCH;
+     *  import static net.time4j.Weekday.THURSDAY;
+     *
+     *  PlainDate date = PlainDate.of(2013, MARCH, 7); // Thursday
+     *  System.out.println(date.with(DAY_OF_WEEK.setToPrevious(THURSDAY)));
+     *  // output: 2013-02-28 (Thursday one week earlier)
+     * </pre>
+     *
+     * @param   value   new element value which is before current value
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor dem
      * aktuellen Wert liegt. </p>
      *
@@ -79,6 +124,17 @@ public interface NavigableElement<V extends Enum<V>>
     ElementOperator<PlainDate> setToPrevious(V value);
 
     /**
+     * <p>Moves a time point to the first given element value which is after
+     * or equal to the current element value. </p>
+     *
+     * <p>Is the current element value equal to the given element value then
+     * there is no movement. </p>
+     *
+     * @param   value   new element value which is either after current value
+     *                  or the same
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert setzt, der nach
      * oder gleich dem aktuellen Wert liegt. </p>
      *
@@ -92,6 +148,17 @@ public interface NavigableElement<V extends Enum<V>>
     ElementOperator<PlainDate> setToNextOrSame(V value);
 
     /**
+     * <p>Moves a time point to the first given element value which is before
+     * or equal to the current element value. </p>
+     *
+     * <p>Is the current element value equal to the given element value then
+     * there is no movement. </p>
+     *
+     * @param   value   new element value which is either before current value
+     *                  or the same
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor oder
      * gleich dem aktuellen Wert liegt. </p>
      *

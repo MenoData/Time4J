@@ -23,6 +23,16 @@ package net.time4j;
 
 
 /**
+ * <p>The element for the ordinal weekday in month. </p>
+ *
+ * <p>An instance can be obtained using the expression
+ * {@link PlainDate#WEEKDAY_IN_MONTH}. This interface inherits from
+ * {@code AdjustableElement} and offers additional operator for setting
+ * the weekday in month. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Das Element f&uuml;r den x-ten Wochentag im Monat. </p>
  *
  * <p>Eine Instanz ist erh&auml;ltlich &uuml;ber den Ausdruck
@@ -38,6 +48,13 @@ public interface OrdinalWeekdayElement
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Defines an operator which moves a date to the first given weekday
+     * in month. </p>
+     *
+     * @param   dayOfWeek   first day of week in month
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den ersten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
@@ -47,6 +64,13 @@ public interface OrdinalWeekdayElement
     ElementOperator<PlainDate> setToFirst(Weekday dayOfWeek);
 
     /**
+     * <p>Defines an operator which moves a date to the second given weekday
+     * in month. </p>
+     *
+     * @param   dayOfWeek   second day of week in month
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den zweiten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
@@ -56,6 +80,13 @@ public interface OrdinalWeekdayElement
     ElementOperator<PlainDate> setToSecond(Weekday dayOfWeek);
 
     /**
+     * <p>Defines an operator which moves a date to the third given weekday
+     * in month. </p>
+     *
+     * @param   dayOfWeek   third day of week in month
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den dritten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
@@ -65,6 +96,13 @@ public interface OrdinalWeekdayElement
     ElementOperator<PlainDate> setToThird(Weekday dayOfWeek);
 
     /**
+     * <p>Defines an operator which moves a date to the fourth given weekday
+     * in month. </p>
+     *
+     * @param   dayOfWeek   fourth day of week in month
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den vierten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
@@ -74,6 +112,13 @@ public interface OrdinalWeekdayElement
     ElementOperator<PlainDate> setToFourth(Weekday dayOfWeek);
 
     /**
+     * <p>Defines an operator which moves a date to the last given weekday
+     * in month. </p>
+     *
+     * @param   dayOfWeek   last day of week in month
+     * @return  operator directly applicable on local types without timezone
+     */
+    /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den letzten angegebenen
      * Wochentag eines Monats setzt. </p>
      *

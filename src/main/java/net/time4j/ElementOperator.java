@@ -29,6 +29,14 @@ import net.time4j.tz.Timezone;
 
 
 /**
+ * <p>Defines any manipulation of date or wall time objects following the
+ * strategy design pattern. </p>
+ *
+ * @param       <T> generic target type this operator is applied to
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Definiert eine Manipulation von Datums- oder Uhrzeitobjekten nach
  * dem Strategy-Entwurfsmuster. </p>
  *
@@ -82,6 +90,19 @@ public abstract class ElementOperator<T>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates an operator which can adjust a {@link Moment} in the
+     * system timezone. </p>
+     *
+     * <p>Note: Usually the operator converts the given {@code Moment} to
+     * a {@code PlainTimestamp} then processes this local timestamp and
+     * finally converts the result back to a new {@code Moment}. A special
+     * case are incrementing and decrementing of (sub-)second elements which
+     * eventually operate directly on the UTC timeline. </p>
+     *
+     * @return  operator with the default system timezone reference,
+     *          applicable on instances of {@code Moment}
+     */
+    /*[deutsch]
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit
      * Hilfe der Systemzeitzonenreferenz anpassen kann. </p>
      *
@@ -102,6 +123,20 @@ public abstract class ElementOperator<T>
     }
 
     /**
+     * <p>Creates an operator which can adjust a {@link Moment} in the
+     * given timezone. </p>
+     *
+     * <p>Note: Usually the operator converts the given {@code Moment} to
+     * a {@code PlainTimestamp} then processes this local timestamp and
+     * finally converts the result back to a new {@code Moment}. A special
+     * case are incrementing and decrementing of (sub-)second elements which
+     * eventually operate directly on the UTC timeline. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  operator with the given timezone reference, applicable on
+     *          instances of {@code Moment}
+     */
+    /*[deutsch]
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit
      * Hilfe einer Zeitzonenreferenz anpassen kann. </p>
      *
@@ -128,6 +163,20 @@ public abstract class ElementOperator<T>
     }
 
     /**
+     * <p>Creates an operator which can adjust a {@link Moment} in the
+     * given timezone. </p>
+     *
+     * <p>Note: Usually the operator converts the given {@code Moment} to
+     * a {@code PlainTimestamp} then processes this local timestamp and
+     * finally converts the result back to a new {@code Moment}. A special
+     * case are incrementing and decrementing of (sub-)second elements which
+     * eventually operate directly on the UTC timeline. </p>
+     *
+     * @param   tz          timezone
+     * @return  operator with the given timezone reference, applicable on
+     *          instances of {@code Moment}
+     */
+    /*[deutsch]
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit
      * Hilfe einer Zeitzonenreferenz anpassen kann. </p>
      *
