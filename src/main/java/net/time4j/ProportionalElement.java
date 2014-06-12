@@ -29,6 +29,14 @@ import java.math.BigDecimal;
 
 
 /**
+ * <p>Defines an element which can interprete its value as proportional
+ * value. </p>
+ *
+ * @param   <V> generic number type of element values
+ * @param   <T> generic type of target entity an operator is applied to
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert ein Element, das seinen Wert als Proportionalwert
  * interpretieren kann. </p>
  *
@@ -42,6 +50,30 @@ public interface ProportionalElement<V extends Number, T>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Defines a query which interpretes the value of this element as
+     * proportional rational number within the range between minimum and
+     * maximum. </p>
+     *
+     * <p>Smaller elements with greater precision are not taken in account.
+     * Following expression serves as formula for internal calculation:
+     * {@code (value - min) / (max - min + 1)}. Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+     *
+     *  PlainTime time = PlainTime.of(12, 45, 30); // T12:45:30
+     *  System.out.println(time.get(MINUTE_OF_HOUR.ratio()));
+     *  // output: 0.75 [= (45 - 0) / (59 - 0 + 1)]
+     * </pre>
+     *
+     * <p>Note: In timezone-related timestamps possible jumps in local time
+     * will be conserved. That means that minimum and maximum do not take
+     * in account if they fall into a daylight saving gap or if there is
+     * any kind of offset shift between them. </p>
+     *
+     * @return  query for proportional value
+     */
+    /*[deutsch]
      * <p>Definiert eine Abfrage, die den Wert dieses Elements als
      * Verh&auml;ltniszahl innerhalb seines Bereichs zwischen Minimum
      * und Maximum interpretiert. </p>
@@ -68,6 +100,27 @@ public interface ProportionalElement<V extends Number, T>
     ChronoFunction<ChronoEntity<?>, BigDecimal> ratio();
 
     /**
+     * <p>Adjusts any kind of entity such that this element will be set to
+     * the given value in lenient mode. </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainDate.MONTH_OF_YEAR;
+     *
+     *  System.out.println(
+     *      PlainDate.of(2011, 5, 31).with(MONTH_OF_YEAR.setLenient(13)));
+     *  // output: 2012-01-31 (addition of 13 - 5 = 8 Monaten)
+     * </pre>
+     *
+     * <p>Leniency does not always prevent exceptions. For example setting
+     * of extreme values like {@code Long.MIN_VALUE} can cause an
+     * {@code ArithmeticException}. Furthermore, moving the value of
+     * {@code SECOND_OF_MINUTE} to the past applied on a {@code Moment}
+     * can trigger a {@code ChronoException} if this action changes to
+     * the pre-UTC-era before 1972. </p>
+     *
+     * @return  lenient operator
+     */
+    /*[deutsch]
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
      * auf den angegebenen Wert im Nachsichtigkeitsmodus gesetzt wird. </p>
      *
@@ -92,6 +145,33 @@ public interface ProportionalElement<V extends Number, T>
     ElementOperator<T> setLenient(V value);
 
     /**
+     * <p>Rounds this chronological element up and makes its numerical
+     * value an integral multiple of given step width if possible. </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+     *
+     *  System.out.println(
+     *      PlainTime.of(18, 38).with(MINUTE_OF_HOUR.roundedUp(15)));
+     *  // output: T18:45
+     * </pre>
+     *
+     * <p>The new element value will always be set in lenient mode.
+     * Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+     *
+     *  System.out.println(
+     *      PlainTime.of(18, 49).with(MINUTE_OF_HOUR.roundedUp(15)));
+     *  // output: T19 corresponding to T18:60 (60 as multiple of 15)
+     * </pre>
+     *
+     * @param   stepwidth   controls the limits within the rounding will occur
+     * @return  rounding operator in ceiling mode
+     * @see     #roundedDown(int)
+     */
+    /*[deutsch]
      * <p>Rundet dieses chronologische Element so auf, da&szlig; sein
      * numerischer Wert m&ouml;glichst ein ganzzahliges Vielfaches der
      * angegebenen Schrittweite annimmt. </p>
@@ -122,9 +202,35 @@ public interface ProportionalElement<V extends Number, T>
     ChronoOperator<T> roundedUp(int stepwidth);
 
     /**
-     * <p>Rundet dieses chronologische Element so, da&szlig; sein
-     * numerischer Wert m&ouml;glichst ein ganzzahliges Vielfaches der
-     * angegebenen Schrittweite annimmt. </p>
+     * <p>Rounds this chronological element up or down and makes its
+     * numerical value an integral multiple of given step width if 
+     * possible. </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+     *
+     *  System.out.println(
+     *      PlainTime.of(18, 38).with(MINUTE_OF_HOUR.roundedHalf(15)));
+     *  // output: T18:45
+     *  System.out.println(
+     *      PlainTime.of(18, 37).with(MINUTE_OF_HOUR.roundedHalf(15)));
+     *  // output: T18:30
+     * </pre>
+     *
+     * <p>The new element value will always be set in lenient mode. Is the
+     * current value nearer to the lower limit then this function will
+     * round down else round up. </p>
+     *
+     * @param   stepwidth   controls the limits within the rounding will occur
+     * @return  rounding operator in ceiling or floor mode dependent on
+     *          actual element value
+     * @see     #roundedUp(int)
+     * @see     #roundedDown(int)
+     */
+    /*[deutsch]
+     * <p>Rundet dieses chronologische Element auf oder ab und stellt
+     * sicher, da&szlig; sein numerischer Wert m&ouml;glichst ein
+     * ganzzahliges Vielfaches der angegebenen Schrittweite annimmt. </p>
      *
      * <pre>
      *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
@@ -150,6 +256,33 @@ public interface ProportionalElement<V extends Number, T>
     ChronoOperator<T> roundedHalf(int stepwidth);
 
     /**
+     * <p>Rounds this chronological element down and makes its numerical
+     * value an integral multiple of given step width if possible. </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+     *
+     *  System.out.println(
+     *      PlainTime.of(18, 38).with(MINUTE_OF_HOUR.roundedDown(15)));
+     *  // output: T18:30
+     * </pre>
+     *
+     * <p>The new element value will always be set in lenient mode.
+     * Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.PlainTime.CLOCK_HOUR_OF_DAY;
+     *
+     *  System.out.println(
+     *      PlainTime.of(2, 30).with(CLOCK_HOUR_OF_DAY.roundedDown(3)));
+     *  // output: T0
+     * </pre>
+     *
+     * @param   stepwidth   controls the limits within the rounding will occur
+     * @return  rounding operator in floor mode
+     * @see     #roundedUp(int)
+     */
+    /*[deutsch]
      * <p>Rundet dieses chronologische Element so ab, da&szlig; sein
      * numerischer Wert m&ouml;glichst ein ganzzahliges Vielfaches der
      * angegebenen Schrittweite annimmt. </p>
