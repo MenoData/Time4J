@@ -26,10 +26,7 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoFunction;
-import net.time4j.engine.EpochDays;
 
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
@@ -470,28 +467,6 @@ public abstract class Timezone
     }
 
     /**
-     * <p>Definiert eine Abfrage nach der Zeitzonen-ID als Singleton. </p>
-     *
-     * <p>Die Abfrage liefert f&uuml;r alle Entit&auml;ten vom Typ
-     * {@code UnixTime} immer die UTC-Zeitzone, sonst {@code null}, es
-     * sei denn, eine Entit&auml;t definiert ein anderes Abfrageergebnis.
-     * Beispiel: </p>
-     *
-     * <pre>
-     *  net.time4j.Moment moment = ...;
-     *  System.out.println(moment.get(Timezone.identifier()));
-     *  // Ausgabe: Z (ZonalOffset.UTC)
-     * </pre>
-     *
-     * @return  singleton-query for timezone id
-     */
-    public static ChronoFunction<ChronoEntity<?>, TZID> identifier() {
-
-        return Query.SINGLETON;
-
-    }
-
-    /**
      * <p>Ermittelt die Strategie zur Aufl&ouml;sung von lokalen
      * Zeitstempeln. </p>
      *
@@ -916,35 +891,6 @@ public abstract class Timezone
 
     }
 
-    private static class Query
-        implements ChronoFunction<ChronoEntity<?>, TZID> {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final Query SINGLETON = new Query();
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private Query() {
-            super();
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public TZID apply(ChronoEntity<?> entity) {
-
-            if (entity instanceof UnixTime) {
-                return ZonalOffset.UTC;
-            } else {
-                return null;
-            }
-
-        }
-
-    }
-
     private static class NamedReference
         extends SoftReference<Timezone> {
 
@@ -1169,11 +1115,7 @@ public abstract class Timezone
 
             // Folgender Code wird nur bei direktem Aufruf genutzt,
             // nicht aber via PlainTimestamp und ist lediglich sekundengenau!
-            long days =
-                EpochDays.UNIX.transform(
-                    GregorianMath.toMJD(date),
-                    EpochDays.MODIFIED_JULIAN_DATE);
-
+            long days = GregorianMath.toMJD(date) - 40587;
             long localSeconds = MathUtils.safeMultiply(days, 86400);
             localSeconds += (time.getHour() * 3600);
             localSeconds += (time.getMinute() * 60);

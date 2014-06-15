@@ -57,9 +57,7 @@ enum TimezoneIDProcessor
         FormatStep step
     ) throws IOException {
 
-        TZID tzid = formattable.get(Timezone.identifier());
-
-        if (tzid == null) {
+        if (!formattable.hasTimezone()) {
             throw new IllegalArgumentException(
                 "Cannot extract timezone id from: " + formattable);
         }
@@ -71,7 +69,7 @@ enum TimezoneIDProcessor
             start = ((CharSequence) buffer).length();
         }
 
-        String canonical = tzid.canonical();
+        String canonical = formattable.getTimezone().canonical();
         buffer.append(canonical);
         printed = canonical.length();
 

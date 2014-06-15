@@ -768,7 +768,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#WEEK_OF_YEAR}</li>
      *  <li>{@link net.time4j.Weekmodel#localDayOfWeek()} =&gt;
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
-     *  <li>{@link net.time4j.tz.Timezone#identifier()} =&gt;
+     *  <li>{@link net.time4j.engine.ChronoEntity#getTimezone()} =&gt;
      *  {@link java.text.DateFormat.Field#TIME_ZONE}</li>
      * </ul>
      *
@@ -1035,15 +1035,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             // lokaler und globaler Zeit => nicht prüfen!
             if (result instanceof UnixTime) {
                 if (status.getDSTInfo() != null) {
-                    TZID tzid = parsed.get(Timezone.identifier());
-
-                    if ( // TODO: Notwendigkeit prüfen (assert tzid != null)
-                        (tzid == null)
-                        && attributes.contains(Attributes.TIMEZONE_ID)
-                    ) {
-                        tzid = attributes.get(Attributes.TIMEZONE_ID);
-                    }
-
+                    TZID tzid = parsed.getTimezone();
                     UnixTime ut = UnixTime.class.cast(result);
                     boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
 
@@ -2200,7 +2192,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any replacement text consists
          *          of white-space only or if given replacement list is empty
-         * @see     Timezone#identifier()
+         * @see     ChronoEntity#getTimezone()
          */
         public Builder<T> addTimezoneOffset(
             DisplayMode precision,
@@ -2247,7 +2239,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * @param   abbreviated     using shortest possible form?
          * @return  this instance for method chaining
-         * @see     Timezone#identifier()
+         * @see     ChronoEntity#getTimezone()
          */
         public Builder<T> addLocalizedOffset(boolean abbreviated) {
 

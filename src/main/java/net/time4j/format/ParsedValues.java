@@ -24,9 +24,8 @@ package net.time4j.format;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
-import net.time4j.tz.Timezone;
+import net.time4j.tz.TZID;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -99,18 +98,6 @@ class ParsedValues
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R> R get(ChronoFunction<? super ParsedValues, R> function) {
-
-        if (function == Timezone.identifier()) {
-            return (R) this.map.get(ZonalElement.TIMEZONE_ID);
-        }
-
-        return super.get(function);
-
-    }
-
-    @Override
     public <V> boolean isValid(
         ChronoElement<V> element,
         V value // optional
@@ -153,14 +140,6 @@ class ParsedValues
     public <V> V getMaximum(ChronoElement<V> element) {
 
         return element.getDefaultMaximum();
-
-    }
-
-    @Override
-    protected Chronology<ParsedValues> getChronology() {
-
-        throw new UnsupportedOperationException(
-            "Parsed values do not have any chronology.");
 
     }
 
@@ -215,6 +194,34 @@ class ParsedValues
 
         sb.append('}');
         return sb.toString();
+
+    }
+
+    @Override
+    protected Chronology<ParsedValues> getChronology() {
+
+        throw new UnsupportedOperationException(
+            "Parsed values do not have any chronology.");
+
+    }
+
+    @Override
+    public boolean hasTimezone() {
+
+        return this.map.containsKey(ZonalElement.TIMEZONE_ID);
+
+    }
+
+    @Override
+    public TZID getTimezone() {
+
+        Object tz = this.map.get(ZonalElement.TIMEZONE_ID);
+
+        if (tz instanceof TZID) {
+            return TZID.class.cast(tz);
+        } else {
+            return super.getTimezone(); // throws exception
+        }
 
     }
 

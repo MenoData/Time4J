@@ -23,7 +23,6 @@ package net.time4j;
 
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
@@ -149,18 +148,6 @@ final class ZonalTimestamp
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <R> R get(ChronoFunction<? super ZonalTimestamp, R> function) {
-
-        if (function == Timezone.identifier()) {
-            return (R) this.zone.getID();
-        }
-
-        return super.get(function);
-
-    }
-
-    @Override
     public <V> boolean isValid(
         ChronoElement<V> element,
         V value
@@ -182,14 +169,6 @@ final class ZonalTimestamp
 
         throw new IllegalArgumentException(
             "Zonal timestamps are effectively read-only.");
-
-    }
-
-    @Override
-    protected Chronology<ZonalTimestamp> getChronology() {
-
-        throw new UnsupportedOperationException(
-            "Zonal timestamps have no defined chronology.");
 
     }
 
@@ -262,6 +241,28 @@ final class ZonalTimestamp
     public int getNanosecond() {
 
         return this.moment.getNanosecond();
+
+    }
+
+    @Override
+    public boolean hasTimezone() {
+
+        return true;
+
+    }
+
+    @Override
+    public TZID getTimezone() {
+
+        return this.zone.getID();
+
+    }
+
+    @Override
+    protected Chronology<ZonalTimestamp> getChronology() {
+
+        throw new UnsupportedOperationException(
+            "Zonal timestamps have no defined chronology.");
 
     }
 

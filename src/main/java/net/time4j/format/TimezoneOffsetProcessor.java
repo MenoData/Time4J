@@ -129,8 +129,12 @@ final class TimezoneOffsetProcessor
             start = ((CharSequence) buffer).length();
         }
 
-        TZID tzid = formattable.get(Timezone.identifier());
+        TZID tzid = null;
         ZonalOffset offset;
+
+        if (formattable.hasTimezone()) {
+            tzid = formattable.getTimezone();
+        }
 
         if (tzid instanceof ZonalOffset) {
             offset = (ZonalOffset) tzid;

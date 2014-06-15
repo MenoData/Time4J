@@ -95,12 +95,14 @@ final class TimezoneNameProcessor
         FormatStep step
     ) throws IOException {
 
-        TZID tzid = formattable.get(Timezone.identifier());
-
-        if (tzid == null) {
+        if (!formattable.hasTimezone()) {
             throw new IllegalArgumentException(
                 "Cannot extract timezone id from: " + formattable);
-        } else if (tzid instanceof ZonalOffset) {
+        }
+
+        TZID tzid = formattable.getTimezone();
+
+        if (tzid instanceof ZonalOffset) {
             this.fallback.print(
                 formattable, buffer, attributes, positions, step);
             return;

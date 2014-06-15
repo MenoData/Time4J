@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import net.time4j.tz.TZID;
+
 
 /**
  * <p>Repr&auml;sentiert ein Zeitwertobjekt, das einzelne Werte mit
@@ -100,7 +102,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
      * @return  result of query or {@code null} if undefined
      * @throws  ChronoException if the given query is not executable
      */
-    public <R> R get(ChronoFunction<? super T, R> function) {
+    public final <R> R get(ChronoFunction<? super T, R> function) {
 
         return function.apply(this.getContext());
 
@@ -350,6 +352,39 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
     public <V> V getMaximum(ChronoElement<V> element) {
 
         return this.getRule(element).getMaximum(this.getContext());
+
+    }
+
+    /**
+     * <p>Ermittelt, ob eine Zeitzone vorhanden ist. </p>
+     *
+     * <p>Diese Implementierung kennt standardm&auml;&szlig;ig keine Zeitzone
+     * und liefert {@code false}. Subklassen mit Zeitzonenbezug werden die
+     * Methode in geeigneter Weise &uuml;berschreiben. </p>
+     *
+     * @return  {@code true} if a timezone is available and can be achieved
+     *          with {@link #getTimezone()} else {@code false}
+     */
+    public boolean hasTimezone() {
+
+        return false;
+
+    }
+
+    /**
+     * <p>Liefert die assoziierte Zeitzonen-ID, wenn vorhanden. </p>
+     *
+     * <p>Diese Implementierung wirft standardm&auml;&szlig;ig eine
+     * {@code ChronoException}. Subklassen mit Zeitzonenbezug werden
+     * die Methode in geeigneter Weise &uuml;berschreiben. </p>
+     *
+     * @return  timezone identifier if available
+     * @throws  ChronoException if the timezone is not available
+     * @see     #hasTimezone()
+     */
+    public TZID getTimezone() {
+
+        throw new ChronoException("Timezone not available: " + this);
 
     }
 

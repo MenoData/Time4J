@@ -25,20 +25,10 @@ package net.time4j.engine;
 /**
  * <p>Repr&auml;sentiert eine beliebige zeitliche Abfrage. </p>
  *
- * <p>&Auml;hnlich wie eine {@code ChronoCondition}, aber nicht nur auf
- * <i>boolean</i>-Ergebnisse beschr&auml;nkt. Dieses Interface erm&ouml;glicht
- * benutzerdefinierte Lesezugriffe. Manipulierende Zugriffe sind &uuml;ber
- * das generische Gegenst&uuml;ck {@code ChronoOperator} zu erhalten. </p>
- *
- * <p>Ist der Ergebnistyp R gleich dem Typ {@code java.lang.Boolean}, dann
- * sollte wegen der sprachlichen Klarheit stattdessen die Verwendung von
- * {@link ChronoCondition} ins Auge gefasst werden. </p>
- *
  * @param   <T> generic type of source
  * @param   <R> generic type of result
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoFunction)
- * @see     ChronoOperator
  */
 // TODO: Ab Java 8 aktiv => extends Function<T, R>
 public interface ChronoFunction<T, R> {
@@ -48,10 +38,10 @@ public interface ChronoFunction<T, R> {
     /**
      * <p>Liest und interpretiert den angegebenen Zeitwertkontext. </p>
      *
-     * <p>Wird von {@link ChronoEntity#get(ChronoFunction)} aufgerufen. Konkrete
-     * Implementierungen m&uuml;ssen dokumentieren, ob sie im Fall von
-     * undefinierten Ergebnissen eher {@code null} zur&uuml;ckgeben oder
-     * stattdessen eine Ausnahme werfen. </p>
+     * <p>Wird von {@link ChronoEntity#get(ChronoFunction)} aufgerufen.
+     * Konkrete Implementierungen m&uuml;ssen dokumentieren, ob
+     * sie im Fall von undefinierten Ergebnissen eher {@code null}
+     * zur&uuml;ckgeben oder stattdessen eine Ausnahme werfen. </p>
      *
      * @param   context     time context to be evaluated
      * @return  result of query or {@code null} if undefined

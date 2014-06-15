@@ -1396,10 +1396,51 @@ public final class Moment
 
     }
 
+    /**
+     * <p>A {@code Moment} ist always in timezone UTC. </p>
+     *
+     * @return  {@code true}
+     */
+    /*[deutsch]
+     * <p>Ein {@code Moment} ist fest an die Zeitzone UTC gekoppelt. </p>
+     *
+     * @return  {@code true}
+     */
+    @Override
+    public boolean hasTimezone() {
+
+        return true;
+
+    }
+
+    /**
+     * <p>A {@code Moment} ist always in timezone UTC. </p>
+     *
+     * @return  {@link ZonalOffset#UTC}
+     */
+    /*[deutsch]
+     * <p>Ein {@code Moment} ist fest an die Zeitzone UTC gekoppelt. </p>
+     *
+     * @return  {@link ZonalOffset#UTC}
+     */
+    @Override
+    public TZID getTimezone() {
+
+        return ZonalOffset.UTC;
+
+    }
+
     @Override
     protected TimeAxis<SI, Moment> getChronology() {
 
         return ENGINE;
+
+    }
+
+    @Override
+    protected Moment getContext() {
+
+        return this;
 
     }
 
@@ -2253,7 +2294,11 @@ public final class Moment
                 return null;
             }
 
-            TZID tzid = entity.get(Timezone.identifier());
+            TZID tzid = null;
+
+            if (entity.hasTimezone()) {
+                tzid = entity.getTimezone();
+            }
 
             if (
                 (tzid == null)
