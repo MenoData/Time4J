@@ -261,6 +261,18 @@ public class PlatformTimezoneTest {
             is(expected));
     }
 
+    @Test
+    public void ofValidTZIDAsString() {
+        TZID tzid = TZID.EUROPE.BERLIN;
+        Timezone expected = loadFromPlatform(tzid);
+        assertThat(Timezone.of("Europe/Berlin"), is(expected));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void ofInvalidTZIDAsString() {
+        Timezone.of("xyz");
+    }
+
     private static Timezone loadFromPlatform(TZID tzid) {
         return new PlatformTimezone(tzid, tzid.canonical());
     }

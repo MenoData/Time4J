@@ -26,7 +26,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
-import net.time4j.engine.ChronoException;
 
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
@@ -306,7 +305,7 @@ public abstract class Timezone
      *
      * @param   tzid    timezone id as interface
      * @return  timezone data
-     * @throws  ChronoException if given timezone cannot be loaded
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     public static Timezone of(TZID tzid) {
 
@@ -319,7 +318,7 @@ public abstract class Timezone
      *
      * @param   tzid    timezone id as String
      * @return  timezone data
-     * @throws  ChronoException if given timezone cannot be loaded
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     public static Timezone of(String tzid) {
 
@@ -612,7 +611,8 @@ public abstract class Timezone
         // Ungültige ID?
         if (tz == null) {
             if (wantsException) {
-                throw new ChronoException("Unknown timezone: " + zoneID);
+                throw new IllegalArgumentException(
+                    "Unknown timezone: " + zoneID);
             } else {
                 return null;
             }
