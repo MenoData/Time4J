@@ -29,6 +29,12 @@ import net.time4j.tz.ZonalOffset;
 
 
 /**
+ * <p>Represents a clock which yields the current local time according
+ * to a timezone. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine Uhr, die die aktuelle lokale Zeit anzeigt. </p>
  *
  * @author  Meno Hochschild
@@ -48,6 +54,16 @@ public class ZonalClock {
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Constructs a new clock which can yield the current local time in
+     * given timezone. </p>
+     *
+     * <p>Equivalent to {@code new ZonalClock(timeSource, tzid, false)}. </p>
+     *
+     * @param   timeSource  source for current world time (UTC)
+     * @param   tzid        timezone id
+     * @throws  ChronoException if given timezone cannot be loaded
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Uhr, die die aktuelle Zeit in einer Zeitzone
      * ermitteln kann. </p>
      *
@@ -66,6 +82,21 @@ public class ZonalClock {
     }
 
     /**
+     * <p>Constructs a new clock which can yield the current local time in
+     * given timezone. </p>
+     *
+     * <p>Is the third parameter set to {@code true} then the associated
+     * timezone will always be loaded <i>on fly</i> so that a
+     * {@link net.time4j.tz.Timezone.Cache#refresh() dynamic update}
+     * of timzone can be taken in account. </p>
+     *
+     * @param   timeSource  source for current world time (UTC)
+     * @param   tzid        timezone id
+     * @param   dynamic     shall the timezone data always be reloaded, even
+     *                      after a dynamic update?
+     * @throws  ChronoException if given timezone cannot be loaded
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Uhr, die die aktuelle Zeit in einer Zeitzone
      * ermitteln kann. </p>
      *
@@ -111,6 +142,11 @@ public class ZonalClock {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets the current timestamp in the associated timezone. </p>
+     *
+     * @return  current local timestamp
+     */
+    /*[deutsch]
      * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone. </p>
      *
      * @return  current local timestamp
@@ -123,6 +159,11 @@ public class ZonalClock {
 
     }
 
+    /**
+     * <p>Gets the current date in the associated timezone. </p>
+     *
+     * @return  calendar date representing today
+     */
     /**
      * <p>Ermittelt das aktuelle Datum in der assoziierten Zeitzone. </p>
      *
@@ -137,6 +178,11 @@ public class ZonalClock {
     }
 
     /**
+     * <p>Gets the associated timezone. </p>
+     *
+     * @return  timezone id
+     */
+    /*[deutsch]
      * <p>Liefert die assoziierte Zeitzone. </p>
      *
      * @return  timezone id
@@ -148,6 +194,13 @@ public class ZonalClock {
     }
 
     /**
+     * <p>Creates a copy of this local clock with given timezone and the
+     * same time source as this instance. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local clock in given timezone
+     */
+    /*[deutsch]
      * <p>Erzeugt eine neue zonale Uhr mit der angegebenen Zeitzone, aber
      * der gleichen Zeitquelle wie in dieser Instanz. </p>
      *

@@ -28,12 +28,23 @@ import net.time4j.tz.TZID;
 
 
 /**
+ * <p>Represents a clock which is based on the clock of the underlying
+ * operating system. </p>
+ *
+ * <p>The system property &quot;net.time4j.systemclock.nanoTime&quot;
+ * controls if this clock is internally based on the expression
+ * {@link System#nanoTime()} (if property is set to &quot;true&quot;)
+ * or {@link System#currentTimeMillis()} (default). </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine Uhr, die auf dem Taktgeber des Betriebssystems
  * basiert. </p>
  *
  * <p>Mit der System-Property &quot;net.time4j.systemclock.nanoTime&quot;
  * kann gesteuert werden, ob diese Uhr intern auf dem Ausdruck
- * {@link System#nanoTime()} (wenn Property auf {@code true} gesetzt)
+ * {@link System#nanoTime()} (wenn Property auf &quot;true&quot; gesetzt)
  * oder {@link System#currentTimeMillis()} (Standard) basiert. </p>
  *
  * @author  Meno Hochschild
@@ -77,6 +88,9 @@ public final class SystemClock
     }
 
     /**
+     * <p>Singleton-instance. </p>
+     */
+    /*[deutsch]
      * <p>Singleton-Instanz. </p>
      */
     public static final SystemClock INSTANCE = new SystemClock();
@@ -104,6 +118,13 @@ public final class SystemClock
     }
 
     /**
+     * <p>Yields the current time in milliseconds elapsed since
+     * [1970-01-01T00:00:00,000Z]. </p>
+     *
+     * @return  count of milliseconds since UNIX epoch without leap seconds
+     * @see     #currentTimeInMicros()
+     */
+    /*[deutsch]
      * <p>Liefert die aktuelle seit [1970-01-01T00:00:00,000Z] verstrichene
      * Zeit in Millisekunden. </p>
      *
@@ -117,13 +138,27 @@ public final class SystemClock
     }
 
     /**
+     * <p>Yields the current time in microseconds elapsed since
+     * [1970-01-01T00:00:00,000000Z]. </p>
+     *
+     * <p>If this clock is based only on {@link System#currentTimeMillis()}
+     * then this method will just multiply the millisecond value by factor
+     * {@code 1000}. On many operating systems the precision is limited to
+     * milliseconds. This is even true if this clock is based on
+     * {@link System#nanoTime()} because for purpose of calibration even
+     * here the method {@code System.currentTimeMillis()} must be accessed
+     * at least one time. </p>
+     *
+     * @return  count of microseconds since UNIX epoch without leap seconds
+     */
+    /*[deutsch]
      * <p>Liefert die aktuelle seit [1970-01-01T00:00:00,000000Z] verstrichene
      * Zeit in Mikrosekunden. </p>
      *
      * <p>Basiert diese Uhr nur auf {@link System#currentTimeMillis()}, wird
      * diese Methode lediglich den Millisekundenwert mit dem Faktor {@code 1000}
-     * multiplizieren. Auf den meisten Betriebssystemen ist die Genauigkeit
-     * auch nur auf Millisekunden begrenzt. Das gilt selbst dann, wenn diese
+     * multiplizieren. Auf vielen Betriebssystemen ist die Genauigkeit auch
+     * nur auf Millisekunden begrenzt. Das gilt selbst dann, wenn diese
      * Uhr auf {@link System#nanoTime()} basiert, weil hier wenigstens einmal
      * zum Zweck der Kalibrierung auf {@code System.currentTimeMillis()}
      * zur&uuml;ckgegriffen werden mu&szlig;. </p>
@@ -137,7 +172,12 @@ public final class SystemClock
     }
 
     /**
-     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     * <p>Creates a local clock in system timezone. </p>
+     *
+     * @return  local clock in standard timezone
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der System-Zeitzone. </p>
      *
      * @return  local clock in standard timezone
      */
@@ -148,6 +188,12 @@ public final class SystemClock
     }
 
     /**
+     * <p>Creates a local clock in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
+     */
+    /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        timezone id

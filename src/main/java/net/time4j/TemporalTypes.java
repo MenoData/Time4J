@@ -42,6 +42,17 @@ import java.util.Map;
 
 
 /**
+ * <p>Serves as bridge to temporal types of JDK or other date and time
+ * libraries. </p>
+ *
+ * <p>All singleton instances are defined as static constants and are
+ * <i>immutable</i>. </p>
+ *
+ * @param   <S> source type in other library
+ * @param   <T> target type in Time4J
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder
  * anderen Bibliotheken. </p>
  *
@@ -72,11 +83,27 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Bridge between a traditional Java timestamp of type
+     * {@code java.util.Date} and the class {@code Moment}. </p>
+     *
+     * <p>The conversion does not take in account any UTC-leapseconds. The
+     * supported value range is smaller than in the class
+     * {@code Moment}. Example: </p>
+     *
+     * <pre>
+     *  java.util.Date instant = new java.util.Date(86401 * 1000);
+     *  Moment ut = TemporalTypes.JAVA_UTIL_DATE.transform(instant);
+     *  System.out.println(
+     *      ut.get(TemporalTypes.JAVA_UTIL_DATE).equals(instant));
+     *  // output: true
+     * </pre>
+     */
+    /*[deutsch]
      * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel des Typs
      * {@code java.util.Date} und der Klasse {@code Moment}. </p>
      *
      * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der
-     * unterst&uuml;tzte Wertbereich ist etwas kleiner als in der Klasse
+     * unterst&uuml;tzte Wertbereich ist kleiner als in der Klasse
      * {@code Moment}. Beispiel: </p>
      *
      * <pre>
@@ -111,6 +138,21 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         );
 
     /**
+     * <p>Bridge between a traditional Java timestamp as count of milliseconds
+     * since UNIX-epoch and the class {@code Moment}. </p>
+     *
+     * <p>The conversion does not take in account any UTC-leapseconds. The
+     * supported value range is smaller than in the class
+     * {@code Moment}. Example: </p>
+     *
+     * <pre>
+     *  long instant = 86401 * 1000L;
+     *  Moment ut = TemporalTypes.MILLIS_SINCE_UNIX.transform(instant);
+     *  System.out.println(ut);
+     *  // output: 1970-01-02T00:00:01Z
+     * </pre>
+     */
+    /*[deutsch]
      * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel als
      * Anzahl der Millisekunden seit der UNIX-Epoche und der Klasse
      * {@code Moment}. </p>
@@ -150,6 +192,37 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         );
 
     /**
+     * <p>Bridge between a JDBC-Date and the class {@code PlainDate}. </p>
+     *
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
+     * set to the value &quot;true&quot; then the conversion will not take in
+     * account the system timezone anticipating that a SQL-DATE was created
+     * without any timezone calculation on the server side, too. That is
+     * more or less the case if UTC is the default timezone on the application
+     * server. </p>
+     *
+     * <p>Example (UTC as default timezone): </p>
+     *
+     * <pre>
+     *  java.sql.Date sqlValue = new java.sql.Date(86400 * 1000);
+     *  PlainDate date =
+     *      TemporalTypes.SQL_DATE.transform(sqlValue); // 1970-01-02
+     *  System.out.println(
+     *      date.get(TemporalTypes.SQL_DATE).equals(sqlValue));
+     *  // output: true
+     * </pre>
+     *
+     * <p><strong>Note:</strong> The conversion is only possible if a date
+     * has a year in the range {@code 1900-9999} because else a JDBC-compatible
+     * database cannot store the date per SQL-specification. It is strongly
+     * recommended to interprete a SQL-DATE only as abstract JDBC object
+     * because its text output via {@code java.sql.Date.toString()}-method
+     * is not reliable (dependency on the gregorian-julian cutover day
+     * + possible timezone side effects). The concrete formatting can be
+     * done by Time4J for example via {@code PlainDate.toString()} or
+     * a suitable {@code ChronoFormatter}. </p>
+     */
+    /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
      * {@code PlainDate}. </p>
      *
@@ -204,6 +277,33 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         );
 
     /**
+     * <p>Bridge between a JDBC-Time and the class {@code PlainTime}. </p>
+     *
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
+     * set to the value &quot;true&quot; then the conversion will NOT take in
+     * account the system timezone anticipating that a SQL-DATE was created
+     * without any timezone calculation on the server side, too. That is
+     * more or less the case if UTC is the default timezone on the application
+     * server. </p>
+     *
+     * <p>Example (UTC as default timezone): </p>
+     *
+     * <pre>
+     *  java.sql.Time sqlValue = new java.sql.Time(43200 * 1000);
+     *  PlainTime time =
+     *      TemporalTypes.SQL_TIME.transform(sqlValue); // T12:00:00
+     *  System.out.println(
+     *      time.get(TemporalTypes.SQL_TIME).equals(sqlValue));
+     *  // output: true
+     * </pre>
+     *
+     * <p><strong>Note:</strong> The conversion only occurs in millisecond
+     * precision at best not in in nanosecond precision so there is possible
+     * loss of data. Furthermore, the text output via the method
+     * {@code java.sql.Time.toString()} can be misinterpreted by timezone
+     * side effects. Concrete text output should be done by Time4J. </p>
+     */
+    /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
      * {@code PlainTime}. </p>
      *
@@ -254,6 +354,29 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         );
 
     /**
+     * <p>Bridge between a JDBC-Timestamp and the class
+     * {@code PlainTimestamp}. </p>
+     *
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
+     * set to the value &quot;true&quot; then the conversion will NOT take in
+     * account the system timezone anticipating that a SQL-DATE was created
+     * without any timezone calculation on the server side, too. That is
+     * more or less the case if UTC is the default timezone on the application
+     * server. </p>
+     *
+     * <p>Example (UTC as default timezone): </p>
+     *
+     * <pre>
+     *  java.sql.Timestamp sqlValue = new java.sql.Timestamp(86401 * 1000);
+     *  sqlValue.setNanos(1);
+     *  PlainTimestamp ts = // 1970-01-02T00:00:01,000000001
+     *      TemporalTypes.SQL_TIMESTAMP.transform(sqlValue);
+     *  System.out.println(
+     *      ts.get(TemporalTypes.SQL_TIMESTAMP).equals(sqlValue));
+     *  // output: true
+     * </pre>
+     */
+    /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
      * {@code PlainTimestamp}. </p>
      *
@@ -327,12 +450,30 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Creates a new instance. </p>
+     *
+     * <p>SPECIFICATION: Subclasses must create only one instance and hence
+     * assign this instance to a static constant. Furthermore, the immutability
+     * of the concrete and final subclass is required. </p>
+     *
+     * @param   name        unique element name
+     * @param   sourceType  source type in other library
+     * @param   targetType  target type in Time4J
+     * @param   rule        element rule
+     * @param   comparator  for comparisons
+     * @param   dmin        default minimum
+     * @param   dmax        default maximum
+     * @param   dateLike    date element?
+     * @param   timeLike    time element?
+     * @throws  IllegalArgumentException if given name is already used or empty
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * <p>SPEZIFIKATION: Subklassen d&uuml;rfen nur einmalig eine Instanz
      * erzeugen und m&uuml;ssen sie dann per Singleton-Muster einer statischen
      * Konstanten zuweisen. Auch ist die Unver&auml;nderlichkeit der konkreten
-     * Klasse zwingend erforderlich. </p>
+     * finalen Subklasse zwingend erforderlich. </p>
      *
      * @param   name        unique element name
      * @param   sourceType  source type in other library
@@ -393,6 +534,23 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Transforms the given temporal value of the JDK or external library to
+     * a Time4J-type. </p>
+     *
+     * <p>The reverse conversion can simply be done by the expression
+     * {@code time4jType.get(TemporalTypes.XYZ)}. Example: </p>
+     *
+     * <pre>
+     *  java.sql.Date sqlValue = new java.sql.Date(86400 * 1000);
+     *  PlainDate date = TemporalTypes.SQL_DATE.transform(sqlValue);
+     *  System.out.println(date);
+     *  // output: 1970-01-02
+     * </pre>
+     *
+     * @param   value   datetime value to be transformed
+     * @return  Time4J-value
+     */
+    /*[deutsch]
      * <p>Wandelt den angegebenen Zeitwert aus dem Fremdsystem zu einem
      * Time4J-Typ um. </p>
      *
