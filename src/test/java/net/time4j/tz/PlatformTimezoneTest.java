@@ -248,16 +248,9 @@ public class PlatformTimezoneTest {
     @Test
     public void ofTZIDFallback() {
         TZID fallback = TZID.EUROPE.BERLIN;
-        TZID wrong =
-            new TZID() { // cannot be loaded
-                @Override
-                public String canonical() {
-                    return "???";
-                }
-            };
         Timezone expected = loadFromPlatform(fallback);
         assertThat(
-            Timezone.of(wrong, fallback),
+            Timezone.of("???", fallback),
             is(expected));
     }
 

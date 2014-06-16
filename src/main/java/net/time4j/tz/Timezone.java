@@ -341,7 +341,7 @@ public abstract class Timezone
      * @return  timezone data
      */
     public static Timezone of(
-        TZID tzid,
+        String tzid,
         TZID fallback
     ) {
 
@@ -532,13 +532,7 @@ public abstract class Timezone
     private static Timezone getDefaultTZ() {
 
         String zoneID = java.util.TimeZone.getDefault().getID();
-        TZID tzid = PREDEFINED.get(zoneID);
-
-        if (tzid == null) {
-            tzid = new NamedID(zoneID);
-        }
-
-        return Timezone.of(tzid, ZonalOffset.UTC);
+        return Timezone.of(zoneID, ZonalOffset.UTC);
 
     }
 
