@@ -23,6 +23,11 @@ package net.time4j.tz;
 
 
 /**
+ * <p>Defines the style of a timezone name. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert den Stil eines Zeitzonennamens. </p>
  *
  * @author  Meno Hochschild
@@ -32,6 +37,11 @@ public enum NameStyle {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Abbreviation in winter time (standard time). </p>
+     *
+     * <p>Example: CET </p>
+     */
+    /*[deutsch]
      * <p>Abk&uuml;rzung in der Winterzeit (Normalzeit). </p>
      *
      * <p>Beispiel: MEZ </p>
@@ -39,6 +49,11 @@ public enum NameStyle {
     SHORT_STANDARD_TIME,
 
     /**
+     * <p>Long name in winter time (standard time). </p>
+     *
+     * <p>Example: Central European Time </p>
+     */
+    /*[deutsch]
      * <p>Langer Name in der Winterzeit (Normalzeit). </p>
      *
      * <p>Beispiel: Mitteleurop&auml;ische Zeit </p>
@@ -46,6 +61,11 @@ public enum NameStyle {
     LONG_STANDARD_TIME,
 
     /**
+     * <p>Abbreviation in summer time (daylight saving). </p>
+     *
+     * <p>Example: CEST </p>
+     */
+    /*[deutsch]
      * <p>Abk&uuml;rzung in der Sommerzeit. </p>
      *
      * <p>Beispiel: MESZ </p>
@@ -53,6 +73,11 @@ public enum NameStyle {
     SHORT_DAYLIGHT_TIME,
 
     /**
+     * <p>Long name in summer time (daylight saving). </p>
+     *
+     * <p>Example: Central European Summer Time </p>
+     */
+    /*[deutsch]
      * <p>Langer Name in der Sommerzeit. </p>
      *
      * <p>Beispiel: Mitteleurop&auml;ische Sommerzeit </p>
@@ -62,6 +87,11 @@ public enum NameStyle {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Does this style denote an abbreviation? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Liegt eine Abk&uuml;rzung vor? </p>
      *
      * @return  boolean
@@ -76,6 +106,11 @@ public enum NameStyle {
     }
 
     /**
+     * <p>Does this style denote a daylight saving time? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Liegt eine Sommerzeitform vor? </p>
      *
      * @return  boolean
