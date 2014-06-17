@@ -27,6 +27,32 @@ import java.io.Serializable;
 
 
 /**
+ * <p>Represents the change of a shift of the local time relative to
+ * POSIX-time in any timezone. </p>
+ *
+ * <p>This class contains informations about the global timestamp of the
+ * transition and the shifts/offsets before and after the transitions.
+ * A change of a zonal shift can either be caused by special historical
+ * events and political actions (change of standard time) or by establishing
+ * <i>daylight saving</i>-rules (change from winter time to summer time and
+ * reverse - DST). Therefore the total shift {@code getTotalOffset()} is
+ * always the sum of the parts {@code getStandardOffset()} and
+ * {@code getDaylightSavingOffset()}. </p>
+ *
+ * <p>Shifts are described on the local timeline in seconds. Following
+ * relationship holds between local time and POSIX-time: </p>
+ *
+ * <p>{@code getTotalOffset() = [Local Wall Time] - [POSIX Time]}</p>
+ *
+ * <p>A zonal transition induces a gap on the local timeline if the new
+ * shift is greater than the old shift. And an overlap occurs if the new
+ * shift is smaller than the old shift. A local time is not defined within
+ * gaps and ambivalent in overlapping regions. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Beschreibt einen Wechsel der Verschiebung der lokalen Zeit relativ
  * zur POSIX-Zeit in einer Zeitzone. </p>
  *
@@ -87,6 +113,17 @@ public final class ZonalTransition
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Creates a new transition between two shifts. </p>
+     *
+     * @param   posixTime               POSIX time of transition
+     * @param   previousOffset          previous total shift in seconds
+     * @param   totalOffset             new total shift in seconds
+     * @param   daylightSavingOffset    DST-shift in seconds
+     * @throws  IllegalArgumentException if the DST-shift is negative
+     * @see     net.time4j.scale.UniversalTime#getPosixTime()
+     * @see     ZonalOffset#getIntegralAmount()
+     */
+    /*[deutsch]
      * <p>Konstruiert einen neuen &Uuml;bergang zwischen zwei
      * Verschiebungen. </p>
      *
@@ -117,6 +154,14 @@ public final class ZonalTransition
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the global timestamp of this transition from one shift to
+     * another as POSIX-timestamp. </p>
+     *
+     * @return  transition time relative to [1970-01-01T00:00:00] in seconds
+     *          (without leap seconds)
+     * @see     net.time4j.scale.TimeScale#POSIX
+     */
+    /*[deutsch]
      * <p>Stellt die Zeit des &Uuml;bergangs von einer Verschiebung zur anderen
      * als POSIX-Zeit dar. </p>
      *
@@ -131,6 +176,13 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Returns the total shift before this transition. </p>
+     *
+     * @return  previous total shift in seconds
+     * @see     #getTotalOffset()
+     * @see     ZonalOffset#getIntegralAmount()
+     */
+    /*[deutsch]
      * <p>Liefert die Gesamtverschiebung vor diesem &Uuml;bergang. </p>
      *
      * @return  previous total shift in seconds
@@ -144,6 +196,16 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Returns the total shift after this transition. </p>
+     *
+     * @return  new total shift in seconds
+     * @see     #getPreviousOffset()
+     * @see     #getStandardOffset()
+     * @see     #getDaylightSavingOffset()
+     * @see     #isDaylightSaving()
+     * @see     ZonalOffset#getIntegralAmount()
+     */
+    /*[deutsch]
      * <p>Liefert die Gesamtverschiebung nach diesem &Uuml;bergang. </p>
      *
      * @return  new total shift in seconds
@@ -160,6 +222,20 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Returns the standard shift after this transition as difference
+     * between total shift and DST-shift (daylight savings). </p>
+     *
+     * <p>Negative standard shifts are related to timezones west for
+     * Greenwich, positive to timezones east for Greenwich. The addition
+     * of the standard shift to POSIX-time yields the
+     * <i>standard local time</i> corresponding to winter time. </p>
+     *
+     * @return  raw shift in seconds after transition
+     * @see     #getTotalOffset()
+     * @see     #getDaylightSavingOffset()
+     * @see     #isDaylightSaving()
+     */
+    /*[deutsch]
      * <p>Liefert die aktuelle Standardverschiebung nach diesem &Uuml;bergang
      * als Differenz zwischen Gesamtverschiebung und DST-Verschiebung. </p>
      *
@@ -180,6 +256,18 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Returns the DST-shift (daylight savings) after this transition that is
+     * the shift induced by change to summer time. </p>
+     *
+     * <p>If the method {@code isDaylightSaving()} yields the value {@code false}
+     * then this method will simply yield {@code 0}. </p>
+     *
+     * @return  daylight-saving-shift in seconds after transition
+     * @see     #getTotalOffset()
+     * @see     #getStandardOffset()
+     * @see     #isDaylightSaving()
+     */
+    /*[deutsch]
      * <p>Liefert die DST-Verschiebung nach dem &Uuml;bergang, also den durch
      * die Sommerzeit induzierten Versatz. </p>
      *
@@ -198,6 +286,12 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Queries if there is any daylight savings after this transition. </p>
+     *
+     * @return  boolean
+     * @see     #getDaylightSavingOffset()
+     */
+    /*[deutsch]
      * <p>Liegt nach diesem &Uuml;bergang Sommerzeit vor? </p>
      *
      * @return  boolean
@@ -210,6 +304,12 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Gets the difference between new and old total shift as
+     * measure for the size of this transition. </p>
+     *
+     * @return  change of total shift in seconds
+     */
+    /*[deutsch]
      * <p>Liefert die Differenz zwischen neuer und alter Gesamtverschiebung
      * als Ma&szlig; f&uuml;r die Gr&ouml;&szlig;e des &Uuml;bergangs. </p>
      *
@@ -222,6 +322,14 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Queries if this transition represents a gap on the local timeline
+     * where local timestamps are invalid. </p>
+     *
+     * @return  {@code true} if this transition represents a gap (by definition
+     *          the new total shift is bigger than the previous one)
+     *          else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist dieser &Uuml;bergang eine L&uuml;cke, w&auml;hrend der eine
      * lokale Zeitangabe ung&uuml;ltig ist? </p>
      *
@@ -236,6 +344,14 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Queries if this transition represents an overlap on the local
+     * timeline where local timestamps are ambivalent. </p>
+     *
+     * @return  {@code true} if this transition represents an overlap (by
+     *          definition the new total shift is smaller than the previous
+     *          one) else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist dieser &Uuml;bergang eine &Uuml;berlappung, w&auml;hrend der
      * eine lokale Zeitangabe nicht mehr eindeutig definiert ist? </p>
      *
@@ -250,6 +366,13 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Compares preferrably the timeline order based on the global
+     * timestamps of transitions, otherwise the total shift and finally
+     * the DST-shift. </p>
+     *
+     * <p>The natural order is consistent with {@code equals()}. </p>
+     */
+    /*[deutsch]
      * <p>Beruht bevorzugt auf der zeitlichen Reihenfolge des POSIX-Zeitpunkts
      * des &Uuml;bergangs, sonst auf den Gesamtverschiebungen und zuletzt auf
      * der DST-Verschiebung. </p>
@@ -279,6 +402,10 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Based on the whole state with global POSIX-timestamp and all
+     * internal shifts. </p>
+     */
+    /*[deutsch]
      * <p>Basiert auf der POSIX-Zeit und allen Verschiebungen. </p>
      */
     @Override
@@ -304,6 +431,9 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Based on the POSIX-timestamp of the transition. </p>
+     */
+    /*[deutsch]
      * <p>Basiert auf der POSIX-Zeit des &Uuml;bergangs. </p>
      */
     @Override
@@ -314,6 +444,11 @@ public final class ZonalTransition
     }
 
     /**
+     * <p>Supports debugging. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
      * <p>Unterst&uuml;tzt Debugging-Ausgaben. </p>
      *
      * @return  String
