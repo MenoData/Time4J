@@ -47,7 +47,14 @@ import java.util.concurrent.ConcurrentMap;
 
 
 /**
- * <p>L&auml;dt und h&auml;lt Zeitzonen mitsamt ihren Regeln. </p>
+ * <p>Loads and keeps timezone data including the rules. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency All static methods are thread-safe while this class is
+ *              immutable as long as the underlying timezone data are.
+ */
+/*[deutsch]
+ * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
  *
  * @author      Meno Hochschild
  * @concurrency All static methods are thread-safe while this class is
@@ -59,6 +66,13 @@ public abstract class Timezone
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>This standard strategy which is also used by JDK subtracts
+     * the next defined offset from any local timestamp in order to
+     * calculate the global time. </p>
+     *
+     * @see     #getOffset(GregorianDate,WallTime)
+     */
+    /*[deutsch]
      * <p>Diese auch vom JDK verwendete Standardstrategie zieht von einem
      * beliebigen lokalen Zeitstempel den jeweils n&auml;chstdefinierten
      * Offset ab, um die globale Zeit zu erhalten. </p>
@@ -69,6 +83,11 @@ public abstract class Timezone
         Strategy.DEFAULT;
 
     /**
+     * <p>In addition to the  {@link #DEFAULT_CONFLICT_STRATEGY
+     * standard strategy}, this strategy ensures the use of valid local 
+     * timestamps. </p>
+     */
+    /*[deutsch]
      * <p>Legt bei Transformationen von lokalen Zeitstempeln zu UTC fest,
      * da&szlig; nur in der Zeitzone g&uuml;ltige Zeitstempel zugelassen
      * werden. </p>
@@ -240,6 +259,11 @@ public abstract class Timezone
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets all available timezone IDs. </p>
+     *
+     * @return  unmodifiable list of available timezone ids in ascending order
+     */
+    /*[deutsch]
      * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen. </p>
      *
      * @return  unmodifiable list of available timezone ids in ascending order
@@ -251,11 +275,18 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets a {@code Set} of preferred timezone IDs for given
+     * ISO-3166-country code. </p>
+     *
+     * @param   locale  ISO-3166-alpha-2-country to be evaluated
+     * @return  unmodifiable set of preferred timezone ids
+     */
+    /*[deutsch]
      * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
      * bevorzugten Zeitzonenkennungen. </p>
      *
      * @param   locale  ISO-3166-alpha-2-country to be evaluated
-     * @return  unmodifiable list of preferred timezone ids
+     * @return  unmodifiable set of preferred timezone ids
      */
     public static Set<TZID> getPreferredIDs(Locale locale) {
 
@@ -270,6 +301,27 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets the system timezone. </p>
+     *
+     * <p>The underlying algorithm to determine the system timezone is
+     * primarily based on the system property &quot;user.timezone&quot;
+     * then on the method {@code java.util.TimeZone.getDefault()}. If
+     * the system property &quot;net.time4j.allow.system.tz.override&quot;
+     * is set to &quot;true&quot; then the system timezone can be changed
+     * by a combined approach of {@code java.util.TimeZone.setDefault()}
+     * and the method {@link Cache#refresh()}. Otherwise this class
+     * will determine the system timezone only for one time while being
+     * loaded. </p>
+     *
+     * <p>Note: If the system timezone cannot be determined (for example
+     * due to a wrong property value for &quot;user.timezone&quot;) then
+     * this method will fall back to UTC timezone.. </p>
+     *
+     * @return  default timezone data of system
+     * @see     java.util.TimeZone#getDefault()
+     *          java.util.TimeZone.getDefault()
+     */
+    /*[deutsch]
      * <p>Liefert die Standard-Zeitzone des Systems. </p>
      *
      * <p>Der verwendete Algorithmus basiert vorrangig auf der
@@ -301,6 +353,13 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets the timezone for given identifier. </p>
+     *
+     * @param   tzid    timezone id as interface
+     * @return  timezone data
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     */
+    /*[deutsch]
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
      *
      * @param   tzid    timezone id as interface
@@ -314,6 +373,13 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets the timezone for given identifier. </p>
+     *
+     * @param   tzid    timezone id as String
+     * @return  timezone data
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     */
+    /*[deutsch]
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
      *
      * @param   tzid    timezone id as String
@@ -327,6 +393,20 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Tries to load the timezone with the first given identifer else
+     * with given alternative identifier. </p>
+     *
+     * <p>If the timezone cannot be loaded with first identifier then
+     * this method will load the timezone using the alternative. In case
+     * of failure, this method will finally load the system timezone.
+     * In contrast to {@link #of(TZID)}, this method never throws any
+     * exception. </p>
+     *
+     * @param   tzid        preferred timezone id
+     * @param   fallback    alternative timezone id
+     * @return  timezone data
+     */
+    /*[deutsch]
      * <p>Versucht bevorzugt, die Zeitzone mit der angegebenen ID zu laden,
      * sonst eine Alternative. </p>
      *
@@ -360,6 +440,12 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets the associated timezone identifier. </p>
+     *
+     * @return  timezone id
+     * @see     java.util.TimeZone#getID() java.util.TimeZone.getID()
+     */
+    /*[deutsch]
      * <p>Liefert die Zeitzonen-ID. </p>
      *
      * @return  timezone id
@@ -368,6 +454,14 @@ public abstract class Timezone
     public abstract TZID getID();
 
     /**
+     * <p>Calculates the offset for given global timestamp. </p>
+     *
+     * @param   ut      unix time
+     * @return  shift in seconds which yields local time if added to unix time
+     * @see     java.util.TimeZone#getOffset(long)
+     *          java.util.TimeZone.getOffset(long)
+     */
+    /*[deutsch]
      * <p>Ermittelt die Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
      * der UT-Weltzeitlinie in Sekunden. </p>
      *
@@ -379,6 +473,19 @@ public abstract class Timezone
     public abstract ZonalOffset getOffset(UnixTime ut);
 
     /**
+     * <p>Calculates the offset for given local timestamp. </p>
+     *
+     * <p>In case of gaps or overlaps, this method uses the standard strategy 
+     * to get the next defined offset. This behaviour is conform to the JDK. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  shift in seconds which yields unix time if subtracted
+     *          from local time choosing later offset at gaps or overlaps
+     * @see     java.util.TimeZone#getOffset(int, int, int, int, int, int)
+     *          java.util.TimeZone.getOffset(int, int, int, int, int, int)
+     */
+    /*[deutsch]
      * <p>Ermittelt die Zeitzonenverschiebung zum angegebenen lokalen
      * Zeitpunkt in Sekunden. </p>
      *
@@ -400,6 +507,19 @@ public abstract class Timezone
     );
 
     /**
+     * <p>Evaluates if given local timestamp is invalid due to a gap
+     * on the local timeline. </p>
+     *
+     * <p>A typical example is the transition from standard to daylight
+     * saving time because the clock will be manually adjusted such
+     * that the clock is moved forward by usually one hour. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  {@code true} if the local time is not defined due to
+     *          transition gaps else {@code false}
+     */
+    /*[deutsch]
      * <p>Bestimmt, ob der angegebene lokale Zeitpunkt in eine L&uuml;cke
      * f&auml;llt. </p>
      *
@@ -418,6 +538,21 @@ public abstract class Timezone
     );
 
     /**
+     * <p>Queries if given global timestamp matches daylight saving time
+     * in this timezone? </p>
+     *
+     * <p>The DST correction can be obtained as difference between total
+     * offset and raw offset if the raw offset has not changed yet.
+     * As alternative the DST correction can be obtained by evaluating
+     * the transition offset history. </p>
+     *
+     * @param   ut      unix time
+     * @return  {@code true} if the argument represents summer time
+     *          else {@code false}
+     * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
+     *          java.util.TimeZone.inDaylightTime(java.util.Date)
+     */
+    /*[deutsch]
      * <p>Herrscht zum angegebenen Zeitpunkt Sommerzeit in der Zeitzone? </p>
      *
      * <p>Die DST-Korrektur selbst kann als Differenz zwischen dem Gesamt-Offset
@@ -434,7 +569,14 @@ public abstract class Timezone
     public abstract boolean isDaylightSaving(UnixTime ut);
 
     /**
-     * <p>Liefert die zugrundeliegenden &Uuml;berg&auml;nge und Regeln. </p>
+     * <p>Gets the underlying offset transitions and rules if available. </p>
+     *
+     * @return  {@code TransitionHistory} or {@code null} if there is no
+     *          better {@code Provider} than {@code java.util.TimeZone}
+     */
+    /*[deutsch]
+     * <p>Liefert die zugrundeliegenden &Uuml;berg&auml;nge und Regeln,
+     * falls vorhanden. </p>
      *
      * @return  {@code TransitionHistory} or {@code null} if there is no
      *          better {@code Provider} than {@code java.util.TimeZone}
@@ -442,7 +584,14 @@ public abstract class Timezone
     public abstract TransitionHistory getHistory();
 
     /**
-     * <p>Beschreibt die Zeitzonendatenbank mit Name, Ort und Version. </p>
+     * <p>Describes the underlying repository with name and optionally
+     * location and version. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Beschreibt die Zeitzonendatenbank mit Name und optional
+     * Ort und Version. </p>
      *
      * @return  String
      */
@@ -466,6 +615,12 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Gets the strategy for resolving local timestamps. </p>
+     *
+     * @return  transition strategy for resolving local timestamps
+     * @see     #with(TransitionStrategy)
+     */
+    /*[deutsch]
      * <p>Ermittelt die Strategie zur Aufl&ouml;sung von lokalen
      * Zeitstempeln. </p>
      *
@@ -475,6 +630,19 @@ public abstract class Timezone
     public abstract TransitionStrategy getStrategy();
 
     /**
+     * <p>Creates a copy of this timezone which uses given strategy for
+     * resolving local timestamps. </p>
+     *
+     * <p>If this timezone has a fixed offset then the strategy will be
+     * ignored because in this case there can never be a conflict.
+     * Otherwise if there is no public offset transition history then
+     * the only supported strategies are {@link #DEFAULT_CONFLICT_STRATEGY}
+     * and {@link #STRICT_MODE}. </p>
+     *
+     * @param   strategy    transition strategy for resolving local timestamps
+     * @return  copy of this timezone with given strategy
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Zeitzone, die zur Aufl&ouml;sung von
      * lokalen Zeitstempeln die angegebene Strategie nutzt. </p>
      *
@@ -490,6 +658,21 @@ public abstract class Timezone
     public abstract Timezone with(TransitionStrategy strategy);
 
     /**
+     * <p>Returns the name of this timezone suitable for presentation to
+     * users in given style and locale. </p>
+     *
+     * <p>If the name is not available then this method will yield the
+     * ID of this timezone. </p>
+     *
+     * @param   style               name style
+     * @param   locale              language setting
+     * @return  localized timezone name for display purposes
+     * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
+     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
+     * @see     Locale#getDefault()
+     * @see     #getID()
+     */
+    /*[deutsch]
      * <p>Liefert den anzuzeigenden Zeitzonennamen. </p>
      *
      * <p>Ist der Zeitzonenname nicht ermittelbar, wird die ID der Zeitzone
@@ -692,15 +875,29 @@ public abstract class Timezone
     //~ Innere Interfaces -------------------------------------------------
 
     /**
+     * <p>SPI interface which encapsulates the timezone repository and
+     * provides all necessary data for a given timezone id. </p>
+     *
+     * <p>Implementations are usually stateless and should normally not
+     * try to manage a cache. Instead Time4J uses its own cache. The
+     * fact that this interface is used per {@code java.util.ServiceLoader}
+     * requires a concrete implementation to offer a public no-arg
+     * constructor. </p>
+     *
+     * @author  Meno Hochschild
+     * @see     java.util.ServiceLoader
+     */
+    /*[deutsch]
      * <p>SPI-Interface, das eine Zeitzonendatenbank kapselt und passend zu
      * einer Zeitzonen-ID (hier als String statt als {@code TZID}) die
      * Zeitzonendaten liefert. </p>
      *
      * <p>Implementierungen sind in der Regel zustandslos und halten keinen
-     * Cache. Letzterer sollte der Klasse {@code Timezone} vorbehalten sein.
-     * Weil dieses Interface per {@code java.util.ServiceLoader} genutzt wird,
-     * mu&szlig; eine konkrete Implementierung einen &ouml;ffentlichen
-     * Konstruktor ohne Argumente definieren. </p>
+     * Cache. Letzterer sollte normalerweise der Klasse {@code Timezone}
+     * vorbehalten sein. Weil dieses Interface mittels eines
+     * {@code java.util.ServiceLoader} genutzt wird, mu&szlig; eine
+     * konkrete Implementierung einen &ouml;ffentlichen Konstruktor ohne
+     * Argumente definieren. </p>
      *
      * @author  Meno Hochschild
      * @see     java.util.ServiceLoader
@@ -710,6 +907,12 @@ public abstract class Timezone
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Gets all available and supported timezone identifiers. </p>
+         *
+         * @return  unmodifiable set of timezone ids
+         * @see     java.util.TimeZone#getAvailableIDs()
+         */
+        /*[deutsch]
          * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen. </p>
          *
          * @return  unmodifiable set of timezone ids
@@ -718,6 +921,14 @@ public abstract class Timezone
         Set<String> getAvailableIDs();
 
         /**
+         * <p>Gets an alias table whose keys represent alternative identifiers
+         * mapped to other aliases or finally canonical timezone IDs.. </p>
+         *
+         * <p>Example: &quot;PST&quot; => &quot;America/Los_Angeles&quot;. </p>
+         *
+         * @return  map from all timezone aliases to canoncial ids
+         */
+        /*[deutsch]
          * <p>Liefert eine Alias-Tabelle, in der die Schl&uuml;ssel alternative
          * Zonen-IDs darstellen und in der die zugeordneten Werte wieder
          * Aliasnamen oder letztlich kanonische Zonen-IDs sind. </p>
@@ -729,6 +940,24 @@ public abstract class Timezone
         Map<String, String> getAliases();
 
         /**
+         * <p>Loads an offset transition table for given timezone id. </p>
+         *
+         * <p>This callback method has a second argument which indicates if
+         * Time4J wants this method to return exactly matching data (default)
+         * or permits the use of aliases (only possible if the method
+         * {@code isFallbackEnabled()} returns {@code true}). </p>
+         *
+         * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
+         * @param   fallback    fallback allowed if a timezone id cannot be
+         *                      found, not even by alias?
+         * @return  timezone history or {@code null} if there are no data
+         * @throws  IllegalStateException if timezone database is broken
+         * @see     #getAvailableIDs()
+         * @see     #getAliases()
+         * @see     #isFallbackEnabled()
+         * @see     java.util.TimeZone#getTimeZone(String)
+         */
+        /*[deutsch]
          * <p>L&auml;dt die Zeitzonendaten zur angegebenen Zonen-ID. </p>
          *
          * <p>Diese Methode wird von {@code Timezone} aufgerufen. Das zweite
@@ -755,6 +984,13 @@ public abstract class Timezone
         );
 
         /**
+         * <p>Determines if in case of a failed search another timezone should
+         * be permitted as alternative with possibly different rules. </p>
+         *
+         * @return  boolean
+         * @see     #load(String, boolean)
+         */
+        /*[deutsch]
          * <p>Soll eine alternative Zeitzone mit eventuell anderen Regeln
          * geliefert werden, wenn die Suche nach einer Zeitzone erfolglos
          * war? </p>
@@ -765,6 +1001,14 @@ public abstract class Timezone
         boolean isFallbackEnabled();
 
         /**
+         * <p>Gets the name of the underlying repository. </p>
+         *
+         * <p>The Olson/IANA-repository has the name
+         * &quot;TZDB&quot;. </p>
+         *
+         * @return  String
+         */
+        /*[deutsch]
          * <p>Gibt den Namen dieser Zeitzonendatenbank an. </p>
          *
          * <p>Die Olson/IANA-Zeitzonendatenbank hat den Namen
@@ -775,6 +1019,11 @@ public abstract class Timezone
         String getName();
 
         /**
+         * <p>Describes the location or source of the repository. </p>
+         *
+         * @return  String which refers to an URI or empty if unknown
+         */
+        /*[deutsch]
          * <p>Beschreibt die Quelle der Zeitzonendatenbank. </p>
          *
          * @return  String which refers to an URI or empty if unknown
@@ -782,6 +1031,15 @@ public abstract class Timezone
         String getLocation();
 
         /**
+         * <p>Queries the version of the underlying repository. </p>
+         *
+         * <p>In most cases the version has the Olson format starting with
+         * a four-digit year number followed by a small letter in range
+         * a-z. </p>
+         *
+         * @return  String (for example &quot;2011n&quot;) or empty if unknown
+         */
+        /*[deutsch]
          * <p>Liefert die Version der Zeitzonendatenbank. </p>
          *
          * <p>Meist liegt die Version im Olson-Format vor. Dieses Format sieht
@@ -797,6 +1055,10 @@ public abstract class Timezone
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Offers some static methods for the configuration of the
+     * timezone cache. </p>
+     */
+    /*[deutsch]
      * <p>Bietet statische Methoden zum Konfigurieren des
      * Zeitzonendatenpuffers. </p>
      */
@@ -811,6 +1073,13 @@ public abstract class Timezone
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Can refresh the timezone cache in case of a dynamic
+         * update of the underlying timezone repository. </p>
+         *
+         * <p>First the internal cache will be cleared. Furthermore,
+         * if needed the system timezone will be determined again. </p>
+         */
+        /*[deutsch]
          * <p>Erlaubt eine Aktualisierung, wenn sich die Zeitzonendatenbank
          * ge&auml;ndert hat (<i>dynamic update</i>). </p>
          *
@@ -834,6 +1103,16 @@ public abstract class Timezone
         }
 
         /**
+         * <p>Aktivates or deactivates the internal cache. </p>
+         *
+         * <p>The timezone cache is active by default. Switching off the cache can
+         * make the performance worse especially if the underlying {@code Provider}
+         * itself has no cache. </p>
+         *
+         * @param   active  {@code true} if chache shall be active
+         *                  else {@code false}
+         */
+        /*[deutsch]
          * <p>Aktiviert oder deaktiviert den internen Cache. </p>
          *
          * <p>Standardm&auml;&szlig;ig ist der Cache aktiv. Ein Abschalten des
@@ -854,6 +1133,12 @@ public abstract class Timezone
         }
 
         /**
+         * <p>Updates the size of the internal timezone cache. </p>
+         *
+         * @param   minimumCacheSize    new minimum size of cache
+         * @throws  IllegalArgumentException if the argument is negative
+         */
+        /*[deutsch]
          * <p>Konfiguriert die Gr&ouml;&szlig;e des internen Cache neu. </p>
          *
          * @param   minimumCacheSize    new minimum size of cache
