@@ -33,6 +33,42 @@ package net.time4j.tz;
 // ***********************************************************************
 
 /**
+ * <p>Identifies a timezone. </p>
+ *
+ * <p>In most cases, the timezone ID has the Olson-format 
+ * &quot;{region}/{city}&quot; or is an offset in the format
+ * &quot;UTC&#x00B1;hh:mm&quot;. In latter case applications can
+ * instead directly use in instance of type {@code ZonalOffset},
+ * especially if the timezone offset for a given timepoint is
+ * already known. </p>
+ *
+ * <p>Lexical comparisons of IDs should always be done by the method
+ * {@link #canonical()} because an object of type {@code TZID} is only
+ * designed for encapsulating a canonical name. <strong>The comparison
+ * using the method {@code equals()} is not allowed. </strong></p>
+ *
+ * <p>The predefined enum constants actually mirror the TZ-version
+ * <span style="text-decoration:underline;"><tt>2013i</tt></span> and
+ * are usually associated wih timezones whose rules have changed or are
+ * about to change. The enum constants do <strong>NOT</strong> mean
+ * that they are also valid or that there are always well-defined timezone
+ * data behind. For example we have {@code TZID.ASIA.HEBRON} which exists
+ * first since TZ-version 2011n. Another example is the ID
+ * &quot;Europe/Tiraspol&quot; which existed for a short time and is
+ * mssing in the version 2011n however. Such timezone IDs will be marked
+ * as <i>deprecated</i> and labelled with a suitable alias. Purpose of
+ * predefined constants is just a safe and performant access (protection
+ * against typing errors). </p>
+ *
+ * <p>If a timezone offset is known for historical timezones before the year
+ * 1970 then users should generally prefer the class {@code ZonalOffset} because
+ * the timezone data associated with the enum constants are not necessarily
+ * correct. </p>
+ *
+ * @author  Meno Hochschild
+ * @spec    All implementations must be immutable, thread-safe and serializable.
+ */
+/*[deutsch]
  * <p>Identifiziert eine Zeitzone. </p>
  *
  * <p>Meistens liegt die ID im Olson-Format &quot;{region}/{city}&quot; oder
@@ -41,7 +77,7 @@ package net.time4j.tz;
  * in Betracht gezogen werden, insbesondere dann, wenn eine Verschiebung
  * zu einem gegebenen Zeitpunkt schon bekannt ist. </p>
  *
- * Ein (lexikalischer) Vergleich von IDs sollte immer &uuml;ber die Methode
+ * <p>Ein (lexikalischer) Vergleich von IDs sollte immer &uuml;ber die Methode
  * {@link #canonical()} gemacht werden, weil ein {@code TZID} nur dem Zweck
  * dient, einen kanonischen Namen zu kapseln. <strong>Der Vergleich &uuml;ber
  * die Objekt-Methode {@code equals()} ist nicht erlaubt. </strong></p>
@@ -73,6 +109,12 @@ public interface TZID {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Represents the full canonical name of a timezone (for
+     * example &quot;Europe/Paris&quot; or &quot;UTC+01:00&quot;). </p>
+     *
+     * @return  String in TZDB format (Olson-ID) or in offset format
+     */
+    /*[deutsch]
      * <p>Repr&auml;sentiert den vollst&auml;ndigen kanonischen Namen
      * einer Zeitzone (zum Beispiel &quot;Europe/Paris&quot; oder
      * &quot;UTC+01:00&quot;). </p>
@@ -84,6 +126,9 @@ public interface TZID {
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Contains all standard timezone IDs in Africa. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Afrika. </p>
      */
     public static enum AFRICA
@@ -193,6 +238,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in America. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Amerika. </p>
      */
     public static enum AMERICA
@@ -372,9 +420,11 @@ public interface TZID {
         //~ Innere Klassen ------------------------------------------------
 
         /**
+         * <p>Contains all standard timezone IDs in Argentina. </p>
+         */
+        /*[deutsch]
          * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Argentinien. </p>
          */
-
         public static enum ARGENTINA
             implements TZID {
 
@@ -437,6 +487,9 @@ public interface TZID {
         }
 
         /**
+         * <p>Contains all standard timezone IDs in USA/Indiana. </p>
+         */
+        /*[deutsch]
          * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in USA/Indiana. </p>
          */
         public static enum INDIANA
@@ -497,6 +550,9 @@ public interface TZID {
         }
 
         /**
+         * <p>Contains all standard timezone IDs in USA/Kentucky. </p>
+         */
+        /*[deutsch]
          * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in USA/Kentucky. </p>
          */
         public static enum KENTUCKY
@@ -551,6 +607,9 @@ public interface TZID {
         }
 
         /**
+         * <p>Contains all standard timezone IDs in USA/North-Dakota. </p>
+         */
+        /*[deutsch]
          * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in USA/Nord-Dakota. </p>
          */
         public static enum NORTH_DAKOTA
@@ -608,6 +667,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Antarctica. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in der Antarktis. </p>
      */
     public static enum ANTARCTICA
@@ -675,6 +737,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Asia. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Asien. </p>
      */
     public static enum ASIA
@@ -811,6 +876,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Atlantic Ocean. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs im Atlantischen Ozean. </p>
      */
     public static enum ATLANTIC
@@ -878,6 +946,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Australia. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Australien. </p>
      */
     public static enum AUSTRALIA
@@ -942,6 +1013,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Europe. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs in Europa. </p>
      */
     public static enum EUROPE
@@ -1054,6 +1128,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Indian Ocean. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs im Indischen Ozean. </p>
      */
     public static enum INDIAN
@@ -1122,6 +1199,9 @@ public interface TZID {
     }
 
     /**
+     * <p>Contains all standard timezone IDs in Pacific Ocean. </p>
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt alle Standard-Zeitzonen-IDs im Pazifischen Ozean. </p>
      */
     public static enum PACIFIC
