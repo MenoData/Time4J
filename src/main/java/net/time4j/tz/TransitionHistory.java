@@ -29,6 +29,12 @@ import java.util.List;
 
 
 /**
+ * <p>Keeps all offset transitions and rules of a timezone. </p>
+ *
+ * @author  Meno Hochschild
+ * @spec    All implementations must be immutable, thread-safe and serializable.
+ */
+/*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
  *
  * @author  Meno Hochschild
@@ -39,6 +45,16 @@ public interface TransitionHistory {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Return the initial offset no matter if there are any
+     * transitions defined or not. </p>
+     *
+     * <p>If any transition is defined then the initial offset
+     * is identical to the shift {@code getPreviousOffset()} of
+     * the first defined transition in history. </p>
+     *
+     * @return  fixed initial shift
+     */
+    /*[deutsch]
      * <p>Ermittelt die initiale Verschiebung unabh&auml;ngig davon, ob es
      * &Uuml;berg&auml;nge gibt oder nicht. </p>
      *
@@ -51,6 +67,14 @@ public interface TransitionHistory {
     ZonalOffset getInitialOffset();
 
     /**
+     * <p>Queries the last transition which defines the offset
+     * for given global timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time
+     *          is before first defined transition
+     */
+    /*[deutsch]
      * <p>Ermittelt den letzten &Uuml;bergang, der die zur angegebenen
      * Referenzzeit zugeh&ouml;rige Verschiebung definiert. </p>
      *
@@ -61,6 +85,16 @@ public interface TransitionHistory {
     ZonalTransition getStartTransition(UnixTime ut);
 
     /**
+     * <p>Returns the conflict transition where given local timestamp
+     * falls either in a gap or in an overlap on the local timeline. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  conflict transition on the local time axis for gaps or
+     *          overlaps else {@code null}
+     * @see     #getValidOffsets(GregorianDate,WallTime)
+     */
+    /*[deutsch]
      * <p>Bestimmt den passenden &Uuml;bergang, wenn die angegebene lokale
      * Zeit in eine L&uuml;cke oder eine &Uuml;berlappung auf dem lokalen
      * Zeitstrahl f&auml;llt. </p>
@@ -77,6 +111,20 @@ public interface TransitionHistory {
     );
 
     /**
+     * <p>Determines the suitable offsets at given local timestamp.. </p>
+     *
+     * <p>The offset list is empty if the local timestamp falls in a gap
+     * on the local timeline. The list has exactly two offsets if the
+     * local timestamp belongs to two different timepoints on the
+     * POSIX timescale due to an overlap. Otherwise the offset list
+     * will contain exactly one suitable offset. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  unmodifiable list of shifts which fits the given local time
+     * @see     #getConflictTransition(GregorianDate,WallTime)
+     */
+    /*[deutsch]
      * <p>Bestimmt die zur angegebenen lokalen Zeit passenden
      * zonalen Verschiebungen. </p>
      *
@@ -97,6 +145,23 @@ public interface TransitionHistory {
     );
 
     /**
+     * <p>Return the offset transitions from UNIX epoch [1970-01-01T00:00Z]
+     * until at maximum the first transition after the current timestamp. </p>
+     *
+     * <p>Indeed, a potentially bigger interval is obtainable by
+     * {@link #getTransitions(UnixTime,UnixTime)}, but earlier or
+     * later timepoints are usually not reliable. For example the
+     * wide-spread IANA/Olson-repository is only designed for times
+     * since UNIX epoch and offers some selected older data to the
+     * best of our knowledge. Users must be aware that even older
+     * data can be changed as side effect of data corrections. Generally
+     * the timezone concept was invented in 19th century. And future
+     * transitions are even less reliable due to political arbitrariness. </p>
+     *
+     * @return  unmodifiable list of standard transitions (after 1970-01-01)
+     *          maybe empty
+     */
+    /*[deutsch]
      * <p>Bestimmt alle vorhandenen zonalen &Uuml;berg&auml;nge ab der
      * UNIX-Epoche [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
      * nach dem aktuellen heutigen Zeitpunkt. </p>
@@ -107,10 +172,12 @@ public interface TransitionHistory {
      * mit gro&szlig;en Unsicherheiten verkn&uuml;pft. Zum Beispiel ist die
      * weithin verwendete IANA/Olson-Zeitzonendatenbank nur f&uuml;r Zeiten
      * ab der UNIX-Epoche gedacht und bietet ausgew&auml;hlte &auml;ltere
-     * Zeitzonendaten lediglich nach bestem Wissen und Gewissen an. Generell
-     * existiert das Zeitzonenkonzept erst ab ca. dem 19. Jahrhundert. Und
-     * in der Zukunft liegende Zeitzonen&auml;nderungen sind wegen politischer
-     * Willk&uuml;r sogar noch unsicherer. </p>
+     * Zeitzonendaten lediglich nach bestem Wissen und Gewissen an. Anwender
+     * m&uuml;ssen beachten, da&szlig; sich sogar historische alte Daten
+     * nachtr&auml;glich &auml;ndern k&ouml;nnen. Generell existiert das
+     * Zeitzonenkonzept erst ab ca. dem 19. Jahrhundert. Und in der Zukunft
+     * liegende Zeitzonen&auml;nderungen sind wegen politischer Willk&uuml;r
+     * sogar noch unsicherer. </p>
      *
      * @return  unmodifiable list of standard transitions (after 1970-01-01)
      *          maybe empty
@@ -118,6 +185,18 @@ public interface TransitionHistory {
     List<ZonalTransition> getStdTransitions();
 
     /**
+     * <p>Returns the previous transitions in descending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp (in descending order on the timeline!). </p>
+     *
+     * @param   ut      unix reference time
+     * @return  previous transitions before reference time
+     *          (only standard transitions after 1970-01-01)
+     * @see     #getStdTransitions()
+     */
+    /*[deutsch]
      * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
      * Reihenfolge, falls vorhanden. </p>
      *
@@ -134,6 +213,18 @@ public interface TransitionHistory {
     List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
 
     /**
+     * <p>Returns the next transitions in ascending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  next transitions after reference time (only standard
+     *          transitions 1970-01-01)
+     * @see     #getStdTransitions()
+     */
+    /*[deutsch]
      * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
      * aufsteigender Reihenfolge, falls vorhanden. </p>
      *
@@ -149,6 +240,14 @@ public interface TransitionHistory {
     List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
 
     /**
+     * <p>Returns the defined transitions in given POSIX-interval. </p>
+     *
+     * @param   startInclusive  start time on POSIX time scale
+     * @param   endExclusive    end time on POSIX time scale
+     * @return  unmodifiable list of transitions maybe empty
+     * @see     #getStdTransitions()
+     */
+    /*[deutsch]
      * <p>Bestimmt die im angegebenen POSIX-Intervall vorhandenen zonalen
      * &Uuml;berg&auml;nge. </p>
      *
