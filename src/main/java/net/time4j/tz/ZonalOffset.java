@@ -33,6 +33,17 @@ import java.util.concurrent.ConcurrentMap;
 
 
 /**
+ * <p>Represents the shift of a local timestamp relative to UTC timezone
+ * in seconds. </p>
+ *
+ * <p>Following rule is the guideline (all data in seconds): </p>
+ *
+ * <p>{@code [Total Offset] = [Local Wall Time] - [POSIX Time]}</p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert die Verschiebung der lokalen Zeit relativ zur
  * UTC-Zeitzone in Sekunden. </p>
  *
@@ -62,6 +73,10 @@ public final class ZonalOffset
     private static final BigDecimal MRD = new BigDecimal(1000000000);
 
     /**
+     * <p>Constant for the UTC timezone representing a shift of {@code 0} seconds
+     * with the canonical representation &quot;Z&quot;. </p>
+     */
+    /*[deutsch]
      * <p>Konstante f&uuml;r eine zeitliche Verschiebung von {@code 0} Sekunden
      * mit der kanonischen Darstellung &quot;Z&quot;. </p>
      */
@@ -212,6 +227,14 @@ public final class ZonalOffset
 //    }
 
     /**
+     * <p>Creates a new shift based on a geographical longitude. </p>
+     *
+     * @param   longitude   geographical longitude in degrees defined in
+     *                      range {@code -180.0 <= longitude <= 180.0}
+     * @return  zonal offset in decimal precision
+     * @throws  IllegalArgumentException if range check fails
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
      * L&auml;ngenangabe. </p>
      *
@@ -247,6 +270,19 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Creates a new shift based on a geographical longitude. </p>
+     *
+     * @param   sign        sign of shift relative to zero meridian
+     * @param   degrees     geographical length in degreed, defined in
+     *                      range {@code 0 <= degrees <= 180}
+     * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
+     * @param   arcSeconds  arc second part ({@code 0 <= arcSeconds <= 59})
+     * @return  zonal offset in decimal precision
+     * @throws  IllegalArgumentException if range check fails (also if total
+     *          absolute offset goes beyond 180 degrees)
+     * @see     #atLongitude(BigDecimal)
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
      * L&auml;ngenangabe. </p>
      *
@@ -307,6 +343,18 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Static factory method for a shift which has the given full
+     * hour part. </p>
+     *
+     * <p>Is equivalent to {@code ofHoursMinutes(sign, hours, 0}. </p>
+     *
+     * @param   sign        sign of shift relative to zero meridian
+     * @param   hours       hour part ({@code 0 <= hours <= 18})
+     * @return  zonal offset in hour precision
+     * @throws  IllegalArgumentException if range check fails
+     * @see     #ofHoursMinutes(Sign, int, int)
+     */
+    /*[deutsch]
      * <p>Statische Fabrikmethode f&uuml;r eine Zeitverschiebung, die den
      * angegebenen vollen Stundenanteil hat. </p>
      *
@@ -328,13 +376,32 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Static factory method for a shift which  has given
+     * hour and minute parts. </p>
+     *
+     * <p>The given numerical values are identical to the numerical
+     * parts of the canonical representation &#x00B1;hh:mm&quot;.
+     * The second part is always {@code 0}. Only values in the range
+     * {@code -18:00 <= [total-offset] <= +18:00} are allowed. When
+     * calculating the total offset the sign relates to both hour
+     * and minute part. Example: The expression
+     * {@code ZonalOffset.ofHoursMinutes(BEHIND_UTC, 4, 30)} has the
+     * representation {@code -04:30} and a total shift in seconds of
+     * {@code -(4 * 3600 + 30 * 60) = 16200}. </p>
+     *
+     * @param   sign        sign ofHoursMinutes shift relative to zero meridian
+     * @param   hours       hour part ({@code 0 <= hours <= 18})
+     * @param   minutes     minute part ({@code 0 <= minutes <= 59})
+     * @return  zonal offset in minute precision
+     * @throws  IllegalArgumentException if range check fails
+     */
+    /*[deutsch]
      * <p>Statische Fabrikmethode f&uuml;r eine Zeitverschiebung, die die
      * angegebenen Stunden- und Minutenanteile hat. </p>
      *
      * <p>Die angegebenen Zahlenwerte entsprechen exakt den numerischen
      * Bestandteilen der kanonischen Darstellung &#x00B1;hh:mm&quot;. Der
-     * Sekundenanteil ist hier immer {@code 0}. Entspricht dem Ausdruck
-     * {@code valueOf(sign, hours, minutes, 0}. Erlaubt sind nur Werte im
+     * Sekundenanteil ist hier immer {@code 0}. Erlaubt sind nur Werte im
      * Bereich {@code -18:00 <= [total-offset] <= +18:00}. Bei der Berechnung
      * der gesamten Verschiebung wird das Vorzeichen nicht nur auf den Stunden-,
      * sondern auch auf den Minutenteil mit &uuml;bertragen. Beispiel: Der
@@ -385,6 +452,16 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Creates a shift of the local time relative to UTC timezone
+     * in integer seconds. </p>
+     *
+     * @param   total   total shift in seconds defined in range
+     *                  {@code -18 * 3600 <= total <= 18 * 3600}
+     * @return  zonal offset in second precision
+     * @throws  IllegalArgumentException if range check fails
+     * @see     #getIntegralAmount()
+     */
+    /*[deutsch]
      * <p>Konstruiert eine Verschiebung der lokalen Zeit relativ zur
      * UTC-Zeitzone in integralen Sekunden. </p>
      *
@@ -401,6 +478,19 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Creates a shift of the local time relative to UTC timezone
+     * in integer seconds or fractional seconds. </p>
+     *
+     * @param   total       total shift in seconds defined in range
+     *                      {@code -18 * 3600 <= total <= 18 * 3600}
+     * @param   fraction    fraction of second
+     * @return  zonal offset in (sub-)second precision
+     * @throws  IllegalArgumentException if any arguments are out of range
+     *                                   or have different signs
+     * @see     #getIntegralAmount()
+     * @see     #getFractionalAmount()
+     */
+    /*[deutsch]
      * <p>Konstruiert eine Verschiebung der lokalen Zeit relativ zur
      * UTC-Zeitzone in integralen oder fraktionalen Sekunden. </p>
      *
@@ -439,6 +529,11 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Return the sign of this zonal shift. </p>
+     *
+     * @return  {@code BEHIND_UTC} if sign is negative else {@code AHEAD_OF_UTC}
+     */
+    /*[deutsch]
      * <p>Liefert das Vorzeichen der zonalen Verschiebung. </p>
      *
      * @return  {@code BEHIND_UTC} if sign is negative else {@code AHEAD_OF_UTC}
@@ -454,6 +549,12 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Returns the hour part of this shift as absolute amount. </p>
+     *
+     * @return  absolute hour part in range {@code 0 <= x <= 18}
+     * @see     #getSign()
+     */
+    /*[deutsch]
      * <p>Liefert den Stundenanteil der Verschiebung als Absolutbetrag. </p>
      *
      * @return  absolute hour part in range {@code 0 <= x <= 18}
@@ -466,6 +567,12 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Returns the minute part of this shift as absolute amount. </p>
+     *
+     * @return  absolute minute part in range {@code 0 <= x <= 59}
+     * @see     #getSign()
+     */
+    /*[deutsch]
      * <p>Liefert den Minutenanteil der Verschiebung als Absolutbetrag. </p>
      *
      * @return  absolute minute part in range {@code 0 <= x <= 59}
@@ -478,6 +585,12 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Returns the second part of this shift as absolute amount. </p>
+     *
+     * @return  absolute second part in range {@code 0 <= x <= 59}
+     * @see     #getSign()
+     */
+    /*[deutsch]
      * <p>Liefert den Sekundenanteil der Verschiebung als Absolutbetrag. </p>
      *
      * @return  absolute second part in range {@code 0 <= x <= 59}
@@ -490,6 +603,12 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Total shift in integer seconds without fractional part. </p>
+     *
+     * @return  integral part in seconds {@code -18 * 3600 <= x <= 18 * 3600}
+     * @see     #getFractionalAmount()
+     */
+    /*[deutsch]
      * <p>Verschiebung in integralen Sekunden ohne Sekundenbruchteil. </p>
      *
      * @return  integral part in seconds {@code -18 * 3600 <= x <= 18 * 3600}
@@ -502,6 +621,12 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Returns the fractional second part of this shift in nanoseconds. </p>
+     *
+     * @return  fractional part in range {@code -999999999 <= x <= 999999999}
+     * @see     #getIntegralAmount()
+     */
+    /*[deutsch]
      * <p>Liefert den Sekundenbruchteil der Verschiebung in
      * Nanosekundenform. </p>
      *
@@ -515,6 +640,15 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Compares the whole state with sign, hours, minutes, seconds and
+     * fractional seconds in ascending order. </p>
+     *
+     * <p>Shifts with sign west for Greenwich (behind UTC) are considered as
+     * smaller than shifts with sign east for Greenwich (ahead of UTC). </p>
+     *
+     * <p>The natural order is consistent with {@code equals()}. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht die gesamte zeitliche Verschiebung. </p>
      *
      * <p>Es wird aufsteigend sortiert. Verschiebungen westlich von Greenwich
@@ -538,6 +672,9 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Compares the whole state. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht die internen Verschiebungswerte. </p>
      */
     @Override
@@ -558,6 +695,9 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Calculates the hash value. </p>
+     */
+    /*[deutsch]
      * <p>Berechnet den Hash-Wert. </p>
      */
     @Override
@@ -568,6 +708,18 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Returns a complete representation of this shift including
+     * the sign. </p>
+     *
+     * <p>If there are only full minutes or hours the representation
+     * is exactly as described in ISO-8601. </p>
+     *
+     * @return  String in ISO-8601 format &quot;&#x00B1;hh:mm&quot; or
+     *          &quot;&#x00B1;hh:mm:ss&quot; if there is a second part
+     *          or &quot;&#x00B1;hh:mm:ss.fffffffff&quot; if any fractional
+     *          part exists
+     */
+    /*[deutsch]
      * <p>Liefert eine vollst&auml;ndige Darstellung der Verschiebung
      * mit Vorzeichen. </p>
      *
@@ -586,6 +738,17 @@ public final class ZonalOffset
 
     }
 
+    /**
+     * <p>Returns a canonical representation of this shift. </p>
+     *
+     * <p>Note: If this instance denotes the UTC timezone then this method
+     * will yield the string &quot;Z&quot;. </p>
+     *
+     * @return  String in format &quot;UTC&#x00B1;hh:mm&quot; or
+     *          &quot;UTC&#x00B1;hh:mm:ss&quot; if there is a second part
+     *          or &quot;UTC&#x00B1;hh:mm:ss.fffffffff&quot; if any fractional
+     *          part exists or &quot;Z&quot; in timezone UTC
+     */
     /**
      * <p>Liefert eine kanonische Darstellung der Verschiebung. </p>
      *
@@ -686,6 +849,9 @@ public final class ZonalOffset
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Represents the sign of a zonal shift. </p>
+     */
+    /*[deutsch]
      * <p>Repr&auml;sentiert das Vorzeichen der zonalen Verschiebung. </p>
      */
     public static enum Sign {
@@ -693,11 +859,17 @@ public final class ZonalOffset
         //~ Statische Felder/Initialisierungen ----------------------------
 
         /**
+         * <p>Negative sign (west for Greenwich meridian). </p>
+         */
+        /*[deutsch]
          * <p>Negatives Vorzeichen. </p>
          */
         BEHIND_UTC,
 
         /**
+         * <p>Positive sign (also in case of zero offset). </p>
+         */
+        /*[deutsch]
          * <p>Positives Vorzeichen (auch bei Null-Offset). </p>
          */
         AHEAD_OF_UTC;
