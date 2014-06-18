@@ -223,8 +223,11 @@ public final class Weekmodel
             new ChronoCondition<GregorianDate>() {
                 @Override
                 public boolean test(GregorianDate context) {
+                    int y = context.getYear();
+                    int m = context.getMonth();
+                    int dom = context.getDayOfMonth();
                     Weekday wd =
-                        Weekday.valueOf(GregorianMath.getDayOfWeek(context));
+                        Weekday.valueOf(GregorianMath.getDayOfWeek(y, m, dom));
                     return ((wd == startOfWeekend) || (wd == endOfWeekend));
                 }
             };

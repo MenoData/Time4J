@@ -23,6 +23,11 @@ package net.time4j.base;
 
 
 /**
+ * <p>Contains some calendrical tools for the rules of gregorian calendar. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Enth&auml;lt kalendarische Hilfsmittel f&uuml;r die Regeln des
  * gregorianischen Kalenders. </p>
  *
@@ -33,11 +38,17 @@ public final class GregorianMath {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * Minimum of supported year range (-999999999).
+     */
+    /*[deutsch]
      * Minimal unterst&uuml;tze Jahreszahl (-999999999).
      */
     public static final int MIN_YEAR = -999999999;
 
     /**
+     * Maximum of supported year range (999999999).
+     */
+    /*[deutsch]
      * Maximal unterst&uuml;tze Jahreszahl (999999999).
      */
     public static final int MAX_YEAR = 999999999;
@@ -54,9 +65,15 @@ public final class GregorianMath {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Queries if given year is a gregorian leap year. </p>
+     *
+     * @param   year    number of proleptic year
+     * @return  {@code true} if it is a leap year else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist das angegebene Jahr ein gregorianisches Schaltjahr? </p>
      *
-     * @param   year    Jahr
+     * @param   year    proleptisches Jahr
      * @return  {@code true} if it is a leap year else {@code false}
      */
     public static boolean isLeapYear(int year) {
@@ -70,6 +87,15 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Determines the maximum length of month in days dependent on given
+     * year (leap years!) and month. </p>
+     *
+     * @param   year    proleptic iso year
+     * @param   month   gregorian month (1-12)
+     * @return  length of month in days
+     * @throws  IllegalArgumentException if month is out of range (1-12)
+     */
+    /*[deutsch]
      * <p>Ermittelt die maximale L&auml;nge des Monats in Tagen abh&auml;ngig
      * vom angegebenen Jahr (Schaltjahre!) und Monat. </p>
      *
@@ -106,25 +132,22 @@ public final class GregorianMath {
     }
 
     /**
-     * <p>Handelt es sich um ein wohldefiniertes gregorianisches Datum? </p>
+     * <p>Queries if given values form a well defined gregorian date. </p>
      *
-     * @param   date        gregorian date
+     * <p>This method only checks the range limits, not if the date is
+     * historically correct. </p>
+     *
+     * @param   year        proleptic iso year [(-999999999) - 999999999]
+     * @param   month       gregorian month (1-12)
+     * @param   dayOfMonth  day of month (1-31)
      * @return  {@code true} if valid else  {@code false}
-     * @see     #isValid(int, int, int)
+     * @see     #checkDate(int, int, int)
      */
-    public static boolean isValid(GregorianDate date) {
-
-        return isValid(date.getYear(), date.getMonth(), date.getDayOfMonth());
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>Handelt es sich um ein wohldefiniertes gregorianisches Datum? </p>
      *
      * <p>Hier werden nur die Bereichsgrenzen &uuml;berpr&uuml;ft, nicht die
-     * historische Sinnhaftigkeit. Aus technischen Gr&uuml;nden ist der
-     * Jahresbereich ebenfalls beschr&auml;nkt, was aber der praktischen
-     * N&uuml;tzlichkeit keinen Abbruch tut. </p>
+     * historische Sinnhaftigkeit. </p>
      *
      * @param   year        proleptic iso year [(-999999999) - 999999999]
      * @param   month       gregorian month (1-12)
@@ -150,27 +173,18 @@ public final class GregorianMath {
     }
 
     /**
-     * <p>&Uuml;berpr&uuml;ft die Bereichsgrenzen der Datumswerte nach
-     * den gregorianischen Kalenderregeln. </p>
+     * <p>Checks the range limits of date values according to the rules
+     * of gregorian calendar. </p>
      *
-     * @param   date        gregorian date
+     * @param   year        proleptic iso year [(-999999999) - 999999999]
+     * @param   month       gregorian month (1-12)
+     * @param   dayOfMonth  day of month (1-31)
      * @throws  IllegalArgumentException if any argument is out of range
-     * @see     #checkDate(int, int, int)
+     * @see     #isValid(int, int, int)
      */
-    public static void checkDate(GregorianDate date) {
-
-        checkDate(date.getYear(), date.getMonth(), date.getDayOfMonth());
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>&Uuml;berpr&uuml;ft die Bereichsgrenzen der Datumswerte nach
      * den gregorianischen Kalenderregeln. </p>
-     *
-     * <p>Hier werden nur die Bereichsgrenzen &uuml;berpr&uuml;ft, nicht die
-     * historische Sinnhaftigkeit. Aus technischen Gr&uuml;nden ist der
-     * Jahresbereich ebenfalls beschr&auml;nkt, was aber der praktischen
-     * N&uuml;tzlichkeit keinen Abbruch tut. </p>
      *
      * @param   year        proleptic iso year [(-999999999) - 999999999]
      * @param   month       gregorian month (1-12)
@@ -202,24 +216,19 @@ public final class GregorianMath {
     }
 
     /**
-     * <p>Liefert den Tag des Woche f&uuml;r das angegebene Datum. </p>
+     * <p>Returns the day of week for given gregorian date. </p>
      *
-     * @param   date        gregorian date
+     * <p>This method is based on ISO-8601 and assumes that Monday is the
+     * first day of week. </p>
+     *
+     * @param   year        proleptic iso year
+     * @param   month       gregorian month (1-12)
+     * @param   dayOfMonth  day of month (1-31)
      * @return  day of week (monday = 1, ..., sunday = 7)
      * @throws  IllegalArgumentException if the month or the day are
      *          out of range
-     * @see     #getDayOfWeek(int, int, int)
      */
-    public static int getDayOfWeek(GregorianDate date) {
-
-        return getDayOfWeek(
-            date.getYear(),
-            date.getMonth(),
-            date.getDayOfMonth());
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>Liefert den Tag des Woche f&uuml;r das angegebene Datum. </p>
      *
      * <p>Diese Methode setzt gem&auml;&szlig; dem ISO-8601-Standard den
@@ -276,6 +285,13 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Returns the year from given binary compressed date. </p>
+     *
+     * @param   packedDate  packed date in binary format
+     * @return  proleptic iso year
+     * @see     #toPackedDate(long)
+     */
+    /*[deutsch]
      * <p>Liefert das Jahr des angegebenen bin&auml;r gepackten Datums. </p>
      *
      * @param   packedDate  packed date in binary format
@@ -289,6 +305,13 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Returns the month from given binary compressed date. </p>
+     *
+     * @param   packedDate  packed date in binary format
+     * @return  gregorian month (1-12)
+     * @see     #toPackedDate(long)
+     */
+    /*[deutsch]
      * <p>Liefert den Monat des angegebenen bin&auml;r gepackten Datums. </p>
      *
      * @param   packedDate  packed date in binary format
@@ -302,6 +325,13 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Returns the day of month from given binary compressed date. </p>
+     *
+     * @param   packedDate  packed date in binary format
+     * @return  day of month (1-31)
+     * @see     #toPackedDate(long)
+     */
+    /*[deutsch]
      * <p>Liefert den Tag des Monats im angegebenen bin&auml;r gepackten
      * Datum. </p>
      *
@@ -316,6 +346,22 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Calculates the gregorian Date based on given modified julian date
+     * in binary compressed format. </p>
+     *
+     * <p>Applications can extract the single date components from the result
+     * of this method by mean of {@code readYear()}, {@code readMonth()} and
+     * {@code readDayOfMonth()}. </p>
+     *
+     * @param   mjd         days since [1858-11-17] (modified julian date)
+     * @return  packed date in binary format
+     * @throws  IllegalArgumentException if the calculated year is not in
+     *          range [(-999999999)-999999999)]
+     * @see     #readYear(long)
+     * @see     #readMonth(long)
+     * @see     #readDayOfMonth(long)
+     */
+    /*[deutsch]
      * <p>Berechnet das gregorianische Datum auf Basis des angegebenen
      * modifizierten julianischen Datums. </p>
      *
@@ -389,6 +435,14 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Calculates the modified julian date. </p>
+     *
+     * @param   date    gregorian date
+     * @return  days since [1858-11-17] (modified julian date)
+     * @throws  IllegalArgumentException if the argument is out of range
+     * @see     #toMJD(int, int, int)
+     */
+    /*[deutsch]
      * <p>Ermittelt das modifizierte julianische Datum. </p>
      *
      * @param   date    gregorian date
@@ -403,6 +457,15 @@ public final class GregorianMath {
     }
 
     /**
+     * <p>Calculates the modified julian date. </p>
+     *
+     * @param   year        proleptic iso year [(-999999999) - 999999999]
+     * @param   month       gregorian month (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @return  days since [1858-11-17] (modified julian date)
+     * @throws  IllegalArgumentException if the argument is out of range
+     */
+    /*[deutsch]
      * <p>Ermittelt das modifizierte julianische Datum. </p>
      *
      * @param   year        proleptic iso year [(-999999999) - 999999999]

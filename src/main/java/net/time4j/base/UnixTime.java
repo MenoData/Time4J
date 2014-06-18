@@ -23,6 +23,12 @@ package net.time4j.base;
 
 
 /**
+ * <p>Represents any UNIX timestamp. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     net.time4j.scale.TimeScale#POSIX
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine beliebige UNIX-Zeit. </p>
  *
  * @author  Meno Hochschild
@@ -33,6 +39,13 @@ public interface UnixTime {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Counts the seconds elapsed since UNIX epoch
+     * [1970-01-01T00:00:00Z] in UTC timezone. </p>
+     *
+     * @return  count of seconds since UNIX-epoch at [1970-01-01T00:00:00Z]
+     *          without leap seconds in the timezone UTC (Greenwich)
+     */
+    /*[deutsch]
      * <p>Liefert die Zeitkoordinate in Sekunden relativ zur UNIX-Epoche
      * [1970-01-01T00:00:00Z] in der UTC-Zeitzone. </p>
      *
@@ -42,6 +55,15 @@ public interface UnixTime {
     long getPosixTime();
 
     /**
+     * <p>Yields the nanosecond fraction of current second. </p>
+     *
+     * <p>As time unit, the nanosecond is defined as one billionth part of
+     * a second). </p>
+     *
+     * @return  count of nanoseconds as fraction of last second in the
+     *          range {@code 0 - 999.999.999}
+     */
+    /*[deutsch]
      * <p>Liefert den Nanosekundenbruchteil der letzten Sekunde. </p>
      *
      * <p>Als Zeiteinheit dient die Nanosekunde (1 Milliarde Nanosekunden

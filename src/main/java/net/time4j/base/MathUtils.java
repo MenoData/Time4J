@@ -23,6 +23,12 @@ package net.time4j.base;
 
 
 /**
+ * <p>Defines some mathematical routines which are needed in calendrical
+ * calculations. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert diverse mathematische Routinen, die in kalendarischen
  * Berechnungen gebraucht werden. </p>
  *
@@ -39,6 +45,13 @@ public final class MathUtils {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Performs a safe type-cast to an int-primitive. </p>
+     *
+     * @param   num     long-primitive
+     * @return  int as type-cast
+     * @throws  ArithmeticException if int-range overflows
+     */
+    /*[deutsch]
      * <p>Macht einen sicheren TypeCast auf ein int-Primitive. </p>
      *
      * @param   num     long-primitive
@@ -56,6 +69,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Sums up the numbers with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  sum
+     * @throws  ArithmeticException if int-range overflows
+     */
+    /*[deutsch]
      * <p>Addiert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -89,6 +110,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Sums up the numbers with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  sum
+     * @throws  ArithmeticException if long-range overflows
+     */
+    /*[deutsch]
      * <p>Addiert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -124,6 +153,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Subtracts the numbers from each other with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  difference
+     * @throws  ArithmeticException if int-range overflows
+     */
+    /*[deutsch]
      * <p>Subtrahiert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -157,6 +194,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Subtracts the numbers from each other with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  difference
+     * @throws  ArithmeticException if long-range overflows
+     */
+    /*[deutsch]
      * <p>Subtrahiert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -192,6 +237,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Multiplies the numbers with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  product
+     * @throws  ArithmeticException if int-range overflows
+     */
+    /*[deutsch]
      * <p>Multipliziert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -225,6 +278,14 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Multiplies the numbers with range check. </p>
+     *
+     * @param   op1     first operand
+     * @param   op2     second operand
+     * @return  product
+     * @throws  ArithmeticException if long-range overflows
+     */
+    /*[deutsch]
      * <p>Multipliziert die Zahlen mit &Uuml;berlaufkontrolle. </p>
      *
      * @param   op1     first operand
@@ -262,6 +323,13 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Inverts the number with range check. </p>
+     *
+     * @param   value   value to be negated
+     * @return  the expression {@code -value}
+     * @throws  ArithmeticException if int-range overflows
+     */
+    /*[deutsch]
      * <p>Pr&uuml;ft auch Extremf&auml;lle beim Negieren. </p>
      *
      * @param   value   value to be negated
@@ -279,6 +347,13 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Inverts the number with range check. </p>
+     *
+     * @param   value   value to be negated
+     * @return  the expression {@code -value}
+     * @throws  ArithmeticException if long-range overflows
+     */
+    /*[deutsch]
      * <p>Pr&uuml;ft auch Extremf&auml;lle beim Negieren. </p>
      *
      * @param   value   value to be negated
@@ -296,6 +371,24 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Returns the largest lower limit of quotient. </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <ul>
+     *  <li>{@code floorDivide(2, 2) == 1}</li>
+     *  <li>{@code floorDivide(1, 2) == 0}</li>
+     *  <li>{@code floorDivide(0, 2) == 0}</li>
+     *  <li>{@code floorDivide(-1, 2) == -1}</li>
+     *  <li>{@code floorDivide(-2, 2) == -1}</li>
+     *  <li>{@code floorDivide(-3, 2) == -2}</li>
+     * </ul>
+     *
+     * @param   value       numerator
+     * @param   divisor     divisor
+     * @return  quotient as result of division
+     */
+    /*[deutsch]
      * <p>Liefert die gr&ouml;&szlig;te untere Schranke des Quotienten. </p>
      *
      * <p>Beispiele: </p>
@@ -327,6 +420,13 @@ public final class MathUtils {
     }
 
     /**
+     * <p>See {@link #floorDivide(int, int)}. </p>
+     *
+     * @param   value       numerator
+     * @param   divisor     divisor
+     * @return  quotient as result of division
+     */
+    /*[deutsch]
      * <p>Siehe {@link #floorDivide(int, int)}. </p>
      *
      * @param   value       numerator
@@ -347,6 +447,24 @@ public final class MathUtils {
     }
 
     /**
+     * <p>Calculates the remainder based on {@link #floorDivide(int, int)}. </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <ul>
+     *  <li>{@code floorModulo(2, 2) == 0}</li>
+     *  <li>{@code floorModulo(1, 2) == 1}</li>
+     *  <li>{@code floorModulo(0, 2) == 0}</li>
+     *  <li>{@code floorModulo(-1, 2) == 1}</li>
+     *  <li>{@code floorModulo(-2, 2) == 0}</li>
+     *  <li>{@code floorModulo(-3, 2) == 1}</li>
+     * </ul>
+     *
+     * @param   value       numerator
+     * @param   divisor     divisor
+     * @return  remainder of division (never negative if divisor is positive)
+     */
+    /*[deutsch]
      * <p>Modulo-Operator, der den Divisionsrest auf Basis von
      * {@link #floorDivide(int, int)} berechnet. </p>
      *
@@ -375,6 +493,13 @@ public final class MathUtils {
     }
 
     /**
+     * <p>See {@link #floorModulo(int, int)}. </p>
+     *
+     * @param   value       numerator
+     * @param   divisor     divisor
+     * @return  remainder of division (never negative if divisor is positive)
+     */
+    /*[deutsch]
      * <p>Siehe {@link #floorModulo(int, int)}. </p>
      *
      * @param   value       numerator

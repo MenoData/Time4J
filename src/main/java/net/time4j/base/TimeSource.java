@@ -23,6 +23,12 @@ package net.time4j.base;
 
 
 /**
+ * <p>Represents any kind of clock as source of current world time. </p>
+ *
+ * @param   <T> generic type of current time
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine beliebige Uhr als Quelle der aktuellen
  * Weltzeit. </p>
  *
@@ -34,9 +40,14 @@ public interface TimeSource<T extends UnixTime> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields the current time. </p>
+     *
+     * @return  current time in seconds (as {@code UnixTime} object or derivate)
+     */
+    /*[deutsch]
      * <p>Liefert die aktuelle Zeit. </p>
      *
-     * @return  current time in seconds as {@code UnixTime} object
+     * @return  current time in seconds (as {@code UnixTime} object or derivate)
      */
     T currentTime();
 

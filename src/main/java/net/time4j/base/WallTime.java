@@ -23,7 +23,17 @@ package net.time4j.base;
 
 
 /**
- * <p>Definiert eine ISO-konforme Uhrzeit im Bereich
+ * <p>Defines a wall time on an analogue clock conforming to ISO-8601
+ * in the range {@code T00:00:00 - T24:00:00}. </p>
+ *
+ * <p>Note: Implementations must document if they support the special value
+ * T24:00:00 or not. This value denotes midnight at the end of the day, that
+ * is midnight T00:00 at the begin of the following day. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
+ * <p>Definiert eine ISO-konforme Uhrzeit auf einer analogen Uhr im Bereich
  * {@code T00:00:00 - T24:00:00}. </p>
  *
  * <p>Anmerkung: Implementierungen m&uuml;ssen dokumentieren, ob sie den
@@ -38,6 +48,12 @@ public interface WallTime {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields the hour of day. </p>
+     *
+     * @return  hour in range {@code 0 - 24} (the value {@code 24} is only
+     *          allowed if minute and second have the value {@code 0})
+     */
+    /*[deutsch]
      * <p>Liefert die Stunde des Tages. </p>
      *
      * @return  hour in range {@code 0 - 24} (the value {@code 24} is only
@@ -46,13 +62,27 @@ public interface WallTime {
     int getHour();
 
     /**
-     * <p>Liefert die Minute. </p>
+     * <p>Yields the minute of hour. </p>
+     *
+     * @return  minute in range {@code 0 - 59}
+     */
+    /**
+     * <p>Liefert die Minute (der aktuellen Stunde). </p>
      *
      * @return  minute in range {@code 0 - 59}
      */
     int getMinute();
 
     /**
+     * <p>Yields the second of minute. </p>
+     *
+     * <p>Given this context and the fact that this interface describes
+     * an analogue clock without UTC reference, the special leapsecond
+     * value {@code 60} cannot be supported. </p>
+     *
+     * @return  second in range {@code 0 - 59}
+     */
+    /*[deutsch]
      * <p>Liefert die Sekunde. </p>
      *
      * <p>Weil dieses Interface eine analoge Uhr ohne UTC-Bezug beschreibt,
@@ -64,6 +94,15 @@ public interface WallTime {
     int getSecond();
 
     /**
+     * <p>Yields a canonical representation in ISO-format
+     * &quot;Thh:mm&quot; or &quot;Thh:mm:ss&quot;. </p>
+     *
+     * <p>If this object also knows subseconds then a fractional part
+     * of second part is possible. </p>
+     *
+     * @return  wall time in ISO-8601 format
+     */
+    /*[deutsch]
      * <p>Liefert eine kanonische Darstellung im ISO-Format
      * &quot;Thh:mm&quot; oder &quot;Thh:mm:ss&quot;. </p>
      *

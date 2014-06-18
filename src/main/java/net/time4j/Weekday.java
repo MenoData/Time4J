@@ -432,7 +432,11 @@ public enum Weekday
     @Override
     public boolean test(GregorianDate context) {
 
-        return (GregorianMath.getDayOfWeek(context) == this.getValue());
+        int y = context.getYear();
+        int m = context.getMonth();
+        int dom = context.getDayOfMonth();
+        
+        return (GregorianMath.getDayOfWeek(y, m, dom) == this.getValue());
 
     }
 
