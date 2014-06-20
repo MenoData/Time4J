@@ -25,17 +25,39 @@ import java.io.IOException;
 
 
 /**
+ * <p>Prints a chronological entity. </p>
+ *
+ * @param   <T> generic type of chronological entity to be formatted
+ * @author  Meno Hochschild
+ * @see     net.time4j.engine.ChronoEntity
+ */
+/*[deutsch]
  * <p>Erzeugt eine formatierte Ausgabe einer Entit&auml;t. </p>
  *
  * @param   <T> generic type of chronological entity to be formatted
  * @author  Meno Hochschild
+ * @see     net.time4j.engine.ChronoEntity
  */
 public interface ChronoPrinter<T> {
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
+     * <p>Creates a text output and writes it into given buffer. </p>
+     *
+     * <p>Note: Implementations must document the type and content of
+     * the result to be returned. </p>
+     *
+     * @param   formattable  chronological entity to be formatted
+     * @param   buffer       format buffer any text output will be sent to
+     * @param   attributes   control attributes
+     * @return  result (will be redefined by subclasses in covariant way)
+     * @throws  IllegalArgumentException if the object is not formattable
+     * @throws  IOException if writing into buffer fails
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Textausgabe und schreibt sie in den angegebenen
+     * Puffer. </p>
      *
      * <p>Notiz: Implementierungen m&uuml;ssen dokumentieren, was f&uuml;r ein
      * Ergebnis zur&uuml;ckgeliefert wird. </p>
