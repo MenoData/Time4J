@@ -28,6 +28,11 @@ import java.util.Set;
 
 
 /**
+ * <p>Allows a flexible interpretation of symbols in format patterns. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Erlaubt eine flexible Interpretation von Symbolen in Formatmustern. </p>
  *
  * @author  Meno Hochschild
@@ -37,6 +42,17 @@ public interface ChronoPattern {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Registers a format symbol. </p>
+     *
+     * @param   builder     serves for construction of {@code ChronoFormatter}
+     * @param   locale      current language- and country setting
+     * @param   symbol      pattern symbol to be interpreted
+     * @param   count       count of symbols in format pattern
+     * @return  set of elements which will replace other already registered
+     *          elements of same name after pattern processing
+     * @throws  IllegalArgumentException if symbol resolution fails
+     */
+    /*[deutsch]
      * <p>Registriert ein Formatsymbol. </p>
      *
      * @param   builder     serves for construction of {@code ChronoFormatter}
