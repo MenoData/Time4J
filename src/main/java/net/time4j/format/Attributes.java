@@ -45,6 +45,13 @@ import static net.time4j.format.Leniency.STRICT;
 
 
 /**
+ * <p>A collection of format attributes for controlling the formatting
+ * and parsing. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Formatattribute zum Steuern des Format- und Interpretierungsvorgangs. </p>
  *
  * @author      Meno Hochschild
@@ -56,6 +63,11 @@ public final class Attributes
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Attribute for the calendar type. </p>
+     *
+     * <p>Default value: {@link CalendarText#ISO_CALENDAR_TYPE} </p>
+     */
+    /*[deutsch]
      * <p>Gibt den Kalendertyp an. </p>
      *
      * <p>Standardwert: {@link CalendarText#ISO_CALENDAR_TYPE} </p>
@@ -64,6 +76,12 @@ public final class Attributes
         PredefinedKey.valueOf("CALENDAR_TYPE", String.class);
 
     /**
+     * <p>Attribute controlling the language output and parsing of
+     * chronological texts (for example month names). </p>
+     *
+     * <p>Default value: {@code Locale.ROOT}. </p>
+     */
+    /*[deutsch]
      * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
      * Sprachausgabe von chronologischen Texten (Beispiel Monatsnamen)
      * steuert. </p>
@@ -74,29 +92,70 @@ public final class Attributes
         PredefinedKey.valueOf("LANGUAGE", Locale.class);
 
     /**
+     * <p>Attribute for the timezone identifier. </p>
+     *
+     * <p>If this attribute is missing then Time4J will assume the default
+     * system timezone in lax mode. The attribute value also serves as
+     * replacement timezone if the parsing has not recognized any
+     * timezone. </p>
+     * 
+     * @see     net.time4j.tz.Timezone.ofSystem()
+     */
+    /*[deutsch]
      * <p>Gibt die Zeitzonen-ID an. </p>
      *
      * <p>Fehlt das Attribut, wird im laxen Modus die System-Zeitzone
      * angenommen. Das Attribut dient auch als Ersatzwert, wenn beim Parsen
      * keine Zeitzone erkannt worden ist. </p>
+     * 
+     * @see     net.time4j.tz.Timezone.ofSystem()
      */
     public static final AttributeKey<TZID> TIMEZONE_ID =
         PredefinedKey.valueOf("TIMEZONE_ID", TZID.class);
 
     /**
+     * <p>Attribute for the conflict strategy to be used in resolving
+     * ambivalent or invalid local timestamps. </p>
+     *
+     * <p>If this attribute is missing then Time4J will assume the default
+     * conflict strategy. </p>
+     * 
+     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY 
+     */
+    /*[deutsch]
      * <p>Gibt die Konfliktstrategie an, die bei der Aufl&ouml;sung von nicht
      * eindeutigen lokalen Zeitstempeln zu verwenden ist. </p>
      *
      * <p>Fehlt das Attribut, wird eine Standardstrategie angenommen. </p>
+     * 
+     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY 
      */
     public static final AttributeKey<TransitionStrategy> TRANSITION_STRATEGY =
         PredefinedKey.valueOf("TRANSITION_STRATEGY", TransitionStrategy.class);
 
     /**
-     * <p>Gibt den allgemeinen Parse-Modus an. </p>
+     * <p>Attribute which controls the leniency in parsing. </p>
      *
-     * <p>Das Setzen dieses Attributs beeinflu&szlig;t auch die Attribute
-     * {@link #PARSE_CASE_INSENSITIVE} und {@link #PARSE_PARTIAL_COMPARE}: </p>
+     * <p>Setting of this attribute also changes other attributes: </p>
+     *
+     * <table border="1" style="margin-top:5px;">
+     *  <tr>
+     *      <th>LENIENCY</th>
+     *      <th>PARSE_CASE_INSENSITIVE</th>
+     *      <th>PARSE_PARTIAL_COMPARE</th>
+     *      <th>TRAILING_CHARACTERS</th></tr>
+     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td></tr>
+     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td></tr>
+     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td></tr>
+     * </table>
+     *
+     * <p>Default value: {@link Leniency#SMART} </p>
+     */
+    /*[deutsch]
+     * <p>Legt den Nachsichtigkeitsmodus beim Parsen fest. </p>
+     *
+     * <p>Das Setzen dieses Attributs beeinflu&szlig;t auch andere
+     * Attribute: </p>
      *
      * <table border="1" style="margin-top:5px;">
      *  <tr>
@@ -115,6 +174,11 @@ public final class Attributes
         PredefinedKey.valueOf("LENIENCY", Leniency.class);
 
     /**
+     * <p>Determines the text width to be used in formatting and parsing. </p>
+     *
+     * <p>Default value: {@link TextWidth#WIDE} </p>
+     */
+    /*[deutsch]
      * <p>Gibt die verwendete Textbreite an. </p>
      *
      * <p>Standardwert: {@link TextWidth#WIDE} </p>
@@ -123,6 +187,12 @@ public final class Attributes
         PredefinedKey.valueOf("TEXT_WIDTH", TextWidth.class);
 
     /**
+     * <p>Determines the output context to be used in formatting and
+     * parsing. </p>
+     *
+     * <p>Default value: {@link OutputContext#FORMAT} </p>
+     */
+    /*[deutsch]
      * <p>Gibt den verwendeten Ausgabekontext an. </p>
      *
      * <p>Standardwert: {@link OutputContext#FORMAT} </p>
@@ -131,8 +201,14 @@ public final class Attributes
         PredefinedKey.valueOf("OUTPUT_CONTEXT", OutputContext.class);
 
     /**
+     * <p>This attribute controls if the case of text is irrelevant
+     * in parsing or not. </p>
+     *
+     * <p>Default value: {@code true} </p>
+     */
+    /*[deutsch]
      * <p>Steuert, ob beim Parsen die Gro&szlig;- und Kleinschreibung
-     * au&szlig;er Acht gelassen werden soll? </p>
+     * au&szlig;er Acht gelassen werden soll. </p>
      *
      * <p>Standardwert: {@code true} </p>
      */
@@ -140,8 +216,15 @@ public final class Attributes
         PredefinedKey.valueOf("PARSE_CASE_INSENSITIVE", Boolean.class);
 
     /**
+     * <p>This attribute controls if the parser will only check the
+     * start of a chronological text. </p>
+     *
+     * <p>Abbreviations can be parsed by help of this attribute, too.
+     * Default value:: {@code false} </p>
+     */
+    /*[deutsch]
      * <p>Steuert, ob beim Parsen nur Textanf&auml;nge gepr&uuml;ft werden
-     * sollen? </p>
+     * sollen. </p>
      *
      * <p>Mit diesem Attribut k&ouml;nnen auch Abk&uuml;rzungen noch
      * sinnvoll interpretiert werden. Standardwert: {@code false} </p>
@@ -150,6 +233,13 @@ public final class Attributes
         PredefinedKey.valueOf("PARSE_PARTIAL_COMPARE", Boolean.class);
 
     /**
+     * <p>Determines the unicode char for the zero digit.. </p>
+     *
+     * <p>In case of changing the language setting this attribute will
+     * automatically be adjusted. Default value is the arab digit
+     * {@code 0} in ISO-8601 (corresponding to the ASCII-value 48). </p>
+     */
+    /*[deutsch]
      * <p>Legt das Unicode-Zeichen f&uuml;r die Null-Ziffer fest. </p>
      *
      * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung
@@ -160,6 +250,15 @@ public final class Attributes
         PredefinedKey.valueOf("ZERO_DIGIT", Character.class);
 
     /**
+     * <p>Determines the unicode char for the decimal separator. </p>
+     *
+     * <p>In case of changing the language setting this attribute will
+     * automatically be adjusted. Default value is the comma in ISO-8601
+     * corresponding to the ASCII-value 44. With help of the boolean
+     * system property &quot;net.time4j.format.iso.decimal.dot&quot;,
+     * the dot can be defined as alternative default value. </p>
+     */
+    /*[deutsch]
      * <p>Legt das Unicode-Zeichen f&uuml;r das Dezimaltrennzeichen fest. </p>
      *
      * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung
@@ -172,6 +271,13 @@ public final class Attributes
         PredefinedKey.valueOf("DECIMAL_SEPARATOR", Character.class);
 
     /**
+     * <p>Determines the pad char to be used if a formatted representation is
+     * shorter than specified. </p>
+     *
+     * <p>Default value is the space. Numerical elements are not affected
+     * by this attribute because they always use the zero digit as pad char. </p>
+     */
+    /*[deutsch]
      * <p>Legt das F&uuml;llzeichen in Textelementen fest, das verwendet wird,
      * wenn eine formatierte Darstellung k&uuml;rzer als mindestens angegeben
      * ist. </p>
@@ -184,6 +290,16 @@ public final class Attributes
         PredefinedKey.valueOf("PAD_CHAR", Character.class);
 
     /**
+     * <p>Determines the pivot year for the representation of 
+     * two-digit-years. </p>
+     *
+     * <p>Default value is the year which is 20 years after the current
+     * year. Example: If the pivot year has the value {@code 2034} then
+     * a two-digit-year will be mapped to the range 1934-2033 such that
+     * the last two digits are equal. This attribute must have at least
+     * three digits an be positive else an exception will be thrown. </p>
+     */
+    /*[deutsch]
      * <p>Legt das Kippjahr zur zweistelligen Darstellung von Jahreselementen
      * fest. </p>
      *
@@ -198,6 +314,28 @@ public final class Attributes
         PredefinedKey.valueOf("PIVOT_YEAR", Integer.class);
 
     /**
+     * <p>Controls if any trailing unparsed characters will be
+     * tolerated or not. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  ChronoFormatter formatter =
+     *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+     *      .addInteger(PlainTime.CLOCK_HOUR_OF_AMPM, 1, 2)
+     *      .addLiteral(' ')
+     *      .addText(PlainTime.AM_PM_OF_DAY)
+     *      .padPrevious(3)
+     *      .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
+     *      .build()
+     *      .with(Attributes.TRAILING_CHARACTERS, true);
+     *  System.out.println(formatter.parse("5 PM 45xyz"));
+     *  // Output: T17:45
+     * </pre>
+     *
+     * <p>Default value: {@code false} </p>
+     */
+    /*[deutsch]
      * <p>Steuert, ob beim Parsen verbleibende Zeichen der Texteingabe
      * toleriert werden. </p>
      *
@@ -297,6 +435,11 @@ public final class Attributes
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Represents an empty collection of format attributes. </p>
+     *
+     * @return  empty attribute query
+     */
+    /*[deutsch]
      * <p>Repr&auml;sentiert eine leere Menge von Formatattributen. </p>
      *
      * @return  empty attribute query
@@ -344,6 +487,9 @@ public final class Attributes
     }
 
     /**
+     * <p>Compares all internal format attributes. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht auf Basis aller internen Formatattribute. </p>
      */
     @Override
@@ -360,7 +506,7 @@ public final class Attributes
 
     }
 
-    /**
+    /*[deutsch]
      * <p>Berechnet den Hash-Code. </p>
      */
     @Override
@@ -371,6 +517,9 @@ public final class Attributes
     }
 
     /**
+     * <p>Supports mainly debugging. </p>
+     */
+    /*[deutsch]
      * <p>Dient vorwiegend der Debugging-Unterst&uuml;tzung. </p>
      */
     @Override
@@ -430,6 +579,9 @@ public final class Attributes
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Builds a collection of format attributes. </p>
+     */
+    /*[deutsch]
      * <p>Baut eine Menge von Formatattributen. </p>
      */
     public static final class Builder {
@@ -443,7 +595,10 @@ public final class Attributes
         //~ Konstruktoren -------------------------------------------------
 
         /**
-         * <p>Konstruktor. </p>
+         * <p>Default constructor. </p>
+         */
+        /*[deutsch]
+         * <p>Standard-Konstruktor. </p>
          */
         public Builder() {
             super();
@@ -458,6 +613,12 @@ public final class Attributes
          * @param   calendarType    calendar type for resource lookup
          * @return  this instance for method chaining
          */
+        /*[deutsch]
+         * <p>Legt den Kalendertyp fest. </p>
+         *
+         * @param   calendarType    calendar type for resource lookup
+         * @return  this instance for method chaining
+         */
         public Builder setCalendarType(String calendarType) {
 
             this.setInternal(CALENDAR_TYPE, calendarType);
@@ -466,6 +627,13 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets the language. </p>
+         *
+         * @param   locale      new language setting
+         * @return  this instance for method chaining
+         * @see     #LANGUAGE
+         */
+        /*[deutsch]
          * <p>Setzt die Spracheinstellung. </p>
          *
          * @param   locale      new language setting
@@ -486,6 +654,13 @@ public final class Attributes
          * @return  this instance for method chaining
          * @see     #TIMEZONE_ID
          */
+        /*[deutsch]
+         * <p>Setzt die Zeitzonenreferenz. </p>
+         *
+         * @param   tzid        timezone id
+         * @return  this instance for method chaining
+         * @see     #TIMEZONE_ID
+         */
         public Builder setTimezone(TZID tzid) {
 
             this.setInternal(TIMEZONE_ID, tzid);
@@ -500,6 +675,13 @@ public final class Attributes
          * @see     #TIMEZONE_ID
          * @see     Timezone#ofSystem()
          */
+        /*[deutsch]
+         * <p>Legt die Systemzeitzone als Zeitzonenreferenz fest. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     #TIMEZONE_ID
+         * @see     Timezone#ofSystem()
+         */
         public Builder setStdTimezone() {
 
             return this.setTimezone(Timezone.ofSystem().getID());
@@ -507,6 +689,13 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets an attribute of {@code boolean}-type. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Setzt ein Formatattribut vom {@code boolean}-Typ. </p>
          *
          * @param   key     attribute key
@@ -524,11 +713,20 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets an attribute of {@code int}-type. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if an invalid pivot year is given
+         */
+        /*[deutsch]
          * <p>Setzt ein Formatattribut vom {@code int}-Typ. </p>
          *
          * @param   key     attribute key
          * @param   value   attribute value
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if an invalid pivot year is given
          */
         public Builder set(
             AttributeKey<Integer> key,
@@ -549,6 +747,13 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets an attribute of {@code char}-type. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Setzt ein Formatattribut vom {@code char}-Typ. </p>
          *
          * @param   key     attribute key
@@ -566,6 +771,14 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets an attribute of {@code enum}-type. </p>
+         *
+         * @param   <A> generic type of attribute
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Setzt ein Formatattribut vom {@code enum}-Typ. </p>
          *
          * @param   <A> generic type of attribute
@@ -616,6 +829,15 @@ public final class Attributes
         }
 
         /**
+         * <p>Accepts all given attributes. </p>
+         *
+         * <p>If an attribute already exists then it will
+         * be overridden. </p>
+         *
+         * @param   attributes      format attributes
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>&Uuml;bernimmt alle angegebenen Attribute. </p>
          *
          * <p>Existiert ein Formatattribut schon, wird es
@@ -638,6 +860,13 @@ public final class Attributes
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given attribute is internal
          */
+        /*[deutsch]
+         * <p>Entfernt das angegebene Attribut. </p>
+         *
+         * @param   key     attribute key to be removed
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given attribute is internal
+         */
         public Builder remove(AttributeKey<?> key) {
 
             String name = key.name();
@@ -653,6 +882,11 @@ public final class Attributes
         }
 
         /**
+         * <p>Creates a new unmodifiable collection of format attributes. </p>
+         *
+         * @return  new instance of {@code Attributes}
+         */
+        /*[deutsch]
          * <p>Erzeugt eine neue unver&auml;nderliche Instanz der
          * Formatattribute. </p>
          *
