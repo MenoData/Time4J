@@ -52,6 +52,23 @@ import static net.time4j.format.TextWidth.SHORT;
 
 
 /**
+ * <p>Source for localized calendrical informations on enum basis like month
+ * or weekday names. </p>
+ *
+ * <p>This class is a facade for an underlying implementation of
+ * {@code CalendarText.Provider} which will be loaded as SPI-interface
+ * by helpf of a {@code ServiceLoader}. If no such SPI-interface can be
+ * found then this class will resort to the sources of JDK (usually
+ * as wrapper around {@code java.text.DateFormatSymbols}). </p>
+ *
+ * <p>Furthermore, an instance of {@code CalendarText} can also access
+ * the UTF-8 text resources in the folder &quot;data&quot; relative to 
+ * the class path which are not based on JDK-defaults. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Quelle f&uuml;r lokalisierte kalendarische Informationen auf Enum-Basis
  * wie zum Beispiel Monats- oder Wochentagsnamen. </p>
  *
@@ -73,6 +90,9 @@ public final class CalendarText {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Default calendar type for all ISO systems. </p>
+     */
+    /*[deutsch]
      * <p>Standard-Kalendertyp f&uuml;r alle ISO-Systeme. </p>
      */
     public static final String ISO_CALENDAR_TYPE = "iso8601";
@@ -198,6 +218,14 @@ public final class CalendarText {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns an instance of {@code CalendarText} for given chronology
+     * and language. </p>
+     *
+     * @param   chronology  chronology (with calendar system)
+     * @param   locale      language
+     * @return  {@code CalendarText} object maybe cached
+     */
+    /*[deutsch]
      * <p>Gibt eine Instanz dieser Klasse f&uuml;r die angegebene Chronologie
      * und Sprache zur&uuml;ck. </p>
      *
@@ -215,7 +243,16 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Gibt eine Instanz dieser Klasse f&uuml;r die angegebene Chronologie
+     * <p>Returns an instance of {@code CalendarText} for given calendar type
+     * and language. </p>
+     *
+     * @param   calendarType    name of calendar system
+     * @param   locale          language
+     * @return  {@code CalendarText} object maybe cached
+     * @see     CalendarType
+     */
+    /*[deutsch]
+     * <p>Gibt eine Instanz dieser Klasse f&uuml;r Kalendertyp
      * und Sprache zur&uuml;ck. </p>
      *
      * @param   calendarType    name of calendar system
@@ -287,7 +324,23 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Standard-Monatsnamen. </p>
+     * <p>Yields an {@code Accessor} for all standard months. </p>
+     *
+     * <p>The underlying list is sorted such that it will obey to the
+     * typical order of months in given calendar system. ISO-systems
+     * define January as first month and at whole 12 months. Other
+     * calendar systems can also define for example 13 months. The order
+     * of element value enums must be in agreement with the order of
+     * the text forms contained here. </p>
+     *
+     * @param   textWidth       text width of displayed month name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for standard month names
+     * @see     net.time4j.Month
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Standard-Monatsnamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
      * Kalendersystem typische Reihenfolge der Monate eingehalten wird.
@@ -311,14 +364,22 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Namen von Schaltmonaten. </p>
+     * <p>Yields an {@code Accessor} for all months if a leap month
+     * is relevant. </p>
      *
-     * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
-     * Kalendersystem typische Reihenfolge der Monate eingehalten wird.
-     * ISO-Systeme definieren den Januar als den ersten Monat und insgesamt
-     * 12 Monate. Andere Kalendersysteme k&ouml;nnen auch 13 Monate definieren.
-     * Die Reihenfolge der Elementwert-Enums mu&szlig; mit der Reihenfolge der
-     * hier enthaltenen Textformen &uuml;bereinstimmen. </p>
+     * <p>Note: Leap months are defined in some calendar systems like the
+     * hebrew calendar (&quot;Adar II&quot;) else there is no difference
+     * between standard and leap months escpecially not in ISO-8601. </p>
+     *
+     * @param   textWidth       text width of displayed month name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for month names
+     * @see     net.time4j.Month
+     * @see     #getStdMonths(TextWidth, OutputContext)
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Monatsnamen, wenn ein Schaltmonat relevant ist. </p>
      *
      * <p>Hinweis: Schaltmonate sind in einigen Kalendersystemen wie dem
      * hebr&auml;ischen Kalender definiert (&quot;Adar II&quot;). Ansonsten
@@ -329,6 +390,7 @@ public final class CalendarText {
      * @param   outputContext   output context (stand-alone?)
      * @return  accessor for month names
      * @see     net.time4j.Month
+     * @see     #getStdMonths(TextWidth, OutputContext)
      */
     public Accessor getLeapMonths(
         TextWidth textWidth,
@@ -340,7 +402,21 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Quartalsnamen. </p>
+     * <p>Yields an {@code Accessor} for all quarter years. </p>
+     *
+     * <p>The underlying list of text forms is sorted in the same order
+     * as the enum {@code Quarter} and uses its ordinal index as list
+     * index. ISO systems define the range January-March as first quarter
+     * etc. and at whole four quarters per calendar year. </p>
+     *
+     * @param   textWidth       text width of displayed quarter name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for quarter names
+     * @see     net.time4j.Quarter
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Quartalsnamen. </p>
      *
      * <p>Die Liste ist wie das Enum {@code Quarter} sortiert und verwendet
      * dessen Ordinalindex als Listenindex. ISO-Systeme definieren den
@@ -362,15 +438,32 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Wochentagsnamen. </p>
+     * <p>Yields an {@code Accessor} for all weekday names. </p>
+     *
+     * <p>The underlying list of text forms is sorted such that the
+     * typical order of weekdays is used in given calendar system.
+     * ISO systems define Monday as first day of week and at whole
+     * 7 weekdays. This order is also valid for US in the context of
+     * this class although in US Sunday is considered as start of a
+     * week. The order element value enums must be in agreement with
+     * the order of text forms contained here. </p>
+     *
+     * @param   textWidth       text width of displayed weekday name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for weekday names
+     * @see     net.time4j.Weekday
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Wochentagsnamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
      * Kalendersystem typische Reihenfolge der Wochentage eingehalten wird.
      * ISO-Systeme definieren den Montag als den ersten Wochentag und insgesamt
-     * 7 Wochentage. Diese Sortierung gilt hier auch f&uuml;r die USA, in
-     * denen der Sonntag als erster Tag der Woche gilt. Die Reihenfolge der
-     * Elementwert-Enums mu&szlig; mit der Reihenfolge der hier enthaltenen
-     * Textformen &uuml;bereinstimmen. </p>
+     * 7 Wochentage. Diese Sortierung gilt im Kontext dieser Klasse auch
+     * f&uuml;r die USA, in denen der Sonntag als erster Tag der Woche gilt.
+     * Die Reihenfolge der Elementwert-Enums mu&szlig; mit der Reihenfolge
+     * der hier enthaltenen Textformen &uuml;bereinstimmen. </p>
      *
      * @param   textWidth       text width of displayed weekday name
      * @param   outputContext   output context (stand-alone?)
@@ -387,7 +480,24 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller &Auml;ranamen. </p>
+     * <p>Yields an {@code Accessor} for all era names. </p>
+     *
+     * <p>The underlying list of text forms is sorted such that the
+     * typical order of eras is used in given calendar system. ISO systems
+     * define era names based on their historical extensions (eras of
+     * gregorian/historic calendar) because they themselves have no internal
+     * concept of eras. The order of element value enums must be in agreement
+     * with the text forms contained here. If an era is not defined on enum
+     * basis then the format API will not evaluate this class but the
+     * {@code CalendarSystem} to get the right text forms. </p>
+     *
+     * @param   textWidth       text width of displayed era name
+     * @return  accessor for era names
+     * @see     net.time4j.engine.CalendarSystem#getEras()
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * &Auml;ranamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
      * Kalendersystem typische Reihenfolge der &Auml;ranamen  eingehalten wird.
@@ -410,7 +520,18 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Tagesperiodennamen (AM/PM). </p>
+     * <p>Yields an {@code Accessor} for all am/pm-names. </p>
+     *
+     * <p>The underlying list of text forms is sorted in AM-PM-order.
+     * The order of element value enums must be the same. </p>
+     *
+     * @param   textWidth       text width of displayed AM/PM name
+     * @return  accessor for AM/PM names
+     * @see     net.time4j.Meridiem
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Tagesabschnittsnamen. </p>
      *
      * <p>Die Liste ist in AM/PM-Reihenfolge sortiert. Die Reihenfolge der
      * Elementwert-Enums mu&szlig; mit der Reihenfolge der hier enthaltenen
@@ -427,7 +548,37 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Textformen des angegebenen
+     * <p>Yields an {@code Accessor} for all text forms of given
+     * chronological element. </p>
+     *
+     * <p>Text forms might exist in different variations. In case of
+     * enum-based variants the name of the enum (example &quot;WIDE&quot; in
+     * the variant {@code TextWidth}) is to be used, in case of boolean-based
+     * variants the literals &quot;true&quot; and &quot;false&quot; are to be
+     * used. </p>
+     *
+     * <p>While the methods {@code getStdMonths()}, {@code getWeekdays()}
+     * etc.are mainly based on JDK-defaults, this method is escpecially
+     * designed for querying chronological texts which are not contained in
+     * JDK. Text forms will be stored internally in the resource folder
+     * &quot;data&quot; relative to class path in properties-files using
+     * UTF-8 encoding. The basic name of these resources is the calendar type.
+     * The combination of element name and optionally variants in the form 
+     * &quot;(variant1|variant2|...|variantN)&quot; and the underscore and
+     * finally a numerical suffix with base 1 serves as resource text key.
+     * If there is no entry for given key in the resources then this method
+     * will simply yield the name of enum value associated with given element
+     * value. </p>
+     *
+     * @param   <V> generic type of element values based on enums
+     * @param   element     element text forms are searched for
+     * @param   variants    text form variants (optional)
+     * @return  accessor for any text forms
+     * @throws  MissingResourceException if for given calendar type there are
+     *          no text resource files
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle Textformen des angegebenen
      * chronologischen Elements. </p>
      *
      * <p>Textformen k&ouml;nnen unter Umst&auml;nden in verschiedenen
@@ -436,15 +587,15 @@ public final class CalendarText {
      * der Variante {@code TextWidth}), im boolean-Fall sind die Literale
      * &quot;true&quot; und &quot;false&quot; zu verwenden. </p>
      *
-     * <p>W&auml;hrend die Methoden {@code getMonths()}, {@code getWeekdays()}
+     * <p>W&auml;hrend die Methoden {@code getStdMonths()}, {@code getWeekdays()}
      * etc. in erster Linie auf JDK-Vorgaben beruhen, dient diese Methode dazu,
      * chronologiespezifische Texte zu beschaffen, die nicht im JDK enthalten
-     * sind. Textformen werden intern im Ressourcenverzeichnis des Klassenpfads
-     * mit Hilfe von properties-Dateien im UTF-8-Format gespeichert. Der
-     * Basisname dieser Ressourcen ist der Kalendertyp. Als Textschluuml;ssel
-     * dient die Kombination aus Elementname, optional Varianten in der Form
-     * &quot;(variant1|variant2|...|variantN)&quot;, dem Unterstrich und
-     * schlie&szlig;lich einem numerischen Suffix mit Basis 1. Wird in den
+     * sind. Textformen werden intern im Ressourcenverzeichnis &quot;data&quot;
+     * des Klassenpfads mit Hilfe von properties-Dateien im UTF-8-Format
+     * gespeichert. Der Basisname dieser Ressourcen ist der Kalendertyp. Als
+     * Textschluuml;ssel dient die Kombination aus Elementname, optional Varianten
+     * in der Form &quot;(variant1|variant2|...|variantN)&quot;, dem Unterstrich
+     * und schlie&szlig;lich einem numerischen Suffix mit Basis 1. Wird in den
      * Ressourcen zum angegebenen Schl&uuml;ssel kein Eintrag gefunden, liefert
      * diese Methode einfach den Namen des mit dem Element assoziierten
      * enum-Werts. </p>
@@ -512,6 +663,12 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Yields the localized GMT-prefix which is used in the
+     * <i>localized GMT format</i> of CLDR. </p>
+     *
+     * @return  localized GMT-String defaults to &quot;GMT&quot;
+     */
+    /*[deutsch]
      * <p>Liefert das lokalisierte GMT-Pr&auml;fix, das im
      * <i>localized GMT format</i> von CLDR benutzt wird. </p>
      *
@@ -530,6 +687,9 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Yields the name of the internal {@code CalendarText.Provider}. </p>
+     */
+    /*[deutsch]
      * <p>Liefert den Namen des internen {@code CalendarText.Provider}. </p>
      */
     @Override
@@ -540,6 +700,12 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Clears the internal cache. </p>
+     *
+     * <p>This method should be called if the internal text resources have
+     * changed and must be reloaded with a suitable {@code ClassLoader}. </p>
+     */
+    /*[deutsch]
      * <p>L&ouml;scht den internen Cache. </p>
      *
      * <p>Diese Methode sollte aufgerufen werden, wenn sich die internen
@@ -654,6 +820,20 @@ public final class CalendarText {
     //~ Innere Interfaces -------------------------------------------------
 
     /**
+     * <p>This <strong>SPI-interface</strong> enables the access to calendrical
+     * standard text informations and will be instantiated by a
+     * {@code ServiceLoader}-mechanism. </p>
+     *
+     * <p>The motivation is mainly to override the language-dependent forms
+     * of JDK-defaults with respect to standard elements like months, weekdays
+     * etc. Specific text forms which are not contained in JDK will instead
+     * be supplied by help of property filed in the &quot;data&quot;-folder. </p>
+     *
+     * @author  Meno Hochschild
+     * @spec    Implementations must have a public no-arg constructor.
+     * @see     java.util.ServiceLoader
+     */
+    /*[deutsch]
      * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
      * auf kalendarische Standard-Textinformationen und wird &uuml;ber einen
      * {@code ServiceLoader}-Mechanismus instanziert. </p>
@@ -673,14 +853,25 @@ public final class CalendarText {
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Defines the supported calendar types. </p>
+         *
+         * @return  String-array with calendar types
+         * @see     CalendarType
+         */
+        /*[deutsch]
          * <p>Definiert die unterst&uuml;tzten Kalendertypen. </p>
          *
          * @return  String-array with calendar types
-         * @see     net.time4j.format.CalendarType
+         * @see     CalendarType
          */
         String[] getSupportedCalendarTypes();
 
         /**
+         * <p>Yields the supported languages. </p>
+         *
+         * @return  Locale-array
+         */
+        /*[deutsch]
          * <p>Gibt die unterst&uuml;tzten Sprachen an. </p>
          *
          * @return  Locale-array
@@ -688,7 +879,18 @@ public final class CalendarText {
         Locale[] getAvailableLocales();
 
         /**
-         * <p>Siehe {@link CalendarText#getMonths}. </p>
+         * <p>See {@link CalendarText#getStdMonths}. </p>
+         *
+         * @param   calendarType    calendar type
+         * @param   locale          language of text output
+         * @param   textWidth       text width
+         * @param   outputContext   output context
+         * @param   leapForm        use leap form (for example the hebrew
+         *                          month &quot;Adar II&quot;)?
+         * @return  unmodifiable sorted array of month names
+         */
+        /*[deutsch]
+         * <p>Siehe {@link CalendarText#getStdMonths}. </p>
          *
          * @param   calendarType    calendar type
          * @param   locale          language of text output
@@ -707,6 +909,15 @@ public final class CalendarText {
         );
 
         /**
+         * <p>See {@link CalendarText#getQuarters}. </p>
+         *
+         * @param   calendarType    calendar type
+         * @param   locale          language of text output
+         * @param   textWidth       text width
+         * @param   outputContext   output context
+         * @return  unmodifiable sorted array of quarter names
+         */
+        /*[deutsch]
          * <p>Siehe {@link CalendarText#getQuarters}. </p>
          *
          * @param   calendarType    calendar type
@@ -723,6 +934,16 @@ public final class CalendarText {
         );
 
         /**
+         * <p>See {@link CalendarText#getWeekdays}. </p>
+         *
+         * @param   calendarType    calendar type
+         * @param   locale          language of text output
+         * @param   textWidth       text width
+         * @param   outputContext   output context
+         * @return  unmodifiable sorted array of weekday names
+         *          in calendar specific order (ISO-8601 starts with monday)
+         */
+        /*[deutsch]
          * <p>Siehe {@link CalendarText#getWeekdays}. </p>
          *
          * @param   calendarType    calendar type
@@ -740,6 +961,14 @@ public final class CalendarText {
         );
 
         /**
+         * <p>See {@link CalendarText#getEras}. </p>
+         *
+         * @param   calendarType    calendar type
+         * @param   locale          language of text output
+         * @param   textWidth       text width
+         * @return  unmodifiable sorted array of era names
+         */
+        /*[deutsch]
          * <p>Siehe {@link CalendarText#getEras}. </p>
          *
          * @param   calendarType    calendar type
@@ -754,6 +983,14 @@ public final class CalendarText {
         );
 
         /**
+         * <p>See {@link CalendarText#getMeridiems}. </p>
+         *
+         * @param   calendarType    calendar type
+         * @param   locale          language of text output
+         * @param   textWidth       text width
+         * @return  unmodifiable sorted array of AM/PM-names
+         */
+        /*[deutsch]
          * <p>Siehe {@link CalendarText#getMeridiems}. </p>
          *
          * @param   calendarType    calendar type
@@ -772,6 +1009,13 @@ public final class CalendarText {
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Supplies an access to the internal name list of an enum-based
+     * element value. </p>
+     *
+     * @author      Meno Hochschild
+     * @concurrency <immutable>
+     */
+    /*[deutsch]
      * <p>Stellt einen Zugriff auf die enthaltenen Namen per Elementwert-Enum
      * bereit. </p>
      *
@@ -802,6 +1046,15 @@ public final class CalendarText {
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Prints the given element value as String. </p>
+         *
+         * <p>If the element value has no localized representation then this
+         * method will simply print the enum name. </p>
+         *
+         * @param   value   current value of element
+         * @return  localized text form
+         */
+        /*[deutsch]
          * <p>Stellt den angegebenen Elementwert als String dar. </p>
          *
          * <p>Hat der Elementwert keine lokalisierte Darstellung, wird einfach
@@ -823,6 +1076,19 @@ public final class CalendarText {
         }
 
         /**
+         * <p>Interpretes given text form as enum-based element value. </p>
+         *
+         * <p>Parsing is case-insensitive. No partial compare is performed,
+         * instead the whole element text will be evaluated. </p>
+         *
+         * @param   <V> generic value type of element
+         * @param   parseable       text to be parsed
+         * @param   status          current parsing position
+         * @param   valueType       value class of element
+         * @return  element value (as enum) or {@code null} if not found
+         * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
+         */
+        /*[deutsch]
          * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung ist nicht relevant. Es
@@ -846,6 +1112,21 @@ public final class CalendarText {
         }
 
         /**
+         * <p>Interpretes given text form as enum-based element value. </p>
+         *
+         * <p>The attributes {@code Attributes.PARSE_CASE_INSENSITIVE} and
+         * {@code Attributes.PARSE_PARTIAL_COMPARE} will be evaluated. </p>
+         *
+         * @param   <V> generic value type of element
+         * @param   parseable       text to be parsed
+         * @param   status          current parsing position
+         * @param   valueType       value class of element
+         * @param   attributes      format attributes
+         * @return  element value (as enum) or {@code null} if not found
+         * @see     Attributes#PARSE_CASE_INSENSITIVE
+         * @see     Attributes#PARSE_PARTIAL_COMPARE
+         */
+        /*[deutsch]
          * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
          *
          * <p>Es werden die Attribute {@code Attributes.PARSE_CASE_INSENSITIVE}
@@ -877,6 +1158,32 @@ public final class CalendarText {
                     .booleanValue();
             return this.parse(
                 parseable, status, valueType, caseInsensitive, partialCompare);
+
+        }
+
+        /**
+         * <p>Supports mainly debugging. </p>
+         */
+        /*[deutsch]
+         * <p>Dient im wesentlichen Debugging-Zwecken. </p>
+         */
+        @Override
+        public String toString() {
+
+            int n = this.textForms.size();
+            StringBuilder sb = new StringBuilder(n * 16 + 2);
+            sb.append('{');
+            boolean first = true;
+            for (int i = 0; i < n; i++) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(',');
+                }
+                sb.append(this.textForms.get(i));
+            }
+            sb.append('}');
+            return sb.toString();
 
         }
 
@@ -944,29 +1251,6 @@ public final class CalendarText {
             }
 
             return candidate;
-
-        }
-
-        /**
-         * <p>Dient im wesentlichen Debugging-Zwecken. </p>
-         */
-        @Override
-        public String toString() {
-
-            int n = this.textForms.size();
-            StringBuilder sb = new StringBuilder(n * 16 + 2);
-            sb.append('{');
-            boolean first = true;
-            for (int i = 0; i < n; i++) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(',');
-                }
-                sb.append(this.textForms.get(i));
-            }
-            sb.append('}');
-            return sb.toString();
 
         }
 
