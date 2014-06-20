@@ -25,6 +25,13 @@ import net.time4j.engine.ChronoElement;
 
 
 /**
+ * <p>Represents a position information of a chronological element
+ * with a formatted text. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine Positionsinformation eines chronologischen
  * Elements in einem formatierten Text. </p>
  *
@@ -42,6 +49,21 @@ public final class ElementPosition {
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Creates a new instance of an {@code ElementPosition}. </p>
+     *
+     * <p>The section {@code text.substring(startIndex, endIndex)} of the
+     * formatted text referring to given element denotes the
+     * element-specific text. </p>
+     *
+     * @param   element     chronological element
+     * @param   startIndex  index in formatted text which indicates the
+     *                      starting position of associated element (inclusive)
+     * @param   endIndex    index in formatted text which indicates the
+     *                      end position of associated element (exclusive)
+     * @throws  IllegalArgumentException if the start index is negative or
+     *          after the end index
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Instanz. </p>
      *
      * <p>Im formatierten Text, der dem angegebenen Element entspricht, ist der
@@ -85,6 +107,11 @@ public final class ElementPosition {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields the formatted chronolocial element. </p>
+     *
+     * @return  {@code ChronoElement}
+     */
+    /*[deutsch]
      * <p>Liefert das formatierte chronologische Element. </p>
      *
      * @return  {@code ChronoElement}
@@ -96,6 +123,11 @@ public final class ElementPosition {
     }
 
     /**
+     * <p>Yields the start index of associated formatted text. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
      * <p>Liefert den Startindex des assoziierten formatierten Texts. </p>
      *
      * @return  int
@@ -107,6 +139,11 @@ public final class ElementPosition {
     }
 
     /**
+     * <p>Yields the end index of associated formatted text. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
      * <p>Liefert den Endindex des assoziierten formatierten Texts. </p>
      *
      * @return  int
@@ -118,6 +155,9 @@ public final class ElementPosition {
     }
 
     /**
+     * <p>Compares element, start index and end index. </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht Element, Start- und Endindex. </p>
      */
     @Override
@@ -138,7 +178,7 @@ public final class ElementPosition {
 
     }
 
-    /**
+    /*[deutsch]
      * <p>Berechnet den Hash-Code. </p>
      */
     @Override
@@ -151,6 +191,9 @@ public final class ElementPosition {
     }
 
     /**
+     * <p>For debugging purposes. </p>
+     */
+    /*[deutsch]
      * <p>F&uuml;r Debugging-Zwecke. </p>
      */
     @Override
