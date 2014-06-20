@@ -23,6 +23,11 @@ package net.time4j.format;
 
 
 /**
+ * <p>Defines how lenient parsing of chronological texts should be. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Nachsichtigkeitsmodus beim Parsen von Text zu chronologischen Typen. </p>
  *
  * @author  Meno Hochschild
@@ -32,6 +37,19 @@ public enum Leniency {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Ensures that all range limits and other validity constraints will
+     * be strictly controlled. </p>
+     *
+     * <p>Exceeding the possibly context-dependent range of an element value
+     * will always throw an exception. </p>
+     *
+     * <p>A consistency check will be performed, too. That means all
+     * parsed informations must be consistent (for example the right
+     * weekday for a given calendar date). In parsing, the given limits
+     * for minimum and maximum count of chars to be interpreted will
+     * be checked, too. </p>
+     */
+    /*[deutsch]
      * <p>Stellt das strikte Einhalten von Wertbereichsgrenzen und anderen
      * G&uuml;ltigkeitseinschr&auml;nkungen sicher. </p>
      *
@@ -47,6 +65,16 @@ public enum Leniency {
     STRICT,
 
     /**
+     * <p>This default mode tries to be a compromise between a pedantic
+     * and a lax strategy by paying attention to value range constraints
+     * but neglecting some constraintes like the width of numerical
+     * elements. </p>
+     *
+     * <p>There is no consistency check like in strict mode. For example
+     * a wrong weekday will be ignored and the calendar date will just
+     * be interpreted on the base of year, month and day of month. </p>
+     */
+    /*[deutsch]
      * <p>Mit dieser Standardvorgabe wird versucht, einen Mittelweg zwischen
      * einer pedantischen und laxen Strategie zu w&auml;hlen, indem zwar auf
      * Wertbereichs&uuml;berschreitungen geachtet wird, aber bestimmte
@@ -60,6 +88,14 @@ public enum Leniency {
     SMART,
 
     /**
+     * <p>The parsed data will be interpreted without any consistency
+     * check or validation of range limits. </p>
+     *
+     * <p>This mode even tolerates values like the wall time &quot;T25:00&quot;
+     * or the invalid calendar date &quot;2014-02-31&quot; which will be
+     * interpreted with the suitable day overflow as &quot;2014-03-03&quot;. </p>
+     */
+    /*[deutsch]
      * <p>Die Daten werden beim ersten passenden Treffer ohne weitere
      * Konsistenzpr&uuml;fung interpretiert. </p>
      *
@@ -72,6 +108,11 @@ public enum Leniency {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Is this leniency mode strict? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Ist dieser Nachsichtigkeitsmodus strikt? </p>
      *
      * @return  boolean
@@ -83,6 +124,11 @@ public enum Leniency {
     }
 
     /**
+     * <p>Is this leniency mode <i>smart</i>? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Ist dieser Nachsichtigkeitsmodus <i>smart</i>? </p>
      *
      * @return  boolean
@@ -94,6 +140,11 @@ public enum Leniency {
     }
 
     /**
+     * <p>Is this leniency mode lax? </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Ist dieser Nachsichtigkeitsmodus lax? </p>
      *
      * @return  boolean
