@@ -23,6 +23,11 @@ package net.time4j.format;
 
 
 /**
+ * <p>Defines how many details will be displayed in chronological texts. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert Anzeigestile, wie detailliert chronologische Informationen
  * dargestellt werden. </p>
  *
@@ -32,16 +37,20 @@ public enum DisplayMode {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    /** Volle Anzeige mit maximalem Detailgehalt. */
+    /** Full display with maximum detailed content. */
+    /*[deutsch] Volle Anzeige mit maximalem Detailgehalt. */
     FULL,
 
-    /** Gespr&auml;chige Anzeige mit vielen Details. */
+    /** Verbose display with many details. */
+    /*[deutsch] Gespr&auml;chige Anzeige mit vielen Details. */
     LONG,
 
-    /** Normale Anzeige mit wenigen Details. */
+    /** Normal display with few details. */
+    /*[deutsch] Normale Anzeige mit wenigen Details. */
     MEDIUM,
 
-    /** Verk&uuml;rzte Anzeige, typischerweise numerisch. */
+    /** Shortened display, typically in numerical form. */
+    /*[deutsch] Verk&uuml;rzte Anzeige, typischerweise numerisch. */
     SHORT;
 
 }
