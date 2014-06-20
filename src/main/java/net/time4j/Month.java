@@ -368,7 +368,7 @@ public enum Month
 
         CalendarText names =
             CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
-        return names.getMonths(width, context, false).print(this);
+        return names.getStdMonths(width, context).print(this);
 
     }
 

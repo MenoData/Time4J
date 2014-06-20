@@ -6,6 +6,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Quarter;
 import net.time4j.Weekday;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
 import net.time4j.format.CalendarText.Provider;
 
@@ -68,31 +69,31 @@ public class CalendricalNamesTest {
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
         String result =
-            instance.getMonths(textWidth, OutputContext.FORMAT, false)
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.MARCH);
         assertThat(result, is("M"));
 
         textWidth = TextWidth.WIDE;
         result =
-            instance.getMonths(textWidth, OutputContext.FORMAT, false)
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.MARCH);
         assertThat(result, is("März"));
 
         textWidth = TextWidth.WIDE;
         result =
-            instance.getMonths(textWidth, OutputContext.STANDALONE, true)
+            instance.getStdMonths(textWidth, OutputContext.STANDALONE)
             .print(Month.MARCH);
         assertThat(result, is("März"));
 
         textWidth = TextWidth.SHORT;
         result =
-            instance.getMonths(textWidth, OutputContext.FORMAT, false)
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.MARCH);
         assertThat(result, is("Mrz"));
 
         textWidth = TextWidth.ABBREVIATED;
         result =
-            instance.getMonths(textWidth, OutputContext.FORMAT, false)
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.MARCH);
         assertThat(result, is("Mrz"));
     }
@@ -102,41 +103,40 @@ public class CalendricalNamesTest {
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
         OutputContext outputContext = OutputContext.FORMAT;
-        boolean leapForm = false;
         ParseLog status = new ParseLog();
         Month value =
-            instance.getMonths(TextWidth.ABBREVIATED, outputContext, leapForm)
+            instance.getStdMonths(TextWidth.ABBREVIATED, outputContext)
             .parse("Mrz", status, Month.class);
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
-            instance.getMonths(TextWidth.WIDE, outputContext, leapForm)
-            .parse("MÄR", status, Month.class, true, true);
+            instance.getStdMonths(TextWidth.WIDE, outputContext)
+            .parse("MÄR", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
-            instance.getMonths(TextWidth.WIDE, outputContext, leapForm)
-            .parse("MÄRz", status, Month.class, true, false);
+            instance.getStdMonths(TextWidth.WIDE, outputContext)
+            .parse("MÄRz", status, Month.class, toAttributes(true, false));
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
-            instance.getMonths(TextWidth.SHORT, outputContext, leapForm)
-            .parse("MR", status, Month.class, true, true);
+            instance.getStdMonths(TextWidth.SHORT, outputContext)
+            .parse("MR", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
-            instance.getMonths(TextWidth.SHORT, outputContext, leapForm)
+            instance.getStdMonths(TextWidth.SHORT, outputContext)
             .parse("Mrz", status, Month.class);
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
-            instance.getMonths(TextWidth.NARROW, outputContext, leapForm)
-            .parse("m", status, Month.class, true, true);
+            instance.getStdMonths(TextWidth.NARROW, outputContext)
+            .parse("m", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
         Locale locale = Locale.JAPAN;
@@ -145,7 +145,7 @@ public class CalendricalNamesTest {
            CalendarText.getInstance("iso8601", locale);
         status.setPosition(0);
         value =
-            instance.getMonths(TextWidth.NARROW, outputContext, leapForm)
+            instance.getStdMonths(TextWidth.NARROW, outputContext)
             .parse(
                 dfs.getShortMonths()[Calendar.MARCH],
                 status,
@@ -251,14 +251,14 @@ public class CalendricalNamesTest {
         ParseLog status = new ParseLog();
         Weekday w =
             instance.getWeekdays(TextWidth.WIDE, OutputContext.FORMAT)
-            .parse("FRE", status, Weekday.class, true, true);
+            .parse("FRE", status, Weekday.class, toAttributes(true, true));
         assertThat(w, is(Weekday.FRIDAY));
 
         instance = CalendarText.getInstance("iso8601", Locale.ENGLISH);
         ParseLog status2 = new ParseLog();
         Weekday w2 =
             instance.getWeekdays(TextWidth.WIDE, OutputContext.FORMAT)
-            .parse("FRI", status2, Weekday.class, true, true);
+            .parse("FRI", status2, Weekday.class, toAttributes(true, true));
         assertThat(w2, is(Weekday.FRIDAY));
     }
 
@@ -351,6 +351,20 @@ public class CalendricalNamesTest {
         }
 
         return false;
+
+    }
+
+    private static AttributeQuery toAttributes(
+        boolean caseInsensitive,
+        boolean partialCompare
+    ) {
+
+        Attributes attrs =
+            new Attributes.Builder()
+            .set(Attributes.PARSE_CASE_INSENSITIVE, caseInsensitive)
+            .set(Attributes.PARSE_PARTIAL_COMPARE, partialCompare)
+            .build();
+        return attrs;
 
     }
 

@@ -127,21 +127,11 @@ enum AmPmElement
         AttributeQuery attributes
     ) {
 
-        boolean caseInsensitive =
-            attributes
-                .get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
-                .booleanValue();
-        boolean partialCompare =
-            attributes
-                .get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE)
-                .booleanValue();
-
         return this.accessor(attributes).parse(
             text,
             status,
             this.getType(),
-            caseInsensitive,
-            partialCompare
+            attributes
         );
 
     }

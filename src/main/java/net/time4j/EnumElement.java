@@ -208,21 +208,11 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) {
 
-        boolean caseInsensitive =
-            attributes
-                .get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
-                .booleanValue();
-        boolean partialCompare =
-            attributes
-                .get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE)
-                .booleanValue();
-
         return this.accessor(attributes).parse(
             text,
             status,
             this.getType(),
-            caseInsensitive,
-            partialCompare
+            attributes
         );
 
     }
@@ -268,12 +258,11 @@ final class EnumElement<V extends Enum<V>>
 
         switch (this.index) {
             case MONTH:
-                return cnames.getMonths(
+                return cnames.getStdMonths(
                     textWidth,
                     attributes.get(
                         Attributes.OUTPUT_CONTEXT,
-                        OutputContext.FORMAT),
-                    false);
+                        OutputContext.FORMAT));
             case DAY_OF_WEEK:
                 return cnames.getWeekdays(
                     textWidth,

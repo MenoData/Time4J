@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
@@ -286,7 +287,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Ermittelt eine sortierte Liste aller Monatsnamen. </p>
+     * <p>Ermittelt eine sortierte Liste aller Standard-Monatsnamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
      * Kalendersystem typische Reihenfolge der Monate eingehalten wird.
@@ -297,22 +298,44 @@ public final class CalendarText {
      *
      * @param   textWidth       text width of displayed month name
      * @param   outputContext   output context (stand-alone?)
-     * @param   leapForm        shall leap form be used (for example the
-     *                          hebrew month &quot;Adar II&quot;)?
+     * @return  accessor for standard month names
+     * @see     net.time4j.Month
+     */
+    public Accessor getStdMonths(
+        TextWidth textWidth,
+        OutputContext outputContext
+    ) {
+
+        return this.getMonths(textWidth, outputContext, false);
+
+    }
+
+    /**
+     * <p>Ermittelt eine sortierte Liste aller Namen von Schaltmonaten. </p>
+     *
+     * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
+     * Kalendersystem typische Reihenfolge der Monate eingehalten wird.
+     * ISO-Systeme definieren den Januar als den ersten Monat und insgesamt
+     * 12 Monate. Andere Kalendersysteme k&ouml;nnen auch 13 Monate definieren.
+     * Die Reihenfolge der Elementwert-Enums mu&szlig; mit der Reihenfolge der
+     * hier enthaltenen Textformen &uuml;bereinstimmen. </p>
+     *
+     * <p>Hinweis: Schaltmonate sind in einigen Kalendersystemen wie dem
+     * hebr&auml;ischen Kalender definiert (&quot;Adar II&quot;). Ansonsten
+     * gibt es keinen Unterschied zwischen Standard- und Schaltmonaten,
+     * insbesondere nicht im ISO-8601-Standard. </p>
+     *
+     * @param   textWidth       text width of displayed month name
+     * @param   outputContext   output context (stand-alone?)
      * @return  accessor for month names
      * @see     net.time4j.Month
      */
-    public Accessor getMonths(
+    public Accessor getLeapMonths(
         TextWidth textWidth,
-        OutputContext outputContext,
-        boolean leapForm
+        OutputContext outputContext
     ) {
 
-        if (leapForm) {
-            return this.leapMonths.get(textWidth).get(outputContext);
-        } else {
-            return this.stdMonths.get(textWidth).get(outputContext);
-        }
+        return this.getMonths(textWidth, outputContext, true);
 
     }
 
@@ -543,6 +566,20 @@ public final class CalendarText {
         CalendarType ft =
             chronology.getChronoType().getAnnotation(CalendarType.class);
         return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
+
+    }
+
+    private Accessor getMonths(
+        TextWidth textWidth,
+        OutputContext outputContext,
+        boolean leapForm
+    ) {
+
+        if (leapForm) {
+            return this.leapMonths.get(textWidth).get(outputContext);
+        } else {
+            return this.stdMonths.get(textWidth).get(outputContext);
+        }
 
     }
 
@@ -788,15 +825,15 @@ public final class CalendarText {
         /**
          * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
          *
-         * <p>Entspricht
-         * {@code parse(parseable, status, valueType, false, false)}. </p>
+         * <p>Die Gro&szlig;- und Kleinschreibung ist nicht relevant. Es
+         * wird immer jeweils der ganze Text verglichen. </p>
          *
          * @param   <V> generic value type of element
          * @param   parseable       text to be parsed
          * @param   status          current parsing position
          * @param   valueType       value class of element
          * @return  element value (as enum) or {@code null} if not found
-         * @see     #parse(CharSequence, ParseLog, Class, boolean, boolean)
+         * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
          */
         public <V extends Enum<V>> V parse(
             CharSequence parseable,
@@ -804,26 +841,46 @@ public final class CalendarText {
             Class<V> valueType
         ) {
 
-            return this.parse(parseable, status, valueType, false, false);
+            return this.parse(parseable, status, valueType, true, false);
 
         }
 
         /**
          * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
          *
-         * <p>Beide {@code boolean}-Parameter sollten nur dann auf den Wert
-         * {@code true} gesetzt werden, wenn damit immer noch eine eindeutige
-         * Identifizierung der Textform gew&auml;hrleistet werden kann. </p>
+         * <p>Es werden die Attribute {@code Attributes.PARSE_CASE_INSENSITIVE}
+         * und {@code Attributes.PARSE_PARTIAL_COMPARE} ausgewertet. </p>
          *
          * @param   <V> generic value type of element
          * @param   parseable       text to be parsed
          * @param   status          current parsing position
          * @param   valueType       value class of element
-         * @param   caseInsensitive shall parsing ignore case?
-         * @param   partialCompare  shall only the start of text be checked?
+         * @param   attributes      format attributes
          * @return  element value (as enum) or {@code null} if not found
+         * @see     Attributes#PARSE_CASE_INSENSITIVE
+         * @see     Attributes#PARSE_PARTIAL_COMPARE
          */
         public <V extends Enum<V>> V parse(
+            CharSequence parseable,
+            ParseLog status,
+            Class<V> valueType,
+            AttributeQuery attributes
+        ) {
+
+            boolean caseInsensitive =
+                attributes
+                    .get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
+                    .booleanValue();
+            boolean partialCompare =
+                attributes
+                    .get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE)
+                    .booleanValue();
+            return this.parse(
+                parseable, status, valueType, caseInsensitive, partialCompare);
+
+        }
+
+        private <V extends Enum<V>> V parse(
             CharSequence parseable,
             ParseLog status,
             Class<V> valueType,
