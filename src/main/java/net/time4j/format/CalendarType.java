@@ -29,12 +29,21 @@ import java.lang.annotation.Target;
 
 
 /**
- * <p>Mit dieser {@code Annotation} k&ouml;nnen alle {@code TimePoint}-Typen
- * ausgezeichnet werden, die formatierte Darstellungen erlauben und einen
- * Zugang zu chronologischen Textressourcen brauchen. </p>
+ * <p>This {@code Annotation} can be used to mark all types of {@code ChronoEntity}
+ * which need formatted representations and access to text resource dependent on
+ * a calendar system. </p>
  *
  * @author  Meno Hochschild
- * @see     net.time4j.engine.TimePoint
+ * @see     net.time4j.engine.ChronoEntity
+ */
+/*[deutsch]
+ * <p>Mit dieser {@code Annotation} k&ouml;nnen alle {@code ChronoEntity}-Typen
+ * ausgezeichnet werden, die formatierte Darstellungen erlauben und einen
+ * Zugang zu chronologischen Textressourcen brauchen, die von einem
+ * Kalendersystem abh&auml;ngig sind. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     net.time4j.engine.ChronoEntity
  */
 @Documented
 @Target({ElementType.TYPE})
@@ -44,6 +53,22 @@ public @interface CalendarType {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Determines the reference name for all text resources of a
+     * calendar system. </p>
+     *
+     * <p>The name must not be unique, but has to be in agreement to the
+     * conventions defined in CLDR if it exists there. The motivation of
+     * the name is a localized access to calendar specific texts of eras,
+     * months, quarters, weekdays and AM/PM. The CLDR file
+     * <a href="http://unicode.org/repos/cldr/trunk/common/bcp47/calendar.xml"
+     * target="_blank">calendar.xml</a> defines both names and aliases.
+     * Alias names should be preferred in most cases. ISO systems usually
+     * use the name &quot;iso8601&quot;. </p>
+     *
+     * @return  reference name for calendar specific text resources (usually
+     *          a name according to CLDR standard)
+     */
+    /*[deutsch]
      * <p>Gibt einen Bezugsnamen f&uuml;r die Textressourcen eines
      * chronologischen Systems an. </p>
      *
