@@ -23,21 +23,36 @@ package net.time4j.format;
 
 
 /**
+ * <p>Determines in which output context the formatting is to be performed. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     Attributes#OUTPUT_CONTEXT
+ */
+/*[deutsch]
  * <p>Definiert, in welchem Ausgabekontext eine Formatierung erfolgen soll. </p>
  *
  * @author  Meno Hochschild
+ * @see     Attributes#OUTPUT_CONTEXT
  */
 public enum OutputContext {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Standard format context (for example weekday names within a
+     * formatted calendar date). </p>
+     */
+    /*[deutsch]
      * <p>Standardformatierung (zum Beispiel Wochentagsnamen in einer
      * formatierten Datumsausgabe). </p>
      */
     FORMAT,
 
     /**
+     * <p>Stand-alone-output (for example weekday names as column headers in
+     * a month calendar). </p>
+     */
+    /*[deutsch]
      * <p>Alleinstehende Ausgabe (zum Beispiel Wochentagsnamen als
      * Spalten&uuml;berschriften in einer Monatstabelle). </p>
      */

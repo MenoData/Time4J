@@ -23,6 +23,21 @@ package net.time4j.format;
 
 
 /**
+ * <p>Determines a suitable strategy for handling numerical signs. </p>
+ *
+ * <p>Note: Signs can usually only occur in ISO-8601-context. Therefore
+ * Time4J will never process signs in a localized way. That means signs
+ * are the ASCII-chars &#39;+&#39; and &#39;-&#39;. A sign precedes the
+ * sequence of numerical digits. Localized formats of elements with signs
+ * (for example in arab language) require a special {@code ChronoPrinter}
+ * and {@code ChronoParser}. </p>
+ *
+ * <p>A parser will only pay attention to this configuration in strict
+ * mode. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Legt die Format- und Interpretationsstrategie f&uuml;r numerische
  * Vorzeichen fest. </p>
  *
@@ -42,6 +57,11 @@ public enum SignPolicy {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>A sign will never be printed or accepted in parsing. </p>
+     *
+     * <p>This setting is the default. </p>
+     */
+    /*[deutsch]
      * <p>Das Vorzeichen wird niemals ausgegeben oder akzeptiert. </p>
      *
      * <p>Diese Einstellung dient als Standardvorgabe. </p>
@@ -49,6 +69,13 @@ public enum SignPolicy {
     SHOW_NEVER,
 
     /**
+     * <p>A positive sign will never be printed, but a negative sign is
+     * always printed. </p>
+     *
+     * <p>This setting is the default for proleptic years in ISO-8601 format
+     * if the year numbers have less than four, but not two digits. </p>
+     */
+    /*[deutsch]
      * <p>Ein positives Vorzeichen wird niemals ausgegeben, aber ein negatives
      * Vorzeichen immer. </p>
      *
@@ -58,6 +85,14 @@ public enum SignPolicy {
     SHOW_WHEN_NEGATIVE,
 
     /**
+     * <p>A positive sign will be printed if the numerical amount has more
+     * digits than specified. </p>
+     *
+     * <p>This setting is the default for proleptic years in ISO-8601-format
+     * if the year numbers have more than four digits. Negative signs will
+     * always be printed. </p>
+     */
+    /*[deutsch]
      * <p>Ein positives Vorzeichen wird ausgegeben, wenn der zugeh&ouml;rige
      * numerische Betrag mehr Stellen hat als minimal vorgegeben. </p>
      *
@@ -68,6 +103,9 @@ public enum SignPolicy {
     SHOW_WHEN_BIG_NUMBER,
 
     /**
+     * <p>The sign will always be printed. </p>
+     */
+    /*[deutsch]
      * <p>Das Vorzeichen wird immer ausgegeben. </p>
      */
     SHOW_ALWAYS;

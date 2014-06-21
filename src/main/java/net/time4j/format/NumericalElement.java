@@ -25,6 +25,12 @@ import net.time4j.engine.ChronoElement;
 
 
 /**
+ * <p>A chronological element which allows a numerical representation. </p>
+ *
+ * @param   <V> generic type of element values
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert ein chronologisches Element, das eine numerische
  * Darstellung erlaubt. </p>
  *
@@ -37,6 +43,12 @@ public interface NumericalElement<V>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Translates given element value to a numerical integer. </p>
+     *
+     * @param   value       value to be converted to int
+     * @return  Integer-representation of given value
+     */
+    /*[deutsch]
      * <p>Ermittelt eine numerische Darstellung des angegebenen Werts. </p>
      *
      * @param   value       value to be converted to int

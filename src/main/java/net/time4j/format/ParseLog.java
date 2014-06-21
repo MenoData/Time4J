@@ -25,6 +25,16 @@ import net.time4j.engine.ChronoEntity;
 
 
 /**
+ * <p>Represents a log for the current status and error informations during
+ * parsing. </p>
+ *
+ * <p>Note: This class is not <i>thread-safe</i>. Therefore a new instance
+ * is to be created per thread (usually per parsing process). </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <mutable>
+ */
+/*[deutsch]
  * <p>Zeichnet den Status und Fehlermeldungen beim Parsen auf. </p>
  *
  * <p>Hinweis: Diese Klasse ist nicht <i>thread-safe</i>, deshalb ist
@@ -47,6 +57,9 @@ public class ParseLog {
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Standard constructor with start position at begin of text. </p>
+     */
+    /*[deutsch]
      * <p>Standard-Konstruktor mit der Startposition am Textanfang. </p>
      */
     public ParseLog() {
@@ -55,6 +68,12 @@ public class ParseLog {
     }
 
     /**
+     * <p>Creates a new instance with given start position. </p>
+     *
+     * @param   offset      start position where parsing of text begins
+     * @throws  IllegalArgumentException if the start position is negative
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Instanz mit der angegebenen Startposition. </p>
      *
      * @param   offset      start position where parsing of text begins
@@ -78,6 +97,11 @@ public class ParseLog {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the current position of the parser. </p>
+     *
+     * @return  int ({@code >= 0})
+     */
+    /*[deutsch]
      * <p>Gibt die aktuelle Position des Parsers wieder. </p>
      *
      * @return  int ({@code >= 0})
@@ -89,6 +113,11 @@ public class ParseLog {
     }
 
     /**
+     * <p>Queries if an error has occurred. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
      * <p>Ermittelt, ob ein Fehler aufgetreten ist. </p>
      *
      * @return  boolean
@@ -100,6 +129,11 @@ public class ParseLog {
     }
 
     /**
+     * <p>Returns the position of error in text. </p>
+     *
+     * @return  int ({@code >= 0} in case of error else {@code -1})
+     */
+    /*[deutsch]
      * <p>Gibt die fehlerhafte Stelle im Text an. </p>
      *
      * @return  int ({@code >= 0} in case of error else {@code -1})
@@ -111,6 +145,11 @@ public class ParseLog {
     }
 
     /**
+     * <p>Returns an error message. </p>
+     *
+     * @return  String (empty if there is no error)
+     */
+    /*[deutsch]
      * <p>Gibt eine Fehlerbeschreibung an. </p>
      *
      * @return  String (empty if there is no error)
@@ -122,6 +161,11 @@ public class ParseLog {
     }
 
     /**
+     * <p>Yields the parsed raw data as chronological entity. </p>
+     *
+     * @return  parsed values as mutable serializable map-like entity
+     */
+    /*[deutsch]
      * <p>Liefert die interpretierten Rohdaten. </p>
      *
      * @return  parsed values as mutable serializable map-like entity
@@ -133,17 +177,9 @@ public class ParseLog {
     }
 
     /**
-     * <p>Interne Methode. </p>
-     *
-     * @return  parsed values
+     * <p>Debugging support. </p>
      */
-    ParsedValues getRawValues0() {
-
-        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>Debugging-Unterst&uuml;tzung. </p>
      */
     @Override
@@ -168,6 +204,12 @@ public class ParseLog {
     }
 
     /**
+     * <p>Sets the current position of the parser to given new position. </p>
+     *
+     * @param   position    new parse position ({@code >= 0})
+     * @throws  IllegalArgumentException if given position is negative
+     */
+    /*[deutsch]
      * <p>Setzt die aktuelle Position des Parsers neu. </p>
      *
      * @param   position    new parse position ({@code >= 0})
@@ -184,6 +226,9 @@ public class ParseLog {
     }
 
     /**
+     * <p>Reuses this instance for next parse process. </p>
+     */
+    /*[deutsch]
      * <p>Bereitet diese Instanz auf die Wiederverwendung f&uuml;r einen
      * neuen Interpretierungsvorgang vor. </p>
      */
@@ -192,6 +237,17 @@ public class ParseLog {
         this.position = 0;
         this.clearError();
         this.rawValues = null;
+
+    }
+
+    /**
+     * <p>Interne Methode. </p>
+     *
+     * @return  parsed values
+     */
+    ParsedValues getRawValues0() {
+
+        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
 
     }
 

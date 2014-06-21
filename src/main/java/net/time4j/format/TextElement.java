@@ -29,6 +29,13 @@ import java.io.IOException;
 
 
 /**
+ * <p>A chronological element which can be formatted as text or can be parsed
+ * from a text. </p>
+ *
+ * @param   <V> generic type of element values
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert ein chronologisches Element, das als Text dargestellt
  * und interpretiert werden kann. </p>
  *
@@ -41,6 +48,18 @@ public interface TextElement<V>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Converts the element value in given context to a formatted text. </p>
+     *
+     * <p>Implementation note: The concrete element value is obtainable by the
+     * expression {@link ChronoEntity#get(ChronoElement) context.get(this)}.
+     * </p>
+     *
+     * @param   context     time context with the value of this element
+     * @param   buffer      format buffer any text output will be sent to
+     * @param   attributes  query for control attributes
+     * @throws  IOException if writing to buffer fails
+     */
+    /*[deutsch]
      * <p>Wandelt dieses im angegebenen Zeitwertkontext enthaltene Element zu
      * einem Text um. </p>
      *
@@ -60,6 +79,20 @@ public interface TextElement<V>
     ) throws IOException;
 
     /**
+     * <p>Interpretes the given text as element value. </p>
+     *
+     * <p>Implementation note: Any implementation will start first at the
+     * position {@link ParseLog#getPosition() status.getPosition()} and
+     * either set the new position after successful parsing or return
+     * {@code null} in case of error. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   status      current parsing position
+     * @param   attributes  query for control attributes
+     * @return  parsed element value or {@code null} if parsing
+     *          was not successful
+     */
+    /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab einer bestimmten Position
      * als Elementwert. </p>
      *

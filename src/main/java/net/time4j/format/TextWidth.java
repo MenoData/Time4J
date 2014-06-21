@@ -23,6 +23,12 @@ package net.time4j.format;
 
 
 /**
+ * <p>Defines the width of a formatted output of chronological element values
+ * as text. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert die Breite einer formatierten Ausgabe von chronologischen
  * Elementwerten als Text. </p>
  *
@@ -32,16 +38,24 @@ public enum TextWidth {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    /** Volle Textbreite. */
+    /** Full text width. */
+    /*[deutsch] Volle Textbreite. */
     WIDE,
 
-    /** Abk&uuml;rzung (Langform). */
+    /** Abbreviation (long form). */
+    /*[deutsch] Abk&uuml;rzung (Langform). */
     ABBREVIATED,
 
-    /** Abk&uuml;rzung (Kurzform - meist identisch mit {@link #ABBREVIATED}). */
+    /**
+     * Abbreviation (short form - usually identical with {@link #ABBREVIATED}).
+     */
+    /*[deutsch]
+     * Abk&uuml;rzung (Kurzform - meist identisch mit {@link #ABBREVIATED}).
+     */
     SHORT,
 
-    /** Symbolform (typischerweise nur ein Buchstabe). */
+    /** Symbol form (typically only one single letter). */
+    /*[deutsch] Symbolform (typischerweise nur ein Buchstabe). */
     NARROW;
 
 }

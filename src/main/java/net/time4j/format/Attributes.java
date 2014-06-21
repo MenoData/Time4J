@@ -98,8 +98,8 @@ public final class Attributes
      * system timezone in lax mode. The attribute value also serves as
      * replacement timezone if the parsing has not recognized any
      * timezone. </p>
-     * 
-     * @see     net.time4j.tz.Timezone.ofSystem()
+     *
+     * @see     net.time4j.tz.Timezone#ofSystem()
      */
     /*[deutsch]
      * <p>Gibt die Zeitzonen-ID an. </p>
@@ -107,8 +107,8 @@ public final class Attributes
      * <p>Fehlt das Attribut, wird im laxen Modus die System-Zeitzone
      * angenommen. Das Attribut dient auch als Ersatzwert, wenn beim Parsen
      * keine Zeitzone erkannt worden ist. </p>
-     * 
-     * @see     net.time4j.tz.Timezone.ofSystem()
+     *
+     * @see     net.time4j.tz.Timezone#ofSystem()
      */
     public static final AttributeKey<TZID> TIMEZONE_ID =
         PredefinedKey.valueOf("TIMEZONE_ID", TZID.class);
@@ -119,16 +119,16 @@ public final class Attributes
      *
      * <p>If this attribute is missing then Time4J will assume the default
      * conflict strategy. </p>
-     * 
-     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY 
+     *
+     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY
      */
     /*[deutsch]
      * <p>Gibt die Konfliktstrategie an, die bei der Aufl&ouml;sung von nicht
      * eindeutigen lokalen Zeitstempeln zu verwenden ist. </p>
      *
      * <p>Fehlt das Attribut, wird eine Standardstrategie angenommen. </p>
-     * 
-     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY 
+     *
+     * @see     net.time4j.tz.Timezone#DEFAULT_CONFLICT_STRATEGY
      */
     public static final AttributeKey<TransitionStrategy> TRANSITION_STRATEGY =
         PredefinedKey.valueOf("TRANSITION_STRATEGY", TransitionStrategy.class);
@@ -290,7 +290,7 @@ public final class Attributes
         PredefinedKey.valueOf("PAD_CHAR", Character.class);
 
     /**
-     * <p>Determines the pivot year for the representation of 
+     * <p>Determines the pivot year for the representation of
      * two-digit-years. </p>
      *
      * <p>Default value is the year which is 20 years after the current

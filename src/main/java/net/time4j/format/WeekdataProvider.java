@@ -25,6 +25,20 @@ import java.util.Locale;
 
 
 /**
+ * <p>This <strong>SPI-interface</strong> enables the access to localized
+ * week rules and is instantiated via a {@code ServiceLoader}-mechanism. </p>
+ *
+ * <p>If there is no external {@code WeekdataProvider} then Time4J will use
+ * an internal implementation which is based on all informations contained
+ * in the JDK and also the CLDR-23-data of unicode consortium. Especially
+ * the data which define a weekend will be preferably read from the resource
+ * file &quot;data/weekend.data&quot;. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     java.util.ServiceLoader
+ * @spec    Implementations must have a public no-arg constructor.
+ */
+/*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
  * auf {@code Locale}-abh&auml;ngige Wochenregeln und wird &uuml;ber einen
  * {@code ServiceLoader}-Mechanismus instanziert. </p>
@@ -35,11 +49,9 @@ import java.util.Locale;
  * Wochenende definierenden Daten werden bevorzugt aus der Textdatei
  * &quot;data/weekend.data&quot; geladen. </p>
  *
- * <p>SPEZIFIKATION: Implementierungen m&uuml;ssen einen parameterlosen
- * Konstruktor haben. </p>
- *
  * @author  Meno Hochschild
  * @see     java.util.ServiceLoader
+ * @spec    Implementations must have a public no-arg constructor.
  */
 // TODO: als inneres Interface von Weekmodel realisieren/verschieben!
 public interface WeekdataProvider {
@@ -47,6 +59,12 @@ public interface WeekdataProvider {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Defines the first day of a calendar week. </p>
+     *
+     * @param   country     country or region
+     * @return  weekday (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
+     */
+    /*[deutsch]
      * <p>Definiert den ersten Tag einer Kalenderwoche. </p>
      *
      * @param   country     L&auml;nderangabe
@@ -55,6 +73,13 @@ public interface WeekdataProvider {
     int getFirstDayOfWeek(Locale country);
 
     /**
+     * <p>Defines the minimum count of days which the first calendar week
+     * of the year or month must contain. </p>
+     *
+     * @param   country     country or region
+     * @return  int in range {@code 1 - 7}
+     */
+    /*[deutsch]
      * <p>Definiert die minimale Anzahl von Tagen, die die erste
      * Kalenderwoche eines Jahres oder Monats enthalten mu&szlig;. </p>
      *
@@ -64,14 +89,26 @@ public interface WeekdataProvider {
     int getMinimalDaysInFirstWeek(Locale country);
 
     /**
-     * <p>Definiert den ersten Tag des Wochenendes. </p>
+     * <p>Defines the first day of weekend. </p>
      *
      * @param   country     L&auml;nderangabe
      * @return  Wochentag (Mo=1, Di=2, Mi=3, Do=4, Fr=5, Sa=6, So=7)
      */
+    /*[deutsch]
+     * <p>Definiert den ersten Tag des Wochenendes. </p>
+     *
+     * @param   country     country or region
+     * @return  weekday (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
+     */
     int getStartOfWeekend(Locale country);
 
     /**
+     * <p>Defines the last day of weekend. </p>
+     *
+     * @param   country     country or region
+     * @return  weekday (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
+     */
+    /*[deutsch]
      * <p>Definiert den letzten Tag des Wochenendes. </p>
      *
      * @param   country     L&auml;nderangabe
