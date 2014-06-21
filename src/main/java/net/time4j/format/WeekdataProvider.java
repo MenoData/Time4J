@@ -30,7 +30,7 @@ import java.util.Locale;
  *
  * <p>If there is no external {@code WeekdataProvider} then Time4J will use
  * an internal implementation which is based on all informations contained
- * in the JDK and also the CLDR-23-data of unicode consortium. Especially
+ * in the JDK and also the CLDR-data of unicode consortium. Especially
  * the data which define a weekend will be preferably read from the resource
  * file &quot;data/weekend.data&quot;. </p>
  *
@@ -45,7 +45,7 @@ import java.util.Locale;
  *
  * <p>Wird kein externer {@code WeekdataProvider} gefunden, wird intern
  * eine Instanz erzeugt, die auf den im JDK enthaltenen Informationen und
- * auf den CLDR-23-Daten des Unicode-Konsortiums beruht. Speziell die ein
+ * auf den CLDR-Daten des Unicode-Konsortiums beruht. Speziell die ein
  * Wochenende definierenden Daten werden bevorzugt aus der Textdatei
  * &quot;data/weekend.data&quot; geladen. </p>
  *
@@ -53,7 +53,6 @@ import java.util.Locale;
  * @see     java.util.ServiceLoader
  * @spec    Implementations must have a public no-arg constructor.
  */
-// TODO: als inneres Interface von Weekmodel realisieren/verschieben!
 public interface WeekdataProvider {
 
     //~ Methoden ----------------------------------------------------------
@@ -91,14 +90,14 @@ public interface WeekdataProvider {
     /**
      * <p>Defines the first day of weekend. </p>
      *
-     * @param   country     L&auml;nderangabe
-     * @return  Wochentag (Mo=1, Di=2, Mi=3, Do=4, Fr=5, Sa=6, So=7)
+     * @param   country     country or region
+     * @return  weekday (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
      */
     /*[deutsch]
      * <p>Definiert den ersten Tag des Wochenendes. </p>
      *
-     * @param   country     country or region
-     * @return  weekday (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
+     * @param   country     L&auml;nderangabe
+     * @return  Wochentag (Mo=1, Di=2, Mi=3, Do=4, Fr=5, Sa=6, So=7)
      */
     int getStartOfWeekend(Locale country);
 
