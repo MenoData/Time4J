@@ -57,6 +57,21 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
+ * <p>Represents a chronological format for the conversion between a
+ * chronological text and the chronological value of type T. </p>
+ *
+ * <p>An instance can either be created via a {@code Builder} obtainable
+ * by {@link #setUp(Class, Locale)} or by some predefined format constants
+ * in {@link net.time4j.Iso8601Format} which can be adjusted by some
+ * {@code with()}-methods. Another way to create an instance are the
+ * methods {@code formatter(...)} and {@code localFormatter(...)} in
+ * the classes {@code PlainDate}, {@code PlainTime} and {@code Moment}. </p>
+ *
+ * @param       <T> generic type of chronological entity
+ * @author      Meno Hochschild
+ * @concurrency <immutable>
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitformat zur Konversion zwischen einem
  * chronologischen Text und einem chronologischen Wert des Typs T. </p>
  *
@@ -220,6 +235,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the associated chronology. </p>
+     *
+     * @return  chronology to be used for formatting associated objects
+     */
+    /*[deutsch]
      * <p>Ermittelt die zugeh&ouml;rige Chronologie. </p>
      *
      * @return  chronology to be used for formatting associated objects
@@ -231,6 +251,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns the locale setting. </p>
+     *
+     * <p>If there is just a reference to ISO-8601 without any concrete
+     * language then this method will yield {@code Locale.ROOT}. </p>
+     *
+     * @return  Locale (empty if related to ISO-8601, never {@code null})
+     */
+    /*[deutsch]
      * <p>Ermittelt die Sprach- und L&auml;ndereinstellung. </p>
      *
      * <p>Falls ein Bezug zu ISO-8601 ohne eine konkrete Sprache vorliegt,
@@ -245,6 +273,61 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns the default attributes which are active if they are not
+     * overridden by sectional attributes. </p>
+     *
+     * <p>The default attributes can be adjusted by a suitable
+     * {@code with()}-method. Following attributes are predefined: </p>
+     *
+     * <table border="1" style="margin-top:5px;">
+     *  <tr>
+     *      <td>{@link Attributes#CALENDAR_TYPE}</td>
+     *      <td>dependent on associated chronology</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#LANGUAGE}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#DECIMAL_SEPARATOR}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#ZERO_DIGIT}</td>
+     *      <td>dependent on associated locale</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#LENIENCY}</td>
+     *      <td>{@link Leniency#SMART}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PARSE_CASE_INSENSITIVE}</td>
+     *      <td>{@code true}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PARSE_PARTIAL_COMPARE}</td>
+     *      <td>{@code false}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#TEXT_WIDTH}</td>
+     *      <td>{@link TextWidth#WIDE}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#OUTPUT_CONTEXT}</td>
+     *      <td>{@link OutputContext#FORMAT}</td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Attributes#PAD_CHAR}</td>
+     *      <td>(SPACE)</td>
+     *  </tr>
+     * </table>
+     *
+     * @return  default control attributes valid for the whole formatter
+     *          (can be overridden by sectional attributes)
+     * @see     #getChronology()
+     * @see     #getLocale()
+     */
+    /*[deutsch]
      * <p>Ermittelt die Standardattribute, welche genau dann wirksam sind,
      * wenn sie nicht durch sektionale Attribute &uuml;berschrieben werden. </p>
      *
@@ -307,6 +390,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Prints given chronological entity as formatted text. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @return  formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     */
+    /*[deutsch]
      * <p>Formatiert das angegebene Objekt als Text. </p>
      *
      * @param   formattable     object to be formatted
@@ -328,7 +418,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Formatiert das angegebene Objekt als Text. </p>
+     * <p>Prints given chronological entity as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>Equiovalent to
+     * {@code print(formattable, buffer, getDefaultAttributes())}. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
+     * den Puffer. </p>
      *
      * <p>Entspricht
      * {@code print(formattable, buffer, getDefaultAttributes())}. </p>
@@ -357,6 +460,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Prints given chronological entity as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>The given attributes cannot change the inner format structure
+     * (for example not change a localized weekmodel), but can override some
+     * format properties like language or certain text attributes for this
+     * run only. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @param   attributes      attributes for limited formatting control
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @throws  IOException if writing to buffer fails
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
      *
      * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
@@ -384,6 +503,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Interpretes given text as chronological entity starting
+     * at the begin of text. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parse result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     */
+    /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab dem Anfang. </p>
      *
      * @param   text        text to be parsed
@@ -408,7 +536,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Interpretiert den angegebenen Text ab der angegebenen Position. </p>
+     * <p>Interpretes given text as chronological entity starting
+     * at the specified position in parse log. </p>
+     *
+     * <p>Equivalent to {@code parse(text, status, getDefaultAttributes())}. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
+     * Log. </p>
      *
      * <p>Entspricht {@code parse(text, status, getDefaultAttributes())}. </p>
      *
@@ -428,7 +569,24 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Interpretiert den angegebenen Text ab der angegebenen Position. </p>
+     * <p>Interpretes given text as chronological entity starting
+     * at the specified position in parse log. </p>
+     *
+     * <p>The given attributes cannot change the inner format structure
+     * (for example not change a localized weekmodel), but can override some
+     * format properties like expected language or certain text attributes
+     * for this run only. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   status      parser information (always as new instance)
+     * @param   attributes  attributes for limited parsing control
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text ab der angegebenen Position
+     * im Log. </p>
      *
      * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
      * Formatstruktur &auml;ndern (zum Beispiel nicht ein lokalisiertes
@@ -492,13 +650,35 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given locale. </p>
+     *
+     * <p>Note: Sectional attributes will never be overridden. Is the
+     * locale not changed then the method will simply return this instance.
+     * Otherwise the copy will contain given locale and also adjusts
+     * the associated numerical symbols: </p>
+     *
+     * <ul>
+     *  <li>{@link Attributes#LANGUAGE}</li>
+     *  <li>{@link Attributes#ZERO_DIGIT}</li>
+     *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     * </ul>
+     *
+     * <p>If necessary all inner format elements which are locale-dependent
+     * will also be adjusted (for example
+     * {@link net.time4j.Weekmodel#weekOfYear()}. </p>
+     *
+     * @param   locale      new language and country configuration
+     * @return  changed copy with given language and localized symbols while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit der alternativ angegebenen
      * Sprach- und L&auml;ndereinstellung. </p>
      *
      * <p>Hinweise: Sektionale Attribute werden grunds&auml;tzlich nicht
      * &uuml;bersteuert. Ist die Einstellung gleich, wird keine Kopie, sondern
      * diese Instanz zur&uuml;ckgegeben, andernfalls werden neben der Sprache
-     * automatisch die Sprache und die numerischen Symbole mit angepasst: </p>
+     * automatisch die numerischen Symbole mit angepasst: </p>
      *
      * <ul>
      *  <li>{@link Attributes#LANGUAGE}</li>
@@ -531,6 +711,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given timezone id which
+     * shall be used in formatting or parsing. </p>
+     *
+     * <p>The timezone is in most cases only relevant for the type
+     * {@link net.time4j.Moment}. When formatting the timezone helps
+     * to convert the UTC value into a zonal representation. When
+     * parsing the timezone serves as replacement value if the formatted
+     * text does not contain any timezone. </p>
+     *
+     * @param   timezone    timezone id
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit der angegebenen Zeitzone, die beim
      * Formatieren oder Parsen verwendet werden soll. </p>
      *
@@ -560,6 +754,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Equivalent to {@link #withTimezone(TZID)
+     * withTimezone(Timezone.ofSystem().getID())}. </p>
+     *
+     * @return  changed copy with the system timezone while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Entspricht {@link #withTimezone(TZID)
      * withTimezone(Timezone.ofSystem().getID())}. </p>
      *
@@ -573,6 +774,25 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Determines a default replacement value for given element. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;PlainDate&gt; fmt =
+     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
+     *               .withDefault(PlainDate.YEAR, 2012);
+     *  PlainDate date = fmt.parse("05-21");
+     *  System.out.println(date); // 2012-05-21
+     * </pre>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   value       replacement value or {@code null}
+     *                      if the default value shall be deregistered
+     * @return  changed copy with new replacement value
+     */
+    /*[deutsch]
      * <p>Legt einen Standard-Ersatzwert f&uuml;r das angegebene Element
      * fest, wenn die Interpretation sonst nicht funktioniert. </p>
      *
@@ -602,6 +822,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given boolean-attribute. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @param   key     attribute key
+     * @param   value   attribute value
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit dem angegebenen boolean-Attribut. </p>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
@@ -626,6 +856,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given int-attribute. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @param   key     attribute key
+     * @param   value   attribute value
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit dem angegebenen int-Attribut. </p>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
@@ -650,6 +890,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given char-attribute. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @param   key     attribute key
+     * @param   value   attribute value
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit dem angegebenen char-Attribut. </p>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
@@ -674,7 +924,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Erzeugt eine Kopie mit dem angegebenen Enum-Attribut. </p>
+     * <p>Creates a copy of this formatter with given enum-attribute. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @param   key     attribute key
+     * @param   value   attribute value
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie mit dem angegebenen enum-Attribut. </p>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
      *
@@ -699,6 +959,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Creates a copy of this formatter with given standard attributes. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @param   attributes  new default attributes
+     * @return  changed copy with the new or changed attributes while
+     *          this instance remains unaffected
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Kopie mit den angegebenen Standard-Attributen. </p>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
@@ -719,6 +988,65 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Converts this formatter into a traditional 
+     * {@code java.text.Format}-object. </p>
+     *
+     * <p>The returned format object also supports attributed strings such
+     * that all {@code ChronoElement}-structures are associated with field
+     * attributes of type {@link java.text.DateFormat.Field DateFormat.Field}.
+     * In ISO systems following mapping will be applied: </p>
+     *
+     * <ul>
+     *  <li>{@link net.time4j.PlainTime#AM_PM_OF_DAY} =&gt;
+     *  {@link java.text.DateFormat.Field#AM_PM}</li>
+     *  <li>{@link net.time4j.PlainTime#CLOCK_HOUR_OF_AMPM} =&gt;
+     *  {@link java.text.DateFormat.Field#HOUR1}</li>
+     *  <li>{@link net.time4j.PlainTime#CLOCK_HOUR_OF_DAY} =&gt;
+     *  {@link java.text.DateFormat.Field#HOUR_OF_DAY1}</li>
+     *  <li>{@link net.time4j.PlainDate#DAY_OF_MONTH} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_MONTH}</li>
+     *  <li>{@link net.time4j.PlainDate#DAY_OF_WEEK} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
+     *  <li>{@link net.time4j.PlainDate#DAY_OF_YEAR} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_YEAR}</li>
+     *  <li>{@link net.time4j.PlainTime#DIGITAL_HOUR_OF_AMPM} =&gt;
+     *  {@link java.text.DateFormat.Field#HOUR1}</li>
+     *  <li>{@link net.time4j.PlainTime#DIGITAL_HOUR_OF_DAY} =&gt;
+     *  {@link java.text.DateFormat.Field#HOUR0}</li>
+     *  <li>{@link net.time4j.PlainTime#MILLI_OF_SECOND} =&gt;
+     *  {@link java.text.DateFormat.Field#MILLISECOND}</li>
+     *  <li>{@link net.time4j.PlainTime#MINUTE_OF_HOUR} =&gt;
+     *  {@link java.text.DateFormat.Field#MINUTE}</li>
+     *  <li>{@link net.time4j.PlainDate#MONTH_AS_NUMBER} =&gt;
+     *  {@link java.text.DateFormat.Field#MONTH}</li>
+     *  <li>{@link net.time4j.PlainDate#MONTH_OF_YEAR} =&gt;
+     *  {@link java.text.DateFormat.Field#MONTH}</li>
+     *  <li>{@link net.time4j.PlainTime#SECOND_OF_MINUTE} =&gt;
+     *  {@link java.text.DateFormat.Field#SECOND}</li>
+     *  <li>{@link net.time4j.PlainDate#WEEKDAY_IN_MONTH} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_WEEK_IN_MONTH}</li>
+     *  <li>{@link net.time4j.PlainDate#YEAR} =&gt;
+     *  {@link java.text.DateFormat.Field#YEAR}</li>
+     *  <li>{@link net.time4j.Weekmodel#boundedWeekOfMonth()} =&gt;
+     *  {@link java.text.DateFormat.Field#WEEK_OF_MONTH}</li>
+     *  <li>{@link net.time4j.Weekmodel#boundedWeekOfYear()} =&gt;
+     *  {@link java.text.DateFormat.Field#WEEK_OF_YEAR}</li>
+     *  <li>{@link net.time4j.Weekmodel#weekOfMonth()} =&gt;
+     *  {@link java.text.DateFormat.Field#WEEK_OF_MONTH}</li>
+     *  <li>{@link net.time4j.Weekmodel#weekOfYear()} =&gt;
+     *  {@link java.text.DateFormat.Field#WEEK_OF_YEAR}</li>
+     *  <li>{@link net.time4j.Weekmodel#localDayOfWeek()} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
+     *  <li>{@link net.time4j.engine.ChronoEntity#getTimezone()} =&gt;
+     *  {@link java.text.DateFormat.Field#TIME_ZONE}</li>
+     * </ul>
+     *
+     * <p>Note: The returned {@code Format}-object is not serializable. </p>
+     *
+     * @return  new non-serializable {@code java.text.Format}-object which
+     *          delegates all formatting and parsing work to this instance
+     */
+    /*[deutsch]
      * <p>Wandelt dieses Objekt in ein herk&ouml;mmliches
      * {@code java.text.Format}-Objekt um. </p>
      *
@@ -784,6 +1112,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Constructs a builder for creating formatters. </p>
+     *
+     * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
+     * @param   type        reified chronological type
+     * @param   locale      format locale
+     * @return  new {@code Builder}-instance
+     * @throws  IllegalArgumentException if given chronological type is not
+     *          formattable that is if no chronology can be derived from type
+     * @see     Chronology#lookup(Class)
+     */
+    /*[deutsch]
      * <p>Konstruiert ein Hilfsobjekt zum Bauen eines Zeitformats. </p>
      *
      * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
@@ -804,8 +1143,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Vergleicht die Chronologien, Standard-Attribute und die internen
-     * Formatverarbeitungen. </p>
+     * <p>Compares the chronologies, default attributes, default values and
+     * the internal format structures. </p>
+     */
+    /*[deutsch]
+     * <p>Vergleicht die Chronologien, Standard-Attribute, Standard-Ersatzwerte
+     * und die internen Formatstrukturen. </p>
      */
     @Override
     public boolean equals(Object obj) {
@@ -826,7 +1169,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    /**
+    /*[deutsch]
      * <p>Berechnet den Hash-Code basierend auf dem internen Zustand. </p>
      */
     @Override
@@ -840,6 +1183,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>For debugging purposes. </p>
+     */
+    /*[deutsch]
      * <p>F&uuml;r Debugging-Zwecke. </p>
      */
     @Override
@@ -1223,6 +1569,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Builder for creating a new {@code ChronoFormatter}. </p>
+     *
+     * <p>This class is not <i>thread-safe</i> so a new instance is
+     * necessary per thread. A new instance can be created by
+     * {@link ChronoFormatter#setUp(Class, Locale)}. </p>
+     *
+     * @param       <T> generic type of chronological entity
+     *              (subtype of {@code ChronoEntity})
+     * @author      Meno Hochschild
+     * @concurrency <mutable>
+     */
+    /*[deutsch]
      * <p>Erzeugt ein neues Formatobjekt. </p>
      *
      * <p>Je Thread wird eine neue {@code Builder}-Instanz ben&ouml;tigt,
@@ -1279,6 +1637,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Returns the associated chronology. </p>
+         *
+         * @return  Chronology
+         */
+        /*[deutsch]
          * <p>Liefert die zugeh&ouml;rige Chronologie. </p>
          *
          * @return  Chronology
@@ -1290,6 +1653,27 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format without sign for given
+         * chronological element. </p>
+         *
+         * <p>Equivalent to {@code addInteger(element, minDigits, maxDigits,
+         * SignPolicy.SHOW_NEVER}. </p>
+         *
+         * @param   element         chronological element
+         * @param   minDigits       minimum count of digits in range 1-9
+         * @param   maxDigits       maximum count of digits in range 1-9
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any of {@code minDigits} and
+         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits < minDigits} or if given element is
+         *          not supported by chronology
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     SignPolicy#SHOW_NEVER
+         * @see     #addInteger(ChronoElement, int, int, SignPolicy)
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen f&uuml;r das
          * angegebene chronologische Element. </p>
          *
@@ -1327,6 +1711,60 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format for given chronological
+         * element. </p>
+         *
+         * <p>First a sign is expected (positive or negative) where the
+         * last argument {@code signPolicy} controls the output and
+         * interpretation. Following rules hold for the sequence of
+         * digits to be formatted: </p>
+         *
+         * <ol><li>PRINT =&gt; If the resulting sequence of digits has
+         * less than {@code minDigits} then it will be left-padded with
+         * zero digit char until the sequence has {@code minDigits}
+         * digits. But if there are more digits than {@code maxDigits}
+         * then an {@code IllegalArgumentException} will be thrown. </li>
+         *
+         * <li>PARSE =&gt; At most {@code maxDigits} chars will be
+         * interpreted as digits. If there are less than {@code minDigits}
+         * then the text input will be invalid. Note: If there is no
+         * strict mode then the parser will always assume
+         * {@code minDigits == 0} and {@code maxDigits = 9}. </li></ol>
+         *
+         * <p>Example: </p>
+         * <pre>
+         *  ChronoElement&lt;Integer&gt; element = PlainTime.MILLI_OF_SECOND;
+         *  int minDigits = 3;
+         *  int maxDigits = 6;
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+         *      .addInteger(
+         *          element,
+         *          minDigits,
+         *          maxDigits,
+         *          SignPolicy.SHOW_ALWAYS)
+         *      .build();
+         *  System.out.println(
+         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *  // output: +012
+         * </pre>
+         *
+         * @param   element         chronological element
+         * @param   minDigits       minimum count of digits in range 1-9
+         * @param   maxDigits       maximum count of digits in range 1-9
+         * @param   signPolicy      controls output of numeric sign
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any of {@code minDigits} and
+         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits < minDigits} or if given element is
+         *          not supported by chronology
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     Attributes#LENIENCY
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat f&uuml;r das angegebene
          * chronologische Element. </p>
          *
@@ -1400,6 +1838,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format for given chronological
+         * element. </p>
+         *
+         * <p>Like {@link #addInteger(ChronoElement, int, int,
+         * SignPolicy)} but on long-basis. </p>
+         *
+         * @param   element         chronological element
+         * @param   minDigits       minimum count of digits in range 1-18
+         * @param   maxDigits       maximum count of digits in range 1-18
+         * @param   signPolicy      controls output of numeric sign
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any of {@code minDigits} and
+         *          {@code maxDigits} are out of range {@code 1-18} or if
+         *          {@code maxDigits < minDigits} or if given element is
+         *          not supported by chronology
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat f&uuml;r das angegebene
          * chronologische Element. </p>
          *
@@ -1437,6 +1895,29 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format without sign and with fixed width
+         * for given chronological element. </p>
+         *
+         * <p>Almost equivalent to
+         * {@code addInteger(element, digits, digits, SignPolicy.SHOW_NEVER)}
+         * but with following important difference: </p>
+         *
+         * <p>If this method directly follow after other numerical elements
+         * then the fixed width defined here will be preserved in preceding
+         * elements so parsing of those ancestors will not consume too many
+         * digits (<i>adjacent digit parsing</i>). </p>
+         *
+         * @param   element         chronological element
+         * @param   digits          fixed count of digits in range 1-9
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code digits} is out of
+         *          range {@code 1-9} or if given element is not supported
+         *          by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     SignPolicy#SHOW_NEVER
+         * @see     #addInteger(ChronoElement, int, int, SignPolicy)
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester
          * Breite f&uuml;r das angegebene chronologische Element. </p>
          *
@@ -1475,6 +1956,41 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format without sign for given chronological
+         * enumeration element. </p>
+         *
+         * <p>If the element is compatible to the interface
+         * {@code NumericalElement} then its value will first converted to
+         * an integer else the ordinal number of enum will be used. A sign
+         * is never printed or expected. Example: </p>
+         *
+         * <pre>
+         *  ChronoFormatter&lt;PlainDate&gt; formatter =
+         *      ChronoFormatter.setUp(PlainDate.class, Locale.US)
+         *      .addNumerical(Weekmodel.of(Locale.US).localDayOfWeek(), 1, 1)
+         *      .build();
+         *  System.out.println(
+         *      formatter.format(PlainDate.of(2013, 6, 14))); // Freitag
+         *  // output: 6 (next to last day of US week)
+         * </pre>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   minDigits       minimum count of digits in range 1-9
+         * @param   maxDigits       maximum count of digits in range 1-9
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any of {@code minDigits} and
+         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits < minDigits} or if given element is
+         *          not supported by chronology
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     NumericalElement#numerical(java.lang.Object)
+         *          NumericalElement.numerical(V)
+         * @see     SignPolicy#SHOW_NEVER
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen f&uuml;r das
          * angegebene chronologische Aufz&auml;hlungselement. </p>
          *
@@ -1526,6 +2042,29 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines an integer format without sign and with fixed width
+         * for given chronological enumeration element. </p>
+         *
+         * <p>Almost equivalent to {@code addNumerical(element, digits, digits)} 
+         * but with following important difference: </p>
+         *
+         * <p>If this method directly follow after other numerical elements
+         * then the fixed width defined here will be preserved in preceding
+         * elements so parsing of those ancestors will not consume too many
+         * digits (<i>adjacent digit parsing</i>). </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   digits          fixed count of digits in range 1-9
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code digits} is out of
+         *          range {@code 1-9} or if given element is not supported
+         *          by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addNumerical(ChronoElement, int, int)
+         *          addNumerical(ChronoElement, int, int)
+         */
+        /*[deutsch]
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester Breite
          * f&uuml;r das angegebene chronologische Aufz&auml;hlungselement. </p>
          *
@@ -1565,15 +2104,87 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a fractional format for given chronological element
+         * including a possible decimal separator char but without any
+         * integer part by mapping the context-dependent value range to
+         * the interval [0.0-1.0). </p>
+         *
+         * <p>First a leading decimal separator char will be formatted
+         * if required by last argument (for example in US the dot, in
+         * Germany a comma). Then the fractional digits follow by mean of
+         * the formula {@code (value - min) / (max - min + 1)}. Possible
+         * gaps like offset-jumps in the value range mapping will be kept.
+         * The fractional representation is most suitable for elements
+         * with a fixed value range, for example {@code MINUTE_OF_HOUR}
+         * or {@code MILLI_OF_SECOND}. </p>
+         *
+         * <ol><li>PRINT =&gt; If the resulting sequence of digits after
+         * the decimal separator char has less than {@code minDigits}
+         * then it will be right-padded with zero digit char until there
+         * are {@code minDigits} digits. But if there are more than
+         * {@code maxDigits} then the sequence of digits will be
+         * truncated. In the special case of {@code minDigits == 0} 
+         * and if the sequence to be formatted has no digits then the
+         * diecimal separator char will be left out. </li>
+         *
+         * <li>PARSE =&gt; At most {@code maxDigits} chars will be
+         * interpreted as digits. If there are less than {@code minDigits}
+         * then the text input will be invalid. Note: If there is no
+         * strict mode then the parser will always assume
+         * {@code minDigits == 0} and {@code maxDigits = 9} unless
+         * a fixed width was implicitly specified by setting
+         * {@code minDigits == maxDigits} and without decimal separator
+         * char (then <i>adjacent digit parsing</i>). </li>
+         * </ol>
+         *
+         * <p>Example: </p>
+         * <pre>
+         *  ChronoElement&lt;Integer&gt; element = PlainTime.MICRO_OF_SECOND;
+         *  int minDigits = 3;
+         *  int maxDigits = 6;
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+         *      .addFraction(
+         *          element,
+         *          minDigits,
+         *          maxDigits,
+         *          true
+         *      ).build();
+         *  System.out.println(
+         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *  // output in US: .012345
+         * </pre>
+         *
+         * <p>Note: A fractional element must not be directly preceded by
+         * another numerical element. </p>
+         *
+         * @param   element             chronological element
+         * @param   minDigits           minimum count of digits after decimal
+         *                              separator in range 0-9
+         * @param   maxDigits           maximum count of digits after decimal
+         *                              separator in range 1-9
+         * @param   decimalSeparator    shall decimal separator be visible?
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code minDigits} is out of
+         *          range {@code 0-9} or if {@code maxDigits} is out of range
+         *          {@code 1-9} or if {@code maxDigits < minDigits} or if
+         *          given element is not supported by chronology or if there
+         *          is already a fractional part defined
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     Attributes#LENIENCY
+         */
+        /*[deutsch]
          * <p>Definiert ein Bruchzahlformat f&uuml;r das angegebene
          * chronologische Element inklusive Dezimaltrennzeichen, aber ohne
          * Integerteil, indem der kontextabh&auml;ngige Wertbereich auf das
          * Intervall [0.0-1.0) abgebildet wird. </p>
          *
          * <p>Zuerst wird ein f&uuml;hrendes Dezimaltrennzeichen in
-         * lokalisierter Form formatiert (zum Beispiel in den USA ein Punkt,
-         * in Deutschland ein Komma). Dann folgen die Nachkommastellen mit
-         * Hilfe der Formel {@code (value - min) / (max - min + 1)}. Eventuelle
+         * lokalisierter Form formatiert, falls mit dem letzten Argument
+         * angefordert (zum Beispiel in den USA ein Punkt, in Deutschland
+         * ein Komma). Dann folgen die Nachkommastellen mit Hilfe der
+         * Formel {@code (value - min) / (max - min + 1)}. Eventuelle
          * L&uuml;cken wie Zeitzonenspr&uuml;nge im Wertbereich bleiben
          * erhalten. Am besten eignet sich die fraktionale Darstellung
          * f&uuml;r Elemente mit einem festen Wertbereich, zum Beispiel
@@ -1677,6 +2288,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a literal element with exactly one char. </p>
+         *
+         * <p>Usually the literal char is a punctuation mark or a
+         * letter symbol. Decimal digits as literal chars are not
+         * recommended, especially not after preceding numerical
+         * elements. </p>
+         *
+         * @param   literal         single literal char
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the char represents
+         *          a non-printable ASCII-char
+         */
+        /*[deutsch]
          * <p>Definiert ein Literalelement mit genau einem festen Zeichen. </p>
          *
          * <p>In der Regel handelt es sich um ein Interpunktionszeichen oder
@@ -1696,6 +2320,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a literal element with any chars. </p>
+         *
+         * <p>Usually the literal char sequence consists of punctuation
+         * marks or letter symbols. Leading decimal digits as literal
+         * chars are not recommended, especially not after preceding
+         * numerical elements. </p>
+         *
+         * @param   literal         literal char sequence
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given literal is empty
+         *          or starts with a non-printable ASCII-char
+         */
+        /*[deutsch]
          * <p>Definiert ein Literalelement mit beliebigen Zeichen. </p>
          *
          * <p>In der Regel handelt es sich um Interpunktionszeichen oder
@@ -1716,6 +2353,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a literal element with a char which will be searched
+         * in given format attribute. </p>
+         *
+         * <p>A localized decimal separator char as literal will be possible
+         * if the argument is equal to {@link Attributes#DECIMAL_SEPARATOR}.
+         * Note: If given format attribute does not exist at runtime then
+         * the formatting will fail. </p>
+         *
+         * @param   attribute       attribute defining a literal char
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Definiert ein Literalelement mit einem Zeichen, das in einem
          * Formatattribut gesucht wird. </p>
          *
@@ -1735,6 +2384,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a sequence of optional white space. </p>
+         *
+         * <p>If printed a space char will be used. In parsing however,
+         * any white space of arbitrary length will be ignored and 
+         * skipped. </p>
+         *
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Definiert optionale nicht-anzeigbare Zeichen. </p>
          *
          * <p>Beim Formatieren wird ein Leerzeichen ausgegeben, beim Parsen
@@ -1751,6 +2409,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Processes given format pattern of given pattern type to a
+         * sequence of format elements. </p>
+         *
+         * <p>The letters a-z and A-Z are treated as format symbols. The
+         * square brackets &quot;[&quot; and &quot;]&quot; define an
+         * optional section which can be nested, too.. The chars 
+         * &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved
+         * for the future. All other chars will be interpreted as literals.
+         * If a reserved char shall be treated as literal then it must be
+         * escaped by the apostroph &quot;'&quot;. The apostroph itself
+         * can be treated as literal by double apostroph. </p>
+         *
+         * <p>For exact interpretation and description of format symbols
+         * see the implementations of interface {@code ChronoPattern}. </p>
+         *
+         * @param   formatPattern   pattern of symbols to be used in formatting
+         * @param   patternType     type of pattern how to interprete symbols
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if resolving of pattern fails
+         * @see     net.time4j.PatternType
+         */
+        /*[deutsch]
          * <p>Verarbeitet ein beliebiges Formatmuster des angegebenen Typs. </p>
          *
          * <p>Als Formatsymbole werden die Buchstaben a-z und A-Z erkannt. Die
@@ -1878,6 +2558,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a text format for given chronological element. </p>
+         *
+         * @param   element         chronological text element
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein Textformat f&uuml;r das angegebene Element. </p>
          *
          * @param   element         chronological text element
@@ -1895,6 +2584,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a text format for given chronological element. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein Textformat f&uuml;r das angegebene Element. </p>
          *
          * @param   <V> generic type of element values
@@ -1924,8 +2623,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a text format for given chronological element with
+         * user-defined string resources. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   lookup          text resources for lookup
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
-         * benutzerdefinierten String-Ressourcen und optionalem Ersatzwert. </p>
+         * benutzerdefinierten String-Ressourcen. </p>
          *
          * @param   <V> generic type of element values
          * @param   element         chronological element
@@ -1947,6 +2658,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a customized format element for given chronological
+         * element. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   formatter       customized formatter object as delegate
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein benutzerdefiniertes Format f&uuml;r das angegebene
          * chronologische Element. </p>
          *
@@ -1968,6 +2691,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a customized format element for given chronological
+         * element. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   printer         customized printer
+         * @param   parser          customized parser
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
          * <p>Definiert ein benutzerdefiniertes Format f&uuml;r das angegebene
          * chronologische Element. </p>
          *
@@ -1994,6 +2730,27 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a special format element for a two-digit-year. </p>
+         *
+         * <p>It is possible to specify a pivot year by setting the
+         * attribute {@code Attributes.PIVOT_YEAR} to a meaningful year.
+         * If this attribute is missing then Time4J will set the year
+         * twenty years after now as pivot year by default. </p>
+         *
+         * <p>If this format element is directly preceded by other numerical
+         * elements with variable width then the fixed width of 2 will be
+         * preserved such that the preceding elements will not consume too
+         * many digits (<i>adjacent digit parsing</i>). Otherwise this
+         * format element can also parse more than two digits if there is
+         * no strict mode with the consequence that the parsed year will be
+         * interpreted as absolute full year.. </p>
+         *
+         * @param   element     year element (name must start with the
+         *                      prefix &quot;YEAR&quot;)
+         * @return  this instance for method chaining
+         * @see     Attributes#PIVOT_YEAR
+         */
+        /*[deutsch]
          * <p>Definiert eine zweistellige Jahresangabe. </p>
          *
          * <p>Die Angabe eines Kippjahres ist mit Hilfe des Attributs
@@ -2008,7 +2765,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * nicht zuviele Ziffern interpretieren (<i>adjacent digit parsing</i>).
          * Andernfalls k&ouml;nnen auch mehr als zwei Ziffern interpretiert
          * werden, sofern kein strikter Modus vorliegt mit der Folge, da&szlig;
-         * eine solche Jahreszahl als absolutes Jahr interpretiert wird. </p>
+         * eine solche Jahreszahl als absolutes volles Jahr interpretiert
+         * wird. </p>
          *
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)
@@ -2043,6 +2801,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a timezone identifier. </p>
+         *
+         * <p>Parsing of a timezone ID is case-sensitive. All timezone IDs
+         * which will be provided by {@link Timezone#getAvailableIDs()}
+         * will be supported - with the exception of old IDs like
+         * &quot;Asia/Riyadh87&quot; or &quot;CST6CDT&quot; which contain
+         * some digits. Offset-IDs like the canonical form of 
+         * {@code ZonalOffset} or &quot;GMT&quot; are supported, too.
+         * An exceptional case are again deprecated IDs like
+         * &quot;Etc/GMT+12&quot;. </p>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException wenn die zugrundeliegende Chronologie
+         *          nicht dem Typ {@link net.time4j.base.UnixTime} entspricht
+         */
+        /*[deutsch]
          * <p>F&uuml;gt eine Zeitzonen-ID hinzu. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonen-ID ist
@@ -2073,6 +2847,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a localized timezone name. </p>
+         *
+         * <p>Dependent on the current locale, the preferred timezone IDs
+         * in a country will be determined first. The parsing of
+         * timezone names is case-sensitive. </p>
+         *
+         * @param   abbreviated     abbreviations to be used?
+         * @return  this instance for method chaining
+         * @see     Timezone#getPreferredIDs(Locale)
+         * @see     #addTimezoneName(boolean,Set)
+         */
+        /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
@@ -2099,6 +2885,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a localized timezone name. </p>
+         *
+         * <p>Parsing of timezone names is case-sensitive. </p>
+         *
+         * @param   abbreviated     abbreviations to be used?
+         * @param   preferredZones  preferred timezone ids for resolving
+         *                          duplicates
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
@@ -2121,6 +2917,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a timezone offset in typical ISO-8601-notation. </p>
+         *
+         * <p>The offset format is &quot;&#x00B1;HH:mm&quot; or in case of
+         * zero offset simply &quot;Z&quot;. Equivalent to the expression
+         * {@code addTimezoneOffset(DisplayMode.MEDIUM, true,
+         * Collections.singletonList("Z"))}. </p>
+         *
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in typischer ISO-8601-Notation
          * hinzu. </p>
          *
@@ -2139,6 +2945,60 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a timezone offset in canonical notation. </p>
+         *
+         * <p>This format element is also applicable on chronological
+         * entities without timezone reference like {@code PlainTime}
+         * provided that a timezone offset is set as format attribute.
+         * Dependent on given arguments following formats are
+         * defined: </p>
+         *
+         * <div style="margin-top:5px;">
+         * <table border="1">
+         * <tr>
+         *  <th>&nbsp;</th>
+         *  <th>SHORT</th>
+         *  <th>MEDIUM</th>
+         *  <th>LONG</th>
+         *  <th>FULL</th>
+         * </tr>
+         * <tr>
+         *  <td>basic</td>
+         *  <td>&#x00B1;HH[mm]</td>
+         *  <td>&#x00B1;HHmm</td>
+         *  <td>&#x00B1;HHmm[ss[.{fraction}]]</td>
+         *  <td>&#x00B1;HHmmss[.{fraction}]</td>
+         * </tr>
+         * <tr>
+         *  <td>extended</td>
+         *  <td>&#x00B1;HH[:mm]</td>
+         *  <td>&#x00B1;HH:mm</td>
+         *  <td>&#x00B1;HH:mm[:ss[.{fraction}]]</td>
+         *  <td>&#x00B1;HH:mm:ss[.{fraction}]</td>
+         * </tr>
+         * </table>
+         * </div>
+         *
+         * <p>Notes: All components given in square brackets are optional.
+         * They will only appear if they are different from {@code 0}.
+         * A fractional second part with 9 digits is always optional
+         * and is only possible in case of a longitudinal offset. The modes
+         * SHORT and MEDIUM correspond to ISO-8601 where an offset should
+         * only have hours and minutes. </p>
+         *
+         * <p>The third argument determines what kind of text should be
+         * interpreted as zero offset. The formatted output always uses
+         * the first list entry while parsing expects any list entries. </p>
+         *
+         * @param   precision       display mode of offset format
+         * @param   extended        extended or basic ISO-8601-mode
+         * @param   zeroOffsets     list of replacement texts if offset is zero
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any replacement text consists
+         *          of white-space only or if given replacement list is empty
+         * @see     ChronoEntity#getTimezone()
+         */
+        /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in kanonischer Notation
          * hinzu. </p>
          *
@@ -2207,6 +3067,40 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Adds a timezone offset in localized notation. </p>
+         *
+         * <p>This format element is also applicable on chronological
+         * entities without timezone reference like {@code PlainTime}
+         * provided that a timezone offset is set as format attribute.
+         * Dependent on given arguments following formats are
+         * defined: </p>
+         *
+         * <div style="margin-top:5px;">
+         * <table border="1">
+         * <tr>
+         *  <th>ABBREVIATED</th>
+         *  <th>FULL</th>
+         * </tr>
+         * <tr>
+         *  <td>GMT&#x00B1;H[:mm]</td>
+         *  <td>GMT&#x00B1;HH:mm</td>
+         * </tr>
+         * </table>
+         * </div>
+         *
+         * <p>Notes: The minute component given in square brackets is
+         * optional in short format and appears only if it is different
+         * from {@code 0}. The GMT-prefix can also be like &quot;UTC&quot;
+         * or &quot;UT&quot; when parsing. A localized GMT-notation is
+         * possible provided that the resource files
+         * &quot;iso8601.properties&quot; have an entry with the key
+         * &quot;prefixGMTOffset&quot;. </p>
+         *
+         * @param   abbreviated     using shortest possible form?
+         * @return  this instance for method chaining
+         * @see     ChronoEntity#getTimezone()
+         */
+        /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in lokalisierter Notation
          * hinzu. </p>
          *
@@ -2249,6 +3143,21 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines for the next format element of the same section so
+         * many pad chars until the element width has reached the width
+         * specified. </p>
+         *
+         * <p>Note: This method will be ignored if it is directly followed
+         * by a new section or if the current section is closed
+         * or if there are no more format elements. </p>
+         *
+         * @param   width   fixed width of following format step
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given width is negative
+         * @see     Attributes#PAD_CHAR
+         * @see     #padPrevious(int)
+         */
+        /*[deutsch]
          * <p>Definiert zum n&auml;chsten Element der gleichen Sektion soviele
          * F&uuml;llzeichen, bis die Elementbreite die angegebene Breite
          * erreicht hat. </p>
@@ -2277,6 +3186,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines for the previous format element of the same
+         * section so many pad chars until the element width has
+         * reached the width specified. </p>
+         *
+         * @param   width   fixed width of previous format step
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given width is negative
+         * @see     Attributes#PAD_CHAR
+         * @see     #padNext(int)
+         */
+        /*[deutsch]
          * <p>Definiert zum vorherigen Element  der gleichen Sektion soviele
          * F&uuml;llzeichen, bis die Elementbreite die angegebene Breite
          * erreicht hat. </p>
@@ -2314,6 +3234,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new optional section where errors in parsing will
+         * not cause an exception but just be ignored. </p>
+         *
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
          * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
          * werden. </p>
@@ -2327,6 +3253,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new optional section where errors in parsing will
+         * not cause an exception but just be ignored. </p>
+         *
+         * @param   printCondition  optional condition for printing
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
          * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
          * werden. </p>
@@ -2379,6 +3312,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new section with given sectional attribute. </p>
+         *
+         * <p>The new section takes over all attributes of current section
+         * if available. Sectional attributes cannot be overridden by the
+         * default attributes of {@code ChronoFormatter}. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen Abschnitt mit dem angegebenen sektionalen
          * boolean-Attribut. </p>
          *
@@ -2411,6 +3355,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new section with given sectional attribute. </p>
+         *
+         * <p>The new section takes over all attributes of current section
+         * if available. Sectional attributes cannot be overridden by the
+         * default attributes of {@code ChronoFormatter}. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen Abschnitt mit dem angegebenen sektionalen
          * int-Attribut. </p>
          *
@@ -2443,6 +3398,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new section with given sectional attribute. </p>
+         *
+         * <p>The new section takes over all attributes of current section
+         * if available. Sectional attributes cannot be overridden by the
+         * default attributes of {@code ChronoFormatter}. </p>
+         *
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen Abschnitt mit dem angegebenen sektionalen
          * char-Attribut. </p>
          *
@@ -2475,6 +3441,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new section with given sectional attribute. </p>
+         *
+         * <p>The new section takes over all attributes of current section
+         * if available. Sectional attributes cannot be overridden by the
+         * default attributes of {@code ChronoFormatter}. </p>
+         *
+         * @param   <A> generic type of attribute (enum-based)
+         * @param   key     attribute key
+         * @param   value   attribute value
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Startet einen neuen Abschnitt mit dem angegebenen sektionalen
          * enum-Attribut. </p>
          *
@@ -2508,11 +3486,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Removes the last sectional attribute. </p>
+         *
+         * @return  this instance for method chaining
+         * @throws  java.util.NoSuchElementException if there is no section
+         *          which was started with {@code startSection()}
+         * @see     #startSection(AttributeKey, boolean)
+         * @see     #startSection(AttributeKey, Enum)
+         * @see     #startSection(AttributeKey, int)
+         * @see     #startSection(AttributeKey, char)
+         */
+        /*[deutsch]
          * <p>Entfernt das letzte sektionale Attribut. </p>
          *
          * @return  this instance for method chaining
          * @throws  java.util.NoSuchElementException if there is no section
-         *          which was startet with {@code startSection()}
+         *          which was started with {@code startSection()}
          * @see     #startSection(AttributeKey, boolean)
          * @see     #startSection(AttributeKey, Enum)
          * @see     #startSection(AttributeKey, int)
@@ -2527,6 +3516,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Finishes the build and creates a new {@code ChronoFormatter}. </p>
+         *
+         * @return  new {@code ChronoFormatter}-instance
+         */
+        /*[deutsch]
          * <p>Schlie&szlig;t den Build-Vorgang ab und erstellt ein neues
          * Zeitformat. </p>
          *
