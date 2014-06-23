@@ -32,8 +32,25 @@ import java.util.Set;
 
 
 /**
+ * <p>Represents a metric suitable for the default algorithm of Time4J. </p>
+ *
+ * <p>If the starting time point is after the end time point then a
+ * duration computed with this metric will be negative. In this case
+ * the metric defined here will first toggle the time points to be
+ * compared and then compare all elements in the order of ascending
+ * precision. Elements which differ less than a full unit will cause
+ * an amount of {@code 0} in related duration item. Convertible units
+ * will be consolidated in one step. Finally the representation of
+ * the duration will be normalized such that small units will be
+ * converted to larger units if possible. </p>
+ *
+ * @param   <U> generic type of time unit ({@code ChronoUnit})
+ * @author  Meno Hochschild
+ * @see     AbstractDuration
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine Metrik passend zum Standardalgorithmus
- * von Zeitspannen in Time4J. </p>
+ * von Time4J. </p>
  *
  * <p>Eine mit Hilfe der Metrik berechnete Zeitspanne ist negativ, wenn
  * der Start nach dem Endzeitpunkt liegt. Im Fall der negativen Zeitspanne
@@ -65,6 +82,18 @@ public abstract class AbstractMetric
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Creates a new default metric with given array of time units. </p>
+     *
+     * <p>The given time units can be in any arbitrary order, but internally
+     * the will be automatically sorted by their default estimated length. </p>
+     *
+     * @param   normalizing     Is normalizing required that is shall amounts
+     *                          in small units be converted to bigger units?
+     * @param   units           time units to be used for calculating time span
+     * @throws  IllegalArgumentException if any time unit is given more than
+     *          once or if there is no time unit at all
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Standardmetrik mit einem Array von
      * Zeiteinheiten. </p>
      *
@@ -102,8 +131,23 @@ public abstract class AbstractMetric
     }
 
     /**
+     * <p>Creates a new default metric with given set of time units. </p>
+     *
+     * <p>The given time units can be in any arbitrary order, but internally
+     * the will be automatically sorted by their default estimated length. </p>
+     *
+     * @param   normalizing     Is normalizing required that is shall amounts
+     *                          in small units be converted to bigger units?
+     * @param   units           time units to be used for calculating time span
+     * @throws  IllegalArgumentException if there is not time unit at all
+     */
+    /*[deutsch]
      * <p>Konstruiert eine neue Standardmetrik mit einem {@code Set}
      * von Zeiteinheiten. </p>
+     *
+     * <p>Die Zeiteinheiten k&ouml;nnen in beliebiger Reihenfolge
+     * angegeben werden, aber intern werden sie &uuml;ber ihre
+     * Standardl&auml;nge automatisch sortiert. </p>
      *
      * @param   normalizing     Is normalizing required that is shall amounts
      *                          in small units be converted to bigger units?
@@ -131,6 +175,14 @@ public abstract class AbstractMetric
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Compares time units by their length in descending order. </p>
+     *
+     * @param   u1  first time unit
+     * @param   u2  second time unit
+     * @return  negative, zero or positive if u1 is greater, equal to
+     *          or smaller than u2
+     */
+    /*[deutsch]
      * <p>Vergleicht Zeiteinheiten absteigend nach ihrer L&auml;nge. </p>
      *
      * @param   u1  first time unit
