@@ -875,7 +875,7 @@ public enum PatternType
                 }
                 break;
             case 'g':
-                builder.addLong(
+                builder.addLongNumber(
                     EpochDays.MODIFIED_JULIAN_DATE,
                     count,
                     18,
@@ -961,9 +961,9 @@ public enum PatternType
             case 'z':
                 Set<TZID> preferredZones = Timezone.getPreferredIDs(locale);
                 if (count < 4) {
-                    builder.addTimezoneName(true, preferredZones);
+                    builder.addShortTimezoneName(preferredZones);
                 } else if ((count == 4) || sdf) {
-                    builder.addTimezoneName(false, preferredZones);
+                    builder.addLongTimezoneName(preferredZones);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
@@ -976,7 +976,7 @@ public enum PatternType
                         false,
                         Collections.singletonList("+0000"));
                 } else if (count == 4) {
-                    builder.addLocalizedOffset(false);
+                    builder.addLongLocalizedOffset();
                 } else if (count == 5) {
                     builder.addTimezoneOffset(
                         DisplayMode.LONG,
@@ -989,9 +989,9 @@ public enum PatternType
                 break;
             case 'O':
                 if (count == 1) {
-                    builder.addLocalizedOffset(true);
+                    builder.addShortLocalizedOffset();
                 } else if (count == 4) {
-                    builder.addLocalizedOffset(false);
+                    builder.addLongLocalizedOffset();
                 } else {
                     throw new IllegalArgumentException(
                         "Count of pattern letters is not 1 or 4: " + count);

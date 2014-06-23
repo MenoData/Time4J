@@ -988,7 +988,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Converts this formatter into a traditional 
+     * <p>Converts this formatter into a traditional
      * {@code java.text.Format}-object. </p>
      *
      * <p>The returned format object also supports attributed strings such
@@ -1877,7 +1877,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
          */
-        public Builder<T> addLong(
+        public Builder<T> addLongNumber(
             ChronoElement<Long> element,
             int minDigits,
             int maxDigits,
@@ -2045,7 +2045,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines an integer format without sign and with fixed width
          * for given chronological enumeration element. </p>
          *
-         * <p>Almost equivalent to {@code addNumerical(element, digits, digits)} 
+         * <p>Almost equivalent to {@code addNumerical(element, digits, digits)}
          * but with following important difference: </p>
          *
          * <p>If this method directly follow after other numerical elements
@@ -2123,7 +2123,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * then it will be right-padded with zero digit char until there
          * are {@code minDigits} digits. But if there are more than
          * {@code maxDigits} then the sequence of digits will be
-         * truncated. In the special case of {@code minDigits == 0} 
+         * truncated. In the special case of {@code minDigits == 0}
          * and if the sequence to be formatted has no digits then the
          * diecimal separator char will be left out. </li>
          *
@@ -2387,7 +2387,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a sequence of optional white space. </p>
          *
          * <p>If printed a space char will be used. In parsing however,
-         * any white space of arbitrary length will be ignored and 
+         * any white space of arbitrary length will be ignored and
          * skipped. </p>
          *
          * @return  this instance for method chaining
@@ -2414,7 +2414,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <p>The letters a-z and A-Z are treated as format symbols. The
          * square brackets &quot;[&quot; and &quot;]&quot; define an
-         * optional section which can be nested, too.. The chars 
+         * optional section which can be nested, too.. The chars
          * &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved
          * for the future. All other chars will be interpreted as literals.
          * If a reserved char shall be treated as literal then it must be
@@ -2807,7 +2807,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * which will be provided by {@link Timezone#getAvailableIDs()}
          * will be supported - with the exception of old IDs like
          * &quot;Asia/Riyadh87&quot; or &quot;CST6CDT&quot; which contain
-         * some digits. Offset-IDs like the canonical form of 
+         * some digits. Offset-IDs like the canonical form of
          * {@code ZonalOffset} or &quot;GMT&quot; are supported, too.
          * An exceptional case are again deprecated IDs like
          * &quot;Etc/GMT+12&quot;. </p>
@@ -2847,30 +2847,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
-         * <p>Adds a localized timezone name. </p>
+         * <p>Adds a short localized timezone name (an abbreviation). </p>
          *
          * <p>Dependent on the current locale, the preferred timezone IDs
          * in a country will be determined first. The parsing of
          * timezone names is case-sensitive. </p>
          *
-         * @param   abbreviated     abbreviations to be used?
          * @return  this instance for method chaining
          * @see     Timezone#getPreferredIDs(Locale)
-         * @see     #addTimezoneName(boolean,Set)
+         * @see     #addShortTimezoneName(Set)
          */
         /*[deutsch]
-         * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
+         * <p>F&uuml;gt die Abk&uuml;rzung eines Zeitzonennamens hinzu. </p>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
          * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
          *
-         * @param   abbreviated     abbreviations to be used?
          * @return  this instance for method chaining
          * @see     Timezone#getPreferredIDs(Locale)
-         * @see     #addTimezoneName(boolean,Set)
+         * @see     #addShortTimezoneName(Set)
          */
-        public Builder<T> addTimezoneName(boolean abbreviated) {
+        public Builder<T> addShortTimezoneName() {
 
             Locale loc = this.locale;
 
@@ -2878,40 +2876,98 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 loc = this.stack.getLast().get(Attributes.LOCALE, loc);
             }
 
-            return this.addTimezoneName(
-                abbreviated,
-                Timezone.getPreferredIDs(loc));
+            return this.addShortTimezoneName(Timezone.getPreferredIDs(loc));
 
         }
 
         /**
-         * <p>Adds a localized timezone name. </p>
+         * <p>Adds a long localized timezone name. </p>
+         *
+         * <p>Dependent on the current locale, the preferred timezone IDs
+         * in a country will be determined first. The parsing of
+         * timezone names is case-sensitive. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     Timezone#getPreferredIDs(Locale)
+         * @see     #addLongTimezoneName(Set)
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen langen Zeitzonennamen hinzu. </p>
+         *
+         * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
+         * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
+         * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     Timezone#getPreferredIDs(Locale)
+         * @see     #addLongTimezoneName(Set)
+         */
+        public Builder<T> addLongTimezoneName() {
+
+            Locale loc = this.locale;
+
+            if (!this.stack.isEmpty()) {
+                loc = this.stack.getLast().get(Attributes.LOCALE, loc);
+            }
+
+            return this.addLongTimezoneName(Timezone.getPreferredIDs(loc));
+
+        }
+
+        /**
+         * <p>Adds a short localized timezone name (an abbreviation). </p>
          *
          * <p>Parsing of timezone names is case-sensitive. </p>
          *
-         * @param   abbreviated     abbreviations to be used?
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @see     #addLongTimezoneName(Set)
          */
         /*[deutsch]
-         * <p>F&uuml;gt einen Zeitzonennamen hinzu. </p>
+         * <p>F&uuml;gt die Abk&uuml;rzung eines Zeitzonennamens hinzu. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
          * beachtet. </p>
          *
-         * @param   abbreviated     abbreviations to be used?
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @see     #addLongTimezoneName(Set)
          */
-        public Builder<T> addTimezoneName(
-            boolean abbreviated,
-            Set<TZID> preferredZones
-        ) {
+        public Builder<T> addShortTimezoneName(Set<TZID> preferredZones) {
 
             this.addProcessor(
-                new TimezoneNameProcessor(abbreviated, preferredZones));
+                new TimezoneNameProcessor(true, preferredZones));
+            return this;
+
+        }
+
+        /**
+         * <p>Adds a long localized timezone name. </p>
+         *
+         * <p>Parsing of timezone names is case-sensitive. </p>
+         *
+         * @param   preferredZones  preferred timezone ids for resolving
+         *                          duplicates
+         * @return  this instance for method chaining
+         * @see     #addShortTimezoneName(Set)
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen langen Zeitzonennamen hinzu. </p>
+         *
+         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
+         * beachtet. </p>
+         *
+         * @param   preferredZones  preferred timezone ids for resolving
+         *                          duplicates
+         * @return  this instance for method chaining
+         * @see     #addShortTimezoneName(Set)
+         */
+        public Builder<T> addLongTimezoneName(Set<TZID> preferredZones) {
+
+            this.addProcessor(
+                new TimezoneNameProcessor(false, preferredZones));
             return this;
 
         }
@@ -3067,26 +3123,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
-         * <p>Adds a timezone offset in localized notation. </p>
+         * <p>Adds a timezone offset in short localized notation. </p>
          *
          * <p>This format element is also applicable on chronological
          * entities without timezone reference like {@code PlainTime}
          * provided that a timezone offset is set as format attribute.
-         * Dependent on given arguments following formats are
-         * defined: </p>
-         *
-         * <div style="margin-top:5px;">
-         * <table border="1">
-         * <tr>
-         *  <th>ABBREVIATED</th>
-         *  <th>FULL</th>
-         * </tr>
-         * <tr>
-         *  <td>GMT&#x00B1;H[:mm]</td>
-         *  <td>GMT&#x00B1;HH:mm</td>
-         * </tr>
-         * </table>
-         * </div>
+         * The format &quot;GMT&#x00B1;H[:mm]&quot; will be used. </p>
          *
          * <p>Notes: The minute component given in square brackets is
          * optional in short format and appears only if it is different
@@ -3096,48 +3138,80 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * &quot;iso8601.properties&quot; have an entry with the key
          * &quot;prefixGMTOffset&quot;. </p>
          *
-         * @param   abbreviated     using shortest possible form?
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
+         * @see     #addLongLocalizedOffset()
          */
         /*[deutsch]
-         * <p>F&uuml;gt einen Zeitzonen-Offset in lokalisierter Notation
+         * <p>F&uuml;gt einen Zeitzonen-Offset in kurzer lokalisierter Notation
          * hinzu. </p>
          *
          * <p>Anwendbar ist dieses Formatierungselement auch auf lokale
          * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
          * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
-         * {@code ChronoFormatter} mitgegeben wird. In Abh&auml;ngigkeit
-         * von den Argumenten sind folgende Formate definiert: </p>
-         *
-         * <div style="margin-top:5px;">
-         * <table border="1">
-         * <tr>
-         *  <th>ABBREVIATED</th>
-         *  <th>FULL</th>
-         * </tr>
-         * <tr>
-         *  <td>GMT&#x00B1;H[:mm]</td>
-         *  <td>GMT&#x00B1;HH:mm</td>
-         * </tr>
-         * </table>
-         * </div>
+         * {@code ChronoFormatter} mitgegeben wird. Als Format wird
+         * &quot;GMT&#x00B1;H[:mm]&quot; verwendet. </p>
          *
          * <p>Hinweise: Die in eckigen Klammern angegebene Minutenkomponente
-         * ist im Kurzformat optional, erscheint also nur, wenn sie von
-         * {@code 0} verschieden ist. Das GMT-Pr&auml;fix darf beim Parsen
-         * auch als &quot;UTC&quot; oder &quot;UT&quot; vorliegen. Auch ist
-         * eine lokalisierte GMT-Notation m&ouml;glich, indem in den
+         * ist optional, erscheint also nur, wenn sie von {@code 0} verschieden
+         * ist. Das GMT-Pr&auml;fix darf beim Parsen auch als &quot;UTC&quot;
+         * oder &quot;UT&quot; vorliegen. Au&szlig;erdem ist eine lokalisierte
+         * GMT-Notation m&ouml;glich, indem in den Ressourcendateien
+         * &quot;iso8601.properties&quot; ein Eintrag mit dem Schl&uuml;ssel
+         * &quot;prefixGMTOffset&quot; vorhanden ist. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     ChronoEntity#getTimezone()
+         * @see     #addLongLocalizedOffset()
+         */
+        public Builder<T> addShortLocalizedOffset() {
+
+            this.addProcessor(new LocalizedGMTProcessor(true));
+            return this;
+
+        }
+
+        /**
+         * <p>Adds a timezone offset in long localized notation. </p>
+         *
+         * <p>This format element is also applicable on chronological
+         * entities without timezone reference like {@code PlainTime}
+         * provided that a timezone offset is set as format attribute.
+         * The format &quot;GMT&#x00B1;HH:mm&quot; will be used. </p>
+         *
+         * <p>Notes: The GMT-prefix can also be like &quot;UTC&quot;
+         * or &quot;UT&quot; when parsing. A localized GMT-notation is
+         * possible provided that the resource files
+         * &quot;iso8601.properties&quot; have an entry with the key
+         * &quot;prefixGMTOffset&quot;. </p>
+         *
+         * @return  this instance for method chaining
+         * @see     ChronoEntity#getTimezone()
+         * @see     #addShortLocalizedOffset()
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen Zeitzonen-Offset in langer lokalisierter Notation
+         * hinzu. </p>
+         *
+         * <p>Anwendbar ist dieses Formatierungselement auch auf lokale
+         * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
+         * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
+         * {@code ChronoFormatter} mitgegeben wird. Als Format wird
+         * &quot;GMT&#x00B1;HH:mm&quot; verwendet. </p>
+         *
+         * <p>Hinweise: Das GMT-Pr&auml;fix darf beim Parsen auch als
+         * &quot;UTC&quot; oder &quot;UT&quot; vorliegen. Au&szlig;erdem
+         * ist eine lokalisierte GMT-Notation m&ouml;glich, indem in den
          * Ressourcendateien &quot;iso8601.properties&quot; ein Eintrag mit
          * dem Schl&uuml;ssel &quot;prefixGMTOffset&quot; vorhanden ist. </p>
          *
-         * @param   abbreviated     using shortest possible form?
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
+         * @see     #addShortLocalizedOffset()
          */
-        public Builder<T> addLocalizedOffset(boolean abbreviated) {
+        public Builder<T> addLongLocalizedOffset() {
 
-            this.addProcessor(new LocalizedGMTProcessor(abbreviated));
+            this.addProcessor(new LocalizedGMTProcessor(false));
             return this;
 
         }
