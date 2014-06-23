@@ -23,7 +23,14 @@ package net.time4j.engine;
 
 
 /**
- * <p>Berechnet Abst&auml;nde auf einer Zeitskala als Zeitspannen. </p>
+ * <p>Computes temporal distances on a time axis as time spans. </p>
+ *
+ * @param   <U> generic type of time unit
+ * @param   <P> generic type of duration type
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
+ * <p>Berechnet Abst&auml;nde auf einer Zeitachse als Zeitspannen. </p>
  *
  * @param   <U> generic type of time unit
  * @param   <P> generic type of duration type
@@ -34,6 +41,15 @@ public interface TimeMetric<U, P extends TimeSpan<?>> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Computes the temporal distance between two time points. </p>
+     *
+     * @param   <T> generic type of time point
+     * @param   start   first time point
+     * @param   end     second time point
+     * @return  calculated time span between given time points, will be
+     *          negative if {@code start} is after {@code end}
+     */
+    /*[deutsch]
      * <p>Berechnet den zeitlichen Abstand zwischen zwei Zeitpunkten. </p>
      *
      * @param   <T> generic type of time point
