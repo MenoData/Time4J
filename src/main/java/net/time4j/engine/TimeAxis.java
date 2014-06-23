@@ -31,6 +31,15 @@ import java.util.Set;
 
 
 /**
+ * <p>A time axis is a dynamic view on a chronology where a system of
+ * registered time units is used to define a time arithmetic for any
+ * time points belonging to this time axis respective chronology. </p>
+ *
+ * @param   <U> generic type of time units
+ * @param   <T> generic type of time context compatible to {@link TimePoint})
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Eine Zeitachse ist eine dynamische Sicht auf eine Chronologie,
  * in der mit Hilfe eines Systems von Zeiteinheiten eine Zeitarithmetik auf
  * beliebigen Zeitpunkten der Chronologie definiert wird. </p>
@@ -88,6 +97,11 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the type of supported time units. </p>
+     *
+     * @return  reified type of time unit
+     */
+    /*[deutsch]
      * <p>Liefert den Zeiteinheitstyp. </p>
      *
      * @return  reified type of time unit
@@ -99,6 +113,11 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Returns all registered time units. </p>
+     *
+     * @return  unmodifiable set of registered units without duplicates
+     */
+    /*[deutsch]
      * <p>Liefert alle registrierten Zeiteinheiten. </p>
      *
      * @return  unmodifiable set of registered units without duplicates
@@ -110,6 +129,12 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Queries if given time unit is registered. </p>
+     *
+     * @param   unit    time unit (optional)
+     * @return  {@code true} if registered else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist die angegebene Zeiteinheit registriert? </p>
      *
      * @param   unit    time unit (optional)
@@ -122,6 +147,16 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Queries if given time unit is supported. </p>
+     *
+     * <p>A time unit is supported if it is either registered or
+     * if it defines a suitable rule. </p>
+     *
+     * @param   unit    time unit (optional)
+     * @return  {@code true} if supported else {@code false}
+     * @see     UnitRule.Source
+     */
+    /*[deutsch]
      * <p>Wird die angegebene Zeiteinheit unterst&uuml;tzt? </p>
      *
      * <p>Unterst&uuml;tzung ist gegeben, wenn die Einheit entweder registriert
@@ -144,6 +179,24 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Returns the length of given time unit in seconds as it is
+     * usual or estimated on this time axis. </p>
+     *
+     * <p>Example: In ISO-systems the year has  {@code 365.2425 * 86400}
+     * seconds by default (mean average), in a julian calender
+     * {@code 365.25 * 86400} seconds however. Daylight-saving-transitions
+     * or UTC-leapseconds are not counted here. </p>
+     *
+     * <p>Note: If given time unit is not registered then Time4J tries
+     * to interprete the unit as {@code ChronoUnit}. If this fails, too,
+     * then the length is not calculatable. </p>
+     *
+     * @param   unit    time unit
+     * @return  estimated standard length in seconds or
+     *          {@code Double.NaN} if not calculatable
+     * @see     ChronoUnit
+     */
+    /*[deutsch]
      * <p>Liefert die in dieser Chronologie &uuml;bliche L&auml;nge der
      * angegebenen Zeiteinheit in Sekunden. </p>
      *
@@ -178,6 +231,24 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Queries if given time units are convertible. </p>
+     *
+     * <p>Convertibility means that there exists a fixed integer factor
+     * for conversion between the units. Examples for convertible units
+     * are weeks/days (factor 7) or years/months (factor 12) in ISO-systems.
+     * Otherwise minutes and seconds will only be convertible with factor
+     * {@code 60} if there is no UTC-context with possible leap seconds. </p>
+     *
+     * <p>If two time units are convertible then the length of a time unit
+     * ({@code getLength()}) can be used to convert time units by applying
+     * the rounded quotient of lengths of units. </p>
+     *
+     * @param   unit1   first time unit
+     * @param   unit2   second time unit
+     * @return  {@code true} if convertible else {@code false}
+     * @see     #getLength(Object) getLength(U)
+     */
+    /*[deutsch]
      * <p>Sind die angegebenen Zeiteinheiten ineinander konvertierbar? </p>
      *
      * <p>Konvertierbarkeit bedeutet, da&szlig; immer ein konstanter
@@ -210,6 +281,9 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Compares time units by ascending precision (that is descending length). </p>
+     */
+    /*[deutsch]
      * <p>Vergleicht Zeiteinheiten nach aufsteigender Genauigkeit. </p>
      */
     @Override
@@ -223,6 +297,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Queries if given element has a base unit. </p>
+     *
+     * @param   element     chronological element (optional)
+     * @return  {@code true} if given element has a base unit else {@code false}
+     * @see     #getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Ermittelt, ob das angegebene Element eine Basiseinheit hat. </p>
      *
      * @param   element     chronological element (optional)
@@ -250,6 +331,19 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Returns the base unit of given element if available. </p>
+     *
+     * <p>Only registred elements can have a base unit unless the element
+     * is a {@code BasicElement} and refers another registered element with
+     * a base unit. </p>
+     *
+     * @param   element     chronological element
+     * @return  found base unit
+     * @throws  ChronoException if there is no base unit
+     * @see     #hasBaseUnit(ChronoElement)
+     * @see     BasicElement#getParent()
+     */
+    /*[deutsch]
      * <p>Liefert die Basiseinheit zum angegebenen Element. </p>
      *
      * <p>Nur registrierte Elemente k&ouml;nnen eine Basiseinheit haben, es
@@ -258,7 +352,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      * mit einer Basiseinheit. </p>
      *
      * @param   element     chronological element
-     * @return  found base unit or {@code null}
+     * @return  found base unit
+     * @throws  ChronoException if there is no base unit
      * @see     #hasBaseUnit(ChronoElement)
      * @see     BasicElement#getParent()
      */
@@ -277,12 +372,22 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             ChronoElement<?> parent = ((BasicElement) element).getParent();
             baseUnit = this.baseUnits.get(parent);
         }
+        
+        if (baseUnit == null) {
+            throw new ChronoException(
+                "Base unit not found for: " + element.name());
+        }
 
         return baseUnit;
 
     }
 
     /**
+     * <p>Yields the minimum of this time axis. </p>
+     *
+     * @return  earliest possible time point
+     */
+    /*[deutsch]
      * <p>Ermittelt das Minimum auf der Zeitachse. </p>
      *
      * @return  earliest possible time point
@@ -294,6 +399,11 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Yields the maximum of this time axis. </p>
+     *
+     * @return  latest possible time point
+     */
+    /*[deutsch]
      * <p>Ermittelt das Maximum auf der Zeitachse. </p>
      *
      * @return  latest possible time point
@@ -323,6 +433,12 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
+     * <p>Yields this time axis as chronological self-referencing
+     * element. </p>
+     *
+     * @return  self-referencing element
+     */
+    /*[deutsch]
      * <p>Liefert diese Zeitachse als chronologisches Element mit
      * Selbstbezug. </p>
      *
@@ -362,9 +478,25 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Erzeugt eine neue Zeitachse respektive Chronologie und wird
-     * ausschlie&szlig;lich beim Laden einer {@code TimePoint}-Klasse T
-     * in einem <i>static initializer</i> benutzt. </p>
+     * <p>Creates a builder for a new time axis respective chronology
+     * and will only be used during loading a class of type
+     * {@code TimePoint (T)} in a <i>static initializer</i>. </p>
+     *
+     * <p>Instances of this class will be created by the static factory
+     * methods {@code setUp()}. </p>
+     *
+     * @param       <U> generic type of time unit
+     * @param       <T> generic type of time context
+     * @author      Meno Hochschild
+     * @see         #setUp(Class,Class,ChronoMerger,TimePoint,TimePoint)
+     * @see         #setUp(Class,Class,ChronoMerger,CalendarSystem)
+     * @concurrency <mutable>
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Builder f&uuml;r eine neue Zeitachse respektive
+     * Chronologie und wird ausschlie&szlig;lich beim Laden einer
+     * {@code TimePoint}-Klasse T in einem <i>static initializer</i>
+     * benutzt. </p>
      *
      * <p>Instanzen dieser Klasse werden &uuml;ber die statischen
      * {@code setUp()}-Fabrikmethoden erzeugt. </p>
@@ -429,6 +561,20 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Creates a builder for building a chronological but
+         * non-calendrical system. </p>
+         *
+         * @param   <U> generic type of time unit
+         * @param   <T> generic type of time context
+         * @param   unitType        reified type of time units
+         * @param   chronoType      reified chronological type
+         * @param   merger          generic replacement for static
+         *                          creation of time points
+         * @param   min             minimum value on time axis
+         * @param   max             maximum value on time axis
+         * @return  new {@code Builder} object
+         */
+        /*[deutsch]
          * <p>Erzeugt ein Hilfsobjekt zum Bauen eines chronologischen, aber
          * nicht kalendarischen Systems. </p>
          *
@@ -461,6 +607,19 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Creates a builder for building a time axis for
+         * plain calendrical objects. </p>
+         *
+         * @param   <U> generic type of time unit
+         * @param   <D> generic type of date context
+         * @param   unitType        reified type of time units
+         * @param   chronoType      reified chronological type
+         * @param   merger          generic replacement for static
+         *                          creation of time points
+         * @param   calendarSystem  calender system
+         * @return  new {@code Builder} object
+         */
+        /*[deutsch]
          * <p>Erzeugt ein Hilfsobjekt zum Bauen einer Zeitachse f&uuml;r
          * reine Datumsangaben. </p>
          *
@@ -512,6 +671,18 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Registers a new element with associated rule and a base
+         * unit. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element     chronological element to be registered
+         * @param   rule        associated element rule
+         * @param   baseUnit    base unit for rolling operations
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is already
+         *          registered (duplicate)
+         */
+        /*[deutsch]
          * <p>Registriert ein neues Element mitsamt der assoziierten Regel
          * und einer Basiseinheit. </p>
          *
@@ -540,6 +711,21 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Registers a non-convertible time unit with an associated
+         * unit rule. </p>
+         *
+         * <p>Is equivalent to {@link #appendUnit(Object,UnitRule,double,Set)
+         * appendUnit(U, rule, length, Collections.emptySet())}. </p>
+         *
+         * @param   unit                time unit to be registered
+         * @param   rule                associated unit rule
+         * @param   length              estimated standard length in seconds
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given time unit is already
+         *          registered (duplicate) or if given length does not represent
+         *          any decimal number
+         */
+        /*[deutsch]
          * <p>Registriert eine neue nicht-konvertierbare Zeiteinheit mitsamt
          * Einheitsregel. </p>
          *
@@ -566,6 +752,48 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Registers a new time unit with an associated unit rule. </p>
+         *
+         * <p>The unit rule defines the time arithmetic for addition and
+         * subtraction of given unit suitable for the time axis. </p>
+         *
+         * <p>If the unit has a length of a whole day then the given length
+         * must be equal to {@code 86400.0}. The time unit of a second has
+         * always the length {@code 1.0}. </p>
+         *
+         * <p>The default length of a time unit primarily serves for
+         * conversion purposes. Rare anomalies like leap seconds or
+         * timezone-induced jumps are not taken into account. Therefore
+         * this estimated length is usually not equal to the real length
+         * in a given time context. In case of non-convertible units the
+         * estimated length has only informational meaning. Example: Months
+         * have as length in ISO-systems the length of a gregorian year
+         * in seconds divided by {@code 12} while in coptic calendar the
+         * divisor {@code 13} is used. However, the definition of the length
+         * of a month in days is not suitable because months and days are
+         * not convertible. </p>
+         *
+         * <p>Convertibility exists if a time unit con be converted to
+         * another time unit using a fixed integer factor. If this is not
+         * always the case then an empty {@code Set} is to be used. Example
+         * minutes/seconds: Without an UTC-context (with possible leapseonds)
+         * minutes are convertible to seconds using a constant factor of
+         * {@code 60}. In an UTC-context however, there is no convertibility
+         * and hence the second will be missing in the argument.
+         * {@code convertibleUnits} to minutes as unit to be registered
+         * (and reverse, too).. </p>
+         *
+         * @param   unit                time unit to be registered
+         * @param   rule                associated unit rule
+         * @param   length              estimated standard length in seconds
+         * @param   convertibleUnits    other time units which {@code unit}
+         *                              can be converted to
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given time unit is already
+         *          registered (duplicate) or if given length does not represent
+         *          any decimal number
+         */
+        /*[deutsch]
          * <p>Registriert eine neue Zeiteinheit mitsamt Einheitsregel. </p>
          *
          * <p>Die Regel zur Zeiteinheit definiert die Zeitarithmetik in der
@@ -648,6 +876,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Creates and registers a time axis. </p>
+         *
+         * @return  new chronology as time axis
+         * @throws  IllegalStateException if already registered or in
+         *          case of inconsistencies
+         */
+        /*[deutsch]
          * <p>Erzeugt und registriert eine Zeitachse. </p>
          *
          * @return  new chronology as time axis
