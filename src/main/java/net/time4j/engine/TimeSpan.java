@@ -29,8 +29,15 @@ import java.util.List;
 
 
 /**
- * <p>Repr&auml;sentiert eine allgemeine Zeitspanne in mehreren Zeiteinheiten
- * mit deren zugeordneten Betr&auml;gen. </p>
+ * <p>Represents a common time span with an associated sign and  a
+ * sequence of time units and related amounts. </p>
+ *
+ * @param   <U> generic type of time unit
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
+ * <p>Repr&auml;sentiert eine allgemeine vorzeichenbehaftete Zeitspannem
+ * in mehreren Zeiteinheiten mit deren zugeordneten Betr&auml;gen. </p>
  *
  * @param   <U> generic type of time unit
  * @author  Meno Hochschild
@@ -40,6 +47,13 @@ public interface TimeSpan<U> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields all containted time span items with amount and unit in
+     * the order from largest to smallest time units. </p>
+     *
+     * @return  unmodifiable list sorted by precision of units in ascending
+     *          order where every time unit exists at most once
+     */
+    /*[deutsch]
      * <p>Liefert alle enthaltenen Zeitspannenelemente mit Einheit und Betrag
      * in der Reihenfolge von den gr&ouml;&szlig;ten zu den kleinsten und
      * genauesten Zeiteinheiten. </p>
@@ -50,6 +64,24 @@ public interface TimeSpan<U> {
     List<Item<U>> getTotalLength();
 
     /**
+     * <p>Queries if given time unit is part of this time span. </p>
+     *
+     * <p>By default the implementation uses following expression: </p>
+     *
+     * <pre>
+     *  for (Item&lt;?&gt; item : getTotalLength()) {
+     *      if (item.getUnit().equals(unit)) {
+     *          return (item.getAmount > 0);
+     *      }
+     *  }
+     *  return false;
+     * </pre>
+     *
+     * @param   unit    time unit to be asked (optional)
+     * @return  {@code true} if exists else {@code false}
+     * @see     #getPartialAmount(ChronoUnit)
+     */
+    /*[deutsch]
      * <p>Ist die angegebene Zeiteinheit in dieser Zeitspanne enthalten? </p>
      *
      * <p>Standardm&auml;&szlig;ig entspricht die konkrete
@@ -71,6 +103,17 @@ public interface TimeSpan<U> {
     boolean contains(ChronoUnit unit);
 
     /**
+     * <p>Yields the partial amount associated with given time unit. </p>
+     *
+     * <p>The method returns {@code 0} if this time span does not contain
+     * given time unit. In order to get the total length/amount of this
+     * time span users have to evaluate the method {@link #getTotalLength()}
+     * instead. </p>
+     *
+     * @param   unit    time unit (optional)
+     * @return  amount as part of time span ({@code >= 0})
+     */
+    /*[deutsch]
      * <p>Liefert den Teilbetrag zur angegebenen Einheit als Absolutwert. </p>
      *
      * <p>Die Methode liefert {@code 0}, wenn die Zeiteinheit nicht enthalten
@@ -83,6 +126,20 @@ public interface TimeSpan<U> {
     long getPartialAmount(ChronoUnit unit);
 
     /**
+     * <p>Queries if this time span is negative. </p>
+     *
+     * <p>A negative time span relates to the subtraction of two time
+     * points where first one is after second one. The partial amounts
+     * of every time span are never negative. Hence this attribute is not
+     * associated with the partial amounts but only with the time span
+     * itself. </p>
+     *
+     * <p>Note: An empty time span itself is never negative in agreement
+     * with the mathematical relation {@code (-1) * 0 = 0}. </p>
+     *
+     * @return  {@code true} if negative and not empty else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist diese Zeitspanne negativ? </p>
      *
      * <p>Der Begriff der negativen Zeitspanne bezieht sich auf die Subtraktion
@@ -100,6 +157,15 @@ public interface TimeSpan<U> {
     boolean isNegative();
 
     /**
+     * <p>Queries if this time span is positive. </p>
+     *
+     * <p>A time span is positive if it is neither empty nor negative. </p>
+     *
+     * @return  {@code true} if positive and not empty else {@code false}
+     * @see     #isEmpty()
+     * @see     #isNegative()
+     */
+    /*[deutsch]
      * <p>Ist diese Zeitspanne positiv? </p>
      *
      * <p>Eine Zeitspanne ist genau dann positiv, wenn sie weder leer noch
@@ -112,15 +178,37 @@ public interface TimeSpan<U> {
     boolean isPositive();
 
     /**
+     * <p>Queries if this time span is empty. </p>
+     *
+     * <p>Per definition an empty time span has no items with a partial
+     * amount different from {@code 0}. </p>
+     *
+     * @return  {@code true} if empty else {@code false}
+     */
+    /*[deutsch]
      * <p>Liegt eine leere Zeitspanne vor? </p>
      *
-     * <p>Per Definition hat eine leere Zeitspanne keine Elemente. </p>
+     * <p>Per Definition hat eine leere Zeitspanne keine Elemente mit
+     * einem von {@code 0} verschiedenen Teilbetrag. </p>
      *
      * @return  {@code true} if empty else {@code false}
      */
     boolean isEmpty();
 
     /**
+     * <p>Adds this time span to given time point. </p>
+     *
+     * <p>Is equivalent to the expression {@link TimePoint#plus(TimeSpan)
+     * time.plus(this)}. Due to better readability usage of the
+     * {@code TimePoint}-method is recommended. Implementations are
+     * required to document the used algorithm in detailed manner. </p>
+     *
+     * @param   <T> generic type of time point
+     * @param   time    reference time point to add this time span to
+     * @return  new time point as result of addition
+     * @see     #subtractFrom(TimePoint)
+     */
+    /*[deutsch]
      * <p>Addiert diese Zeitspanne zum angegebenen Zeitpunkt. </p>
      *
      * <p>Entspricht dem Ausdruck {@link TimePoint#plus(TimeSpan)
@@ -137,6 +225,19 @@ public interface TimeSpan<U> {
     <T extends TimePoint<? super U, T>> T addTo(T time);
 
     /**
+     * <p>Subtracts this time span from given time point. </p>
+     *
+     * <p>Is equivalent to the expression {@link TimePoint#minus(TimeSpan)
+     * time.minus(this)}. Due to better readability usage of the
+     * {@code TimePoint}-method is recommended. Implementations are
+     * required to document the used algorithm in detailed manner. </p>
+     *
+     * @param   <T> generic type of time point
+     * @param   time    reference time point to subtract this time span from
+     * @return  new time point as result of subtraction
+     * @see     #addTo(TimePoint)
+     */
+    /*[deutsch]
      * <p>Subtrahiert diese Zeitspanne vom angegebenen Zeitpunkt. </p>
      *
      * <p>Entspricht dem Ausdruck {@link TimePoint#minus(TimeSpan)
@@ -155,8 +256,15 @@ public interface TimeSpan<U> {
     //~ Innere Klassen ----------------------------------------------------
 
     /**
+     * <p>Represents a single item of a time span which is based on only one
+     * time unit and has a non-negative amount. </p>
+     *
+     * @param   <U> type of time unit
+     * @concurrency <immutable>
+     */
+    /*[deutsch]
      * <p>Repr&auml;sentiert ein atomares Element einer Zeitspanne, das auf nur
-     * einer Zeiteinheit beruht und einen positiven Betrag hat. </p>
+     * einer Zeiteinheit beruht und einen nicht-negativen Betrag hat. </p>
      *
      * @param   <U> type of time unit
      * @concurrency <immutable>
@@ -203,11 +311,19 @@ public interface TimeSpan<U> {
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Creates a new time span item. </p>
+         *
+         * @param   amount  amount in units {@code >= 0}
+         * @param   unit    time unit
+         * @return  new time span item
+         * @throws  IllegalArgumentException if amount is negative
+         */
+        /*[deutsch]
          * <p>Konstruiert ein neues Zeitspannenelement. </p>
          *
          * @param   amount  amount in units {@code >= 0}
          * @param   unit    time unit
-         * @return  new timespan item
+         * @return  new time span item
          * @throws  IllegalArgumentException if amount is negative
          */
         public static <U> Item<U> of(
@@ -220,7 +336,12 @@ public interface TimeSpan<U> {
         }
 
         /**
-         * <p>Liefert den positiven Betrag. </p>
+         * <p>Yields the non-negative amount. </p>
+         *
+         * @return  amount in units ({@code >= 0})
+         */
+        /*[deutsch]
+         * <p>Liefert den nicht-negativen Betrag. </p>
          *
          * @return  amount in units ({@code >= 0})
          */
@@ -231,6 +352,11 @@ public interface TimeSpan<U> {
         }
 
         /**
+         * <p>Yields the time unit. </p>
+         *
+         * @return  time unit
+         */
+        /*[deutsch]
          * <p>Liefert die Zeiteinheit. </p>
          *
          * @return  time unit
@@ -268,6 +394,12 @@ public interface TimeSpan<U> {
         }
 
         /**
+         * <p>Provides a canonical representation in the format
+         * 'P' amount '{' unit '}', for example &quot;P4{YEARS}&quot;. </p>
+         *
+         * @return  String
+         */
+        /*[deutsch]
          * <p>Liefert eine kanonische Darstellung im Format
          * 'P' amount '{' unit '}', zum Beispiel &quot;P4{YEARS}&quot;. </p>
          *
