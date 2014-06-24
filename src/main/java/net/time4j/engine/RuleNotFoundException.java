@@ -23,6 +23,12 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Indicates that a chronological rule for an element or
+ * a time unit is missing. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Signalisiert das Fehlen einer chronologischen Regel f&uuml;r ein
  * chronologisches Element oder eine Zeiteinheit. </p>
  *
