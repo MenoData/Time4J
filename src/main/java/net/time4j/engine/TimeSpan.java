@@ -29,8 +29,8 @@ import java.util.List;
 
 
 /**
- * <p>Represents a common time span with an associated sign and  a
- * sequence of time units and related amounts. </p>
+ * <p>Represents a common time span with an associated sign and
+ * a sequence of time units and related amounts. </p>
  *
  * @param   <U> generic type of time unit
  * @author  Meno Hochschild

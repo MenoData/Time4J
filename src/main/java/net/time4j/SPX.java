@@ -183,7 +183,7 @@ final class SPX
                 this.obj = this.readTimestamp(in);
                 break;
             case DURATION_TYPE:
-                this.obj = this.readDuration(in);
+                this.obj = this.readDuration(in, header);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -444,12 +444,31 @@ final class SPX
         throws IOException {
 
         Duration<?> d = Duration.class.cast(this.obj);
-        out.writeByte(DURATION_TYPE << 4);
         int size = d.getTotalLength().size();
+        boolean useLong = false;
+
+        for (int i = 0, n = Math.min(size, 6); i < n; i++ ) {
+            if (d.getTotalLength().get(i).getAmount() >= 1000) {
+                useLong = true;
+                break;
+            }
+        }
+
+        int header = DURATION_TYPE;
+        header <<= 4;
+        if (useLong) {
+            header |= 1;
+        }
+        out.writeByte(header);
         out.writeInt(size);
 
-        for (TimeSpan.Item<?> item : d.getTotalLength()) {
-            out.writeLong(item.getAmount());
+        for (int i = 0; i < size; i++ ) {
+            TimeSpan.Item<?> item = d.getTotalLength().get(i);
+            if (useLong) {
+                out.writeLong(item.getAmount());
+            } else {
+                out.writeInt((int) item.getAmount());
+            }
             out.writeObject(item.getUnit());
         }
 
@@ -459,9 +478,12 @@ final class SPX
 
     }
 
-    private Object readDuration(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+    private Object readDuration(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
 
+        boolean useLong = ((header & 0xF) == 1);
         int size = in.readInt();
 
         if (size == 0) {
@@ -472,7 +494,7 @@ final class SPX
             new ArrayList<TimeSpan.Item<IsoUnit>>(size);
 
         for (int i = 0; i < size; i++) {
-            long amount = in.readLong();
+            long amount = (useLong ? in.readLong() : in.readInt());
             IsoUnit unit = (IsoUnit) in.readObject();
             items.add(TimeSpan.Item.of(amount, unit));
         }

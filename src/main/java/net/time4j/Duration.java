@@ -2547,19 +2547,30 @@ public final class Duration<U extends IsoUnit>
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
-     *              four most significant bits the type id {@code 6}. Then
+     *              four most significant bits the type id {@code 6} and as
+     *              least significant bit the value 1 if long should be used
+     *              for transferring the item amounts (else using int). Then
      *              the data bytes for date and time component follow.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *      out.writeByte(6 << 4);
+     *      boolean useLong = ...;
+     *      byte header = (6 << 4);
+     *      if (useLong) header |= 1;
+     *      out.writeByte(header);
      *      out.writeInt(getTotalLength().size());
      *      for (Item&lt;U&gt; item : getTotalLength()) {
-     *          out.writeLong(item.getAmount());
+     *          if (useLong) {
+     *              out.writeLong(item.getAmount());
+     *          } else {
+     *              out.writeInt((int) item.getAmount());
+     *          }
      *          out.writeObject(item.getUnit());
      *      }
-     *      out.writeBoolean(isNegative());
+     *      if (getTotalLength().size() > 0) {
+     *          out.writeBoolean(isNegative());
+     *      }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {
