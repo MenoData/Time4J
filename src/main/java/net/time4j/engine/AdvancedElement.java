@@ -23,6 +23,13 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Default implementation of a chronological element with some
+ * element-related manipulation methods. </p>
+ *
+ * @param   <V> generic type of element values
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Standardimplementierung eines chronologischen Elements mit verschiedenen
  * element-bezogenen Manipulationsmethoden. </p>
  *
@@ -62,6 +69,12 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Compares the values of this element based on their natural order. </p>
+     *
+     * @throws  ChronoException if this element is not registered in any entity
+     *          and/or if no element rule exists to extract the element value
+     */
+    /*[deutsch]
      * <p>Vergleicht die Werte dieses Elements auf Basis ihrer
      * nat&uuml;rlichen Ordnung. </p>
      *
@@ -79,6 +92,14 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
+     * <p>Yields a new operator which can set any entity to its minimum
+     * element value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  operator
+     */
+    /*[deutsch]
      * <p>Liefert einen Operator, der eine beliebige Entit&auml;t auf
      * das Elementminimum setzt. </p>
      *
@@ -95,6 +116,14 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
+     * <p>Yields a new operator which can set any entity to its maximum
+     * element value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  operator
+     */
+    /*[deutsch]
      * <p>Liefert einen Operator, der eine beliebige Entit&auml;t auf
      * das Elementmaximum setzt. </p>
      *
@@ -111,6 +140,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
+     * <p>Yields a new operator which can set any entity such that its
+     * actual element value gets the decremented value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  decrementing operator
+     * @see     TimeAxis#getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Liefert einen Operator, der eine beliebige Entit&auml;t so
      * anpasst, da&szlig; dieses Element den vorherigen Wert bekommt. </p>
      *
@@ -128,6 +166,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
+     * <p>Yields a new operator which can set any entity such that its
+     * actual element value gets the incremented value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  incrementing operator
+     * @see     TimeAxis#getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Liefert einen Operator, der eine beliebige Entit&auml;t so
      * anpasst, da&szlig; dieses Element den n&auml;chsten Wert bekommt. </p>
      *
@@ -145,7 +192,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
-     * <p>Liefert ein Objekt, das eine Entit&auml;t abrundet, indem alle
+     * <p>Yields an operator which rounds any entity down so that the child
+     * elements will be set to the minimum. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  operator
+     */
+    /*[deutsch]
+     * <p>Liefert einen Operator, der eine Entit&auml;t abrundet, indem alle
      * Kindselemente dieses Elements auf ihr Minimum gesetzt werden. </p>
      *
      * @param   <T> generic type of target entity
@@ -161,7 +216,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
-     * <p>Liefert ein Objekt, das eine Entit&auml;t aufrundet, indem alle
+     * <p>Yields an operator which rounds any entity up so that the child
+     * elements will be set to the maximum. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   context     context type
+     * @return  operator
+     */
+    /*[deutsch]
+     * <p>Liefert einen Operator, der eine Entit&auml;t aufrundet, indem alle
      * Kindselemente dieses Elements auf ihr Maximum gesetzt werden. </p>
      *
      * @param   <T> generic type of target entity
@@ -177,6 +240,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     }
 
     /**
+     * <p>Yields an operator which sets any entity such that its actual
+     * element value will be set in lenient mode to given value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   value       new element value
+     * @param   context     context type
+     * @return  operator
+     */
+    /*[deutsch]
      * <p>Liefert einen Operator, der eine beliebige Entit&auml;t so
      * anpasst, da&szlig; dieses Element auf den angegebenen Wert im
      * Nachsichtigkeitsmodus gesetzt wird. </p>
@@ -231,15 +303,6 @@ public abstract class AdvancedElement<V extends Comparable<V>>
 
         //~ Methoden ------------------------------------------------------
 
-        /**
-         * <p>Passt die angegebene Entit&auml;t an. </p>
-         *
-         * @param   entity      chronological entity to be adjusted
-         * @return  adjusted copy of argument which itself remains unaffected
-         * @throws  ChronoException if there is no element rule for adjusting
-         * @throws  IllegalArgumentException if an invalid value is tried
-         * @throws  ArithmeticException in case of numerical overflow
-         */
         @Override
         public T apply(T entity) {
 
@@ -382,14 +445,13 @@ public abstract class AdvancedElement<V extends Comparable<V>>
                 TimePoint<?, ?> tp = TimePoint.class.cast(entity);
                 Object answer = add(tp, this.element, forward);
                 result = entity.getChronology().getChronoType().cast(answer);
+            } else {
+                throw new ChronoException(
+                    "Base units not supported by: "
+                    + entity.getChronology().getChronoType());
             }
 
-            if (result == null) {
-                throw new ChronoException(
-                    "No base unit defined for: " + this.element.name());
-            } else {
-                return result;
-            }
+            return result;
 
         }
 
@@ -402,9 +464,7 @@ public abstract class AdvancedElement<V extends Comparable<V>>
 
             U unit = context.getChronology().getBaseUnit(element);
 
-            if (unit == null) {
-                return null;
-            } else if (forward) {
+            if (forward) {
                 return context.plus(1, unit);
             } else {
                 return context.minus(1, unit);

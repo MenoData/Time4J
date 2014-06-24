@@ -802,13 +802,6 @@ public final class PlainTimestamp
 
     }
 
-    @Override
-    protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
-
-        return ENGINE;
-
-    }
-
     /**
      * <p>Combines this local timestamp with the timezone UTC to a global
      * timestamp. </p>
@@ -940,6 +933,13 @@ public final class PlainTimestamp
         }
 
         return !Timezone.of(tzid).isInvalid(this.date, this.time);
+
+    }
+
+    @Override
+    protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
+
+        return ENGINE;
 
     }
 
