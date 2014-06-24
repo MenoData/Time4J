@@ -1,4 +1,4 @@
-/*
+﻿/*
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
@@ -88,7 +88,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * in millisecond but in nanosecond precision on 96-bit base. </p>
  *
  * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * this class with access in UTC timezone (always without base unit): </p>
  *
  * <ul>
  *  <li>{@link PlainDate#YEAR}</li>
@@ -160,7 +160,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * sondern in Nanosekunden auf 96-Bit-Basis. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente mit
- * Zugriff in der UTC-Zeitzone: </p>
+ * Zugriff in der UTC-Zeitzone (immer ohne Basiseinheit): </p>
  *
  * <ul>
  *  <li>{@link PlainDate#YEAR}</li>
