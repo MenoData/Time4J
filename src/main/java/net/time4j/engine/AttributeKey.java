@@ -23,6 +23,18 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Defines a key for a format attribute as type-safe accessor. </p>
+ *
+ * <p>Attributes are constrained to types which are <i>immutable</i> and
+ * serializable. If there are predefined attributes then the associated
+ * keys are to be used via the corresponding constants in the class
+ * {@link net.time4j.format.Attributes} instead of creating new ones. </p>
+ *
+ * @param   <A> generic immutable type of attribute value
+ * @author  Meno Hochschild
+ * @see     AttributeQuery
+ */
+/*[deutsch]
  * <p>Definiert einen Attributschl&uuml;ssel zum typsicheren Zugriff auf ein
  * Formatattribut. </p>
  *
@@ -41,14 +53,24 @@ public interface AttributeKey<A> {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Name des gesuchten Formatattributs. </p>
+     * <p>Name of associated format attribute. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Name des assoziierten Formatattributs. </p>
      *
      * @return  String
      */
     String name();
 
     /**
-     * <p>Typ des gesuchten Formatattributs. </p>
+     * <p>Type of associated format attribute. </p>
+     *
+     * @return  Class
+     */
+    /**
+     * <p>Typ des assoziierten Formatattributs. </p>
      *
      * @return  Class
      */

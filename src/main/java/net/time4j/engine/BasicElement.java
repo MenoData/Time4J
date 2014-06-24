@@ -25,6 +25,13 @@ import java.io.Serializable;
 
 
 /**
+ * <p>Abstract base implementation of a chronological element which has
+ * a name and can also define an (unregistered) element rule. </p>
+ *
+ * @param   <V> generic type of element values
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Abstrakte Basisimplementierung eines chronologischen Elements, das
  * einen Namen hat und bei Bedarf auch eigene Regeln definieren kann. </p>
  *
@@ -75,6 +82,17 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>There is no format symbol by default. </p>
+     *
+     * <p>In order to define a format symbol subclasses must override this
+     * methode. In that case such an element instance should be annotated
+     * with the annotation {@code FormattableElement} for documentation
+     * support. </p>
+     *
+     * @return  ASCII-0 (placeholder for an undefined format symbol)
+     * @see     FormattableElement
+     */
+    /*[deutsch]
      * <p>Standardm&auml;&szlig;ig gibt es kein Formatsymbol. </p>
      *
      * <p>Um ein Formatsymbol zu definieren, m&uuml;ssen Subklassen diese
@@ -93,6 +111,11 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Chronological elements are strict by default. </p>
+     *
+     * @return  {@code false}
+     */
+    /*[deutsch]
      * <p>Chronologische Elemente verhalten sich standardm&auml;&szlig;ig
      * strikt und nicht nachsichtig. </p>
      *
@@ -106,6 +129,12 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Based on equality of element names AND element classes. </p>
+     *
+     * @return  {@code true} if this instance and the argument are of same
+     *          class and have same names else {@code false}
+     */
+    /*[deutsch]
      * <p>Basiert auf der Gleichheit der Elementnamen UND Elementklassen. </p>
      *
      * @return  {@code true} if this instance and the argument are of same
@@ -130,6 +159,11 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Based on the element name. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
      * <p>Basiert auf dem Elementnamen. </p>
      *
      * @return  int
@@ -142,6 +176,14 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Serves mainly for debugging support. </p>
+     *
+     * <p>For display purpose the method {@link #name()} is to be
+     * preferred. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
      * <p>Dient vornehmlich der Debugging-Unterst&uuml;tzung. </p>
      *
      * <p>F&uuml;r Anzeigezwecke sollte die Methode {@link #name()}

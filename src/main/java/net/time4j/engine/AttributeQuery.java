@@ -23,8 +23,15 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Type-safe query for format attributes which control the formatting
+ * process. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     ChronoMerger#createFrom(ChronoEntity, AttributeQuery, boolean)
+ */
+/*[deutsch]
  * <p>Typsichere Abfrage von Formatattributen zur Steuerung eines
- * Parse-Vorgangs. </p>
+ * Formatier- oder Parse-Vorgangs. </p>
  *
  * @author  Meno Hochschild
  * @see     ChronoMerger#createFrom(ChronoEntity, AttributeQuery, boolean)
@@ -34,6 +41,12 @@ public interface AttributeQuery {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Queries if a format attribute exists for given key. </p>
+     *
+     * @param   key     attribute key
+     * @return  {@code true} if attribute exists else {@code false}
+     */
+    /*[deutsch]
      * <p>Ermittelt, ob ein Formatattribut zum angegebenen Schl&uuml;ssel
      * existiert. </p>
      *
@@ -43,7 +56,15 @@ public interface AttributeQuery {
     boolean contains(AttributeKey<?> key);
 
     /**
-     * <p>Ermittelt ein Formatattribut vom angegebenen Typ. </p>
+     * <p>Yields a format attribute for given key. </p>
+     *
+     * @param   <A> generic type of attribute value
+     * @param   key     attribute key
+     * @return  attribute value
+     * @throws  java.util.NoSuchElementException if attribute does not exist
+     */
+    /*[deutsch]
+     * <p>Ermittelt ein Formatattribut zum angegebenen Schl&uuml;ssel. </p>
      *
      * @param   <A> generic type of attribute value
      * @param   key     attribute key
@@ -53,7 +74,16 @@ public interface AttributeQuery {
     <A> A get(AttributeKey<A> key);
 
     /**
-     * <p>Ermittelt ein Formatattribut vom angegebenen Typ. </p>
+     * <p>Yields a format attribute for given key. </p>
+     *
+     * @param   <A> generic type of attribute value
+     * @param   key             attribute key
+     * @param   defaultValue    replacement value to be used if attribute does
+     *                          not exist
+     * @return  attribute value
+     */
+    /*[deutsch]
+     * <p>Ermittelt ein Formatattribut zum angegebenen Schl&uuml;ssel. </p>
      *
      * @param   <A> generic type of attribute value
      * @param   key             attribute key
