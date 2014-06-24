@@ -23,6 +23,12 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Normalizes a time span. </p>
+ *
+ * @param   <U> generic type of time unit compatible to {@link ChronoUnit}
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Normalisiert eine Zeitspanne. </p>
  *
  * @param   <U> generic type of time unit compatible to {@link ChronoUnit}
@@ -33,6 +39,14 @@ public interface Normalizer<U> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Normalizes given time span such that the amounts of associated
+     * time units are converted in a specific way. </p>
+     *
+     * @param   timespan    time span to be normalized
+     * @return  normalized copy of argument which itself remains unaffected
+     * @see     net.time4j.Duration#with(Normalizer)
+     */
+    /*[deutsch]
      * <p>Normalisiert die angegebene Zeitspanne so, da&szlig; die Betr&auml;ge
      * der enthaltenen Zeiteinheiten ineinander nach einem spezifischen
      * Verfahren umgerechnet werden. </p>
