@@ -21,6 +21,8 @@
 
 package net.time4j;
 
+import net.time4j.engine.TimeSpan;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -29,6 +31,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -67,6 +71,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code PlainTimestamp}. */
     static final int TIMESTAMP_TYPE = 5;
+
+    /** Serialisierungstyp von {@code Duration}. */
+    static final int DURATION_TYPE = 6;
 
     private static final long serialVersionUID = 1L;
 
@@ -137,6 +144,9 @@ final class SPX
             case TIMESTAMP_TYPE:
                 this.writeTimestamp(out);
                 break;
+            case DURATION_TYPE:
+                this.writeDuration(out);
+                break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
         }
@@ -171,6 +181,9 @@ final class SPX
                 break;
             case TIMESTAMP_TYPE:
                 this.obj = this.readTimestamp(in);
+                break;
+            case DURATION_TYPE:
+                this.obj = this.readDuration(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -425,6 +438,47 @@ final class SPX
             throw new InvalidObjectException("Missing date or time object.");
         }
 
+    }
+
+    private void writeDuration(ObjectOutput out)
+        throws IOException {
+
+        Duration<?> d = Duration.class.cast(this.obj);
+        out.writeByte(DURATION_TYPE << 4);
+        int size = d.getTotalLength().size();
+        out.writeInt(size);
+
+        for (TimeSpan.Item<?> item : d.getTotalLength()) {
+            out.writeLong(item.getAmount());
+            out.writeObject(item.getUnit());
+        }
+
+        if (size > 0) {
+            out.writeBoolean(d.isNegative());
+        }
+
+    }
+
+    private Object readDuration(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int size = in.readInt();
+
+        if (size == 0) {
+            return Duration.ofZero();
+        }
+
+        List<TimeSpan.Item<IsoUnit>> items =
+            new ArrayList<TimeSpan.Item<IsoUnit>>(size);
+
+        for (int i = 0; i < size; i++) {
+            long amount = in.readLong();
+            IsoUnit unit = (IsoUnit) in.readObject();
+            items.add(TimeSpan.Item.of(amount, unit));
+        }
+
+        boolean negative = in.readBoolean();
+        return new Duration<IsoUnit>(items, negative);
     }
 
 }

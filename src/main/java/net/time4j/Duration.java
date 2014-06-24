@@ -33,6 +33,10 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.tz.TZID;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -268,20 +272,18 @@ public final class Duration<U extends IsoUnit>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  list of amounts and units
-     */
-    private final List<Item<U>> items;
-
-    /**
-     * @serial  marks a negative duration
-     */
-    private final boolean negative;
+    private transient final List<Item<U>> items;
+    private transient final boolean negative;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    // Standard-Konstruktor
-    private Duration(
+    /**
+     * Standard-Konstruktor.
+     *
+     * @param   items       Dauer-Elemente
+     * @param   negative    negative Dauer angezeigt?
+     */
+    Duration(
         List<Item<U>> items,
         boolean negative
     ) {
@@ -2538,6 +2540,42 @@ public final class Duration<U extends IsoUnit>
             pe.initCause(nfe);
             throw pe;
         }
+
+    }
+
+    /**
+     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     *              a dedicated serialization form</a> as proxy. The layout
+     *              is bit-compressed. The first byte contains within the
+     *              four most significant bits the type id {@code 6}. Then
+     *              the data bytes for date and time component follow.
+     *
+     * Schematic algorithm:
+     *
+     * <pre>
+     *      out.writeByte(6 << 4);
+     *      out.writeInt(getTotalLength().size());
+     *      for (Item&lt;U&gt; item : getTotalLength()) {
+     *          out.writeLong(item.getAmount());
+     *          out.writeObject(item.getUnit());
+     *      }
+     *      out.writeBoolean(isNegative());
+     * </pre>
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, SPX.DURATION_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

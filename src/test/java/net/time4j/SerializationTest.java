@@ -143,6 +143,29 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfDuration()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(
+            Duration.ofZero(),
+            Duration.of(4, ClockUnit.HOURS),
+            Duration.ofCalendarUnits(0, 13, 5));
+    }
+
+    @Test
+    public void sizeOfDuration()
+        throws IOException, ClassNotFoundException {
+
+        Object[] sers = new Object[GRAPH_SIZE];
+        for (int i = 0; i < sers.length; i++) {
+            sers[i] = Duration.ofCalendarUnits(i, i % 12, 30);
+        }
+        Info info = analyze("[Duration]", sers);
+        assertThat(info.first, is(130));
+        assertThat(info.next, is(59));
+    }
+
+    @Test
     public void roundTripOfParsedValues()
         throws IOException, ClassNotFoundException {
 
