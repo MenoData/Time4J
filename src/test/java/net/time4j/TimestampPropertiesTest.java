@@ -12,7 +12,6 @@ import org.junit.runners.JUnit4;
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -129,11 +128,9 @@ public class TimestampPropertiesTest {
             is(PlainTime.of(11, 45)));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitWallTime() {
-        assertThat(
-            PlainTimestamp.axis().getBaseUnit(WALL_TIME),
-            is(nullValue()));
+        PlainTimestamp.axis().getBaseUnit(WALL_TIME);
     }
 
     @Test
@@ -205,11 +202,9 @@ public class TimestampPropertiesTest {
             is(Meridiem.PM));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitAmPm() {
-        assertThat(
-            PlainTimestamp.axis().getBaseUnit(AM_PM_OF_DAY),
-            is(nullValue()));
+        PlainTimestamp.axis().getBaseUnit(AM_PM_OF_DAY);
     }
 
     @Test

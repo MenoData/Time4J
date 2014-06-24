@@ -24,7 +24,6 @@ import org.junit.runners.JUnit4;
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -70,11 +69,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.get(AM_PM_OF_DAY), is(Meridiem.PM));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitAmPm() {
-        assertThat(
-            Moment.axis().getBaseUnit(AM_PM_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(AM_PM_OF_DAY);
     }
 
     @Test
@@ -124,11 +121,9 @@ public class MomentPropertiesTest {
             is(1439));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMinuteOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(MINUTE_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MINUTE_OF_DAY);
     }
 
     @Test
@@ -185,11 +180,9 @@ public class MomentPropertiesTest {
             is(86399));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitSecondOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(SECOND_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(SECOND_OF_DAY);
     }
 
     @Test
@@ -246,11 +239,9 @@ public class MomentPropertiesTest {
             is(86399 * 1000 + 123));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMilliOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(MILLI_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MILLI_OF_DAY);
     }
 
     @Test
@@ -307,11 +298,9 @@ public class MomentPropertiesTest {
             is(86399 * MIO + 123456));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMicroOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(MICRO_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MICRO_OF_DAY);
     }
 
     @Test
@@ -368,11 +357,9 @@ public class MomentPropertiesTest {
             is(86399 * MRD + 123456789));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitNanoOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(NANO_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(NANO_OF_DAY);
     }
 
     @Test
@@ -427,11 +414,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.get(ISO_HOUR), is(23));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitIsoHour() {
-        assertThat(
-            Moment.axis().getBaseUnit(ISO_HOUR),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(ISO_HOUR);
     }
 
     @Test
@@ -488,11 +473,9 @@ public class MomentPropertiesTest {
             is(59));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMinuteOfHour() {
-        assertThat(
-            Moment.axis().getBaseUnit(MINUTE_OF_HOUR),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MINUTE_OF_HOUR);
     }
 
     @Test
@@ -549,11 +532,9 @@ public class MomentPropertiesTest {
             is(60));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitSecondOfMinute() {
-        assertThat(
-            Moment.axis().getBaseUnit(SECOND_OF_MINUTE),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(SECOND_OF_MINUTE);
     }
 
     @Test
@@ -612,11 +593,9 @@ public class MomentPropertiesTest {
             is(123));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMilliOfSecond() {
-        assertThat(
-            Moment.axis().getBaseUnit(MILLI_OF_SECOND),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MILLI_OF_SECOND);
     }
 
     @Test
@@ -673,11 +652,9 @@ public class MomentPropertiesTest {
             is(123456));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitMicroOfSecond() {
-        assertThat(
-            Moment.axis().getBaseUnit(MICRO_OF_SECOND),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(MICRO_OF_SECOND);
     }
 
     @Test
@@ -734,11 +711,9 @@ public class MomentPropertiesTest {
             is(123456789));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitNanoOfSecond() {
-        assertThat(
-            Moment.axis().getBaseUnit(NANO_OF_SECOND),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(NANO_OF_SECOND);
     }
 
     @Test
@@ -795,11 +770,9 @@ public class MomentPropertiesTest {
             is(11));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitClockHourOfAmPm() {
-        assertThat(
-            Moment.axis().getBaseUnit(CLOCK_HOUR_OF_AMPM),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(CLOCK_HOUR_OF_AMPM);
     }
 
     @Test
@@ -859,11 +832,9 @@ public class MomentPropertiesTest {
             is(23));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitClockHourOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(CLOCK_HOUR_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(CLOCK_HOUR_OF_DAY);
     }
 
     @Test
@@ -920,11 +891,9 @@ public class MomentPropertiesTest {
             is(11));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitDigitalHourOfAmPm() {
-        assertThat(
-            Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_AMPM),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_AMPM);
     }
 
     @Test
@@ -982,11 +951,9 @@ public class MomentPropertiesTest {
             is(23));
     }
 
-    @Test
+    @Test(expected=ChronoException.class)
     public void getBaseUnitDigitalHourOfDay() {
-        assertThat(
-            Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_DAY),
-            is(nullValue()));
+        Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_DAY);
     }
 
     @Test
