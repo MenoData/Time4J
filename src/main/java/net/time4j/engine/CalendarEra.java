@@ -25,6 +25,18 @@ import net.time4j.base.GregorianDate;
 
 
 /**
+ * <p>Represents an era in a calendar system. </p>
+ *
+ * <p>An era is date-related and defines a reference date which can be
+ * interpreted as start or end of an era. Not all calendar systems know
+ * an era concept, however. Especially all ISO-calendar systems have no
+ * era according to ISO-8601-standard. If an era exists in a given
+ * calendar system then the meaning of a year changes such that it
+ * means the year of an era counting as positive number from {@code >= 1}. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine &Auml;ra in einem Kalendersystem. </p>
  *
  * <p>Eine &Auml;ra ist grunds&auml;tzlich datumsbezogen und definiert ein
@@ -43,6 +55,11 @@ public interface CalendarEra {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields the canonical non-localized name. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
      * <p>Liefert den kanonischen nicht lokalisierten Namen. </p>
      *
      * @return  String
@@ -50,6 +67,13 @@ public interface CalendarEra {
     String name();
 
     /**
+     * <p>Yields an ordinal number which is scaled such that every era
+     * which contains the ISO-date of UTC-epoch [1972-01-01] will have
+     * the associated value {@code 1}. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
      * <p>Liefert eine Ordnungsnummer, die so skaliert ist, da&szlig;
      * jede &Auml;ra, die das ISO-Datum der UTC-Epoche [1972-01-01]
      * enth&auml;lt, den Wert {@code 1} ergibt. </p>
@@ -59,6 +83,12 @@ public interface CalendarEra {
     int getValue();
 
     /**
+     * <p>Yields the reference date (start or end of an era). </p>
+     *
+     * @return  gregorian date
+     * @see     #isStarting()
+     */
+    /*[deutsch]
      * <p>Liefert das Bezugsdatum (Start oder Ende einer &Auml;ra). </p>
      *
      * @return  gregorian date
@@ -67,6 +97,17 @@ public interface CalendarEra {
     GregorianDate getDate();
 
     /**
+     * <p>Queries if the associated reference date defines the start of
+     * this era. </p>
+     *
+     * <p>A system of eras is required to define at most one ending era and
+     * if so then only as first era. In such an ending era the year 1 is the
+     * last and not the first year of era! </p>
+     *
+     * @return  boolean
+     * @see     #getDate()
+     */
+    /*[deutsch]
      * <p>Definiert das zugeh&ouml;rige Bezugsdatum den Start oder das Ende
      * dieser &Auml;ra? </p>
      *
