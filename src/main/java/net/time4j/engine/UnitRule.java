@@ -23,6 +23,18 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Represents a rule for the addition or subtraction associated with
+ * a time unit. </p>
+ *
+ * <p>A unit rule will usually be registered together with an unit for a
+ * {@code TimeAxis}, during loading of the concrete {@code TimePoint}-class.
+ * For every time axis and every time unit there is exactly one rule
+ * instance. Implementations must be always <i>immutable</i>. </p>
+ *
+ * @param   <T> generic type of time context compatible to {@code TimePoint}
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert die Additions- und Subtraktionsregel einer
  * Zeiteinheit. </p>
  *
@@ -40,6 +52,25 @@ public interface UnitRule<T> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Adds given amount to a time point in the context of an
+     * associated time unit. </p>
+     *
+     * <p>This method is called by the {@code plus()}- and
+     * {@code minus()}-methods in the class {@code TimePoint}. If not
+     * specified otherwise then a possible range overflow will be
+     * resolved such that the last valid time point is choosen. For
+     * example the addition of one month to date of 31th of may will
+     * yield June, 30th. </p>
+     *
+     * @param   timepoint   time point
+     * @param   amount      count of units to be added to
+     * @return  result of addition as changed copy, given time point
+     *          remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
+     * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
+     */
+    /*[deutsch]
      * <p>Addiert den angegebenen Betrag zu einem Zeitpunkt im Kontext der
      * assoziierten Zeiteinheit. </p>
      *
@@ -61,6 +92,22 @@ public interface UnitRule<T> {
     T addTo(T timepoint, long amount);
 
     /**
+     * <p>Queries how many units are between given time points. </p>
+     *
+     * <p>This method is called by {@code TimePoint.until(T, U)}. The
+     * expression {@code start.until(end, unit)} corresponds to
+     * {@code ruleForUnit.between(start, end)}. Only full units will
+     * be counted. A possible remainder of subtraction will always
+     * be truncated. </p>
+     *
+     * @param   start   start time point
+     * @param   end     end time point
+     * @return  difference in units (negative if {@code end} is before
+     *          {@code start})
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     TimePoint#until(TimePoint, Object) TimePoint.until(T, U)
+     */
+    /*[deutsch]
      * <p>Ermittelt die Differenz zwischen den angegebenen Zeitwertpunkten
      * als Anzahl der assoziierten Zeiteinheit. </p>
      *
@@ -82,6 +129,13 @@ public interface UnitRule<T> {
     //~ Innere Interfaces -------------------------------------------------
 
     /**
+     * <p>Contains a rule for a time unit. </p>
+     *
+     * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
+     * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
+     * @see     TimePoint#until(TimePoint, Object) TimePoint.until(T, U)
+     */
+    /*[deutsch]
      * <p>Enth&auml;lt eine Regel f&uuml;r eine Zeiteinheit. </p>
      *
      * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
@@ -93,6 +147,14 @@ public interface UnitRule<T> {
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Derives an optional unit rule for given chronology. </p>
+         *
+         * @param   <T> generic type of time context
+         * @param   chronology  chronology an unit rule is searched for
+         * @return  unit rule or {@code null} if given chronology is
+         *          not supported
+         */
+        /*[deutsch]
          * <p>Leitet eine optionale Einheitsregel f&uuml;r die angegebene
          * Chronologie ab. </p>
          *
