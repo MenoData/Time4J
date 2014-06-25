@@ -23,6 +23,17 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Represents a temporal condition. </p>
+ *
+ * <p>Common examples are queries for Friday the thirteenth or if a date
+ * matches a holiday or a weekend. This interface is very similar to the
+ * type {@code ChronoQuery<T, Boolean>} but allows more clarity and does
+ * not throw any exception. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     ChronoEntity#matches(ChronoCondition)
+ */
+/*[deutsch]
  * <p>Repr&auml;sentiert eine zeitliche Bedingung. </p>
  *
  * <p>Die g&auml;ngigsten Beispiele w&auml;ren etwa Freitag, der 13. oder
@@ -39,6 +50,25 @@ public interface ChronoCondition<T> {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Decides if given context matches this condition. </p>
+     *
+     * <p>Due to better readability it is recommended to use following
+     * equivalent approach instead of this method:: </p>
+     *
+     * <pre>
+     *  import static net.time4j.Weekday.SATURDAY;
+     *  import static net.time4j.Month.JANUARY;
+     *
+     *  PlainDate date = PlainDate.of(2014, JANUARY, 25);
+     *  System.out.println(SATURDAY.test(date)); // direct use
+     *  System.out.println(date.matches(SATURDAY)); // recommended callback
+     * </pre>
+     *
+     * @param   context     context as base of testing this condition
+     * @return  {@code true} if given time context matches this condition
+     *          else {@code false}
+     */
+    /*[deutsch]
      * <p>Entscheidet, ob der angegebene Zeitwertkontext diese Bedingung
      * erf&uuml;llt. </p>
      *
