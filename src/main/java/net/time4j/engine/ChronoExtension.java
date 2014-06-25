@@ -26,6 +26,12 @@ import java.util.Set;
 
 
 /**
+ * <p>Defines a configuration-dependent extension of the chronological
+ * elements of a {@code Chronology}. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert eine konfigurationsabh&auml;ngige Erweiterung der
  * chronologischen Elemente einer Chronologie. </p>
  *
@@ -36,11 +42,21 @@ public interface ChronoExtension {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the element set for given configuration. </p>
+     *
+     * <p>An empty {@code Set} indicates that this extension is not relevant
+     * for the given configuration. </p>
+     *
+     * @param   locale          language and country setting
+     * @param   attributes      configuration attributes
+     * @return  extended element model
+     */
+    /*[deutsch]
      * <p>Liefert das Elementmodell zur angegebenen Konfiguration. </p>
      *
-     * <p>Ein leeres Set als R&uuml;ckgabe signalisiert dem Aufrufer, da&szlig;
-     * f&uuml;r die gegebene Konfiguration die Erweiterung nicht relevant
-     * ist. </p>
+     * <p>Ein leeres {@code Set} als R&uuml;ckgabe signalisiert dem Aufrufer,
+     * da&szlig; f&uuml;r die gegebene Konfiguration die Erweiterung nicht
+     * relevant ist. </p>
      *
      * @param   locale          language and country setting
      * @param   attributes      configuration attributes
@@ -52,6 +68,24 @@ public interface ChronoExtension {
     );
 
     /**
+     * <p>Updates the given value source if necessary in order to resolve
+     * the values of extension elements to values of standard elements. </p>
+     *
+     * <p>Implementations are allowed to use {@code null} as pseudo-value
+     * in order to delete an element from given source via the expression
+     * {@code parsedValues.with(element, null)}. Note: The argument has
+     * exceptionally no chronology. </p>
+     *
+     * @param   entity  any kind of map from chronological elements to
+     *                  their values (note that the main use case of parsed
+     *                  data has no chronology and allows the virtual value
+     *                  {@code null} to be set as indication for removing
+     *                  associated element)
+     * @return  eventually changed argument
+     * @see     ChronoEntity#with(ChronoElement, Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     */
+    /*[deutsch]
      * <p>Aktualisiert bei Bedarf die angegebene Wertquelle, um die Werte von
      * Erweiterungselementen zu Werten von Standardelementen aufzul&ouml;sen.
      * </p>
