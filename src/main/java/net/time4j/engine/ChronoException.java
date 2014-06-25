@@ -23,6 +23,11 @@ package net.time4j.engine;
 
 
 /**
+ * <p>Indicates a chronological error situation. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Signalisiert eine chronologische Fehlersituation. </p>
  *
  * @author  Meno Hochschild
@@ -37,6 +42,12 @@ public class ChronoException
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * Creates a new instanceo of <code>ChronoException</code>
+     * with given error message.
+     *
+     * @param   msg     detailed error message
+     */
+    /*[deutsch]
      * Erzeugt eine neue Instanz von <code>ChronoException</code>
      * mit der angegebenen Detailmeldung.
      *
@@ -48,8 +59,15 @@ public class ChronoException
     }
 
     /**
+     * Creates a new instanceo of <code>ChronoException</code>
+     * with given error message and the cause.
+     *
+     * @param   msg     detailed error message
+     * @param   ex      cause
+     */
+    /*[deutsch]
      * Erzeugt eine neue Instanz von <code>ChronoException</code>
-     * mit der angegebenen Detailmeldung.
+     * mit der angegebenen Detailmeldung und der Ursache.
      *
      * @param   msg     detailed error message
      * @param   ex      cause
