@@ -23,6 +23,16 @@ package net.time4j.engine;
 
 
 /**
+ * <p>External time units which are not registered on any chronology (time axis)
+ * can implement this interface in order to support standard calculations in
+ * time spans and symbol formatting. </p>
+ *
+ * <p><strong>Naming convention:</strong> Time units have Java-names in
+ * plural form. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Externe Zeiteinheiten, die nicht in einer Chronologie (Zeitachse)
  * registriert sind, k&ouml;nnen dieses Interface implementieren, um
  * Standardberechnungen in Zeitspannen und Symbolformatierungen zu
@@ -38,6 +48,12 @@ public interface ChronoUnit {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Defines the typical length of this time unit in seconds without
+     * taking into account anomalies like timezone effects or leap seconds. </p>
+     *
+     * @return  decimal value in seconds
+     */
+    /*[deutsch]
      * <p>Definiert die typische L&auml;nge dieser Zeiteinheit in Sekunden
      * ohne Ber&uuml;cksichtigung von Anomalien wie Zeitzoneneffekten oder
      * Schaltsekunden. </p>
@@ -46,6 +62,18 @@ public interface ChronoUnit {
      */
     double getLength();
 
+    /**
+     * <p>Queries if this time unit is calendrical respective is at least
+     * as long as a calendar day. </p>
+     *
+     * <p>Implementation note: The method must be consistent with the typical
+     * length of the unit. The expression
+     * {@code Double.compare(unit.getLength(), 86400.0) >= 0} is
+     * equivalent to {@code unit.isCalendrical()}. </p>
+     *
+     * @return  {@code true} if at least as long as a day else {@code false}
+     */
+    /*[deutsch]
     /**
      * <p>Ist diese Zeiteinheit kalendarisch beziehungsweise mindestens
      * so lange wie ein Kalendertag? </p>

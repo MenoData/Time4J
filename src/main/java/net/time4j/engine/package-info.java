@@ -1,12 +1,48 @@
 
 /**
+ * <p>Defines the common generic schemes and interfaces of chronological
+ * systems. Users which only need an entry point to standard chronologies
+ * should rather consult the main package
+ * <a href="../package-summary.html">net.time4j</a>. </p>
+ *
+ * <p>Ein chronologisches System contains chronological elements and
+ * (as time axis) also time units. Given a concrete time point on a
+ * time axis the (primary) elements compose the coordinates of the
+ * time point on this time axis which is directed into future. This
+ * time axis might be the global UTC-timeline. In general a time axis
+ * is mathematically spoken a line where a time point is described by
+ * some suitable coordinates. This time axis is also scaled by mean of
+ * a system of fixed predefined time units. These units mainly serve for
+ * the time arithmetic and calculations of durations/distances on a
+ * time axis. </p>
+ *
+ * <p>The main difference between elements and units is such that elements
+ * directly refers to the state of a time point and are dimension-less like
+ * coordinates on a time axis while time units have the dimension of a
+ * length respective duration. </p>
+ *
+ * <p>The available abstractions of this package allow type-safety and also
+ * the necessary flexibility in order to build new chronologies from the
+ * scratch. Concrete implementations either start with the base class
+ * {@code TimePoint} or with the date class {@code Calendrical} and register
+ * elements, time units and calculation rules in the associated
+ * <code>Chronology</code> which contains the chronological logic. </p>
+ *
+ * <p>Values of elements are usually modelled as integers but can also be
+ * defined in other types like enums. The value range of an int-primitive
+ * is usually no real limitation because each chronology can define
+ * sufficiently large elements (with small precision). For example
+ * a GPS-time also knows a week element. The detailed value range of
+ * a chronological element is documented in the concrete element types. </p>
+ */
+/*[deutsch]
  * <p>Definiert die allgemeinen generischen Schemata und Schnittstellen
- * von kalendarischen Zeitsystemen. Anwender, die nur einen kurzen Einstieg
- * in Standardkalendersysteme suchen, seien auf das Hauptpaket
+ * von chronologischen Zeitsystemen. Anwender, die nur einen kurzen Einstieg
+ * in Standardchronologien suchen, seien auf das Hauptpaket
  * <a href="../package-summary.html">net.time4j</a> verwiesen. </p>
  *
  * <p>Ein chronologisches System enth&auml;lt chronologische Elemente und
- * als Zeitachse auch Zeiteinheiten. Den Elementen sind in einer konkreten
+ * (als Zeitachse) auch Zeiteinheiten. Den Elementen sind in einer konkreten
  * Zeitpunktinstanz Werte zugeordnet, die zusammen eine Koordinate auf einer
  * in die Zukunft gerichteten Zeitachse festlegen. Diese Zeitachse kann
  * z.B. die UTC-Weltzeitlinie sein. Allgemein ist eine Zeitachse mathematisch
