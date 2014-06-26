@@ -29,6 +29,19 @@ import java.lang.annotation.Target;
 
 
 /**
+ * <p>This {@code Annotation} can be used to document all chronological
+ * elements which allow formatted representations. </p>
+ *
+ * <p>Usage note: Usually only element constants with the modifiers
+ * <i>static</i> und <i>final</i> are target of this {@code Annotation}.
+ * The target type {@code ElementType.METHOD} is only permitted if
+ * elements are generated in a {@code ChronoExtension}. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     ChronoElement
+ * @see     ChronoExtension
+ */
+/*[deutsch]
  * <p>Mit dieser {@code Annotation} k&ouml;nnen alle chronologischen Elemente
  * dokumentiert werden, die formatierte Darstellungen erlauben. </p>
  *
@@ -49,6 +62,22 @@ public @interface FormattableElement {
     //~ Methoden --------------------------------------------------------------
 
     /**
+     * <p>Returns the associated format pattern symbol in the standard
+     * format context. </p>
+     *
+     * <p>Format pattern symbols should be unique among all registered
+     * elements of a given chronology. In standard elements they correspond
+     * to the format symbols defined by unicode organization in CLDR. The
+     * symbol is case-sensitive. </p>
+     *
+     * <p>The default value of an empty string means that the associated
+     * element is not primarily designed for formatting via a pattern
+     * expression. </p>
+     *
+     * @return  char
+     * @see     net.time4j.format.OutputContext#FORMAT
+     */
+    /*[deutsch]
      * <p>Liefert das zugeh&ouml;rige Formatmusterzeichen im normalen
      * Formatkontext. </p>
      *
@@ -67,6 +96,25 @@ public @interface FormattableElement {
     String format() default "";
 
     /**
+     * <p>Returns the associated format pattern symbol in the stand-alone
+     * context. </p>
+     *
+     * <p>Almost equivalent to {@code format()} with the difference that
+     * the element shall be formatted in a stand-alone context (for example
+     * nominative form &quot;x January&quot; instead of the ordinal form
+     * &quot;x-th January&quot;). However, the stand-alone context is not
+     * relevant for English - as &quot;January&quot; is still the same word,
+     * only relevant for some languages which make an explicit grammar
+     * difference. </p>
+     *
+     * <p>The default value of an empty string just means that the
+     * stand-alone context should use the same value as in the format
+     * context. </p>
+     *
+     * @return  char
+     * @see     net.time4j.format.OutputContext#STANDALONE
+     */
+    /*[deutsch]
      * <p>Liefert das zugeh&ouml;rige Formatmusterzeichen f&uuml;r die
      * Verwendung in alleinstehendem Kontext. </p>
      *

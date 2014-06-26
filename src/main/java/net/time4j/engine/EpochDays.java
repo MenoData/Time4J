@@ -25,6 +25,22 @@ import net.time4j.base.MathUtils;
 
 
 /**
+ * <p>Defines elements based on different epoch-related day numbers. </p>
+ *
+ * <p>Some day number procedures really use decimal fractions in order to
+ * represent wall time fractions in calendar dates (for example julian days).
+ * This enum only supports pure date types of type {@code Calendrical} and
+ * always uses the largest integer which is still smaller than or equal to
+ * the decimal fraction in question (mathematically a
+ * {@code floor()}-function. </p>
+ *
+ * <p>Instances of this element class will be automatically registered in
+ * any chronology which is compatible to {@code Calendrical}. </p>
+ *
+ * @author  Meno Hochschild
+ * @see     Calendrical
+ */
+/*[deutsch]
  * <p>Definiert Elemente auf der Basis von verschiedenen epochenbezogenen
  * Tagesnummern. </p>
  *
@@ -47,11 +63,32 @@ public enum EpochDays
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Reference point is the introduction of UTC on date [1972-01-01]
+     * at midnight as day zero. </p>
+     */
+    /*[deutsch]
      * <p>Bezugspunkt ist die Einf&uuml;hrung von UTC zum Datum [1972-01-01]
      * zu Mitternacht als Tag 0. </p>
      */
     UTC(2441317),
 
+    /**
+     * <p>Reference point is the first of January 1970 at midnight as
+     * day zero. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  import static net.time4j.Month.FEBRUARY;
+     *
+     *  PlainDate date = PlainDate.of(1970, FEBRUARY, 4);
+     *  System.out.println(date.get(EpochDays.UNIX)); // output: 34
+     * </pre>
+     *
+     * <p>Strictly spoken, the UNIX time is counted in seconds. This element
+     * counts in days based on the relation &quot;1 day = 86400 seconds&quot;.
+     * </p>
+     */
     /**
      * <p>Bezugspunkt ist der erste Januar 1970 Mitternacht als Tag 0. </p>
      *
@@ -65,16 +102,17 @@ public enum EpochDays
      * </pre>
      *
      * <p>Streng genommen wird die UNIX-Zeit in Sekunden gez&auml;hlt. Dieses
-     * Feld benutzt f&uuml;r den Zweck der Datumsumrechnung die Z&auml;hlung
-     * in ganzen Tagen auf der Basis &quot;1 Tag = 86400 Sekunden&quot;.
-     * Zeitpunktklassen, die UTC-Schaltsekunden oder zeitzonenbedingte
-     * Ver&auml;nderungen der Tagesl&auml;nge kennen, k&ouml;nnen dieses
-     * Element auch korrekt verarbeiten, indem die Umrechnung von Sekunden
-     * zu Tagen automatisch angepasst wird. </p>
+     * Element benutzt f&uuml;r den Zweck der Datumsumrechnung die Z&auml;hlung
+     * in ganzen Tagen auf der Basis &quot;1 Tag = 86400 Sekunden&quot;. </p>
      */
     UNIX(2440587),
 
     /**
+     * <p>Count of days relative to the ISO-date [1858-11-17] as day zero. </p>
+     *
+     * <p>Used by astronomers for example. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der Tage relativ zum ISO-Datum [1858-11-17] als Tag 0. </p>
      *
      * <p>Wird u.a. von Astronomen verwendet. </p>
@@ -83,6 +121,11 @@ public enum EpochDays
     MODIFIED_JULIAN_DATE(2400000),
 
     /**
+     * <p>Count of days relative to the ISO-date [1900-01-01] as day 1. </p>
+     *
+     * <p>Used by MS-Excel in Windows operating systems. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der Tage relativ zum ISO-Datum [1900-01-01] als Tag 1. </p>
      *
      * <p>Wird von MS-Excel in Windows-Betriebssystemen verwendet. </p>
@@ -90,6 +133,11 @@ public enum EpochDays
     EXCEL(2415019),
 
     /**
+     * <p>Count of days relative to the ISO-date [1601-01-01] as day 1. </p>
+     *
+     * <p>Used by COBOL for example. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der Tage relativ zum ISO-Datum [1601-01-01] als Tag 1. </p>
      *
      * <p>Wird u.a. von COBOL verwendet. </p>
@@ -97,6 +145,12 @@ public enum EpochDays
     ANSI(2305812),
 
     /**
+     * <p>Count of days relative to the ISO-date [0001-01-01] as day 1. </p>
+     *
+     * <p>Used by the autors Nachum Dershowitz and Edward M. Reingold in
+     * their standard work &quot;CalendarDate Calculations&quot;. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der Tage relativ zum ISO-Datum [0001-01-01] als Tag 1. </p>
      *
      * <p>Wird im Standard-Werk &quot;CalendarDate Calculations&quot; von den
@@ -105,6 +159,14 @@ public enum EpochDays
     RATA_DIE(1721424),
 
     /**
+     * <p>Count of julian days relative to the the julian calendar date
+     * [1st of January 4713 BC] at noon [12:00] as day zero. </p>
+     *
+     * <p>The julian epoch date corresponds to the proleptic ISO-date
+     * [-4713-11-24]. The ISO-day centered around noon will be taken into
+     * account whose associated julian day starts at noon. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der julianischen Tage relativ zum julianischen Datum
      * [1 Januar 4713 BC] zur Mittagszeit [12:00] als Tag 0. </p>
      *
@@ -117,6 +179,10 @@ public enum EpochDays
     JULIAN_DAY_NUMBER(-1),
 
     /**
+     * <p>Count of days relative to gregorian cut-over date
+     * [1582-10-15] as day 1. </p>
+     */
+    /*[deutsch]
      * <p>Anzahl der Tage relativ zum gregorianischen Umstellungsdatum
      * [1582-10-15] als Tag 1. </p>
      */
@@ -135,6 +201,14 @@ public enum EpochDays
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Converts given day number to a day number based on this epoch
+     * at reference time of midnight. </p>
+     *
+     * @param   amount  count of days relative to given epoch at noon
+     * @param   epoch   epoch reference
+     * @return  count of days relative to this epoch
+     */
+    /*[deutsch]
      * <p>Rechnet die angegebene Tageszahl in eine Tageszahl auf der
      * Nummerierungsbasis dieser Instanz zur Mittagszeit um. </p>
      *
@@ -162,6 +236,11 @@ public enum EpochDays
     }
 
     /**
+     * <p>Defines  the format symbol. </p>
+     *
+     * @return  &quot;g&quot; if MODIFIED_JULIAN_DATE else ASCII-0
+     */
+    /*[deutsch]
      * <p>Definiert das Formatsymbol. </p>
      *
      * @return  &quot;g&quot; if MODIFIED_JULIAN_DATE else ASCII-0
@@ -200,6 +279,11 @@ public enum EpochDays
     }
 
     /**
+     * <p>This element is a date element. </p>
+     *
+     * @return  {@code true}
+     */
+    /*[deutsch]
      * <p>Dieses Element ist ein Datumselement. </p>
      *
      * @return  {@code true}
@@ -212,6 +296,11 @@ public enum EpochDays
     }
 
     /**
+     * <p>This element is no wall time element. </p>
+     *
+     * @return  {@code false}
+     */
+    /*[deutsch]
      * <p>Dieses Element ist kein Uhrzeitelement. </p>
      *
      * @return  {@code false}

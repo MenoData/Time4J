@@ -35,7 +35,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * <p>Repr&auml;sentiert ein System von chronologischen Elementen. </p>
+ * <p>Represents a system of chronological elements which form any kind
+ * of temporal value. </p>
+ *
+ * @param   <T> generic type compatible to {@link ChronoEntity}
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
+ * <p>Repr&auml;sentiert ein System von chronologischen Elementen, die
+ * zusammen einen zeitlichen Wert formen. </p>
  *
  * @param   <T> generic type compatible to {@link ChronoEntity}
  * @author  Meno Hochschild
@@ -96,6 +104,11 @@ public class Chronology<T extends ChronoEntity<T>>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the chronological type. </p>
+     *
+     * @return  type of time context
+     */
+    /*[deutsch]
      * <p>Liefert den chronologischen Typ. </p>
      *
      * @return  type of time context
@@ -107,6 +120,11 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns all registered chronological elements. </p>
+     *
+     * @return  unmodifiable set of elements without duplicates
+     */
+    /*[deutsch]
      * <p>Liefert den zu dieser Chronologie zugeh&ouml;rigen Satz
      * von registrierten chronologischen Elementen. </p>
      *
@@ -119,6 +137,13 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Queries if given chronological element is registered together
+     * with its element rule. </p>
+     *
+     * @param   element     element to be asked (optional)
+     * @return  {@code true} if registered else {@code false}
+     */
+    /*[deutsch]
      * <p>Ist das angegebene chronologische Element inklusive Regel
      * registriert? </p>
      *
@@ -136,6 +161,16 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Queries if given chronological element is supported by this
+     * chronology. </p>
+     *
+     * <p>The element will be supported if it is either registered or
+     * defines a suitable element rule for this chronology. </p>
+     *
+     * @param   element     element to be asked (optional)
+     * @return  {@code true} if supported else {@code false}
+     */
+    /*[deutsch]
      * <p>Wird das angegebene chronologische Element unterst&uuml;tzt? </p>
      *
      * <p>Unterst&uuml;tzung ist gegeben, wenn das Element entweder registriert
@@ -205,6 +240,14 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns all registered chronological extensions. </p>
+     *
+     * <p>This method will be called by format-API in order to collect
+     * all extension elements which are relevant for formatting. </p>
+     *
+     * @return  unmodifiable list of extensions
+     */
+    /*[deutsch]
      * <p>Liefert die registrierten chronologischen Erweiterungen. </p>
      *
      * <p>Diese Methode wird vom Format-API aufgerufen, um zus&auml;tzlich
@@ -220,6 +263,13 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Queries if this chronology has a calendar system. </p>
+     *
+     * @return  {@code true} if this chronology has a calendar system
+     *          else {@code false}
+     * @see     #getCalendarSystem()
+     */
+    /*[deutsch]
      * <p>Ermittelt, ob diese Chronologie ein Kalendersystem hat. </p>
      *
      * @return  {@code true} if this chronology has a calendar system
@@ -233,6 +283,13 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns the associated calendar system if available. </p>
+     *
+     * @return  calendar system, not {@code null}
+     * @throws  ChronoException if the calendar system is unavailable
+     * @see     #hasCalendarSystem()
+     */
+    /*[deutsch]
      * <p>Liefert das assoziierte Kalendersystem, wenn verf&uuml;gbar. </p>
      *
      * @return  calendar system, not {@code null}
@@ -246,6 +303,13 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns a typed singleton per {@code ChronoEntity}-class. </p>
+     *
+     * @param   <T> generic type of time context
+     * @param   chronoType  chronological type
+     * @return  chronology or {@code null} if not found
+     */
+    /*[deutsch]
      * <p>Liefert ein getyptes Singleton pro {@code ChronoEntity}-Klasse. </p>
      *
      * @param   <T> generic type of time context
@@ -454,7 +518,17 @@ public class Chronology<T extends ChronoEntity<T>>
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Erzeugt eine neue Chronologie ohne Zeitachse und wird meist
+     * <p>Builder for creating a new chronology without any time axis.
+     *
+     * <p>This class will be used during loading of a {@code ChronoEntity}-class
+     * T in a <i>static initializer</i>. </p>
+     *
+     * @param       <T> generic type of time context
+     * @author      Meno Hochschild
+     * @concurrency <mutable>
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine neue Chronologie ohne Zeitachse und wird
      * beim Laden einer {@code ChronoEntity}-Klasse T in einem
      * <i>static initializer</i> benutzt. </p>
      *
@@ -502,6 +576,17 @@ public class Chronology<T extends ChronoEntity<T>>
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Creates a builder for building a new chronological system. </p>
+         *
+         * @param   <T> generic type of time context
+         * @param   chronoType      chronological type
+         * @param   chronoMerger    creates a new instance of T from another
+         *                          source (clock or parsed values)
+         * @return  new {@code Builder} object
+         * @throws  UnsupportedOperationException if T represents a subclass
+         *          of {@code TimePoint}
+         */
+        /*[deutsch]
          * <p>Erzeugt ein Hilfsobjekt zum Bauen eines chronologischen
          * Systems. </p>
          *
@@ -529,6 +614,17 @@ public class Chronology<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Registers a new element together with its associated
+         * element rule. </p>
+         *
+         * @param   <V> generic type of element value
+         * @param   element     chronological element to be registered
+         * @param   rule        rule associated with the element
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is already
+         *          registered (duplicate)
+         */
+        /*[deutsch]
          * <p>Registriert ein neues Element mitsamt der assoziierten Regel. </p>
          *
          * @param   <V> generic type of element value
@@ -550,6 +646,13 @@ public class Chronology<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Registers a state extension which can create models with their
+         * own state separated from standard time value context. </p>
+         *
+         * @param   extension   chronological extension
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
          * <p>Registriert eine Zustandserweiterung, die Modelle mit einem
          * eigenen Zustand separat vom Zeitwertkontext erzeugen kann. </p>
          *
@@ -570,6 +673,18 @@ public class Chronology<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Finishes the build of a new chronology. </p>
+         *
+         * <p>Internally the new chronology will be weakly registered for
+         * {@code lookup()}. Therefore it is strongly recommended to
+         * reference the created chronology in a static constant within
+         * the chronological type in question. </p>
+         *
+         * @return  new instance of chronology
+         * @throws  IllegalStateException if already registered
+         * @see     Chronology#lookup(Class)
+         */
+        /*[deutsch]
          * <p>Schlie&szlig;t den Build-Vorgang ab. </p>
          *
          * <p>Intern wird die neue Chronologie f&uuml;r {@code lookup()}
