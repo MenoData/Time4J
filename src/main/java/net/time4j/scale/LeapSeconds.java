@@ -48,6 +48,37 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
+ * <p>Holds all leapseconds occurred since the official start of UTC in
+ * 1972. </p>
+ *
+ * <p>The source is either an implementation of the SPI-interface
+ * {@code Provider} loaded by a {@code ServiceLoader} or an internal
+ * standard implementation of {@code Provider} which accesses the file
+ * &quot;leapseconds.data&quot;. This resource file must be in the
+ * classpath (in folder data). It has the format of a CSV-ASCII-text
+ * which has two columns separated by comma. The first column denotes
+ * the calendar day after the leapsecond-shift in ISO-8601-format (for
+ * example 1972-07-01). The second column determines the sign of the
+ * leapsecond (+/-). </p>
+ *
+ * <p>The source will mainly be loaded by the context-classloader. If
+ * there is no source at all then Time4J assumes that leapseconds
+ * shall not be used. </p>
+ *
+ * <p>The system property &quot;time4j.scale.leapseconds.suppressed&quot;
+ * determines if leapseconds shall be active at all. If this system
+ * property has the value {@code true} then this class will never
+ * register any leapseconds equal if the underlying sources are filled
+ * or not. Furthermore, the system property
+ * &quot;time4j.scale.leapseconds.final&quot; determines if leapseconds
+ * are only registered at system start or if new ones can be lazily
+ * registered at runtime using the methods {@code registerXYZ()}.
+ * Setting one of both properties can improve the performance. </p>
+ *
+ * @author      Meno Hochschild
+ * @concurrency <threadsafe>
+ */
+/*[deutsch]
  * <p>Ermittelt alle seit dem offiziellen Start von UTC 1972 aufgetretenen
  * Schaltsekunden. </p>
  *
@@ -72,7 +103,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Quellen gef&uuml;llt sind. Daneben gibt es noch die System-Property
  * &quot;time4j.scale.leapseconds.final&quot;, die festlegt, ob Schaltsekunden
  * nur zum Systemstart registriert werden oder auch nachtr&auml;glich zur
- * Laufzeit mittels {@code register()} registriert werden k&ouml;nnen. Das
+ * Laufzeit mittels {@code registerXYZ()} registriert werden k&ouml;nnen. Das
  * Setzen einer der beiden Properties kann die Performance verbessern. </p>
  *
  * @author      Meno Hochschild
@@ -84,20 +115,37 @@ public final class LeapSeconds
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>System property &quot;net.time4j.scale.leapseconds.suppressed&quot;
+     * which determines that no leapseconds shall be loaded and used. </p>
+     *
+     * <p>Defined values: &quot;true&quot; (suppressed) or &quot;false&quot;
+     * (active - default). </p>
+     */
+    /*[deutsch]
      * <p>System-Property &quot;net.time4j.scale.leapseconds.suppressed&quot;,
      * die regelt, da&szlig; keine Schaltsekunden geladen werden. </p>
      *
-     * <p>Defined values: &quot;true&quot; or &quot;false&quot; </p>
+     * <p>Definierte Werte: &quot;true&quot; (unterdr&uuml;ckt) oder
+     & quot;false&quot; (aktiv - Standard). </p>
      */
     public static final boolean SUPPRESS_UTC_LEAPSECONDS =
         Boolean.getBoolean("net.time4j.scale.leapseconds.suppressed");
 
     /**
+     * <p>System property &quot;net.time4j.scale.leapseconds.final&quot;
+     * which determines that leapseconds can be laoded only one time at
+     * system start. </p>
+     *
+     * <p>Defined values: &quot;true&quot; (final) or &quot;false&quot;
+     * (enables lazy regisration - default). </p>
+     */
+    /*[deutsch]
      * <p>System-Property &quot;net.time4j.scale.leapseconds.final&quot;, die
      * regelt, da&szlig; Schaltsekunden nur einmalig zum Systemstart festgelegt
      * werden k&ouml;nnen. </p>
      *
-     * <p>Defined values: &quot;true&quot; or &quot;false&quot; </p>
+     * <p>Definierte Werte: &quot;true&quot; (final) oder &quot;false&quot;
+     * (nachtr&auml;gliche Registrierung m&oumL;glich - Standard). </p>
      */
     public static final boolean FINAL_UTC_LEAPSECONDS =
         Boolean.getBoolean("net.time4j.scale.leapseconds.final");
@@ -207,6 +255,11 @@ public final class LeapSeconds
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the singleton instance. </p>
+     *
+     * @return  singleton instance
+     */
+    /*[deutsch]
      * <p>Liefert die Singleton-Instanz. </p>
      *
      * @return  singleton instance
@@ -218,6 +271,13 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Queries if the leapsecond support is activated. </p>
+     *
+     * @return  {@code true} if leap seconds are supported and are also
+     *          registered else {@code false}
+     * @see     #SUPPRESS_UTC_LEAPSECONDS
+     */
+    /*[deutsch]
      * <p>Ist die Schaltsekundenunterst&uuml;tzung aktiviert? </p>
      *
      * @return  {@code true} if leap seconds are supported and are also
@@ -231,6 +291,19 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Queries if a lazy registration of leapseconds is possible. </p>
+     *
+     * <p>If the leapsecond support is switched off then a registration of
+     * leapseconds is never possible so this method will be ignored. </p>
+     *
+     * @return  {@code true} if the method {@code registerXYZ()} can be
+     *          called without exception else {@code false}
+     * @see     #registerPositiveLS(int, int, int)
+     * @see     #registerNegativeLS(int, int, int)
+     * @see     #FINAL_UTC_LEAPSECONDS
+     * @see     #isEnabled()
+     */
+    /*[deutsch]
      * <p>K&ouml;nnen nachtr&auml;glich UTC-Schaltsekunden registriert
      * werden? </p>
      *
@@ -238,9 +311,10 @@ public final class LeapSeconds
      * eine Registrierung niemals m&ouml;glich, und diese Methode wird dann
      * de facto ignoriert. </p>
      *
-     * @return  {@code true} if the method {@code register()} can be called
-     *          without exception else {@code false}
-     * @see     #register(int, int, int, boolean)
+     * @return  {@code true} if the method {@code registerXYZ()} can be
+     *          called without exception else {@code false}
+     * @see     #registerPositiveLS(int, int, int)
+     * @see     #registerNegativeLS(int, int, int)
      * @see     #FINAL_UTC_LEAPSECONDS
      * @see     #isEnabled()
      */
@@ -251,6 +325,11 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Yields the count of all registered leapseconds. </p>
+     *
+     * @return  count of registered leap seconds
+     */
+    /*[deutsch]
      * <p>Ermittelt die Anzahl aller registrierten Schaltsekunden. </p>
      *
      * @return  count of registered leap seconds
@@ -262,14 +341,12 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Registriert eine neue Schaltsekunde, indem als Datum der Tag
-     * der Umstellung und die absolute Verschiebung definiert werden. </p>
+     * <p>Registers a new positive leapsecond by defining the 
+     * switch-over-day. </p>
      *
      * @param   year        proleptic iso year
      * @param   month       gregorian month in range (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
-     * @param   negativeLS  Is the leap second negative ({@code true}) or
-     *                      positive ({@code false})?
      * @throws  IllegalStateException if support of leap seconds is switched
      *          off by configuration or if the value of system property
      *          &quot;net.time4j.utc.leapseconds.final&quot; is {@code true}
@@ -280,7 +357,420 @@ public final class LeapSeconds
      * @see     #SUPPRESS_UTC_LEAPSECONDS
      * @see     #FINAL_UTC_LEAPSECONDS
      */
-    public void register(
+    /*[deutsch]
+     * <p>Registriert eine neue positive Schaltsekunde, indem als Datum
+     * der Tag der Umstellung definiert wird. </p>
+     *
+     * @param   year        proleptic iso year
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @throws  IllegalStateException if support of leap seconds is switched
+     *          off by configuration or if the value of system property
+     *          &quot;net.time4j.utc.leapseconds.final&quot; is {@code true}
+     * @throws  IllegalArgumentException if the new event is not after the
+     *          last stored event or if the date is invalid
+     * @see     #isExtensible()
+     * @see     #isEnabled()
+     * @see     #SUPPRESS_UTC_LEAPSECONDS
+     * @see     #FINAL_UTC_LEAPSECONDS
+     */
+    public void registerPositiveLS(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+        
+        this.register(year, month, dayOfMonth, false);
+        
+    }
+    
+    /**
+     * <p>Registers a new negative leapsecond by defining the 
+     * switch-over-day. </p>
+     *
+     * @param   year        proleptic iso year
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @throws  IllegalStateException if support of leap seconds is switched
+     *          off by configuration or if the value of system property
+     *          &quot;net.time4j.utc.leapseconds.final&quot; is {@code true}
+     * @throws  IllegalArgumentException if the new event is not after the
+     *          last stored event or if the date is invalid
+     * @see     #isExtensible()
+     * @see     #isEnabled()
+     * @see     #SUPPRESS_UTC_LEAPSECONDS
+     * @see     #FINAL_UTC_LEAPSECONDS
+     */
+    /*[deutsch]
+     * <p>Registriert eine neue negative Schaltsekunde, indem als Datum
+     * der Tag der Umstellung definiert wird. </p>
+     *
+     * @param   year        proleptic iso year
+     * @param   month       gregorian month in range (1-12)
+     * @param   dayOfMonth  day of month in range (1-31)
+     * @throws  IllegalStateException if support of leap seconds is switched
+     *          off by configuration or if the value of system property
+     *          &quot;net.time4j.utc.leapseconds.final&quot; is {@code true}
+     * @throws  IllegalArgumentException if the new event is not after the
+     *          last stored event or if the date is invalid
+     * @see     #isExtensible()
+     * @see     #isEnabled()
+     * @see     #SUPPRESS_UTC_LEAPSECONDS
+     * @see     #FINAL_UTC_LEAPSECONDS
+     */
+    public void registerNegativeLS(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+        
+        this.register(year, month, dayOfMonth, true);
+        
+    }
+    
+    /**
+     * <p>Queries if negative leapseconds are supported. </p>
+     *
+     * @return  {@code true} if negative leap seconds are supported
+     *          else {@code false}
+     * @see     Provider#supportsNegativeLS()
+     */
+    /*[deutsch]
+     * <p>Werden auch negative Schaltsekunden unterst&uuml;tzt? </p>
+     *
+     * @return  {@code true} if negative leap seconds are supported
+     *          else {@code false}
+     * @see     Provider#supportsNegativeLS()
+     */
+    public boolean supportsNegativeLS() {
+
+        return this.supportsNegativeLS;
+
+    }
+
+    /**
+     * <p>Iterates over all leapsecond events in descending temporal
+     * order. </p>
+     *
+     * @return  {@code Iterator} over all stored leap second events
+     *          which enables for-each-support
+     */
+    /*[deutsch]
+     * <p>Iteriert &uuml;ber alle Schaltsekundenereignisse in zeitlich
+     * absteigender Reihenfolge. </p>
+     *
+     * @return  {@code Iterator} over all stored leap second events
+     *          which enables for-each-support
+     */
+    @Override
+    public Iterator<LeapSecondEvent> iterator() {
+
+        final LeapSecondEvent[] events = this.getEventsInDescendingOrder();
+
+        return new Iterator<LeapSecondEvent>() {
+            private int index = 0;
+            @Override
+            public boolean hasNext() {
+                return (this.index < events.length);
+            }
+            @Override
+            public LeapSecondEvent next() {
+                if (this.index >= events.length) {
+                    throw new NoSuchElementException();
+                }
+                LeapSecondEvent event = events[this.index];
+                this.index++;
+                return event;
+            }
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+
+    }
+
+    /**
+     * <p>Yields the shift in seconds suitable for the last minute
+     * of given calendar date. </p>
+     *
+     * <p>The result of this method can be added to the second value
+     * {@code 59} in order to calculate the maximum of the element
+     * SECOND_OF_MINUTE in given time context. The behaviour of the
+     * method is undefined if given calendar date is undefined. </p>
+     *
+     * @param   date    day of possible leap second event in the last minute
+     * @return  shift of second element (most of the times just {@code 0})
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Verschiebung in Sekunden passend zur letzten Minute
+     * des angegebenen Datums. </p>
+     *
+     * <p>Das Ergebnis der Methode kann zum Sekundenwert {@code 59} addiert
+     * werden, um das Maximum des Elements SECOND_OF_MINUTE im angegebenen
+     * Zeitkontext zu erhalten. Das Verhalten der Methode ist undefiniert,
+     * wenn die angegebenen Bereichsgrenzen der Argumentwerte nicht beachtet
+     * werden. </p>
+     *
+     * @param   date    day of possible leap second event in the last minute
+     * @return  shift of second element (most of the times just {@code 0})
+     */
+    public int getShift(GregorianDate date) {
+
+        int year = date.getYear();
+
+        // Schaltsekundenereignisse gibt es erst seit Juni 1972
+        if (year >= 1972) {
+
+            ExtendedLSE[] events = this.getEventsInDescendingOrder();
+
+            for (int i = 0; i < events.length; i++) {
+                ExtendedLSE event = events[i];
+                GregorianDate lsDate = event.getDate();
+
+                // Ist es der Umstellungstag?
+                if (
+                    (year == lsDate.getYear())
+                    && (date.getMonth() == lsDate.getMonth())
+                    && (date.getDayOfMonth() == lsDate.getDayOfMonth())
+                ) {
+                    return event.getShift();
+                }
+            }
+        }
+
+        return 0;
+
+    }
+
+    /**
+     * <p>Yields the shift in seconds dependent on if given UTC time point
+     * represents a leapsecond or not. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  {@code 1, 0, -1} if the argument denotes a positive leapsecond
+                no leapsecond or a negative leapsecond
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Verschiebung in Sekunden, wenn dieser Zeitpunkt
+     * &uuml;berhaupt eine Schaltsekunde repr&auml;sentiert. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  {@code 1, 0, -1} if the argument denotes a positive leapsecond
+                no leapsecond or a negative leapsecond
+     */
+    public int getShift(long utc) {
+
+        if (utc <= 0) {
+            return 0;
+        }
+
+        ExtendedLSE[] events = this.getEventsInDescendingOrder();
+
+        for (int i = 0; i < events.length; i++) {
+            ExtendedLSE lse = events[i];
+
+            if (utc > lse.utc()) {
+                return 0;
+            } else {
+                long start = lse.utc() - lse.getShift();
+                if (utc > start) { // Schaltbereich
+                    return (int) (utc - start);
+                }
+            }
+        }
+
+        return 0;
+
+    }
+
+    /**
+     * <p>Enhances an UNIX-timestamp with leapseconds and converts it to an
+     * UTC-timestamp. </p>
+     *
+     * <p>Note: A leapsecond itself cannot be restored because the mapping
+     * between UNIX- and UTC-time is not bijective. Hence the result of this
+     * method can not represent a leapsecond. </p>
+     *
+     * @param   unixTime    elapsed time in seconds relative to UNIX epoch
+     *                      [1970-01-01T00:00:00Z] without leap seconds
+     * @return  elapsed SI-seconds relative to UTC epoch
+     *          [1972-01-01T00:00:00Z] including leap seconds
+     * @see     #strip(long)
+     */
+    /*[deutsch]
+     * <p>Reichert einen UNIX-Zeitstempel mit Schaltsekunden an und wandelt
+     * ihn in einen UTC-Zeitstempel um. </p>
+     *
+     * <p>Notiz: Eine Schaltsekunde kann selbst nicht wiederhergestellt werden,
+     * da die Abbildung zwischen der UNIX- und UTC-Zeit nicht bijektiv ist.
+     * Das Ergebnis dieser Methode stellt also keine aktuelle Schaltsekunde
+     * dar. </p>
+     *
+     * @param   unixTime    elapsed time in seconds relative to UNIX epoch
+     *                      [1970-01-01T00:00:00Z] without leap seconds
+     * @return  elapsed SI-seconds relative to UTC epoch
+     *          [1972-01-01T00:00:00Z] including leap seconds
+     * @see     #strip(long)
+     */
+    public long enhance(long unixTime) {
+
+        long epochTime = unixTime - UNIX_OFFSET;
+
+        if (unixTime <= 0) {
+            return unixTime;
+        }
+
+        // Lineare Suche hier besser als binäre Suche, weil in der
+        // Praxis meistens mit aktuellen Datumswerten gesucht wird
+        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
+
+        for (int i = 0; i < events.length; i++) {
+            ExtendedLSE lse = events[i];
+
+            if (lse.raw() < epochTime) {
+                return MathUtils.safeAdd(epochTime, lse.utc() - lse.raw());
+            }
+        }
+
+        return epochTime;
+
+    }
+
+    /**
+     * <p>Converts given UTC-timestamp to an UNIX-timestamp without
+     * leapseconds. </p>
+     *
+     * <p>This method is the reversal of {@code enhance()}. Note that
+     * there is no bijective mapping, that is sometimes the expression
+     * {@code enhance(strip(val)) != val} is {@code true}. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  elapsed time in seconds relative to UNIX epoch
+     *          [1970-01-01T00:00:00Z] without leap seconds
+     * @see     #enhance(long)
+     */
+    /*[deutsch]
+     * <p>Konvertiert die UTC-Angabe zu einem UNIX-Zeitstempel ohne
+     * Schaltsekunden. </p>
+     *
+     * <p>Diese Methode ist die Umkehrung zu {@code enhance()}. Zu
+     * beachten ist, da&szlig; keine bijektive Abbildung besteht, d.h. es gilt
+     * manchmal: {@code enhance(strip(val)) != val}. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  elapsed time in seconds relative to UNIX epoch
+     *          [1970-01-01T00:00:00Z] without leap seconds
+     * @see     #enhance(long)
+     */
+    public long strip(long utc) {
+
+        if (utc <= 0) {
+            return utc + UNIX_OFFSET;
+        }
+
+        // Lineare Suche hier besser als binäre Suche, weil in der
+        // Praxis meistens mit aktuellen Datumswerten gesucht wird
+        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
+        boolean snls = this.supportsNegativeLS;
+
+        for (int i = 0; i < events.length; i++) {
+            ExtendedLSE lse = events[i];
+
+            if (
+                (lse.utc() - lse.getShift() < utc)
+                || (snls && (lse.getShift() < 0) && (lse.utc() < utc))
+            ) {
+                utc = MathUtils.safeAdd(utc, lse.raw() - lse.utc());
+                break;
+            }
+        }
+
+        return utc + UNIX_OFFSET;
+
+    }
+
+    /**
+     * <p>Queries if given UTC-timestamp represents a registered
+     * positive leapsecond. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  {@code true} if the argument represents a registered
+     *          positive leap second else {@code false}
+     */
+    /*[deutsch]
+     * <p>Ist die angegebene UTC-Zeit eine registrierte positive
+     * Schaltsekunde? </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  {@code true} if the argument represents a registered
+     *          positive leap second else {@code false}
+     */
+    public boolean isPositiveLS(long utc) {
+
+        if (utc <= 0) {
+            return false;
+        }
+
+        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
+
+        for (int i = 0; i < events.length; i++) {
+            long comp = events[i].utc();
+            
+            if (comp == utc) {
+                return (events[i].getShift() == 1);
+            } else if (comp < utc) {
+                break;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * <p>For debugging purposes. </p>
+     *
+     * @return  table of leap seconds as String
+     */
+    /*[deutsch]
+     * <p>F&uuml;r Debugging-Zwecke. </p>
+     *
+     * @return  table of leap seconds as String
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(2048);
+        sb.append("[PROVIDER=");
+        sb.append(this.provider);
+        sb.append(",EVENTS=[");
+
+        if (this.isEnabled()) {
+            boolean first = true;
+            for (Object event : this.list) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append('|');
+                }
+                sb.append(event);
+            }
+        } else {
+            sb.append("NOT SUPPORTED");
+        }
+
+        return sb.append("]]").toString();
+
+    }
+
+    private void register(
         int year,
         int month,
         int dayOfMonth,
@@ -334,286 +824,6 @@ public final class LeapSeconds
             this.list.add(createLSE(newLS, shift, last));
             this.reverseVolatile = this.initReverse();
         }
-
-    }
-
-    /**
-     * <p>Werden auch negative Schaltsekunden unterst&uuml;tzt? </p>
-     *
-     * @return  {@code true} if negative leap seconds are supported
-     *          else {@code false}
-     * @see     Provider#supportsNegativeLS()
-     */
-    public boolean supportsNegativeLS() {
-
-        return this.supportsNegativeLS;
-
-    }
-
-    /**
-     * <p>Iteriert &uuml;ber alle Schaltsekundenereignisse in zeitlich
-     * absteigender Reihenfolge. </p>
-     *
-     * @return  {@code Iterator} over all stored leap second events
-     *          which enables for-each-support
-     */
-    @Override
-    public Iterator<LeapSecondEvent> iterator() {
-
-        final LeapSecondEvent[] events = this.getEventsInDescendingOrder();
-
-        return new Iterator<LeapSecondEvent>() {
-            private int index = 0;
-            @Override
-            public boolean hasNext() {
-                return (this.index < events.length);
-            }
-            @Override
-            public LeapSecondEvent next() {
-                if (this.index >= events.length) {
-                    throw new NoSuchElementException();
-                }
-                LeapSecondEvent event = events[this.index];
-                this.index++;
-                return event;
-            }
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
-
-    }
-
-    /**
-     * <p>Ermittelt die Verschiebung in Sekunden passend zur letzten Minute
-     * des angegebenen Datums. </p>
-     *
-     * <p>Das Ergebnis der Methode kann zum Sekundenwert {@code 59} addiert
-     * werden, um das Maximum eines Sekundenfelds im angegebenen Zeitkontext
-     * zu erhalten. Das Verhalten der Methode ist undefiniert, wenn die
-     * angegebenen Bereichsgrenzen der Argumentwerte nicht beachtet werden. </p>
-     *
-     * @param   date    day of possible leap second event in the last minute
-     * @return  shift of second element (most of the times just {@code 0})
-     */
-    public int getShift(GregorianDate date) {
-
-        int year = date.getYear();
-
-        // Schaltsekundenereignisse gibt es erst seit Juni 1972
-        if (year >= 1972) {
-
-            ExtendedLSE[] events = this.getEventsInDescendingOrder();
-
-            for (int i = 0; i < events.length; i++) {
-                ExtendedLSE event = events[i];
-                GregorianDate lsDate = event.getDate();
-
-                // Ist es der Umstellungstag?
-                if (
-                    (year == lsDate.getYear())
-                    && (date.getMonth() == lsDate.getMonth())
-                    && (date.getDayOfMonth() == lsDate.getDayOfMonth())
-                ) {
-                    return event.getShift();
-                }
-            }
-        }
-
-        return 0;
-
-    }
-
-    /**
-     * <p>Ermittelt die zum angegebenen Zeitpunkt neuesten eingef&uuml;gten
-     * Schaltsekunden, wenn dieser Zeitpunkt &uuml;berhaupt eine Schaltsekunde
-     * repr&auml;sentiert. </p>
-     *
-     * <p>Historische Schaltsekunden von fr&uuml;heren Jahren werden hierbei
-     * nicht mitgez&auml;hlt. Falls jemals Schaltsekundenereignisse definiert
-     * sein sollten, bei denen mehr als eine Schaltsekunde eingef&uuml;gt
-     * wird, dann wird diese Methode entsprechend den zum Argument passenden
-     * Anteil liefern. </p>
-     *
-     * <p>Folgendes Szenario erhellt den Zweck dieser Methode: Wenn ein
-     * UTC-Zeitstempel zun&auml;chst in einen lokalen Wert transformiert wird,
-     * gehen alle Schaltsekundeninformationen verloren, auch die letzte, wenn
-     * vorhanden. Nach einer Umrechnung in die einzelnen Feldwerte Jahr, Monat
-     * usw. ist die berechnete Datumszeit zu gro&szlig;, weil die Schaltsekunde
-     * f&auml;lschlicherweise als erste Sekunde der n&auml;chsten Minute
-     * angesehen wird. Daher kann diese Methode herangezogen werden, um
-     * zu entscheiden, ob ein UTC-Wert aktuell eine Schaltsekunde ist. Wenn
-     * ja, ist das Ergebnis dieser Methode von der berechneten Zeit abzuziehen
-     * (Subtraktion auf die berechnete Datumszeit angewandt). </p>
-     *
-     * @param   utc     elapsed SI-seconds relative to UTC epoch
-     *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  shift of second element ({@code 0} if the argument does not
-     *          represent a leap second)
-     */
-    public int getShift(long utc) {
-
-        if (utc <= 0) {
-            return 0;
-        }
-
-        ExtendedLSE[] events = this.getEventsInDescendingOrder();
-
-        for (int i = 0; i < events.length; i++) {
-            ExtendedLSE lse = events[i];
-
-            if (utc > lse.utc()) {
-                return 0;
-            } else {
-                long start = lse.utc() - lse.getShift();
-                if (utc > start) { // Schaltbereich
-                    return (int) (utc - start);
-                }
-            }
-        }
-
-        return 0;
-
-    }
-
-    /**
-     * <p>Reichert einen UNIX-Zeitstempel mit Schaltsekunden an und wandelt
-     * ihn in einen UTC-Zeitstempel um. </p>
-     *
-     * <p>Notiz: Eine Schaltsekunde kann selbst nicht wiederhergestellt werden,
-     * da die Abbildung zwischen der UNIX-Zeit und UTC nicht bijektiv ist.
-     * Das Ergebnis dieser Methode stellt also keine aktuelle Schaltsekunde
-     * dar. </p>
-     *
-     * @param   unixTime    elapsed time in seconds relative to UNIX epoch
-     *                      [1970-01-01T00:00:00Z] without leap seconds
-     * @return  elapsed SI-seconds relative to UTC epoch
-     *          [1972-01-01T00:00:00Z] including leap seconds
-     * @see     #strip(long)
-     */
-    public long enhance(long unixTime) {
-
-        long epochTime = unixTime - UNIX_OFFSET;
-
-        if (unixTime <= 0) {
-            return unixTime;
-        }
-
-        // Lineare Suche hier besser als binäre Suche, weil in der
-        // Praxis meistens mit aktuellen Datumswerten gesucht wird
-        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
-
-        for (int i = 0; i < events.length; i++) {
-            ExtendedLSE lse = events[i];
-
-            if (lse.raw() < epochTime) {
-                return MathUtils.safeAdd(epochTime, lse.utc() - lse.raw());
-            }
-        }
-
-        return epochTime;
-
-    }
-
-    /**
-     * <p>Konvertiert die UTC-Angabe zu einem UNIX-Zeitstempel ohne
-     * Schaltsekunden. </p>
-     *
-     * <p>Diese Methode ist die Umkehrung zu {@code enhance()}. Zu
-     * beachten ist, da&szlig; keine bijektive Abbildung besteht, d.h. es gilt
-     * manchmal: {@code enhance(strip(val)) != val}. </p>
-     *
-     * @param   utc     elapsed SI-seconds relative to UTC epoch
-     *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  elapsed time in seconds relative to UNIX epoch
-     *          [1970-01-01T00:00:00Z] without leap seconds
-     * @see     #enhance(long)
-     */
-    public long strip(long utc) {
-
-        if (utc <= 0) {
-            return utc + UNIX_OFFSET;
-        }
-
-        // Lineare Suche hier besser als binäre Suche, weil in der
-        // Praxis meistens mit aktuellen Datumswerten gesucht wird
-        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
-        boolean snls = this.supportsNegativeLS;
-
-        for (int i = 0; i < events.length; i++) {
-            ExtendedLSE lse = events[i];
-
-            if (
-                (lse.utc() - lse.getShift() < utc)
-                || (snls && (lse.getShift() < 0) && (lse.utc() < utc))
-            ) {
-                utc = MathUtils.safeAdd(utc, lse.raw() - lse.utc());
-                break;
-            }
-        }
-
-        return utc + UNIX_OFFSET;
-
-    }
-
-    /**
-     * <p>Ist die angegebene UTC-Zeit eine registrierte positive
-     * Schaltsekunde? </p>
-     *
-     * @param   utc     elapsed SI-seconds relative to UTC epoch
-     *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  {@code true} if the argument represents a registered
-     *          positive leap second else {@code false}
-     */
-    public boolean isPositiveLS(long utc) {
-
-        if (utc <= 0) {
-            return false;
-        }
-
-        final ExtendedLSE[] events = this.getEventsInDescendingOrder();
-
-        for (int i = 0; i < events.length; i++) {
-            if (events[i].utc() == utc) {
-                return (events[i].getShift() == 1);
-            } else if (events[i].utc() < utc) {
-                break;
-            }
-        }
-
-        return false;
-
-    }
-
-    /**
-     * <p>F&uuml;r Debugging-Zwecke. </p>
-     *
-     * @return  table of leap seconds as String
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder(2048);
-        sb.append("[PROVIDER=");
-        sb.append(this.provider);
-        sb.append(",EVENTS=[");
-
-        if (this.isEnabled()) {
-            boolean first = true;
-            for (Object event : this.list) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append('|');
-                }
-                sb.append(event);
-            }
-        } else {
-            sb.append("NOT SUPPORTED");
-        }
-
-        return sb.append("]]").toString();
 
     }
 
@@ -703,6 +913,18 @@ public final class LeapSeconds
     //~ Innere Interfaces -------------------------------------------------
 
     /**
+     * <p>This <strong>SPI-interface</strong> describes when
+     * UTC-leapseconds were introduced. </p>
+     *
+     * <p>Will be evaluated during loading of the class {@code LeapSeconds}.
+     * If any implementation defines no leapseconds then Time4J assumes
+     * that leapseconds will generally not be active, effectively resulting
+     * in POSIX-time instead of UTC. </p>
+     *
+     * @author  Meno Hochschild
+     * @spec    All implementations must have a public no-arg constructor.
+     */
+    /*[deutsch]
      * <p>Dieses <strong>SPI-Interface</strong> beschreibt, wann
      * UTC-Schaltsekunden eingef&uuml;hrt worden sind. </p>
      *
@@ -720,6 +942,17 @@ public final class LeapSeconds
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Yields all UTC-leapseconds with date and sign. </p>
+         *
+         * <p>The switch-over day in the UTC-timezone is considered as
+         * map key. The associated value is denotes the sign of the
+         * leapsecond. Is the value {@code +1} then it is a positive
+         * leapsecond. Is the value {@code -1} then it is a negative
+         * leapsecond. Other values are not supported. </p>
+         *
+         * @return  map from leap second event day to sign of leap second
+         */
+        /*[deutsch]
          * <p>Liefert alle UTC-Schaltsekunden mit Datum und Vorzeichen. </p>
          *
          * <p>Als Schl&uuml;ssel wird der Umstellungstag in der UTC-Zeitzone
@@ -734,11 +967,21 @@ public final class LeapSeconds
         Map<GregorianDate, Integer> getLeapSecondTable();
 
         /**
+         * <p>Queries if negative leapseconds are supported. </p>
+         *
+         * <p>Until now there has never been any negative leapseconds.
+         * As long as this is the case a {@code Provider} is allowed to
+         * return {@code false} in order to improve the performance. </p>
+         *
+         * @return  {@code true} if supported else {@code false}
+         */
+        /*[deutsch]
          * <p>Werden auch negative Schaltsekunden unterst&uuml;tzt? </p>
          *
          * <p>Bis jetzt hat es real noch nie negative Schaltsekunden gegeben.
-         * Solange das der Fall ist, darf ein Provider aus Gr&uuml;nden der
-         * besseren Performance hier {@code false} zur&uuml;ckgeben. </p>
+         * Solange das der Fall ist, darf ein {@code Provider} aus
+         * Gr&uuml;nden der besseren Performance hier {@code false}
+         * zur&uuml;ckgeben. </p>
          *
          * @return  {@code true} if supported else {@code false}
          */
