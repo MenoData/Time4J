@@ -24,12 +24,183 @@ package net.time4j.scale;
 import net.time4j.base.UnixTime;
 
 
-
 /**
- * <p>Definiert eine Koordinate auf der Weltzeitlinie mit Hilfe der Anzahl der
- * Sekunden relativ zur UTC-Epoche [1972-01-01T00:00:00Z] in der UTC-Zeitzone
- * (Greenwich-Meridian) und einem in der letzten Sekunde enthaltenen
- * Nanosekundenbruchteil. </p>
+ * <p>Defines a time point respective coordinate on the universal timeline as
+ * the count of seconds relative to UTC epoch [1972-01-01T00:00:00Z] in the
+ * UTC-timezone (Greenwich meridian) and a nanosecond as part of last
+ * second. </p>
+ *
+ * <p>The abbreviation &quot;UTC&quot; stands for the term
+ * &quot;Corrected Universal Time&quot;. This term relates to the timezone
+ * UTC+00:00 as reference for all timestamps. <strong>This API uses as
+ * measurement system a combination of seconds (hold in a long-primitive)
+ * and nanoseconds as fraction of last second (hold in an int-primitive).
+ * </strong> In such defined system all time points of type {@code TimePoint}
+ * can be directly compared with each other which implement this interface.
+ * The time of the technical introduction of UTC in radio signals on the
+ * date 1972-01-01 is determined by Time4J as UTC-epoch. Before this epoch
+ * the second is just the 86400th part of a mean solar day. After the
+ * UTC-epoch the atomic time is valid with the new definition of the
+ * second as SI-second based on the count of periods in a caesium atom
+ * at a given frequency transition. </p>
+ *
+ * <p>Generally the rules of univeral time are those of the gregorian
+ * calendar - with the exception of leapseconds. UTC and ISO-8601 (for
+ * the representation) take into account leapseconds which were introduced
+ * in order to always keep the difference between an atomic clock and the
+ * mean solar time UT1 within the range of 0.9 seconds. The solar time UT1
+ * is a mean average time due to the anomalies associated with the
+ * irregular rotation of earth around the own axis where every day
+ * consists of 86400 seconds having a variable length. Therefore these
+ * seconds are no SI-seconds. This API reads UTC-leapseconds from a
+ * table and defines the universal time in SI-seconds since the begin
+ * of UTC-epoch [1972-01-01T00:00:00Z] including a nanosecond part (mostly
+ * only precise to milliseconds). Taking out the leapseconds and by
+ * transforming to the POSIX-epoch 1970-01-01 yields the POSIX-time where
+ * every minute always have 60 seconds (on the base of one calendar day
+ * equal to 86400 seconds). </p>
+ *
+ * <p>The UTC-standard defined so far was officially introduced on
+ * the date 1972-01-01. Befor this UTC-epoch there are no leapseconds.
+ * The consequence is that Time4J interpretes all historical timestamps before
+ * 1972 as UT1-time - with reference to mean solar day on Greenwich meridian.
+ * Correspondingly the definiton of the second changes with the begin of
+ * UTC-epoch to atomic based time. The definiton of the calendar day
+ * changes, too. For all UT1-timestamps the calendar day is identical
+ * with the mean solar day which can yield the true solar day using the
+ * equation of time (astronomical formula). But with start of UTC a calendar
+ * day consists of 86400 SI-seconds, in rare cases of 86401 or (until now
+ * only theoretical) 86399 SI-seconds. This definition of the calendar
+ * day is already now no longer exact equal to the mean solar day. The
+ * leapseconds only guarantee an approximation of the calendar day to
+ * the mean solar day such that the difference will never go beyond
+ * 0.9 seconds. </p>
+ *
+ * <p>There is a debate initiated by USA to abolish leapseconds. If this
+ * might happen then Time4J would start a new section on the universal
+ * timeline after UT1 and UTC - with a probably new name. The new section
+ * will surely be based on SI-seconds but indeed stop to count any leapseconds.
+ * This interface would then mutate to a pure atomic scale without any
+ * reference to the mean solar day. The deviation of the atomic day from
+ * the mean solar day is in year 2013 already about 25 SI-seconds. The
+ * ITU-conference in January 2012 just decided to postpone the decision
+ * about the proposal to abolish leapseconds first in year 2015. ITU is
+ * an international organization for controlling the radio signals and
+ * telecommunication standards. Currently ITU manages the UTC standard, too.
+ * Time4J stores timestamps using the concept of this interface as
+ * followed: </p>
+ *
+ * <p>&nbsp;</p>
+ *
+ * <table border="1">
+ *  <tr>
+ *      <th>Section</th>
+ *      <th>Name</th>
+ *      <th>Second definition</th>
+ *      <th>Details</th>
+ *  </tr>
+ *  <tr>
+ *      <td>before 1972-01-01T00:00:00Z</td>
+ *      <td>UT1</td>
+ *      <td>mean solar second</td>
+ *      <td>A mean solar day corresponds to always 86400 seconds
+ *      with variable length. </td>
+ *  </tr>
+ *  <tr>
+ *      <td>1972-01-01T00:00:00Z until day X</td>
+ *      <td>UTC (with leapseconds)</td>
+ *      <td>SI-second based on atomic clocks</td>
+ *      <td>A calendar day consists in most cases of 86400 SI-seconds
+ *      sometimes also of 86401 or 86399 SI-seconds. The mechanism of
+ *      leapseconds is responsible for keeping the difference between
+ *      the calendar day and the mean solar day within the range of
+ *      0.9 SI-seconds. Due to the impossibility to make long-term-predictions
+ *      about the earth rotation the day X is about 6 months after current
+ *      date or last leapsecond in the future. The institute IERS is
+ *      responsible for announcing leapseconds around 6 months in advance.
+ *      A second precision is not given for any kind of time calculations
+ *      if the calculation includes the future further than 6 months. </td
+ *  </tr>
+ *  <tr>
+ *      <td>after day X</td>
+ *      <td>IT ??? (International Time ??? - without Schaltsekunden)</td>
+ *      <td>SI-second based on atomic clocks</td>
+ *      <td>Future leapseconds are no longer defined here. Consequently
+ *      the calendar day based on 86400 SI-seconds will increasingly
+ *      deviate from the mean solar day. </td>
+ *  </tr>
+ * </table>
+ *
+ * <p>If leapseconds in Time4J are switched off per configuration then
+ * UTC will practically mutate to POSIX with the exception of the different
+ * epoch date (two years between epochs). Calculations of time deltas in
+ * SI-seconds and fractional seconds will get a small error after UTC-epoch
+ * which can normally be ignored in standard business use-cases (for example
+ * banks do not care about seconds when calculating day-based interest
+ * rates). </p>
+ *
+ * <p>Arguments for keeping leapseconds alive: </p>
+ *
+ * <ul><li>ASTRONOMY: The difference between the atomic time and the mean
+ * solar time UT1 is a physical fact which cannot simply be denied. The
+ * UT1-time is more important in civil life because human beings are
+ * accustomed to expect the highest sun around noon. Without the UTC-mechanism
+ * of leapseconds the time would come where noon occurs in the night which
+ * is not acceptable for anybody. </li>
+ * <li>PRECISION: An API can only guarantee precision around leapsecond events
+ * if the take into account leapseconds. This is especially true for time
+ * differences in seconds or fractions of seconds. All clocks nowadays used
+ * in practise finally use atomic clocks as reference clocks and hence
+ * indirectly use SI-seconds. Even if they themselves don't use atomic clock
+ * mechanisms (quartz, spring works etc.) so they are adapted to atomic clocks
+ * in any way. This is not always neglectable because the used measurement
+ * system in Java goes down to nanoseconds. This is the Java-based reasoning
+ * why {@code UniversalTime} uses UTC as universal time scale. Simultaneously
+ * the limitation to leapseconds on the section from 1972 and later takes
+ * into account that before this epoch there is no precision in seconds due
+ * to technical and practical reasons. Even today nanosecond precision is
+ * not realistic with all kinds of computer clocks or the NTP-protocol and
+ * only exists here for database support (SQL-TIMESTAMP-support, databases
+ * often generate nano-timestamps as primary keys by help of random-based
+ * numbers or a simple numerical counter). But after 1972 it is also valid
+ * to say that for example relative inaccurate computer clocks can adapted
+ * manually to UTC-time and are sufficiently sensible for leapseconds near
+ * leapsecond events if it is just about second precision. </li>
+ * <li>STANDARDS: Another important reason is that UTC is currently the
+ * actual world standard in civil life and important technical standards
+ * like ISO-8601 or internet protocols like RFC 3339. This API has the
+ * goal to follow these standards as much as possible. Leapseconds are
+ * rare but nevertheless present in civil life if they happen. They are
+ * always published in the broad mass media. </p>
+ * <li>DEFINITION OF SECOND: UTC based on atomic clocks ensures that
+ * every second has exactly the same length what is not true for the
+ * usual mean solar time (UT1) which is more present in civil life.
+ * Variations like the expired proposal UTC-SLS have never played any
+ * role and try to hide leapseconds by introducing leap milliseconds.
+ * Latter case does not really favor any practical use case. Such proposals
+ * counteract the basic idea of UTC to define seconds with constant and
+ * same length. </li></ul>
+ *
+ * <p>Further links for definition of UTC: </p>
+ *
+ * <ul>
+ *  <li><a href="http://en.wikipedia.org/wiki/Coordinated_Universal_Time">
+ * Wikipedia</a></li>
+ *  <li><a href="http://hpiers.obspm.fr/eoppc/bul/bulc/TimeSteps.history">
+ * History of leapseconds</a></li>
+ *  <li><a href="http://hpiers.obspm.fr/eoppc/bul/bulc/bulletinc.dat">
+ * Actual announcements of leapseconds</a></li>
+ * </ul>
+ *
+ * @author  Meno Hochschild
+ * @see     LeapSeconds
+ * @spec    Implementations are required to be immutable.
+ */
+/*[deutsch]
+ * <p>Definiert einen Zeitstempel als Koordinate/Punkt auf der Weltzeitlinie mit
+ * Hilfe der Anzahl der Sekunden relativ zur UTC-Epoche [1972-01-01T00:00:00Z]
+ * in der UTC-Zeitzone (Greenwich-Meridian) und einem in der letzten Sekunde
+ * enthaltenen Nanosekundenbruchteil. </p>
  *
  * <p>Die Abk&uuml;rzung &quot;UTC&quot; steht f&uuml;r die Bezeichnung
  * &quot;Corrected Universal Time&quot;. Der Begriff bezieht sich auf die
@@ -203,11 +374,9 @@ import net.time4j.base.UnixTime;
  * Aktuelle Ank&uuml;ndigung von Schaltsekunden</a></li>
  * </ul>
  *
- * <p>Spezifikation: Implementierungen m&uuml;ssen unver&auml;nderlich
- * (<i>immutable</i>) sein. </p>
- *
  * @author  Meno Hochschild
  * @see     LeapSeconds
+ * @spec    Implementations are required to be immutable.
  */
 public interface UniversalTime
     extends UnixTime {
@@ -215,6 +384,19 @@ public interface UniversalTime
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Represents this timestamp as elpased seconds on given time scale. </p>
+     *
+     * <p>The method {@code getPosixTime()} inherited from {@code UnixTime}
+     * is equivalent to {@code getElapsedTime(TimeScale.POSIX)} and relates
+     * to the UNIX-epoch 1970-01-01. The time scale UTC starts two years
+     * later however and also counts leapseconds. </p>
+     *
+     * @param   scale       time scale reference
+     * @return  elapsed seconds in given time scale
+     * @throws  IllegalArgumentException if this instance is out of range
+     *          for given time scale
+     */
+    /*[deutsch]
      * <p>Stellt diese Weltzeit als Sekundenwert in der angegebenen Zeitskala
      * dar. </p>
      *
@@ -231,7 +413,19 @@ public interface UniversalTime
     long getElapsedTime(TimeScale scale);
 
     /**
-     * <p>Stellt diese Weltzeit als Nanosekundenbruchteil in der angegebenen
+     * <p>Represents the nanosecond part on the given time scale. </p>
+     *
+     * <p>The method with the same name and without argument inherited from
+     * super interface {@code UnixTime} is identical to this method if the
+     * time scale is either {@code POSIX} or {@code UTC}. </p>
+     *
+     * @param   scale       time scale reference
+     * @return  nanosecond fraction in given time scale
+     * @throws  IllegalArgumentException if this instance is out of range
+     *          for given time scale
+     */
+    /*[deutsch]
+     * <p>Stellt den Nanosekundenbruchteil in der angegebenen
      * Zeitskala dar. </p>
      *
      * <p>Die vom Super-Interface {@code UnixTime} geeerbte Methode gleichen
@@ -246,6 +440,16 @@ public interface UniversalTime
     int getNanosecond(TimeScale scale);
 
     /**
+     * <p>Queries if this time point is within a positive leapsecond. </p>
+     *
+     * <p>If the support for UTC-leapseconds is switched off per configuration
+     * then this method will always yield {@code false}. </p>
+     *
+     * @return  {@code true} if this instance represents a positive
+     *          leap second else {@code false}
+     * @see     LeapSeconds#isEnabled()
+     */
+    /*[deutsch]
      * <p>Liegt dieser Zeitpunkt innerhalb einer positiven Schaltsekunde? </p>
      *
      * <p>Wurde die Unterst&uuml;tzung von UTC-Schaltsekunden per Konfiguration

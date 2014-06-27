@@ -25,6 +25,16 @@ import net.time4j.base.GregorianDate;
 
 
 /**
+ * <p>This interface describes that during the last minute of a given
+ * calendar day an UTC-leapsecond was either introducted or left out. </p>
+ *
+ * <p>Example: If the day is given as [1972-06-30] then this means a leapsecond
+ * in the last minute short before midnight of following day, namely at
+ * [1972-06-30T23:59:60Z]. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Beschreibt, da&szlig; in der letzten Minute des hier bestimmten Tags eine
  * UTC-Schaltsekunde eingef&uuml;gt oder eine Sekunde ausgelassen wurde. </p>
  *
@@ -39,6 +49,11 @@ public interface LeapSecondEvent {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns the date of leapsecond introduction. </p>
+     *
+     * @return  gregorian date where a leap second is inserted at the end
+     */
+    /*[deutsch]
      * <p>Ermittelt das Datum der Zeitumstellung. </p>
      *
      * @return  gregorian date where a leap second is inserted at the end
@@ -46,7 +61,17 @@ public interface LeapSecondEvent {
     GregorianDate getDate();
 
     /**
-     * <p>Liefert die Anzahl der Schaltsekunden nur dieses Ereignisses. </p>
+     * <p>Returns the leapsecond shift of this event only. </p>
+     *
+     * <p>Note: Until the year 2014 there was only the shift of one
+     * second extra so the return value of this method is always {@code +1}.
+     * But negative leapseconds with the shift {@code -1} remain
+     * theoretically possible according to UTC definition. </p>
+     *
+     * @return  event-related shift in seconds ({@code != 0})
+     */
+    /**
+     * <p>Liefert die Schaltsekundenverschiebung nur dieses Ereignisses. </p>
      *
      * <p>Anmerkung: Bis zum Jahr 2014 gab es nur den Versatz von jeweils
      * einer Sekunde extra, also ist der R&uuml;ckgabewert dieser Methode
