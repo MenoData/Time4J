@@ -33,8 +33,7 @@ public class LeapSecondTest {
             int year = 2112;
             int month = 12;
             int dayOfMonth = 31;
-            boolean negativeLS = true;
-            instance.register(year, month, dayOfMonth, negativeLS);
+            instance.registerNegativeLS(year, month, dayOfMonth, negativeLS);
         }
     }
 
