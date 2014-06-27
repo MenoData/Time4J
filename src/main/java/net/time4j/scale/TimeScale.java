@@ -23,6 +23,17 @@ package net.time4j.scale;
 
 
 /**
+ * <p>Defines some time scales for usage both in civil life and in science. </p>
+ *
+ * <p>Any conversion is usually not bijective. That means that for example
+ * an UTC-timestamp can be mapped in a unique way to UT1, GPS or TAI (provided
+ * that there are no negative leapseconds) but in reverse not. More important:
+ * Conversions often happen in millisecond-precision or worse so they are
+ * more or less like approximation procedures. </p>
+ *
+ * @author  Meno Hochschild
+ */
+/*[deutsch]
  * <p>Definiert verschiedene Zeitskalen sowohl zur Verwendung im zivilen
  * Alltag als auch in der Wissenschaft. </p>
  *
@@ -40,6 +51,36 @@ public enum TimeScale {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Counts the seconds relative to UNIX-epoch 1970-01-01T00:00:00Z
+     * which is two years before UTC-epoch. </p>
+     *
+     * <p>Leap seconds are not counted but ignored according to POSIX-standard.
+     * Before the UTC-epoch 1972-01-01 the second is effectively defined as
+     * the 86400th part of mean solar day (UT1). After this UTC-epoch the
+     * POSIX-second is with th exception of leapsecond events equal to
+     * the SI-second based on atomic clocks, but in long term effectively
+     * similar to the UT1-second based on mean solar time. </p>
+     *
+     * <p>POSIX is more present in computer realms than UTC although there is
+     * no precision in calculation of SI-seconds (a bug of UNIX-specification).
+     * The definition of the reference timezone on zero meridian of Greenwich
+     * is the same as in UTC. </p>
+     *
+     * <p>During a leapsecond the transformation of POSIX-time to an
+     * UTC-timestamp is not defined. An old convention in the UNIX world
+     * tries to reset the clock by one second AFTER the leapsecod, so
+     * effectively mapping the leapsecond to the next day despite of
+     * its obvious written form as last second of current day (see also
+     * <a href="http://en.wikipedia.org/wiki/Unix_time">Wikipedia-Artikel</a>).
+     * The <a href="http://www.opengroup.org/onlinepubs/007904975/basedefs/xbd_chap04.html#tag_04_14">current description of POSIX-time</a>
+     * explicitly states however that the relation between the current day
+     * time and the current POSIX-value is not specified and dependent on
+     * the implementation. Time4J maps the leapsecond to the current day
+     * as the last second. This corresponds to an UNXI-variation where a
+     * clock is reset at the begin of a leapsecond instead of at the end
+     * of a leapsecond. </p>
+     */
+    /*[deutsch]
      * <p>Z&auml;hlt die Sekunden relativ zur UNIX-Epoche 1970-01-01T00:00:00Z,
      * die zwei Jahre vor der UTC-Epoche liegt. </p>
      *
@@ -58,7 +99,7 @@ public enum TimeScale {
      * gegeben. </p>
      *
      * <p>W&auml;hrend einer Schaltsekunde ist die Transformation einer
-     * POSIX-Zeit zu einem gregorianischen Zeitstempel im Prinzip undefiniert.
+     * POSIX-Zeit zu einem UTC-Zeitstempel im Prinzip undefiniert.
      * Eine alte Konvention in der UNIX-Welt versucht jedoch, erst am Ende
      * einer Schaltsekunde die zugeh&ouml;rige Uhr um eine Sekunde
      * zur&uuml;ckzusetzen, rechnet also die Schaltsekunde selbst entgegen
@@ -75,6 +116,19 @@ public enum TimeScale {
     POSIX,
 
     /**
+     * <p>Counts the seconds relative to UTC-epoch which started at
+     * midnight on the calendar days 1972-01-01 (1972-01-01T00:00:00Z)
+     * inclusive all leapseconds. </p>
+     *
+     * <p>Time4J handles all {@code UniversalTime}-timestamps before
+     * the UTC-epoch as mean solar time (UT1). The second is therefore
+     * defined as the 86400th part of the mean solar day before 1972.
+     * After the UTC-epoch 1972-01-01 the second is always the
+     * SI-second based on atomic clocks. </p>
+     *
+     * @see     UniversalTime
+     */
+    /*[deutsch]
      * <p>Z&auml;hlt die Sekunden relativ zur UTC-Epoche, die zu Mitternacht
      * des Datums 1972-01-01 begann (1972-01-01T00:00:00Z in der UTC-Zeitzone),
      * inklusive aller Schaltsekunden. </p>
@@ -90,6 +144,36 @@ public enum TimeScale {
     UTC,
 
     /**
+     * <p>International atomic time which is based on the SI-seconds of an
+     * atomic clock and presents a continuous scale relative to 1972-01-01. </p>
+     *
+     * <p>There is no second which is interpreted respective labelled as
+     * leapsecond. Hence this scale is decoupled from civil day and only
+     * usefule in a scientific context. As consequence the astronomic day has
+     * no meaning on this scale. </p>
+     *
+     * <p>Strictly spoken the scale defintion of TAI is a statistical
+     * approximation to the defintion of SI-second because the average of
+     * around 250 atomic clocks worldwide is used. But the deviations are
+     * in picosends or smaler which is not in the focus of this API. </p>
+     *
+     * <p>Although TAI knows historical ancestors already since 1958
+     * Time4J only supports TAI from UTC-epoch 1972-01-01. First to note
+     * the SI-second was introduced in year 1967. Second, the nowadays
+     * used TAI-scale had got its name on a conference in year 1971, third
+     * to note, the TAI-ancestors were still directly synchronized with
+     * UT2 hence had still got a vague astronimical reference.. At the
+     * calendar date 1972-01-01 the difference between TAI and UTC was
+     * defined as exactly 10 seconds (TAI = UTC + 10). This difference is
+     * fixed for all timestamps in epoch seconds because both TAI and UTC
+     * counts in pure SI-seconds. But note: If TAI and UTC are resolved
+     * to an element-oriented notation (YYYY-MM-DD HH:MM:SS) then the
+     * difference between TAI and UTC increases with every inserted
+     * leapsecond because of the different labelling. A TAI day does not
+     * know leapseconds. In the year 2013 this difference between a TAI
+     * day and an UTC dayhas increased to 35 seconds. </p>
+     */
+    /*[deutsch]
      * <p>Internationale Atomuhrzeit, die auf den SI-Sekunden einer Atomuhr
      * basiert und eine monoton fortlaufende Skala relativ zu 1972-01-01
      * darstellt. </p>
@@ -125,6 +209,19 @@ public enum TimeScale {
     TAI,
 
     /**
+     * <p>Is used by the GPS-navigation system and counts SI-seconds relative
+     * to the start of GPS. </p>
+     *
+     * <p>GPS was introducted on 6th of January 1980. All earlier timestamps
+     * are not supported by Time4J. Between 1972 and 1980 there were 9
+     * leap seconds therefore following relation holds leaving aside the
+     * different epoch reference: GPS + delta = UTC - 9 = TAI - 19 where
+     * <i>delta</i> stands for the POSIX-difference between 1972-01-01 and
+     * 1980-01-06. </p>
+     *
+     * @see     #TAI
+     */
+    /*[deutsch]
      * <p>Wird vom GPS-Navigationssystem verwendet und wird relativ zum Start
      * von GPS in SI-Sekunden gez&auml;hlt. </p>
      *
