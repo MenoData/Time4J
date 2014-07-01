@@ -638,7 +638,7 @@ public final class Duration<U extends IsoUnit>
      * @param   unit    time unit to be checked (optional)
      * @return  {@code true} if this duration contains given unit
      *          else {@code false}
-     * @see     #getPartialAmount(ChronoUnit) getPartialAmount(U)
+     * @see     #getPartialAmount(IsoUnit) getPartialAmount(U)
      */
     /*[deutsch]
      * <p>Ist die angegebene Zeiteinheit in dieser Zeitspanne enthalten? </p>
@@ -650,10 +650,10 @@ public final class Duration<U extends IsoUnit>
      * @param   unit    time unit to be checked (optional)
      * @return  {@code true} if this duration contains given unit
      *          else {@code false}
-     * @see     #getPartialAmount(ChronoUnit) getPartialAmount(U)
+     * @see     #getPartialAmount(IsoUnit) getPartialAmount(U)
      */
     @Override
-    public boolean contains(ChronoUnit unit) {
+    public boolean contains(U unit) {
 
         if (unit instanceof IsoUnit) {
             IsoUnit isoUnit = (IsoUnit) unit;
@@ -704,7 +704,7 @@ public final class Duration<U extends IsoUnit>
      * @return  non-negative amount associated with given unit ({@code >= 0})
      */
     @Override
-    public long getPartialAmount(ChronoUnit unit) {
+    public long getPartialAmount(U unit) {
 
         if (unit instanceof IsoUnit) {
             IsoUnit isoUnit = (IsoUnit) unit;

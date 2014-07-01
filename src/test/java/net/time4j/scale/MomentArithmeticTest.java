@@ -112,6 +112,24 @@ public class MomentArithmeticTest {
     }
 
     @Test
+    public void betweenSISeconds() {
+        assertThat(
+            SI.SECONDS.between(
+                Moment.of(1278028823, TimeScale.UTC),
+                Moment.of(1278028826, TimeScale.UTC)
+            ),
+            is(3L));
+    }
+
+    @Test
+    public void betweenTimeUnitSeconds() {
+        assertThat(
+            Moment.of(1278028823, TimeScale.UTC)
+                .until(Moment.of(1278028826, TimeScale.UTC), TimeUnit.SECONDS),
+            is(2L));
+    }
+
+    @Test
     public void plusSINanos() {
         Moment expected = Moment.of(1278028824, 2, TimeScale.UTC);
         assertThat(

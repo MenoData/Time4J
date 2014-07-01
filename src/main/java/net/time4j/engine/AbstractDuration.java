@@ -115,13 +115,13 @@ import java.util.List;
  * <p>The permutation of addition steps is obvious. If Time4J had
  * tried the alternative to first add the months and then the days
  * even in case of a negative duration then we would have with
- * 
+ *
  * <ul>
  *  <li>t1 = [2013-02-01]</li>
  *  <li>t2 = [2013-03-31]</li>
  *  <li>duration = t1.until(t2) = [P1M30D]</li>
  * </ul>
- * 
+ *
  * the situation that the mentiioned third invariance would be violated
  * even if the day of month is the first day of month: t2.minus(P1M30D)
  * would not yield t1 but [2013-01-29]. Surely, the sign-dependent
@@ -268,7 +268,7 @@ public abstract class AbstractDuration<U extends ChronoUnit>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public boolean contains(ChronoUnit unit) {
+    public boolean contains(U unit) {
 
         for (Item<?> item : this.getTotalLength()) {
             if (item.getUnit().equals(unit)) {
@@ -281,7 +281,7 @@ public abstract class AbstractDuration<U extends ChronoUnit>
     }
 
     @Override
-    public long getPartialAmount(ChronoUnit unit) {
+    public long getPartialAmount(U unit) {
 
         for (Item<?> item : this.getTotalLength()) {
             if (item.getUnit().equals(unit)) {

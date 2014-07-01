@@ -36,7 +36,7 @@ package net.time4j.engine;
  * @param   <P> generic type of duration type
  * @author  Meno Hochschild
  */
-public interface TimeMetric<U, P extends TimeSpan<?>> {
+public interface TimeMetric<U, P> {
 
     //~ Methoden ----------------------------------------------------------
 

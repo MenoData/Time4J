@@ -161,8 +161,8 @@ public class SerializationTest {
             sers[i] = Duration.ofCalendarUnits(i, i % 12, 30);
         }
         Info info = analyze("[Duration]", sers);
-        assertThat(info.first, is(130));
-        assertThat(info.next, is(59));
+        assertThat(info.first, is(126));
+        assertThat(info.next, is(47));
     }
 
     @Test

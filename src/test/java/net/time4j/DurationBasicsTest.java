@@ -1,7 +1,6 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.TimeSpan.Item;
@@ -1145,11 +1144,11 @@ public class DurationBasicsTest {
                 return false;
             }
             @Override
-            public boolean contains(ChronoUnit unit) {
+            public boolean contains(ClockUnit unit) {
                 throw new UnsupportedOperationException();
             }
             @Override
-            public long getPartialAmount(ChronoUnit unit) {
+            public long getPartialAmount(ClockUnit unit) {
                 throw new UnsupportedOperationException();
             }
             @Override

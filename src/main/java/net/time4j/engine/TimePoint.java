@@ -44,12 +44,12 @@ import java.io.Serializable;
  * <h4>Time axis</h4>
  *
  * <p>If the referenced time axis is the UTC-timeline (that is a time point
- * is defined relative to the start of UTC epoch - see 
+ * is defined relative to the start of UTC epoch - see
  * <a href="package-summary.html">package summary</a>) then any implementation
  * must also implement the interface {@link net.time4j.scale.UniversalTime}.
  * In every other case we have a local time axis. All time units are to be
  * defined referencing the time axis. For example, second units are interpreted
- * as local UT1-seconds on a local timestamp but on a {@code UniversalTime} 
+ * as local UT1-seconds on a local timestamp but on a {@code UniversalTime}
  * before 1972 as global UT1-seconds and after 1972 as atomic SI-seconds.
  * Hence Time4J has even defined different second units in the main package.
  * Applications should therefore take much care if they transform a duration
@@ -423,7 +423,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      *          expressed as time span
      * @throws  ArithmeticException in case of numerical overflow
      */
-    public <P extends TimeSpan<?>> P until(
+    public <P> P until(
         T end,
         TimeMetric<? extends U, P> metric
     ) {
@@ -599,7 +599,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      *
      * <p>The textual description often follows the conventions of ISO-8601.
      * Usually the description starts with the chronological informations
-     * which are coarse-grained and ends with those ones which are 
+     * which are coarse-grained and ends with those ones which are
      * faine-grained (for example the ISO-notation YYYY-MM-DD). </p>
      */
     /*[deutsch]

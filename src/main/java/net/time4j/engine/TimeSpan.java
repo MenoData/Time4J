@@ -79,7 +79,7 @@ public interface TimeSpan<U> {
      *
      * @param   unit    time unit to be asked (optional)
      * @return  {@code true} if exists else {@code false}
-     * @see     #getPartialAmount(ChronoUnit)
+     * @see     #getPartialAmount(Object) getPartialAmount(U)
      */
     /*[deutsch]
      * <p>Ist die angegebene Zeiteinheit in dieser Zeitspanne enthalten? </p>
@@ -98,9 +98,9 @@ public interface TimeSpan<U> {
      *
      * @param   unit    time unit to be asked (optional)
      * @return  {@code true} if exists else {@code false}
-     * @see     #getPartialAmount(ChronoUnit)
+     * @see     #getPartialAmount(Object) getPartialAmount(U)
      */
-    boolean contains(ChronoUnit unit);
+    boolean contains(U unit);
 
     /**
      * <p>Yields the partial amount associated with given time unit. </p>
@@ -123,7 +123,7 @@ public interface TimeSpan<U> {
      * @param   unit    time unit (optional)
      * @return  amount as part of time span ({@code >= 0})
      */
-    long getPartialAmount(ChronoUnit unit);
+    long getPartialAmount(U unit);
 
     /**
      * <p>Queries if this time span is negative. </p>

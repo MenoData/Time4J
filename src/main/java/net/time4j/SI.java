@@ -21,7 +21,9 @@
 
 package net.time4j;
 
+import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoUnit;
+import net.time4j.scale.TimeScale;
 
 
 /**
@@ -71,6 +73,64 @@ public enum SI
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Calculates the time distance between given time points
+     * in SI-units. </p>
+     *
+     * @param   start   start time point
+     * @param   end     end time point
+     * @return  count of SI-units between start and end
+     * @throws  UnsupportedOperationException if any time point is before 1972
+     */
+    /*[deutsch]
+     * <p>Berechnet den zeitlichen Abstand zwischen den angegebenen Zeitpunkten
+     * in SI-Einheiten. </p>
+     *
+     * @param   start   Startzeitpunkt
+     * @param   end     Endzeitpunkt
+     * @return  Anzahl der SI-Einheiten zwischen Start und Ende
+     * @throws  UnsupportedOperationException wenn ein Zeitpunkt vor 1972 ist
+     */
+    public long between(
+        Moment start,
+        Moment end
+    ) {
+
+        Moment.check1972(start);
+        Moment.check1972(end);
+
+        switch (this) {
+            case SECONDS:
+                long delta = (
+                    end.getElapsedTime(TimeScale.UTC)
+                    - start.getElapsedTime(TimeScale.UTC));
+                if (delta < 0) {
+                    if (end.getNanosecond() > start.getNanosecond()) {
+                        delta++;
+                    }
+                } else if (delta > 0) {
+                    if (end.getNanosecond() < start.getNanosecond()) {
+                        delta--;
+                    }
+                }
+                return delta;
+            case NANOSECONDS:
+                return MathUtils.safeAdd(
+                    MathUtils.safeMultiply(
+                        MathUtils.safeSubtract(
+                            end.getElapsedTime(TimeScale.UTC),
+                            start.getElapsedTime(TimeScale.UTC)
+                        ),
+                        1000000000
+                    ),
+                    end.getNanosecond() - start.getNanosecond()
+                 );
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+    }
 
     @Override
     public double getLength() {
