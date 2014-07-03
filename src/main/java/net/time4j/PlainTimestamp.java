@@ -547,6 +547,13 @@ public final class PlainTimestamp
 
     }
 
+    @Override
+    public int getNanosecond() {
+
+        return this.time.getNanosecond();
+
+    }
+
     /**
      * <p>Adjusts this timestamp by given operator. </p>
      *

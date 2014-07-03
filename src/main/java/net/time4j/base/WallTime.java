@@ -94,6 +94,25 @@ public interface WallTime {
     int getSecond();
 
     /**
+     * <p>Yields the nanosecond. </p>
+     *
+     * <p>Implementations which are not capable of nanosecond precision
+     * will just yield {@code 0} or another suitable rounded value. </p>
+     *
+     * @return  nanosecond in range {@code 0 - 999,999,999}
+     */
+    /*[deutsch]
+     * <p>Liefert die Nanosekunde. </p>
+     *
+     * <p>Implementierungen, die keine Nanosekundengenauigkeit haben,
+     * werden einfach {@code 0} oder einen anderen gerundeten Wert
+     * liefern. </p>
+     *
+     * @return  Nanosekunde im Bereich {@code 0 - 999.999.999}
+     */
+    int getNanosecond();
+
+    /**
      * <p>Yields a canonical representation in ISO-format
      * &quot;Thh:mm&quot; or &quot;Thh:mm:ss&quot;. </p>
      *

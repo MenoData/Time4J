@@ -34,6 +34,10 @@ public class TimeComparisonTest {
                 public int getSecond() {
                     return 30;
                 }
+                @Override
+                public int getNanosecond() {
+                    return 0;
+                }
             };
         assertThat(d1.equals(d2), is(true));
         assertThat(d1.equals(d3), is(false));
@@ -59,6 +63,10 @@ public class TimeComparisonTest {
                 @Override
                 public int getSecond() {
                     return 30;
+                }
+                @Override
+                public int getNanosecond() {
+                    return 0;
                 }
             };
         assertThat(d1.hashCode() == d2.hashCode(), is(true));

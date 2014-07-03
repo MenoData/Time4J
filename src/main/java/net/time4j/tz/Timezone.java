@@ -65,6 +65,8 @@ public abstract class Timezone
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final int MRD = 1000000000;
+
     /**
      * <p>This standard strategy which is also used by JDK subtracts
      * the next defined offset from any local timestamp in order to
@@ -84,7 +86,7 @@ public abstract class Timezone
 
     /**
      * <p>In addition to the  {@link #DEFAULT_CONFLICT_STRATEGY
-     * standard strategy}, this strategy ensures the use of valid local 
+     * standard strategy}, this strategy ensures the use of valid local
      * timestamps. </p>
      */
     /*[deutsch]
@@ -196,7 +198,13 @@ public abstract class Timezone
         temp2.put("SJ", Collections.singleton(svalbard));
         TERRITORIES = Collections.unmodifiableMap(temp2);
 
-        ServiceLoader<Provider> sl = ServiceLoader.load(Provider.class);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = Provider.class.getClassLoader();
+        }
+
+        ServiceLoader<Provider> sl = ServiceLoader.load(Provider.class, cl);
         Provider loaded = null;
 
         for (Provider provider : sl) {
@@ -475,7 +483,7 @@ public abstract class Timezone
     /**
      * <p>Calculates the offset for given local timestamp. </p>
      *
-     * <p>In case of gaps or overlaps, this method uses the standard strategy 
+     * <p>In case of gaps or overlaps, this method uses the standard strategy
      * to get the next defined offset. This behaviour is conform to the JDK. </p>
      *
      * @param   localDate   local date in timezone
@@ -1392,8 +1400,6 @@ public abstract class Timezone
                 );
             }
 
-            // Folgender Code wird nur bei direktem Aufruf genutzt,
-            // nicht aber via PlainTimestamp und ist lediglich sekundengenau!
             long days = GregorianMath.toMJD(date) - 40587;
             long localSeconds = MathUtils.safeMultiply(days, 86400);
             localSeconds += (time.getHour() * 3600);
@@ -1401,16 +1407,29 @@ public abstract class Timezone
             localSeconds += time.getSecond();
 
             ZonalOffset offset = tz.getOffset(date, time);
-            final long posixTime = localSeconds - offset.getIntegralAmount();
+            int localNanos = time.getNanosecond();
+            long posixTime = localSeconds - offset.getIntegralAmount();
+            int posixNanos = localNanos - offset.getFractionalAmount();
+
+            if (posixNanos < 0) {
+                posixNanos += MRD;
+                posixTime--;
+            } else if (posixNanos >= MRD) {
+                posixNanos -= MRD;
+                posixTime++;
+            }
+
+            final long pt = posixTime;
+            final int pn = posixNanos;
 
             return new UnixTime() {
                 @Override
                 public long getPosixTime() {
-                    return posixTime;
+                    return pt;
                 }
                 @Override
                 public int getNanosecond() {
-                    return 0;
+                    return pn;
                 }
             };
 

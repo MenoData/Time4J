@@ -50,11 +50,6 @@ public interface TransitionStrategy {
      * <p>Converts a local timestamp to a global timestamp using given
      * timezone. </p>
      *
-     * <p>Note: A direct call of this method sometimes only offers second
-     * precision if {@code WallTime} has no direct access to subseconds.
-     * Therefore it is wise to use {@code PlainTimestamp#at(Timezone)}
-     * with a timezone configured to use a transition strategy. </p>
-     *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
@@ -64,12 +59,6 @@ public interface TransitionStrategy {
      */
     /*[deutsch]
      * <p>Konvertiert eine lokale Zeitangabe in einen globalen Zeitstempel. </p>
-     *
-     * <p>Ein direkter Aufruf der Methode kann manchmal nur sekundengenau
-     * sein, wenn {@code WallTime} keinen unmittelbaren Zugriff auf den
-     * Sekundenbruchteil gestattet. Es ist deshalb immer besser, stattdessen
-     * {@code PlainTimestamp#at(Timezone)} mit einer strategie-behafteten
-     * Zeitzone zu verwenden. </p>
      *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone

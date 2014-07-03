@@ -1032,6 +1032,13 @@ public final class PlainTime
 
     }
 
+    @Override
+    public int getNanosecond() {
+
+        return this.nano;
+
+    }
+
     /**
      * <p>Yields midnight at the start of the day. </p>
      *
@@ -1241,9 +1248,14 @@ public final class PlainTime
 
         if (time instanceof PlainTime) {
             return (PlainTime) time;
+        } else if (time instanceof PlainTimestamp) {
+            return ((PlainTimestamp) time).getWallTime();
         } else {
             return PlainTime.of(
-                time.getHour(), time.getMinute(), time.getSecond());
+                time.getHour(),
+                time.getMinute(),
+                time.getSecond(),
+                time.getNanosecond());
         }
 
     }
@@ -1664,17 +1676,6 @@ public final class PlainTime
     protected PlainTime getContext() {
 
         return this;
-
-    }
-
-    /**
-     * <p>Liefert die Nanosekunde. </p>
-     *
-     * @return  nanosecond in the range {@code 0 - 999,999,999}
-     */
-    int getNanosecond() {
-
-        return this.nano;
 
     }
 

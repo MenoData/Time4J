@@ -187,7 +187,7 @@ final class PlatformTimezone
                 localTime.getHour() * 3600
                 + localTime.getMinute() * 60
                 + localTime.getSecond()
-            ) * 1000;
+            ) * 1000 + (localTime.getNanosecond() / 1000000);
         }
 
         return fromOffsetMillis(
@@ -207,9 +207,10 @@ final class PlatformTimezone
         int hour = localTime.getHour();
         int minute = localTime.getMinute();
         int second = localTime.getSecond();
+        int milli = localTime.getNanosecond() / 1000000;
 
         GregorianCalendar gcal = new GregorianCalendar(this.tz);
-        gcal.set(Calendar.MILLISECOND, 0);
+        gcal.set(Calendar.MILLISECOND, milli);
         gcal.set(year, month - 1, day, hour, minute, second);
 
         return (
@@ -219,6 +220,7 @@ final class PlatformTimezone
             || (gcal.get(Calendar.HOUR_OF_DAY) != hour)
             || (gcal.get(Calendar.MINUTE) != minute)
             || (gcal.get(Calendar.SECOND) != second)
+            || (gcal.get(Calendar.MILLISECOND) != milli)
         );
 
     }
