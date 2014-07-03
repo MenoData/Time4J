@@ -42,8 +42,13 @@ public class CalendricalNamesTest {
         Locale locale = Locale.US;
         CalendarText result = CalendarText.getInstance("iso8601", locale);
         Provider p = null;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        for (Provider tmp : ServiceLoader.load(Provider.class)) {
+        if (cl == null) {
+            cl = Provider.class.getClassLoader();
+        }
+
+        for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
             if (
                 isCalendarTypeSupported(tmp, "iso8601")
                 && isLocaleSupported(tmp, locale)

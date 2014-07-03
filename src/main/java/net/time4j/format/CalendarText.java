@@ -62,7 +62,7 @@ import static net.time4j.format.TextWidth.SHORT;
  * as wrapper around {@code java.text.DateFormatSymbols}). </p>
  *
  * <p>Furthermore, an instance of {@code CalendarText} can also access
- * the UTF-8 text resources in the folder &quot;data&quot; relative to 
+ * the UTF-8 text resources in the folder &quot;data&quot; relative to
  * the class path which are not based on JDK-defaults. </p>
  *
  * @author      Meno Hochschild
@@ -281,9 +281,14 @@ public final class CalendarText {
 
         if (instance == null) {
             Provider p = null;
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+            if (cl == null) {
+                cl = Provider.class.getClassLoader();
+            }
 
             // ServiceLoader-Mechanismus
-            for (Provider tmp : ServiceLoader.load(Provider.class)) {
+            for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
                     && isLocaleSupported(tmp, locale)
@@ -563,7 +568,7 @@ public final class CalendarText {
      * JDK. Text forms will be stored internally in the resource folder
      * &quot;data&quot; relative to class path in properties-files using
      * UTF-8 encoding. The basic name of these resources is the calendar type.
-     * The combination of element name and optionally variants in the form 
+     * The combination of element name and optionally variants in the form
      * &quot;(variant1|variant2|...|variantN)&quot; and the underscore and
      * finally a numerical suffix with base 1 serves as resource text key.
      * If there is no entry for given key in the resources then this method

@@ -61,9 +61,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * example 1972-07-01). The second column determines the sign of the
  * leapsecond (+/-). </p>
  *
- * <p>The source will mainly be loaded by the context-classloader. If
- * there is no source at all then Time4J assumes that leapseconds
- * shall not be used. </p>
+ * <p>The source will mainly be loaded by the context classloader else
+ * by application classloader. If there is no source at all then Time4J
+ * assumes that leapseconds shall not be used. </p>
  *
  * <p>The system property &quot;time4j.scale.leapseconds.suppressed&quot;
  * determines if leapseconds shall be active at all. If this system
@@ -178,9 +178,13 @@ public final class LeapSeconds
 
         } else {
 
-            ServiceLoader<Provider> sl =
-                ServiceLoader.load(Provider.class);
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
+            if (cl == null) {
+                cl = Provider.class.getClassLoader();
+            }
+
+            ServiceLoader<Provider> sl = ServiceLoader.load(Provider.class, cl);
             Provider loaded = null;
             int leapCount = 0;
 
@@ -341,7 +345,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Registers a new positive leapsecond by defining the 
+     * <p>Registers a new positive leapsecond by defining the
      * switch-over-day. </p>
      *
      * @param   year        proleptic iso year
@@ -379,13 +383,13 @@ public final class LeapSeconds
         int month,
         int dayOfMonth
     ) {
-        
+
         this.register(year, month, dayOfMonth, false);
-        
+
     }
-    
+
     /**
-     * <p>Registers a new negative leapsecond by defining the 
+     * <p>Registers a new negative leapsecond by defining the
      * switch-over-day. </p>
      *
      * @param   year        proleptic iso year
@@ -423,11 +427,11 @@ public final class LeapSeconds
         int month,
         int dayOfMonth
     ) {
-        
+
         this.register(year, month, dayOfMonth, true);
-        
+
     }
-    
+
     /**
      * <p>Queries if negative leapseconds are supported. </p>
      *
@@ -722,7 +726,7 @@ public final class LeapSeconds
 
         for (int i = 0; i < events.length; i++) {
             long comp = events[i].utc();
-            
+
             if (comp == utc) {
                 return (events[i].getShift() == 1);
             } else if (comp < utc) {
@@ -1268,7 +1272,7 @@ public final class LeapSeconds
                 is = cl.getResourceAsStream(name);
             }
 
-            if ((cl == null) || (is == null)) {
+            if (is == null) {
                 cl = LeapSeconds.Provider.class.getClassLoader();
                 is = cl.getResourceAsStream(name);
             }

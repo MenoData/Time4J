@@ -136,8 +136,15 @@ public final class Weekmodel
 
     static {
         WeekdataProvider tmp = null;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        for (WeekdataProvider p : ServiceLoader.load(WeekdataProvider.class)) {
+        if (cl == null) {
+            cl = WeekdataProvider.class.getClassLoader();
+        }
+
+        for (
+            WeekdataProvider p : ServiceLoader.load(WeekdataProvider.class, cl)
+        ) {
             tmp = p;
             break;
         }
