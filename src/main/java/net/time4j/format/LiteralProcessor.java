@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.engine.AttributeKey;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 
@@ -96,7 +97,7 @@ final class LiteralProcessor
     public void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
         FormatStep step
     ) throws IOException {
@@ -121,7 +122,7 @@ final class LiteralProcessor
     public void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
         FormatStep step
     ) {
@@ -137,7 +138,7 @@ final class LiteralProcessor
     private void parseChar(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         FormatStep step
     ) {
 
@@ -166,7 +167,8 @@ final class LiteralProcessor
 
             if (
                 Attributes.DECIMAL_SEPARATOR.name().equals(this.attribute)
-                && Locale.ROOT.equals(attributes.getLocale())
+                && Locale.ROOT.equals(
+                    attributes.get(Attributes.LOCALE, Locale.ROOT))
             ) { // Spezialfall: ISO-8601
                 alternative = (
                     (literal == ',')
@@ -212,7 +214,7 @@ final class LiteralProcessor
     private void parseMulti(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         FormatStep step
     ) {
 

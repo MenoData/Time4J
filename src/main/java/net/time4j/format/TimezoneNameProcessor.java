@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.base.UnixTime;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.NameStyle;
@@ -90,7 +91,7 @@ final class TimezoneNameProcessor
     public void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions,
         FormatStep step
     ) throws IOException {
@@ -152,7 +153,7 @@ final class TimezoneNameProcessor
     public void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
         FormatStep step
     ) {

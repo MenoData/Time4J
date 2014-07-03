@@ -21,6 +21,8 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.AttributeQuery;
+
 import java.io.IOException;
 
 
@@ -72,7 +74,7 @@ public interface ChronoPrinter<T> {
     Object print(
         T formattable,
         Appendable buffer,
-        Attributes attributes
+        AttributeQuery attributes
     ) throws IOException;
 
 }

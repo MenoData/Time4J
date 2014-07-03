@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.EpochDays;
@@ -85,7 +86,7 @@ final class TwoDigitYearProcessor
     public void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
         FormatStep step
     ) throws IOException {
@@ -148,7 +149,7 @@ final class TwoDigitYearProcessor
     public void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
         FormatStep step
     ) {

@@ -70,7 +70,7 @@ final class LocalizedGMTProcessor
     public void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions,
         FormatStep step
     ) throws IOException {
@@ -165,7 +165,7 @@ final class LocalizedGMTProcessor
     public void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
         FormatStep step
     ) {
@@ -323,7 +323,7 @@ final class LocalizedGMTProcessor
     private static ZonalOffset getOffset(
         ChronoEntity<?> formattable,
         FormatStep step,
-        Attributes attributes
+        AttributeQuery attributes
     ) {
 
         AttributeQuery aq = step.getQuery(attributes);

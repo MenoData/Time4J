@@ -125,7 +125,7 @@ final class FormatStep {
     void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions
     ) throws IOException {
 
@@ -242,7 +242,7 @@ final class FormatStep {
     void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult
     ) {
 
@@ -471,11 +471,11 @@ final class FormatStep {
      */
     <A> A getAttribute(
         AttributeKey<A> key,
-        Attributes defaultAttrs,
+        AttributeQuery defaultAttrs,
         A defaultValue
     ) {
 
-        Attributes current = this.sectionalAttrs;
+        AttributeQuery current = this.sectionalAttrs;
 
         if (
             (this.sectionalAttrs == null)
@@ -500,7 +500,7 @@ final class FormatStep {
      * @param   defaultAttrs    default attributes of {@code ChronoFormatter}
      * @return  query for retrieving attribute values
      */
-    AttributeQuery getQuery(final Attributes defaultAttrs) {
+    AttributeQuery getQuery(final AttributeQuery defaultAttrs) {
 
         if (this.sectionalAttrs == null) {
             return defaultAttrs; // Optimierung
@@ -526,7 +526,7 @@ final class FormatStep {
             }
 
             private AttributeQuery getQuery(AttributeKey<?> key) {
-                Attributes current = FormatStep.this.sectionalAttrs;
+                AttributeQuery current = FormatStep.this.sectionalAttrs;
 
                 if (!current.contains(key)) {
                     current = defaultAttrs;
@@ -638,7 +638,7 @@ final class FormatStep {
     private void doParse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult
     ) {
 
@@ -658,7 +658,7 @@ final class FormatStep {
 
     }
 
-    private boolean isStrict(Attributes attributes) {
+    private boolean isStrict(AttributeQuery attributes) {
 
         return this.getAttribute(
             Attributes.LENIENCY,
@@ -668,7 +668,7 @@ final class FormatStep {
 
     }
 
-    private char getPadChar(Attributes attributes) {
+    private char getPadChar(AttributeQuery attributes) {
 
         return this.getAttribute(
             Attributes.PAD_CHAR,

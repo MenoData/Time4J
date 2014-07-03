@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -495,7 +496,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public Set<ElementPosition> print(
         T formattable,
         Appendable buffer,
-        Attributes attributes
+        AttributeQuery attributes
     ) throws IOException {
 
         return this.print(formattable, buffer, attributes, true);
@@ -605,7 +606,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public T parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes
+        AttributeQuery attributes
     ) {
 
         T result = null;
@@ -1217,7 +1218,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private Set<ElementPosition> print(
         T formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         boolean withPositions
     ) throws IOException {
 
@@ -1261,7 +1262,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Chronology<T> chronology,
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         boolean preparsing
     ) {
 
@@ -1370,7 +1371,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         T result,
         CharSequence text,
         ParseLog status,
-        Attributes attributes
+        AttributeQuery attributes
     ) {
 
         Leniency leniency =
@@ -1434,7 +1435,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private ParsedValues parseElements(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Deque<NonAmbivalentMap> data
     ) {
 

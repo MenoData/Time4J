@@ -21,6 +21,8 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.AttributeQuery;
+
 
 /**
  * <p>Interpretes a text as chronological entity. </p>
@@ -75,7 +77,7 @@ public interface ChronoParser<T> {
     T parse(
         CharSequence    text,
         ParseLog        status,
-        Attributes attributes
+        AttributeQuery attributes
     );
 
 }

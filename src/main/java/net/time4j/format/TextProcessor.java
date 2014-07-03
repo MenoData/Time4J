@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 
@@ -74,7 +75,7 @@ final class TextProcessor<V>
     public void print(
         ChronoEntity<?> formattable,
         Appendable buffer,
-        Attributes attributes,
+        AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
         FormatStep step
     ) throws IOException {
@@ -98,7 +99,7 @@ final class TextProcessor<V>
     public void parse(
         CharSequence text,
         ParseLog status,
-        Attributes attributes,
+        AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
         FormatStep step
     ) {
