@@ -809,6 +809,7 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if this moment is before 1972
      */
     /*[deutsch]
      * <p>Addiert einen Betrag in der angegegebenen SI-Zeiteinheit auf die
@@ -817,6 +818,7 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException wenn der Zeitpunkt vor 1972 ist
      */
     public Moment plus(
         long amount,
@@ -871,6 +873,7 @@ public final class Moment
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if this moment is before 1972
      */
     /*[deutsch]
      * <p>Subtrahiert einen Betrag in der angegegebenen Zeiteinheit von der
@@ -879,6 +882,7 @@ public final class Moment
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException wenn der Zeitpunkt vor 1972 ist
      */
     public Moment minus(
         long amount,
@@ -896,6 +900,7 @@ public final class Moment
      * @param   end     end time point
      * @param   unit    time unit defined in UTC time space
      * @return  count of SI-units between this instance and end time point
+     * @throws  UnsupportedOperationException if any moment is before 1972
      */
     /*[deutsch]
      * <p>Bestimmt den zeitlichen Abstand zu einem Endzeitpunkt in der
@@ -904,6 +909,7 @@ public final class Moment
      * @param   end     end time point
      * @param   unit    time unit defined in UTC time space
      * @return  count of SI-units between this instance and end time point
+     * @throws  UnsupportedOperationException wenn ein Zeitpunkt vor 1972 ist
      */
     public long until(
         Moment end,
