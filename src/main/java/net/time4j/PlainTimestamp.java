@@ -1143,7 +1143,7 @@ public final class PlainTimestamp
                 }
 
                 Moment ut = Moment.from(UnixTime.class.cast(entity));
-                return ut.inTimezone(tzid);
+                return ut.inZonalView(tzid);
             }
 
             boolean leapsecond =

@@ -60,7 +60,7 @@ public class TZIDTest {
         PlainTimestamp ts = PlainTimestamp.of(2014, 7, 1, 12, 0);
         assertThat(
             ts.at(Timezone.of("Brazil/Acre"))
-              .inTimezone(TZID.AMERICA.RIO_BRANCO),
+              .inZonalView(TZID.AMERICA.RIO_BRANCO),
             is(ts));
     }
 

@@ -7,6 +7,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.SI;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.util.concurrent.TimeUnit;
@@ -24,33 +25,34 @@ public class MomentArithmeticTest {
 
     @Test
     public void plusClockHoursBerlin() {
-        TZID timezone = TZID.EUROPE.BERLIN;
+        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().atTimezone(timezone)
-                .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
+                .atStartOfDay().at(tz)
+                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0)
+                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
     public void minusClockHoursBerlin() {
-        TZID timezone = TZID.EUROPE.BERLIN;
+        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().atTimezone(timezone)
-                .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
+                .atStartOfDay().at(tz)
+                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
         Moment end =
-            start.with(Duration.of(5, ClockUnit.HOURS).earlier(timezone));
+            start.with(Duration.of(5, ClockUnit.HOURS).earlier(tz));
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .atTimezone(timezone)));
+                .at(tz)));
     }
 
     @Test
@@ -65,7 +67,8 @@ public class MomentArithmeticTest {
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0).atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .atTime(5, 0)
+                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -86,14 +89,15 @@ public class MomentArithmeticTest {
 
     @Test
     public void hourShiftBerlin() {
-        TZID timezone = TZID.EUROPE.BERLIN;
+        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
         Moment start =
-            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().atTimezone(timezone);
+            PlainDate.of(2014, Month.MARCH, 30)
+            .atStartOfDay().at(tz);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .atTimezone(timezone)
-                .with(Duration.of(5, ClockUnit.HOURS).later(timezone));
+                .at(tz)
+                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
         assertThat(start.until(end, TimeUnit.HOURS), is(4L)); // DST-jump
     }
 

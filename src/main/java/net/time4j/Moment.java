@@ -130,7 +130,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * date- and time-values, always in the timezone UTC. </p>
  *
  * <p>A {@code Moment} is also capable of delivering the date- and time-values
- * in a different timezone if the method {@link #inTimezone(TZID)} is called.
+ * in a different timezone if the method {@link #inZonalView(TZID)} is called.
  * If zonal operators are defined by any elements then manipulations of related
  * data are possible in any timezone. </p>
  *
@@ -146,8 +146,8 @@ import static net.time4j.scale.TimeScale.UTC;
  * <p>Furthermore, there is the option to use local time units like
  * {@code ClockUnit} which count the virtual ticks on an analogue clock
  * and are ignorant of daylight-saving switches. As entry point users can
- * use the {@code Duration}-methods {@link Duration#earlier(TZID)} and
- * {@link Duration#later(TZID)}. </p>
+ * use the {@code Duration}-methods {@link Duration#earlier(Timezone)} and
+ * {@link Duration#later(Timezone)}. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -203,7 +203,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * Zeitwerten, immer in der Zeitzone UTC. </p>
  *
  * <p>Ein {@code Moment} kann die Datums- und Zeitwerte auch in einer anderen
- * Zeitzone liefern, wenn die Methode {@link #inTimezone(TZID)} aufgerufen
+ * Zeitzone liefern, wenn die Methode {@link #inZonalView(TZID)} aufgerufen
  * wird. Falls &uuml;ber die Elemente zonale Operatoren zur Verf&uuml;gung
  * stehen, sind auch Manipulationen in beliebigen Zeitzonen m&ouml;glich. </p>
  *
@@ -219,7 +219,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * <p>Au&szlig;erdem gibt es die M&ouml;glichkeit, lokale Zeiteinheiten wie
  * in {@code ClockUnit} definiert bezogen auf eine Zeitzone anzuwenden. Ein
  * Einstiegspunkt daf&uuml;r ist mit den {@code Duration}-Methoden
- * {@link Duration#earlier(TZID)} und {@link Duration#later(TZID)}
+ * {@link Duration#earlier(Timezone)} und {@link Duration#later(Timezone)}
  * vorhanden. </p>
  *
  * @author      Meno Hochschild
@@ -747,6 +747,8 @@ public final class Moment
      * @return  local timestamp in system timezone (leap seconds will
      *          always be lost)
      * @see     Timezone#ofSystem()
+     * @see     #inZonalView(TZID)
+     * @see     #inZonalView(String)
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
@@ -754,8 +756,10 @@ public final class Moment
      * @return  local timestamp in system timezone (leap seconds will
      *          always be lost)
      * @see     Timezone#ofSystem()
+     * @see     #inZonalView(TZID)
+     * @see     #inZonalView(String)
      */
-    public PlainTimestamp inStdTimezone() {
+    public PlainTimestamp inLocalView() {
 
         return this.in(Timezone.ofSystem());
 
@@ -767,6 +771,7 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @see     #inLocalView()
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
@@ -774,8 +779,9 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @see     #inLocalView()
      */
-    public PlainTimestamp inTimezone(TZID tzid) {
+    public PlainTimestamp inZonalView(TZID tzid) {
 
         return this.in(Timezone.of(tzid));
 
@@ -784,21 +790,24 @@ public final class Moment
     /**
      * <p>Converts this instance to a local timestamp in given timezone. </p>
      *
-     * @param   tz      timezone
+     * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @see     #inZonalView(TZID)
+     * @see     #inLocalView()
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
      *
-     * @param   tz      timezone
+     * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @see     #inZonalView(TZID)
+     * @see     #inLocalView()
      */
-    public PlainTimestamp in(Timezone tz) {
+    public PlainTimestamp inZonalView(String tzid) {
 
-        ZonalOffset offset = tz.getOffset(this);
-        return PlainTimestamp.from(this, offset);
+        return this.in(Timezone.of(tzid));
 
     }
 
@@ -1590,6 +1599,12 @@ public final class Moment
 
     }
 
+    private PlainTimestamp in(Timezone tz) {
+
+        return PlainTimestamp.from(this, tz.getOffset(this));
+
+    }
+
     // wildcard capture
     private static <V> void doAppend(
         TimeAxis.Builder<TimeUnit, Moment> builder,
@@ -2193,7 +2208,7 @@ public final class Moment
                 }
             }
 
-            PlainTimestamp ts = context.inTimezone(ZonalOffset.UTC);
+            PlainTimestamp ts = context.inZonalView(ZonalOffset.UTC);
             ts = ts.with(this.element, value);
             Moment result = ts.atTimezone(ZonalOffset.UTC);
 

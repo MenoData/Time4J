@@ -174,14 +174,16 @@ public final class SystemClock
     /**
      * <p>Creates a local clock in system timezone. </p>
      *
-     * @return  local clock in standard timezone
+     * @return  local clock in system timezone
+     * @see     net.time4j.tz.Timezone#ofSystem()
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der System-Zeitzone. </p>
      *
-     * @return  local clock in standard timezone
+     * @return  local clock in system timezone
+     * @see     net.time4j.tz.Timezone#ofSystem()
      */
-    public static ZonalClock inStdTimezone() {
+    public static ZonalClock inLocalView() {
 
         return ZonalClock.ofSystem();
 
@@ -192,14 +194,36 @@ public final class SystemClock
      *
      * @param   tzid        timezone id
      * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        timezone id
      * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
-    public static ZonalClock inTimezone(TZID tzid) {
+    public static ZonalClock inZonalView(TZID tzid) {
+
+        return new ZonalClock(SystemClock.INSTANCE, tzid);
+
+    }
+
+    /**
+     * <p>Creates a local clock in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     */
+    public static ZonalClock inZonalView(String tzid) {
 
         return new ZonalClock(SystemClock.INSTANCE, tzid);
 

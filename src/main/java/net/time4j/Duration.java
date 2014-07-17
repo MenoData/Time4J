@@ -31,7 +31,7 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
-import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -1350,7 +1350,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #later(TZID)
+     * @see     #later(Timezone)
      */
     /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
@@ -1359,16 +1359,17 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #later(TZID)
+     * @see     #later(Timezone)
      */
-    public ChronoOperator<Moment> earlier(final TZID timezone) {
+    public ChronoOperator<Moment> earlier(final Timezone timezone) {
 
         return new ChronoOperator<Moment>() {
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
-                    entity.inTimezone(timezone).minus(Duration.this);
-                return ts.atTimezone(timezone);
+                    PlainTimestamp.from(entity, timezone.getOffset(entity));
+                ts = ts.minus(Duration.this);
+                return ts.at(timezone);
             }
         };
 
@@ -1384,14 +1385,15 @@ public final class Duration<U extends IsoUnit>
      *      PlainDate.of(2014, Month.MARCH, 30)
      *      .atStartOfDay().atTimezone(berlin);
      *  Moment end =
-     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
+     *      start.with(
+     *          Duration.of(5, ClockUnit.HOURS).later(Timezone.of(berlin)));
      *  System.out.println(start.until(end, TimeUnit.HOURS));
      *  // output: 4 (5 local hour ticks equal to 4 physical hours)
      * <pre>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier(TZID)
+     * @see     #earlier(Timezone)
      */
     /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
@@ -1404,7 +1406,8 @@ public final class Duration<U extends IsoUnit>
      *      PlainDate.of(2014, Month.MARCH, 30)
      *      .atStartOfDay().atTimezone(berlin);
      *  Moment end =
-     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
+     *      start.with(
+     *          Duration.of(5, ClockUnit.HOURS).later(Timezone.of(berlin)));
      *  System.out.println(start.until(end, TimeUnit.HOURS));
      *  // Ausgabe: 4
      *  // (5 lokale Stunden &auml;quivalent zu 4 physikalischen Stunden)
@@ -1412,16 +1415,17 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier(TZID)
+     * @see     #earlier(Timezone)
      */
-    public ChronoOperator<Moment> later(final TZID timezone) {
+    public ChronoOperator<Moment> later(final Timezone timezone) {
 
         return new ChronoOperator<Moment>() {
             @Override
             public Moment apply(Moment entity) {
                 PlainTimestamp ts =
-                    entity.inTimezone(timezone).plus(Duration.this);
-                return ts.atTimezone(timezone);
+                    PlainTimestamp.from(entity, timezone.getOffset(entity));
+                ts = ts.plus(Duration.this);
+                return ts.at(timezone);
             }
         };
 
