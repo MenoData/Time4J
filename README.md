@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-02-15 I have published the first release of Time4J as initial version v0.1-alpha. A development process of more than two years has preceded this big milestone. Although this is just the begin of release cycles and there will still be some backwards incompatible changes due to alpha-state until a future version v1.0, Time4J is now really useful for many date-and-time-applications, especially with the coming almost-stable pre-release v0.3-alpha (expected in the begin of June). 
+On 2014-07-04 the core of Time4J is finished and released as extra module on GitHub with the version time4J-core-v1.0. The further development of all modules will continue on this main project however.
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
@@ -25,9 +25,15 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 Here some examples as a flavour of how Time4J-code looks like (shown code valid for v0.3-alpha):
 
 ```java
-import net.time4j.*;
+import net.time4j.Moment;
+import net.time4j.Month;
+import net.time4j.PatternType;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
+import net.time4j.SI;
+import net.time4j.SystemClock;
 import net.time4j.tz.TZID;
-import net.time4j.tz.ZonalOffset;
 
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -35,40 +41,37 @@ import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static net.time4j.Weekday.WEDNESDAY;
 
-  // What is the last day of overnext month?
-  System.out.println(
-      SystemClock.inStdTimezone().today()
-          .plus(2, MONTHS)
-          .with(DAY_OF_MONTH.maximized()));
+		// What is the last day of overnext month?
+		System.out.println(
+			SystemClock.inStdTimezone().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized())
+		);
 
-  // When is next wednesday?
-  PlainDate today = SystemClock.inStdTimezone().today();
-  PlainDate nextWednesday =
-    today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
-  System.out.println(nextWednesday);
+		// When is next wednesday?
+		PlainDate today = SystemClock.inStdTimezone().today();
+		PlainDate nextWednesday = today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
+		System.out.println(nextWednesday);
 
-  // What is the current wall time rounded down to multiples of 5 minutes?
-  PlainTimestamp currentLocalTimestamp =
-    SystemClock.inTimezone(TZID.EUROPE.BERLIN).now();
-  PlainTime roundedTime =
-    currentLocalTimestamp.getWallTime() // T22:06:52,688
-                         .with(MINUTE_OF_HOUR.atFloor()) // T22:06
-                         .with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
-  System.out.println("Rounded wall time: " + roundedTime);
+		// What is the current wall time rounded down to multiples of 5 minutes?
+		PlainTimestamp currentLocalTimestamp = SystemClock.inTimezone(TZID.EUROPE.BERLIN).now();
+		PlainTime roundedTime =
+			currentLocalTimestamp.getWallTime() // T22:06:52,688
+			.with(MINUTE_OF_HOUR.atFloor()) // T22:06
+			.with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
+		System.out.println("Rounded wall time: " + roundedTime);
 
-  // How does last UTC-leapsecond look like in Japan?
-  Moment leapsecondUTC =
-    PlainDate.of(2012, Month.JUNE, 30)
-    .atTime(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
-    .atOffset(ZonalOffset.UTC)
-    .minus(1, SI.SECONDS);
-  System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
+		// How does last UTC-leapsecond look like in Japan?
+		Moment leapsecondUTC =
+			PlainDate.of(2012, Month.JUNE, 30)
+			.at(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
+			.atUTC().minus(1, SI.SECONDS);
+		System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
 
-  System.out.println(
-    "Japan-Time: "
-    + Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
-            .withTimezone(TZID.ASIA.TOKYO)
-            .format(leapsecondUTC)); // Japan-Time: 2012-07-01T08:59:60+0900
+		System.out.println(
+			"Japan-Time: "
+			+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR).withTimezone(
+				TZID.ASIA.TOKYO
+			).format(leapsecondUTC)
+		); // Japan-Time: 2012-07-01T08:59:60+0900
 ```
 
 Design remarks:
@@ -91,12 +94,17 @@ There are no fixed predictions when some features will introduced in which relea
 
 While the main focus of the next pre-releases until v1.0 are standard business use cases, reliablity and stability, you can expect after v1.0 more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
 
-Be aware of the fact that Time4J is currently in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such bigger breaks - especially on CLDR/formatting area).
+Be aware of the fact that Time4J is currently in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such bigger breaks - especially on CLDR/formatting area). Please note that some modules might already be available as production-ready (without alpha state), for example the core module. Such modules are available in extra GitHub-projects - see also https://github.com/MenoData/time4j-core/releases.
 
 Downloads and Requirements:
 ---------------------------
 
 You can find any downloads on the release page. Time4J will run at least under Java 6 or later. If you want to build it yourself from sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
+
+Feedback:
+---------
+
+Feedback is welcome. You can best use following page for feedback: https://github.com/MenoData/Time4J/issues
 
 Tutorials:
 ----------
