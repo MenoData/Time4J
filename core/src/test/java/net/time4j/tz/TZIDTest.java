@@ -1,6 +1,8 @@
 package net.time4j.tz;
 
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.olson.AMERICA;
+import net.time4j.tz.olson.EUROPE;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +17,7 @@ public class TZIDTest {
 
     @Test
     public void canonicalEnum() {
-        TZID tzid = TZID.EUROPE.LISBON;
+        TZID tzid = EUROPE.LISBON;
         assertThat(tzid.canonical(), is("Europe/Lisbon"));
     }
 
@@ -36,10 +38,10 @@ public class TZIDTest {
         TZID tzid = new TZID() {
             @Override
             public String canonical() {
-                return TZID.EUROPE.BERLIN.canonical();
+                return EUROPE.BERLIN.canonical();
             }
         };
-        assertThat(tzid.equals(TZID.EUROPE.BERLIN), is(false));
+        assertThat(tzid.equals(EUROPE.BERLIN), is(false));
     }
 
     @Test
@@ -47,11 +49,11 @@ public class TZIDTest {
         TZID tzid = new TZID() {
             @Override
             public String canonical() {
-                return TZID.EUROPE.BERLIN.canonical();
+                return EUROPE.BERLIN.canonical();
             }
         };
         assertThat(
-            tzid.canonical().equals(TZID.EUROPE.BERLIN.canonical()),
+            tzid.canonical().equals(EUROPE.BERLIN.canonical()),
             is(true));
     }
 
@@ -60,8 +62,19 @@ public class TZIDTest {
         PlainTimestamp ts = PlainTimestamp.of(2014, 7, 1, 12, 0);
         assertThat(
             ts.at(Timezone.of("Brazil/Acre"))
-              .inZonalView(TZID.AMERICA.RIO_BRANCO),
+              .inZonalView(AMERICA.RIO_BRANCO),
             is(ts));
+    }
+
+    @Test
+    public void predefinedTZ() {
+        TZID tzid = AMERICA.ARGENTINA.BUENOS_AIRES;
+        assertThat(
+            Timezone.of(tzid).getID(),
+            is(tzid));
+        assertThat(
+            Timezone.of(tzid).getID() == tzid,
+            is(true));
     }
 
 }

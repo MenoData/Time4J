@@ -7,6 +7,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.olson.PACIFIC;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class DatelineBorderTest {
 
     @Test
     public void plusCalendarDaysSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment end =
             PlainDate.of(2011, Month.DECEMBER, 29)
                 .atStartOfDay().at(tz)
@@ -39,7 +40,7 @@ public class DatelineBorderTest {
 
     @Test
     public void plusPosixDaysSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment end =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz)
                 .plus(1, TimeUnit.DAYS);
@@ -53,7 +54,7 @@ public class DatelineBorderTest {
 
     @Test
     public void plusPosixHoursSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment end =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz)
                 .plus(24, TimeUnit.HOURS);
@@ -67,7 +68,7 @@ public class DatelineBorderTest {
 
     @Test
     public void standardOffsetChangeSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         Moment end =
@@ -83,7 +84,7 @@ public class DatelineBorderTest {
 
     @Test
     public void daysShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         Moment end =
@@ -95,7 +96,7 @@ public class DatelineBorderTest {
 
     @Test
     public void hoursShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         Moment end =
@@ -107,7 +108,7 @@ public class DatelineBorderTest {
 
     @Test
     public void minutesShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         Moment end =
@@ -119,7 +120,7 @@ public class DatelineBorderTest {
 
     @Test
     public void secondsShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         Moment end =
@@ -131,7 +132,7 @@ public class DatelineBorderTest {
 
     @Test
     public void invalidDaySamoa() {
-        TZID timezone = TZID.PACIFIC.APIA;
+        TZID timezone = PACIFIC.APIA;
         assertThat(
             PlainDate.of(2011, Month.DECEMBER, 30).atTime(12, 0)
                 .isValid(timezone),
@@ -140,7 +141,7 @@ public class DatelineBorderTest {
 
     @Test
     public void dayBeforeShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment start =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz);
         assertThat(
@@ -150,7 +151,7 @@ public class DatelineBorderTest {
 
     @Test
     public void dayAfterShiftSamoa() {
-        Timezone tz = Timezone.of(TZID.PACIFIC.APIA);
+        Timezone tz = Timezone.of(PACIFIC.APIA);
         Moment end =
             PlainDate.of(2011, Month.DECEMBER, 29).atStartOfDay().at(tz)
                 .with(Duration.of(2, CalendarUnit.DAYS).later(tz));

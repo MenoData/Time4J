@@ -30,6 +30,7 @@ import net.time4j.base.WallTime;
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -121,21 +122,28 @@ public abstract class Timezone
         QUEUE = new ReferenceQueue<Timezone>();
         LAST_USED = new LinkedList<Timezone>(); // strong references
 
-        List<Class<? extends TZID>> areas =
-            new ArrayList<Class<? extends TZID>>();
-        areas.add(TZID.AFRICA.class);
-        areas.add(TZID.AMERICA.class);
-        areas.add(TZID.AMERICA.ARGENTINA.class);
-        areas.add(TZID.AMERICA.INDIANA.class);
-        areas.add(TZID.AMERICA.KENTUCKY.class);
-        areas.add(TZID.AMERICA.NORTH_DAKOTA.class);
-        areas.add(TZID.ANTARCTICA.class);
-        areas.add(TZID.ASIA.class);
-        areas.add(TZID.ATLANTIC.class);
-        areas.add(TZID.AUSTRALIA.class);
-        areas.add(TZID.EUROPE.class);
-        areas.add(TZID.INDIAN.class);
-        areas.add(TZID.PACIFIC.class);
+        List<Class<? extends TZID>> areas;
+
+        try {
+            areas =
+                loadPredefined(
+                    "AFRICA",
+                    "AMERICA",
+                    "AMERICA$ARGENTINA",
+                    "AMERICA$INDIANA",
+                    "AMERICA$KENTUCKY",
+                    "AMERICA$NORTH_DAKOTA",
+                    "ANTARCTICA",
+                    "ASIA",
+                    "ATLANTIC",
+                    "AUSTRALIA",
+                    "EUROPE",
+                    "INDIAN",
+                    "PACIFIC");
+        } catch (ClassNotFoundException cnfe) {
+            // olson-package not available
+            areas = Collections.emptyList();
+        }
 
         Map<String, TZID> temp1 = new HashMap<String, TZID>();
         temp1.put("Z", ZonalOffset.UTC);
@@ -152,48 +160,22 @@ public abstract class Timezone
         PREDEFINED = Collections.unmodifiableMap(temp1);
 
         Map<String, Set<TZID>> temp2 = new HashMap<String, Set<TZID>>();
-        for (TZID.AFRICA tz : TZID.AFRICA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
+        Class<?>[] emptyTypes =  new Class<?>[0];
+        Object[] emptyParams = new Object[0];
+
+        try {
+            for (Class<? extends TZID> area : areas) {
+                Method m = area.getDeclaredMethod("getCountry", emptyTypes);
+                m.setAccessible(true);
+                for (TZID tzid : area.getEnumConstants()) {
+                    String country = (String) m.invoke(tzid, emptyParams);
+                    addTerritory(temp2, country, tzid);
+                }
+            }
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
         }
-        for (TZID.AMERICA tz : TZID.AMERICA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.AMERICA.ARGENTINA tz : TZID.AMERICA.ARGENTINA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.AMERICA.INDIANA tz : TZID.AMERICA.INDIANA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.AMERICA.KENTUCKY tz : TZID.AMERICA.KENTUCKY.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (
-            TZID.AMERICA.NORTH_DAKOTA tz
-            : TZID.AMERICA.NORTH_DAKOTA.values()
-        ) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.ANTARCTICA tz : TZID.ANTARCTICA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.ASIA tz : TZID.ASIA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.ATLANTIC tz : TZID.ATLANTIC.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.AUSTRALIA tz : TZID.AUSTRALIA.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.EUROPE tz : TZID.EUROPE.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.INDIAN tz : TZID.INDIAN.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
-        for (TZID.PACIFIC tz : TZID.PACIFIC.values()) {
-            addTerritory(temp2, tz.getCountry(), tz);
-        }
+
         TZID svalbard = new NamedID("Arctic/Longyearbyen");
         temp2.put("SJ", Collections.singleton(svalbard));
         TERRITORIES = Collections.unmodifiableMap(temp2);
@@ -860,6 +842,25 @@ public abstract class Timezone
         } else {
             return new HistorizedTimezone(tzid, history);
         }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Class<? extends TZID>> loadPredefined(String... names)
+        throws ClassNotFoundException {
+
+        List<Class<? extends TZID>> classes =
+            new ArrayList<Class<? extends TZID>>();
+
+        for (String name : names) {
+            Class<?> clazz = Class.forName("net.time4j.tz.olson." + name);
+
+            if (TZID.class.isAssignableFrom(clazz)) {
+                classes.add((Class<? extends TZID>) clazz);
+            }
+        }
+
+        return Collections.unmodifiableList(classes);
 
     }
 

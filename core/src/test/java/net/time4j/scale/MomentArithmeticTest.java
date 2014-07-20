@@ -9,6 +9,7 @@ import net.time4j.SI;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import net.time4j.tz.olson.EUROPE;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void plusClockHoursBerlin() {
-        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
+        Timezone tz = Timezone.of(EUROPE.BERLIN);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay().at(tz)
@@ -40,7 +41,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void minusClockHoursBerlin() {
-        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
+        Timezone tz = Timezone.of(EUROPE.BERLIN);
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay().at(tz)
@@ -57,7 +58,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void plusPosixHoursBerlin() {
-        TZID timezone = TZID.EUROPE.BERLIN;
+        TZID timezone = EUROPE.BERLIN;
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
@@ -73,7 +74,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void minusPosixHoursBerlin() {
-        TZID timezone = TZID.EUROPE.BERLIN;
+        TZID timezone = EUROPE.BERLIN;
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atTime(5, 0)
@@ -89,7 +90,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void hourShiftBerlin() {
-        Timezone tz = Timezone.of(TZID.EUROPE.BERLIN);
+        Timezone tz = Timezone.of(EUROPE.BERLIN);
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atStartOfDay().at(tz);
