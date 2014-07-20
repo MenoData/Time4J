@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-07-04 the core of Time4J is finished and released as extra module on GitHub with the version time4J-core-v1.0. The further development of all modules will continue on this main project however.
+On 2014-07-20 the core of Time4J is finished and released with the version time4j-core-v1.0. Another useable module is time4j-olson-v1.0 which contains some predefined timezone identifiers as enums.
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
@@ -22,7 +22,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 - PlainTimestamp = local timestamp as composition of calendar date and wall time
 - Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like (shown code valid for v0.3-alpha):
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v1.0):
 
 ```java
 import net.time4j.Moment;
@@ -34,6 +34,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.SystemClock;
 import net.time4j.tz.TZID;
+import net.time4j.tz.olson.*; // extra module beyond core
 
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -43,16 +44,16 @@ import static net.time4j.Weekday.WEDNESDAY;
 
 		// What is the last day of overnext month?
 		System.out.println(
-			SystemClock.inStdTimezone().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized())
+			SystemClock.inLocalView().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized())
 		);
 
 		// When is next wednesday?
-		PlainDate today = SystemClock.inStdTimezone().today();
+		PlainDate today = SystemClock.inLocalView().today();
 		PlainDate nextWednesday = today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
 		System.out.println(nextWednesday);
 
 		// What is the current wall time rounded down to multiples of 5 minutes?
-		PlainTimestamp currentLocalTimestamp = SystemClock.inTimezone(TZID.EUROPE.BERLIN).now();
+		PlainTimestamp currentLocalTimestamp = SystemClock.inZonalView(EUROPE.BERLIN).now();
 		PlainTime roundedTime =
 			currentLocalTimestamp.getWallTime() // T22:06:52,688
 			.with(MINUTE_OF_HOUR.atFloor()) // T22:06
@@ -68,9 +69,9 @@ import static net.time4j.Weekday.WEDNESDAY;
 
 		System.out.println(
 			"Japan-Time: "
-			+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR).withTimezone(
-				TZID.ASIA.TOKYO
-			).format(leapsecondUTC)
+			+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
+				.withTimezone(ASIA.TOKYO)
+				.format(leapsecondUTC)
 		); // Japan-Time: 2012-07-01T08:59:60+0900
 ```
 
@@ -78,7 +79,7 @@ Design remarks:
 
 a) Safety: Although Time4J is strongly generified users will not really use any generics in their application code as demonstrated in example code, but are more or less type-safe at compile-time. For example, it is impossible to add clock units to a calendar date. This is in contrast to JSR-310 which heavily relies on runtime exceptions. Otherwise Time4J shares the advantages like immutability and non-tolerant null-handling.
 
-b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inStdTimezone()" or "localFormatter(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
+b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inLocalView()" or "localFormatter(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
 
 c) Time4J offers a lot of manipulations of date and time by an element-centric approach. Every basic type like 
 "PlainTime" registers some elements (similar to fields in other libraries) which serve as access key to chronological partial data. These elements like "MINUTE_OF_HOUR" offer many different manipulation methods, called operators using the strategy pattern idea. With this design it is possible to manipulate a "PlainTime" in more than 170 different ways. Another advantage of this design: Despite the size of features the count of methods in most classes is still not too big, "PlainTime" has less than 45 methods including the inherited methods from super classes.
@@ -92,9 +93,8 @@ Plans for next releases:
 
 There are no fixed predictions when some features will introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/issues/milestones.
 
-While the main focus of the next pre-releases until v1.0 are standard business use cases, reliablity and stability, you can expect after v1.0 more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
+While the main focus of the next releases after v1.0 are standard business use cases, you can expect later more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
 
-Be aware of the fact that Time4J is currently in alpha state so backward incompatible changes are still possible. Nevertheless I will try my best to limit such compatibility breaks as much as reasonable for the next pre-releases (v0.3-alpha will hopefully be the last one which has such bigger breaks - especially on CLDR/formatting area). Please note that some modules might already be available as production-ready (without alpha state), for example the core module. Such modules are available in extra GitHub-projects - see also https://github.com/MenoData/time4j-core/releases.
 
 Downloads and Requirements:
 ---------------------------
