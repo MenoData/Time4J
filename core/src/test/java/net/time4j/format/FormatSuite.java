@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         Iso8601FormatTest.class,
         MiscellaneousTest.class,
         MomentPatternTest.class,
+        OffsetPatternTest.class,
         ParsingTextOverflowTest.class,
         WhitespaceTest.class
     }

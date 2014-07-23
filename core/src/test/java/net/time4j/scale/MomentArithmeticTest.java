@@ -6,10 +6,8 @@ import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.SI;
-import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.olson.EUROPE;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -26,7 +24,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void plusClockHoursBerlin() {
-        Timezone tz = Timezone.of(EUROPE.BERLIN);
+        Timezone tz = Timezone.of("Europe/Berlin");
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay().at(tz)
@@ -41,7 +39,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void minusClockHoursBerlin() {
-        Timezone tz = Timezone.of(EUROPE.BERLIN);
+        Timezone tz = Timezone.of("Europe/Berlin");
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay().at(tz)
@@ -58,11 +56,10 @@ public class MomentArithmeticTest {
 
     @Test
     public void plusPosixHoursBerlin() {
-        TZID timezone = EUROPE.BERLIN;
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .atTimezone(timezone)
+                .at(Timezone.of("Europe/Berlin"))
                 .plus(4, TimeUnit.HOURS);
         assertThat(
             end,
@@ -74,11 +71,10 @@ public class MomentArithmeticTest {
 
     @Test
     public void minusPosixHoursBerlin() {
-        TZID timezone = EUROPE.BERLIN;
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atTime(5, 0)
-            .atTimezone(timezone);
+            .at(Timezone.of("Europe/Berlin"));
         Moment end = start.minus(4, TimeUnit.HOURS);
         assertThat(
             end,
@@ -90,7 +86,7 @@ public class MomentArithmeticTest {
 
     @Test
     public void hourShiftBerlin() {
-        Timezone tz = Timezone.of(EUROPE.BERLIN);
+        Timezone tz = Timezone.of("Europe/Berlin");
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atStartOfDay().at(tz);
