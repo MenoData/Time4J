@@ -57,7 +57,7 @@ final class TimezoneNameProcessor
         new ConcurrentHashMap<Locale, TZNames>();
     private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
-    private static final int MAX = 10;
+    private static final int MAX = 25;
 
     //~ Instanzvariablen --------------------------------------------------
 

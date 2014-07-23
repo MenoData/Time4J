@@ -771,6 +771,7 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #inLocalView()
      */
     /*[deutsch]
@@ -779,6 +780,7 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #inLocalView()
      */
     public PlainTimestamp inZonalView(TZID tzid) {
@@ -793,6 +795,7 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #inZonalView(TZID)
      * @see     #inLocalView()
      */
@@ -802,6 +805,7 @@ public final class Moment
      * @param   tzid    timezone id
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #inZonalView(TZID)
      * @see     #inLocalView()
      */

@@ -135,6 +135,7 @@ public abstract class ElementOperator<T>
      * @param   tzid        timezone id
      * @return  operator with the given timezone reference, applicable on
      *          instances of {@code Moment}
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Erzeugt einen Operator, der einen {@link Moment} mit
@@ -150,6 +151,7 @@ public abstract class ElementOperator<T>
      * @param   tzid        timezone id
      * @return  operator with the given timezone reference, applicable on
      *          instances of {@code Moment}
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     public final ChronoOperator<Moment> inTimezone(TZID tzid) {
 

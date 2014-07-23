@@ -756,6 +756,34 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     /**
      * <p>Equivalent to {@link #withTimezone(TZID)
+     * withTimezone(Timezone.of(tzid).getID())}. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #withTimezone(TZID)
+     * @since   1.1
+     */
+    /*[deutsch]
+     * <p>Entspricht {@link #withTimezone(TZID)
+     * withTimezone(Timezone.of(tzid).getID())}. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  changed copy with the new or changed attribute while
+     *          this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #withTimezone(TZID)
+     * @since   1.1
+     */
+    public ChronoFormatter<T> withTimezone(String tzid) {
+
+        return this.withTimezone(Timezone.of(tzid).getID());
+
+    }
+
+    /**
+     * <p>Equivalent to {@link #withTimezone(TZID)
      * withTimezone(Timezone.ofSystem().getID())}. </p>
      *
      * @return  changed copy with the system timezone while
@@ -1384,21 +1412,29 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 if (status.getDSTInfo() != null) {
                     TZID tzid = parsed.getTimezone();
                     UnixTime ut = UnixTime.class.cast(result);
-                    boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
 
-                    if (dst != status.getDSTInfo().booleanValue()) {
-                        StringBuilder reason = new StringBuilder(256);
-                        reason.append("Conflict found: ");
-                        reason.append("Parsed entity is ");
-                        if (!dst) {
-                            reason.append("not ");
+                    try {
+                        boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
+                        if (dst != status.getDSTInfo().booleanValue()) {
+                            StringBuilder reason = new StringBuilder(256);
+                            reason.append("Conflict found: ");
+                            reason.append("Parsed entity is ");
+                            if (!dst) {
+                                reason.append("not ");
+                            }
+                            reason.append("daylight-saving, but timezone name");
+                            reason.append(" has not the appropriate form in {");
+                            reason.append(text.toString());
+                            reason.append("}.");
+                            status.setError(text.length(), reason.toString());
+                            result = null;
                         }
-                        reason.append("daylight-saving, but timezone name");
-                        reason.append(" has not the appropriate form in {");
-                        reason.append(text.toString());
-                        reason.append("}.");
+                    } catch (IllegalArgumentException iae) {
+                        StringBuilder reason = new StringBuilder(256);
+                        reason.append("Unable to check timezone name: ");
+                        reason.append(iae.getMessage());
                         status.setError(text.length(), reason.toString());
-                        result = null;
+                        return null;
                     }
                 }
             } else {

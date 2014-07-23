@@ -669,6 +669,31 @@ public final class Attributes
         }
 
         /**
+         * <p>Sets the timezone reference. </p>
+         *
+         * @param   tzid        timezone id
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given timezone cannot be loaded
+         * @see     #TIMEZONE_ID
+         * @since   1.1
+         */
+        /*[deutsch]
+         * <p>Setzt die Zeitzonenreferenz. </p>
+         *
+         * @param   tzid        timezone id
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given timezone cannot be loaded
+         * @see     #TIMEZONE_ID
+         * @since   1.1
+         */
+        public Builder setTimezone(String tzid) {
+
+            this.setTimezone(Timezone.of(tzid).getID());
+            return this;
+
+        }
+
+        /**
          * <p>Sets the system timezone reference. </p>
          *
          * @return  this instance for method chaining

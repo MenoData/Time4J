@@ -860,6 +860,7 @@ public final class PlainTimestamp
      * @param   tzid        timezone id
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     Timezone#of(TZID)
      * @see     #atStdTimezone()
      */
@@ -870,6 +871,7 @@ public final class PlainTimestamp
      * @param   tzid        timezone id
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     Timezone#of(TZID)
      * @see     #atStdTimezone()
      */
@@ -926,12 +928,14 @@ public final class PlainTimestamp
      *
      * @param   tzid    timezone id
      * @return  {@code true} if this timestamp is valid in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Existiert dieser Zeitstempel in der angegebenen Zeitzone? </p>
      *
      * @param   tzid    timezone id
      * @return  {@code true} if this timestamp is valid in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     public boolean isValid(TZID tzid) {
 

@@ -57,7 +57,8 @@ final class ZonalTimestamp
      * @param   moment          global timestamp
      * @param   tzid            timezone id (optional)
      * @throws  IllegalArgumentException if leapsecond shall be formatted
-     *          with non-full-minute-timezone-offset
+     *          with non-full-minute-timezone-offset or if given timezone
+     *          cannot be loaded
      */
     ZonalTimestamp(
         Moment moment,
