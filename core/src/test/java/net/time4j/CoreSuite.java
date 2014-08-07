@@ -23,6 +23,6 @@ import org.junit.runners.Suite.SuiteClasses;
         ZoneSuite.class
     }
 )
-public class AllSuite {
+public class CoreSuite {
 
 }
