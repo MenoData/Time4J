@@ -30,8 +30,10 @@ import net.time4j.base.WallTime;
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -172,12 +174,23 @@ public abstract class Timezone
                     addTerritory(temp2, country, tzid);
                 }
             }
-        } catch (Exception ex) {
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException(ex);
+        } catch (NoSuchMethodException ex) {
+            throw new IllegalStateException(ex);
+        } catch (InvocationTargetException ex) {
             throw new IllegalStateException(ex);
         }
 
-        TZID svalbard = new NamedID("Arctic/Longyearbyen");
-        temp2.put("SJ", Collections.singleton(svalbard));
+        if (areas.isEmpty()) {
+            System.out.println(
+                "Warning: olson-module is not available "
+                + "so there are no preferred timezones for any locale.");
+        } else {
+            TZID svalbard = new NamedID("Arctic/Longyearbyen");
+            temp2.put("SJ", Collections.singleton(svalbard));
+        }
+        
         TERRITORIES = Collections.unmodifiableMap(temp2);
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -267,6 +280,10 @@ public abstract class Timezone
     /**
      * <p>Gets a {@code Set} of preferred timezone IDs for given
      * ISO-3166-country code. </p>
+     * 
+     * <p>This information is necessary to enable parsing of timezone names
+     * and is only available if the olson-module &quot;net.time4j.tz.olson&quot;
+     * is accessible in class path. </p>
      *
      * @param   locale  ISO-3166-alpha-2-country to be evaluated
      * @return  unmodifiable set of preferred timezone ids
@@ -274,6 +291,10 @@ public abstract class Timezone
     /*[deutsch]
      * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
      * bevorzugten Zeitzonenkennungen. </p>
+     *
+     * <p>Diese Information ist f&uuml;r die Interpretation von Zeitzonennamen
+     * notwendig und steht nur dann zur Verf&uuml;gung, wenn das olson-Modul
+     * &quot;net.time4j.tz.olson&quot; im Klassenpfad existiert. </p>
      *
      * @param   locale  ISO-3166-alpha-2-country to be evaluated
      * @return  unmodifiable set of preferred timezone ids
@@ -1184,7 +1205,7 @@ public abstract class Timezone
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final TZID tzid;
+        private final String tzid;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1193,7 +1214,7 @@ public abstract class Timezone
             ReferenceQueue<Timezone> queue
         ) {
             super(tz, queue);
-            this.tzid = tz.getID();
+            this.tzid = tz.getID().canonical();
 
         }
 
@@ -1318,11 +1339,7 @@ public abstract class Timezone
 
             Set<String> ret = new HashSet<String>();
             String[] temp = java.util.TimeZone.getAvailableIDs();
-
-            for (String s : temp) {
-                ret.add(s);
-            }
-
+            ret.addAll(Arrays.asList(temp));
             return ret;
 
         }
