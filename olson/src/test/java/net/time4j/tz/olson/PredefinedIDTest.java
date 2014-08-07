@@ -3,12 +3,14 @@ package net.time4j.tz.olson;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
+import java.util.Collections;
+import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 
 
 @RunWith(JUnit4.class)
@@ -89,6 +91,14 @@ public class PredefinedIDTest {
     public void getRegion() {
         StdZoneIdentifier tzid = AMERICA.ARGENTINA.BUENOS_AIRES;
         assertThat(tzid.getRegion(), is("America/Argentina"));
+    }
+
+    @Test
+    public void getPreferredIDs() {
+        TZID tzid = EUROPE.BERLIN;
+        assertThat(
+            Timezone.getPreferredIDs(Locale.GERMANY),
+            is(Collections.singleton(tzid)));
     }
 
 }

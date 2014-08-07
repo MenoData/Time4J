@@ -58,6 +58,18 @@ final class TimezoneNameProcessor
     private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
     private static final int MAX = 25;
+    
+    private static final boolean WITH_OLSON_MODULE;
+    
+    static {
+        boolean hasOlsonModule = true;
+        try {
+            Class.forName("net.time4j.tz.olson.StdZoneIdentifier");
+        } catch (ClassNotFoundException ex) {
+            hasOlsonModule = false;
+        }
+        WITH_OLSON_MODULE = hasOlsonModule;
+    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -126,7 +138,7 @@ final class TimezoneNameProcessor
         }
 
         int start = -1;
-        int printed = 0;
+        int printed;
 
         if (buffer instanceof CharSequence) {
             start = ((CharSequence) buffer).length();
@@ -180,7 +192,8 @@ final class TimezoneNameProcessor
 
             if (
                 Character.isLetter(c)
-                || (!this.abbreviated && Character.isWhitespace(c))
+                || (!this.abbreviated 
+                    && (Character.isWhitespace(c)) || (c == '\''))
             ) {
                 name.append(c);
                 pos++;
@@ -252,7 +265,8 @@ final class TimezoneNameProcessor
                 "Unknown timezone name: " + key);
             return;
         } else if (
-            (zones.size() > 1)
+            WITH_OLSON_MODULE
+            && (zones.size() > 1)
             && !leniency.isLax()
         ) { // tz name not unique
             List<TZID> candidates = new ArrayList<TZID>(zones);
@@ -271,15 +285,18 @@ final class TimezoneNameProcessor
                     candidates.remove(tz);
                 }
             }
-
-            zones = candidates;
+            
+            if (candidates.isEmpty()) {
+                status.setError(
+                    start,
+                    "Time zone id not found among preferred timezones.");
+                return;
+            } else {
+                zones = candidates;
+            }
         }
 
-        if (zones.isEmpty()) {
-            status.setError(
-                start,
-                "Time zone id not found among preferred timezones.");
-        } else if (
+        if (
             (zones.size() == 1)
             || leniency.isLax()
         ) {
@@ -289,7 +306,7 @@ final class TimezoneNameProcessor
         } else {
             status.setError(
                 start,
-                "Time zone name is not unique: " + key);
+                "Time zone name is not unique: \"" + key + "\" in " + zones);
         }
 
     }

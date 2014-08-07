@@ -7,7 +7,6 @@ import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
 import net.time4j.scale.TimeScale;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import org.junit.Test;
@@ -228,14 +227,6 @@ public class PlatformTimezoneTest {
         TZID id = Timezone.of("Asia/Tokyo").getID();
         Timezone tz = loadFromPlatform("Asia/Tokyo");
         assertThat(tz.getID(), is(id));
-    }
-
-    @Test
-    public void getPreferredIDs() {
-        TZID tzid = Timezone.of("Europe/Berlin").getID();
-        assertThat(
-            Timezone.getPreferredIDs(Locale.GERMANY),
-            is(Collections.singleton(tzid)));
     }
 
     @Test

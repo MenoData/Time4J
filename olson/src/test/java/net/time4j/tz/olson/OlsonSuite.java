@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        PredefinedIDTest.class
+        PredefinedIDTest.class,
+        ZoneNameParsingTest.class
     }
 )
 public class OlsonSuite {
