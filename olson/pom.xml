@@ -5,7 +5,7 @@
     
     <parent>
         <groupId>net.time4j</groupId>
-        <artifactId>time4j</artifactId>
+        <artifactId>parent</artifactId>
         <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
