@@ -509,24 +509,42 @@ public final class Duration<U extends IsoUnit>
      * <p>Constructs a metric for any kind of standard units in
      * normalized form. </p>
      *
-     * <p><strong>IMPORTANT:</strong> If the smallest unit is missing which
+     * <p><strong>Important:</strong> If the smallest unit is missing which
      * fits the precision of timepoints to be compared then a remainder of
      * subtraction will exist. The result of distance calculation will not
      * express the full temporal distance in this case. For the completeness
      * of calculation, the day unit is required if the distance between
      * two dates is needed. </p>
      *
+     * <p><strong>Example with different unit types:</strong> If this method
+     * is called with different unit types then it is strongly recommended to
+     * first assign the units to static constants of type {@code IsoUnit} in
+     * order to avoid compiler problems with generics. This practice also
+     * helps to improve the readability of code. </p>
+     *
+     * <pre>
+     *  private static final IsoUnit DAYS = CalendarUnit.DAYS;
+     *  private static final IsoUnit HOURS = ClockUnit.HOURS;
+     *  private static final IsoUnit MINUTES = ClockUnit.MINUTES;
+     *
+     *  PlainTimestamp start = PlainTimestamp.of(2014, 3, 28, 0, 30);
+     *  PlainTimestamp end = PlainTimestamp.of(2014, 4, 5, 14, 15);
+     *  Duration&lt;IsoUnit&gt; duration =
+     *      Duration.in(DAYS, HOURS, MINUTES).between(start, end);
+     *  System.out.println(duration); // output: P8DT13H45M
+     * </pre>
+     *
      * @param   <U> generic unit type
      * @param   units       time units to be used in calculation
      * @return  immutable metric for calculating a duration in given units
-     * @throws  IllegalArgumentException if any time unit is missing or
+     * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
      */
     /*[deutsch]
      * <p>Konstruiert eine Metrik f&uuml;r beliebige Standard-Zeiteinheiten
      * in normalisierter Form. </p>
      *
-     * <p><strong>WICHTIG:</strong> Fehlt die der Pr&auml;zision der zu
+     * <p><strong>Wichtig:</strong> Fehlt die der Pr&auml;zision der zu
      * vergleichenden Zeitpunkte entsprechende kleinste Zeiteinheit, wird
      * im allgemeinen ein Subtraktionsrest &uuml;brigbleiben. Das Ergebnis
      * der Metrikberechnung wird dann nicht den vollst&auml;ndigen zeitlichen
@@ -534,10 +552,29 @@ public final class Duration<U extends IsoUnit>
      * Vollst&auml;ndigkeit der Berechnung ist bei Datumsangaben mindestens
      * die explizite Angabe der Tageseinheit notwendig. </p>
      *
+     * <p><strong>Beispiel mit verschiedenen Einheitstypen:</strong> Wenn diese
+     * Method mit verschiedenen Zeiteinheitstypen aufgerufen wird, dann wird
+     * dringend empfohlen, zuerst die Einheiten statischen Konstanten vom Typ
+     * {@code IsoUnit} zuzuweisen, um Compiler-Probleme mit Generics zu
+     * vermeiden. Diese Praxis hilft auch, die Lesbarkeit des Code zu
+     * verbessern. </p>
+     *
+     * <pre>
+     *  private static final IsoUnit DAYS = CalendarUnit.DAYS;
+     *  private static final IsoUnit HOURS = ClockUnit.HOURS;
+     *  private static final IsoUnit MINUTES = ClockUnit.MINUTES;
+     *
+     *  PlainTimestamp start = PlainTimestamp.of(2014, 3, 28, 0, 30);
+     *  PlainTimestamp end = PlainTimestamp.of(2014, 4, 5, 14, 15);
+     *  Duration&lt;IsoUnit&gt; duration =
+     *      Duration.in(DAYS, HOURS, MINUTES).between(start, end);
+     *  System.out.println(duration); // output: P8DT13H45M
+     * </pre>
+     *
      * @param   <U> generic unit type
      * @param   units       time units to be used in calculation
      * @return  immutable metric for calculating a duration in given units
-     * @throws  IllegalArgumentException if any time unit is missing or
+     * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
      */
     public static <U extends IsoUnit>
@@ -546,7 +583,7 @@ public final class Duration<U extends IsoUnit>
         return new Metric<U>(units);
 
     }
-
+    
     /**
      * <p>Constructs a metric in years, months and days. </p>
      *
