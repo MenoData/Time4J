@@ -5,20 +5,20 @@
     
     <parent>
         <groupId>net.time4j</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>time4j-parent</artifactId>
         <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
     <groupId>net.time4j</groupId>
-    <artifactId>olson</artifactId>
+    <artifactId>time4j-olson</artifactId>
     <packaging>jar</packaging>
     <name>Time4J-Olson</name>
     
     <dependencies>
         <dependency>
             <groupId>net.time4j</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>time4j-core</artifactId>
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
