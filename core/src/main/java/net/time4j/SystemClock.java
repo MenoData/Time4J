@@ -121,6 +121,9 @@ public final class SystemClock
      * <p>Yields the current time in milliseconds elapsed since
      * [1970-01-01T00:00:00,000Z]. </p>
      *
+     * <p>Starting with version 1.1 this method always delegates to
+     * {@link System#currentTimeMillis()}. </p>
+     *
      * @return  count of milliseconds since UNIX epoch without leap seconds
      * @see     #currentTimeInMicros()
      */
@@ -128,12 +131,15 @@ public final class SystemClock
      * <p>Liefert die aktuelle seit [1970-01-01T00:00:00,000Z] verstrichene
      * Zeit in Millisekunden. </p>
      *
+     * <p>Beginnend mit der Version 1.1 delegiert diese Methode immer
+     * an {@link System#currentTimeMillis()}. </p>
+     *
      * @return  count of milliseconds since UNIX epoch without leap seconds
      * @see     #currentTimeInMicros()
      */
     public long currentTimeInMillis() {
 
-        return this.source.getMillis();
+        return System.currentTimeMillis();
 
     }
 
@@ -238,24 +244,13 @@ public final class SystemClock
         STANDARD() {
             @Override
             Moment getTime() {
-                long millis = getMillis();
+                long millis = System.currentTimeMillis();
                 int nanos = ((int) (millis % 1000)) * MIO;
-                return Moment.of(
-                    millis / 1000,
-                    nanos,
-                    TimeScale.POSIX);
-            }
-            @Override
-            long getMillis() {
-                return System.currentTimeMillis();
+                return Moment.of(millis / 1000, nanos, TimeScale.POSIX);
             }
             @Override
             long getMicros() {
-                return MathUtils.safeMultiply(getMillis(), 1000);
-            }
-            @Override
-            long getNanos() {
-                return MathUtils.safeMultiply(getMillis(), MIO);
+                return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
             }
         },
 
@@ -269,15 +264,10 @@ public final class SystemClock
                     TimeScale.POSIX);
             }
             @Override
-            long getMillis() {
-                return getNanos() / MIO;
-            }
-            @Override
             long getMicros() {
                 return getNanos() / 1000;
             }
-            @Override
-            long getNanos() {
+            private long getNanos() {
                 return MathUtils.safeAdd(
                     System.nanoTime(),
                     CALIBRATED_OFFSET
@@ -289,11 +279,7 @@ public final class SystemClock
 
         abstract Moment getTime();
 
-        abstract long getMillis();
-
         abstract long getMicros();
-
-        abstract long getNanos();
 
     }
 
