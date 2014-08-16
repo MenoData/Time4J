@@ -3093,6 +3093,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   <U> generic type of time units
      * @since   1.2
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     /*[deutsch]
      * <p>Stellt eine Methode zum Ermitteln der lokalen beziehungsweise
@@ -3100,6 +3101,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   <U> generic type of time units
      * @since   1.2
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     public static final class ZonalMetric<U extends IsoUnit> {
 
