@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MomentPatternTest.class,
         OffsetPatternTest.class,
         ParsingTextOverflowTest.class,
+        PluralRulesTest.class,
         WhitespaceTest.class
     }
 )
