@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-07-20 the core of Time4J is finished and released with the version time4j-core-v1.0. Another useable module is time4j-olson-v1.0 which contains some predefined timezone identifiers as enums.
+On 2014-07-20 the core of Time4J is finished and released with the version time4j-core-v1.0. Another useable module is time4j-olson-v1.0 which contains some predefined timezone identifiers as enums and enables parsing of localized timezone names. On 2014-08-14 the version 1.1 was released with support for Apache Maven.
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
