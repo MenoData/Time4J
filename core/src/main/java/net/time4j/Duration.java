@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.UnixTime;
 import net.time4j.engine.AbstractDuration;
 import net.time4j.engine.AbstractMetric;
 import net.time4j.engine.ChronoException;
@@ -583,7 +584,7 @@ public final class Duration<U extends IsoUnit>
         return new Metric<U>(units);
 
     }
-    
+
     /**
      * <p>Constructs a metric in years, months and days. </p>
      *
@@ -649,6 +650,42 @@ public final class Duration<U extends IsoUnit>
     TimeMetric<ClockUnit, Duration<ClockUnit>> inClockUnits() {
 
         return CLOCK_METRIC;
+
+    }
+
+    /**
+     * <p>Helps to evaluate the zonal duration between two UNIX-timestamps. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   tz          timezone
+     * @param   units       time units to be used in calculation
+     * @return  zonal metric for calculating a duration in given units
+     * @throws  IllegalArgumentException if no time unit is given or
+     *          if there are unit duplicates
+     * @see     #earlier(Timezone)
+     * @see     #later(Timezone)
+     * @see     Moment
+     */
+    /*[deutsch]
+     * <p>Hilfsmethode zur Bestimmung der lokalen beziehungsweise zonalen
+     * Dauer zwischen zwei absoluten UNIX-Zeitstempeln. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   tz          timezone
+     * @param   units       time units to be used in calculation
+     * @return  zonal metric for calculating a duration in given units
+     * @throws  IllegalArgumentException if no time unit is given or
+     *          if there are unit duplicates
+     * @see     #earlier(Timezone)
+     * @see     #later(Timezone)
+     * @see     Moment
+     */
+    public static <U extends IsoUnit> ZonalMetric<U> in(
+        Timezone tz,
+        U... units
+    ) {
+
+        return new ZonalMetric<U>(tz, units);
 
     }
 
@@ -1388,6 +1425,7 @@ public final class Duration<U extends IsoUnit>
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
      * @see     #later(Timezone)
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
@@ -1397,6 +1435,7 @@ public final class Duration<U extends IsoUnit>
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
      * @see     #later(Timezone)
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     public ChronoOperator<Moment> earlier(final Timezone timezone) {
 
@@ -1417,20 +1456,22 @@ public final class Duration<U extends IsoUnit>
      * defined local timestamp will be computed. </p>
      *
      * <pre>
-     *  TZID berlin = TZID.EUROPE.BERLIN;
+     *  Timezone berlin = Timezone.of(EUROPE.BERLIN);
      *  Moment start =
-     *      PlainDate.of(2014, Month.MARCH, 30)
-     *      .atStartOfDay().atTimezone(berlin);
+     *      PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
      *  Moment end =
-     *      start.with(
-     *          Duration.of(5, ClockUnit.HOURS).later(Timezone.of(berlin)));
+     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
      *  System.out.println(start.until(end, TimeUnit.HOURS));
-     *  // output: 4 (5 local hour ticks equal to 4 physical hours)
+     *  // output: 4 (physical hours)
+     *  System.out.println(
+     *      Duration.in(berlin, ClockUnit.HOURS).between(start, end));
+     *  // output: PT5 (local hour ticks, one is virtual due to offset jump)
      * <pre>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
      * @see     #earlier(Timezone)
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     /*[deutsch]
      * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
@@ -1438,21 +1479,22 @@ public final class Duration<U extends IsoUnit>
      * wird. </p>
      *
      * <pre>
-     *  TZID berlin = TZID.EUROPE.BERLIN;
+     *  Timezone berlin = Timezone.of(EUROPE.BERLIN);
      *  Moment start =
-     *      PlainDate.of(2014, Month.MARCH, 30)
-     *      .atStartOfDay().atTimezone(berlin);
+     *      PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
      *  Moment end =
-     *      start.with(
-     *          Duration.of(5, ClockUnit.HOURS).later(Timezone.of(berlin)));
+     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
      *  System.out.println(start.until(end, TimeUnit.HOURS));
-     *  // Ausgabe: 4
-     *  // (5 lokale Stunden &auml;quivalent zu 4 physikalischen Stunden)
+     *  // Ausgabe: 4 (physikalische Stunden)
+     *  System.out.println(
+     *      Duration.in(berlin, ClockUnit.HOURS).between(start, end));
+     *  // Ausgabe: PT5 (lokale Stunden, dabei eine Sommerzeitumstellung)
      * <pre>
      *
      * @param   timezone    timezone id
      * @return  operator applicable on {@code Moment}-objects
      * @see     #earlier(Timezone)
+     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
      */
     public ChronoOperator<Moment> later(final Timezone timezone) {
 
@@ -3040,6 +3082,85 @@ public final class Duration<U extends IsoUnit>
             }
 
             this.nanosSet = true;
+
+        }
+
+    }
+
+    /**
+     * <p>Represents a way to evaluate a local respectively a zonal duration
+     * between two absolute unix timestamps. </p>
+     *
+     * @param   <U> generic type of time units
+     * @since   1.2
+     */
+    /*[deutsch]
+     * <p>Stellt eine Methode zum Ermitteln der lokalen beziehungsweise
+     * zonalen Dauer zwischen zwei absoluten UNIX-Zeitstempeln bereit. </p>
+     *
+     * @param   <U> generic type of time units
+     * @since   1.2
+     */
+    public static final class ZonalMetric<U extends IsoUnit> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final Timezone tz;
+        private final TimeMetric<U, Duration<U>> metric;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private ZonalMetric(
+            Timezone tz,
+            U... units
+        ) {
+            super();
+
+            if (tz == null) {
+                throw new NullPointerException("Missing timezone.");
+            }
+
+            this.tz = tz;
+            this.metric = new Metric<U>(units);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Evaluates the zonal duration between given two absolute
+         * moments in time. </p>
+         *
+         * <p>The physical duration can deviate due to timezone offset
+         * jumps. UTC-leapseconds are ignored, too. </p>
+         *
+         * @param   start       start time as unix timestamp
+         * @param   end         end time as unix timestamp
+         * @return  zonal duration
+         */
+        /*[deutsch]
+         * <p>Ermittelt die zonale Dauer zwischen den angegebenen
+         * UNIX-Zeitstempeln. </p>
+         *
+         * <p>Die physikalische Dauer kann wegen Zeitzonen-Spr&uuml;ngen
+         * davon abweichen. UTC-Schaltsekunden werden ebenfalls ignoriert. </p>
+         *
+         * @param   start       start time as unix timestamp
+         * @param   end         end time as unix timestamp
+         * @return  zonal duration
+         */
+        public Duration<U> between(
+            UnixTime start,
+            UnixTime end
+        ) {
+
+            Moment u1 = Moment.from(start);
+            Moment u2 = Moment.from(end);
+
+            PlainTimestamp t1 = PlainTimestamp.from(u1, this.tz.getOffset(u1));
+            PlainTimestamp t2 = PlainTimestamp.from(u2, this.tz.getOffset(u2));
+
+            return this.metric.between(t1, t2);
 
         }
 

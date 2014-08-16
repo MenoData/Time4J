@@ -85,17 +85,29 @@ public class MomentArithmeticTest {
     }
 
     @Test
-    public void hourShiftBerlin() {
-        Timezone tz = Timezone.of("Europe/Berlin");
+    public void realHourShiftBerlin() {
+        Timezone berlin = Timezone.of("Europe/Berlin");
         Moment start =
-            PlainDate.of(2014, Month.MARCH, 30)
-            .atStartOfDay().at(tz);
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(tz)
-                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
+                .at(berlin)
+                .with(Duration.of(5, ClockUnit.HOURS).later(berlin));
         assertThat(start.until(end, TimeUnit.HOURS), is(4L)); // DST-jump
+    }
+
+    @Test
+    public void localHourShiftBerlin() {
+        Timezone berlin = Timezone.of("Europe/Berlin");
+        Moment start =
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
+        Moment end =
+            PlainDate.of(2014, Month.MARCH, 30).atTime(5, 0).at(berlin);
+        assertThat(
+            Duration.in(berlin, ClockUnit.HOURS).between(start, end),
+            is(Duration.of(5, ClockUnit.HOURS))
+        );
     }
 
     @Test
