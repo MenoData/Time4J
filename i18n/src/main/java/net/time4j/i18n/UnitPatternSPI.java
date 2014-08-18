@@ -29,15 +29,17 @@ import java.util.Set;
 
 
 /**
- * <p>Service-Provider-Implementation for accessing localized unit patterns. </p>
+ * <p>Service-Provider-Implementation for accessing localized unit
+ * patterns. </p>
  *
- * <p>The underlying properties files are located in the folder &quot;i18n&quot; relative
- * to class path and are encoded in UTF-8. The basic bundle names are &quot;years&quot;
- * &quot;months&quot;, &quot;weeks&quot;, &quot;days&quot;, &quot;hours&quot;,
- * &quot;minutes&quot; and &quot;seconds&quot;. This class uses a modified fallback
- * algorithm for searching the right properties file as documented in 
- * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance" target="_blank">CLDR</a>
- * published by unicode consortium. </p>
+ * <p>The underlying properties files are located in the folder
+ * &quot;i18n&quot; relative to class path and are encoded in UTF-8. The basic
+ * bundle names are &quot;years&quot; &quot;months&quot;, &quot;weeks&quot;,
+ * &quot;days&quot;, &quot;hours&quot;, &quot;minutes&quot; and
+ * &quot;seconds&quot;. This class uses a modified fallback algorithm
+ * for searching the right properties file as documented in
+ * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
+ * target="_blank">CLDR</a> published by unicode consortium. </p>
  *
  * @author  Meno Hochschild
  */
@@ -45,18 +47,19 @@ import java.util.Set;
  * <p>Service-Provider-Implementierung f&uuml;r den Zugang zu lokalisierten
  * Zeiteinheitsmustern. </p>
  *
- * <p>Die zugrundeliegenden properties-Dateien liegen im Ordner &quot;i18n&quot; relativ
- * zum Klassenpfad und sind in UTF-8 kodiert. Die Basisnamen der Dateien sind &quot;years&quot;
- * &quot;months&quot;, &quot;weeks&quot;, &quot;days&quot;, &quot;hours&quot;,
- * &quot;minutes&quot; und &quot;seconds&quot;. Diese Klasse verwendet einen ge&auml;nderten
- * Suchalgorithmus, um die richtige properties-Datei zu erhalten - dokumentiert in
- * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance" target="_blank">CLDR</a>
- * ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
+ * <p>Die zugrundeliegenden properties-Dateien liegen im Ordner
+ * &quot;i18n&quot; relativ zum Klassenpfad und sind in UTF-8 kodiert. Die
+ * Basisnamen der Dateien sind &quot;years&quot; &quot;months&quot;,
+ * &quot;weeks&quot;, &quot;days&quot;, &quot;hours&quot;, &quot;minutes&quot;
+ * und &quot;seconds&quot;. Diese Klasse verwendet einen ge&auml;nderten
+ * Suchalgorithmus, um die richtige properties-Datei zu erhalten - dokumentiert
+ * in <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
+ * target="_blank">CLDR</a> ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
  *
  * @author  Meno Hochschild
  */
 public final class UnitPatternSPI {
-    
+
     //~ Methoden ----------------------------------------------------------
 
     /**
@@ -81,11 +84,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "years");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of months. </p>
@@ -108,11 +111,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "months");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of weeks. </p>
@@ -135,11 +138,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "weeks");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of days. </p>
@@ -162,11 +165,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "days");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of hours. </p>
@@ -189,11 +192,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "hours");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of minutes. </p>
@@ -216,11 +219,11 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "minutes");
-        
+
     }
-    
+
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of seconds. </p>
@@ -243,31 +246,32 @@ public final class UnitPatternSPI {
         Locale language,
         PluralCategory category
     ) {
-        
+
         return this.getUnitPattern(language, category, "seconds");
-        
+
     }
-    
+
     private String getUnitPattern(
-        Locale language,
+        Locale lang,
         PluralCategory category,
         String baseBundleName
     ) {
-    
+
         ClassLoader loader = this.getClass().getClassLoader();
-        ResourceBundle.Control control = UnitPatternControl.getInstance(category);
+        ResourceBundle.Control control =
+            UnitPatternControl.getInstance(category);
         ResourceBundle rb =
-            ResourceBundle.getBundle(baseBundleName, language, loader, control);
-        
+            ResourceBundle.getBundle(baseBundleName, lang, loader, control);
+
         Set<String> keys = UnitPatternBundle.class.cast(rb).getInternalKeys();
         String key = category.name();
-        
-        if (!keys.containsKey(key)) {
+
+        if (!keys.contains(key)) {
             key = PluralCategory.OTHER.name();
         }
-        
+
         return rb.getString(key);
-        
+
     }
 
 }

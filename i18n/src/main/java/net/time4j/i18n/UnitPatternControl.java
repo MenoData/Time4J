@@ -47,11 +47,11 @@ import java.util.Set;
  */
 class UnitPatternControl
     extends ResourceBundle.Control {
-    
+
     //~ Statische Felder/Initialisierungen --------------------------------
-    
+
     private static final Map<PluralCategory, UnitPatternControl> CONTROLS;
-    
+
     static {
         Map<PluralCategory, UnitPatternControl> map =
             new EnumMap<PluralCategory, UnitPatternControl>(
@@ -61,18 +61,18 @@ class UnitPatternControl
         }
         CONTROLS = Collections.unmodifiableMap(map);
     }
-    
+
     //~ Instanzvariablen --------------------------------------------------
-    
+
     private final PluralCategory category;
-    
+
     //~ Konstruktoren -----------------------------------------------------
-    
+
     private UnitPatternControl(PluralCategory category) {
         super();
-        
+
         this.category = category;
-        
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -84,29 +84,29 @@ class UnitPatternControl
      * @return  cached bundle control instance
      */
     static UnitPatternControl getInstance(PluralCategory category) {
-    
+
         if (category == null) {
             throw new NullPointerException();
         }
-        
+
         return CONTROLS.get(category);
-        
+
     }
 
     @Override
     public Locale getFallbackLocale(
-        String baseName, 
+        String baseName,
         Locale locale
     ) {
-    
-	    if (baseName == null || locale == null) {
-		    throw new NullPointerException();
-	    }
-	    
-	    return null;
-	    
+
+        if (baseName == null || locale == null) {
+            throw new NullPointerException();
+        }
+
+        return null;
+
 	}
-	
+
     @Override
     public List<String> getFormats(String baseName) {
 
@@ -154,12 +154,12 @@ class UnitPatternControl
                             new InputStreamReader(stream, "UTF-8"));
                     UnitPatternBundle test = new UnitPatternBundle(reader);
                     Set<String> keys = test.getInternalKeys();
-                    
-                    if (test.containsKey(this.category.name())) {
+
+                    if (keys.contains(this.category.name())) {
                         bundle = test;
                     } else if (
                         (this.category != PluralCategory.OTHER)
-                        && test.containsKey(PluralCategory.OTHER.name())
+                        && keys.contains(PluralCategory.OTHER.name())
                     ) {
                         bundle = test;
                     }
