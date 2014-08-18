@@ -1689,6 +1689,20 @@ public final class CalendarText {
         //~ Methoden ------------------------------------------------------
 
         @Override
+        public Locale getFallbackLocale(
+            String baseName, 
+            Locale locale
+        ) {
+    
+	        if (baseName == null || locale == null) {
+		        throw new NullPointerException();
+	        }
+	    
+	        return null;
+	    
+	    }
+	
+        @Override
         public List<String> getFormats(String baseName) {
 
             return ResourceBundle.Control.FORMAT_PROPERTIES;
