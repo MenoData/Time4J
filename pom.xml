@@ -13,6 +13,7 @@
     <modules>
         <module>core</module>
         <module>olson</module>
+        <module>i18n</module>
     </modules>
     
     <licenses>
