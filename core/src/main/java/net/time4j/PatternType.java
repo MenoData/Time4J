@@ -262,7 +262,7 @@ public enum PatternType
      *      can only be applied on the type {@link Moment}. </td>
      *  </tr>
      *  <tr>
-     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
      *      <td>X</td>
      *      <td>One symbol: &#x00B1;HH[mm], two symbols: &#x00B1;HHmm, three
      *      symbols: &#x00B1;HH:mm, four symbols: &#x00B1;HHmm[ss[.{fraction}]],
@@ -271,7 +271,7 @@ public enum PatternType
      *      be used. </td>
      *  </tr>
      *  <tr>
-     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
      *      <td>x</td>
      *      <td>Like X but without the special char &quot;Z&quot; if the
      *      timezone offset is equal to {@code 0}. </td>
@@ -488,7 +488,7 @@ public enum PatternType
      *      nur auf den Typ {@link Moment} angewandt werden. </td>
      *  </tr>
      *  <tr>
-     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
      *      <td>X</td>
      *      <td>Ein Symbol: &#x00B1;HH[mm], zwei Symbole: &#x00B1;HHmm, drei
      *      Symbole: &#x00B1;HH:mm, vier Symbole: &#x00B1;HHmm[ss[.{fraction}]],
@@ -497,7 +497,7 @@ public enum PatternType
      *      &quot;Z&quot; verwendet. </td>
      *  </tr>
      *  <tr>
-     *      <td>ISO_TIMEZONE_OFFSET}</td>
+     *      <td>ISO_TIMEZONE_OFFSET</td>
      *      <td>x</td>
      *      <td>Wie X, aber ohne das Spezialzeichen &quot;Z&quot;, wenn der
      *      Zeitzonen-Offset gleich {@code 0} ist. </td>
