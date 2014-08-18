@@ -42,7 +42,7 @@ class UnitPatternBundle
      *
      * @param   reader  character stream from the property file
      */
-    PropertyResourceBundle(Reader reader) throws IOException {
+    UnitPatternBundle(Reader reader) throws IOException {
         super(reader);
         
     }
