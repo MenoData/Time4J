@@ -44,6 +44,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * &quot;common/supplemental/plurals.xml&quot;. </p>
  *
  * @author  Meno Hochschild
+ * @spec    All concrete classes must be immutable.
  */
 /*[deutsch]
  * <p>Hilfsklasse zur Bestimmung der Pluralkategorie f&uuml;r eine gegebene
@@ -57,6 +58,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * gefunden werden. </p>
  *
  * @author  Meno Hochschild
+ * @spec    All concrete classes must be immutable.
  */
 public abstract class PluralRules {
 
@@ -64,7 +66,7 @@ public abstract class PluralRules {
 
     private static final Map<String, PluralRules> LANGUAGE_MAP =
         new ConcurrentHashMap<String, PluralRules>(140);
-    private static final PluralRules STD_RULES = new CLDRPluralRules(0);
+    private static final PluralRules STD_RULES = new CLDR(0);
 
     static {
         Map<String, PluralRules> map = new HashMap<String, PluralRules>();
@@ -176,14 +178,14 @@ public abstract class PluralRules {
     ) {
 
         for (String language : languages.split(" ")) {
-            map.put(language, new CLDRPluralRules(id));
+            map.put(language, new CLDR(id));
         }
 
     }
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class CLDRPluralRules
+    private static class CLDR
         extends PluralRules {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -192,7 +194,7 @@ public abstract class PluralRules {
 
         //~ Konstruktoren -------------------------------------------------
 
-        private CLDRPluralRules(int id) {
+        private CLDR(int id) {
             super();
 
             this.id = id;
