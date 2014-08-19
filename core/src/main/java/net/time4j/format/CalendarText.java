@@ -99,6 +99,8 @@ public final class CalendarText {
 
     private static final ConcurrentMap<String, CalendarText> CACHE =
         new ConcurrentHashMap<String, CalendarText>();
+    private static final ResourceBundle.Control CONTROL =
+    	new UTF8NoFallbackControl();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -128,6 +130,7 @@ public final class CalendarText {
 
         this.provider = p.toString();
 
+		// Allgemeine Textformen als optionales Bundle vorbereiten
         ResourceBundle rb = null;
         MissingResourceException tmpMre = null;
 
@@ -136,7 +139,7 @@ public final class CalendarText {
                 ResourceBundle.getBundle(
                     "data/" + calendarType,
                     locale,
-                    new PropertiesControl());
+                    CONTROL);
         } catch (MissingResourceException ex) {
             tmpMre = ex;
         }
@@ -144,6 +147,7 @@ public final class CalendarText {
         this.textForms = rb;
         this.mre = tmpMre;
 
+		// Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
             Collections.unmodifiableMap(
                 getMonths(calendarType, locale, p, false));
@@ -287,7 +291,7 @@ public final class CalendarText {
                 cl = Provider.class.getClassLoader();
             }
 
-            // ServiceLoader-Mechanismus
+            // ServiceLoader-Mechanismus (Suche nach externen Providern)
             for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
@@ -310,8 +314,11 @@ public final class CalendarText {
                     p = tmp;
                 }
 
+                // if (p == null) {
+                    // TODO: Provider mit Zugriff auf data/{calendar-type}!
+                // }
+
                 if (p == null) {
-                    // TODO: Provider mit Zugriff auf data/calendar-type!
                     p = new FallbackProvider();
                 }
             }
@@ -627,8 +634,7 @@ public final class CalendarText {
         V[] enums = element.getType().getEnumConstants();
         int len = enums.length;
         String[] tfs = new String[len];
-        String skey = element.name();
-        StringBuilder sb = new StringBuilder(skey);
+        StringBuilder sb = new StringBuilder(element.name());
 
         if (
             (variants != null)
@@ -649,17 +655,18 @@ public final class CalendarText {
         String raw = sb.toString();
 
         for (int i = 0; i < len; i++) {
-            StringBuilder keyBuilder = new StringBuilder(raw);
-            keyBuilder.append('_');
-            keyBuilder.append(i + 1);
-            String vkey = keyBuilder.toString();
+            String vkey = toKey(raw, i);
 
             if (this.textForms.containsKey(vkey)) {
                 tfs[i] = this.textForms.getString(vkey);
-            } else if (this.textForms.containsKey(skey)) {
-                tfs[i] = this.textForms.getString(skey);
             } else {
-                tfs[i] = enums[i].name();
+            	String skey = toKey(element.name(), i);
+            	
+            	if (this.textForms.containsKey(skey)) {
+                	tfs[i] = this.textForms.getString(skey);
+                } else {
+                	tfs[i] = enums[i].name();
+                }
             }
         }
 
@@ -821,6 +828,18 @@ public final class CalendarText {
         return false;
 
     }
+    
+    private static final String toKey(
+    	String raw,
+    	int counter
+    ) {
+    	
+        StringBuilder keyBuilder = new StringBuilder(raw);
+        keyBuilder.append('_');
+        keyBuilder.append(counter + 1);
+        return keyBuilder.toString();
+    	
+    }
 
     //~ Innere Interfaces -------------------------------------------------
 
@@ -832,7 +851,7 @@ public final class CalendarText {
      * <p>The motivation is mainly to override the language-dependent forms
      * of JDK-defaults with respect to standard elements like months, weekdays
      * etc. Specific text forms which are not contained in JDK will instead
-     * be supplied by help of property filed in the &quot;data&quot;-folder. </p>
+     * be supplied by help of properties-files in the &quot;data&quot;-folder. </p>
      *
      * @author  Meno Hochschild
      * @spec    Implementations must have a public no-arg constructor.
@@ -1320,14 +1339,14 @@ public final class CalendarText {
                     String[] names = new String[12];
 
                     for (int m = 0; m < 12; m++) {
-                        StringBuilder skey = new StringBuilder();
-                        skey.append("MONTH_OF_YEAR(");
-                        skey.append(textWidth);
-                        skey.append('|');
-                        skey.append(outputContext);
-                        skey.append(")_");
-                        skey.append(m + 1);
-                        names[m] = rb.getString(skey.toString());
+                        StringBuilder b = new StringBuilder();
+                        b.append("MONTH_OF_YEAR(");
+                        b.append(textWidth);
+                        b.append('|');
+                        b.append(outputContext);
+                        b.append(")_");
+                        b.append(m + 1);
+                        names[m] = rb.getString(b.toString());
                     }
 
                     return names;
@@ -1385,18 +1404,18 @@ public final class CalendarText {
                 boolean useFallback = false;
 
                 for (int q = 0; q < 4; q++) {
-                    StringBuilder skey = new StringBuilder();
-                    skey.append("QUARTER_OF_YEAR(");
-                    skey.append(textWidth);
+                    StringBuilder b = new StringBuilder();
+                    b.append("QUARTER_OF_YEAR(");
+                    b.append(textWidth);
                     if (outputContext == OutputContext.STANDALONE) {
-                        skey.append('|');
-                        skey.append(outputContext);
+                        b.append('|');
+                        b.append(outputContext);
                     }
-                    skey.append(")_");
-                    skey.append(q + 1);
+                    b.append(")_");
+                    b.append(q + 1);
 
                     try {
-                        names[q] = rb.getString(skey.toString());
+                        names[q] = rb.getString(b.toString());
                     } catch (MissingResourceException ex) {
                         useFallback = true;
                         break;
@@ -1406,7 +1425,6 @@ public final class CalendarText {
                 if (!useFallback) {
                     return names;
                 }
-
             }
 
             return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
@@ -1432,14 +1450,14 @@ public final class CalendarText {
                     String[] names = new String[7];
 
                     for (int d = 0; d < 7; d++) {
-                        StringBuilder skey = new StringBuilder();
-                        skey.append("DAY_OF_WEEK(");
-                        skey.append(textWidth);
-                        skey.append('|');
-                        skey.append(outputContext);
-                        skey.append(")_");
-                        skey.append(d + 1);
-                        names[d] = rb.getString(skey.toString());
+                        StringBuilder b = new StringBuilder();
+                        b.append("DAY_OF_WEEK(");
+                        b.append(textWidth);
+                        b.append('|');
+                        b.append(outputContext);
+                        b.append(")_");
+                        b.append(d + 1);
+                        names[d] = rb.getString(b.toString());
                     }
 
                     return names;
@@ -1578,7 +1596,7 @@ public final class CalendarText {
                 return ResourceBundle.getBundle(
                     "data/" + ISO_CALENDAR_TYPE,
                     locale,
-                    new PropertiesControl());
+                    CONTROL);
             } catch (MissingResourceException ex) {
                 return null;
             }
@@ -1683,7 +1701,7 @@ public final class CalendarText {
 
     }
 
-    private static class PropertiesControl
+    private static class UTF8NoFallbackControl
         extends ResourceBundle.Control {
 
         //~ Methoden ------------------------------------------------------
@@ -1693,14 +1711,14 @@ public final class CalendarText {
             String baseName, 
             Locale locale
         ) {
-    
-	        if (baseName == null || locale == null) {
-		        throw new NullPointerException();
-	        }
-	    
+        	
+        	if (baseName == null || locale == null) {
+        		throw new NullPointerException();
+        	}
+        	
 	        return null;
-	    
-	    }
+
+        }
 	
         @Override
         public List<String> getFormats(String baseName) {
