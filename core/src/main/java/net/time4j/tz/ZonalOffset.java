@@ -801,9 +801,7 @@ public final class ZonalOffset
     }
 
     /**
-     * @serialData  Uses
-     *              <a href="../../../serialized-form.html#net.time4j.tz.SPX">
-     *              a specialized serialisation form</a> as proxy. The format
+     * @serialData  Uses a specialized serialisation form as proxy. The format
      *              is bit-compressed. The first byte contains in the four
      *              most significant bits the type id {@code 15}. If there is
      *              any fractional part then the four least significant bits
