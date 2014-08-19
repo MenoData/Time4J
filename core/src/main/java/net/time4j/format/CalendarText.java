@@ -1490,20 +1490,26 @@ public final class CalendarText {
                             String[] names = new String[7];
 
                             for (int d = 0; d < 7; d++) {
-                                StringBuilder skey = new StringBuilder();
-                                skey.append("DAY_OF_WEEK(SHORT)_");
-                                skey.append(d + 1);
-                                names[d] = rb.getString(skey.toString());
+                                StringBuilder b = new StringBuilder();
+                                b.append("DAY_OF_WEEK(SHORT)_");
+                                b.append(d + 1);
+                                String key = b.toString();
+                                if (rb.containsKey(key)) {
+                                    names[d] = rb.getString(key);
+                                } else {
+                                    names[d] = result[d]; // JDK-Quelle
+                                }
                             }
 
                             result = names;
                         } catch (MissingResourceException mre) {
-                            // no-op
+                            throw new AssertionError("Should not happen.");
                         }
                     }
                     break;
                 case NARROW:
-                    String[] weekdays = dfs.getShortWeekdays();
+                    String[] weekdays = 
+                        weekdays(calendarType, locale, TextWidth.SHORT, OutputContext.FORMAT);
                     String[] ret = new String[weekdays.length];
                     for (int i = 1; i < weekdays.length; i++) {
                         if (!weekdays[i].isEmpty()) {
