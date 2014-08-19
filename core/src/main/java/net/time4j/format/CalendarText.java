@@ -678,12 +678,14 @@ public final class CalendarText {
      * <p>Yields the localized GMT-prefix which is used in the
      * <i>localized GMT format</i> of CLDR. </p>
      *
+     * @param 	locale 	language and country configuration
      * @return  localized GMT-String defaults to &quot;GMT&quot;
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte GMT-Pr&auml;fix, das im
      * <i>localized GMT format</i> von CLDR benutzt wird. </p>
      *
+     * @param 	locale 	language and country configuration
      * @return  localized GMT-String defaults to &quot;GMT&quot;
      */
     public static String getGMTPrefix(Locale locale) {
@@ -1404,7 +1406,7 @@ public final class CalendarText {
                 boolean useFallback = false;
                 
                 if (textWidth == TextWidth.SHORT) {
-                	textWidth = TextWidth.ABBREVIATED;
+                    textWidth = TextWidth.ABBREVIATED;
                 }
 
                 for (int q = 0; q < 4; q++) {
@@ -1717,7 +1719,7 @@ public final class CalendarText {
         ) {
         	
         	if (baseName == null || locale == null) {
-        		throw new NullPointerException();
+        	    throw new NullPointerException();
         	}
         	
 	        return null;
