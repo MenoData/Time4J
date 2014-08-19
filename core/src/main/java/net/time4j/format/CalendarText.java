@@ -657,7 +657,7 @@ public final class CalendarText {
                 tfs[i] = this.textForms.getString(vkey);
             } else {
             	String skey = toKey(element.name(), i);
-            	
+
             	if (this.textForms.containsKey(skey)) {
                 	tfs[i] = this.textForms.getString(skey);
                 } else {
@@ -826,17 +826,17 @@ public final class CalendarText {
         return false;
 
     }
-    
+
     private static final String toKey(
     	String raw,
     	int counter
     ) {
-    	
+
         StringBuilder keyBuilder = new StringBuilder(raw);
         keyBuilder.append('_');
         keyBuilder.append(counter + 1);
         return keyBuilder.toString();
-    	
+
     }
 
     //~ Innere Interfaces -------------------------------------------------
@@ -1400,7 +1400,7 @@ public final class CalendarText {
 
                 String[] names = new String[4];
                 boolean useFallback = false;
-                
+
                 if (textWidth == TextWidth.SHORT) {
                     textWidth = TextWidth.ABBREVIATED;
                 }
@@ -1479,10 +1479,11 @@ public final class CalendarText {
                     result = dfs.getShortWeekdays();
                     break;
                 case SHORT:
-                    result = dfs.getShortWeekdays();
+                    result = dfs.getShortWeekdays(); // 8 Elemente!!!
 
                     if (rb != null) {
                         String[] names = new String[7];
+                        boolean hasData = true;
 
                         for (int d = 0; d < 7; d++) {
                             StringBuilder b = new StringBuilder();
@@ -1492,18 +1493,25 @@ public final class CalendarText {
                             if (rb.containsKey(key)) {
                                 names[d] = rb.getString(key);
                             } else {
-                                names[d] = result[d]; // JDK-Quelle
+                                hasData = false;
+                                break;
                             }
                         }
 
-                        result = names;
+                        if (hasData) {
+                            result = names;
+                        }
                     }
                     break;
                 case NARROW:
-                    String[] weekdays = 
-                        weekdays(calendarType, locale, TextWidth.SHORT, OutputContext.FORMAT);
+                    String[] weekdays = // 7 Elemente
+                        weekdays(
+                            calendarType,
+                            locale,
+                            TextWidth.SHORT,
+                            OutputContext.FORMAT);
                     String[] ret = new String[weekdays.length];
-                    for (int i = 1; i < weekdays.length; i++) {
+                    for (int i = 0; i < weekdays.length; i++) {
                         if (!weekdays[i].isEmpty()) {
                             ret[i] = toLatinLetter(weekdays[i]);
                         } else {
@@ -1519,12 +1527,14 @@ public final class CalendarText {
 
             if (result.length == 8) { // ISO-Reihenfolge erzwingen
                 String sunday = result[1];
+                String[] arr = new String[7];
 
                 for (int i = 2; i < 8; i++) {
-                    result[i - 2] = result[i];
+                    arr[i - 2] = result[i];
                 }
 
-                result[6] = sunday;
+                arr[6] = sunday;
+                result = arr;
             }
 
             return result;
@@ -1712,18 +1722,18 @@ public final class CalendarText {
 
         @Override
         public Locale getFallbackLocale(
-            String baseName, 
+            String baseName,
             Locale locale
         ) {
-        	
+
         	if (baseName == null || locale == null) {
         	    throw new NullPointerException();
         	}
-        	
+
 	        return null;
 
         }
-	
+
         @Override
         public List<String> getFormats(String baseName) {
 

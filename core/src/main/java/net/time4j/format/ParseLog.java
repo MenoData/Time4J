@@ -277,7 +277,7 @@ public class ParseLog {
 
         if (errorIndex >= 0) {
             this.errorMessage = (
-                errorMessage.isEmpty()
+                ((errorMessage == null) || errorMessage.isEmpty())
                 ? ("Error occurred at position: " + errorIndex)
                 : errorMessage);
         } else {

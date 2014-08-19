@@ -319,7 +319,7 @@ public class Iso8601FormatTest {
                 .at(PlainTime.of(23, 59, 59))
                 .atUTC()
                 .plus(1, SI.SECONDS)),
-            is("2012-07-01T01:59:60+02"));
+            is("2012-07-01T01:59:60+02:00"));
     }
 
     @Test
