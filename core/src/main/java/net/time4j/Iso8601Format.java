@@ -213,7 +213,7 @@ public class Iso8601Format {
     /**
      * <p>Defines the <i>extended</i> ISO-8601-format for a composition of
      * calendar date, wall time and timezone offset using the pattern
-     * &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]X&quot;. </p>
+     * &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]XXX&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
      * the count of decimal digits is flexible (0-9). </p>
@@ -221,7 +221,7 @@ public class Iso8601Format {
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Kombination aus Kalenderdatum, Uhrzeit mit Stunde und Minute und Offset
-     * im Muster &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]X&quot;. </p>
+     * im Muster &quot;uuuu-MM-dd'T'HH:mm[:ss[,SSSSSSSSS]]XXX&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
      * Dezimalstellen ist variabel (0-9). </p>
@@ -343,7 +343,7 @@ public class Iso8601Format {
         addSeconds(builder, extended);
 
         builder.addTimezoneOffset(
-            DisplayMode.SHORT,
+            (extended ? DisplayMode.MEDIUM : DisplayMode.SHORT),
             extended,
             Collections.singletonList("Z"));
 
