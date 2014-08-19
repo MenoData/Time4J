@@ -130,7 +130,7 @@ public final class CalendarText {
 
         this.provider = p.toString();
 
-		// Allgemeine Textformen als optionales Bundle vorbereiten
+	// Allgemeine Textformen als optionales Bundle vorbereiten
         ResourceBundle rb = null;
         MissingResourceException tmpMre = null;
 
@@ -147,7 +147,7 @@ public final class CalendarText {
         this.textForms = rb;
         this.mre = tmpMre;
 
-		// Monate, Quartale, Wochentage, Äras und AM/PM
+	// Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
             Collections.unmodifiableMap(
                 getMonths(calendarType, locale, p, false));
@@ -1402,6 +1402,10 @@ public final class CalendarText {
 
                 String[] names = new String[4];
                 boolean useFallback = false;
+                
+                if (textWidth == TextWidth.SHORT) {
+                	textWidth = TextWidth.ABBREVIATED;
+                }
 
                 for (int q = 0; q < 4; q++) {
                     StringBuilder b = new StringBuilder();
