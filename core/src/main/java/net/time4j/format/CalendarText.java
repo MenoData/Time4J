@@ -314,10 +314,6 @@ public final class CalendarText {
                     p = tmp;
                 }
 
-                // if (p == null) {
-                    // TODO: Provider mit Zugriff auf data/{calendar-type}!
-                // }
-
                 if (p == null) {
                     p = new FallbackProvider();
                 }
@@ -1486,25 +1482,21 @@ public final class CalendarText {
                     result = dfs.getShortWeekdays();
 
                     if (rb != null) {
-                        try {
-                            String[] names = new String[7];
+                        String[] names = new String[7];
 
-                            for (int d = 0; d < 7; d++) {
-                                StringBuilder b = new StringBuilder();
-                                b.append("DAY_OF_WEEK(SHORT)_");
-                                b.append(d + 1);
-                                String key = b.toString();
-                                if (rb.containsKey(key)) {
-                                    names[d] = rb.getString(key);
-                                } else {
-                                    names[d] = result[d]; // JDK-Quelle
-                                }
+                        for (int d = 0; d < 7; d++) {
+                            StringBuilder b = new StringBuilder();
+                            b.append("DAY_OF_WEEK(SHORT)_");
+                            b.append(d + 1);
+                            String key = b.toString();
+                            if (rb.containsKey(key)) {
+                                names[d] = rb.getString(key);
+                            } else {
+                                names[d] = result[d]; // JDK-Quelle
                             }
-
-                            result = names;
-                        } catch (MissingResourceException mre) {
-                            throw new AssertionError("Should not happen.");
                         }
+
+                        result = names;
                     }
                     break;
                 case NARROW:
