@@ -72,6 +72,7 @@ import static net.time4j.PlainTime.*;
  * this class: </p>
  *
  * <ul>
+ *  <li>{@link PlainDate#COMPONENT}</li>
  *  <li>{@link PlainDate#YEAR}</li>
  *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
  *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
@@ -82,6 +83,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
  *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
  *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link PlainTime#COMPONENT}</li>
  *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
@@ -116,6 +118,7 @@ import static net.time4j.PlainTime.*;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
+ *  <li>{@link PlainDate#COMPONENT}</li>
  *  <li>{@link PlainDate#YEAR}</li>
  *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
  *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
@@ -126,6 +129,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
  *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
  *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
+ *  <li>{@link PlainTime#COMPONENT}</li>
  *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>

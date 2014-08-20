@@ -21,8 +21,10 @@
 
 package net.time4j;
 
+import net.time4j.base.UnixTime;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.Chronology;
 
 import java.io.ObjectStreamException;
 
@@ -96,6 +98,19 @@ final class DateElement
     public boolean isTimeElement() {
 
         return false;
+
+    }
+
+    @Override
+    protected String getVeto(Chronology<?> chronology) {
+
+        if (UnixTime.class.isAssignableFrom(chronology.getChronoType())) {
+            return "Accessing the calendar date component from a global type "
+                   + "requires a timezone. Try to first convert the global "
+                   + "type to a PlainTimestamp: \"moment.inZonalView(...)\".";
+        }
+        
+        return null;
 
     }
 

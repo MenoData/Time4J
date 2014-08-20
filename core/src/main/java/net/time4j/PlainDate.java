@@ -80,6 +80,7 @@ import java.util.Set;
  * this class: </p>
  *
  * <ul>
+ *  <li>{@link #COMPONENT}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_QUARTER}</li>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -111,6 +112,7 @@ import java.util.Set;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
+ *  <li>{@link #COMPONENT}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_QUARTER}</li>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -185,11 +187,38 @@ public final class PlainDate
         DAY_OF_LEAP_YEAR_PER_MONTH[11] = 366;
     }
 
+    /** Datumskomponente. */
+    static final ChronoElement<PlainDate> CALENDAR_DATE = DateElement.INSTANCE;
+
     /**
+     * <p>Element with the calendar date in the value range
+     * {@code [-999999999-01-01]} until {@code [+999999999-12-31]}. </p>
+     *
+     * <p>Example of usage: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
+     *  tsp = tsp.with(PlainDate.COMPONENT, PlainDate.of(2015, 1, 1));
+     *  System.out.println(tsp); // output: 2015-01-01T14:30
+     * </pre>
+     *
+     * @since   1.2
+     */
+    /*[deutsch]
      * <p>Element mit dem Datum im Wertebereich {@code [-999999999-01-01]}
      * bis {@code [+999999999-12-31]}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
+     *  tsp = tsp.with(PlainDate.COMPONENT, PlainDate.of(2015, 1, 1));
+     *  System.out.println(tsp); // output: 2015-01-01T14:30
+     * </pre>
+     *
+     * @since   1.2
      */
-    static final ChronoElement<PlainDate> CALENDAR_DATE = DateElement.INSTANCE;
+    public static final ChronoElement<PlainDate> COMPONENT = CALENDAR_DATE;
 
     /**
      * <p>Element with the proleptic iso-year without any era reference and

@@ -60,6 +60,16 @@ public class RuleNotFoundException
     /**
      * Erzeugt eine neue Instanz von <code>RuleNotFoundException</code>.
      *
+     * @param   veto        detailed error message
+     */
+    RuleNotFoundException(String veto) {
+        super(veto);
+
+    }
+
+    /**
+     * Erzeugt eine neue Instanz von <code>RuleNotFoundException</code>.
+     *
      * @param   chronology  chronology a rule was searched for in vain
      * @param   unit        unit as reference for searched rule
      */

@@ -186,7 +186,7 @@ public class Chronology<T extends ChronoEntity<T>>
         } else {
             return (
                 this.isRegistered(element)
-                || (this.getDerivedRule(element) != null)
+                || (this.getDerivedRule(element, false) != null)
                 || (this.getEpochRule(element) != null)
             );
         }
@@ -410,7 +410,7 @@ public class Chronology<T extends ChronoEntity<T>>
         ElementRule<?, ?> rule = this.ruleMap.get(element);
 
         if (rule == null) {
-            rule = this.getDerivedRule(element);
+            rule = this.getDerivedRule(element, true);
 
             if ((rule == null) && withEpochMechanism) {
                 rule = this.getEpochRule(element);
@@ -426,11 +426,21 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     // optional
-    private <V> ElementRule<T, V> getDerivedRule(ChronoElement<V> element) {
+    private <V> ElementRule<T, V> getDerivedRule(
+        ChronoElement<V> element,
+        boolean wantsVeto
+    ) {
 
         if (element instanceof BasicElement) {
             BasicElement<V> e = (BasicElement<V>) element;
-            return e.derive(this);
+
+            String veto = (wantsVeto ? e.getVeto(this) : null);
+
+            if (veto == null) {
+                return e.derive(this);
+            } else {
+                throw new RuleNotFoundException(veto);
+            }
         }
 
         return null;

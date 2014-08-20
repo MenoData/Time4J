@@ -241,4 +241,24 @@ public abstract class BasicElement<V>
 
     }
 
+    /**
+     * <p>Falls dieses Element in der angegebenen Chronologie nicht registriert
+     * ist, wird diese Methode aufgerufen, um eine passende Veto-Fehlermeldung
+     * zu generieren, wenn dieses Element nicht den Kontext unterst&uuml;tzen
+     * soll. </p>
+     *
+     * <p>Diese Implementierung liefert {@code null}, um anzuzeigen, da&szlig;
+     * per Standard kein Veto gegen den Gebrauch dieses Elements in der
+     * angegebenen Chronologie eingelegt wird. </p>
+     *
+     * @param   chronology      chronologischer Kontext
+     * @return  Fehlermeldung als Veto oder {@code null}
+     * @since   1.2
+     */
+    protected String getVeto(Chronology<?> chronology) {
+
+        return null;
+
+    }
+
 }

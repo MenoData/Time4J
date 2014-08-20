@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,
         OperatorSuite.class,

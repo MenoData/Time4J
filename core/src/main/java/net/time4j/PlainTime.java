@@ -72,6 +72,7 @@ import java.util.Set;
  * this class: </p>
  *
  * <ul>
+ *  <li>{@link #COMPONENT}</li>
  *  <li>{@link #AM_PM_OF_DAY}</li>
  *  <li>{@link #CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
@@ -109,6 +110,7 @@ import java.util.Set;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
+ *  <li>{@link #COMPONENT}</li>
  *  <li>{@link #AM_PM_OF_DAY}</li>
  *  <li>{@link #CLOCK_HOUR_OF_AMPM}</li>
  *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
@@ -179,14 +181,52 @@ public final class PlainTime
     /** Maximalwert. */
     static final PlainTime MAX = HOURS[24];
 
+    /** Uhrzeitkomponente. */
+    static final ChronoElement<PlainTime> WALL_TIME = TimeElement.INSTANCE;
+
     /**
+     * <p>Element with the wall time in the value range
+     * {@code [T00:00:00,000000000]} until {@code [T24:00:00,000000000]}
+     * (inclusive in the context of {@code PlainTime} else exclusive). </p>
+     *
+     * <p>Example of usage: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp =
+     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *          .withDefault(
+     *              PlainTime.COMPONENT,
+     *              PlainTime.midnightAtStartOfDay())
+     *          .parse("2014-08-20");
+     *  System.out.println(tsp); // output: 2014-08-20T00
+     * </pre>
+     *
+     * <p>Note: This element does not define any base unit. </p>
+     *
+     * @since   1.2
+     */
+    /*[deutsch]
      * <p>Element mit der Uhrzeit im Wertebereich {@code [T00:00:00,000000000]}
      * bis {@code [T24:00:00,000000000]} (inklusive im Kontext von
      * {@code PlainTime}, sonst exklusive). </p>
      *
-     * <p>Dieses Element definiert keine Basiseinheit. </p>
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp =
+     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *          .withDefault(
+     *              PlainTime.COMPONENT,
+     *              PlainTime.midnightAtStartOfDay())
+     *          .parse("2014-08-20");
+     *  System.out.println(tsp); // output: 2014-08-20T00
+     * </pre>
+     *
+     * <p>Hinweis: Dieses Element definiert keine Basiseinheit. </p>
+     *
+     * @since   1.2
      */
-    static final ChronoElement<PlainTime> WALL_TIME = TimeElement.INSTANCE;
+    public static final ChronoElement<PlainTime> COMPONENT = WALL_TIME;
 
     /**
      * <p>Element with the half day section relative to noon (ante meridiem
