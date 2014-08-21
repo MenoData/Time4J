@@ -47,9 +47,6 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.time4j.format.TextWidth.ABBREVIATED;
-import static net.time4j.format.TextWidth.SHORT;
-
 
 /**
  * <p>Source for localized calendrical informations on enum basis like month
@@ -63,7 +60,9 @@ import static net.time4j.format.TextWidth.SHORT;
  *
  * <p>Furthermore, an instance of {@code CalendarText} can also access
  * the UTF-8 text resources in the folder &quot;data&quot; relative to
- * the class path which are not based on JDK-defaults. </p>
+ * the class path which are not based on JDK-defaults. In all ISO-systems
+ * the &quot;iso8601_{locale}.properties&quot;-files will override the
+ * JDK-defaults unless it is the ROOT-locale. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -80,7 +79,10 @@ import static net.time4j.format.TextWidth.SHORT;
  *
  * <p>Dar&uuml;berhinaus kann eine Instanz von {@code CalendarText} auch
  * auf UTF-8-Textressourcen im Verzeichnis &quot;data&quot; innerhalb des
- * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. </p>
+ * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. F&uuml;r
+ * alle ISO-Systeme gilt, da&szlig; die Eintr&auml;ge in den Dateien
+ * &quot;iso8601_{locale}.properties&quot; die JDK-Vorgaben
+ * &uuml;berschreiben, sofern es nicht die ROOT-locale ist. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -130,7 +132,7 @@ public final class CalendarText {
 
         this.provider = p.toString();
 
-	// Allgemeine Textformen als optionales Bundle vorbereiten
+	    // Allgemeine Textformen als optionales Bundle vorbereiten
         ResourceBundle rb = null;
         MissingResourceException tmpMre = null;
 
@@ -139,6 +141,7 @@ public final class CalendarText {
                 ResourceBundle.getBundle(
                     "data/" + calendarType,
                     locale,
+                    getLoader(),
                     CONTROL);
         } catch (MissingResourceException ex) {
             tmpMre = ex;
@@ -147,7 +150,7 @@ public final class CalendarText {
         this.textForms = rb;
         this.mre = tmpMre;
 
-	// Monate, Quartale, Wochentage, Äras und AM/PM
+	    // Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
             Collections.unmodifiableMap(
                 getMonths(calendarType, locale, p, false));
@@ -305,7 +308,7 @@ public final class CalendarText {
             // Java-Ressourcen
             if (p == null) {
                 // TODO: Für Java 8 neuen Provider definieren (mit Quartalen)?
-                Provider tmp = new OldJdkProvider();
+                Provider tmp = new Iso8601Provider();
 
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
@@ -827,7 +830,7 @@ public final class CalendarText {
 
     }
 
-    private static final String toKey(
+    private static String toKey(
     	String raw,
     	int counter
     ) {
@@ -838,6 +841,18 @@ public final class CalendarText {
         return keyBuilder.toString();
 
     }
+
+	private static ClassLoader getLoader() {
+
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+		if (cl == null) {
+			cl = CalendarText.class.getClassLoader();
+		}
+
+		return cl;
+
+	}
 
     //~ Innere Interfaces -------------------------------------------------
 
@@ -1298,7 +1313,7 @@ public final class CalendarText {
 
     }
 
-    private static class OldJdkProvider
+    private static class Iso8601Provider
         implements Provider {
 
         //~ Methoden ------------------------------------------------------
@@ -1326,34 +1341,26 @@ public final class CalendarText {
             boolean leapForm
         ) {
 
-            try {
-                ResourceBundle rb = getBundle(locale);
+            ResourceBundle rb = getBundle(locale);
 
-                if (
-                    (rb != null)
-                    && (outputContext == OutputContext.STANDALONE)
-                    && "true".equals(rb.getObject("enableStandalone"))
-                ) {
-                    String[] names = new String[12];
-
-                    for (int m = 0; m < 12; m++) {
-                        StringBuilder b = new StringBuilder();
-                        b.append("MONTH_OF_YEAR(");
-                        b.append(textWidth);
-                        b.append('|');
-                        b.append(outputContext);
-                        b.append(")_");
-                        b.append(m + 1);
-                        names[m] = rb.getString(b.toString());
-                    }
-
-                    return names;
-                }
-            } catch (MissingResourceException ex) {
-                // continue standard case
+            if (rb != null) {
+            	String[] names;
+            	
+            	if (
+            		(outputContext == OutputContext.STANDALONE)
+            		&& "true".equals(rb.getObject("enableStandalone"))
+            	) {
+            		names = lookupBundle(rb, 12, "MONTH_OF_YEAR", textWidth, outputContext);
+            	} else {
+            		names = lookupBundle(rb, 12, "MONTH_OF_YEAR", textWidth);
+            	}
+            	
+            	if (names != null) {
+            		return names;
+            	}
             }
 
-            // Normalfall
+            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
             switch (textWidth) {
@@ -1364,8 +1371,8 @@ public final class CalendarText {
                     return dfs.getShortMonths();
                 case NARROW:
                     String[] months = dfs.getShortMonths();
-                    String[] ret = new String[months.length];
-                    for (int i = 0, n = months.length; i < n; i++) {
+                    String[] ret = new String[12];
+                    for (int i = 0; i < 12; i++) {
                         if (!months[i].isEmpty()) {
                             ret[i] = toLatinLetter(months[i]);
                         } else {
@@ -1390,43 +1397,24 @@ public final class CalendarText {
             ResourceBundle rb = getBundle(locale);
 
             if (rb != null) {
-                if (
-                    (outputContext == OutputContext.STANDALONE)
-                    && !"true".equals(rb.getObject("enableStandalone"))
-                ) {
-                    return quarters(
-                        calendarType, locale, textWidth, OutputContext.FORMAT);
-                }
-
-                String[] names = new String[4];
-                boolean useFallback = false;
-
                 if (textWidth == TextWidth.SHORT) {
                     textWidth = TextWidth.ABBREVIATED;
                 }
 
-                for (int q = 0; q < 4; q++) {
-                    StringBuilder b = new StringBuilder();
-                    b.append("QUARTER_OF_YEAR(");
-                    b.append(textWidth);
-                    if (outputContext == OutputContext.STANDALONE) {
-                        b.append('|');
-                        b.append(outputContext);
-                    }
-                    b.append(")_");
-                    b.append(q + 1);
-
-                    try {
-                        names[q] = rb.getString(b.toString());
-                    } catch (MissingResourceException ex) {
-                        useFallback = true;
-                        break;
-                    }
-                }
-
-                if (!useFallback) {
-                    return names;
-                }
+            	String[] names;
+            	
+            	if (
+            		(outputContext == OutputContext.STANDALONE)
+            		&& "true".equals(rb.getObject("enableStandalone"))
+            	) {
+            		names = lookupBundle(rb, 4, "QUARTER_OF_YEAR", textWidth, outputContext);
+            	} else {
+            		names = lookupBundle(rb, 4, "QUARTER_OF_YEAR", textWidth);
+            	}
+            	
+            	if (names != null) {
+            		return names;
+            	}
             }
 
             return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
@@ -1442,80 +1430,45 @@ public final class CalendarText {
         ) {
 
             ResourceBundle rb = getBundle(locale);
-
-            try {
-                if (
-                    (rb != null)
-                    && (outputContext == OutputContext.STANDALONE)
-                    && "true".equals(rb.getObject("enableStandalone"))
-                ) {
-                    String[] names = new String[7];
-
-                    for (int d = 0; d < 7; d++) {
-                        StringBuilder b = new StringBuilder();
-                        b.append("DAY_OF_WEEK(");
-                        b.append(textWidth);
-                        b.append('|');
-                        b.append(outputContext);
-                        b.append(")_");
-                        b.append(d + 1);
-                        names[d] = rb.getString(b.toString());
-                    }
-
-                    return names;
-                }
-            } catch (MissingResourceException ex) {
-                // continue standard case
+            
+            if (rb != null) {
+            	String[] names;
+            	
+            	if (
+            		(outputContext == OutputContext.STANDALONE)
+            		&& "true".equals(rb.getObject("enableStandalone"))
+            	) {
+            		names = lookupBundle(rb, 7, "DAY_OF_WEEK", textWidth, outputContext);
+            	} else {
+            		names = lookupBundle(rb, 7, "DAY_OF_WEEK", textWidth);
+            	}
+            	
+            	if (names != null) {
+            		return names;
+            	}
             }
 
+            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
             String[] result;
 
             switch (textWidth) {
                 case WIDE:
-                    result = dfs.getWeekdays();
+                    result = dfs.getWeekdays(); // 8 Elemente
                     break;
                 case ABBREVIATED:
-                    result = dfs.getShortWeekdays();
-                    break;
                 case SHORT:
-                    result = dfs.getShortWeekdays(); // 8 Elemente!!!
-
-                    if (rb != null) {
-                        String[] names = new String[7];
-                        boolean hasData = true;
-
-                        for (int d = 0; d < 7; d++) {
-                            StringBuilder b = new StringBuilder();
-                            b.append("DAY_OF_WEEK(SHORT)_");
-                            b.append(d + 1);
-                            String key = b.toString();
-                            if (rb.containsKey(key)) {
-                                names[d] = rb.getString(key);
-                            } else {
-                                hasData = false;
-                                break;
-                            }
-                        }
-
-                        if (hasData) {
-                            result = names;
-                        }
-                    }
+                    result = dfs.getShortWeekdays(); // 8 Elemente
                     break;
                 case NARROW:
                     String[] weekdays = // 7 Elemente
-                        weekdays(
-                            calendarType,
-                            locale,
-                            TextWidth.SHORT,
-                            OutputContext.FORMAT);
-                    String[] ret = new String[weekdays.length];
-                    for (int i = 0; i < weekdays.length; i++) {
+                        weekdays("", locale, TextWidth.SHORT, OutputContext.FORMAT);
+                    String[] ret = new String[7];
+                    for (int i = 0; i < 7; i++) {
                         if (!weekdays[i].isEmpty()) {
                             ret[i] = toLatinLetter(weekdays[i]);
                         } else {
-                            ret[i] = String.valueOf(i);
+                            ret[i] = String.valueOf(i + 1);
                         }
                     }
                     result = ret;
@@ -1525,7 +1478,7 @@ public final class CalendarText {
                         "Unknown text width: " + textWidth);
             }
 
-            if (result.length == 8) { // ISO-Reihenfolge erzwingen
+            if (result.length > 7) { // ISO-Reihenfolge erzwingen
                 String sunday = result[1];
                 String[] arr = new String[7];
 
@@ -1548,6 +1501,17 @@ public final class CalendarText {
             TextWidth textWidth
         ) {
 
+            ResourceBundle rb = getBundle(locale);
+            
+            if (rb != null) {
+            	String[] names = lookupBundle(rb, 2, "ERA", textWidth);
+            	
+            	if (names != null) {
+            		return names;
+            	}
+            }
+        	
+            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
             if (textWidth == TextWidth.NARROW) {
@@ -1577,14 +1541,23 @@ public final class CalendarText {
             Locale locale,
             TextWidth textWidth
         ) {
-
-            DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
-
-            if (textWidth == TextWidth.NARROW) {
-                return new String[] {"A", "P"};
-            } else {
-                return dfs.getAmPmStrings();
+        	
+            ResourceBundle rb = getBundle(locale);
+            
+            if (rb != null) {
+            	String[] names = lookupBundle(rb, 2, "AM_PM_OF_DAY", textWidth);
+            	
+            	if (names != null) {
+            		return names;
+            	}
             }
+
+        	if (textWidth == TextWidth.NARROW) {
+                return new String[] {"A", "P"};
+        	}
+        	
+            // JDK-Quelle
+            return DateFormatSymbols.getInstance(locale).getAmPmStrings();
 
         }
 
@@ -1610,6 +1583,7 @@ public final class CalendarText {
                 return ResourceBundle.getBundle(
                     "data/" + ISO_CALENDAR_TYPE,
                     locale,
+                    getLoader(),
                     CONTROL);
             } catch (MissingResourceException ex) {
                 return null;
@@ -1617,6 +1591,49 @@ public final class CalendarText {
 
         }
 
+    	private static String[] lookupBundle(
+      		ResourceBundle rb,
+	       	int len,
+    	   	String elementName,
+       		Enum<?>... variants
+    	) {
+        	
+        	String[] names = new String[len];
+            
+        	for (int i = 0; i < len; i++) {
+            	StringBuilder b = new StringBuilder();
+            	b.append(elementName);
+            	int count = 0;
+                
+            	for (int j = 0; j < variants.length; j++) {
+               		if (count == 0) {
+               			b.append('(');
+               		} else {
+               			b.append('|');
+               		}
+               		count++;
+                	b.append(variants[j].name());
+            	}
+                
+            	if (count > 0) {
+               		b.append(')');
+            	}
+            
+            	b.append('_');
+            	b.append(i + 1);
+            	String key = b.toString();
+            
+            	if (rb.containsKey(key)) {
+               		names[i] = rb.getString(key);
+            	} else {
+               		return null;
+            	}
+        	}
+        
+        	return names;
+        
+    	}
+        
     }
 
     private static class FallbackProvider
