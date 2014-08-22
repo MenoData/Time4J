@@ -54,7 +54,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>This class is a facade for an underlying implementation of
  * {@code CalendarText.Provider} which will be loaded as SPI-interface
- * by helpf of a {@code ServiceLoader}. If no such SPI-interface can be
+ * by help of a {@code ServiceLoader}. If no such SPI-interface can be
  * found then this class will resort to the sources of JDK (usually
  * as wrapper around {@code java.text.DateFormatSymbols}). </p>
  *
@@ -62,7 +62,24 @@ import java.util.concurrent.ConcurrentMap;
  * the UTF-8 text resources in the folder &quot;data&quot; relative to
  * the class path which are not based on JDK-defaults. In all ISO-systems
  * the &quot;iso8601_{locale}.properties&quot;-files will override the
- * JDK-defaults unless it is the ROOT-locale. </p>
+ * JDK-defaults unless it is the ROOT-locale. Example: </p>
+ *
+ * <p>If you wish to use the name &quot;Sonnabend&quot; instead of the standard
+ * word &quot;Samstag&quot; in german locale (english: Saturday) then you can
+ * copy the existing file &quot;data/iso8601_de.properties&quot; from the
+ * content of &quot;time4j-core-v{version}.jar&quot;-file into a new directory
+ * with the same path. Then you can insert these lines extra (all seven entries
+ * must be inserted, not just the sixth line): </p>
+ *
+ * <pre>
+ *  DAY_OF_WEEK(WIDE)_1=Montag
+ *  DAY_OF_WEEK(WIDE)_2=Dienstag
+ *  DAY_OF_WEEK(WIDE)_3=Mittwoch
+ *  DAY_OF_WEEK(WIDE)_4=Donnerstag
+ *  DAY_OF_WEEK(WIDE)_5=Freitag
+ *  DAY_OF_WEEK(WIDE)_6=Sonnabend
+ *  DAY_OF_WEEK(WIDE)_7=Sonntag
+ * </pre>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -82,7 +99,25 @@ import java.util.concurrent.ConcurrentMap;
  * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. F&uuml;r
  * alle ISO-Systeme gilt, da&szlig; die Eintr&auml;ge in den Dateien
  * &quot;iso8601_{locale}.properties&quot; die JDK-Vorgaben
- * &uuml;berschreiben, sofern es nicht die ROOT-locale ist. </p>
+ * &uuml;berschreiben, sofern es nicht die ROOT-locale ist. Beispiel: </p>
+ *
+ * <p>Wenn der Name &quot;Sonnabend&quot; anstatt der Standardvorgabe
+ * &quot;Samstag&quot; in der deutschen Variante verwendet werden soll,
+ * dann kann die existierende Datei &quot;data/iso8601_de.properties&quot;
+ * vom Inhalt der Bibliotheksdatei &quot;time4j-core-v{version].jar&quot;
+ * in ein neues Verzeichnis mit dem gleichen Pfad kopiert werden. Danach
+ * k&ouml;nnen alle folgenden Zeilen extra eingef&uuml;gt werden (nicht nur
+ * die sechste Zeile allein): </p>
+ *
+ * <pre>
+ *  DAY_OF_WEEK(WIDE)_1=Montag
+ *  DAY_OF_WEEK(WIDE)_2=Dienstag
+ *  DAY_OF_WEEK(WIDE)_3=Mittwoch
+ *  DAY_OF_WEEK(WIDE)_4=Donnerstag
+ *  DAY_OF_WEEK(WIDE)_5=Freitag
+ *  DAY_OF_WEEK(WIDE)_6=Sonnabend
+ *  DAY_OF_WEEK(WIDE)_7=Sonntag
+ * </pre>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -589,8 +624,8 @@ public final class CalendarText {
      *          no text resource files
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle Textformen des angegebenen
-     * chronologischen Elements. </p>
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle Textformen des
+     * angegebenen chronologischen Elements. </p>
      *
      * <p>Textformen k&ouml;nnen unter Umst&auml;nden in verschiedenen
      * Varianten vorkommen. Als Variantenbezug dient bei enum-Varianten
@@ -598,18 +633,18 @@ public final class CalendarText {
      * der Variante {@code TextWidth}), im boolean-Fall sind die Literale
      * &quot;true&quot; und &quot;false&quot; zu verwenden. </p>
      *
-     * <p>W&auml;hrend die Methoden {@code getStdMonths()}, {@code getWeekdays()}
-     * etc. in erster Linie auf JDK-Vorgaben beruhen, dient diese Methode dazu,
+     * <p>W&auml;hrend {@code getStdMonths()}, {@code getWeekdays()} etc. in
+     * erster Linie auf JDK-Vorgaben beruhen, dient diese Methode dazu,
      * chronologiespezifische Texte zu beschaffen, die nicht im JDK enthalten
      * sind. Textformen werden intern im Ressourcenverzeichnis &quot;data&quot;
      * des Klassenpfads mit Hilfe von properties-Dateien im UTF-8-Format
      * gespeichert. Der Basisname dieser Ressourcen ist der Kalendertyp. Als
-     * Textschluuml;ssel dient die Kombination aus Elementname, optional Varianten
-     * in der Form &quot;(variant1|variant2|...|variantN)&quot;, dem Unterstrich
-     * und schlie&szlig;lich einem numerischen Suffix mit Basis 1. Wird in den
-     * Ressourcen zum angegebenen Schl&uuml;ssel kein Eintrag gefunden, liefert
-     * diese Methode einfach den Namen des mit dem Element assoziierten
-     * enum-Werts. </p>
+     * Textschluuml;ssel dient die Kombination aus Elementname, optional
+     * Varianten in der Form &quot;(variant1|variant2|...|variantN)&quot;,
+     * dem Unterstrich und schlie&szlig;lich einem numerischen Suffix mit
+     * Basis 1. Wird in den Ressourcen zum angegebenen Schl&uuml;ssel kein
+     * Eintrag gefunden, liefert diese Methode einfach den Namen des mit dem
+     * Element assoziierten enum-Werts. </p>
      *
      * @param   <V> generic type of element values based on enums
      * @param   element     element text forms are searched for
@@ -864,7 +899,8 @@ public final class CalendarText {
      * <p>The motivation is mainly to override the language-dependent forms
      * of JDK-defaults with respect to standard elements like months, weekdays
      * etc. Specific text forms which are not contained in JDK will instead
-     * be supplied by help of properties-files in the &quot;data&quot;-folder. </p>
+     * be supplied by help of properties-files in the &quot;data&quot;-folder.
+     * </p>
      *
      * @author  Meno Hochschild
      * @spec    Implementations must have a public no-arg constructor.
@@ -1343,18 +1379,23 @@ public final class CalendarText {
 
             ResourceBundle rb = getBundle(locale);
 
-            if (rb != null) {
+            if (
+                (rb != null)
+                && !locale.equals(Locale.ROOT)
+            ) {
             	String[] names;
-            	
+
             	if (
             		(outputContext == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names = lookupBundle(rb, 12, "MONTH_OF_YEAR", textWidth, outputContext);
+            		names =
+                        lookupBundle(
+                            rb, 12, "MONTH_OF_YEAR", textWidth, outputContext);
             	} else {
             		names = lookupBundle(rb, 12, "MONTH_OF_YEAR", textWidth);
             	}
-            	
+
             	if (names != null) {
             		return names;
             	}
@@ -1402,16 +1443,18 @@ public final class CalendarText {
                 }
 
             	String[] names;
-            	
+
             	if (
             		(outputContext == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names = lookupBundle(rb, 4, "QUARTER_OF_YEAR", textWidth, outputContext);
+            		names =
+                        lookupBundle(
+                            rb, 4, "QUARTER_OF_YEAR", textWidth, outputContext);
             	} else {
             		names = lookupBundle(rb, 4, "QUARTER_OF_YEAR", textWidth);
             	}
-            	
+
             	if (names != null) {
             		return names;
             	}
@@ -1430,19 +1473,24 @@ public final class CalendarText {
         ) {
 
             ResourceBundle rb = getBundle(locale);
-            
-            if (rb != null) {
+
+            if (
+                (rb != null)
+                && !locale.equals(Locale.ROOT)
+            ) {
             	String[] names;
-            	
+
             	if (
             		(outputContext == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names = lookupBundle(rb, 7, "DAY_OF_WEEK", textWidth, outputContext);
+            		names =
+                        lookupBundle(
+                            rb, 7, "DAY_OF_WEEK", textWidth, outputContext);
             	} else {
             		names = lookupBundle(rb, 7, "DAY_OF_WEEK", textWidth);
             	}
-            	
+
             	if (names != null) {
             		return names;
             	}
@@ -1462,7 +1510,8 @@ public final class CalendarText {
                     break;
                 case NARROW:
                     String[] weekdays = // 7 Elemente
-                        weekdays("", locale, TextWidth.SHORT, OutputContext.FORMAT);
+                        weekdays(
+                            "", locale, TextWidth.SHORT, OutputContext.FORMAT);
                     String[] ret = new String[7];
                     for (int i = 0; i < 7; i++) {
                         if (!weekdays[i].isEmpty()) {
@@ -1502,15 +1551,18 @@ public final class CalendarText {
         ) {
 
             ResourceBundle rb = getBundle(locale);
-            
-            if (rb != null) {
+
+            if (
+                (rb != null)
+                && !locale.equals(Locale.ROOT)
+            ) {
             	String[] names = lookupBundle(rb, 2, "ERA", textWidth);
-            	
+
             	if (names != null) {
             		return names;
             	}
             }
-        	
+
             // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
@@ -1541,12 +1593,15 @@ public final class CalendarText {
             Locale locale,
             TextWidth textWidth
         ) {
-        	
+
             ResourceBundle rb = getBundle(locale);
-            
-            if (rb != null) {
+
+            if (
+                (rb != null)
+                && !locale.equals(Locale.ROOT)
+            ) {
             	String[] names = lookupBundle(rb, 2, "AM_PM_OF_DAY", textWidth);
-            	
+
             	if (names != null) {
             		return names;
             	}
@@ -1555,9 +1610,16 @@ public final class CalendarText {
         	if (textWidth == TextWidth.NARROW) {
                 return new String[] {"A", "P"};
         	}
-        	
+
             // JDK-Quelle
             return DateFormatSymbols.getInstance(locale).getAmPmStrings();
+
+        }
+
+        @Override
+        public String toString() {
+
+            return "Iso8601Provider";
 
         }
 
@@ -1597,14 +1659,14 @@ public final class CalendarText {
     	   	String elementName,
        		Enum<?>... variants
     	) {
-        	
+
         	String[] names = new String[len];
-            
+
         	for (int i = 0; i < len; i++) {
             	StringBuilder b = new StringBuilder();
             	b.append(elementName);
             	int count = 0;
-                
+
             	for (int j = 0; j < variants.length; j++) {
                		if (count == 0) {
                			b.append('(');
@@ -1614,26 +1676,26 @@ public final class CalendarText {
                		count++;
                 	b.append(variants[j].name());
             	}
-                
+
             	if (count > 0) {
                		b.append(')');
             	}
-            
+
             	b.append('_');
             	b.append(i + 1);
             	String key = b.toString();
-            
+
             	if (rb.containsKey(key)) {
                		names[i] = rb.getString(key);
             	} else {
                		return null;
             	}
         	}
-        
+
         	return names;
-        
+
     	}
-        
+
     }
 
     private static class FallbackProvider
@@ -1727,6 +1789,13 @@ public final class CalendarText {
             } else {
                 return new String[] {"AM", "PM"};
             }
+
+        }
+
+        @Override
+        public String toString() {
+
+            return "FallbackProvider";
 
         }
 

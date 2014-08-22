@@ -45,7 +45,7 @@ public class CalendricalNamesTest {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         if (cl == null) {
-            cl = Provider.class.getClassLoader();
+            cl = CalendarText.class.getClassLoader();
         }
 
         for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
@@ -59,13 +59,13 @@ public class CalendricalNamesTest {
         }
 
         if (p == null) {
-            assertThat(result.toString().contains("JdkProvider"), is(true));
+            assertThat(result.toString(), is("Iso8601Provider"));
         } else {
-            assertThat(result.toString().equals(p.toString()), is(true));
+            assertThat(result.toString(), is(p.toString()));
         }
 
         result = CalendarText.getInstance("xyz", locale);
-        assertThat(result.toString().contains("FallbackProvider"), is(true));
+        assertThat(result.toString(), is("FallbackProvider"));
     }
 
     @Test
