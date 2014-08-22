@@ -159,21 +159,99 @@ public class CalendricalNamesTest {
     }
 
     @Test
-    public void printQuarters() {
+    public void printQuartersEN() {
         TextWidth textWidth = TextWidth.NARROW;
         OutputContext outputContext = OutputContext.FORMAT;
         CalendarText instance =
-           CalendarText.getInstance("iso8601", Locale.GERMAN);
+           CalendarText.getInstance("iso8601", Locale.ENGLISH);
         String result =
             instance.getQuarters(textWidth, outputContext)
             .print(Quarter.Q3);
         assertThat(result, is("3"));
 
-        textWidth = TextWidth.SHORT;
+        textWidth = TextWidth.ABBREVIATED;
         result =
             instance.getQuarters(textWidth, outputContext)
             .print(Quarter.Q3);
         assertThat(result, is("Q3"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q3);
+        assertThat(result, is("3rd quarter"));
+    }
+
+    @Test
+    public void printQuartersDE() {
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", Locale.GERMAN);
+        TextWidth textWidth = TextWidth.NARROW;
+        String result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("1"));
+
+        textWidth = TextWidth.ABBREVIATED;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("Q1"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("erstes Quartal"));
+    }
+
+    @Test
+    public void printQuartersZH() {
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", Locale.SIMPLIFIED_CHINESE);
+        TextWidth textWidth = TextWidth.NARROW;
+        String result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("1"));
+
+        textWidth = TextWidth.ABBREVIATED;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("1季度"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("第一季度"));
+    }
+
+    @Test
+    public void printQuartersAR() {
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", new Locale("ar"));
+        TextWidth textWidth = TextWidth.NARROW;
+        String result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q4);
+        assertThat(result, is("٤"));
+
+        textWidth = TextWidth.ABBREVIATED;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q1);
+        assertThat(result, is("الربع الأول"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q2);
+        assertThat(result, is("الربع الثاني"));
     }
 
     @Test
@@ -189,11 +267,43 @@ public class CalendricalNamesTest {
     }
 
     @Test
-    public void printWeekdays() {
+    public void printWeekdaysEN() {
         OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", Locale.ENGLISH);
+        TextWidth textWidth = TextWidth.NARROW;
+        String result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.FRIDAY);
 
-        // deutsch
+        textWidth = TextWidth.NARROW;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.FRIDAY);
+        assertThat(result, is("F"));
 
+        textWidth = TextWidth.SHORT;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.FRIDAY);
+        assertThat(result, is("Fr"));
+
+        textWidth = TextWidth.ABBREVIATED;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.FRIDAY);
+        assertThat(result, is("Fri"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.FRIDAY);
+        assertThat(result, is("Friday"));
+    }
+
+    @Test
+    public void printWeekdaysDE() {
+        OutputContext outputContext = OutputContext.FORMAT;
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
         TextWidth textWidth = TextWidth.NARROW;
@@ -219,34 +329,6 @@ public class CalendricalNamesTest {
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.FRIDAY);
         assertThat(result, is("Freitag"));
-
-        // englisch
-
-        instance = CalendarText.getInstance("iso8601", Locale.ENGLISH);
-
-        textWidth = TextWidth.NARROW;
-        result =
-            instance.getWeekdays(textWidth, outputContext)
-            .print(Weekday.FRIDAY);
-        assertThat(result, is("F"));
-
-        textWidth = TextWidth.SHORT;
-        result =
-            instance.getWeekdays(textWidth, outputContext)
-            .print(Weekday.FRIDAY);
-        assertThat(result, is("Fr"));
-
-        textWidth = TextWidth.ABBREVIATED;
-        result =
-            instance.getWeekdays(textWidth, outputContext)
-            .print(Weekday.FRIDAY);
-        assertThat(result, is("Fri"));
-
-        textWidth = TextWidth.WIDE;
-        result =
-            instance.getWeekdays(textWidth, outputContext)
-            .print(Weekday.FRIDAY);
-        assertThat(result, is("Friday"));
     }
 
     @Test
