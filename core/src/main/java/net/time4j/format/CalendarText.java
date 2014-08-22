@@ -1413,6 +1413,10 @@ public final class CalendarText {
                 (rb != null)
                 && !locale.equals(Locale.ROOT)
             ) {
+                if (textWidth == TextWidth.SHORT) {
+                    textWidth = TextWidth.ABBREVIATED;
+                }
+
             	String[] names;
 
             	if (
