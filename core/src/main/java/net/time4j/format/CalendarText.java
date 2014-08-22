@@ -81,6 +81,21 @@ import java.util.concurrent.ConcurrentMap;
  *  DAY_OF_WEEK(WIDE)_7=Sonntag
  * </pre>
  *
+ * <p>The general format of these lines is: </p>
+ *
+ * <pre>
+ *  {element-name}({text-width}[|STANDALONE])_{one-based-integer}={text}
+ * </pre>
+ *
+ * <p>STANDALONE is optional. As element name in the context of ISO-8601
+ * following names are supported: </p>
+ *
+ * <ul><li>MONTH_OF_YEAR</li>
+ * <li>QUARTER_OF_YEAR</li>
+ * <li>DAY_OF_WEEK</li>
+ * <li>ERA</li>
+ * <li>AM_PM_OF_DAY</li></ul>
+ *
  * @author      Meno Hochschild
  * @concurrency <immutable>
  */
@@ -118,6 +133,21 @@ import java.util.concurrent.ConcurrentMap;
  *  DAY_OF_WEEK(WIDE)_6=Sonnabend
  *  DAY_OF_WEEK(WIDE)_7=Sonntag
  * </pre>
+ *
+ * <p>Das allgemeine Format dieser Zeilen ist: </p>
+ *
+ * <pre>
+ *  {element-name}({text-width}[|STANDALONE])_{eins-basierter-integer}={text}
+ * </pre>
+ *
+ * <p>STANDALONE ist optional. Als Elementname im Kontext von ISO-8601 werden
+ * folgende Namen unterst&uuml;tzt: </p>
+ *
+ * <ul><li>MONTH_OF_YEAR</li>
+ * <li>QUARTER_OF_YEAR</li>
+ * <li>DAY_OF_WEEK</li>
+ * <li>ERA</li>
+ * <li>AM_PM_OF_DAY</li></ul>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
