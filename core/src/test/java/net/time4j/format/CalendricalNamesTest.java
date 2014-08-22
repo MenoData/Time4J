@@ -69,7 +69,7 @@ public class CalendricalNamesTest {
     }
 
     @Test
-    public void printMonths() {
+    public void printMonthsDE() {
         TextWidth textWidth = TextWidth.NARROW;
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
@@ -101,6 +101,29 @@ public class CalendricalNamesTest {
             instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.MARCH);
         assertThat(result, is("Mrz"));
+    }
+
+    @Test
+    public void printMonthsRU() {
+        OutputContext oc = OutputContext.FORMAT;
+        TextWidth textWidth = TextWidth.NARROW;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", new Locale("ru"));
+        String result =
+            instance.getStdMonths(textWidth, oc).print(Month.FEBRUARY);
+        assertThat(result, is("Ф"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getStdMonths(textWidth, oc)
+            .print(Month.MARCH);
+        assertThat(result, is("марта"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getStdMonths(textWidth, OutputContext.STANDALONE)
+            .print(Month.MARCH);
+        assertThat(result, is("Март"));
     }
 
     @Test
@@ -252,6 +275,24 @@ public class CalendricalNamesTest {
             instance.getQuarters(textWidth, outputContext)
             .print(Quarter.Q2);
         assertThat(result, is("الربع الثاني"));
+    }
+
+    @Test
+    public void printQuartersRU() {
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", new Locale("ru"));
+        TextWidth textWidth = TextWidth.ABBREVIATED;
+        String result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q4);
+        assertThat(result, is("4-й кв."));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getQuarters(textWidth, outputContext)
+            .print(Quarter.Q2);
+        assertThat(result, is("2-й квартал"));
     }
 
     @Test
