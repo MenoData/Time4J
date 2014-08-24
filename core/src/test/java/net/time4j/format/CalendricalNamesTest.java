@@ -127,6 +127,29 @@ public class CalendricalNamesTest {
     }
 
     @Test
+    public void printMonthsZH() {
+        TextWidth textWidth = TextWidth.NARROW;
+        CalendarText instance =
+           CalendarText.getInstance("iso8601", Locale.SIMPLIFIED_CHINESE);
+        String result =
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
+            .print(Month.MARCH);
+        assertThat(result, is("3"));
+
+        textWidth = TextWidth.WIDE;
+        result =
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
+            .print(Month.MARCH);
+        assertThat(result, is("三月"));
+
+        textWidth = TextWidth.ABBREVIATED;
+        result =
+            instance.getStdMonths(textWidth, OutputContext.FORMAT)
+            .print(Month.MARCH);
+        assertThat(result, is("3月"));
+    }
+
+    @Test
     public void parseMonths() {
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
@@ -340,6 +363,55 @@ public class CalendricalNamesTest {
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.FRIDAY);
         assertThat(result, is("Friday"));
+    }
+
+    @Test
+    public void printWeekdaysES() {
+        TextWidth textWidth = TextWidth.WIDE;
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+            CalendarText.getInstance("iso8601", new Locale("es"));
+        String result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.SATURDAY);
+        assertThat(result, is("sábado"));
+
+        textWidth = TextWidth.NARROW;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.SATURDAY);
+        assertThat(result, is("S"));
+
+        textWidth = TextWidth.WIDE;
+        outputContext = OutputContext.STANDALONE;
+        result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.SATURDAY);
+        assertThat(result, is("Sábado"));
+    }
+
+    @Test
+    public void printWeekdaysZH() {
+        TextWidth textWidth = TextWidth.ABBREVIATED;
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+            CalendarText.getInstance("iso8601", Locale.SIMPLIFIED_CHINESE);
+        String result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.SUNDAY);
+        assertThat(result, is("周日"));
+    }
+
+    @Test
+    public void printWeekdaysZH_TW() {
+        TextWidth textWidth = TextWidth.ABBREVIATED;
+        OutputContext outputContext = OutputContext.FORMAT;
+        CalendarText instance =
+            CalendarText.getInstance("iso8601", Locale.TRADITIONAL_CHINESE);
+        String result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.SUNDAY);
+        assertThat(result, is("週日"));
     }
 
     @Test

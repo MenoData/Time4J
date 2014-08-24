@@ -409,6 +409,9 @@ public final class CalendarText {
      * of element value enums must be in agreement with the order of
      * the text forms contained here. </p>
      *
+     * <p>The default implementation handles SHORT as synonym for
+     * ABBREVIATION in the context of ISO-8601. </p>
+     *
      * @param   textWidth       text width of displayed month name
      * @param   outputContext   output context (stand-alone?)
      * @return  accessor for standard month names
@@ -424,6 +427,9 @@ public final class CalendarText {
      * 12 Monate. Andere Kalendersysteme k&ouml;nnen auch 13 Monate definieren.
      * Die Reihenfolge der Elementwert-Enums mu&szlig; mit der Reihenfolge der
      * hier enthaltenen Textformen &uuml;bereinstimmen. </p>
+     *
+     * <p>Speziell f&uuml;r ISO-8601 behandelt die Standardimplementierung
+     * die Textbreiten SHORT und ABBREVIATED gleich. </p>
      *
      * @param   textWidth       text width of displayed month name
      * @param   outputContext   output context (stand-alone?)
@@ -485,6 +491,9 @@ public final class CalendarText {
      * index. ISO systems define the range January-March as first quarter
      * etc. and at whole four quarters per calendar year. </p>
      *
+     * <p>The default implementation handles SHORT as synonym for
+     * ABBREVIATION in the context of ISO-8601. </p>
+     *
      * @param   textWidth       text width of displayed quarter name
      * @param   outputContext   output context (stand-alone?)
      * @return  accessor for quarter names
@@ -498,6 +507,9 @@ public final class CalendarText {
      * dessen Ordinalindex als Listenindex. ISO-Systeme definieren den
      * Zeitraum Januar-M&auml;rz als erstes Quartal usw. und insgesamt
      * 4 Quartale pro Kalenderjahr. </p>
+     *
+     * <p>Speziell f&uuml;r ISO-8601 behandelt die Standardimplementierung
+     * die Textbreiten SHORT und ABBREVIATED gleich. </p>
      *
      * @param   textWidth       text width of displayed quarter name
      * @param   outputContext   output context (stand-alone?)
@@ -1402,8 +1414,8 @@ public final class CalendarText {
         public String[] months(
             String calendarType,
             Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext,
+            TextWidth tw,
+            OutputContext oc,
             boolean leapForm
         ) {
 
@@ -1413,50 +1425,44 @@ public final class CalendarText {
                 (rb != null)
                 && !locale.equals(Locale.ROOT)
             ) {
-                if (textWidth == TextWidth.SHORT) {
-                    textWidth = TextWidth.ABBREVIATED;
+            	String[] names;
+                String key = getKey(rb, "MONTH_OF_YEAR");
+
+                if (tw == TextWidth.SHORT) {
+                    tw = TextWidth.ABBREVIATED;
                 }
 
-            	String[] names;
-
             	if (
-            		(outputContext == OutputContext.STANDALONE)
+            		(oc == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names =
-                        lookupBundle(
-                            rb, 12, "MONTH_OF_YEAR", textWidth, outputContext);
+            		names = lookupBundle(rb, 12, key, tw, oc);
             	} else {
-            		names = lookupBundle(rb, 12, "MONTH_OF_YEAR", textWidth);
+            		names = lookupBundle(rb, 12, key, tw);
             	}
 
             	if (names != null) {
             		return names;
-            	}
+            	} else if (tw == TextWidth.NARROW) {
+                    names = months("", locale, TextWidth.SHORT, oc, false);
+                    return narrow(names, 12);
+
+                }
             }
 
             // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
-            switch (textWidth) {
+            switch (tw) {
                 case WIDE:
                     return dfs.getMonths();
                 case ABBREVIATED:
                 case SHORT:
                     return dfs.getShortMonths();
                 case NARROW:
-                    String[] months = dfs.getShortMonths();
-                    String[] ret = new String[12];
-                    for (int i = 0; i < 12; i++) {
-                        if (!months[i].isEmpty()) {
-                            ret[i] = toLatinLetter(months[i]);
-                        } else {
-                            ret[i] = String.valueOf(i + 1);
-                        }
-                    }
-                    return ret;
+                    return narrow(dfs.getShortMonths(), 12);
                 default:
-                    throw new UnsupportedOperationException(textWidth.name());
+                    throw new UnsupportedOperationException(tw.name());
             }
 
         }
@@ -1465,28 +1471,27 @@ public final class CalendarText {
         public String[] quarters(
             String calendarType,
             Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext
+            TextWidth tw,
+            OutputContext oc
         ) {
 
             ResourceBundle rb = getBundle(locale);
 
             if (rb != null) {
-                if (textWidth == TextWidth.SHORT) {
-                    textWidth = TextWidth.ABBREVIATED;
+            	String[] names;
+                String key = getKey(rb, "QUARTER_OF_YEAR");
+
+                if (tw == TextWidth.SHORT) {
+                    tw = TextWidth.ABBREVIATED;
                 }
 
-            	String[] names;
-
             	if (
-            		(outputContext == OutputContext.STANDALONE)
+            		(oc == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names =
-                        lookupBundle(
-                            rb, 4, "QUARTER_OF_YEAR", textWidth, outputContext);
+            		names = lookupBundle(rb, 4, key, tw, oc);
             	} else {
-            		names = lookupBundle(rb, 4, "QUARTER_OF_YEAR", textWidth);
+            		names = lookupBundle(rb, 4, key, tw);
             	}
 
             	if (names != null) {
@@ -1502,8 +1507,8 @@ public final class CalendarText {
         public String[] weekdays(
             String calendarType,
             Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext
+            TextWidth tw,
+            OutputContext oc
         ) {
 
             ResourceBundle rb = getBundle(locale);
@@ -1513,28 +1518,32 @@ public final class CalendarText {
                 && !locale.equals(Locale.ROOT)
             ) {
             	String[] names;
+                String key = getKey(rb, "DAY_OF_WEEK");
 
             	if (
-            		(outputContext == OutputContext.STANDALONE)
+            		(oc == OutputContext.STANDALONE)
             		&& "true".equals(rb.getObject("enableStandalone"))
             	) {
-            		names =
-                        lookupBundle(
-                            rb, 7, "DAY_OF_WEEK", textWidth, outputContext);
+            		names = lookupBundle(rb, 7, key, tw, oc);
             	} else {
-            		names = lookupBundle(rb, 7, "DAY_OF_WEEK", textWidth);
+            		names = lookupBundle(rb, 7, key, tw);
             	}
 
             	if (names != null) {
             		return names;
-            	}
+            	} else if (tw == TextWidth.SHORT) {
+                    return weekdays("", locale, TextWidth.ABBREVIATED, oc);
+            	} else if (tw == TextWidth.NARROW) {
+                    names = weekdays("", locale, TextWidth.SHORT, oc);
+                    return narrow(names, 7);
+                }
             }
 
             // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
             String[] result;
 
-            switch (textWidth) {
+            switch (tw) {
                 case WIDE:
                     result = dfs.getWeekdays(); // 8 Elemente
                     break;
@@ -1543,22 +1552,13 @@ public final class CalendarText {
                     result = dfs.getShortWeekdays(); // 8 Elemente
                     break;
                 case NARROW:
-                    String[] weekdays = // 7 Elemente
-                        weekdays(
-                            "", locale, TextWidth.SHORT, OutputContext.FORMAT);
-                    String[] ret = new String[7];
-                    for (int i = 0; i < 7; i++) {
-                        if (!weekdays[i].isEmpty()) {
-                            ret[i] = toLatinLetter(weekdays[i]);
-                        } else {
-                            ret[i] = String.valueOf(i + 1);
-                        }
-                    }
-                    result = ret;
+                    String[] names = // 7 Elemente
+                        weekdays("", locale, TextWidth.SHORT, oc);
+                    result = narrow(names, 7);
                     break;
                 default:
                     throw new UnsupportedOperationException(
-                        "Unknown text width: " + textWidth);
+                        "Unknown text width: " + tw);
             }
 
             if (result.length > 7) { // ISO-Reihenfolge erzwingen
@@ -1590,7 +1590,8 @@ public final class CalendarText {
                 (rb != null)
                 && !locale.equals(Locale.ROOT)
             ) {
-            	String[] names = lookupBundle(rb, 2, "ERA", textWidth);
+                String key = getKey(rb, "ERA");
+            	String[] names = lookupBundle(rb, 2, key, textWidth);
 
             	if (names != null) {
             		return names;
@@ -1605,7 +1606,7 @@ public final class CalendarText {
                 String[] ret = new String[eras.length];
                 for (int i = 0, n = eras.length; i < n; i++) {
                     if (!eras[i].isEmpty()) {
-                        ret[i] = toLatinLetter(eras[i]);
+                        ret[i] = toSingleLetter(eras[i]);
                     } else if ((i == 0) && (eras.length == 2)) {
                         ret[i] = "B";
                     } else if ((i == 1) && (eras.length == 2)) {
@@ -1634,7 +1635,8 @@ public final class CalendarText {
                 (rb != null)
                 && !locale.equals(Locale.ROOT)
             ) {
-            	String[] names = lookupBundle(rb, 2, "AM_PM_OF_DAY", textWidth);
+                String key = getKey(rb, "AM_PM_OF_DAY");
+            	String[] names = lookupBundle(rb, 2, key, textWidth);
 
             	if (names != null) {
             		return names;
@@ -1657,7 +1659,26 @@ public final class CalendarText {
 
         }
 
-        private static String toLatinLetter(String input) {
+        private static String[] narrow(
+            String[] names,
+            int len
+        ) {
+
+            String[] ret = new String[len];
+
+            for (int i = 0; i < len; i++) {
+                if (!names[i].isEmpty()) {
+                    ret[i] = toSingleLetter(names[i]);
+                } else {
+                    ret[i] = String.valueOf(i + 1);
+                }
+            }
+
+            return ret;
+
+        }
+
+        private static String toSingleLetter(String input) {
 
             // diakritische Zeichen entfernen
             char c = Normalizer.normalize(input, Normalizer.Form.NFD).charAt(0);
@@ -1666,6 +1687,11 @@ public final class CalendarText {
                 return String.valueOf(c);
             } else if ((c >= 'a') && (c <= 'z')) {
                 c += ('A' - 'a');
+                return String.valueOf(c);
+            } else if ((c >= '\u0410') && (c <= '\u042F')) { // kyrillisch (ru)
+                return String.valueOf(c);
+            } else if ((c >= '\u0430') && (c <= '\u044F')) { // kyrillisch (ru)
+                c += ('\u0410' - '\u0430');
                 return String.valueOf(c);
             } else {
                 return input; // NARROW-Form nicht möglich => nichts ändern!
@@ -1691,30 +1717,47 @@ public final class CalendarText {
       		ResourceBundle rb,
 	       	int len,
     	   	String elementName,
-       		Enum<?>... variants
+       		TextWidth tw
+    	) {
+
+            return lookupBundle(rb, len, elementName, tw, null);
+
+        }
+
+    	private static String[] lookupBundle(
+      		ResourceBundle rb,
+	       	int len,
+    	   	String elementName,
+       		TextWidth tw,
+            OutputContext oc
     	) {
 
         	String[] names = new String[len];
+            boolean shortKey = (elementName.length() == 1);
 
         	for (int i = 0; i < len; i++) {
             	StringBuilder b = new StringBuilder();
             	b.append(elementName);
-            	int count = 0;
+                b.append('(');
 
-            	for (int j = 0; j < variants.length; j++) {
-               		if (count == 0) {
-               			b.append('(');
-               		} else {
-               			b.append('|');
-               		}
-               		count++;
-                	b.append(variants[j].name());
-            	}
+                if (shortKey) {
+                    char c = tw.name().charAt(0);
 
-            	if (count > 0) {
-               		b.append(')');
-            	}
+                    if (oc != OutputContext.STANDALONE) {
+                        c = Character.toLowerCase(c);
+                    }
 
+                    b.append(c);
+                } else {
+                    b.append(tw.name());
+
+                    if (oc == OutputContext.STANDALONE) {
+                        b.append('|');
+                        b.append(oc.name());
+                    }
+                }
+
+            	b.append(')');
             	b.append('_');
             	b.append(i + 1);
             	String key = b.toString();
@@ -1729,6 +1772,24 @@ public final class CalendarText {
         	return names;
 
     	}
+
+        private static String getKey(
+            ResourceBundle bundle,
+            String elementName
+        ) {
+
+            if (
+                bundle.containsKey("useShortKeys")
+                && "true".equals(bundle.getString("useShortKeys"))
+            ) {
+
+                return elementName.substring(0, 1);
+
+            }
+
+            return elementName;
+
+        }
 
     }
 
