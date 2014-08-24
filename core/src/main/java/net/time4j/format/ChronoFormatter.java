@@ -666,7 +666,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <p>If necessary all inner format elements which are locale-dependent
      * will also be adjusted (for example
-     * {@link net.time4j.Weekmodel#weekOfYear()}. </p>
+     * {@link net.time4j.Weekmodel#weekOfYear()}. But fixed literals will
+     * remain unchanged hence this method might not be suitable for all
+     * languages. </p>
      *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
@@ -690,7 +692,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Angepasst werden bei Bedarf auch innere Formatelemente, die
      * Bestandteil landesabh&auml;ngiger chronologischer Erweiterungen wie
      * zum Beispiel {@link net.time4j.Weekmodel#weekOfYear()} sind (lokales
-     * Wochenmodell). </p>
+     * Wochenmodell). Aber feste Literale bleiben unver&auml;ndert, so da&szlig;
+     * diese Methode nicht f&uuml;r alle Sprachen geeignet sein mag. </p>
      *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
