@@ -67,6 +67,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of years. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for years
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -76,16 +77,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Jahre. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for years
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getYearsPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "years");
+        return this.getUnitPattern(language, 'Y', width, category);
 
     }
 
@@ -94,6 +97,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of months. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for months
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -103,16 +107,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Monate. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for months
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getMonthsPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "months");
+        return this.getUnitPattern(language, 'M', width, category);
 
     }
 
@@ -121,6 +127,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of weeks. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for weeks
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -130,16 +137,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Wochen. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for weeks
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getWeeksPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "weeks");
+        return this.getUnitPattern(language, 'W', width, category);
 
     }
 
@@ -148,6 +157,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of days. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for days
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -157,16 +167,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Tage. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for days
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getDaysPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "days");
+        return this.getUnitPattern(language, 'D', width, category);
 
     }
 
@@ -175,6 +187,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of hours. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for hours
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -184,16 +197,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Stunden. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for hours
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getHoursPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "hours");
+        return this.getUnitPattern(language, 'H', width, category);
 
     }
 
@@ -202,6 +217,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of minutes. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for minutes
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -211,16 +227,18 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Minuten. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for minutes
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getMinutesPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "minutes");
+        return this.getUnitPattern(language, 'N', width, category);
 
     }
 
@@ -229,6 +247,7 @@ public final class UnitPatternSPI {
      * &quot;{0}&quot; for the count of seconds. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for seconds
      * @throws  java.util.MissingResourceException if no pattern was found
@@ -238,40 +257,71 @@ public final class UnitPatternSPI {
      * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Sekunden. </p>
      *
      * @param   language    language setting
+     * @param   width       text width
      * @param   category    plural category
      * @return  unit pattern for seconds
      * @throws  java.util.MissingResourceException if no pattern was found
      */
     public String getSecondsPattern(
         Locale language,
+        TextWidth width,
         PluralCategory category
     ) {
 
-        return this.getUnitPattern(language, category, "seconds");
+        return this.getUnitPattern(language, 'S', width, category);
 
     }
 
     private String getUnitPattern(
         Locale lang,
-        PluralCategory category,
-        String baseBundleName
+        char unitID,
+        TextWidth width,
+        PluralCategory category
     ) {
 
         ClassLoader loader = this.getClass().getClassLoader();
         ResourceBundle.Control control =
             UnitPatternControl.getInstance(category);
         ResourceBundle rb =
-            ResourceBundle.getBundle(baseBundleName, lang, loader, control);
+            ResourceBundle.getBundle("units/pattern", lang, loader, control);
 
         Set<String> keys = UnitPatternBundle.class.cast(rb).getInternalKeys();
-        String key = category.name();
+        String key = buildKey(unitID, width, category);
 
         if (!keys.contains(key)) {
-            key = PluralCategory.OTHER.name();
+            key = buildKey(unitID, width, PluralCategory.OTHER);
         }
 
         return rb.getString(key);
 
     }
 
+    private static String buildKey(
+        char unitID,
+        TextWidth width,
+        PluralCategory category
+    ) {
+        
+        StringBuilder sb = new StringBuilder(3);
+        sb.append(unitID);
+        
+        switch (width) {
+            case WIDE:
+                sb.append('w');
+                break;
+            case ABBREVIATED:
+            case SHORT:
+                sb.append('s');
+                break;
+            case NARROW:
+                sb.append('n');
+                break;
+            default:
+                throw new UnsupportedOperationException(width.name());
+        }
+        
+        return sb.append(category.ordinal()).toString();
+        
+    }
+    
 }
