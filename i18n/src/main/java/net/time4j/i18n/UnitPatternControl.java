@@ -155,11 +155,11 @@ class UnitPatternControl
                     UnitPatternBundle test = new UnitPatternBundle(reader);
                     Set<String> keys = test.getInternalKeys();
 
-                    if (keys.contains(this.category.name())) {
+                    if (exists(keys, this.category)) {
                         bundle = test;
                     } else if (
                         (this.category != PluralCategory.OTHER)
-                        && keys.contains(PluralCategory.OTHER.name())
+                        && exists(keys, PluralCategory.OTHER)
                     ) {
                         bundle = test;
                     }
@@ -177,6 +177,23 @@ class UnitPatternControl
                 "Unknown resource bundle format: " + format);
         }
 
+    }
+    
+    private static boolean exists(
+    	Set<String> keys,
+    	PluralCategory category
+    ) {
+    	
+    	char c = (char) (48 + category.ordinal());
+    	
+    	for (String key : keys) {
+    	    if (key.charAt(2) == c) {
+    	    	return true;
+    	    }
+    	}
+    	
+    	return false;
+    	
     }
 
 }
