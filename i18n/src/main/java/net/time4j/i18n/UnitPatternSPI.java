@@ -22,10 +22,11 @@
 package net.time4j.i18n;
 
 import net.time4j.format.PluralCategory;
+import net.time4j.format.TextWidth;
+import net.time4j.format.UnitPatternProvider;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 
 /**
@@ -33,13 +34,13 @@ import java.util.Set;
  * patterns. </p>
  *
  * <p>The underlying properties files are located in the folder
- * &quot;i18n&quot; relative to class path and are encoded in UTF-8. The basic
- * bundle names are &quot;years&quot; &quot;months&quot;, &quot;weeks&quot;,
- * &quot;days&quot;, &quot;hours&quot;, &quot;minutes&quot; and
- * &quot;seconds&quot;. This class uses a modified fallback algorithm
- * for searching the right properties file as documented in
+ * &quot;units&quot; relative to class path and are encoded in UTF-8. The basic
+ * bundle name is &quot;pattern&quot;. This class uses a modified fallback
+ * algorithm for searching the right properties file as documented in
  * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
- * target="_blank">CLDR</a> published by unicode consortium. </p>
+ * target="_blank">CLDR</a> published by unicode consortium. In such a
+ * properties file all key variants must exist, varying over all units
+ * and text widths. </p>
  *
  * @author  Meno Hochschild
  */
@@ -48,40 +49,23 @@ import java.util.Set;
  * Zeiteinheitsmustern. </p>
  *
  * <p>Die zugrundeliegenden properties-Dateien liegen im Ordner
- * &quot;i18n&quot; relativ zum Klassenpfad und sind in UTF-8 kodiert. Die
- * Basisnamen der Dateien sind &quot;years&quot; &quot;months&quot;,
- * &quot;weeks&quot;, &quot;days&quot;, &quot;hours&quot;, &quot;minutes&quot;
- * und &quot;seconds&quot;. Diese Klasse verwendet einen ge&auml;nderten
- * Suchalgorithmus, um die richtige properties-Datei zu erhalten - dokumentiert
- * in <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
+ * &quot;units&quot; relativ zum Klassenpfad und sind in UTF-8 kodiert.
+ * Der Basisname der Dateien ist &quot;patternquot;. Diese Klasse verwendet
+ * einen ge&auml;nderten Suchalgorithmus, um die richtige properties-Datei
+ * zu erhalten. Zu einer gegebenen Pluralkategorie m&uuml;ssen in einer
+ * solchen Datei alle Schl&uuml;sselvarianten existieren (variierend &uuml;ber
+ * alle Zeiteinheiten und Textbreiten). Der Algorithmus ist dokumentiert in
+ * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
  * target="_blank">CLDR</a> ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
  *
  * @author  Meno Hochschild
  */
-public final class UnitPatternSPI {
+public final class UnitPatternSPI
+    implements UnitPatternProvider {
 
     //~ Methoden ----------------------------------------------------------
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of years. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for years
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Jahre. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for years
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getYearsPattern(
         Locale language,
         TextWidth width,
@@ -92,26 +76,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of months. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for months
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Monate. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for months
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getMonthsPattern(
         Locale language,
         TextWidth width,
@@ -122,26 +87,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of weeks. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for weeks
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Wochen. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for weeks
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getWeeksPattern(
         Locale language,
         TextWidth width,
@@ -152,26 +98,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of days. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for days
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Tage. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for days
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getDaysPattern(
         Locale language,
         TextWidth width,
@@ -182,26 +109,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of hours. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for hours
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Stunden. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for hours
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getHoursPattern(
         Locale language,
         TextWidth width,
@@ -212,26 +120,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of minutes. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for minutes
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Minuten. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for minutes
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getMinutesPattern(
         Locale language,
         TextWidth width,
@@ -242,26 +131,7 @@ public final class UnitPatternSPI {
 
     }
 
-    /**
-     * <p>Yields the localized unit pattern with unit name and a placeholder
-     * &quot;{0}&quot; for the count of seconds. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for seconds
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
-     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Sekunden. </p>
-     *
-     * @param   language    language setting
-     * @param   width       text width
-     * @param   category    plural category
-     * @return  unit pattern for seconds
-     * @throws  java.util.MissingResourceException if no pattern was found
-     */
+    @Override
     public String getSecondsPattern(
         Locale language,
         TextWidth width,
@@ -284,11 +154,9 @@ public final class UnitPatternSPI {
             UnitPatternControl.getInstance(category);
         ResourceBundle rb =
             ResourceBundle.getBundle("units/pattern", lang, loader, control);
-
-        Set<String> keys = UnitPatternBundle.class.cast(rb).getInternalKeys();
         String key = buildKey(unitID, width, category);
 
-        if (!keys.contains(key)) {
+        if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
             key = buildKey(unitID, width, PluralCategory.OTHER);
         }
 
@@ -301,10 +169,10 @@ public final class UnitPatternSPI {
         TextWidth width,
         PluralCategory category
     ) {
-        
+
         StringBuilder sb = new StringBuilder(3);
         sb.append(unitID);
-        
+
         switch (width) {
             case WIDE:
                 sb.append('w');
@@ -319,9 +187,9 @@ public final class UnitPatternSPI {
             default:
                 throw new UnsupportedOperationException(width.name());
         }
-        
+
         return sb.append(category.ordinal()).toString();
-        
+
     }
-    
+
 }

@@ -178,22 +178,26 @@ class UnitPatternControl
         }
 
     }
-    
+
     private static boolean exists(
     	Set<String> keys,
     	PluralCategory category
     ) {
-    	
+
     	char c = (char) (48 + category.ordinal());
-    	
+
     	for (String key : keys) {
-    	    if (key.charAt(2) == c) {
+    	    if (
+                (key.charAt(0) != '#')
+                && (key.length() == 3)
+                && (key.charAt(2) == c)
+            ) {
     	    	return true;
     	    }
     	}
-    	
+
     	return false;
-    	
+
     }
 
 }

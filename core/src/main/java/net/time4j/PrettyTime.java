@@ -21,9 +21,14 @@
 
 package net.time4j;
 
+import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
+import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
+import net.time4j.format.TextWidth;
+import net.time4j.format.UnitPatterns;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -186,48 +191,133 @@ public final class PrettyTime {
     }
 
     /**
-     * <p>Formats given duration. </p>
+     * <p>Formats given duration in calendar units. </p>
+     *
+     * <p>Note: Millennia, centuries and decades are automatically normalized
+     * to years while quarter-years are normalized to months. </p>
      *
      * @param   amount  count of units (quantity)
      * @param   unit    calendar unit
+     * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
      */
     /*[deutsch]
-     * <p>Formatiert die angegebene Dauer. </p>
+     * <p>Formatiert die angegebene Dauer in kalendarischen Zeiteinheiten. </p>
+     *
+     * <p>Hinweis: Jahrtausende, Jahrhunderte und Dekaden werden automatisch
+     * zu Jahren normalisiert, w&auml;hrend Quartale zu Monaten normalisiert
+     * werden. </p>
      *
      * @param   amount  Anzahl der Einheiten
      * @param   unit    kalendarische Zeiteinheit
+     * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
      */
     public String print(
         long amount,
-        CalendarUnit unit
+        CalendarUnit unit,
+        TextWidth width
     ) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        UnitPatterns p = UnitPatterns.of(language);
+        String pattern;
+
+        switch (unit) {
+            case MILLENNIA:
+                amount = MathUtils.safeMultiply(amount, 1000);
+                pattern = p.getYears(width, this.getCategory(amount));
+                break;
+            case CENTURIES:
+                amount = MathUtils.safeMultiply(amount, 100);
+                pattern = p.getYears(width, this.getCategory(amount));
+                break;
+            case DECADES:
+                amount = MathUtils.safeMultiply(amount, 10);
+                pattern = p.getYears(width, this.getCategory(amount));
+                break;
+            case YEARS:
+                pattern = p.getYears(width, this.getCategory(amount));
+                break;
+            case QUARTERS:
+                amount = MathUtils.safeMultiply(amount, 3);
+                pattern = p.getMonths(width, this.getCategory(amount));
+                break;
+            case MONTHS:
+                pattern = p.getMonths(width, this.getCategory(amount));
+                break;
+            case WEEKS:
+                pattern = p.getWeeks(width, this.getCategory(amount));
+                break;
+            case DAYS:
+                pattern = p.getDays(width, this.getCategory(amount));
+                break;
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+        String num = NumberFormat.getIntegerInstance(language).format(amount);
+        return pattern.replace("{0}", num);
 
     }
 
     /**
-     * <p>Formats given duration. </p>
+     * <p>Formats given duration in clock units. </p>
+     *
+     * <p>Note: Subsecond parts will be normalized to full seconds. </p>
      *
      * @param   amount  count of units (quantity)
      * @param   unit    clock unit
+     * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
      */
     /*[deutsch]
-     * <p>Formatiert die angegebene Dauer. </p>
+     * <p>Formatiert die angegebene Dauer in Uhrzeiteinheiten. </p>
+     *
+     * <p>Hinweis: Sekundenbruchteile werden zu vollen Sekunden
+     * normalisiert. </p>
      *
      * @param   amount  Anzahl der Einheiten
      * @param   unit    Uhrzeiteinheit
+     * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
      */
     public String print(
         long amount,
-        ClockUnit unit
+        ClockUnit unit,
+        TextWidth width
     ) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        UnitPatterns p = UnitPatterns.of(language);
+        String pattern;
+
+        switch (unit) {
+            case HOURS:
+                pattern = p.getHours(width, this.getCategory(amount));
+                break;
+            case MINUTES:
+                pattern = p.getMinutes(width, this.getCategory(amount));
+                break;
+            case SECONDS:
+                pattern = p.getSeconds(width, this.getCategory(amount));
+                break;
+            case MILLIS:
+                amount = amount / 1000;
+                pattern = p.getSeconds(width, this.getCategory(amount));
+                break;
+            case MICROS:
+                amount = amount / 1000000;
+                pattern = p.getSeconds(width, this.getCategory(amount));
+                break;
+            case NANOS:
+                amount = amount / 1000000000;
+                pattern = p.getSeconds(width, this.getCategory(amount));
+                break;
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+        String num = NumberFormat.getIntegerInstance(language).format(amount);
+        return pattern.replace("{0}", num);
 
     }
 
@@ -266,6 +356,12 @@ public final class PrettyTime {
     public String print(UnixTime moment) {
 
         throw new UnsupportedOperationException("Not yet implemented.");
+
+    }
+
+    private PluralCategory getCategory(long amount) {
+
+        return PluralRules.of(this.language).getCategory(amount);
 
     }
 
