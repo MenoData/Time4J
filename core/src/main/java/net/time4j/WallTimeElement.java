@@ -29,6 +29,7 @@ package net.time4j;
  * possibly changing the day. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Uhrzeit. </p>
@@ -37,6 +38,7 @@ package net.time4j;
  * Uhrzeit bewegen und bei Bedarf den Tag wechseln. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 public interface WallTimeElement
     extends ChronoElement<PlainTime> {
