@@ -226,7 +226,7 @@ public final class PlainTime
      *
      * @since   1.2
      */
-    public static final ChronoElement<PlainTime> COMPONENT = WALL_TIME;
+    public static final WallTimeElement COMPONENT = TimeElement.INSTANCE;
 
     /**
      * <p>Element with the half day section relative to noon (ante meridiem
