@@ -662,6 +662,7 @@ public final class Duration<U extends IsoUnit>
      * @return  zonal metric for calculating a duration in given units
      * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
+     * @since   1.2
      * @see     #earlier(Timezone)
      * @see     #later(Timezone)
      * @see     Moment
@@ -676,6 +677,7 @@ public final class Duration<U extends IsoUnit>
      * @return  zonal metric for calculating a duration in given units
      * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
+     * @since   1.2
      * @see     #earlier(Timezone)
      * @see     #later(Timezone)
      * @see     Moment

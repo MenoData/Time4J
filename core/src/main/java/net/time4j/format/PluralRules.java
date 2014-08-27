@@ -44,6 +44,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * &quot;common/supplemental/plurals.xml&quot;. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @spec    All concrete classes must be immutable.
  */
 /*[deutsch]
@@ -58,6 +59,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * gefunden werden. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @spec    All concrete classes must be immutable.
  */
 public abstract class PluralRules {

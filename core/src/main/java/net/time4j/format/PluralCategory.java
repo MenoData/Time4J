@@ -26,12 +26,14 @@ package net.time4j.format;
  * <p>Enumeration of CLDR plural categories. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     PluralRules
  */
 /*[deutsch]
  * <p>Aufz&auml;hlung der CLDR-Pluralkategorien. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     PluralRules
  */
 public enum PluralCategory {

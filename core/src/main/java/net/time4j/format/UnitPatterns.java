@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>Offers localized time unit patterns for formatting of durations. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     UnitPatternProvider
  * @concurrency <immutable>
  */
@@ -44,6 +45,7 @@ import java.util.concurrent.ConcurrentMap;
  * Dauer an. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     UnitPatternProvider
  * @concurrency <immutable>
  */

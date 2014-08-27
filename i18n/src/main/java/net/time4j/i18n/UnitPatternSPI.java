@@ -46,6 +46,7 @@ import java.util.ResourceBundle;
  * that the folder &quot;reltime&quot; is used instead. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 /*[deutsch]
  * <p>Service-Provider-Implementierung f&uuml;r den Zugang zu lokalisierten
@@ -66,6 +67,7 @@ import java.util.ResourceBundle;
  * benutzt wird. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 public final class UnitPatternSPI
     implements UnitPatternProvider {

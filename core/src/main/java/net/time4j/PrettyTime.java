@@ -42,6 +42,7 @@ import java.util.concurrent.ConcurrentMap;
  * for printing. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @concurrency <immutable>
  */
 /*[deutsch]
@@ -54,6 +55,7 @@ import java.util.concurrent.ConcurrentMap;
  * zu halten und es f&uuml;r die formatierte Ausgabe zu nutzen. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @concurrency <immutable>
  */
 public final class PrettyTime {
@@ -361,7 +363,7 @@ public final class PrettyTime {
 
     private PluralCategory getCategory(long amount) {
 
-        return PluralRules.of(this.language).getCategory(amount);
+        return this.rules.getCategory(amount);
 
     }
 

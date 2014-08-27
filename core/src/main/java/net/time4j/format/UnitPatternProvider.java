@@ -33,6 +33,7 @@ import java.util.Locale;
  * english or in scientific notation. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     java.util.ServiceLoader
  * @spec    Implementations must have a public no-arg constructor.
  */
@@ -46,6 +47,7 @@ import java.util.Locale;
  * oder in wissenschaftlicher Notation anbietet. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  * @see     java.util.ServiceLoader
  * @spec    Implementations must have a public no-arg constructor.
  */
