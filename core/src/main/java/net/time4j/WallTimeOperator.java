@@ -31,10 +31,11 @@ import net.time4j.engine.ChronoOperator;
  * @concurrency <immutable>
  */
 final class WallTimeOperator
-    extends ElementOperator<PlainTimestamp> {
+    implements ChronoOperator<PlainTimestamp> {
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private final int mode;
     private final PlainTime value;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -49,12 +50,13 @@ final class WallTimeOperator
         int mode,
         PlainTime value
     ) {
-        super(TimeElement.INSTANCE, mode);
+        super();
 
         if (value == null) {
             throw new NullPointerException("Missing target wall time.");
         }
 
+        this.mode = mode;
         this.value = value;
 
     }
@@ -63,9 +65,9 @@ final class WallTimeOperator
 
     @Override
     public PlainTimestamp apply(PlainTimestamp entity) {
-    
+
         PlainTime oldTime = entity.getWallTime();
-        
+
         if (this.value.isSimultaneous(oldTime)) {
         	return this.handleSameTimes(entity);
         } else if (this.value.getHour() == 24) {
@@ -75,28 +77,21 @@ final class WallTimeOperator
         } else {
         	return this.handleEarlier(entity);
         }
-        
-    }
-
-    @Override
-    ChronoOperator<PlainTimestamp> onTimestamp() {
-
-        return this;
 
     }
 
     private PlainTimestamp handleSameTimes(PlainTimestamp entity) {
 
-        switch (this.getType()) {
-            case OP_NAV_NEXT:
+        switch (this.mode) {
+            case ElementOperator.OP_NAV_NEXT:
                 return entity.plus(1, CalendarUnit.DAYS);
-            case OP_NAV_PREVIOUS:
+            case ElementOperator.OP_NAV_PREVIOUS:
                 return entity.minus(1, CalendarUnit.DAYS);
-            case OP_NAV_NEXT_OR_SAME:
-            case OP_NAV_PREVIOUS_OR_SAME:
+            case ElementOperator.OP_NAV_NEXT_OR_SAME:
+            case ElementOperator.OP_NAV_PREVIOUS_OR_SAME:
                 return entity;
             default:
-                throw new AssertionError("Unknown: " + this.getType());
+                throw new AssertionError("Unknown: " + this.mode);
         }
 
     }
@@ -104,45 +99,47 @@ final class WallTimeOperator
     // entity is never on 24:00 hence following logic is to be applied
     private PlainTimestamp handleMidnight24(PlainTimestamp entity) {
 
-        switch (this.getType()) {
-            case OP_NAV_NEXT:
-            case OP_NAV_NEXT_OR_SAME:
-                return entity.getCalendarDate().plus(1, CalendarUnit.DAYS).atStartOfDay();
-            case OP_NAV_PREVIOUS:
-            case OP_NAV_PREVIOUS_OR_SAME:
-                return entity.getCalendarDate().atStartOfDay();
+        PlainDate date = entity.getCalendarDate();
+
+        switch (this.mode) {
+            case ElementOperator.OP_NAV_NEXT:
+            case ElementOperator.OP_NAV_NEXT_OR_SAME:
+                return date.plus(1, CalendarUnit.DAYS).atStartOfDay();
+            case ElementOperator.OP_NAV_PREVIOUS:
+            case ElementOperator.OP_NAV_PREVIOUS_OR_SAME:
+                return date.atStartOfDay();
             default:
-                throw new AssertionError("Unknown: " + this.getType());
+                throw new AssertionError("Unknown: " + this.mode);
         }
 
     }
 
     private PlainTimestamp handleLater(PlainTimestamp entity) {
 
-        switch (this.getType()) {
-            case OP_NAV_NEXT:
-            case OP_NAV_NEXT_OR_SAME:
+        switch (this.mode) {
+            case ElementOperator.OP_NAV_NEXT:
+            case ElementOperator.OP_NAV_NEXT_OR_SAME:
                 return entity.with(this.value);
-            case OP_NAV_PREVIOUS:
-            case OP_NAV_PREVIOUS_OR_SAME:
+            case ElementOperator.OP_NAV_PREVIOUS:
+            case ElementOperator.OP_NAV_PREVIOUS_OR_SAME:
                 return entity.minus(1, CalendarUnit.DAYS).with(this.value);
             default:
-                throw new AssertionError("Unknown: " + this.getType());
+                throw new AssertionError("Unknown: " + this.mode);
         }
 
     }
 
     private PlainTimestamp handleEarlier(PlainTimestamp entity) {
 
-        switch (this.getType()) {
-            case OP_NAV_NEXT:
-            case OP_NAV_NEXT_OR_SAME:
+        switch (this.mode) {
+            case ElementOperator.OP_NAV_NEXT:
+            case ElementOperator.OP_NAV_NEXT_OR_SAME:
                 return entity.plus(1, CalendarUnit.DAYS).with(this.value);
-            case OP_NAV_PREVIOUS:
-            case OP_NAV_PREVIOUS_OR_SAME:
+            case ElementOperator.OP_NAV_PREVIOUS:
+            case ElementOperator.OP_NAV_PREVIOUS_OR_SAME:
                 return entity.with(this.value);
             default:
-                throw new AssertionError("Unknown: " + this.getType());
+                throw new AssertionError("Unknown: " + this.mode);
         }
 
     }

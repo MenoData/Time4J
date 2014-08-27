@@ -21,6 +21,9 @@
 
 package net.time4j;
 
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoOperator;
+
 
 /**
  * <p>Represents the wall time. </p>
@@ -59,7 +62,7 @@ public interface WallTimeElement
      * @param   value   new wall time which is after current wall time
      * @return  operator applicable on {@code PlainTimestamp}
      */
-    ElementOperator<PlainTimestamp> setToNext(PlainTime value);
+    ChronoOperator<PlainTimestamp> setToNext(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the previous given wall time and change the day
@@ -75,7 +78,7 @@ public interface WallTimeElement
      * @param   value   new wall time which is before current wall time
      * @return  operator applicable on {@code PlainTimestamp}
      */
-    ElementOperator<PlainTimestamp> setToPrevious(PlainTime value);
+    ChronoOperator<PlainTimestamp> setToPrevious(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the next or same given wall time and change
@@ -91,7 +94,7 @@ public interface WallTimeElement
      * @param   value   new wall time which is not before current wall time
      * @return  operator applicable on {@code PlainTimestamp}
      */
-    ElementOperator<PlainTimestamp> setToNextOrSame(PlainTime value);
+    ChronoOperator<PlainTimestamp> setToNextOrSame(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the previous or same given wall time and
@@ -107,6 +110,6 @@ public interface WallTimeElement
      * @param   value   new wall time which is not after current wall time
      * @return  operator applicable on {@code PlainTimestamp}
      */
-    ElementOperator<PlainTimestamp> setToPreviousOrSame(PlainTime value);
+    ChronoOperator<PlainTimestamp> setToPreviousOrSame(PlainTime value);
 
 }

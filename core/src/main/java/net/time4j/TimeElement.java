@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 
 import java.io.ObjectStreamException;
@@ -103,31 +104,33 @@ final class TimeElement
     }
 
 	@Override
-	public ElementOperator<PlainTimestamp> setToNext(PlainTime value) {
-		
-		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT, value);
-		
+	public ChronoOperator<PlainTimestamp> setToNext(PlainTime v) {
+
+		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT, v);
+
 	}
 
 	@Override
-	public ElementOperator<PlainTimestamp> setToPrevious(PlainTime value) {
-		
-		return new WallTimeOperator(ElementOperator.OP_NAV_PREVIOUS, value);
-		
+	public ChronoOperator<PlainTimestamp> setToPrevious(PlainTime v) {
+
+		return new WallTimeOperator(ElementOperator.OP_NAV_PREVIOUS, v);
+
 	}
 
 	@Override
-	public ElementOperator<PlainTimestamp> setToNextOrSame(PlainTime value) {
-		
-		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT_OR_SAME, value);
-		
+	public ChronoOperator<PlainTimestamp> setToNextOrSame(PlainTime v) {
+
+		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT_OR_SAME, v);
+
 	}
 
 	@Override
-	public ElementOperator<PlainTimestamp> setToPreviousOrSame(PlainTime value) {
-		
-		return new WallTimeOperator(ElementOperator.OP_NAV_PREVIOUS_OR_SAME, value);
-		
+	public ChronoOperator<PlainTimestamp> setToPreviousOrSame(PlainTime v) {
+
+		return new WallTimeOperator(
+            ElementOperator.OP_NAV_PREVIOUS_OR_SAME,
+            v);
+
 	}
 
     @Override
