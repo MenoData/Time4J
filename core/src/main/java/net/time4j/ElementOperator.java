@@ -21,7 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.engine.AdvancedElement;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.tz.TZID;
