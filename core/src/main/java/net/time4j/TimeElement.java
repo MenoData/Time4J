@@ -36,7 +36,8 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class TimeElement
-    extends BasicElement<PlainTime> {
+    extends BasicElement<PlainTime>
+	implements WallTimeElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -100,6 +101,34 @@ final class TimeElement
         return true;
 
     }
+
+	@Override
+	public ElementOperator<PlainTimestamp> setToNext(PlainTime value) {
+		
+		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT, value);
+		
+	}
+
+	@Override
+	public ElementOperator<PlainTimestamp> setToPrevious(PlainTime value) {
+		
+		return new WallTimeOperator(ElementOperator.OP_NAV_PREVIOUS, value);
+		
+	}
+
+	@Override
+	public ElementOperator<PlainTimestamp> setToNextOrSame(PlainTime value) {
+		
+		return new WallTimeOperator(ElementOperator.OP_NAV_NEXT_OR_SAME, value);
+		
+	}
+
+	@Override
+	public ElementOperator<PlainTimestamp> setToPreviousOrSame(PlainTime value) {
+		
+		return new WallTimeOperator(ElementOperator.OP_NAV_PREVIOUS_OR_SAME, value);
+		
+	}
 
     @Override
     protected String getVeto(Chronology<?> chronology) {
