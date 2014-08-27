@@ -77,7 +77,7 @@ public abstract class ElementOperator<T>
      * @param   type            operator type
      */
     ElementOperator(
-        AdvancedElement<?> element,
+        ChronoElement<?> element,
         int type
     ) {
         super();
