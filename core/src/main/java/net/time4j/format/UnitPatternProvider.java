@@ -235,4 +235,340 @@ public interface UnitPatternProvider {
         PluralCategory category
     );
 
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of years in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for years in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Jahre in der
+     * Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for years in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastYearsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of months in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for months in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Monate in
+     * der Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for months in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastMonthsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of weeks in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for weeks in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Wochen in
+     * der Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for weeks in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastWeeksPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of days in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for days in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Tage in der
+     * Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for days in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastDaysPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of hours in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for hours in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Stunden in
+     * der Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for hours in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastHoursPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of minutes in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for minutes in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Minuten in
+     * der Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for minutes in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastMinutesPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of seconds in the past. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for seconds in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Sekunden in
+     * der Vergangenheit. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for seconds in the past
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getPastSecondsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of years in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for years in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Jahre in der
+     * Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for years in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureYearsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of months in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for months in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Monate in der
+     * Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for months in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureMonthsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of weeks in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for weeks in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Wochen in der
+     * Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for weeks in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureWeeksPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of days in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for days in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Tage in
+     * der Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for days in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureDaysPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of hours in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for hours in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Stunden in
+     * der Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for hours in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureHoursPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of minutes in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for minutes in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Minuten in
+     * der Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for minutes in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureMinutesPattern(
+        Locale language,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of seconds in the future. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for seconds in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
+     * einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der Sekunden in
+     * der Zukunft. </p>
+     *
+     * @param   language    language setting
+     * @param   category    plural category
+     * @return  unit pattern for seconds in the future
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getFutureSecondsPattern(
+        Locale language,
+        PluralCategory category
+    );
+
 }

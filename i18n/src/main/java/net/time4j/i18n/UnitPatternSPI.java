@@ -42,6 +42,9 @@ import java.util.ResourceBundle;
  * properties file all key variants must exist, varying over all units
  * and text widths. </p>
  *
+ * <p>The case is similar for past and future patterns - with the difference
+ * that the folder &quot;reltime&quot; is used instead. </p>
+ *
  * @author  Meno Hochschild
  */
 /*[deutsch]
@@ -57,6 +60,10 @@ import java.util.ResourceBundle;
  * alle Zeiteinheiten und Textbreiten). Der Algorithmus ist dokumentiert in
  * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
  * target="_blank">CLDR</a> ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
+ *
+ * <p>Die Vergangenheits- und Zukunftsmuster verhalten sich genauso - nur mit
+ * dem Unterschied, da&szlig; stattdessen der Ordner &quot;reltime&quot;
+ * benutzt wird. </p>
  *
  * @author  Meno Hochschild
  */
@@ -142,6 +149,146 @@ public final class UnitPatternSPI
 
     }
 
+    @Override
+    public String getPastYearsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'Y', false, category);
+
+    }
+
+    @Override
+    public String getPastMonthsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'M', false, category);
+
+    }
+
+    @Override
+    public String getPastWeeksPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'W', false, category);
+
+    }
+
+    @Override
+    public String getPastDaysPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'D', false, category);
+
+    }
+
+    @Override
+    public String getPastHoursPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'H', false, category);
+
+    }
+
+    @Override
+    public String getPastMinutesPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'N', false, category);
+
+    }
+
+    @Override
+    public String getPastSecondsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'S', false, category);
+
+    }
+
+    @Override
+    public String getFutureYearsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'Y', true, category);
+
+    }
+
+    @Override
+    public String getFutureMonthsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'M', true, category);
+
+    }
+
+    @Override
+    public String getFutureWeeksPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'W', true, category);
+
+    }
+
+    @Override
+    public String getFutureDaysPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'D', true, category);
+
+    }
+
+    @Override
+    public String getFutureHoursPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'H', true, category);
+
+    }
+
+    @Override
+    public String getFutureMinutesPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'N', true, category);
+
+    }
+
+    @Override
+    public String getFutureSecondsPattern(
+        Locale language,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'S', true, category);
+
+    }
+
     private String getUnitPattern(
         Locale lang,
         char unitID,
@@ -158,6 +305,28 @@ public final class UnitPatternSPI
 
         if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
             key = buildKey(unitID, width, PluralCategory.OTHER);
+        }
+
+        return rb.getString(key);
+
+    }
+
+    private String getRelativePattern(
+        Locale lang,
+        char unitID,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        ClassLoader loader = this.getClass().getClassLoader();
+        ResourceBundle.Control control =
+            UnitPatternControl.getInstance(category);
+        ResourceBundle rb =
+            ResourceBundle.getBundle("reltime/pattern", lang, loader, control);
+        String key = buildKey(unitID, future, category);
+
+        if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
+            key = buildKey(unitID, future, PluralCategory.OTHER);
         }
 
         return rb.getString(key);
@@ -188,6 +357,19 @@ public final class UnitPatternSPI
                 throw new UnsupportedOperationException(width.name());
         }
 
+        return sb.append(category.ordinal()).toString();
+
+    }
+
+    private static String buildKey(
+        char unitID,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        StringBuilder sb = new StringBuilder(3);
+        sb.append(unitID);
+        sb.append(future ? '+' : '-');
         return sb.append(category.ordinal()).toString();
 
     }
