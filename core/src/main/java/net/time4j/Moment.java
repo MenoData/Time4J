@@ -262,10 +262,8 @@ public final class Moment
             * 86400 + 86399;
     }
 
-    private static final Moment MIN =
-        new Moment(MIN_LIMIT, 0, TimeScale.POSIX);
-    private static final Moment MAX =
-        new Moment(MAX_LIMIT, MRD - 1, TimeScale.POSIX);
+    private static final Moment MIN = new Moment(MIN_LIMIT, 0, POSIX);
+    private static final Moment MAX = new Moment(MAX_LIMIT, MRD - 1, POSIX);
 
     /**
      * <p>Start of UNIX-era = [1970-01-01T00:00:00,000000000Z]. </p>
@@ -277,7 +275,7 @@ public final class Moment
 
     private static final ChronoFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
-        new Moment(86400, 0, TimeScale.UTC);
+        new Moment(86400 + POSIX_UTC_DELTA, 0, POSIX);
     private static final Set<ChronoElement<?>> HIGH_TIME_ELEMENTS;
     private static final Map<ChronoElement<?>, Integer> LOW_TIME_ELEMENTS;
     private static final Map<TimeUnit, Double> UNIT_LENGTHS;
@@ -563,7 +561,7 @@ public final class Moment
         if (
             (elapsedTime == 0)
             && (nanosecond == 0)
-            && (scale == TimeScale.POSIX)
+            && (scale == POSIX)
         ) {
             return Moment.UNIX_EPOCH;
         }
@@ -588,7 +586,10 @@ public final class Moment
 
         if (ut instanceof Moment) {
             return Moment.class.cast(ut);
-        } else if (ut instanceof UniversalTime) {
+        } else if (
+            (ut instanceof UniversalTime)
+            && LeapSeconds.getInstance().isEnabled()
+        ) {
             UniversalTime utc = UniversalTime.class.cast(ut);
             return Moment.of(
                 utc.getElapsedTime(UTC),
@@ -598,7 +599,7 @@ public final class Moment
             return Moment.of(
                 ut.getPosixTime(),
                 ut.getNanosecond(),
-                TimeScale.POSIX);
+                POSIX);
         }
 
     }
@@ -822,7 +823,8 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if this moment is before 1972
+     * @throws  UnsupportedOperationException if this moment or the result
+     *          is before 1972
      */
     /*[deutsch]
      * <p>Addiert einen Betrag in der angegegebenen SI-Zeiteinheit auf die
@@ -831,29 +833,37 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException wenn der Zeitpunkt vor 1972 ist
+     * @throws  UnsupportedOperationException if this moment or the result
+     *          is before 1972
      */
     public Moment plus(
         long amount,
         SI unit
     ) {
 
-        Moment.check1972(this);
+        if (amount == 0) {
+            return this;
+        } else if (amount > 0) {
+            Moment.check1972(this);
+        }
+
+        Moment result;
 
         switch (unit) {
             case SECONDS:
                 if (LeapSeconds.getInstance().isEnabled()) {
-                    return new Moment(
+                    result = new Moment(
                         MathUtils.safeAdd(this.getEpochTime(), amount),
                         this.getNanosecond(),
-                        TimeScale.UTC);
+                        UTC);
                 } else {
-                    return Moment.of(
+                    result = Moment.of(
                         MathUtils.safeAdd(this.posixTime, amount),
                         this.getNanosecond(),
-                        TimeScale.POSIX
+                        POSIX
                     );
                 }
+                break;
             case NANOSECONDS:
                 long sum =
                     MathUtils.safeAdd(this.getNanosecond(), amount);
@@ -861,21 +871,28 @@ public final class Moment
                 long second = MathUtils.floorDivide(sum, MRD);
 
                 if (LeapSeconds.getInstance().isEnabled()) {
-                    return new Moment(
+                    result = new Moment(
                         MathUtils.safeAdd(this.getEpochTime(), second),
                         nano,
-                        TimeScale.UTC
+                        UTC
                     );
                 } else {
-                    return Moment.of(
+                    result = Moment.of(
                         MathUtils.safeAdd(this.posixTime, second),
                         nano,
-                        TimeScale.POSIX
+                        POSIX
                     );
                 }
+                break;
             default:
                 throw new UnsupportedOperationException();
         }
+
+        if (amount < 0) {
+            Moment.check1972(result);
+        }
+
+        return result;
 
     }
 
@@ -1351,7 +1368,7 @@ public final class Moment
                     new Moment(
                         this.getNanosecond(),
                         MathUtils.safeAdd(
-                            this.getElapsedTime(TimeScale.TAI),
+                            this.getElapsedTime(TAI),
                             POSIX_UTC_DELTA)
                         );
                 sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
@@ -1362,7 +1379,7 @@ public final class Moment
                     new Moment(
                         this.getNanosecond(),
                         MathUtils.safeAdd(
-                            this.getElapsedTime(TimeScale.GPS),
+                            this.getElapsedTime(GPS),
                             POSIX_GPS_DELTA)
                         );
                 sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
@@ -1981,7 +1998,7 @@ public final class Moment
                 return Moment.of(
                     MathUtils.safeAdd(context.getPosixTime(), secs),
                     context.getNanosecond(),
-                    TimeScale.POSIX
+                    POSIX
                 );
             } else { // MILLIS, MICROS, NANOS
                 long nanos =
@@ -1993,7 +2010,7 @@ public final class Moment
                 return Moment.of(
                     MathUtils.safeAdd(context.getPosixTime(), second),
                     nano,
-                    TimeScale.POSIX
+                    POSIX
                 );
             }
 

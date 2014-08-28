@@ -124,6 +124,16 @@ public class MomentArithmeticTest {
             is(Moment.of(1278028823, TimeScale.UTC)));
     }
 
+    @Test(expected=UnsupportedOperationException.class)
+    public void plusSISecondsBefore1972() {
+        Moment.of(-1, TimeScale.UTC).plus(3, SI.SECONDS);
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void minusSISecondsBefore1972() {
+        Moment.of(2, TimeScale.UTC).minus(3, SI.SECONDS);
+    }
+
     @Test
     public void betweenSISeconds() {
         assertThat(
