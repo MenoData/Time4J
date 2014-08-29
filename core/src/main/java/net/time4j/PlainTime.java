@@ -2100,7 +2100,7 @@ public final class PlainTime
             ClockUnit unit
         ) {
 
-            if (amount == 0) {
+            if ((amount == 0) && (context.hour < 24)) {
                 return new DayCycles(0, context);
             }
 
