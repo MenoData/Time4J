@@ -1307,7 +1307,7 @@ public final class PlainTime
      * @param   amount      amount to be added (maybe negative)
      * @param   unit        time unit
      * @return  result of rolling including possible day overflow
-     * @see     #plus(long, Object) plus(long, Unit)
+     * @see     #plus(long, IsoTimeUnit)
      */
     /*[deutsch]
      * <p>Rollt die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
@@ -1316,7 +1316,7 @@ public final class PlainTime
      * @param   amount      amount to be added (maybe negative)
      * @param   unit        time unit
      * @return  result of rolling including possible day overflow
-     * @see     #plus(long, Object) plus(long, Unit)
+     * @see     #plus(long, IsoTimeUnit)
      */
     public DayCycles roll(
         long amount,
@@ -2185,22 +2185,22 @@ public final class PlainTime
             }
 
             int hour = MathUtils.floorModulo(hours, 24);
-            PlainTime ret;
+            PlainTime time;
 
-            if ((hour | minute | second | fraction) == 0) {
-                ret = ((amount > 0) ? PlainTime.MAX : PlainTime.MIN);
+            if ((hour | minute | second | fraction) == 0) { // midnight
+                time = (
+                	((amount > 0) && (returnType == PlainTime.class)) 
+                	? PlainTime.MAX 
+                	: PlainTime.MIN);
             } else {
-                ret = PlainTime.of(hour, minute, second, fraction);
+                time = PlainTime.of(hour, minute, second, fraction);
             }
 
             if (returnType == PlainTime.class) {
-                return returnType.cast(ret);
+                return returnType.cast(time);
             } else {
                 long cycles = MathUtils.floorDivide(hours, 24);
-                if (context.hour == 24) {
-                    cycles--;
-                }
-                return returnType.cast(new DayCycles(cycles, ret));
+                return returnType.cast(new DayCycles(cycles, time));
             }
 
         }
