@@ -54,10 +54,10 @@ public class TimeArithmeticTest {
         DayCycles cycles = PlainTime.midnightAtStartOfDay().roll(48, HOURS);
         assertThat(
             cycles.getDayOverflow(),
-            is(2L)); // a) T0->T24 => Overflow=+1, b) T24+24hours => Overflow=+1
+            is(2L));
         assertThat(
             cycles.getWallTime(),
-            is(PlainTime.of(24)));
+            is(PlainTime.midnightAtStartOfDay()));
     }
 
     @Test
@@ -65,10 +65,10 @@ public class TimeArithmeticTest {
         DayCycles cycles = PlainTime.midnightAtEndOfDay().roll(48, HOURS);
         assertThat(
             cycles.getDayOverflow(),
-            is(2L));
+            is(3L));
         assertThat(
             cycles.getWallTime(),
-            is(PlainTime.of(24)));
+            is(PlainTime.midnightAtStartOfDay()));
     }
 
     @Test
@@ -76,10 +76,10 @@ public class TimeArithmeticTest {
         DayCycles cycles = PlainTime.midnightAtEndOfDay().roll(-48, HOURS);
         assertThat(
             cycles.getDayOverflow(),
-            is(-2L)); // a) T24->T0 => Overflow=-1, b) T0-24hours => Overflow=-1
+            is(-1L));
         assertThat(
             cycles.getWallTime(),
-            is(PlainTime.of(0)));
+            is(PlainTime.midnightAtStartOfDay()));
     }
 
     @Test
@@ -116,6 +116,9 @@ public class TimeArithmeticTest {
 
     @Test
     public void plusSomeMinutes() {
+        assertThat(
+            PlainTime.of(23, 59).plus(1, MINUTES),
+            is(PlainTime.midnightAtEndOfDay()));
         assertThat(
             PlainTime.of(0).plus(24 * 60 + 1, MINUTES),
             is(PlainTime.of(0, 1)));

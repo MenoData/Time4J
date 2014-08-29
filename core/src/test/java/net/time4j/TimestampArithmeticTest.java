@@ -53,6 +53,12 @@ public class TimestampArithmeticTest {
         assertThat(
             PlainTimestamp.of(2012, 1, 31, 12, 45).plus(1501, MINUTES),
             is(PlainTimestamp.of(2012, 2, 1, 13, 46)));
+        assertThat(
+            PlainTimestamp.of(2012, 1, 31, 23, 59).plus(1, MINUTES),
+            is(PlainTimestamp.of(2012, 2, 1, 0, 0)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 1, 0, 0).plus(1, MINUTES),
+            is(PlainTimestamp.of(2012, 2, 1, 0, 1)));
     }
 
     @Test
@@ -61,6 +67,12 @@ public class TimestampArithmeticTest {
         assertThat(
             PlainTimestamp.of(2012, 2, 29, 11, 43, 59).minus(amount, MINUTES),
             is(PlainTimestamp.of(2012, 1, 31, 12, 45, 59)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 1, 0, 0).minus(1, MINUTES),
+            is(PlainTimestamp.of(2012, 1, 31, 23, 59)));
+        assertThat(
+            PlainTimestamp.of(2012, 2, 1, 0, 1).minus(1, MINUTES),
+            is(PlainTimestamp.of(2012, 2, 1, 0, 0)));
     }
 
     @Test
