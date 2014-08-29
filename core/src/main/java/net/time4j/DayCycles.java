@@ -91,12 +91,12 @@ public final class DayCycles implements Serializable {
     /**
      * <p>Gets the rolled wall time. </p>
      *
-     * @return  wall time
+     * @return  wall time (never 24:00)
      */
     /*[deutsch]
      * <p>Ermittelt die Uhrzeit. </p>
      *
-     * @return  wall time
+     * @return  wall time (never 24:00)
      */
     public PlainTime getWallTime() {
         return this.time;
