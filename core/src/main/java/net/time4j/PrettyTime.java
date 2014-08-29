@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
+import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.TextWidth;
@@ -79,7 +80,8 @@ public final class PrettyTime {
     ) {
         super();
 
-        this.rules = PluralRules.of(language); // throws NPE if locale == null
+        // throws NPE if locale == null
+        this.rules = PluralRules.of(language, NumberType.CARDINALS);
         this.language = language;
         this.reference = reference;
 

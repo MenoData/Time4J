@@ -41,7 +41,8 @@ import static net.time4j.format.PluralCategory.ZERO;
  * CLDR-version 25 but can be overridden if necessary. The source data
  * of the underlying algorithms to determine the plural category can be
  * found in CLDR-repository-file &quot;core.zip&quot; along the path
- * &quot;common/supplemental/plurals.xml&quot;. </p>
+ * &quot;common/supplemental/plurals.xml&quot; for cardinal numbers and
+ * &quot;common/supplemental/ordinals.xml&quot; for ordinal numbers. </p>
  *
  * @author  Meno Hochschild
  * @since   1.2
@@ -56,7 +57,8 @@ import static net.time4j.format.PluralCategory.ZERO;
  * werden. Die Quelldaten der zugrundeliegenden Algorithmen, die die
  * Pluralkategorie zu bestimmen helfen, k&ouml;nnen im CLDR-Repositorium
  * &quot;core.zip&quot; und dem Pfad &quot;common/supplemental/plurals.xml&quot;
- * gefunden werden. </p>
+ * (f&uuml;r Grundzahlen) gefunden werden. Ordinalzahlregeln sind in der
+ * Datei &quot;common/supplemental/ordinals.xml&quot; zu finden. </p>
  *
  * @author  Meno Hochschild
  * @since   1.2
@@ -66,43 +68,68 @@ public abstract class PluralRules {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<String, PluralRules> LANGUAGE_MAP =
+    private static final Map<String, PluralRules> CARDINAL_MAP =
         new ConcurrentHashMap<String, PluralRules>(140);
-    private static final PluralRules STD_RULES = new CLDR(0);
+    private static final PluralRules STD_CARDINALS = new StdCardinalRules(0);
 
     static {
-        Map<String, PluralRules> map = new HashMap<String, PluralRules>();
-        fill(map, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
-        fill(map, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
-        fill(map, "am bn fa gu hi kn mr zu", 1);
-        fill(map, "ff fr hy kab", 1);
-        fill(map, "si", 1);
-        fill(map, "ak bh guw ln mg nso pa ti wa", 1);
-        fill(map, "tzm", 2);
-        fill(map, "is", 3);
-        fill(map, "mk", 4);
-        fill(map, "fil tl", 5);
-        fill(map, "lv prg", 6);
-        fill(map, "lag ksh", 7);
-        fill(map, "iu kw naq se sma smi smj smn sms", 8);
-        fill(map, "shi", 9);
-        fill(map, "mo ro", 10);
-        fill(map, "bs hr sh sr", 11);
-        fill(map, "gd", 12);
-        fill(map, "sl", 13);
-        fill(map, "he iw", 14);
-        fill(map, "cs sk", 15);
-        fill(map, "pl", 16);
-        fill(map, "be", 17);
-        fill(map, "lt", 18);
-        fill(map, "mt", 19);
-        fill(map, "ru uk", 17);
-        fill(map, "br", 20);
-        fill(map, "ga", 21);
-        fill(map, "gv", 22);
-        fill(map, "ar", 23);
-        fill(map, "cy", 24);
-        LANGUAGE_MAP.putAll(map);
+        Map<String, PluralRules> cmap = new HashMap<String, PluralRules>();
+        fillC(cmap, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
+        fillC(cmap, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
+        fillC(cmap, "am bn fa gu hi kn mr zu", 1);
+        fillC(cmap, "ff fr hy kab", 1);
+        fillC(cmap, "si", 1);
+        fillC(cmap, "ak bh guw ln mg nso pa ti wa", 1);
+        fillC(cmap, "tzm", 2);
+        fillC(cmap, "is", 3);
+        fillC(cmap, "mk", 4);
+        fillC(cmap, "fil tl", 5);
+        fillC(cmap, "lv prg", 6);
+        fillC(cmap, "lag ksh", 7);
+        fillC(cmap, "iu kw naq se sma smi smj smn sms", 8);
+        fillC(cmap, "shi", 9);
+        fillC(cmap, "mo ro", 10);
+        fillC(cmap, "bs hr sh sr", 11);
+        fillC(cmap, "gd", 12);
+        fillC(cmap, "sl", 13);
+        fillC(cmap, "he iw", 14);
+        fillC(cmap, "cs sk", 15);
+        fillC(cmap, "pl", 16);
+        fillC(cmap, "be", 17);
+        fillC(cmap, "lt", 18);
+        fillC(cmap, "mt", 19);
+        fillC(cmap, "ru uk", 17);
+        fillC(cmap, "br", 20);
+        fillC(cmap, "ga", 21);
+        fillC(cmap, "gv", 22);
+        fillC(cmap, "ar", 23);
+        fillC(cmap, "cy", 24);
+        CARDINAL_MAP.putAll(cmap);
+    }
+
+    private static final Map<String, PluralRules> ORDINAL_MAP =
+        new ConcurrentHashMap<String, PluralRules>(140);
+    private static final PluralRules STD_ORDINALS = new StdOrdinalRules(0);
+
+    static {
+        Map<String, PluralRules> omap = new HashMap<String, PluralRules>();
+        fillO(omap, "sv", 1);
+        fillO(omap, "fil fr hy lo mo ms ro tl vi", 2);
+        fillO(omap, "hu", 3);
+        fillO(omap, "ne", 4);
+        fillO(omap, "kk", 5);
+        fillO(omap, "it", 6);
+        fillO(omap, "ka", 7);
+        fillO(omap, "sq", 8);
+        fillO(omap, "en", 9);
+        fillO(omap, "mr", 10);
+        fillO(omap, "ca", 11);
+        fillO(omap, "mk", 12);
+        fillO(omap, "az", 13);
+        fillO(omap, "gu hi", 14);
+        fillO(omap, "bn", 15);
+        fillO(omap, "cy", 16);
+        ORDINAL_MAP.putAll(omap);
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -110,21 +137,42 @@ public abstract class PluralRules {
     /**
      * <p>Gets the localized plural rules for given language. </p>
      *
-     * @param   lang    language which specifies the suitable plural rules
+     * @param   lang        language which specifies the suitable plural rules
+     * @param   numType     number type
      * @return  localized plural rules
      */
     /*[deutsch]
      * <p>Ermittelt die Pluralregeln f&uuml;r die angegebene Sprache. </p>
      *
      * @param   lang    language which specifies the suitable plural rules
+     * @param   numType     number type
      * @return  localized plural rules
      */
-    public static PluralRules of(Locale lang) {
+    public static PluralRules of(
+        Locale lang,
+        NumberType numType
+    ) {
 
-        PluralRules rules = LANGUAGE_MAP.get(lang.getLanguage());
+        Map<String, PluralRules> map;
+        PluralRules stdRules;
+
+        switch (numType) {
+            case CARDINALS:
+                map = CARDINAL_MAP;
+                stdRules = STD_CARDINALS;
+                break;
+            case ORDINALS:
+                map = ORDINAL_MAP;
+                stdRules = STD_ORDINALS;
+                break;
+            default:
+                throw new UnsupportedOperationException(numType.name());
+        }
+
+        PluralRules rules = map.get(lang.getLanguage());
 
         if (rules == null) {
-            return STD_RULES;
+            return stdRules;
         }
 
         return rules;
@@ -150,11 +198,21 @@ public abstract class PluralRules {
         PluralRules rules
     ) {
 
-        if (rules == null) {
-            throw new NullPointerException("Missing plural rules.");
+        Map<String, PluralRules> map;
+        NumberType numType = rules.getNumberType();
+
+        switch (numType) {
+            case CARDINALS:
+                map = CARDINAL_MAP;
+                break;
+            case ORDINALS:
+                map = ORDINAL_MAP;
+                break;
+            default:
+                throw new UnsupportedOperationException(numType.name());
         }
 
-        LANGUAGE_MAP.put(lang.getLanguage(), rules);
+        map.put(lang.getLanguage(), rules);
 
     }
 
@@ -173,21 +231,45 @@ public abstract class PluralRules {
      */
     public abstract PluralCategory getCategory(long count);
 
-    private static void fill(
+    /**
+     * <p>Yields the number type these rules are referring to. </p>
+     *
+     * @return number type
+     */
+    /*[deutsch]
+     * <p>Liefert den Zahltyp, auf den sich diese Regeln beziehen. </p>
+     *
+     * @return number type
+     */
+    public abstract NumberType getNumberType();
+
+    private static void fillC(
         Map<String, PluralRules> map,
         String languages,
         int id
     ) {
 
         for (String language : languages.split(" ")) {
-            map.put(language, new CLDR(id));
+            map.put(language, new StdCardinalRules(id));
+        }
+
+    }
+
+    private static void fillO(
+        Map<String, PluralRules> map,
+        String languages,
+        int id
+    ) {
+
+        for (String language : languages.split(" ")) {
+            map.put(language, new StdOrdinalRules(id));
         }
 
     }
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class CLDR
+    private static class StdCardinalRules
         extends PluralRules {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -196,7 +278,7 @@ public abstract class PluralRules {
 
         //~ Konstruktoren -------------------------------------------------
 
-        private CLDR(int id) {
+        private StdCardinalRules(int id) {
             super();
 
             this.id = id;
@@ -470,6 +552,232 @@ public abstract class PluralRules {
                 default: // chinesisch (zh)
                     return OTHER;
             }
+
+        }
+
+        @Override
+        public NumberType getNumberType() {
+
+            return NumberType.CARDINALS;
+
+        }
+
+    }
+
+    private static class StdOrdinalRules
+        extends PluralRules {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final int id;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private StdOrdinalRules(int id) {
+            super();
+
+            this.id = id;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PluralCategory getCategory(long n) {
+
+            long mod10 = -1;
+            long mod100 = -1;
+
+            switch (this.id) {
+                case 0: // STD_RULES
+                    return OTHER;
+                case 1: // schwedisch (sv)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    if (
+                        ((mod10 == 1) || (mod10 == 2))
+                        && !((mod100 == 11) || (mod100 == 12))
+                    ) {
+                        return ONE;
+                    }
+                    return OTHER;
+                case 2: // französisch (fr)
+                    if (n == 1) {
+                        return ONE;
+                    }
+                    return OTHER;
+                case 3: // ungarisch (hu)
+                    if ((n == 1) || (n == 5)) {
+                        return ONE;
+                    }
+                    return OTHER;
+                case 4: // nepalesisch (ne)
+                    if ((n >= 1) || (n <= 4)) {
+                        return ONE;
+                    }
+                    return OTHER;
+                case 5: // kasachisch (kk)
+                    mod10 = n % 10;
+                    if (
+                        (mod10 == 6)
+                        || (mod10 == 9)
+                        || ((mod10 == 0) && (n != 0))
+                    ) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 6: // italienisch (it)
+                    if (
+                        (n == 8)
+                        || (n == 11)
+                        || (n == 80)
+                        || (n == 800)
+                    ) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 7: // georgisch (ka)
+                    mod100 = n % 100;
+                    if (n == 1) {
+                        return ONE;
+                    } else if (
+                        (n == 0)
+                        || (mod100 >= 2 && mod100 <= 20)
+                        || (mod100 == 40)
+                        || (mod100 == 60)
+                        || (mod100 == 80)
+                    ) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 8: // albanisch (sq)
+                    if (n == 1) {
+                        return ONE;
+                    } else if (((n % 10) == 4) && ((n % 100) != 14)) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 9: // englisch (en)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    if ((mod10 == 1) && (mod100 != 11)) {
+                        return ONE;
+                    } else if ((mod10 == 2) && (mod100 != 12)) {
+                        return TWO;
+                    } else if ((mod10 == 3) && (mod100 != 13)) {
+                        return FEW;
+                    }
+                    return OTHER;
+                case 10: // Marathi - Indien (mr)
+                    if (n == 1) {
+                        return ONE;
+                    } else if ((n == 2) || (n == 3)) {
+                        return TWO;
+                    } else if (n == 4) {
+                        return FEW;
+                    }
+                    return OTHER;
+                case 11: // katalanisch (ca)
+                    if ((n == 1) || (n == 3)) {
+                        return ONE;
+                    } else if (n == 2) {
+                        return TWO;
+                    } else if (n == 4) {
+                        return FEW;
+                    }
+                    return OTHER;
+                case 12: // mazedonisch (mk)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    if ((mod10 == 1) && (mod100 != 11)) {
+                        return ONE;
+                    } else if ((mod10 == 2) && (mod100 != 12)) {
+                        return TWO;
+                    } else if (
+                        ((mod10 == 7) || (mod10 == 8))
+                        && !((mod100 == 17) || (mod100 == 18))
+                    ) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 13: // aserbeidschanisch (az)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    long mod1000 = n % 1000;
+                    if (
+                        (mod10 == 1) || (mod10 == 2) || (mod10 == 5)
+                        || (mod10 == 7) || (mod10 == 8) || (mod100 == 20)
+                        || (mod100 == 50) || (mod100 == 70) || (mod100 == 80)
+                    ) {
+                        return ONE;
+                    } else if (
+                        (mod10 == 3) || (mod10 == 4)
+                        || (mod1000 == 100) || (mod1000 == 200)
+                        || (mod1000 == 300) || (mod1000 == 400)
+                        || (mod1000 == 500) || (mod1000 == 600)
+                        || (mod1000 == 700) || (mod1000 == 800)
+                        || (mod1000 == 900)
+                    ) {
+                        return FEW;
+                    } else if (
+                        (n == 0) || (mod10 == 6)
+                        || (mod100 == 40)|| (mod100 == 60)|| (mod100 == 90)
+                    ) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 14: // hindi (hi)
+                    if (n == 1) {
+                        return ONE;
+                    } else if ((n == 2) || (n == 3)) {
+                        return TWO;
+                    } else if (n == 4) {
+                        return FEW;
+                    } else if (n == 6) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 15: // bengalisch (bn)
+                    if (
+                        (n == 1)
+                        || (n == 5)
+                        || ((n >= 7) && (n <= 10))
+                    ) {
+                        return ONE;
+                    } else if ((n == 2) || (n == 3)) {
+                        return TWO;
+                    } else if (n == 4) {
+                        return FEW;
+                    } else if (n == 6) {
+                        return MANY;
+                    }
+                    return OTHER;
+                case 16: // walisisch (cy)
+                    if (
+                        (n == 0)
+                        || ((n >= 7) && (n <= 9))
+                    ) {
+                        return ZERO;
+                    } else if (n == 1) {
+                        return ONE;
+                    } else if (n == 2) {
+                        return TWO;
+                    } else if ((n == 3) || (n == 4)) {
+                        return FEW;
+                    } else if ((n == 5) || (n == 6)) {
+                        return MANY;
+                    }
+                    return OTHER;
+                default: // fallback
+                    return OTHER;
+            }
+
+        }
+
+        @Override
+        public NumberType getNumberType() {
+
+            return NumberType.ORDINALS;
 
         }
 

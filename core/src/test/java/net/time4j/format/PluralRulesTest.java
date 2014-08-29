@@ -13,8 +13,9 @@ import static org.junit.Assert.assertThat;
 public class PluralRulesTest {
 
     @Test
-    public void english() {
-        PluralRules rules = PluralRules.of(Locale.ENGLISH);
+    public void englishCardinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.ENGLISH, NumberType.CARDINALS);
         assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
         assertThat(rules.getCategory(1), is(PluralCategory.ONE));
         assertThat(rules.getCategory(2), is(PluralCategory.OTHER));
@@ -22,8 +23,35 @@ public class PluralRulesTest {
     }
 
     @Test
-    public void german() {
-        PluralRules rules = PluralRules.of(Locale.GERMAN);
+    public void englishOrdinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.ENGLISH, NumberType.ORDINALS);
+        assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(1), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(21), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(31), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(51), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(101), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(2), is(PluralCategory.TWO));
+        assertThat(rules.getCategory(22), is(PluralCategory.TWO));
+        assertThat(rules.getCategory(92), is(PluralCategory.TWO));
+        assertThat(rules.getCategory(3), is(PluralCategory.FEW));
+        assertThat(rules.getCategory(23), is(PluralCategory.FEW));
+        assertThat(rules.getCategory(24), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(10), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(11), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(12), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(13), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(14), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(20), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(30), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(111), is(PluralCategory.OTHER));
+    }
+
+    @Test
+    public void germanCardinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.GERMAN, NumberType.CARDINALS);
         assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
         assertThat(rules.getCategory(1), is(PluralCategory.ONE));
         assertThat(rules.getCategory(2), is(PluralCategory.OTHER));
@@ -31,8 +59,20 @@ public class PluralRulesTest {
     }
 
     @Test
-    public void french() {
-        PluralRules rules = PluralRules.of(Locale.FRENCH);
+    public void germanOrdinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.GERMAN, NumberType.ORDINALS);
+        assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(1), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(2), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(11), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(56), is(PluralCategory.OTHER));
+    }
+
+    @Test
+    public void frenchCardinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.FRENCH, NumberType.CARDINALS);
         assertThat(rules.getCategory(0), is(PluralCategory.ONE));
         assertThat(rules.getCategory(1), is(PluralCategory.ONE));
         assertThat(rules.getCategory(2), is(PluralCategory.OTHER));
@@ -40,8 +80,19 @@ public class PluralRulesTest {
     }
 
     @Test
-    public void arabic() {
-        PluralRules rules = PluralRules.of(new Locale("ar"));
+    public void frenchOrdinals() {
+        PluralRules rules =
+            PluralRules.of(Locale.FRENCH, NumberType.ORDINALS);
+        assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(1), is(PluralCategory.ONE));
+        assertThat(rules.getCategory(2), is(PluralCategory.OTHER));
+        assertThat(rules.getCategory(11), is(PluralCategory.OTHER));
+    }
+
+    @Test
+    public void arabicCardinals() {
+        PluralRules rules =
+            PluralRules.of(new Locale("ar"), NumberType.CARDINALS);
         assertThat(rules.getCategory(0), is(PluralCategory.ZERO));
         assertThat(rules.getCategory(1), is(PluralCategory.ONE));
         assertThat(rules.getCategory(2), is(PluralCategory.TWO));
@@ -56,8 +107,9 @@ public class PluralRulesTest {
     }
 
     @Test
-    public void russian() {
-        PluralRules rules = PluralRules.of(new Locale("ru"));
+    public void russianCardinals() {
+        PluralRules rules =
+            PluralRules.of(new Locale("ru"), NumberType.CARDINALS);
         assertThat(rules.getCategory(1), is(PluralCategory.ONE));
         assertThat(rules.getCategory(21), is(PluralCategory.ONE));
         assertThat(rules.getCategory(2), is(PluralCategory.FEW));
@@ -69,8 +121,9 @@ public class PluralRulesTest {
     }
 
     @Test
-    public void chinese() {
-        PluralRules rules = PluralRules.of(new Locale("zh"));
+    public void chineseCardinals() {
+        PluralRules rules =
+            PluralRules.of(new Locale("zh"), NumberType.CARDINALS);
         assertThat(rules.getCategory(0), is(PluralCategory.OTHER));
         assertThat(rules.getCategory(1), is(PluralCategory.OTHER));
         assertThat(rules.getCategory(77), is(PluralCategory.OTHER));
