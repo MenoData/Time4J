@@ -307,6 +307,7 @@ public final class UnitPatternSPI
 
         if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
             key = buildKey(unitID, width, PluralCategory.OTHER);
+            // Hinweis: root-locale hat nur die Kategorie OTHER !
         }
 
         return rb.getString(key);
@@ -329,6 +330,7 @@ public final class UnitPatternSPI
 
         if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
             key = buildKey(unitID, future, PluralCategory.OTHER);
+            // Hinweis: root-locale hat nur die Kategorie OTHER !
         }
 
         return rb.getString(key);
