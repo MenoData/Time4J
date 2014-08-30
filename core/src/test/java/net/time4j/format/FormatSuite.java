@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MiscellaneousTest.class,
         MomentPatternTest.class,
         OffsetPatternTest.class,
+        OrdinalTest.class,
         ParsingTextOverflowTest.class,
         PluralRulesTest.class,
         WhitespaceTest.class

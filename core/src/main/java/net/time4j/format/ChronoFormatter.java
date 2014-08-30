@@ -1786,7 +1786,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          SignPolicy.SHOW_ALWAYS)
          *      .build();
          *  System.out.println(
-         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *      formatter.format(PlainTime.of(12, 0, 0, 12345678)));
          *  // output: +012
          * </pre>
          *
@@ -1842,7 +1842,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          SignPolicy.SHOW_ALWAYS)
          *      .build();
          *  System.out.println(
-         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *      formatter.format(PlainTime.of(12, 0, 0, 12345678)));
          *  // Ausgabe: +012
          * </pre>
          *
@@ -2192,7 +2192,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          true
          *      ).build();
          *  System.out.println(
-         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *      formatter.format(PlainTime.of(12, 0, 0, 12345678)));
          *  // output in US: .012345
          * </pre>
          *
@@ -2265,7 +2265,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          true
          *      ).build();
          *  System.out.println(
-         *      formatter.format(new PlainTime(12, 0, 0, 12345678)));
+         *      formatter.format(PlainTime.of(12, 0, 0, 12345678)));
          *  // Ausgabe in den USA: .012345
          * </pre>
          *
@@ -2325,6 +2325,144 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             return this;
+        }
+
+        /**
+         * <p>Defines an ordinal format for given chronological
+         * element in english language. </p>
+         *
+         * <p>An ordinal indicator will be printed or parsed after a
+         * given sequence of digits. In English the indicators &quot;st&quot;,
+         * &quot;nd&quot;, &quot;rd&quot; and &quot;th&quot; are used
+         * dependent on the value of the element. </p>
+         *
+         * @param   element         chronological element
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addOrdinal(ChronoElement,Map)
+         */
+        /*[deutsch]
+         * <p>Definiert ein Ordinalformat f&uuml;r das angegebene chronologische
+         * Element in der englischen Sprache. </p>
+         *
+         * <p>Ein Ordinal-Indikator wird als Suffix an eine Ziffernfolge
+         * angeh&auml;ngt. In Englisch gibt es die Indikatoren &quot;st&quot;,
+         * &quot;nd&quot;, &quot;rd&quot; und &quot;th&quot;, welche vom
+         * numerischen Wert des Elements abh&auml;ngig sind. </p>
+         *
+         * @param   element         chronological element
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addOrdinal(ChronoElement,Map)
+         */
+        public Builder<T> addEnglishOrdinal(ChronoElement<Integer> element) {
+
+            return this.addOrdinalProcessor(element, null);
+
+        }
+
+        /**
+         * <p>Defines an ordinal format for given chronological
+         * element. </p>
+         *
+         * <p>An ordinal indicator will be printed or parsed after a
+         * given sequence of digits. In English the indicators &quot;st&quot;,
+         * &quot;nd&quot;, &quot;rd&quot; and &quot;th&quot; are used
+         * dependent on the value of the element. In many other languages a
+         * fixed literal can be sufficient (although often context-dependent).
+         * This method is necessary if the indicators of a given language
+         * depend on the numerical value of the element. </p>
+         *
+         * <p>Example for French: </p>
+         * <pre>
+         *  ChronoElement&lt;Integer&gt; element = PlainDate.DAY_OF_MONTH;
+         *  Map&lt;PluralCategory, String&gt; indicators =
+         *      new HashMap&lt;PluralCategory, String&gt;();
+         *  indicators.put(PluralCategory.ONE, "&lt;sup&gt;er&lt;/sup&gt;");
+         *  indicators.put(PluralCategory.OTHER, "&lt;sup&gt;e&lt;/sup&gt;");
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainDate.class, Locale.FRENCH)
+         *      .addOrdinal(element, indicators)
+         *      .addLiteral(&quot; jour&quot;)
+         *      .build();
+         *  System.out.println(
+         *      formatter.format(PlainDate.of(2014, 8, 1)));
+         *  // output: 1&lt;sup&gt;er&lt;/sup&gt; jour
+         * </pre>
+         *
+         * <p>Note that dependent on the context other strings can be necessary,
+         * for example French also uses feminine forms (for the week etc.). </p>
+         *
+         * @param   element         chronological element
+         * @param   indicators      ordinal indicators to be used as suffixes
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if there is no indicator at least
+         *          for the plural category OTHER
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        /*[deutsch]
+         * <p>Definiert ein Ordinalformat f&uuml;r das angegebene chronologische
+         * Element. </p>
+         *
+         * <p>Ein Ordinal-Indikator wird als Suffix an eine Ziffernfolge
+         * angeh&auml;ngt. In Englisch gibt es die Indikatoren &quot;st&quot;,
+         * &quot;nd&quot;, &quot;rd&quot; und &quot;th&quot;, welche vom
+         * numerischen Wert des Elements abh&auml;ngig sind. In vielen
+         * anderen Sprachen ist eine festes Literal ausreichend (obwohl oft
+         * kontext-abh&auml;ngig). Diese Methode ist notwendig, wenn die
+         * Indikatoren in einer gegebenen Sprache vom numerischen Wert des
+         * Elements abh&auml;ngig sind. </p>
+         *
+         * <p>Beispiel f&uuml;r Franz&ouml;sisch: </p>
+         * <pre>
+         *  ChronoElement&lt;Integer&gt; element = PlainDate.DAY_OF_MONTH;
+         *  Map&lt;PluralCategory, String&gt; indicators =
+         *      new HashMap&lt;PluralCategory, String&gt;();
+         *  indicators.put(PluralCategory.ONE, "&lt;sup&gt;er&lt;/sup&gt;");
+         *  indicators.put(PluralCategory.OTHER, "&lt;sup&gt;e&lt;/sup&gt;");
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainDate.class, Locale.FRENCH)
+         *      .addOrdinal(element, indicators)
+         *      .addLiteral(&quot; jour&quot;)
+         *      .build();
+         *  System.out.println(
+         *      formatter.format(PlainDate.of(2014, 8, 1)));
+         *  // Ausgabe: 1&lt;sup&gt;er&lt;/sup&gt; jour
+         * </pre>
+         *
+         * <p>Zu beachten ist, da&szlig; abh&auml;ngig vom Kontext andere
+         * Textformen notwendig sein k&ouml;nnen. Zum Beispiel kennt die
+         * franz&ouml;sische Sprache auch weibliche Formen (etwa f&uuml;r
+         * die Woche etc.). </p>
+         *
+         * @param   element         chronological element
+         * @param   indicators      ordinal indicators to be used as suffixes
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if there is no indicator at least
+         *          for the plural category OTHER
+         * @throws  IllegalStateException if a numerical element is added
+         *          multiple times in a row
+         * @see     Chronology#isSupported(ChronoElement)
+         */
+        public Builder<T> addOrdinal(
+            ChronoElement<Integer> element,
+            Map<PluralCategory, String> indicators
+        ) {
+
+            if (indicators == null) {
+                throw new NullPointerException("Missing ordinal indicators.");
+            }
+
+            return this.addOrdinalProcessor(element, indicators);
+
         }
 
         /**
@@ -3695,6 +3833,30 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             } else {
                 this.addProcessor(np);
                 this.reservedIndex = this.steps.size() - 1;
+            }
+
+            return this;
+
+        }
+
+        private Builder<T> addOrdinalProcessor(
+            ChronoElement<Integer> element,
+            Map<PluralCategory, String> indicators
+        ) {
+
+            this.checkElement(element);
+            FormatStep last = this.checkAfterFraction(element);
+            OrdinalProcessor p = new OrdinalProcessor(element, indicators);
+
+            if (
+                (last != null)
+                && last.isNumerical()
+            ) {
+                throw new IllegalStateException(
+                    "Ordinal element with variable width can't be inserted "
+                    + "after another numerical element.");
+            } else {
+                this.addProcessor(p);
             }
 
             return this;
