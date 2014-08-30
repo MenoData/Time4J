@@ -850,11 +850,11 @@ public final class PlainTime
      *
      * <pre>
      *  // reading of precision -------------------------------------
-     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  PlainTime time = PlainTime.of(12, 26, 52, 987654000);
      *  System.out.println(time.get(PRECISION)); // Output: MICROS
      *
      *  // setting of precision -------------------------------------
-     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  PlainTime time = PlainTime.of(12, 26, 52, 987654000);
      *  System.out.println(time.with(PRECISION, ClockUnit.MILLIS));
      *  // Output: T12:26:52,987
      * </pre>
@@ -871,11 +871,11 @@ public final class PlainTime
      *
      * <pre>
      *  // Lesen der Genauigkeit ------------------------------------
-     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  PlainTime time = PlainTime.of(12, 26, 52, 987654000);
      *  System.out.println(time.get(PRECISION)); // Ausgabe: MICROS
      *
      *  // Setzen der Genauigkeit -----------------------------------
-     *  PlainTime time = new PlainTime(12, 26, 52, 987654000);
+     *  PlainTime time = PlainTime.of(12, 26, 52, 987654000);
      *  System.out.println(time.with(PRECISION, ClockUnit.MILLIS));
      *  // Ausgabe: T12:26:52,987
      * </pre>
@@ -2189,8 +2189,8 @@ public final class PlainTime
 
             if ((hour | minute | second | fraction) == 0) { // midnight
                 time = (
-                	((amount > 0) && (returnType == PlainTime.class)) 
-                	? PlainTime.MAX 
+                	((amount > 0) && (returnType == PlainTime.class))
+                	? PlainTime.MAX
                 	: PlainTime.MIN);
             } else {
                 time = PlainTime.of(hour, minute, second, fraction);
