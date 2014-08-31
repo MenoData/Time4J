@@ -81,4 +81,13 @@ public class DurationNormalizerTest {
             is(Duration.ofClockUnits(3, 3, 0)));
     }
 
+    @Test
+    public void withMinutesOnly() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(2, 61, 122);
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.only()),
+            is(Duration.of(183, ClockUnit.MINUTES)));
+    }
+
 }

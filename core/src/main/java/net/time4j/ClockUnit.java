@@ -22,7 +22,9 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimePoint;
+import net.time4j.engine.TimeSpan;
 
 
 /**
@@ -229,6 +231,65 @@ public enum ClockUnit
         } else {
             return (sourceDuration / FACTORS[o2 - o1]);
         }
+
+    }
+
+    /**
+     * <p>Converts the given duration to an amount in this unit and performs
+     * any necessary truncation if needed. </p>
+     *
+     * @param   duration    temporal amount in clock units to be converted
+     * @return  count of this unit representing given duration
+     * @since   1.2
+     */
+    /*[deutsch]
+     * <p>Konvertiert die angegebene Dauer zu einer Anzahl von Zeiteinheiten
+     * dieser Instanz und rundet bei Bedarf. </p>
+     *
+     * @param   duration    temporal amount in clock units to be converted
+     * @return  count of this unit representing given duration
+     * @since   1.2
+     */
+    public long convert(TimeSpan<? extends ClockUnit> duration) {
+
+        if (duration.isEmpty()) {
+            return 0;
+        }
+
+        long total = 0;
+        ClockUnit smallest = null;
+
+        for (int i = duration.getTotalLength().size() - 1; i >= 0; i--) {
+            TimeSpan.Item<? extends ClockUnit> item =
+                duration.getTotalLength().get(i);
+            ClockUnit unit = item.getUnit();
+
+            if (smallest == null) {
+                smallest = unit;
+                total = item.getAmount();
+            } else {
+                total =
+                    MathUtils.safeAdd(
+                        total,
+                        smallest.convert(item.getAmount(), unit));
+            }
+        }
+
+        return this.convert(total, smallest); // possibly lossy
+
+    }
+
+    /**
+     * <p>Yields a normalizer which converts a given duration in another
+     * duration with only this clock unit. </p>
+     *
+     * @return  normalizer
+     * @since   1.2
+     * @see     #convert(TimeSpan)
+     */
+    public Normalizer<ClockUnit> only() {
+
+        return OnlyNormalizer.of(this);
 
     }
 
