@@ -90,4 +90,12 @@ public class DurationNormalizerTest {
             is(Duration.of(183, ClockUnit.MINUTES)));
     }
 
+    @Test
+    public void withMinutesOnlyIfEmpty() {
+        Duration<ClockUnit> timePeriod = Duration.ofZero();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.only()).isEmpty(),
+            is(true));
+    }
+
 }
