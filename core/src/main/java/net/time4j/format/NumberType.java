@@ -26,11 +26,13 @@ package net.time4j.format;
  * <p>Defines the number type. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 /*[deutsch]
  * <p>Definiert einen Zahltyp. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 public enum NumberType {
 

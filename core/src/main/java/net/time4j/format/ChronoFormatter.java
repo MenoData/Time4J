@@ -2340,6 +2340,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
+         * @since   1.2
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addOrdinal(ChronoElement,Map)
          */
@@ -2356,6 +2357,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
+         * @since   1.2
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addOrdinal(ChronoElement,Map)
          */
@@ -2405,6 +2407,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          for the plural category OTHER
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
+         * @since   1.2
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -2450,6 +2453,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          for the plural category OTHER
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
+         * @since   1.2
          * @see     Chronology#isSupported(ChronoElement)
          */
         public Builder<T> addOrdinal(

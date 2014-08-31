@@ -36,7 +36,8 @@ import java.util.Set;
 /**
  * <p>Ordinalzahl-Formatierung eines chronologischen Elements. </p>
  *
- * @author      Meno Hochschild
+ * @author  Meno Hochschild
+ * @since   1.2
  * @concurrency <immutable>
  */
 final class OrdinalProcessor
