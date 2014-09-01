@@ -1113,6 +1113,60 @@ public final class PlainDate
     }
 
     /**
+     * <p>Specialized manipulation method which returns a copy changed such
+     * that it has the first day of next month. </p>
+     *
+     * @return  adjusted calendar date
+     * @since   1.2
+     * @see     #with(ChronoElement, Object) with(ChronoElement<V>, V)
+     * @see     #with(net.time4j.engine.ChronoOperator)
+     */
+    /*[deutsch]
+     * <p>Spezielle Manipulationsmethode, die ein Datum liefert, das den
+     * ersten Tag des n&auml;chsten Monats hat. </p>
+     *
+     * @return  adjusted calendar date
+     * @since   1.2
+     * @see     #with(ChronoElement, Object) with(ChronoElement<V>, V)
+     * @see     #with(net.time4j.engine.ChronoOperator)
+     */
+    public PlainDate withFirstDayOfNextMonth() {
+
+        int m = this.month + 1;
+
+        if (m == 13) {
+            return PlainDate.of(this.year + 1, 1, 1);
+        } else {
+            return PlainDate.of(this.year, m, 1);
+        }
+
+    }
+
+    /**
+     * <p>Specialized manipulation method which returns a copy changed such
+     * that it has the first day of next year. </p>
+     *
+     * @return  adjusted calendar date
+     * @since   1.2
+     * @see     #with(ChronoElement, Object) with(ChronoElement<V>, V)
+     * @see     #with(net.time4j.engine.ChronoOperator)
+     */
+    /*[deutsch]
+     * <p>Spezielle Manipulationsmethode, die ein Datum liefert, das den
+     * ersten Tag des n&auml;chsten Jahres hat. </p>
+     *
+     * @return  adjusted calendar date
+     * @since   1.2
+     * @see     #with(ChronoElement, Object) with(ChronoElement<V>, V)
+     * @see     #with(net.time4j.engine.ChronoOperator)
+     */
+    public PlainDate withFirstDayOfNextYear() {
+
+        return PlainDate.of(this.year + 1, 1, 1);
+
+    }
+
+    /**
      * <p>Is the year of this date a leap year? </p>
      *
      * @return  boolean
