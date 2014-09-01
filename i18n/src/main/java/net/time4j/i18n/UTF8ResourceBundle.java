@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (UnitPatternBundle.java) is part of project Time4J.
+ * This file (UTF8ResourceBundle.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -31,20 +31,21 @@ import java.util.Set;
  * <p>Erweiterung um den Zugang zu den eigenen <i>property-keys</i>. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
-class UnitPatternBundle
+class UTF8ResourceBundle
     extends PropertyResourceBundle {
-    
+
     //~ Konstruktoren -----------------------------------------------------
-    
+
     /**
      * <p>Standard-Konstruktor zum Auslesen von UTF-8-Dateien. </p>
      *
      * @param   reader  character stream from the property file
      */
-    UnitPatternBundle(Reader reader) throws IOException {
+    UTF8ResourceBundle(Reader reader) throws IOException {
         super(reader);
-        
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -55,9 +56,9 @@ class UnitPatternBundle
      * @return  property keys contained only in this bundle
      */
     Set<String> getInternalKeys() {
-        
+
         return super.handleKeySet();
-        
+
     }
 
 }

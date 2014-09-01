@@ -28,7 +28,7 @@ import java.util.Locale;
  * <p>This <strong>SPI-interface</strong> enables the access to localized
  * unit patterns and is instantiated via a {@code ServiceLoader}-mechanism. </p>
  *
- * <p>If there is no external {@code WeekdataProvider} then Time4J will use
+ * <p>If there is no external {@code UnitPatternProvider} then Time4J will use
  * an internal implementation which just offers unit patterns either in
  * english or in scientific notation. </p>
  *
@@ -589,5 +589,5 @@ public interface UnitPatternProvider {
      * @throws  java.util.MissingResourceException if not found
      */
     String getNowWord(Locale language);
-    
+
 }

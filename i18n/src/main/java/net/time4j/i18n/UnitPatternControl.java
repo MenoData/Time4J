@@ -38,6 +38,7 @@ import java.util.ResourceBundle;
  * Standard-Fallback-Mechanismus. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 class UnitPatternControl
     extends ResourceBundle.Control {
@@ -115,7 +116,7 @@ class UnitPatternControl
                     reader =
                         new BufferedReader(
                             new InputStreamReader(stream, "UTF-8"));
-                    bundle = new UnitPatternBundle(reader);
+                    bundle = new UTF8ResourceBundle(reader);
                 } finally {
                     if (reader != null) {
                         reader.close();

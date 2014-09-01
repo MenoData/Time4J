@@ -146,15 +146,15 @@ public final class UnitPatterns {
         this.patterns = Collections.unmodifiableMap(map);
         this.past = Collections.unmodifiableMap(mapPast);
         this.future = Collections.unmodifiableMap(mapFuture);
-        
+
         String n;
-        
+
         try {
             n = PROVIDER.getNowWord(language);
         } catch (MissingResourceException mre) {
-            n = "now"; // should not happen
+            n = FALLBACK.getNowWord(language); // should not happen
         }
-        
+
         this.now = n;
 
     }
@@ -703,22 +703,22 @@ public final class UnitPatterns {
         return this.future.get('S').get(category);
 
     }
-    
+
     /**
      * <p>Yields the localized word for the current time (now). </p>
-     * 
+     *
      * @return  String
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Wort f&uuml;r die aktuelle Zeit
      * (jetzt). </p>
-     * 
+     *
      * @return  String
      */
     public String getNowWord() {
-        
+
         return this.now;
-        
+
     }
 
     private static void checkNull(PluralCategory category) {
@@ -1175,7 +1175,7 @@ public final class UnitPatterns {
 
 	    @Override
     	public String getNowWord(Locale lang) {
-    	    
+
     	    return "now";
 
     	}

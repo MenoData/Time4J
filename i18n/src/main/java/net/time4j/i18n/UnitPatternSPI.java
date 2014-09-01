@@ -291,7 +291,12 @@ public final class UnitPatternSPI
 	@Override
 	public String getNowWord(Locale lang) {
 
-		return this.getPattern(lang, "reltime/pattern", "now", null, PluralCategory.OTHER);
+		return this.getPattern(
+            lang,
+            "reltime/pattern",
+            "now",
+            null,
+            PluralCategory.OTHER);
 
 	}
 
@@ -344,7 +349,7 @@ public final class UnitPatternSPI
 
 		for (Locale locale : control.getCandidateLocales(baseName, lang)) {
 			ResourceBundle rb = (
-				init && (first != null) 
+				init && (first != null)
 				? first
 				: ResourceBundle.getBundle(baseName, locale, loader, control));
 
@@ -357,7 +362,7 @@ public final class UnitPatternSPI
 				}
 			}
 
-			UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
+			UTF8ResourceBundle bundle = UTF8ResourceBundle.class.cast(rb);
 
 			if (bundle.getInternalKeys().contains(key)) {
 				return bundle.getString(key);
@@ -371,7 +376,8 @@ public final class UnitPatternSPI
 		}
 
 		throw new MissingResourceException(
-			"Can't find resource for bundle " + baseName + ".properties, key " + key,
+			"Can't find resource for bundle "
+                + baseName + ".properties, key " + key,
 			baseName + ".properties",
 			key
 		);
