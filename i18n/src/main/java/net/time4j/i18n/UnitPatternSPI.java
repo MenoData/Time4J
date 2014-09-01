@@ -288,6 +288,13 @@ public final class UnitPatternSPI
 
     }
 
+	@Override
+	public String getNowWord(Locale lang) {
+
+		return this.getPattern(lang, "reltime/pattern", "now", null, PluralCategory.OTHER);
+
+	}
+
 	private String getUnitPattern(
 		Locale		   lang,
 		char		   unitID,
