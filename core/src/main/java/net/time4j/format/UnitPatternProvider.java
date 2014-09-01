@@ -573,4 +573,21 @@ public interface UnitPatternProvider {
         PluralCategory category
     );
 
+    /**
+     * <p>Yields the localized word for the current time (now). </p>
+     *
+     * @param   language    language setting
+     * @return  String
+     * @throws  java.util.MissingResourceException if not found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Wort f&uuml;r die aktuelle Zeit
+     * (jetzt). </p>
+     *
+     * @param   language    language setting
+     * @return  String
+     * @throws  java.util.MissingResourceException if not found
+     */
+    String getNowWord(Locale language);
+    
 }
