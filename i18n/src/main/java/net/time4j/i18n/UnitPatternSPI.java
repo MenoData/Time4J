@@ -288,97 +288,88 @@ public final class UnitPatternSPI
 
     }
 
-    private String getUnitPattern(
-        Locale lang,
-        char unitID,
-        TextWidth width,
-        PluralCategory category
-    ) {
+	private String getUnitPattern(
+		Locale		   lang,
+		char		   unitID,
+		TextWidth	   width,
+		PluralCategory category
+	) {
 
-        ClassLoader loader = this.getClass().getClassLoader();
-        ResourceBundle.Control control = UnitPatternControl.SINGLETON;
-        String baseName = "units/pattern";
-    	String key = buildKey(unitID, width, category);
-        boolean init = true;
-        
-        for (Locale locale : control.getCandidateLocales(baseName, lang)) {
-            ResourceBundle rb =
-                    ResourceBundle.getBundle(baseName, locale, loader, control);
-            
-        	if (init) {
-	        	if (rb.getLocale().equals(locale)) {
-	        		init = false;
-	        	} else {
-	        		continue;
-	        	}
-        	}
-        	
-        	UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
-        	
-        	if (bundle.getInternalKeys().contains(key)) {
-        		return bundle.getString(key);
-        	} else if (category != PluralCategory.OTHER) {
-        		String alt = buildKey(unitID, width, PluralCategory.OTHER);
-        		
-        		if (bundle.getInternalKeys().contains(alt)) {
-        			return bundle.getString(alt);
-        		}
-        	}
-        	
-        }
-        
-        throw new MissingResourceException(
-        	"Can't find resource for bundle " + baseName + ".properties, key " + key,
-        	baseName + ".properties", 
-        	key);
+		return this.getPattern(
+			lang,
+			"units/pattern",
+			buildKey(unitID, width, category),
+			buildKey(unitID, width, PluralCategory.OTHER),
+			category
+		);
 
-    }
+	}
 
-    private String getRelativePattern(
-        Locale lang,
-        char unitID,
-        boolean future,
-        PluralCategory category
-    ) {
+	private String getRelativePattern(
+		Locale		   lang,
+		char		   unitID,
+		boolean		   future,
+		PluralCategory category
+	) {
 
-        ClassLoader loader = this.getClass().getClassLoader();
-        ResourceBundle.Control control = UnitPatternControl.SINGLETON;
-        String baseName = "reltime/pattern";
-    	String key = buildKey(unitID, future, category);
-        boolean init = true;
-        
-        for (Locale locale : control.getCandidateLocales(baseName, lang)) {
-            ResourceBundle rb =
-                    ResourceBundle.getBundle(baseName, locale, loader, control);
-            
-        	if (init) {
-	        	if (rb.getLocale().equals(locale)) {
-	        		init = false;
-	        	} else {
-	        		continue;
-	        	}
-        	}
-        	
-        	UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
-        	
-        	if (bundle.getInternalKeys().contains(key)) {
-        		return bundle.getString(key);
-        	} else if (category != PluralCategory.OTHER) {
-        		String alt = buildKey(unitID, future, PluralCategory.OTHER);
-        		
-        		if (bundle.getInternalKeys().contains(alt)) {
-        			return bundle.getString(alt);
-        		}
-        	}
-        	
-        }
-        
-        throw new MissingResourceException(
-        	"Can't find resource for bundle " + baseName + ".properties, key " + key,
-        	baseName + ".properties", 
-        	key);
+		return this.getPattern(
+			lang,
+			"reltime/pattern",
+			buildKey(unitID, future, category),
+			buildKey(unitID, future, PluralCategory.OTHER),
+			category
+		);
 
-    }
+	}
+
+	private String getPattern(
+		Locale		   lang,
+		String		   baseName,
+		String		   key,
+		String		   alt,
+		PluralCategory category
+	) {
+
+		ClassLoader loader = this.getClass().getClassLoader();
+		ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+		boolean init = true;
+		ResourceBundle first = null;
+
+		for (Locale locale : control.getCandidateLocales(baseName, lang)) {
+			ResourceBundle rb = (
+				init && (first != null) 
+				? first
+				: ResourceBundle.getBundle(baseName, locale, loader, control));
+
+			if (init) {
+				if (rb.getLocale().equals(locale)) {
+					init = false;
+				} else {
+					first = rb;
+					continue;
+				}
+			}
+
+			UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
+
+			if (bundle.getInternalKeys().contains(key)) {
+				return bundle.getString(key);
+			} else if (
+				(category != PluralCategory.OTHER)
+				&& bundle.getInternalKeys().contains(alt)
+			) {
+				return bundle.getString(alt);
+			}
+
+		}
+
+		throw new MissingResourceException(
+			"Can't find resource for bundle " + baseName + ".properties, key " + key,
+			baseName + ".properties",
+			key
+		);
+
+	}
 
     private static String buildKey(
         char unitID,
