@@ -26,6 +26,7 @@ import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 
@@ -38,9 +39,7 @@ import java.util.ResourceBundle;
  * bundle name is &quot;pattern&quot;. This class uses a modified fallback
  * algorithm for searching the right properties file as documented in
  * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
- * target="_blank">CLDR</a> published by unicode consortium. In such a
- * properties file all key variants must exist, varying over all units
- * and text widths. </p>
+ * target="_blank">CLDR</a> published by unicode consortium. </p>
  *
  * <p>The case is similar for past and future patterns - with the difference
  * that the folder &quot;reltime&quot; is used instead. </p>
@@ -56,9 +55,7 @@ import java.util.ResourceBundle;
  * &quot;units&quot; relativ zum Klassenpfad und sind in UTF-8 kodiert.
  * Der Basisname der Dateien ist &quot;patternquot;. Diese Klasse verwendet
  * einen ge&auml;nderten Suchalgorithmus, um die richtige properties-Datei
- * zu erhalten. Zu einer gegebenen Pluralkategorie m&uuml;ssen in einer
- * solchen Datei alle Schl&uuml;sselvarianten existieren (variierend &uuml;ber
- * alle Zeiteinheiten und Textbreiten). Der Algorithmus ist dokumentiert in
+ * zu erhalten. Der Algorithmus ist dokumentiert in
  * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
  * target="_blank">CLDR</a> ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
  *
@@ -299,18 +296,41 @@ public final class UnitPatternSPI
     ) {
 
         ClassLoader loader = this.getClass().getClassLoader();
-        ResourceBundle.Control control =
-            UnitPatternControl.getInstance(category);
-        ResourceBundle rb =
-            ResourceBundle.getBundle("units/pattern", lang, loader, control);
-        String key = buildKey(unitID, width, category);
-
-        if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
-            key = buildKey(unitID, width, PluralCategory.OTHER);
-            // Hinweis: root-locale hat nur die Kategorie OTHER !
+        ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+        String baseName = "units/pattern";
+    	String key = buildKey(unitID, width, category);
+        boolean init = true;
+        
+        for (Locale locale : control.getCandidateLocales(baseName, lang)) {
+            ResourceBundle rb =
+                    ResourceBundle.getBundle(baseName, locale, loader, control);
+            
+        	if (init) {
+	        	if (rb.getLocale().equals(locale)) {
+	        		init = false;
+	        	} else {
+	        		continue;
+	        	}
+        	}
+        	
+        	UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
+        	
+        	if (bundle.getInternalKeys().contains(key)) {
+        		return bundle.getString(key);
+        	} else if (category != PluralCategory.OTHER) {
+        		String alt = buildKey(unitID, width, PluralCategory.OTHER);
+        		
+        		if (bundle.getInternalKeys().contains(alt)) {
+        			return bundle.getString(alt);
+        		}
+        	}
+        	
         }
-
-        return rb.getString(key);
+        
+        throw new MissingResourceException(
+        	"Can't find resource for bundle " + baseName + ".properties, key " + key,
+        	baseName + ".properties", 
+        	key);
 
     }
 
@@ -322,18 +342,41 @@ public final class UnitPatternSPI
     ) {
 
         ClassLoader loader = this.getClass().getClassLoader();
-        ResourceBundle.Control control =
-            UnitPatternControl.getInstance(category);
-        ResourceBundle rb =
-            ResourceBundle.getBundle("reltime/pattern", lang, loader, control);
-        String key = buildKey(unitID, future, category);
-
-        if (!UnitPatternBundle.class.cast(rb).getInternalKeys().contains(key)) {
-            key = buildKey(unitID, future, PluralCategory.OTHER);
-            // Hinweis: root-locale hat nur die Kategorie OTHER !
+        ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+        String baseName = "reltime/pattern";
+    	String key = buildKey(unitID, future, category);
+        boolean init = true;
+        
+        for (Locale locale : control.getCandidateLocales(baseName, lang)) {
+            ResourceBundle rb =
+                    ResourceBundle.getBundle(baseName, locale, loader, control);
+            
+        	if (init) {
+	        	if (rb.getLocale().equals(locale)) {
+	        		init = false;
+	        	} else {
+	        		continue;
+	        	}
+        	}
+        	
+        	UnitPatternBundle bundle = UnitPatternBundle.class.cast(rb);
+        	
+        	if (bundle.getInternalKeys().contains(key)) {
+        		return bundle.getString(key);
+        	} else if (category != PluralCategory.OTHER) {
+        		String alt = buildKey(unitID, future, PluralCategory.OTHER);
+        		
+        		if (bundle.getInternalKeys().contains(alt)) {
+        			return bundle.getString(alt);
+        		}
+        	}
+        	
         }
-
-        return rb.getString(key);
+        
+        throw new MissingResourceException(
+        	"Can't find resource for bundle " + baseName + ".properties, key " + key,
+        	baseName + ".properties", 
+        	key);
 
     }
 
