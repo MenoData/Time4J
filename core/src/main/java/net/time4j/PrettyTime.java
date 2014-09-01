@@ -22,17 +22,30 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
+import net.time4j.engine.TimeMetric;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatterns;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.WEEKS;
+import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.SECONDS;
 
 
 /**
@@ -66,21 +79,29 @@ public final class PrettyTime {
     private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
         new ConcurrentHashMap<Locale, PrettyTime>();
 
+    private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
+
+    static {
+        IsoUnit[] units =
+            {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
+        STD_METRIC = Duration.in(units);
+    }
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final PluralRules rules;
     private final Locale language;
-    private final Moment reference;
+    private final TimeSource<?> reference;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private PrettyTime(
         Locale language,
-        Moment reference
+        TimeSource<?> reference
     ) {
         super();
 
-        // throws NPE if locale == null
+        // throws NPE if language == null
         this.rules = PluralRules.of(language, NumberType.CARDINALS);
         this.language = language;
         this.reference = reference;
@@ -137,25 +158,26 @@ public final class PrettyTime {
     }
 
     /**
-     * <p>Yields the reference time point for formatting of relative times. </p>
+     * <p>Yields the reference clock for formatting of relative times. </p>
      *
-     * @return  reference time or current system time if not yet specified
-     * @see     #withReference(UnixTime)
-     * @see     #print(UnixTime)
+     * @return  reference clock or system clock if not yet specified
+     * @see     #withReference(TimeSource)
+     * @see     #print(UnixTime, TZID)
+     * @see     #print(UnixTime, String)
      */
     /*[deutsch]
-     * <p>Liefert die Bezugszeit f&uuml;r formatierte Ausgaben der relativen
+     * <p>Liefert die Bezugsuhr f&uuml;r formatierte Ausgaben der relativen
      * Zeit. </p>
      *
-     * @return  Bezugszeit oder die aktuelle Systemzeit, wenn die Bezugszeit
-     *          noch nicht angegeben wurde
-     * @see     #withReference(UnixTime)
-     * @see     #print(UnixTime)
+     * @return  Zeitquelle oder die Systemuhr, wenn noch nicht angegeben
+     * @see     #withReference(TimeSource)
+     * @see     #print(UnixTime, TZID)
+     * @see     #print(UnixTime, String)
      */
-    public Moment getReference() {
+    public TimeSource<?> getReferenceClock() {
 
         if (this.reference == null) {
-            return SystemClock.INSTANCE.currentTime();
+            return SystemClock.INSTANCE;
         }
 
         return this.reference;
@@ -163,34 +185,37 @@ public final class PrettyTime {
     }
 
     /**
-     * <p>Yields a changed copy of this instance with given reference time. </p>
+     * <p>Yields a changed copy of this instance with given reference
+     * clock. </p>
      *
-     * <p>If given reference timestamp is {@code null} then the reference time
-     * will always be the current system time. </p>
+     * <p>If given reference clock is {@code null} then the reference clock
+     * will always be the system clock. </p>
      *
-     * @param   moment  new reference time (maybe {@code null})
-     * @return  new instance of {@code PrettyTime} with changed reference time
-     * @see     #getReference()
-     * @see     #print(UnixTime)
+     * @param   clock   new reference clock (maybe {@code null})
+     * @return  new instance of {@code PrettyTime} with changed reference clock
+     * @see     #getReferenceClock()
+     * @see     #print(UnixTime, TZID)
+     * @see     #print(UnixTime, String)
      */
     /*[deutsch]
      * <p>Legt die Bezugszeit f&uuml;r relative Zeitangaben neu fest. </p>
      *
-     * <p>Wenn die angegebene Bezugszeit {@code null} ist, dann wird sie
-     * immer auf die aktuelle Systemzeit gesetzt. </p>
+     * <p>Wenn die angegebene Bezugsuhr {@code null} ist, wird die
+     * Systemuhr verwendet. </p>
      *
-     * @param   moment  new reference time (maybe {@code null})
-     * @return  new instance of {@code PrettyTime} with changed reference time
-     * @see     #getReference()
-     * @see     #print(UnixTime)
+     * @param   clock   new reference clock (maybe {@code null})
+     * @return  new instance of {@code PrettyTime} with changed reference clock
+     * @see     #getReferenceClock()
+     * @see     #print(UnixTime, TZID)
+     * @see     #print(UnixTime, String)
      */
-    public PrettyTime withReference(UnixTime moment) {
+    public PrettyTime withReferenceClock(TimeSource<?> clock) {
 
-        if (moment == null) {
+        if (clock == null) {
             return PrettyTime.of(this.language);
         }
 
-        return new PrettyTime(this.language, Moment.from(moment));
+        return new PrettyTime(this.language, clock);
 
     }
 
@@ -259,7 +284,8 @@ public final class PrettyTime {
                 throw new UnsupportedOperationException(unit.name());
         }
 
-        String num = NumberFormat.getIntegerInstance(language).format(amount);
+        String num =
+            NumberFormat.getIntegerInstance(this.language).format(amount);
         return pattern.replace("{0}", num);
 
     }
@@ -320,46 +346,219 @@ public final class PrettyTime {
                 throw new UnsupportedOperationException(unit.name());
         }
 
-        String num = NumberFormat.getIntegerInstance(language).format(amount);
+        String num =
+            NumberFormat.getIntegerInstance(this.language).format(amount);
         return pattern.replace("{0}", num);
 
     }
 
+//    /**
+//     * <p>Formats given duration. </p>
+//     *
+//     * @param   duration    object representing a duration which might contain
+//     *                      several units and quantities
+//     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+//     * @return  formatted output
+//     */
+//    /*[deutsch]
+//     * <p>Formatiert die angegebene Dauer. </p>
+//     *
+//     * @param   duration    object representing a duration which might contain
+//     *                      several units and quantities
+//     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+//     * @return  formatted output
+//     */
+//    public String print(
+//        Duration<?> duration,
+//        TextWidth width
+//    ) {
+//
+//        throw new UnsupportedOperationException("Not yet implemented.");
+//
+//    }
+
     /**
-     * <p>Formats given duration. </p>
+     * <p>Formats given time point relative to the current time of
+     * {@link #getReferenceClock()}. </p>
      *
-     * @param   duration    object representing a duration which might contain
-     *                      several units and quantities
-     * @return  formatted output
+     * @param   moment      relative time point
+     * @param   tzid        time zone id for translating to a local duration
+     * @return  formatted output of relative time, either in past or in future
      */
     /*[deutsch]
-     * <p>Formatiert die angegebene Dauer. </p>
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()}. </p>
      *
-     * @param   duration    Dauer-Objekt
-     * @return  formatierte Ausgabe
+     * @param   moment      relative time point
+     * @param   tzid        time zone id for translating to a local duration
+     * @return  formatted output of relative time, either in past or in future
      */
-    public String print(Duration<?> duration) {
+    public String print(
+        UnixTime moment,
+        TZID tzid
+    ) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return this.print(moment, Timezone.of(tzid));
 
     }
 
     /**
-     * <p>Formats given time point relative to {@link #getReference()}. </p>
+     * <p>Formats given time point relative to the current time of
+     * {@link #getReferenceClock()}. </p>
      *
      * @param   moment      relative time point
+     * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
      */
     /*[deutsch]
-     * <p>Formatiert den angegebenen Zeitpunkt relativ zu
-     * {@link #getReference()}. </p>
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()}. </p>
      *
      * @param   moment      relative time point
+     * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
      */
-    public String print(UnixTime moment) {
+    public String print(
+        UnixTime moment,
+        String tzid
+    ) {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        return this.print(moment, Timezone.of(tzid));
+
+    }
+
+    private String print(
+        UnixTime ut,
+        Timezone tz
+    ) {
+
+        UnixTime ref = this.getReferenceClock().currentTime();
+
+        PlainTimestamp start =
+            PlainTimestamp.from(
+                ref,
+                tz.getOffset(ref));
+        PlainTimestamp end =
+            PlainTimestamp.from(
+                ut,
+                tz.getOffset(ut));
+
+        Duration<IsoUnit> duration = STD_METRIC.between(start, end);
+
+        if (duration.isEmpty()) {
+            return UnitPatterns.of(this.language).getNowWord();
+        }
+
+        TimeSpan.Item<IsoUnit> item = duration.getTotalLength().get(0);
+        long amount = item.getAmount();
+        IsoUnit unit = item.getUnit();
+        String pattern;
+
+        if (duration.isNegative()) {
+            if (unit.isCalendrical()) {
+                pattern = this.getPastPattern(amount, (CalendarUnit) unit);
+            } else {
+                pattern = this.getPastPattern(amount, (ClockUnit) unit);
+            }
+        } else {
+            if (unit.isCalendrical()) {
+                pattern = this.getFuturePattern(amount, (CalendarUnit) unit);
+            } else {
+                pattern = this.getFuturePattern(amount, (ClockUnit) unit);
+            }
+        }
+
+        String num =
+            NumberFormat.getIntegerInstance(this.language).format(amount);
+        return pattern.replace("{0}", num);
+
+    }
+
+    private String getPastPattern(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        UnitPatterns patterns = UnitPatterns.of(this.language);
+        PluralCategory category = this.getCategory(amount);
+
+        switch (unit) {
+            case YEARS:
+                return patterns.getPastYears(category);
+            case MONTHS:
+                return patterns.getPastMonths(category);
+            case WEEKS:
+                return patterns.getPastWeeks(category);
+            case DAYS:
+                return patterns.getPastDays(category);
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+    }
+
+    private String getFuturePattern(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        UnitPatterns patterns = UnitPatterns.of(this.language);
+        PluralCategory category = this.getCategory(amount);
+
+        switch (unit) {
+            case YEARS:
+                return patterns.getFutureYears(category);
+            case MONTHS:
+                return patterns.getFutureMonths(category);
+            case WEEKS:
+                return patterns.getFutureWeeks(category);
+            case DAYS:
+                return patterns.getFutureDays(category);
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+    }
+
+    private String getPastPattern(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        UnitPatterns patterns = UnitPatterns.of(this.language);
+        PluralCategory category = this.getCategory(amount);
+
+        switch (unit) {
+            case HOURS:
+                return patterns.getPastHours(category);
+            case MINUTES:
+                return patterns.getPastMinutes(category);
+            case SECONDS:
+                return patterns.getPastSeconds(category);
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+    }
+
+    private String getFuturePattern(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        UnitPatterns patterns = UnitPatterns.of(this.language);
+        PluralCategory category = this.getCategory(amount);
+
+        switch (unit) {
+            case HOURS:
+                return patterns.getFutureHours(category);
+            case MINUTES:
+                return patterns.getFutureMinutes(category);
+            case SECONDS:
+                return patterns.getFutureSeconds(category);
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
 
     }
 
