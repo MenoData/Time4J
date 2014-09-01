@@ -162,8 +162,8 @@ public final class PrettyTime {
      *
      * @return  reference clock or system clock if not yet specified
      * @see     #withReference(TimeSource)
-     * @see     #print(UnixTime, TZID)
-     * @see     #print(UnixTime, String)
+     * @see     #printRelative(UnixTime, TZID)
+     * @see     #printRelative(UnixTime, String)
      */
     /*[deutsch]
      * <p>Liefert die Bezugsuhr f&uuml;r formatierte Ausgaben der relativen
@@ -171,8 +171,8 @@ public final class PrettyTime {
      *
      * @return  Zeitquelle oder die Systemuhr, wenn noch nicht angegeben
      * @see     #withReference(TimeSource)
-     * @see     #print(UnixTime, TZID)
-     * @see     #print(UnixTime, String)
+     * @see     #printRelative(UnixTime, TZID)
+     * @see     #printRelative(UnixTime, String)
      */
     public TimeSource<?> getReferenceClock() {
 
@@ -194,8 +194,8 @@ public final class PrettyTime {
      * @param   clock   new reference clock (maybe {@code null})
      * @return  new instance of {@code PrettyTime} with changed reference clock
      * @see     #getReferenceClock()
-     * @see     #print(UnixTime, TZID)
-     * @see     #print(UnixTime, String)
+     * @see     #printRelative(UnixTime, TZID)
+     * @see     #printRelative(UnixTime, String)
      */
     /*[deutsch]
      * <p>Legt die Bezugszeit f&uuml;r relative Zeitangaben neu fest. </p>
@@ -206,8 +206,8 @@ public final class PrettyTime {
      * @param   clock   new reference clock (maybe {@code null})
      * @return  new instance of {@code PrettyTime} with changed reference clock
      * @see     #getReferenceClock()
-     * @see     #print(UnixTime, TZID)
-     * @see     #print(UnixTime, String)
+     * @see     #printRelative(UnixTime, TZID)
+     * @see     #printRelative(UnixTime, String)
      */
     public PrettyTime withReferenceClock(TimeSource<?> clock) {
 
@@ -393,7 +393,7 @@ public final class PrettyTime {
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
      */
-    public String print(
+    public String printRelative(
         UnixTime moment,
         TZID tzid
     ) {
@@ -418,7 +418,7 @@ public final class PrettyTime {
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
      */
-    public String print(
+    public String printRelative(
         UnixTime moment,
         String tzid
     ) {
