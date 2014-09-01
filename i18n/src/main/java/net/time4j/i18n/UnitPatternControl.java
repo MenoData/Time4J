@@ -21,8 +21,6 @@
 
 package net.time4j.i18n;
 
-import net.time4j.format.PluralCategory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,13 +28,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 
 /**
@@ -50,48 +44,17 @@ class UnitPatternControl
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<PluralCategory, UnitPatternControl> CONTROLS;
-
-    static {
-        Map<PluralCategory, UnitPatternControl> map =
-            new EnumMap<PluralCategory, UnitPatternControl>(
-                PluralCategory.class);
-        for (PluralCategory category : PluralCategory.values()) {
-            map.put(category, new UnitPatternControl(category));
-        }
-        CONTROLS = Collections.unmodifiableMap(map);
-    }
-
-    //~ Instanzvariablen --------------------------------------------------
-
-    private final PluralCategory category;
+    public static final ResourceBundle.Control SINGLETON =
+    	new UnitPatternControl();
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private UnitPatternControl(PluralCategory category) {
+    private UnitPatternControl() {
         super();
-
-        this.category = category;
 
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>L&auml;dt die Instanz aus dem Cache. </p>
-     *
-     * @param   category    property key
-     * @return  cached bundle control instance
-     */
-    static UnitPatternControl getInstance(PluralCategory category) {
-
-        if (category == null) {
-            throw new NullPointerException();
-        }
-
-        return CONTROLS.get(category);
-
-    }
 
     @Override
     public Locale getFallbackLocale(
@@ -152,17 +115,7 @@ class UnitPatternControl
                     reader =
                         new BufferedReader(
                             new InputStreamReader(stream, "UTF-8"));
-                    UnitPatternBundle test = new UnitPatternBundle(reader);
-                    Set<String> keys = test.getInternalKeys();
-
-                    if (exists(keys, this.category)) {
-                        bundle = test;
-                    } else if (
-                        (this.category != PluralCategory.OTHER)
-                        && exists(keys, PluralCategory.OTHER)
-                    ) {
-                        bundle = test;
-                    }
+                    bundle = new UnitPatternBundle(reader);
                 } finally {
                     if (reader != null) {
                         reader.close();
@@ -176,27 +129,6 @@ class UnitPatternControl
             throw new UnsupportedOperationException(
                 "Unknown resource bundle format: " + format);
         }
-
-    }
-
-    private static boolean exists(
-    	Set<String> keys,
-    	PluralCategory category
-    ) {
-
-    	char c = (char) (48 + category.ordinal());
-
-    	for (String key : keys) {
-    	    if (
-                (key.charAt(0) != '#')
-                && (key.length() == 3)
-                && (key.charAt(2) == c)
-            ) {
-    	    	return true;
-    	    }
-    	}
-
-    	return false;
 
     }
 
