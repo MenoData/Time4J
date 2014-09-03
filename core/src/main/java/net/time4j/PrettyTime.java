@@ -484,13 +484,13 @@ public final class PrettyTime {
 
         switch (unit) {
             case YEARS:
-                return patterns.getPastYears(category);
+                return patterns.getYearsInPast(category);
             case MONTHS:
-                return patterns.getPastMonths(category);
+                return patterns.getMonthsInPast(category);
             case WEEKS:
-                return patterns.getPastWeeks(category);
+                return patterns.getWeeksInPast(category);
             case DAYS:
-                return patterns.getPastDays(category);
+                return patterns.getDaysInPast(category);
             default:
                 throw new UnsupportedOperationException(unit.name());
         }
@@ -507,13 +507,13 @@ public final class PrettyTime {
 
         switch (unit) {
             case YEARS:
-                return patterns.getFutureYears(category);
+                return patterns.getYearsInFuture(category);
             case MONTHS:
-                return patterns.getFutureMonths(category);
+                return patterns.getMonthsInFuture(category);
             case WEEKS:
-                return patterns.getFutureWeeks(category);
+                return patterns.getWeeksInFuture(category);
             case DAYS:
-                return patterns.getFutureDays(category);
+                return patterns.getDaysInFuture(category);
             default:
                 throw new UnsupportedOperationException(unit.name());
         }
@@ -530,11 +530,11 @@ public final class PrettyTime {
 
         switch (unit) {
             case HOURS:
-                return patterns.getPastHours(category);
+                return patterns.getHoursInPast(category);
             case MINUTES:
-                return patterns.getPastMinutes(category);
+                return patterns.getMinutesInPast(category);
             case SECONDS:
-                return patterns.getPastSeconds(category);
+                return patterns.getSecondsInPast(category);
             default:
                 throw new UnsupportedOperationException(unit.name());
         }
@@ -551,11 +551,11 @@ public final class PrettyTime {
 
         switch (unit) {
             case HOURS:
-                return patterns.getFutureHours(category);
+                return patterns.getHoursInFuture(category);
             case MINUTES:
-                return patterns.getFutureMinutes(category);
+                return patterns.getMinutesInFuture(category);
             case SECONDS:
-                return patterns.getFutureSeconds(category);
+                return patterns.getSecondsInFuture(category);
             default:
                 throw new UnsupportedOperationException(unit.name());
         }

@@ -53,6 +53,9 @@ public final class UnitPatterns {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final int MIN_LIST_INDEX = 2;
+    private static final int MAX_LIST_INDEX = 7;
+
     private static final ConcurrentMap<Locale, UnitPatterns> CACHE =
         new ConcurrentHashMap<Locale, UnitPatterns>();
     private static final char[] UNIT_IDS =
@@ -86,16 +89,20 @@ public final class UnitPatterns {
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private final Locale locale;
     private final
         Map<Character, Map<TextWidth, Map<PluralCategory, String>>> patterns;
     private final Map<Character, Map<PluralCategory, String>> past;
     private final Map<Character, Map<PluralCategory, String>> future;
+    private final Map<Integer, Map<TextWidth, String>> list;
     private final String now;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private UnitPatterns(Locale language) {
         super();
+
+        this.locale = language;
 
         Map<Character, Map<TextWidth, Map<PluralCategory, String>>> map =
             new HashMap
@@ -104,6 +111,8 @@ public final class UnitPatterns {
             new HashMap<Character, Map<PluralCategory, String>>(10);
         Map<Character, Map<PluralCategory, String>> mapFuture =
             new HashMap<Character, Map<PluralCategory, String>>(10);
+        Map<Integer, Map<TextWidth, String>> mapList =
+            new HashMap<Integer, Map<TextWidth, String>>(10);
 
         for (char unitID : UNIT_IDS) {
             // Standard-Muster
@@ -141,11 +150,25 @@ public final class UnitPatterns {
             mapFuture.put(
                 Character.valueOf(unitID),
                 Collections.unmodifiableMap(tmp4));
+
+            // Liste
+            for (int i = MIN_LIST_INDEX; i <= MAX_LIST_INDEX; i++) {
+                Integer index = Integer.valueOf(i);
+                Map<TextWidth, String> tmp5 =
+                    new EnumMap<TextWidth, String>(TextWidth.class);
+                for (TextWidth width : TextWidth.values()) {
+                    tmp5.put(width, lookup(language, width, index));
+                }
+                mapList.put(
+                    index,
+                    Collections.unmodifiableMap(tmp5));
+            }
         }
 
         this.patterns = Collections.unmodifiableMap(map);
         this.past = Collections.unmodifiableMap(mapPast);
         this.future = Collections.unmodifiableMap(mapFuture);
+        this.list = Collections.unmodifiableMap(mapList);
 
         String n;
 
@@ -398,7 +421,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for years in the past
      */
-    public String getPastYears(PluralCategory category) {
+    public String getYearsInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('Y').get(category);
@@ -421,7 +444,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for years in the future
      */
-    public String getFutureYears(PluralCategory category) {
+    public String getYearsInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('Y').get(category);
@@ -444,7 +467,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for months in the past
      */
-    public String getPastMonths(PluralCategory category) {
+    public String getMonthsInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('M').get(category);
@@ -467,7 +490,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for months in the future
      */
-    public String getFutureMonths(PluralCategory category) {
+    public String getMonthsInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('M').get(category);
@@ -490,7 +513,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for weeks in the past
      */
-    public String getPastWeeks(PluralCategory category) {
+    public String getWeeksInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('W').get(category);
@@ -513,7 +536,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for weeks in the future
      */
-    public String getFutureWeeks(PluralCategory category) {
+    public String getWeeksInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('W').get(category);
@@ -536,7 +559,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for days in the past
      */
-    public String getPastDays(PluralCategory category) {
+    public String getDaysInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('D').get(category);
@@ -559,7 +582,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for days in the future
      */
-    public String getFutureDays(PluralCategory category) {
+    public String getDaysInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('D').get(category);
@@ -582,7 +605,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for hours in the past
      */
-    public String getPastHours(PluralCategory category) {
+    public String getHoursInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('H').get(category);
@@ -605,7 +628,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for hours in the future
      */
-    public String getFutureHours(PluralCategory category) {
+    public String getHoursInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('H').get(category);
@@ -628,7 +651,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for minutes in the past
      */
-    public String getPastMinutes(PluralCategory category) {
+    public String getMinutesInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('N').get(category);
@@ -651,7 +674,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for minutes in the future
      */
-    public String getFutureMinutes(PluralCategory category) {
+    public String getMinutesInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('N').get(category);
@@ -674,7 +697,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for seconds in the past
      */
-    public String getPastSeconds(PluralCategory category) {
+    public String getSecondsInPast(PluralCategory category) {
 
         checkNull(category);
         return this.past.get('S').get(category);
@@ -697,7 +720,7 @@ public final class UnitPatterns {
      * @param   category    plural category
      * @return  unit pattern for seconds in the future
      */
-    public String getFutureSeconds(PluralCategory category) {
+    public String getSecondsInFuture(PluralCategory category) {
 
         checkNull(category);
         return this.future.get('S').get(category);
@@ -718,6 +741,40 @@ public final class UnitPatterns {
     public String getNowWord() {
 
         return this.now;
+
+    }
+
+    /**
+     * <p>Constructs a localized list pattern suitable for the use in
+     * {@link java.text.MessageFormat#format(String, Object[])}. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   size        count of list items
+     * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
+     * @throws  IllegalArgumentException if size is smaller than 2
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein lokalisiertes Listenformat geeignet f&uuml;r
+     * {@link java.text.MessageFormat#format(String, Object[])}. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   size        count of list items
+     * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
+     * @throws  IllegalArgumentException if size is smaller than 2
+     */
+    public String getListPattern(
+        TextWidth width,
+        int size
+    ) {
+
+        if (
+            (size >= MIN_LIST_INDEX)
+            && (size <= MAX_LIST_INDEX)
+        ) {
+            return this.list.get(Integer.valueOf(size)).get(width);
+        }
+
+        return lookup(this.locale, width, size);
 
     }
 
@@ -767,19 +824,19 @@ public final class UnitPatterns {
 
         switch (unitID) {
             case 'Y':
-                return p.getYearsPattern(language, width, category);
+                return p.getYearPattern(language, width, category);
             case 'M':
-                return p.getMonthsPattern(language, width, category);
+                return p.getMonthPattern(language, width, category);
             case 'W':
-                return p.getWeeksPattern(language, width, category);
+                return p.getWeekPattern(language, width, category);
             case 'D':
-                return p.getDaysPattern(language, width, category);
+                return p.getDayPattern(language, width, category);
             case 'H':
-                return p.getHoursPattern(language, width, category);
+                return p.getHourPattern(language, width, category);
             case 'N':
-                return p.getMinutesPattern(language, width, category);
+                return p.getMinutePattern(language, width, category);
             case 'S':
-                return p.getSecondsPattern(language, width, category);
+                return p.getSecondPattern(language, width, category);
             default:
                 throw new UnsupportedOperationException("Unit-ID: " + unitID);
         }
@@ -793,74 +850,53 @@ public final class UnitPatterns {
         PluralCategory category
     ) {
 
-        if (future) {
-            try {
-                return lookupFuture(PROVIDER, language, unitID, category);
-            } catch (MissingResourceException mre) { // should not happen
-                return lookupFuture(FALLBACK, language, unitID, category);
-            }
-        } else {
-            try {
-                return lookupPast(PROVIDER, language, unitID, category);
-            } catch (MissingResourceException mre) { // should not happen
-                return lookupPast(FALLBACK, language, unitID, category);
-            }
+        try {
+            return lookup(PROVIDER, language, unitID, future, category);
+        } catch (MissingResourceException mre) { // should not happen
+            return lookup(FALLBACK, language, unitID, future, category);
         }
 
     }
 
-    private static String lookupPast(
+    private static String lookup(
         UnitPatternProvider p,
         Locale language,
         char unitID,
+        boolean future,
         PluralCategory category
     ) {
 
         switch (unitID) {
             case 'Y':
-                return p.getPastYearsPattern(language, category);
+                return p.getYearPattern(language, future, category);
             case 'M':
-                return p.getPastMonthsPattern(language, category);
+                return p.getMonthPattern(language, future, category);
             case 'W':
-                return p.getPastWeeksPattern(language, category);
+                return p.getWeekPattern(language, future, category);
             case 'D':
-                return p.getPastDaysPattern(language, category);
+                return p.getDayPattern(language, future, category);
             case 'H':
-                return p.getPastHoursPattern(language, category);
+                return p.getHourPattern(language, future, category);
             case 'N':
-                return p.getPastMinutesPattern(language, category);
+                return p.getMinutePattern(language, future, category);
             case 'S':
-                return p.getPastSecondsPattern(language, category);
+                return p.getSecondPattern(language, future, category);
             default:
                 throw new UnsupportedOperationException("Unit-ID: " + unitID);
         }
 
     }
 
-    private static String lookupFuture(
-        UnitPatternProvider p,
+    private static String lookup(
         Locale language,
-        char unitID,
-        PluralCategory category
+        TextWidth width,
+        int size
     ) {
 
-        switch (unitID) {
-            case 'Y':
-                return p.getFutureYearsPattern(language, category);
-            case 'M':
-                return p.getFutureMonthsPattern(language, category);
-            case 'W':
-                return p.getFutureWeeksPattern(language, category);
-            case 'D':
-                return p.getFutureDaysPattern(language, category);
-            case 'H':
-                return p.getFutureHoursPattern(language, category);
-            case 'N':
-                return p.getFutureMinutesPattern(language, category);
-            case 'S':
-                return p.getFutureSecondsPattern(language, category);
-            default:
-                throw new UnsupportedOperationException("Unit-ID: " + unitID);
+        try {
+            return PROVIDER.getListPattern(language, width, size);
+        } catch (MissingResourceException mre) { // should not happen
+            return FALLBACK.getListPattern(language, width, size);
         }
 
     }
@@ -873,7 +909,7 @@ public final class UnitPatterns {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public String getYearsPattern(
+        public String getYearPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -888,7 +924,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getMonthsPattern(
+        public String getMonthPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -903,7 +939,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getWeeksPattern(
+        public String getWeekPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -918,7 +954,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getDaysPattern(
+        public String getDayPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -933,7 +969,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getHoursPattern(
+        public String getHourPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -948,7 +984,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getMinutesPattern(
+        public String getMinutePattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -963,7 +999,7 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getSecondsPattern(
+        public String getSecondPattern(
             Locale lang,
             TextWidth width,
             PluralCategory category
@@ -978,198 +1014,107 @@ public final class UnitPatterns {
         }
 
         @Override
-        public String getPastYearsPattern(
+        public String getYearPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("year", category);
+                return getRelativeEnglishPattern("year", future, category);
             }
 
-            return getPastPattern("y");
+            return getRelativePattern("y", future);
 
         }
 
         @Override
-        public String getPastMonthsPattern(
+        public String getMonthPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("month", category);
+                return getRelativeEnglishPattern("month", future, category);
             }
 
-            return getPastPattern("m");
+            return getRelativePattern("m", future);
 
         }
 
         @Override
-        public String getPastWeeksPattern(
+        public String getWeekPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("week", category);
+                return getRelativeEnglishPattern("week", future, category);
             }
 
-            return getPastPattern("w");
+            return getRelativePattern("w", future);
 
         }
 
         @Override
-        public String getPastDaysPattern(
+        public String getDayPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("day", category);
+                return getRelativeEnglishPattern("day", future, category);
             }
 
-            return getPastPattern("d");
+            return getRelativePattern("d", future);
 
         }
 
         @Override
-        public String getPastHoursPattern(
+        public String getHourPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("hour", category);
+                return getRelativeEnglishPattern("hour", future, category);
             }
 
-            return getPastPattern("h");
+            return getRelativePattern("h", future);
 
         }
 
         @Override
-        public String getPastMinutesPattern(
+        public String getMinutePattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("minute", category);
+                return getRelativeEnglishPattern("minute", future, category);
             }
 
-            return getPastPattern("min");
+            return getRelativePattern("min", future);
 
         }
 
         @Override
-        public String getPastSecondsPattern(
+        public String getSecondPattern(
             Locale lang,
+            boolean future,
             PluralCategory category
         ) {
 
             if (lang.getLanguage().equals("en")) {
-                return getPastEnglishPattern("second", category);
+                return getRelativeEnglishPattern("second", future, category);
             }
 
-            return getPastPattern("s");
-
-        }
-
-        @Override
-        public String getFutureYearsPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("year", category);
-            }
-
-            return getFuturePattern("y");
-
-        }
-
-        @Override
-        public String getFutureMonthsPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("month", category);
-            }
-
-            return getFuturePattern("m");
-
-        }
-
-        @Override
-        public String getFutureWeeksPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("week", category);
-            }
-
-            return getFuturePattern("w");
-
-        }
-
-        @Override
-        public String getFutureDaysPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("day", category);
-            }
-
-            return getFuturePattern("d");
-
-        }
-
-        @Override
-        public String getFutureHoursPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("hour", category);
-            }
-
-            return getFuturePattern("h");
-
-        }
-
-        @Override
-        public String getFutureMinutesPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("minute", category);
-            }
-
-            return getFuturePattern("min");
-
-        }
-
-        @Override
-        public String getFutureSecondsPattern(
-            Locale lang,
-            PluralCategory category
-        ) {
-
-            if (lang.getLanguage().equals("en")) {
-                return getFutureEnglishPattern("second", category);
-            }
-
-            return getFuturePattern("s");
+            return getRelativePattern("s", future);
 
         }
 
@@ -1218,35 +1163,56 @@ public final class UnitPatterns {
 
         }
 
-        private static String getPastEnglishPattern(
+        private static String getRelativeEnglishPattern(
             String unit,
+            boolean future,
             PluralCategory category
         ) {
 
             String plural = (category == PluralCategory.ONE ? "" : "s");
-            return "{0} " + unit + plural + " ago";
+
+            if (future) {
+                return "in {0} " + unit + plural;
+            } else {
+                return "{0} " + unit + plural + " ago";
+            }
 
         }
 
-        private static String getFutureEnglishPattern(
+        private static String getRelativePattern(
             String unit,
-            PluralCategory category
+            boolean future
         ) {
 
-            String plural = (category == PluralCategory.ONE ? "" : "s");
-            return "in {0} " + unit + plural;
+            return ((future ? "+" : "-") + "{0} " + unit);
 
         }
 
-        private static String getPastPattern(String unit) {
+        @Override
+        public String getListPattern(
+            Locale lang,
+            TextWidth width,
+            int size
+        ) {
 
-            return "-{0} " + unit;
+            if (size < 2) {
+                throw new IllegalArgumentException(
+                    "Size must be greater than 1.");
+            }
 
-        }
+            StringBuilder sb = new StringBuilder(size * 5);
 
-        private static String getFuturePattern(String unit) {
+            for (int i = 0; i < size; i++) {
+                sb.append('{');
+                sb.append(i);
+                sb.append('}');
 
-            return "+{0} " + unit;
+                if (i < size - 1) {
+                    sb.append(", ");
+                }
+            }
+
+            return sb.toString();
 
         }
 

@@ -25,6 +25,7 @@ import net.time4j.format.PluralCategory;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -72,7 +73,7 @@ public final class UnitPatternSPI
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public String getYearsPattern(
+    public String getYearPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -83,7 +84,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getMonthsPattern(
+    public String getMonthPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -94,7 +95,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getWeeksPattern(
+    public String getWeekPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -105,7 +106,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getDaysPattern(
+    public String getDayPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -116,7 +117,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getHoursPattern(
+    public String getHourPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -127,7 +128,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getMinutesPattern(
+    public String getMinutePattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -138,7 +139,7 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getSecondsPattern(
+    public String getSecondPattern(
         Locale language,
         TextWidth width,
         PluralCategory category
@@ -149,146 +150,83 @@ public final class UnitPatternSPI
     }
 
     @Override
-    public String getPastYearsPattern(
+    public String getYearPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'Y', false, category);
+        return this.getRelativePattern(language, 'Y', future, category);
 
     }
 
     @Override
-    public String getPastMonthsPattern(
+    public String getMonthPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'M', false, category);
+        return this.getRelativePattern(language, 'M', future, category);
 
     }
 
     @Override
-    public String getPastWeeksPattern(
+    public String getWeekPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'W', false, category);
+        return this.getRelativePattern(language, 'W', future, category);
 
     }
 
     @Override
-    public String getPastDaysPattern(
+    public String getDayPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'D', false, category);
+        return this.getRelativePattern(language, 'D', future, category);
 
     }
 
     @Override
-    public String getPastHoursPattern(
+    public String getHourPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'H', false, category);
+        return this.getRelativePattern(language, 'H', future, category);
 
     }
 
     @Override
-    public String getPastMinutesPattern(
+    public String getMinutePattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'N', false, category);
+        return this.getRelativePattern(language, 'N', future, category);
 
     }
 
     @Override
-    public String getPastSecondsPattern(
+    public String getSecondPattern(
         Locale language,
+        boolean future,
         PluralCategory category
     ) {
 
-        return this.getRelativePattern(language, 'S', false, category);
+        return this.getRelativePattern(language, 'S', future, category);
 
     }
 
     @Override
-    public String getFutureYearsPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'Y', true, category);
-
-    }
-
-    @Override
-    public String getFutureMonthsPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'M', true, category);
-
-    }
-
-    @Override
-    public String getFutureWeeksPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'W', true, category);
-
-    }
-
-    @Override
-    public String getFutureDaysPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'D', true, category);
-
-    }
-
-    @Override
-    public String getFutureHoursPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'H', true, category);
-
-    }
-
-    @Override
-    public String getFutureMinutesPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'N', true, category);
-
-    }
-
-    @Override
-    public String getFutureSecondsPattern(
-        Locale language,
-        PluralCategory category
-    ) {
-
-        return this.getRelativePattern(language, 'S', true, category);
-
-    }
-
-	@Override
 	public String getNowWord(Locale lang) {
 
 		return this.getPattern(
@@ -299,6 +237,76 @@ public final class UnitPatternSPI
             PluralCategory.OTHER);
 
 	}
+
+    @Override
+    public String getListPattern(
+        Locale lang,
+        TextWidth width,
+        int size
+    ) {
+
+        if (size < 2) {
+            throw new IllegalArgumentException("Size must be greater than 1.");
+        }
+
+		ClassLoader loader = this.getClass().getClassLoader();
+		ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+		ResourceBundle rb =
+            ResourceBundle.getBundle("units/pattern", lang, loader, control);
+        String exact = buildListKey(width, String.valueOf(size));
+
+        if (rb.containsKey(exact)) {
+            return rb.getString(exact);
+        }
+
+        String end = rb.getString(buildListKey(width, "end"));
+
+        if (size == 2) {
+            return end;
+        }
+
+        String start = rb.getString(buildListKey(width, "start"));
+        String middle = rb.getString(buildListKey(width, "middle"));
+
+        end = replace(end, '1', size - 1);
+        end = replace(end, '0', size - 2);
+
+        String previous = end;
+        String result = previous;
+
+        for (int i = size - 3; i >= 0; i--) {
+            String pattern = ((i == 0) ? start : middle);
+            int pos = -1;
+            int n = pattern.length();
+
+            for (int j = n - 1; j >= 0; j--) {
+                if (
+                    (j >= 2)
+                    && (pattern.charAt(j) == '}')
+                    && (pattern.charAt(j - 1) == '1')
+                    && (pattern.charAt(j - 2) == '{')
+                ) {
+                    pos = j - 2;
+                    break;
+                }
+            }
+
+            if (pos > -1) {
+                result = pattern.substring(0, pos) + previous;
+
+                if (pos < n - 3) {
+                    result += pattern.substring(pos + 3);
+                }
+            }
+
+            if (i > 0) {
+                previous = replace(result, '0', i);
+            }
+        }
+
+        return result;
+
+    }
 
 	private String getUnitPattern(
 		Locale		   lang,
@@ -423,6 +431,73 @@ public final class UnitPatternSPI
         sb.append(future ? '+' : '-');
         return sb.append(category.ordinal()).toString();
 
+    }
+
+    private static String buildListKey(
+        TextWidth width,
+        String suffix
+    ) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('L');
+
+        switch (width) {
+            case WIDE:
+                sb.append('w');
+                break;
+            case ABBREVIATED:
+            case SHORT:
+                sb.append('s');
+                break;
+            case NARROW:
+                sb.append('n');
+                break;
+            default:
+                throw new UnsupportedOperationException(width.name());
+        }
+
+        return sb.append('-').append(suffix).toString();
+
+    }
+
+    private static String replace(
+        String s,
+        char search,
+        int value
+    ) {
+
+        for (int i = 0, n = s.length() - 2; i < n; i++) {
+            if (
+                (s.charAt(i) == '{')
+                && (s.charAt(i + 1) == search)
+                && (s.charAt(i + 2) == '}')
+            ) {
+                StringBuilder b = new StringBuilder(n + 10);
+                b.append(s);
+                b.replace(i + 1, i + 2, String.valueOf(value));
+                return b.toString();
+            }
+        }
+
+        return s;
+
+    }
+
+    public static void main(String... args) {
+        UnitPatternSPI spi = new UnitPatternSPI();
+        String s = spi.getListPattern(new Locale("ar"), TextWidth.WIDE, 12);
+        System.out.println("list-pattern=" + s);
+        Object[] items =
+            {
+                "{0} سنة", "شهر", "لا أسابيع", "يومان",
+                "{0} سنة", "شهر", "لا أسابيع", "يومان",
+                "{0} سنة", "شهر", "لا أسابيع", "يومان"
+            };
+        String f = MessageFormat.format(s, items);
+        System.out.println(f); // 3 days, 5 hours, 21 minutes, and 7 seconds
+        int v = 1;
+        char c = (char) (v + '0');
+        System.out.println("char=" + c);
     }
 
 }
