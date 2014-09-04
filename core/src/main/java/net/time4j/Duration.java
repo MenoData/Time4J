@@ -729,22 +729,19 @@ public final class Duration<U extends IsoUnit>
      * @see     #getPartialAmount(IsoUnit) getPartialAmount(U)
      */
     @Override
-    public boolean contains(U unit) {
+    public boolean contains(IsoUnit unit) {
 
-        if (unit instanceof IsoUnit) {
-            IsoUnit isoUnit = (IsoUnit) unit;
-            boolean fractional = isFractionUnit(isoUnit);
+        boolean fractional = isFractionUnit(unit);
 
-            for (int i = 0, n = this.items.size(); i < n; i++) {
-                Item<U> item = this.items.get(i);
-                U u = item.getUnit();
+        for (int i = 0, n = this.items.size(); i < n; i++) {
+            Item<U> item = this.items.get(i);
+            U u = item.getUnit();
 
-                if (
-                    u.equals(unit)
-                    || (fractional && isFractionUnit(u))
-                ) {
-                    return (item.getAmount() > 0);
-                }
+            if (
+                u.equals(unit)
+                || (fractional && isFractionUnit(u))
+            ) {
+                return (item.getAmount() > 0);
             }
         }
 
@@ -780,35 +777,32 @@ public final class Duration<U extends IsoUnit>
      * @return  non-negative amount associated with given unit ({@code >= 0})
      */
     @Override
-    public long getPartialAmount(U unit) {
+    public long getPartialAmount(IsoUnit unit) {
 
-        if (unit instanceof IsoUnit) {
-            IsoUnit isoUnit = (IsoUnit) unit;
-            boolean fractional = isFractionUnit(isoUnit);
+        boolean fractional = isFractionUnit(unit);
 
-            for (int i = 0, n = this.items.size(); i < n; i++) {
-                Item<U> item = this.items.get(i);
-                U u = item.getUnit();
+        for (int i = 0, n = this.items.size(); i < n; i++) {
+            Item<U> item = this.items.get(i);
+            U u = item.getUnit();
 
-                if (u.equals(unit)) {
-                    return item.getAmount();
-                } else if (
-                    fractional
-                    && isFractionUnit(u)
-                ) {
-                    int d1 = u.getSymbol() - '0';
-                    int d2 = isoUnit.getSymbol() - '0';
-                    int factor = 1;
+            if (u.equals(unit)) {
+                return item.getAmount();
+            } else if (
+                fractional
+                && isFractionUnit(u)
+            ) {
+                int d1 = u.getSymbol() - '0';
+                int d2 = unit.getSymbol() - '0';
+                int factor = 1;
 
-                    for (int j = 0, m = Math.abs(d1 - d2); j < m; j++) {
-                        factor *= 10;
-                    }
+                for (int j = 0, m = Math.abs(d1 - d2); j < m; j++) {
+                    factor *= 10;
+                }
 
-                    if (d1 >= d2) {
-                        return item.getAmount() / factor;
-                    } else {
-                        return item.getAmount() * factor;
-                    }
+                if (d1 >= d2) {
+                    return item.getAmount() / factor;
+                } else {
+                    return item.getAmount() * factor;
                 }
             }
         }
