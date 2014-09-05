@@ -181,7 +181,7 @@ public final class Duration<U extends IsoUnit>
      * leapseconds are ignored. That is why this normalization should
      * only be applied on ISO-timestamps without timezone reference.
      * Only time units of enum types {@link CalendarUnit} and
-     * {@link ClockUnit} can be normalized. </p>
+     * {@link ClockUnit} will be normalized. </p>
      *
      * <p>Weeks will be normalized to days if weeks do not represent
      * the only calendrical duration items. </p>
@@ -240,7 +240,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Attention: Timezone-dependent changes of length of day or
      * leapseconds are ignored. That is why this normalization should
      * only be applied on ISO-timestamps without timezone reference.
-     * Only time units of enum type {@link ClockUnit} can be normalized. </p>
+     * Only time units of enum type {@link ClockUnit} will be normalized. </p>
      *
      * @see     PlainTime
      */
@@ -281,8 +281,9 @@ public final class Duration<U extends IsoUnit>
     /**
      * Standard-Konstruktor.
      *
-     * @param   items       Dauer-Elemente
-     * @param   negative    negative Dauer angezeigt?
+     * @param   items           list of duration items
+     * @param   negative        negative duration indicated?
+     * @throws  IllegalArgumentException if different units of same length exist
      */
     Duration(
         List<Item<U>> items,
@@ -876,6 +877,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #with(long, IsoUnit) with(long, U)
      */
@@ -905,6 +907,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #with(long, IsoUnit) with(long, U)
      */
@@ -994,6 +997,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          subtracting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
@@ -1009,6 +1013,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          subtracting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
@@ -1034,6 +1039,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      */
     /*[deutsch]
@@ -1051,6 +1057,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
@@ -1071,6 +1078,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration
      * @throws  IllegalStateException if the result gets mixed signs by
      *          subtracting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      */
     /*[deutsch]
@@ -1085,6 +1093,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration
      * @throws  IllegalStateException if the result gets mixed signs by
      *          subtracting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      */
     public Duration<U> minus(TimeSpan<? extends U> timespan) {
@@ -1104,6 +1113,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          setting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
@@ -1118,6 +1128,7 @@ public final class Duration<U extends IsoUnit>
      * @return  new changed duration while this duration remains unaffected
      * @throws  IllegalStateException if the result gets mixed signs by
      *          setting the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #plus(long, IsoUnit) plus(long, U)
      */
@@ -1346,6 +1357,8 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration with {@code IsoUnit} as unit type
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
+     * @throws  ArithmeticException in case of long overflow
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
@@ -1381,6 +1394,8 @@ public final class Duration<U extends IsoUnit>
      * @return  new merged duration with {@code IsoUnit} as unit type
      * @throws  IllegalStateException if the result gets mixed signs by
      *          adding the partial amounts
+     * @throws  IllegalArgumentException if different units of same length exist
+     * @throws  ArithmeticException in case of long overflow
      */
     public Duration<IsoUnit> union(TimeSpan<? extends IsoUnit> timespan) {
 
@@ -1975,12 +1990,12 @@ public final class Duration<U extends IsoUnit>
                                 }
                             } else {
                                 weeksAsDays = MathUtils.safeMultiply(amount, 7);
-                                if (this.getIndex(DAYS) < 0) {
+                                if (this.contains(DAYS)) {
+                                    continue;
+                                } else {
                                     sb.append(weeksAsDays);
                                     weeksAsDays = 0;
                                     symbol = 'D';
-                                } else {
-                                    continue;
                                 }
                             }
                             break;
@@ -2304,7 +2319,17 @@ public final class Duration<U extends IsoUnit>
         ChronoUnit u2
     ) {
 
-        return Double.compare(u2.getLength(), u1.getLength());
+        int result = Double.compare(u2.getLength(), u1.getLength());
+
+        if (
+            (result == 0)
+            && !u1.equals(u2)
+        ) {
+            throw new IllegalArgumentException(
+                "Mixing different units of same length not allowed.");
+        }
+
+        return result;
 
     }
 
@@ -2596,7 +2621,7 @@ public final class Duration<U extends IsoUnit>
                 items.add(Item.of(amount, reified));
             }
             return unit;
-        } else if (unit.getLength() == last.getLength()) {
+        } else if (Double.compare(unit.getLength(), last.getLength()) == 0) {
             throw new ParseException(
                 "Duplicate unit items: " + duration, index);
         } else {

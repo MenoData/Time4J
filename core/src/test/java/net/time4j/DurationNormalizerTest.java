@@ -54,6 +54,13 @@ public class DurationNormalizerTest {
                 .seconds(1).millis(75).micros(800).build()));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void withSTD_PERIOD_unitsOfSameLength() {
+        Duration.of(1, CalendarUnit.weekBasedYears())
+            .union(Duration.ofZero().plus(5, CalendarUnit.CENTURIES))
+            .with(Duration.STD_PERIOD);
+    }
+
     @Test
     public void withSTD_CALENDAR_PERIOD1() {
         Duration<CalendarUnit> datePeriod =

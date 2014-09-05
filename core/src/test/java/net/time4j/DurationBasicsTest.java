@@ -544,9 +544,21 @@ public class DurationBasicsTest {
         Duration.ofCalendarUnits(12, 4, 3).plus(-5, CalendarUnit.MONTHS);
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void plusWithUnitsOfSameLength() {
+        Duration.of(1, CalendarUnit.QUARTERS.unlessInvalid())
+            .plus(1, CalendarUnit.QUARTERS);
+    }
+
     @Test(expected=IllegalStateException.class)
     public void minusWithMixedSigns() {
         Duration.ofCalendarUnits(12, 4, 3).minus(5, CalendarUnit.MONTHS);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void minusWithUnitsOfSameLength() {
+        Duration.of(1, CalendarUnit.MONTHS.withCarryOver())
+            .minus(1, CalendarUnit.MONTHS);
     }
 
     @Test
@@ -652,6 +664,15 @@ public class DurationBasicsTest {
         result = Duration.ofNegative().months(1).days(30).build();
         assertThat(p1.union(p2), is(result));
         assertThat(p2.union(p1), is(result));
+
+        assertThat(
+            Duration.of(1, CalendarUnit.MONTHS.unlessInvalid())
+            .union(Duration.ofZero().plus(1, CalendarUnit.QUARTERS)).toString(),
+            is("P1Q1{M-UNLESS_INVALID}"));
+        assertThat(
+            Duration.of(1, CalendarUnit.weekBasedYears())
+            .union(Duration.ofZero().plus(5, CalendarUnit.MONTHS)).toString(),
+            is("P1{WEEK_BASED_YEARS}5M"));
     }
 
     @Test(expected=IllegalStateException.class)
@@ -659,6 +680,12 @@ public class DurationBasicsTest {
         Duration<CalendarUnit> p1 = Duration.ofCalendarUnits(0, 5, 4);
         Duration<CalendarUnit> p2 = Duration.ofCalendarUnits(0, 4, 34).inverse();
         p1.union(p2); // + 1 Monat - 30 Tage
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void unionWithUnitsOfSameLength() {
+        Duration.of(1, CalendarUnit.QUARTERS.unlessInvalid())
+            .union(Duration.ofZero().plus(1, CalendarUnit.QUARTERS));
     }
 
     @Test
