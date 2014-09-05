@@ -1,5 +1,7 @@
 package net.time4j.i18n;
 
+import net.time4j.CalendarUnit;
+import net.time4j.Duration;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
@@ -73,9 +75,11 @@ public class PrettyTimeTest {
         };
 
         assertThat(
-            PrettyTime.of(Locale.GERMANY).withReferenceClock(clock).print(
-                PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC(),
-                ZonalOffset.UTC),
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC(),
+                    ZonalOffset.UTC),
             is("jetzt"));
     }
 
@@ -89,9 +93,11 @@ public class PrettyTimeTest {
         };
 
         assertThat(
-            PrettyTime.of(Locale.GERMANY).withReferenceClock(clock).print(
-                PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(),
-                ZonalOffset.UTC),
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(),
+                    ZonalOffset.UTC),
             is("in 3 Tagen"));
     }
 
@@ -105,9 +111,11 @@ public class PrettyTimeTest {
         };
 
         assertThat(
-            PrettyTime.of(Locale.GERMANY).withReferenceClock(clock).print(
-                PlainTimestamp.of(2014, 4, 5, 14, 0).atUTC(),
-                ZonalOffset.UTC),
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 4, 5, 14, 0).atUTC(),
+                    ZonalOffset.UTC),
             is("vor 4 Monaten"));
     }
 
@@ -144,6 +152,24 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar")).print(3, MONTHS, TextWidth.SHORT),
             is("3 أشهر"));
+    }
+
+    @Test
+    public void print3MonthsArabicU0660() {
+        assertThat(
+            PrettyTime.of(new Locale("ar"))
+                .withZeroDigit('\u0660')
+                .print(3, MONTHS, TextWidth.SHORT),
+            is('\u0663' + " أشهر"));
+    }
+
+    @Test
+    public void print5Years3Months1Week2DaysFrench() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+        assertThat(
+            PrettyTime.of(Locale.FRANCE).print(duration, TextWidth.WIDE),
+            is("15 années, 3 mois, 1 semaine et 2 jours"));
     }
 
 }
