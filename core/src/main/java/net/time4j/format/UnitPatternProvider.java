@@ -239,6 +239,87 @@ public interface UnitPatternProvider {
 
     /**
      * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of milliseconds. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for milliseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
+     * und einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der
+     * Millisekunden. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for milliseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getMilliPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of microseconds. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for microseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
+     * und einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der
+     * Mikrosekunden. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for microseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getMicroPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
+     * &quot;{0}&quot; for the count of nanoseconds. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for nanoseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
+     * und einem Platzhalter &quot;{0}&quot; f&uuml;r die Anzahl der
+     * Nanosekunden. </p>
+     *
+     * @param   lang        language setting
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for nanoseconds
+     * @throws  java.util.MissingResourceException if no pattern was found
+     */
+    String getNanoPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    );
+
+    /**
+     * <p>Yields the localized unit pattern with unit name and a placeholder
      * &quot;{0}&quot; for the count of years in the past or future. </p>
      *
      * @param   lang        language setting

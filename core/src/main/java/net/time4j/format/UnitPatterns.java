@@ -59,7 +59,7 @@ public final class UnitPatterns {
     private static final ConcurrentMap<Locale, UnitPatterns> CACHE =
         new ConcurrentHashMap<Locale, UnitPatterns>();
     private static final char[] UNIT_IDS =
-        new char[] {'Y', 'M', 'W', 'D', 'H', 'N', 'S'};
+        new char[] {'Y', 'M', 'W', 'D', 'H', 'N', 'S', '3', '6', '9'};
     private static final UnitPatternProvider PROVIDER;
     private static final UnitPatternProvider FALLBACK;
 
@@ -131,38 +131,40 @@ public final class UnitPatterns {
                 Character.valueOf(unitID),
                 Collections.unmodifiableMap(tmp1));
 
-            // Vergangenheit
-            Map<PluralCategory, String> tmp3 =
-                new EnumMap<PluralCategory, String>(PluralCategory.class);
-            for (PluralCategory cat : PluralCategory.values()) {
-                tmp3.put(cat, lookup(language, unitID, false, cat));
-            }
-            mapPast.put(
-                Character.valueOf(unitID),
-                Collections.unmodifiableMap(tmp3));
-
-            // Zukunft
-            Map<PluralCategory, String> tmp4 =
-                new EnumMap<PluralCategory, String>(PluralCategory.class);
-            for (PluralCategory cat : PluralCategory.values()) {
-                tmp4.put(cat, lookup(language, unitID, true, cat));
-            }
-            mapFuture.put(
-                Character.valueOf(unitID),
-                Collections.unmodifiableMap(tmp4));
-
-            // Liste
-            for (int i = MIN_LIST_INDEX; i <= MAX_LIST_INDEX; i++) {
-                Integer index = Integer.valueOf(i);
-                Map<TextWidth, String> tmp5 =
-                    new EnumMap<TextWidth, String>(TextWidth.class);
-                for (TextWidth width : TextWidth.values()) {
-                    tmp5.put(width, lookup(language, width, index));
+            if (!Character.isDigit(unitID)) { // no subseconds
+                // Vergangenheit
+                Map<PluralCategory, String> tmp3 =
+                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                for (PluralCategory cat : PluralCategory.values()) {
+                    tmp3.put(cat, lookup(language, unitID, false, cat));
                 }
-                mapList.put(
-                    index,
-                    Collections.unmodifiableMap(tmp5));
+                mapPast.put(
+                    Character.valueOf(unitID),
+                    Collections.unmodifiableMap(tmp3));
+
+                // Zukunft
+                Map<PluralCategory, String> tmp4 =
+                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                for (PluralCategory cat : PluralCategory.values()) {
+                    tmp4.put(cat, lookup(language, unitID, true, cat));
+                }
+                mapFuture.put(
+                    Character.valueOf(unitID),
+                    Collections.unmodifiableMap(tmp4));
             }
+        }
+
+        // Liste
+        for (int i = MIN_LIST_INDEX; i <= MAX_LIST_INDEX; i++) {
+            Integer index = Integer.valueOf(i);
+            Map<TextWidth, String> tmp5 =
+                new EnumMap<TextWidth, String>(TextWidth.class);
+            for (TextWidth width : TextWidth.values()) {
+                tmp5.put(width, lookup(language, width, index));
+            }
+            mapList.put(
+                index,
+                Collections.unmodifiableMap(tmp5));
         }
 
         this.patterns = Collections.unmodifiableMap(map);
@@ -402,6 +404,90 @@ public final class UnitPatterns {
 
         checkNull(width, category);
         return this.patterns.get('S').get(width).get(category);
+
+    }
+
+    /**
+     * <p>Yields a pattern for milliseconds which optionally contains a
+     * placeholder of the form &quot;{0}&quot; standing for the count of
+     * milliseconds. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for milliseconds
+     */
+    /*[deutsch]
+     * <p>Liefert ein Muster f&uuml;r Millisekunden, das optional einen
+     * Platzhalter der Form &quot;{0}&quot; enth&auml;lt, welcher die Anzahl
+     * der Millisekunden repr&auml;sentiert. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for milliseconds
+     */
+    public String getMillis(
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        checkNull(width, category);
+        return this.patterns.get('3').get(width).get(category);
+
+    }
+
+    /**
+     * <p>Yields a pattern for microseconds which optionally contains a
+     * placeholder of the form &quot;{0}&quot; standing for the count of
+     * microseconds. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for microseconds
+     */
+    /*[deutsch]
+     * <p>Liefert ein Muster f&uuml;r Mikrosekunden, das optional einen
+     * Platzhalter der Form &quot;{0}&quot; enth&auml;lt, welcher die Anzahl
+     * der Mikrosekunden repr&auml;sentiert. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for microseconds
+     */
+    public String getMicros(
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        checkNull(width, category);
+        return this.patterns.get('6').get(width).get(category);
+
+    }
+
+    /**
+     * <p>Yields a pattern for nanoseconds which optionally contains a
+     * placeholder of the form &quot;{0}&quot; standing for the count of
+     * nanoseconds. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for nanoseconds
+     */
+    /*[deutsch]
+     * <p>Liefert ein Muster f&uuml;r Nanosekunden, das optional einen
+     * Platzhalter der Form &quot;{0}&quot; enth&auml;lt, welcher die Anzahl
+     * der Nanosekunden repr&auml;sentiert. </p>
+     *
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   category    plural category
+     * @return  unit pattern for nanoseconds
+     */
+    public String getNanos(
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        checkNull(width, category);
+        return this.patterns.get('9').get(width).get(category);
 
     }
 
@@ -767,6 +853,10 @@ public final class UnitPatterns {
         int size
     ) {
 
+        if (width == null) {
+            throw new NullPointerException("Missing width.");
+        }
+
         if (
             (size >= MIN_LIST_INDEX)
             && (size <= MAX_LIST_INDEX)
@@ -837,6 +927,12 @@ public final class UnitPatterns {
                 return p.getMinutePattern(language, width, category);
             case 'S':
                 return p.getSecondPattern(language, width, category);
+            case '3':
+                return p.getMilliPattern(language, width, category);
+            case '6':
+                return p.getMicroPattern(language, width, category);
+            case '9':
+                return p.getNanoPattern(language, width, category);
             default:
                 throw new UnsupportedOperationException("Unit-ID: " + unitID);
         }
@@ -1213,6 +1309,54 @@ public final class UnitPatterns {
             }
 
             return sb.toString();
+
+        }
+
+        @Override
+        public String getMilliPattern(
+            Locale lang,
+            TextWidth width,
+            PluralCategory category
+        ) {
+
+            if (lang.getLanguage().equals("en")) {
+                return getEnglishPattern(
+                    "millisecond", "msec", "ms", width, category);
+            }
+
+            return getUnitPattern("ms");
+
+        }
+
+        @Override
+        public String getMicroPattern(
+            Locale lang,
+            TextWidth width,
+            PluralCategory category
+        ) {
+
+            if (lang.getLanguage().equals("en")) {
+                return getEnglishPattern(
+                    "microsecond", "µsec", "µs", width, category);
+            }
+
+            return getUnitPattern("µs");
+
+        }
+
+        @Override
+        public String getNanoPattern(
+            Locale lang,
+            TextWidth width,
+            PluralCategory category
+        ) {
+
+            if (lang.getLanguage().equals("en")) {
+                return getEnglishPattern(
+                    "nanosecond", "nsec", "ns", width, category);
+            }
+
+            return getUnitPattern("ns");
 
         }
 

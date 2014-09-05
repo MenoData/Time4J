@@ -150,6 +150,39 @@ public final class UnitPatternSPI
     }
 
     @Override
+    public String getMilliPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        return this.getUnitPattern(lang, '3', width, category);
+
+    }
+
+    @Override
+    public String getMicroPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        return this.getUnitPattern(lang, '6', width, category);
+
+    }
+
+    @Override
+    public String getNanoPattern(
+        Locale lang,
+        TextWidth width,
+        PluralCategory category
+    ) {
+
+        return this.getUnitPattern(lang, '9', width, category);
+
+    }
+
+    @Override
     public String getYearPattern(
         Locale language,
         boolean future,
