@@ -38,7 +38,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * <p>Helps to determine the plural category for a given number of units. </p>
  *
  * <p>The predefined rules for any given language are based on
- * CLDR-version 25 but can be overridden if necessary. The source data
+ * CLDR-version 26 but can be overridden if necessary. The source data
  * of the underlying algorithms to determine the plural category can be
  * found in CLDR-repository-file &quot;core.zip&quot; along the path
  * &quot;common/supplemental/plurals.xml&quot; for cardinal numbers and
@@ -53,7 +53,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * Sprache und eine entsprechende Anzahl von Zeiteinheiten. </p>
  *
  * <p>Die vordefinierten Regeln f&uuml;r irgendeine Sprache basieren auf
- * der CLDR-Version 25, k&ouml;nnen bei Bedarf aber &uuml;berschrieben
+ * der CLDR-Version 26, k&ouml;nnen bei Bedarf aber &uuml;berschrieben
  * werden. Die Quelldaten der zugrundeliegenden Algorithmen, die die
  * Pluralkategorie zu bestimmen helfen, k&ouml;nnen im CLDR-Repositorium
  * &quot;core.zip&quot; und dem Pfad &quot;common/supplemental/plurals.xml&quot;
@@ -76,8 +76,9 @@ public abstract class PluralRules {
         Map<String, PluralRules> cmap = new HashMap<String, PluralRules>();
         fillC(cmap, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
         fillC(cmap, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
+        fillC(cmap, "pt_PT", 0);
         fillC(cmap, "am bn fa gu hi kn mr zu", 1);
-        fillC(cmap, "ff fr hy kab", 1);
+        fillC(cmap, "ff fr hy kab pt", 1);
         fillC(cmap, "si", 1);
         fillC(cmap, "ak bh guw ln mg nso pa ti wa", 1);
         fillC(cmap, "tzm", 2);
@@ -135,21 +136,31 @@ public abstract class PluralRules {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Gets the localized plural rules for given language. </p>
+     * <p>Gets the localized plural rules for given language or
+     * country. </p>
+     * 
+     * <p>If no rules can be found then Time4J will choose the default rules
+     * which apply {@code PluralCategory.ONE} to n=1 and else apply the
+     * fallback category {@code PluralCategory.OTHER}. </p>
      *
-     * @param   lang        language which specifies the suitable plural rules
+     * @param   locale      locale which specifies the suitable plural rules
      * @param   numType     number type
      * @return  localized plural rules
      */
     /*[deutsch]
-     * <p>Ermittelt die Pluralregeln f&uuml;r die angegebene Sprache. </p>
+     * <p>Ermittelt die Pluralregeln f&uuml;r die angegebene Sprache oder
+     * das Land. </p>
      *
-     * @param   lang    language which specifies the suitable plural rules
+     * <p>Wenn keine Regeln gefunden werden k&ouml;nnen, dann wird Time4J
+     * die Standardregeln w&auml;hlen, die {@code PluralCategory.ONE} auf
+     * n=1 und sonst die Kategorie {@code PluralCategory.OTHER} anwenden. </p>
+     *
+     * @param   locale      locale which specifies the suitable plural rules
      * @param   numType     number type
      * @return  localized plural rules
      */
     public static PluralRules of(
-        Locale lang,
+        Locale locale,
         NumberType numType
     ) {
 
@@ -169,7 +180,19 @@ public abstract class PluralRules {
                 throw new UnsupportedOperationException(numType.name());
         }
 
-        PluralRules rules = map.get(lang.getLanguage());
+        PluralRules rules = null;
+        
+        if (!locale.getCountry().equals("")) {
+            StringBuilder kb = new StringBuilder();
+            kb.append(locale.getLanguage());
+            kb.append('_');
+            kb.append(locale.getCountry());
+            rules = map.get(kb.toString());
+        }
+        
+        if (rules == null) {
+            rules = map.get(locale.getLanguage());
+        }
 
         if (rules == null) {
             return stdRules;
@@ -183,18 +206,18 @@ public abstract class PluralRules {
      * <p>Registers given plural rules for a language, possibly overriding
      * CLDR-default setting. </p>
      *
-     * @param   lang    language which the rules shall be assigned to
+     * @param   locale  language or country which the rules shall be assigned to
      * @param   rules   localized plural rules
      */
     /*[deutsch]
      * <p>Registriert die angegebenen Pluralregeln f&uuml;r eine Sprache,
      * wobei die CLDR-Vorgabe &uuml;berschrieben werden kann. </p>
      *
-     * @param   lang    language which the rules shall be assigned to
+     * @param   locale  language or country which the rules shall be assigned to
      * @param   rules   localized plural rules
      */
     public static void register(
-        Locale lang,
+        Locale locale,
         PluralRules rules
     ) {
 
@@ -211,8 +234,18 @@ public abstract class PluralRules {
             default:
                 throw new UnsupportedOperationException(numType.name());
         }
+        
+        String key = locale.getLanguage();
 
-        map.put(lang.getLanguage(), rules);
+        if (!locale.getCountry().equals("")) {
+            StringBuilder kb = new StringBuilder();
+            kb.append(locale.getLanguage());
+            kb.append('_');
+            kb.append(locale.getCountry());
+            key = kb.toString();
+        }
+        
+        map.put(key, rules);
 
     }
 
