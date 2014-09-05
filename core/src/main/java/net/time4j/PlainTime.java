@@ -1307,7 +1307,7 @@ public final class PlainTime
      * @param   amount      amount to be added (maybe negative)
      * @param   unit        time unit
      * @return  result of rolling including possible day overflow
-     * @see     #plus(long, IsoTimeUnit)
+     * @see     #plus(long, Object) plus(long, IsoTimeUnit)
      */
     /*[deutsch]
      * <p>Rollt die angegebene Dauer mit Betrag und Einheit zu dieser Uhrzeit
@@ -1316,7 +1316,7 @@ public final class PlainTime
      * @param   amount      amount to be added (maybe negative)
      * @param   unit        time unit
      * @return  result of rolling including possible day overflow
-     * @see     #plus(long, IsoTimeUnit)
+     * @see     #plus(long, Object) plus(long, IsoTimeUnit)
      */
     public DayCycles roll(
         long amount,
