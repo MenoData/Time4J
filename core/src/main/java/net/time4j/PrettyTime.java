@@ -85,12 +85,13 @@ public final class PrettyTime {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
-        new ConcurrentHashMap<Locale, PrettyTime>();
     private static final int LEFT = 0;
     private static final int RIGHT = 1;
     private static final int MIO = 1000000;
+    private static final char UNICODE_RLM = '\u200F';
 
+    private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
+        new ConcurrentHashMap<Locale, PrettyTime>();
     private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
     private static final Set<IsoUnit> STD_UNITS;
 
@@ -114,7 +115,7 @@ public final class PrettyTime {
     private final PluralRules rules;
     private final Locale locale;
     private final TimeSource<?> refClock;
-    private final Character zeroDigit;
+    private final char zeroDigit;
     private final IsoUnit emptyUnit;
     private final int minusOrientation;
     private final char minusSign;
@@ -124,7 +125,7 @@ public final class PrettyTime {
     private PrettyTime(
         Locale locale,
         TimeSource<?> refClock,
-        Character zeroDigit,
+        char zeroDigit,
         IsoUnit emptyUnit
     ) {
         super();
@@ -177,8 +178,8 @@ public final class PrettyTime {
                 new PrettyTime(
                     locale,
                     SystemClock.INSTANCE,
-                    null,
-                    ClockUnit.SECONDS);
+                    DecimalFormatSymbols.getInstance(locale).getZeroDigit(),
+                    SECONDS);
             PrettyTime old = LANGUAGE_MAP.putIfAbsent(locale, ptime);
 
             if (old != null) {
@@ -293,7 +294,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
-            Character.valueOf(zeroDigit),
+            zeroDigit,
             this.emptyUnit);
 
     }
@@ -366,6 +367,7 @@ public final class PrettyTime {
      * @param   unit    calendar unit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
+     * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
      * <p>Formatiert die angegebene Dauer in kalendarischen Zeiteinheiten. </p>
@@ -378,6 +380,7 @@ public final class PrettyTime {
      * @param   unit    kalendarische Zeiteinheit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
+     * @see     #print(Duration, TextWidth)
      */
     public String print(
         long amount,
@@ -432,6 +435,7 @@ public final class PrettyTime {
      * @param   unit    clock unit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
+     * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
      * <p>Formatiert die angegebene Dauer in Uhrzeiteinheiten. </p>
@@ -440,6 +444,7 @@ public final class PrettyTime {
      * @param   unit    Uhrzeiteinheit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
+     * @see     #print(Duration, TextWidth)
      */
     public String print(
         long amount,
@@ -483,7 +488,12 @@ public final class PrettyTime {
      * <p>A localized output is only supported for the units
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
      * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} and
-     * all {@link ClockUnit}-units. </p>
+     * all {@link ClockUnit}-units. This methode does not perform
+     * any normalization. </p>
+     *
+     * <p>Note: If the local script variant is from right to left
+     * then a unicode-RLM-marker will automatically be inserted
+     * before each number. </p>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities
@@ -496,7 +506,12 @@ public final class PrettyTime {
      * <p>Eine lokalisierte Ausgabe ist nur f&uuml;r die Zeiteinheiten
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
      * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} und
-     * alle {@link ClockUnit}-Instanzen vorhanden. </p>
+     * alle {@link ClockUnit}-Instanzen vorhanden. Diese Methode
+     * f&uuml;hrt keine Normalisierung durch. </p>
+     *
+     * <p>Hinweis: Wenn die lokale Skript-Variante von rechts nach links
+     * geht, wird automatisch ein Unicode-RLM-Marker vor jeder Nummer
+     * eingef&uuml;gt. </p>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities
@@ -749,7 +764,7 @@ public final class PrettyTime {
         if (STD_UNITS.contains(unit)) {
             if (unit.isCalendrical()) {
                 CalendarUnit u = CalendarUnit.class.cast(unit);
-                return this.print(amount, u, width);
+                return this.print(value, u, width);
             } else {
                 ClockUnit u = ClockUnit.class.cast(unit);
 
@@ -795,14 +810,13 @@ public final class PrettyTime {
     private String format(long amount) {
 
         StringBuilder sb = new StringBuilder();
-        String num = String.valueOf(amount);
-        char zero = (
-            (this.zeroDigit == null)
-            ? DecimalFormatSymbols.getInstance(this.locale).getZeroDigit()
-            : this.zeroDigit.charValue());
+        String num = String.valueOf(Math.abs(amount));
+        char zero = this.zeroDigit;
 
-        if ((amount < 0) && (this.minusOrientation == LEFT)) {
+        if ((this.minusOrientation == LEFT) && (amount < 0)) {
             sb.append(this.minusSign);
+        } else if (this.minusOrientation == RIGHT) {
+            sb.append(UNICODE_RLM);
         }
 
         for (int i = 0, n = num.length(); i < n; i++) {
@@ -813,7 +827,7 @@ public final class PrettyTime {
             sb.append(c);
         }
 
-        if ((amount < 0) && (this.minusOrientation == RIGHT)) {
+        if ((this.minusOrientation == RIGHT) && (amount < 0)) {
             sb.append(this.minusSign);
         }
 

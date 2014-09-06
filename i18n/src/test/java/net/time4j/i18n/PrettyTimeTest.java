@@ -1,6 +1,7 @@
 package net.time4j.i18n;
 
 import net.time4j.CalendarUnit;
+import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
@@ -134,9 +135,18 @@ public class PrettyTimeTest {
     }
 
     @Test
-    public void print0MonthsArabic() {
+    public void print0MonthsArabic1() {
         assertThat(
             PrettyTime.of(new Locale("ar")).print(0, MONTHS, TextWidth.SHORT),
+            is("لا أشهر"));
+    }
+
+    @Test
+    public void print0MonthsArabic2() {
+        assertThat(
+            PrettyTime.of(new Locale("ar"))
+                .withEmptyUnit(MONTHS)
+                .print(Duration.of(0, MONTHS), TextWidth.SHORT),
             is("لا أشهر"));
     }
 
@@ -151,7 +161,7 @@ public class PrettyTimeTest {
     public void print3MonthsArabic() {
         assertThat(
             PrettyTime.of(new Locale("ar")).print(3, MONTHS, TextWidth.SHORT),
-            is("3 أشهر"));
+            is("\u200F" + "3 أشهر"));
     }
 
     @Test
@@ -160,16 +170,142 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar"))
                 .withZeroDigit('\u0660')
                 .print(3, MONTHS, TextWidth.SHORT),
-            is('\u0663' + " أشهر"));
+            is("\u200F" + '\u0663' + " أشهر"));
     }
 
     @Test
-    public void print5Years3Months1Week2DaysFrench() {
+    public void printMillisWideGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(Duration.of(123, ClockUnit.MILLIS), TextWidth.WIDE),
+            is("123 Millisekunden"));
+    }
+
+    @Test
+    public void printMicrosWideGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(Duration.of(123456, ClockUnit.MICROS), TextWidth.WIDE),
+            is("123456 Mikrosekunden"));
+    }
+
+    @Test
+    public void printNanosWideGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(
+                    Duration.of(123456789, ClockUnit.NANOS),
+                    TextWidth.WIDE),
+            is("123456789 Nanosekunden"));
+    }
+
+    @Test
+    public void printMillisShortGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(Duration.of(123, ClockUnit.MILLIS), TextWidth.SHORT),
+            is("123 ms"));
+    }
+
+    @Test
+    public void printMicrosShortGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(Duration.of(123456, ClockUnit.MICROS), TextWidth.SHORT),
+            is("123456 μs"));
+    }
+
+    @Test
+    public void printNanosShortGerman() {
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .print(
+                    Duration.of(123456789, ClockUnit.NANOS),
+                    TextWidth.SHORT),
+            is("123456789 ns"));
+    }
+
+    @Test
+    public void printMillisWideEnglish() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(1000, ClockUnit.MICROS);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
+            is("124 milliseconds"));
+    }
+
+    @Test
+    public void printMicrosWideEnglish() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(1001, ClockUnit.MICROS);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
+            is("124001 microseconds"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysFrench() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(duration, TextWidth.WIDE),
             is("15 années, 3 mois, 1 semaine et 2 jours"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysMinusGerman() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2)
+                .plus(1, CalendarUnit.WEEKS)
+                .inverse();
+        assertThat(
+            PrettyTime.of(Locale.GERMANY).print(duration, TextWidth.WIDE),
+            is("-15 Jahre, -3 Monate, -1 Woche und -2 Tage"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysArabic() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+        assertThat(
+            PrettyTime.of(new Locale("ar")).print(duration, TextWidth.WIDE),
+            is("\u200F" + "15 سنة، " + "\u200F" + "3 أشهر، أسبوع، و يومان"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysArabicU0660() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+        assertThat(
+            PrettyTime.of(new Locale("ar"))
+                .withZeroDigit('\u0660')
+                .print(duration, TextWidth.WIDE),
+            is("\u200F" + "\u0661\u0665" + " سنة، "
+               + "\u200F" + "\u0663" + " أشهر، أسبوع، و يومان"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysArabicMinus() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS)
+            .inverse();
+        assertThat(
+            PrettyTime.of(new Locale("ar"))
+                .print(duration, TextWidth.WIDE),
+            is("\u200F" + "15- سنة، " + "\u200F" + "3- أشهر، أسبوع، و يومان"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysArabicU0660Minus() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS)
+            .inverse();
+        assertThat(
+            PrettyTime.of(new Locale("ar"))
+                .withZeroDigit('\u0660')
+                .print(duration, TextWidth.WIDE),
+            is("\u200F" + "\u0661\u0665" + "- سنة، "
+               + "\u200F" + "\u0663" + "- أشهر، أسبوع، و يومان"));
     }
 
 }

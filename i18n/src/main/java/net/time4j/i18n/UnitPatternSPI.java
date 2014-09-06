@@ -25,7 +25,6 @@ import net.time4j.format.PluralCategory;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
 
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -514,23 +513,6 @@ public final class UnitPatternSPI
 
         return s;
 
-    }
-
-    public static void main(String... args) {
-        UnitPatternSPI spi = new UnitPatternSPI();
-        String s = spi.getListPattern(new Locale("ar"), TextWidth.WIDE, 12);
-        System.out.println("list-pattern=" + s);
-        Object[] items =
-            {
-                "{0} سنة", "شهر", "لا أسابيع", "يومان",
-                "{0} سنة", "شهر", "لا أسابيع", "يومان",
-                "{0} سنة", "شهر", "لا أسابيع", "يومان"
-            };
-        String f = MessageFormat.format(s, items);
-        System.out.println(f); // 3 days, 5 hours, 21 minutes, and 7 seconds
-        int v = 1;
-        char c = (char) (v + '0');
-        System.out.println("char=" + c);
     }
 
 }
