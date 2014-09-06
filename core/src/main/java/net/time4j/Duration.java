@@ -351,7 +351,8 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Is the given amount is negative then the duration will be
      * negative, too. Is the amount equal to {@code 0} then an empty
-     * duration will be returned. </p>
+     * duration will be returned. Milliseconds or microseconds will
+     * be automatically normalized to nanoseconds. </p>
      *
      * @param   <U> generic unit type
      * @param   amount      amount as count of units
@@ -364,7 +365,8 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Ist der angegebene Betrag negativ, so wird auch die Zeitspanne
      * negativ sein. Ist er {@code 0}, wird eine leere Zeitspanne
-     * zur&uuml;ckgegeben. </p>
+     * zur&uuml;ckgegeben. Millisekunden oder Mikrosekunden werden
+     * automatisch zu Nanosekunden normalisiert. </p>
      *
      * @param   <U> generic unit type
      * @param   amount      amount as count of units
