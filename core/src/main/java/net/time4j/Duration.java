@@ -380,12 +380,28 @@ public final class Duration<U extends IsoUnit>
             return ofZero();
         }
 
+        U u = unit;
+        long value = amount;
+
+        if (amount < 0) {
+            value = MathUtils.safeNegate(amount);
+        }
+
+        switch (unit.getSymbol()) {
+            case '3':
+                u = cast(ClockUnit.NANOS);
+                value = MathUtils.safeMultiply(value, MIO);
+                break;
+            case '6':
+                u = cast(ClockUnit.NANOS);
+                value = MathUtils.safeMultiply(value, 1000);
+                break;
+            default:
+                // no-op
+        }
+
         List<Item<U>> items = new ArrayList<Item<U>>(1);
-        items.add(
-            Item.of(
-                ((amount < 0) ? MathUtils.safeNegate(amount) : amount),
-                unit)
-            );
+        items.add(Item.of(value, u));
         return new Duration<U>(items, (amount < 0));
 
     }

@@ -1200,4 +1200,61 @@ public class DurationBasicsTest {
 
     }
 
+    @Test
+    public void ofSingleUnitMillis() {
+        Duration<ClockUnit> dur = Duration.of(123, MILLIS);
+        assertThat(dur.toString(), is("PT0,123000000S"));
+        assertThat(dur.getTotalLength().size(), is(1));
+        assertThat(dur.isPositive(), is(true));
+        assertThat(dur.isNegative(), is(false));
+        assertThat(dur.isEmpty(), is(false));
+        Item<ClockUnit> item = dur.getTotalLength().get(0);
+        assertThat(item.getAmount(), is(123000000L));
+        assertThat(item.getUnit(), is(NANOS));
+    }
+
+    @Test
+    public void ofSingleUnitMicros() {
+        Duration<ClockUnit> dur = Duration.of(123456, MICROS);
+        assertThat(dur.toString(), is("PT0,123456000S"));
+        assertThat(dur.getTotalLength().size(), is(1));
+        assertThat(dur.isPositive(), is(true));
+        assertThat(dur.isNegative(), is(false));
+        assertThat(dur.isEmpty(), is(false));
+        Item<ClockUnit> item = dur.getTotalLength().get(0);
+        assertThat(item.getAmount(), is(123456000L));
+        assertThat(item.getUnit(), is(NANOS));
+    }
+
+    @Test
+    public void ofSingleUnitNanos() {
+        Duration<ClockUnit> dur = Duration.of(123456789, NANOS);
+        assertThat(dur.toString(), is("PT0,123456789S"));
+        assertThat(dur.getTotalLength().size(), is(1));
+        assertThat(dur.isPositive(), is(true));
+        assertThat(dur.isNegative(), is(false));
+        assertThat(dur.isEmpty(), is(false));
+        Item<ClockUnit> item = dur.getTotalLength().get(0);
+        assertThat(item.getAmount(), is(123456789L));
+        assertThat(item.getUnit(), is(NANOS));
+    }
+
+    @Test
+    public void ofMillisPlusMicros1() {
+        Duration<ClockUnit> dur = Duration.of(123, MILLIS).plus(1000, MICROS);
+        assertThat(dur.getTotalLength().size(), is(1));
+        Item<ClockUnit> item = dur.getTotalLength().get(0);
+        assertThat(item.getAmount(), is(124000000L));
+        assertThat(item.getUnit(), is(NANOS));
+    }
+
+    @Test
+    public void ofMillisPlusMicros2() {
+        Duration<ClockUnit> dur = Duration.of(123, MILLIS).plus(1001, MICROS);
+        assertThat(dur.getTotalLength().size(), is(1));
+        Item<ClockUnit> item = dur.getTotalLength().get(0);
+        assertThat(item.getAmount(), is(124001000L));
+        assertThat(item.getUnit(), is(NANOS));
+    }
+
 }
