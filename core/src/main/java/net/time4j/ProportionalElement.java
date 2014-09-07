@@ -118,7 +118,7 @@ public interface ProportionalElement<V extends Number, T>
      * can trigger a {@code ChronoException} if this action changes to
      * the pre-UTC-era before 1972. </p>
      *
-     * @return  lenient operator
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Passt eine beliebige Entit&auml;t so an, da&szlig; dieses Element
@@ -140,7 +140,7 @@ public interface ProportionalElement<V extends Number, T>
      * ausl&ouml;sen, wenn damit ein Wechsel von der UTC-&Auml;ra in die
      * UT-&Auml;ra vor 1972 verbunden ist. </p>
      *
-     * @return  lenient operator
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> setLenient(V value);
 
@@ -203,7 +203,7 @@ public interface ProportionalElement<V extends Number, T>
 
     /**
      * <p>Rounds this chronological element up or down and makes its
-     * numerical value an integral multiple of given step width if 
+     * numerical value an integral multiple of given step width if
      * possible. </p>
      *
      * <pre>

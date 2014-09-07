@@ -31,7 +31,7 @@ import net.time4j.engine.ChronoOperator;
  * @concurrency <immutable>
  */
 final class WallTimeOperator
-    implements ChronoOperator<PlainTimestamp> {
+    extends ElementOperator<PlainTimestamp> {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -47,10 +47,10 @@ final class WallTimeOperator
      * @param   value       target value of navigation
      */
     WallTimeOperator(
-        int mode,
-        PlainTime value
+        final int mode,
+        final PlainTime value
     ) {
-        super();
+        super(PlainTime.COMPONENT, mode);
 
         if (value == null) {
             throw new NullPointerException("Missing target wall time.");
@@ -69,14 +69,21 @@ final class WallTimeOperator
         PlainTime oldTime = entity.getWallTime();
 
         if (this.value.isSimultaneous(oldTime)) {
-        	return this.handleSameTimes(entity);
+            return this.handleSameTimes(entity);
         } else if (this.value.getHour() == 24) {
-        	return this.handleMidnight24(entity);
+            return this.handleMidnight24(entity);
         } else if (this.value.isAfter(oldTime)) {
-        	return this.handleLater(entity);
+            return this.handleLater(entity);
         } else {
-        	return this.handleEarlier(entity);
+            return this.handleEarlier(entity);
         }
+
+    }
+
+    @Override
+    ChronoOperator<PlainTimestamp> onTimestamp() {
+
+        return this;
 
     }
 

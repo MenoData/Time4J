@@ -58,7 +58,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is after current value
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der nach dem
@@ -78,7 +78,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is after current value
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToNext(V value);
 
@@ -99,7 +99,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is before current value
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor dem
@@ -119,7 +119,7 @@ public interface NavigableElement<V extends Enum<V>>
      * </pre>
      *
      * @param   value   new element value which is before current value
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToPrevious(V value);
 
@@ -132,7 +132,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either after current value
      *                  or the same
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert setzt, der nach
@@ -143,7 +143,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either after current value
      *                  or the same
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToNextOrSame(V value);
 
@@ -156,7 +156,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either before current value
      *                  or the same
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf den ersten angegebenen Wert, der vor oder
@@ -167,7 +167,7 @@ public interface NavigableElement<V extends Enum<V>>
      *
      * @param   value   new element value which is either before current value
      *                  or the same
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToPreviousOrSame(V value);
 

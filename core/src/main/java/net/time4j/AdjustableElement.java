@@ -48,24 +48,24 @@ public interface AdjustableElement<V, T>
     /**
      * <p>Sets any local entity to the minimum of this element. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementminimum. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> minimized();
 
     /**
      * <p>Sets any local entity to the maximum of this element. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Setzt eine beliebige Entit&auml;t auf das Elementmaximum. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> maximized();
 
@@ -76,7 +76,7 @@ public interface AdjustableElement<V, T>
      * <p>The operator throws a {@code ChronoException} if there is no
      * base unit available for this element. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      *          and requiring a base unit in given chronology for decrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -88,7 +88,7 @@ public interface AdjustableElement<V, T>
      * Zeitpunkt angewandt wird, dessen Zeitachse keine Basiseinheit zu diesem
      * Element kennt. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      *          and requiring a base unit in given chronology for decrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -101,7 +101,7 @@ public interface AdjustableElement<V, T>
      * <p>The operator throws a {@code ChronoException} if there is no
      * base unit available for this element. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      *          and requiring a base unit in given chronology for incrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -113,7 +113,7 @@ public interface AdjustableElement<V, T>
      * Zeitpunkt angewandt wird, dessen Zeitachse keine Basiseinheit zu diesem
      * Element kennt. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      *          and requiring a base unit in given chronology for incrementing
      * @see     net.time4j.engine.TimeAxis#getBaseUnit(ChronoElement)
      */
@@ -128,7 +128,7 @@ public interface AdjustableElement<V, T>
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
      * Elements auf ihr Minimum gesetzt werden. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> atFloor();
 
@@ -141,7 +141,7 @@ public interface AdjustableElement<V, T>
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
      * Elements auf ihr Maximum gesetzt werden. </p>
      *
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> atCeiling();
 

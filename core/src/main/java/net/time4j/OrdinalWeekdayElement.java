@@ -52,14 +52,14 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * @param   dayOfWeek   first day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den ersten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   first day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToFirst(Weekday dayOfWeek);
 
@@ -68,14 +68,14 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * @param   dayOfWeek   second day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den zweiten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   second day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToSecond(Weekday dayOfWeek);
 
@@ -84,14 +84,14 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * @param   dayOfWeek   third day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den dritten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   third day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToThird(Weekday dayOfWeek);
 
@@ -100,14 +100,14 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * @param   dayOfWeek   fourth day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den vierten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   fourth day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToFourth(Weekday dayOfWeek);
 
@@ -116,14 +116,14 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * @param   dayOfWeek   last day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den letzten angegebenen
      * Wochentag eines Monats setzt. </p>
      *
      * @param   dayOfWeek   last day of week in month
-     * @return  operator directly applicable on local types without timezone
+     * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToLast(Weekday dayOfWeek);
 

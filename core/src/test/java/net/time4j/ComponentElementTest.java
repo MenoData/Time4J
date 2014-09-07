@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.engine.RuleNotFoundException;
+import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
 import org.junit.Test;
@@ -118,6 +119,17 @@ public class ComponentElementTest {
             tsp.with(
                 PlainTime.COMPONENT.setToPrevious(PlainTime.of(14, 30)));
         assertThat(tsp, is(PlainTimestamp.of(2014, 8, 18, 14, 30)));
+    }
+
+    @Test
+    public void setToNextTimeOnMoment() {
+        Moment tsp = PlainTimestamp.of(2014, 8, 19, 14, 30).atUTC();
+        tsp =
+            tsp.with(
+                PlainTime.COMPONENT
+                .setToNext(PlainTime.of(21, 45))
+                .inTimezone(ZonalOffset.UTC));
+        assertThat(tsp, is(PlainTimestamp.of(2014, 8, 19, 21, 45).atUTC()));
     }
 
 }

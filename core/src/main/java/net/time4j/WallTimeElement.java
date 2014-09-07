@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoOperator;
 
 
 /**
@@ -53,63 +52,71 @@ public interface WallTimeElement
      * if necessary. </p>
      *
      * @param   value   new wall time which is after current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf die n&auml;chste angegebene Uhrzeit und
      * wechselt bei Bedarf den Tag. </p>
      *
      * @param   value   new wall time which is after current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
-    ChronoOperator<PlainTimestamp> setToNext(PlainTime value);
+    ElementOperator<?> setToNext(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the previous given wall time and change the day
      * backwards if necessary. </p>
      *
      * @param   value   new wall time which is before current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf die vorherige angegebene Uhrzeit und
      * wechselt bei Bedarf den Tag r&uuml;ckw&auml;rts. </p>
      *
      * @param   value   new wall time which is before current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
-    ChronoOperator<PlainTimestamp> setToPrevious(PlainTime value);
+    ElementOperator<?> setToPrevious(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the next or same given wall time and change
      * the day if necessary. </p>
      *
      * @param   value   new wall time which is not before current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf die n&auml;chste oder gleiche angegebene
      * Uhrzeit und wechselt bei Bedarf den Tag. </p>
      *
      * @param   value   new wall time which is not before current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
-    ChronoOperator<PlainTimestamp> setToNextOrSame(PlainTime value);
+    ElementOperator<?> setToNextOrSame(PlainTime value);
 
     /**
      * <p>Moves a timestamp to the previous or same given wall time and
      * change the day backwards if necessary. </p>
      *
      * @param   value   new wall time which is not after current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
      * <p>Setzt einen Zeitpunkt auf die vorherige oder gleiche angegebene
      * Uhrzeit und wechselt bei Bedarf den Tag r&uuml;ckw&auml;rts. </p>
      *
      * @param   value   new wall time which is not after current wall time
-     * @return  operator applicable on {@code PlainTimestamp}
+     * @return  operator directly applicable on {@code PlainTimestamp}
+     * @see     PlainTimestamp#with(ElementOperator)
      */
-    ChronoOperator<PlainTimestamp> setToPreviousOrSame(PlainTime value);
+    ElementOperator<?> setToPreviousOrSame(PlainTime value);
 
 }
