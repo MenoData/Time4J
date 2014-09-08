@@ -133,6 +133,34 @@ final class TimeElement
 	}
 
     @Override
+    public ElementOperator<PlainTime> roundedToFullHour() {
+
+        return FullValueOperator.ROUNDING_FULL_HOUR;
+
+    }
+
+    @Override
+    public ElementOperator<PlainTime> roundedToFullMinute() {
+
+        return FullValueOperator.ROUNDING_FULL_MINUTE;
+
+    }
+
+    @Override
+    public ElementOperator<PlainTime> setToNextFullHour() {
+
+        return FullValueOperator.NEXT_FULL_HOUR;
+
+    }
+
+    @Override
+    public ElementOperator<PlainTime> setToNextFullMinute() {
+
+        return FullValueOperator.NEXT_FULL_MINUTE;
+
+    }
+
+    @Override
     protected String getVeto(Chronology<?> chronology) {
 
         if (UnixTime.class.isAssignableFrom(chronology.getChronoType())) {

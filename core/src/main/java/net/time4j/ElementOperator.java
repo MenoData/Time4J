@@ -61,6 +61,10 @@ public abstract class ElementOperator<T>
     static final int OP_NAV_PREVIOUS = 10;
     static final int OP_NAV_NEXT_OR_SAME = 11;
     static final int OP_NAV_PREVIOUS_OR_SAME = 12;
+    static final int OP_ROUND_FULL_HOUR = 13;
+    static final int OP_ROUND_FULL_MINUTE = 14;
+    static final int OP_NEXT_FULL_HOUR = 15;
+    static final int OP_NEXT_FULL_MINUTE = 16;
 
     //~ Instanzvariablen --------------------------------------------------
 

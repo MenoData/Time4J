@@ -132,4 +132,132 @@ public class ComponentElementTest {
         assertThat(tsp, is(PlainTimestamp.of(2014, 8, 19, 21, 45).atUTC()));
     }
 
+    @Test
+    public void roundedToFullHourOnTime2329() {
+        PlainTime time = PlainTime.of(23, 29, 59, 999999999);
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullHour()),
+            is(PlainTime.of(23)));
+    }
+
+    @Test
+    public void roundedToFullHourOnTime2330() {
+        PlainTime time = PlainTime.of(23, 30);
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullHour()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void roundedToFullMinuteOnTime235929() {
+        PlainTime time = PlainTime.of(23, 59, 29, 999999999);
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullMinute()),
+            is(PlainTime.of(23, 59)));
+    }
+
+    @Test
+    public void roundedToFullMinuteOnTime235930() {
+        PlainTime time = PlainTime.of(23, 59, 30);
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullMinute()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void roundedToFullHourOnTime24() {
+        PlainTime time = PlainTime.midnightAtEndOfDay();
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullHour()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void roundedToFullMinuteOnTime24() {
+        PlainTime time = PlainTime.midnightAtEndOfDay();
+        assertThat(
+            time.with(PlainTime.COMPONENT.roundedToFullMinute()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void roundedToFullHourOnTimestamp2329() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 29, 59);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.roundedToFullHour()),
+            is(PlainTimestamp.of(2014, 12, 31, 23, 0)));
+    }
+
+    @Test
+    public void roundedToFullHourOnTimestamp2330() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 30);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.roundedToFullHour()),
+            is(PlainTimestamp.of(2015, 1, 1, 0, 0)));
+    }
+
+    @Test
+    public void roundedToFullMinuteOnTimestamp235929() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 59, 29);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.roundedToFullMinute()),
+            is(PlainTimestamp.of(2014, 12, 31, 23, 59)));
+    }
+
+    @Test
+    public void roundedToFullMinuteOnTimestamp235930() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 59, 30);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.roundedToFullMinute()),
+            is(PlainTimestamp.of(2015, 1, 1, 0, 0)));
+    }
+
+    @Test
+    public void setToNextFullHourOnTime2329() {
+        PlainTime time = PlainTime.of(23, 29, 59, 999999999);
+        assertThat(
+            time.with(PlainTime.COMPONENT.setToNextFullHour()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void setToNextFullMinuteOnTime235929() {
+        PlainTime time = PlainTime.of(23, 59, 29, 999999999);
+        assertThat(
+            time.with(PlainTime.COMPONENT.setToNextFullMinute()),
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void setToNextFullHourOnTime24() {
+        PlainTime time = PlainTime.midnightAtEndOfDay();
+        assertThat(
+            time.with(PlainTime.COMPONENT.setToNextFullHour()),
+            is(PlainTime.of(1)));
+    }
+
+    @Test
+    public void setToNextFullMinuteOnTime24() {
+        PlainTime time = PlainTime.midnightAtEndOfDay();
+        assertThat(
+            time.with(PlainTime.COMPONENT.setToNextFullMinute()),
+            is(PlainTime.of(0, 1)));
+    }
+
+    @Test
+    public void setToNextFullHourOnTimestamp2329() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 1, 0);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.setToNextFullHour()),
+            is(PlainTimestamp.of(2015, 1, 1, 0, 0)));
+    }
+
+    @Test
+    public void setToNextFullMinuteOnTimestamp235929() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 31, 23, 59, 1);
+        assertThat(
+            ts.with(PlainTime.COMPONENT.setToNextFullMinute()),
+            is(PlainTimestamp.of(2015, 1, 1, 0, 0)));
+    }
+
 }

@@ -119,4 +119,52 @@ public interface WallTimeElement
      */
     ElementOperator<?> setToPreviousOrSame(PlainTime value);
 
+    /**
+     * <p>Performs rounding to full hour in half rounding mode. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    /*[deutsch]
+     * <p>Rundet kaufm&auml;nnisch zur vollen Stunde. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    ElementOperator<PlainTime> roundedToFullHour();
+
+    /**
+     * <p>Performs rounding to full minute in half rounding mode. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    /*[deutsch]
+     * <p>Rundet kaufm&auml;nnisch zur vollen Minute. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    ElementOperator<PlainTime> roundedToFullMinute();
+
+    /**
+     * <p>Adjusts to next full hour. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    /*[deutsch]
+     * <p>Verstellt zur n&auml;chsten vollen Stunde. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    ElementOperator<PlainTime> setToNextFullHour();
+
+    /**
+     * <p>Adjusts to next full minute. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    /*[deutsch]
+     * <p>Verstellt zur n&auml;chsten vollen Minute. </p>
+     *
+     * @return  operator also applicable on {@code PlainTimestamp}
+     */
+    ElementOperator<PlainTime> setToNextFullMinute();
+
 }
