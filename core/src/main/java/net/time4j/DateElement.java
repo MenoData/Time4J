@@ -36,7 +36,8 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class DateElement
-    extends BasicElement<PlainDate> {
+    extends BasicElement<PlainDate>
+    implements CalendarDateElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -102,6 +103,48 @@ final class DateElement
     }
 
     @Override
+    public ElementOperator<PlainDate> firstDayOfNextMonth() {
+
+        return CalendarOperator.FIRST_DAY_OF_NEXT_MONTH;
+
+    }
+
+    @Override
+    public ElementOperator<PlainDate> firstDayOfNextQuarter() {
+
+        return CalendarOperator.FIRST_DAY_OF_NEXT_QUARTER;
+
+    }
+
+    @Override
+    public ElementOperator<PlainDate> firstDayOfNextYear() {
+
+        return CalendarOperator.FIRST_DAY_OF_NEXT_YEAR;
+
+    }
+
+    @Override
+    public ElementOperator<PlainDate> lastDayOfPreviousMonth() {
+
+        return CalendarOperator.LAST_DAY_OF_PREVIOUS_MONTH;
+
+    }
+
+    @Override
+    public ElementOperator<PlainDate> lastDayOfPreviousQuarter() {
+
+        return CalendarOperator.LAST_DAY_OF_PREVIOUS_QUARTER;
+
+    }
+
+    @Override
+    public ElementOperator<PlainDate> lastDayOfPreviousYear() {
+
+        return CalendarOperator.LAST_DAY_OF_PREVIOUS_YEAR;
+
+    }
+
+    @Override
     protected String getVeto(Chronology<?> chronology) {
 
         if (UnixTime.class.isAssignableFrom(chronology.getChronoType())) {
@@ -109,7 +152,7 @@ final class DateElement
                    + "requires a timezone. Try to first convert the global "
                    + "type to a PlainTimestamp: \"moment.inZonalView(...)\".";
         }
-        
+
         return null;
 
     }

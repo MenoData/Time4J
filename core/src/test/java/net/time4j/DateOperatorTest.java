@@ -520,18 +520,4 @@ public class DateOperatorTest {
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
     }
 
-    @Test
-    public void firstDayOfNextYear() {
-        assertThat(
-            PlainDate.of(2012, 2, 29).withFirstDayOfNextYear(),
-            is(PlainDate.of(2013, 1, 1)));
-    }
-
-    @Test
-    public void firstDayOfNextMonth() {
-        assertThat(
-            PlainDate.of(2012, 2, 27).withFirstDayOfNextMonth(),
-            is(PlainDate.of(2012, 3, 1)));
-    }
-
 }

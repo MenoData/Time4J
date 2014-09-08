@@ -260,4 +260,58 @@ public class ComponentElementTest {
             is(PlainTimestamp.of(2015, 1, 1, 0, 0)));
     }
 
+    @Test
+    public void setToFirstDayOfNextMonth() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 12, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.firstDayOfNextMonth()),
+            is(PlainTimestamp.of(2015, 1, 1, 23, 59, 1)));
+
+    }
+
+    @Test
+    public void setToFirstDayOfNextQuarter() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 11, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.firstDayOfNextQuarter()),
+            is(PlainTimestamp.of(2015, 1, 1, 23, 59, 1)));
+
+    }
+
+    @Test
+    public void setToFirstDayOfNextYear() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 3, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.firstDayOfNextYear()),
+            is(PlainTimestamp.of(2015, 1, 1, 23, 59, 1)));
+
+    }
+
+    @Test
+    public void setToLastDayOfPreviousMonth() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 3, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.lastDayOfPreviousMonth()),
+            is(PlainTimestamp.of(2014, 2, 28, 23, 59, 1)));
+
+    }
+
+    @Test
+    public void setToLastDayOfPreviousQuarter() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 11, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.lastDayOfPreviousQuarter()),
+            is(PlainTimestamp.of(2014, 9, 30, 23, 59, 1)));
+
+    }
+
+    @Test
+    public void setToLastDayOfPreviousYear() {
+        PlainTimestamp ts = PlainTimestamp.of(2014, 3, 27, 23, 59, 1);
+        assertThat(
+            ts.with(PlainDate.COMPONENT.lastDayOfPreviousYear()),
+            is(PlainTimestamp.of(2013, 12, 31, 23, 59, 1)));
+
+    }
+
 }
