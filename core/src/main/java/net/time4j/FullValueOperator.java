@@ -30,6 +30,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * <p>Rundet auf volle Werte. </p>
  *
  * @author  Meno Hochschild
+ * @since   1.2
  */
 final class FullValueOperator
     extends ElementOperator<PlainTime> {
@@ -48,11 +49,12 @@ final class FullValueOperator
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoOperator<PlainTimestamp> tsop;
+    private final ChronoOperator<Moment> moop;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private FullValueOperator(final int mode) {
-        super(PlainTime.COMPONENT, mode);
+    private FullValueOperator(int type) {
+        super(PlainTime.COMPONENT, type);
 
         this.tsop =
             new ChronoOperator<PlainTimestamp>() {
@@ -69,6 +71,8 @@ final class FullValueOperator
                     }
                 }
             };
+        this.moop =
+            new Moment.Operator(this.tsop, PlainTime.COMPONENT, type);
 
     }
 
@@ -78,6 +82,13 @@ final class FullValueOperator
     public PlainTime apply(PlainTime entity) {
 
         return this.doApply(entity);
+
+    }
+
+    @Override
+    public ChronoOperator<Moment> inStdTimezone() {
+
+        return this.moop;
 
     }
 
