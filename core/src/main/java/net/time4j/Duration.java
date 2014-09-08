@@ -21,18 +21,8 @@
 
 package net.time4j;
 
-import net.time4j.base.MathUtils;
-import net.time4j.base.UnixTime;
-import net.time4j.engine.AbstractDuration;
-import net.time4j.engine.AbstractMetric;
-import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.ChronoUnit;
-import net.time4j.engine.Normalizer;
-import net.time4j.engine.TimeMetric;
-import net.time4j.engine.TimePoint;
-import net.time4j.engine.TimeSpan;
-import net.time4j.tz.Timezone;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -47,20 +37,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.time4j.CalendarUnit.CENTURIES;
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.DECADES;
-import static net.time4j.CalendarUnit.MILLENNIA;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.QUARTERS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
-import static net.time4j.ClockUnit.SECONDS;
+import net.time4j.base.MathUtils;
+import net.time4j.base.UnixTime;
+import net.time4j.engine.AbstractDuration;
+import net.time4j.engine.AbstractMetric;
+import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoOperator;
+import net.time4j.engine.ChronoUnit;
+import net.time4j.engine.Normalizer;
+import net.time4j.engine.TimeMetric;
+import net.time4j.engine.TimePoint;
+import net.time4j.engine.TimeSpan;
+import net.time4j.format.SignPolicy;
+import net.time4j.tz.Timezone;
 
 
 /**
@@ -153,6 +142,7 @@ public final class Duration<U extends IsoUnit>
         : ',' // Empfehlung des ISO-Standards
     );
 
+    private static final Object SIGN_KEY = new Object();
     private static final long MRD = 1000000000L;
     private static final long MIO = 1000000L;
 
@@ -389,17 +379,19 @@ public final class Duration<U extends IsoUnit>
             value = MathUtils.safeNegate(amount);
         }
 
-        switch (unit.getSymbol()) {
-            case '3':
-                u = cast(ClockUnit.NANOS);
-                value = MathUtils.safeMultiply(value, MIO);
-                break;
-            case '6':
-                u = cast(ClockUnit.NANOS);
-                value = MathUtils.safeMultiply(value, 1000);
-                break;
-            default:
-                // no-op
+        if (unit instanceof ClockUnit) {
+	        switch (unit.getSymbol()) {
+	            case '3':
+	                u = cast(ClockUnit.NANOS);
+	                value = MathUtils.safeMultiply(value, MIO);
+	                break;
+	            case '6':
+	                u = cast(ClockUnit.NANOS);
+	                value = MathUtils.safeMultiply(value, 1000);
+	                break;
+	            default:
+	                // no-op
+	        }
         }
 
         List<Item<U>> items = new ArrayList<Item<U>>(1);
@@ -3207,6 +3199,681 @@ public final class Duration<U extends IsoUnit>
 
     }
 
+    /**
+     * <p>Format for non-localized durations based on a pattern containing some
+     *  standard symbols. </p>
+     *
+     * @param   <U> generic type of time units
+     * @since   1.2
+     * @see     #formatter(String, Class)
+     */
+    /*[deutsch]
+     * <p>Nicht-lokalisiertes Dauerformat, das auf Symbolmustern beruht. </p>
+     *
+     * @param   <U> generic type of time units
+     * @since   1.2
+     * @see     #formatter(String, Class)
+     */
+    static final class Formatter<U extends IsoUnit> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+    	private final Class<U> type;
+    	private final List<FormatItem> items;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Formatter(
+            Class<U> type,
+            List<FormatItem> items
+        ) {
+            super();
+
+            if (type == null) {
+                throw new NullPointerException("Missing unit type.");
+            } else if (items.isEmpty()) {
+            	throw new IllegalArgumentException("Missing format definition.");
+            }
+
+            this.type = type;
+            this.items = items;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+        
+        static <U extends IsoUnit> Formatter<U> ofPattern(
+            Class<U> type,
+            String pattern
+        ) {
+        	
+            int n = pattern.length();
+            List<List<FormatItem>> stack = new ArrayList<List<FormatItem>>();
+            stack.add(new ArrayList<FormatItem>());
+
+            for (int i = 0; i < n; i++) {
+                char c = pattern.charAt(i);
+
+                if (isSymbol(c)) {
+                    int start = i++;
+                    while ((i < n) && pattern.charAt(i) == c) {
+                        i++;
+                    }
+                    addSymbol(c, i - start);
+                    i--;
+                    
+                } else if (c == '\'') {
+                    int start = i++;
+
+                    while (i < n) {
+                        if (pattern.charAt(i) == '\'') {
+                            if (
+                                (i + 1 < n)
+                                && (pattern.charAt(i + 1) == '\'')
+                            ) {
+                                i++;
+                            } else {
+                                break;
+                            }
+                        }
+                        i++;
+                    }
+
+                    if (i >= n) {
+                        throw new IllegalArgumentException(
+                            "String literal in pattern not closed: " + pattern);
+                    }
+
+                    if (start + 1 == i) {
+                        addLiteral('\'', stack);
+                    } else {
+                        String s = pattern.substring(start + 1, i);
+                        addLiteral(s.replace("''", "'"), stack);                        
+                    }
+                    
+                } else if (c == '[') {
+                    startOptionalSection(stack);
+                    
+                } else if (c == ']') {
+                    endOptionalSection(stack);
+                    
+                } else if ((c == '#') || (c == '{') || (c == '}')) {
+                    throw new IllegalArgumentException(
+                        "Pattern contains reserved character: '" + c + "'");
+                    
+                } else {
+                    addLiteral(c, stack);
+                }
+            }
+
+        	return null;
+        	
+        }
+
+        /**
+         * <p>Creates a textual output of given duration. </p>
+         *
+         * @param   duration	duration object
+         * @return  textual represenation of duration
+         * @throws	IllegalArgumentException if some aspects of duration prevents printing
+         */
+        /*[deutsch]
+         * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer. </p>
+         *
+         * @param   duration	duration object
+         * @return  textual represenation of duration
+         * @throws	IllegalArgumentException if some aspects of duration prevents printing
+         */
+        public String print(Duration<? extends U> duration) {
+        	
+        	StringBuilder buffer = new StringBuilder();
+
+			for (FormatItem item : this.items) {
+				item.print(buffer, duration);
+			}
+			
+        	return buffer.toString();
+
+        }
+
+        /**
+         * <p>Analyzes given text according to format pattern and parses the
+         * text to a duration. </p>
+         *
+         * @param   text	textual representation to be parsed
+         * @return  parsed duration
+         * @throws	ParseException
+         */
+        /*[deutsch]
+         * <p>Interpretiert den angegebenen Text entsprechend dem voreingestellten
+         * Formatmuster als Dauer. </p>
+         *
+         * @param   text	textual representation to be parsed
+         * @return  parsed duration
+         * @throws	ParseException
+         */
+        public Duration<U> parse(String text) throws ParseException {
+
+			int pos = 0;
+			Map<Object, Long> unitsToValues = new HashMap<Object, Long>();
+			
+			for (FormatItem item : this.items) {
+				int reply = item.parse(unitsToValues, text, pos);
+				
+				if (reply < 0) {
+					throw new ParseException("Cannot parse: " + text, ~reply);
+				} else {
+					pos = reply;
+				}
+			}
+			
+			Long sign = unitsToValues.remove(SIGN_KEY);
+			boolean negative = ((sign != null) && (sign.longValue() < 0));
+			Map<U, Long> map = new HashMap<U, Long>();
+			
+			for (Object key : unitsToValues.keySet()) {
+				if (this.type.isInstance(key)) {
+					map.put(this.type.cast(key), unitsToValues.get(key));
+				} else {
+					throw new ParseException("Duration type mismatched: " + unitsToValues, pos);
+				}
+			}
+			
+			return Duration.create(map, negative);
+
+        }
+	
+        private static boolean isSymbol(char c) {
+
+            return (
+                ((c >= 'A') && (c <= 'Z'))
+                || ((c >= 'a') && (c <= 'z'))
+            );
+
+        }
+        
+        private static void addSymbol(
+        	char symbol,
+        	int count
+        ) {
+        	
+        }
+        
+        private static void addLiteral(
+        	char literal,
+        	List<List<FormatItem>> stack
+        ) {
+            	
+        	addLiteral(String.valueOf(literal), stack);
+    	
+        }
+
+        private static void addLiteral(
+        	String literal,
+        	List<List<FormatItem>> stack
+        ) {
+        	
+        	List<FormatItem> items = stack.get(stack.size() - 1);
+        	items.add(new LiteralItem(literal));
+        	
+        }
+        
+        private static void startOptionalSection(List<List<FormatItem>> stack) {
+        	
+            stack.add(new ArrayList<FormatItem>());
+            
+        }
+
+        private static void endOptionalSection(List<List<FormatItem>> stack) {
+        	
+        	int index = stack.size() - 1;
+        	List<FormatItem> items = stack.remove(index);
+        	stack.get(index - 1).add(new OptionalSectionItem(items));
+        	
+        }
+
+    }
+    
+    private abstract static class FormatItem {
+    	
+        //~ Methoden ------------------------------------------------------
+
+    	abstract void print(
+    		StringBuilder buffer, 
+    		Duration<?> duration
+    	);
+    	
+    	abstract int parse(
+    		Map<Object, Long> unitsToValues, 
+    		String text, 
+    		int pos
+    	);
+    	
+    }
+    
+    private static class NumberItem
+    	extends FormatItem {
+    	
+    	
+        //~ Instanzvariablen ----------------------------------------------
+
+    	private final int minWidth;
+    	private final IsoUnit unit;
+
+        //~ Konstruktoren -------------------------------------------------
+    	
+    	private NumberItem(
+    		int minWidth,
+    		IsoUnit unit
+    	) {
+    		super();
+    		
+    		if (minWidth < 1 || minWidth > 18) {
+    			throw new IllegalArgumentException("Min width out of bounds: " + minWidth);
+    		} else if (unit == null) {
+    			throw new NullPointerException("Missing unit.");
+    		}
+    		
+    		this.minWidth = minWidth;
+    		this.unit = unit;
+    		
+    	}
+
+        //~ Methoden ------------------------------------------------------
+
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+
+			String num = String.valueOf(duration.getPartialAmount(this.unit));
+			
+			for (int i = this.minWidth - num.length(); i > 0; i--) {
+				buffer.append('0');
+			}
+			
+			buffer.append(num);
+			
+		}
+
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+
+			long total = 0;
+			int pos = start;
+			
+			for (int i = start, n = text.length(); i < n; i++) {
+				char c = text.charAt(i);
+				if ((c >= '0') && (c <= '9')) {
+					if (i - start >= 18) {
+						return ~start; // too many digits
+					}
+					int digit = (c - '0');
+					total = total * 10 + digit;
+					pos++;
+				} else {
+					break;
+				}
+			}
+			
+			if (pos == start) {
+				return ~start; // digits expected
+			}
+			
+			Long value = Long.valueOf(total);
+			Object old = unitsToValues.put(this.unit, value);
+			
+			if ((old == null) || old.equals(value)) {
+				return pos;
+			} else {
+				return ~start; // ambivalent parsing
+			}
+			
+		}
+
+    }
+
+    private static class FractionItem
+		extends FormatItem {
+		
+		
+	    //~ Instanzvariablen ----------------------------------------------
+	
+    	private final int width;
+	
+	    //~ Konstruktoren -------------------------------------------------
+		
+		private FractionItem(int width) {
+			super();
+			
+    		if (width < 1 || width > 9) {
+    			throw new IllegalArgumentException("Fraction width out of bounds: " + width);
+    		}
+    		
+			this.width = width;
+			
+		}
+	
+	    //~ Methoden ------------------------------------------------------
+	
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+	
+			String num = String.valueOf(duration.getPartialAmount(NANOS));
+			int len = num.length();
+			
+			if (len > 9) {
+				throw new IllegalArgumentException(
+					"Too many nanoseconds, consider normalization: " + duration);
+			}
+			
+			StringBuilder sb = new StringBuilder();
+			
+			for (int i = 0; i < 9 - len; i++) {
+				sb.append('0');
+			}
+			
+			sb.append(num);
+			buffer.append(sb.toString().substring(0, this.width));
+			
+		}
+	
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+	
+			StringBuilder fraction = new StringBuilder();
+			int pos = start;
+			
+			for (int i = start, n = Math.min(text.length(), start + this.width); i < n; i++) {
+				char c = text.charAt(i);
+				if ((c >= '0') && (c <= '9')) {
+					fraction.append(c);
+					pos++;
+				} else {
+					break;
+				}
+			}
+			
+			if (pos == start) {
+				return ~start; // digits expected
+			}
+			
+			for (int i = 0, n = pos - start; i < 9 - n; i++) {
+				fraction.append('0');
+			}
+			
+			Long value = Long.valueOf(Long.parseLong(fraction.toString()));			
+			Object old = unitsToValues.put(NANOS, value);
+			
+			if ((old == null) || old.equals(value)) {
+				return pos;
+			} else {
+				return ~start; // ambivalent parsing
+			}
+			
+		}
+	
+	}
+	
+    private static class SeparatorItem
+		extends FormatItem {
+		
+		
+	    //~ Instanzvariablen ----------------------------------------------
+	
+    	private final char separator;
+    	private final char alt;
+	
+	    //~ Konstruktoren -------------------------------------------------
+		
+		private SeparatorItem(
+			char separator,
+			char alt
+	    ) {
+			super();
+			
+			this.separator = separator;
+			this.alt = alt;
+			
+		}
+	
+	    //~ Methoden ------------------------------------------------------
+	
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+	
+			buffer.append(this.separator);
+			
+		}
+	
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+	
+			if (
+				(start >= text.length())
+				|| (text.charAt(start) != this.separator)
+				|| (text.charAt(start) != this.alt)
+			) {
+				return ~start; // decimal separator expected
+			}
+			
+			return start + 1;
+			
+		}
+	
+	}
+	
+    private static class LiteralItem
+		extends FormatItem {
+		
+		
+	    //~ Instanzvariablen ----------------------------------------------
+	
+		private final String literal;
+	
+	    //~ Konstruktoren -------------------------------------------------
+		
+		private LiteralItem(String literal) {
+			super();
+			
+			if (literal.isEmpty()) {
+				throw new IllegalArgumentException("Literal is empty.");
+			}
+			
+			this.literal = literal;
+			
+		}
+	
+	    //~ Methoden ------------------------------------------------------
+	
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+	
+			buffer.append(this.literal);
+			
+		}
+	
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+	
+			if (text.startsWith(this.literal, start)) {
+				return start + this.literal.length();
+			}
+			
+			return ~start; // literal expected
+			
+		}
+	
+	}
+	
+    private static class SignItem
+		extends FormatItem {
+		
+		
+	    //~ Instanzvariablen ----------------------------------------------
+	
+		private final SignPolicy policy;
+	
+	    //~ Konstruktoren -------------------------------------------------
+		
+		private SignItem(SignPolicy policy) {
+			super();
+			
+			if (policy == null) {
+				throw new NullPointerException("Missing sign policy.");
+			}
+			
+			this.policy = policy;
+			
+		}
+	
+	    //~ Methoden ------------------------------------------------------
+	
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+	
+			switch (this.policy) {
+				case SHOW_NEVER:
+					if (duration.isNegative()) {
+						throw new IllegalArgumentException(
+							"Cannot print negative sign due to sign policy.");
+					}
+					break;
+				case SHOW_WHEN_NEGATIVE:
+				case SHOW_WHEN_BIG_NUMBER:
+					if (duration.isNegative()) {
+						buffer.append('-');
+					}
+					break;
+				case SHOW_ALWAYS:
+					buffer.append(duration.isNegative() ? '-' : '+');
+					break;
+				default:
+					throw new UnsupportedOperationException(this.policy.name());
+			}
+			
+		}
+	
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+			
+			if (start >= text.length()) {
+				if (this.policy == SignPolicy.SHOW_ALWAYS) {
+					return ~start; // sign expected
+				} else {
+					Long old = unitsToValues.put(SIGN_KEY, Long.valueOf(1));
+					if ((old != null) && (old.longValue() != 1)) {
+						return ~start; // mixed signs
+					}
+					return start;
+				}
+			}
+			
+			char c = text.charAt(start);
+			Long sign = Long.valueOf(1);
+			int ret = start;
+			
+			switch (this.policy) {
+				case SHOW_NEVER:
+					if ((c == '-') || (c == '+')) {
+						return ~start; // sign not allowed
+					}
+					break;
+				case SHOW_WHEN_NEGATIVE:
+					if (c == '+') {
+						return ~start; // positive sign not allowed
+					} else if (c == '-') {
+						sign = Long.valueOf(-1);
+						ret = start + 1;
+					}
+					break;
+				case SHOW_WHEN_BIG_NUMBER:
+					if (c == '+') {
+						ret = start + 1;
+					} else if (c == '-') {
+						sign = Long.valueOf(-1);
+						ret = start + 1;
+					}
+					break;
+				case SHOW_ALWAYS:
+					if (c == '+') {
+						ret = start + 1;
+					} else if (c == '-') {
+						sign = Long.valueOf(-1);
+						ret = start + 1;
+					} else {
+						return ~start; // sign expected
+					}
+					break;
+				default:
+					throw new UnsupportedOperationException(this.policy.name());
+			}
+			
+			Long old = unitsToValues.put(SIGN_KEY, sign);
+			
+			if ((old != null) && (old.longValue() != sign.longValue())) {
+				return ~start; // mixed signs
+			}
+			
+			return ret;
+			
+		}
+	
+	}
+	
+    private static class OptionalSectionItem
+		extends FormatItem {
+		
+		
+	    //~ Instanzvariablen ----------------------------------------------
+	
+    	private final List<FormatItem> items;
+	
+	    //~ Konstruktoren -------------------------------------------------
+		
+    	private OptionalSectionItem(List<FormatItem> items) {
+			super();
+			
+			if (items.isEmpty()) {
+				throw new IllegalArgumentException("Optional section is empty.");
+			}
+			
+			this.items = items;
+			
+		}
+	
+	    //~ Methoden ------------------------------------------------------
+	
+		@Override
+		void print(StringBuilder buffer, Duration<?> duration) {
+			
+			for (FormatItem item : this.items) {
+				item.print(buffer, duration);
+			}
+			
+		}
+	
+		@Override
+		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+			
+			int pos = start;
+			Map<Object, Long> store = new HashMap<Object, Long>(unitsToValues);
+	
+			for (FormatItem item : this.items) {
+				int reply = item.parse(store, text, pos);
+				
+				if (reply < 0) {
+					return start;
+				} else {
+					pos = reply;
+				}
+			}
+			
+			unitsToValues.putAll(store);
+			return pos;
+			
+		}
+	
+	}
+	
     private static class TimestampNormalizer
         implements Normalizer<IsoUnit> {
 
