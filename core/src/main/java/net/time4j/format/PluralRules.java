@@ -138,7 +138,7 @@ public abstract class PluralRules {
     /**
      * <p>Gets the localized plural rules for given language or
      * country. </p>
-     * 
+     *
      * <p>If no rules can be found then Time4J will choose the default rules
      * which apply {@code PluralCategory.ONE} to n=1 and else apply the
      * fallback category {@code PluralCategory.OTHER}. </p>
@@ -146,6 +146,7 @@ public abstract class PluralRules {
      * @param   locale      locale which specifies the suitable plural rules
      * @param   numType     number type
      * @return  localized plural rules
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Ermittelt die Pluralregeln f&uuml;r die angegebene Sprache oder
@@ -158,6 +159,7 @@ public abstract class PluralRules {
      * @param   locale      locale which specifies the suitable plural rules
      * @param   numType     number type
      * @return  localized plural rules
+     * @since   1.2
      */
     public static PluralRules of(
         Locale locale,
@@ -181,7 +183,7 @@ public abstract class PluralRules {
         }
 
         PluralRules rules = null;
-        
+
         if (!locale.getCountry().equals("")) {
             StringBuilder kb = new StringBuilder();
             kb.append(locale.getLanguage());
@@ -189,7 +191,7 @@ public abstract class PluralRules {
             kb.append(locale.getCountry());
             rules = map.get(kb.toString());
         }
-        
+
         if (rules == null) {
             rules = map.get(locale.getLanguage());
         }
@@ -208,6 +210,7 @@ public abstract class PluralRules {
      *
      * @param   locale  language or country which the rules shall be assigned to
      * @param   rules   localized plural rules
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Registriert die angegebenen Pluralregeln f&uuml;r eine Sprache,
@@ -215,6 +218,7 @@ public abstract class PluralRules {
      *
      * @param   locale  language or country which the rules shall be assigned to
      * @param   rules   localized plural rules
+     * @since   1.2
      */
     public static void register(
         Locale locale,
@@ -234,7 +238,7 @@ public abstract class PluralRules {
             default:
                 throw new UnsupportedOperationException(numType.name());
         }
-        
+
         String key = locale.getLanguage();
 
         if (!locale.getCountry().equals("")) {
@@ -244,7 +248,7 @@ public abstract class PluralRules {
             kb.append(locale.getCountry());
             key = kb.toString();
         }
-        
+
         map.put(key, rules);
 
     }
@@ -254,6 +258,7 @@ public abstract class PluralRules {
      *
      * @param   count   integral number of units
      * @return  plural category, never {@code null}
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Bestimmt die Pluralkategorie f&uuml;r die angegebene Anzahl von
@@ -261,6 +266,7 @@ public abstract class PluralRules {
      *
      * @param   count   integral number of units
      * @return  plural category, never {@code null}
+     * @since   1.2
      */
     public abstract PluralCategory getCategory(long count);
 
@@ -268,11 +274,13 @@ public abstract class PluralRules {
      * <p>Yields the number type these rules are referring to. </p>
      *
      * @return number type
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert den Zahltyp, auf den sich diese Regeln beziehen. </p>
      *
      * @return number type
+     * @since   1.2
      */
     public abstract NumberType getNumberType();
 

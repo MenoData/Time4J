@@ -64,6 +64,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for years
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -74,6 +75,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for years
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getYearPattern(
         Locale lang,
@@ -90,6 +92,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for months
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -100,6 +103,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for months
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMonthPattern(
         Locale lang,
@@ -116,6 +120,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for weeks
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -126,6 +131,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for weeks
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getWeekPattern(
         Locale lang,
@@ -142,6 +148,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for days
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -152,6 +159,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for days
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getDayPattern(
         Locale lang,
@@ -168,6 +176,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for hours
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -178,6 +187,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for hours
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getHourPattern(
         Locale lang,
@@ -194,6 +204,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for minutes
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -204,6 +215,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for minutes
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMinutePattern(
         Locale lang,
@@ -220,6 +232,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for seconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -230,6 +243,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for seconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getSecondPattern(
         Locale lang,
@@ -246,6 +260,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for milliseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
@@ -257,6 +272,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for milliseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMilliPattern(
         Locale lang,
@@ -273,6 +289,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for microseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
@@ -284,6 +301,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for microseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMicroPattern(
         Locale lang,
@@ -300,6 +318,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for nanoseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext
@@ -311,6 +330,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for nanoseconds
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getNanoPattern(
         Locale lang,
@@ -327,6 +347,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for years in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -338,6 +359,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for years in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getYearPattern(
         Locale lang,
@@ -354,6 +376,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for months in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -365,6 +388,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for months in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMonthPattern(
         Locale lang,
@@ -381,6 +405,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for weeks in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -392,6 +417,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for weeks in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getWeekPattern(
         Locale lang,
@@ -408,6 +434,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for days in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -419,6 +446,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for days in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getDayPattern(
         Locale lang,
@@ -435,6 +463,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for hours in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -446,6 +475,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for hours in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getHourPattern(
         Locale lang,
@@ -462,6 +492,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for minutes in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -473,6 +504,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for minutes in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getMinutePattern(
         Locale lang,
@@ -489,6 +521,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for seconds in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Zeiteinheitsmuster mit Zeiteinheitstext und
@@ -500,6 +533,7 @@ public interface UnitPatternProvider {
      * @param   category    plural category
      * @return  unit pattern for seconds in the past or future
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getSecondPattern(
         Locale lang,
@@ -513,6 +547,7 @@ public interface UnitPatternProvider {
      * @param   lang    language setting
      * @return  String
      * @throws  java.util.MissingResourceException if not found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Wort f&uuml;r die aktuelle Zeit
@@ -521,6 +556,7 @@ public interface UnitPatternProvider {
      * @param   lang    language setting
      * @return  String
      * @throws  java.util.MissingResourceException if not found
+     * @since   1.2
      */
     String getNowWord(Locale lang);
 
@@ -534,6 +570,7 @@ public interface UnitPatternProvider {
      * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
      * @throws  IllegalArgumentException if size is smaller than 2
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Konstruiert ein lokalisiertes Listenformat geeignet f&uuml;r
@@ -545,6 +582,7 @@ public interface UnitPatternProvider {
      * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
      * @throws  IllegalArgumentException if size is smaller than 2
      * @throws  java.util.MissingResourceException if no pattern was found
+     * @since   1.2
      */
     String getListPattern(
         Locale lang,

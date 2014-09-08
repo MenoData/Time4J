@@ -53,6 +53,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is after current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
@@ -61,6 +62,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is after current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     ElementOperator<?> setToNext(PlainTime value);
@@ -71,6 +73,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is before current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
@@ -79,6 +82,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is before current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     ElementOperator<?> setToPrevious(PlainTime value);
@@ -89,6 +93,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is not before current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
@@ -97,6 +102,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is not before current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     ElementOperator<?> setToNextOrSame(PlainTime value);
@@ -107,6 +113,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is not after current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     /*[deutsch]
@@ -115,6 +122,7 @@ public interface WallTimeElement
      *
      * @param   value   new wall time which is not after current wall time
      * @return  operator directly applicable on {@code PlainTimestamp}
+     * @since   1.2
      * @see     PlainTimestamp#with(ElementOperator)
      */
     ElementOperator<?> setToPreviousOrSame(PlainTime value);
@@ -123,11 +131,13 @@ public interface WallTimeElement
      * <p>Performs rounding to full hour in half rounding mode. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Rundet kaufm&auml;nnisch zur vollen Stunde. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     ElementOperator<PlainTime> roundedToFullHour();
 
@@ -135,11 +145,13 @@ public interface WallTimeElement
      * <p>Performs rounding to full minute in half rounding mode. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Rundet kaufm&auml;nnisch zur vollen Minute. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     ElementOperator<PlainTime> roundedToFullMinute();
 
@@ -147,11 +159,13 @@ public interface WallTimeElement
      * <p>Adjusts to next full hour. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Verstellt zur n&auml;chsten vollen Stunde. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     ElementOperator<PlainTime> setToNextFullHour();
 
@@ -159,11 +173,13 @@ public interface WallTimeElement
      * <p>Adjusts to next full minute. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Verstellt zur n&auml;chsten vollen Minute. </p>
      *
      * @return  operator also applicable on {@code PlainTimestamp}
+     * @since   1.2
      */
     ElementOperator<PlainTime> setToNextFullMinute();
 

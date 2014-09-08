@@ -191,12 +191,14 @@ public final class UnitPatterns {
      *
      * @param   lang    language setting
      * @return  chached instance
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Fabrikmethode als Konstruktor-Ersatz. </p>
      *
      * @param   lang    language setting
      * @return  chached instance
+     * @since   1.2
      */
     public static UnitPatterns of(Locale lang) {
 
@@ -225,6 +227,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for years
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Jahre, das optional einen Platzhalter
@@ -234,6 +237,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for years
+     * @since   1.2
      */
     public String getYears(
         TextWidth width,
@@ -252,6 +256,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for months
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Monate, das optional einen Platzhalter
@@ -261,6 +266,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for months
+     * @since   1.2
      */
     public String getMonths(
         TextWidth width,
@@ -279,6 +285,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for weeks
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Wochen, das optional einen Platzhalter
@@ -288,6 +295,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for weeks
+     * @since   1.2
      */
     public String getWeeks(
         TextWidth width,
@@ -306,6 +314,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for days
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Tage, das optional einen Platzhalter
@@ -315,6 +324,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for days
+     * @since   1.2
      */
     public String getDays(
         TextWidth width,
@@ -333,6 +343,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for hours
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Stunden, das optional einen Platzhalter
@@ -342,6 +353,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for hours
+     * @since   1.2
      */
     public String getHours(
         TextWidth width,
@@ -360,6 +372,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for minutes
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Minuten, das optional einen Platzhalter
@@ -369,6 +382,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for minutes
+     * @since   1.2
      */
     public String getMinutes(
         TextWidth width,
@@ -387,6 +401,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for seconds
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Sekunden, das optional einen Platzhalter
@@ -396,6 +411,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for seconds
+     * @since   1.2
      */
     public String getSeconds(
         TextWidth width,
@@ -415,6 +431,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for milliseconds
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Millisekunden, das optional einen
@@ -424,6 +441,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for milliseconds
+     * @since   1.2
      */
     public String getMillis(
         TextWidth width,
@@ -443,6 +461,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for microseconds
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Mikrosekunden, das optional einen
@@ -452,6 +471,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for microseconds
+     * @since   1.2
      */
     public String getMicros(
         TextWidth width,
@@ -471,6 +491,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for nanoseconds
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Nanosekunden, das optional einen
@@ -480,6 +501,7 @@ public final class UnitPatterns {
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @param   category    plural category
      * @return  unit pattern for nanoseconds
+     * @since   1.2
      */
     public String getNanos(
         TextWidth width,
@@ -498,6 +520,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for years in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Jahre, das optional einen Platzhalter
@@ -506,6 +529,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for years in the past
+     * @since   1.2
      */
     public String getYearsInPast(PluralCategory category) {
 
@@ -521,6 +545,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for years in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Jahre, das optional einen Platzhalter
@@ -529,6 +554,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for years in the future
+     * @since   1.2
      */
     public String getYearsInFuture(PluralCategory category) {
 
@@ -544,6 +570,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for months in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Monate, das optional einen Platzhalter
@@ -552,6 +579,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for months in the past
+     * @since   1.2
      */
     public String getMonthsInPast(PluralCategory category) {
 
@@ -567,6 +595,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for months in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Monate, das optional einen Platzhalter
@@ -575,6 +604,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for months in the future
+     * @since   1.2
      */
     public String getMonthsInFuture(PluralCategory category) {
 
@@ -590,6 +620,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for weeks in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Wochen, das optional einen Platzhalter
@@ -598,6 +629,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for weeks in the past
+     * @since   1.2
      */
     public String getWeeksInPast(PluralCategory category) {
 
@@ -613,6 +645,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for weeks in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Wochen, das optional einen Platzhalter
@@ -621,6 +654,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for weeks in the future
+     * @since   1.2
      */
     public String getWeeksInFuture(PluralCategory category) {
 
@@ -636,6 +670,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for days in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Tage, das optional einen Platzhalter
@@ -644,6 +679,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for days in the past
+     * @since   1.2
      */
     public String getDaysInPast(PluralCategory category) {
 
@@ -659,6 +695,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for days in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Tage, das optional einen Platzhalter
@@ -667,6 +704,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for days in the future
+     * @since   1.2
      */
     public String getDaysInFuture(PluralCategory category) {
 
@@ -682,6 +720,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for hours in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Stunden, das optional einen Platzhalter
@@ -690,6 +729,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for hours in the past
+     * @since   1.2
      */
     public String getHoursInPast(PluralCategory category) {
 
@@ -705,6 +745,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for hours in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Stunden, das optional einen Platzhalter
@@ -713,6 +754,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for hours in the future
+     * @since   1.2
      */
     public String getHoursInFuture(PluralCategory category) {
 
@@ -728,6 +770,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for minutes in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Minuten, das optional einen Platzhalter
@@ -736,6 +779,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for minutes in the past
+     * @since   1.2
      */
     public String getMinutesInPast(PluralCategory category) {
 
@@ -751,6 +795,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for minutes in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Minuten, das optional einen Platzhalter
@@ -759,6 +804,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for minutes in the future
+     * @since   1.2
      */
     public String getMinutesInFuture(PluralCategory category) {
 
@@ -774,6 +820,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for seconds in the past
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Sekunden, das optional einen Platzhalter
@@ -782,6 +829,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for seconds in the past
+     * @since   1.2
      */
     public String getSecondsInPast(PluralCategory category) {
 
@@ -797,6 +845,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for seconds in the future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert ein Muster f&uuml;r Sekunden, das optional einen Platzhalter
@@ -805,6 +854,7 @@ public final class UnitPatterns {
      *
      * @param   category    plural category
      * @return  unit pattern for seconds in the future
+     * @since   1.2
      */
     public String getSecondsInFuture(PluralCategory category) {
 
@@ -817,12 +867,14 @@ public final class UnitPatterns {
      * <p>Yields the localized word for the current time (now). </p>
      *
      * @return  String
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Wort f&uuml;r die aktuelle Zeit
      * (jetzt). </p>
      *
      * @return  String
+     * @since   1.2
      */
     public String getNowWord() {
 
@@ -838,6 +890,7 @@ public final class UnitPatterns {
      * @param   size        count of list items
      * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
      * @throws  IllegalArgumentException if size is smaller than 2
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Konstruiert ein lokalisiertes Listenformat geeignet f&uuml;r
@@ -847,6 +900,7 @@ public final class UnitPatterns {
      * @param   size        count of list items
      * @return  message format pattern with placeholders {0}, {1}, ..., {x}, ...
      * @throws  IllegalArgumentException if size is smaller than 2
+     * @since   1.2
      */
     public String getListPattern(
         TextWidth width,

@@ -161,6 +161,7 @@ public final class PrettyTime {
      *
      * @param   locale    the language an instance is searched for
      * @return  pretty time object for formatting durations or relative time
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert eine Instanz von {@code PrettyTime} f&uuml;r die angegebene
@@ -168,6 +169,7 @@ public final class PrettyTime {
      *
      * @param   locale    the language an instance is searched for
      * @return  pretty time object for formatting durations or relative time
+     * @since   1.2
      */
     public static PrettyTime of(Locale locale) {
 
@@ -195,11 +197,13 @@ public final class PrettyTime {
      * <p>Gets the language of this instance. </p>
      *
      * @return  language
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Liefert die Bezugssprache. </p>
      *
      * @return  Spracheinstellung
+     * @since   1.2
      */
     public Locale getLocale() {
 
@@ -211,6 +215,7 @@ public final class PrettyTime {
      * <p>Yields the reference clock for formatting of relative times. </p>
      *
      * @return  reference clock or system clock if not yet specified
+     * @since   1.2
      * @see     #withReferenceClock(TimeSource)
      * @see     #printRelative(UnixTime, TZID)
      * @see     #printRelative(UnixTime, String)
@@ -220,6 +225,7 @@ public final class PrettyTime {
      * Zeit. </p>
      *
      * @return  Zeitquelle oder die Systemuhr, wenn noch nicht angegeben
+     * @since   1.2
      * @see     #withReferenceClock(TimeSource)
      * @see     #printRelative(UnixTime, TZID)
      * @see     #printRelative(UnixTime, String)
@@ -239,6 +245,7 @@ public final class PrettyTime {
      *
      * @param   clock   new reference clock (maybe {@code null})
      * @return  new instance of {@code PrettyTime} with changed reference clock
+     * @since   1.2
      * @see     #getReferenceClock()
      * @see     #printRelative(UnixTime, TZID)
      * @see     #printRelative(UnixTime, String)
@@ -251,6 +258,7 @@ public final class PrettyTime {
      *
      * @param   clock   new reference clock
      * @return  new instance of {@code PrettyTime} with changed reference clock
+     * @since   1.2
      * @see     #getReferenceClock()
      * @see     #printRelative(UnixTime, TZID)
      * @see     #printRelative(UnixTime, String)
@@ -275,6 +283,7 @@ public final class PrettyTime {
      *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
+     * @since   1.2
      * @see     java.text.DecimalFormatSymbols#getZeroDigit()
      */
     /*[deutsch]
@@ -287,6 +296,7 @@ public final class PrettyTime {
      *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
+     * @since   1.2
      * @see     java.text.DecimalFormatSymbols#getZeroDigit()
      */
     public PrettyTime withZeroDigit(char zeroDigit) {
@@ -307,6 +317,7 @@ public final class PrettyTime {
      *
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Definiert die Zeiteinheit f&uuml;r die Verwendung in der
@@ -317,6 +328,7 @@ public final class PrettyTime {
      *
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
+     * @since   1.2
      */
     public PrettyTime withEmptyUnit(CalendarUnit emptyUnit) {
 
@@ -336,6 +348,7 @@ public final class PrettyTime {
      *
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Definiert die Zeiteinheit f&uuml;r die Verwendung in der
@@ -346,6 +359,7 @@ public final class PrettyTime {
      *
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
+     * @since   1.2
      */
     public PrettyTime withEmptyUnit(ClockUnit emptyUnit) {
 
@@ -367,6 +381,7 @@ public final class PrettyTime {
      * @param   unit    calendar unit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
+     * @since   1.2
      * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
@@ -380,6 +395,7 @@ public final class PrettyTime {
      * @param   unit    kalendarische Zeiteinheit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
+     * @since   1.2
      * @see     #print(Duration, TextWidth)
      */
     public String print(
@@ -435,6 +451,7 @@ public final class PrettyTime {
      * @param   unit    clock unit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted output
+     * @since   1.2
      * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
@@ -444,6 +461,7 @@ public final class PrettyTime {
      * @param   unit    Uhrzeiteinheit
      * @param   width   text width (ABBREVIATED as synonym for SHORT)
      * @return  formatierte Ausgabe
+     * @since   1.2
      * @see     #print(Duration, TextWidth)
      */
     public String print(
@@ -499,6 +517,7 @@ public final class PrettyTime {
      *                      several units and quantities
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted list output
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Formatiert die angegebene Dauer. </p>
@@ -517,6 +536,7 @@ public final class PrettyTime {
      *                      several units and quantities
      * @param   width       text width (ABBREVIATED as synonym for SHORT)
      * @return  formatted list output
+     * @since   1.2
      */
     public String print(
         Duration<?> duration,
@@ -562,6 +582,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
@@ -571,6 +592,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @since   1.2
      */
     public String printRelative(
         UnixTime moment,
@@ -589,6 +611,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @since   1.2
      */
     /*[deutsch]
      * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
@@ -598,6 +621,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @since   1.2
      */
     public String printRelative(
         UnixTime moment,
