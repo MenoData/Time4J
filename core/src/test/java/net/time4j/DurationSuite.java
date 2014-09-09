@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ClockDurationTest.class,
         DurationArithmeticTest.class,
         DurationBasicsTest.class,
+        DurationFormatterTest.class,
         DurationNormalizerTest.class,
         DurationUntilTest.class
     }
