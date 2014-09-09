@@ -61,7 +61,7 @@ public class DurationFormatterTest {
     @Test
     public void print() {
         assertThat(
-            this.formatter.print(this.value),
+            this.formatter.format(this.value),
             is(this.text));
     }
 

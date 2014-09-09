@@ -1768,7 +1768,10 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Parses a canonical representation to a duration. </p>
      *
-     * <p>Syntax in a notation similar to regular expressions: </p>
+     * <p>Canonical representations which start with the literal P are
+     * also called &quot;period&quot; in Time4J (P-string). This format
+     * is strongly recommended for storage in databases or XML. Syntax
+     * in a notation similar to regular expressions: </p>
      *
      * <pre>
      *  sign := [-]?
@@ -1778,7 +1781,7 @@ public final class Duration<U extends IsoUnit>
      *  weeks := ({amount}W)?
      *  date := {years-months-days} | {weeks}
      *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
-     *  duration := {sign}P{date}(T{time})? | PT{time}
+     *  period := {sign}P{date}(T{time})? | PT{time}
      * </pre>
      *
      * <p>The units MILLENNIA, CENTURIES, DECADES and QUARTERS defined in
@@ -1806,8 +1809,8 @@ public final class Duration<U extends IsoUnit>
      *  date-time := P1Y1M5DT15H59M10.400S (dot as decimal separator)
      * </pre>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed duration in all possible standard units of date and time
      * @throws  ParseException if parsing fails
      * @see     #parseCalendarPeriod(String)
@@ -1819,7 +1822,10 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Parst eine kanonische Darstellung zu einer Dauer. </p>
      *
-     * <p>Syntax in RegExp-&auml;hnlicher Notation: </p>
+     * <p>Kanonische Darstellungen, die mit dem Literal P beginnen, werden
+     * in Time4J auch als &quot;period&quot; bezeichnet (P-string). Dieses
+     * Format ist erste Wahl, wenn es um das Speichern einer Dauer in
+     * Datenbanken oder XML geht. Syntax in RegExp-&auml;hnlicher Notation: </p>
      *
      * <pre>
      *  sign := [-]?
@@ -1829,7 +1835,7 @@ public final class Duration<U extends IsoUnit>
      *  weeks := ({amount}W)?
      *  date := {years-months-days} | {weeks}
      *  time := ({amount}H)?({amount}M)?({amount}{fraction}?S)?
-     *  duration := {sign}P{date}(T{time})? | PT{time}
+     *  period := {sign}P{date}(T{time})? | PT{time}
      * </pre>
      *
      * <p>Die in {@link CalendarUnit} definierten Zeiteinheiten MILLENNIA,
@@ -1859,8 +1865,8 @@ public final class Duration<U extends IsoUnit>
      *  date-time := P1Y1M5DT15H59M10.400S (Punkt als Dezimaltrennzeichen)
      * </pre>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed duration in all possible standard units of date and time
      * @throws  ParseException if parsing fails
      * @see     #parseCalendarPeriod(String)
@@ -1869,10 +1875,10 @@ public final class Duration<U extends IsoUnit>
      * @see     #toStringISO()
      * @see     #toStringXML()
      */
-    public static Duration<IsoUnit> parse(String duration)
+    public static Duration<IsoUnit> parse(String period)
         throws ParseException {
 
-        return parse(duration, IsoUnit.class);
+        return parse(period, IsoUnit.class);
 
     }
 
@@ -1880,8 +1886,8 @@ public final class Duration<U extends IsoUnit>
      * <p>Parses a canonical representation with only date units to a
      * calendrical duration. </p>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed calendrical duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
@@ -1891,18 +1897,17 @@ public final class Duration<U extends IsoUnit>
      * <p>Parst eine kanonische Darstellung nur mit
      * Datumskomponenten zu einer Dauer. </p>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed calendrical duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
      * @see     #parseClockPeriod(String)
      */
-    public static
-    Duration<CalendarUnit> parseCalendarPeriod(String duration)
+    public static Duration<CalendarUnit> parseCalendarPeriod(String period)
         throws ParseException {
 
-        return parse(duration, CalendarUnit.class);
+        return parse(period, CalendarUnit.class);
 
     }
 
@@ -1910,8 +1915,8 @@ public final class Duration<U extends IsoUnit>
      * <p>Parses a canonical representation with only wall time units to a
      * time-only duration. </p>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed time-only duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
@@ -1921,18 +1926,17 @@ public final class Duration<U extends IsoUnit>
      * <p>Parst eine kanonische Darstellung nur mit
      * Uhrzeitkomponenten zu einer Dauer. </p>
      *
-     * @param   duration        duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
      * @return  parsed time-only duration
      * @throws  ParseException if parsing fails
      * @see     #parse(String)
      * @see     #parseCalendarPeriod(String)
      */
-    public static
-    Duration<ClockUnit> parseClockPeriod(String duration)
+    public static Duration<ClockUnit> parseClockPeriod(String period)
         throws ParseException {
 
-        return parse(duration, ClockUnit.class);
+        return parse(period, ClockUnit.class);
 
     }
 
@@ -2423,58 +2427,58 @@ public final class Duration<U extends IsoUnit>
     //~ Parse-Routinen ----------------------------------------------------
 
     private static <U extends IsoUnit> Duration<U> parse(
-        String duration,
+        String period,
         Class<U> type
     ) throws ParseException {
 
         int index = 0;
         boolean negative = false;
 
-        if (duration.length() == 0) {
-            throw new ParseException("Empty duration string.", index);
-        } else if (duration.charAt(0) == '-') {
+        if (period.length() == 0) {
+            throw new ParseException("Empty period string.", index);
+        } else if (period.charAt(0) == '-') {
             negative = true;
             index = 1;
         }
 
         try {
 
-            if (duration.charAt(index) != 'P') {
+            if (period.charAt(index) != 'P') {
                 throw new ParseException(
-                    "Format symbol \'P\' expected: " + duration, index);
+                    "Format symbol \'P\' expected: " + period, index);
             } else {
                 index++;
             }
 
             List<Item<U>> items = new ArrayList<Item<U>>();
-            int sep = duration.indexOf('T', index);
+            int sep = period.indexOf('T', index);
             boolean calendrical = (sep == -1);
 
             if (calendrical) {
                 if (type == ClockUnit.class) {
                     throw new ParseException(
-                        "Format symbol \'T\' expected: " + duration, index);
+                        "Format symbol \'T\' expected: " + period, index);
                 } else {
-                    parseItems(duration, index, duration.length(), true, items);
+                    parseItems(period, index, period.length(), true, items);
                 }
             } else {
                 if (sep > index) {
                     if (type == ClockUnit.class) {
                         throw new ParseException(
-                            "Unexpected date component found: " + duration,
+                            "Unexpected date component found: " + period,
                             index);
                     } else {
-                        parseItems(duration, index, sep, true, items);
+                        parseItems(period, index, sep, true, items);
                     }
                 }
                 if (type == CalendarUnit.class) {
                     throw new ParseException(
-                        "Unexpected time component found: " + duration, sep);
+                        "Unexpected time component found: " + period, sep);
                 } else {
                     parseItems(
-                        duration,
+                        period,
                         sep + 1,
-                        duration.length(),
+                        period.length(),
                         false,
                         items);
                 }
@@ -2485,7 +2489,8 @@ public final class Duration<U extends IsoUnit>
         } catch (IndexOutOfBoundsException ex) {
             ParseException pe =
                 new ParseException(
-                    "Unexpected termination of duration: " + duration, index);
+                    "Unexpected termination of period string: " + period,
+                    index);
             pe.initCause(ex);
             throw pe;
         }
@@ -2493,7 +2498,7 @@ public final class Duration<U extends IsoUnit>
     }
 
     private static <U extends ChronoUnit> void parseItems(
-        String duration,
+        String period,
         int from,
         int to,
         boolean date,
@@ -2501,7 +2506,7 @@ public final class Duration<U extends IsoUnit>
     ) throws ParseException {
 
         if (from == to) {
-            throw new ParseException(duration, from);
+            throw new ParseException(period, from);
         }
 
         StringBuilder num = null;
@@ -2511,7 +2516,7 @@ public final class Duration<U extends IsoUnit>
         boolean decimal = false;
 
         for (int i = from; i < to; i++) {
-            char c = duration.charAt(i);
+            char c = period.charAt(i);
 
             if ((c >= '0') && (c <= '9')) {
                 if (num == null) {
@@ -2523,26 +2528,26 @@ public final class Duration<U extends IsoUnit>
             } else if ((c == ',') || (c == '.')) {
                 if ((num == null) || date) {
                     throw new ParseException(
-                        "Decimal separator misplaced: " + duration, i);
+                        "Decimal separator misplaced: " + period, i);
                 } else {
                     endOfItem = true;
-                    long amount = parseAmount(duration, num.toString(), index);
+                    long amount = parseAmount(period, num.toString(), index);
                     ChronoUnit unit = SECONDS;
                     last =
-                        addParsedItem(unit, last, amount, duration, i, items);
+                        addParsedItem(unit, last, amount, period, i, items);
                     num = null;
                     decimal = true;
                 }
             } else if (endOfItem) {
                 throw new ParseException(
-                    "Unexpected char \'" + c + "\' found: " + duration, i);
+                    "Unexpected char \'" + c + "\' found: " + period, i);
             } else if (decimal) {
                 if (c != 'S') {
                     throw new ParseException(
-                        "Second symbol expected: " + duration, i);
+                        "Second symbol expected: " + period, i);
                 } else if (num == null) {
                     throw new ParseException(
-                        "Decimal separator misplaced: " + duration, i - 1);
+                        "Decimal separator misplaced: " + period, i - 1);
                 } else if (num.length() > 9) {
                     num.delete(9, num.length());
                 }
@@ -2550,36 +2555,36 @@ public final class Duration<U extends IsoUnit>
                     num.append('0');
                 }
                 endOfItem = true;
-                long amount = parseAmount(duration, num.toString(), index);
+                long amount = parseAmount(period, num.toString(), index);
                 ChronoUnit unit = NANOS;
                 num = null;
-                last = addParsedItem(unit, last, amount, duration, i, items);
+                last = addParsedItem(unit, last, amount, period, i, items);
             } else {
                 endOfItem = true;
                 long amount =
                     parseAmount(
-                        duration,
+                        period,
                         (num == null) ? String.valueOf(c) : num.toString(),
                         index);
                 num = null;
                 ChronoUnit unit = (
                     date
-                    ? parseDateSymbol(c, duration, i)
-                    : parseTimeSymbol(c, duration, i));
-                last = addParsedItem(unit, last, amount, duration, i, items);
+                    ? parseDateSymbol(c, period, i)
+                    : parseTimeSymbol(c, period, i));
+                last = addParsedItem(unit, last, amount, period, i, items);
             }
 
         }
 
         if (!endOfItem) {
-            throw new ParseException("Unit symbol expected: " + duration, to);
+            throw new ParseException("Unit symbol expected: " + period, to);
         }
 
     }
 
     private static CalendarUnit parseDateSymbol(
         char c,
-        String duration,
+        String period,
         int index
     ) throws ParseException {
 
@@ -2602,14 +2607,14 @@ public final class Duration<U extends IsoUnit>
                 return DAYS;
             default:
                 throw new ParseException(
-                    "Symbol \'" + c + "\' not supported: " + duration, index);
+                    "Symbol \'" + c + "\' not supported: " + period, index);
         }
 
     }
 
     private static ClockUnit parseTimeSymbol(
         char c,
-        String duration,
+        String period,
         int index
     ) throws ParseException {
 
@@ -2622,7 +2627,7 @@ public final class Duration<U extends IsoUnit>
                 return SECONDS;
             default:
                 throw new ParseException(
-                    "Symbol \'" + c + "\' not supported: " + duration, index);
+                    "Symbol \'" + c + "\' not supported: " + period, index);
         }
 
     }
@@ -2631,7 +2636,7 @@ public final class Duration<U extends IsoUnit>
         ChronoUnit unit,
         ChronoUnit last, // optional
         long amount,
-        String duration,
+        String period,
         int index,
         List<Item<U>> items
     ) throws ParseException {
@@ -2647,16 +2652,16 @@ public final class Duration<U extends IsoUnit>
             return unit;
         } else if (Double.compare(unit.getLength(), last.getLength()) == 0) {
             throw new ParseException(
-                "Duplicate unit items: " + duration, index);
+                "Duplicate unit items: " + period, index);
         } else {
             throw new ParseException(
-                "Wrong order of unit items: " + duration, index);
+                "Wrong order of unit items: " + period, index);
         }
 
     }
 
     private static long parseAmount(
-        String duration,
+        String period,
         String number,
         int index
     ) throws ParseException {
@@ -2664,7 +2669,7 @@ public final class Duration<U extends IsoUnit>
         try {
             return Long.parseLong(number);
         } catch (NumberFormatException nfe) {
-            ParseException pe = new ParseException(duration, index);
+            ParseException pe = new ParseException(period, index);
             pe.initCause(nfe);
             throw pe;
         }
@@ -3324,6 +3329,28 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         /**
+         * <p>Equivalent to {@code ofPattern(IsoUnit.class, pattern)}. </p>
+         *
+         * @param   pattern format pattern
+         * @return  new formatter instance
+         * @since   1.2
+         * @see     #ofPattern(Class, String)
+         */
+        /*[deutsch]
+         * <p>&Auml;quivalent zu {@code ofPattern(IsoUnit.class, pattern)}. </p>
+         *
+         * @param   pattern format pattern
+         * @return  new formatter instance
+         * @since   1.2
+         * @see     #ofPattern(Class, String)
+         */
+        public static Formatter<IsoUnit> ofPattern(String pattern) {
+
+            return ofPattern(IsoUnit.class, pattern);
+
+        }
+
+        /**
          * <p>Constructs a new instance of duration formatter. </p>
          *
          * <p>Uses a pattern with symbols as followed: <br>&nbsp;</p>
@@ -3348,7 +3375,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>f</td>
          *    <td>{@link ClockUnit#NANOS} as fraction, (1-9) chars</td></tr>
          *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
-         *  <tr><td>[]</td><td>optional section</td></tr>
+         *  <tr><td>[]</td><td>optional section for parsing</td></tr>
          *  <tr><td>#{}</td><td>reserved chars for future use</td></tr>
          * </table>
          *
@@ -3356,7 +3383,9 @@ public final class Duration<U extends IsoUnit>
          * and must be escaped by apostrophes for interpretation as literals.
          * If such a letter is repeated then the count of symbols controls
          * the minimum width for formatted output. If necessary a number
-         * (of units) will be padded from left with the zero digt. </p>
+         * (of units) will be padded from left with the zero digt. Optional
+         * sections let the parser be error-tolerant and continue with the
+         * next section in case of errors. </p>
          *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
@@ -3389,7 +3418,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>f</td>
          *    <td>{@link ClockUnit#NANOS} als Bruchteil, (1-9) Zeichen</td></tr>
          *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
-         *  <tr><td>[]</td><td>optionaler Abschnitt</td></tr>
+         *  <tr><td>[]</td><td>optionaler Abschnitt beim Parsen</td></tr>
          *  <tr><td>#{}</td><td>zuk&uuml;nftige reservierte Zeichen</td></tr>
          * </table>
          *
@@ -3398,7 +3427,10 @@ public final class Duration<U extends IsoUnit>
          * gefasst werden. Wird ein Buchstabensymbol mehrfach wiederholt,
          * dann regelt die Anzahl der Symbole die Mindestbreite in der
          * formatierten Ausgabe. Bei Bedarf wird eine Zahl (von Einheiten)
-         * von links mit der Nullziffer aufgef&uuml;llt. </p>
+         * von links mit der Nullziffer aufgef&uuml;llt. Optionale Abschnitte
+         * regeln, da&szlig; der Interpretationsvorgang bei Fehlern nicht
+         * sofort abbricht, sondern mit dem n&auml;chsten Abschnitt
+         * fortsetzt. </p>
          *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
@@ -3502,6 +3534,24 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Yields the associated reified unit type. </p>
+         *
+         * @return  Class
+         * @since   1.2
+         */
+        /**
+         * <p>Liefert den zugeh&ouml;rigen Zeiteinheitstyp. </p>
+         *
+         * @return  Class
+         * @since   1.2
+         */
+        public Class<U> getType() {
+
+            return this.type;
+
+        }
+
+        /**
          * <p>Creates a textual output of given duration. </p>
          *
          * @param   duration	duration object
@@ -3519,12 +3569,14 @@ public final class Duration<U extends IsoUnit>
          *          prevents printing (for example too many nanoseconds)
          * @since   1.2
          */
-        public String print(Duration<? extends U> duration) {
+        public String format(Duration<?> duration) {
 
         	StringBuilder buffer = new StringBuilder();
 
-			for (FormatItem item : this.items) {
-				item.print(buffer, duration);
+            try {
+                this.print(duration, buffer);
+            } catch (IOException ex) {
+                throw new AssertionError(ex); // should never happen
 			}
 
         	return buffer.toString();
@@ -3532,10 +3584,68 @@ public final class Duration<U extends IsoUnit>
         }
 
         /**
+         * <p>Creates a textual output of given duration and writes to
+         * the buffer. </p>
+         *
+         * @param   duration	duration object
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of duration
+         *          prevents printing (for example too many nanoseconds)
+         * @throws  IOException if writing into buffer fails
+         * @since   1.2
+         */
+        /*[deutsch]
+         * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer und
+         * schreibt sie in den Puffer. </p>
+         *
+         * @param   duration	duration object
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of duration
+         *          prevents printing (for example too many nanoseconds)
+         * @throws  IOException if writing into buffer fails
+         * @since   1.2
+         */
+        public void print(
+            Duration<?> duration,
+            Appendable buffer
+        ) throws IOException {
+
+			for (FormatItem item : this.items) {
+				item.print(duration, buffer);
+			}
+
+        }
+
+        /**
+         * <p>Equivalent to {@code parse(text, 0)}. </p>
+         *
+         * @param   text	custom textual representation to be parsed
+         * @return  parsed duration
+         * @throws	ParseException (for example in case of mixed signs)
+         * @since   1.2
+         * @see     #parse(CharSequence, int)
+         */
+        /*[deutsch]
+         * <p>&Auml;quivalent zu {@code parse(text, 0)}. </p>
+         *
+         * @param   text	custom textual representation to be parsed
+         * @return  parsed duration
+         * @throws	ParseException (for example in case of mixed signs)
+         * @since   1.2
+         * @see     #parse(CharSequence, int)
+         */
+        public Duration<U> parse(CharSequence text) throws ParseException {
+
+            return this.parse(text, 0);
+
+        }
+
+        /**
          * <p>Analyzes given text according to format pattern and parses the
          * text to a duration. </p>
          *
-         * @param   text	textual representation to be parsed
+         * @param   text	custom textual representation to be parsed
+         * @param   offset  start position for the parser
          * @return  parsed duration
          * @throws	ParseException (for example in case of mixed signs)
          * @since   1.2
@@ -3544,14 +3654,18 @@ public final class Duration<U extends IsoUnit>
          * <p>Interpretiert den angegebenen Text entsprechend dem
          * voreingestellten Formatmuster als Dauer. </p>
          *
-         * @param   text	textual representation to be parsed
+         * @param   text	custom textual representation to be parsed
+         * @param   offset  start position for the parser
          * @return  parsed duration
          * @throws	ParseException (for example in case of mixed signs)
          * @since   1.2
          */
-        public Duration<U> parse(String text) throws ParseException {
+        public Duration<U> parse(
+            CharSequence text,
+            int offset
+        ) throws ParseException {
 
-			int pos = 0;
+            int pos = offset;
 			Map<Object, Long> unitsToValues = new HashMap<Object, Long>();
 
 			for (FormatItem item : this.items) {
@@ -3564,8 +3678,8 @@ public final class Duration<U extends IsoUnit>
 				}
 			}
 
-            if (pos == 0) {
-                throw new ParseException("Cannot parse: " + text, 0);
+            if (pos == offset) {
+                throw new ParseException("Cannot parse: " + text, offset);
             }
 
 			Long sign = unitsToValues.remove(SIGN_KEY);
@@ -3705,13 +3819,13 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
     	abstract void print(
-    		StringBuilder buffer,
-    		Duration<?> duration
-    	);
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException;
 
     	abstract int parse(
     		Map<Object, Long> unitsToValues,
-    		String text,
+    		CharSequence text,
     		int pos
     	);
 
@@ -3749,7 +3863,10 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			String num = String.valueOf(duration.getPartialAmount(this.unit));
 
@@ -3762,7 +3879,11 @@ public final class Duration<U extends IsoUnit>
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
 			long total = 0;
 			int pos = start;
@@ -3823,7 +3944,10 @@ public final class Duration<U extends IsoUnit>
 	    //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			String num = String.valueOf(duration.getPartialAmount(NANOS));
 			int len = num.length();
@@ -3846,7 +3970,11 @@ public final class Duration<U extends IsoUnit>
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
 			StringBuilder fraction = new StringBuilder();
 			int pos = start;
@@ -3911,14 +4039,21 @@ public final class Duration<U extends IsoUnit>
 	    //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			buffer.append(this.separator);
 
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
 			if (start >= text.length()) {
                 return ~start; // end of text
@@ -3960,20 +4095,35 @@ public final class Duration<U extends IsoUnit>
 	    //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			buffer.append(this.literal);
 
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
-			if (text.startsWith(this.literal, start)) {
-				return start + this.literal.length();
-			}
+            int end = start + this.literal.length();
 
-			return ~start; // literal expected
+            if (end > text.length()) {
+                return ~start; // end of line
+            }
+
+            for (int i = start; i < end; i++) {
+                if (text.charAt(i) != this.literal.charAt(i - start)) {
+                    return ~start; // literal expected
+                }
+            }
+
+			return end;
 
 		}
 
@@ -4003,7 +4153,10 @@ public final class Duration<U extends IsoUnit>
 	    //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			switch (this.policy) {
 				case SHOW_WHEN_NEGATIVE:
@@ -4021,7 +4174,11 @@ public final class Duration<U extends IsoUnit>
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
 			if (start >= text.length()) {
 				if (this.policy == SignPolicy.SHOW_ALWAYS) {
@@ -4099,16 +4256,23 @@ public final class Duration<U extends IsoUnit>
 	    //~ Methoden ------------------------------------------------------
 
 		@Override
-		void print(StringBuilder buffer, Duration<?> duration) {
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
 
 			for (FormatItem item : this.items) {
-				item.print(buffer, duration);
+				item.print(duration, buffer);
 			}
 
 		}
 
 		@Override
-		int parse(Map<Object, Long> unitsToValues, String text, int start) {
+		int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
 
 			int pos = start;
 			Map<Object, Long> store = new HashMap<Object, Long>(unitsToValues);
