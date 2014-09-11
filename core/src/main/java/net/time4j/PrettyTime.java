@@ -24,7 +24,6 @@ package net.time4j;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
-import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
@@ -92,13 +91,13 @@ public final class PrettyTime {
 
     private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
         new ConcurrentHashMap<Locale, PrettyTime>();
-    private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
-    private static final Set<IsoUnit> STD_UNITS;
+    private static final IsoUnit[] STD_UNITS;
+    private static final Set<IsoUnit> SUPPORTED_UNITS;
 
     static {
         IsoUnit[] units =
             {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
-        STD_METRIC = Duration.in(units);
+        STD_UNITS = units;
 
         Set<IsoUnit> tmp = new HashSet<IsoUnit>();
         for (IsoUnit unit : units) {
@@ -107,7 +106,7 @@ public final class PrettyTime {
         tmp.add(MILLIS);
         tmp.add(MICROS);
         tmp.add(NANOS);
-        STD_UNITS = Collections.unmodifiableSet(tmp);
+        SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -648,7 +647,8 @@ public final class PrettyTime {
                 ut,
                 tz.getOffset(ut));
 
-        Duration<IsoUnit> duration = STD_METRIC.between(start, end);
+        Duration<IsoUnit> duration =
+            Duration.in(tz, STD_UNITS).between(start, end);
 
         if (duration.isEmpty()) {
             return UnitPatterns.of(this.locale).getNowWord();
@@ -785,7 +785,7 @@ public final class PrettyTime {
             value = MathUtils.safeNegate(amount);
         }
 
-        if (STD_UNITS.contains(unit)) {
+        if (SUPPORTED_UNITS.contains(unit)) {
             if (unit.isCalendrical()) {
                 CalendarUnit u = CalendarUnit.class.cast(unit);
                 return this.print(value, u, width);

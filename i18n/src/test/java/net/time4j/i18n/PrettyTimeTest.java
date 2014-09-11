@@ -8,6 +8,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
 import net.time4j.format.TextWidth;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.util.Locale;
@@ -118,6 +119,26 @@ public class PrettyTimeTest {
                     PlainTimestamp.of(2014, 4, 5, 14, 0).atUTC(),
                     ZonalOffset.UTC),
             is("vor 4 Monaten"));
+    }
+
+    @Test
+    public void print4HoursEarlierGerman() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 3, 30, 5, 0)
+                    .at(Timezone.of("Europe/Berlin"));
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 3, 30, 0, 0)
+                        .at(Timezone.of("Europe/Berlin")),
+                    "Europe/Berlin"),
+            is("vor 4 Stunden"));
     }
 
     @Test
