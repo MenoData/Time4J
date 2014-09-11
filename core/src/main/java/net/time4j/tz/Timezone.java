@@ -22,8 +22,6 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
-import net.time4j.base.GregorianMath;
-import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -190,7 +188,7 @@ public abstract class Timezone
             TZID svalbard = new NamedID("Arctic/Longyearbyen");
             temp2.put("SJ", Collections.singleton(svalbard));
         }
-        
+
         TERRITORIES = Collections.unmodifiableMap(temp2);
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -280,7 +278,7 @@ public abstract class Timezone
     /**
      * <p>Gets a {@code Set} of preferred timezone IDs for given
      * ISO-3166-country code. </p>
-     * 
+     *
      * <p>This information is necessary to enable parsing of timezone names
      * and is only available if the olson-module &quot;net.time4j.tz.olson&quot;
      * is accessible in class path. </p>
@@ -1401,7 +1399,7 @@ public abstract class Timezone
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public UnixTime resolve(
+        public ZonalOffset resolve(
             GregorianDate date,
             WallTime time,
             Timezone tz
@@ -1418,38 +1416,7 @@ public abstract class Timezone
                 );
             }
 
-            long days = GregorianMath.toMJD(date) - 40587;
-            long localSeconds = MathUtils.safeMultiply(days, 86400);
-            localSeconds += (time.getHour() * 3600);
-            localSeconds += (time.getMinute() * 60);
-            localSeconds += time.getSecond();
-
-            ZonalOffset offset = tz.getOffset(date, time);
-            int localNanos = time.getNanosecond();
-            long posixTime = localSeconds - offset.getIntegralAmount();
-            int posixNanos = localNanos - offset.getFractionalAmount();
-
-            if (posixNanos < 0) {
-                posixNanos += MRD;
-                posixTime--;
-            } else if (posixNanos >= MRD) {
-                posixNanos -= MRD;
-                posixTime++;
-            }
-
-            final long pt = posixTime;
-            final int pn = posixNanos;
-
-            return new UnixTime() {
-                @Override
-                public long getPosixTime() {
-                    return pt;
-                }
-                @Override
-                public int getNanosecond() {
-                    return pn;
-                }
-            };
+            return tz.getOffset(date, time);
 
         }
 

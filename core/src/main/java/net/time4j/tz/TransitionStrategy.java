@@ -22,7 +22,6 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
-import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
 
@@ -47,27 +46,28 @@ public interface TransitionStrategy {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Converts a local timestamp to a global timestamp using given
-     * timezone. </p>
+     * <p>Calculates a suitable offset for given local timestamp. </p>
      *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
-     * @return  global unix timestamp
+     * @return  ZonalOffset
+     * @since   1.2
      * @see     net.time4j.PlainTimestamp#at(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
     /*[deutsch]
-     * <p>Konvertiert eine lokale Zeitangabe in einen globalen Zeitstempel. </p>
+     * <p>Bestimmt einen geeigneten Offset f&uuml;r eine lokale Zeitangabe. </p>
      *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
-     * @return  global unix timestamp
+     * @return  ZonalOffset
+     * @since   1.2
      * @see     net.time4j.PlainTimestamp#at(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
-    UnixTime resolve(
+    ZonalOffset resolve(
         GregorianDate localDate,
         WallTime localTime,
         Timezone timezone

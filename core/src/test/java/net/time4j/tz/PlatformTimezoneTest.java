@@ -159,10 +159,8 @@ public class PlatformTimezoneTest {
                 PlainDate.of(2014, 3, 30),
                 PlainTime.of(2, 30),
                 tz
-            ).getPosixTime(),
-            is(
-                PlainTimestamp.of(2014, 3, 30, 2, 30)
-                .at(tz).getPosixTime()));
+            ),
+            is(ZonalOffset.ofTotalSeconds(7200)));
     }
 
     @Test

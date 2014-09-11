@@ -22,9 +22,9 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
-import net.time4j.base.UnixTime;
 import net.time4j.engine.AbstractDuration;
 import net.time4j.engine.AbstractMetric;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.ChronoUnit;
@@ -34,6 +34,7 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.SignPolicy;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -577,7 +578,7 @@ public final class Duration<U extends IsoUnit>
      * die explizite Angabe der Tageseinheit notwendig. </p>
      *
      * <p><strong>Beispiel mit verschiedenen Einheitstypen:</strong> Wenn diese
-     * Method mit verschiedenen Zeiteinheitstypen aufgerufen wird, dann wird
+     * Methode mit verschiedenen Zeiteinheitstypen aufgerufen wird, dann wird
      * dringend empfohlen, zuerst die Einheiten statischen Konstanten vom Typ
      * {@code IsoUnit} zuzuweisen, um Compiler-Probleme mit Generics zu
      * vermeiden. Diese Praxis hilft auch, die Lesbarkeit des Code zu
@@ -669,48 +670,41 @@ public final class Duration<U extends IsoUnit>
      * @see     ClockUnit#SECONDS
      * @see     ClockUnit#NANOS
      */
-    public static
-    TimeMetric<ClockUnit, Duration<ClockUnit>> inClockUnits() {
+    public static TimeMetric<ClockUnit, Duration<ClockUnit>> inClockUnits() {
 
         return CLOCK_METRIC;
 
     }
 
     /**
-     * <p>Helps to evaluate the zonal duration between two UNIX-timestamps. </p>
+     * <p>Helps to evaluate the zonal duration between two timestamps
+     * and applies an offset correction if necessary. </p>
      *
-     * @param   <U> generic unit type
      * @param   tz          timezone
      * @param   units       time units to be used in calculation
      * @return  zonal metric for calculating a duration in given units
      * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
      * @since   1.2
-     * @see     #earlier(Timezone)
-     * @see     #later(Timezone)
-     * @see     Moment
      */
     /*[deutsch]
      * <p>Hilfsmethode zur Bestimmung der lokalen beziehungsweise zonalen
-     * Dauer zwischen zwei absoluten UNIX-Zeitstempeln. </p>
+     * Dauer zwischen zwei Zeitstempeln, die bei Bedarf eine Offset-Korrektur
+     * anwendet. </p>
      *
-     * @param   <U> generic unit type
      * @param   tz          timezone
      * @param   units       time units to be used in calculation
      * @return  zonal metric for calculating a duration in given units
      * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
      * @since   1.2
-     * @see     #earlier(Timezone)
-     * @see     #later(Timezone)
-     * @see     Moment
      */
-    public static <U extends IsoUnit> ZonalMetric<U> in(
+    public static TimeMetric<IsoUnit, Duration<IsoUnit>> in(
         Timezone tz,
-        U... units
+        IsoUnit... units
     ) {
 
-        return new ZonalMetric<U>(tz, units);
+        return new ZonalMetric(tz, units);
 
     }
 
@@ -3137,36 +3131,19 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    /**
-     * <p>Represents a way to evaluate a local respectively a zonal duration
-     * between two absolute unix timestamps. </p>
-     *
-     * @param   <U> generic type of time units
-     * @since   1.2
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     * @concurrency <immutable>
-     */
-    /*[deutsch]
-     * <p>Stellt eine Methode zum Ermitteln der lokalen beziehungsweise
-     * zonalen Dauer zwischen zwei absoluten UNIX-Zeitstempeln bereit. </p>
-     *
-     * @param   <U> generic type of time units
-     * @since   1.2
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     * @concurrency <immutable>
-     */
-    public static final class ZonalMetric<U extends IsoUnit> {
+    private static class ZonalMetric
+        implements TimeMetric<IsoUnit, Duration<IsoUnit>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final Timezone tz;
-        private final TimeMetric<U, Duration<U>> metric;
+        private final TimeMetric<IsoUnit, Duration<IsoUnit>> metric;
 
         //~ Konstruktoren -------------------------------------------------
 
         private ZonalMetric(
             Timezone tz,
-            U... units
+            IsoUnit... units
         ) {
             super();
 
@@ -3175,48 +3152,52 @@ public final class Duration<U extends IsoUnit>
             }
 
             this.tz = tz;
-            this.metric = new Metric<U>(units);
+            this.metric = new Metric<IsoUnit>(units);
 
         }
 
         //~ Methoden ------------------------------------------------------
 
-        /**
-         * <p>Evaluates the zonal duration between given two absolute
-         * moments in time. </p>
-         *
-         * <p>The physical duration can deviate due to timezone offset
-         * jumps. UTC-leapseconds are ignored, too. </p>
-         *
-         * @param   start       start time as unix timestamp
-         * @param   end         end time as unix timestamp
-         * @return  zonal duration
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Ermittelt die zonale Dauer zwischen den angegebenen
-         * UNIX-Zeitstempeln. </p>
-         *
-         * <p>Die physikalische Dauer kann wegen Zeitzonen-Spr&uuml;ngen
-         * davon abweichen. UTC-Schaltsekunden werden ebenfalls ignoriert. </p>
-         *
-         * @param   start       start time as unix timestamp
-         * @param   end         end time as unix timestamp
-         * @return  zonal duration
-         * @since   1.2
-         */
-        public Duration<U> between(
-            UnixTime start,
-            UnixTime end
+        @Override
+        public <T extends TimePoint<? super IsoUnit, T>>
+        Duration<IsoUnit> between(
+            T start,
+            T end
         ) {
 
-            Moment u1 = Moment.from(start);
-            Moment u2 = Moment.from(end);
+            T t1 = start;
+            T t2 = end;
+            boolean negative = false;
 
-            PlainTimestamp t1 = PlainTimestamp.from(u1, this.tz.getOffset(u1));
-            PlainTimestamp t2 = PlainTimestamp.from(u2, this.tz.getOffset(u2));
+            if (start.compareTo(end) > 0) {
+                t1 = end;
+                t2 = start;
+                negative = true;
+            }
 
-            return this.metric.between(t1, t2);
+            ZonalOffset o1 = this.getOffset(t1);
+            ZonalOffset o2 = this.getOffset(t2);
+            t2 = t2.plus(
+                o1.getIntegralAmount() - o2.getIntegralAmount(),
+                SECONDS);
+            t2 = t2.plus(
+                o1.getFractionalAmount() - o2.getFractionalAmount(),
+                NANOS);
+            Duration<IsoUnit> duration = this.metric.between(t1, t2);
+
+            if (negative) {
+                duration = duration.inverse();
+            }
+
+            return duration;
+
+        }
+
+        private ZonalOffset getOffset(ChronoEntity<?> entity) {
+
+            PlainDate date = entity.get(PlainDate.COMPONENT);
+            PlainTime time = entity.get(PlainTime.COMPONENT);
+            return this.tz.getStrategy().resolve(date, time, this.tz);
 
         }
 

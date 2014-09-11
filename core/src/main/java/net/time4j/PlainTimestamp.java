@@ -906,24 +906,13 @@ public final class PlainTimestamp
     public Moment at(Timezone tz) {
 
         TransitionStrategy strategy = tz.getStrategy();
+        Moment result = this.at(strategy.resolve(this.date, this.time, tz));
 
-        if (strategy == Timezone.DEFAULT_CONFLICT_STRATEGY) {
-            return this.resolveDefault(tz);
-        } else if (strategy == Timezone.STRICT_MODE) {
-            if (tz.isInvalid(this.date, this.time)) {
-                throw new IllegalArgumentException(
-                    "Invalid local timestamp due to timezone transition: "
-                    + this
-                    + " [" + tz.getID() + "]"
-                );
-            }
-
-            Moment result = this.resolveDefault(tz);
+        if (strategy == Timezone.STRICT_MODE) {
             Moment.checkNegativeLS(result.getPosixTime(), this);
-            return result;
-        } else {
-            return Moment.from(strategy.resolve(this.date, this.time, tz));
         }
+
+        return result;
 
     }
 
@@ -1011,9 +1000,8 @@ public final class PlainTimestamp
 
     }
 
-    private Moment resolveDefault(Timezone tz) {
+    private Moment at(ZonalOffset offset) {
 
-        ZonalOffset offset = tz.getOffset(this.date, this.time);
         long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
         localSeconds += (this.time.getHour() * 3600);
         localSeconds += (this.time.getMinute() * 60);

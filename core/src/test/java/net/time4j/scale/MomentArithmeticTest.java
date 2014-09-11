@@ -2,9 +2,11 @@ package net.time4j.scale;
 
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
+import net.time4j.IsoUnit;
 import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -100,13 +102,14 @@ public class MomentArithmeticTest {
     @Test
     public void localHourShiftBerlin() {
         Timezone berlin = Timezone.of("Europe/Berlin");
-        Moment start =
-            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
-        Moment end =
-            PlainDate.of(2014, Month.MARCH, 30).atTime(5, 0).at(berlin);
+        PlainTimestamp start =
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay();
+        PlainTimestamp end =
+            PlainDate.of(2014, Month.MARCH, 30).atTime(5, 0);
+        IsoUnit hours = ClockUnit.HOURS;
         assertThat(
-            Duration.in(berlin, ClockUnit.HOURS).between(start, end),
-            is(Duration.of(5, ClockUnit.HOURS))
+            Duration.in(berlin, hours).between(start, end),
+            is(Duration.of(4, hours))
         );
     }
 
