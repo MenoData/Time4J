@@ -724,7 +724,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * parsing the timezone serves as replacement value if the formatted
      * text does not contain any timezone. </p>
      *
-     * @param   timezone    timezone id
+     * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
      */
@@ -738,20 +738,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * Ersatzwert, wenn im zu interpretierenden Text keine Zeitzone
      * gefunden werden konnte. </p>
      *
-     * @param   timezone    timezone id
+     * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
      */
-    public ChronoFormatter<T> withTimezone(TZID timezone) {
+    public ChronoFormatter<T> withTimezone(TZID tzid) {
 
-        if (timezone == null) {
+        if (tzid == null) {
             throw new NullPointerException("Missing timezone id.");
         }
 
         Attributes attrs =
             new Attributes.Builder()
             .setAll(this.defaultAttributes)
-            .setTimezone(timezone)
+            .setTimezone(tzid)
             .build();
         return new ChronoFormatter<T>(this, attrs);
 

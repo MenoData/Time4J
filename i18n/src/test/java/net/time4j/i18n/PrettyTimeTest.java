@@ -127,7 +127,7 @@ public class PrettyTimeTest {
             @Override
             public Moment currentTime() {
                 return PlainTimestamp.of(2014, 3, 30, 5, 0)
-                    .at(Timezone.of("Europe/Berlin"));
+                    .in(Timezone.of("Europe/Berlin"));
             }
         };
 
@@ -136,7 +136,7 @@ public class PrettyTimeTest {
                 .withReferenceClock(clock)
                 .printRelative(
                     PlainTimestamp.of(2014, 3, 30, 0, 0)
-                        .at(Timezone.of("Europe/Berlin")),
+                        .in(Timezone.of("Europe/Berlin")),
                     "Europe/Berlin"),
             is("vor 4 Stunden"));
     }

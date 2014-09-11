@@ -148,7 +148,7 @@ public class PlatformTimezoneTest {
         PlainTimestamp.of(
             PlainDate.of(2014, 3, 30),
             PlainTime.of(2, 30)
-        ).at(tz.with(Timezone.STRICT_MODE));
+        ).in(tz.with(Timezone.STRICT_MODE));
     }
 
     @Test
@@ -170,8 +170,8 @@ public class PlatformTimezoneTest {
             PlainTimestamp.of(
                 PlainDate.of(2014, 3, 30),
                 PlainTime.of(2, 30)
-            ).at(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY)),
-            is(PlainTimestamp.of(2014, 3, 30, 2, 30).at(tz)));
+            ).in(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY)),
+            is(PlainTimestamp.of(2014, 3, 30, 2, 30).in(tz)));
     }
 
     @Test

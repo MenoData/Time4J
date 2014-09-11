@@ -53,7 +53,7 @@ public interface TransitionStrategy {
      * @param   timezone    timezone data containing offset history
      * @return  ZonalOffset
      * @since   1.2
-     * @see     net.time4j.PlainTimestamp#at(Timezone)
+     * @see     net.time4j.PlainTimestamp#in(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
     /*[deutsch]
@@ -64,7 +64,7 @@ public interface TransitionStrategy {
      * @param   timezone    timezone data containing offset history
      * @return  ZonalOffset
      * @since   1.2
-     * @see     net.time4j.PlainTimestamp#at(Timezone)
+     * @see     net.time4j.PlainTimestamp#in(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
     ZonalOffset resolve(

@@ -814,22 +814,69 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Combines this local timestamp with the timezone UTC to a global
-     * timestamp. </p>
+     * <p>Combines this local timestamp with the timezone offset UTC+00:00
+     * to a global timestamp. </p>
      *
      * @return  global timestamp  based on this local timestamp interpreted
      *          at offset UTC+00:00
+     * @see     #at(ZonalOffset)
      */
     /*[deutsch]
-     * <p>Kombiniert diesen lokalen Zeitstempel mit der UTC-Zeitzone zu
+     * <p>Kombiniert diesen lokalen Zeitstempel mit UTC+00:00 zu
      * einem globalen Zeitstempel. </p>
      *
      * @return  global timestamp  based on this local timestamp interpreted
      *          at offset UTC+00:00
+     * @see     #at(ZonalOffset)
      */
     public Moment atUTC() {
 
-        return this.atTimezone(ZonalOffset.UTC);
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    /**
+     * <p>Combines this local timestamp with the given timezone offset
+     * to a global timestamp. </p>
+     *
+     * @param   offset  timezone offset
+     * @return  global timestamp  based on this local timestamp interpreted
+     *          at given offset
+     * @since   1.2
+     * @see     #atUTC()
+     * @see     #in(Timezone)
+     */
+    /*[deutsch]
+     * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen
+     * Zeitzonen-Offset zu einem globalen Zeitstempel. </p>
+     *
+     * @param   offset  timezone offset
+     * @return  global timestamp  based on this local timestamp interpreted
+     *          at given offset
+     * @since   1.2
+     * @see     #atUTC()
+     * @see     #in(Timezone)
+     */
+    public Moment at(ZonalOffset offset) {
+
+        long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
+        localSeconds += (this.time.getHour() * 3600);
+        localSeconds += (this.time.getMinute() * 60);
+        localSeconds += this.time.getSecond();
+
+        int localNanos = this.time.getNanosecond();
+        long posixTime = localSeconds - offset.getIntegralAmount();
+        int posixNanos = localNanos - offset.getFractionalAmount();
+
+        if (posixNanos < 0) {
+            posixNanos += MRD;
+            posixTime--;
+        } else if (posixNanos >= MRD) {
+            posixNanos -= MRD;
+            posixTime++;
+        }
+
+        return Moment.of(posixTime, posixNanos, TimeScale.POSIX);
 
     }
 
@@ -839,8 +886,9 @@ public final class PlainTimestamp
      *
      * @return  global timestamp based on this local timestamp interpreted
      *          in system timezone
+     * @since   1.2
      * @see     Timezone#ofSystem()
-     * @see     #atTimezone(TZID)
+     * @see     #inTimezone(TZID)
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der System-Zeitzone
@@ -848,12 +896,13 @@ public final class PlainTimestamp
      *
      * @return  global timestamp based on this local timestamp interpreted
      *          in system timezone
+     * @since   1.2
      * @see     Timezone#ofSystem()
-     * @see     #atTimezone(TZID)
+     * @see     #inTimezone(TZID)
      */
-    public Moment atStdTimezone() {
+    public Moment inStdTimezone() {
 
-        return this.at(Timezone.ofSystem());
+        return this.in(Timezone.ofSystem());
 
     }
 
@@ -865,8 +914,9 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   1.2
      * @see     Timezone#of(TZID)
-     * @see     #atStdTimezone()
+     * @see     #inStdTimezone()
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
@@ -876,12 +926,13 @@ public final class PlainTimestamp
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   1.2
      * @see     Timezone#of(TZID)
-     * @see     #atStdTimezone()
+     * @see     #inStdTimezone()
      */
-    public Moment atTimezone(TZID tzid) {
+    public Moment inTimezone(TZID tzid) {
 
-        return this.at(Timezone.of(tzid));
+        return this.in(Timezone.of(tzid));
 
     }
 
@@ -892,6 +943,7 @@ public final class PlainTimestamp
      * @param   tz      timezone
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
+     * @since   1.2
      * @see     Timezone#of(String)
      */
     /*[deutsch]
@@ -901,9 +953,10 @@ public final class PlainTimestamp
      * @param   tz      timezone
      * @return  global timestamp based on this local timestamp interpreted
      *          in given timezone
+     * @since   1.2
      * @see     Timezone#of(String)
      */
-    public Moment at(Timezone tz) {
+    public Moment in(Timezone tz) {
 
         TransitionStrategy strategy = tz.getStrategy();
         Moment result = this.at(strategy.resolve(this.date, this.time, tz));
@@ -913,6 +966,54 @@ public final class PlainTimestamp
         }
 
         return result;
+
+    }
+
+    /**
+     * <p>Combines this local timestamp with the system timezone to a global
+     * timestamp. </p>
+     *
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in system timezone
+     * @deprecated  use {@link #inStdTimezone()}
+     */
+    @Deprecated
+    public Moment atStdTimezone() {
+
+        return this.inStdTimezone();
+
+    }
+
+    /**
+     * <p>Combines this local timestamp with given timezone to a global
+     * timestamp. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @deprecated  use {@link #inTimezone(TZID)}
+     */
+    @Deprecated
+    public Moment atTimezone(TZID tzid) {
+
+        return this.inTimezone(tzid);
+
+    }
+
+    /**
+     * <p>Combines this local timestamp with given timezone to a global
+     * timestamp. </p>
+     *
+     * @param   tz      timezone
+     * @return  global timestamp based on this local timestamp interpreted
+     *          in given timezone
+     * @deprecated  use {@link #in(Timezone)}
+     */
+    @Deprecated
+    public Moment at(Timezone tz) {
+
+        return this.in(tz);
 
     }
 
@@ -997,29 +1098,6 @@ public final class PlainTimestamp
             );
 
         return PlainTimestamp.of(date, time);
-
-    }
-
-    private Moment at(ZonalOffset offset) {
-
-        long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
-        localSeconds += (this.time.getHour() * 3600);
-        localSeconds += (this.time.getMinute() * 60);
-        localSeconds += this.time.getSecond();
-
-        int localNanos = this.time.getNanosecond();
-        long posixTime = localSeconds - offset.getIntegralAmount();
-        int posixNanos = localNanos - offset.getFractionalAmount();
-
-        if (posixNanos < 0) {
-            posixNanos += MRD;
-            posixTime--;
-        } else if (posixNanos >= MRD) {
-            posixNanos -= MRD;
-            posixTime++;
-        }
-
-        return Moment.of(posixTime, posixNanos, TimeScale.POSIX);
 
     }
 
@@ -1139,7 +1217,7 @@ public final class PlainTimestamp
                 }
 
                 Moment ut = Moment.from(UnixTime.class.cast(entity));
-                return ut.inZonalView(tzid);
+                return ut.toZonalTimestamp(tzid);
             }
 
             boolean leapsecond =

@@ -25,6 +25,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 
 /**
@@ -217,6 +218,70 @@ public abstract class ElementOperator<T>
             this.element,
             this.type,
             tz
+        );
+
+    }
+
+    /**
+     * <p>Equivalent to {@code at(ZonalOffset.UTC)}. </p>
+     *
+     * @return  operator for UTC+00:00, applicable on instances
+     *          of {@code Moment}
+     * @since   1.2
+     * @see     #at(ZonalOffset)
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code at(ZonalOffset.UTC)}. </p>
+     *
+     * @return  operator for UTC+00:00, applicable on instances
+     *          of {@code Moment}
+     * @since   1.2
+     * @see     #at(ZonalOffset)
+     */
+    public final ChronoOperator<Moment> atUTC() {
+
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    /**
+     * <p>Creates an operator which can adjust a {@link Moment} at the
+     * given timezone offset. </p>
+     *
+     * <p>Note: Usually the operator converts the given {@code Moment} to
+     * a {@code PlainTimestamp} then processes this local timestamp and
+     * finally converts the result back to a new {@code Moment}. A special
+     * case are incrementing and decrementing of (sub-)second elements which
+     * eventually operate directly on the UTC timeline. </p>
+     *
+     * @param   offset  timezone offset
+     * @return  operator with the given timezone offset, applicable on
+     *          instances of {@code Moment}
+     * @since   1.2
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Operator, der einen {@link Moment} mit
+     * Hilfe eines Zeitzonen-Offsets anpassen kann. </p>
+     *
+     * <p>Hinweis: Der Operator wandelt meist den gegebenen {@code Moment}
+     * in einen lokalen Zeitstempel um, bearbeitet dann diese lokale
+     * Darstellung und konvertiert das Ergebnis in einen neuen {@code Moment}
+     * zur&uuml;ck. Ein Spezialfall sind Inkrementierungen und Dekrementierungen
+     * von (Sub-)Sekundenelementen, bei denen ggf. direkt auf dem globalen
+     * Zeitstrahl operiert wird. </p>
+     *
+     * @param   offset  timezone offset
+     * @return  operator with the given timezone offset, applicable on
+     *          instances of {@code Moment}
+     * @since   1.2
+     */
+    public final ChronoOperator<Moment> at(ZonalOffset offset) {
+
+        return new Moment.Operator(
+            this.onTimestamp(),
+            this.element,
+            this.type,
+            Timezone.of(offset)
         );
 
     }

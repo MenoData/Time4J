@@ -26,7 +26,6 @@ import net.time4j.engine.AbstractDuration;
 import net.time4j.engine.AbstractMetric;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
@@ -680,6 +679,18 @@ public final class Duration<U extends IsoUnit>
      * <p>Helps to evaluate the zonal duration between two timestamps
      * and applies an offset correction if necessary. </p>
      *
+     * <p>Following example handles the change from winter time to summer time
+     * in Germany causing 4 instead of 5 hours difference: </p>
+     *
+     * <pre>
+     *  PlainTimestamp start = PlainTimestamp.of(2014, 3, 30, 0, 0);
+     *  PlainTimestamp end = PlainTimestamp.of(2014, 3, 30, 5, 0);
+     *  IsoUnit hours = ClockUnit.HOURS;
+     *  System.out.println(
+     *      Duration.in(Timezone.of(&quot;Europe/Berlin&quot;), hours)
+     *          .between(start, end).toString()); // output: PT4H
+     * </pre>
+     *
      * @param   tz          timezone
      * @param   units       time units to be used in calculation
      * @return  zonal metric for calculating a duration in given units
@@ -691,6 +702,19 @@ public final class Duration<U extends IsoUnit>
      * <p>Hilfsmethode zur Bestimmung der lokalen beziehungsweise zonalen
      * Dauer zwischen zwei Zeitstempeln, die bei Bedarf eine Offset-Korrektur
      * anwendet. </p>
+     *
+     * <p>Das folgende Beispiel behandelt den Wechsel von der Winterzeit zur
+     * Sommerzeit in Deutschland, so da&szlig; nur 4 statt 5 Stunden Differenz
+     * errechnet werden: </p>
+     *
+     * <pre>
+     *  PlainTimestamp start = PlainTimestamp.of(2014, 3, 30, 0, 0);
+     *  PlainTimestamp end = PlainTimestamp.of(2014, 3, 30, 5, 0);
+     *  IsoUnit hours = ClockUnit.HOURS;
+     *  System.out.println(
+     *      Duration.in(Timezone.of(&quot;Europe/Berlin&quot;), hours)
+     *          .between(start, end).toString()); // Ausgabe: PT4H
+     * </pre>
      *
      * @param   tz          timezone
      * @param   units       time units to be used in calculation
@@ -1442,98 +1466,6 @@ public final class Duration<U extends IsoUnit>
     public Duration<U> with(Normalizer<U> normalizer) {
 
         return convert(normalizer.normalize(this));
-
-    }
-
-    /**
-     * <p>Operates on a {@code Moment} such that in given timezone, the earlier
-     * defined local timestamp will be computed. </p>
-     *
-     * @param   timezone    timezone id
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #later(Timezone)
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     */
-    /*[deutsch]
-     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
-     * der angegebenen Zeitzone der fr&uuml;here lokale Zeitstempel berechnet
-     * wird. </p>
-     *
-     * @param   timezone    timezone id
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #later(Timezone)
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     */
-    public ChronoOperator<Moment> earlier(final Timezone timezone) {
-
-        return new ChronoOperator<Moment>() {
-            @Override
-            public Moment apply(Moment entity) {
-                PlainTimestamp ts =
-                    PlainTimestamp.from(entity, timezone.getOffset(entity));
-                ts = ts.minus(Duration.this);
-                return ts.at(timezone);
-            }
-        };
-
-    }
-
-    /**
-     * <p>Operates on a {@code Moment} such that in given timezone, the later
-     * defined local timestamp will be computed. </p>
-     *
-     * <pre>
-     *  Timezone berlin = Timezone.of(EUROPE.BERLIN);
-     *  Moment start =
-     *      PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
-     *  Moment end =
-     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
-     *  System.out.println(start.until(end, TimeUnit.HOURS));
-     *  // output: 4 (physical hours)
-     *  System.out.println(
-     *      Duration.in(berlin, ClockUnit.HOURS).between(start, end));
-     *  // output: PT5 (local hour ticks, one is virtual due to offset jump)
-     * <pre>
-     *
-     * @param   timezone    timezone id
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier(Timezone)
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     */
-    /*[deutsch]
-     * <p>Wendet diese Dauer so auf einen {@code Moment} an, da&szlig; in
-     * der angegebenen Zeitzone der sp&auml;tere lokale Zeitstempel berechnet
-     * wird. </p>
-     *
-     * <pre>
-     *  Timezone berlin = Timezone.of(EUROPE.BERLIN);
-     *  Moment start =
-     *      PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
-     *  Moment end =
-     *      start.with(Duration.of(5, ClockUnit.HOURS).later(berlin));
-     *  System.out.println(start.until(end, TimeUnit.HOURS));
-     *  // Ausgabe: 4 (physikalische Stunden)
-     *  System.out.println(
-     *      Duration.in(berlin, ClockUnit.HOURS).between(start, end));
-     *  // Ausgabe: PT5 (lokale Stunden, dabei eine Sommerzeitumstellung)
-     * <pre>
-     *
-     * @param   timezone    timezone id
-     * @return  operator applicable on {@code Moment}-objects
-     * @see     #earlier(Timezone)
-     * @see     #in(Timezone, IsoUnit[]) in(Timezone, U...)
-     */
-    public ChronoOperator<Moment> later(final Timezone timezone) {
-
-        return new ChronoOperator<Moment>() {
-            @Override
-            public Moment apply(Moment entity) {
-                PlainTimestamp ts =
-                    PlainTimestamp.from(entity, timezone.getOffset(entity));
-                ts = ts.plus(Duration.this);
-                return ts.at(timezone);
-            }
-        };
 
     }
 

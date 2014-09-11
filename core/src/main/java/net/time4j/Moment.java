@@ -130,7 +130,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * date- and time-values, always in the timezone UTC. </p>
  *
  * <p>A {@code Moment} is also capable of delivering the date- and time-values
- * in a different timezone if the method {@link #inZonalView(TZID)} is called.
+ * in a different timezone if the method {@link #toZonalTimestamp(TZID)} is called.
  * If zonal operators are defined by any elements then manipulations of related
  * data are possible in any timezone. </p>
  *
@@ -142,12 +142,6 @@ import static net.time4j.scale.TimeScale.UTC;
  * leapseconds. Both kinds of time units can be used in the methods
  * {@code plus(long, unit)}, {@code minus(long, unit)} and
  * {@code until(Moment, unit)}. </p>
- *
- * <p>Furthermore, there is the option to use local time units like
- * {@code ClockUnit} which count the virtual ticks on an analogue clock
- * and are ignorant of daylight-saving switches. As entry point users can
- * use the {@code Duration}-methods {@link Duration#earlier(Timezone)} and
- * {@link Duration#later(Timezone)}. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -203,24 +197,18 @@ import static net.time4j.scale.TimeScale.UTC;
  * Zeitwerten, immer in der Zeitzone UTC. </p>
  *
  * <p>Ein {@code Moment} kann die Datums- und Zeitwerte auch in einer anderen
- * Zeitzone liefern, wenn die Methode {@link #inZonalView(TZID)} aufgerufen
+ * Zeitzone liefern, wenn die Methode {@link #toZonalTimestamp(TZID)} aufgerufen
  * wird. Falls &uuml;ber die Elemente zonale Operatoren zur Verf&uuml;gung
  * stehen, sind auch Manipulationen in beliebigen Zeitzonen m&ouml;glich. </p>
  *
  * <h3>Zeitarithmetik</h3>
  *
- * <p>Als Zeiteinheiten kommen vor allem {@link SI} (mit Z&auml;hlung
- * von Schaltsekunden) und {@link TimeUnit} in Betracht. Letztere Einheit
- * kann verwendet werden, wenn eine bessere Interoperabilit&auml;t mit
- * externen APIs notwendig ist, die UTC-Schaltsekunden ignorieren. Beide
- * Arten von Zeiteinheiten werden in den Methoden {@code plus(long, unit)},
- * {@code minus(long, unit)} und {@code until(Moment, unit)} verwendet. </p>
- *
- * <p>Au&szlig;erdem gibt es die M&ouml;glichkeit, lokale Zeiteinheiten wie
- * in {@code ClockUnit} definiert bezogen auf eine Zeitzone anzuwenden. Ein
- * Einstiegspunkt daf&uuml;r ist mit den {@code Duration}-Methoden
- * {@link Duration#earlier(Timezone)} und {@link Duration#later(Timezone)}
- * vorhanden. </p>
+ * <p>Als Zeiteinheiten kommen {@link SI} (mit Z&auml;hlung von Schaltsekunden)
+ * und {@link TimeUnit} in Betracht. Letztere Einheit kann verwendet werden,
+ * wenn eine bessere Interoperabilit&auml;t mit externen APIs notwendig ist,
+ * die UTC-Schaltsekunden ignorieren. Beide Arten von Zeiteinheiten werden in
+ * den Methoden {@code plus(long, unit)}, {@code minus(long, unit)} und
+ * {@code until(Moment, unit)} verwendet. </p>
  *
  * @author      Meno Hochschild
  * @concurrency <immutable>
@@ -747,20 +735,22 @@ public final class Moment
      *
      * @return  local timestamp in system timezone (leap seconds will
      *          always be lost)
+     * @since   1.2
      * @see     Timezone#ofSystem()
-     * @see     #inZonalView(TZID)
-     * @see     #inZonalView(String)
+     * @see     #toZonalTimestamp(TZID)
+     * @see     #toZonalTimestamp(String)
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
      *
      * @return  local timestamp in system timezone (leap seconds will
      *          always be lost)
+     * @since   1.2
      * @see     Timezone#ofSystem()
-     * @see     #inZonalView(TZID)
-     * @see     #inZonalView(String)
+     * @see     #toZonalTimestamp(TZID)
+     * @see     #toZonalTimestamp(String)
      */
-    public PlainTimestamp inLocalView() {
+    public PlainTimestamp toLocalTimestamp() {
 
         return this.in(Timezone.ofSystem());
 
@@ -773,7 +763,8 @@ public final class Moment
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #inLocalView()
+     * @since   1.2
+     * @see     #toLocalTimestamp()
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
@@ -782,9 +773,10 @@ public final class Moment
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #inLocalView()
+     * @since   1.2
+     * @see     #toLocalTimestamp()
      */
-    public PlainTimestamp inZonalView(TZID tzid) {
+    public PlainTimestamp toZonalTimestamp(TZID tzid) {
 
         return this.in(Timezone.of(tzid));
 
@@ -797,8 +789,9 @@ public final class Moment
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #inZonalView(TZID)
-     * @see     #inLocalView()
+     * @since   1.2
+     * @see     #toZonalTimestamp(TZID)
+     * @see     #toLocalTimestamp()
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen lokalen Zeitstempel um. </p>
@@ -807,12 +800,54 @@ public final class Moment
      * @return  local timestamp in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #inZonalView(TZID)
-     * @see     #inLocalView()
+     * @since   1.2
+     * @see     #toZonalTimestamp(TZID)
+     * @see     #toLocalTimestamp()
      */
-    public PlainTimestamp inZonalView(String tzid) {
+    public PlainTimestamp toZonalTimestamp(String tzid) {
 
         return this.in(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Converts this instance to a local timestamp in system timezone. </p>
+     *
+     * @return  local timestamp in system timezone
+     * @deprecated  use {@link #toLocalTimestamp()}
+     */
+    @Deprecated
+    public PlainTimestamp inLocalView() {
+
+        return this.toLocalTimestamp();
+
+    }
+
+    /**
+     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local timestamp in given timezone
+     * @deprecated  use {@link #toZonalTimestamp(TZID)}
+     */
+    @Deprecated
+    public PlainTimestamp inZonalView(TZID tzid) {
+
+        return this.toZonalTimestamp(tzid);
+
+    }
+
+    /**
+     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     *
+     * @param   tzid    timezone id
+     * @return  local timestamp in given timezone
+     * @deprecated  use {@link #toZonalTimestamp(String)}
+     */
+    @Deprecated
+    public PlainTimestamp inZonalView(String tzid) {
+
+        return this.toZonalTimestamp(tzid);
 
     }
 
@@ -1909,7 +1944,7 @@ public final class Moment
                 : this.tz);
 
             PlainTimestamp ts = moment.in(timezone).with(this.delegate);
-            Moment result = ts.at(timezone);
+            Moment result = ts.in(timezone);
 
             // hier kann niemals die Schaltsekunde erreicht werden
             if (this.type == ElementOperator.OP_FLOOR) {
@@ -2229,9 +2264,9 @@ public final class Moment
                 }
             }
 
-            PlainTimestamp ts = context.inZonalView(ZonalOffset.UTC);
+            PlainTimestamp ts = context.toZonalTimestamp(ZonalOffset.UTC);
             ts = ts.with(this.element, value);
-            Moment result = ts.atTimezone(ZonalOffset.UTC);
+            Moment result = ts.inTimezone(ZonalOffset.UTC);
 
             if (
                 this.element.isDateElement()
@@ -2343,15 +2378,15 @@ public final class Moment
                 if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
                     TransitionStrategy strategy =
                         attrs.get(Attributes.TRANSITION_STRATEGY);
-                    result = ts.at(Timezone.of(tzid).with(strategy));
+                    result = ts.in(Timezone.of(tzid).with(strategy));
                 } else {
-                    result = ts.atTimezone(tzid);
+                    result = ts.inTimezone(tzid);
                 }
             } else {
                 Leniency leniency =
                     attrs.get(Attributes.LENIENCY, Leniency.SMART);
                 if (leniency.isLax()) {
-                    result = ts.atStdTimezone();
+                    result = ts.inStdTimezone();
                     tzid = Timezone.ofSystem().getID();
                 }
             }

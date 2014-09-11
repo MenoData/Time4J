@@ -29,8 +29,8 @@ public class TZIDTest {
     public void brazilRoundtrip() {
         PlainTimestamp ts = PlainTimestamp.of(2014, 7, 1, 12, 0);
         assertThat(
-            ts.at(Timezone.of("Brazil/Acre"))
-              .inZonalView("America/Rio_Branco"),
+            ts.in(Timezone.of("Brazil/Acre"))
+              .toZonalTimestamp("America/Rio_Branco"),
             is(ts));
     }
 

@@ -25,50 +25,18 @@ import static org.junit.Assert.assertThat;
 public class MomentArithmeticTest {
 
     @Test
-    public void plusClockHoursBerlin() {
-        Timezone tz = Timezone.of("Europe/Berlin");
-        Moment end =
-            PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().at(tz)
-                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
-        assertThat(
-            end,
-            is(
-                PlainDate.of(2014, Month.MARCH, 30)
-                .atTime(5, 0)
-                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
-    }
-
-    @Test
-    public void minusClockHoursBerlin() {
-        Timezone tz = Timezone.of("Europe/Berlin");
-        Moment start =
-            PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay().at(tz)
-                .with(Duration.of(5, ClockUnit.HOURS).later(tz));
-        Moment end =
-            start.with(Duration.of(5, ClockUnit.HOURS).earlier(tz));
-        assertThat(
-            end,
-            is(
-                PlainDate.of(2014, Month.MARCH, 30)
-                .atStartOfDay()
-                .at(tz)));
-    }
-
-    @Test
     public void plusPosixHoursBerlin() {
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(Timezone.of("Europe/Berlin"))
+                .in(Timezone.of("Europe/Berlin"))
                 .plus(4, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atTime(5, 0)
-                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
+                .inTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 2))));
     }
 
     @Test
@@ -76,26 +44,26 @@ public class MomentArithmeticTest {
         Moment start =
             PlainDate.of(2014, Month.MARCH, 30)
             .atTime(5, 0)
-            .at(Timezone.of("Europe/Berlin"));
+            .in(Timezone.of("Europe/Berlin"));
         Moment end = start.minus(4, TimeUnit.HOURS);
         assertThat(
             end,
             is(
                 PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .atTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
+                .inTimezone(ZonalOffset.ofHours(AHEAD_OF_UTC, 1))));
     }
 
     @Test
     public void realHourShiftBerlin() {
         Timezone berlin = Timezone.of("Europe/Berlin");
         Moment start =
-            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().at(berlin);
+            PlainDate.of(2014, Month.MARCH, 30).atStartOfDay().in(berlin);
         Moment end =
             PlainDate.of(2014, Month.MARCH, 30)
                 .atStartOfDay()
-                .at(berlin)
-                .with(Duration.of(5, ClockUnit.HOURS).later(berlin));
+                .plus(5, ClockUnit.HOURS)
+                .in(berlin);
         assertThat(start.until(end, TimeUnit.HOURS), is(4L)); // DST-jump
     }
 
