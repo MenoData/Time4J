@@ -42,48 +42,47 @@ import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static net.time4j.Weekday.WEDNESDAY;
 
-		// What is the last day of overnext month?
-		System.out.println(
-			SystemClock.inLocalView().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized())
-		);
+	// What is the last day of overnext month?
+	System.out.println(
+		SystemClock.inLocalView().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized()));
 
-		// When is next wednesday?
-		PlainDate today = SystemClock.inLocalView().today();
-		PlainDate nextWednesday = today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
-		System.out.println(nextWednesday);
+	// When is next wednesday?
+	PlainDate today = SystemClock.inLocalView().today();
+	PlainDate nextWednesday = today.with(DAY_OF_WEEK.setToNext(WEDNESDAY));
+	System.out.println(nextWednesday);
 
-		// What is the current wall time rounded down to multiples of 5 minutes?
-		PlainTimestamp currentLocalTimestamp = SystemClock.inZonalView(EUROPE.BERLIN).now();
-		PlainTime roundedTime =
-			currentLocalTimestamp.getWallTime() // T22:06:52,688
-			.with(MINUTE_OF_HOUR.atFloor()) // T22:06
-			.with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
-		System.out.println("Rounded wall time: " + roundedTime);
+	// What is the current wall time rounded down to multiples of 5 minutes?
+	PlainTimestamp currentLocalTimestamp = SystemClock.inZonalView(EUROPE.BERLIN).now();
+	PlainTime roundedTime =
+		currentLocalTimestamp.getWallTime() // T22:06:52,688
+		.with(MINUTE_OF_HOUR.atFloor()) // T22:06
+		.with(MINUTE_OF_HOUR.roundedDown(5)); // T22:05
+	System.out.println("Rounded wall time: " + roundedTime);
 
-		// How does last UTC-leapsecond look like in Japan?
-		Moment leapsecondUTC =
-			PlainDate.of(2012, Month.JUNE, 30)
-			.at(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
-			.atUTC().minus(1, SI.SECONDS);
-		System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
+	// How does last UTC-leapsecond look like in Japan?
+	Moment leapsecondUTC =
+		PlainDate.of(2012, Month.JUNE, 30)
+		.at(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
+		.atUTC().minus(1, SI.SECONDS);
+	System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
 
-		System.out.println(
-			"Japan-Time: "
-			+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
-				.withTimezone(ASIA.TOKYO)
-				.format(leapsecondUTC)
-		); // Japan-Time: 2012-07-01T08:59:60+0900
+	System.out.println(
+		"Japan-Time: "
+		+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
+			.withTimezone(ASIA.TOKYO)
+			.format(leapsecondUTC)
+	); // Japan-Time: 2012-07-01T08:59:60+0900
 
-		// duration in seconds normalized to hours, minutes and seconds
-		Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
+	// duration in seconds normalized to hours, minutes and seconds
+	Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
 
-		// custom duration format => hh:mm:ss
-		String s1 = Duration.Formatter.ofPattern("hh:mm:ss").format(dur);
-		System.out.println(s1); // output: 93:45:40
+	// custom duration format => hh:mm:ss
+	String s1 = Duration.Formatter.ofPattern("hh:mm:ss").format(dur);
+	System.out.println(s1); // output: 93:45:40
 
-		// localized duration format
-		String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
-		System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
+	// localized duration format for french
+	String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
+	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 ```
 
 Design remarks:
