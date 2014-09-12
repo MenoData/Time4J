@@ -73,6 +73,17 @@ import static net.time4j.Weekday.WEDNESDAY;
 				.withTimezone(ASIA.TOKYO)
 				.format(leapsecondUTC)
 		); // Japan-Time: 2012-07-01T08:59:60+0900
+
+		// duration in seconds normalized to hours, minutes and seconds
+		Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
+
+		// custom duration format => hh:mm:ss
+		String s1 = Duration.Formatter.ofPattern("hh:mm:ss").format(dur);
+		System.out.println(s1); // output: 93:45:40
+
+		// localized duration format
+		String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
+		System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 ```
 
 Design remarks:
