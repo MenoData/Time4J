@@ -26,8 +26,10 @@ Here some examples as a flavour of how Time4J-code looks like (shown code valid 
 
 ```java
 import net.time4j.*;
-import net.time4j.tz.TZID;
-import net.time4j.tz.olson.*; // extra module beyond core
+import net.time4j.format.TextWidth;
+import net.time4j.tz.olson*;
+
+import java.util.Locale;
 
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -35,6 +37,8 @@ import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static net.time4j.Weekday.WEDNESDAY;
 
+public class Demo {
+    public static void main(String... args) {
 	// What is the last day of overnext month?
 	System.out.println(
 		SystemClock.inLocalView().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized()));
@@ -76,6 +80,8 @@ import static net.time4j.Weekday.WEDNESDAY;
 	// localized duration format for french
 	String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
+    }
+}
 ```
 
 Design remarks:
