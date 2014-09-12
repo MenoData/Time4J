@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-07-20 the core of Time4J is finished and released with the version time4j-core-v1.0. Another useable module is time4j-olson-v1.0 which contains some predefined timezone identifiers as enums and enables parsing of localized timezone names. On 2014-08-14 the version 1.1 was released with support for Apache Maven.
+On 2014-07-20 the core of Time4J is finished and released with the version time4j-core-v1.0. Another useable module is time4j-olson-v1.0 which contains some predefined timezone identifiers as enums and enables parsing of localized timezone names. On 2014-08-14 the version 1.1 was released with support for Apache Maven. On 2014-09-11 the version v1.2 is out and contains enhancements for internationalization, duration formatting and some important bugfixes.
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
@@ -22,7 +22,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 - PlainTimestamp = local timestamp as composition of calendar date and wall time
 - Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like (shown code valid for v1.0):
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v1.2):
 
 ```java
 import net.time4j.Moment;
@@ -79,7 +79,7 @@ Design remarks:
 
 a) Safety: Although Time4J is strongly generified users will not really use any generics in their application code as demonstrated in example code, but are more or less type-safe at compile-time. For example, it is impossible to add clock units to a calendar date. This is in contrast to JSR-310 which heavily relies on runtime exceptions. Otherwise Time4J shares the advantages like immutability and non-tolerant null-handling.
 
-b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inLocalView()" or "localFormatter(...)". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
+b) In contrast to most other libraries Time4J does not like implicit defaults. Users have to explicitly specify what locale or time zone they want. And even if they want the default then they spell it so in methods like: "inLocalView()" or "localFormatter(...)" or "inStdTimezone()". This philosophy is also the reason why the class "PlainDate" is missing a static method like "today()". This method instead exists in the class "ZonalClock" making clear that you cannot achieve the current local date and time without specifying the time zone.
 
 c) Time4J offers a lot of manipulations of date and time by an element-centric approach. Every basic type like 
 "PlainTime" registers some elements (similar to fields in other libraries) which serve as access key to chronological partial data. These elements like "MINUTE_OF_HOUR" offer many different manipulation methods, called operators using the strategy pattern idea. With this design it is possible to manipulate a "PlainTime" in more than 170 different ways. Another advantage of this design: Despite the size of features the count of methods in most classes is still not too big, "PlainTime" has less than 45 methods including the inherited methods from super classes.
