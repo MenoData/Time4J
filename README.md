@@ -38,7 +38,7 @@ import static net.time4j.PlainTime.MINUTE_OF_HOUR;
 import static net.time4j.Weekday.WEDNESDAY;
 
 public class Demo {
-    public static void main(String... args) {
+  public static void main(String... args) {
 	// What is the last day of overnext month?
 	System.out.println(
 		SystemClock.inLocalView().today().plus(2, MONTHS).with(DAY_OF_MONTH.maximized()));
@@ -80,7 +80,7 @@ public class Demo {
 	// localized duration format for french
 	String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
-    }
+  }
 }
 ```
 
