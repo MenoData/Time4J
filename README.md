@@ -25,14 +25,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 Here some examples as a flavour of how Time4J-code looks like (shown code valid for v1.2):
 
 ```java
-import net.time4j.Moment;
-import net.time4j.Month;
-import net.time4j.PatternType;
-import net.time4j.PlainDate;
-import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
-import net.time4j.SI;
-import net.time4j.SystemClock;
+import net.time4j.*;
 import net.time4j.tz.TZID;
 import net.time4j.tz.olson.*; // extra module beyond core
 
