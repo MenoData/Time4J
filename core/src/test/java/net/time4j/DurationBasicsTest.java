@@ -515,13 +515,7 @@ public class DurationBasicsTest {
     public void minusCalendarUnits() {
         Duration<CalendarUnit> datePeriod = Duration.ofCalendarUnits(12, 4, 3);
         assertThat(
-            datePeriod.minus(0, MONTHS),
-            is(datePeriod));
-        assertThat(
-            datePeriod.minus(-4, MONTHS),
-            is(Duration.ofCalendarUnits(12, 8, 3)));
-        assertThat(
-            datePeriod.minus(4, MONTHS),
+            datePeriod.plus(-4, MONTHS),
             is(Duration.ofCalendarUnits(12, 0, 3)));
     }
 
@@ -531,11 +525,11 @@ public class DurationBasicsTest {
             Duration.ofPositive().nanos(123456789).build();
         IsoUnit unit = MILLIS;
         assertThat(
-            timePeriod.minus(1, unit),
+            timePeriod.plus(-1, unit),
             is(Duration.ofPositive().nanos(122456789).build()));
         unit = MICROS;
         assertThat(
-            timePeriod.minus(1, unit),
+            timePeriod.plus(-1, unit),
             is(Duration.ofPositive().nanos(123455789).build()));
     }
 
@@ -550,15 +544,10 @@ public class DurationBasicsTest {
             .plus(1, CalendarUnit.QUARTERS);
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void minusWithMixedSigns() {
-        Duration.ofCalendarUnits(12, 4, 3).minus(5, CalendarUnit.MONTHS);
-    }
-
     @Test(expected=IllegalArgumentException.class)
     public void minusWithUnitsOfSameLength() {
         Duration.of(1, CalendarUnit.MONTHS.withCarryOver())
-            .minus(1, CalendarUnit.MONTHS);
+            .plus(-1, CalendarUnit.MONTHS);
     }
 
     @Test
@@ -709,28 +698,6 @@ public class DurationBasicsTest {
             Duration.of(0, SECONDS).plus(createClockPeriod()),
             is(Duration.of(0, SECONDS).plus(123000, NANOS)));
 
-    }
-
-    @Test
-    public void minusTimeSpan() {
-        Duration<CalendarUnit> p1 = Duration.ofCalendarUnits(0, 0, 10);
-        Duration<CalendarUnit> p2 = Duration.ofCalendarUnits(0, 4, 20);
-        assertThat(
-            p1.minus(p2),
-            is(Duration.ofCalendarUnits(0, 4, 10).inverse()));
-
-        assertThat(
-            Duration.of(0, SECONDS).minus(createClockPeriod()),
-            is(Duration.of(0, SECONDS).minus(123000, NANOS)));
-
-        p1 = Duration.ofCalendarUnits(0, 0, 4);
-        p2 = Duration.ofCalendarUnits(0, 1, 34).inverse();
-        assertThat(
-            p1.minus(p2),
-            is(Duration.ofCalendarUnits(0, 1, 38)));
-        assertThat(
-            p2.minus(p1),
-            is(Duration.ofCalendarUnits(0, 1, 38).inverse()));
     }
 
     @Test

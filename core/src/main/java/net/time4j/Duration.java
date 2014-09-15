@@ -81,9 +81,9 @@ import static net.time4j.ClockUnit.SECONDS;
  * </ul>
  *
  * <p>All instances are <i>immutable</i>, but changed copies can be created
- * by using the methods {@code plus()}, {@code minus()}, {@code with()},
- * {@code union()}, {@code multipliedBy()}, {@code abs()} and {@code inverse()}.
- * The time units {@code ClockUnit.MILLIS} and {@code ClockUnit.MICROS} will
+ * by using the methods {@code plus()}, {@code with()}, {@code union()},
+ * {@code multipliedBy()}, {@code abs()} and {@code inverse()}. The time
+ * units {@code ClockUnit.MILLIS} and {@code ClockUnit.MICROS} will
  * automatically normalized to nanoseconds. In every other case a normalization
  * must be  explicitly triggered by {@code with(Normalizer)}. </p>
  *
@@ -120,12 +120,12 @@ import static net.time4j.ClockUnit.SECONDS;
  * </ul>
  *
  * <p>Alle Instanzen sind <i>immutable</i>, aber ge&auml;nderte Kopien lassen
- * sich &uuml;ber die Methoden {@code plus()}, {@code minus()}, {@code with()},
- * {@code union()}, {@code multipliedBy()}, {@code abs()} und {@code inverse()}
- * erzeugen. Hierbei werden die Zeiteinheiten {@code ClockUnit.MILLIS} und
- * {@code ClockUnit.MICROS} intern immer zu Nanosekunden normalisiert. Ansonsten
- * mu&szlig; eine Normalisierung explizit mittels {@code with(Normalizer)}
- * angesto&szlig;en werden. </p>
+ * sich &uuml;ber die Methoden {@code plus()}, {@code with()}, {@code union()},
+ * {@code multipliedBy()}, {@code abs()} und {@code inverse()} erzeugen.
+ * Hierbei werden die Zeiteinheiten {@code ClockUnit.MILLIS} und
+ * {@code ClockUnit.MICROS} intern immer zu Nanosekunden normalisiert.
+ * Ansonsten mu&szlig; eine Normalisierung explizit mittels
+ * {@code with(Normalizer)} angesto&szlig;en werden. </p>
  *
  * <p>Notiz: Die Definition eines optionalen negativen Vorzeichens ist streng
  * genommen nicht Bestandteil des ISO-Standards, ist aber Bestandteil der
@@ -1027,46 +1027,6 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
-     * <p>Gets a copy of this duration where given amount will be subtracted
-     * from the partial amount of this duration in given unit. </p>
-     *
-     * <p>Equivalent to {@code plus(-amount, unit)}. </p>
-     *
-     * @param   amount      temporal amount to be subtracted (maybe negative)
-     * @param   unit        associated time unit
-     * @return  new changed duration while this duration remains unaffected
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          subtracting the partial amounts
-     * @throws  IllegalArgumentException if different units of same length exist
-     * @throws  ArithmeticException in case of long overflow
-     * @see     #plus(long, IsoUnit) plus(long, U)
-     */
-    /*[deutsch]
-     * <p>Liefert eine Kopie dieser Instanz, in der der angegebene Betrag
-     * vom mit der angegebenen Zeiteinheit assoziierten Feldwert subtrahiert
-     * wird. </p>
-     *
-     * <p>Entspricht {@code plus(-amount, unit)}. </p>
-     *
-     * @param   amount      temporal amount to be subtracted (maybe negative)
-     * @param   unit        associated time unit
-     * @return  new changed duration while this duration remains unaffected
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          subtracting the partial amounts
-     * @throws  IllegalArgumentException if different units of same length exist
-     * @throws  ArithmeticException in case of long overflow
-     * @see     #plus(long, IsoUnit) plus(long, U)
-     */
-    public Duration<U> minus(
-        long amount,
-        U unit
-    ) {
-
-        return this.plus(MathUtils.safeNegate(amount), unit);
-
-    }
-
-    /**
      * <p>Creates a duration as union of this instance and given timespan
      * where partial amounts of equal units will be summed up. </p>
      *
@@ -1102,43 +1062,97 @@ public final class Duration<U extends IsoUnit>
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
-        return add(this, timespan, false);
+        if (this.isEmpty()) {
+            if (isEmpty(timespan)) {
+                return this;
+            } else if (timespan instanceof Duration) {
+                Duration<U> result = cast(timespan);
+                return result;
+            }
+        }
 
-    }
+        Map<U, Long> map = new HashMap<U, Long>();
 
-    /**
-     * <p>Creates a duration as union of this instance and given timespan
-     * where partial amounts of other timespan related to equal units will be
-     * subtracted from this duration. </p>
-     *
-     * <p>Further details see {@link #plus(TimeSpan)}. </p>
-     *
-     * @param   timespan    other time span this duration will be merged
-     *                      with by subtracting the partial amounts
-     * @return  new merged duration
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          subtracting the partial amounts
-     * @throws  IllegalArgumentException if different units of same length exist
-     * @throws  ArithmeticException in case of long overflow
-     */
-    /*[deutsch]
-     * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
-     * angegebenen Zeitspanne, wobei die Betr&auml;ge des Arguments zu
-     * gleichen Zeiteinheiten subtrahiert werden. </p>
-     *
-     * <p>Weitere Details siehe {@link #plus(TimeSpan)}. </p>
-     *
-     * @param   timespan    other time span this duration will be merged
-     *                      with by subtracting the partial amounts
-     * @return  new merged duration
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          subtracting the partial amounts
-     * @throws  IllegalArgumentException if different units of same length exist
-     * @throws  ArithmeticException in case of long overflow
-     */
-    public Duration<U> minus(TimeSpan<? extends U> timespan) {
+        for (int i = 0, n = this.count(); i < n; i++) {
+            Item<U> item = this.getTotalLength().get(i);
+            map.put(
+                item.getUnit(),
+                Long.valueOf(
+                    MathUtils.safeMultiply(
+                        item.getAmount(),
+                        (this.isNegative() ? -1 : 1)
+                    )
+                )
+            );
+        }
 
-        return add(this, timespan, true);
+        boolean tsign = timespan.isNegative();
+
+        for (int i = 0, n = timespan.getTotalLength().size(); i < n; i++) {
+            TimeSpan.Item<? extends U> e = timespan.getTotalLength().get(i);
+            U unit = e.getUnit();
+            long amount = e.getAmount();
+
+            // Millis und Micros ersetzen
+            Item<U> item = replaceFraction(amount, unit);
+
+            if (item != null) {
+                amount = item.getAmount();
+                unit = item.getUnit();
+            }
+
+            // Items aktualisieren
+            if (map.containsKey(unit)) {
+                map.put(
+                    unit,
+                    Long.valueOf(
+                        MathUtils.safeAdd(
+                            map.get(unit).longValue(),
+                            MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
+                        )
+                    )
+                );
+            } else {
+                map.put(
+                    unit,
+                    MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
+                );
+            }
+        }
+
+        Boolean neg = null;
+
+        if (this.isNegative() == tsign) {
+            neg = Boolean.valueOf(this.isNegative());
+        } else {
+            for (Map.Entry<U, Long> entry : map.entrySet()) {
+                boolean nsign = (entry.getValue().longValue() < 0);
+                if (neg == null) {
+                    neg = Boolean.valueOf(nsign);
+                } else if (neg.booleanValue() != nsign) {
+                    throw new IllegalStateException(
+                        "Mixed signs in result time span not allowed: "
+                        + this
+                        + " UNION "
+                        + timespan);
+                }
+            }
+        }
+
+        if (neg.booleanValue()) {
+            for (Map.Entry<U, Long> entry : map.entrySet()) {
+                long value = entry.getValue().longValue();
+                map.put(
+                    entry.getKey(),
+                    Long.valueOf(
+                        (value < 0)
+                        ? MathUtils.safeNegate(value)
+                        : value)
+                );
+            }
+        }
+
+        return Duration.create(map, neg.booleanValue());
 
     }
 
@@ -2026,110 +2040,6 @@ public final class Duration<U extends IsoUnit>
         }
 
         return true;
-
-    }
-
-    private static <U extends IsoUnit> Duration<U> add(
-        Duration<U> duration,
-        TimeSpan<? extends U> timespan,
-        boolean inverse
-    ) {
-
-        if (duration.isEmpty()) {
-            if (isEmpty(timespan)) {
-                return duration;
-            } else if (timespan instanceof Duration) {
-                Duration<U> result = cast(timespan);
-                return (inverse ? result.inverse() : result);
-            }
-        }
-
-        Map<U, Long> map = new HashMap<U, Long>();
-
-        for (int i = 0, n = duration.count(); i < n; i++) {
-            Item<U> item = duration.getTotalLength().get(i);
-            map.put(
-                item.getUnit(),
-                Long.valueOf(
-                    MathUtils.safeMultiply(
-                        item.getAmount(),
-                        (duration.isNegative() ? -1 : 1)
-                    )
-                )
-            );
-        }
-
-        boolean tsign = timespan.isNegative();
-
-        if (inverse) {
-            tsign = !tsign;
-        }
-
-        for (int i = 0, n = timespan.getTotalLength().size(); i < n; i++) {
-            TimeSpan.Item<? extends U> e = timespan.getTotalLength().get(i);
-            U unit = e.getUnit();
-            long amount = e.getAmount();
-
-            // Millis und Micros ersetzen
-            Item<U> item = replaceFraction(amount, unit);
-
-            if (item != null) {
-                amount = item.getAmount();
-                unit = item.getUnit();
-            }
-
-            // Items aktualisieren
-            if (map.containsKey(unit)) {
-                map.put(
-                    unit,
-                    Long.valueOf(
-                        MathUtils.safeAdd(
-                            map.get(unit).longValue(),
-                            MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
-                        )
-                    )
-                );
-            } else {
-                map.put(
-                    unit,
-                    MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
-                );
-            }
-        }
-
-        Boolean neg = null;
-
-        if (duration.isNegative() == tsign) {
-            neg = Boolean.valueOf(duration.isNegative());
-        } else {
-            for (Map.Entry<U, Long> entry : map.entrySet()) {
-                boolean nsign = (entry.getValue().longValue() < 0);
-                if (neg == null) {
-                    neg = Boolean.valueOf(nsign);
-                } else if (neg.booleanValue() != nsign) {
-                    throw new IllegalStateException(
-                        "Mixed signs in result time span not allowed: "
-                        + duration
-                        + " UNION "
-                        + (inverse ? "-" : "") + timespan);
-                }
-            }
-        }
-
-        if (neg.booleanValue()) {
-            for (Map.Entry<U, Long> entry : map.entrySet()) {
-                long value = entry.getValue().longValue();
-                map.put(
-                    entry.getKey(),
-                    Long.valueOf(
-                        (value < 0)
-                        ? MathUtils.safeNegate(value)
-                        : value)
-                );
-            }
-        }
-
-        return Duration.create(map, neg.booleanValue());
 
     }
 
