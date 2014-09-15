@@ -57,7 +57,7 @@ public enum TimeScale {
      * <p>Leap seconds are not counted but ignored according to POSIX-standard.
      * Before the UTC-epoch 1972-01-01 the second is effectively defined as
      * the 86400th part of mean solar day (UT1). After this UTC-epoch the
-     * POSIX-second is with th exception of leapsecond events equal to
+     * POSIX-second is with the exception of leap second events equal to
      * the SI-second based on atomic clocks, but in long term effectively
      * similar to the UT1-second based on mean solar time. </p>
      *
@@ -66,7 +66,7 @@ public enum TimeScale {
      * The definition of the reference timezone on zero meridian of Greenwich
      * is the same as in UTC. </p>
      *
-     * <p>During a leapsecond the transformation of POSIX-time to an
+     * <p>During a leap second the transformation of POSIX-time to an
      * UTC-timestamp is not defined. An old convention in the UNIX world
      * tries to reset the clock by one second AFTER the leapsecod, so
      * effectively mapping the leapsecond to the next day despite of
@@ -118,7 +118,7 @@ public enum TimeScale {
     /**
      * <p>Counts the seconds relative to UTC-epoch which started at
      * midnight on the calendar days 1972-01-01 (1972-01-01T00:00:00Z)
-     * inclusive all leapseconds. </p>
+     * inclusive all leap seconds. </p>
      *
      * <p>Time4J handles all {@code UniversalTime}-timestamps before
      * the UTC-epoch as mean solar time (UT1). The second is therefore
@@ -152,26 +152,26 @@ public enum TimeScale {
      * usefule in a scientific context. As consequence the astronomic day has
      * no meaning on this scale. </p>
      *
-     * <p>Strictly spoken the scale defintion of TAI is a statistical
-     * approximation to the defintion of SI-second because the average of
+     * <p>Strictly spoken, the scale definition of TAI is a statistical
+     * approximation to the definition of an SI-second because the average of
      * around 250 atomic clocks worldwide is used. But the deviations are
-     * in picosends or smaler which is not in the focus of this API. </p>
+     * in picoseconds or smaller which is not in the focus of this API. </p>
      *
      * <p>Although TAI knows historical ancestors already since 1958
      * Time4J only supports TAI from UTC-epoch 1972-01-01. First to note
      * the SI-second was introduced in year 1967. Second, the nowadays
      * used TAI-scale had got its name on a conference in year 1971, third
      * to note, the TAI-ancestors were still directly synchronized with
-     * UT2 hence had still got a vague astronimical reference.. At the
+     * UT2 hence had still got a vague astronomical reference.. At the
      * calendar date 1972-01-01 the difference between TAI and UTC was
      * defined as exactly 10 seconds (TAI = UTC + 10). This difference is
      * fixed for all timestamps in epoch seconds because both TAI and UTC
      * counts in pure SI-seconds. But note: If TAI and UTC are resolved
      * to an element-oriented notation (YYYY-MM-DD HH:MM:SS) then the
      * difference between TAI and UTC increases with every inserted
-     * leapsecond because of the different labelling. A TAI day does not
-     * know leapseconds. In the year 2013 this difference between a TAI
-     * day and an UTC dayhas increased to 35 seconds. </p>
+     * leap second because of the different labelling. A TAI day does not
+     * know leap seconds. In the year 2013 this difference between a TAI
+     * day and an UTC day has increased to 35 seconds. </p>
      */
     /*[deutsch]
      * <p>Internationale Atomuhrzeit, die auf den SI-Sekunden einer Atomuhr
@@ -212,7 +212,7 @@ public enum TimeScale {
      * <p>Is used by the GPS-navigation system and counts SI-seconds relative
      * to the start of GPS. </p>
      *
-     * <p>GPS was introducted on 6th of January 1980. All earlier timestamps
+     * <p>GPS was introduced on 6th of January 1980. All earlier timestamps
      * are not supported by Time4J. Between 1972 and 1980 there were 9
      * leap seconds therefore following relation holds leaving aside the
      * different epoch reference: GPS + delta = UTC - 9 = TAI - 19 where
