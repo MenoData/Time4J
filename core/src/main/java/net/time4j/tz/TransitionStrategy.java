@@ -46,13 +46,50 @@ public interface TransitionStrategy {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Calculates a suitable global timestamp for given local timestamp. </p>
+     *
+     * <p>The nanosecond fraction of given wall time will not be taken
+     * into account. </p>
+     *
+     * @param   localDate   local calendar date in given timezone
+     * @param   localTime   local wall time in given timezone
+     * @param   timezone    timezone data containing offset history
+     * @return  global timestamp as full seconds since UNIX epoch (posix time)
+     * @since   1.2.1
+     * @see     net.time4j.scale.TimeScale#POSIX
+     * @see     net.time4j.PlainTimestamp#in(Timezone)
+     * @see     Timezone#with(TransitionStrategy)
+     */
+    /*[deutsch]
+     * <p>Bestimmt einen geeigneten globalen Zeitstempel f&uuml;r eine
+     * lokale Zeitangabe. </p>
+     *
+     * <p>Der Nanosekundenteil der angegebenen Uhrzeit bleibt
+     * unber&uuml;cksichtigt. </p>
+     *
+     * @param   localDate   local calendar date in given timezone
+     * @param   localTime   local wall time in given timezone
+     * @param   timezone    timezone data containing offset history
+     * @return  global timestamp as full seconds since UNIX epoch (posix time)
+     * @since   1.2.1
+     * @see     net.time4j.scale.TimeScale#POSIX
+     * @see     net.time4j.PlainTimestamp#in(Timezone)
+     * @see     Timezone#with(TransitionStrategy)
+     */
+    long resolve(
+        GregorianDate localDate,
+        WallTime localTime,
+        Timezone timezone
+    );
+
+    /**
      * <p>Calculates a suitable offset for given local timestamp. </p>
      *
      * @param   localDate   local calendar date in given timezone
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
      * @return  ZonalOffset
-     * @since   1.2
+     * @since   1.2.1
      * @see     net.time4j.PlainTimestamp#in(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
@@ -63,11 +100,11 @@ public interface TransitionStrategy {
      * @param   localTime   local wall time in given timezone
      * @param   timezone    timezone data containing offset history
      * @return  ZonalOffset
-     * @since   1.2
+     * @since   1.2.1
      * @see     net.time4j.PlainTimestamp#in(Timezone)
      * @see     Timezone#with(TransitionStrategy)
      */
-    ZonalOffset resolve(
+    ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime,
         Timezone timezone

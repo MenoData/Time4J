@@ -22,6 +22,8 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
+import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -32,8 +34,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -576,6 +580,22 @@ public abstract class Timezone
      *          java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     public abstract boolean isDaylightSaving(UnixTime ut);
+
+    /**
+     * <p>Determines if this timezone has no offset transitions and always
+     * uses a fixed offset. </p>
+     *
+     * @return  {@code true} if there is no transition else {@code false}
+     * @since   1.2.1
+     */
+    /*[deutsch]
+     * <p>Legt fest, ob diese Zeitzone keine &Uuml;berg&auml;nge kennt und
+     * nur einen festen Offset benutzt. </p>
+     *
+     * @return  {@code true} if there is no transition else {@code false}
+     * @since   1.2.1
+     */
+    public abstract boolean isFixed();
 
     /**
      * <p>Gets the underlying offset transitions and rules if available. </p>
@@ -1399,7 +1419,71 @@ public abstract class Timezone
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public ZonalOffset resolve(
+        public long resolve(
+            GregorianDate date,
+            WallTime time,
+            Timezone tz
+        ) {
+
+            int y = date.getYear();
+            int m = date.getMonth();
+            int d = date.getDayOfMonth();
+            int h = time.getHour();
+            int min = time.getMinute();
+            int s = time.getSecond();
+
+            TransitionHistory history = tz.getHistory();
+
+            if (history != null) {
+                long localSecs = toLocalSeconds(y, m, d, h, min, s);
+                ZonalTransition t = history.getConflictTransition(date, time);
+
+                if ((t != null) && t.isGap()) {
+                    if (this == STRICT) {
+                        this.throwInvalidException(date, time, tz);
+                    }
+
+                    localSecs += t.getSize();
+                }
+
+                return localSecs - t.getTotalOffset();
+            }
+
+            java.util.TimeZone javaTZ =
+                java.util.TimeZone.getTimeZone(tz.getID().canonical());
+            GregorianCalendar cal = new GregorianCalendar(javaTZ);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.set(y, m - 1, d, h, min, s);
+
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH) + 1;
+            int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+            int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
+            int minute = cal.get(Calendar.MINUTE);
+            int second = cal.get(Calendar.SECOND);
+
+            if (this == STRICT) {
+                if (
+                    (y != year)
+                    || (m != month)
+                    || (d != dayOfMonth)
+                    || (h != hourOfDay)
+                    || (min != minute)
+                    || (s != second)
+                ) {
+                    this.throwInvalidException(date, time, tz);
+                }
+            }
+
+            long localSeconds =
+                toLocalSeconds(
+                    year, month, dayOfMonth, hourOfDay, minute, second);
+            return localSeconds - tz.getOffset(date, time).getIntegralAmount();
+
+        }
+
+        @Override
+        public ZonalOffset getOffset(
             GregorianDate date,
             WallTime time,
             Timezone tz
@@ -1409,14 +1493,44 @@ public abstract class Timezone
                 (this == STRICT)
                 && tz.isInvalid(date, time)
             ) {
-                throw new IllegalArgumentException(
-                    "Invalid local timestamp due to timezone transition: "
-                    + date + time
-                    + " [" + tz.getID() + "]"
-                );
+                this.throwInvalidException(date, time, tz);
             }
 
             return tz.getOffset(date, time);
+
+        }
+
+        private static long toLocalSeconds(
+            int year,
+            int month,
+            int dayOfMonth,
+            int hourOfDay,
+            int minute,
+            int second
+        ) {
+
+            long localSeconds =
+                MathUtils.safeMultiply(
+                    MathUtils.safeSubtract(
+                        GregorianMath.toMJD(year, month, dayOfMonth),
+                        40587L),
+                    86400L);
+            localSeconds += (hourOfDay * 3600 + minute * 60 + second);
+            return localSeconds;
+
+        }
+
+        private void throwInvalidException(
+            GregorianDate date,
+            WallTime time,
+            Timezone tz
+        ) {
+
+            throw new IllegalArgumentException(
+                "Invalid local timestamp due to timezone transition: "
+                + date + time
+                + " [" + tz.getID() + "]"
+            );
 
         }
 

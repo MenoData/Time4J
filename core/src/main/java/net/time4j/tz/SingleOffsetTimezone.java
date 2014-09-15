@@ -117,6 +117,20 @@ final class SingleOffsetTimezone
     }
 
     @Override
+    public boolean isFixed() {
+
+        return true;
+
+    }
+
+    @Override
+    public boolean isEmpty() {
+
+        return true;
+
+    }
+
+    @Override
     public TransitionHistory getHistory() {
 
         return this;

@@ -859,7 +859,10 @@ public final class PlainTimestamp
      */
     public Moment at(ZonalOffset offset) {
 
-        long localSeconds = (this.date.getDaysSinceUTC() + 2 * 365) * 86400;
+        long localSeconds =
+            MathUtils.safeMultiply(
+                this.date.getDaysSinceUTC() + 2 * 365,
+                86400);
         localSeconds += (this.time.getHour() * 3600);
         localSeconds += (this.time.getMinute() * 60);
         localSeconds += this.time.getSecond();
@@ -958,14 +961,20 @@ public final class PlainTimestamp
      */
     public Moment in(Timezone tz) {
 
-        TransitionStrategy strategy = tz.getStrategy();
-        Moment result = this.at(strategy.resolve(this.date, this.time, tz));
-
-        if (strategy == Timezone.STRICT_MODE) {
-            Moment.checkNegativeLS(result.getPosixTime(), this);
+        if (tz.isFixed()) {
+            return this.at(tz.getOffset(this.date, this.time));
         }
 
-        return result;
+        TransitionStrategy strategy = tz.getStrategy();
+        long posixTime = strategy.resolve(this.date, this.time, tz);
+        Moment moment =
+            Moment.of(posixTime, this.time.getNanosecond(), TimeScale.POSIX);
+
+        if (strategy == Timezone.STRICT_MODE) {
+            Moment.checkNegativeLS(posixTime, this);
+        }
+
+        return moment;
 
     }
 

@@ -261,4 +261,18 @@ public interface TransitionHistory {
         UnixTime endExclusive
     );
 
+    /**
+     * <p>Determines if this history does not have any transitions. </p>
+     *
+     * @return  {@code true} if there are no transitions else {@code false}
+     * @since   1.2.1
+     */
+    /*[deutsch]
+     * <p>Ermittelt ob diese Historie keine &Uuml;berg&auml;nge kennt. </p>
+     *
+     * @return  {@code true} if there are no transitions else {@code false}
+     * @since   1.2.1
+     */
+    boolean isEmpty();
+
 }

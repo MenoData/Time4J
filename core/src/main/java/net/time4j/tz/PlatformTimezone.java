@@ -131,7 +131,7 @@ final class PlatformTimezone
     @Override
     public ZonalOffset getOffset(UnixTime ut) {
 
-        if (this.fixedOffset != null) {
+        if (this.isFixed()) {
             return this.fixedOffset;
         }
 
@@ -145,7 +145,7 @@ final class PlatformTimezone
         WallTime localTime
     ) {
 
-        if (this.fixedOffset != null) {
+        if (this.isFixed()) {
             return this.fixedOffset;
         }
 
@@ -229,6 +229,13 @@ final class PlatformTimezone
     public boolean isDaylightSaving(UnixTime ut) {
 
         return this.tz.inDaylightTime(new Date(ut.getPosixTime() * 1000));
+
+    }
+
+    @Override
+    public boolean isFixed() {
+
+        return (this.fixedOffset != null);
 
     }
 

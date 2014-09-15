@@ -3129,7 +3129,7 @@ public final class Duration<U extends IsoUnit>
 
             PlainDate date = entity.get(PlainDate.COMPONENT);
             PlainTime time = entity.get(PlainTime.COMPONENT);
-            return this.tz.getStrategy().resolve(date, time, this.tz);
+            return this.tz.getStrategy().getOffset(date, time, this.tz);
 
         }
 

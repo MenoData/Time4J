@@ -167,6 +167,13 @@ final class HistorizedTimezone
     }
 
     @Override
+    public boolean isFixed() {
+
+        return this.history.isEmpty();
+
+    }
+
+    @Override
     public TransitionHistory getHistory() {
 
         return this.history;
@@ -228,7 +235,7 @@ final class HistorizedTimezone
         if (this.strategy == strategy) {
             return this;
         }
-        
+
         return new HistorizedTimezone(this.id, this.history, strategy);
 
     }

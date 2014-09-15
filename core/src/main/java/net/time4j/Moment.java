@@ -1498,7 +1498,7 @@ public final class Moment
      * <p>Pr&uuml;ft, ob eine negative Schaltsekunde vorliegt. </p>
      *
      * @param   posixTime   UNIX-time in seconds
-     * @param   ts          local timestamp
+     * @param   ts          local timestamp used for error message
      * @throws  ChronoException if a negative leap second is touched
      */
     static void checkNegativeLS(

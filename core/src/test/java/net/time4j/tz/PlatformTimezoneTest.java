@@ -152,10 +152,10 @@ public class PlatformTimezoneTest {
     }
 
     @Test
-    public void withDefaultConflictStrategyDirectUse() {
+    public void withDefaultConflictStrategyGetOffset() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         assertThat(
-            Timezone.DEFAULT_CONFLICT_STRATEGY.resolve(
+            Timezone.DEFAULT_CONFLICT_STRATEGY.getOffset(
                 PlainDate.of(2014, 3, 30),
                 PlainTime.of(2, 30),
                 tz
@@ -164,14 +164,35 @@ public class PlatformTimezoneTest {
     }
 
     @Test
-    public void withDefaultConflictStrategyIndirectUse() {
+    public void withDefaultConflictStrategyResolvingGermany() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
-        assertThat(
+        Moment m =
             PlainTimestamp.of(
                 PlainDate.of(2014, 3, 30),
                 PlainTime.of(2, 30)
-            ).in(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY)),
-            is(PlainTimestamp.of(2014, 3, 30, 2, 30).in(tz)));
+            ).in(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY));
+        assertThat(
+            m,
+            is(PlainTimestamp.of(2014, 3, 30, 3, 30).in(tz)));
+        assertThat(
+            m.toZonalTimestamp(tz.getID()),
+            is(PlainTimestamp.of(2014, 3, 30, 3, 30)));
+    }
+
+    @Test
+    public void withDefaultConflictStrategyResolvingBrazil() {
+        Timezone tz = loadFromPlatform("America/Sao_Paulo");
+        Moment m =
+            PlainTimestamp.of(
+                PlainDate.of(2014, 10, 19),
+                PlainTime.midnightAtStartOfDay()
+            ).in(tz.with(Timezone.DEFAULT_CONFLICT_STRATEGY));
+        assertThat(
+            m,
+            is(PlainTimestamp.of(2014, 10, 19, 1, 0).in(tz)));
+        assertThat(
+            m.toZonalTimestamp(tz.getID()),
+            is(PlainTimestamp.of(2014, 10, 19, 1, 0)));
     }
 
     @Test
