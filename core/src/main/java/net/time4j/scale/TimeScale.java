@@ -27,7 +27,7 @@ package net.time4j.scale;
  *
  * <p>Any conversion is usually not bijective. That means that for example
  * an UTC-timestamp can be mapped in a unique way to UT1, GPS or TAI (provided
- * that there are no negative leapseconds) but in reverse not. More important:
+ * that there are no negative leap seconds) but in reverse not. More important:
  * Conversions often happen in millisecond-precision or worse so they are
  * more or less like approximation procedures. </p>
  *
@@ -68,17 +68,17 @@ public enum TimeScale {
      *
      * <p>During a leap second the transformation of POSIX-time to an
      * UTC-timestamp is not defined. An old convention in the UNIX world
-     * tries to reset the clock by one second AFTER the leapsecod, so
-     * effectively mapping the leapsecond to the next day despite of
+     * tries to reset the clock by one second AFTER the leap second, so
+     * effectively mapping the leap second to the next day despite of
      * its obvious written form as last second of current day (see also
-     * <a href="http://en.wikipedia.org/wiki/Unix_time">Wikipedia-Artikel</a>).
+     * <a href="http://en.wikipedia.org/wiki/Unix_time">Wikipedia-page</a>).
      * The <a href="http://www.opengroup.org/onlinepubs/007904975/basedefs/xbd_chap04.html#tag_04_14">current description of POSIX-time</a>
      * explicitly states however that the relation between the current day
      * time and the current POSIX-value is not specified and dependent on
-     * the implementation. Time4J maps the leapsecond to the current day
+     * the implementation. Time4J maps the leap second to the current day
      * as the last second. This corresponds to an UNXI-variation where a
-     * clock is reset at the begin of a leapsecond instead of at the end
-     * of a leapsecond. </p>
+     * clock is reset at the begin of a leap second instead of at the end
+     * of a leap second. </p>
      */
     /*[deutsch]
      * <p>Z&auml;hlt die Sekunden relativ zur UNIX-Epoche 1970-01-01T00:00:00Z,
