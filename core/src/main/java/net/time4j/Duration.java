@@ -1080,7 +1080,7 @@ public final class Duration<U extends IsoUnit>
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
-    	Duration<U> result = this.merge(timespan);
+    	Duration<U> result = merge(this, timespan);
     	
     	if (result == null) {
             throw new IllegalStateException(
@@ -2174,11 +2174,14 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private Duration<U> merge(TimeSpan<? extends U> timespan) {
+    private static <U extends IsoUnit> Duration<U> merge(
+    	Duration<U> duration,
+    	TimeSpan<? extends U> timespan
+    ) {
 
-        if (this.isEmpty()) {
+        if (duration.isEmpty()) {
             if (isEmpty(timespan)) {
-                return this;
+                return duration;
             } else if (timespan instanceof Duration) {
                 Duration<U> result = cast(timespan);
                 return result;
@@ -2187,14 +2190,14 @@ public final class Duration<U extends IsoUnit>
 
         Map<U, Long> map = new HashMap<U, Long>();
 
-        for (int i = 0, n = this.count(); i < n; i++) {
-            Item<U> item = this.getTotalLength().get(i);
+        for (int i = 0, n = duration.count(); i < n; i++) {
+            Item<U> item = duration.getTotalLength().get(i);
             map.put(
                 item.getUnit(),
                 Long.valueOf(
                     MathUtils.safeMultiply(
                         item.getAmount(),
-                        (this.isNegative() ? -1 : 1)
+                        (duration.isNegative() ? -1 : 1)
                     )
                 )
             );
@@ -2236,8 +2239,8 @@ public final class Duration<U extends IsoUnit>
 
         boolean negative = false;
 
-        if (this.isNegative() == tsign) {
-        	negative = this.isNegative();
+        if (duration.isNegative() == tsign) {
+        	negative = tsign;
         } else {
             boolean firstScan = true;            
             for (Map.Entry<U, Long> entry : map.entrySet()) {
