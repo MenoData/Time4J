@@ -265,6 +265,24 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print15Years3Months1Week2DaysUS() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+        assertThat(
+            PrettyTime.of(Locale.US).print(duration, TextWidth.WIDE),
+            is("15 years, 3 months, 1 week, and 2 days"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysBritish() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+        assertThat(
+            PrettyTime.of(Locale.UK).print(duration, TextWidth.WIDE),
+            is("15 years, 3 months, 1 week and 2 days"));
+    }
+
+    @Test
     public void print15Years3Months1Week2DaysFrench() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
