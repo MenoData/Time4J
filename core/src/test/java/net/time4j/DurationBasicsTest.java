@@ -333,7 +333,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800001, ClockUnit.NANOS);
         Duration<IsoUnit> expResult =
-            datePeriod.union(timePeriod);
+            Duration.ofZero().plus(datePeriod).plus(timePeriod);
         Duration<IsoUnit> result =
             Duration.ofPositive().years(12).months(4).days(3)
             .hours(150).minutes(2).seconds(4).millis(75).micros(800).nanos(1)
@@ -349,7 +349,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 0, 0);
         Duration<IsoUnit> expResult =
-            datePeriod.union(timePeriod);
+            Duration.ofZero().plus(datePeriod).plus(timePeriod);
         Duration<IsoUnit> result =
             Duration.ofPositive()
             .hours(150).years(12).months(0).days(3).build();
@@ -364,7 +364,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800001, ClockUnit.NANOS);
         Duration<IsoUnit> expResult =
-            datePeriod.union(timePeriod).inverse();
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse();
         Duration<IsoUnit> result =
             Duration.ofNegative()
             .hours(150).months(4).seconds(4).nanos(1).millis(75).micros(800)
@@ -380,7 +380,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 0, 0);
         Duration<IsoUnit> expResult =
-            datePeriod.union(timePeriod).inverse();
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse();
         Duration<IsoUnit> result =
             Duration.ofNegative()
             .hours(150).years(12).seconds(0).days(3).build();
@@ -639,10 +639,13 @@ public class DurationBasicsTest {
             Duration.ofCalendarUnits(12, 4, 3);
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(758000000, NANOS);
-        Duration<IsoUnit> result =
-            datePeriod.union(timePeriod).inverse();
+        List<Duration<IsoUnit>> result =
+            Duration.ofZero().plus(datePeriod).union(timePeriod).inverse();
         assertThat(
-            result.toString(),
+            result.size(),
+            is(1));
+        assertThat(
+            result.get(0).toString(),
             is("-P12Y4M3DT150H2M4,758000000S"));
         assertThat(
             datePeriod.union(timePeriod),
@@ -650,31 +653,46 @@ public class DurationBasicsTest {
 
         Duration<CalendarUnit> p1 = Duration.ofCalendarUnits(0, 0, 4);
         Duration<CalendarUnit> p2 = Duration.ofCalendarUnits(0, 1, 34).inverse();
-        result = Duration.ofNegative().months(1).days(30).build();
-        assertThat(p1.union(p2), is(result));
-        assertThat(p2.union(p1), is(result));
+        Duration<IsoUnit> expected = Duration.ofNegative().months(1).days(30).build();
+        assertThat(p1.union(p2).get(0), is(expected));
+        assertThat(p2.union(p1).get(0), is(expected));
 
+        String period1 =
+		  Duration.ofZero()
+			.plus(1, CalendarUnit.QUARTERS)
+			.union(Duration.of(1, CalendarUnit.MONTHS.unlessInvalid()))
+			.get(0)
+			.toString();
         assertThat(
-            Duration.of(1, CalendarUnit.MONTHS.unlessInvalid())
-            .union(Duration.ofZero().plus(1, CalendarUnit.QUARTERS)).toString(),
+            period1,
             is("P1Q1{M-UNLESS_INVALID}"));
+        
+        String period2 =
+		  Duration.ofZero()
+			.plus(1, CalendarUnit.weekBasedYears())
+			.union(Duration.of(5, CalendarUnit.MONTHS))
+			.get(0)
+			.toString();
         assertThat(
-            Duration.of(1, CalendarUnit.weekBasedYears())
-            .union(Duration.ofZero().plus(5, CalendarUnit.MONTHS)).toString(),
+            period2,
             is("P1{WEEK_BASED_YEARS}5M"));
     }
 
-    @Test(expected=IllegalStateException.class)
+    @Test
     public void unionWithMixedSigns() {
-        Duration<CalendarUnit> p1 = Duration.ofCalendarUnits(0, 5, 4);
-        Duration<CalendarUnit> p2 = Duration.ofCalendarUnits(0, 4, 34).inverse();
-        p1.union(p2); // + 1 Monat - 30 Tage
+		Duration<CalendarUnit> p1 = Duration.ofCalendarUnits(0, 5, 4);
+		Duration<CalendarUnit> p2 = Duration.ofCalendarUnits(0, 4, 34).inverse();
+		List<Duration<CalendarUnit>> durations = p1.union(p2);
+        assertThat(durations.size(), is(2));
+		assertThat(durations.get(0), is(p1));
+		assertThat(durations.get(1), is(p2));
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void unionWithUnitsOfSameLength() {
-        Duration.of(1, CalendarUnit.QUARTERS.unlessInvalid())
-            .union(Duration.ofZero().plus(1, CalendarUnit.QUARTERS));
+		Duration.ofZero()
+			.plus(1, CalendarUnit.QUARTERS)
+			.union(Duration.of(1, CalendarUnit.QUARTERS.unlessInvalid()));
     }
 
     @Test
@@ -707,8 +725,10 @@ public class DurationBasicsTest {
             Duration.ofCalendarUnits(12, 4, 3);
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
-        String formatted1 = datePeriod.union(timePeriod).inverse().toString();
-        String formatted2 = Duration.parsePeriod(formatted1).toString();
+        String formatted1 = 
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse().toString();
+        String formatted2 = 
+            Duration.parsePeriod(formatted1).toString();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
 
@@ -763,8 +783,10 @@ public class DurationBasicsTest {
             Duration.ofCalendarUnits(12, 4, 3);
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
-        String formatted1 = datePeriod.union(timePeriod).toString();
-        String formatted2 = Duration.parsePeriod(formatted1).toString();
+        String formatted1 = 
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).toString();
+        String formatted2 = 
+            Duration.parsePeriod(formatted1).toString();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
 
@@ -789,7 +811,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
         String formatted1 =
-            datePeriod.union(timePeriod).inverse().toStringXML();
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse().toStringXML();
         String formatted2 = Duration.parsePeriod(formatted1).toStringXML();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
@@ -825,38 +847,38 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(758000000, NANOS);
         Duration<IsoUnit> expResult =
-            datePeriod.union(timePeriod).inverse();
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse();
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P4M3DT150H2M4S";
         datePeriod = Duration.ofCalendarUnits(0, 4, 3);
         timePeriod = Duration.ofClockUnits(150, 2, 4);
-        expResult = datePeriod.union(timePeriod);
+        expResult = Duration.ofZero().plus(datePeriod).plus(timePeriod);
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P2Y4M3D";
         datePeriod = Duration.ofCalendarUnits(2, 4, 3);
-        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        expResult = Duration.ofZero().plus(datePeriod);
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "-PT7H340M0,007S";
         timePeriod = Duration.ofClockUnits(7, 340, 0).plus(7000000, NANOS);
-        expResult = Duration.of(0, DAYS).union(timePeriod).inverse();
+        expResult = Duration.ofZero().plus(timePeriod).inverse();
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P0000Y04M03D";
         datePeriod = Duration.ofCalendarUnits(0, 4, 3);
-        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        expResult = Duration.ofZero().plus(datePeriod));
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P12Y4M2W";
         datePeriod = Duration.ofCalendarUnits(12, 4, 0).plus(2, WEEKS);
-        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        expResult = Duration.ofZero().plus(datePeriod);
         assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P2W3D";
         datePeriod = Duration.of(3, DAYS).plus(2, WEEKS);
-        expResult = datePeriod.union(Duration.of(0, SECONDS));
+        expResult = Duration.ofZero().plus(datePeriod);
         assertThat(Duration.parsePeriod(period), is(expResult));
     }
 
@@ -1084,7 +1106,8 @@ public class DurationBasicsTest {
             Duration.ofCalendarUnits(12, 4, 3);
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800000, ClockUnit.NANOS);
-        Duration<IsoUnit> test1 = datePeriod.union(timePeriod).inverse();
+        Duration<IsoUnit> test1 = 
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse();
         Duration<IsoUnit> test2 = Duration.parsePeriod(period);
         Duration<IsoUnit> test3 = Duration.parsePeriod("P2Y").plus(-2, YEARS);
 
@@ -1109,8 +1132,8 @@ public class DurationBasicsTest {
             Duration.ofPositive().months(4).days(3).build()
             .plus(Duration.of(2, CalendarUnit.weekBasedYears()));
         Duration<?> expected =
-            Duration.ofCalendarUnits(0, 4, 3)
-            .union(Duration.of(2, CalendarUnit.weekBasedYears()));
+            Duration.ofZero().plus(Duration.ofCalendarUnits(0, 4, 3))
+            .plus(Duration.of(2, CalendarUnit.weekBasedYears()));
         assertThat(period.equals(expected), is(true));
     }
 
@@ -1121,7 +1144,8 @@ public class DurationBasicsTest {
             Duration.ofCalendarUnits(12, 4, 3);
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800000, ClockUnit.NANOS);
-        Duration<IsoUnit> test1 = datePeriod.union(timePeriod).inverse();
+        Duration<IsoUnit> test1 = 
+            Duration.ofZero().plus(datePeriod).plus(timePeriod).inverse();
         Duration<IsoUnit> test2 = Duration.parsePeriod(period);
         assertThat(test1.hashCode(), is(test2.hashCode()));
     }
