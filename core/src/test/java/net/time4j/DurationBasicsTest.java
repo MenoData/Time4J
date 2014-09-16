@@ -708,7 +708,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
         String formatted1 = datePeriod.union(timePeriod).inverse().toString();
-        String formatted2 = Duration.parse(formatted1).toString();
+        String formatted2 = Duration.parsePeriod(formatted1).toString();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
 
@@ -764,7 +764,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
         String formatted1 = datePeriod.union(timePeriod).toString();
-        String formatted2 = Duration.parse(formatted1).toString();
+        String formatted2 = Duration.parsePeriod(formatted1).toString();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
 
@@ -790,7 +790,7 @@ public class DurationBasicsTest {
             Duration.ofClockUnits(150, 2, 0).plus(75800000, NANOS);
         String formatted1 =
             datePeriod.union(timePeriod).inverse().toStringXML();
-        String formatted2 = Duration.parse(formatted1).toStringXML();
+        String formatted2 = Duration.parsePeriod(formatted1).toStringXML();
         assertThat(formatted1, is(period));
         assertThat(formatted2, is(period)); // roundtrip
     }
@@ -826,45 +826,45 @@ public class DurationBasicsTest {
             Duration.ofClockUnits(150, 2, 4).plus(758000000, NANOS);
         Duration<IsoUnit> expResult =
             datePeriod.union(timePeriod).inverse();
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P4M3DT150H2M4S";
         datePeriod = Duration.ofCalendarUnits(0, 4, 3);
         timePeriod = Duration.ofClockUnits(150, 2, 4);
         expResult = datePeriod.union(timePeriod);
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P2Y4M3D";
         datePeriod = Duration.ofCalendarUnits(2, 4, 3);
         expResult = datePeriod.union(Duration.of(0, SECONDS));
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "-PT7H340M0,007S";
         timePeriod = Duration.ofClockUnits(7, 340, 0).plus(7000000, NANOS);
         expResult = Duration.of(0, DAYS).union(timePeriod).inverse();
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P0000Y04M03D";
         datePeriod = Duration.ofCalendarUnits(0, 4, 3);
         expResult = datePeriod.union(Duration.of(0, SECONDS));
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P12Y4M2W";
         datePeriod = Duration.ofCalendarUnits(12, 4, 0).plus(2, WEEKS);
         expResult = datePeriod.union(Duration.of(0, SECONDS));
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
 
         period = "P2W3D";
         datePeriod = Duration.of(3, DAYS).plus(2, WEEKS);
         expResult = datePeriod.union(Duration.of(0, SECONDS));
-        assertThat(Duration.parse(period), is(expResult));
+        assertThat(Duration.parsePeriod(period), is(expResult));
     }
 
     @Test(expected=ParseException.class)
     public void parseWithoutPeriodSymbol() throws Exception {
         try {
             String period = "-12Y4M30D";
-            Duration.parse(period); // P fehlt
+            Duration.parsePeriod(period); // P fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
             System.out.println(pe.getMessage());
@@ -876,7 +876,7 @@ public class DurationBasicsTest {
     public void parseWithoutUnits() throws Exception {
         try {
             String period = "P12";
-            Duration.parse(period); // Einheitensymbol fehlt
+            Duration.parsePeriod(period); // Einheitensymbol fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(3));
             System.out.println(pe.getMessage());
@@ -888,7 +888,7 @@ public class DurationBasicsTest {
     public void parseWithoutItems() throws Exception {
         try {
             String period = "P";
-            Duration.parse(period); // Zeitfeld fehlt
+            Duration.parsePeriod(period); // Zeitfeld fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
             System.out.println(pe.getMessage());
@@ -900,7 +900,7 @@ public class DurationBasicsTest {
     public void parseWithoutTime() throws Exception {
         try {
             String period = "P12DT";
-            Duration.parse(period); // Uhrzeitfeld fehlt
+            Duration.parsePeriod(period); // Uhrzeitfeld fehlt
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(5));
             System.out.println(pe.getMessage());
@@ -912,7 +912,7 @@ public class DurationBasicsTest {
     public void parseWithWrongOrder() throws Exception {
         try {
             String period = "-P4M12Y3DT150H2M4,758S";
-            Duration.parse(period); // falsche Reihenfolge der Einheiten
+            Duration.parsePeriod(period); // falsche Reihenfolge der Einheiten
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(6));
             System.out.println(pe.getMessage());
@@ -924,7 +924,7 @@ public class DurationBasicsTest {
     public void parseWithWrongSymbolZ() throws Exception {
         try {
             String period = "-P12Y3DT150Z2M4,758S";
-            Duration.parse(period); // falsches Symbol Z
+            Duration.parsePeriod(period); // falsches Symbol Z
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(11));
             System.out.println(pe.getMessage());
@@ -936,7 +936,7 @@ public class DurationBasicsTest {
     public void parseWithWrongSymbolHHNoAmount() throws Exception {
         try {
             String period = "-P12Y3DT150HH2M4,758S";
-            Duration.parse(period); // doppeltes Symbol H ohne Betrag
+            Duration.parsePeriod(period); // doppeltes Symbol H ohne Betrag
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(12));
             System.out.println(pe.getMessage());
@@ -948,7 +948,7 @@ public class DurationBasicsTest {
     public void parseWithWrongSymbolHHAndAmount() throws Exception {
         try {
             String period = "-P12Y3DT150H6H2M4,758S";
-            Duration.parse(period); // doppeltes Symbol H mit Betrag
+            Duration.parsePeriod(period); // doppeltes Symbol H mit Betrag
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(13));
             System.out.println(pe.getMessage());
@@ -960,7 +960,7 @@ public class DurationBasicsTest {
     public void parseWithWrongDecimal1() throws Exception {
         try {
             String period = "-P12Y3DT150H2M4.S";
-            Duration.parse(period); // Dezimalfehler
+            Duration.parsePeriod(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(16));
             System.out.println(pe.getMessage());
@@ -972,7 +972,7 @@ public class DurationBasicsTest {
     public void parseWithWrongDecimal2() throws Exception {
         try {
             String period = "-P12Y3DT150H2M.2S";
-            Duration.parse(period); // Dezimalfehler
+            Duration.parsePeriod(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(14));
             System.out.println(pe.getMessage());
@@ -984,7 +984,7 @@ public class DurationBasicsTest {
     public void parseWithWrongDecimal3() throws Exception {
         try {
             String period = "-P12Y3DT150H2M0;2S";
-            Duration.parse(period); // Dezimalfehler
+            Duration.parsePeriod(period); // Dezimalfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(15));
             System.out.println(pe.getMessage());
@@ -996,7 +996,7 @@ public class DurationBasicsTest {
     public void parseWithWrongSignStyle1() throws Exception {
         try {
             String period = "P-12Y-3D";
-            Duration.parse(period); // Vorzeichenfehler
+            Duration.parsePeriod(period); // Vorzeichenfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(1));
             System.out.println(pe.getMessage());
@@ -1008,7 +1008,7 @@ public class DurationBasicsTest {
     public void parseWithWrongSignStyle2() throws Exception {
         try {
             String period = "P12Y-3D";
-            Duration.parse(period); // Vorzeichenfehler
+            Duration.parsePeriod(period); // Vorzeichenfehler
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(4));
             System.out.println(pe.getMessage());
@@ -1020,7 +1020,7 @@ public class DurationBasicsTest {
     public void parseWithWrongTail() throws Exception {
         try {
             String period = "P12Y3D ";
-            Duration.parse(period); // Leerzeichen am Ende
+            Duration.parsePeriod(period); // Leerzeichen am Ende
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(6));
             System.out.println(pe.getMessage());
@@ -1032,7 +1032,7 @@ public class DurationBasicsTest {
     public void parseSpecialUnits() throws Exception {
         try {
             String period = "P4{Y-CARRY_OVER}";
-            Duration.parse(period);
+            Duration.parsePeriod(period);
         } catch (ParseException pe) {
             assertThat(pe.getErrorOffset(), is(2));
             System.out.println(pe.getMessage());
@@ -1085,8 +1085,8 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800000, ClockUnit.NANOS);
         Duration<IsoUnit> test1 = datePeriod.union(timePeriod).inverse();
-        Duration<IsoUnit> test2 = Duration.parse(period);
-        Duration<IsoUnit> test3 = Duration.parse("P2Y").plus(-2, YEARS);
+        Duration<IsoUnit> test2 = Duration.parsePeriod(period);
+        Duration<IsoUnit> test3 = Duration.parsePeriod("P2Y").plus(-2, YEARS);
 
         assertThat(test1.equals(test2), is(true));
         assertThat(test1.equals(Duration.of(0, DAYS)), is(false));
@@ -1122,7 +1122,7 @@ public class DurationBasicsTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(150, 2, 4).plus(75800000, ClockUnit.NANOS);
         Duration<IsoUnit> test1 = datePeriod.union(timePeriod).inverse();
-        Duration<IsoUnit> test2 = Duration.parse(period);
+        Duration<IsoUnit> test2 = Duration.parsePeriod(period);
         assertThat(test1.hashCode(), is(test2.hashCode()));
     }
 

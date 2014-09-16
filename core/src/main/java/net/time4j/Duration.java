@@ -75,7 +75,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *  <li>{@link #ofClockUnits(int, int, int)}</li>
  *  <li>{@link #ofPositive()} (<i>builder</i>-pattern)</li>
  *  <li>{@link #ofNegative()} (<i>builder</i>-pattern)</li>
- *  <li>{@link #parse(String)}</li>
+ *  <li>{@link #parsePeriod(String)}</li>
  *  <li>{@link #parseCalendarPeriod(String)}</li>
  *  <li>{@link #parseClockPeriod(String)}</li>
  * </ul>
@@ -114,7 +114,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *  <li>{@link #ofClockUnits(int, int, int)}</li>
  *  <li>{@link #ofPositive()} (<i>builder</i>-Muster)</li>
  *  <li>{@link #ofNegative()} (<i>builder</i>-Muster)</li>
- *  <li>{@link #parse(String)}</li>
+ *  <li>{@link #parsePeriod(String)}</li>
  *  <li>{@link #parseCalendarPeriod(String)}</li>
  *  <li>{@link #parseClockPeriod(String)}</li>
  * </ul>
@@ -344,7 +344,7 @@ public final class Duration<U extends IsoUnit>
     @SuppressWarnings("unchecked")
     public static <U extends IsoUnit> Duration<U> ofZero() {
 
-        return (Duration<U>) ZERO;
+        return ZERO;
 
     }
 
@@ -1674,7 +1674,7 @@ public final class Duration<U extends IsoUnit>
      * @throws  ChronoException if any special units shall be
      *          output, but units of type {@code CalendarUnit} will be
      *          translated to xml-compatible units if necessary
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     IsoUnit#getSymbol()
      */
     /*[deutsch]
@@ -1702,6 +1702,23 @@ public final class Duration<U extends IsoUnit>
     public String toStringXML() {
 
         return this.toString(PRINT_STYLE_XML);
+
+    }
+
+    /**
+     * <p>Parses a canonical representation to a duration. </p>
+     *
+     * @param   period          duration in canonical, ISO-8601-compatible or
+     *                          XML-schema-compatible format (P-string)
+     * @return  parsed duration in all possible standard units of date and time
+     * @throws  ParseException if parsing fails
+     * @deprecated  Use {@link #parsePeriod(String)}
+     */
+    @Deprecated
+    public static Duration<IsoUnit> parse(String period)
+        throws ParseException {
+
+        return parsePeriod(period);
 
     }
 
@@ -1753,6 +1770,7 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed duration in all possible standard units of date and time
      * @throws  ParseException if parsing fails
+     * @since   1.2.1
      * @see     #parseCalendarPeriod(String)
      * @see     #parseClockPeriod(String)
      * @see     #toString()
@@ -1809,16 +1827,17 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed duration in all possible standard units of date and time
      * @throws  ParseException if parsing fails
+     * @since   1.2.1
      * @see     #parseCalendarPeriod(String)
      * @see     #parseClockPeriod(String)
      * @see     #toString()
      * @see     #toStringISO()
      * @see     #toStringXML()
      */
-    public static Duration<IsoUnit> parse(String period)
+    public static Duration<IsoUnit> parsePeriod(String period)
         throws ParseException {
 
-        return parse(period, IsoUnit.class);
+        return parsePeriod(period, IsoUnit.class);
 
     }
 
@@ -1830,7 +1849,7 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed calendrical duration
      * @throws  ParseException if parsing fails
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     #parseClockPeriod(String)
      */
     /*[deutsch]
@@ -1841,13 +1860,13 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed calendrical duration
      * @throws  ParseException if parsing fails
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     #parseClockPeriod(String)
      */
     public static Duration<CalendarUnit> parseCalendarPeriod(String period)
         throws ParseException {
 
-        return parse(period, CalendarUnit.class);
+        return parsePeriod(period, CalendarUnit.class);
 
     }
 
@@ -1859,7 +1878,7 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed time-only duration
      * @throws  ParseException if parsing fails
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     #parseCalendarPeriod(String)
      */
     /*[deutsch]
@@ -1870,13 +1889,13 @@ public final class Duration<U extends IsoUnit>
      *                          XML-schema-compatible format (P-string)
      * @return  parsed time-only duration
      * @throws  ParseException if parsing fails
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     #parseCalendarPeriod(String)
      */
     public static Duration<ClockUnit> parseClockPeriod(String period)
         throws ParseException {
 
-        return parse(period, ClockUnit.class);
+        return parsePeriod(period, ClockUnit.class);
 
     }
 
@@ -2262,7 +2281,7 @@ public final class Duration<U extends IsoUnit>
 
     //~ Parse-Routinen ----------------------------------------------------
 
-    private static <U extends IsoUnit> Duration<U> parse(
+    private static <U extends IsoUnit> Duration<U> parsePeriod(
         String period,
         Class<U> type
     ) throws ParseException {

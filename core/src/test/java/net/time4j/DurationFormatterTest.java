@@ -54,7 +54,7 @@ public class DurationFormatterTest {
 
         this.formatter =
             Duration.Formatter.ofPattern(IsoUnit.class, pattern);
-        this.value = Duration.parse(value);
+        this.value = Duration.parsePeriod(value);
         this.text = text;
     }
 
