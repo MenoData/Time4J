@@ -331,12 +331,28 @@ public final class Duration<U extends IsoUnit>
 
     /**
      * <p>Gets an empty duration without units. </p>
+     * 
+     * <p>This method can also be used for generic upcasting of the
+     * type U to {@code IsoUnit}: </p>
+     * 
+     * <pre>
+     * 	Duration&lt;CalendarUnit&gt; dur = Duration.ofCalendarUnits(2, 5, 30);
+     * 	Duration&lt;IsoUnit&gt; upcasted = Duration.ofZero().plus(dur);
+     * </pre>
      *
      * @param   <U> generic unit type
      * @return  empty duration
      */
     /*[deutsch]
      * <p>Liefert eine leere Zeitspanne ohne Einheiten. </p>
+     *
+     * <p>Diese Methode kann auch daf&uuml;r benutzt werden, den generischen
+     * Typparameter U zu {@code IsoUnit} zu &auml;ndern: </p>
+     * 
+     * <pre>
+     * 	Duration&lt;CalendarUnit&gt; dur = Duration.ofCalendarUnits(2, 5, 30);
+     * 	Duration&lt;IsoUnit&gt; upcasted = Duration.ofZero().plus(dur);
+     * </pre>
      *
      * @param   <U> generic unit type
      * @return  empty duration
@@ -601,8 +617,7 @@ public final class Duration<U extends IsoUnit>
      * @throws  IllegalArgumentException if no time unit is given or
      *          if there are unit duplicates
      */
-    public static <U extends IsoUnit>
-    TimeMetric<U, Duration<U>> in(U... units) {
+    public static <U extends IsoUnit> TimeMetric<U, Duration<U>> in(U... units) {
 
         return new Metric<U>(units);
 
@@ -635,8 +650,7 @@ public final class Duration<U extends IsoUnit>
      * @see     CalendarUnit#MONTHS
      * @see     CalendarUnit#DAYS
      */
-    public static
-    TimeMetric<CalendarUnit, Duration<CalendarUnit>> inYearsMonthsDays() {
+    public static TimeMetric<CalendarUnit, Duration<CalendarUnit>> inYearsMonthsDays() {
 
         return YMD_METRIC;
 
@@ -1050,6 +1064,7 @@ public final class Duration<U extends IsoUnit>
      *          adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
+     * @see		#union(TimeSpan)
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
@@ -1077,6 +1092,7 @@ public final class Duration<U extends IsoUnit>
      *          adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
+     * @see		#union(TimeSpan)
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
@@ -1311,90 +1327,84 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Creates a duration as union of this instance and given timespan
      * where partial amounts of equal units will be summed up. </p>
-     *
-     * <p><i>union of timespans with date and time units</i></p>
+     * 
+     * <p>The list result of this method can be used in time arithmetic as follows: </p>
+     * 
      * <pre>
-     *  Duration&lt;CalendarUnit&gt; dateDuration =
+     *  Duration&lt;CalendarUnit&gt; dateDur =
      *      Duration.ofCalendarUnits(2, 7, 10);
-     *  Duration&lt;ClockUnit&gt; timeDuration =
+     *  Duration&lt;ClockUnit&gt; timeDur =
      *      Duration.ofClockUnits(0, 30, 0);
-     *  System.out.println(dateDuration.union(timeDuration)); // P2Y7M10DT30M
+     *  PlainTimestamp tsp = PlainTimestamp.of(2014, 1, 1, 0, 0);
+     *  
+     *  for (Duration&lt;?&gt; dur : Duration.ofZero().plus(dateDur).union(timeDur)) {
+     *  	tsp = tsp.plus(dur);
+     *  } 
+     *  
+     *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
-     * <p><i>union as addition of timespans</i></p>
-     * <pre>
-     *  Duration&lt;CalendarUnit&gt; p1 =
-     *      Duration.ofCalendarUnits(0, 0, 10);
-     *  Duration&lt;CalendarUnit&gt; p2 =
-     *      Duration.of(21, CalendarUnit.DAYS);
-     *  System.out.println(p1.union(p2)); // P31D
-     * </pre>
-     *
-     * <p>If the signs of both timespans are different then the signs of
-     * all partial amounts must be equal in the result in order to define
-     * the sign of the whole result in a unique way. Example: </p>
-     *
-     * <pre>
-     *  Duration&lt;CalendarUnit&gt; duration =
-     *      Duration.of(4, DAYS)
-     *      .union(Duration.ofCalendarUnits(0, 1, 34))
-     *      .inverse(); // [-P1M30D] (OK)
-     *  Duration&lt;CalendarUnit&gt; duration =
-     *      Duration.ofCalendarUnits(0, 5, 4)
-     *      .union(Duration.ofCalendarUnits(0, 1, 34))
-     *      .inverse(); // [P+1M-30D] (throws IllegalStateException)
-     * </pre>
+     * <p>Note that this example will even work in case of mixed signs. No exception
+     * will be thrown. Instead this duration and the other one would just be added
+     * to the timestamp within a loop - step by step. </p>
      *
      * @param   timespan    other time span this duration is to be merged with
-     * @return  new merged duration with {@code IsoUnit} as unit type
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          adding the partial amounts
+     * @return  unmodifiable list with one new merged duration or two unmerged durations
+     * 			in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
+     * @see		#plus(TimeSpan)
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
      * angegebenen Zeitspanne, wobei Betr&auml;ge zu gleichen Zeiteinheiten
      * addiert werden. </p>
      *
-     * <p><i>Vereinigung von Zeitspannen in Datum und Uhrzeit</i></p>
+     * <p>Das Listenergebnis dieser Methode kann in der Zeitarithmetik wie folgt
+     * genutzt werden: </p>
+     * 
      * <pre>
-     *  Duration&lt;CalendarUnit&gt; dateDuration =
+     *  Duration&lt;CalendarUnit&gt; dateDur =
      *      Duration.ofCalendarUnits(2, 7, 10);
-     *  Duration&lt;ClockUnit&gt; timeDuration =
+     *  Duration&lt;ClockUnit&gt; timeDur =
      *      Duration.ofClockUnits(0, 30, 0);
-     *  System.out.println(dateDuration.union(timeDuration)); // P2Y7M10DT30M
+     *  PlainTimestamp tsp = PlainTimestamp.of(2014, 1, 1, 0, 0);
+     *  
+     *  for (Duration&lt;?&gt; dur : Duration.ofZero().plus(dateDur).union(timeDur)) {
+     *  	tsp = tsp.plus(dur);
+     *  } 
+     *  
+     *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
-     * <p><i>Vereinigung als Addition von Zeitspannen</i></p>
-     * <pre>
-     *  Duration&lt;CalendarUnit&gt; p1 =
-     *      Duration.ofCalendarUnits(0, 0, 10);
-     *  Duration&lt;CalendarUnit&gt; p2 =
-     *      Duration.of(21, CalendarUnit.DAYS);
-     *  System.out.println(p1.union(p2)); // P31D
-     * </pre>
-     *
-     * <p>Falls die Vorzeichen beider Zeitspannen verschieden sind, m&uuml;ssen
-     * im Ergebnis trotzdem die Vorzeichen aller Betr&auml;ge gleich sein, damit
-     * eindeutig das Vorzeichen der Ergebnis-Zeitspanne feststeht. Beispiel in
-     * Pseudo-Code: [P4D] union [-P1M34D] = [-P1M30D]. Hingegen f&uuml;hrt die
-     * Vereinigung [P5M4D] union [-P4M34D] zum Abbruch, weil [P+1M-30D] keine
-     * sinnvolle Vorzeichenregelung erlaubt. </p>
+     * <p>Zu beachten: Dieses Beispiel funktioniert sogar, wenn beide Dauer-Objekte wegen
+     * gemischter Vorzeichen nicht zusammengef&uuml;hrt werden k&ouml;nnen. Stattdessen
+     * werden dann diese Dauer und die angegebene Zeitspanne Schritt f&uuml;r Schritt
+     * innerhalb der Schleife zum Zeitstempel aufaddiert. </p>
      *
      * @param   timespan    other time span this duration is to be merged with
-     * @return  new merged duration with {@code IsoUnit} as unit type
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          adding the partial amounts
+     * @return  unmodifiable list with one new merged duration or two unmerged durations
+     * 			in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
+     * @see		#plus(TimeSpan)
      */
-    public Duration<IsoUnit> union(TimeSpan<? extends IsoUnit> timespan) {
+	public List<Duration<U>> union(TimeSpan<? extends U> timespan) {
 
-        Duration<IsoUnit> zero = ofZero();
-        return zero.plus(this).plus(timespan);
+		Duration<U> merged = this.plus(timespan);
 
-    }
+		if (merged == null) {
+			List<Duration<U>> result = new ArrayList<Duration<U>>();
+			result.add(this);
+			Duration<U> empty = ofZero();
+			Duration<U> other = empty.plus(timespan);
+			result.add(other);
+			return Collections.unmodifiableList(result);
+		}
+
+		return Collections.singletonList(merged);
+
+	}
 
     /**
      * <p>Normalizes this duration by given normalizer. </p>
@@ -2288,8 +2298,7 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static <U extends IsoUnit>
-    Duration<U> convert(TimeSpan<U> timespan) {
+    private static <U extends IsoUnit> Duration<U> convert(TimeSpan<U> timespan) {
 
         if (timespan instanceof Duration) {
             return cast(timespan);
