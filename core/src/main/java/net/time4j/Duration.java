@@ -1030,9 +1030,18 @@ public final class Duration<U extends IsoUnit>
      * <p>Creates a duration as union of this instance and given timespan
      * where partial amounts of equal units will be summed up. </p>
      *
-     * <p>In contrast to {@code union()}, this method only handles timespans
-     * with the same unit type. Further details can be seen in the description
-     * of {@link #union(TimeSpan)}. </p>
+     * <p>In order to sum up timespans with different unit types, following
+     * trick can be applied: </p>
+     * 
+     * <pre>
+     *	Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
+     *	Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
+     * </pre>
+     * 
+     * <p><strong>Note about sign handling:</strong> If this duration and
+     * given timespan have different signs then this method will throw an
+     * exception in case of mixed signs for different duration items. So it
+     * is strongly recommended only to merge durations with equal signs.</p>
      *
      * @param   timespan    other time span this duration will be merged
      *                      with by adding the partial amounts
@@ -1047,10 +1056,19 @@ public final class Duration<U extends IsoUnit>
      * angegebenen Zeitspanne, wobei Betr&auml;ge zu gleichen Zeiteinheiten
      * addiert werden. </p>
      *
-     * <p>Diese Methode vereinigt anders als {@code union()} nur
-     * Zeitspannen mit dem gleichen Einheitstyp. Weitere Details sind
-     * gleich und der Beschreibung von {@link #union(TimeSpan)} zu
-     * entnehmen. </p>
+     * <p>Um Zeitspannen mit verschiedenen Einheitstypen zu vereinigen, kann
+     * folgender Kniff angewandt werden: </p>
+     * 
+     * <pre>
+     *	Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
+     *	Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
+     * </pre>
+     *
+     * <p><strong>Hinweis zur Vorzeichenbehandlung:</strong> Wenn diese Dauer
+     * und die angegebene Zeitspanne verschiedene Vorzeichen haben, wirft diese
+     * Methode eine Ausnahme im Fall gemischter Vorzeichen f&uuml;r einzelne
+     * Dauerelemente. Es wird dringend empfohlen, nur Zeitspannen mit gleichen
+     * Vorzeichen zusammenzuf&uuml;hren.</p>
      *
      * @param   timespan    other time span this duration will be merged
      *                      with by adding the partial amounts
@@ -1062,98 +1080,18 @@ public final class Duration<U extends IsoUnit>
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
-        if (this.isEmpty()) {
-            if (isEmpty(timespan)) {
-                return this;
-            } else if (timespan instanceof Duration) {
-                Duration<U> result = cast(timespan);
-                return result;
-            }
-        }
-
-        Map<U, Long> map = new HashMap<U, Long>();
-
-        for (int i = 0, n = this.count(); i < n; i++) {
-            Item<U> item = this.getTotalLength().get(i);
-            map.put(
-                item.getUnit(),
-                Long.valueOf(
-                    MathUtils.safeMultiply(
-                        item.getAmount(),
-                        (this.isNegative() ? -1 : 1)
-                    )
-                )
-            );
-        }
-
-        boolean tsign = timespan.isNegative();
-
-        for (int i = 0, n = timespan.getTotalLength().size(); i < n; i++) {
-            TimeSpan.Item<? extends U> e = timespan.getTotalLength().get(i);
-            U unit = e.getUnit();
-            long amount = e.getAmount();
-
-            // Millis und Micros ersetzen
-            Item<U> item = replaceFraction(amount, unit);
-
-            if (item != null) {
-                amount = item.getAmount();
-                unit = item.getUnit();
-            }
-
-            // Items aktualisieren
-            if (map.containsKey(unit)) {
-                map.put(
-                    unit,
-                    Long.valueOf(
-                        MathUtils.safeAdd(
-                            map.get(unit).longValue(),
-                            MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
-                        )
-                    )
-                );
-            } else {
-                map.put(
-                    unit,
-                    MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
-                );
-            }
-        }
-
-        Boolean neg = null;
-
-        if (this.isNegative() == tsign) {
-            neg = Boolean.valueOf(this.isNegative());
-        } else {
-            for (Map.Entry<U, Long> entry : map.entrySet()) {
-                boolean nsign = (entry.getValue().longValue() < 0);
-                if (neg == null) {
-                    neg = Boolean.valueOf(nsign);
-                } else if (neg.booleanValue() != nsign) {
-                    throw new IllegalStateException(
-                        "Mixed signs in result time span not allowed: "
-                        + this
-                        + " UNION "
-                        + timespan);
-                }
-            }
-        }
-
-        if (neg.booleanValue()) {
-            for (Map.Entry<U, Long> entry : map.entrySet()) {
-                long value = entry.getValue().longValue();
-                map.put(
-                    entry.getKey(),
-                    Long.valueOf(
-                        (value < 0)
-                        ? MathUtils.safeNegate(value)
-                        : value)
-                );
-            }
-        }
-
-        return Duration.create(map, neg.booleanValue());
-
+    	Duration<U> result = this.merge(timespan);
+    	
+    	if (result == null) {
+            throw new IllegalStateException(
+                    "Mixed signs in result time span not allowed: "
+                    + this
+                    + " PLUS "
+                    + timespan);
+    	}
+    	
+    	return result;
+    	
     }
 
     /**
@@ -1708,11 +1646,11 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Parses a canonical representation to a duration. </p>
      *
-     * @param   period          duration in canonical, ISO-8601-compatible or
+     * @param   	period      duration in canonical, ISO-8601-compatible or
      *                          XML-schema-compatible format (P-string)
-     * @return  parsed duration in all possible standard units of date and time
-     * @throws  ParseException if parsing fails
-     * @deprecated  Use {@link #parsePeriod(String)}
+     * @return  	parsed duration in all possible standard units of date and time
+     * @throws  	ParseException if parsing fails
+     * @deprecated  Use {@link #parsePeriod(String)} for naming consistency
      */
     @Deprecated
     public static Duration<IsoUnit> parse(String period)
@@ -2233,6 +2171,100 @@ public final class Duration<U extends IsoUnit>
         }
 
         return Item.of(amount, unit);
+
+    }
+
+    private Duration<U> merge(TimeSpan<? extends U> timespan) {
+
+        if (this.isEmpty()) {
+            if (isEmpty(timespan)) {
+                return this;
+            } else if (timespan instanceof Duration) {
+                Duration<U> result = cast(timespan);
+                return result;
+            }
+        }
+
+        Map<U, Long> map = new HashMap<U, Long>();
+
+        for (int i = 0, n = this.count(); i < n; i++) {
+            Item<U> item = this.getTotalLength().get(i);
+            map.put(
+                item.getUnit(),
+                Long.valueOf(
+                    MathUtils.safeMultiply(
+                        item.getAmount(),
+                        (this.isNegative() ? -1 : 1)
+                    )
+                )
+            );
+        }
+
+        boolean tsign = timespan.isNegative();
+
+        for (int i = 0, n = timespan.getTotalLength().size(); i < n; i++) {
+            TimeSpan.Item<? extends U> e = timespan.getTotalLength().get(i);
+            U unit = e.getUnit();
+            long amount = e.getAmount();
+
+            // Millis und Micros ersetzen
+            Item<U> item = replaceFraction(amount, unit);
+
+            if (item != null) {
+                amount = item.getAmount();
+                unit = item.getUnit();
+            }
+
+            // Items aktualisieren
+            if (map.containsKey(unit)) {
+                map.put(
+                    unit,
+                    Long.valueOf(
+                        MathUtils.safeAdd(
+                            map.get(unit).longValue(),
+                            MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
+                        )
+                    )
+                );
+            } else {
+                map.put(
+                    unit,
+                    MathUtils.safeMultiply(amount, (tsign ? -1 : 1))
+                );
+            }
+        }
+
+        boolean negative = false;
+
+        if (this.isNegative() == tsign) {
+        	negative = this.isNegative();
+        } else {
+            boolean firstScan = true;            
+            for (Map.Entry<U, Long> entry : map.entrySet()) {
+                boolean nsign = (entry.getValue().longValue() < 0);
+                if (firstScan) {
+                    negative = nsign;
+                    firstScan = false;
+                } else if (negative != nsign) {
+                	return null; // mixed signs
+                }
+            }
+        }
+
+        if (negative) {
+            for (Map.Entry<U, Long> entry : map.entrySet()) {
+                long value = entry.getValue().longValue();
+                map.put(
+                    entry.getKey(),
+                    Long.valueOf(
+                        (value < 0)
+                        ? MathUtils.safeNegate(value)
+                        : value)
+                );
+            }
+        }
+
+        return Duration.create(map, negative);
 
     }
 
