@@ -1048,8 +1048,8 @@ public final class Duration<U extends IsoUnit>
      * trick can be applied: </p>
      * 
      * <pre>
-     *	Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
-     *	Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
+     *  Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
+     *  Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
      * </pre>
      * 
      * <p><strong>Note about sign handling:</strong> If this duration and
@@ -1064,7 +1064,7 @@ public final class Duration<U extends IsoUnit>
      *          adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
-     * @see		#union(TimeSpan)
+     * @see     #union(TimeSpan)
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
@@ -1075,8 +1075,8 @@ public final class Duration<U extends IsoUnit>
      * folgender Kniff angewandt werden: </p>
      * 
      * <pre>
-     *	Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
-     *	Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
+     *  Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
+     *  Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
      * </pre>
      *
      * <p><strong>Hinweis zur Vorzeichenbehandlung:</strong> Wenn diese Dauer
@@ -1092,7 +1092,7 @@ public final class Duration<U extends IsoUnit>
      *          adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
-     * @see		#union(TimeSpan)
+     * @see	    #union(TimeSpan)
      */
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
@@ -1353,7 +1353,7 @@ public final class Duration<U extends IsoUnit>
      * 			in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
-     * @see		#plus(TimeSpan)
+     * @see	    #plus(TimeSpan)
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Zeitspanne als Vereinigung dieser und der
@@ -1365,13 +1365,13 @@ public final class Duration<U extends IsoUnit>
      * 
      * <pre>
      *  Duration&lt;CalendarUnit&gt; dateDur =
-     *      Duration.ofCalendarUnits(2, 7, 10);
+     *    Duration.ofCalendarUnits(2, 7, 10);
      *  Duration&lt;ClockUnit&gt; timeDur =
-     *      Duration.ofClockUnits(0, 30, 0);
+     *    Duration.ofClockUnits(0, 30, 0);
      *  PlainTimestamp tsp = PlainTimestamp.of(2014, 1, 1, 0, 0);
      *  
      *  for (Duration&lt;?&gt; dur : Duration.ofZero().plus(dateDur).union(timeDur)) {
-     *  	tsp = tsp.plus(dur);
+     *    tsp = tsp.plus(dur);
      *  } 
      *  
      *  System.out.println(tsp); // 2016-08-11T00:30
@@ -1387,12 +1387,12 @@ public final class Duration<U extends IsoUnit>
      * 			in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
-     * @see		#plus(TimeSpan)
+     * @see	    #plus(TimeSpan)
      */
 	public List<Duration<U>> union(TimeSpan<? extends U> timespan) {
-
-		Duration<U> merged = this.plus(timespan);
-
+		
+		Duration<U> merged = merge(this, timespan);
+		
 		if (merged == null) {
 			List<Duration<U>> result = new ArrayList<Duration<U>>();
 			result.add(this);
@@ -1401,9 +1401,9 @@ public final class Duration<U extends IsoUnit>
 			result.add(other);
 			return Collections.unmodifiableList(result);
 		}
-
+		
 		return Collections.singletonList(merged);
-
+		
 	}
 
     /**
