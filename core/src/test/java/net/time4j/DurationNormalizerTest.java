@@ -41,12 +41,12 @@ public class DurationNormalizerTest {
 
     @Test
     public void withSTD_PERIOD() {
-        Duration<CalendarUnit> datePeriod =
-            Duration.ofCalendarUnits(2, 14, 30);
-        Duration<ClockUnit> timePeriod =
-            Duration.ofClockUnits(47, 59, 60).plus(1075800000, NANOS);
         Duration<IsoUnit> test =
-            datePeriod.union(timePeriod).inverse();
+        	Duration.ofZero()
+        		.plus(Duration.ofCalendarUnits(2, 14, 30))
+        		.plus(Duration.ofClockUnits(47, 59, 60))
+        		.plus(1075800000, NANOS)
+                .inverse();
         assertThat(
             test.with(Duration.STD_PERIOD),
             is(
@@ -56,9 +56,10 @@ public class DurationNormalizerTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void withSTD_PERIOD_unitsOfSameLength() {
-        Duration.of(1, CalendarUnit.weekBasedYears())
-            .union(Duration.ofZero().plus(5, CalendarUnit.CENTURIES))
-            .with(Duration.STD_PERIOD);
+		Duration.ofZero()
+			.plus(1, CalendarUnit.weekBasedYears())
+			.plus(5, CalendarUnit.CENTURIES)
+			.with(Duration.STD_PERIOD);
     }
 
     @Test
