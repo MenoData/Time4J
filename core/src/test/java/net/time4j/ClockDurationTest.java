@@ -91,4 +91,28 @@ public class ClockDurationTest {
             is(t2));
     }
 
+    @Test
+    public void convertToHours() {
+        Duration<ClockUnit> duration = Duration.parseClockPeriod("PT121M3612,123456789S");
+        assertThat(ClockUnit.HOURS.convert(duration), is(3L));
+    }
+
+    @Test
+    public void convertToMinutes() {
+        Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
+        assertThat(ClockUnit.MINUTES.convert(duration), is(21L));
+    }
+
+    @Test
+    public void convertToSeconds() {
+        Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
+        assertThat(ClockUnit.SECONDS.convert(duration), is(1272L));
+    }
+
+    @Test
+    public void convertToMillis() {
+        Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
+        assertThat(ClockUnit.MILLIS.convert(duration), is(1272667L));
+    }
+
 }
