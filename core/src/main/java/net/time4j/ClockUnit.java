@@ -74,12 +74,16 @@ public enum ClockUnit
     /**
      * <p>Time unit &quot;seconds&quot; (symbol S) according to the
      * position of the second pointer on an analogue clock. </p>
+     * 
+     * <p>This unit is NOT the SI-second. </p>
      *
      * @see     SI
      */
     /*[deutsch]
      * <p>Zeiteinheit &quot;Sekunden&quot; (Symbol S) entsprechend der
      * Stellung des Sekundenzeigers auf einer analogen Uhr. </p>
+     *
+     * <p>Diese Zeiteinheit ist nicht die SI-Sekunde. </p>
      *
      * @see     SI
      */
@@ -226,10 +230,11 @@ public enum ClockUnit
         } else if (o1 > o2) {
             return MathUtils.safeMultiply(
                 sourceDuration,
-                FACTORS[o1 - o2]
+                FACTORS[o1] / FACTORS[o2]
             );
         } else {
-            return (sourceDuration / FACTORS[o2 - o1]);
+            long factor = FACTORS[o2] / FACTORS[o1];
+            return (sourceDuration / factor); // possible truncation
         }
 
     }
