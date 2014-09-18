@@ -18,6 +18,7 @@ import org.junit.runners.JUnit4;
 
 import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.WEEKS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -65,6 +66,13 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(3, DAYS, TextWidth.WIDE),
             is("3 jours"));
+    }
+
+    @Test
+    public void print3WeeksDanish() {
+        assertThat(
+            PrettyTime.of(new Locale("da")).print(3, WEEKS, TextWidth.WIDE),
+            is("3 uger"));
     }
 
     @Test
