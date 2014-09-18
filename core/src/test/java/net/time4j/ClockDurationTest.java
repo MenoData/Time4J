@@ -1,5 +1,6 @@
 package net.time4j;
 
+import java.text.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -92,25 +93,25 @@ public class ClockDurationTest {
     }
 
     @Test
-    public void convertToHours() {
+    public void convertToHours() throws ParseException {
         Duration<ClockUnit> duration = Duration.parseClockPeriod("PT121M3612,123456789S");
         assertThat(ClockUnit.HOURS.convert(duration), is(3L));
     }
 
     @Test
-    public void convertToMinutes() {
+    public void convertToMinutes() throws ParseException {
         Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
         assertThat(ClockUnit.MINUTES.convert(duration), is(21L));
     }
 
     @Test
-    public void convertToSeconds() {
+    public void convertToSeconds() throws ParseException {
         Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
         assertThat(ClockUnit.SECONDS.convert(duration), is(1272L));
     }
 
     @Test
-    public void convertToMillis() {
+    public void convertToMillis() throws ParseException {
         Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
         assertThat(ClockUnit.MILLIS.convert(duration), is(1272667L));
     }
