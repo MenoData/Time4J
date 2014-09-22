@@ -220,7 +220,7 @@ public final class Attributes
      * start of a chronological text. </p>
      *
      * <p>Abbreviations can be parsed by help of this attribute, too.
-     * Default value:: {@code false} </p>
+     * Default value: {@code false} </p>
      */
     /*[deutsch]
      * <p>Steuert, ob beim Parsen nur Textanf&auml;nge gepr&uuml;ft werden
@@ -359,6 +359,28 @@ public final class Attributes
      */
     public static final AttributeKey<Boolean> TRAILING_CHARACTERS =
         PredefinedKey.valueOf("TRAILING_CHARACTERS", Boolean.class);
+
+    /**
+     * <p>This attribute controls if the parser will use a possibly available
+     * default value for a given element in case of error. </p>
+     *
+     * <p>Default value: {@code false} </p>
+     *
+     * @since   1.3
+     * @see     ChronoFormatter#withDefault(ChronoElement,Object)
+     */
+    /*[deutsch]
+     * <p>Steuert, ob beim Parsen m&ouml;glicherweise vorhandene Ersatzwerte
+     * verwendet werden sollen, wenn ein Element nicht erfolgreich interpretiert
+     * werden konnte. </p>
+     *
+     * <p>Standardwert: {@code false} </p>
+     *
+     * @since   1.3
+     * @see     ChronoFormatter#withDefault(ChronoElement,Object)
+     */
+    public static final AttributeKey<Boolean> USE_DEFAULT_WHEN_ERROR =
+        PredefinedKey.valueOf("USE_DEFAULT_WHEN_ERROR", Boolean.class);
 
     /**
      * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die

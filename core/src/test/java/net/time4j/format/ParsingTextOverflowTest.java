@@ -25,13 +25,14 @@ public class ParsingTextOverflowTest {
     public void initialize() {
         this.formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
-                .addPattern("MM/dd/yyyy", PatternType.CLDR).build();
+                .addPattern("MM/dd/y", PatternType.CLDR)
+                .build();
         this.formatterAny =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
                 .addPattern("MM/dd/y", PatternType.CLDR)
                 .build()
                 .with(Attributes.TRAILING_CHARACTERS, true);
-        this.text = "09/01/3~34";
+        this.text = "09/01/2013~34";
     }
 
     @Test
@@ -42,7 +43,7 @@ public class ParsingTextOverflowTest {
         PlainDate date = fmt.parse(this.text, plog);
         PlainDate expected = null;
         assertThat(date, is(expected));
-        assertThat(plog.getErrorIndex(), is(7));
+        assertThat(plog.getErrorIndex(), is(10));
         assertThat(
             plog.getErrorMessage(),
             is("Unparsed trailing characters: ~34"));
@@ -54,7 +55,7 @@ public class ParsingTextOverflowTest {
 
         ParseLog plog = new ParseLog();
         PlainDate date = fmt.parse(this.text, plog);
-        PlainDate expected = PlainDate.of(3, 9, 1);
+        PlainDate expected = PlainDate.of(2013, 9, 1);
         assertThat(date, is(expected));
         assertThat(plog.isError(), is(false));
     }
@@ -66,7 +67,7 @@ public class ParsingTextOverflowTest {
 
         ParseLog plog = new ParseLog();
         PlainDate date = fmt.parse(this.text, plog);
-        PlainDate expected = PlainDate.of(3, 9, 1);
+        PlainDate expected = PlainDate.of(2013, 9, 1);
         assertThat(date, is(expected));
         assertThat(plog.isError(), is(false));
     }
@@ -78,7 +79,7 @@ public class ParsingTextOverflowTest {
 
         ParseLog plog = new ParseLog();
         PlainDate date = fmt.parse(this.text, plog);
-        PlainDate expected = PlainDate.of(3, 9, 1);
+        PlainDate expected = PlainDate.of(2013, 9, 1);
         assertThat(date, is(expected));
         assertThat(plog.isError(), is(false));
     }
@@ -92,7 +93,7 @@ public class ParsingTextOverflowTest {
         PlainDate date = fmt.parse(this.text, plog);
         PlainDate expected = null;
         assertThat(date, is(expected));
-        assertThat(plog.getErrorIndex(), is(7));
+        assertThat(plog.getErrorIndex(), is(10));
         assertThat(
             plog.getErrorMessage(),
             is("Unparsed trailing characters: ~34"));
@@ -102,7 +103,6 @@ public class ParsingTextOverflowTest {
     public void smartWithAnyEndOfText() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
             this.formatterAny.with(Attributes.LENIENCY, Leniency.SMART);
-
         fmt.parse(this.text);
     }
 
@@ -115,17 +115,16 @@ public class ParsingTextOverflowTest {
         PlainDate date = fmt.parse(this.text, plog);
         PlainDate expected = null;
         assertThat(date, is(expected));
-        assertThat(plog.getErrorIndex(), is(6));
+        assertThat(plog.getErrorIndex(), is(10));
         assertThat(
             plog.getErrorMessage(),
-            is("Not enough digits found for: YEAR_OF_ERA"));
+            is("Unparsed trailing characters: ~34"));
     }
 
     @Test(expected=ParseException.class)
     public void strictWithAnyEndOfText() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
             this.formatterAny.with(Attributes.LENIENCY, Leniency.STRICT);
-
         fmt.parse(this.text);
     }
 

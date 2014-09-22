@@ -823,6 +823,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   value       replacement value or {@code null}
      *                      if the default value shall be deregistered
      * @return  changed copy with new replacement value
+     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     /*[deutsch]
      * <p>Legt einen Standard-Ersatzwert f&uuml;r das angegebene Element
@@ -843,6 +844,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   value       replacement value or {@code null}
      *                      if the default value shall be deregistered
      * @return  changed copy with new replacement value
+     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     public <V> ChronoFormatter<T> withDefault(
         ChronoElement<V> element,
@@ -1511,6 +1513,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Map<ChronoElement<?>, Object> parsedResult = data.peek();
             step.parse(text, status, attributes, parsedResult);
 
+            // Im Fehlerfall default-value verwenden?
+            if (status.isError()) {
+                boolean useDefault =
+                    step.getAttribute(
+                        Attributes.USE_DEFAULT_WHEN_ERROR,
+                        attributes,
+                        Boolean.FALSE
+                    ).booleanValue();
+                if (useDefault) {
+                    ChronoElement<?> element = step.getProcessor().getElement();
+                    if (
+                        (element != null)
+                        && this.defaults.containsKey(element)
+                    ) {
+                        parsedResult.put(element, this.defaults.get(element));
+                        status.clearError();
+                    }
+                }
+            }
+
             // Fehler-Auflösung
             if (status.isError()) {
                 if (current == 0) {
@@ -1768,7 +1790,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <li>PARSE =&gt; At most {@code maxDigits} chars will be
          * interpreted as digits. If there are less than {@code minDigits}
          * then the text input will be invalid. Note: If there is no
-         * strict mode then the parser will always assume
+         * strict or smart mode (lax) then the parser will always assume
          * {@code minDigits == 0} and {@code maxDigits = 9}. </li></ol>
          *
          * <p>Example: </p>
@@ -1822,7 +1844,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <li>PARSE =&gt; Es werden bis zu {@code maxDigits} Zeichen als
          * Ziffern interpretiert. Gibt es aber weniger als {@code minDigits}
          * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen. Zu
-         * beachten: Ist kein strikter Parse-Modus angegeben, dann wird
+         * beachten: Ist ein laxer Parse-Modus angegeben, dann wird
          * unabh&auml;ngig von den hier angegebenen Argumenten stets
          * {@code minDigits == 0} und die Obergrenze von {@code maxDigits = 9}
          * angenommen. </li></ol>
@@ -2169,12 +2191,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <li>PARSE =&gt; At most {@code maxDigits} chars will be
          * interpreted as digits. If there are less than {@code minDigits}
-         * then the text input will be invalid. Note: If there is no
-         * strict mode then the parser will always assume
-         * {@code minDigits == 0} and {@code maxDigits = 9} unless
-         * a fixed width was implicitly specified by setting
-         * {@code minDigits == maxDigits} and without decimal separator
-         * char (then <i>adjacent digit parsing</i>). </li>
+         * then the text input will be invalid. Note: If there is just a
+         * lax mode then the parser will always assume {@code minDigits == 0}
+         * and {@code maxDigits = 9} unless a fixed width was implicitly
+         * specified by setting {@code minDigits == maxDigits} and without
+         * decimal separator char (then <i>adjacent digit parsing</i>). </li>
          * </ol>
          *
          * <p>Example: </p>
@@ -2242,7 +2263,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <li>PARSE =&gt; Es werden bis zu {@code maxDigits} Zeichen als
          * Ziffern interpretiert. Gibt es aber weniger als {@code minDigits}
          * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen. Zu
-         * beachten: Ist kein strikter Parse-Modus angegeben, dann wird
+         * beachten: Ist nur ein laxer Parse-Modus angegeben, dann wird
          * unabh&auml;ngig von den hier angegebenen Argumenten stets
          * {@code minDigits == 0} und {@code maxDigits == 9} angenommen,
          * es sei denn, es wurde implizit eine feste Breite mittels
@@ -2925,7 +2946,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * many digits (<i>adjacent digit parsing</i>). Otherwise this
          * format element can also parse more than two digits if there is
          * no strict mode with the consequence that the parsed year will be
-         * interpreted as absolute full year.. </p>
+         * interpreted as absolute full year. </p>
          *
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)

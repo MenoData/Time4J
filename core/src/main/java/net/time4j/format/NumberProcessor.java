@@ -267,7 +267,7 @@ final class NumberProcessor<V>
 
         if (
             this.fixedWidth
-            || leniency.isStrict()
+            || !leniency.isLax()
         ) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
@@ -375,7 +375,7 @@ final class NumberProcessor<V>
 
         if (
             (pos < minPos)
-            && (this.fixedWidth || leniency.isStrict())
+            && (first || this.fixedWidth || !leniency.isLax())
         ) {
             status.setError(
                 start,

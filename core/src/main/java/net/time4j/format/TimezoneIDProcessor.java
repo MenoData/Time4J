@@ -106,9 +106,6 @@ enum TimezoneIDProcessor
             return;
         }
 
-        Leniency leniency =
-            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
-
         // Zeitzonen-ID einlesen
         StringBuilder name = new StringBuilder();
 

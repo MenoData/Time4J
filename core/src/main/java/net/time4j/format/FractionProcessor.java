@@ -217,7 +217,7 @@ final class FractionProcessor
         int effectiveMax = 9;
 
         if (
-            leniency.isStrict()
+            !leniency.isLax()
             || this.fixedWidth
         ) {
             effectiveMin = this.minDigits;

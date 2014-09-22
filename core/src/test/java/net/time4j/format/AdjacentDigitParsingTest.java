@@ -108,7 +108,7 @@ public class AdjacentDigitParsingTest {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter
                 .setUp(PlainTimestamp.class, Locale.US)
-                .addInteger(PlainDate.YEAR, 4, 4) // no fixed-width!
+                .addInteger(PlainDate.YEAR, 4, 4)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
@@ -128,7 +128,7 @@ public class AdjacentDigitParsingTest {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter
                 .setUp(PlainTimestamp.class, Locale.US)
-                .addInteger(PlainDate.YEAR, 4, 4) // no fixed-width!
+                .addInteger(PlainDate.YEAR, 4, 4)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
@@ -148,7 +148,9 @@ public class AdjacentDigitParsingTest {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter
                 .setUp(PlainTimestamp.class, Locale.US)
+                .startSection(Attributes.LENIENCY, Leniency.LAX)
                 .addInteger(PlainDate.YEAR, 4, 4) // no fixed-width!
+                .endSection()
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
@@ -165,6 +167,34 @@ public class AdjacentDigitParsingTest {
             assertThat(
                 pe.getErrorOffset(),
                 is(9));
+            throw pe;
+        }
+    }
+
+    @Test(expected=ParseException.class)
+    public void adjacentFixedDateTimeFraction5() throws ParseException {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter
+                .setUp(PlainTimestamp.class, Locale.US)
+                .startSection(Attributes.LENIENCY, Leniency.SMART)
+                .addInteger(PlainDate.YEAR, 4, 5) // no fixed-width!
+                .endSection()
+                .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
+                .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
+                .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
+                .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
+                .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
+                .addFraction(PlainTime.NANO_OF_SECOND, 3, 6, true)
+                .build(); // lenient mode
+        try {
+            formatter.parse("20000229174521123456");
+        } catch (ParseException pe) {
+            assertThat(
+                pe.getMessage(),
+                is("[MONTH_OF_YEAR] No enum found for value: 22"));
+            assertThat(
+                pe.getErrorOffset(),
+                is(5));
             throw pe;
         }
     }

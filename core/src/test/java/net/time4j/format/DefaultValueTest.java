@@ -22,7 +22,6 @@ public class DefaultValueTest {
                      .withDefault(PlainDate.YEAR, 2012);
         PlainDate date = fmt.parse("05-21");
         assertThat(date, is(PlainDate.of(2012, 5, 21)));
-        System.out.println(date); // 2012-05-21
     }
 
     @Test
@@ -32,7 +31,24 @@ public class DefaultValueTest {
                      .withDefault(PlainDate.MONTH_AS_NUMBER, 11);
         PlainDate date = fmt.parse("2012-21");
         assertThat(date, is(PlainDate.of(2012, 11, 21)));
-        System.out.println(date); // 2012-11-21
+    }
+
+    @Test(expected=ParseException.class)
+    public void noReplaceOfWrongYear() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            PlainDate.localFormatter("uuuu[-]MM[-]dd", PatternType.CLDR)
+                     .withDefault(PlainDate.YEAR, 1985);
+        fmt.parse("10-21");
+    }
+
+    @Test
+    public void replaceWrongYear() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            PlainDate.localFormatter("uuuu[-]MM[-]dd", PatternType.CLDR)
+                     .withDefault(PlainDate.YEAR, 1985)
+                     .with(Attributes.USE_DEFAULT_WHEN_ERROR, true);
+        PlainDate date = fmt.parse("10-21");
+        assertThat(date, is(PlainDate.of(1985, 10, 21)));
     }
 
 }
