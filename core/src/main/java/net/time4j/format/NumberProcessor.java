@@ -257,10 +257,7 @@ final class NumberProcessor<V>
     ) {
 
         Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART);
+            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
         int effectiveMin = 1;
         int effectiveMax = this.getScale();
@@ -276,6 +273,17 @@ final class NumberProcessor<V>
         int len = text.length();
         int start = status.getPosition();
         int pos = start;
+
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+        
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
 
         if (pos >= len) {
             status.setError(pos, "Missing digits for: " + this.element.name());
@@ -317,7 +325,7 @@ final class NumberProcessor<V>
             return;
         }
 
-        if (pos == len) {
+        if (pos >= len) {
             status.setError(
                 start,
                 "Missing digits for: " + this.element.name());

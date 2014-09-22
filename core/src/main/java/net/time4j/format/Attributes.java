@@ -383,6 +383,29 @@ public final class Attributes
         PredefinedKey.valueOf("USE_DEFAULT_WHEN_ERROR", Boolean.class);
 
     /**
+     * <p>Determines how many remaining chars in a given text are reserved
+     * and cannot be consumed by the current format step. </p>
+     *
+     * <p>Default value is {@code 0}. This attribute can be used as sectional
+     * attribute if an integer element is numerically processed. </p>
+     *
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Legt fest, wieviele der verbleibenden Zeichen in einem zu
+     * interpretierenden Text reserviert und damit nicht vom aktuellen
+     * Formatschritt konsumiert werden k&ouml;nnen. </p>
+     *
+     * <p>Standardwert ist {@code 0}. Dieses Attribut eignet sich als
+     * sektionales Attribut, wenn ein Integer-Element numerisch
+     * verarbeitet wird. </p>
+     *
+     * @since   1.3
+     */
+    public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
+        PredefinedKey.valueOf("PROTECTED_CHARACTERS", Integer.class);
+
+    /**
      * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
      * Sprachausgabe von chronologischen Texten (Beispiel Monatsnamen)
      * und andere Aspekte wie Wochennummerierungen steuert. </p>
