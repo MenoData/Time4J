@@ -375,7 +375,7 @@ final class NumberProcessor<V>
 
         if (
             (pos < minPos)
-            && (this.fixedWidth || leniency.isStrict())
+            && (first || this.fixedWidth || leniency.isStrict())
         ) {
             status.setError(
                 start,
