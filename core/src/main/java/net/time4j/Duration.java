@@ -1495,7 +1495,9 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Example: In ISO-8601 a duration of one month, three days and four
      * hours is described as &quot;P1M3DT4H&quot;. The special char
-     * &quot;T&quot; separates date and time part. </p>
+     * &quot;T&quot; separates date and time part. Units are normally
+     * printed using their symbols, as second alternative using the output
+     * of their {@code toString()}-method within curly brackets. </p>
      *
      * <p>Is the duration negative then the representation will have a
      * preceding minus sign as specified by XML-schema (for example
@@ -1521,7 +1523,9 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Beispiel: Im ISO8601-Format ist eine Zeitspanne von 1 Monat, 3 Tagen
      * und 4 Stunden als &quot;P1M3DT4H&quot; beschrieben, wobei der Buchstabe
-     * &quot;T&quot; Datums- und Uhrzeitteil trennt. </p>
+     * &quot;T&quot; Datums- und Uhrzeitteil trennt. Einheiten werden in der
+     * Regel als Symbole ausgegeben, andernfalls wird die Ausgabe ihrer
+     * {@code toString()}-Methode in geschweiften Klammern benutzt. </p>
      *
      * <p>Ist die Zeitspanne negativ, so wird in &Uuml;bereinstimmung mit der
      * XML-Schema-Norm ein Minuszeichen vorangestellt (z.B. &quot;-P2D&quot;),
@@ -1565,6 +1569,9 @@ public final class Duration<U extends IsoUnit>
      * Furthermore, weeks are normalized to days if there are other
      * calendrical units like years or months. </p>
      *
+     * <p>Only units of types {@code CalendarUnit} or {@code ClockUnit} can
+     * be printed. </p>
+     *
      * @return  String
      * @throws  ChronoException if this duration is negative or if any special
      *          units shall be output, but units of type {@code CalendarUnit}
@@ -1590,6 +1597,9 @@ public final class Duration<U extends IsoUnit>
      * Komma verwendet wird. Es gilt auch, da&szlig; ein vorhandenes Wochenfeld
      * zu Tagen auf der Basis (1 Woche = 7 Tage) normalisiert wird, wenn
      * zugleich auch andere Kalendereinheiten vorhanden sind. </p>
+     *
+     * <p>Nur Einheiten der Typen {@code CalendarUnit} oder {@code ClockUnit
+     * k&ouml;nnen angezeigt werden. </p>
      *
      * @return  String
      * @throws  ChronoException if this duration is negative or if any special
@@ -1617,6 +1627,9 @@ public final class Duration<U extends IsoUnit>
      * part is also fractional then this method will use the dot as
      * decimal separator char (deviating specification in XML-schema).
      * Weeks will always be normalized to days. </p>
+     * 
+     * <p>Only units of types {@code CalendarUnit} or {@code ClockUnit} can
+     * be printed. </p>
      *
      * @return  String
      * @throws  ChronoException if any special units shall be
@@ -1639,6 +1652,9 @@ public final class Duration<U extends IsoUnit>
      * Empfehlung des ISO-Standards gew&auml;hlt. Es gilt auch, da&szlig;
      * ein vorhandenes Wochenfeld zu Tagen auf der Basis (1 Woche = 7 Tage)
      * normalisiert wird. </p>
+     *
+     * <p>Nur Einheiten der Typen {@code CalendarUnit} oder {@code ClockUnit
+     * k&ouml;nnen angezeigt werden. </p>
      *
      * @return  String
      * @throws  ChronoException if any special units shall be
@@ -1703,7 +1719,7 @@ public final class Duration<U extends IsoUnit>
      * be stated that week items are missing in contrast to ISO-8601. The
      * method {@code toStringXML()} takes in account these characteristics
      * of XML-schema (leaving aside the fact that XML-schema is potentially
-     * design for unlimited big amounts but Time4J can define durations
+     * designed for unlimited big amounts but Time4J can define durations
      * only in long range with nanosecond precision at best). </p>
      *
      * <p>Examples for supported formats: </p>
