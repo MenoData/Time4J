@@ -1,5 +1,6 @@
 package net.time4j.format;
 
+import net.time4j.Iso8601Format;
 import net.time4j.PatternType;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -100,6 +101,18 @@ public class MiscellaneousTest {
             .with(Attributes.LENIENCY, Leniency.LAX)
             .parse("2014-13-31 27:00"),
             is(PlainTimestamp.of(2015, 2, 1, 3, 0)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseNoDigitsFound1() throws ParseException {
+        PlainDate.localFormatter("yyyy", PatternType.CLDR)
+            .with(Attributes.LENIENCY, Leniency.LAX)
+            .parse("abcd");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseNoDigitsFound2() throws ParseException {
+        Iso8601Format.BASIC_CALENDAR_DATE.parse("0625");
     }
 
 }
