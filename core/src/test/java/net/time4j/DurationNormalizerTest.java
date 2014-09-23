@@ -105,13 +105,13 @@ public class DurationNormalizerTest {
             timePeriod.with(ClockUnit.MINUTES.only()).isEmpty(),
             is(true));
     }
-    
+
     @Test
     public void withApproximatePeriod24Hours() {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         assertThat(
-            dur.with(Duration.approximatePeriod(24 * 60 * 60)),
+            dur.with(Duration.approximateHours(24)),
             is(Duration.ofPositive().years(3).months(2).days(4).build()));
     }
 
@@ -120,17 +120,28 @@ public class DurationNormalizerTest {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         assertThat(
-            dur.with(Duration.approximatePeriod(10)),
+            dur.with(Duration.approximateSeconds(10)),
             is(
             	Duration.ofPositive().years(3).months(2).days(4)
             	.hours(15).minutes(42).seconds(50).build()));
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withApproximatePeriod0Seconds() {
+    public void withApproximatePeriod0Minutes() {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
-        dur.with(Duration.approximatePeriod(0));
+        dur.with(Duration.approximateMinutes(0));
     }
-    
+
+    @Test
+    public void withTimestampNormalizer() {
+		Duration<IsoUnit> dur =
+			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+        assertThat(
+            dur.with(PlainTimestamp.of(2012, 2, 29, 14, 25)),
+            is(
+            	Duration.ofPositive().years(3).months(2).days(4)
+            	.hours(2).minutes(12).build()));
+    }
+
 }

@@ -331,10 +331,10 @@ public final class Duration<U extends IsoUnit>
 
     /**
      * <p>Gets an empty duration without units. </p>
-     * 
+     *
      * <p>This method can also be used for generic upcasting of the
      * type U to {@code IsoUnit}: </p>
-     * 
+     *
      * <pre>
      * 	Duration&lt;CalendarUnit&gt; dur = Duration.ofCalendarUnits(2, 5, 30);
      * 	Duration&lt;IsoUnit&gt; upcasted = Duration.ofZero().plus(dur);
@@ -348,7 +348,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Diese Methode kann auch daf&uuml;r benutzt werden, den generischen
      * Typparameter U zu {@code IsoUnit} zu &auml;ndern: </p>
-     * 
+     *
      * <pre>
      * 	Duration&lt;CalendarUnit&gt; dur = Duration.ofCalendarUnits(2, 5, 30);
      * 	Duration&lt;IsoUnit&gt; upcasted = Duration.ofZero().plus(dur);
@@ -1046,12 +1046,12 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>In order to sum up timespans with different unit types, following
      * trick can be applied: </p>
-     * 
+     *
      * <pre>
      *  Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
      *  Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
      * </pre>
-     * 
+     *
      * <p><strong>Note about sign handling:</strong> If this duration and
      * given timespan have different signs then this method will throw an
      * exception in case of mixed signs for different duration items. So it
@@ -1073,7 +1073,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Um Zeitspannen mit verschiedenen Einheitstypen zu vereinigen, kann
      * folgender Kniff angewandt werden: </p>
-     * 
+     *
      * <pre>
      *  Duration&lt;IsoUnit&gt; zero = Duration.ofZero();
      *  Duration&lt;IsoUnit&gt; result = zero.plus(this).plus(timespan);
@@ -1097,7 +1097,7 @@ public final class Duration<U extends IsoUnit>
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
     	Duration<U> result = merge(this, timespan);
-    	
+
     	if (result == null) {
             throw new IllegalStateException(
                     "Mixed signs in result time span not allowed: "
@@ -1105,9 +1105,9 @@ public final class Duration<U extends IsoUnit>
                     + " PLUS "
                     + timespan);
     	}
-    	
+
     	return result;
-    	
+
     }
 
     /**
@@ -1327,20 +1327,20 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Creates a duration as union of this instance and given timespan
      * where partial amounts of equal units will be summed up. </p>
-     * 
+     *
      * <p>The list result of this method can be used in time arithmetic as follows: </p>
-     * 
+     *
      * <pre>
      *  Duration&lt;CalendarUnit&gt; dateDur =
      *      Duration.ofCalendarUnits(2, 7, 10);
      *  Duration&lt;ClockUnit&gt; timeDur =
      *      Duration.ofClockUnits(0, 30, 0);
      *  PlainTimestamp tsp = PlainTimestamp.of(2014, 1, 1, 0, 0);
-     *  
+     *
      *  for (Duration&lt;?&gt; dur : Duration.ofZero().plus(dateDur).union(timeDur)) {
      *  	tsp = tsp.plus(dur);
-     *  } 
-     *  
+     *  }
+     *
      *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
@@ -1362,18 +1362,18 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Das Listenergebnis dieser Methode kann in der Zeitarithmetik wie folgt
      * genutzt werden: </p>
-     * 
+     *
      * <pre>
      *  Duration&lt;CalendarUnit&gt; dateDur =
      *    Duration.ofCalendarUnits(2, 7, 10);
      *  Duration&lt;ClockUnit&gt; timeDur =
      *    Duration.ofClockUnits(0, 30, 0);
      *  PlainTimestamp tsp = PlainTimestamp.of(2014, 1, 1, 0, 0);
-     *  
+     *
      *  for (Duration&lt;?&gt; dur : Duration.ofZero().plus(dateDur).union(timeDur)) {
      *    tsp = tsp.plus(dur);
-     *  } 
-     *  
+     *  }
+     *
      *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
@@ -1390,9 +1390,9 @@ public final class Duration<U extends IsoUnit>
      * @see	    #plus(TimeSpan)
      */
 	public List<Duration<U>> union(TimeSpan<? extends U> timespan) {
-		
+
 		Duration<U> merged = merge(this, timespan);
-		
+
 		if (merged == null) {
 			List<Duration<U>> result = new ArrayList<Duration<U>>();
 			result.add(this);
@@ -1401,9 +1401,9 @@ public final class Duration<U extends IsoUnit>
 			result.add(other);
 			return Collections.unmodifiableList(result);
 		}
-		
+
 		return Collections.singletonList(merged);
-		
+
 	}
 
     /**
@@ -1414,6 +1414,10 @@ public final class Duration<U extends IsoUnit>
      * @see     #STD_PERIOD
      * @see     #STD_CALENDAR_PERIOD
      * @see     #STD_CLOCK_PERIOD
+     * @see     #approximateHours(int)
+     * @see     #approximateMinutes(int)
+     * @see     #approximateSeconds(int)
+     * @see     ClockUnit#only()
      */
     /*[deutsch]
      * <p>Normalisiert diese Zeitspanne &uuml;ber den angegebenen
@@ -1424,18 +1428,94 @@ public final class Duration<U extends IsoUnit>
      * @see     #STD_PERIOD
      * @see     #STD_CALENDAR_PERIOD
      * @see     #STD_CLOCK_PERIOD
+     * @see     #approximateHours(int)
+     * @see     #approximateMinutes(int)
+     * @see     #approximateSeconds(int)
+     * @see     ClockUnit#only()
      */
     public Duration<U> with(Normalizer<U> normalizer) {
 
         return convert(normalizer.normalize(this));
 
     }
-    
+
     /**
-     * <p>Yields an approximate normalizer in steps of seconds which
-     * finally uses years, months, days, hours, minutes and seconds. </p>
-     * 
-     * @param 	stepsInSeconds		rounding step width in seconds
+     * <p>Yields an approximate normalizer in steps of hours which
+     * finally uses years, months, days and rounded hours. </p>
+     *
+     * <p>Example for suppressing hours (and all smaller units) by mean
+     * of an extra big step width of 24 hours (= 1 day): </p>
+     *
+     * <pre>
+     *  Duration&lt;IsoUnit&gt; dur =
+     *      Duration.ofPositive().years(2).months(13).days(35)
+     *              .minutes(132).build()
+     *              .with(Duration.approximateHours(24));
+     *  System.out.println(dur); // output: P3Y2M4D
+     * </pre>
+     *
+     * @param 	steps   rounding step width
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in Stundenschritten auf
+     * N&auml;herungsbasis mit Jahren, Monaten, Tagen und gerundeten Stunden
+     * erstellt. </p>
+     *
+     * <p>Beispiel f&uuml;r das Unterdr&uuml;cken von Stunden mittels einer
+     * extra gro&szlig;en Schrittweite von 24 Stunden (= 1 Tag): </p>
+     *
+     * <pre>
+     *  Duration&lt;IsoUnit&gt; dur =
+     *      Duration.ofPositive().years(2).months(13).days(35)
+     *              .minutes(132).build()
+     *              .with(Duration.approximateHours(24));
+     *  System.out.println(dur); // output: P3Y2M4D
+     * </pre>
+     *
+     * @param 	steps   rounding step width
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    public static Normalizer<IsoUnit> approximateHours(int steps) {
+
+    	return new ApproximateNormalizer(steps, HOURS);
+
+    }
+
+    /**
+     * <p>Yields an approximate normalizer in steps of minutes which
+     * finally uses years, months, days, hours and rounded minutes. </p>
+     *
+     * @param 	steps   rounding step width
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in Minutenschritten auf
+     * N&auml;herungsbasis mit Jahren, Monaten, Tagen, Stunden und gerundeten
+     * Minuten erstellt. </p>
+     *
+     * @param 	steps   rounding step width
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    public static Normalizer<IsoUnit> approximateMinutes(int steps) {
+
+    	return new ApproximateNormalizer(steps, MINUTES);
+
+    }
+
+    /**
+     * <p>Yields an approximate normalizer in steps of seconds which finally
+     * uses years, months, days, hours, minutes and rounded seconds. </p>
+     *
+     * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
      * @since	1.3
@@ -1443,17 +1523,17 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine Dauer in Sekundenschritten auf
      * N&auml;herungsbasis mit Jahren, Monaten, Tagen, Stunden, Minuten und
-     * Sekunden erstellt. </p>
-     * 
-     * @param 	stepsInSeconds		rounding step width in seconds
+     * gerundeten Sekunden erstellt. </p>
+     *
+     * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
      * @since	1.3
      */
-    public static Normalizer<IsoUnit> approximatePeriod(int stepsInSeconds) {
-    	
-    	return new ApproximateNormalizer(stepsInSeconds);
-    	
+    public static Normalizer<IsoUnit> approximateSeconds(int steps) {
+
+    	return new ApproximateNormalizer(steps, SECONDS);
+
     }
 
     /**
@@ -1652,7 +1732,7 @@ public final class Duration<U extends IsoUnit>
      * part is also fractional then this method will use the dot as
      * decimal separator char (deviating specification in XML-schema).
      * Weeks will always be normalized to days. </p>
-     * 
+     *
      * <p>Only units of types {@code CalendarUnit} or {@code ClockUnit} can
      * be printed. </p>
      *
@@ -2293,7 +2373,7 @@ public final class Duration<U extends IsoUnit>
         if (duration.isNegative() == tsign) {
         	negative = tsign;
         } else {
-            boolean firstScan = true;            
+            boolean firstScan = true;
             for (Map.Entry<U, Long> entry : map.entrySet()) {
                 boolean nsign = (entry.getValue().longValue() < 0);
                 if (firstScan) {
@@ -4637,86 +4717,85 @@ public final class Duration<U extends IsoUnit>
 
     private static class ApproximateNormalizer
     	implements Normalizer<IsoUnit> {
-    	
+
         //~ Instanzvariablen ----------------------------------------------
 
-		private final long stepsInSeconds;
+		private final int steps;
+        private final ClockUnit unit;
 
         //~ Konstruktoren -------------------------------------------------
 
-		ApproximateNormalizer(int stepsInSeconds) {
+		ApproximateNormalizer(
+            int steps,
+            ClockUnit unit
+        ) {
 			super();
-			
-			if (stepsInSeconds < 1) {
-				throw new IllegalArgumentException(
-					"Step width is not positive: " + stepsInSeconds);
-			}
 
-			this.stepsInSeconds = stepsInSeconds;
+			if (steps < 1) {
+				throw new IllegalArgumentException(
+					"Step width is not positive: " + steps);
+			} else if (unit.compareTo(SECONDS) > 0) {
+                throw new IllegalArgumentException("Unsupported unit.");
+            }
+
+			this.steps = steps;
+            this.unit = unit;
 
 		}
-    	
+
 	    //~ Methoden ------------------------------------------------------
-	
+
 	    @Override
-	    public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
-	
-	        int count = timespan.getTotalLength().size();
+	    public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> dur) {
+
 	        double total = 0.0;
-	
-	        for (int i = 0; i < count; i++) {
-	            Item<? extends IsoUnit> item = timespan.getTotalLength().get(i);
+
+	        for (int i = 0, n = dur.getTotalLength().size(); i < n; i++) {
+	            Item<? extends IsoUnit> item = dur.getTotalLength().get(i);
 	            total += (item.getAmount() * item.getUnit().getLength());
 	        }
-	
-			long value = (long) (total / this.stepsInSeconds);
-			value *= this.stepsInSeconds;
 
+			long value = (long) total;
 			int y = 0, m = 0, d = 0, h = 0, min = 0, s = 0;
 
-			if (value >= this.stepsInSeconds) {
-				y = safeCast(value / CalendarUnit.YEARS.getLength());
-				value -= y * CalendarUnit.YEARS.getLength();
+            y = safeCast(value / YEARS.getLength());
+			value -= y * YEARS.getLength();
+			m = safeCast(value / MONTHS.getLength());
+			value -= m * MONTHS.getLength();
+			d = safeCast(value / DAYS.getLength());
+			value -= d * DAYS.getLength();
+			h = safeCast(value / HOURS.getLength());
+
+			if (this.unit == HOURS) {
+                h = (h / this.steps);
+                h *= this.steps;
+            } else if (this.unit.compareTo(MINUTES) >= 0) {
+                value -= h * HOURS.getLength();
+				min = safeCast(value / MINUTES.getLength());
+                if (this.unit == MINUTES) {
+                    min = (min / this.steps);
+                    min *= this.steps;
+                } else { // seconds
+                    value -= min * MINUTES.getLength();
+                    s = safeCast(value / SECONDS.getLength());
+                    s = (s / this.steps);
+                    s *= this.steps;
+                }
 			}
 
-			if (value >= this.stepsInSeconds) {
-				m = safeCast(value / CalendarUnit.MONTHS.getLength());
-				value -= m * CalendarUnit.MONTHS.getLength();
-			}
-
-			if (value >= this.stepsInSeconds) {
-				d = safeCast(value / CalendarUnit.DAYS.getLength());
-				value -= d * CalendarUnit.DAYS.getLength();
-			}
-
-			if (value >= this.stepsInSeconds) {
-				h = safeCast(value / ClockUnit.HOURS.getLength());
-				value -= h * ClockUnit.HOURS.getLength();
-			}
-
-			if (value >= this.stepsInSeconds) {
-				min = safeCast(value / ClockUnit.MINUTES.getLength());
-				value -= min * ClockUnit.MINUTES.getLength();
-			}
-
-			if (value >= this.stepsInSeconds) {
-				value = (value / this.stepsInSeconds) * this.stepsInSeconds;
-				s = safeCast(value / ClockUnit.SECONDS.getLength());
-			}
-		
-	        Duration<IsoUnit> duration = 
+	        Duration<IsoUnit> duration =
 	        	Duration.ofPositive()
 	        	.years(y).months(m).days(d)
 	        	.hours(h).minutes(min).seconds(s).build();
-	        
-	        if (timespan.isNegative()) {
+
+	        if (dur.isNegative()) {
 	        	duration = duration.inverse();
 	        }
-	        
+
 	        return duration;
-	
+
 	    }
-	
+
 	    private static int safeCast(double num) {
 
 	        if (num < Integer.MIN_VALUE || num > Integer.MAX_VALUE) {

@@ -34,9 +34,12 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
+import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
+import net.time4j.engine.TimeSpan;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
@@ -60,6 +63,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.MICROS;
+import static net.time4j.ClockUnit.MILLIS;
+import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.ClockUnit.SECONDS;
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
 
@@ -162,7 +174,10 @@ import static net.time4j.PlainTime.*;
 @CalendarType("iso8601")
 public final class PlainTimestamp
     extends TimePoint<IsoUnit, PlainTimestamp>
-    implements GregorianDate, WallTime, Temporal<PlainTimestamp> {
+    implements GregorianDate,
+               WallTime,
+               Temporal<PlainTimestamp>,
+               Normalizer<IsoUnit> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -175,6 +190,7 @@ public final class PlainTimestamp
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
+    private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
 
     static {
         Map<Object, ChronoElement<?>> children =
@@ -324,6 +340,10 @@ public final class PlainTimestamp
         registerCalendarUnits(builder);
         registerClockUnits(builder);
         ENGINE = builder.build();
+
+        IsoUnit[] units =
+            {YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS, NANOS};
+        STD_METRIC = Duration.in(units);
     }
 
     private static final long serialVersionUID = 7458380065762437714L;
@@ -1047,6 +1067,29 @@ public final class PlainTimestamp
         }
 
         return !Timezone.of(tzid).isInvalid(this.date, this.time);
+
+    }
+
+    /**
+     * <p>Normalized given timespan using years, months, days and
+     * all clock units. </p>
+     *
+     * @param   timespan    to be normalized
+     * @return  normalized duration
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Normalisiert die angegebene Zeitspanne, indem Jahre, Monate, Tage
+     * und alle Uhrzeiteinheiten verwendet werden. </p>
+     *
+     * @param   timespan    to be normalized
+     * @return  normalized duration
+     * @since   1.3
+     */
+    @Override
+    public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
+
+        return this.until(this.plus(timespan), STD_METRIC);
 
     }
 
