@@ -105,5 +105,32 @@ public class DurationNormalizerTest {
             timePeriod.with(ClockUnit.MINUTES.only()).isEmpty(),
             is(true));
     }
+    
+    @Test
+    public void withApproximatePeriod24Hours() {
+		Duration<IsoUnit> dur =
+			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+        assertThat(
+            dur.with(Duration.approximatePeriod(24 * 60 * 60)),
+            is(Duration.ofPositive().years(3).months(2).days(4).build()));
+    }
 
+    @Test
+    public void withApproximatePeriod10Seconds() {
+		Duration<IsoUnit> dur =
+			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+        assertThat(
+            dur.with(Duration.approximatePeriod(10)),
+            is(
+            	Duration.ofPositive().years(3).months(2).days(4)
+            	.hours(15).minutes(42).seconds(50).build()));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withApproximatePeriod0Seconds() {
+		Duration<IsoUnit> dur =
+			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+        dur.with(Duration.approximatePeriod(0));
+    }
+    
 }
