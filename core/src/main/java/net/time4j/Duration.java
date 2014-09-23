@@ -1430,6 +1430,31 @@ public final class Duration<U extends IsoUnit>
         return convert(normalizer.normalize(this));
 
     }
+    
+    /**
+     * <p>Yields an approximate normalizer in steps of seconds which
+     * finally uses years, months, days, hours, minutes and seconds. </p>
+     * 
+     * @param 	stepsInSeconds		rounding step width in seconds
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in Sekundenschritten auf
+     * N&auml;herungsbasis mit Jahren, Monaten, Tagen, Stunden, Minuten und
+     * Sekunden erstellt. </p>
+     * 
+     * @param 	stepsInSeconds		rounding step width in seconds
+     * @return	new normalizer for fuzzy and approximate durations
+     * @throws	IllegalArgumentException if the argument is not positive
+     * @since	1.3
+     */
+    public static Normalizer<IsoUnit> approximatePeriod(int stepsInSeconds) {
+    	
+    	return new ApproximateNormalizer(stepsInSeconds);
+    	
+    }
 
     /**
      * <p>Based on all stored duration items and the sign. </p>
@@ -4607,6 +4632,100 @@ public final class Duration<U extends IsoUnit>
             return this.base.plus(d1).compareTo(this.base.plus(d2));
 
         }
+
+    }
+
+    private static class ApproximateNormalizer
+    	implements Normalizer<IsoUnit> {
+    	
+        //~ Instanzvariablen ----------------------------------------------
+
+		private final long stepsInSeconds;
+
+        //~ Konstruktoren -------------------------------------------------
+
+		ApproximateNormalizer(int stepsInSeconds) {
+			super();
+			
+			if (stepsInSeconds < 1) {
+				throw new IllegalArgumentException(
+					"Step width is not positive: " + stepsInSeconds);
+			}
+
+			this.stepsInSeconds = stepsInSeconds;
+
+		}
+    	
+	    //~ Methoden ------------------------------------------------------
+	
+	    @Override
+	    public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
+	
+	        int count = timespan.getTotalLength().size();
+	        double total = 0.0;
+	
+	        for (int i = 0; i < count; i++) {
+	            Item<? extends IsoUnit> item = timespan.getTotalLength().get(i);
+	            total += (item.getAmount() * item.getUnit().getLength());
+	        }
+	
+			long value = (long) (total / this.stepsInSeconds);
+			value *= this.stepsInSeconds;
+
+			int y = 0, m = 0, d = 0, h = 0, min = 0, s = 0;
+
+			if (value >= this.stepsInSeconds) {
+				y = safeCast(value / CalendarUnit.YEARS.getLength());
+				value -= y * CalendarUnit.YEARS.getLength();
+			}
+
+			if (value >= this.stepsInSeconds) {
+				m = safeCast(value / CalendarUnit.MONTHS.getLength());
+				value -= m * CalendarUnit.MONTHS.getLength();
+			}
+
+			if (value >= this.stepsInSeconds) {
+				d = safeCast(value / CalendarUnit.DAYS.getLength());
+				value -= d * CalendarUnit.DAYS.getLength();
+			}
+
+			if (value >= this.stepsInSeconds) {
+				h = safeCast(value / ClockUnit.HOURS.getLength());
+				value -= h * ClockUnit.HOURS.getLength();
+			}
+
+			if (value >= this.stepsInSeconds) {
+				min = safeCast(value / ClockUnit.MINUTES.getLength());
+				value -= min * ClockUnit.MINUTES.getLength();
+			}
+
+			if (value >= this.stepsInSeconds) {
+				value = (value / this.stepsInSeconds) * this.stepsInSeconds;
+				s = safeCast(value / ClockUnit.SECONDS.getLength());
+			}
+		
+	        Duration<IsoUnit> duration = 
+	        	Duration.ofPositive()
+	        	.years(y).months(m).days(d)
+	        	.hours(h).minutes(min).seconds(s).build();
+	        
+	        if (timespan.isNegative()) {
+	        	duration = duration.inverse();
+	        }
+	        
+	        return duration;
+	
+	    }
+	
+	    private static int safeCast(double num) {
+
+	        if (num < Integer.MIN_VALUE || num > Integer.MAX_VALUE) {
+	            throw new ArithmeticException("Out of range: " + num);
+	        } else {
+	            return (int) num;
+	        }
+
+	    }
 
     }
 
