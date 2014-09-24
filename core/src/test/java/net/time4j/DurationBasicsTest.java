@@ -533,9 +533,23 @@ public class DurationBasicsTest {
             is(Duration.ofPositive().nanos(123455789).build()));
     }
 
+    @Test
+    public void plusWithMixedSigns1() {
+        assertThat(
+            Duration.ofCalendarUnits(1, 4, 3).plus(-5, CalendarUnit.MONTHS),
+            is(Duration.ofCalendarUnits(0, 11, 3)));
+    }
+
     @Test(expected=IllegalStateException.class)
-    public void plusWithMixedSigns() {
-        Duration.ofCalendarUnits(12, 4, 3).plus(-5, CalendarUnit.MONTHS);
+    public void plusWithMixedSigns2() {
+        Duration.ofCalendarUnits(0, 4, 3).plus(-5, CalendarUnit.MONTHS);
+    }
+
+    @Test
+    public void plusWithMixedSigns3() {
+        assertThat(
+            Duration.ofClockUnits(1, 4, 30).plus(-5, ClockUnit.MINUTES),
+            is(Duration.ofClockUnits(0, 59, 30)));
     }
 
     @Test(expected=IllegalArgumentException.class)

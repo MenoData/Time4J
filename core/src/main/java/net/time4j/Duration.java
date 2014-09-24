@@ -1006,8 +1006,8 @@ public final class Duration<U extends IsoUnit>
         if (index < 0) { // Einheit nicht vorhanden
             if (this.isNegative() == negatedValue) {
                 temp.add(Item.of(amount, unit));
-            } else {
-                this.throwMixedSignsException(originalAmount, originalUnit);
+            } else { // mixed signs possible => last try
+                return this.plus(Duration.of(originalAmount, originalUnit));
             }
         } else {
             long sum =
@@ -1031,8 +1031,8 @@ public final class Duration<U extends IsoUnit>
                 long absSum = ((sum < 0) ? MathUtils.safeNegate(sum) : sum);
                 temp.set(index, Item.of(absSum, unit));
                 resultNegative = (sum < 0);
-            } else {
-                this.throwMixedSignsException(originalAmount, originalUnit);
+            } else { // mixed signs possible => last try
+                return this.plus(Duration.of(originalAmount, originalUnit));
             }
         }
 
@@ -1053,9 +1053,11 @@ public final class Duration<U extends IsoUnit>
      * </pre>
      *
      * <p><strong>Note about sign handling:</strong> If this duration and
-     * given timespan have different signs then this method will throw an
-     * exception in case of mixed signs for different duration items. So it
-     * is strongly recommended only to merge durations with equal signs.</p>
+     * given timespan have different signs then Time4J tries to apply a
+     * normalization in the hope the mixed signs disappear. Otherwise
+     * this method will throw an exception in case of mixed signs for
+     * different duration items. So it is strongly recommended only to
+     * merge durations with equal signs.</p>
      *
      * @param   timespan    other time span this duration will be merged
      *                      with by adding the partial amounts
@@ -1080,9 +1082,11 @@ public final class Duration<U extends IsoUnit>
      * </pre>
      *
      * <p><strong>Hinweis zur Vorzeichenbehandlung:</strong> Wenn diese Dauer
-     * und die angegebene Zeitspanne verschiedene Vorzeichen haben, wirft diese
-     * Methode eine Ausnahme im Fall gemischter Vorzeichen f&uuml;r einzelne
-     * Dauerelemente. Es wird dringend empfohlen, nur Zeitspannen mit gleichen
+     * und die angegebene Zeitspanne verschiedene Vorzeichen haben, wird
+     * Time4J bei Bedarf eine automatische Normalisierung durchf&uuml;hren.
+     * Sind dann immer noch gemischte Vorzeichen f&uuml;r einzelne
+     * Dauerelemente vorhanden, wird eine Ausnahme geworfen. Es wird
+     * deshalb empfohlen, nur Zeitspannen mit gleichen
      * Vorzeichen zusammenzuf&uuml;hren.</p>
      *
      * @param   timespan    other time span this duration will be merged
@@ -1094,11 +1098,70 @@ public final class Duration<U extends IsoUnit>
      * @throws  ArithmeticException in case of long overflow
      * @see	    #union(TimeSpan)
      */
+    @SuppressWarnings("unchecked")
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
     	Duration<U> result = merge(this, timespan);
 
     	if (result == null) {
+            long[] sums = new long[4];
+            sums[0] = 0;
+            sums[1] = 0;
+            sums[2] = 0;
+            sums[3] = 0;
+
+            if (summarize(this, sums) && summarize(timespan, sums)) {
+                long months = sums[0];
+                long days = sums[1];
+                long secs = sums[2];
+                long nanos = sums[3];
+                long daytime;
+
+                if (nanos != 0) {
+                    daytime = nanos;
+                } else if (secs != 0) {
+                    daytime = secs;
+                } else {
+                    daytime = days;
+                }
+
+                boolean negMonths = (months < 0);
+                boolean negDaytime = (daytime < 0);
+
+                if (negMonths == negDaytime) {
+                    boolean neg = negMonths;
+
+                    if (neg) {
+                        months = MathUtils.safeNegate(months);
+                        days = MathUtils.safeNegate(days);
+                        secs = MathUtils.safeNegate(secs);
+                        nanos = MathUtils.safeNegate(nanos);
+                    }
+
+                    long years = months / 12;
+                    months = months % 12;
+                    long nanosecs = 0;
+                    if (nanos != 0) {
+                        nanosecs = nanos / MRD;
+                        secs = nanos % MRD;
+                    }
+                    long hours = secs / 3600;
+                    secs = secs % 3600;
+                    long minutes = secs / 60;
+                    secs = secs % 60;
+
+                    Map<IsoUnit, Long> map = new HashMap<IsoUnit, Long>();
+                    map.put(YEARS, years);
+                    map.put(MONTHS, months);
+                    map.put(DAYS, days);
+                    map.put(HOURS, hours);
+                    map.put(MINUTES, minutes);
+                    map.put(SECONDS, secs);
+                    map.put(NANOS, nanosecs);
+                    return (Duration<U>) Duration.create(map, neg);
+                }
+            }
+
             throw new IllegalStateException(
                     "Mixed signs in result time span not allowed: "
                     + this
@@ -1328,7 +1391,8 @@ public final class Duration<U extends IsoUnit>
      * <p>Creates a duration as union of this instance and given timespan
      * where partial amounts of equal units will be summed up. </p>
      *
-     * <p>The list result of this method can be used in time arithmetic as follows: </p>
+     * <p>The list result of this method can be used in time arithmetic as
+     * follows: </p>
      *
      * <pre>
      *  Duration&lt;CalendarUnit&gt; dateDur =
@@ -1344,13 +1408,16 @@ public final class Duration<U extends IsoUnit>
      *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
-     * <p>Note that this example will even work in case of mixed signs. No exception
-     * will be thrown. Instead this duration and the other one would just be added
-     * to the timestamp within a loop - step by step. </p>
+     * <p>Note that this example will even work in case of mixed signs. No
+     * exception will be thrown. Instead this duration and the other one would
+     * just be added to the timestamp within a loop - step by step. In contrast
+     * to {@code plus(TimeSpan)}, Time4J does not try to normalize the durations
+     * in order to produce a unique sign (on best effort base) in case of
+     * mixed signs. </p>
      *
      * @param   timespan    other time span this duration is to be merged with
-     * @return  unmodifiable list with one new merged duration or two unmerged durations
-     * 			in case of mixed signs
+     * @return  unmodifiable list with one new merged duration or two unmerged
+     *          durations in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see	    #plus(TimeSpan)
@@ -1377,14 +1444,17 @@ public final class Duration<U extends IsoUnit>
      *  System.out.println(tsp); // 2016-08-11T00:30
      * </pre>
      *
-     * <p>Zu beachten: Dieses Beispiel funktioniert sogar, wenn beide Dauer-Objekte wegen
-     * gemischter Vorzeichen nicht zusammengef&uuml;hrt werden k&ouml;nnen. Stattdessen
-     * werden dann diese Dauer und die angegebene Zeitspanne Schritt f&uuml;r Schritt
-     * innerhalb der Schleife zum Zeitstempel aufaddiert. </p>
+     * <p>Zu beachten: Dieses Beispiel funktioniert sogar, wenn beide
+     * Dauer-Objekte wegen gemischter Vorzeichen nicht zusammengef&uuml;hrt
+     * werden k&ouml;nnen. Stattdessen werden dann diese Dauer und die
+     * angegebene Zeitspanne Schritt f&uuml;r Schritt innerhalb der Schleife
+     * zum Zeitstempel aufaddiert. Anders als in {@code plus(TimeSpan)}
+     * versucht Time4J hier nicht, im Fall gemischter Vorzeichen mit Hilfe
+     * einer Normalisierung ein eindeutiges Vorzeichen herzustellen. </p>
      *
      * @param   timespan    other time span this duration is to be merged with
-     * @return  unmodifiable list with one new merged duration or two unmerged durations
-     * 			in case of mixed signs
+     * @return  unmodifiable list with one new merged duration or two unmerged
+     *          durations in case of mixed signs
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see	    #plus(TimeSpan)
@@ -2402,24 +2472,131 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private void throwMixedSignsException(
-        long amount,
-        ChronoUnit unit
+    private static <U extends IsoUnit> boolean summarize(
+        TimeSpan<? extends U> timespan,
+        long[] sums
     ) {
 
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("Mixed signs in result time span not allowed: ");
-        sb.append(this);
-        sb.append(" + (");
-        sb.append(amount);
-        sb.append(' ');
-        sb.append(unit);
-        sb.append(')');
-        throw new IllegalStateException(sb.toString());
+        long months = sums[0];
+        long days = sums[1];
+        long secs = sums[2];
+        long nanos = sums[3];
+
+        for (Item<? extends U> item : timespan.getTotalLength()) {
+            U unit = item.getUnit();
+            long amount = item.getAmount();
+
+            if (timespan.isNegative()) {
+                amount = MathUtils.safeNegate(amount);
+            }
+
+            if (unit instanceof CalendarUnit) {
+                CalendarUnit cu = CalendarUnit.class.cast(unit);
+                switch (cu) {
+                    case MILLENNIA:
+                        months =
+                            MathUtils.safeAdd(months,
+                                MathUtils.safeMultiply(amount, 12 * 1000));
+                        break;
+                    case CENTURIES:
+                        months =
+                            MathUtils.safeAdd(months,
+                                MathUtils.safeMultiply(amount, 12 * 100));
+                        break;
+                    case DECADES:
+                        months =
+                            MathUtils.safeAdd(months,
+                                MathUtils.safeMultiply(amount, 12 * 10));
+                        break;
+                    case YEARS:
+                        months =
+                            MathUtils.safeAdd(months,
+                                MathUtils.safeMultiply(amount, 12));
+                        break;
+                    case QUARTERS:
+                        months =
+                            MathUtils.safeAdd(months,
+                                MathUtils.safeMultiply(amount, 3));
+                        break;
+                    case MONTHS:
+                        months = MathUtils.safeAdd(months, amount);
+                        break;
+                    case WEEKS:
+                        days =
+                            MathUtils.safeAdd(days,
+                                MathUtils.safeMultiply(amount, 7));
+                        break;
+                    case DAYS:
+                        days = MathUtils.safeAdd(days, amount);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException(cu.name());
+                }
+            } else if (unit instanceof ClockUnit) {
+                ClockUnit cu = ClockUnit.class.cast(unit);
+                switch (cu) {
+                    case HOURS:
+                        secs =
+                            MathUtils.safeAdd(secs,
+                                MathUtils.safeMultiply(amount, 3600));
+                        break;
+                    case MINUTES:
+                        secs =
+                            MathUtils.safeAdd(secs,
+                                MathUtils.safeMultiply(amount, 60));
+                        break;
+                    case SECONDS:
+                        secs = MathUtils.safeAdd(secs, amount);
+                        break;
+                    case MILLIS:
+                        nanos =
+                            MathUtils.safeAdd(nanos,
+                                MathUtils.safeMultiply(amount, MIO));
+                        break;
+                    case MICROS:
+                        nanos =
+                            MathUtils.safeAdd(nanos,
+                                MathUtils.safeMultiply(amount, 1000));
+                        break;
+                    case NANOS:
+                        nanos = MathUtils.safeAdd(nanos, amount);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException(cu.name());
+                }
+            } else {
+                return false;
+            }
+        }
+
+        if (nanos != 0) {
+            nanos =
+                MathUtils.safeAdd(nanos,
+                    MathUtils.safeMultiply(days, 86400L * MRD));
+            nanos =
+                MathUtils.safeAdd(nanos,
+                    MathUtils.safeMultiply(secs, MRD));
+            days = 0;
+            secs = 0;
+        } else if (secs != 0) {
+            secs =
+                MathUtils.safeAdd(secs,
+                    MathUtils.safeMultiply(days, 86400L));
+            days = 0;
+        }
+
+        sums[0] = months;
+        sums[1] = days;
+        sums[2] = secs;
+        sums[3] = nanos;
+
+        return true;
 
     }
 
-    private static <U extends IsoUnit> Duration<U> convert(TimeSpan<U> timespan) {
+    private static <U extends IsoUnit> Duration<U> convert(
+        TimeSpan<U> timespan
+    ) {
 
         if (timespan instanceof Duration) {
             return cast(timespan);
