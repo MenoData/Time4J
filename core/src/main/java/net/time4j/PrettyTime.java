@@ -561,7 +561,6 @@ public final class PrettyTime {
             return this.format(item, negative, width);
         }
 
-        UnitPatterns p = UnitPatterns.of(this.locale);
         Object[] parts = new Object[len];
 
         for (int i = 0; i < len; i++) {
@@ -569,6 +568,7 @@ public final class PrettyTime {
                 this.format(duration.getTotalLength().get(i), negative, width);
         }
 
+        UnitPatterns p = UnitPatterns.of(this.locale);
         return MessageFormat.format(p.getListPattern(width, len), parts);
 
     }
@@ -776,9 +776,18 @@ public final class PrettyTime {
         boolean negative,
         TextWidth width
     ) {
+    	
+    	return this.format(item.getAmount(), item.getUnit(), negative, width);
+    	
+    }
 
-        IsoUnit unit = item.getUnit();
-        long amount = item.getAmount();
+    private String format(
+		long amount,
+		IsoUnit unit,
+        boolean negative,
+        TextWidth width
+    ) {
+
         long value = amount;
 
         if (negative) {
@@ -803,6 +812,11 @@ public final class PrettyTime {
                 }
                 return this.print(value, u, width);
             }
+        } else if (unit instanceof OverflowUnit) {
+        	CalendarUnit u = OverflowUnit.class.cast(unit).getCalendarUnit();
+            return this.print(value, u, width);
+        } else if (unit.equals(CalendarUnit.weekBasedYears())) {
+        	return this.print(value, CalendarUnit.YEARS, width);
         } else {
             return this.format(value) + " " + unit.toString(); // fallback
         }
