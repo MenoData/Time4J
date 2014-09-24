@@ -134,7 +134,7 @@ public class DurationNormalizerTest {
     }
 
     @Test
-    public void withTimestampNormalizer() {
+    public void withTimestampNormalizer1() {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         assertThat(
@@ -142,6 +142,14 @@ public class DurationNormalizerTest {
             is(
             	Duration.ofPositive().years(3).months(2).days(4)
             	.hours(2).minutes(12).build()));
+    }
+
+    @Test
+    public void withTimestampNormalizer2() {
+        Duration<CalendarUnit> dur = Duration.of(30, CalendarUnit.DAYS);
+        assertThat(
+            PlainTimestamp.of(2012, 2, 28, 0, 0).normalize(dur),
+            is(Duration.ofPositive().months(1).days(1).build()));
     }
 
 }

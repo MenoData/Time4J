@@ -1074,6 +1074,15 @@ public final class PlainTimestamp
      * <p>Normalized given timespan using years, months, days and
      * all clock units. </p>
      *
+     * <p>This normalizer can also convert from days to months. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; dur = Duration.of(30, CalendarUnit.DAYS);
+     *  Duration&lt;IsoUnit&gt; result =
+     *      PlainTimestamp.of(2012, 2, 28, 0, 0).normalize(dur);
+     *  System.out.println(result); // output: P1M1D (leap year!)
+     * </pre>
+     *
      * @param   timespan    to be normalized
      * @return  normalized duration
      * @since   1.3
@@ -1081,6 +1090,16 @@ public final class PlainTimestamp
     /*[deutsch]
      * <p>Normalisiert die angegebene Zeitspanne, indem Jahre, Monate, Tage
      * und alle Uhrzeiteinheiten verwendet werden. </p>
+     *
+     * <p>Dieser Normalisierer kann auch von Tagen zu Monaten konvertieren.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; dur = Duration.of(30, CalendarUnit.DAYS);
+     *  Duration&lt;IsoUnit&gt; result =
+     *      PlainTimestamp.of(2012, 2, 28, 0, 0).normalize(dur);
+     *  System.out.println(result); // Ausgabe: P1M1D (Schaltjahr!)
+     * </pre>
      *
      * @param   timespan    to be normalized
      * @return  normalized duration

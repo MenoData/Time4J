@@ -188,7 +188,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Weeks will be normalized to days if weeks do not represent
      * the only calendrical duration items. </p>
      *
-     * @see     PlainTimestamp
+     * @see     PlainTimestamp#normalize(TimeSpan)
      */
     /*[deutsch]
      * <p>Normalisiert die Zeitspannenelemente einer Zeitspanne auf der Basis
@@ -206,7 +206,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Wochen werden genau dann zu Tagen konvertiert, wenn sie nicht das
      * einzige datumsbezogene Zeitspannenelement darstellen. </p>
      *
-     * @see     PlainTimestamp
+     * @see     PlainTimestamp#normalize(TimeSpan)
      */
     public static Normalizer<IsoUnit> STD_PERIOD = new TimestampNormalizer();
 
@@ -218,7 +218,7 @@ public final class Duration<U extends IsoUnit>
      * the only calendrical duration items. Only time units of type
      * {@link CalendarUnit} will be normalized. </p>
      *
-     * @see     PlainDate
+     * @see     PlainDate#normalize(TimeSpan)
      */
     /*[deutsch]
      * <p>Normalisiert die Datumselemente einer Zeitspanne auf der Basis
@@ -229,7 +229,7 @@ public final class Duration<U extends IsoUnit>
      * einzige datumsbezogene Zeitspannenelement darstellen. Nur Zeiteinheiten
      * des Enums {@link CalendarUnit} werden normalisiert. </p>
      *
-     * @see     PlainDate
+     * @see     PlainDate#normalize(TimeSpan)
      */
     public static Normalizer<CalendarUnit> STD_CALENDAR_PERIOD =
         new DateNormalizer();

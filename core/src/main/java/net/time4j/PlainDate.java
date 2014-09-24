@@ -1335,6 +1335,38 @@ public final class PlainDate
 
     }
 
+    /**
+     * <p>Normalized given timespan using years, months and days. </p>
+     *
+     * <p>This normalizer can also convert from days to months. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; dur = Duration.of(30, CalendarUnit.DAYS);
+     *  Duration&lt;CalendarUnit&gt; result =
+     *      PlainDate.of(2012, 2, 28).normalize(dur);
+     *  System.out.println(result); // output: P1M1D (leap year!)
+     * </pre>
+     *
+     * @param   timespan    to be normalized
+     * @return  normalized duration in years, months and days
+     */
+    /*[deutsch]
+     * <p>Normalisiert die angegebene Zeitspanne, indem Jahre, Monate und Tage
+     * verwendet werden. </p>
+     *
+     * <p>Dieser Normalisierer kann auch von Tagen zu Monaten konvertieren.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; dur = Duration.of(30, CalendarUnit.DAYS);
+     *  Duration&lt;CalendarUnit&gt; result =
+     *      PlainDate.of(2012, 2, 28).normalize(dur);
+     *  System.out.println(result); // Ausgabe: P1M1D (Schaltjahr!)
+     * </pre>
+     *
+     * @param   timespan    to be normalized
+     * @return  normalized duration in years, months and days
+     */
     @Override
     public Duration<CalendarUnit> normalize(
         TimeSpan<? extends CalendarUnit> timespan) {
