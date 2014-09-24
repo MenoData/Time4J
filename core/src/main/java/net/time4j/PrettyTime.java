@@ -777,13 +777,13 @@ public final class PrettyTime {
         TextWidth width
     ) {
     	
-    	return this.format(item.getAmount(), item.getUnit(), negative, width);
+        return this.format(item.getAmount(), item.getUnit(), negative, width);
     	
     }
 
     private String format(
-		long amount,
-		IsoUnit unit,
+        long amount,
+        IsoUnit unit,
         boolean negative,
         TextWidth width
     ) {
@@ -800,8 +800,7 @@ public final class PrettyTime {
                 return this.print(value, u, width);
             } else {
                 ClockUnit u = ClockUnit.class.cast(unit);
-
-                if (u == NANOS) { // Duration has no MILLIS or MICROS
+                if (u == NANOS) { // Duration has no internal MILLIS or MICROS
                     if ((amount % MIO) == 0) {
                         u = MILLIS;
                         value = value / MIO;
@@ -813,13 +812,15 @@ public final class PrettyTime {
                 return this.print(value, u, width);
             }
         } else if (unit instanceof OverflowUnit) {
-        	CalendarUnit u = OverflowUnit.class.cast(unit).getCalendarUnit();
-            return this.print(value, u, width);
+            CalendarUnit u = OverflowUnit.class.cast(unit).getCalendarUnit();
+            if (SUPPORTED_UNITS.contains(u)) {
+                return this.print(value, u, width);
+            }
         } else if (unit.equals(CalendarUnit.weekBasedYears())) {
-        	return this.print(value, CalendarUnit.YEARS, width);
-        } else {
-            return this.format(value) + " " + unit.toString(); // fallback
+            return this.print(value, CalendarUnit.YEARS, width);
         }
+
+        return this.format(value) + " " + unit.toString(); // fallback
 
     }
 
