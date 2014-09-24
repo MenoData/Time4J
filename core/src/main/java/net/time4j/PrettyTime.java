@@ -500,7 +500,7 @@ public final class PrettyTime {
     }
 
     /**
-     * <p>Formats given duration. </p>
+     * <p>Formats the total given duration. </p>
      *
      * <p>A localized output is only supported for the units
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
@@ -519,7 +519,7 @@ public final class PrettyTime {
      * @since   1.2
      */
     /*[deutsch]
-     * <p>Formatiert die angegebene Dauer. </p>
+     * <p>Formatiert die gesamte angegebene Dauer. </p>
      *
      * <p>Eine lokalisierte Ausgabe ist nur f&uuml;r die Zeiteinheiten
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
@@ -542,6 +542,48 @@ public final class PrettyTime {
         TextWidth width
     ) {
 
+        return this.print(duration, width, Integer.MAX_VALUE);
+
+    }
+
+    /**
+     * <p>Formats given duration. </p>
+     *
+     * <p>Like {@link #print(Duration, TextWidth)}, but offers the
+     * option to limit the count of displayed duration items. </p>
+     *
+     * @param  duration     object representing a duration which might contain
+     *                      several units and quantities
+     * @param  width        text width (ABBREVIATED as synonym for SHORT)
+     * @param  maxLength    maximum count of displayed items
+     * @return formatted list output
+     * @throws IllegalArgumentException if maxLength is smaller than {@code 1}
+     * @since  1.3
+     */
+    /*[deutsch]
+     * <p>Formatiert die angegebene Dauer. </p>
+     *
+     * <p>Wie {@link #print(Duration, TextWidth)}, aber mit der Option, die Anzahl
+     * der Dauerelemente zu begrenzen. </p>
+     *
+     * @param  duration     object representing a duration which might contain
+     *                      several units and quantities
+     * @param  width        text width (ABBREVIATED as synonym for SHORT)
+     * @param  maxLength    maximum count of displayed items
+     * @return formatted list output
+     * @throws IllegalArgumentException if maxLength is smaller than {@code 1}
+     * @since  1.3
+     */
+    public String print(
+        Duration<?> duration,
+        TextWidth width,
+        int maxLength
+    ) {
+
+        if (maxLength < 1) {
+            throw new IllegalArgumentException("Max length is invalid: " + maxLength);
+        }
+
         if (duration.isEmpty()) {
             if (this.emptyUnit.isCalendrical()) {
                 CalendarUnit unit = CalendarUnit.class.cast(this.emptyUnit);
@@ -561,6 +603,7 @@ public final class PrettyTime {
             return this.format(item, negative, width);
         }
 
+        len = Math.min(len, maxLength);
         Object[] parts = new Object[len];
 
         for (int i = 0; i < len; i++) {
