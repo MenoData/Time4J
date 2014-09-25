@@ -66,7 +66,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * in {@link net.time4j.Iso8601Format} which can be adjusted by some
  * {@code with()}-methods. Another way to create an instance are the
  * methods {@code formatter(...)} and {@code localFormatter(...)} in
- * the classes {@code PlainDate}, {@code PlainTime} and {@code Moment}. </p>
+ * the classes {@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp}
+ * and {@code Moment}. </p>
  *
  * @param       <T> generic type of chronological entity
  * @author      Meno Hochschild
@@ -82,7 +83,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * die dann mit den {@code with()}-Methoden geeignet angepasst werden
  * k&ouml;nnen. Ein anderer Weg sind die Methoden {@code formatter(...)}
  * und {@code localFormatter(...)} der Klassen {@code PlainDate},
- * {@code PlainTime} und {@code Moment}. </p>
+ * {@code PlainTime}, {@code PlainTimestamp} und {@code Moment}. </p>
  *
  * @param       <T> generic type of chronological entity
  * @author      Meno Hochschild
@@ -2400,7 +2401,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * This method is necessary if the indicators of a given language
          * depend on the numerical value of the element. </p>
          *
-         * <p>Example for French: </p>
+         * <p>Example for French generating HTML-text: </p>
          * <pre>
          *  ChronoElement&lt;Integer&gt; element = PlainDate.DAY_OF_MONTH;
          *  Map&lt;PluralCategory, String&gt; indicators =
@@ -2408,7 +2409,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *  indicators.put(PluralCategory.ONE, "&lt;sup&gt;er&lt;/sup&gt;");
          *  indicators.put(PluralCategory.OTHER, "&lt;sup&gt;e&lt;/sup&gt;");
          *
-         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *  ChronoFormatter&lt;PlainDate&gt; formatter =
          *      ChronoFormatter.setUp(PlainDate.class, Locale.FRENCH)
          *      .addOrdinal(element, indicators)
          *      .addLiteral(&quot; jour&quot;)
@@ -2444,7 +2445,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Indikatoren in einer gegebenen Sprache vom numerischen Wert des
          * Elements abh&auml;ngig sind. </p>
          *
-         * <p>Beispiel f&uuml;r Franz&ouml;sisch: </p>
+         * <p>Beispiel f&uuml;r Franz&ouml;sisch - erzeugt HTML-Text: </p>
          * <pre>
          *  ChronoElement&lt;Integer&gt; element = PlainDate.DAY_OF_MONTH;
          *  Map&lt;PluralCategory, String&gt; indicators =
@@ -2452,7 +2453,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *  indicators.put(PluralCategory.ONE, "&lt;sup&gt;er&lt;/sup&gt;");
          *  indicators.put(PluralCategory.OTHER, "&lt;sup&gt;e&lt;/sup&gt;");
          *
-         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *  ChronoFormatter&lt;PlainDate&gt; formatter =
          *      ChronoFormatter.setUp(PlainDate.class, Locale.FRENCH)
          *      .addOrdinal(element, indicators)
          *      .addLiteral(&quot; jour&quot;)
