@@ -36,8 +36,10 @@ import net.time4j.tz.Timezone;
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,8 +105,6 @@ public final class PrettyTime {
         for (IsoUnit unit : units) {
             tmp.add(unit);
         }
-        tmp.add(MILLIS);
-        tmp.add(MICROS);
         tmp.add(NANOS);
         SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
     }
@@ -505,8 +505,8 @@ public final class PrettyTime {
      * <p>A localized output is only supported for the units
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
      * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} and
-     * all {@link ClockUnit}-units. This methode does not perform
-     * any normalization. </p>
+     * all {@link ClockUnit}-units. This method performs an internal
+     * normalization if any other unit is involved. </p>
      *
      * <p>Note: If the local script variant is from right to left
      * then a unicode-RLM-marker will automatically be inserted
@@ -524,8 +524,8 @@ public final class PrettyTime {
      * <p>Eine lokalisierte Ausgabe ist nur f&uuml;r die Zeiteinheiten
      * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
      * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} und
-     * alle {@link ClockUnit}-Instanzen vorhanden. Diese Methode
-     * f&uuml;hrt keine Normalisierung durch. </p>
+     * alle {@link ClockUnit}-Instanzen vorhanden. Bei Bedarf werden
+     * andere Einheiten zu diesen normalisiert. </p>
      *
      * <p>Hinweis: Wenn die lokale Skript-Variante von rechts nach links
      * geht, wird automatisch ein Unicode-RLM-Marker vor jeder Nummer
@@ -542,7 +542,7 @@ public final class PrettyTime {
         TextWidth width
     ) {
 
-        return this.print(duration, width, Integer.MAX_VALUE);
+        return this.print(duration, width, false, Integer.MAX_VALUE);
 
     }
 
@@ -550,40 +550,49 @@ public final class PrettyTime {
      * <p>Formats given duration. </p>
      *
      * <p>Like {@link #print(Duration, TextWidth)}, but offers the
-     * option to limit the count of displayed duration items. </p>
+     * option to limit the count of displayed duration items and also
+     * to print items with zero amount. The first printed duration item
+     * has always a non-zero amount however. </p>
      *
-     * @param  duration     object representing a duration which might contain
+     * @param   duration    object representing a duration which might contain
      *                      several units and quantities
-     * @param  width        text width (ABBREVIATED as synonym for SHORT)
-     * @param  maxLength    maximum count of displayed items
-     * @return formatted list output
-     * @throws IllegalArgumentException if maxLength is smaller than {@code 1}
-     * @since  1.3
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   printZero   determines if zero amounts shall be printed, too
+     * @param   maxLength   maximum count of displayed items
+     * @return  formatted list output
+     * @throws  IllegalArgumentException if maxLength is smaller than {@code 1}
+     * @since   1.3
      */
     /*[deutsch]
      * <p>Formatiert die angegebene Dauer. </p>
      *
-     * <p>Wie {@link #print(Duration, TextWidth)}, aber mit der Option, die Anzahl
-     * der Dauerelemente zu begrenzen. </p>
+     * <p>Wie {@link #print(Duration, TextWidth)}, aber mit der Option, die
+     * Anzahl der Dauerelemente zu begrenzen und auch Elemente mit dem
+     * Betrag {@code 0} auszugeben. Das erste ausgegebene Element hat aber
+     * immer einen Betrag ungleich {@code 0}. </p>
      *
-     * @param  duration     object representing a duration which might contain
+     * @param   duration    object representing a duration which might contain
      *                      several units and quantities
-     * @param  width        text width (ABBREVIATED as synonym for SHORT)
-     * @param  maxLength    maximum count of displayed items
-     * @return formatted list output
-     * @throws IllegalArgumentException if maxLength is smaller than {@code 1}
-     * @since  1.3
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   printZero   determines if zero amounts shall be printed, too
+     * @param   maxLength   maximum count of displayed items
+     * @return  formatted list output
+     * @throws  IllegalArgumentException if maxLength is smaller than {@code 1}
+     * @since   1.3
      */
     public String print(
         Duration<?> duration,
         TextWidth width,
+        boolean printZero,
         int maxLength
     ) {
 
         if (maxLength < 1) {
-            throw new IllegalArgumentException("Max length is invalid: " + maxLength);
+            throw new IllegalArgumentException(
+                "Max length is invalid: " + maxLength);
         }
 
+        // special case of empty duration
         if (duration.isEmpty()) {
             if (this.emptyUnit.isCalendrical()) {
                 CalendarUnit unit = CalendarUnit.class.cast(this.emptyUnit);
@@ -594,25 +603,38 @@ public final class PrettyTime {
             }
         }
 
-        int len = duration.getTotalLength().size();
+        // fill values-array from duration
         boolean negative = duration.isNegative();
+        long[] values = new long[8];
+        pushDuration(values, duration);
 
-        if (len == 1) {
-            TimeSpan.Item<? extends IsoUnit> item =
-                duration.getTotalLength().get(0);
-            return this.format(item, negative, width);
+        // format duration items
+        List<Object> parts = new ArrayList<Object>();
+        int count = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            if (
+                (count < maxLength)
+                && ((printZero && (count > 0)) || (values[i] > 0))
+            ) {
+                IsoUnit unit = ((i == 7) ? NANOS : STD_UNITS[i]);
+                parts.add(this.format(values[i], unit, negative, width));
+                count++;
+            }
         }
 
-        len = Math.min(len, maxLength);
-        Object[] parts = new Object[len];
+        // duration is not empty here
+        assert (count > 0);
 
-        for (int i = 0; i < len; i++) {
-            parts[i] =
-                this.format(duration.getTotalLength().get(i), negative, width);
+        // special case of only one item
+        if (count == 1) {
+            return parts.get(0).toString();
         }
 
-        UnitPatterns p = UnitPatterns.of(this.locale);
-        return MessageFormat.format(p.getListPattern(width, len), parts);
+        // multiple items >= 2
+        return MessageFormat.format(
+            UnitPatterns.of(this.locale).getListPattern(width, count),
+            parts.toArray(new Object[count]));
 
     }
 
@@ -814,14 +836,120 @@ public final class PrettyTime {
 
     }
 
-    private String format(
-        TimeSpan.Item<? extends IsoUnit> item,
-        boolean negative,
-        TextWidth width
+    private static void pushDuration(
+        long[] values,
+        Duration<?> duration
     ) {
-    	
-        return this.format(item.getAmount(), item.getUnit(), negative, width);
-    	
+
+        int len = duration.getTotalLength().size();
+
+        for (int i = 0; i < len; i++) {
+            TimeSpan.Item<? extends IsoUnit> item =
+                duration.getTotalLength().get(i);
+            IsoUnit unit = item.getUnit();
+            long amount = item.getAmount();
+
+            if (unit instanceof CalendarUnit) {
+                push(values, CalendarUnit.class.cast(unit), amount);
+            } else if (unit instanceof ClockUnit) {
+                push(values, ClockUnit.class.cast(unit), amount);
+            } else if (unit instanceof OverflowUnit) {
+                push(
+                    values,
+                    OverflowUnit.class.cast(unit).getCalendarUnit(),
+                    amount);
+            } else if (unit.equals(CalendarUnit.weekBasedYears())) {
+                values[0] = MathUtils.safeAdd(amount, values[0]); // YEARS
+            } else { // approximated duration by normalization without nanos
+                PlainTimestamp start = SystemClock.inLocalView().now();
+                PlainTimestamp end = start.plus(amount, unit);
+                Duration<?> part = Duration.in(STD_UNITS).between(start, end);
+                pushDuration(values, part);
+            }
+        }
+
+    }
+
+    private static void push(
+        long[] values,
+        CalendarUnit unit,
+        long amount
+    ) {
+
+        int index;
+
+        switch (unit) {
+            case MILLENNIA:
+                amount = MathUtils.safeMultiply(amount, 1000);
+                index = 0; // YEARS
+                break;
+            case CENTURIES:
+                amount = MathUtils.safeMultiply(amount, 100);
+                index = 0; // YEARS
+                break;
+            case DECADES:
+                amount = MathUtils.safeMultiply(amount, 10);
+                index = 0; // YEARS
+                break;
+            case YEARS:
+                index = 0; // YEARS
+                break;
+            case QUARTERS:
+                amount = MathUtils.safeMultiply(amount, 3);
+                index = 1; // MONTHS
+                break;
+            case MONTHS:
+                index = 1; // MONTHS
+                break;
+            case WEEKS:
+                index = 2; // WEEKS
+                break;
+            case DAYS:
+                index = 3; // DAYS
+                break;
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+        values[index] = MathUtils.safeAdd(amount, values[index]);
+
+    }
+
+    private static void push(
+        long[] values,
+        ClockUnit unit,
+        long amount
+    ) {
+
+        int index;
+
+        switch (unit) {
+            case HOURS:
+                index = 4;
+                break;
+            case MINUTES:
+                index = 5;
+                break;
+            case SECONDS:
+                index = 6;
+                break;
+            case MILLIS:
+                amount = MathUtils.safeMultiply(amount, MIO);
+                index = 7; // NANOS
+                break;
+            case MICROS:
+                amount = MathUtils.safeMultiply(amount, 1000);
+                index = 7; // NANOS
+                break;
+            case NANOS:
+                index = 7; // NANOS
+                break;
+            default:
+                throw new UnsupportedOperationException(unit.name());
+        }
+
+        values[index] = MathUtils.safeAdd(amount, values[index]);
+
     }
 
     private String format(
@@ -843,7 +971,7 @@ public final class PrettyTime {
                 return this.print(value, u, width);
             } else {
                 ClockUnit u = ClockUnit.class.cast(unit);
-                if (u == NANOS) { // Duration has no internal MILLIS or MICROS
+                if (u == NANOS) {
                     if ((amount % MIO) == 0) {
                         u = MILLIS;
                         value = value / MIO;
@@ -854,16 +982,9 @@ public final class PrettyTime {
                 }
                 return this.print(value, u, width);
             }
-        } else if (unit instanceof OverflowUnit) {
-            CalendarUnit u = OverflowUnit.class.cast(unit).getCalendarUnit();
-            if (SUPPORTED_UNITS.contains(u)) {
-                return this.print(value, u, width);
-            }
-        } else if (unit.equals(CalendarUnit.weekBasedYears())) {
-            return this.print(value, CalendarUnit.YEARS, width);
         }
 
-        return this.format(value) + " " + unit.toString(); // fallback
+        throw new UnsupportedOperationException("Unknown unit: " + unit);
 
     }
 

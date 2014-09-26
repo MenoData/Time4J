@@ -1,6 +1,5 @@
 package net.time4j.i18n;
 
-import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.Moment;
@@ -19,6 +18,7 @@ import org.junit.runners.JUnit4;
 import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.WEEKS;
+import static net.time4j.CalendarUnit.YEARS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -275,7 +275,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysUS() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(Locale.US).print(duration, TextWidth.WIDE),
             is("15 years, 3 months, 1 week, and 2 days"));
@@ -284,7 +284,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysBritish() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(Locale.UK).print(duration, TextWidth.WIDE),
             is("15 years, 3 months, 1 week and 2 days"));
@@ -293,7 +293,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysFrench() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(duration, TextWidth.WIDE),
             is("15 années, 3 mois, 1 semaine et 2 jours"));
@@ -303,7 +303,7 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysMinusGerman() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2)
-                .plus(1, CalendarUnit.WEEKS)
+                .plus(1, WEEKS)
                 .inverse();
         assertThat(
             PrettyTime.of(Locale.GERMANY).print(duration, TextWidth.WIDE),
@@ -313,7 +313,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysArabic() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(new Locale("ar")).print(duration, TextWidth.WIDE),
             is("\u200F" + "15 سنة، " + "\u200F" + "3 أشهر، أسبوع، و يومان"));
@@ -322,7 +322,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysArabicU0660() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .withZeroDigit('\u0660')
@@ -334,7 +334,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysArabicMinus() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS)
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar"))
@@ -345,7 +345,7 @@ public class PrettyTimeTest {
     @Test
     public void print15Years3Months1Week2DaysArabicU0660Minus() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, CalendarUnit.WEEKS)
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar"))
@@ -353,6 +353,96 @@ public class PrettyTimeTest {
                 .print(duration, TextWidth.WIDE),
             is("\u200F" + "\u0661\u0665" + "- سنة، "
                + "\u200F" + "\u0663" + "- أشهر، أسبوع، و يومان"));
+    }
+
+    @Test
+    public void printMillisWideMax1English() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(1000, ClockUnit.MICROS);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, false, 1),
+            is("124 milliseconds"));
+    }
+
+    @Test
+    public void printHoursMillisWideMax1English() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.HOURS);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, false, 1),
+            is("4 hours"));
+    }
+
+    @Test
+    public void printMinutesMillisWideZeroMax1English() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 1),
+            is("4 minutes"));
+    }
+
+    @Test
+    public void printMinutesMillisWideZeroMax2English() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 2),
+            is("4 minutes and 0 seconds"));
+    }
+
+    @Test
+    public void printMinutesMicrosWideZeroMax3English() {
+        Duration<ClockUnit> dur =
+            Duration.of(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 3),
+            is("4 minutes, 0 seconds, and 123 microseconds"));
+    }
+
+    @Test
+    public void printDaysMinutesMicrosWideZeroMax3English() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(1, DAYS)
+                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 3),
+            is("1 day, 0 hours, and 4 minutes"));
+    }
+
+    @Test
+    public void printDaysMinutesMicrosWideZeroMax3French() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(1, DAYS)
+                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 3),
+            is("1 jour, 0 heure et 4 minutes"));
+    }
+
+    @Test
+    public void printDaysMinutesMicrosWideZeroMax8French() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(1, DAYS)
+                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 8),
+            is("1 jour, 0 heure, 4 minutes, 0 seconde et 123 microsecondes"));
+    }
+
+    @Test
+    public void printYearsDaysMinutesMicrosWideZeroMax6English() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(3, YEARS)
+                .plus(1, DAYS)
+                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 6),
+            is("3 years, 0 months, 0 weeks, 1 day, 0 hours, and 4 minutes"));
     }
 
 }
