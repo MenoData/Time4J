@@ -3,10 +3,14 @@ package net.time4j.i18n;
 import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
+import net.time4j.IsoUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.Chronology;
+import net.time4j.engine.UnitRule;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -16,8 +20,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static net.time4j.CalendarUnit.CENTURIES;
 import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.QUARTERS;
 import static net.time4j.CalendarUnit.WEEKS;
 import static net.time4j.CalendarUnit.YEARS;
 import static net.time4j.ClockUnit.HOURS;
@@ -557,6 +563,97 @@ public class PrettyTimeTest {
                     PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC(),
                     ZonalOffset.UTC),
             is("in 23 Tagen"));
+    }
+
+    @Test
+    public void printCenturiesAndWeekBasedYearsEnglish() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(1, CENTURIES)
+                .plus(2, CalendarUnit.weekBasedYears());
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
+            is("102 years"));
+    }
+
+    @Test
+    public void printOverflowUnitsEnglish() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(1, QUARTERS)
+                .plus(2, MONTHS.withCarryOver());
+        assertThat(
+            PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
+            is("5 months"));
+    }
+
+    @Test
+    public void printSpecialUnitsEnglish() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 10, 1, 14, 30).atUTC();
+            }
+        };
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(8, DAYS)
+                .plus(2, new FortnightPlusOneDay());
+        assertThat(
+            PrettyTime.of(Locale.US)
+                .withReferenceClock(clock)
+                .print(dur, TextWidth.WIDE),
+            is("4 weeks and 10 days"));
+    }
+
+    private static class FortnightPlusOneDay
+        implements IsoUnit, UnitRule.Source {
+
+        @Override
+        public char getSymbol() {
+            return 'F';
+        }
+
+        @Override
+        public double getLength() {
+            return 86400.0 * 15;
+        }
+
+        @Override
+        public boolean isCalendrical() {
+            return true;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T extends ChronoEntity<T>> UnitRule<T> derive(Chronology<T> c) {
+
+            if (c == PlainTimestamp.axis()) {
+                UnitRule<PlainTimestamp> rule =
+                    new UnitRule<PlainTimestamp>() {
+                        @Override
+                        public PlainTimestamp addTo(
+                            PlainTimestamp timepoint,
+                            long amount
+                        ) {
+                            return timepoint.plus(amount * 15, DAYS);
+                        }
+                        @Override
+                        public long between(
+                            PlainTimestamp start,
+                            PlainTimestamp end
+                        ) {
+                            long days = DAYS.between(start, end);
+                            return days / 15;
+                        }
+                    };
+                return (UnitRule<T>) rule;
+            }
+
+            throw new UnsupportedOperationException(
+                c.getChronoType().getName());
+        }
+
     }
 
 }

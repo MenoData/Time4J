@@ -32,6 +32,7 @@ import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatterns;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
@@ -676,7 +677,7 @@ public final class PrettyTime {
         // fill values-array from duration
         boolean negative = duration.isNegative();
         long[] values = new long[8];
-        pushDuration(values, duration, this.weekToDays);
+        pushDuration(values, duration, this.refClock, this.weekToDays);
 
         // format duration items
         List<Object> parts = new ArrayList<Object>();
@@ -911,6 +912,7 @@ public final class PrettyTime {
     private static void pushDuration(
         long[] values,
         Duration<?> duration,
+        TimeSource<?> refClock,
         boolean weekToDays
     ) {
 
@@ -935,11 +937,12 @@ public final class PrettyTime {
             } else if (unit.equals(CalendarUnit.weekBasedYears())) {
                 values[0] = MathUtils.safeAdd(amount, values[0]); // YEARS
             } else { // approximated duration by normalization without nanos
-                PlainTimestamp start = SystemClock.inLocalView().now();
+                Moment unix = Moment.from(refClock.currentTime());
+                PlainTimestamp start = unix.toZonalTimestamp(ZonalOffset.UTC);
                 PlainTimestamp end = start.plus(amount, unit);
                 IsoUnit[] units = (weekToDays ? TSP_UNITS : STD_UNITS);
                 Duration<?> part = Duration.in(units).between(start, end);
-                pushDuration(values, part, weekToDays);
+                pushDuration(values, part, refClock, weekToDays);
             }
         }
 
