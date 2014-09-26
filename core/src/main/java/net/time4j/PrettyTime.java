@@ -94,15 +94,19 @@ public final class PrettyTime {
     private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
         new ConcurrentHashMap<Locale, PrettyTime>();
     private static final IsoUnit[] STD_UNITS;
+    private static final IsoUnit[] TSP_UNITS;
     private static final Set<IsoUnit> SUPPORTED_UNITS;
 
     static {
-        IsoUnit[] units =
+        IsoUnit[] stdUnits =
             {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
-        STD_UNITS = units;
+        STD_UNITS = stdUnits;
+        IsoUnit[] tspUnits =
+            {YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS};
+        TSP_UNITS = tspUnits;
 
         Set<IsoUnit> tmp = new HashSet<IsoUnit>();
-        for (IsoUnit unit : units) {
+        for (IsoUnit unit : stdUnits) {
             tmp.add(unit);
         }
         tmp.add(NANOS);
@@ -118,6 +122,7 @@ public final class PrettyTime {
     private final IsoUnit emptyUnit;
     private final int minusOrientation;
     private final char minusSign;
+    private final boolean weekToDays;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -125,7 +130,8 @@ public final class PrettyTime {
         Locale locale,
         TimeSource<?> refClock,
         char zeroDigit,
-        IsoUnit emptyUnit
+        IsoUnit emptyUnit,
+        boolean weekToDays
     ) {
         super();
 
@@ -149,6 +155,7 @@ public final class PrettyTime {
             ? RIGHT
             : LEFT);
         this.minusSign = c;
+        this.weekToDays = weekToDays;
 
     }
 
@@ -180,7 +187,8 @@ public final class PrettyTime {
                     locale,
                     SystemClock.INSTANCE,
                     DecimalFormatSymbols.getInstance(locale).getZeroDigit(),
-                    SECONDS);
+                    SECONDS,
+                    false);
             PrettyTime old = LANGUAGE_MAP.putIfAbsent(locale, ptime);
 
             if (old != null) {
@@ -262,7 +270,8 @@ public final class PrettyTime {
             this.locale,
             clock,
             this.zeroDigit,
-            this.emptyUnit);
+            this.emptyUnit,
+            this.weekToDays);
 
     }
 
@@ -294,11 +303,16 @@ public final class PrettyTime {
      */
     public PrettyTime withZeroDigit(char zeroDigit) {
 
+        if (this.zeroDigit == zeroDigit) {
+            return this;
+        }
+
         return new PrettyTime(
             this.locale,
             this.refClock,
             zeroDigit,
-            this.emptyUnit);
+            this.emptyUnit,
+            this.weekToDays);
 
     }
 
@@ -327,11 +341,16 @@ public final class PrettyTime {
      */
     public PrettyTime withEmptyUnit(CalendarUnit emptyUnit) {
 
+        if (this.emptyUnit.equals(emptyUnit)) {
+            return this;
+        }
+
         return new PrettyTime(
             this.locale,
             this.refClock,
-            Character.valueOf(this.zeroDigit),
-            emptyUnit);
+            this.zeroDigit,
+            emptyUnit,
+            this.weekToDays);
 
     }
 
@@ -360,11 +379,43 @@ public final class PrettyTime {
      */
     public PrettyTime withEmptyUnit(ClockUnit emptyUnit) {
 
+        if (this.emptyUnit.equals(emptyUnit)) {
+            return this;
+        }
+
         return new PrettyTime(
             this.locale,
             this.refClock,
-            Character.valueOf(this.zeroDigit),
-            emptyUnit);
+            this.zeroDigit,
+            emptyUnit,
+            this.weekToDays);
+
+    }
+
+    /**
+     * <p>Determines that weeks will always normalized to days. </p>
+     *
+     * @return  changed copy of this instance
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Legt fest, da&szlig; Wochen immer zu Tagen normalisiert werden. </p>
+     *
+     * @return  changed copy of this instance
+     * @since   1.3
+     */
+    public PrettyTime withWeeksToDays() {
+
+        if (this.weekToDays) {
+            return this;
+        }
+
+        return new PrettyTime(
+            this.locale,
+            this.refClock,
+            this.zeroDigit,
+            this.emptyUnit,
+            true);
 
     }
 
@@ -428,7 +479,12 @@ public final class PrettyTime {
                 pattern = p.getMonths(width, this.getCategory(amount));
                 break;
             case WEEKS:
-                pattern = p.getWeeks(width, this.getCategory(amount));
+                if (this.weekToDays) {
+                    amount = MathUtils.safeMultiply(amount, 7);
+                    pattern = p.getDays(width, this.getCategory(amount));
+                } else {
+                    pattern = p.getWeeks(width, this.getCategory(amount));
+                }
                 break;
             case DAYS:
                 pattern = p.getDays(width, this.getCategory(amount));
@@ -620,7 +676,7 @@ public final class PrettyTime {
         // fill values-array from duration
         boolean negative = duration.isNegative();
         long[] values = new long[8];
-        pushDuration(values, duration);
+        pushDuration(values, duration, this.weekToDays);
 
         // format duration items
         List<Object> parts = new ArrayList<Object>();
@@ -629,6 +685,7 @@ public final class PrettyTime {
         for (int i = 0; i < values.length; i++) {
             if (
                 (count < maxLength)
+                && (!this.weekToDays || (i != 2))
                 && ((printZero && (count > 0)) || (values[i] > 0))
             ) {
                 IsoUnit unit = ((i == 7) ? NANOS : STD_UNITS[i]);
@@ -726,8 +783,9 @@ public final class PrettyTime {
                 ut,
                 tz.getOffset(ut));
 
+        IsoUnit[] units = (this.weekToDays ? TSP_UNITS : STD_UNITS);
         Duration<IsoUnit> duration =
-            Duration.in(tz, STD_UNITS).between(start, end);
+            Duration.in(tz, units).between(start, end);
 
         if (duration.isEmpty()) {
             return UnitPatterns.of(this.locale).getNowWord();
@@ -852,7 +910,8 @@ public final class PrettyTime {
 
     private static void pushDuration(
         long[] values,
-        Duration<?> duration
+        Duration<?> duration,
+        boolean weekToDays
     ) {
 
         int len = duration.getTotalLength().size();
@@ -864,21 +923,23 @@ public final class PrettyTime {
             long amount = item.getAmount();
 
             if (unit instanceof CalendarUnit) {
-                push(values, CalendarUnit.class.cast(unit), amount);
+                push(values, CalendarUnit.class.cast(unit), amount, weekToDays);
             } else if (unit instanceof ClockUnit) {
                 push(values, ClockUnit.class.cast(unit), amount);
             } else if (unit instanceof OverflowUnit) {
                 push(
                     values,
                     OverflowUnit.class.cast(unit).getCalendarUnit(),
-                    amount);
+                    amount,
+                    weekToDays);
             } else if (unit.equals(CalendarUnit.weekBasedYears())) {
                 values[0] = MathUtils.safeAdd(amount, values[0]); // YEARS
             } else { // approximated duration by normalization without nanos
                 PlainTimestamp start = SystemClock.inLocalView().now();
                 PlainTimestamp end = start.plus(amount, unit);
-                Duration<?> part = Duration.in(STD_UNITS).between(start, end);
-                pushDuration(values, part);
+                IsoUnit[] units = (weekToDays ? TSP_UNITS : STD_UNITS);
+                Duration<?> part = Duration.in(units).between(start, end);
+                pushDuration(values, part, weekToDays);
             }
         }
 
@@ -887,7 +948,8 @@ public final class PrettyTime {
     private static void push(
         long[] values,
         CalendarUnit unit,
-        long amount
+        long amount,
+        boolean weekToDays
     ) {
 
         int index;
@@ -916,7 +978,12 @@ public final class PrettyTime {
                 index = 1; // MONTHS
                 break;
             case WEEKS:
-                index = 2; // WEEKS
+                if (weekToDays) {
+                    amount = MathUtils.safeMultiply(amount, 7);
+                    index = 3; // DAYS
+                } else {
+                    index = 2; // WEEKS
+                }
                 break;
             case DAYS:
                 index = 3; // DAYS

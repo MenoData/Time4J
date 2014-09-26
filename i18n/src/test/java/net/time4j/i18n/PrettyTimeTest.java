@@ -1,5 +1,6 @@
 package net.time4j.i18n;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.Moment;
@@ -30,6 +31,40 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PrettyTimeTest {
+
+    @Test
+    public void getLocale() {
+        assertThat(
+            PrettyTime.of(Locale.ROOT).getLocale(),
+            is(Locale.ROOT));
+    }
+
+    @Test
+    public void withEmptyDayUnit() {
+        assertThat(
+            PrettyTime.of(Locale.ROOT).withEmptyUnit(DAYS)
+                .print(Duration.ofZero(), TextWidth.WIDE),
+            is("0 d"));
+    }
+
+    @Test
+    public void withEmptyMinuteUnit() {
+        assertThat(
+            PrettyTime.of(Locale.ROOT).withEmptyUnit(MINUTES)
+                .print(Duration.ofZero(), TextWidth.WIDE),
+            is("0 min"));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withEmptyNullUnit() {
+        CalendarUnit unit = null;
+        PrettyTime.of(Locale.ROOT).withEmptyUnit(unit);
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withNullReferenceClock() {
+        PrettyTime.of(Locale.ROOT).withReferenceClock(null);
+    }
 
     @Test
     public void print0DaysEnglish() {
@@ -78,6 +113,15 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("da")).print(3, WEEKS, TextWidth.WIDE),
             is("3 uger"));
+    }
+
+    @Test
+    public void print3WeeksDanishAndWeeksToDays() {
+        assertThat(
+            PrettyTime.of(new Locale("da"))
+                .withWeeksToDays()
+                .print(3, WEEKS, TextWidth.WIDE),
+            is("21 dage"));
     }
 
     @Test
@@ -448,6 +492,71 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 6),
             is("3 years, 0 months, 0 weeks, 1 day, 0 hours, and 4 minutes"));
+    }
+
+    @Test
+    public void withWeeksToDaysPrintDuration() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(3, YEARS)
+                .plus(2, WEEKS)
+                .plus(1, DAYS)
+                .plus(4, MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.GERMANY).withWeeksToDays()
+                .print(dur, TextWidth.WIDE),
+            is("3 Jahre, 15 Tage und 4 Minuten"));
+    }
+
+    @Test
+    public void withWeeksToDaysPrintDurationZeroMax4() {
+        Duration<?> dur =
+            Duration.ofZero()
+                .plus(3, YEARS)
+                .plus(2, WEEKS)
+                .plus(1, DAYS)
+                .plus(4, MINUTES);
+        assertThat(
+            PrettyTime.of(Locale.GERMANY).withWeeksToDays()
+                .print(dur, TextWidth.WIDE, true, 4),
+            is("3 Jahre, 0 Monate, 15 Tage und 0 Stunden"));
+    }
+
+    @Test
+    public void print3WeeksLaterGerman() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("in 3 Wochen"));
+    }
+
+    @Test
+    public void print3WeeksLaterGermanAndWeeksToDays() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("in 23 Tagen"));
     }
 
 }
