@@ -239,10 +239,7 @@ public final class PrettyTime {
      * <p>Yields a changed copy of this instance with given reference
      * clock. </p>
      *
-     * <p>If given reference clock is {@code null} then the reference clock
-     * will always be the system clock. </p>
-     *
-     * @param   clock   new reference clock (maybe {@code null})
+     * @param   clock   new reference clock
      * @return  new instance of {@code PrettyTime} with changed reference clock
      * @since   1.2
      * @see     #getReferenceClock()
@@ -251,9 +248,6 @@ public final class PrettyTime {
      */
     /*[deutsch]
      * <p>Legt die Bezugszeit f&uuml;r relative Zeitangaben neu fest. </p>
-     *
-     * <p>Wenn die angegebene Bezugsuhr {@code null} ist, wird die
-     * Systemuhr verwendet. </p>
      *
      * @param   clock   new reference clock
      * @return  new instance of {@code PrettyTime} with changed reference clock
@@ -317,6 +311,7 @@ public final class PrettyTime {
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
      * @since   1.2
+     * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
      * <p>Definiert die Zeiteinheit f&uuml;r die Verwendung in der
@@ -328,6 +323,7 @@ public final class PrettyTime {
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
      * @since   1.2
+     * @see     #print(Duration, TextWidth)
      */
     public PrettyTime withEmptyUnit(CalendarUnit emptyUnit) {
 
@@ -348,6 +344,7 @@ public final class PrettyTime {
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
      * @since   1.2
+     * @see     #print(Duration, TextWidth)
      */
     /*[deutsch]
      * <p>Definiert die Zeiteinheit f&uuml;r die Verwendung in der
@@ -359,6 +356,7 @@ public final class PrettyTime {
      * @param   emptyUnit   time unit for usage in an empty duration
      * @return  changed copy of this instance
      * @since   1.2
+     * @see     #print(Duration, TextWidth)
      */
     public PrettyTime withEmptyUnit(ClockUnit emptyUnit) {
 
@@ -552,7 +550,15 @@ public final class PrettyTime {
      * <p>Like {@link #print(Duration, TextWidth)}, but offers the
      * option to limit the count of displayed duration items and also
      * to print items with zero amount. The first printed duration item
-     * has always a non-zero amount however. </p>
+     * has always a non-zero amount however. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;?&gt; dur =
+     *      Duration.ofZero().plus(1, DAYS).plus(4, ClockUnit.MINUTES);
+     *  System.out.println(
+     *      PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 3));
+     *  // output: 1 jour, 0 heure et 4 minutes
+     * </pre>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities
@@ -569,7 +575,15 @@ public final class PrettyTime {
      * <p>Wie {@link #print(Duration, TextWidth)}, aber mit der Option, die
      * Anzahl der Dauerelemente zu begrenzen und auch Elemente mit dem
      * Betrag {@code 0} auszugeben. Das erste ausgegebene Element hat aber
-     * immer einen Betrag ungleich {@code 0}. </p>
+     * immer einen Betrag ungleich {@code 0}. Beispiel: </p>
+     *
+     * <pre>
+     *  Duration&lt;?&gt; dur =
+     *      Duration.ofZero().plus(1, DAYS).plus(4, ClockUnit.MINUTES);
+     *  System.out.println(
+     *      PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 3));
+     *  // output: 1 jour, 0 heure et 4 minutes
+     * </pre>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities

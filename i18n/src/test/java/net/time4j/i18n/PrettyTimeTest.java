@@ -19,6 +19,11 @@ import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.WEEKS;
 import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.MICROS;
+import static net.time4j.ClockUnit.MILLIS;
+import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.NANOS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -206,7 +211,7 @@ public class PrettyTimeTest {
     public void printMillisWideGerman() {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
-                .print(Duration.of(123, ClockUnit.MILLIS), TextWidth.WIDE),
+                .print(Duration.of(123, MILLIS), TextWidth.WIDE),
             is("123 Millisekunden"));
     }
 
@@ -214,7 +219,7 @@ public class PrettyTimeTest {
     public void printMicrosWideGerman() {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
-                .print(Duration.of(123456, ClockUnit.MICROS), TextWidth.WIDE),
+                .print(Duration.of(123456, MICROS), TextWidth.WIDE),
             is("123456 Mikrosekunden"));
     }
 
@@ -223,7 +228,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
                 .print(
-                    Duration.of(123456789, ClockUnit.NANOS),
+                    Duration.of(123456789, NANOS),
                     TextWidth.WIDE),
             is("123456789 Nanosekunden"));
     }
@@ -232,7 +237,7 @@ public class PrettyTimeTest {
     public void printMillisShortGerman() {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
-                .print(Duration.of(123, ClockUnit.MILLIS), TextWidth.SHORT),
+                .print(Duration.of(123, MILLIS), TextWidth.SHORT),
             is("123 ms"));
     }
 
@@ -240,7 +245,7 @@ public class PrettyTimeTest {
     public void printMicrosShortGerman() {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
-                .print(Duration.of(123456, ClockUnit.MICROS), TextWidth.SHORT),
+                .print(Duration.of(123456, MICROS), TextWidth.SHORT),
             is("123456 μs"));
     }
 
@@ -249,7 +254,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(Locale.GERMANY)
                 .print(
-                    Duration.of(123456789, ClockUnit.NANOS),
+                    Duration.of(123456789, NANOS),
                     TextWidth.SHORT),
             is("123456789 ns"));
     }
@@ -257,7 +262,7 @@ public class PrettyTimeTest {
     @Test
     public void printMillisWideEnglish() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(1000, ClockUnit.MICROS);
+            Duration.of(123, MILLIS).plus(1000, MICROS);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
             is("124 milliseconds"));
@@ -266,7 +271,7 @@ public class PrettyTimeTest {
     @Test
     public void printMicrosWideEnglish() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(1001, ClockUnit.MICROS);
+            Duration.of(123, MILLIS).plus(1001, MICROS);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE),
             is("124001 microseconds"));
@@ -358,7 +363,7 @@ public class PrettyTimeTest {
     @Test
     public void printMillisWideMax1English() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(1000, ClockUnit.MICROS);
+            Duration.of(123, MILLIS).plus(1000, MICROS);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, false, 1),
             is("124 milliseconds"));
@@ -367,7 +372,7 @@ public class PrettyTimeTest {
     @Test
     public void printHoursMillisWideMax1English() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.HOURS);
+            Duration.of(123, MILLIS).plus(4, HOURS);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, false, 1),
             is("4 hours"));
@@ -376,7 +381,7 @@ public class PrettyTimeTest {
     @Test
     public void printMinutesMillisWideZeroMax1English() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.MINUTES);
+            Duration.of(123, MILLIS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 1),
             is("4 minutes"));
@@ -385,7 +390,7 @@ public class PrettyTimeTest {
     @Test
     public void printMinutesMillisWideZeroMax2English() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MILLIS).plus(4, ClockUnit.MINUTES);
+            Duration.of(123, MILLIS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 2),
             is("4 minutes and 0 seconds"));
@@ -394,7 +399,7 @@ public class PrettyTimeTest {
     @Test
     public void printMinutesMicrosWideZeroMax3English() {
         Duration<ClockUnit> dur =
-            Duration.of(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+            Duration.of(123, MICROS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 3),
             is("4 minutes, 0 seconds, and 123 microseconds"));
@@ -405,7 +410,7 @@ public class PrettyTimeTest {
         Duration<?> dur =
             Duration.ofZero()
                 .plus(1, DAYS)
-                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+                .plus(123, MICROS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 3),
             is("1 day, 0 hours, and 4 minutes"));
@@ -416,7 +421,7 @@ public class PrettyTimeTest {
         Duration<?> dur =
             Duration.ofZero()
                 .plus(1, DAYS)
-                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+                .plus(123, MICROS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 3),
             is("1 jour, 0 heure et 4 minutes"));
@@ -427,7 +432,7 @@ public class PrettyTimeTest {
         Duration<?> dur =
             Duration.ofZero()
                 .plus(1, DAYS)
-                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+                .plus(123, MICROS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE, true, 8),
             is("1 jour, 0 heure, 4 minutes, 0 seconde et 123 microsecondes"));
@@ -439,7 +444,7 @@ public class PrettyTimeTest {
             Duration.ofZero()
                 .plus(3, YEARS)
                 .plus(1, DAYS)
-                .plus(123, ClockUnit.MICROS).plus(4, ClockUnit.MINUTES);
+                .plus(123, MICROS).plus(4, MINUTES);
         assertThat(
             PrettyTime.of(Locale.US).print(dur, TextWidth.WIDE, true, 6),
             is("3 years, 0 months, 0 weeks, 1 day, 0 hours, and 4 minutes"));
