@@ -31,6 +31,9 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
+import net.time4j.format.NumberType;
+import net.time4j.format.PluralCategory;
+import net.time4j.format.PluralRules;
 import net.time4j.format.SignPolicy;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -44,8 +47,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static net.time4j.CalendarUnit.CENTURIES;
@@ -3560,7 +3565,8 @@ public final class Duration<U extends IsoUnit>
          *    <td>{@link ClockUnit#NANOS} as fraction, (1-9) chars</td></tr>
          *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
          *  <tr><td>[]</td><td>optional section for parsing</td></tr>
-         *  <tr><td>#{}</td><td>reserved chars for future use</td></tr>
+         *  <tr><td>{}</td><td>section with plural forms, since v1.3</td></tr>
+         *  <tr><td>#</td><td>reserved char for future use</td></tr>
          * </table>
          *
          * <p>All letters in range a-z and A-Z are always reserved chars
@@ -3570,6 +3576,38 @@ public final class Duration<U extends IsoUnit>
          * (of units) will be padded from left with the zero digt. Optional
          * sections let the parser be error-tolerant and continue with the
          * next section in case of errors. </p>
+         *
+         * <p><strong>Enhancement since version 1.3: plural forms</strong></p>
+         *
+         * <p>Every expression inside curly brackets represents a combination
+         * of amount, separator and pluralized unit name and has following
+         * syntax: </p>
+         *
+         * <p>{[symbol]:[separator]:[locale]:[CATEGORY=LITERAL][:...]}</p>
+         *
+         * <p>The symbol is one of following chars:
+         * I, C, E, Y, Q, M, W, D, h, m, s, f (legend see table above)</p>
+         *
+         * <p>Afterwards the definition of separator chars follows. The
+         * empty separator (represented by zero space between colons) is
+         * permitted, too. The next section denotes the locale necessary
+         * for determination of suitable plural rules. The form
+         * [language]-[country]-[variant] can be used, for example
+         * &quot;en-US&quot; or &quot;en_US&quot;. At least the language
+         * must be present. The underscore is an acceptable alternative
+         * for the minus-sign. Finally there must be a sequence of
+         * name-value-pairs in the form CATEGORY=LITERAL. Every category
+         * label must be the name of a {@link PluralCategory plural category}.
+         * The category OTHER must exist. Example: </p>
+         *
+         * <pre>
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter =
+         *      Duration.Formatter.ofPattern(
+         *          CalendarUnit.class,
+         *          &quot;{D: :en:ONE=day:OTHER=days}&quot;);
+         *  String s = formatter.format(Duration.of(3, DAYS));
+         *  System.out.println(s); // output: 3 days
+         * </pre>
          *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
@@ -3603,7 +3641,8 @@ public final class Duration<U extends IsoUnit>
          *    <td>{@link ClockUnit#NANOS} als Bruchteil, (1-9) Zeichen</td></tr>
          *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
          *  <tr><td>[]</td><td>optionaler Abschnitt beim Parsen</td></tr>
-         *  <tr><td>#{}</td><td>zuk&uuml;nftige reservierte Zeichen</td></tr>
+         *  <tr><td>{}</td><td>Abschnitt mit Pluralformen, seit v1.3</td></tr>
+         *  <tr><td>#</td><td>zuk&uuml;nftiges reserviertes Zeichen</td></tr>
          * </table>
          *
          * <p>Alle Buchstaben im Bereich a-z und A-Z sind grunds&auml;tzlich
@@ -3615,6 +3654,37 @@ public final class Duration<U extends IsoUnit>
          * regeln, da&szlig; der Interpretationsvorgang bei Fehlern nicht
          * sofort abbricht, sondern mit dem n&auml;chsten Abschnitt
          * fortsetzt. </p>
+         *
+         * <p><strong>Erweiterung seit Version 1.3: Pluralformen</strong></p>
+         *
+         * <p>Jeder in geschweifte Klammern gefasste Ausdruck symbolisiert
+         * eine Kombination aus Betrag, Trennzeichen und pluralisierten
+         * Einheitsnamen und hat folgende Syntax: </p>
+         *
+         * <p>{[symbol]:[separator]:[locale]:[CATEGORY=LITERAL][:...]}</p>
+         *
+         * <p>Das Symbol ist eines von folgenden Zeichen: I, C, E, Y, Q, M,
+         * W, D, h, m, s, f (Bedeutung siehe Tabelle)</p>
+         *
+         * <p>Danach folgen Trennzeichen, abgetrennt durch einen Doppelpunkt.
+         * Eine leere Zeichenkette ist auch zul&auml;ssig. Danach folgt eine
+         * Lokalisierungsangabe zum Bestimmen der Pluralregeln in der Form
+         * [language]-[country]-[variant], zum Beispiel &quot;de-DE&quot; oder
+         * &quot;en_US&quot;. Mindestens mu&szlig; die Sprache vorhanden sein.
+         * Der Unterstrich wird neben dem Minuszeichen ebenfalls interpretiert.
+         * Schlie&szlig;lich folgt eine Sequenz von Name-Wert-Paaren in
+         * der Form CATEGORY=LITERAL. Jede Kategoriebezeichnung ist der Name
+         * einer {@link PluralCategory Pluralkategorie}. Die Kategorie OTHER
+         * mu&szlig; enthalten sein. Beispiel: </p>
+         *
+         * <pre>
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter =
+         *      Duration.Formatter.ofPattern(
+         *          CalendarUnit.class,
+         *          &quot;{D: :de:ONE=Tag:OTHER=Tage}&quot;);
+         *  String s = formatter.format(Duration.of(3, DAYS));
+         *  System.out.println(s); // output: 3 Tage
+         * </pre>
          *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
@@ -3680,7 +3750,13 @@ public final class Duration<U extends IsoUnit>
                 } else if (c == '+') {
                     lastOn(stack).add(
                         new SignItem(SignPolicy.SHOW_ALWAYS));
-                } else if ((c == '#') || (c == '{') || (c == '}')) {
+                } else if (c == '{') {
+                    int start = ++i;
+                    while ((i < n) && pattern.charAt(i) != '}') {
+                        i++;
+                    }
+                    addPluralItem(pattern.substring(start, i), stack);
+                } else if ((c == '#') || (c == '}')) {
                     throw new IllegalArgumentException(
                         "Pattern contains reserved character: '" + c + "'");
                 } else {
@@ -3898,6 +3974,19 @@ public final class Duration<U extends IsoUnit>
         	List<List<FormatItem>> stack
         ) {
 
+            IsoUnit unit = getUnit(symbol);
+        	List<FormatItem> items = stack.get(stack.size() - 1);
+
+            if (symbol == 'f') {
+                items.add(new FractionItem(count));
+            } else {
+                items.add(new NumberItem(count, unit));
+            }
+
+        }
+
+        private static IsoUnit getUnit(char symbol) {
+
             IsoUnit unit;
 
             switch (symbol) {
@@ -3942,13 +4031,7 @@ public final class Duration<U extends IsoUnit>
                         "Unsupported pattern symbol: " + symbol);
             }
 
-        	List<FormatItem> items = stack.get(stack.size() - 1);
-
-            if (symbol == 'f') {
-                items.add(new FractionItem(count));
-            } else {
-                items.add(new NumberItem(count, unit));
-            }
+            return unit;
 
         }
 
@@ -3967,6 +4050,81 @@ public final class Duration<U extends IsoUnit>
         ) {
 
         	lastOn(stack).add(new LiteralItem(literal));
+
+        }
+
+        private static void addPluralItem(
+            String pluralInfo,
+            List<List<FormatItem>> stack
+        ) {
+
+            String[] parts = pluralInfo.split(":");
+
+            if (
+                (parts.length > 9)
+                || (parts.length < 4)
+            ) {
+                throw new IllegalArgumentException(
+                    "Plural information has wrong format: " + pluralInfo);
+            }
+
+            IsoUnit unit;
+
+            if (parts[0].length() == 1) {
+                unit = getUnit(parts[0].charAt(0));
+            } else {
+                throw new IllegalArgumentException(
+                    "Plural information has wrong symbol: " + pluralInfo);
+            }
+
+            String[] localInfo = parts[2].split("-|_");
+            String lang = localInfo[0];
+            Locale loc;
+
+            if (localInfo.length > 1) {
+                String country = localInfo[1];
+                if (localInfo.length > 2) {
+                    String variant = localInfo[2];
+                    if (localInfo.length > 3) {
+                        throw new IllegalArgumentException(
+                            "Plural information has wrong locale: "
+                            + pluralInfo);
+                    } else {
+                        loc = new Locale(lang, country, variant);
+                    }
+                } else {
+                    loc = new Locale(lang, country);
+                }
+            } else {
+                loc = new Locale(lang);
+            }
+
+            Map<PluralCategory, String> pluralForms =
+                new EnumMap<PluralCategory, String>(PluralCategory.class);
+            PluralRules rules = PluralRules.of(loc, NumberType.CARDINALS);
+
+            for (int i = 3; i < parts.length; i++) {
+                String[] formInfo = parts[i].split("=");
+                if (formInfo.length == 2) {
+                    pluralForms.put(
+                        PluralCategory.valueOf(formInfo[0]),
+                        formInfo[1]);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Plural information has wrong format: " + pluralInfo);
+                }
+            }
+
+            if (pluralForms.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Missing plural forms: " + pluralInfo);
+            } else if (!pluralForms.containsKey(PluralCategory.OTHER)) {
+                throw new IllegalArgumentException(
+                    "Missing plural category OTHER: " + pluralInfo);
+            }
+
+        	lastOn(stack).add(
+                new PluralItem(unit, parts[1], rules, pluralForms));
 
         }
 
@@ -4101,6 +4259,18 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
+        long getAmount(Duration<?> duration) {
+
+            return duration.getPartialAmount(this.unit);
+
+        }
+
+        IsoUnit getUnit() {
+
+            return this.unit;
+
+        }
+
     }
 
     private static class FractionItem
@@ -4198,6 +4368,85 @@ public final class Duration<U extends IsoUnit>
 
 	}
 
+    private static class PluralItem
+        extends FormatItem {
+
+	    //~ Instanzvariablen ----------------------------------------------
+
+        private final NumberItem numItem;
+        private final FormatItem sepItem;
+    	private final PluralRules rules;
+    	private final Map<PluralCategory, String> pluralForms;
+
+	    //~ Konstruktoren -------------------------------------------------
+
+		private PluralItem(
+            IsoUnit unit,
+            String separator,
+			PluralRules rules,
+			Map<PluralCategory, String> pluralForms
+	    ) {
+			super();
+
+            this.numItem = new NumberItem(1, unit);
+            this.sepItem = new LiteralItem(separator, true);
+			this.rules = rules;
+			this.pluralForms = pluralForms;
+
+		}
+
+	    //~ Methoden ------------------------------------------------------
+
+		@Override
+		void print(
+    		Duration<?> duration,
+    		Appendable buffer
+    	) throws IOException {
+
+            this.numItem.print(duration, buffer);
+            this.sepItem.print(duration, buffer);
+            PluralCategory category =
+                this.rules.getCategory(this.numItem.getAmount(duration));
+            buffer.append(this.pluralForms.get(category));
+
+        }
+
+        @Override
+        int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int pos
+        ) {
+
+            int start = pos;
+            pos = this.numItem.parse(unitsToValues, text, pos);
+
+            if (pos < 0) {
+                return pos;
+            }
+
+            pos = this.sepItem.parse(unitsToValues, text, pos);
+
+            if (pos < 0) {
+                return pos;
+            }
+
+            long value = unitsToValues.get(this.numItem.getUnit()).longValue();
+            String s = this.pluralForms.get(this.rules.getCategory(value));
+            int n = s.length();
+
+            for (int i = 0; i < n; i++) {
+                if (s.charAt(i) != text.charAt(pos + i)) {
+                    return ~start;
+                }
+            }
+
+            return pos + n;
+
+        }
+
+    }
+
     private static class SeparatorItem
 		extends FormatItem {
 
@@ -4266,9 +4515,17 @@ public final class Duration<U extends IsoUnit>
 	    //~ Konstruktoren -------------------------------------------------
 
 		private LiteralItem(String literal) {
+			this(literal, false);
+
+        }
+
+		private LiteralItem(
+            String literal,
+            boolean withEmpty
+        ) {
 			super();
 
-			if (literal.isEmpty()) {
+			if (!withEmpty && literal.isEmpty()) {
 				throw new IllegalArgumentException("Literal is empty.");
 			}
 

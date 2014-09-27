@@ -36,8 +36,22 @@ public class DurationFormatterTest {
                         "-05:30:34"},
                 {"+hh:mm:ss.fff",
                         "PT5H30M34,012S",
-                        "+05:30:34.012"}
-           }
+                        "+05:30:34.012"},
+                {"{D: :en:ONE=day:OTHER=days}",
+                        "P3D",
+                        "3 days"},
+                {"{s:::ONE=sec:OTHER=secs}",
+                        "PT3S",
+                        "3secs"},
+                {"{s:::ONE=sec:OTHER=secs}' per run'",
+                        "PT1S",
+                        "1sec per run"},
+                {"{Y: :en:ONE=year:OTHER=years}', '"
+                 + "{M: :en:ONE=month:OTHER=months}', '"
+                 + "{D: :en:ONE=day:OTHER=days}",
+                        "P1Y0M3D",
+                        "1 year, 0 months, 3 days"},
+            }
         );
     }
 
