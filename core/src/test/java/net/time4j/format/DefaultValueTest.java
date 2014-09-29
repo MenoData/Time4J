@@ -26,6 +26,13 @@ public class DefaultValueTest {
         assertThat(date, is(PlainDate.of(2012, 5, 21)));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void dateFormatWithDefaultHour() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            PlainDate.localFormatter("MM-dd", PatternType.CLDR)
+                     .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 12);
+    }
+
     @Test
     public void missingMonth() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
