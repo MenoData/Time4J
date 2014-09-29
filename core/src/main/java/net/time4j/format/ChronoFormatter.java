@@ -210,13 +210,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
         super();
 
-        if (element == null) {
-            throw new NullPointerException("Missing element.");
-        }
-
         this.chronology = formatter.chronology;
         this.defaultAttributes = formatter.defaultAttributes;
         this.fracproc = formatter.fracproc;
+
+        if (element == null) {
+            throw new NullPointerException("Missing element.");
+        } else if (!this.chronology.isSupported(element)) {
+            throw new IllegalArgumentException(
+                "Not supported: " + element.name());
+        }
 
         Map<ChronoElement<?>, Object> map =
             new NonAmbivalentMap(formatter.defaults);
@@ -824,6 +827,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   value       replacement value or {@code null}
      *                      if the default value shall be deregistered
      * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if given element is not supported
+     *          by the underlying chronology
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     /*[deutsch]
@@ -845,6 +850,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   value       replacement value or {@code null}
      *                      if the default value shall be deregistered
      * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if given element is not supported
+     *          by the underlying chronology
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     public <V> ChronoFormatter<T> withDefault(
@@ -2360,6 +2367,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * @param   element         chronological element
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by the underlying chronology
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2377,6 +2386,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * @param   element         chronological element
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by the underlying chronology
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2426,7 +2437,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   indicators      ordinal indicators to be used as suffixes
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if there is no indicator at least
-         *          for the plural category OTHER
+         *          for the plural category OTHER or if given element is not
+         *          supported by the underlying chronology
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2472,7 +2484,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   indicators      ordinal indicators to be used as suffixes
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if there is no indicator at least
-         *          for the plural category OTHER
+         *          for the plural category OTHER or if given element is not
+         *          supported by the underlying chronology
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2952,6 +2965,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
          * @see     Attributes#PIVOT_YEAR
          */
         /*[deutsch]
@@ -2975,6 +2990,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element     year element (name must start with the
          *                      prefix &quot;YEAR&quot;)
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology
          * @see     Attributes#PIVOT_YEAR
          */
         public Builder<T> addTwoDigitYear(ChronoElement<Integer> element) {
