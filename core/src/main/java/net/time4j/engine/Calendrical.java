@@ -118,6 +118,10 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     @Override
     public boolean isSimultaneous(Calendrical<?, ?> date) {
 
+        if (this == date) {
+            return true;
+        }
+
         return (this.compareByTime(date) == 0);
 
     }
