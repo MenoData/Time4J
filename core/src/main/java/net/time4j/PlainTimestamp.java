@@ -837,7 +837,7 @@ public final class PlainTimestamp
      * <p>Combines this local timestamp with the timezone offset UTC+00:00
      * to a global timestamp. </p>
      *
-     * @return  global timestamp  based on this local timestamp interpreted
+     * @return  global timestamp based on this local timestamp interpreted
      *          at offset UTC+00:00
      * @see     #at(ZonalOffset)
      */
@@ -845,7 +845,7 @@ public final class PlainTimestamp
      * <p>Kombiniert diesen lokalen Zeitstempel mit UTC+00:00 zu
      * einem globalen Zeitstempel. </p>
      *
-     * @return  global timestamp  based on this local timestamp interpreted
+     * @return  global timestamp based on this local timestamp interpreted
      *          at offset UTC+00:00
      * @see     #at(ZonalOffset)
      */
@@ -860,7 +860,7 @@ public final class PlainTimestamp
      * to a global timestamp. </p>
      *
      * @param   offset  timezone offset
-     * @return  global timestamp  based on this local timestamp interpreted
+     * @return  global timestamp based on this local timestamp interpreted
      *          at given offset
      * @since   1.2
      * @see     #atUTC()
@@ -871,7 +871,7 @@ public final class PlainTimestamp
      * Zeitzonen-Offset zu einem globalen Zeitstempel. </p>
      *
      * @param   offset  timezone offset
-     * @return  global timestamp  based on this local timestamp interpreted
+     * @return  global timestamp based on this local timestamp interpreted
      *          at given offset
      * @since   1.2
      * @see     #atUTC()
