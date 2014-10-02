@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ScaleSuite.class,
         SerializationTest.class,
         TemporalTypesTest.class,
+        TimeLineTest.class,
         TimeSuite.class,
         ZoneSuite.class
     }

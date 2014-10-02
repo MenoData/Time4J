@@ -21,6 +21,7 @@
 
 package net.time4j.engine;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ import java.util.Set;
  */
 public final class TimeAxis<U, T extends TimePoint<U, T>>
     extends Chronology<T>
-    implements Comparator<U> {
+    implements Comparator<U>, TimeLine<T> {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -63,6 +64,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     private final T max;
     private final CalendarSystem<T> calendarSystem;
     private final ChronoElement<T> self;
+    private final TimeLine<T> timeline;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -72,13 +74,14 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         ChronoMerger<T> merger,
         Map<ChronoElement<?>, ElementRule<T, ?>> ruleMap,
         Map<U, UnitRule<T>> unitRules,
-        Map<U, Double> unitLengths,
+        final Map<U, Double> unitLengths,
         Map<U, Set<U>> convertibleUnits,
         List<ChronoExtension> extensions,
         Map<ChronoElement<?>, U> baseUnits,
         T min,
         T max,
-        CalendarSystem<T> calendarSystem // optional
+        CalendarSystem<T> calendarSystem, // optional
+        TimeLine<T> timeline // optional
     ) {
         super(chronoType, merger, ruleMap, extensions);
 
@@ -91,6 +94,27 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         this.max = max;
         this.calendarSystem = calendarSystem;
         this.self = new SelfElement<T>(chronoType, min, max);
+
+        if (timeline == null) {
+            List<U> registeredUnits = new ArrayList<U>(unitRules.keySet());
+            Collections.sort(
+                registeredUnits,
+                new Comparator<U>() {
+                    @Override
+                    public int compare(
+                        U unit1,
+                        U unit2
+                    ) {
+                        return Double.compare(
+                            getLength(unitLengths, unit1),
+                            getLength(unitLengths, unit2));
+                    }
+                });
+            U step = registeredUnits.get(0);
+            this.timeline = new DefaultTimeLine<U, T>(step);
+        } else {
+            this.timeline = timeline;
+        }
 
     }
 
@@ -216,17 +240,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      */
     public double getLength(U unit) {
 
-        Double length = this.unitLengths.get(unit);
-
-        if (length == null) {
-            if (unit instanceof ChronoUnit) {
-                return ChronoUnit.class.cast(unit).getLength();
-            } else {
-                return Double.NaN;
-            }
-        } else {
-            return length.doubleValue();
-        }
+        return getLength(this.unitLengths, unit);
 
     }
 
@@ -281,7 +295,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
-     * <p>Compares time units by ascending precision (that is descending length). </p>
+     * <p>Compares time units by ascending precision
+     * (that is descending length). </p>
      */
     /*[deutsch]
      * <p>Vergleicht Zeiteinheiten nach aufsteigender Genauigkeit. </p>
@@ -372,7 +387,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             ChronoElement<?> parent = ((BasicElement) element).getParent();
             baseUnit = this.baseUnits.get(parent);
         }
-        
+
         if (baseUnit == null) {
             throw new ChronoException(
                 "Base unit not found for: " + element.name());
@@ -450,6 +465,20 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
     }
 
+    @Override
+    public T stepForward(T timepoint) {
+
+        return this.timeline.stepForward(timepoint);
+
+    }
+
+    @Override
+    public T stepBackwards(T timepoint) {
+
+        return this.timeline.stepBackwards(timepoint);
+
+    }
+
     /**
      * <p>Liefert die chronologische Regel zur angegebenen Zeiteinheit. </p>
      *
@@ -472,6 +501,25 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         throw new RuleNotFoundException(this, unit);
+
+    }
+
+    private static <U> double getLength(
+        Map<U, Double> unitLengths,
+        U unit
+    ) {
+
+        Double length = unitLengths.get(unit);
+
+        if (length == null) {
+            if (unit instanceof ChronoUnit) {
+                return ChronoUnit.class.cast(unit).getLength();
+            } else {
+                return Double.NaN;
+            }
+        } else {
+            return length.doubleValue();
+        }
 
     }
 
@@ -521,6 +569,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         private final T min;
         private final T max;
         private final CalendarSystem<T> calendarSystem;
+        private TimeLine<T> timeline = null;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -530,7 +579,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             ChronoMerger<T> merger,
             T min,
             T max,
-            CalendarSystem<T> calendarSystem // optional
+            CalendarSystem<T> calendarSystem, // optional
+            TimeLine<T> timeline
         ) {
             super(chronoType, merger);
 
@@ -555,6 +605,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             this.min = min;
             this.max = max;
             this.calendarSystem = calendarSystem;
+            this.timeline = timeline;
 
         }
 
@@ -602,6 +653,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                 merger,
                 min,
                 max,
+                null,
                 null);
 
         }
@@ -648,7 +700,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                     merger,
                     calsys.transform(calsys.getMinimumSinceUTC()),
                     calsys.transform(calsys.getMaximumSinceUTC()),
-                    calsys
+                    calsys,
+                    null
                 );
 
             for (EpochDays element : EpochDays.values()) {
@@ -845,6 +898,12 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             Set<? extends U> convertibleUnits
         ) {
 
+            if (unit == null) {
+                throw new NullPointerException("Missing time unit.");
+            } else if (rule == null) {
+                throw new NullPointerException("Missing unit rule.");
+            }
+
             this.checkUnitDuplicates(unit);
 
             if (convertibleUnits.contains(null)) {
@@ -876,6 +935,33 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         /**
+         * <p>Defines the argument as timeline to be used for stepping
+         * forward or backwards. </p>
+         *
+         * @param   timeline    time line to be used
+         * @return  this instance for method chaining
+         * @since   1.3
+         */
+        /*[deutsch]
+         * <p>Definiert das Argument als Zeitstrahl, auf dem schrittweise
+         * vorw&auml;rts oder r&uuml;ckw&auml;rts gegangen wird. </p>
+         *
+         * @param   timeline    time line to be used
+         * @return  this instance for method chaining
+         * @since   1.3
+         */
+        public Builder<U, T> withTimeLine(TimeLine<T> timeline) {
+
+            if (timeline == null) {
+                throw new NullPointerException("Missing time line.");
+            }
+
+            this.timeline = timeline;
+            return this;
+
+        }
+
+        /**
          * <p>Creates and registers a time axis. </p>
          *
          * @return  new chronology as time axis
@@ -892,6 +978,10 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         @Override
         public TimeAxis<U, T> build() {
 
+            if (this.unitRules.isEmpty()) {
+                throw new IllegalStateException("No time unit was registered.");
+            }
+
             TimeAxis<U, T> engine =
                 new TimeAxis<U, T>(
                     this.chronoType,
@@ -905,7 +995,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                     this.baseUnits,
                     this.min,
                     this.max,
-                    this.calendarSystem
+                    this.calendarSystem,
+                    this.timeline
                 );
 
             Chronology.register(engine);
@@ -1091,6 +1182,40 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             return null;
+
+        }
+
+    }
+
+    private static class DefaultTimeLine<U, T extends TimePoint<U, T>>
+        implements TimeLine<T> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final U step;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        DefaultTimeLine(U step) {
+            super();
+
+            this.step = step;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public T stepForward(T timepoint) {
+
+            return timepoint.plus(1, this.step);
+
+        }
+
+        @Override
+        public T stepBackwards(T timepoint) {
+
+            return timepoint.minus(1, this.step);
 
         }
 

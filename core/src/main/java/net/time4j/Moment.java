@@ -36,6 +36,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
+import net.time4j.engine.TimeLine;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
@@ -341,7 +342,7 @@ public final class Moment
             }
         }
 
-        ENGINE = builder.build();
+        ENGINE = builder.withTimeLine(new SITimeLine()).build();
 
         FORMATTER_RFC_1123 =
             ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
@@ -2463,6 +2464,27 @@ public final class Moment
         public Chronology<?> preparser() {
 
             return PlainTimestamp.axis();
+
+        }
+
+    }
+
+    private static class SITimeLine
+        implements TimeLine<Moment> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Moment stepForward(Moment timepoint) {
+
+            return timepoint.plus(1, SI.NANOSECONDS);
+
+        }
+
+        @Override
+        public Moment stepBackwards(Moment timepoint) {
+
+            return timepoint.minus(1, SI.NANOSECONDS);
 
         }
 
