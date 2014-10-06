@@ -97,9 +97,9 @@ public final class MachineTime<U>
     private static final int MRD = 1000000000;
 
     private static final MachineTime<TimeUnit> POSIX_ZERO =
-        new MachineTime<TimeUnit>(0, 0, TimeScale.POSIX);
+        new MachineTime<TimeUnit>(0, 0, POSIX);
     private static final MachineTime<SI> UTC_ZERO =
-        new MachineTime<SI>(0, 0, TimeScale.UTC);
+        new MachineTime<SI>(0, 0, UTC);
 
     /**
      * Metric on the POSIX scale (without leap seconds).
@@ -289,10 +289,7 @@ public final class MachineTime<U>
             return POSIX_ZERO;
         }
 
-        return new MachineTime<TimeUnit>(
-            seconds,
-            fraction,
-            TimeScale.POSIX);
+        return new MachineTime<TimeUnit>(seconds, fraction, POSIX);
 
     }
 
@@ -331,10 +328,7 @@ public final class MachineTime<U>
             return UTC_ZERO;
         }
 
-        return new MachineTime<SI>(
-            seconds,
-            fraction,
-            TimeScale.UTC);
+        return new MachineTime<SI>(seconds, fraction, UTC);
 
     }
 
@@ -649,7 +643,7 @@ public final class MachineTime<U>
         long s = this.seconds;
         int f = this.nanos;
 
-        if (this.scale == TimeScale.POSIX) {
+        if (this.scale == POSIX) {
             TimeUnit u = TimeUnit.class.cast(unit);
 
             if (u.compareTo(TimeUnit.SECONDS) >= 0) {
@@ -852,7 +846,7 @@ public final class MachineTime<U>
             this.toBigDecimal().multiply(BigDecimal.valueOf(factor));
         MachineTime<?> mt;
 
-        if (this.scale == TimeScale.POSIX) {
+        if (this.scale == POSIX) {
             mt = MachineTime.ofPosixSeconds(value);
         } else {
             mt = MachineTime.ofSISeconds(value);
@@ -890,7 +884,7 @@ public final class MachineTime<U>
                 .divide(new BigDecimal(divisor), RoundingMode.HALF_UP);
         MachineTime<?> mt;
 
-        if (this.scale == TimeScale.POSIX) {
+        if (this.scale == POSIX) {
             mt = MachineTime.ofPosixSeconds(value);
         } else {
             mt = MachineTime.ofSISeconds(value);
