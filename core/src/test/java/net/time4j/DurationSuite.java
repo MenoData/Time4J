@@ -14,7 +14,8 @@ import org.junit.runners.Suite.SuiteClasses;
         DurationBasicsTest.class,
         DurationFormatterTest.class,
         DurationNormalizerTest.class,
-        DurationUntilTest.class
+        DurationUntilTest.class,
+        MachineTimeTest.class
     }
 )
 public class DurationSuite {

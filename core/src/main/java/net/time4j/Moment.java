@@ -960,6 +960,52 @@ public final class Moment
     }
 
     /**
+     * <p>Adds the given machine time duration in SI-seconds to this
+     * moment. </p>
+     *
+     * @param   duration    machine time in SI-seconds
+     * @return  result of addition
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebene Maschinenzeit in SI-Sekunden zu dieser
+     * Instanz. </p>
+     *
+     * @param   duration    machine time in SI-seconds
+     * @return  result of addition
+     * @since   1.3
+     */
+    public Moment plus(MachineTime<SI> duration) {
+
+        return this.plus(duration.getSeconds(), SI.SECONDS)
+                   .plus(duration.getFraction(), SI.NANOSECONDS);
+
+    }
+
+    /**
+     * <p>Subtracts the given machine time duration in SI-seconds from this
+     * moment. </p>
+     *
+     * @param   duration    machine time in SI-seconds
+     * @return  result of subtraction
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Subtrahiert die angegebene Maschinenzeit in SI-Sekunden von dieser
+     * Instanz. </p>
+     *
+     * @param   duration    machine time in SI-seconds
+     * @return  result of subtraction
+     * @since   1.3
+     */
+    public Moment minus(MachineTime<SI> duration) {
+
+        return this.minus(duration.getSeconds(), SI.SECONDS)
+                   .minus(duration.getFraction(), SI.NANOSECONDS);
+
+    }
+
+    /**
      * <p>Calculates the time distance between this timestamp and given
      * end timestamp in given SI-unit on the UTC time scale. </p>
      *
