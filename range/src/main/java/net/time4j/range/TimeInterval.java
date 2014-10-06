@@ -21,6 +21,8 @@
 
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
+import net.time4j.Duration;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeLine;
 
@@ -30,6 +32,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 
+import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.NANOS;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
@@ -182,6 +186,44 @@ public final class TimeInterval
             Boundary.of(this.getEnd().getEdge(), temporal);
         return new TimeInterval(this.getStart(), boundary);
 
+    }
+
+    /**
+     * <p>Yields the length of this interval. </p>
+     * 
+     * @return  duration in hours, minutes, seconds and nanoseconds
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls. </p>
+     * 
+     * @return  duration in hours, minutes, seconds and nanoseconds
+     * @since   1.3
+     */
+    public Duration<ClockUnit> getDuration() {
+        
+        PlainTime t1 = this.getStart().getTemporal();
+        PlainTime t2 = this.getEnd().getTemporal();
+        
+        if (
+            (t2.getHour() == 24)
+            && this.getEnd().isClosed()
+        ) {
+            if (this.getStart().isClosed()) {
+                if (t1.equals(PlainTime.midnightAtStartOfDay())) {
+                    return Duration.of(24, HOURS).plus(1, NANOS);
+                } else {
+                    t1 = t1.minus(1, NANOS);
+                }
+            }
+        } else if (this.getStart().isOpen()) {
+            t1 = t1.plus(1, NANOS);
+        } else if (this.getEnd().isClosed()) {
+            t2 = t2.plus(1, NANOS);
+        }
+        
+        return Duration.inClockUnits().between(t1, t2);
+        
     }
 
     @Override
