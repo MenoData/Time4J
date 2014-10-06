@@ -21,6 +21,8 @@
 
 package net.time4j.range;
 
+import net.time4j.Duration;
+import net.time4j.IsoUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.TimeLine;
@@ -328,6 +330,66 @@ public final class TimestampInterval
 
         return new MomentInterval(b1, b2);
 
+    }
+
+    /**
+     * <p>Yields the length of this interval in given units. </p>
+     * 
+     * @param   units   time units to be used in calculation
+     * @return  duration in given units
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
+     * Zeiteinheiten. </p>
+     * 
+     * @param   units   time units to be used in calculation
+     * @return  duration in given units
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     */
+    public <U extends IsoUnit> Duration<U> getDuration(U... units) {
+        
+        ChronoInterval<PlainTimestamp> base = this.getCalculationBase();
+        
+        return Duration.in(units).between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+        
+    }
+
+    /**
+     * <p>Yields the length of this interval in given units and applies
+     * a timezone offset correction . </p>
+     * 
+     * @param   tz      timezone
+     * @param   units   time units to be used in calculation
+     * @return  duration in given units including a zonal correction
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
+     * Zeiteinheiten und wendet eine Zeitzonenkorrektur an. </p>
+     * 
+     * @param   tz      timezone
+     * @param   units   time units to be used in calculation
+     * @return  duration in given units including a zonal correction
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     */
+    public Duration<IsoUnit> getDuration(
+        Timezone tz,
+        IsoUnit... units
+    ) {
+        
+        ChronoInterval<PlainTimestamp> base = this.getCalculationBase();
+        
+        return Duration.in(tz, units).between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+        
     }
 
     @Override
