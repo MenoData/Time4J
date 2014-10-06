@@ -46,8 +46,8 @@ import static net.time4j.scale.TimeScale.UTC;
 
 
 /**
- * <p>Represents a duration for machine times in seconds and
- * nanosecond part. </p>
+ * <p>Represents a duration for machine times in decimal seconds with
+ * nanosecond precision. </p>
  *
  * <p>Note: Other time units are NOT contained but can be used in construction
  * of a machine time. Example: </p>
@@ -68,8 +68,8 @@ import static net.time4j.scale.TimeScale.UTC;
  * @concurrency <immutable>
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert eine Dauer f&uuml;r maschinelle Zeiten in
- * Sekunden und mit Nanosekundenbruchteil. </p>
+ * <p>Repr&auml;sentiert eine Dauer f&uuml;r maschinelle Zeiten in dezimalen
+ * Sekunden mit Nanosekundengenauigkeit. </p>
  *
  * <p>Hinweis: Andere Zeiteinheiten sind NICHT enthalten, k&ouml;nnen aber in
  * der Konstruktuion einer maschinellen Dauer verwendet werden. Beispiel: </p>
@@ -628,7 +628,7 @@ public final class MachineTime<U>
      *
      * @param   amount  the amount to be added
      * @param   unit    the related time unit
-     * @return  new machine time duration
+     * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -637,7 +637,7 @@ public final class MachineTime<U>
      *
      * @param   amount  the amount to be added
      * @param   unit    the related time unit
-     * @return  new machine time duration
+     * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -694,7 +694,7 @@ public final class MachineTime<U>
      * <p>Add given temporal amount to this machine time. </p>
      *
      * @param   duration    other machine time to be added
-     * @return  new machine time duration
+     * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -702,7 +702,7 @@ public final class MachineTime<U>
      * <p>Addiert den angegebenen Zeitbetrag zu dieser maschinellen Dauer. </p>
      *
      * @param   duration    other machine time to be added
-     * @return  new machine time duration
+     * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -725,7 +725,7 @@ public final class MachineTime<U>
      *
      * @param   amount  the amount to be subtracted
      * @param   unit    the related time unit
-     * @return  new machine time duration
+     * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -735,7 +735,7 @@ public final class MachineTime<U>
      *
      * @param   amount  the amount to be subtracted
      * @param   unit    the related time unit
-     * @return  new machine time duration
+     * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -752,7 +752,7 @@ public final class MachineTime<U>
      * <p>Subtracts given temporal amount from this machine time. </p>
      *
      * @param   duration    other machine time to be subtracted
-     * @return  new machine time duration
+     * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -761,7 +761,7 @@ public final class MachineTime<U>
      * Dauer. </p>
      *
      * @param   duration    other machine time to be subtracted
-     * @return  new machine time duration
+     * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -782,14 +782,14 @@ public final class MachineTime<U>
     /**
      * <p>Converts this machine duration to its absolute amount. </p>
      *
-     * @return  new machine time duration, always non-negative
+     * @return  absolute machine time duration, always non-negative
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
     /*[deutsch]
      * <p>Wandelt eine maschinelle Dauer in ihren Absolutbetrag um. </p>
      *
-     * @return  new machine time duration, always non-negative
+     * @return  absolute machine time duration, always non-negative
      * @throws  ArithmeticException in case of numerical overflow
      * @since   1.3
      */
@@ -831,19 +831,75 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Callback-method used by {@code Moment.plus(this)}. </p>
+     * <p>Multiplies this duration with given factor. </p>
      *
-     * @param   <T> generic type of time point
-     * @param   time    reference time point to add this time span to
-     * @return  new time point as result of addition
+     * @param   factor  multiplicand
+     * @return  changed copy of this duration
      */
     /*[deutsch]
-     * <p>Verwendet von {@code Moment.plus(this)}. </p>
+     * <p>Multipliziert diese Dauer mit dem angegebenen Faktor. </p>
      *
-     * @param   <T> generic type of time point
-     * @param   time    reference time point to add this time span to
-     * @return  new time point as result of addition
+     * @param   factor  multiplicand
+     * @return  changed copy of this duration
      */
+    public MachineTime<U> multipliedBy(long factor) {
+
+        if (factor == 1) {
+            return this;
+        }
+
+        BigDecimal value =
+            this.toBigDecimal().multiply(BigDecimal.valueOf(factor));
+        MachineTime<?> mt;
+
+        if (this.scale == TimeScale.POSIX) {
+            mt = MachineTime.ofPosixSeconds(value);
+        } else {
+            mt = MachineTime.ofSISeconds(value);
+        }
+
+        return cast(mt);
+
+    }
+
+    /**
+     * <p>Divides this duration by given divisor using rounding
+     * mode {@code HALF_UP}. </p>
+     *
+     * @param   divisor     divisor
+     * @return  changed copy of this duration
+     * @see     RoundingMode#HALF_UP
+     */
+    /*[deutsch]
+     * <p>Dividiert diese Dauer durch den angegebenen Teiler und
+     * benutzt die kaufm&auml;nnische Rundung. </p>
+     *
+     * @param   divisor     Teiler
+     * @return  ge&auml;nderte Kopie dieser Dauer
+     * @see     RoundingMode#HALF_UP
+     */
+    public MachineTime<U> dividedBy(long divisor) {
+
+        if (divisor == 1) {
+            return this;
+        }
+
+        BigDecimal value =
+            this.toBigDecimal()
+                .setScale(9, RoundingMode.FLOOR)
+                .divide(new BigDecimal(divisor), RoundingMode.HALF_UP);
+        MachineTime<?> mt;
+
+        if (this.scale == TimeScale.POSIX) {
+            mt = MachineTime.ofPosixSeconds(value);
+        } else {
+            mt = MachineTime.ofSISeconds(value);
+        }
+
+        return cast(mt);
+
+    }
+
     @Override
     public <T extends TimePoint<? super U, T>> T addTo(T time) {
 
@@ -864,20 +920,6 @@ public final class MachineTime<U>
 
     }
 
-    /**
-     * <p>Callback-method used by {@code Moment.minus(this)}. </p>
-     *
-     * @param   <T> generic type of time point
-     * @param   time    reference time point to subtract this time span from
-     * @return  new time point as result of subtraction
-     */
-    /*[deutsch]
-     * <p>Verwendet von {@code Moment.minus(this)}. </p>
-     *
-     * @param   <T> generic type of time point
-     * @param   time    reference time point to subtract this time span from
-     * @return  new time point as result of subtraction
-     */
     @Override
     public <T extends TimePoint<? super U, T>> T subtractFrom(T time) {
 

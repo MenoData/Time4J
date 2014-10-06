@@ -310,4 +310,18 @@ public class MachineTimeTest {
             is(true));
     }
 
+    @Test
+    public void multipliedBy() {
+        assertThat(
+            MachineTime.ofSIUnits(2, 500000000).multipliedBy(3),
+            is(MachineTime.ofSIUnits(7, 500000000)));
+    }
+
+    @Test
+    public void dividedBy() {
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3),
+            is(MachineTime.ofSIUnits(2, 500000000)));
+    }
+
 }
