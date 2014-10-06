@@ -71,7 +71,7 @@ public interface TimeSpan<U> {
      * <pre>
      *  for (Item&lt;?&gt; item : getTotalLength()) {
      *      if (item.getUnit().equals(unit)) {
-     *          return (item.getAmount > 0);
+     *          return (item.getAmount() > 0);
      *      }
      *  }
      *  return false;
@@ -90,7 +90,7 @@ public interface TimeSpan<U> {
      * <pre>
      *  for (Item&lt;?&gt; item : getTotalLength()) {
      *      if (item.getUnit().equals(unit)) {
-     *          return (item.getAmount > 0);
+     *          return (item.getAmount() > 0);
      *      }
      *  }
      *  return false;

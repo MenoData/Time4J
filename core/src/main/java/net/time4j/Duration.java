@@ -791,6 +791,10 @@ public final class Duration<U extends IsoUnit>
     @Override
     public boolean contains(IsoUnit unit) {
 
+        if (unit == null) {
+            return false;
+        }
+
         boolean fractional = isFractionUnit(unit);
 
         for (int i = 0, n = this.items.size(); i < n; i++) {
@@ -838,6 +842,10 @@ public final class Duration<U extends IsoUnit>
      */
     @Override
     public long getPartialAmount(IsoUnit unit) {
+
+        if (unit == null) {
+            return 0;
+        }
 
         boolean fractional = isFractionUnit(unit);
 
@@ -2885,7 +2893,8 @@ public final class Duration<U extends IsoUnit>
      *              four most significant bits the type id {@code 6} and as
      *              least significant bit the value 1 if long should be used
      *              for transferring the item amounts (else using int). Then
-     *              the data bytes for date and time component follow.
+     *              the data bytes for the duration items follow. The byte
+     *              sequence optionally ends with the sign information.
      *
      * Schematic algorithm:
      *
