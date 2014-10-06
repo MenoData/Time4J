@@ -113,7 +113,7 @@ public final class MachineTime<U>
      */
     public static final
     TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE =
-        new Metric<TimeUnit>(POSIX, TimeUnit.class);
+        new Metric<TimeUnit>(POSIX);
 
     /**
      * Metric on the UTC scale (inclusive leap seconds).
@@ -126,7 +126,7 @@ public final class MachineTime<U>
      * @since   1.3
      */
     public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE =
-        new Metric<SI>(UTC, SI.class);
+        new Metric<SI>(UTC);
 
     private static final long serialVersionUID = -4150291820807606229L;
 
@@ -907,8 +907,12 @@ public final class MachineTime<U>
             U s = cast(TimeUnit.SECONDS);
             U f = cast(TimeUnit.NANOSECONDS);
             return time.plus(this.seconds, s).plus(this.nanos, f);
-        } else if (time instanceof Moment) {
-            Moment moment = (Moment) time;
+        }
+        
+        Object t = time;
+        
+        if (t instanceof Moment) {
+            Moment moment = (Moment) t;
             Moment result =
                 moment.plus(this.seconds, SI.SECONDS)
                       .plus(this.nanos, SI.NANOSECONDS);
@@ -927,8 +931,12 @@ public final class MachineTime<U>
             U s = cast(TimeUnit.SECONDS);
             U f = cast(TimeUnit.NANOSECONDS);
             return time.minus(this.seconds, s).minus(this.nanos, f);
-        } else if (time instanceof Moment) {
-            Moment moment = (Moment) time;
+        }
+        
+        Object t = time;
+        
+        if (t instanceof Moment) {
+            Moment moment = (Moment) t;
             Moment result =
                 moment.minus(this.seconds, SI.SECONDS)
                       .minus(this.nanos, SI.NANOSECONDS);
@@ -946,7 +954,7 @@ public final class MachineTime<U>
         if (this == obj) {
             return true;
         } else if (obj instanceof MachineTime) {
-            MachineTime<?> that = (MachineTime) obj;
+            MachineTime<?> that = (MachineTime<?>) obj;
             return (
                 (this.seconds == that.seconds)
                 && (this.nanos == that.nanos)
@@ -1084,18 +1092,13 @@ public final class MachineTime<U>
         //~ Instanzvariablen ----------------------------------------------
 
         private final TimeScale scale;
-        private final Class<U> unitType;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private Metric(
-            TimeScale scale,
-            Class<U> unitType
-        ) {
+        private Metric(TimeScale scale) {
             super();
 
             this.scale = scale;
-            this.unitType = unitType;
 
         }
 
