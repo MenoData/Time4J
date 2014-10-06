@@ -116,12 +116,16 @@ public final class MachineTime<U>
         new Metric<TimeUnit>(POSIX);
 
     /**
-     * Metric on the UTC scale (inclusive leap seconds).
+     * <p>Metric on the UTC scale (inclusive leap seconds). </p>
+     * 
+     * <p>Time points before 1972 are not supported. </p>
      *
      * @since   1.3
      */
     /*[deutsch]
-     * Metrik auf der UTC-Skala (inklusive Schaltsekunden).
+     * <p>Metrik auf der UTC-Skala (inklusive Schaltsekunden). </p>
+     *
+     * <p>Zeitpunkte vor 1972 werden nicht unterst&uuml;tzt. </p>
      *
      * @since   1.3
      */
@@ -1114,7 +1118,13 @@ public final class MachineTime<U>
             ) {
                 UniversalTime t1 = (UniversalTime) start;
                 UniversalTime t2 = (UniversalTime) end;
-                secs = t2.getElapsedTime(UTC) - t1.getElapsedTime(UTC);
+                long utc2 = t2.getElapsedTime(UTC);
+                long utc1 = t1.getElapsedTime(UTC);
+                if (utc2 < 0 || utc1 < 0) {
+                    throw new UnsupportedOperationException(
+                        "Cannot calculate SI-duration before 1972-01-01.");
+                }
+                secs = utc2 - utc1;
                 nanos = t2.getNanosecond(UTC) - t1.getNanosecond(UTC);
             } else if (start instanceof UnixTime) {
                 UnixTime t1 = (UnixTime) start;
