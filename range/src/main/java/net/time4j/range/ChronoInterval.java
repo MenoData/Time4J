@@ -371,7 +371,7 @@ public abstract class ChronoInterval<T extends Temporal<? super T>> {
         if (this == obj) {
             return true;
         } else if (obj instanceof ChronoInterval) {
-            ChronoInterval<?> that = (ChronoInterval) obj;
+            ChronoInterval<?> that = (ChronoInterval<?>) obj;
             return (
                 this.start.equals(that.start)
                 && this.end.equals(that.end)
@@ -410,5 +410,34 @@ public abstract class ChronoInterval<T extends Temporal<? super T>> {
      * @since   1.3
      */
     protected abstract TimeLine<T> getTimeLine();
+    
+    /**
+     * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
+     * 
+     * @return  Intervall mit {@code duration = ende - start}
+     * @throws  UnsupportedOperationException wenn unendlich
+     */
+    ChronoInterval<T> getCalculationBase() {
+        
+        if (!this.isFinite()) {
+            throw new UnsupportedOperationException(
+                "An infinite interval has no finite duration.");
+        }
+        
+        T t1 = this.start.getTemporal();
+        T t2 = this.end.getTemporal();
+        TimeLine<T> timeline = this.getTimeLine();
+        
+        if (this.start.isOpen()) {
+            t1 = timeline.stepForward(t1);
+        } else if (this.end.isClosed()) {
+            t2 = timeline.stepForward(t2);
+        } else {
+            return this; // short-cut
+        }
+        
+        return on(timeline).between(t1, t2); // half-open
+        
+    }
 
 }
