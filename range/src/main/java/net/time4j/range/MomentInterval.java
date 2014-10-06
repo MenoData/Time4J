@@ -21,8 +21,10 @@
 
 package net.time4j.range;
 
+import net.time4j.MachineTime;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
+import net.time4j.SI;
 import net.time4j.engine.TimeLine;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -32,6 +34,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
@@ -314,6 +317,60 @@ public final class MomentInterval
 
         return new TimestampInterval(b1, b2);
 
+    }
+
+    /**
+     * <p>Yields the length of this interval on the POSIX-scale. </p>
+     * 
+     * @return  machine time duration on POSIX-scale
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getRealDuration()
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls auf der POSIX-Skala. </p>
+     * 
+     * @return  machine time duration on POSIX-scale
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getRealDuration()
+     */
+    public MachineTime<TimeUnit> getSimpleDuration() {
+        
+        ChronoInterval<Moment> base = this.getCalculationBase();
+        
+        return MachineTime.ON_POSIX_SCALE.between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+        
+    }
+
+    /**
+     * <p>Yields the length of this interval on the UTC-scale. </p>
+     * 
+     * @return  machine time duration on UTC-scale
+     * @throws  UnsupportedOperationException if start is before year 1972
+     *          or if this interval is infinite
+     * @since   1.3
+     * @see     #getSimpleDuration()
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls auf der UTC-Skala. </p>
+     * 
+     * @return  machine time duration on UTC-scale
+     * @throws  UnsupportedOperationException if start is before year 1972
+     *          or if this interval is infinite
+     * @since   1.3
+     * @see     #getSimpleDuration()
+     */
+    public MachineTime<SI> getRealDuration() {
+        
+        ChronoInterval<Moment> base = this.getCalculationBase();
+        
+        return MachineTime.ON_UTC_SCALE.between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+        
     }
 
     @Override
