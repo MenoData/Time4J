@@ -21,11 +21,12 @@
 
 package net.time4j.range;
 
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 
 
-final class GenericInterval<T extends Temporal<? super T>>
+final class GenericInterval<T extends ChronoEntity<T> & Temporal<? super T>>
     extends ChronoInterval<T> {
 
     //~ Instanzvariablen --------------------------------------------------
