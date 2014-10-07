@@ -21,6 +21,7 @@
 
 package net.time4j.range;
 
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 
 
