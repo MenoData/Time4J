@@ -21,6 +21,8 @@
 
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
+import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -195,10 +197,25 @@ public final class DateInterval
 
     }
 
-    @Override
-    protected TimeLine<PlainDate> getTimeLine() {
+    /**
+     * <p>Removes the upper boundary from this interval. </p>
+     *
+     * @return  changed copy of this interval excluding upper boundary
+     */
+    /*[deutsch]
+     * <p>Nimmt die obere Grenze von diesem Intervall aus. </p>
+     *
+     * @return  changed copy of this interval excluding upper boundary
+     */
+    public DateInterval withOpenEnd() {
 
-        return PlainDate.axis();
+        if (this.getEnd().isInfinite()) {
+            return this;
+        }
+        
+        Boundary<PlainDate> boundary =
+            Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
+        return this.withEnd(boundary);
 
     }
 
@@ -253,6 +270,111 @@ public final class DateInterval
         }
 
         return new TimestampInterval(b1, b2);
+
+    }
+
+    /**
+     * <p>Yields the length of this interval in days. </p>
+     *
+     * @return  duration in days as long primitive
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getDurationInYearsMonthsDays()
+     * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls in Tagen. </p>
+     *
+     * @return  duration in days as long primitive
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getDurationInYearsMonthsDays()
+     * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
+     */
+    public long getLengthInDays() {
+
+        if (this.isFinite()) {
+            long days = CalendarUnit.DAYS.between(
+                this.getStart().getTemporal(),
+                this.getEnd().getTemporal());
+            if (this.getStart().isOpen()) {
+                days--;
+            }
+            if (this.getEnd().isClosed()) {
+                days++;
+            }
+            return days;
+        } else {
+            throw new UnsupportedOperationException(
+                "An infinite interval has no finite duration.");
+        }
+
+    }
+
+    /**
+     * <p>Yields the length of this interval in years, months and days. </p>
+     *
+     * @return  duration in years, months and days
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getLengthInDays()
+     * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls in Jahren, Monaten und
+     * Tagen. </p>
+     *
+     * @return  duration in years, months and days
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getLengthInDays()
+     * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
+     */
+    public Duration<CalendarUnit> getDurationInYearsMonthsDays() {
+
+        ChronoInterval<PlainDate> base = this.getCalculationBase();
+
+        return Duration.inYearsMonthsDays().between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+
+    }
+
+    /**
+     * <p>Yields the length of this interval in given calendrical units. </p>
+     *
+     * @param   units   calendrical units as calculation base
+     * @return  duration in given units
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getLengthInDays()
+     * @see     #getDurationInYearsMonthsDays()
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
+     * kalendarischen Zeiteinheiten. </p>
+     *
+     * @param   units   calendrical units as calculation base
+     * @return  duration in given units
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   1.3
+     * @see     #getLengthInDays()
+     * @see     #getDurationInYearsMonthsDays()
+     */
+    public Duration<CalendarUnit> getDuration(CalendarUnit... units) {
+
+        ChronoInterval<PlainDate> base = this.getCalculationBase();
+
+        return Duration.in(units).between(
+            base.getStart().getTemporal(),
+            base.getEnd().getTemporal());
+
+    }
+
+    @Override
+    protected TimeLine<PlainDate> getTimeLine() {
+
+        return PlainDate.axis();
 
     }
 
