@@ -168,4 +168,22 @@ public class RangeDurationTest {
                 .hours(8).minutes(15).build()));
     }
 
+    @Test
+	public void getRealDurationOfMomentInterval() {
+	    Moment m1 = Moment.of(1278028823, TimeScale.UTC);
+	    Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
+	    MachineTime<SI> duration = MomentInterval.between(m1, m2).getRealDuration();
+	    MachineTime<SI> expected = MachineTime.ofSIUnits(3L, 1);
+	    assertThat(duration, is(expected));
+	}
+
+    @Test
+	public void getSimpleDurationOfMomentInterval() {
+	    Moment m1 = Moment.of(1278028823, TimeScale.UTC);
+	    Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
+	    MachineTime<TimeUnit> duration = MomentInterval.between(m1, m2).getSimpleDuration();
+	    MachineTime<TimeUnit> expected = MachineTime.ofPosixUnits(2L, 1);
+	    assertThat(duration, is(expected));
+	}
+
 }
