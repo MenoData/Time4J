@@ -25,8 +25,10 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.ChronoFormatter;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +49,7 @@ import java.util.Map;
  * @author  Meno Hochschild
  * @since   1.3
  */
-public abstract class ChronoInterval<T extends Temporal<? super T>> {
+public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? super T>> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -142,7 +144,7 @@ public abstract class ChronoInterval<T extends Temporal<? super T>> {
      * @see     MomentInterval#between(Moment,Moment)
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Temporal<? super T>> IntervalFactory<T> on(
+    public static <T extends ChronoEntity<T> & Temporal<? super T>> IntervalFactory<T> on(
         TimeLine<T> timeline
     ) {
 
@@ -390,17 +392,90 @@ public abstract class ChronoInterval<T extends Temporal<? super T>> {
 
     }
 
+    /**
+     * <p>Yields a descriptive string using the standard output
+     * of the method {@code toString()} of start and end. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Liefert eine Beschreibung, die auf der Standardausgabe von
+     * {@code toString()} angewandt auf Start und Ende beruht.. </p>
+     *
+     * @return  String
+     */
     @Override
     public final String toString() {
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.start.isOpen() ? '(' : '[');
-        sb.append(this.start.isInfinite() ? "-∞" : this.start.getTemporal());
+        sb.append(this.start.isInfinite() ? "-\u221E" : this.start.getTemporal());
         sb.append('/');
-        sb.append(this.end.isInfinite() ? "+∞" : this.end.getTemporal());
+        sb.append(this.end.isInfinite() ? "+\u221E" : this.end.getTemporal());
         sb.append(this.end.isOpen() ? ')' : ']');
         return sb.toString();
 
+    }
+
+    /**
+     * <p>Prints the start and end separated by a slash using given
+     * formatter. </p>
+     * 
+     * <p>Note: The open/closed-state of the boundaries is not printed. 
+     * Infinite boundaries are printed either as &quot;-&#x221E;&quot; or
+     * &quot;+&#x221E;&quot;. Example for an ISO-representation: </p>
+     * 
+     * <pre>
+     *  DateInterval interval =
+     *      DateInterval.between(
+     *          PlainDate.of(2014, 1, 31), 
+     *          PlainDate.of(2014, 4, 2));
+     *  System.out.println(
+     *      interval.toString(Iso8601Format.BASIC_CALENDAR_DATE));
+     *  // output: 20140131/20140402
+     * </pre>
+     * 
+     * @param   formatter   format object for printing start and end
+     * @return  formatted string in format {start}/{end}
+     */
+    /*[deutsch]
+     * <p>Formatiert den Start und das Ende getrennt mit einem
+     * Schr&auml;gstrich unter Benutzung des angegebenen Formatierers. </p>
+     *
+     * <p>Hinweis: Der open/closed-Zustand der Intervallgrenzen wird nicht
+     * ausgegeben. Unendliche Intervallgrenzen werden entweder als
+     * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben.
+     * Beispiel f&uuml;r eine ISO-Darstellung: </p>
+     * 
+     * <pre>
+     *  DateInterval interval =
+     *      DateInterval.between(
+     *          PlainDate.of(2014, 1, 31), 
+     *          PlainDate.of(2014, 4, 2));
+     *  System.out.println(
+     *      interval.toString(Iso8601Format.BASIC_CALENDAR_DATE));
+     *  // output: 20140131/20140402
+     * </pre>
+     * 
+     * @param   formatter   format object for printing start and end
+     * @return  formatted string in format {start}/{end}
+     */
+    public String toString(ChronoFormatter<T> formatter) {
+        
+        StringBuilder sb = new StringBuilder(64);
+        if (this.start.isInfinite()) {
+            sb.append("-\u221E");
+        } else {
+            formatter.print(this.start.getTemporal(), sb);
+        }
+        sb.append('/');
+        if (this.end.isInfinite()) {
+            sb.append("+\u221E");
+        } else {
+            formatter.print(this.end.getTemporal(), sb);
+        }
+        return sb.toString();
+        
     }
 
     /**
