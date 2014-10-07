@@ -1136,13 +1136,6 @@ public final class PlainTimestamp
 
     }
 
-    @Override
-    protected PlainTimestamp reduced() {
-
-        return PlainTimestamp.of(this.date, PlainTime.midnightAtStartOfDay());
-
-    }
-
     /**
      * <p>Erzeugt eine neue Uhrzeit passend zur angegebenen absoluten Zeit. </p>
      *
@@ -1193,10 +1186,8 @@ public final class PlainTimestamp
         TimeAxis.Builder<IsoUnit, PlainTimestamp> builder
     ) {
 
-        Set<CalendarUnit> monthly =
-            EnumSet.range(MILLENNIA, MONTHS);
-        Set<CalendarUnit> daily =
-            EnumSet.range(WEEKS, DAYS);
+        Set<CalendarUnit> monthly = EnumSet.range(MILLENNIA, MONTHS);
+        Set<CalendarUnit> daily = EnumSet.range(WEEKS, DAYS);
 
         for (CalendarUnit unit : CalendarUnit.values()) {
             builder.appendUnit(
@@ -1613,14 +1604,25 @@ public final class PlainTimestamp
                 delta = this.calendarUnit.between(start.date, end.date);
 
                 if (delta != 0) {
-                    PlainTime t1 = start.time;
-                    PlainTime t2 = end.time;
-
-                    if ((delta > 0) && t1.isAfter(t2)) {
-                        delta--;
-                    } else if ((delta < 0) && t1.isBefore(t2)) {
-                        delta++;
-                    }
+                	boolean needsTimeCorrection;
+                	
+                	if (this.calendarUnit == DAYS) {
+                		needsTimeCorrection = true;
+                	} else {
+                		PlainDate tmp = start.date.plus(delta, this.calendarUnit);
+                		needsTimeCorrection = (tmp.compareByTime(end.date) == 0);
+                	}
+                	
+                	if (needsTimeCorrection) {
+                	    PlainTime t1 = start.time;
+                	    PlainTime t2 = end.time;
+                	    
+                	    if ((delta > 0) && t1.isAfter(t2)) {
+                	        delta--;
+                	    } else if ((delta < 0) && t1.isBefore(t2)) {
+                	        delta++;
+                	    }
+                	}
                 }
             } else if (start.date.isAfter(end.date)) {
                 delta = -between(end, start);
