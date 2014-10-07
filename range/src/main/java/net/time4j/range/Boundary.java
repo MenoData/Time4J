@@ -370,15 +370,15 @@ public final class Boundary<T extends Temporal<? super T>>
     /**
      * <p>Yields a descriptive string. </p>
      *
-     * @return  String (either &quot;(-∞)&quot;, &quot;(+∞)&quot; or
-     *          &quot;(temporal)&quot; for finite open boundary or
+     * @return  String (either &quot;(-&#x221E;)&quot;, &quot;(+&#x221E;)&quot;
+     *          or &quot;(temporal)&quot; for finite open boundary or
      *          &quot;[temporal]&quot; for finite closed boundary)
      */
     /*[deutsch]
      * <p>Liefert eine Beschreibung. </p>
      *
-     * @return  String (either &quot;(-∞)&quot;, &quot;(+∞)&quot; or
-     *          &quot;(temporal)&quot; for finite open boundary or
+     * @return  String (either &quot;(-&#x221E;)&quot;, &quot;(+&#x221E;)&quot;
+     *          or &quot;(temporal)&quot; for finite open boundary or
      *          &quot;[temporal]&quot; for finite closed boundary)
      */
     @Override
