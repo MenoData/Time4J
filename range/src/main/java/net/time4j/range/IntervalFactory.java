@@ -32,6 +32,7 @@ import net.time4j.engine.Temporal;
  * {@code PlainTimestamp} and {@code Moment}), there are specialized static
  * factory methods on the appropriate interval types. </p>
  *
+ * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
  * @since   1.3
  */
@@ -43,10 +44,11 @@ import net.time4j.engine.Temporal;
  * ({@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp} und
  * {@code Moment}) bieten spezialisierte statische Fabrikmethoden an. </p>
  *
+ * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
  * @since   1.3
  */
-public interface IntervalFactory<T extends Temporal<? super T>> {
+public interface IntervalFactory<T extends ChronoEntity<T> & Temporal<? super T>> {
 
     //~ Methoden ----------------------------------------------------------
 
