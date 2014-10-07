@@ -170,4 +170,37 @@ public class DurationUntilTest {
                 .hours(9).minutes(15).build()));
     }
 
+    @Test
+    public void betweenTimestamps5() {
+		PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 31, 21, 45);
+		PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 1, 7, 0);
+		IsoUnit[] units = {
+		    CalendarUnit.MONTHS, ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(Duration.ofPositive().months(1).hours(9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenTimestamps6() {
+		PlainTimestamp t1 = PlainTimestamp.of(2014, 2, 1, 21, 45);
+		PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 2, 7, 0);
+		IsoUnit[] units = {
+		    CalendarUnit.MONTHS, ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(Duration.ofPositive().months(1).hours(9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenTimestamps7() {
+		PlainTimestamp t1 = PlainTimestamp.of(2014, 2, 1, 21, 45);
+		PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 1, 7, 0);
+		IsoUnit[] units = {
+		    CalendarUnit.MONTHS, ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(Duration.ofPositive().hours(27 * 24 + 9).minutes(15).build()));
+    }
+
 }
