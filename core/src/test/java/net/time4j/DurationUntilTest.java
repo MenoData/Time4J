@@ -108,10 +108,66 @@ public class DurationUntilTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void untilInDoubleUnits() {
+    public void untilInDuplicateUnits() {
         PlainDate start = PlainDate.of(2003, 2, 27);
         PlainDate end = PlainDate.of(2008, 2, 26);
         start.until(end, Duration.in(MONTHS, MONTHS));
+    }
+
+    @Test
+    public void betweenTimestamps1() {
+        PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 31, 21, 45);
+        PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 4, 7, 0);
+        IsoUnit[] units = {
+            CalendarUnit.MONTHS, CalendarUnit.DAYS,
+            ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(
+                Duration.ofPositive().months(1).days(3)
+                .hours(9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenTimestamps2() {
+        PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 1, 21, 45);
+        PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 31, 7, 0);
+        IsoUnit[] units = {
+            CalendarUnit.MONTHS, CalendarUnit.DAYS,
+            ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(
+                Duration.ofPositive().months(2).days(29)
+                .hours(9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenTimestamps3() {
+        PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 31, 21, 45);
+        PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 1, 7, 0);
+        IsoUnit[] units = {
+            CalendarUnit.MONTHS, CalendarUnit.DAYS,
+            ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(
+                Duration.ofPositive().months(1).days(0)
+                .hours(9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenTimestamps4() {
+        PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 31, 21, 45);
+        PlainTimestamp t2 = PlainTimestamp.of(2014, 2, 28, 7, 0);
+        IsoUnit[] units = {
+            CalendarUnit.MONTHS, CalendarUnit.DAYS,
+            ClockUnit.HOURS, ClockUnit.MINUTES};
+        assertThat(
+            Duration.in(units).between(t1, t2),
+            is(
+                Duration.ofPositive().months(0).days(27)
+                .hours(9).minutes(15).build()));
     }
 
 }

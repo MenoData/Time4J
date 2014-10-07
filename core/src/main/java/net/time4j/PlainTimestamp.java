@@ -64,7 +64,10 @@ import java.util.Map;
 import java.util.Set;
 
 import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.MILLENNIA;
 import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.QUARTERS;
+import static net.time4j.CalendarUnit.WEEKS;
 import static net.time4j.CalendarUnit.YEARS;
 import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.MICROS;
@@ -229,11 +232,11 @@ public final class PlainTimestamp
                 .appendElement(
                     CALENDAR_DATE,
                     FieldRule.of(CALENDAR_DATE),
-                    CalendarUnit.DAYS)
+                    DAYS)
                 .appendElement(
                     YEAR,
                     FieldRule.of(YEAR),
-                    CalendarUnit.YEARS)
+                    YEARS)
                 .appendElement(
                     YEAR_OF_WEEKDATE,
                     FieldRule.of(YEAR_OF_WEEKDATE),
@@ -241,35 +244,35 @@ public final class PlainTimestamp
                 .appendElement(
                     QUARTER_OF_YEAR,
                     FieldRule.of(QUARTER_OF_YEAR),
-                    CalendarUnit.QUARTERS)
+                    QUARTERS)
                 .appendElement(
                     MONTH_OF_YEAR,
                     FieldRule.of(MONTH_OF_YEAR),
-                    CalendarUnit.MONTHS)
+                    MONTHS)
                 .appendElement(
                     MONTH_AS_NUMBER,
                     FieldRule.of(MONTH_AS_NUMBER),
-                    CalendarUnit.MONTHS)
+                    MONTHS)
                 .appendElement(
                     DAY_OF_MONTH,
                     FieldRule.of(DAY_OF_MONTH),
-                    CalendarUnit.DAYS)
+                    DAYS)
                 .appendElement(
                     DAY_OF_WEEK,
                     FieldRule.of(DAY_OF_WEEK),
-                    CalendarUnit.DAYS)
+                    DAYS)
                 .appendElement(
                     DAY_OF_YEAR,
                     FieldRule.of(DAY_OF_YEAR),
-                    CalendarUnit.DAYS)
+                    DAYS)
                 .appendElement(
                     DAY_OF_QUARTER,
                     FieldRule.of(DAY_OF_QUARTER),
-                    CalendarUnit.DAYS)
+                    DAYS)
                 .appendElement(
                     WEEKDAY_IN_MONTH,
                     FieldRule.of(WEEKDAY_IN_MONTH),
-                    CalendarUnit.WEEKS)
+                    WEEKS)
                 .appendElement(
                     WALL_TIME,
                     FieldRule.of(WALL_TIME))
@@ -279,63 +282,63 @@ public final class PlainTimestamp
                 .appendElement(
                     CLOCK_HOUR_OF_AMPM,
                     FieldRule.of(CLOCK_HOUR_OF_AMPM),
-                    ClockUnit.HOURS)
+                    HOURS)
                 .appendElement(
                     CLOCK_HOUR_OF_DAY,
                     FieldRule.of(CLOCK_HOUR_OF_DAY),
-                    ClockUnit.HOURS)
+                    HOURS)
                 .appendElement(
                     DIGITAL_HOUR_OF_AMPM,
                     FieldRule.of(DIGITAL_HOUR_OF_AMPM),
-                    ClockUnit.HOURS)
+                    HOURS)
                 .appendElement(
                     DIGITAL_HOUR_OF_DAY,
                     FieldRule.of(DIGITAL_HOUR_OF_DAY),
-                    ClockUnit.HOURS)
+                    HOURS)
                 .appendElement(
                     ISO_HOUR,
                     FieldRule.of(ISO_HOUR),
-                    ClockUnit.HOURS)
+                    HOURS)
                 .appendElement(
                     MINUTE_OF_HOUR,
                     FieldRule.of(MINUTE_OF_HOUR),
-                    ClockUnit.MINUTES)
+                    MINUTES)
                 .appendElement(
                     MINUTE_OF_DAY,
                     FieldRule.of(MINUTE_OF_DAY),
-                    ClockUnit.MINUTES)
+                    MINUTES)
                 .appendElement(
                     SECOND_OF_MINUTE,
                     FieldRule.of(SECOND_OF_MINUTE),
-                    ClockUnit.SECONDS)
+                    SECONDS)
                 .appendElement(
                     SECOND_OF_DAY,
                     FieldRule.of(SECOND_OF_DAY),
-                    ClockUnit.SECONDS)
+                    SECONDS)
                 .appendElement(
                     MILLI_OF_SECOND,
                     FieldRule.of(MILLI_OF_SECOND),
-                    ClockUnit.MILLIS)
+                    MILLIS)
                 .appendElement(
                     MICRO_OF_SECOND,
                     FieldRule.of(MICRO_OF_SECOND),
-                    ClockUnit.MICROS)
+                    MICROS)
                 .appendElement(
                     NANO_OF_SECOND,
                     FieldRule.of(NANO_OF_SECOND),
-                    ClockUnit.NANOS)
+                    NANOS)
                 .appendElement(
                     MILLI_OF_DAY,
                     FieldRule.of(MILLI_OF_DAY),
-                    ClockUnit.MILLIS)
+                    MILLIS)
                 .appendElement(
                     MICRO_OF_DAY,
                     FieldRule.of(MICRO_OF_DAY),
-                    ClockUnit.MICROS)
+                    MICROS)
                 .appendElement(
                     NANO_OF_DAY,
                     FieldRule.of(NANO_OF_DAY),
-                    ClockUnit.NANOS)
+                    NANOS)
                 .appendExtension(new WeekExtension());
         registerCalendarUnits(builder);
         registerClockUnits(builder);
@@ -362,7 +365,7 @@ public final class PlainTimestamp
         super();
 
         if (time.getHour() == 24) { // T24 normalisieren
-            this.date = date.plus(1, CalendarUnit.DAYS);
+            this.date = date.plus(1, DAYS);
             this.time = PlainTime.MIN;
         } else if (date == null) {
             throw new NullPointerException("Missing date.");
@@ -675,10 +678,17 @@ public final class PlainTimestamp
     @Override
     public int compareTo(PlainTimestamp timestamp) {
 
-        int delta = this.date.compareTo(timestamp.getCalendarDate());
+        PlainDate d1 = this.date;
+        PlainDate d2 = timestamp.date;
 
-        if (delta == 0) {
-            delta = this.time.compareTo(timestamp.getWallTime());
+        int delta;
+
+        if (d1.isAfter(d2)) {
+            delta = 1;
+        } else if (d1.isBefore(d2)) {
+            delta = -1;
+        } else {
+            delta = this.time.compareTo(timestamp.time);
         }
 
         return ((delta < 0) ? -1 : ((delta == 0) ? 0 : 1));
@@ -1126,6 +1136,13 @@ public final class PlainTimestamp
 
     }
 
+    @Override
+    protected PlainTimestamp reduced() {
+
+        return PlainTimestamp.of(this.date, PlainTime.midnightAtStartOfDay());
+
+    }
+
     /**
      * <p>Erzeugt eine neue Uhrzeit passend zur angegebenen absoluten Zeit. </p>
      *
@@ -1177,16 +1194,16 @@ public final class PlainTimestamp
     ) {
 
         Set<CalendarUnit> monthly =
-            EnumSet.range(CalendarUnit.MILLENNIA, CalendarUnit.MONTHS);
+            EnumSet.range(MILLENNIA, MONTHS);
         Set<CalendarUnit> daily =
-            EnumSet.range(CalendarUnit.WEEKS, CalendarUnit.DAYS);
+            EnumSet.range(WEEKS, DAYS);
 
         for (CalendarUnit unit : CalendarUnit.values()) {
             builder.appendUnit(
                 unit,
                 new CompositeUnitRule(unit),
                 unit.getLength(),
-                (unit.compareTo(CalendarUnit.WEEKS) < 0) ? monthly : daily
+                (unit.compareTo(WEEKS) < 0) ? monthly : daily
             );
         }
 
@@ -1330,7 +1347,7 @@ public final class PlainTimestamp
                     date =
                         date.plus(
                             entity.get(LongElement.DAY_OVERFLOW).longValue(),
-                            CalendarUnit.DAYS);
+                            DAYS);
                 }
 
                 if (
@@ -1576,9 +1593,7 @@ public final class PlainTimestamp
                 DayCycles cycles =
                     timepoint.time.roll(amount, this.clockUnit);
                 d =
-                    timepoint.date.plus(
-                        cycles.getDayOverflow(),
-                        CalendarUnit.DAYS);
+                    timepoint.date.plus(cycles.getDayOverflow(), DAYS);
                 t = cycles.getWallTime();
             }
 
@@ -1610,11 +1625,11 @@ public final class PlainTimestamp
             } else if (start.date.isAfter(end.date)) {
                 delta = -between(end, start);
             } else {
-                long days = start.date.until(end.date, CalendarUnit.DAYS);
+                long days = start.date.until(end.date, DAYS);
 
                 if (days == 0) {
                     return this.clockUnit.between(start.time, end.time);
-                } else if (this.clockUnit.compareTo(ClockUnit.SECONDS) <= 0) {
+                } else if (this.clockUnit.compareTo(SECONDS) <= 0) {
                     // HOURS, MINUTES, SECONDS
                     delta =
                         MathUtils.safeAdd(

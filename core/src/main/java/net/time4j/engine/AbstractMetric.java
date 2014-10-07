@@ -21,6 +21,7 @@
 
 package net.time4j.engine;
 
+
 import net.time4j.base.MathUtils;
 
 import java.util.ArrayList;
@@ -78,6 +79,7 @@ public abstract class AbstractMetric
 
     private final List<U> sortedUnits;
     private final boolean normalizing;
+    private final boolean mixed;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -113,6 +115,10 @@ public abstract class AbstractMetric
     ) {
         super();
 
+        if (units.length == 0) {
+            throw new IllegalArgumentException("Missing units.");
+        }
+
         for (int i = 0; i < units.length - 1; i++) {
             for (int j = i + 1; j < units.length; j++) {
                 if (units[i].equals(units[j])) {
@@ -127,6 +133,9 @@ public abstract class AbstractMetric
         this.sortedUnits =
             Collections.unmodifiableList(Arrays.asList(units));
         this.normalizing = normalizing;
+        U first = this.sortedUnits.get(0);
+        U last = this.sortedUnits.get(this.sortedUnits.size() - 1);
+        this.mixed = first.isCalendrical() && !last.isCalendrical();
 
     }
 
@@ -169,6 +178,9 @@ public abstract class AbstractMetric
 
         this.sortedUnits = Collections.unmodifiableList(list);
         this.normalizing = normalizing;
+        U first = this.sortedUnits.get(0);
+        U last = this.sortedUnits.get(this.sortedUnits.size() - 1);
+        this.mixed = first.isCalendrical() && !last.isCalendrical();
 
     }
 
@@ -229,8 +241,24 @@ public abstract class AbstractMetric
         while (index < endIndex) {
 
             // Nächste Subtraktion vorbereiten
-            if (amount != 0) {
-                t1 = t1.plus(amount, unit);
+            if (amount > 0) {
+                T tmp = t1.plus(amount, unit);
+
+                if (
+                    this.mixed
+                    && unit.isCalendrical()
+                    && (tmp.compareTo(t2) > 0)
+                ) {
+                    amount--;
+                    tmp = t1.plus(amount, unit);
+                }
+
+                t1 = tmp;
+
+                if (amount > 0) {
+                    resultList.add(TimeSpan.Item.of(amount, unit));
+                    amount = 0;
+                }
             }
 
             // Aktuelle Zeiteinheit bestimmen
@@ -262,11 +290,13 @@ public abstract class AbstractMetric
                 index = k - 1;
 
                 // Differenz in einer Einheit berechnen
-                amount = t1.until(t2, unit);
+                if (this.mixed && unit.isCalendrical()) {
+                    amount = t1.reduced().until(t2.reduced(), unit);
+                } else {
+                    amount = t1.until(t2, unit);
+                }
 
-                if (amount > 0) {
-                    resultList.add(TimeSpan.Item.of(amount, unit));
-                } else if (amount < 0) {
+                if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
                         + "Cannot compute timespan "
@@ -274,6 +304,10 @@ public abstract class AbstractMetric
                 }
             }
             index++;
+        }
+
+        if (amount > 0) {
+            resultList.add(TimeSpan.Item.of(amount, unit));
         }
 
         if (this.normalizing) {
