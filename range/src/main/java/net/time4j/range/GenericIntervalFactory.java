@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.engine.Calendrical;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 
@@ -29,7 +30,7 @@ import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
 
-final class GenericIntervalFactory<T extends Temporal<? super T>>
+final class GenericIntervalFactory<T extends ChronoEntity<T> & Temporal<? super T>>
     implements IntervalFactory<T> {
 
     //~ Instanzvariablen --------------------------------------------------
