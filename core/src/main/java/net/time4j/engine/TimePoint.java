@@ -632,21 +632,6 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
     @Override
     protected abstract TimeAxis<U, T> getChronology();
 
-    /**
-     * <p>Liefert eine reduzierte Instanz. </p>
-     *
-     * <p>Diese Instanz liefert einfach den Selbstbezug. Zeitstempel mit
-     * Datum und Uhrzeit sollten die Methode &uuml;berschreiben und das
-     * Datum zum Start des Tages angeben. </p>
-     *
-     * @return  reduced form of this time point (preferrably date at midnight)
-     */
-    protected T reduced() {
-
-        return this.getContext();
-
-    }
-
     // Einheitsregel
     private UnitRule<T> getRule(U unit) {
 
