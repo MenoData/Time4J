@@ -435,6 +435,7 @@ public abstract class ChronoInterval
      * @return  formatted string in format {start}/{end}
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     #toString(ChronoFormatter, BracketPolicy)
      */
     /*[deutsch]
      * <p>Entspricht
@@ -444,6 +445,7 @@ public abstract class ChronoInterval
      * @return  formatted string in format {start}/{end}
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     #toString(ChronoFormatter, BracketPolicy)
      */
     public String toString(ChronoFormatter<T> formatter) {
 
