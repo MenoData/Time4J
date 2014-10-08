@@ -1314,7 +1314,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
-        ParsedValues parsed = null;
+        ParsedValues parsed = status.getRawValues0();
 
         try {
             parsed = cf.parseElements(text, status, attributes, data);
@@ -1331,6 +1331,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         int index = status.getPosition();
+        assert (parsed != null);
 
         if (
             (index < text.length())
@@ -1387,12 +1388,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 5: Konsistenzprüfung
-        if (result instanceof ChronoEntity) {
-            return checkConsistency(parsed, result, text, status, attributes);
-        } else {
+        if (result == null) {
             String reason = "Insufficient data:" + getDescription(data.peek());
             status.setError(text.length(), reason);
             return null;
+        } else {
+            return checkConsistency(parsed, result, text, status, attributes);
         }
 
     }
