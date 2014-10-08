@@ -163,22 +163,20 @@ public class ParseLog {
     /**
      * <p>Yields the parsed raw data as chronological entity. </p>
      * 
-     * <p>Note: Before used in parsing, this method will return a new
-     * empty instance with every single call. </p>
-     *
      * @return  parsed values as mutable serializable map-like entity
      */
     /*[deutsch]
      * <p>Liefert die interpretierten Rohdaten. </p>
      *
-     * <p>Hinweis: Bevor die Daten gelesen werden, wird diese Methode
-     * mit jedem einzelnen Aufruf eine neue leere Instanz liefern. </p>
-     *
      * @return  parsed values as mutable serializable map-like entity
      */
     public ChronoEntity<?> getRawValues() {
 
-        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
+        if (this.rawValues == null) {
+            this.rawValues = new ParsedValues();
+        }
+        
+        return this.rawValues;
 
     }
 
