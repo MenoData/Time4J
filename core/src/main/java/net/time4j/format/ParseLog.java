@@ -162,17 +162,23 @@ public class ParseLog {
 
     /**
      * <p>Yields the parsed raw data as chronological entity. </p>
+     * 
+     * <p>Note: Before used in parsing, this method will return a new
+     * empty instance with every single call. </p>
      *
      * @return  parsed values as mutable serializable map-like entity
      */
     /*[deutsch]
      * <p>Liefert die interpretierten Rohdaten. </p>
      *
+     * <p>Hinweis: Bevor die Daten gelesen werden, wird diese Methode
+     * mit jedem einzelnen Aufruf eine neue leere Instanz liefern. </p>
+     *
      * @return  parsed values as mutable serializable map-like entity
      */
     public ChronoEntity<?> getRawValues() {
 
-        return this.getRawValues0();
+        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
 
     }
 
@@ -192,8 +198,11 @@ public class ParseLog {
         sb.append(this.errorIndex);
         sb.append(", error-message=\"");
         sb.append(this.errorMessage);
-        sb.append("\", raw-values=");
-        sb.append(this.getRawValues());
+        sb.append('\"');
+        if (this.rawValues != null) {
+            sb.append(", raw-values=");
+            sb.append(this.rawValues);
+        }
         if (this.daylightSaving != null) {
             sb.append(", daylight-saving=");
             sb.append(this.daylightSaving);
@@ -226,51 +235,20 @@ public class ParseLog {
     }
 
     /**
-     * <p>Reuses this instance for next parse process. </p>
-     */
-    /*[deutsch]
-     * <p>Bereitet diese Instanz auf die Wiederverwendung f&uuml;r einen
-     * neuen Interpretierungsvorgang vor. </p>
-     */
-    public void reset() {
-
-        this.position = 0;
-        this.clearError();
-        this.rawValues = null;
-
-    }
-
-    /**
-     * <p>Interne Methode. </p>
-     *
-     * @return  parsed values
-     */
-    ParsedValues getRawValues0() {
-
-        return (this.rawValues == null) ? new ParsedValues() : this.rawValues;
-
-    }
-
-    /**
-     * <p>Setzt eine Fehlerinformation. </p>
+     * <p>Sets an error information. </p>
      *
      * @param   errorIndex      error index in parsed text
+     * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
      */
-    void setError(int errorIndex) {
-
-        this.setError(errorIndex, "");
-
-    }
-
-    /**
+    /*[deutsch]
      * <p>Setzt eine Fehlerinformation. </p>
      *
      * @param   errorIndex      error index in parsed text
      * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
      */
-    void setError(
+    public void setError(
         int errorIndex,
         String errorMessage
     ) {
@@ -285,6 +263,33 @@ public class ParseLog {
         }
 
         this.errorIndex = errorIndex;
+
+    }
+
+    /**
+     * <p>Reuses this instance for next parse process. </p>
+     */
+    /*[deutsch]
+     * <p>Bereitet diese Instanz auf die Wiederverwendung f&uuml;r einen
+     * neuen Interpretierungsvorgang vor. </p>
+     */
+    public void reset() {
+
+        this.position = 0;
+        this.clearError();
+        this.rawValues = null;
+        this.daylightSaving = null;
+
+    }
+
+    /**
+     * <p>Interne Methode. </p>
+     *
+     * @return  parsed values, initially {@code null}
+     */
+    ParsedValues getRawValues0() {
+
+        return this.rawValues;
 
     }
 
