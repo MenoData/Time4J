@@ -1360,7 +1360,9 @@ public final class CalendarText {
             }
 
             if (candidate == null) {
-                status.setError(start);
+                status.setError(
+                    start, 
+                    "No suitable enum found: " + valueType.getName());
             } else {
                 status.setPosition(start + maxEq);
             }
