@@ -4,12 +4,17 @@ import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
+import net.time4j.MachineTime;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.SI;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.olson.EUROPE;
 
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -172,7 +177,8 @@ public class RangeDurationTest {
 	public void getRealDurationOfMomentInterval() {
 	    Moment m1 = Moment.of(1278028823, TimeScale.UTC);
 	    Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
-	    MachineTime<SI> duration = MomentInterval.between(m1, m2).getRealDuration();
+	    MachineTime<SI> duration =
+            MomentInterval.between(m1, m2).getRealDuration();
 	    MachineTime<SI> expected = MachineTime.ofSIUnits(3L, 1);
 	    assertThat(duration, is(expected));
 	}
@@ -181,7 +187,8 @@ public class RangeDurationTest {
 	public void getSimpleDurationOfMomentInterval() {
 	    Moment m1 = Moment.of(1278028823, TimeScale.UTC);
 	    Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
-	    MachineTime<TimeUnit> duration = MomentInterval.between(m1, m2).getSimpleDuration();
+	    MachineTime<TimeUnit> duration =
+            MomentInterval.between(m1, m2).getSimpleDuration();
 	    MachineTime<TimeUnit> expected = MachineTime.ofPosixUnits(2L, 1);
 	    assertThat(duration, is(expected));
 	}
