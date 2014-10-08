@@ -30,7 +30,8 @@ import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
 
-final class GenericIntervalFactory<T extends ChronoEntity<T> & Temporal<? super T>>
+final class GenericIntervalFactory
+    <T extends ChronoEntity<T> & Temporal<? super T>>
     implements IntervalFactory<T> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -61,13 +62,19 @@ final class GenericIntervalFactory<T extends ChronoEntity<T> & Temporal<? super 
         Boundary<T> t1 = Boundary.of(CLOSED, start);
         Boundary<T> t2;
 
-        if (end instanceof Calendrical) {
+        if (isCalendrical(end)) {
             t2 = Boundary.of(CLOSED, end);
         } else {
             t2 = Boundary.of(OPEN, end);
         }
 
         return new GenericInterval<T>(this.timeline, t1, t2);
+
+    }
+
+    private static boolean isCalendrical(Object obj) {
+
+        return (obj instanceof Calendrical);
 
     }
 

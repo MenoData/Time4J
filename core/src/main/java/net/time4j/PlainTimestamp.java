@@ -678,20 +678,13 @@ public final class PlainTimestamp
     @Override
     public int compareTo(PlainTimestamp timestamp) {
 
-        PlainDate d1 = this.date;
-        PlainDate d2 = timestamp.date;
-
-        int delta;
-
-        if (d1.isAfter(d2)) {
-            delta = 1;
-        } else if (d1.isBefore(d2)) {
-            delta = -1;
-        } else {
-            delta = this.time.compareTo(timestamp.time);
+        if (this.date.isAfter(timestamp.date)) {
+            return 1;
+        } else if (this.date.isBefore(timestamp.date)) {
+            return -1;
         }
 
-        return ((delta < 0) ? -1 : ((delta == 0) ? 0 : 1));
+        return this.time.compareTo(timestamp.time);
 
     }
 
@@ -1605,18 +1598,18 @@ public final class PlainTimestamp
 
                 if (delta != 0) {
                 	boolean needsTimeCorrection;
-                	
+
                 	if (this.calendarUnit == DAYS) {
                 		needsTimeCorrection = true;
                 	} else {
-                		PlainDate tmp = start.date.plus(delta, this.calendarUnit);
-                		needsTimeCorrection = (tmp.compareByTime(end.date) == 0);
+                		PlainDate d = start.date.plus(delta, this.calendarUnit);
+                		needsTimeCorrection = (d.compareByTime(end.date) == 0);
                 	}
-                	
+
                 	if (needsTimeCorrection) {
                 	    PlainTime t1 = start.time;
                 	    PlainTime t2 = end.time;
-                	    
+
                 	    if ((delta > 0) && t1.isAfter(t2)) {
                 	        delta--;
                 	    } else if ((delta < 0) && t1.isBefore(t2)) {
