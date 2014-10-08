@@ -49,7 +49,8 @@ import java.util.Map;
  * @author  Meno Hochschild
  * @since   1.3
  */
-public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? super T>> {
+public abstract class ChronoInterval
+    <T extends ChronoEntity<T> & Temporal<? super T>> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -144,7 +145,8 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
      * @see     MomentInterval#between(Moment,Moment)
      */
     @SuppressWarnings("unchecked")
-    public static <T extends ChronoEntity<T> & Temporal<? super T>> IntervalFactory<T> on(
+    public static
+    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalFactory<T> on(
         TimeLine<T> timeline
     ) {
 
@@ -324,6 +326,7 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
      * @param   temporal    time point to be queried, maybe {@code null}
      * @return  {@code true} if given time point is not {@code null} and
      *          belongs to this interval else {@code false}
+     * @since   1.3
      */
     /*[deutsch]
      * <p>Ermittelt, ob der angegebene Zeitpunkt zu diesem Intervall
@@ -332,6 +335,7 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
      * @param   temporal    time point to be queried, maybe {@code null}
      * @return  {@code true} if given time point is not {@code null} and
      *          belongs to this interval else {@code false}
+     * @since   1.3
      */
     public boolean contains(T temporal) {
 
@@ -409,73 +413,125 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.start.isOpen() ? '(' : '[');
-        sb.append(this.start.isInfinite() ? "-\u221E" : this.start.getTemporal());
+        sb.append(
+            this.start.isInfinite()
+            ? "-\u221E"
+            : this.start.getTemporal());
         sb.append('/');
-        sb.append(this.end.isInfinite() ? "+\u221E" : this.end.getTemporal());
+        sb.append(
+            this.end.isInfinite()
+            ? "+\u221E"
+            : this.end.getTemporal());
         sb.append(this.end.isOpen() ? ')' : ']');
         return sb.toString();
 
     }
 
     /**
+     * <p>Equivalent to
+     * {@code toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     *
+     * @param   formatter   format object for printing start and end
+     * @return  formatted string in format {start}/{end}
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Entspricht
+     * {@code toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     *
+     * @param   formatter   format object for printing start and end
+     * @return  formatted string in format {start}/{end}
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    public String toString(ChronoFormatter<T> formatter) {
+
+        return this.toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD);
+
+    }
+
+    /**
      * <p>Prints the start and end separated by a slash using given
      * formatter. </p>
-     * 
-     * <p>Note: The open/closed-state of the boundaries is not printed. 
-     * Infinite boundaries are printed either as &quot;-&#x221E;&quot; or
-     * &quot;+&#x221E;&quot;. Example for an ISO-representation: </p>
-     * 
+     *
+     * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot;
+     * or &quot;+&#x221E;&quot;. Example for an ISO-representation: </p>
+     *
      * <pre>
      *  DateInterval interval =
      *      DateInterval.between(
-     *          PlainDate.of(2014, 1, 31), 
+     *          PlainDate.of(2014, 1, 31),
      *          PlainDate.of(2014, 4, 2));
      *  System.out.println(
-     *      interval.toString(Iso8601Format.BASIC_CALENDAR_DATE));
+     *      interval.toString(
+     *          Iso8601Format.BASIC_CALENDAR_DATE,
+     *          BracketPolicy.SHOW_NEVER));
      *  // output: 20140131/20140402
      * </pre>
-     * 
+     *
      * @param   formatter   format object for printing start and end
+     * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
+     * @since   1.3
      */
     /*[deutsch]
      * <p>Formatiert den Start und das Ende getrennt mit einem
      * Schr&auml;gstrich unter Benutzung des angegebenen Formatierers. </p>
      *
-     * <p>Hinweis: Der open/closed-Zustand der Intervallgrenzen wird nicht
-     * ausgegeben. Unendliche Intervallgrenzen werden entweder als
+     * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
      * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben.
      * Beispiel f&uuml;r eine ISO-Darstellung: </p>
-     * 
+     *
      * <pre>
      *  DateInterval interval =
      *      DateInterval.between(
-     *          PlainDate.of(2014, 1, 31), 
+     *          PlainDate.of(2014, 1, 31),
      *          PlainDate.of(2014, 4, 2));
      *  System.out.println(
-     *      interval.toString(Iso8601Format.BASIC_CALENDAR_DATE));
+     *      interval.toString(
+     *          Iso8601Format.BASIC_CALENDAR_DATE,
+     *          BracketPolicy.SHOW_NEVER));
      *  // output: 20140131/20140402
      * </pre>
-     * 
+     *
      * @param   formatter   format object for printing start and end
+     * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
+     * @since   1.3
      */
-    public String toString(ChronoFormatter<T> formatter) {
-        
+    public String toString(
+        ChronoFormatter<T> formatter,
+        BracketPolicy policy
+    ) {
+
+        boolean showBoundaries = policy.display(this);
         StringBuilder sb = new StringBuilder(64);
+
+        if (showBoundaries) {
+            sb.append(this.start.isOpen() ? '(' : '[');
+        }
+
         if (this.start.isInfinite()) {
             sb.append("-\u221E");
         } else {
             formatter.print(this.start.getTemporal(), sb);
         }
+
         sb.append('/');
+
         if (this.end.isInfinite()) {
             sb.append("+\u221E");
         } else {
             formatter.print(this.end.getTemporal(), sb);
         }
+
+        if (showBoundaries) {
+            sb.append(this.end.isOpen() ? ')' : ']');
+        }
+
         return sb.toString();
-        
+
     }
 
     /**
@@ -485,24 +541,25 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
      * @since   1.3
      */
     protected abstract TimeLine<T> getTimeLine();
-    
+
     /**
      * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
-     * 
+     *
      * @return  Intervall mit {@code duration = ende - start}
      * @throws  UnsupportedOperationException wenn unendlich
+     * @since   1.3
      */
     ChronoInterval<T> getCalculationBase() {
-        
+
         if (!this.isFinite()) {
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
         }
-        
+
         T t1 = this.start.getTemporal();
         T t2 = this.end.getTemporal();
         TimeLine<T> timeline = this.getTimeLine();
-        
+
         if (this.start.isOpen()) {
             t1 = timeline.stepForward(t1);
         } else if (this.end.isClosed()) {
@@ -510,9 +567,9 @@ public abstract class ChronoInterval<T extends ChronoEntity<T> & Temporal<? supe
         } else {
             return this; // short-cut
         }
-        
+
         return on(timeline).between(t1, t2); // half-open
-        
+
     }
 
 }
