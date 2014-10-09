@@ -43,11 +43,11 @@ final class TimestampIntervalFactory
 
     @Override
     public ChronoInterval<PlainTimestamp> between(
-        PlainTimestamp start,
-        PlainTimestamp end
+        Boundary<PlainTimestamp> start,
+        Boundary<PlainTimestamp> end
     ) {
 
-        return TimestampInterval.between(start, end);
+        return new TimestampInterval(start, end);
 
     }
 

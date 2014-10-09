@@ -42,7 +42,7 @@ final class GenericInterval<T extends ChronoEntity<T> & Temporal<? super T>>
     ) {
         super(start, end);
 
-        // null-check implicitly done in GenericIntervalFactory
+        // null-check done in GenericIntervalFactory
         this.timeline = timeline;
 
     }

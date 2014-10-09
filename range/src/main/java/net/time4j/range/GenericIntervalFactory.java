@@ -21,13 +21,9 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
-
-import static net.time4j.range.IntervalEdge.CLOSED;
-import static net.time4j.range.IntervalEdge.OPEN;
 
 
 final class GenericIntervalFactory
@@ -55,26 +51,11 @@ final class GenericIntervalFactory
 
     @Override
     public ChronoInterval<T> between(
-        T start,
-        T end
+        Boundary<T> start,
+        Boundary<T> end
     ) {
 
-        Boundary<T> t1 = Boundary.of(CLOSED, start);
-        Boundary<T> t2;
-
-        if (isCalendrical(end)) {
-            t2 = Boundary.of(CLOSED, end);
-        } else {
-            t2 = Boundary.of(OPEN, end);
-        }
-
-        return new GenericInterval<T>(this.timeline, t1, t2);
-
-    }
-
-    private static boolean isCalendrical(Object obj) {
-
-        return (obj instanceof Calendrical);
+        return new GenericInterval<T>(this.timeline, start, end);
 
     }
 

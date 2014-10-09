@@ -232,10 +232,12 @@ public class BasicDateRangeTest {
                     DateInterval.between(start2, end2)
                     .withStart(Boundary.of(IntervalEdge.OPEN, start2))),
             is(false));
+        Boundary<PlainDate> lower = Boundary.of(IntervalEdge.CLOSED, start1);
+        Boundary<PlainDate> upper = Boundary.of(IntervalEdge.CLOSED, end2);
         assertThat(
             DateInterval.between(start1, end1)
                 .equals(
-                    ChronoInterval.on(PlainDate.axis()).between(start1, end2)),
+                    ChronoInterval.on(PlainDate.axis()).between(lower, upper)),
             is(true));
     }
 
@@ -254,11 +256,13 @@ public class BasicDateRangeTest {
                 DateInterval.between(start2, end2)
                 .withStart(Boundary.of(IntervalEdge.OPEN, start2))
                 .hashCode()));
+        Boundary<PlainDate> lower = Boundary.of(IntervalEdge.CLOSED, start1);
+        Boundary<PlainDate> upper = Boundary.of(IntervalEdge.CLOSED, end2);
         assertThat(
             DateInterval.between(start1, end1).hashCode(),
             is(
                 ChronoInterval.on(PlainDate.axis())
-                .between(start1, end2).hashCode()));
+                .between(lower, upper).hashCode()));
     }
 
     @Test
@@ -300,6 +304,22 @@ public class BasicDateRangeTest {
                 .withEnd(Boundary.of(IntervalEdge.OPEN, end))
                 .toString(),
             is("[2014-02-27/2014-05-14)"));
+    }
+
+    @Test
+    public void withOpenEnd() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.withOpenEnd(),
+            is(interval.withEnd(Boundary.of(IntervalEdge.OPEN, end))));
+
+        DateInterval infinite = DateInterval.since(start);
+        assertThat(
+            infinite.withOpenEnd(),
+            is(infinite));
     }
 
 }

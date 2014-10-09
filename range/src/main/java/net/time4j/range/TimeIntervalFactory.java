@@ -43,11 +43,11 @@ final class TimeIntervalFactory
 
     @Override
     public ChronoInterval<PlainTime> between(
-        PlainTime start,
-        PlainTime end
+        Boundary<PlainTime> start,
+        Boundary<PlainTime> end
     ) {
 
-        return TimeInterval.between(start, end);
+        return new TimeInterval(start, end);
 
     }
 

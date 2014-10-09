@@ -558,19 +558,21 @@ public abstract class ChronoInterval
                 "An infinite interval has no finite duration.");
         }
 
-        T t1 = this.start.getTemporal();
-        T t2 = this.end.getTemporal();
+        Boundary<T> lower = this.start;
+        Boundary<T> upper = this.end;
         TimeLine<T> timeline = this.getTimeLine();
 
-        if (this.start.isOpen()) {
-            t1 = timeline.stepForward(t1);
-        } else if (this.end.isClosed()) {
-            t2 = timeline.stepForward(t2);
+        if (lower.isOpen()) {
+            T t1 = lower.getTemporal();
+            lower = Boundary.of(IntervalEdge.CLOSED, timeline.stepForward(t1));
+        } else if (upper.isClosed()) {
+            T t2 = upper.getTemporal();
+            upper = Boundary.of(IntervalEdge.OPEN, timeline.stepForward(t2));
         } else {
             return this; // short-cut
         }
 
-        return on(timeline).between(t1, t2); // half-open
+        return on(timeline).between(lower, upper); // half-open
 
     }
 

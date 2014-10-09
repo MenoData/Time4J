@@ -42,11 +42,11 @@ final class MomentIntervalFactory
 
     @Override
     public ChronoInterval<Moment> between(
-        Moment start,
-        Moment end
+        Boundary<Moment> start,
+        Boundary<Moment> end
     ) {
 
-        return MomentInterval.between(start, end);
+        return new MomentInterval(start, end);
 
     }
 

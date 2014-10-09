@@ -42,11 +42,11 @@ final class DateIntervalFactory
 
     @Override
     public ChronoInterval<PlainDate> between(
-        PlainDate start,
-        PlainDate end
+        Boundary<PlainDate> start,
+        Boundary<PlainDate> end
     ) {
 
-        return DateInterval.between(start, end);
+        return new DateInterval(start, end);
 
     }
 

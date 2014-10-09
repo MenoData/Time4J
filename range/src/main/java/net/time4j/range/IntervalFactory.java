@@ -26,7 +26,7 @@ import net.time4j.engine.Temporal;
 
 
 /**
- * <p>Creates finite temporal intervals. </p>
+ * <p>Creates temporal intervals. </p>
  *
  * <p>This interface realizes a generic way to create intervals. For the
  * four basic temporal types of Time4J ({@code PlainDate}, {@code PlainTime},
@@ -38,7 +38,7 @@ import net.time4j.engine.Temporal;
  * @since   1.3
  */
 /*[deutsch]
- * <p>Erzeugt begrenzte Zeitintervalle. </p>
+ * <p>Erzeugt Zeitintervalle. </p>
  *
  * <p>Dieses Interface realisiert einen generischen Weg der Intervallerzeugung.
  * Die Intervalltypen passend zu den vier Basiszeittypen von Time4J
@@ -49,41 +49,42 @@ import net.time4j.engine.Temporal;
  * @author  Meno Hochschild
  * @since   1.3
  */
-public interface IntervalFactory<T extends ChronoEntity<T> & Temporal<? super T>> {
+public interface IntervalFactory
+    <T extends ChronoEntity<T> & Temporal<? super T>> {
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a finite interval between given time points. </p>
+     * <p>Creates an interval between given boundaries. </p>
      *
-     * <p>If given time points are calendrical then this method will create
+     * <p>If given boundaries are calendrical then this method will create
      * a closed interval else a half-open interval with an open upper
-     * boundary. </p>
+     * boundary. Note: Infinite intervals always use open boundaries. </p>
      *
-     * @param   start   time point of lower boundary
-     * @param   end     time point of upper boundary
+     * @param   start   lower boundary
+     * @param   end     upper boundary
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
      * @since   1.3
      * @see     net.time4j.engine.Calendrical
      */
     /*[deutsch]
-     * <p>Erzeugt ein begrenztes Intervall zwischen den angegebenen
-     * Zeitpunkten. </p>
+     * <p>Erzeugt ein Intervall zwischen den angegebenen Intervallgrenzen. </p>
      *
-     * <p>Sind die angegebenen Zeitpunkte kalendarisch, dann wird ein
-     * geschlossenes Intervall erzeugt, sonst ein rechts-offenes Intervall. </p>
+     * <p>Sind die angegebenen Grenzen kalendarisch, dann wird ein
+     * geschlossenes Intervall erzeugt, sonst ein rechts-offenes Intervall.
+     * Hinweis: Unendliche Intervalle haben immer offene Grenzen. </p>
      *
-     * @param   start   time point of lower boundary
-     * @param   end     time point of upper boundary
+     * @param   start   lower boundary
+     * @param   end     upper boundary
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
      * @since   1.3
      * @see     net.time4j.engine.Calendrical
      */
     ChronoInterval<T> between(
-        T start,
-        T end
+        Boundary<T> start,
+        Boundary<T> end
     );
 
 }
