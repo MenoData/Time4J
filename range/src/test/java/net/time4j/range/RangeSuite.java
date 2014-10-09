@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BasicTimeRangeTest.class,
         BasicTimestampRangeTest.class,
         BoundaryTest.class,
+        IntervalFormatTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class
     }

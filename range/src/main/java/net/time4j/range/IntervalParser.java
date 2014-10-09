@@ -21,15 +21,20 @@
 
 package net.time4j.range;
 
+import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
-
+import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
+
+import static net.time4j.range.IntervalEdge.CLOSED;
+import static net.time4j.range.IntervalEdge.OPEN;
+
 
 /**
  * <p>Parses intervals based on component formatters which are applied on start
@@ -47,13 +52,18 @@ import net.time4j.format.ParseLog;
  * @param   <T>  generic temporal type
  * @since   1.3
  */
-public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T>>
+public final class IntervalParser
+    <T extends ChronoEntity<T> & Temporal<? super T>>
 	implements ChronoParser<ChronoInterval<T>> {
+
+    //~ Instanzvariablen --------------------------------------------------
 
 	private final IntervalFactory<T> factory;
 	private final ChronoFormatter<T> startFormat;
 	private final ChronoFormatter<T> endFormat;
 	private final BracketPolicy policy;
+
+    //~ Konstruktoren -----------------------------------------------------
 
 	private IntervalParser(
 		IntervalFactory<T> factory,
@@ -63,13 +73,7 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 	) {
 		super();
 
-		if (factory == null) {
-			throw new NullPointerException("Missing interval factory.");
-		} else if (startFormat == null) {
-			throw new NullPointerException("Missing start component formatter.");
-		} else if (endFormat == null) {
-			throw new NullPointerException("Missing end component formatter.");
-		} else if (policy == null) {
+		if (policy == null) {
 			throw new NullPointerException("Missing bracket policy.");
 		}
 
@@ -80,11 +84,38 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 
 	}
 
-	/**
-	 * @param   format
-	 * @return  new interval parser
-	 */
-	public static <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
+    //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Creates an interval parser. </p>
+     *
+     * <p>Equivalent to
+     * {@code of(format, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   format     formatter for start and end component
+     * @return  new interval parser
+     * @throws  IllegalArgumentException if the format does not refer to
+     *          a chronology based on a timeline
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Intervallinterpretierer. </p>
+     *
+     * <p>&Auml;quivalent zu
+     * {@code of(format, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   format     formatter for start and end component
+     * @return  new interval parser
+     * @throws  IllegalArgumentException if the format does not refer to
+     *          a chronology based on a timeline
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+	public static
+    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
 		ChronoFormatter<T> format
 	) {
 
@@ -92,24 +123,43 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 
 	}
 
-	/**
-	 * @param   format
-	 * @param   policy
-	 * @return  new interval parser
-	 */
+    /**
+     * <p>Creates an interval parser. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   format     formatter for start and end component
+     * @param   policy     bracket policy
+     * @return  new interval parser
+     * @throws  IllegalArgumentException if the format does not refer to
+     *          a chronology based on a timeline
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Intervallinterpretierer. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   format     formatter for start and end component
+     * @param   policy     bracket policy
+     * @return  new interval parser
+     * @throws  IllegalArgumentException if the format does not refer to
+     *          a chronology based on a timeline
+     * @since   1.3
+     */
 	@SuppressWarnings("unchecked")
-	public static <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
+	public static
+    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
 		ChronoFormatter<T> format,
 		BracketPolicy	   policy
 	) {
 
-		Object chronology = format.getChronology();
+		Object chronology = format.getChronology(); // NPE-check
 		TimeLine<T> timeline;
 
 		if (chronology instanceof TimeLine) {
 			timeline = (TimeLine<T>) chronology;
 		} else {
-			throw new IllegalArgumentException("Formatter without a timeline-chronology.");
+			throw new IllegalArgumentException(
+                "Formatter without a timeline-chronology.");
 		}
 
 		IntervalFactory<T> factory = new GenericIntervalFactory<T>(timeline);
@@ -117,7 +167,19 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 
 	}
 
-	static <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
+    /**
+     * <p>Interne Methode, die auch von ISO-Intervallen aufgerufen wird. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   factory         interval factory
+     * @param   startFormat     formatter for lower interval boundary
+     * @param   endFormat       formatter for upper interval boundary
+     * @param   policy          bracket policy
+     * @return  new interval parser
+     * @since   1.3
+     */
+	static
+    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
 		IntervalFactory<T> factory,
 		ChronoFormatter<T> startFormat,
 		ChronoFormatter<T> endFormat,
@@ -129,24 +191,64 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 	}
 
 	@Override
-	public ChronoInterval<T> parse(CharSequence text, ParseLog status, AttributeQuery attributes) {
+	public ChronoInterval<T> parse(
+        CharSequence text,
+        ParseLog status,
+        final AttributeQuery attributes
+    ) {
 
 		// initialization phase
-		IntervalEdge left = IntervalEdge.CLOSED;
-		IntervalEdge right =
-			Calendrical.class.isAssignableFrom(this.startFormat.getChronology().getChronoType())
-			? IntervalEdge.CLOSED : IntervalEdge.OPEN;
-		T t1 = null;
-		T t2 = null;
-
 		int start = status.getPosition();
 		int len = text.length();
 		int pos = start;
 
 		if (pos >= len) {
-			status.setError(pos, "End of text reached.");
-			return null;
-		}
+            throw new IndexOutOfBoundsException(
+                "[" + pos + "]: " + text.toString());
+        }
+
+        AttributeQuery attrs = attributes;
+        boolean allowTrailingChars =
+            attributes.get(
+                Attributes.TRAILING_CHARACTERS,
+                Boolean.FALSE
+            ).booleanValue();
+
+        if (!allowTrailingChars) {
+            attrs =
+                new AttributeQuery() {
+                    @Override
+                    public boolean contains(AttributeKey<?> key) {
+                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
+                            return true;
+                        }
+                        return attributes.contains(key);
+                    }
+                    @Override
+                    public <A> A get(AttributeKey<A> key) {
+                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
+                            return key.type().cast(Boolean.TRUE);
+                        }
+                        return attributes.get(key);
+                    }
+                    @Override
+                    public <A> A get(AttributeKey<A> key, A defaultValue) {
+                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
+                            return key.type().cast(Boolean.TRUE);
+                        }
+                        return attributes.get(key, defaultValue);
+                    }
+                };
+        }
+
+        Class<T> type = this.startFormat.getChronology().getChronoType();
+		IntervalEdge left = CLOSED;
+		IntervalEdge right =
+			Calendrical.class.isAssignableFrom(type) ? CLOSED : OPEN;
+		T t1 = null;
+		T t2 = null;
+        Boundary<T> lower = null;
+        Boundary<T> upper = null;
 
 		// starting boundary
 		char c = text.charAt(pos);
@@ -154,22 +256,23 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 
 		if (leftVisible) {
 			if (this.policy == BracketPolicy.SHOW_NEVER) {
-				status.setError(pos, "Boundary bracket not allowed: " + c);
+				status.setError(
+                    pos,
+                    "Illegal start boundary due to bracket policy: " + c);
 			} else if (c == '(') {
-				left = IntervalEdge.OPEN;
+				left = OPEN;
 			}
+            pos++;
 		} else if (this.policy == BracketPolicy.SHOW_ALWAYS) {
 			status.setError(pos, "Missing start boundary bracket.");
 		}
 
 		if (status.isError()) {
 			return null;
-		}
-
-		pos++;
-
-		if (pos >= len) {
-			status.setError(pos, "End of text reached.");
+		} else if (pos >= len) {
+			status.setError(
+                pos,
+                "Missing interval start component, end of text reached.");
 			return null;
 		}
 
@@ -187,51 +290,160 @@ public final class IntervalParser<T extends ChronoEntity<T> & Temporal<? super T
 				}
 			}
 			if (solidus == -1) {
-				status.setError(pos, "Solidus char separating start and end boundaries expected.");
-				return null;
+                return solidusError(status, pos);
 			}
-			parsed.with(PeriodElement.START_PERIOD, text.subSequence(pos, solidus).toString());
+            String period = text.subSequence(pos, solidus).toString();
+			parsed.with(PeriodElement.START_PERIOD, period);
 			pos = solidus + 1;
-			status.setPosition(pos);
-		} else if ((c == '-') && (pos + 1 < len) && (text.charAt(pos + 1) == '\u221E')) {
-			if ((left == IntervalEdge.CLOSED) && leftVisible) {
-				status.setError(pos, "Open boundary expected.");
+		} else if (
+            (c == '-')
+            && (pos + 1 < len)
+            && (text.charAt(pos + 1) == '\u221E')
+        ) {
+			if ((left == CLOSED) && leftVisible) {
+				status.setError(pos - 1, "Open boundary expected.");
 				return null;
 			}
-			left = IntervalEdge.OPEN;
+			left = OPEN;
 			parsed.with(InfiniteElement.START_INFINITE, Boolean.TRUE);
+            lower = Boundary.infinitePast();
 			pos += 2;
 			if ((pos >= len) || (text.charAt(pos) != '/')) {
-				status.setError(pos, "Solidus char separating start and end boundaries expected.");
-				return null;
+                return solidusError(status, pos);
 			}
 			pos++;
-			status.setPosition(pos);
 		} else {
 			ParseLog plog = new ParseLog(pos);
-			t1 = this.startFormat.parse(text, plog, attributes);
+			t1 = this.startFormat.parse(text, plog, attrs);
 			if (t1 == null || plog.isError()) {
 				status.setError(pos, plog.getErrorMessage());
 				return null;
 			}
-			parsed.with(
-				TemporalElement.start(this.startFormat.getChronology().getChronoType()),
-				t1
-			);
+			parsed.with(TemporalElement.start(type), t1);
+            lower = Boundary.of(left, t1);
 			pos = plog.getPosition();
 			if ((pos >= len) || (text.charAt(pos) != '/')) {
-				status.setError(pos, "Solidus char separating start and end boundaries expected.");
-				return null;
+                return solidusError(status, pos);
 			}
 			pos++;
-			status.setPosition(pos);
 		}
 
-		// end component
-		// TODO: impl
+		// end component after solidus
+		if (pos >= len) {
+			status.setError(
+                pos,
+                "Missing interval end component, end of text reached.");
+			return null;
+		}
 
-		return null;
+		c = text.charAt(pos);
+
+		if (c == 'P') {
+            int endIndex = len;
+            char test = text.charAt(endIndex - 1);
+            if ((test == ']') || (test == ')')) {
+                endIndex--;
+            }
+            String period = text.subSequence(pos, endIndex).toString();
+			parsed.with(PeriodElement.END_PERIOD, period);
+			pos = endIndex;
+		} else if (
+            (c == '+')
+            && (pos + 1 < len)
+            && (text.charAt(pos + 1) == '\u221E')
+        ) {
+            if (
+                (pos + 2 < len)
+                && (text.charAt(pos + 2) == ']')
+                && (this.policy != BracketPolicy.SHOW_NEVER)
+            ) {
+                status.setError(pos + 2, "Open boundary expected.");
+                return null;
+            }
+			right = OPEN;
+			parsed.with(InfiniteElement.END_INFINITE, Boolean.TRUE);
+            upper = Boundary.infiniteFuture();
+			pos += 2;
+		} else {
+            // TODO: default-Werte vom Start übernehmen (wenn t1 != null)
+			ParseLog plog = new ParseLog(pos);
+			t2 = this.endFormat.parse(text, plog, attrs);
+			if (t2 == null || plog.isError()) {
+				status.setError(pos, plog.getErrorMessage());
+				return null;
+			}
+			parsed.with(TemporalElement.end(type), t2);
+            upper = Boundary.of(right, t2);
+			pos = plog.getPosition();
+		}
+
+		// ending boundary
+        if (pos >= len) {
+            if (this.policy == BracketPolicy.SHOW_ALWAYS) {
+                status.setError(pos, "Missing end boundary bracket.");
+            }
+        } else {
+            c = text.charAt(pos);
+            if ((c == ']') || (c == ')')) {
+                if (this.policy == BracketPolicy.SHOW_NEVER) {
+                    status.setError(
+                        pos,
+                        "Illegal end boundary due to bracket policy: " + c);
+                } else {
+                    right = ((c == ']') ? CLOSED : OPEN);
+                    pos++;
+                }
+            } else if (this.policy == BracketPolicy.SHOW_ALWAYS) {
+                status.setError(pos, "Missing end boundary bracket.");
+            }
+        }
+
+        if (status.isError()) {
+            return null;
+        }
+
+        if (
+            (pos < len)
+            && !allowTrailingChars
+        ) {
+            String suffix;
+
+            if (len - pos <= 10) {
+                suffix = text.subSequence(pos, len).toString();
+            } else {
+                suffix = text.subSequence(pos, pos + 10).toString() + "...";
+            }
+
+            status.setError(pos, "Unparsed trailing characters: " + suffix);
+            return null;
+        }
+
+        // special case for p-strings (ISO-support)
+        if (lower == null) {
+            // TODO: impl
+        }
+
+        if (upper == null) {
+            // TODO: impl
+        }
+
+        // create and return interval
+        status.setPosition(pos);
+		return this.factory.between(lower, upper);
 
 	}
+
+
+    private static <R> R solidusError(
+        ParseLog status,
+        int pos
+    ) {
+
+        status.setError(
+            pos,
+            "Solidus char separating start and end boundaries expected.");
+        return null;
+
+    }
 
 }
