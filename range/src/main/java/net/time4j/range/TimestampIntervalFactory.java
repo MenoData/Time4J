@@ -21,11 +21,24 @@
 
 package net.time4j.range;
 
+import net.time4j.Duration;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.Weekmodel;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.format.ParseLog;
+
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 final class TimestampIntervalFactory
-    implements IntervalFactory<PlainTimestamp> {
+    implements IsoIntervalFactory<PlainTimestamp> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -48,6 +61,69 @@ final class TimestampIntervalFactory
     ) {
 
         return new TimestampInterval(start, end);
+
+    }
+
+    @Override
+    public PlainTimestamp plusPeriod(
+        PlainTimestamp timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        try {
+            return timepoint.plus(Duration.parsePeriod(period));
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public PlainTimestamp minusPeriod(
+        PlainTimestamp timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        try {
+            return timepoint.minus(Duration.parsePeriod(period));
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
+
+        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+
+        if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
+            if (!rawData.contains(PlainDate.YEAR_OF_WEEKDATE)) {
+                set.add(PlainDate.YEAR_OF_WEEKDATE);
+                if (!rawData.contains(Weekmodel.ISO.weekOfYear())) {
+                    set.add(Weekmodel.ISO.weekOfYear());
+                }
+            }
+        } else if (!rawData.contains(PlainDate.YEAR)) {
+            set.add(PlainDate.YEAR);
+            if (
+                !rawData.contains(PlainDate.MONTH_OF_YEAR)
+                && !rawData.contains(PlainDate.MONTH_AS_NUMBER)
+                && !rawData.contains(PlainDate.DAY_OF_YEAR)
+            ) {
+                set.add(PlainDate.MONTH_AS_NUMBER);
+                if (!rawData.contains(PlainDate.DAY_OF_MONTH)) {
+                    set.add(PlainDate.DAY_OF_MONTH);
+                    set.add(PlainTime.ISO_HOUR);
+                }
+            }
+        }
+
+        return Collections.unmodifiableSet(set);
 
     }
 

@@ -21,11 +21,25 @@
 
 package net.time4j.range;
 
+import net.time4j.Duration;
 import net.time4j.Moment;
+import net.time4j.PlainTimestamp;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
+import net.time4j.format.ParseLog;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.TransitionStrategy;
+
+import java.text.ParseException;
+import java.util.Set;
 
 
 final class MomentIntervalFactory
-    implements IntervalFactory<Moment> {
+    implements IsoIntervalFactory<Moment> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -47,6 +61,91 @@ final class MomentIntervalFactory
     ) {
 
         return new MomentInterval(start, end);
+
+    }
+
+    @Override
+    public Moment plusPeriod(
+        Moment timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        Timezone tz = getTimezone(plog.getRawValues(), attributes);
+        PlainTimestamp tsp = timepoint.toZonalTimestamp(tz.getID());
+
+        try {
+            return tsp.plus(Duration.parsePeriod(period)).in(tz);
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public Moment minusPeriod(
+        Moment timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        Timezone tz = getTimezone(plog.getRawValues(), attributes);
+        PlainTimestamp tsp = timepoint.toZonalTimestamp(tz.getID());
+
+        try {
+            return tsp.minus(Duration.parsePeriod(period)).in(tz);
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
+
+        return TimestampIntervalFactory.INSTANCE.stdElements(rawData);
+
+    }
+
+    // übernommen von Moment.Merger
+    private static Timezone getTimezone(
+        ChronoEntity<?> entity,
+        AttributeQuery attrs
+    ) {
+
+        TZID tzid = null;
+
+        if (entity.hasTimezone()) {
+            tzid = entity.getTimezone();
+        }
+
+        if (
+            (tzid == null)
+            && attrs.contains(Attributes.TIMEZONE_ID)
+        ) {
+            tzid = attrs.get(Attributes.TIMEZONE_ID); // Ersatzwert
+        }
+
+        if (tzid != null) {
+            if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                TransitionStrategy strategy =
+                    attrs.get(Attributes.TRANSITION_STRATEGY);
+                return Timezone.of(tzid).with(strategy);
+            } else {
+                return Timezone.of(tzid);
+            }
+        } else {
+            Leniency leniency =
+                attrs.get(Attributes.LENIENCY, Leniency.SMART);
+            if (leniency.isLax()) {
+                return Timezone.ofSystem();
+            }
+        }
+
+        throw new AssertionError(
+            "Timezone must exist if a moment was successfully parsed.");
 
     }
 

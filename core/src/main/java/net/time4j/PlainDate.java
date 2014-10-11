@@ -2059,7 +2059,6 @@ public final class PlainDate
                             month.intValue(),
                             dom.intValue());
                     }
-
                 }
 
                 if (entity.contains(DAY_OF_YEAR)) {

@@ -21,11 +21,22 @@
 
 package net.time4j.range;
 
+import net.time4j.Duration;
 import net.time4j.PlainDate;
+import net.time4j.Weekmodel;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.format.ParseLog;
+
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
 final class DateIntervalFactory
-    implements IntervalFactory<PlainDate> {
+    implements IsoIntervalFactory<PlainDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -47,6 +58,65 @@ final class DateIntervalFactory
     ) {
 
         return new DateInterval(start, end);
+
+    }
+
+    @Override
+    public PlainDate plusPeriod(
+        PlainDate timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        try {
+            return timepoint.plus(Duration.parseCalendarPeriod(period));
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public PlainDate minusPeriod(
+        PlainDate timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    ) {
+
+        try {
+            return timepoint.minus(Duration.parseCalendarPeriod(period));
+        } catch (ParseException ex) {
+            return null;
+        }
+
+    }
+
+    @Override
+    public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
+
+        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+
+        if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
+            if (!rawData.contains(PlainDate.YEAR_OF_WEEKDATE)) {
+                set.add(PlainDate.YEAR_OF_WEEKDATE);
+                if (!rawData.contains(Weekmodel.ISO.weekOfYear())) {
+                    set.add(Weekmodel.ISO.weekOfYear());
+                }
+            }
+        } else if (!rawData.contains(PlainDate.YEAR)) {
+            set.add(PlainDate.YEAR);
+            if (
+                !rawData.contains(PlainDate.MONTH_OF_YEAR)
+                && !rawData.contains(PlainDate.MONTH_AS_NUMBER)
+                && !rawData.contains(PlainDate.DAY_OF_YEAR)
+            ) {
+                set.add(PlainDate.MONTH_AS_NUMBER);
+            }
+        }
+
+        return Collections.unmodifiableSet(set);
 
     }
 

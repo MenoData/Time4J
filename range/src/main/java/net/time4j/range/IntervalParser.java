@@ -24,6 +24,7 @@ package net.time4j.range;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Calendrical;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
@@ -32,6 +33,7 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
 
+import static net.time4j.format.Leniency.SMART;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
@@ -163,7 +165,7 @@ public final class IntervalParser
 		}
 
 		IntervalFactory<T> factory = new GenericIntervalFactory<T>(timeline);
-		return of(factory, format, format, policy);
+		return new IntervalParser<T>(factory, format, format, policy);
 
 	}
 
@@ -180,7 +182,7 @@ public final class IntervalParser
      */
 	static
     <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
-		IntervalFactory<T> factory,
+		IsoIntervalFactory<T> factory,
 		ChronoFormatter<T> startFormat,
 		ChronoFormatter<T> endFormat,
 		BracketPolicy	   policy
@@ -216,29 +218,9 @@ public final class IntervalParser
 
         if (!allowTrailingChars) {
             attrs =
-                new AttributeQuery() {
-                    @Override
-                    public boolean contains(AttributeKey<?> key) {
-                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
-                            return true;
-                        }
-                        return attributes.contains(key);
-                    }
-                    @Override
-                    public <A> A get(AttributeKey<A> key) {
-                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
-                            return key.type().cast(Boolean.TRUE);
-                        }
-                        return attributes.get(key);
-                    }
-                    @Override
-                    public <A> A get(AttributeKey<A> key, A defaultValue) {
-                        if (key.equals(Attributes.TRAILING_CHARACTERS)) {
-                            return key.type().cast(Boolean.TRUE);
-                        }
-                        return attributes.get(key, defaultValue);
-                    }
-                };
+                new AttributeWrapper(
+                    attributes,
+                    Attributes.TRAILING_CHARACTERS);
         }
 
         Class<T> type = this.startFormat.getChronology().getChronoType();
@@ -249,6 +231,11 @@ public final class IntervalParser
 		T t2 = null;
         Boundary<T> lower = null;
         Boundary<T> upper = null;
+        int posLower = -1;
+        int posUpper = -1;
+        ParseLog lowerLog = null;
+        ParseLog upperLog = null;
+        String period = null;
 
 		// starting boundary
 		char c = text.charAt(pos);
@@ -277,10 +264,13 @@ public final class IntervalParser
 		}
 
 		// start component and solidus
-		ChronoEntity<?> parsed = status.getRawValues();
 		c = text.charAt(pos);
 
-		if (c == 'P') {
+		if (
+            (c == 'P')
+            && (this.factory instanceof IsoIntervalFactory)
+        ) {
+            posLower = pos;
 			int index = pos;
 			int solidus = -1;
 			while (++index < len) {
@@ -292,8 +282,7 @@ public final class IntervalParser
 			if (solidus == -1) {
                 return solidusError(status, pos);
 			}
-            String period = text.subSequence(pos, solidus).toString();
-			parsed.with(PeriodElement.START_PERIOD, period);
+            period = text.subSequence(pos, solidus).toString();
 			pos = solidus + 1;
 		} else if (
             (c == '-')
@@ -305,7 +294,6 @@ public final class IntervalParser
 				return null;
 			}
 			left = OPEN;
-			parsed.with(InfiniteElement.START_INFINITE, Boolean.TRUE);
             lower = Boundary.infinitePast();
 			pos += 2;
 			if ((pos >= len) || (text.charAt(pos) != '/')) {
@@ -313,15 +301,14 @@ public final class IntervalParser
 			}
 			pos++;
 		} else {
-			ParseLog plog = new ParseLog(pos);
-			t1 = this.startFormat.parse(text, plog, attrs);
-			if (t1 == null || plog.isError()) {
-				status.setError(pos, plog.getErrorMessage());
+			lowerLog = new ParseLog(pos);
+			t1 = this.startFormat.parse(text, lowerLog, attrs);
+			if (t1 == null || lowerLog.isError()) {
+				status.setError(pos, lowerLog.getErrorMessage());
 				return null;
 			}
-			parsed.with(TemporalElement.start(type), t1);
             lower = Boundary.of(left, t1);
-			pos = plog.getPosition();
+			pos = lowerLog.getPosition();
 			if ((pos >= len) || (text.charAt(pos) != '/')) {
                 return solidusError(status, pos);
 			}
@@ -338,15 +325,24 @@ public final class IntervalParser
 
 		c = text.charAt(pos);
 
-		if (c == 'P') {
+		if (
+            (c == 'P')
+            && (this.factory instanceof IsoIntervalFactory)
+        ) {
+            if (t1 == null) {
+                status.setError(
+                    pos,
+                    "Cannot process end period without start time.");
+                return null;
+            }
+            posUpper = pos;
             int endIndex = len;
             char test = text.charAt(endIndex - 1);
             if ((test == ']') || (test == ')')) {
                 endIndex--;
             }
-            String period = text.subSequence(pos, endIndex).toString();
-			parsed.with(PeriodElement.END_PERIOD, period);
-			pos = endIndex;
+            period = text.subSequence(pos, endIndex).toString();
+            pos = endIndex;
 		} else if (
             (c == '+')
             && (pos + 1 < len)
@@ -361,20 +357,43 @@ public final class IntervalParser
                 return null;
             }
 			right = OPEN;
-			parsed.with(InfiniteElement.END_INFINITE, Boolean.TRUE);
             upper = Boundary.infiniteFuture();
 			pos += 2;
 		} else {
-            // TODO: default-Werte vom Start übernehmen (wenn t1 != null)
-			ParseLog plog = new ParseLog(pos);
-			t2 = this.endFormat.parse(text, plog, attrs);
-			if (t2 == null || plog.isError()) {
-				status.setError(pos, plog.getErrorMessage());
+			upperLog = new ParseLog(pos);
+			t2 = this.endFormat.parse(text, upperLog, attrs);
+			if (t2 == null || upperLog.isError()) {
+                if (
+                    (t1 != null)
+                    && (this.factory instanceof IsoIntervalFactory)
+                    && !attrs.get(Attributes.LENIENCY, SMART).isStrict()
+                ) {
+                    IsoIntervalFactory<T> iif =
+                        (IsoIntervalFactory<T>) this.factory;
+                    ChronoFormatter<T> fmt = this.endFormat;
+                    ChronoEntity<?> upperRaw = upperLog.getRawValues();
+                    for (ChronoElement<?> key : iif.stdElements(upperRaw)) {
+                        fmt = withDefault(fmt, t1, key);
+                    }
+                    ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
+                    if (lowerRaw.hasTimezone()) {
+                        fmt = fmt.withTimezone(lowerRaw.getTimezone());
+                    }
+                    upperLog.reset();
+                    upperLog.setPosition(pos);
+                    attrs =
+                        new AttributeWrapper(
+                            attrs,
+                            Attributes.USE_DEFAULT_WHEN_ERROR);
+                    t2 = fmt.parse(text, upperLog, attrs);
+                }
+            }
+			if (t2 == null || upperLog.isError()) {
+				status.setError(pos, upperLog.getErrorMessage());
 				return null;
 			}
-			parsed.with(TemporalElement.end(type), t2);
             upper = Boundary.of(right, t2);
-			pos = plog.getPosition();
+			pos = upperLog.getPosition();
 		}
 
 		// ending boundary
@@ -418,13 +437,33 @@ public final class IntervalParser
             return null;
         }
 
-        // special case for p-strings (ISO-support)
-        if (lower == null) {
-            // TODO: impl
-        }
+        // special case for P-strings (ISO-support)
+        if (period != null) {
+            IsoIntervalFactory<T> iif = (IsoIntervalFactory<T>) this.factory;
 
-        if (upper == null) {
-            // TODO: impl
+            if (lower == null) {
+                if (t2 == null) {
+                    status.setError(
+                        posLower,
+                        "Cannot process start period without end time.");
+                    return null;
+                }
+                t1 = iif.minusPeriod(t2, period, upperLog, attributes);
+                if (t1 == null) {
+                    status.setError(posLower, "Wrong period: " + period);
+                    return null;
+                }
+                lower = Boundary.of(left, t1);
+            }
+
+            if (upper == null) {
+                t2 = iif.plusPeriod(t1, period, lowerLog, attributes);
+                if (t2 == null) {
+                    status.setError(posUpper, "Wrong period: " + period);
+                    return null;
+                }
+                upper = Boundary.of(right, t2);
+            }
         }
 
         // create and return interval
@@ -443,6 +482,69 @@ public final class IntervalParser
             pos,
             "Solidus char separating start and end boundaries expected.");
         return null;
+
+    }
+
+    // wildcard capture
+    private static
+    <T extends ChronoEntity<T>, V> ChronoFormatter<T> withDefault(
+        ChronoFormatter<T> fmt,
+        T timepoint,
+        ChronoElement<V> key
+    ) {
+
+        return fmt.withDefault(key, timepoint.get(key));
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class AttributeWrapper
+        implements AttributeQuery {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final AttributeQuery attributes;
+        private final AttributeKey<Boolean> specialKey;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        AttributeWrapper(
+            AttributeQuery attributes,
+            AttributeKey<Boolean> specialKey
+        ) {
+            super();
+
+            this.attributes = attributes;
+            this.specialKey = specialKey;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean contains(AttributeKey<?> key) {
+            if (key.equals(this.specialKey)) {
+                return true;
+            }
+            return this.attributes.contains(key);
+        }
+
+        @Override
+        public <A> A get(AttributeKey<A> key) {
+            if (key.equals(this.specialKey)) {
+                return key.type().cast(Boolean.TRUE);
+            }
+            return this.attributes.get(key);
+        }
+
+        @Override
+        public <A> A get(AttributeKey<A> key, A defaultValue) {
+            if (key.equals(this.specialKey)) {
+                return key.type().cast(Boolean.TRUE);
+            }
+            return this.attributes.get(key, defaultValue);
+        }
 
     }
 
