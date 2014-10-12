@@ -99,6 +99,15 @@ public class DurationNormalizerTest {
     }
 
     @Test
+    public void withNegativeMinutesOnly() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 0).inverse();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.only()),
+            is(Duration.of(-295, ClockUnit.MINUTES)));
+    }
+
+    @Test
     public void withMinutesOnlyIfEmpty() {
         Duration<ClockUnit> timePeriod = Duration.ofZero();
         assertThat(

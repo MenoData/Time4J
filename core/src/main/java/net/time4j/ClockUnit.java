@@ -74,7 +74,7 @@ public enum ClockUnit
     /**
      * <p>Time unit &quot;seconds&quot; (symbol S) according to the
      * position of the second pointer on an analogue clock. </p>
-     * 
+     *
      * <p>This unit is NOT the SI-second. </p>
      *
      * @see     SI
@@ -278,6 +278,10 @@ public enum ClockUnit
                         total,
                         smallest.convert(item.getAmount(), unit));
             }
+        }
+
+        if (duration.isNegative()) {
+            total = MathUtils.safeNegate(total);
         }
 
         return this.convert(total, smallest); // possibly lossy
