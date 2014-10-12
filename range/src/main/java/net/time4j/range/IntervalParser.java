@@ -33,6 +33,8 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
 
+import java.text.ParseException;
+
 import static net.time4j.format.Leniency.SMART;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
@@ -170,7 +172,7 @@ public final class IntervalParser
 	}
 
     /**
-     * <p>Interne Methode, die auch von ISO-Intervallen aufgerufen wird. </p>
+     * <p>Interne Methode, die von ISO-Intervallen aufgerufen wird. </p>
      *
      * @param   <T> generic temporal type
      * @param   factory         interval factory
@@ -192,11 +194,42 @@ public final class IntervalParser
 
 	}
 
+    /**
+     * <p>Interpretes given text as chronological interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parse result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als chronologisches Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parse result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     */
+	public ChronoInterval<T> parse(String text) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        ChronoInterval<T> ret = this.parse(text, plog, Attributes.empty());
+
+        if (ret == null) {
+            throw new ParseException(
+                plog.getErrorMessage(),
+                plog.getErrorIndex());
+        }
+
+        return ret;
+
+    }
+
 	@Override
 	public ChronoInterval<T> parse(
         CharSequence text,
         ParseLog status,
-        final AttributeQuery attributes
+        AttributeQuery attributes
     ) {
 
 		// initialization phase

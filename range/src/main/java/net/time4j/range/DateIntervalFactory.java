@@ -52,7 +52,7 @@ final class DateIntervalFactory
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public ChronoInterval<PlainDate> between(
+    public DateInterval between(
         Boundary<PlainDate> start,
         Boundary<PlainDate> end
     ) {

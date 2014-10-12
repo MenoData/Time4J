@@ -185,57 +185,22 @@ public class BoundaryTest {
         Boundary<PlainDate> b5 = Boundary.infinitePast();
         Boundary<PlainDate> b6 = Boundary.infiniteFuture();
 
-        assertThat(b1.isAfter(b2), is(false));
-        assertThat(b2.isAfter(b1), is(true));
-        assertThat(b3.isAfter(b1), is(false));
-        assertThat(b4.isAfter(b1), is(true));
-        assertThat(b1.isAfter(b3), is(true));
-        assertThat(b1.isAfter(b4), is(false));
+        assertThat(Boundary.isAfter(b1, b2), is(false));
+        assertThat(Boundary.isAfter(b2, b1), is(true));
+        assertThat(Boundary.isAfter(b3, b1), is(false));
+        assertThat(Boundary.isAfter(b4, b1), is(true));
+        assertThat(Boundary.isAfter(b1, b3), is(true));
+        assertThat(Boundary.isAfter(b1, b4), is(false));
 
-        assertThat(b1.isAfter(b5), is(true));
-        assertThat(b1.isAfter(b6), is(false));
+        assertThat(Boundary.isAfter(b1, b5), is(true));
+        assertThat(Boundary.isAfter(b1, b6), is(false));
 
-        assertThat(b5.isAfter(b1), is(false));
-        assertThat(b6.isAfter(b1), is(true));
+        assertThat(Boundary.isAfter(b5, b1), is(false));
+        assertThat(Boundary.isAfter(b6, b1), is(true));
 
-        assertThat(b5.isAfter(b6), is(false));
-        assertThat(b6.isAfter(b5), is(true));
-        assertThat(b1.isAfter(b1), is(false));
-    }
-
-    @Test
-    public void isBefore() {
-        PlainDate d1 = PlainDate.of(2014, 5, 21);
-        Boundary<PlainDate> b1 = Boundary.of(IntervalEdge.OPEN, d1);
-
-        PlainDate d2 = PlainDate.of(2014, 5, 22);
-        Boundary<PlainDate> b2 = Boundary.of(IntervalEdge.OPEN, d2);
-
-        PlainDate d3 = PlainDate.of(2014, 5, 20);
-        Boundary<PlainDate> b3 = Boundary.of(IntervalEdge.CLOSED, d3);
-
-        PlainDate d4 = PlainDate.of(2014, 5, 22);
-        Boundary<PlainDate> b4 = Boundary.of(IntervalEdge.CLOSED, d4);
-
-        Boundary<PlainDate> b5 = Boundary.infinitePast();
-        Boundary<PlainDate> b6 = Boundary.infiniteFuture();
-
-        assertThat(b1.isBefore(b2), is(true));
-        assertThat(b2.isBefore(b1), is(false));
-        assertThat(b3.isBefore(b1), is(true));
-        assertThat(b4.isBefore(b1), is(false));
-        assertThat(b1.isBefore(b3), is(false));
-        assertThat(b1.isBefore(b4), is(true));
-
-        assertThat(b1.isBefore(b5), is(false));
-        assertThat(b1.isBefore(b6), is(true));
-
-        assertThat(b5.isBefore(b1), is(true));
-        assertThat(b6.isBefore(b1), is(false));
-
-        assertThat(b5.isBefore(b6), is(true));
-        assertThat(b6.isBefore(b5), is(false));
-        assertThat(b1.isBefore(b1), is(false));
+        assertThat(Boundary.isAfter(b5, b6), is(false));
+        assertThat(Boundary.isAfter(b6, b5), is(true));
+        assertThat(Boundary.isAfter(b1, b1), is(false));
     }
 
     @Test
@@ -255,30 +220,30 @@ public class BoundaryTest {
         Boundary<PlainDate> b5 = Boundary.infinitePast();
         Boundary<PlainDate> b6 = Boundary.infiniteFuture();
 
-        assertThat(b1.isSimultaneous(b2), is(false));
-        assertThat(b2.isSimultaneous(b1), is(false));
-        assertThat(b3.isSimultaneous(b1), is(false));
-        assertThat(b4.isSimultaneous(b1), is(false));
-        assertThat(b1.isSimultaneous(b3), is(false));
-        assertThat(b1.isSimultaneous(b4), is(false));
-        assertThat(b2.isSimultaneous(b4), is(true));
+        assertThat(Boundary.isSimultaneous(b1, b2), is(false));
+        assertThat(Boundary.isSimultaneous(b2, b1), is(false));
+        assertThat(Boundary.isSimultaneous(b3, b1), is(false));
+        assertThat(Boundary.isSimultaneous(b4, b1), is(false));
+        assertThat(Boundary.isSimultaneous(b1, b3), is(false));
+        assertThat(Boundary.isSimultaneous(b1, b4), is(false));
+        assertThat(Boundary.isSimultaneous(b2, b4), is(true));
 
-        assertThat(b1.isSimultaneous(b5), is(false));
-        assertThat(b1.isSimultaneous(b6), is(false));
+        assertThat(Boundary.isSimultaneous(b1, b5), is(false));
+        assertThat(Boundary.isSimultaneous(b1, b6), is(false));
 
-        assertThat(b5.isSimultaneous(b1), is(false));
-        assertThat(b6.isSimultaneous(b1), is(false));
+        assertThat(Boundary.isSimultaneous(b5, b1), is(false));
+        assertThat(Boundary.isSimultaneous(b6, b1), is(false));
 
-        assertThat(b5.isSimultaneous(b6), is(false));
-        assertThat(b6.isSimultaneous(b5), is(false));
+        assertThat(Boundary.isSimultaneous(b5, b6), is(false));
+        assertThat(Boundary.isSimultaneous(b6, b5), is(false));
 
-        assertThat(b1.isSimultaneous(b1), is(true));
+        assertThat(Boundary.isSimultaneous(b1, b1), is(true));
         assertThat(
-            b1.isSimultaneous(Boundary.of(IntervalEdge.OPEN, d1)),
+            Boundary.isSimultaneous(b1, Boundary.of(IntervalEdge.OPEN, d1)),
             is(true));
 
-        assertThat(b5.isSimultaneous(b5), is(true));
-        assertThat(b6.isSimultaneous(b6), is(true));
+        assertThat(Boundary.isSimultaneous(b5, b5), is(true));
+        assertThat(Boundary.isSimultaneous(b6, b6), is(true));
     }
 
 }

@@ -55,7 +55,7 @@ final class MomentIntervalFactory
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public ChronoInterval<Moment> between(
+    public MomentInterval between(
         Boundary<Moment> start,
         Boundary<Moment> end
     ) {

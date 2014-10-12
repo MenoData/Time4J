@@ -54,7 +54,7 @@ import java.io.Serializable;
  * @since   1.3
  */
 public final class Boundary<T extends Temporal<? super T>>
-    implements Temporal<Boundary<T>>, Serializable {
+    implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -285,57 +285,6 @@ public final class Boundary<T extends Temporal<? super T>>
     }
 
     @Override
-    public boolean isAfter(Boundary<T> other) {
-
-        if (this.mode == PAST) {
-            return false;
-        } else if (this.mode == FUTURE) {
-            return (other.mode != FUTURE);
-        } else if (other.mode == PAST) {
-            return true;
-        } else if (other.mode == FUTURE) {
-            return false;
-        } else {
-            return this.temporal.isAfter(other.temporal);
-        }
-
-    }
-
-    @Override
-    public boolean isBefore(Boundary<T> other) {
-
-        if (this.mode == PAST) {
-            return (other.mode != PAST);
-        } else if (this.mode == FUTURE) {
-            return false;
-        } else if (other.mode == PAST) {
-            return false;
-        } else if (other.mode == FUTURE) {
-            return true;
-        } else {
-            return this.temporal.isBefore(other.temporal);
-        }
-
-    }
-
-    @Override
-    public boolean isSimultaneous(Boundary<T> other) {
-
-        if (this.mode == PAST) {
-            return (other.mode == PAST);
-        } else if (this.mode == FUTURE) {
-            return (other.mode == FUTURE);
-        } else if (other.mode == PAST) {
-            return false;
-        } else if (other.mode == FUTURE) {
-            return false;
-        } else {
-            return this.temporal.isSimultaneous(other.temporal);
-        }
-
-    }
-
-    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -407,6 +356,62 @@ public final class Boundary<T extends Temporal<? super T>>
     IntervalEdge getEdge() {
 
         return this.edge;
+
+    }
+
+    /**
+     * <p>Rein temporaler Vergleich ohne Ansehen der open/closed-Bedingung. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   start   starting boundary
+     * @param   end     ending boundary
+     * @return  {@code true} if start is after end else {@code false}
+     * @since   1.3
+     */
+    static <T extends Temporal<? super T>> boolean isAfter(
+        Boundary<T> start,
+        Boundary<T> end
+    ) {
+
+        if (start.mode == PAST) {
+            return false;
+        } else if (start.mode == FUTURE) {
+            return (end.mode != FUTURE);
+        } else if (end.mode == PAST) {
+            return true;
+        } else if (end.mode == FUTURE) {
+            return false;
+        } else {
+            return start.temporal.isAfter(end.temporal);
+        }
+
+    }
+
+    /**
+     * <p>Rein temporaler Vergleich ohne Ansehen der open/closed-Bedingung. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   start   starting boundary
+     * @param   end     ending boundary
+     * @return  {@code true} if start is simultaneous to end else {@code false}
+     * @since   1.3
+     */
+    static <T extends Temporal<? super T>> boolean isSimultaneous(
+        Boundary<T> start,
+        Boundary<T> end
+    ) {
+
+        if (start.mode == PAST) {
+            return (end.mode == PAST);
+        } else if (start.mode == FUTURE) {
+            return (end.mode == FUTURE);
+        } else if (end.mode == PAST) {
+            return false;
+        } else if (end.mode == FUTURE) {
+            return false;
+        } else {
+            return start.temporal.isSimultaneous(end.temporal);
+        }
 
     }
 

@@ -55,7 +55,7 @@ final class TimestampIntervalFactory
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public ChronoInterval<PlainTimestamp> between(
+    public TimestampInterval between(
         Boundary<PlainTimestamp> start,
         Boundary<PlainTimestamp> end
     ) {

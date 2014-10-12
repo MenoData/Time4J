@@ -57,6 +57,42 @@ public final class DateInterval
 
     private static final long serialVersionUID = 1L;
 
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;uuuuMMdd/uuuuMMdd&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_BASIC_CALENDAR_DATES;
+//
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;uuuu-MM-dd/uuuu-MM-dd&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_EXTENDED_CALENDAR_DATES;
+//
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;uuuuDDD/uuuuDDD&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_BASIC_ORDINAL_DATES;
+//
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;uuuu-DDD/uuuu-DDD&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_EXTENDED_ORDINAL_DATES;
+//
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;YYYYWwwE/YYYYWwwE&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_BASIC_WEEK_DATES;
+//
+//    /**
+//     * <p>Special interval parser for basic calendar dates according to
+//     * ISO-8601 using the format &quot;YYYY-Www-E/YYYY-Www-E&quot;. </p>
+//     */
+//    public static final IntervalParser<PlainDate> ISO_EXTENDED_WEEK_DATES;
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -212,7 +248,7 @@ public final class DateInterval
         if (this.getEnd().isInfinite()) {
             return this;
         }
-        
+
         Boundary<PlainDate> boundary =
             Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
         return this.withEnd(boundary);

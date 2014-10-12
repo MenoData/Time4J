@@ -87,13 +87,13 @@ public abstract class ChronoInterval
         super();
 
 
-        if (start.isAfter(end)) { // NPE-check
+        if (Boundary.isAfter(start, end)) { // NPE-check
             throw new IllegalArgumentException(
                 "Start after end: " + start + "/" + end);
         } else if (
             end.isOpen() // NPE-check
             && start.isOpen()
-            && start.isSimultaneous(end)
+            && Boundary.isSimultaneous(start, end)
         ) {
             if (start.isInfinite()) {
                 throw new IllegalArgumentException(

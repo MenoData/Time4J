@@ -60,7 +60,7 @@ final class TimeIntervalFactory
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public ChronoInterval<PlainTime> between(
+    public TimeInterval between(
         Boundary<PlainTime> start,
         Boundary<PlainTime> end
     ) {
