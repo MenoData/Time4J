@@ -193,7 +193,7 @@ public interface ChronoValues {
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt, ob eine Zeitzone vorhanden ist. </p>
      *
      * @return  {@code true} if a timezone is available and can be achieved

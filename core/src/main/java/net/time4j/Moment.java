@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
+import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -812,43 +813,92 @@ public final class Moment
     }
 
     /**
-     * <p>Converts this instance to a local timestamp in system timezone. </p>
+     * <p>Creates a combination of this moment and system timezone. </p>
      *
-     * @return  local timestamp in system timezone
-     * @deprecated  use {@link #toLocalTimestamp()}
+     * <p>A direct conversion to a local timestamp can be achieved by
+     * {@link #toLocalTimestamp()}. </p>
+     *
+     * @return  moment in system timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset
      */
-    @Deprecated
-    public PlainTimestamp inLocalView() {
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Moments und der Systemzeitzone. </p>
+     *
+     * <p>Eine Direktumwandlung zu einem lokalen Zeitstempel kann mit Hilfe
+     * von {@link #toLocalTimestamp()} erreicht werden. </p>
+     *
+     * @return  moment in system timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset
+     */
+    public ZonalMoment inLocalView() {
 
-        return this.toLocalTimestamp();
+        return new ZonalMoment(this, Timezone.ofSystem());
 
     }
 
     /**
-     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     * <p>Creates a combination of this moment and given timezone. </p>
      *
-     * @param   tzid    timezone id
-     * @return  local timestamp in given timezone
-     * @deprecated  use {@link #toZonalTimestamp(TZID)}
+     * <p>A direct conversion to a zonal timestamp can be achieved by
+     * {@link #toZonalTimestamp(TZID)}. </p>
+     *
+     * @return  moment in given timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset or
+     *          if given timezone cannot be loaded
      */
-    @Deprecated
-    public PlainTimestamp inZonalView(TZID tzid) {
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Moments und der angegebenen
+     * Zeitzone. </p>
+     *
+     * <p>Eine Direktumwandlung zu einem zonalen Zeitstempel kann mit Hilfe
+     * von {@link #toZonalTimestamp(TZID)} erreicht werden. </p>
+     *
+     * @return  moment in given timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset or
+     *          if given timezone cannot be loaded
+     */
+    public ZonalMoment inZonalView(TZID tzid) {
 
-        return this.toZonalTimestamp(tzid);
+        return new ZonalMoment(this, Timezone.of(tzid));
 
     }
 
     /**
-     * <p>Converts this instance to a local timestamp in given timezone. </p>
+     * <p>Creates a combination of this moment and given timezone. </p>
      *
-     * @param   tzid    timezone id
-     * @return  local timestamp in given timezone
-     * @deprecated  use {@link #toZonalTimestamp(String)}
+     * <p>A direct conversion to a zonal timestamp can be achieved by
+     * {@link #toZonalTimestamp(String)}. </p>
+     *
+     * @return  moment in given timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset or
+     *          if given timezone cannot be loaded
      */
-    @Deprecated
-    public PlainTimestamp inZonalView(String tzid) {
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Moments und der angegebenen
+     * Zeitzone. </p>
+     *
+     * <p>Eine Direktumwandlung zu einem zonalen Zeitstempel kann mit Hilfe
+     * von {@link #toZonalTimestamp(String)} erreicht werden. </p>
+     *
+     * @return  moment in given timezone
+     * @since   1.3
+     * @throws  IllegalArgumentException if this moment is a leapsecond and
+     *          shall be combined with a non-full-minute-timezone-offset or
+     *          if given timezone cannot be loaded
+     */
+    public ZonalMoment inZonalView(String tzid) {
 
-        return this.toZonalTimestamp(tzid);
+        return new ZonalMoment(this, Timezone.of(tzid));
 
     }
 
@@ -2489,7 +2539,7 @@ public final class Moment
         }
 
         @Override
-        public ChronoEntity<?> preformat(
+        public ChronoValues preformat(
             Moment context,
             AttributeQuery attributes
         ) {
@@ -2497,8 +2547,8 @@ public final class Moment
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
 
-                if (tzid != ZonalOffset.UTC) {
-                    return new ZonalTimestamp(context, tzid);
+                if (!ZonalOffset.UTC.equals(tzid)) {
+                    return context.inZonalView(tzid);
                 }
             }
 
