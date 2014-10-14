@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -461,13 +461,13 @@ public final class Attributes
     //~ Instanzvariablen --------------------------------------------------
 
     private final Map<String, Object> attributes;
-    private final ChronoCondition<ChronoEntity<?>> printCondition;
+    private final ChronoCondition<ChronoValues> printCondition;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private Attributes(
         Map<String, Object> map,
-        ChronoCondition<ChronoEntity<?>> printCondition
+        ChronoCondition<ChronoValues> printCondition
     ) {
         super();
 
@@ -599,7 +599,7 @@ public final class Attributes
      *
      * @return  print condition object maybe {@code null}
      */
-    ChronoCondition<ChronoEntity<?>> getCondition() {
+    ChronoCondition<ChronoValues> getCondition() {
 
         return this.printCondition;
 
@@ -635,7 +635,7 @@ public final class Attributes
 
         private final Map<String, Object> attributes =
             new HashMap<String, Object>();
-        private ChronoCondition<ChronoEntity<?>> printCondition = null;
+        private ChronoCondition<ChronoValues> printCondition = null;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1028,7 +1028,7 @@ public final class Attributes
          *
          * @param   printCondition  condition object
          */
-        void setCondition(ChronoCondition<ChronoEntity<?>> printCondition) {
+        void setCondition(ChronoCondition<ChronoValues> printCondition) {
 
             this.printCondition = printCondition;
 
