@@ -26,13 +26,13 @@ public class IntervalFormatTest {
         ChronoFormatter<PlainDate> formatter =
             Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
-            interval.toString(formatter, BracketPolicy.SHOW_NEVER),
+            interval.print(formatter, BracketPolicy.SHOW_NEVER),
             is("20140227/20140514"));
         assertThat(
-            interval.toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            interval.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
             is("20140227/20140514"));
         assertThat(
-            interval.toString(formatter, BracketPolicy.SHOW_ALWAYS),
+            interval.print(formatter, BracketPolicy.SHOW_ALWAYS),
             is("[20140227/20140514]"));
     }
 

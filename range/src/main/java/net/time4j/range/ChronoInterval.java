@@ -25,11 +25,14 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
 
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -429,27 +432,27 @@ public abstract class ChronoInterval
 
     /**
      * <p>Equivalent to
-     * {@code toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * {@code print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
      *
      * @param   formatter   format object for printing start and end
      * @return  formatted string in format {start}/{end}
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #toString(ChronoFormatter, BracketPolicy)
+     * @see     #print(ChronoFormatter, BracketPolicy)
      */
     /*[deutsch]
      * <p>Entspricht
-     * {@code toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * {@code print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
      *
      * @param   formatter   format object for printing start and end
      * @return  formatted string in format {start}/{end}
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #toString(ChronoFormatter, BracketPolicy)
+     * @see     #print(ChronoFormatter, BracketPolicy)
      */
-    public String toString(ChronoFormatter<T> formatter) {
+    public String print(ChronoFormatter<T> formatter) {
 
-        return this.toString(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD);
+        return this.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD);
 
     }
 
@@ -466,7 +469,7 @@ public abstract class ChronoInterval
      *          PlainDate.of(2014, 1, 31),
      *          PlainDate.of(2014, 4, 2));
      *  System.out.println(
-     *      interval.toString(
+     *      interval.print(
      *          Iso8601Format.BASIC_CALENDAR_DATE,
      *          BracketPolicy.SHOW_NEVER));
      *  // output: 20140131/20140402
@@ -491,7 +494,7 @@ public abstract class ChronoInterval
      *          PlainDate.of(2014, 1, 31),
      *          PlainDate.of(2014, 4, 2));
      *  System.out.println(
-     *      interval.toString(
+     *      interval.print(
      *          Iso8601Format.BASIC_CALENDAR_DATE,
      *          BracketPolicy.SHOW_NEVER));
      *  // output: 20140131/20140402
@@ -502,7 +505,7 @@ public abstract class ChronoInterval
      * @return  formatted string in format {start}/{end}
      * @since   1.3
      */
-    public String toString(
+    public String print(
         ChronoFormatter<T> formatter,
         BracketPolicy policy
     ) {
@@ -533,6 +536,98 @@ public abstract class ChronoInterval
         }
 
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  interval result
+     * @throws  IllegalArgumentException if the formatter does not refer to
+     *          a chronology based on a timeline
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if parsing fails
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     #print(ChronoFormatter, BracketPolicy)
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  interval result
+     * @throws  IllegalArgumentException if the formatter does not refer to
+     *          a chronology based on a timeline
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if parsing fails
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     #print(ChronoFormatter, BracketPolicy)
+     */
+    public static <T extends ChronoEntity<T> & Temporal<? super T>>
+    ChronoInterval<T> parse(
+        String text,
+        ChronoFormatter<T> formatter
+    ) throws ParseException {
+
+        return IntervalParser.of(formatter).parse(text);
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @param   attributes  control attributes
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IllegalArgumentException if the formatter does not refer to
+     *          a chronology based on a timeline
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     * @see     #print(ChronoFormatter, BracketPolicy)
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @param   attributes  control attributes
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IllegalArgumentException if the formatter does not refer to
+     *          a chronology based on a timeline
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     * @see     #print(ChronoFormatter, BracketPolicy)
+     */
+    public static <T extends ChronoEntity<T> & Temporal<? super T>>
+    ChronoInterval<T> parse(
+        CharSequence text,
+        ChronoFormatter<T> formatter,
+        BracketPolicy policy,
+        ParseLog status,
+        AttributeQuery attributes
+    ) {
+
+        return IntervalParser.of(
+             formatter,
+             policy
+        ).parse(text, status, attributes);
 
     }
 

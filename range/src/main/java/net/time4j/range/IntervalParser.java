@@ -41,28 +41,23 @@ import static net.time4j.range.IntervalEdge.OPEN;
 
 
 /**
- * <p>Parses intervals based on component formatters which are applied on start
- * and end boundaries. </p>
- *
- * @author  Meno Hochschild
- * @param   <T>  generic temporal type
- * @since   1.3
- */
-/*[deutsch]
  * <p>Interpretiert Intervalle basierend auf Zeitformatierern, die auf die
  * Start- oder Endkomponenten angewandt werden. </p>
  *
  * @author  Meno Hochschild
- * @param   <T>  generic temporal type
+ * @param   <T> generic temporal type
+ * @param   <I> generic interval type
  * @since   1.3
  */
-public final class IntervalParser
-    <T extends ChronoEntity<T> & Temporal<? super T>>
-	implements ChronoParser<ChronoInterval<T>> {
+final class IntervalParser
+    <T extends ChronoEntity<T> & Temporal<? super T>,
+        I extends ChronoInterval<T>>
+	implements ChronoParser<I> {
 
     //~ Instanzvariablen --------------------------------------------------
 
 	private final IntervalFactory<T> factory;
+	private final IsoIntervalFactory<T, I> isoFactory;
 	private final ChronoFormatter<T> startFormat;
 	private final ChronoFormatter<T> endFormat;
 	private final BracketPolicy policy;
@@ -70,7 +65,27 @@ public final class IntervalParser
     //~ Konstruktoren -----------------------------------------------------
 
 	private IntervalParser(
-		IntervalFactory<T> factory,
+		TimeLine<T> timeline,
+		ChronoFormatter<T> startFormat,
+		ChronoFormatter<T> endFormat,
+		BracketPolicy	   policy
+	) {
+		super();
+
+		if (policy == null) {
+			throw new NullPointerException("Missing bracket policy.");
+		}
+
+		this.factory = ChronoInterval.on(timeline);
+        this.isoFactory = null;
+		this.startFormat = startFormat;
+		this.endFormat = endFormat;
+		this.policy = policy;
+
+	}
+
+	private IntervalParser(
+		IsoIntervalFactory<T, I> factory,
 		ChronoFormatter<T> startFormat,
 		ChronoFormatter<T> endFormat,
 		BracketPolicy	   policy
@@ -82,6 +97,7 @@ public final class IntervalParser
 		}
 
 		this.factory = factory;
+        this.isoFactory = factory;
 		this.startFormat = startFormat;
 		this.endFormat = endFormat;
 		this.policy = policy;
@@ -91,67 +107,39 @@ public final class IntervalParser
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates an interval parser. </p>
-     *
-     * <p>Equivalent to
-     * {@code of(format, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   format     formatter for start and end component
-     * @return  new interval parser
-     * @throws  IllegalArgumentException if the format does not refer to
-     *          a chronology based on a timeline
-     * @since   1.3
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     */
-    /*[deutsch]
      * <p>Erzeugt einen Intervallinterpretierer. </p>
      *
      * <p>&Auml;quivalent zu
      * {@code of(format, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
      *
      * @param   <T> generic temporal type
-     * @param   format     formatter for start and end component
+     * @param   format      formatter for start and end component
      * @return  new interval parser
      * @throws  IllegalArgumentException if the format does not refer to
      *          a chronology based on a timeline
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
-	public static
-    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
-		ChronoFormatter<T> format
-	) {
+	static <T extends ChronoEntity<T> & Temporal<? super T>>
+    IntervalParser<T, ChronoInterval<T>> of(ChronoFormatter<T> format) {
 
 		return of(format, BracketPolicy.SHOW_WHEN_NON_STANDARD);
 
 	}
 
     /**
-     * <p>Creates an interval parser. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   format     formatter for start and end component
-     * @param   policy     bracket policy
-     * @return  new interval parser
-     * @throws  IllegalArgumentException if the format does not refer to
-     *          a chronology based on a timeline
-     * @since   1.3
-     */
-    /*[deutsch]
      * <p>Erzeugt einen Intervallinterpretierer. </p>
      *
      * @param   <T> generic temporal type
-     * @param   format     formatter for start and end component
-     * @param   policy     bracket policy
+     * @param   format      formatter for start and end component
+     * @param   policy      bracket policy
      * @return  new interval parser
      * @throws  IllegalArgumentException if the format does not refer to
      *          a chronology based on a timeline
      * @since   1.3
      */
-	@SuppressWarnings("unchecked")
-	public static
-    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
+	static <T extends ChronoEntity<T> & Temporal<? super T>>
+    IntervalParser<T, ChronoInterval<T>> of(
 		ChronoFormatter<T> format,
 		BracketPolicy	   policy
 	) {
@@ -160,14 +148,14 @@ public final class IntervalParser
 		TimeLine<T> timeline;
 
 		if (chronology instanceof TimeLine) {
-			timeline = (TimeLine<T>) chronology;
+			timeline = cast(chronology);
 		} else {
 			throw new IllegalArgumentException(
                 "Formatter without a timeline-chronology.");
 		}
 
-		IntervalFactory<T> factory = new GenericIntervalFactory<T>(timeline);
-		return new IntervalParser<T>(factory, format, format, policy);
+		return new IntervalParser<T, ChronoInterval<T>>(
+            timeline, format, format, policy);
 
 	}
 
@@ -175,6 +163,7 @@ public final class IntervalParser
      * <p>Interne Methode, die von ISO-Intervallen aufgerufen wird. </p>
      *
      * @param   <T> generic temporal type
+     * @param   <I> generic interval type
      * @param   factory         interval factory
      * @param   startFormat     formatter for lower interval boundary
      * @param   endFormat       formatter for upper interval boundary
@@ -182,27 +171,21 @@ public final class IntervalParser
      * @return  new interval parser
      * @since   1.3
      */
-	static
-    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalParser<T> of(
-		IsoIntervalFactory<T> factory,
+	static <T extends ChronoEntity<T> & Temporal<? super T>,
+        I extends ChronoInterval<T>>
+    IntervalParser<T, I> of(
+		IsoIntervalFactory<T, I> factory,
 		ChronoFormatter<T> startFormat,
 		ChronoFormatter<T> endFormat,
 		BracketPolicy	   policy
 	) {
 
-		return new IntervalParser<T>(factory, startFormat, endFormat, policy);
+		return new IntervalParser<T, I>(
+            factory, startFormat, endFormat, policy);
 
 	}
 
     /**
-     * <p>Interpretes given text as chronological interval. </p>
-     *
-     * @param   text        text to be parsed
-     * @return  parse result
-     * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  ParseException if the text is not parseable
-     */
-    /*[deutsch]
      * <p>Interpretiert den angegebenen Text als chronologisches Intervall. </p>
      *
      * @param   text        text to be parsed
@@ -210,10 +193,10 @@ public final class IntervalParser
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
      */
-	public ChronoInterval<T> parse(String text) throws ParseException {
+	I parse(String text) throws ParseException {
 
         ParseLog plog = new ParseLog();
-        ChronoInterval<T> ret = this.parse(text, plog, Attributes.empty());
+        I ret = this.parse(text, plog, Attributes.empty());
 
         if (ret == null) {
             throw new ParseException(
@@ -226,7 +209,7 @@ public final class IntervalParser
     }
 
 	@Override
-	public ChronoInterval<T> parse(
+	public I parse(
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes
@@ -301,7 +284,7 @@ public final class IntervalParser
 
 		if (
             (c == 'P')
-            && (this.factory instanceof IsoIntervalFactory)
+            && (this.isoFactory != null)
         ) {
             posLower = pos;
 			int index = pos;
@@ -360,7 +343,7 @@ public final class IntervalParser
 
 		if (
             (c == 'P')
-            && (this.factory instanceof IsoIntervalFactory)
+            && (this.isoFactory != null)
         ) {
             if (t1 == null) {
                 status.setError(
@@ -398,11 +381,10 @@ public final class IntervalParser
 			if (t2 == null || upperLog.isError()) {
                 if (
                     (t1 != null)
-                    && (this.factory instanceof IsoIntervalFactory)
+                    && (this.isoFactory != null)
                     && !attrs.get(Attributes.LENIENCY, SMART).isStrict()
                 ) {
-                    IsoIntervalFactory<T> iif =
-                        (IsoIntervalFactory<T>) this.factory;
+                    IsoIntervalFactory<T, I> iif = this.isoFactory;
                     ChronoFormatter<T> fmt = this.endFormat;
                     ChronoEntity<?> upperRaw = upperLog.getRawValues();
                     for (ChronoElement<?> key : iif.stdElements(upperRaw)) {
@@ -472,7 +454,7 @@ public final class IntervalParser
 
         // special case for P-strings (ISO-support)
         if (period != null) {
-            IsoIntervalFactory<T> iif = (IsoIntervalFactory<T>) this.factory;
+            IsoIntervalFactory<T, I> iif = this.isoFactory;
 
             if (lower == null) {
                 if (t2 == null) {
@@ -501,7 +483,12 @@ public final class IntervalParser
 
         // create and return interval
         status.setPosition(pos);
-		return this.factory.between(lower, upper);
+
+        if (this.isoFactory == null) {
+            return cast(this.factory.between(lower, upper));
+        } else {
+            return this.isoFactory.between(lower, upper);
+        }
 
 	}
 
@@ -527,6 +514,13 @@ public final class IntervalParser
     ) {
 
         return fmt.withDefault(key, timepoint.get(key));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <R> R cast(Object obj) {
+
+        return (R) obj;
 
     }
 

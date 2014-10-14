@@ -35,7 +35,7 @@ import java.util.Set;
 
 
 final class TimeIntervalFactory
-    implements IsoIntervalFactory<PlainTime> {
+    implements IsoIntervalFactory<PlainTime, TimeInterval> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

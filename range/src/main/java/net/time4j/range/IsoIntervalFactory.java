@@ -36,10 +36,18 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @see     1.3
  */
-interface IsoIntervalFactory<T extends ChronoEntity<T> & Temporal<? super T>>
+interface IsoIntervalFactory
+    <T extends ChronoEntity<T> & Temporal<? super T>,
+        I extends ChronoInterval<T>>
     extends IntervalFactory<T> {
 
     //~ Methoden ----------------------------------------------------------
+
+    @Override
+    I between(
+        Boundary<T> start,
+        Boundary<T> end
+    );
 
     /**
      * <p>Addiert die angegebene Dauer zu einem Zeitpunkt. </p>

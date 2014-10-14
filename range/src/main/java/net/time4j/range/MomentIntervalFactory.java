@@ -39,7 +39,7 @@ import java.util.Set;
 
 
 final class MomentIntervalFactory
-    implements IsoIntervalFactory<Moment> {
+    implements IsoIntervalFactory<Moment, MomentInterval> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
