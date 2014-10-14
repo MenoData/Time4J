@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -115,7 +115,7 @@ final class TimezoneOffsetProcessor
 
     @Override
     public void print(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
@@ -473,7 +473,7 @@ final class TimezoneOffsetProcessor
     }
 
     private static ZonalOffset getOffset(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         FormatStep step,
         AttributeQuery attributes
     ) {

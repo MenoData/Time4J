@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.ParseLog;
@@ -111,7 +112,7 @@ enum AmPmElement
 
     @Override
     public void print(
-        ChronoEntity<?> context,
+        ChronoValues context,
         Appendable buffer,
         AttributeQuery attributes
     ) throws IOException {

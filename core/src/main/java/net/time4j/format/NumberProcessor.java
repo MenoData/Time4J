@@ -23,7 +23,7 @@ package net.time4j.format;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 
 import java.io.IOException;
 import java.util.Map;
@@ -116,7 +116,7 @@ final class NumberProcessor<V>
 
     @Override
     public void print(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
@@ -280,7 +280,7 @@ final class NumberProcessor<V>
                 attributes,
                 0
             ).intValue();
-        
+
         if (protectedChars > 0) {
             len -= protectedChars;
         }

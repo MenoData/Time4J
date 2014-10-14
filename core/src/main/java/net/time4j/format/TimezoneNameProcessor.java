@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -58,9 +58,9 @@ final class TimezoneNameProcessor
     private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
     private static final int MAX = 25;
-    
+
     private static final boolean WITH_OLSON_MODULE;
-    
+
     static {
         boolean hasOlsonModule = true;
         try {
@@ -101,7 +101,7 @@ final class TimezoneNameProcessor
 
     @Override
     public void print(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
@@ -192,7 +192,7 @@ final class TimezoneNameProcessor
 
             if (
                 Character.isLetter(c)
-                || (!this.abbreviated 
+                || (!this.abbreviated
                     && (Character.isWhitespace(c)) || (c == '\''))
             ) {
                 name.append(c);
@@ -285,7 +285,7 @@ final class TimezoneNameProcessor
                     candidates.remove(tz);
                 }
             }
-            
+
             if (candidates.isEmpty()) {
                 status.setError(
                     start,

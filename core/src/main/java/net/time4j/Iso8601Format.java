@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.SignPolicy;
@@ -61,7 +62,7 @@ public class Iso8601Format {
         new NonZeroCondition(PlainTime.SECOND_OF_MINUTE);
     private static final NonZeroCondition NON_ZERO_FRACTION =
         new NonZeroCondition(PlainTime.NANO_OF_SECOND);
-    private static final ChronoCondition<ChronoEntity<?>> SECOND_PART =
+    private static final ChronoCondition<ChronoValues> SECOND_PART =
         NON_ZERO_SECOND.or(NON_ZERO_FRACTION);
 
     /**
@@ -409,7 +410,7 @@ public class Iso8601Format {
     //~ Innere Klassen ----------------------------------------------------
 
     private static class NonZeroCondition
-        implements ChronoCondition<ChronoEntity<?>> {
+        implements ChronoCondition<ChronoValues> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -427,7 +428,7 @@ public class Iso8601Format {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public boolean test(ChronoEntity<?> context) {
+        public boolean test(ChronoValues context) {
 
             return (
                 !context.contains(this.element)
@@ -436,11 +437,11 @@ public class Iso8601Format {
 
         }
 
-        ChronoCondition<ChronoEntity<?>> or(final NonZeroCondition other) {
+        ChronoCondition<ChronoValues> or(final NonZeroCondition other) {
 
-            return new ChronoCondition<ChronoEntity<?>>() {
+            return new ChronoCondition<ChronoValues>() {
                 @Override
-                public boolean test(ChronoEntity<?> context) {
+                public boolean test(ChronoValues context) {
                     return (
                         NonZeroCondition.this.test(context)
                         || other.test(context)

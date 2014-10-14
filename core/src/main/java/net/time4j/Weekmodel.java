@@ -28,6 +28,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -1067,7 +1068,7 @@ public final class Weekmodel
 
         @Override
         public void print(
-            ChronoEntity<?> context,
+            ChronoValues context,
             Appendable buffer,
             AttributeQuery attributes
         ) throws IOException {
