@@ -24,6 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -101,7 +102,7 @@ final class FractionProcessor
 
     @Override
     public void print(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
