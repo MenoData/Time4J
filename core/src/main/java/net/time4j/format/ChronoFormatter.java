@@ -29,6 +29,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
+import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
 import net.time4j.tz.TZID;
@@ -3564,13 +3565,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          */
         public Builder<T> startOptionalSection(
-            final ChronoCondition<ChronoEntity<?>> printCondition
+            final ChronoCondition<ChronoValues> printCondition
         ) {
 
             this.resetPadding();
             Attributes.Builder ab = new Attributes.Builder();
             Attributes previous = null;
-            ChronoCondition<ChronoEntity<?>> cc = null;
+            ChronoCondition<ChronoValues> cc = null;
 
             if (!this.stack.isEmpty()) {
                 previous = this.stack.getLast();
@@ -3583,15 +3584,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ab.set(Attributes.OPTIONAL, true);
 
             if (printCondition != null) {
-                final ChronoCondition<ChronoEntity<?>> old = cc;
+                final ChronoCondition<ChronoValues> old = cc;
 
                 if (old == null) {
                     cc = printCondition;
                 } else {
                     cc =
-                        new ChronoCondition<ChronoEntity<?>>(){
+                        new ChronoCondition<ChronoValues>(){
                             @Override
-                            public boolean test(ChronoEntity<?> context) {
+                            public boolean test(ChronoValues context) {
                                 return (
                                     old.test(context)
                                     && printCondition.test(context));
