@@ -3415,7 +3415,7 @@ public final class PlainTime
         }
 
         @Override
-        public ChronoEntity<?> preformat(
+        public ChronoValues preformat(
             PlainTime context,
             AttributeQuery attributes
         ) {
