@@ -142,20 +142,23 @@ public interface ChronoMerger<T> {
     );
 
     /**
-     * <p>Transforms the current context/entity into another entity which
-     * finally shall be formatted using given attributes. </p>
+     * <p>Transforms the current context/entity into another set of chronological
+     * values which finally shall be formatted using given attributes. </p>
      *
      * @param   attributes      controls attributes during formatting
      * @return  replacement entity which will finally be used for formatting
+     * @throws  IllegalArgumentException in any case of inconsistent data
      */
     /*[deutsch]
      * <p>Transformiert den aktuellen Kontext unter Beachtung der Attribute
-     * bei Bedarf in die tats&auml;chlich zu formatierende Entit&auml;t. </p>
+     * bei Bedarf in den tats&auml;chlich zu formatierenden Satz von
+     * chronologischen Werten. </p>
      *
      * @param   attributes      controls attributes during formatting
      * @return  replacement entity which will finally be used for formatting
+     * @throws  IllegalArgumentException in any case of inconsistent data
      */
-    ChronoEntity<?> preformat(
+    ChronoValues preformat(
         T context,
         AttributeQuery attributes
     );
