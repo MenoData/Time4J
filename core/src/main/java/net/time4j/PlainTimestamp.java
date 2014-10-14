@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -838,17 +839,17 @@ public final class PlainTimestamp
 
     /**
      * <p>Combines this local timestamp with the timezone offset UTC+00:00
-     * to a global timestamp. </p>
+     * to a global UTC-moment. </p>
      *
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          at offset UTC+00:00
      * @see     #at(ZonalOffset)
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit UTC+00:00 zu
-     * einem globalen Zeitstempel. </p>
+     * einem globalen UTC-Moment. </p>
      *
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          at offset UTC+00:00
      * @see     #at(ZonalOffset)
      */
@@ -860,10 +861,10 @@ public final class PlainTimestamp
 
     /**
      * <p>Combines this local timestamp with the given timezone offset
-     * to a global timestamp. </p>
+     * to a global UTC-moment. </p>
      *
      * @param   offset  timezone offset
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          at given offset
      * @since   1.2
      * @see     #atUTC()
@@ -871,10 +872,10 @@ public final class PlainTimestamp
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit dem angegebenen
-     * Zeitzonen-Offset zu einem globalen Zeitstempel. </p>
+     * Zeitzonen-Offset zu einem globalen UTC-Moment. </p>
      *
      * @param   offset  timezone offset
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          at given offset
      * @since   1.2
      * @see     #atUTC()
@@ -908,9 +909,9 @@ public final class PlainTimestamp
 
     /**
      * <p>Combines this local timestamp with the system timezone to a global
-     * timestamp. </p>
+     * UTC-moment. </p>
      *
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in system timezone
      * @since   1.2
      * @see     Timezone#ofSystem()
@@ -918,9 +919,9 @@ public final class PlainTimestamp
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der System-Zeitzone
-     * zu einem UTC-Zeitstempel. </p>
+     * zu einem UTC-Moment. </p>
      *
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in system timezone
      * @since   1.2
      * @see     Timezone#ofSystem()
@@ -934,10 +935,10 @@ public final class PlainTimestamp
 
     /**
      * <p>Combines this local timestamp with given timezone to a global
-     * timestamp. </p>
+     * UTC-moment. </p>
      *
      * @param   tzid        timezone id
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @since   1.2
@@ -946,10 +947,10 @@ public final class PlainTimestamp
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
-     * zu einem UTC-Zeitstempel. </p>
+     * zu einem UTC-Moment. </p>
      *
      * @param   tzid        timezone id
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @since   1.2
@@ -964,20 +965,20 @@ public final class PlainTimestamp
 
     /**
      * <p>Combines this local timestamp with given timezone to a global
-     * timestamp. </p>
+     * UTC-moment. </p>
      *
      * @param   tz      timezone
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in given timezone
      * @since   1.2
      * @see     Timezone#of(String)
      */
     /*[deutsch]
      * <p>Kombiniert diesen lokalen Zeitstempel mit der angegebenen Zeitzone
-     * zu einem UTC-Zeitstempel. </p>
+     * zu einem UTC-Moment. </p>
      *
      * @param   tz      timezone
-     * @return  global timestamp based on this local timestamp interpreted
+     * @return  global UTC-moment based on this local timestamp interpreted
      *          in given timezone
      * @since   1.2
      * @see     Timezone#of(String)
