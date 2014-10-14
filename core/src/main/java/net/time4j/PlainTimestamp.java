@@ -1349,7 +1349,7 @@ public final class PlainTimestamp
         }
 
         @Override
-        public ChronoEntity<?> preformat(
+        public ChronoValues preformat(
             PlainTimestamp context,
             AttributeQuery attributes
         ) {
