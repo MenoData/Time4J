@@ -65,67 +65,36 @@ import net.time4j.tz.TZID;
  * @author  Meno Hochschild
  * @spec    All public implementations must be immutable.
  */
-public abstract class ChronoEntity<T extends ChronoEntity<T>> {
+public abstract class ChronoEntity<T extends ChronoEntity<T>>
+    implements ChronoValues {
 
     //~ Methoden ----------------------------------------------------------
 
-    /**
-     * <p>Queries if the value for given chronological element can be
-     * accessed via {@code get(element)}. </p>
-     *
-     * <p>If the argument is missing then this method will yield {@code false}.
-     * Note: Elements which are not registered but define a suitable rule
-     * are also accessible. </p>
-     *
-     * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} if the method {@code get(ChronoElement)} can
-     *          be called without exception else {@code false}
-     * @see     #get(ChronoElement)
-     */
-    /*[deutsch]
-     * <p>Ist der Wert zum angegebenen chronologischen Element abfragbar
-     * beziehungsweise enthalten? </p>
-     *
-     * <p>Fehlt das Argument, dann liefert die Methode {@code false}. Zu
-     * beachten: Es werden hier nicht nur registrierte Elemente als abfragbar
-     * gewertet, sondern auch solche, die z.B. eine passende chronologische
-     * Regel definieren. </p>
-     *
-     * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} if the method {@code get(ChronoElement)} can
-     *          be called without exception else {@code false}
-     * @see     #get(ChronoElement)
-     */
+    @Override
     public boolean contains(ChronoElement<?> element) {
 
         return this.getChronology().isSupported(element);
 
     }
 
-    /**
-     * <p>Returns the partial value associated with given chronological
-     * element. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element which has the value
-     * @return  associated element value as object (never {@code null})
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for evaluating the value
-     * @see     #contains(ChronoElement)
-     */
-    /*[deutsch]
-     * <p>Fragt ein chronologisches Element nach seinem Wert als Objekt ab. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element which has the value
-     * @return  associated element value as object (never {@code null})
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for evaluating the value
-     * @see     #contains(ChronoElement)
-     */
+    @Override
     public <V> V get(ChronoElement<V> element) {
 
         return this.getRule(element).getValue(this.getContext());
+
+    }
+
+    @Override
+    public <V> V getMinimum(ChronoElement<V> element) {
+
+        return this.getRule(element).getMinimum(this.getContext());
+
+    }
+
+    @Override
+    public <V> V getMaximum(ChronoElement<V> element) {
+
+        return this.getRule(element).getMaximum(this.getContext());
 
     }
 
@@ -467,106 +436,6 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
     }
 
     /**
-     * <p>Yields the minimum value of given chronological element in the
-     * current context of this entity. </p>
-     *
-     * <p>The definition of a minimum and a maximum does generally not
-     * imply that every intermediate value between minimum and maximum
-     * is valid in this context. For example in the timezone Europe/Berlin
-     * the hour [T02:00] will be invalid if switching to summer time. </p>
-     *
-     * <p>In most cases the minimum value is not dependent on this
-     * context. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element whose minimum value is to be evaluated
-     * @return  minimum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the minimum value
-     * @see     ChronoElement#getDefaultMinimum()
-     * @see     #getMaximum(ChronoElement)
-     */
-    /*[deutsch]
-     * <p>Ermittelt das Minimum des mit dem angegebenen chronologischen Element
-     * assoziierten Elementwerts. </p>
-     *
-     * <p>Die Definition eines Minimums und eines Maximums bedeutet im
-     * allgemeinen <strong>nicht</strong>, da&szlig; jeder Zwischenwert
-     * innerhalb des Bereichs im Kontext g&uuml;ltig sein mu&szlig;. Zum
-     * Beispiel wird bei Sommerzeitumstellungen in der Zeitzone Europe/Berlin
-     * die Stunde [T02:00] komplett fehlen. </p>
-     *
-     * <p>Oft wird der Minimalwert von diesem Kontext unabh&auml;ngig sein. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element whose minimum value is to be evaluated
-     * @return  minimum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the minimum value
-     * @see     ChronoElement#getDefaultMinimum()
-     * @see     #getMaximum(ChronoElement)
-     */
-    public <V> V getMinimum(ChronoElement<V> element) {
-
-        return this.getRule(element).getMinimum(this.getContext());
-
-    }
-
-    /**
-     * <p>Yields the maximum value of given chronological element in the
-     * current context of this entity. </p>
-     *
-     * <p>Maximum values are different from minimum case often dependent
-     * on the context. An example is the element SECOND_OF_MINUTE whose
-     * maximum is normally {@code 59} but can differ in UTC-context with
-     * leap seconds. Another more common example is the maximum of the
-     * element DAY_OF_MONTH (28-31) which is dependent on the month and year
-     * of this context/entity (leap years!). </p>
-     *
-     * <p>Note: In timezone-related timestamps possible offset jumps
-     * inducing gaps on the local timeline will be conserved. That means
-     * that minimum and maximum do not guarantee a continuum of valid
-     * intermediate values. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element whose maximum value is to be evaluated
-     * @return  maximum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the maximum value
-     * @see     ChronoElement#getDefaultMaximum()
-     * @see     #getMinimum(ChronoElement)
-     */
-    /*[deutsch]
-     * <p>Ermittelt das Maximum des mit dem angegebenen chronologischen Element
-     * assoziierten Elementwerts. </p>
-     *
-     * <p>Maximalwerte sind anders als Minima h&auml;ufig vom Kontext
-     * abh&auml;ngig. Ein Beispiel sind Sekundenelemente und die Frage der
-     * Existenz von Schaltsekunden im gegebenen Kontext (evtl. als Maximum
-     * die Werte {@code 58} oder {@code 60} statt {@code 59} m&ouml;glich).
-     * Ein anderes Beispiel ist der Maximalwert eines Tags (28-31), der
-     * abh&auml;ngig vom Monats- und Jahreskontext (Schaltjahre!) ist. </p>
-     *
-     * <p>Zu beachten: In zeitzonen-bezogenen Zeitstempeln bleiben eventuelle
-     * Zeitzonenspr&uuml;nge erhalten. Das bedeutet, da&szlig; Minimum und
-     * Maximum nicht ber&uuml;cksichtigen, ob sie in eine L&uuml;cke fallen
-     * oder zwischen ihnen ein Offset-Sprung existiert. </p>
-     *
-     * @param   <V> generic type of element value
-     * @param   element     element whose maximum value is to be evaluated
-     * @return  maximum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the maximum value
-     * @see     ChronoElement#getDefaultMaximum()
-     * @see     #getMinimum(ChronoElement)
-     */
-    public <V> V getMaximum(ChronoElement<V> element) {
-
-        return this.getRule(element).getMaximum(this.getContext());
-
-    }
-
-    /**
      * <p>Queries if this entity contains a timezone. </p>
      *
      * <p>This implementation has no timezone by default and yields
@@ -586,6 +455,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
      */
+    @Override
     public boolean hasTimezone() {
 
         return false;
@@ -614,6 +484,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>> {
      * @throws  ChronoException if the timezone is not available
      * @see     #hasTimezone()
      */
+    @Override
     public TZID getTimezone() {
 
         throw new ChronoException("Timezone not available: " + this);
