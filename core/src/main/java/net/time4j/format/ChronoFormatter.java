@@ -1273,7 +1273,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             positions = new LinkedHashSet<ElementPosition>(this.steps.size());
         }
 
-        ChronoEntity<?> entity =
+        ChronoValues entity =
             this.chronology.preformat(formattable, attributes);
 
         try {
