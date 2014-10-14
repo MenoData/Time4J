@@ -25,7 +25,7 @@ import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -123,7 +123,7 @@ final class FormatStep {
      * @throws  IOException if writing into buffer fails
      */
     void print(
-        ChronoEntity<?> formattable,
+        ChronoValues formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions
@@ -692,13 +692,13 @@ final class FormatStep {
 
     }
 
-    private boolean isPrinting(ChronoEntity<?> formattable) {
+    private boolean isPrinting(ChronoValues formattable) {
 
         if (this.sectionalAttrs == null) {
             return true;
         }
 
-        ChronoCondition<ChronoEntity<?>> printCondition =
+        ChronoCondition<ChronoValues> printCondition =
             this.sectionalAttrs.getCondition();
         return (
             (printCondition == null)
