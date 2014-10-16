@@ -21,15 +21,22 @@
 
 package net.time4j;
 
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoValues;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import static net.time4j.PlainTime.SECOND_OF_MINUTE;
+import static net.time4j.format.Attributes.TIMEZONE_ID;
 
 
 /**
@@ -38,8 +45,8 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
  * <p>An instance can be created by {@code Moment.inLocalView()} or
  * {@code Moment.inZonalView(...)}. This type mainly serves for various
  * type conversions and incorporates a valid local timestamp as well as an
- * universal time in UTC. If users wish to apply formatting or any kind of
- * data manipulation then an object of this type has first to be converted
+ * universal time in UTC. If users wish to apply any kind of data
+ * manipulation then an object of this type has first to be converted
  * to a local timestamp or to a global UTC-moment. Example: </p>
  *
  * <pre>
@@ -67,10 +74,10 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
  * <p>Eine Instanz kann mit Hilfe von {@code Moment.inLocalView()} oder
  * {@code Moment.inZonalView(...)} erzeugt werden. Dieser Typ dient vorwiegend
  * der Typkonversion und verk&ouml;rpert sowohl einen g&uuml;ltigen lokalen
- * Zeitstempel als auch eine Universalzeit in UTC. Wenn Anwender eine
- * Formatierung anwenden oder irgendeine Art von Datenmanipulation machen
- * wollen, dann mu&szlig; ein Objekt dieses Typs zuerst in einen lokalen
- * Zeitstempel oder einen globalen UTC-Moment umgewandelt werden. Beispiel: </p>
+ * Zeitstempel als auch eine Universalzeit in UTC. Wenn Anwender irgendeine
+ * Art von Datenmanipulation anwenden m&ouml;chten, dann mu&szlig; ein
+ * Objekt dieses Typs zuerst in einen lokalen Zeitstempel oder einen
+ * globalen UTC-Moment umgewandelt werden. Beispiel: </p>
  *
  * <pre>
  *  Moment moment = ...;
@@ -102,15 +109,7 @@ public final class ZonalMoment
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Erzeugt einen zonalen Zeitstempel. </p>
-     *
-     * @param   moment          global timestamp
-     * @param   tz              timezone
-     * @throws  IllegalArgumentException if leapsecond shall be formatted
-     *          with non-full-minute-timezone-offset
-     */
-    ZonalMoment(
+    private ZonalMoment(
         Moment moment,
         Timezone tz
     ) {
@@ -137,6 +136,23 @@ public final class ZonalMoment
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Erzeugt einen zonalen Zeitstempel. </p>
+     *
+     * @param   moment          global timestamp
+     * @param   tz              timezone
+     * @throws  IllegalArgumentException if leapsecond shall be formatted
+     *          with non-full-minute-timezone-offset
+     */
+    static ZonalMoment of(
+        Moment moment,
+        Timezone tz
+    ) {
+
+        return new ZonalMoment(moment, tz);
+
+    }
 
     @Override
     public boolean contains(ChronoElement<?> element) {
@@ -284,6 +300,87 @@ public final class ZonalMoment
 
     }
 
+    /**
+     * <p>Creates a formatted output of this instance. </p>
+     *
+     * @param   formatter   helps to format this instance
+     * @return  formatted string
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
+     *
+     * @param   formatter   helps to format this instance
+     * @return  formatted string
+     * @since   1.3
+     */
+    public String print(ChronoFormatter<Moment> formatter) {
+
+        AttributeQuery aq = new ZOM(this, formatter.getDefaultAttributes());
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            formatter.print(this.moment, sb, aq, false);
+        } catch (IOException ex) {
+            throw new AssertionError(ex); // never happen
+        }
+
+        return sb.toString();
+
+    }
+
+    /**
+     * <p>Parses given text to a {@code ZonalMoment}. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   helps to parse given text
+     * @return  parsed zonal moment
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als {@code ZonalMoment}. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   helps to parse given text
+     * @return  parsed zonal moment
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     */
+    public static ZonalMoment parse(
+        String text,
+        ChronoFormatter<Moment> formatter
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        Moment moment = formatter.parse(text, plog);
+        Timezone tz;
+
+        if (moment == null) {
+            throw new ParseException(
+                plog.getErrorMessage(),
+                plog.getErrorIndex()
+            );
+        } else if (plog.getRawValues().hasTimezone()) {
+            tz =
+                toTimezone(
+                    plog.getRawValues().getTimezone(),
+                    text);
+        } else if (formatter.getDefaultAttributes().contains(TIMEZONE_ID)) {
+            tz =
+                toTimezone(
+                    formatter.getDefaultAttributes().get(TIMEZONE_ID),
+                    text);
+        } else {
+            throw new ParseException("Missing timezone: " + text, 0);
+        }
+
+        return ZonalMoment.of(moment, tz);
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -330,6 +427,22 @@ public final class ZonalMoment
         sb.append(this.zone);
         sb.append(']');
         return sb.toString();
+
+    }
+
+    private static Timezone toTimezone(
+        TZID tzid,
+        String text
+    ) throws ParseException {
+
+        try {
+            return Timezone.of(tzid);
+        } catch (IllegalArgumentException iae) {
+            ParseException pe =
+                new ParseException("Timezone error: " + text, 0);
+            pe.initCause(iae);
+            throw pe;
+        }
 
     }
 

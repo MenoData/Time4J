@@ -13,7 +13,8 @@ import org.junit.runners.Suite.SuiteClasses;
         MomentArithmeticTest.class,
         MomentCreationTest.class,
         MomentPropertiesTest.class,
-        TimeScaleTest.class
+        TimeScaleTest.class,
+        ZonalMomentTest.class
     }
 )
 public class ScaleSuite {

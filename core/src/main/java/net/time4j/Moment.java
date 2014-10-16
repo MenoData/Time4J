@@ -836,7 +836,7 @@ public final class Moment
      */
     public ZonalMoment inLocalView() {
 
-        return new ZonalMoment(this, Timezone.ofSystem());
+        return ZonalMoment.of(this, Timezone.ofSystem());
 
     }
 
@@ -867,7 +867,7 @@ public final class Moment
      */
     public ZonalMoment inZonalView(TZID tzid) {
 
-        return new ZonalMoment(this, Timezone.of(tzid));
+        return ZonalMoment.of(this, Timezone.of(tzid));
 
     }
 
@@ -898,7 +898,7 @@ public final class Moment
      */
     public ZonalMoment inZonalView(String tzid) {
 
-        return new ZonalMoment(this, Timezone.of(tzid));
+        return ZonalMoment.of(this, Timezone.of(tzid));
 
     }
 
@@ -2462,12 +2462,7 @@ public final class Moment
 
             if (entity.hasTimezone()) {
                 tzid = entity.getTimezone();
-            }
-
-            if (
-                (tzid == null)
-                && attrs.contains(Attributes.TIMEZONE_ID)
-            ) {
+            } else if (attrs.contains(Attributes.TIMEZONE_ID)) {
                 tzid = attrs.get(Attributes.TIMEZONE_ID); // Ersatzwert
             }
 
@@ -2544,7 +2539,9 @@ public final class Moment
             AttributeQuery attributes
         ) {
 
-            if (attributes.contains(Attributes.TIMEZONE_ID)) {
+            if (attributes instanceof ZOM) {
+                return attributes.get((ZOM) attributes);
+            } else if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
 
                 if (!ZonalOffset.UTC.equals(tzid)) {

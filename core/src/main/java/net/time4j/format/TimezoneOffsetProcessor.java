@@ -136,12 +136,12 @@ final class TimezoneOffsetProcessor
             tzid = formattable.getTimezone();
         }
 
-        if (tzid instanceof ZonalOffset) {
+        if (tzid == null) {
+            offset = getOffset(formattable, step, attributes);
+        } else if (tzid instanceof ZonalOffset) {
             offset = (ZonalOffset) tzid;
         } else if (formattable instanceof UnixTime) {
             offset = Timezone.of(tzid).getOffset((UnixTime) formattable);
-        } else if (tzid == null) {
-            offset = getOffset(formattable, step, attributes);
         } else {
             throw new IllegalArgumentException(
                 "Cannot extract timezone offset from: " + formattable);

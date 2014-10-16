@@ -119,12 +119,7 @@ final class MomentIntervalFactory
 
         if (entity.hasTimezone()) {
             tzid = entity.getTimezone();
-        }
-
-        if (
-            (tzid == null)
-            && attrs.contains(Attributes.TIMEZONE_ID)
-        ) {
+        } else if (attrs.contains(Attributes.TIMEZONE_ID)) {
             tzid = attrs.get(Attributes.TIMEZONE_ID); // Ersatzwert
         }
 

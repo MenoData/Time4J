@@ -428,7 +428,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * the text into given buffer. </p>
      *
      * <p>Equiovalent to
-     * {@code print(formattable, buffer, getDefaultAttributes())}. </p>
+     * {@code print(formattable, buffer, getDefaultAttributes(), true)}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -440,7 +440,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * den Puffer. </p>
      *
      * <p>Entspricht
-     * {@code print(formattable, buffer, getDefaultAttributes())}. </p>
+     * {@code print(formattable, buffer, getDefaultAttributes(), true)}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -474,6 +474,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * format properties like language or certain text attributes for this
      * run only. </p>
      *
+     * <p>Equivalent to
+     * {@code print(formattable, buffer, attributes, true)}. </p>
+     *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
      * @param   attributes      attributes for limited formatting control
@@ -490,6 +493,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * die Sprachausgabe oder Textattribute individuell nur f&uuml;r diesen
      * Lauf setzen. </p>
      *
+     * <p>Entspricht {@code print(formattable, buffer, attributes, true)}. </p>
+     *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
      * @param   attributes      attributes for limited formatting control
@@ -505,6 +510,87 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) throws IOException {
 
         return this.print(formattable, buffer, attributes, true);
+
+    }
+
+    /**
+     * <p>Prints given chronological entity as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>The given attributes cannot change the inner format structure
+     * (for example not change a localized weekmodel), but can override some
+     * format properties like language or certain text attributes for this
+     * run only. If the last argument {@code withPositions} is set to
+     * {@code false} then this method will just return an empty set. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @param   attributes      attributes for limited formatting control
+     * @param   withPositions   controls if element positions shall be tracked
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @throws  IOException if writing to buffer fails
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
+     *
+     * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
+     * Formatstruktur &auml;ndern (zum Beispiel nicht ein lokalisiertes
+     * Wochenmodell wechseln), aber bestimmte Formateigenschaften wie
+     * die Sprachausgabe oder Textattribute individuell nur f&uuml;r diesen
+     * Lauf setzen. Wenn das letzte Argument {@code withPositions} den Wert
+     * {@code false} hat, wird diese Methode lediglich ein leeres {@code Set}
+     * liefern. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @param   attributes      attributes for limited formatting control
+     * @param   withPositions   controls if element positions shall be tracked
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @throws  IOException if writing to buffer fails
+     * @since   1.3
+     */
+    public Set<ElementPosition> print(
+        T formattable,
+        Appendable buffer,
+        AttributeQuery attributes,
+        boolean withPositions
+    ) throws IOException {
+
+        if (buffer == null) {
+            throw new NullPointerException("Missing text result buffer.");
+        }
+
+        Set<ElementPosition> positions = null;
+
+        if (withPositions) {
+            positions = new LinkedHashSet<ElementPosition>(this.steps.size());
+        }
+
+        ChronoValues entity =
+            this.chronology.preformat(formattable, attributes);
+
+        try {
+            for (FormatStep step : this.steps) {
+                step.print(
+                    entity,
+                    buffer,
+                    attributes,
+                    positions
+                );
+            }
+        } catch (ChronoException ex) {
+            throw new IllegalArgumentException(
+                "Not formattable: " + formattable, ex);
+        }
+
+        if (withPositions) {
+            return Collections.unmodifiableSet(positions);
+        } else {
+            return Collections.emptySet();
+        }
 
     }
 
@@ -1254,48 +1340,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
         sb.append("}]");
         return sb.toString();
-
-    }
-
-    private Set<ElementPosition> print(
-        T formattable,
-        Appendable buffer,
-        AttributeQuery attributes,
-        boolean withPositions
-    ) throws IOException {
-
-        if (buffer == null) {
-            throw new NullPointerException("Missing text result buffer.");
-        }
-
-        Set<ElementPosition> positions = null;
-
-        if (withPositions) {
-            positions = new LinkedHashSet<ElementPosition>(this.steps.size());
-        }
-
-        ChronoValues entity =
-            this.chronology.preformat(formattable, attributes);
-
-        try {
-            for (FormatStep step : this.steps) {
-                step.print(
-                    entity,
-                    buffer,
-                    attributes,
-                    positions
-                );
-            }
-        } catch (ChronoException ex) {
-            throw new IllegalArgumentException(
-                "Not formattable: " + formattable, ex);
-        }
-
-        if (withPositions) {
-            return Collections.unmodifiableSet(positions);
-        } else {
-            return Collections.emptySet();
-        }
 
     }
 
