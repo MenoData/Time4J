@@ -287,6 +287,7 @@ final class NumberProcessor<V>
 
         if (pos >= len) {
             status.setError(pos, "Missing digits for: " + this.element.name());
+            status.setWarning();
             return;
         }
 
