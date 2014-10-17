@@ -411,7 +411,6 @@ final class NumberProcessor<V>
                 && (pos <= minPos)
             ) {
                 status.setError(
-
                     start,
                     "Positive sign only allowed for big number.");
             } else if (
