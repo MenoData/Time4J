@@ -234,13 +234,9 @@ public class BasicTimeRangeTest {
                     TimeInterval.between(start2, end2)
                     .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))),
             is(false));
-        Boundary<PlainTime> lower = Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainTime> upper = Boundary.of(IntervalEdge.OPEN, end1);
         assertThat(
             TimeInterval.between(start1, end1)
-                .equals(
-                    ChronoInterval.on(PlainTime.axis())
-                    .between(lower, upper)),
+                .equals(TimeInterval.between(start1, end1)),
             is(true));
     }
 
@@ -259,13 +255,9 @@ public class BasicTimeRangeTest {
                 TimeInterval.between(start2, end2)
                 .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))
                 .hashCode()));
-        Boundary<PlainTime> lower = Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainTime> upper = Boundary.of(IntervalEdge.OPEN, end1);
         assertThat(
             TimeInterval.between(start1, end1).hashCode(),
-            is(
-                ChronoInterval.on(PlainTime.axis())
-                .between(lower, upper).hashCode()));
+            is(TimeInterval.between(start1, end1).hashCode()));
     }
 
     @Test

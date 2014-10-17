@@ -225,15 +225,9 @@ public class BasicTimestampRangeTest {
                     TimestampInterval.between(start2, end2)
                     .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))),
             is(false));
-        Boundary<PlainTimestamp> lower =
-            Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainTimestamp> upper =
-            Boundary.of(IntervalEdge.OPEN, end1);
         assertThat(
             TimestampInterval.between(start1, end1)
-                .equals(
-                    ChronoInterval.on(PlainTimestamp.axis())
-                    .between(lower, upper)),
+                .equals(TimestampInterval.between(start1, end1)),
             is(true));
     }
 
@@ -252,15 +246,9 @@ public class BasicTimestampRangeTest {
                 TimestampInterval.between(start2, end2)
                 .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))
                 .hashCode()));
-        Boundary<PlainTimestamp> lower =
-            Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainTimestamp> upper =
-            Boundary.of(IntervalEdge.OPEN, end1);
         assertThat(
             TimestampInterval.between(start1, end1).hashCode(),
-            is(
-                ChronoInterval.on(PlainTimestamp.axis())
-                .between(lower, upper).hashCode()));
+            is(TimestampInterval.between(start1, end1).hashCode()));
     }
 
     @Test

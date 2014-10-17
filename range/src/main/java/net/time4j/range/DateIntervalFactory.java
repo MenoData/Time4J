@@ -36,7 +36,7 @@ import java.util.Set;
 
 
 final class DateIntervalFactory
-    implements IsoIntervalFactory<PlainDate, DateInterval> {
+    implements IntervalFactory<PlainDate, DateInterval> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

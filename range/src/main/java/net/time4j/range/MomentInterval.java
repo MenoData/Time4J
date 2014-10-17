@@ -26,6 +26,8 @@ import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -34,6 +36,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 
 import static net.time4j.range.IntervalEdge.CLOSED;
@@ -321,7 +324,7 @@ public final class MomentInterval
 
     /**
      * <p>Yields the length of this interval on the POSIX-scale. </p>
-     * 
+     *
      * @return  machine time duration on POSIX-scale
      * @throws  UnsupportedOperationException if this interval is infinite
      * @since   1.3
@@ -329,25 +332,24 @@ public final class MomentInterval
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls auf der POSIX-Skala. </p>
-     * 
+     *
      * @return  machine time duration on POSIX-scale
      * @throws  UnsupportedOperationException if this interval is infinite
      * @since   1.3
      * @see     #getRealDuration()
      */
     public MachineTime<TimeUnit> getSimpleDuration() {
-        
-        ChronoInterval<Moment> base = this.getCalculationBase();
-        
+
         return MachineTime.ON_POSIX_SCALE.between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
-        
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
+
     }
 
     /**
      * <p>Yields the length of this interval on the UTC-scale. </p>
-     * 
+     *
      * @return  machine time duration on UTC-scale
      * @throws  UnsupportedOperationException if start is before year 1972
      *          or if this interval is infinite
@@ -356,7 +358,7 @@ public final class MomentInterval
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls auf der UTC-Skala. </p>
-     * 
+     *
      * @return  machine time duration on UTC-scale
      * @throws  UnsupportedOperationException if start is before year 1972
      *          or if this interval is infinite
@@ -364,13 +366,88 @@ public final class MomentInterval
      * @see     #getSimpleDuration()
      */
     public MachineTime<SI> getRealDuration() {
-        
-        ChronoInterval<Moment> base = this.getCalculationBase();
-        
+
         return MachineTime.ON_UTC_SCALE.between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
-        
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    public static MomentInterval parse(
+        String text,
+        ChronoFormatter<Moment> formatter
+    ) throws ParseException {
+
+        return IntervalParser.of(
+             MomentIntervalFactory.INSTANCE,
+             formatter,
+             BracketPolicy.SHOW_WHEN_NON_STANDARD
+        ).parse(text);
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    public static MomentInterval parse(
+        CharSequence text,
+        ChronoFormatter<Moment> formatter,
+        BracketPolicy policy,
+        ParseLog status
+    ) {
+
+        return IntervalParser.of(
+             MomentIntervalFactory.INSTANCE,
+             formatter,
+             policy
+        ).parse(text, status, formatter.getDefaultAttributes());
+
     }
 
     @Override

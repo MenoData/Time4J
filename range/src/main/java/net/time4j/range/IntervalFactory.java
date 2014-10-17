@@ -21,36 +21,24 @@
 
 package net.time4j.range;
 
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
+import net.time4j.format.ParseLog;
+
+import java.util.Set;
 
 
 /**
- * <p>Creates temporal intervals. </p>
+ * <p>Allgemeine Intervallfabrik f&uuml;r ISO-8601-Typen. </p>
  *
- * <p>This interface realizes a generic way to create intervals. For the
- * four basic temporal types of Time4J ({@code PlainDate}, {@code PlainTime},
- * {@code PlainTimestamp} and {@code Moment}), there are specialized static
- * factory methods on the appropriate interval types. </p>
- *
- * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
- * @since   1.3
+ * @see     1.3
  */
-/*[deutsch]
- * <p>Erzeugt Zeitintervalle. </p>
- *
- * <p>Dieses Interface realisiert einen generischen Weg der Intervallerzeugung.
- * Die Intervalltypen passend zu den vier Basiszeittypen von Time4J
- * ({@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp} und
- * {@code Moment}) bieten spezialisierte statische Fabrikmethoden an. </p>
- *
- * @param   <T> temporal type of time points within a given interval
- * @author  Meno Hochschild
- * @since   1.3
- */
-public interface IntervalFactory
-    <T extends ChronoEntity<T> & Temporal<? super T>> {
+interface IntervalFactory
+    <T extends ChronoEntity<T> & Temporal<? super T>,
+        I extends ChronoInterval<T>> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -82,9 +70,52 @@ public interface IntervalFactory
      * @since   1.3
      * @see     net.time4j.engine.Calendrical
      */
-    ChronoInterval<T> between(
+    I between(
         Boundary<T> start,
         Boundary<T> end
     );
+
+    /**
+     * <p>Addiert die angegebene Dauer zu einem Zeitpunkt. </p>
+     *
+     * @param   timepoint   point in time given duration will be added to
+     * @param   period      duration as P-string
+     * @param   plog        contains raw parsed data and parse position
+     * @param   attributes  format control attributes
+     * @return  result of addition or {@code null} in case of error
+     */
+    T plusPeriod(
+        T timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    );
+
+    /**
+     * <p>Subtrahiert die angegebene Dauer von einem Zeitpunkt. </p>
+     *
+     * @param   timepoint   point in time given duration will be subtracted from
+     * @param   period      duration as P-string
+     * @param   plog        contains raw parsed data and parse position
+     * @param   attributes  format control attributes
+     * @return  result of subtraction or {@code null} in case of error
+     */
+    T minusPeriod(
+        T timepoint,
+        String period,
+        ParseLog plog,
+        AttributeQuery attributes
+    );
+
+    /**
+     * <p>Bestimmt die Elemente, deren mit dem Start assoziierte Werte als
+     * Vorgabe f&uuml;r das Ende eines Intervalls &uuml;bernommen werden
+     * sollen. </p>
+     *
+     * @param   rawData     parsed raw data of first failed try
+     * @return  chronological elements as source for default temporal values
+     *          of the end boundary
+     */
+    Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData);
 
 }

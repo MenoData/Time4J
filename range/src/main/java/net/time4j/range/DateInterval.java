@@ -23,17 +23,32 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.Duration;
+import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.Weekmodel;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.Attributes;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
+import net.time4j.format.SignPolicy;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.util.Locale;
 
+import static net.time4j.PlainDate.DAY_OF_MONTH;
+import static net.time4j.PlainDate.DAY_OF_WEEK;
+import static net.time4j.PlainDate.DAY_OF_YEAR;
+import static net.time4j.PlainDate.MONTH_AS_NUMBER;
+import static net.time4j.PlainDate.YEAR;
+import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
 import static net.time4j.range.IntervalEdge.CLOSED;
 
 
@@ -368,11 +383,10 @@ public final class DateInterval
      */
     public Duration<CalendarUnit> getDurationInYearsMonthsDays() {
 
-        ChronoInterval<PlainDate> base = this.getCalculationBase();
-
         return Duration.inYearsMonthsDays().between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
 
     }
 
@@ -399,11 +413,227 @@ public final class DateInterval
      */
     public Duration<CalendarUnit> getDuration(CalendarUnit... units) {
 
-        ChronoInterval<PlainDate> base = this.getCalculationBase();
-
         return Duration.in(units).between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    public static DateInterval parse(
+        String text,
+        ChronoFormatter<PlainDate> formatter
+    ) throws ParseException {
+
+        return IntervalParser.of(
+             DateIntervalFactory.INSTANCE,
+             formatter,
+             BracketPolicy.SHOW_WHEN_NON_STANDARD
+        ).parse(text);
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    public static DateInterval parse(
+        CharSequence text,
+        ChronoFormatter<PlainDate> formatter,
+        BracketPolicy policy,
+        ParseLog status
+    ) {
+
+        return IntervalParser.of(
+             DateIntervalFactory.INSTANCE,
+             formatter,
+             policy
+        ).parse(text, status, formatter.getDefaultAttributes());
+
+    }
+
+    /**
+     * <p>Interpretes given ISO-conforming text as interval. </p>
+     *
+     * <p>All styles are supported, namely calendar dates, ordinal dates
+     * and week dates. Furthermore, one of start or end can also be represented
+     * by a period string. If not then the end component may exist in an
+     * abbreviated form as documented in ISO-8601-paper leaving out
+     * higher-order elements like the calendar year (which will be
+     * overtaken from the start component instead). </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
+     *
+     * <p>Alle Stile werden unterst&uuml;tzt, n&auml;mlich Kalendardatum,
+     * Ordinaldatum und Wochendatum. Au&szlig;erdem darf eine der beiden
+     * Komponenten Start und Ende als P-String vorliegen. Wenn nicht, dann
+     * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
+     * angegeben werden, in der weniger pr&auml;zise Elemente wie das
+     * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
+     * werden. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     */
+    public static DateInterval parseISO(String text) throws ParseException {
+
+        // prescan for format analysis
+        int literals = 0;
+        boolean extended = false;
+        boolean ordinalStyle = false;
+        boolean weekStyle = false;
+
+        for (int i = 0, n = Math.min(text.length(), 16); i < n; i++) {
+            char c = text.charAt(i);
+            if (c == '-') {
+                literals++;
+            } else if (c == 'W') {
+                weekStyle = true;
+                break;
+            }
+        }
+
+        extended = (literals > 0);
+        if (!weekStyle) {
+            ordinalStyle = (
+                (literals == 1)
+                || ((literals == 0) && (text.length() == 7)));
+        }
+
+        // start format
+        ChronoFormatter<PlainDate> startFormat;
+
+        if (extended) {
+            if (ordinalStyle) {
+                startFormat = Iso8601Format.EXTENDED_ORDINAL_DATE;
+            } else if (weekStyle) {
+                startFormat = Iso8601Format.EXTENDED_WEEK_DATE;
+            } else {
+                startFormat = Iso8601Format.EXTENDED_CALENDAR_DATE;
+            }
+        } else {
+            if (ordinalStyle) {
+                startFormat = Iso8601Format.BASIC_ORDINAL_DATE;
+            } else if (weekStyle) {
+                startFormat = Iso8601Format.BASIC_WEEK_DATE;
+            } else {
+                startFormat = Iso8601Format.BASIC_CALENDAR_DATE;
+            }
+        }
+
+        // end format
+        ChronoFormatter.Builder<PlainDate> builder =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
+
+        int p;
+
+        if (ordinalStyle) {
+            p = (extended ? 4 : 3);
+        } else {
+            p = (extended ? 6 : 4);
+        }
+
+        builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
+        ChronoElement<Integer> year = (weekStyle ? YEAR_OF_WEEKDATE : YEAR);
+        builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+        builder.endSection();
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        if (weekStyle) {
+            builder.startSection(
+                Attributes.PROTECTED_CHARACTERS,
+                extended ? 2 : 1);
+            builder.addLiteral('W');
+            builder.addFixedInteger(Weekmodel.ISO.weekOfYear(), 2);
+            builder.endSection();
+        } else if (ordinalStyle) {
+            builder.addFixedInteger(DAY_OF_YEAR, 3);
+        } else {
+            builder.startSection(
+                Attributes.PROTECTED_CHARACTERS,
+                extended ? 3 : 2);
+            builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+            builder.endSection();
+        }
+
+        if (!ordinalStyle) {
+            if (extended) {
+                builder.addLiteral('-');
+            }
+
+            if (weekStyle) {
+                builder.addFixedNumerical(DAY_OF_WEEK, 1);
+            } else {
+                builder.addFixedInteger(DAY_OF_MONTH, 2);
+            }
+        }
+
+        ChronoFormatter<PlainDate> endFormat = builder.build();
+
+        // create interval
+        return IntervalParser.of(
+             DateIntervalFactory.INSTANCE,
+             startFormat,
+             endFormat,
+             BracketPolicy.SHOW_NEVER
+        ).parse(text);
 
     }
 

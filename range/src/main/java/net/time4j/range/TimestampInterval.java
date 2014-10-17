@@ -26,6 +26,8 @@ import net.time4j.IsoUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -35,6 +37,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParseException;
 
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
@@ -334,7 +337,7 @@ public final class TimestampInterval
 
     /**
      * <p>Yields the length of this interval in given units. </p>
-     * 
+     *
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
@@ -343,26 +346,25 @@ public final class TimestampInterval
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
      * Zeiteinheiten. </p>
-     * 
+     *
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
      * @since   1.3
      */
     public <U extends IsoUnit> Duration<U> getDuration(U... units) {
-        
-        ChronoInterval<PlainTimestamp> base = this.getCalculationBase();
-        
+
         return Duration.in(units).between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
-        
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
+
     }
 
     /**
      * <p>Yields the length of this interval in given units and applies
      * a timezone offset correction . </p>
-     * 
+     *
      * @param   tz      timezone
      * @param   units   time units to be used in calculation
      * @return  duration in given units including a zonal correction
@@ -372,7 +374,7 @@ public final class TimestampInterval
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
      * Zeiteinheiten und wendet eine Zeitzonenkorrektur an. </p>
-     * 
+     *
      * @param   tz      timezone
      * @param   units   time units to be used in calculation
      * @return  duration in given units including a zonal correction
@@ -383,13 +385,88 @@ public final class TimestampInterval
         Timezone tz,
         IsoUnit... units
     ) {
-        
-        ChronoInterval<PlainTimestamp> base = this.getCalculationBase();
-        
+
         return Duration.in(tz, units).between(
-            base.getStart().getTemporal(),
-            base.getEnd().getTemporal());
-        
+            this.getTemporalOfClosedStart(),
+            this.getTemporalOfOpenEnd()
+        );
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    public static TimestampInterval parse(
+        String text,
+        ChronoFormatter<PlainTimestamp> formatter
+    ) throws ParseException {
+
+        return IntervalParser.of(
+             TimestampIntervalFactory.INSTANCE,
+             formatter,
+             BracketPolicy.SHOW_WHEN_NON_STANDARD
+        ).parse(text);
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    public static TimestampInterval parse(
+        CharSequence text,
+        ChronoFormatter<PlainTimestamp> formatter,
+        BracketPolicy policy,
+        ParseLog status
+    ) {
+
+        return IntervalParser.of(
+             TimestampIntervalFactory.INSTANCE,
+             formatter,
+             policy
+        ).parse(text, status, formatter.getDefaultAttributes());
+
     }
 
     @Override

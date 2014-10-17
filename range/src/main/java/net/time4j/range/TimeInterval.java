@@ -25,12 +25,15 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParseException;
 
 import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.NANOS;
@@ -190,21 +193,21 @@ public final class TimeInterval
 
     /**
      * <p>Yields the length of this interval. </p>
-     * 
+     *
      * @return  duration in hours, minutes, seconds and nanoseconds
      * @since   1.3
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls. </p>
-     * 
+     *
      * @return  duration in hours, minutes, seconds and nanoseconds
      * @since   1.3
      */
     public Duration<ClockUnit> getDuration() {
-        
+
         PlainTime t1 = this.getStart().getTemporal();
         PlainTime t2 = this.getEnd().getTemporal();
-        
+
         if (
             (t2.getHour() == 24)
             && this.getEnd().isClosed()
@@ -221,9 +224,85 @@ public final class TimeInterval
         } else if (this.getEnd().isClosed()) {
             t2 = t2.plus(1, NANOS);
         }
-        
+
         return Duration.inClockUnits().between(t1, t2);
-        
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     */
+    public static TimeInterval parse(
+        String text,
+        ChronoFormatter<PlainTime> formatter
+    ) throws ParseException {
+
+        return IntervalParser.of(
+             TimeIntervalFactory.INSTANCE,
+             formatter,
+             BracketPolicy.SHOW_WHEN_NON_STANDARD
+        ).parse(text);
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of
+     *          text or even behind
+     * @since   1.3
+     */
+    public static TimeInterval parse(
+        CharSequence text,
+        ChronoFormatter<PlainTime> formatter,
+        BracketPolicy policy,
+        ParseLog status
+    ) {
+
+        return IntervalParser.of(
+             TimeIntervalFactory.INSTANCE,
+             formatter,
+             policy
+        ).parse(text, status, formatter.getDefaultAttributes());
+
     }
 
     @Override

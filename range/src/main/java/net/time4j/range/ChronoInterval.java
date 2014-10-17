@@ -21,21 +21,11 @@
 
 package net.time4j.range;
 
-import net.time4j.Moment;
-import net.time4j.PlainDate;
-import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
-import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.ChronoFormatter;
-import net.time4j.format.ParseLog;
 
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -54,20 +44,6 @@ import java.util.Map;
  */
 public abstract class ChronoInterval
     <T extends ChronoEntity<T> & Temporal<? super T>> {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final Map<TimeLine<?>, IntervalFactory<?>> FACTORIES;
-
-    static {
-        Map<TimeLine<?>, IntervalFactory<?>> map =
-            new HashMap<TimeLine<?>, IntervalFactory<?>>();
-        map.put(PlainDate.axis(), DateIntervalFactory.INSTANCE);
-        map.put(PlainTime.axis(), TimeIntervalFactory.INSTANCE);
-        map.put(PlainTimestamp.axis(), TimestampIntervalFactory.INSTANCE);
-        map.put(Moment.axis(), MomentIntervalFactory.INSTANCE);
-        FACTORIES = Collections.unmodifiableMap(map);
-    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -113,55 +89,6 @@ public abstract class ChronoInterval
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Determines a generic factory for finite intervals
-     * on given timeline. </p>
-     *
-     * <p>User will usually use this method only for creating finite
-     * intervals on specific non-basic timelines. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   timeline    time axis
-     * @return  generic interval factory which only supports finite intervals
-     * @since   1.3
-     * @see     DateInterval#between(PlainDate,PlainDate)
-     * @see     TimeInterval#between(PlainTime,PlainTime)
-     * @see     TimestampInterval#between(PlainTimestamp,PlainTimestamp)
-     * @see     MomentInterval#between(Moment,Moment)
-     */
-    /*[deutsch]
-     * <p>Bestimmt eine Fabrik f&uuml;r begrenzte Intervalle
-     * auf dem angegebenen Zeitstrahl. </p>
-     *
-     * <p>Anwender werden diese Methode normalerweise nur f&uuml;r die
-     * Erzeugung von begrenzten Intervallen auf einem speziellen
-     * Nicht-Standard-Zeitstrahl verwenden. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   timeline    time axis
-     * @return  generic interval factory which only supports finite intervals
-     * @since   1.3
-     * @see     DateInterval#between(PlainDate,PlainDate)
-     * @see     TimeInterval#between(PlainTime,PlainTime)
-     * @see     TimestampInterval#between(PlainTimestamp,PlainTimestamp)
-     * @see     MomentInterval#between(Moment,Moment)
-     */
-    @SuppressWarnings("unchecked")
-    public static
-    <T extends ChronoEntity<T> & Temporal<? super T>> IntervalFactory<T> on(
-        TimeLine<T> timeline
-    ) {
-
-        IntervalFactory<?> factory = FACTORIES.get(timeline);
-
-        if (factory == null) {
-            return new GenericIntervalFactory<T>(timeline);
-        } else {
-            return (IntervalFactory<T>) factory;
-        }
-
-    }
 
     /**
      * <p>Yields the lower bound of this interval. </p>
@@ -540,98 +467,6 @@ public abstract class ChronoInterval
     }
 
     /**
-     * <p>Interpretes given text as interval. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
-     * @return  interval result
-     * @throws  IllegalArgumentException if the formatter does not refer to
-     *          a chronology based on a timeline
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
-     * @throws  ParseException if parsing fails
-     * @since   1.3
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoFormatter, BracketPolicy)
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
-     * @return  interval result
-     * @throws  IllegalArgumentException if the formatter does not refer to
-     *          a chronology based on a timeline
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
-     * @throws  ParseException if parsing fails
-     * @since   1.3
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoFormatter, BracketPolicy)
-     */
-    public static <T extends ChronoEntity<T> & Temporal<? super T>>
-    ChronoInterval<T> parse(
-        String text,
-        ChronoFormatter<T> formatter
-    ) throws ParseException {
-
-        return IntervalParser.of(formatter).parse(text);
-
-    }
-
-    /**
-     * <p>Interpretes given text as interval. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @param   attributes  control attributes
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IllegalArgumentException if the formatter does not refer to
-     *          a chronology based on a timeline
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
-     * @since   1.3
-     * @see     #print(ChronoFormatter, BracketPolicy)
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * @param   <T> generic temporal type
-     * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @param   attributes  control attributes
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IllegalArgumentException if the formatter does not refer to
-     *          a chronology based on a timeline
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
-     * @since   1.3
-     * @see     #print(ChronoFormatter, BracketPolicy)
-     */
-    public static <T extends ChronoEntity<T> & Temporal<? super T>>
-    ChronoInterval<T> parse(
-        CharSequence text,
-        ChronoFormatter<T> formatter,
-        BracketPolicy policy,
-        ParseLog status,
-        AttributeQuery attributes
-    ) {
-
-        return IntervalParser.of(
-             formatter,
-             policy
-        ).parse(text, status, attributes);
-
-    }
-
-    /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
@@ -642,32 +477,44 @@ public abstract class ChronoInterval
     /**
      * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
      *
-     * @return  Intervall mit {@code duration = ende - start}
+     * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
      * @throws  UnsupportedOperationException wenn unendlich
      * @since   1.3
      */
-    ChronoInterval<T> getCalculationBase() {
+    T getTemporalOfClosedStart() {
 
-        if (!this.isFinite()) {
+        T temporal = this.start.getTemporal();
+
+        if (temporal == null) {
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
-        }
-
-        Boundary<T> lower = this.start;
-        Boundary<T> upper = this.end;
-        TimeLine<T> timeline = this.getTimeLine();
-
-        if (lower.isOpen()) {
-            T t1 = lower.getTemporal();
-            lower = Boundary.of(IntervalEdge.CLOSED, timeline.stepForward(t1));
-        } else if (upper.isClosed()) {
-            T t2 = upper.getTemporal();
-            upper = Boundary.of(IntervalEdge.OPEN, timeline.stepForward(t2));
+        } if (this.start.isOpen()) {
+            return this.getTimeLine().stepForward(temporal);
         } else {
-            return this; // short-cut
+            return temporal;
         }
 
-        return on(timeline).between(lower, upper); // half-open
+    }
+
+    /**
+     * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze
+     * @throws  UnsupportedOperationException wenn unendlich
+     * @since   1.3
+     */
+    T getTemporalOfOpenEnd() {
+
+        T temporal = this.end.getTemporal();
+
+        if (temporal == null) {
+            throw new UnsupportedOperationException(
+                "An infinite interval has no finite duration.");
+        } if (this.end.isClosed()) {
+            return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
 
     }
 

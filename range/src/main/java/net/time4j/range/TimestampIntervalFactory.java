@@ -38,7 +38,7 @@ import java.util.Set;
 
 
 final class TimestampIntervalFactory
-    implements IsoIntervalFactory<PlainTimestamp, TimestampInterval> {
+    implements IntervalFactory<PlainTimestamp, TimestampInterval> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

@@ -232,12 +232,9 @@ public class BasicDateRangeTest {
                     DateInterval.between(start2, end2)
                     .withStart(Boundary.of(IntervalEdge.OPEN, start2))),
             is(false));
-        Boundary<PlainDate> lower = Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainDate> upper = Boundary.of(IntervalEdge.CLOSED, end2);
         assertThat(
             DateInterval.between(start1, end1)
-                .equals(
-                    ChronoInterval.on(PlainDate.axis()).between(lower, upper)),
+                .equals(DateInterval.between(start1, end1)),
             is(true));
     }
 
@@ -256,13 +253,9 @@ public class BasicDateRangeTest {
                 DateInterval.between(start2, end2)
                 .withStart(Boundary.of(IntervalEdge.OPEN, start2))
                 .hashCode()));
-        Boundary<PlainDate> lower = Boundary.of(IntervalEdge.CLOSED, start1);
-        Boundary<PlainDate> upper = Boundary.of(IntervalEdge.CLOSED, end2);
         assertThat(
             DateInterval.between(start1, end1).hashCode(),
-            is(
-                ChronoInterval.on(PlainDate.axis())
-                .between(lower, upper).hashCode()));
+            is(DateInterval.between(start1, end1).hashCode()));
     }
 
     @Test
