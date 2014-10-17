@@ -1567,8 +1567,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Map<ChronoElement<?>, Object> parsedResult = data.peek();
             step.parse(text, status, attributes, parsedResult);
 
-            // Im Fehlerfall default-value verwenden?
-            if (status.isError()) {
+            // Im Warnzustand default-value verwenden?
+            if (status.isWarning()) {
                 boolean useDefault =
                     step.getAttribute(
                         Attributes.USE_DEFAULT_WHEN_ERROR,
@@ -1585,6 +1585,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         status.clearError();
                     }
                 }
+                status.clearWarning();
             }
 
             // Fehler-Auflösung
