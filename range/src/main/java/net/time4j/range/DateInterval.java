@@ -72,42 +72,6 @@ public final class DateInterval
 
     private static final long serialVersionUID = 1L;
 
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;uuuuMMdd/uuuuMMdd&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_BASIC_CALENDAR_DATES;
-//
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;uuuu-MM-dd/uuuu-MM-dd&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_EXTENDED_CALENDAR_DATES;
-//
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;uuuuDDD/uuuuDDD&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_BASIC_ORDINAL_DATES;
-//
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;uuuu-DDD/uuuu-DDD&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_EXTENDED_ORDINAL_DATES;
-//
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;YYYYWwwE/YYYYWwwE&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_BASIC_WEEK_DATES;
-//
-//    /**
-//     * <p>Special interval parser for basic calendar dates according to
-//     * ISO-8601 using the format &quot;YYYY-Www-E/YYYY-Www-E&quot;. </p>
-//     */
-//    public static final IntervalParser<PlainDate> ISO_EXTENDED_WEEK_DATES;
-
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -426,8 +390,7 @@ public final class DateInterval
      * @param   text        text to be parsed
      * @param   formatter   format object for parsing start and end boundaries
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
@@ -438,8 +401,7 @@ public final class DateInterval
      * @param   text        text to be parsed
      * @param   formatter   format object for parsing start and end boundaries
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
@@ -500,58 +462,88 @@ public final class DateInterval
      * <p>Interpretes given ISO-conforming text as interval. </p>
      *
      * <p>All styles are supported, namely calendar dates, ordinal dates
-     * and week dates. Furthermore, one of start or end can also be represented
+     * and week dates. Mixed date styles for start and end are not allowed
+     * however. Furthermore, one of start or end can also be represented
      * by a period string. If not then the end component may exist in an
      * abbreviated form as documented in ISO-8601-paper leaving out
      * higher-order elements like the calendar year (which will be
      * overtaken from the start component instead). </p>
+     * 
+     * <p>This method dynamically creates an appropriate interval format.
+     * If performance is important then a static fixed formatter should
+     * be considered. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
      * @since   1.3
+     * @see     BracketPolicy#SHOW_NEVER
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
      *
      * <p>Alle Stile werden unterst&uuml;tzt, n&auml;mlich Kalendardatum,
-     * Ordinaldatum und Wochendatum. Au&szlig;erdem darf eine der beiden
+     * Ordinaldatum und Wochendatum. Gemischte Datumsstile von Start und Ende
+     * sind jedoch nicht erlaubt. Au&szlig;erdem darf eine der beiden
      * Komponenten Start und Ende als P-String vorliegen. Wenn nicht, dann
      * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
      * werden. </p>
      *
+     * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
+     * das Antwortzeitverhalten wichtig, sollte einem statisch initialisierten
+     * konstanten Format der Vorzug gegeben werden. </p>
+     *
      * @param   text        text to be parsed
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
      * @since   1.3
+     * @see     BracketPolicy#SHOW_NEVER
      */
     public static DateInterval parseISO(String text) throws ParseException {
+        
+        if (text.isEmpty()) {
+            throw new IndexOutOfBoundsException("Empty text.");
+        }
 
         // prescan for format analysis
+		int start = 0;
+		int n = Math.min(text.length(), 33);
+		
+		if (text.charAt(0) == 'P') {
+		    for (int i = 1; i < n; i++) {
+		        if (text.charAt(i) == '/') {
+		            start = i + 1;
+		            break;
+		        }
+		    }
+		}
+
         int literals = 0;
-        boolean extended = false;
         boolean ordinalStyle = false;
         boolean weekStyle = false;
 
-        for (int i = 0, n = Math.min(text.length(), 16); i < n; i++) {
+        for (int i = start; i < n; i++) {
             char c = text.charAt(i);
             if (c == '-') {
                 literals++;
             } else if (c == 'W') {
                 weekStyle = true;
                 break;
+            } else if (c == '/') {
+                break;
             }
         }
 
-        extended = (literals > 0);
+        boolean extended = (literals > 0);
+        
         if (!weekStyle) {
             ordinalStyle = (
                 (literals == 1)
-                || ((literals == 0) && (text.length() == 7)));
+                || ((literals == 0) && (text.length() == start + 7)));
         }
 
         // start format
