@@ -53,6 +53,7 @@ public class ParseLog {
     private String errorMessage;
     private ParsedValues rawValues;
     private Boolean daylightSaving;
+    private boolean warning;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -91,6 +92,7 @@ public class ParseLog {
         this.errorMessage = "";
         this.rawValues = null;
         this.daylightSaving = null;
+        this.warning = false;
 
     }
 
@@ -265,6 +267,37 @@ public class ParseLog {
     }
 
     /**
+     * <p>Sets a warning to indicate if the current formatter should try
+     * to use default values for chronological elements which could not
+     * be parsed. </p>
+     * 
+     * <p>If there is no error present then an unspecific error message
+     * will be created, too. </p>
+     * 
+     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     */
+    /*[deutsch]
+     * <p>Setzt eine Warnung, um anzuzeigen, da&szlig; der aktuelle
+     * Formatierer versuchen sollte, Standardwerte f&uuml;r chronologische
+     * Elemente zu verwenden, die nicht interpretiert werden konnten. </p>
+     *
+     * <p>Wenn kein Fehler gesetzt ist, dann wird automatisch eine
+     * unspezifizierte Fehlermeldung generiert. </p>
+     * 
+     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     */
+    public void setWarning() {
+
+        if (!this.isError()) {
+            this.errorMessage = "Warning state active.";
+            this.errorIndex = this.getPosition();
+        }
+
+        this.warning = true;
+
+    }
+
+    /**
      * <p>Reuses this instance for next parse process. </p>
      */
     /*[deutsch]
@@ -331,6 +364,26 @@ public class ParseLog {
 
         return this.daylightSaving;
 
+    }
+
+    /**
+     * <p>Ermittelt, ob eine Warnung gesetzt wurde. </p>
+     *
+     * @return  boolean
+     */
+    boolean isWarning() {
+
+        return this.warning;
+
+    }
+    
+    /**
+     * <p>Entfernt eine Warnung. </p>
+     */
+    void clearWarning() {
+        
+        this.warning = false;
+        
     }
 
 }
