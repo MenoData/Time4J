@@ -240,6 +240,7 @@ public class ParseLog {
      * @param   errorIndex      error index in parsed text
      * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
+	 * @since	1.3
      */
     /*[deutsch]
      * <p>Setzt eine Fehlerinformation. </p>
@@ -247,6 +248,7 @@ public class ParseLog {
      * @param   errorIndex      error index in parsed text
      * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
+	 * @since	1.3
      */
     public void setError(
         int errorIndex,
@@ -274,6 +276,7 @@ public class ParseLog {
      * <p>If there is no error present then an unspecific error message
      * will be created, too. </p>
      * 
+	 * @since	1.3
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     /*[deutsch]
@@ -284,6 +287,7 @@ public class ParseLog {
      * <p>Wenn kein Fehler gesetzt ist, dann wird automatisch eine
      * unspezifizierte Fehlermeldung generiert. </p>
      * 
+	 * @since	1.3
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      */
     public void setWarning() {
