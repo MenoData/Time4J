@@ -30,7 +30,6 @@ import net.time4j.format.ParseLog;
 
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -41,14 +40,6 @@ final class TimeIntervalFactory
 
     static final TimeIntervalFactory INSTANCE =
         new TimeIntervalFactory();
-
-    private static final Set<ChronoElement<?>> DEFAULTS;
-
-    static {
-        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
-        set.add(PlainTime.ISO_HOUR);
-        DEFAULTS = Collections.unmodifiableSet(set);
-    }
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -104,7 +95,7 @@ final class TimeIntervalFactory
     @Override
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
 
-        return DEFAULTS;
+        return Collections.emptySet();
 
     }
 

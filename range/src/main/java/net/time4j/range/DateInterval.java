@@ -468,7 +468,7 @@ public final class DateInterval
      * abbreviated form as documented in ISO-8601-paper leaving out
      * higher-order elements like the calendar year (which will be
      * overtaken from the start component instead). </p>
-     * 
+     *
      * <p>This method dynamically creates an appropriate interval format.
      * If performance is important then a static fixed formatter should
      * be considered. </p>
@@ -504,7 +504,7 @@ public final class DateInterval
      * @see     BracketPolicy#SHOW_NEVER
      */
     public static DateInterval parseISO(String text) throws ParseException {
-        
+
         if (text.isEmpty()) {
             throw new IndexOutOfBoundsException("Empty text.");
         }
@@ -512,7 +512,7 @@ public final class DateInterval
         // prescan for format analysis
 		int start = 0;
 		int n = Math.min(text.length(), 33);
-		
+
 		if (text.charAt(0) == 'P') {
 		    for (int i = 1; i < n; i++) {
 		        if (text.charAt(i) == '/') {
@@ -539,7 +539,7 @@ public final class DateInterval
         }
 
         boolean extended = (literals > 0);
-        
+
         if (!weekStyle) {
             ordinalStyle = (
                 (literals == 1)
@@ -571,50 +571,45 @@ public final class DateInterval
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
 
-        int p;
-
-        if (ordinalStyle) {
-            p = (extended ? 4 : 3);
-        } else {
-            p = (extended ? 6 : 4);
-        }
-
-        builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
         ChronoElement<Integer> year = (weekStyle ? YEAR_OF_WEEKDATE : YEAR);
-        builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+        if (extended) {
+            int p = (ordinalStyle ? 3 : 5);
+            builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
+            builder.addCustomized(
+                year,
+                NoopPrinter.NOOP,
+                (weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
+        } else {
+            int p = (ordinalStyle ? 3 : 4);
+            builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
+            builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+        }
         builder.endSection();
 
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
         if (weekStyle) {
-            builder.startSection(
-                Attributes.PROTECTED_CHARACTERS,
-                extended ? 2 : 1);
-            builder.addLiteral('W');
-            builder.addFixedInteger(Weekmodel.ISO.weekOfYear(), 2);
+            builder.startSection(Attributes.PROTECTED_CHARACTERS, 1);
+            builder.addCustomized(
+                Weekmodel.ISO.weekOfYear(),
+                NoopPrinter.NOOP,
+                extended
+                    ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
+                    : FixedNumParser.BASIC_WEEK_OF_YEAR);
             builder.endSection();
+            builder.addFixedNumerical(DAY_OF_WEEK, 1);
         } else if (ordinalStyle) {
             builder.addFixedInteger(DAY_OF_YEAR, 3);
         } else {
-            builder.startSection(
-                Attributes.PROTECTED_CHARACTERS,
-                extended ? 3 : 2);
-            builder.addFixedInteger(MONTH_AS_NUMBER, 2);
-            builder.endSection();
-        }
-
-        if (!ordinalStyle) {
+            builder.startSection(Attributes.PROTECTED_CHARACTERS, 2);
             if (extended) {
-                builder.addLiteral('-');
-            }
-
-            if (weekStyle) {
-                builder.addFixedNumerical(DAY_OF_WEEK, 1);
+                builder.addCustomized(
+                    MONTH_AS_NUMBER,
+                    NoopPrinter.NOOP,
+                    FixedNumParser.CALENDAR_MONTH);
             } else {
-                builder.addFixedInteger(DAY_OF_MONTH, 2);
+                builder.addFixedInteger(MONTH_AS_NUMBER, 2);
             }
+            builder.endSection();
+            builder.addFixedInteger(DAY_OF_MONTH, 2);
         }
 
         ChronoFormatter<PlainDate> endFormat = builder.build();

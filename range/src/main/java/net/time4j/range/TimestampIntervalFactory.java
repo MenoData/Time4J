@@ -23,7 +23,6 @@ package net.time4j.range;
 
 import net.time4j.Duration;
 import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
 import net.time4j.engine.AttributeQuery;
@@ -102,24 +101,15 @@ final class TimestampIntervalFactory
         Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
 
         if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
-            if (!rawData.contains(PlainDate.YEAR_OF_WEEKDATE)) {
-                set.add(PlainDate.YEAR_OF_WEEKDATE);
-                if (!rawData.contains(Weekmodel.ISO.weekOfYear())) {
-                    set.add(Weekmodel.ISO.weekOfYear());
-                }
-            }
-        } else if (!rawData.contains(PlainDate.YEAR)) {
+            set.add(PlainDate.YEAR_OF_WEEKDATE);
+            set.add(Weekmodel.ISO.weekOfYear());
+        } else {
             set.add(PlainDate.YEAR);
-            if (
-                !rawData.contains(PlainDate.MONTH_OF_YEAR)
-                && !rawData.contains(PlainDate.MONTH_AS_NUMBER)
-                && !rawData.contains(PlainDate.DAY_OF_YEAR)
-            ) {
+            if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
                 set.add(PlainDate.MONTH_AS_NUMBER);
-                if (!rawData.contains(PlainDate.DAY_OF_MONTH)) {
-                    set.add(PlainDate.DAY_OF_MONTH);
-                    set.add(PlainTime.ISO_HOUR);
-                }
+                set.add(PlainDate.DAY_OF_MONTH);
+            } else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
+                set.add(PlainDate.DAY_OF_YEAR);
             }
         }
 

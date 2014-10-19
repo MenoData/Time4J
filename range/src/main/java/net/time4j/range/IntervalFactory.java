@@ -112,7 +112,7 @@ interface IntervalFactory
      * Vorgabe f&uuml;r das Ende eines Intervalls &uuml;bernommen werden
      * sollen. </p>
      *
-     * @param   rawData     parsed raw data of first failed try
+     * @param   rawData     parsed raw data of start component
      * @return  chronological elements as source for default temporal values
      *          of the end boundary
      */

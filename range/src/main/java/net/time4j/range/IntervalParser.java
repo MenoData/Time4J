@@ -214,6 +214,7 @@ final class IntervalParser
 		// starting boundary
 		char c = text.charAt(pos);
 		boolean leftVisible = ((c == '[') || (c == '('));
+        boolean rightVisible = false;
 
 		if (leftVisible) {
 			if (this.policy == BracketPolicy.SHOW_NEVER) {
@@ -338,20 +339,15 @@ final class IntervalParser
                 ) {
                     IntervalFactory<T, I> iif = this.factory;
                     ChronoFormatter<T> fmt = this.endFormat;
-                    ChronoEntity<?> upperRaw = upperLog.getRawValues();
-                    for (ChronoElement<?> key : iif.stdElements(upperRaw)) {
+                    ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
+                    for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
                         fmt = withDefault(fmt, t1, key);
                     }
-                    ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
                     if (lowerRaw.hasTimezone()) {
                         fmt = fmt.withTimezone(lowerRaw.getTimezone());
                     }
                     upperLog.reset();
                     upperLog.setPosition(pos);
-                    attrs =
-                        new AttributeWrapper(
-                            attrs,
-                            Attributes.USE_DEFAULT_WHEN_ERROR);
                     t2 = fmt.parse(text, upperLog, attrs);
                 }
             }
@@ -376,6 +372,7 @@ final class IntervalParser
                         pos,
                         "Illegal end boundary due to bracket policy: " + c);
                 } else {
+                    rightVisible = true;
                     right = ((c == ']') ? CLOSED : OPEN);
                     pos++;
                 }
@@ -434,8 +431,26 @@ final class IntervalParser
         }
 
         // create and return interval
+        I interval = this.factory.between(lower, upper);
+
+        if (this.policy == BracketPolicy.SHOW_WHEN_NON_STANDARD) {
+            boolean visible = this.policy.display(interval);
+
+            if (visible && (!leftVisible || !rightVisible)) {
+                int index = (!rightVisible ? pos : start);
+                status.setError(index, "Missing boundary.");
+                return null;
+            } else if (!visible && (leftVisible || rightVisible)) {
+                int index = (rightVisible ? pos : start);
+                status.setError(
+                    index,
+                    "Standard boundary not allowed due to sign policy.");
+                return null;
+            }
+        }
+
         status.setPosition(pos);
-        return this.factory.between(lower, upper);
+        return interval;
 
 	}
 

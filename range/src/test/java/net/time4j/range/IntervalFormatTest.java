@@ -20,25 +20,127 @@ import static org.junit.Assert.assertThat;
 public class IntervalFormatTest {
 
     @Test
-    public void testToString() {
+    public void printSHOW_NEVER() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
-        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        DateInterval interval = DateInterval.between(start, end);
         ChronoFormatter<PlainDate> formatter =
             Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
             interval.print(formatter, BracketPolicy.SHOW_NEVER),
             is("20140227/20140514"));
         assertThat(
+            interval.withOpenEnd().print(formatter, BracketPolicy.SHOW_NEVER),
+            is("20140227/20140514"));
+    }
+
+    @Test
+    public void printSHOW_WHEN_NON_STANDARD() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
             interval.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
             is("20140227/20140514"));
+        assertThat(
+            interval.withOpenEnd().print(
+                formatter,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is("[20140227/20140514)"));
+    }
+
+    @Test
+    public void printSHOW_ALWAYS() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
             interval.print(formatter, BracketPolicy.SHOW_ALWAYS),
             is("[20140227/20140514]"));
     }
 
     @Test
-    public void parse() throws ParseException {
+    public void printInfinitePastSHOW_ALWAYS() {
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.until(end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_ALWAYS),
+            is("(-\u221E/20140514]"));
+    }
+
+    @Test
+    public void printInfiniteFutureSHOW_ALWAYS() {
+        PlainDate start = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.since(start);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_ALWAYS),
+            is("[20140514/+\u221E)"));
+    }
+
+    @Test
+    public void printInfinitePastSHOW_WHEN_NON_STANDARD() {
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.until(end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is("(-\u221E/20140514]"));
+        assertThat(
+            interval.withOpenEnd().print(
+                formatter,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is("(-\u221E/20140514)"));
+    }
+
+    @Test
+    public void printInfiniteFutureSHOW_WHEN_NON_STANDARD() {
+        PlainDate start = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.since(start);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is("[20140514/+\u221E)"));
+    }
+
+    @Test
+    public void printInfinitePastSHOW_NEVER() {
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.until(end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_NEVER),
+            is("-\u221E/20140514"));
+        assertThat(
+            interval.withOpenEnd().print(
+                formatter,
+                BracketPolicy.SHOW_NEVER),
+            is("-\u221E/20140514"));
+    }
+
+    @Test
+    public void printInfiniteFutureSHOW_NEVER() {
+        PlainDate start = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.since(start);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
+        assertThat(
+            interval.print(formatter, BracketPolicy.SHOW_NEVER),
+            is("20140514/+\u221E"));
+    }
+
+    @Test
+    public void parseBasicCalendarDateSHOW_NEVER() throws ParseException {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
         ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
@@ -52,7 +154,46 @@ public class IntervalFormatTest {
                 BracketPolicy.SHOW_NEVER
             ).parse("20140227/20140514"),
             is(interval));
+    }
 
+    @Test(expected=ParseException.class)
+    public void parseBasicCalendarDateExSHOW_NEVER() throws ParseException {
+        IntervalParser.of(
+            DateIntervalFactory.INSTANCE,
+            Iso8601Format.BASIC_CALENDAR_DATE,
+            BracketPolicy.SHOW_NEVER
+        ).parse("[20140227/20140514]");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseBasicCalendarDateExSHOW_WHEN_NON_STANDARD()
+        throws ParseException {
+
+        IntervalParser.of(
+            DateIntervalFactory.INSTANCE,
+            Iso8601Format.BASIC_CALENDAR_DATE,
+            BracketPolicy.SHOW_WHEN_NON_STANDARD
+        ).parse("[20140227/20140514]");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseBasicCalendarDateExSHOW_ALWAYS() throws ParseException {
+        IntervalParser.of(
+            DateIntervalFactory.INSTANCE,
+            Iso8601Format.BASIC_CALENDAR_DATE,
+            BracketPolicy.SHOW_ALWAYS
+        ).parse("20140227/20140514");
+    }
+
+    @Test
+    public void parseBasicCalendarDateSHOW_WHEN_NON_STANDARD()
+        throws ParseException {
+
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
             IntervalParser.of(
                 DateIntervalFactory.INSTANCE,
@@ -60,7 +201,15 @@ public class IntervalFormatTest {
                 BracketPolicy.SHOW_WHEN_NON_STANDARD
             ).parse("20140227/20140514"),
             is(interval));
+    }
 
+    @Test
+    public void parseBasicCalendarDateSHOW_ALWAYS() throws ParseException {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
             IntervalParser.of(
                 DateIntervalFactory.INSTANCE,
@@ -68,7 +217,15 @@ public class IntervalFormatTest {
                 BracketPolicy.SHOW_ALWAYS
             ).parse("[20140227/20140514]"),
             is(interval));
+    }
 
+    @Test
+    public void parseCustom() throws ParseException {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            Iso8601Format.BASIC_CALENDAR_DATE;
         ParseLog plog = new ParseLog();
         assertThat(
             IntervalParser.of(
@@ -86,6 +243,46 @@ public class IntervalFormatTest {
                 BracketPolicy.SHOW_ALWAYS
             ).parse("[20140227/0514]", plog, formatter.getDefaultAttributes()),
             is(interval));
+    }
+
+    @Test
+    public void parseIsoOrdinaldateAbbreviated() throws ParseException {
+        PlainDate start = PlainDate.of(2012, 1, 1);
+        PlainDate end = PlainDate.of(2012, 12, 31);
+        DateInterval expected = DateInterval.between(start, end);
+
+        assertThat(
+            DateInterval.parseISO("2012-001/366"),
+            is(expected));
+    }
+
+    @Test
+    public void parseIsoWeekdateAbbreviated() throws ParseException {
+        PlainDate start = PlainDate.of(2012, 1, 2);
+        PlainDate end = PlainDate.of(2012, 2, 2);
+        DateInterval expected = DateInterval.between(start, end);
+
+        assertThat(
+            DateInterval.parseISO("2012-W01-1/W05-4"),
+            is(expected));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseBasicIsoWeekdateAbbreviatedMissingWOY()
+        throws ParseException {
+        DateInterval.parseISO("2012W011/2012");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseExtendedIsoOrdinaldateAbbreviatedMissingDOY()
+        throws ParseException {
+        DateInterval.parseISO("2012-001/2012-");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseBasicIsoOrdinaldateAbbreviatedMissingDOY()
+        throws ParseException {
+        DateInterval.parseISO("2012001/2012");
     }
 
 }
