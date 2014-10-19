@@ -181,8 +181,20 @@ final class OrdinalProcessor
         int start = status.getPosition();
         int pos = start;
 
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
         if (pos >= len) {
             status.setError(pos, "Missing digits for: " + this.element.name());
+            status.setWarning();
             return;
         }
 

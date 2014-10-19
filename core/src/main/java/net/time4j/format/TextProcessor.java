@@ -105,9 +105,23 @@ final class TextProcessor<V>
     ) {
 
         int start = status.getPosition();
+        int len = text.length();
 
-        if (start >= text.length()) {
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
+
+        if (start >= len) {
             status.setError(start, "Missing chars for: " + this.element.name());
+            status.setWarning();
             return;
         }
 

@@ -1,5 +1,6 @@
 package net.time4j.format;
 
+import net.time4j.Month;
 import net.time4j.PatternType;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -28,9 +29,8 @@ public class DefaultValueTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void dateFormatWithDefaultHour() throws ParseException {
-        ChronoFormatter<PlainDate> fmt =
-            PlainDate.localFormatter("MM-dd", PatternType.CLDR)
-                     .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 12);
+        PlainDate.localFormatter("MM-dd", PatternType.CLDR)
+            .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 12);
     }
 
     @Test
@@ -43,19 +43,46 @@ public class DefaultValueTest {
     }
 
     @Test(expected=ParseException.class)
+    public void noReplaceMonth() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            PlainDate.formatter("MMM[/]dd[/]yyyy", PatternType.CLDR, Locale.US)
+                     .withDefault(PlainDate.MONTH_OF_YEAR, Month.NOVEMBER);
+        fmt.parse("21/2012");
+    }
+
+    @Test
+    public void replaceWithDefaultMonth() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            ChronoFormatter.setUp(PlainDate.class, Locale.US)
+                .startSection(Attributes.PROTECTED_CHARACTERS, 8)
+                .addText(PlainDate.MONTH_OF_YEAR)
+                .endSection()
+                .addPattern("[/]dd[/]yyyy", PatternType.CLDR)
+                .build()
+                .withDefault(PlainDate.MONTH_OF_YEAR, Month.NOVEMBER);
+        PlainDate date = fmt.parse("21/2012");
+        assertThat(date, is(PlainDate.of(2012, 11, 21)));
+    }
+
+    @Test(expected=ParseException.class)
     public void noReplaceOfWrongYear() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
             PlainDate.localFormatter("uuuu[-]MM[-]dd", PatternType.CLDR)
                      .withDefault(PlainDate.YEAR, 1985);
-        fmt.parse("10-21");
+        fmt.parse("10-21"); // 10 is not a valid year
     }
 
     @Test
     public void replaceWrongYear() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
-            PlainDate.localFormatter("uuuu[-]MM[-]dd", PatternType.CLDR)
-                     .withDefault(PlainDate.YEAR, 1985)
-                     .with(Attributes.USE_DEFAULT_WHEN_ERROR, true);
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.PROTECTED_CHARACTERS, 6)
+                .addInteger(
+                    PlainDate.YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER)
+                .endSection()
+                .addPattern("[-]MM[-]dd", PatternType.CLDR)
+                .build()
+                .withDefault(PlainDate.YEAR, 1985);
         PlainDate date = fmt.parse("10-21");
         assertThat(date, is(PlainDate.of(1985, 10, 21)));
     }
@@ -64,8 +91,7 @@ public class DefaultValueTest {
     public void noReplaceOfHour() throws ParseException {
         ChronoFormatter<PlainTime> fmt =
             PlainTime.localFormatter("HH[:]mm[:]ss", PatternType.CLDR)
-                     .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 15)
-                     .with(Attributes.USE_DEFAULT_WHEN_ERROR, true);
+                     .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 15);
         PlainTime time = fmt.parse("10:21");
         assertThat(time, is(PlainTime.of(15, 10, 21)));
     }
@@ -86,8 +112,7 @@ public class DefaultValueTest {
                 .endSection()
                 .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
                 .build()
-                .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 15)
-                .with(Attributes.USE_DEFAULT_WHEN_ERROR, true);
+                .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 15);
         PlainTime time = fmt.parse("10:21");
         assertThat(time, is(PlainTime.of(15, 10, 21)));
     }

@@ -909,6 +909,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *
+     * <p>Default replacement values will be considered by Time4J if either
+     * the formatter does not contain the element in question at all or if
+     * there are no consumable characters for given element. Latter
+     * situation might sometimes require the use of sectional attribute
+     * {@code PROTECTED_CHARACTERS} in order to simulate an end-of-text
+     * situation. </p>
+     *
      * @param   <V> generic element value type
      * @param   element     chronological element to be updated
      * @param   value       replacement value or {@code null}
@@ -916,7 +923,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with new replacement value
      * @throws  IllegalArgumentException if given element is not supported
      *          by the underlying chronology
-     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     * @see     Attributes#PROTECTED_CHARACTERS
      */
     /*[deutsch]
      * <p>Legt einen Standard-Ersatzwert f&uuml;r das angegebene Element
@@ -932,6 +939,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *
+     * <p>Standard-Ersatzwerte werden von Time4J herangezogen, wenn entweder
+     * der Formatierer das fragliche Element nicht enth&auml;lt oder wenn es
+     * keine konsumierbaren Zeichen f&uuml;r das angegebene Element gibt.
+     * Die letzte Situation erfordert manchmal die Verwendung des sektionalen
+     * Attributs {@code PROTECTED_CHARACTERS}, um eine Situation zu simulieren,
+     * in der der Formatierer quasi am Ende eines Texts angekommen ist. </p>
+     *
      * @param   <V> generic element value type
      * @param   element     chronological element to be updated
      * @param   value       replacement value or {@code null}
@@ -939,7 +953,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with new replacement value
      * @throws  IllegalArgumentException if given element is not supported
      *          by the underlying chronology
-     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     * @see     Attributes#PROTECTED_CHARACTERS
      */
     public <V> ChronoFormatter<T> withDefault(
         ChronoElement<V> element,
@@ -1565,27 +1579,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             // Delegation der Element-Verarbeitung
             Map<ChronoElement<?>, Object> parsedResult = data.peek();
+            status.clearWarning();
             step.parse(text, status, attributes, parsedResult);
 
             // Im Warnzustand default-value verwenden?
             if (status.isWarning()) {
-                boolean useDefault =
-                    step.getAttribute(
-                        Attributes.USE_DEFAULT_WHEN_ERROR,
-                        attributes,
-                        Boolean.FALSE
-                    ).booleanValue();
-                if (useDefault) {
-                    ChronoElement<?> element = step.getProcessor().getElement();
-                    if (
-                        (element != null)
-                        && this.defaults.containsKey(element)
-                    ) {
-                        parsedResult.put(element, this.defaults.get(element));
-                        status.clearError();
-                    }
+                ChronoElement<?> element = step.getProcessor().getElement();
+                if (
+                    (element != null)
+                    && this.defaults.containsKey(element)
+                ) {
+                    parsedResult.put(element, this.defaults.get(element));
+                    status.clearError();
+                    status.clearWarning();
                 }
-                status.clearWarning();
             }
 
             // Fehler-Auflösung

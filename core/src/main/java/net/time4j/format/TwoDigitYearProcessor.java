@@ -157,10 +157,22 @@ final class TwoDigitYearProcessor
         int len = text.length();
         int start = status.getPosition();
 
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
         if (start >= len) {
             status.setError(
                 start,
                 "Missing digits for: " + this.element.name());
+            status.setWarning();
             return;
         }
 

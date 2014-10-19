@@ -164,7 +164,7 @@ public class ParseLog {
 
     /**
      * <p>Yields the parsed raw data as chronological entity. </p>
-     * 
+     *
      * @return  parsed values as mutable serializable map-like entity
      */
     /*[deutsch]
@@ -177,7 +177,7 @@ public class ParseLog {
         if (this.rawValues == null) {
             this.rawValues = new ParsedValues();
         }
-        
+
         return this.rawValues;
 
     }
@@ -199,6 +199,9 @@ public class ParseLog {
         sb.append(", error-message=\"");
         sb.append(this.errorMessage);
         sb.append('\"');
+        if (this.warning) {
+            sb.append(", warning-active");
+        }
         if (this.rawValues != null) {
             sb.append(", raw-values=");
             sb.append(this.rawValues);
@@ -272,12 +275,14 @@ public class ParseLog {
      * <p>Sets a warning to indicate if the current formatter should try
      * to use default values for chronological elements which could not
      * be parsed. </p>
-     * 
+     *
      * <p>If there is no error present then an unspecific error message
-     * will be created, too. </p>
-     * 
+     * will be created, too. Only customized {@code ChronoParser}-objects
+     * might need to call this method. </p>
+     *
      * @since	1.3
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     * @see     ChronoParser
      */
     /*[deutsch]
      * <p>Setzt eine Warnung, um anzuzeigen, da&szlig; der aktuelle
@@ -285,10 +290,12 @@ public class ParseLog {
      * Elemente zu verwenden, die nicht interpretiert werden konnten. </p>
      *
      * <p>Wenn kein Fehler gesetzt ist, dann wird automatisch eine
-     * unspezifizierte Fehlermeldung generiert. </p>
+     * unspezifizierte Fehlermeldung generiert. Nur spezielle
+     * {@code ChronoParser}-Objekte rufen diese Methode bei Bedarf auf. </p>
      *
      * @since	1.3
      * @see     Attributes#USE_DEFAULT_WHEN_ERROR
+     * @see     ChronoParser
      */
     public void setWarning() {
 
@@ -312,6 +319,7 @@ public class ParseLog {
 
         this.position = 0;
         this.clearError();
+        this.clearWarning();
         this.rawValues = null;
         this.daylightSaving = null;
 
@@ -380,14 +388,14 @@ public class ParseLog {
         return this.warning;
 
     }
-    
+
     /**
      * <p>Entfernt eine Warnung. </p>
      */
     void clearWarning() {
-        
+
         this.warning = false;
-        
+
     }
 
 }

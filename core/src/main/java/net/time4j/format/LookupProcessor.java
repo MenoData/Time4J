@@ -107,9 +107,22 @@ final class LookupProcessor<V extends Enum<V>>
     ) {
 
         int start = status.getPosition();
+        int len = text.length();
 
-        if (start >= text.length()) {
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
+        if (start >= len) {
             status.setError(start, "Missing chars for: " + this.element.name());
+            status.setWarning();
             return;
         }
 
@@ -121,7 +134,7 @@ final class LookupProcessor<V extends Enum<V>>
                 Boolean.TRUE
             ).booleanValue();
         Locale locale = query.get(Attributes.LOCALE, Locale.getDefault());
-        int len = text.length() - start;
+        int maxCount = len - start;
 
         for (V value : type.getEnumConstants()) {
             String test = this.getString(value);
@@ -130,7 +143,7 @@ final class LookupProcessor<V extends Enum<V>>
                 String upper = test.toUpperCase(locale);
                 int count = test.length();
 
-                if (count <= len) {
+                if (count <= maxCount) {
                     String s =
                         text.subSequence(start, start + count)
                             .toString()
@@ -144,7 +157,7 @@ final class LookupProcessor<V extends Enum<V>>
             } else {
                 int count = test.length();
 
-                if (count <= len) {
+                if (count <= maxCount) {
                     CharSequence cs =
                         text.subSequence(start, start + count);
 

@@ -361,35 +361,16 @@ public final class Attributes
         PredefinedKey.valueOf("TRAILING_CHARACTERS", Boolean.class);
 
     /**
-     * <p>This attribute controls if the parser will use a possibly available
-     * default value for a given element in case of error. </p>
-     *
-     * <p>Default value: {@code false} </p>
-     *
-     * @since   1.3
-     * @see     ChronoFormatter#withDefault(ChronoElement,Object)
-     */
-    /*[deutsch]
-     * <p>Steuert, ob beim Parsen m&ouml;glicherweise vorhandene Ersatzwerte
-     * verwendet werden sollen, wenn ein Element nicht erfolgreich interpretiert
-     * werden konnte. </p>
-     *
-     * <p>Standardwert: {@code false} </p>
-     *
-     * @since   1.3
-     * @see     ChronoFormatter#withDefault(ChronoElement,Object)
-     */
-    public static final AttributeKey<Boolean> USE_DEFAULT_WHEN_ERROR =
-        PredefinedKey.valueOf("USE_DEFAULT_WHEN_ERROR", Boolean.class);
-
-    /**
      * <p>Determines how many remaining chars in a given text are reserved
      * and cannot be consumed by the current format step. </p>
      *
      * <p>Default value is {@code 0}. This attribute can be used as sectional
-     * attribute if an integer element is numerically processed. </p>
+     * attribute if an integer element is numerically processed. Such a
+     * protected element will not consume any following chars and possibly
+     * use the default value setting of the current formatter instead. </p>
      *
      * @since   1.3
+     * @see     ChronoFormatter#withDefault
      */
     /*[deutsch]
      * <p>Legt fest, wieviele der verbleibenden Zeichen in einem zu
@@ -398,9 +379,12 @@ public final class Attributes
      *
      * <p>Standardwert ist {@code 0}. Dieses Attribut eignet sich als
      * sektionales Attribut, wenn ein Integer-Element numerisch
-     * verarbeitet wird. </p>
+     * verarbeitet wird. So ein gesch&uuml;tztes Element wird keine
+     * folgenden Zeichen konsumieren und eventuell den Standardwert
+     * des aktuellen Formatierers verwenden. </p>
      *
      * @since   1.3
+     * @see     ChronoFormatter#withDefault
      */
     public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
         PredefinedKey.valueOf("PROTECTED_CHARACTERS", Integer.class);

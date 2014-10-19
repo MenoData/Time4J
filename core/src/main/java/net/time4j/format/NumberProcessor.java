@@ -318,6 +318,7 @@ final class NumberProcessor<V>
             }
             negative = (sign == '-');
             pos++;
+            start++;
         } else if (
             (this.signPolicy == SignPolicy.SHOW_ALWAYS)
             && leniency.isStrict()
@@ -397,7 +398,7 @@ final class NumberProcessor<V>
                 (total == 0)
                 && leniency.isStrict()
             ) {
-                status.setError(start, "Negative zero is not allowed.");
+                status.setError(start - 1, "Negative zero is not allowed.");
                 return;
             }
 
@@ -411,7 +412,7 @@ final class NumberProcessor<V>
                 && (pos <= minPos)
             ) {
                 status.setError(
-                    start,
+                    start - 1,
                     "Positive sign only allowed for big number.");
             } else if (
                 (sign != '+')
@@ -450,7 +451,7 @@ final class NumberProcessor<V>
 
             if (value == null) {
                 status.setError(
-                    start,
+                    ((sign == '-') || (sign == '+') ? start - 1 : start),
                     "["
                         + this.element.name()
                         + "] No enum found for value: "

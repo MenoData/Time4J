@@ -141,7 +141,8 @@ final class CustomizedProcessor<V>
         int offset = status.getPosition();
 
         try {
-            V value = this.parser.parse(text, status, attributes);
+            AttributeQuery attrs = step.getQuery(attributes);
+            V value = this.parser.parse(text, status, attrs);
 
             if (value == null) {
                 status.setError(offset, status.getErrorMessage());
