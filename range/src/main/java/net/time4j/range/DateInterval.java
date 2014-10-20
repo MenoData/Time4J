@@ -387,16 +387,14 @@ public final class DateInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
-     * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
-     * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  ParseException if the text is not parseable
-     * @since   1.3
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      &quot;20120101/20140620&quot,
+     *      Iso8601Format.BASIC_CALENDAR_DATE));
+     *  // output: [2012-01-01/2014-06-20]
+     * </pre>
      *
      * @param   text        text to be parsed
      * @param   formatter   format object for parsing start and end boundaries
@@ -405,6 +403,28 @@ public final class DateInterval
      * @throws  ParseException if the text is not parseable
      * @since   1.3
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     Iso8601Format
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      &quot;20120101/20140620&quot,
+     *      Iso8601Format.BASIC_CALENDAR_DATE));
+     *  // Ausgabe: [2012-01-01/2014-06-20]
+     * </pre>
+     *
+     * @param   text        text to be parsed
+     * @param   formatter   format object for parsing start and end boundaries
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @see     Iso8601Format
      */
     public static DateInterval parse(
         String text,
@@ -430,6 +450,7 @@ public final class DateInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @since   1.3
+     * @see     #parse(String, ChronoFormatter)
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -442,6 +463,7 @@ public final class DateInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @since   1.3
+     * @see     #parse(String, ChronoFormatter)
      */
     public static DateInterval parse(
         CharSequence text,
@@ -467,10 +489,26 @@ public final class DateInterval
      * by a period string. If not then the end component may exist in an
      * abbreviated form as documented in ISO-8601-paper leaving out
      * higher-order elements like the calendar year (which will be
-     * overtaken from the start component instead). </p>
+     * overtaken from the start component instead). Examples for
+     * supported formats: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      DateInterval.parseISO(&quot;2012-01-01/2014-06-20&quot;));
+     *  // output: [2012-01-01/2014-06-20]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-01-01/08-11&quot;));
+     *  // output: [2012-01-01/2012-08-11]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-W01-1/W06-4&quot;));
+     *  // output: [2012-01-02/2012-02-09]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-001/366&quot;));
+     *  // output: [2012-01-01/2012-12-31]
+     * </pre>
      *
      * <p>This method dynamically creates an appropriate interval format.
-     * If performance is important then a static fixed formatter should
+     * If performance is more important then a static fixed formatter might
      * be considered. </p>
      *
      * @param   text        text to be parsed
@@ -490,10 +528,25 @@ public final class DateInterval
      * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
-     * werden. </p>
+     * werden. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      DateInterval.parseISO(&quot;2012-01-01/2014-06-20&quot;));
+     *  // Ausgabe: [2012-01-01/2014-06-20]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-01-01/08-11&quot;));
+     *  // Ausgabe: [2012-01-01/2012-08-11]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-W01-1/W06-4&quot;));
+     *  // Ausgabe: [2012-01-02/2012-02-09]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-001/366&quot;));
+     *  // Ausgabe: [2012-01-01/2012-12-31]
+     * </pre>
      *
      * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
-     * das Antwortzeitverhalten wichtig, sollte einem statisch initialisierten
+     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten
      * konstanten Format der Vorzug gegeben werden. </p>
      *
      * @param   text        text to be parsed
@@ -512,15 +565,26 @@ public final class DateInterval
         // prescan for format analysis
 		int start = 0;
 		int n = Math.min(text.length(), 33);
+        boolean sameFormat = true;
+        int componentLength = 0;
 
-		if (text.charAt(0) == 'P') {
-		    for (int i = 1; i < n; i++) {
-		        if (text.charAt(i) == '/') {
-		            start = i + 1;
-		            break;
-		        }
-		    }
-		}
+        for (int i = 1; i < n; i++) {
+            if (text.charAt(i) == '/') {
+                if (text.charAt(0) == 'P') {
+                    start = i + 1;
+                    componentLength = n - i - 1;
+                } else if (
+                    (i + 1 < n)
+                    && (text.charAt(i + 1) == 'P')
+                ) {
+                    componentLength = i;
+                } else {
+                    sameFormat = (2 * i + 1 == n);
+                    componentLength = i;
+                }
+                break;
+            }
+        }
 
         int literals = 0;
         boolean ordinalStyle = false;
@@ -543,7 +607,7 @@ public final class DateInterval
         if (!weekStyle) {
             ordinalStyle = (
                 (literals == 1)
-                || ((literals == 0) && (text.length() == start + 7)));
+                || ((literals == 0) && (componentLength == 7)));
         }
 
         // start format
@@ -568,6 +632,37 @@ public final class DateInterval
         }
 
         // end format
+        ChronoFormatter<PlainDate> endFormat;
+
+        if (sameFormat) {
+            endFormat = startFormat;
+        } else{
+            endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle);
+        }
+
+        // create interval
+        return IntervalParser.of(
+             DateIntervalFactory.INSTANCE,
+             startFormat,
+             endFormat,
+             BracketPolicy.SHOW_NEVER
+        ).parse(text);
+
+    }
+
+    @Override
+    protected TimeLine<PlainDate> getTimeLine() {
+
+        return PlainDate.axis();
+
+    }
+
+    private static ChronoFormatter<PlainDate> abbreviatedFormat(
+        boolean extended,
+        boolean weekStyle,
+        boolean ordinalStyle
+    ) {
+
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
 
@@ -612,22 +707,7 @@ public final class DateInterval
             builder.addFixedInteger(DAY_OF_MONTH, 2);
         }
 
-        ChronoFormatter<PlainDate> endFormat = builder.build();
-
-        // create interval
-        return IntervalParser.of(
-             DateIntervalFactory.INSTANCE,
-             startFormat,
-             endFormat,
-             BracketPolicy.SHOW_NEVER
-        ).parse(text);
-
-    }
-
-    @Override
-    protected TimeLine<PlainDate> getTimeLine() {
-
-        return PlainDate.axis();
+        return builder.build();
 
     }
 
