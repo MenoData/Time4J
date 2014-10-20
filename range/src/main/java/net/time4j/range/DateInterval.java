@@ -484,13 +484,13 @@ public final class DateInterval
      * <p>Interpretes given ISO-conforming text as interval. </p>
      *
      * <p>All styles are supported, namely calendar dates, ordinal dates
-     * and week dates. Mixed date styles for start and end are not allowed
-     * however. Furthermore, one of start or end can also be represented
-     * by a period string. If not then the end component may exist in an
-     * abbreviated form as documented in ISO-8601-paper leaving out
-     * higher-order elements like the calendar year (which will be
-     * overtaken from the start component instead). Examples for
-     * supported formats: </p>
+     * and week dates, either in basic or in extended format. Mixed date
+     * styles for start and end are not allowed however. Furthermore, one
+     * of start or end can also be represented by a period string. If not
+     * then the end component may exist in an abbreviated form as
+     * documented in ISO-8601-paper leaving out higher-order elements
+     * like the calendar year (which will be overtaken from the start
+     * component instead). Examples for supported formats: </p>
      *
      * <pre>
      *  System.out.println(
@@ -522,7 +522,8 @@ public final class DateInterval
      * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
      *
      * <p>Alle Stile werden unterst&uuml;tzt, n&auml;mlich Kalendardatum,
-     * Ordinaldatum und Wochendatum. Gemischte Datumsstile von Start und Ende
+     * Ordinaldatum und Wochendatum, sowohl im Basisformat als auch im
+     * erweiterten Format. Gemischte Datumsstile von Start und Ende
      * sind jedoch nicht erlaubt. Au&szlig;erdem darf eine der beiden
      * Komponenten Start und Ende als P-String vorliegen. Wenn nicht, dann
      * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
