@@ -127,33 +127,25 @@ public class Iso8601Format {
 
     /**
      * <p>Defines the <i>basic</i> ISO-8601-format for a wall time with
-     * hour and minute using the pattern &quot;HHmm&quot;. </p>
-     *
-     * <p>More elements like second and nanosecond are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * hour, minute and optional second using the pattern
+     * &quot;HHmm[ss[SSSSSSSSS]]&quot;. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit mit Stunde und Minute im Muster &quot;HHmm&quot;. </p>
-     *
-     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional.
-     * Auch die Anzahl der Dezimalstellen ist variabel (0-9). </p>
+     * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
+     * &quot;HHmm[ss[SSSSSSSSS]]&quot;. </p>
      */
     public static final ChronoFormatter<PlainTime> BASIC_WALL_TIME;
 
     /**
      * <p>Defines the <i>extended</i> ISO-8601-format for a wall time
-     * with hour and minute using the pattern &quot;HH:mm&quot;. </p>
-     *
-     * <p>More elements like second and nanosecond are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * with hour, minute and optional second using the pattern
+     * &quot;HH:mm[:ss[,SSSSSSSSS]]&quot;. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
-     * Uhrzeit mit Stunde und Minute im Muster &quot;HH:mm&quot;. </p>
-     *
-     * <p>Die weiteren Elemente wie Sekunde und Nanosekunde sind optional.
-     * Auch die Anzahl der Dezimalstellen ist variabel (0-9). </p>
+     * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
+     * &quot;HH:mm[:ss[,SSSSSSSSS]]&quot;. </p>
      */
     public static final ChronoFormatter<PlainTime> EXTENDED_WALL_TIME;
 
