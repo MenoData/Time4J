@@ -41,28 +41,28 @@ final class TimestampIntervalFactory
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-	private static final Set<ChronoElement<?>> CSET;
-	private static final Set<ChronoElement<?>> OSET;
-	private static final Set<ChronoElement<?>> WSET;
+    private static final Set<ChronoElement<?>> CSET;
+    private static final Set<ChronoElement<?>> OSET;
+    private static final Set<ChronoElement<?>> WSET;
 
-	static {
-		Set<ChronoElement<?>> cset = new HashSet<ChronoElement<?>>();
-		cset.add(PlainDate.YEAR);
-		cset.add(PlainDate.MONTH_AS_NUMBER);
-		cset.add(PlainDate.DAY_OF_MONTH);
-		CSET = Collections.unmodifiableSet(cset);
+    static {
+        Set<ChronoElement<?>> cset = new HashSet<ChronoElement<?>>();
+        cset.add(PlainDate.YEAR);
+        cset.add(PlainDate.MONTH_AS_NUMBER);
+        cset.add(PlainDate.DAY_OF_MONTH);
+        CSET = Collections.unmodifiableSet(cset);
 
-		Set<ChronoElement<?>> oset = new HashSet<ChronoElement<?>>();
-		oset.add(PlainDate.YEAR);
-		oset.add(PlainDate.DAY_OF_YEAR);
-		OSET = Collections.unmodifiableSet(oset);
+        Set<ChronoElement<?>> oset = new HashSet<ChronoElement<?>>();
+        oset.add(PlainDate.YEAR);
+        oset.add(PlainDate.DAY_OF_YEAR);
+        OSET = Collections.unmodifiableSet(oset);
 
-		Set<ChronoElement<?>> wset = new HashSet<ChronoElement<?>>();
-		wset.add(PlainDate.YEAR_OF_WEEKDATE);
-		wset.add(Weekmodel.ISO.weekOfYear());
-		wset.add(PlainDate.DAY_OF_WEEK);
-		WSET = Collections.unmodifiableSet(wset);
-	}
+        Set<ChronoElement<?>> wset = new HashSet<ChronoElement<?>>();
+        wset.add(PlainDate.YEAR_OF_WEEKDATE);
+        wset.add(Weekmodel.ISO.weekOfYear());
+        wset.add(PlainDate.DAY_OF_WEEK);
+        WSET = Collections.unmodifiableSet(wset);
+    }
 
     static final TimestampIntervalFactory INSTANCE =
         new TimestampIntervalFactory();
@@ -120,18 +120,16 @@ final class TimestampIntervalFactory
 
     @Override
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
+    	
+        if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
+            return CSET;
+    	} else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
+            return OSET;
+        } else if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
+            return WSET;
+        }
 
-		if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
-			return WSET;
-		} else {
-			if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
-				return CSET;
-			} else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
-				return OSET;
-			}
-		}
-
-		return Collections.emptySet();
+        return Collections.emptySet();
 
     }
 
