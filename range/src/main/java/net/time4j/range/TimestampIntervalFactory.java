@@ -41,6 +41,29 @@ final class TimestampIntervalFactory
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+	private static final Set<ChronoElement<?>> CSET;
+	private static final Set<ChronoElement<?>> OSET;
+	private static final Set<ChronoElement<?>> WSET;
+
+	static {
+		Set<ChronoElement<?>> cset = new HashSet<ChronoElement<?>>();
+		cset.add(PlainDate.YEAR);
+		cset.add(PlainDate.MONTH_AS_NUMBER);
+		cset.add(PlainDate.DAY_OF_MONTH);
+		CSET = Collections.unmodifiableSet(cset);
+
+		Set<ChronoElement<?>> oset = new HashSet<ChronoElement<?>>();
+		oset.add(PlainDate.YEAR);
+		oset.add(PlainDate.DAY_OF_YEAR);
+		OSET = Collections.unmodifiableSet(oset);
+
+		Set<ChronoElement<?>> wset = new HashSet<ChronoElement<?>>();
+		wset.add(PlainDate.YEAR_OF_WEEKDATE);
+		wset.add(Weekmodel.ISO.weekOfYear());
+		wset.add(PlainDate.DAY_OF_WEEK);
+		WSET = Collections.unmodifiableSet(wset);
+	}
+
     static final TimestampIntervalFactory INSTANCE =
         new TimestampIntervalFactory();
 
@@ -98,23 +121,17 @@ final class TimestampIntervalFactory
     @Override
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
 
-        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+		if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
+			return WSET;
+		} else {
+			if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
+				return CSET;
+			} else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
+				return OSET;
+			}
+		}
 
-        if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
-            set.add(PlainDate.YEAR_OF_WEEKDATE);
-            set.add(Weekmodel.ISO.weekOfYear());
-            set.add(PlainDate.DAY_OF_WEEK);
-        } else {
-            set.add(PlainDate.YEAR);
-            if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
-                set.add(PlainDate.MONTH_AS_NUMBER);
-                set.add(PlainDate.DAY_OF_MONTH);
-            } else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
-                set.add(PlainDate.DAY_OF_YEAR);
-            }
-        }
-
-        return Collections.unmodifiableSet(set);
+		return Collections.emptySet();
 
     }
 
