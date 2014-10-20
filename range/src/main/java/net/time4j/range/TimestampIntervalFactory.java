@@ -103,6 +103,7 @@ final class TimestampIntervalFactory
         if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
             set.add(PlainDate.YEAR_OF_WEEKDATE);
             set.add(Weekmodel.ISO.weekOfYear());
+            set.add(PlainDate.DAY_OF_WEEK);
         } else {
             set.add(PlainDate.YEAR);
             if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
