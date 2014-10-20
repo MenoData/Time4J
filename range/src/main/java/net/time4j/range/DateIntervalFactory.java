@@ -40,6 +40,26 @@ final class DateIntervalFactory
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final Set<ChronoElement<?>> CSET;
+    private static final Set<ChronoElement<?>> OSET;
+    private static final Set<ChronoElement<?>> WSET;
+
+    static {
+        Set<ChronoElement<?>> cset = new HashSet<ChronoElement<?>>();
+        cset.add(PlainDate.YEAR);
+        cset.add(PlainDate.MONTH_AS_NUMBER);
+        CSET = Collections.unmodifiableSet(cset);
+
+        Set<ChronoElement<?>> oset = new HashSet<ChronoElement<?>>();
+        oset.add(PlainDate.YEAR);
+        OSET = Collections.unmodifiableSet(oset);
+
+        Set<ChronoElement<?>> wset = new HashSet<ChronoElement<?>>();
+        wset.add(PlainDate.YEAR_OF_WEEKDATE);
+        wset.add(Weekmodel.ISO.weekOfYear());
+        WSET = Collections.unmodifiableSet(wset);
+    }
+
     static final DateIntervalFactory INSTANCE = new DateIntervalFactory();
 
     //~ Konstruktoren -----------------------------------------------------
@@ -96,19 +116,15 @@ final class DateIntervalFactory
     @Override
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
 
-        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
-
-        if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
-            set.add(PlainDate.YEAR_OF_WEEKDATE);
-            set.add(Weekmodel.ISO.weekOfYear());
-        } else {
-            set.add(PlainDate.YEAR);
-            if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
-                set.add(PlainDate.MONTH_AS_NUMBER);
-            }
+        if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
+            return CSET;
+    	} else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
+            return OSET;
+        } else if (rawData.contains(PlainDate.DAY_OF_WEEK)) {
+            return WSET;
         }
 
-        return Collections.unmodifiableSet(set);
+        return Collections.emptySet();
 
     }
 
