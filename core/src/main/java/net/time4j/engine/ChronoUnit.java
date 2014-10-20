@@ -50,15 +50,24 @@ public interface ChronoUnit {
     /**
      * <p>Defines the typical length of this time unit in seconds without
      * taking into account anomalies like timezone effects or leap seconds. </p>
+     * 
+     * <p><strong>Important note:</strong> This method can only yield an
+     * estimated value and is not intended to assist in calculations of
+     * durations, but only in sorting of units. </p>
      *
-     * @return  decimal value in seconds
+     * @return  estimated decimal value in seconds
      */
     /*[deutsch]
      * <p>Definiert die typische L&auml;nge dieser Zeiteinheit in Sekunden
      * ohne Ber&uuml;cksichtigung von Anomalien wie Zeitzoneneffekten oder
      * Schaltsekunden. </p>
      *
-     * @return  decimal value in seconds
+     * <p><strong>Wichtiger Hinweis:</strong> Diese Methode kann nur einen
+     * Sch&auml;tzwert liefern und ist f&uuml;r die Berechnung einer jedweden
+     * Dauer ungeeignet. Stattdessen darf und soll die Methode zum Sortieren
+     * von Zeiteinheiten verwendet werden. </p>
+     *
+     * @return  estimated decimal value in seconds
      */
     double getLength();
 
