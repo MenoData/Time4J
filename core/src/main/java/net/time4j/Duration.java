@@ -168,6 +168,11 @@ public final class Duration<U extends IsoUnit>
     @SuppressWarnings("rawtypes")
     private static final Duration ZERO = new Duration();
 
+    private static final ChronoFormatter<?> CF_EXT_CAL = createDateFormat(true, false);
+    private static final ChronoFormatter<?> CF_EXT_ORD = createDateFormat(true, true);
+    private static final ChronoFormatter<?> CF_BAS_CAL = createDateFormat(false, false);
+    private static final ChronoFormatter<?> CF_BAS_ORD = createDateFormat(false, true);
+
     private static final
     Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
         new Comparator<Item<? extends ChronoUnit>>() {
@@ -1890,10 +1895,14 @@ public final class Duration<U extends IsoUnit>
      * is the preferred char, in XML-schema only the dot is allowed. If this
      * parser is used in context of XML-schema (type xs:duration) it must
      * be stated that week items are missing in contrast to ISO-8601. The
-     * method {@code toStringXML()} takes in account these characteristics
+     * method {@code toStringXML()} takes into account these characteristics
      * of XML-schema (leaving aside the fact that XML-schema is potentially
      * designed for unlimited big amounts but Time4J can define durations
      * only in long range with nanosecond precision at best). </p>
+     * 
+     * <p>Note: The alternative ISO-formats PYYYY-MM-DDThh:mm:ss and
+     * PYYYY-DDDThh:mm:ss and their basic variants are supported since
+     * version 1.3. </p>
      *
      * <p>Examples for supported formats: </p>
      *
@@ -1951,6 +1960,10 @@ public final class Duration<U extends IsoUnit>
      * unbegrenzt gro&szlig;e Zahlen zul&auml;&szlig;t, aber Time4J eine
      * Zeitspanne nur im long-Bereich mit maximal Nanosekunden-Genauigkeit
      * definiert). </p>
+     *
+     * <p>Hinweis: Die alternativen ISO-Formate PYYYY-MM-DDThh:mm:ss und
+     * PYYYY-DDDThh:mm:ss und ihre Basisvarianten werden seit Version 1.3
+     * ebenfalls unterst&uuml;tzt. </p>
      *
      * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
      *
@@ -2794,7 +2807,6 @@ public final class Duration<U extends IsoUnit>
     ) throws ParseException {
     	
         boolean extended = false;
-        ParseLog plog = new ParseLog(from);
         ChronoFormatter<?> fmt;
 	
         if (date) {
@@ -2805,12 +2817,11 @@ public final class Duration<U extends IsoUnit>
                 extended 
                 ? (from + 8 == to) 
                 : (from + 7 == to));
-            fmt = createDateFormat(extended, ordinalStyle);
-            fmt.parse(period, plog);
-            if (plog.isError()) {
-                throw new ParseException(period, plog.getErrorIndex());
+            fmt = getDateFormat(extended, ordinalStyle);
+            ChronoEntity<?> entity = fmt.parseRaw(period, from);
+            if (!entity.contains(PlainDate.YEAR)) {
+                throw new ParseException(period, from);
             }
-            ChronoEntity<?> entity = plog.getRawValues();
             int years = entity.get(PlainDate.YEAR).intValue();
             int months = 0;
             int days = 0;
@@ -2852,11 +2863,10 @@ public final class Duration<U extends IsoUnit>
             } else {
                 fmt = Iso8601Format.BASIC_WALL_TIME;
             }
-            fmt.parse(period, plog);
-            if (plog.isError()) {
-                throw new ParseException(period, plog.getErrorIndex());
+            ChronoEntity<?> entity = fmt.parseRaw(period, from);
+            if (!entity.contains(PlainTime.ISO_HOUR)) {
+                throw new ParseException(period, from);
             }
-            ChronoEntity<?> entity = plog.getRawValues();
             int hours = entity.get(PlainTime.ISO_HOUR).intValue();
             if (hours > 0) {
                 if (hours > 24) {
@@ -2930,6 +2940,19 @@ public final class Duration<U extends IsoUnit>
 	
     }
 
+    private static ChronoFormatter<?> getDateFormat(
+        boolean extended,
+        boolean ordinalStyle
+    ) {
+
+        if (extended) {
+            return (ordinalStyle ? CF_EXT_ORD : CF_EXT_CAL);
+        } else {
+            return (ordinalStyle ? CF_BAS_ORD : CF_BAS_CAL);
+        }
+
+    }
+	
     private static CalendarUnit parseDateSymbol(
         char c,
         String period,
