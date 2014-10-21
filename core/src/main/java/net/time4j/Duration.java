@@ -31,7 +31,9 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
+import net.time4j.format.ChronoFormatter;
 import net.time4j.format.NumberType;
+import net.time4j.format.ParseLog;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.SignPolicy;
@@ -2791,8 +2793,143 @@ public final class Duration<U extends IsoUnit>
         List<Item<U>> items
     ) throws ParseException {
     	
+        boolean extended = false;
+        ParseLog plog = new ParseLog(from);
+        ChronoFormatter<?> fmt;
+	
+        if (date) {
+            if (from + 4 < to) {
+                extended = (period.charAt(from + 4) == '-');
+            }
+            boolean ordinalStyle = (
+                extended 
+                ? (from + 8 == to) 
+                : (from + 7 == to));
+            fmt = createDateFormat(extended, ordinalStyle);
+            fmt.parse(period, plog);
+            if (plog.isError()) {
+                throw new ParseException(period, plog.getErrorIndex());
+            }
+            ChronoEntity<?> entity = plog.getRawValues();
+            int years = entity.get(PlainDate.YEAR).intValue();
+            int months = 0;
+            int days = 0;
+            if (ordinalStyle) {
+                days = entity.get(PlainDate.DAY_OF_YEAR).intValue();
+                // ISO does not specify any constraint here
+            } else {
+                months = entity.get(PlainDate.MONTH_AS_NUMBER).intValue();
+                days = entity.get(PlainDate.DAY_OF_MONTH).intValue();
+                if (months > 12) {
+                    throw new ParseException(
+                        "ISO-8601 prohibits months-part > 12: " + period,
+                        from + 4 + (extended ? 1 : 0));
+                }
+                if (days > 30) {
+                    throw new ParseException(
+                        "ISO-8601 prohibits days-part > 30: " + period,
+                        from + 6 + (extended ? 2 : 0));
+                }
+            }
+            if (years > 0) {
+                U unit = cast(YEARS);
+                items.add(Item.of(years, unit));
+            }
+            if (months > 0) {
+                U unit = cast(MONTHS);
+                items.add(Item.of(months, unit));
+            }
+            if (days > 0) {
+                U unit = cast(DAYS);
+                items.add(Item.of(days, unit));
+            }
+        } else {
+            if (from + 2 < to) {
+                extended = (period.charAt(from + 2) == ':');
+            }
+            if (extended) {
+                fmt = Iso8601Format.EXTENDED_WALL_TIME;
+            } else {
+                fmt = Iso8601Format.BASIC_WALL_TIME;
+            }
+            fmt.parse(period, plog);
+            if (plog.isError()) {
+                throw new ParseException(period, plog.getErrorIndex());
+            }
+            ChronoEntity<?> entity = plog.getRawValues();
+            int hours = entity.get(PlainTime.ISO_HOUR).intValue();
+            if (hours > 0) {
+                if (hours > 24) {
+                    throw new ParseException(
+                        "ISO-8601 prohibits hours-part > 24: " + period,
+                        from);
+                }
+                U unit = cast(HOURS);
+                items.add(Item.of(hours, unit));
+            }
+            int minutes = 0;
+            if (entity.contains(PlainTime.MINUTE_OF_HOUR)) {
+                minutes = entity.get(PlainTime.MINUTE_OF_HOUR).intValue();
+                if (minutes > 60) {
+                    throw new ParseException(
+                        "ISO-8601 prohibits minutes-part > 60: " + period,
+                        from + 2 + (extended ? 1 : 0));
+                } else if (minutes > 0) {
+                    U unit = cast(MINUTES);
+                    items.add(Item.of(minutes, unit));
+                }
+            }
+            int seconds = 0;
+            if (entity.contains(PlainTime.SECOND_OF_MINUTE)) {
+                seconds = entity.get(PlainTime.SECOND_OF_MINUTE).intValue();
+                if (seconds > 60) {
+                    throw new ParseException(
+                        "ISO-8601 prohibits seconds-part > 60: " + period,
+                        from + 4 + (extended ? 2 : 0));
+                } else if (seconds > 0) {
+                    U unit = cast(SECONDS);
+                    items.add(Item.of(seconds, unit));
+                }
+            }
+            int nanos = 0;
+            if (entity.contains(PlainTime.NANO_OF_SECOND)) {
+                nanos = entity.get(PlainTime.NANO_OF_SECOND).intValue();
+                if (nanos > 0) {
+                    U unit = cast(NANOS);
+                    items.add(Item.of(nanos, unit));
+                }
+            }
+        }
+
     }
     
+    private static ChronoFormatter<?> createDateFormat(
+        boolean extended,
+        boolean ordinalStyle
+    ) {
+	
+        ChronoFormatter.Builder<PlainDate> builder =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
+        builder.addFixedInteger(PlainDate.YEAR, 4);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        if (ordinalStyle) {
+            builder.addFixedInteger(PlainDate.DAY_OF_YEAR, 3);
+        } else {
+            builder.addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2);
+            if (extended) {
+                 builder.addLiteral('-');
+            }
+            builder.addFixedInteger(PlainDate.DAY_OF_MONTH, 2);
+        }
+        
+        return builder.build();
+	
+    }
+
     private static CalendarUnit parseDateSymbol(
         char c,
         String period,
