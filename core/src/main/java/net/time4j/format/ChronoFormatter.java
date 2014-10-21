@@ -758,12 +758,39 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @since	1.3
      */
     public ChronoEntity<?> parseRaw(String text) {
+        
+        return this.parseRaw(text, 0);
+        
+    }
 
-        if (text.isEmpty()) {
+    /**
+     * <p>Translates given text as raw chronological entity without
+     * converting to the target type of the underlying chronology. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   offset      start position
+     * @return  new map-like mutable entity (empty if parsing does not work)
+     * @since	1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text zu Rohdaten, ohne eine
+     * Typkonversion vorzunehmen. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   offset      start position
+     * @return  new map-like mutable entity (empty if parsing does not work)
+     * @since	1.3
+     */
+    public ChronoEntity<?> parseRaw(
+        CharSequence text,
+        int offset
+    ) {
+
+        if (offset >= text.length()) {
             return new ParsedValues();
         }
 
-        ParseLog status = new ParseLog();
+        ParseLog status = new ParseLog(offset);
         AttributeQuery attributes = this.defaultAttributes;
         Chronology<?> c = this.chronology.preparser();
 
