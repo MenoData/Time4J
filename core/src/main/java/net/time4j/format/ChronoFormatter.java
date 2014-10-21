@@ -742,6 +742,74 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Translates given text as raw chronological entity without
+     * converting to the target type of the underlying chronology. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  new map-like mutable entity (empty if parsing does not work)
+     * @since	1.3
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text zu Rohdaten, ohne eine
+     * Typkonversion vorzunehmen. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  new map-like mutable entity (empty if parsing does not work)
+     * @since	1.3
+     */
+    public ChronoEntity<?> parseRaw(String text) {
+
+        if (text.isEmpty()) {
+            return new ParsedValues();
+        }
+
+        ParseLog status = new ParseLog();
+        AttributeQuery attributes = this.defaultAttributes;
+        Chronology<?> c = this.chronology.preparser();
+
+        if (c == null) {
+            c = this.chronology;
+        }
+        
+        // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
+        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
+        ParsedValues parsed = status.getRawValues0();
+
+        try {
+            parsed = this.parseElements(text, status, attributes, data);
+            parsed.setNoAmbivalentCheck();
+            status.setRawValues(parsed);
+        } catch (AmbivalentValueException ex) {
+            if (!status.isError()) {
+                status.setError(status.getPosition(), ex.getMessage());
+            }
+        }
+
+        if (status.isError()) {
+            return new ParsedValues();
+        }
+
+        assert (parsed != null);
+
+        // Phase 2: Anreicherung mit Default-Werten
+        for (ChronoElement<?> e : this.defaults.keySet()) {
+            if (!parsed.contains(e)) {
+                fill(parsed, e, this.defaults.get(e));
+            }
+        }
+
+        // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
+        for (ChronoExtension ext : chronology.getExtensions()) {
+            if (!ext.getElements(this.getLocale(), attributes).isEmpty()) {
+                parsed = ext.resolve(parsed);
+            }
+        }
+
+        return parsed;
+
+    }
+
+    /**
      * <p>Creates a copy of this formatter with given locale. </p>
      *
      * <p>Note: Sectional attributes will never be overridden. Is the
