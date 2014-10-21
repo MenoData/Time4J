@@ -1003,54 +1003,6 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Combines this local timestamp with the system timezone to a global
-     * timestamp. </p>
-     *
-     * @return  global timestamp based on this local timestamp interpreted
-     *          in system timezone
-     * @deprecated  use {@link #inStdTimezone()}
-     */
-    @Deprecated
-    public Moment atStdTimezone() {
-
-        return this.inStdTimezone();
-
-    }
-
-    /**
-     * <p>Combines this local timestamp with given timezone to a global
-     * timestamp. </p>
-     *
-     * @param   tzid        timezone id
-     * @return  global timestamp based on this local timestamp interpreted
-     *          in given timezone
-     * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @deprecated  use {@link #inTimezone(TZID)}
-     */
-    @Deprecated
-    public Moment atTimezone(TZID tzid) {
-
-        return this.inTimezone(tzid);
-
-    }
-
-    /**
-     * <p>Combines this local timestamp with given timezone to a global
-     * timestamp. </p>
-     *
-     * @param   tz      timezone
-     * @return  global timestamp based on this local timestamp interpreted
-     *          in given timezone
-     * @deprecated  use {@link #in(Timezone)}
-     */
-    @Deprecated
-    public Moment at(Timezone tz) {
-
-        return this.in(tz);
-
-    }
-
-    /**
      * <p>Does this local timestamp exist in given timezone? </p>
      *
      * @param   tzid    timezone id
