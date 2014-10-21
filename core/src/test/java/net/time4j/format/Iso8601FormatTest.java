@@ -191,6 +191,21 @@ public class Iso8601FormatTest {
     }
 
     @Test
+    public void printExtendedTimeHH() {
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.format(
+                PlainTime.of(23)),
+            is("23:00"));
+    }
+
+    @Test
+    public void parseExtendedTimeHH() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("23"),
+            is(PlainTime.of(23)));
+    }
+
+    @Test
     public void printExtendedTimeHHMM() {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.format(
