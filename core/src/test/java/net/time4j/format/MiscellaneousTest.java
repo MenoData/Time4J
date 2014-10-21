@@ -7,6 +7,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.engine.ChronoEntity;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -113,6 +114,18 @@ public class MiscellaneousTest {
     @Test(expected=ParseException.class)
     public void parseNoDigitsFound2() throws ParseException {
         Iso8601Format.BASIC_CALENDAR_DATE.parse("0625");
+    }
+
+    @Test
+    public void parseRawData() {
+        ChronoFormatter<?> cf = Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
+        ParseLog plog = new ParseLog();
+        String text = "2014-10-21T15:10:00+02:00";
+        cf.parse(text, plog);
+        ChronoEntity<?> e1 = plog.getRawValues();
+        e1.with(PlainTimestamp.axis().element(), null);
+        ChronoEntity<?> e2 = cf.parseRaw(text);
+        assertThat(e1.equals(e2), is(true));
     }
 
 }
