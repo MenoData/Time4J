@@ -129,11 +129,17 @@ public class Iso8601Format {
      * <p>Defines the <i>basic</i> ISO-8601-format for a wall time with
      * hour, minute and optional second using the pattern
      * &quot;HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
+     * 
+     * <p>The minute part is optional during parsing, but will always
+     * be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
      * &quot;HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
+     * 
+     * <p>Der Minutenteil ist beim Parsen optional, wird aber beim
+     * Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<PlainTime> BASIC_WALL_TIME;
 
@@ -141,11 +147,17 @@ public class Iso8601Format {
      * <p>Defines the <i>extended</i> ISO-8601-format for a wall time
      * with hour, minute and optional second using the pattern
      * &quot;HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
+     * 
+     * <p>The minute part is optional during parsing, but will always
+     * be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
      * &quot;HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
+     * 
+     * <p>Der Minutenteil ist beim Parsen optional, wird aber beim
+     * Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<PlainTime> EXTENDED_WALL_TIME;
 
@@ -155,7 +167,8 @@ public class Iso8601Format {
      * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * the count of decimal digits is flexible (0-9). The minute part is
+     * optional during parsing, but will always be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
@@ -163,7 +176,8 @@ public class Iso8601Format {
      * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
-     * Dezimalstellen ist variabel (0-9). </p>
+     * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
+     * optional, wird aber beim Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<PlainTimestamp> BASIC_DATE_TIME;
 
@@ -173,7 +187,8 @@ public class Iso8601Format {
      * &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * the count of decimal digits is flexible (0-9). The minute part is
+     * optional during parsing, but will always be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
@@ -181,7 +196,8 @@ public class Iso8601Format {
      * im Muster &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
-     * Dezimalstellen ist variabel (0-9). </p>
+     * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
+     * optional, wird aber beim Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<PlainTimestamp> EXTENDED_DATE_TIME;
 
@@ -191,7 +207,8 @@ public class Iso8601Format {
      * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]X&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * the count of decimal digits is flexible (0-9). The minute part is
+     * optional during parsing, but will always be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
@@ -199,7 +216,8 @@ public class Iso8601Format {
      * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]X&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
-     * Dezimalstellen ist variabel (0-9). </p>
+     * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
+     * optional, wird aber beim Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<Moment> BASIC_DATE_TIME_OFFSET;
 
@@ -209,7 +227,8 @@ public class Iso8601Format {
      * &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]XXX&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
-     * the count of decimal digits is flexible (0-9). </p>
+     * the count of decimal digits is flexible (0-9). The minute part is
+     * optional during parsing, but will always be printed. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
@@ -217,7 +236,8 @@ public class Iso8601Format {
      * im Muster &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]XXX&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
-     * Dezimalstellen ist variabel (0-9). </p>
+     * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
+     * optional, wird aber beim Formatieren immer ausgegeben. </p>
      */
     public static final ChronoFormatter<Moment> EXTENDED_DATE_TIME_OFFSET;
 
@@ -362,34 +382,33 @@ public class Iso8601Format {
 
     }
 
-	private static <T extends ChronoEntity<T>> void addWallTime(
-		ChronoFormatter.Builder<T> builder,
-		boolean					   extended
-	) {
+    private static <T extends ChronoEntity<T>> void addWallTime(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
 
-		builder.addFixedInteger(ISO_HOUR, 2);
+        builder.addFixedInteger(ISO_HOUR, 2);
+        builder.startOptionalSection();
 
-		builder.startOptionalSection();
+        if (extended) {
+            builder.addLiteral(':');
+        }
 
-		if (extended) {
-			builder.addLiteral(':');
-		}
+        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+        builder.startOptionalSection(SECOND_PART);
 
-		builder.addFixedInteger(MINUTE_OF_HOUR, 2);
-		builder.startOptionalSection(SECOND_PART);
+        if (extended) {
+            builder.addLiteral(':');
+        }
 
-		if (extended) {
-			builder.addLiteral(':');
-		}
+        builder.addFixedInteger(SECOND_OF_MINUTE, 2);
+        builder.startOptionalSection(NON_ZERO_FRACTION);
+  	builder.addFraction(NANO_OF_SECOND, 0, 9, true);
+        builder.endSection();
+        builder.endSection();
+        builder.endSection();
 
-		builder.addFixedInteger(SECOND_OF_MINUTE, 2);
-		builder.startOptionalSection(NON_ZERO_FRACTION);
-		builder.addFraction(NANO_OF_SECOND, 0, 9, true);
-		builder.endSection();
-		builder.endSection();
-		builder.endSection();
-
-	}
+    }
 
     //~ Innere Klassen ----------------------------------------------------
 
