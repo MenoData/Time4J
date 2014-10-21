@@ -2655,25 +2655,23 @@ public final class Duration<U extends IsoUnit>
                     parseItems(period, index, period.length(), true, items);
                 }
             } else {
+                boolean alternative = false;
                 if (sep > index) {
                     if (type == ClockUnit.class) {
                         throw new ParseException(
                             "Unexpected date component found: " + period,
                             index);
                     } else {
-                        parseItems(period, index, sep, true, items);
+                        alternative = parseItems(period, index, sep, true, items);
                     }
                 }
                 if (type == CalendarUnit.class) {
                     throw new ParseException(
                         "Unexpected time component found: " + period, sep);
+                } else if (alternative) {
+		    parseAlternative(period, sep + 1, period.length(), false, items);
                 } else {
-                    parseItems(
-                        period,
-                        sep + 1,
-                        period.length(),
-                        false,
-                        items);
+                    parseItems(period, sep + 1, period.length(), false, items);
                 }
             }
 
@@ -2690,13 +2688,21 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static <U extends ChronoUnit> void parseItems(
+    private static <U extends ChronoUnit> boolean parseItems(
         String period,
         int from,
         int to,
         boolean date,
         List<Item<U>> items
     ) throws ParseException {
+
+        // alternative format?
+        char ending = period.charAt(to - 1);
+
+        if ((ending >= '0') && (ending <= '9')) {
+            parseAlternative(period, from, to, date, items);
+            return true;
+        }
 
         if (from == to) {
             throw new ParseException(period, from);
@@ -2772,9 +2778,21 @@ public final class Duration<U extends IsoUnit>
         if (!endOfItem) {
             throw new ParseException("Unit symbol expected: " + period, to);
         }
+        
+        return false;
 
     }
 
+    private static <U extends ChronoUnit> void parseAlternative(
+        String period,
+        int from,
+        int to,
+        boolean date,
+        List<Item<U>> items
+    ) throws ParseException {
+    	
+    }
+    
     private static CalendarUnit parseDateSymbol(
         char c,
         String period,
