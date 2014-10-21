@@ -1701,7 +1701,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @see     #toStringISO()
      * @see     #toStringXML()
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      */
     /*[deutsch]
      * <p>Liefert eine kanonische Darstellung, die optional mit einem negativen
@@ -1730,7 +1730,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @see     #toStringISO()
      * @see     #toStringXML()
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      */
     @Override
     public String toString() {
@@ -1764,7 +1764,7 @@ public final class Duration<U extends IsoUnit>
      * @throws  ChronoException if this duration is negative or if any special
      *          units shall be output, but units of type {@code CalendarUnit}
      *          will be translated to iso-compatible units if necessary
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     IsoUnit#getSymbol()
      */
     /*[deutsch]
@@ -1793,7 +1793,7 @@ public final class Duration<U extends IsoUnit>
      * @throws  ChronoException if this duration is negative or if any special
      *          units shall be output, but units of type {@code CalendarUnit}
      *          will be translated to iso-compatible units if necessary
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     IsoUnit#getSymbol()
      */
     public String toStringISO() {
@@ -1848,7 +1848,7 @@ public final class Duration<U extends IsoUnit>
      * @throws  ChronoException if any special units shall be
      *          output, but units of type {@code CalendarUnit} will be
      *          translated to xml-compatible units if necessary
-     * @see     #parse(String)
+     * @see     #parsePeriod(String)
      * @see     IsoUnit#getSymbol()
      */
     public String toStringXML() {
@@ -3436,7 +3436,7 @@ public final class Duration<U extends IsoUnit>
      * @param   <U> generic type of time units
      * @since   1.2
      * @see     Duration#toString()
-     * @see     Duration#parse(String)
+     * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
      * @concurrency <immutable>
      */
@@ -3474,7 +3474,7 @@ public final class Duration<U extends IsoUnit>
      * @param   <U> generic type of time units
      * @since   1.2
      * @see     Duration#toString()
-     * @see     Duration#parse(String)
+     * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
      * @concurrency <immutable>
      */
