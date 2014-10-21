@@ -1860,23 +1860,6 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Parses a canonical representation to a duration. </p>
      *
-     * @param   	period      duration in canonical, ISO-8601-compatible or
-     *                          XML-schema-compatible format (P-string)
-     * @return  	parsed duration in all possible standard units of date and time
-     * @throws  	ParseException if parsing fails
-     * @deprecated  Use {@link #parsePeriod(String)} for naming consistency
-     */
-    @Deprecated
-    public static Duration<IsoUnit> parse(String period)
-        throws ParseException {
-
-        return parsePeriod(period);
-
-    }
-
-    /**
-     * <p>Parses a canonical representation to a duration. </p>
-     *
      * <p>Canonical representations which start with the literal P are
      * also called &quot;period&quot; in Time4J (P-string). This format
      * is strongly recommended for storage in databases or XML. Syntax
