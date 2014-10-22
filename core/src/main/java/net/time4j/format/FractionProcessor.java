@@ -42,6 +42,10 @@ import java.util.Set;
 final class FractionProcessor
     implements FormatProcessor<Integer> {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Integer MRD_MINUS_1 = Integer.valueOf(999999999);
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final FormatProcessor<Void> decimalSeparator;
@@ -292,9 +296,17 @@ final class FractionProcessor
         BigDecimal fraction = new BigDecimal(total);
         fraction = fraction.movePointLeft(current - status.getPosition());
 
-        // hier nur prototypischer Wert, später fraktionalen Wert bestimmen
-        parsedResult.put(FractionalElement.FRACTION, fraction);
-        parsedResult.put(this.element, this.element.getDefaultMinimum());
+        if (this.element.name().equals("NANO_OF_SECOND")) {
+            Integer min = Integer.valueOf(0);
+            Integer max = MRD_MINUS_1;
+            Integer num = this.getRealValue(fraction, min, max);
+            parsedResult.put(this.element, num);
+        } else {
+            // hier nur prototypischer Wert, später fraktionalen Wert bestimmen
+            parsedResult.put(FractionalElement.FRACTION, fraction);
+            parsedResult.put(this.element, this.element.getDefaultMinimum());
+        }
+
         status.setPosition(current);
 
     }
