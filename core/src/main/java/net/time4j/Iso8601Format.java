@@ -129,7 +129,7 @@ public class Iso8601Format {
      * <p>Defines the <i>basic</i> ISO-8601-format for a wall time with
      * hour, minute and optional second using the pattern
      * &quot;HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
-     * 
+     *
      * <p>The minute part is optional during parsing, but will always
      * be printed. </p>
      */
@@ -137,7 +137,7 @@ public class Iso8601Format {
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
      * &quot;HH[mm[ss[SSSSSSSSS]]]&quot;. </p>
-     * 
+     *
      * <p>Der Minutenteil ist beim Parsen optional, wird aber beim
      * Formatieren immer ausgegeben. </p>
      */
@@ -147,7 +147,7 @@ public class Iso8601Format {
      * <p>Defines the <i>extended</i> ISO-8601-format for a wall time
      * with hour, minute and optional second using the pattern
      * &quot;HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
-     * 
+     *
      * <p>The minute part is optional during parsing, but will always
      * be printed. </p>
      */
@@ -155,7 +155,7 @@ public class Iso8601Format {
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Uhrzeit mit Stunde, Minute und optionaler Sekunde im Muster
      * &quot;HH[:mm[:ss[,SSSSSSSSS]]]&quot;. </p>
-     * 
+     *
      * <p>Der Minutenteil ist beim Parsen optional, wird aber beim
      * Formatieren immer ausgegeben. </p>
      */
@@ -403,7 +403,7 @@ public class Iso8601Format {
 
         builder.addFixedInteger(SECOND_OF_MINUTE, 2);
         builder.startOptionalSection(NON_ZERO_FRACTION);
-  	builder.addFraction(NANO_OF_SECOND, 0, 9, true);
+        builder.addFraction(NANO_OF_SECOND, 0, 9, true);
         builder.endSection();
         builder.endSection();
         builder.endSection();

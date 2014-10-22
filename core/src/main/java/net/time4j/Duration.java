@@ -33,7 +33,6 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.NumberType;
-import net.time4j.format.ParseLog;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.SignPolicy;
@@ -168,10 +167,14 @@ public final class Duration<U extends IsoUnit>
     @SuppressWarnings("rawtypes")
     private static final Duration ZERO = new Duration();
 
-    private static final ChronoFormatter<?> CF_EXT_CAL = createDateFormat(true, false);
-    private static final ChronoFormatter<?> CF_EXT_ORD = createDateFormat(true, true);
-    private static final ChronoFormatter<?> CF_BAS_CAL = createDateFormat(false, false);
-    private static final ChronoFormatter<?> CF_BAS_ORD = createDateFormat(false, true);
+    private static final ChronoFormatter<?> CF_EXT_CAL =
+        createDateFormat(true, false);
+    private static final ChronoFormatter<?> CF_EXT_ORD =
+        createDateFormat(true, true);
+    private static final ChronoFormatter<?> CF_BAS_CAL =
+        createDateFormat(false, false);
+    private static final ChronoFormatter<?> CF_BAS_ORD =
+        createDateFormat(false, true);
 
     private static final
     Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
@@ -1899,7 +1902,7 @@ public final class Duration<U extends IsoUnit>
      * of XML-schema (leaving aside the fact that XML-schema is potentially
      * designed for unlimited big amounts but Time4J can define durations
      * only in long range with nanosecond precision at best). </p>
-     * 
+     *
      * <p>Note: The alternative ISO-formats PYYYY-MM-DDThh:mm:ss and
      * PYYYY-DDDThh:mm:ss and their basic variants are supported since
      * version 1.3. </p>
@@ -2667,7 +2670,7 @@ public final class Duration<U extends IsoUnit>
                     throw new ParseException(
                         "Format symbol \'T\' expected: " + period, index);
                 } else {
-                    parseItems(period, index, period.length(), true, items);
+                    parse(period, index, period.length(), true, items);
                 }
             } else {
                 boolean alternative = false;
@@ -2677,16 +2680,16 @@ public final class Duration<U extends IsoUnit>
                             "Unexpected date component found: " + period,
                             index);
                     } else {
-                        alternative = parseItems(period, index, sep, true, items);
+                        alternative = parse(period, index, sep, true, items);
                     }
                 }
                 if (type == CalendarUnit.class) {
                     throw new ParseException(
                         "Unexpected time component found: " + period, sep);
                 } else if (alternative) {
-		    parseAlternative(period, sep + 1, period.length(), false, items);
+                    parseAlt(period, sep + 1, period.length(), false, items);
                 } else {
-                    parseItems(period, sep + 1, period.length(), false, items);
+                    parse(period, sep + 1, period.length(), false, items);
                 }
             }
 
@@ -2703,7 +2706,7 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static <U extends ChronoUnit> boolean parseItems(
+    private static <U extends ChronoUnit> boolean parse(
         String period,
         int from,
         int to,
@@ -2715,7 +2718,7 @@ public final class Duration<U extends IsoUnit>
         char ending = period.charAt(to - 1);
 
         if ((ending >= '0') && (ending <= '9')) {
-            parseAlternative(period, from, to, date, items);
+            parseAlt(period, from, to, date, items);
             return true;
         }
 
@@ -2793,29 +2796,29 @@ public final class Duration<U extends IsoUnit>
         if (!endOfItem) {
             throw new ParseException("Unit symbol expected: " + period, to);
         }
-        
+
         return false;
 
     }
 
-    private static <U extends ChronoUnit> void parseAlternative(
+    private static <U extends ChronoUnit> void parseAlt(
         String period,
         int from,
         int to,
         boolean date,
         List<Item<U>> items
     ) throws ParseException {
-    	
+
         boolean extended = false;
         ChronoFormatter<?> fmt;
-	
+
         if (date) {
             if (from + 4 < to) {
                 extended = (period.charAt(from + 4) == '-');
             }
             boolean ordinalStyle = (
-                extended 
-                ? (from + 8 == to) 
+                extended
+                ? (from + 8 == to)
                 : (from + 7 == to));
             fmt = getDateFormat(extended, ordinalStyle);
             ChronoEntity<?> entity = fmt.parseRaw(period, from);
@@ -2912,12 +2915,12 @@ public final class Duration<U extends IsoUnit>
         }
 
     }
-    
+
     private static ChronoFormatter<?> createDateFormat(
         boolean extended,
         boolean ordinalStyle
     ) {
-	
+
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
         builder.addFixedInteger(PlainDate.YEAR, 4);
@@ -2935,9 +2938,9 @@ public final class Duration<U extends IsoUnit>
             }
             builder.addFixedInteger(PlainDate.DAY_OF_MONTH, 2);
         }
-        
+
         return builder.build();
-	
+
     }
 
     private static ChronoFormatter<?> getDateFormat(
@@ -2952,7 +2955,7 @@ public final class Duration<U extends IsoUnit>
         }
 
     }
-	
+
     private static CalendarUnit parseDateSymbol(
         char c,
         String period,
