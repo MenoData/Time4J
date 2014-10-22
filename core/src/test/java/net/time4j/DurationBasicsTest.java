@@ -910,15 +910,87 @@ public class DurationBasicsTest {
     }
 
     @Test(expected=ParseException.class)
-    public void parseWithoutUnits() throws Exception {
+    public void parseCalendricalWithoutUnits() throws Exception {
         try {
             String period = "P12";
-            Duration.parsePeriod(period); // Einheitensymbol fehlt
+            Duration.parsePeriod(period);
         } catch (ParseException pe) {
-            assertThat(pe.getErrorOffset(), is(3));
+            assertThat(pe.getErrorOffset(), is(1));
             System.out.println(pe.getMessage());
             throw pe;
         }
+    }
+
+    @Test
+    public void parseAlternativePYYYY_MM_DD() throws Exception {
+        assertThat(
+            Duration.parseCalendarPeriod("P1234-05-17"),
+            is(Duration.ofCalendarUnits(1234, 5, 17)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseAlternativeInvalid_1_PYYYY_MM_DD() throws Exception {
+        try {
+            Duration.parseCalendarPeriod("P1234-13-17"); // 13 invalid
+        } catch (ParseException pe) {
+            assertThat(pe.getErrorOffset(), is(6));
+            throw pe;
+        }
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseAlternativeInvalid_2_PYYYY_MM_DD() throws Exception {
+        try {
+            Duration.parseCalendarPeriod("P1234-12-31"); // 31 invalid
+        } catch (ParseException pe) {
+            assertThat(pe.getErrorOffset(), is(9));
+            throw pe;
+        }
+    }
+
+    @Test
+    public void parseAlternativePYYYY_MM_DDTHH() throws Exception {
+        assertThat(
+            Duration.parsePeriod("P0000-00-00T12"),
+            is(Duration.ofZero().plus(12, HOURS)));
+    }
+
+    @Test
+    public void parseAlternativePYYYY_MM_DDTHH_MM() throws Exception {
+        assertThat(
+            Duration.parsePeriod("P0002-03-10T07:15"),
+            is(
+                Duration.ofZero()
+                .plus(2, YEARS).plus(3, MONTHS).plus(10, DAYS)
+                .plus(7, HOURS).plus(15, MINUTES)));
+    }
+
+    @Test
+    public void parseAlternativePTHH() throws Exception {
+        assertThat(
+            Duration.parseClockPeriod("PT12"),
+            is(Duration.ofClockUnits(12, 0, 0)));
+    }
+
+    @Test
+    public void parseAlternativePTHHMM() throws Exception {
+        assertThat(
+            Duration.parseClockPeriod("PT1245"),
+            is(Duration.ofClockUnits(12, 45, 0)));
+    }
+
+    @Test
+    public void parseAlternativePTHH_MM() throws Exception {
+        assertThat(
+            Duration.parseClockPeriod("PT12:45"),
+            is(Duration.ofClockUnits(12, 45, 0)));
+    }
+
+    @Test
+    public void parseAlternativePTHH_MM_SS_Fraction() throws Exception {
+        assertThat(
+            Duration.parseClockPeriod("PT12:45:30,123456789"),
+            is(Duration.ofClockUnits(12, 45, 30).plus(123456789, NANOS)));
     }
 
     @Test(expected=ParseException.class)
