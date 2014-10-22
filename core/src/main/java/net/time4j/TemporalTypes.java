@@ -63,7 +63,7 @@ import java.util.Map;
  * @param   <T> target type in Time4J
  * @author  Meno Hochschild
  */
-public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
+public class TemporalTypes<S, T extends ChronoEntity<T>>
     extends BasicElement<S> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -626,11 +626,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected final <T extends ChronoEntity<T>>
-        ElementRule<T, S> derive(Chronology<T> chronology) {
+    protected final <E extends ChronoEntity<E>>
+        ElementRule<E, S> derive(Chronology<E> chronology) {
 
         if (chronology.getChronoType() == this.targetType) {
-            return (ElementRule<T, S>) this.rule;
+            return (ElementRule<E, S>) this.rule;
         }
 
         return null;
