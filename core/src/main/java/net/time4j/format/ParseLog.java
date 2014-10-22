@@ -281,7 +281,6 @@ public class ParseLog {
      * might need to call this method. </p>
      *
      * @since	1.3
-     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      * @see     ChronoParser
      */
     /*[deutsch]
@@ -294,7 +293,6 @@ public class ParseLog {
      * {@code ChronoParser}-Objekte rufen diese Methode bei Bedarf auf. </p>
      *
      * @since	1.3
-     * @see     Attributes#USE_DEFAULT_WHEN_ERROR
      * @see     ChronoParser
      */
     public void setWarning() {

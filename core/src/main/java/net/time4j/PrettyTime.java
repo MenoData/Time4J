@@ -394,7 +394,7 @@ public final class PrettyTime {
     }
 
     /**
-     * <p>Determines that weeks will always normalized to days. </p>
+     * <p>Determines that weeks will always be normalized to days. </p>
      *
      * @return  changed copy of this instance
      * @since   1.3
