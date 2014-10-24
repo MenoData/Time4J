@@ -76,6 +76,15 @@ public final class TimestampInterval
 
     private static final long serialVersionUID = 1L;
 
+    private static final ChronoFormatter<PlainTimestamp> EXT_O =
+        ordinalFormat(true);
+    private static final ChronoFormatter<PlainTimestamp> EXT_W =
+        weekdateFormat(true);
+    private static final ChronoFormatter<PlainTimestamp> BAS_O =
+        ordinalFormat(false);
+    private static final ChronoFormatter<PlainTimestamp> BAS_W =
+        weekdateFormat(false);
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -636,9 +645,9 @@ public final class TimestampInterval
         ChronoFormatter<PlainTimestamp> startFormat;
 
         if (ordinalStyle) {
-            startFormat = ordinalFormat(extended);
+            startFormat = (extended ? EXT_O : BAS_O);
         } else if (weekStyle) {
-            startFormat = weekdateFormat(extended);
+            startFormat = (extended ? EXT_W : BAS_W);
         } else if (extended) {
             startFormat = Iso8601Format.EXTENDED_DATE_TIME;
         } else {
@@ -650,7 +659,7 @@ public final class TimestampInterval
 
         if (sameFormat) {
             endFormat = startFormat;
-        } else{
+        } else {
             boolean hasT = true;
             if (n - 1 - componentLength < timeLength) {
                 timeLength--; // end component without date or T-symbol
@@ -678,9 +687,8 @@ public final class TimestampInterval
 
     }
 
-    private static ChronoFormatter<PlainTimestamp> ordinalFormat(
-        boolean extended
-    ) {
+    private static ChronoFormatter<PlainTimestamp>
+    ordinalFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
@@ -702,9 +710,8 @@ public final class TimestampInterval
 
     }
 
-    private static ChronoFormatter<PlainTimestamp> weekdateFormat(
-        boolean extended
-    ) {
+    private static ChronoFormatter<PlainTimestamp>
+    weekdateFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
