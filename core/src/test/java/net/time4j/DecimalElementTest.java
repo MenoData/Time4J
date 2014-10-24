@@ -20,50 +20,8 @@ import static org.junit.Assert.assertThat;
 public class DecimalElementTest {
 
     @Test
-    @SuppressWarnings("rawtypes")
     public void mergeDecimalMinute() {
-        ChronoEntity<?> vs = new ChronoEntity() {
-            @Override
-            public boolean contains(ChronoElement element) {
-                return (
-                    (element == PlainTime.DIGITAL_HOUR_OF_DAY)
-                    || (element == PlainTime.DECIMAL_MINUTE)
-                );
-            }
-            @Override
-            public Object get(ChronoElement element) {
-                Object ret;
-                if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
-                    ret = Integer.valueOf(10);
-                } else if (element == PlainTime.DECIMAL_MINUTE) {
-                    ret = new BigDecimal("2.75");
-                } else {
-                    throw new ChronoException(
-                        "Not registered: " + element.name());
-                }
-                return element.getType().cast(ret);
-            }
-            @Override
-            public boolean isValid(ChronoElement element, Object value) {
-                return false;
-            }
-            @Override
-            public ChronoEntity with(ChronoElement element, Object value) {
-                throw new UnsupportedOperationException();
-            }
-            @Override
-            public Object getMinimum(ChronoElement element) {
-                throw new UnsupportedOperationException();
-            }
-            @Override
-            public Object getMaximum(ChronoElement element) {
-                throw new UnsupportedOperationException();
-            }
-            @Override
-            protected Chronology getChronology() {
-                throw new UnsupportedOperationException();
-            }
-        };
+        ChronoEntity<?> vs = new RawEntity();
         PlainTime result =
             Chronology.lookup(PlainTime.class).createFrom(
                 vs,
@@ -104,5 +62,50 @@ public class DecimalElementTest {
             PlainTime.of(0).with(PlainTime.DECIMAL_HOUR, bd),
             is(time));
     }
+
+    private static class RawEntity
+        extends ChronoEntity<RawEntity> {
+
+        @Override
+        public boolean contains(ChronoElement<?> element) {
+            return (
+                (element == PlainTime.DIGITAL_HOUR_OF_DAY)
+                || (element == PlainTime.DECIMAL_MINUTE)
+            );
+        }
+        @Override
+        public <V> V get(ChronoElement<V> element) {
+            Object ret;
+            if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                ret = Integer.valueOf(10);
+            } else if (element == PlainTime.DECIMAL_MINUTE) {
+                ret = new BigDecimal("2.75");
+            } else {
+                throw new ChronoException(
+                    "Not registered: " + element.name());
+            }
+            return element.getType().cast(ret);
+        }
+        @Override
+        public <V> boolean isValid(ChronoElement<V> element, V value) {
+            return false;
+        }
+        @Override
+        public <V> RawEntity with(ChronoElement<V> element, V value) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public <V> V getMinimum(ChronoElement<V> element) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public <V> V getMaximum(ChronoElement<V> element) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        protected Chronology<RawEntity> getChronology() {
+            throw new UnsupportedOperationException();
+        }
+    };
 
 }
