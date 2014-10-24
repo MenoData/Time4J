@@ -211,16 +211,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
         super();
 
+        if (element == null) {
+            throw new NullPointerException("Missing element.");
+        }
+
+        checkElement(formatter.chronology, element);
+
         this.chronology = formatter.chronology;
         this.defaultAttributes = formatter.defaultAttributes;
         this.fracproc = formatter.fracproc;
-
-        if (element == null) {
-            throw new NullPointerException("Missing element.");
-        } else if (!this.chronology.isSupported(element)) {
-            throw new IllegalArgumentException(
-                "Not supported: " + element.name());
-        }
 
         Map<ChronoElement<?>, Object> map =
             new NonAmbivalentMap(formatter.defaults);
@@ -758,9 +757,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @since	1.3
      */
     public ChronoEntity<?> parseRaw(String text) {
-        
+
         return this.parseRaw(text, 0);
-        
+
     }
 
     /**
@@ -797,7 +796,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (c == null) {
             c = this.chronology;
         }
-        
+
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
         ParsedValues parsed = status.getRawValues0();
@@ -1785,6 +1784,25 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
+    private static void checkElement(
+        Chronology<?> chronology,
+        ChronoElement<?> element
+    ) {
+
+        if (!chronology.isSupported(element)) {
+            Chronology<?> child = chronology.preparser();
+
+            if (
+                (child == null)
+                || !child.isSupported(element)
+            ) {
+                throw new IllegalArgumentException(
+                    "Unsupported element: " + element.name());
+            }
+        }
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     /**
@@ -1885,7 +1903,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -1906,7 +1924,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -1977,7 +1995,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2033,7 +2051,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2071,7 +2089,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-18} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2091,7 +2109,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-18} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2131,7 +2149,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
          *          range {@code 1-9} or if given element is not supported
-         *          by chronology
+         *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     SignPolicy#SHOW_NEVER
          * @see     #addInteger(ChronoElement, int, int, SignPolicy)
@@ -2201,7 +2219,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2236,7 +2254,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if any of {@code minDigits} and
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
-         *          not supported by chronology
+         *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
@@ -2278,7 +2296,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
          *          range {@code 1-9} or if given element is not supported
-         *          by chronology
+         *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addNumerical(ChronoElement, int, int)
          *          addNumerical(ChronoElement, int, int)
@@ -2302,7 +2320,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
          *          range {@code 1-9} or if given element is not supported
-         *          by chronology
+         *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addNumerical(ChronoElement, int, int)
          *          addNumerical(ChronoElement, int, int)
@@ -2387,8 +2405,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if {@code minDigits} is out of
          *          range {@code 0-9} or if {@code maxDigits} is out of range
          *          {@code 1-9} or if {@code maxDigits < minDigits} or if
-         *          given element is not supported by chronology or if there
-         *          is already a fractional part defined
+         *          given element is not supported by chronology or its
+         *          preparser or if there is already a fractional part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
          */
@@ -2460,8 +2478,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if {@code minDigits} is out of
          *          range {@code 0-9} or if {@code maxDigits} is out of range
          *          {@code 1-9} or if {@code maxDigits < minDigits} or if
-         *          given element is not supported by chronology or if there
-         *          is already a fractional part defined
+         *          given element is not supported by chronology or its
+         *          preparser or if there is already a fractional part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
          */
@@ -2517,7 +2535,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element         chronological element
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by the underlying chronology
+         *          supported by the underlying chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2536,7 +2554,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element         chronological element
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by the underlying chronology
+         *          supported by the underlying chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2587,7 +2605,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if there is no indicator at least
          *          for the plural category OTHER or if given element is not
-         *          supported by the underlying chronology
+         *          supported by the underlying chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2634,7 +2652,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if there is no indicator at least
          *          for the plural category OTHER or if given element is not
-         *          supported by the underlying chronology
+         *          supported by the underlying chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
@@ -2929,7 +2947,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element         chronological text element
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -2938,7 +2956,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   element         chronological text element
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         public Builder<T> addText(TextElement<?> element) {
@@ -2997,7 +3015,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   lookup          text resources for lookup
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -3009,7 +3027,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   lookup          text resources for lookup
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         public <V extends Enum<V>> Builder<T> addText(
@@ -3032,7 +3050,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   formatter       customized formatter object as delegate
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -3044,7 +3062,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   formatter       customized formatter object as delegate
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         public <V extends ChronoEntity<V>> Builder<T> addCustomized(
@@ -3066,7 +3084,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   parser          customized parser
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -3079,7 +3097,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   parser          customized parser
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         public <V> Builder<T> addCustomized(
@@ -4121,10 +4139,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         private void checkElement(ChronoElement<?> element) {
 
-            if (!this.chronology.isSupported(element)) {
-                throw new IllegalArgumentException(
-                    "Not supported: " + element.name());
-            }
+            ChronoFormatter.checkElement(this.chronology, element);
 
         }
 

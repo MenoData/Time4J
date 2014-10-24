@@ -346,6 +346,7 @@ final class NumberProcessor<V>
         if (
             !this.fixedWidth
             && (reserved > 0)
+            && (protectedChars <= 0)
         ) {
             int digitCount = 0;
 

@@ -21,13 +21,20 @@
 
 package net.time4j.range;
 
+import net.time4j.Iso8601Format;
 import net.time4j.MachineTime;
 import net.time4j.Moment;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
+import net.time4j.Weekmodel;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.ParseLog;
+import net.time4j.format.SignPolicy;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -37,8 +44,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static net.time4j.PlainDate.DAY_OF_MONTH;
+import static net.time4j.PlainDate.DAY_OF_WEEK;
+import static net.time4j.PlainDate.DAY_OF_YEAR;
+import static net.time4j.PlainDate.MONTH_AS_NUMBER;
+import static net.time4j.PlainDate.YEAR;
+import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
+import static net.time4j.format.Attributes.PROTECTED_CHARACTERS;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
@@ -62,6 +78,13 @@ public final class MomentInterval
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final long serialVersionUID = 1L;
+
+    private static final ChronoFormatter<Moment> EXT_C = calendarFormat(true);
+    private static final ChronoFormatter<Moment> EXT_O = ordinalFormat(true);
+    private static final ChronoFormatter<Moment> EXT_W = weekdateFormat(true);
+    private static final ChronoFormatter<Moment> BAS_C = calendarFormat(false);
+    private static final ChronoFormatter<Moment> BAS_O = ordinalFormat(false);
+    private static final ChronoFormatter<Moment> BAS_W = weekdateFormat(false);
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -450,10 +473,406 @@ public final class MomentInterval
 
     }
 
+    /**
+     * <p>Interpretes given ISO-conforming text as interval. </p>
+     *
+     * <p>All styles are supported, namely calendar dates, ordinal dates
+     * and week dates, either in basic or in extended format. Mixed date
+     * styles for start and end are not allowed however. Furthermore, one
+     * of start or end can also be represented by a period string. If not
+     * then the end component may exist in an abbreviated form as
+     * documented in ISO-8601-paper leaving out higher-order elements
+     * like the calendar year (which will be overtaken from the start
+     * component instead). In latter case, the timezone offset of the
+     * end component is optional, too. Examples for supported formats: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
+     *  // output: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
+     *  // output: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/16:00&quot;));
+     *  // output: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
+     *  // output: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     * </pre>
+     *
+     * <p>This method dynamically creates an appropriate interval format.
+     * If performance is more important then a static fixed formatter might
+     * be considered. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_NEVER
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
+     *
+     * <p>Alle Stile werden unterst&uuml;tzt, n&auml;mlich Kalendardatum,
+     * Ordinaldatum und Wochendatum, sowohl im Basisformat als auch im
+     * erweiterten Format. Gemischte Datumsstile von Start und Ende
+     * sind jedoch nicht erlaubt. Au&szlig;erdem darf eine der beiden
+     * Komponenten Start und Ende als P-String vorliegen. Wenn nicht, dann
+     * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
+     * angegeben werden, in der weniger pr&auml;zise Elemente wie das
+     * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
+     * werden. In letzterem Fall ist auch der Offset der Endkomponente
+     * optional. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     *
+     * <pre>
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/16:00&quot;));
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     * </pre>
+     *
+     * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
+     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten
+     * konstanten Format der Vorzug gegeben werden. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   1.3
+     * @see     BracketPolicy#SHOW_NEVER
+     */
+    public static MomentInterval parseISO(String text)
+        throws ParseException {
+
+        if (text.isEmpty()) {
+            throw new IndexOutOfBoundsException("Empty text.");
+        }
+
+        // betrifft nur Endkomponente, wenn kein P
+        boolean hasT = false;
+        int protectedArea = 0;
+
+        // prescan for format analysis
+		int start = 0;
+		int n = Math.min(text.length(), 83);
+        boolean sameFormat = true;
+        int componentLength = 0;
+
+        for (int i = 1; i < n; i++) {
+            if (text.charAt(i) == '/') {
+                if (text.charAt(0) == 'P') {
+                    start = i + 1;
+                    componentLength = n - i - 1;
+                    hasT = true;
+                } else if (
+                    (i + 1 < n)
+                    && (text.charAt(i + 1) == 'P')
+                ) {
+                    componentLength = i;
+                    hasT = true;
+                } else {
+                    sameFormat = (2 * i + 1 == n) && hasSameOffsets(text, i, n);
+                    componentLength = i;
+                    protectedArea = n - i - 1;
+                    for (int j = i + 1; j < n; j++) {
+                        if (text.charAt(j) == 'T') {
+                            protectedArea = n - j;
+                            hasT = true;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        int literals = 0;
+        boolean ordinalStyle = false;
+        boolean weekStyle = false;
+        int timeLength = 0;
+
+        for (int i = start; i < n; i++) {
+            char c = text.charAt(i);
+            if (c == '/') {
+                break;
+            } else if ((c == 'T') || (timeLength > 0)) {
+                timeLength++;
+            } else if (c == '-') {
+                literals++;
+            } else if (c == 'W') {
+                weekStyle = true;
+            }
+        }
+
+        boolean extended = (literals > 0);
+
+        if (!weekStyle) {
+            ordinalStyle = (
+                (literals == 1)
+                || (
+                    (literals == 0)
+                    && (componentLength - timeLength == 7)));
+        }
+
+        // start format
+        ChronoFormatter<Moment> startFormat;
+
+        if (ordinalStyle) {
+            startFormat = (extended ? EXT_O : BAS_O);
+        } else if (weekStyle) {
+            startFormat = (extended ? EXT_W : BAS_W);
+        } else {
+            startFormat = (extended ? EXT_C : BAS_C);
+        }
+
+        // end format
+        ChronoFormatter<Moment> endFormat;
+
+        if (sameFormat) {
+            endFormat = startFormat;
+        } else {
+            endFormat =
+                abbreviatedFormat(
+                    extended, weekStyle, ordinalStyle, protectedArea, hasT);
+        }
+
+        // create interval
+        return IntervalParser.of(
+             MomentIntervalFactory.INSTANCE,
+             startFormat,
+             endFormat,
+             BracketPolicy.SHOW_NEVER
+        ).parse(text);
+
+    }
+
     @Override
     protected TimeLine<Moment> getTimeLine() {
 
         return Moment.axis();
+
+    }
+
+    private static boolean hasSameOffsets(
+        String text,
+        int solidus,
+        int len
+    ) {
+
+        if (text.charAt(solidus - 1) == 'Z') {
+            return (text.charAt(len - 1) == 'Z');
+        }
+
+        for (int i = solidus - 1; i >= 0; i--) {
+            char test = text.charAt(i);
+            if ((test == '+') || (test == '-')) {
+                int index = i + len - solidus;
+                if (index < 0) {
+                    break;
+                } else {
+                    char compare = text.charAt(index);
+                    return ((compare == '+') || (compare == '-'));
+                }
+            }
+        }
+
+        return false;
+
+    }
+
+    private static ChronoFormatter<Moment> calendarFormat(boolean extended) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedInteger(DAY_OF_MONTH, 2);
+        builder.addLiteral('T');
+        addWallTime(builder, extended);
+        addOffset(builder, extended);
+
+        return builder.build();
+
+    }
+
+    private static ChronoFormatter<Moment> ordinalFormat(boolean extended) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedInteger(DAY_OF_YEAR, 3).build();
+        builder.addLiteral('T');
+        addWallTime(builder, extended);
+        addOffset(builder, extended);
+
+        return builder.build();
+
+    }
+
+    private static ChronoFormatter<Moment> weekdateFormat(boolean extended) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+        builder.addInteger(
+                YEAR_OF_WEEKDATE,
+                4,
+                9,
+                SignPolicy.SHOW_WHEN_BIG_NUMBER);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addLiteral('W');
+        builder.addFixedInteger(Weekmodel.ISO.weekOfYear(), 2);
+
+        if (extended) {
+            builder.addLiteral('-');
+        }
+
+        builder.addFixedNumerical(DAY_OF_WEEK, 1).build();
+        builder.addLiteral('T');
+        addWallTime(builder, extended);
+        addOffset(builder, extended);
+
+        return builder.build();
+
+    }
+
+    private static ChronoFormatter<Moment> abbreviatedFormat(
+        boolean extended,
+        boolean weekStyle,
+        boolean ordinalStyle,
+        int protectedArea,
+        boolean hasT
+    ) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+
+        ChronoElement<Integer> year = (weekStyle ? YEAR_OF_WEEKDATE : YEAR);
+        if (extended) {
+            int p = (ordinalStyle ? 3 : 5) + protectedArea;
+            builder.startSection(PROTECTED_CHARACTERS, p);
+            builder.addCustomized(
+                year,
+                NoopPrinter.NOOP,
+                (weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
+        } else {
+            int p = (ordinalStyle ? 3 : 4) + protectedArea;
+            builder.startSection(PROTECTED_CHARACTERS, p);
+            builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+        }
+        builder.endSection();
+
+        if (weekStyle) {
+            builder.startSection(PROTECTED_CHARACTERS, 1 + protectedArea);
+            builder.addCustomized(
+                Weekmodel.ISO.weekOfYear(),
+                NoopPrinter.NOOP,
+                extended
+                    ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
+                    : FixedNumParser.BASIC_WEEK_OF_YEAR);
+            builder.endSection();
+            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
+            builder.addFixedNumerical(DAY_OF_WEEK, 1);
+            builder.endSection();
+        } else if (ordinalStyle) {
+            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
+            builder.addFixedInteger(DAY_OF_YEAR, 3);
+            builder.endSection();
+        } else {
+            builder.startSection(PROTECTED_CHARACTERS, 2 + protectedArea);
+            if (extended) {
+                builder.addCustomized(
+                    MONTH_AS_NUMBER,
+                    NoopPrinter.NOOP,
+                    FixedNumParser.CALENDAR_MONTH);
+            } else {
+                builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+            }
+            builder.endSection();
+            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
+            builder.addFixedInteger(DAY_OF_MONTH, 2);
+            builder.endSection();
+        }
+
+        if (hasT) {
+            builder.addLiteral('T');
+        }
+
+        addWallTime(builder, extended);
+
+        builder.startOptionalSection();
+        addOffset(builder, extended);
+        builder.endSection();
+
+        return builder.build();
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addWallTime(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
+
+        builder.addCustomized(
+            PlainTime.COMPONENT,
+            extended
+                ? Iso8601Format.EXTENDED_WALL_TIME
+                : Iso8601Format.BASIC_WALL_TIME);
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addOffset(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended
+    ) {
+
+        builder.addTimezoneOffset(
+            DisplayMode.SHORT,
+            extended,
+            Collections.singletonList("Z"));
 
     }
 

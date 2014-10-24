@@ -192,7 +192,10 @@ final class TwoDigitYearProcessor
         int reserved = step.getReserved();
         int effectiveMax = leniency.isStrict() ? 2 : 9;
 
-        if (reserved > 0) {
+        if (
+            (reserved > 0)
+            && (protectedChars <= 0)
+        ) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?

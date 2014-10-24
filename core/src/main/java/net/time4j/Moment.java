@@ -1365,7 +1365,7 @@ public final class Moment
      * <p>Provides a canonical representation in the ISO-format
      * [yyyy-MM-ddTHH:mm:ss,fffffffffZ]. </p>
      *
-     * <p>Example:
+     * <p>The fraction will only be printed if not zero. Example:
      * The expression {@code Moment.of(1341100824, 210, TimeScale.UTC)}
      * has the representation &quot;2012-06-30T23:59:60,000000210Z&quot;. </p>
      *
@@ -1375,7 +1375,7 @@ public final class Moment
      * <p>Erzeugt eine kanonische Darstellung im ISO-Format
      * [yyyy-MM-ddTHH:mm:ss,fffffffffZ]. </p>
      *
-     * <p>Beispiel:
+     * <p>Der fraktionale Teil wird nur ausgegeben, wenn nicht 0. Beispiel:
      * Der Ausdruck {@code Moment.of(1341100824, 210, TimeScale.UTC)}
      * hat die Darstellung &quot;2012-06-30T23:59:60,000000210Z&quot;. </p>
      *
@@ -1411,8 +1411,14 @@ public final class Moment
         format(minute, 2, sb);
         sb.append(':');
         format(second, 2, sb);
-        sb.append(',');
-        format(this.getNanosecond(), 9, sb);
+
+        // Fraktionaler Sekundenteil
+        int nano = this.getNanosecond();
+
+        if (nano > 0) {
+            sb.append(',');
+            format(nano, 9, sb);
+        }
 
         // UTC-Symbol anhängen
         sb.append('Z');
@@ -2543,10 +2549,7 @@ public final class Moment
                 return attributes.get((ZOM) attributes);
             } else if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
-
-                if (!ZonalOffset.UTC.equals(tzid)) {
-                    return context.inZonalView(tzid);
-                }
+                return context.inZonalView(tzid);
             }
 
             return context;

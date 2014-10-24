@@ -369,6 +369,9 @@ public final class Attributes
      * protected element will not consume any following chars and possibly
      * use the default value setting of the current formatter instead. </p>
      *
+     * <p>Note: This attribute overrides any reserved area due to
+     * <i>adjacent digit parsing</i>. </p>
+     *
      * @since   1.3
      * @see     ChronoFormatter#withDefault
      */
@@ -382,6 +385,10 @@ public final class Attributes
      * verarbeitet wird. So ein gesch&uuml;tztes Element wird keine
      * folgenden Zeichen konsumieren und eventuell den Standardwert
      * des aktuellen Formatierers verwenden. </p>
+     *
+     * <p>Hinweis: Dieses Attribut &uuml;berlagert reservierte Ziffernbereiche,
+     * die dem Modus <i>adjacent digit parsing</i> von nachgelagerten Elementen
+     * mit fester Ziffernbreite zuzuschreiben sind. </p>
      *
      * @since   1.3
      * @see     ChronoFormatter#withDefault

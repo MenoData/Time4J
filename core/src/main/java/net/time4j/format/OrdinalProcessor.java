@@ -207,7 +207,10 @@ final class OrdinalProcessor
 
         int reserved = step.getReserved();
 
-        if (reserved > 0) {
+        if (
+            (reserved > 0)
+            && (protectedChars <= 0)
+        ) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?

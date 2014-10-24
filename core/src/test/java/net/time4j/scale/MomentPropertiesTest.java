@@ -60,6 +60,13 @@ public class MomentPropertiesTest {
     }
 
     @Test
+    public void testToStringEpoch() {
+        assertThat(
+            Moment.UNIX_EPOCH.toString(),
+            is("1970-01-01T00:00:00Z"));
+    }
+
+    @Test
     public void containsAmPm() {
         assertThat(this.utc.contains(AM_PM_OF_DAY), is(true));
     }

@@ -26,11 +26,13 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
+import net.time4j.tz.TZID;
 
 import java.text.ParseException;
 
@@ -191,10 +193,7 @@ final class IntervalParser
             ).booleanValue();
 
         if (!allowTrailingChars) {
-            attrs =
-                new AttributeWrapper(
-                    attributes,
-                    Attributes.TRAILING_CHARACTERS);
+            attrs = new Wrapper(attributes);
         }
 
         Class<T> type = this.startFormat.getChronology().getChronoType();
@@ -340,11 +339,13 @@ final class IntervalParser
                     IntervalFactory<T, I> iif = this.factory;
                     ChronoFormatter<T> fmt = this.endFormat;
                     ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
-                    for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
-                        fmt = withDefault(fmt, t1, key);
-                    }
                     if (lowerRaw.hasTimezone()) {
-                        fmt = fmt.withTimezone(lowerRaw.getTimezone());
+                        attrs = new Wrapper(attrs, lowerRaw.getTimezone());
+                    }
+                    ChronoValues cv =
+                        this.startFormat.getChronology().preformat(t1, attrs);
+                    for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
+                        fmt = setDefault(fmt, cv, key);
                     }
                     upperLog.reset();
                     upperLog.setPosition(pos);
@@ -468,37 +469,43 @@ final class IntervalParser
     }
 
     // wildcard capture
-    private static
-    <T extends ChronoEntity<T>, V> ChronoFormatter<T> withDefault(
+    private static <T extends ChronoEntity<T>, V> ChronoFormatter<T> setDefault(
         ChronoFormatter<T> fmt,
-        T timepoint,
+        ChronoValues cv,
         ChronoElement<V> key
     ) {
 
-        return fmt.withDefault(key, timepoint.get(key));
+        return fmt.withDefault(key, cv.get(key));
 
     }
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class AttributeWrapper
+    private static class Wrapper
         implements AttributeQuery {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final AttributeQuery attributes;
         private final AttributeKey<Boolean> specialKey;
+        private final TZID tzid;
 
         //~ Konstruktoren -------------------------------------------------
 
-        AttributeWrapper(
+        Wrapper(AttributeQuery attributes) {
+            this(attributes, null);
+
+        }
+
+        Wrapper(
             AttributeQuery attributes,
-            AttributeKey<Boolean> specialKey
+            TZID tzid
         ) {
             super();
 
             this.attributes = attributes;
-            this.specialKey = specialKey;
+            this.specialKey = Attributes.TRAILING_CHARACTERS;
+            this.tzid = tzid;
 
         }
 
@@ -508,6 +515,11 @@ final class IntervalParser
         public boolean contains(AttributeKey<?> key) {
             if (key.equals(this.specialKey)) {
                 return true;
+            } else if (
+                (this.tzid != null)
+                && key.equals(Attributes.TIMEZONE_ID)
+            ) {
+                return true;
             }
             return this.attributes.contains(key);
         }
@@ -516,6 +528,11 @@ final class IntervalParser
         public <A> A get(AttributeKey<A> key) {
             if (key.equals(this.specialKey)) {
                 return key.type().cast(Boolean.TRUE);
+            } else if (
+                (this.tzid != null)
+                && key.equals(Attributes.TIMEZONE_ID)
+            ) {
+                return key.type().cast(this.tzid);
             }
             return this.attributes.get(key);
         }
@@ -524,6 +541,11 @@ final class IntervalParser
         public <A> A get(AttributeKey<A> key, A defaultValue) {
             if (key.equals(this.specialKey)) {
                 return key.type().cast(Boolean.TRUE);
+            } else if (
+                (this.tzid != null)
+                && key.equals(Attributes.TIMEZONE_ID)
+            ) {
+                return key.type().cast(this.tzid);
             }
             return this.attributes.get(key, defaultValue);
         }
