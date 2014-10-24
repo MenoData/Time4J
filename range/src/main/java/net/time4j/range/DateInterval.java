@@ -637,7 +637,7 @@ public final class DateInterval
 
         if (sameFormat) {
             endFormat = startFormat;
-        } else{
+        } else {
             endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle);
         }
 
