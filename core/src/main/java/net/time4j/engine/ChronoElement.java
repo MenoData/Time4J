@@ -72,7 +72,7 @@ import java.util.Comparator;
  * @spec    All implementations must be immutable and serializable.
  */
 public interface ChronoElement<V>
-    extends Comparator<ChronoEntity<?>> {
+    extends Comparator<ChronoValues> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -135,7 +135,7 @@ public interface ChronoElement<V>
     char getSymbol();
 
     /**
-     * <p>Applies an element-orientated sorting of any chronological 
+     * <p>Applies an element-orientated sorting of any chronological
      * entities. </p>
      *
      * <p>The value type V is usually a subtype of the interface
@@ -188,8 +188,8 @@ public interface ChronoElement<V>
      */
     @Override
     int compare(
-        ChronoEntity<?> o1,
-        ChronoEntity<?> o2
+        ChronoValues o1,
+        ChronoValues o2
     );
 
     /**

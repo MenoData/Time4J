@@ -22,8 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoValues;
 
 import java.math.BigDecimal;
 
@@ -55,10 +54,10 @@ enum FractionalElement
 
     @Override
     public int compare(
-        ChronoEntity<?> o1,
-        ChronoEntity<?> o2
+        ChronoValues o1,
+        ChronoValues o2
     ) {
-        throw new ChronoException("Not comparable.");
+        return o1.get(this).compareTo(o2.get(this));
     }
 
     @Override

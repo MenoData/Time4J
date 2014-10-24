@@ -83,8 +83,8 @@ public abstract class AdvancedElement<V extends Comparable<V>>
      */
     @Override
     public int compare(
-        ChronoEntity<?> o1,
-        ChronoEntity<?> o2
+        ChronoValues o1,
+        ChronoValues o2
     ) {
 
         return o1.get(this).compareTo(o2.get(this));

@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoValues;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -67,8 +66,8 @@ enum AmPmElement
 
     @Override
     public int compare(
-        ChronoEntity<?> o1,
-        ChronoEntity<?> o2
+        ChronoValues o1,
+        ChronoValues o2
     ) {
 
         return o1.get(this).compareTo(o2.get(this));

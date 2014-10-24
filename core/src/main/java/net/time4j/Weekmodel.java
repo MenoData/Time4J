@@ -984,8 +984,8 @@ public final class Weekmodel
 
         @Override
         public int compare(
-            ChronoEntity<?> o1,
-            ChronoEntity<?> o2
+            ChronoValues o1,
+            ChronoValues o2
         ) {
 
             int i1 = o1.get(this).getValue(Weekmodel.this);
