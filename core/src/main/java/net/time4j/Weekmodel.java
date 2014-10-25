@@ -1260,8 +1260,7 @@ public final class Weekmodel
 
     private class CalendarWeekElement
         extends AbstractDateElement<Integer>
-        implements AdjustableElement<Integer, PlainDate>,
-                   NumericalElement<Integer> {
+        implements NumericalElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 

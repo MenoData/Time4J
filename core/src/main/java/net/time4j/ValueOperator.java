@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (LenientOperator.java) is part of project Time4J.
+ * This file (ValueOperator.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -25,29 +25,29 @@ import net.time4j.engine.ChronoOperator;
 
 
 /**
- * <p>Spezial-Operator f&uuml;r das nachsichtige Setzen von Werten auf einem
+ * <p>Spezial-Operator f&uuml;r das Setzen von Werten auf einem
  * {@code PlainTimestamp}. </p>
  *
  * @author  Meno Hochschild
  */
-final class LenientOperator
+final class ValueOperator
     implements ChronoOperator<PlainTimestamp> {
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoOperator<PlainTimestamp> delegate;
-    private final long value;
+    private final Object value;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    LenientOperator(
+    ValueOperator(
         ChronoOperator<PlainTimestamp> delegate,
         Object value
     ) {
         super();
 
         this.delegate = delegate;
-        this.value = Number.class.cast(value).longValue();
+        this.value = value;
 
     }
 
@@ -61,11 +61,11 @@ final class LenientOperator
     }
 
     /**
-     * <p>Liefert den Wert, der nachsichtig neu gesetzt werden soll. </p>
+     * <p>Liefert den Wert, der neu gesetzt werden soll. </p>
      *
-     * @return  new value which shall be set in lenient mode
+     * @return  new value which shall be set in standard or lenient mode
      */
-    long getValue() {
+    Object getValue() {
 
         return this.value;
 

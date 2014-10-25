@@ -41,6 +41,7 @@ public abstract class AdvancedElement<V extends Comparable<V>>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final int NEW_VALUE_MODE = 0;
     private static final int MIN_MODE = 1;
     private static final int MAX_MODE = 2;
     private static final int FLOOR_MODE = 3;
@@ -267,6 +268,36 @@ public abstract class AdvancedElement<V extends Comparable<V>>
 
     }
 
+    /**
+     * <p>Yields an operator which sets any entity such that its actual
+     * element value will be set in normal mode to given value. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   value       new element value
+     * @param   context     context type
+     * @return  operator
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen Operator, der eine beliebige Entit&auml;t so
+     * anpasst, da&szlig; dieses Element auf den angegebenen Wert im
+     * Standardmodus gesetzt wird. </p>
+     *
+     * @param   <T> generic type of target entity
+     * @param   value       new element value
+     * @param   context     context type
+     * @return  operator
+     * @since   2.0
+     */
+    public <T extends ChronoEntity<T>> ChronoOperator<T> newValue(
+        V value,
+        Class<T> context
+    ) {
+
+        return new StdOperator<T>(NEW_VALUE_MODE, this, value);
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class StdOperator<T extends ChronoEntity<T>>
@@ -307,6 +338,8 @@ public abstract class AdvancedElement<V extends Comparable<V>>
         public T apply(T entity) {
 
             switch (this.mode) {
+                case NEW_VALUE_MODE:
+                    return value(entity, this.element, this.value, false);
                 case MIN_MODE:
                     return min(entity, this.element);
                 case MAX_MODE:

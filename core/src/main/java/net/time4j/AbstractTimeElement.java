@@ -75,6 +75,13 @@ abstract class AbstractTimeElement<V extends Comparable<V>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
+    public ElementOperator<PlainTime> newValue(V value) {
+
+        return new TimeOperator(this, ElementOperator.OP_NEW_VALUE, value);
+
+    }
+
+    @Override
     public ElementOperator<PlainTime> minimized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));

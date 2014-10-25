@@ -46,6 +46,26 @@ public interface AdjustableElement<V, T>
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Sets any local entity to given new value of this element. </p>
+     *
+     * @param   value   new element value
+     * @return  operator directly applicable also on {@code PlainTimestamp}
+     * @since   2.0
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     */
+    /*[deutsch]
+     * <p>Setzt eine beliebige Entit&auml;t auf den angegebenen Wert. </p>
+     *
+     * @param   value   new element value
+     * @return  operator directly applicable also on {@code PlainTimestamp}
+     * @since   2.0
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     */
+    ElementOperator<T> newValue(V value);
+
+    /**
      * <p>Sets any local entity to the minimum of this element. </p>
      *
      * @return  operator directly applicable also on {@code PlainTimestamp}

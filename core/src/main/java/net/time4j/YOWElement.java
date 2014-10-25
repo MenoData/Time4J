@@ -46,8 +46,7 @@ import static net.time4j.PlainTime.WALL_TIME;
  */
 final class YOWElement
     extends AbstractDateElement<Integer>
-    implements AdjustableElement<Integer, PlainDate>,
-               NumericalElement<Integer> {
+    implements NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

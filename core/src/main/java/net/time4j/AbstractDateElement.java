@@ -75,6 +75,13 @@ abstract class AbstractDateElement<V extends Comparable<V>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
+    public ElementOperator<PlainDate> newValue(V value) {
+
+        return new DateOperator(this, ElementOperator.OP_NEW_VALUE, value);
+
+    }
+
+    @Override
     public ElementOperator<PlainDate> minimized() {
 
         return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));

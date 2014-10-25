@@ -124,7 +124,7 @@ public final class ZonalMoment
                 || ((offset.getAbsoluteSeconds() % 60) != 0)
             ) {
                 throw new IllegalArgumentException(
-                    "Leap second can only be formatted "
+                    "Leap second can only be represented "
                     + " with timezone-offset in full minutes: "
                     + offset);
             }

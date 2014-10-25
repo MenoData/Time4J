@@ -1774,6 +1774,20 @@ public final class Moment
 
     }
 
+    private static int getMaxSecondOfMinute(Moment context) {
+
+        int minutes = getTimeOfDay(context) / 60;
+        int second = 59;
+
+        if (((minutes / 60) == 23) && ((minutes % 60) == 59)) {
+            PlainDate date = context.getDateUTC();
+            second += LeapSeconds.getInstance().getShift(date);
+        }
+
+        return second;
+
+    }
+
     /**
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The format
@@ -2003,49 +2017,80 @@ public final class Moment
         @Override
         public Moment apply(Moment moment) {
 
-            // Spezialfall feingranulare Zeitarithmetik in der UTC-Ära
-            if (
-                LOW_TIME_ELEMENTS.containsKey(this.element)
-                && moment.isAfter(START_LS_CHECK)
-                && ((this.type == ElementOperator.OP_DECREMENT)
-                    || (this.type == ElementOperator.OP_INCREMENT)
-                    || (this.type == ElementOperator.OP_LENIENT))
-            ) {
-                int step = LOW_TIME_ELEMENTS.get(this.element).intValue();
-                long amount = 1;
-
-                if (this.type == ElementOperator.OP_DECREMENT) {
-                    amount = -1;
-                } else if (this.type == ElementOperator.OP_LENIENT) {
-                    long oldValue =
-                        Number.class.cast(moment.get(this.element)).longValue();
-                    long newValue =
-                        LenientOperator.class.cast(this.delegate).getValue();
-                    amount = MathUtils.safeSubtract(newValue, oldValue);
-                }
-
-                switch (step) {
-                    case 1:
-                        return moment.plus(amount, SECONDS);
-                    case 1000:
-                        return moment.plus(
-                            MathUtils.safeMultiply(MIO, amount), NANOSECONDS);
-                    case MIO:
-                        return moment.plus(
-                            MathUtils.safeMultiply(1000, amount), NANOSECONDS);
-                    case MRD:
-                        return moment.plus(amount, NANOSECONDS);
-                    default:
-                        throw new AssertionError();
-                }
-            }
-
-            // lokale Transformation
             Timezone timezone = (
                 (this.tz == null)
                 ? Timezone.ofSystem()
                 : this.tz);
 
+            if (
+                moment.isLeapSecond()
+                && isNonIsoOffset(timezone, moment)
+            ) {
+                throw new IllegalArgumentException(
+                    "Leap second can only be adjusted "
+                    + " with timezone-offset in full minutes: "
+                    + timezone.getOffset(moment));
+            }
+
+            // Spezialfall feingranulare Zeitarithmetik in der UTC-Ära
+            if (moment.isAfter(START_LS_CHECK)) {
+                if (
+                    (this.element == SECOND_OF_MINUTE)
+                    && (this.type == ElementOperator.OP_NEW_VALUE)
+                    && (this.extractValue() == 60)
+                ) {
+                    if (moment.isLeapSecond()) {
+                        return moment;
+                    } else if (isNonIsoOffset(timezone, moment)) {
+                        throw new IllegalArgumentException(
+                            "Leap second can only be set "
+                            + " with timezone-offset in full minutes: "
+                            + timezone.getOffset(moment));
+                    } else if (getMaxSecondOfMinute(moment) == 60) {
+                        return moment.plus(
+                            MathUtils.safeSubtract(60, this.extractOld(moment)),
+                            SECONDS);
+                    } else {
+                        throw new IllegalArgumentException(
+                            "Leap second invalid in context: " + moment);
+                    }
+                } else if (
+                    LOW_TIME_ELEMENTS.containsKey(this.element)
+                    && ((this.type == ElementOperator.OP_DECREMENT)
+                        || (this.type == ElementOperator.OP_INCREMENT)
+                        || (this.type == ElementOperator.OP_LENIENT))
+                ) {
+                    int step = LOW_TIME_ELEMENTS.get(this.element).intValue();
+                    long amount = 1;
+
+                    if (this.type == ElementOperator.OP_DECREMENT) {
+                        amount = -1;
+                    } else if (this.type == ElementOperator.OP_LENIENT) {
+                        long oldValue = this.extractOld(moment);
+                        long newValue = this.extractValue();
+                        amount = MathUtils.safeSubtract(newValue, oldValue);
+                    }
+
+                    switch (step) {
+                        case 1:
+                            return moment.plus(amount, SECONDS);
+                        case 1000:
+                            return moment.plus(
+                                MathUtils.safeMultiply(MIO, amount),
+                                NANOSECONDS);
+                        case MIO:
+                            return moment.plus(
+                                MathUtils.safeMultiply(1000, amount),
+                                NANOSECONDS);
+                        case MRD:
+                            return moment.plus(amount, NANOSECONDS);
+                        default:
+                            throw new AssertionError();
+                    }
+                }
+            }
+
+            // lokale Transformation
             PlainTimestamp ts = moment.in(timezone).with(this.delegate);
             Moment result = ts.in(timezone);
 
@@ -2088,6 +2133,7 @@ public final class Moment
                 || (this.element == NANO_OF_SECOND)
             ) {
                 switch (this.type) {
+                    case ElementOperator.OP_NEW_VALUE:
                     case ElementOperator.OP_MINIMIZE:
                     case ElementOperator.OP_MAXIMIZE:
                     case ElementOperator.OP_CEILING:
@@ -2101,6 +2147,35 @@ public final class Moment
             }
 
             return result;
+
+        }
+
+        private long extractOld(Moment context) {
+
+            return Number.class.cast(
+                context.getTimeUTC().get(this.element)
+            ).longValue();
+
+        }
+
+        private long extractValue() {
+
+            Object obj = ValueOperator.class.cast(this.delegate).getValue();
+            return Number.class.cast(obj).longValue();
+
+        }
+
+        private static boolean isNonIsoOffset(
+            Timezone timezone,
+            Moment context
+        ) {
+
+            ZonalOffset offset = timezone.getOffset(context);
+
+            return (
+                (offset.getFractionalAmount() != 0)
+                || ((offset.getAbsoluteSeconds() % 60) != 0)
+            );
 
         }
 
@@ -2397,20 +2472,6 @@ public final class Moment
 
             // Operatoren nur für PlainXYZ definiert!
             throw new AssertionError("Should never be called.");
-
-        }
-
-        private static int getMaxSecondOfMinute(Moment context) {
-
-            int minutes = getTimeOfDay(context) / 60;
-            int second = 59;
-
-            if (((minutes / 60) == 23) && ((minutes % 60) == 59)) {
-                PlainDate date = context.getDateUTC();
-                second += LeapSeconds.getInstance().getShift(date);
-            }
-
-            return second;
 
         }
 

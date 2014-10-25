@@ -72,6 +72,10 @@ final class DateOperator
         super(element, type);
 
         switch (type) {
+            case OP_NEW_VALUE:
+                this.opCache = newValue(element, value);
+                this.tsCache = newValueTS(element, value);
+                break;
             case OP_MINIMIZE:
                 this.opCache = element.minimized(PlainDate.class);
                 this.tsCache = element.minimized(PlainTimestamp.class);
@@ -132,6 +136,33 @@ final class DateOperator
     }
 
     private static <V extends Comparable<V>>
+    ChronoOperator<PlainDate> newValue(
+        AdvancedElement<V> element,
+        Object value
+    ) {
+
+        return element.newValue(
+            element.getType().cast(value),
+            PlainDate.class);
+
+    }
+
+    private static <V extends Comparable<V>>
+    ChronoOperator<PlainTimestamp> newValueTS(
+        AdvancedElement<V> element,
+        Object value
+    ) {
+
+        return new ValueOperator(
+            element.newValue(
+                element.getType().cast(value),
+                PlainTimestamp.class),
+            value
+        );
+
+    }
+
+    private static <V extends Comparable<V>>
     ChronoOperator<PlainDate> lenient(
         AdvancedElement<V> element,
         Object value
@@ -149,11 +180,11 @@ final class DateOperator
         Object value
     ) {
 
-        return new LenientOperator(
+        return new ValueOperator(
             element.setLenient(
                 element.getType().cast(value),
                 PlainTimestamp.class),
-            Number.class.cast(value)
+            value
         );
 
     }
