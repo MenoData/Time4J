@@ -1190,6 +1190,7 @@ public final class Moment
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @see     PatternType
      * @see     #localFormatter(String,ChronoPattern)
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
@@ -1210,8 +1211,9 @@ public final class Moment
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @see     PatternType
      * @see     #localFormatter(String,ChronoPattern)
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatter(
+    public static ChronoFormatter<Moment> formatterUTC(
         String formatPattern,
         ChronoPattern patternType,
         Locale locale
@@ -1241,6 +1243,7 @@ public final class Moment
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
      * @see     #localFormatter(DisplayMode)
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
@@ -1257,8 +1260,9 @@ public final class Moment
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
      * @see     #localFormatter(DisplayMode)
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatter(
+    public static ChronoFormatter<Moment> formatterUTC(
         DisplayMode mode,
         Locale locale
     ) {

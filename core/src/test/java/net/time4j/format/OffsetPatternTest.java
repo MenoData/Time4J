@@ -109,7 +109,7 @@ public class OffsetPatternTest {
         super();
 
         this.formatter =
-            Moment.formatter(
+            Moment.formatterUTC(
                 pattern,
                 PatternType.CLDR,
                 toLocale(locale))
