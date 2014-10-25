@@ -41,7 +41,7 @@ import net.time4j.engine.ChronoElement;
  * @author  Meno Hochschild
  */
 public interface AdjustableElement<V, T>
-    extends ChronoElement<V> {
+    extends ZonalElement<V> {
 
     //~ Methoden ----------------------------------------------------------
 

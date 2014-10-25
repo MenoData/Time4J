@@ -21,8 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
-
 
 /**
  * <p>Represents the calendar date. </p>
@@ -37,7 +35,7 @@ import net.time4j.engine.ChronoElement;
  * @since   1.2
  */
 public interface CalendarDateElement
-    extends ChronoElement<PlainDate> {
+    extends ZonalElement<PlainDate> {
 
     //~ Methoden ----------------------------------------------------------
 

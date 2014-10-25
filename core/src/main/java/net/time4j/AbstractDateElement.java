@@ -22,6 +22,10 @@
 package net.time4j;
 
 import net.time4j.engine.AdvancedElement;
+import net.time4j.engine.ChronoFunction;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -126,6 +130,41 @@ abstract class AbstractDateElement<V extends Comparable<V>>
     public ElementOperator<PlainDate> setLenient(V value) {
 
         return new DateOperator(this, ElementOperator.OP_LENIENT, value);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, V> inStdTimezone() {
+
+        return this.in(Timezone.ofSystem());
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, V> inTimezone(TZID tzid) {
+
+        return this.in(Timezone.of(tzid));
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, V> in(Timezone tz) {
+
+        return new ZonalQuery<V>(this, tz);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, V> atUTC() {
+
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, V> at(ZonalOffset offset) {
+
+        return new ZonalQuery<V>(this, offset);
 
     }
 

@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import net.time4j.base.UnixTime;
+
 import java.io.Serializable;
 
 
@@ -249,7 +251,8 @@ public abstract class BasicElement<V>
      *
      * <p>Diese Implementierung liefert {@code null}, um anzuzeigen, da&szlig;
      * per Standard kein Veto gegen den Gebrauch dieses Elements in der
-     * angegebenen Chronologie eingelegt wird. </p>
+     * angegebenen Chronologie eingelegt wird, es sei denn, dieses Element
+     * ist lokal und die angegebene Chronologie global. </p>
      *
      * @param   chronology      chronologischer Kontext
      * @return  Fehlermeldung als Veto oder {@code null}
@@ -257,7 +260,32 @@ public abstract class BasicElement<V>
      */
     protected String getVeto(Chronology<?> chronology) {
 
+        if (
+            this.isLocal()
+            && UnixTime.class.isAssignableFrom(chronology.getChronoType())
+        ) {
+            return "Accessing the local element ["
+                   + this.name
+                   + "] from a global type requires a timezone. Try to apply "
+                   + "a zonal query or to first convert the global type to "
+                   + "a zonal timestamp: "
+                   + "\"moment.toZonalTimestamp(...)\".";
+        }
+
         return null;
+
+    }
+
+    /**
+     * <p>Elemente sind normalerweise lokal und k&ouml;nnen deshalb nicht
+     * in einem globalen Kontext verwendet werden. </p>
+     *
+     * @return  {@code true}
+     * @see     #getVeto(Chronology)
+     */
+    protected boolean isLocal() {
+
+        return true;
 
     }
 

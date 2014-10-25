@@ -21,8 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
-
 
 /**
  * <p>Represents the wall time. </p>
@@ -43,7 +41,7 @@ import net.time4j.engine.ChronoElement;
  * @since   1.2
  */
 public interface WallTimeElement
-    extends ChronoElement<PlainTime> {
+    extends ZonalElement<PlainTime> {
 
     //~ Methoden ----------------------------------------------------------
 

@@ -22,12 +22,16 @@
 package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoValues;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.ParseLog;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -42,11 +46,11 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @concurrency <immutable>
  */
 enum AmPmElement
-    implements TextElement<Meridiem> {
+    implements ZonalElement<Meridiem>, TextElement<Meridiem> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    AM_PM_OF_DAY;
+     AM_PM_OF_DAY;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -106,6 +110,41 @@ enum AmPmElement
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, Meridiem> inStdTimezone() {
+
+        return this.in(Timezone.ofSystem());
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, Meridiem> inTimezone(TZID tzid) {
+
+        return this.in(Timezone.of(tzid));
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, Meridiem> in(Timezone tz) {
+
+        return new ZonalQuery<Meridiem>(this, tz);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, Meridiem> atUTC() {
+
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, Meridiem> at(ZonalOffset offset) {
+
+        return new ZonalQuery<Meridiem>(this, offset);
 
     }
 

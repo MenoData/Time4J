@@ -21,10 +21,12 @@
 
 package net.time4j;
 
-import net.time4j.base.UnixTime;
 import net.time4j.engine.BasicElement;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoValues;
-import net.time4j.engine.Chronology;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.ObjectStreamException;
 
@@ -145,15 +147,37 @@ final class DateElement
     }
 
     @Override
-    protected String getVeto(Chronology<?> chronology) {
+    public ChronoFunction<Moment, PlainDate> inStdTimezone() {
 
-        if (UnixTime.class.isAssignableFrom(chronology.getChronoType())) {
-            return "Accessing the calendar date component from a global type "
-                   + "requires a timezone. Try to first convert the global "
-                   + "type to a PlainTimestamp: \"moment.inZonalView(...)\".";
-        }
+        return this.in(Timezone.ofSystem());
 
-        return null;
+    }
+
+    @Override
+    public ChronoFunction<Moment, PlainDate> inTimezone(TZID tzid) {
+
+        return this.in(Timezone.of(tzid));
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, PlainDate> in(Timezone tz) {
+
+        return new ZonalQuery<PlainDate>(this, tz);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, PlainDate> atUTC() {
+
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, PlainDate> at(ZonalOffset offset) {
+
+        return new ZonalQuery<PlainDate>(this, offset);
 
     }
 

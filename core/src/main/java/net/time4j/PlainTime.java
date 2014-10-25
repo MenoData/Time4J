@@ -296,7 +296,7 @@ public final class PlainTime
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
     @FormattableElement(format = "a")
-    public static final ChronoElement<Meridiem> AM_PM_OF_DAY =
+    public static final ZonalElement<Meridiem> AM_PM_OF_DAY =
         AmPmElement.AM_PM_OF_DAY;
 
     /**
