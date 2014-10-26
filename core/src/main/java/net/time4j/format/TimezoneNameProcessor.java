@@ -154,7 +154,7 @@ final class TimezoneNameProcessor
         ) {
             positions.add(
                 new ElementPosition(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     start,
                     start + printed));
         }
@@ -300,7 +300,7 @@ final class TimezoneNameProcessor
             (zones.size() == 1)
             || leniency.isLax()
         ) {
-            parsedResult.put(ZonalElement.TIMEZONE_ID, zones.get(0));
+            parsedResult.put(TimezoneElement.TIMEZONE_ID, zones.get(0));
             status.setPosition(pos);
             status.setDaylightSaving(daylightSaving);
         } else {
@@ -314,7 +314,7 @@ final class TimezoneNameProcessor
     @Override
     public ChronoElement<TZID> getElement() {
 
-        return ZonalElement.TIMEZONE_ID;
+        return TimezoneElement.TIMEZONE_ID;
 
     }
 

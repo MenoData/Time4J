@@ -208,14 +208,14 @@ class ParsedValues
     @Override
     public boolean hasTimezone() {
 
-        return this.map.containsKey(ZonalElement.TIMEZONE_ID);
+        return this.map.containsKey(TimezoneElement.TIMEZONE_ID);
 
     }
 
     @Override
     public TZID getTimezone() {
 
-        Object tz = this.map.get(ZonalElement.TIMEZONE_ID);
+        Object tz = this.map.get(TimezoneElement.TIMEZONE_ID);
 
         if (tz instanceof TZID) {
             return TZID.class.cast(tz);

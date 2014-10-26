@@ -233,7 +233,7 @@ final class TimezoneOffsetProcessor
         ) {
             positions.add(
                 new ElementPosition(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     start,
                     start + printed));
         }
@@ -275,7 +275,7 @@ final class TimezoneOffsetProcessor
                     (caseInsensitive && compare.equalsIgnoreCase(zeroOffset))
                     || (!caseInsensitive && compare.equals(zeroOffset))
                 ) {
-                    parsedResult.put(ZonalElement.TIMEZONE_ID, ZonalOffset.UTC);
+                    parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
                     status.setPosition(pos + zl);
                     return;
                 }
@@ -322,7 +322,7 @@ final class TimezoneOffsetProcessor
         if (pos >= len) {
             if (this.precision == SHORT) {
                 parsedResult.put(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
@@ -342,7 +342,7 @@ final class TimezoneOffsetProcessor
                 pos++;
             } else if (this.precision == SHORT) {
                 parsedResult.put(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
                 return;
@@ -360,7 +360,7 @@ final class TimezoneOffsetProcessor
                 && !this.extended
             ) {
                 parsedResult.put(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
@@ -446,7 +446,7 @@ final class TimezoneOffsetProcessor
             offset = ZonalOffset.ofTotalSeconds(total, fraction);
         }
 
-        parsedResult.put(ZonalElement.TIMEZONE_ID, offset);
+        parsedResult.put(TimezoneElement.TIMEZONE_ID, offset);
         status.setPosition(pos);
 
     }
@@ -454,7 +454,7 @@ final class TimezoneOffsetProcessor
     @Override
     public ChronoElement<TZID> getElement() {
 
-        return ZonalElement.TIMEZONE_ID;
+        return TimezoneElement.TIMEZONE_ID;
 
     }
 

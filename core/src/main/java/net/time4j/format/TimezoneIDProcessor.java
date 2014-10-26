@@ -81,7 +81,7 @@ enum TimezoneIDProcessor
         ) {
             positions.add(
                 new ElementPosition(
-                    ZonalElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_ID,
                     start,
                     start + printed));
         }
@@ -144,7 +144,7 @@ enum TimezoneIDProcessor
                 + "use UTC-Offsets instead.");
             return;
         } else if (key.equals("Z")) {
-            parsedResult.put(ZonalElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         } else if (
@@ -161,7 +161,7 @@ enum TimezoneIDProcessor
                     return;
                 }
             }
-            parsedResult.put(ZonalElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         }
@@ -181,7 +181,7 @@ enum TimezoneIDProcessor
             } else if (cmp > 0) {
                 high = mid - 1;
             } else {
-                parsedResult.put(ZonalElement.TIMEZONE_ID, zone);
+                parsedResult.put(TimezoneElement.TIMEZONE_ID, zone);
                 status.setPosition(pos);
                 return;
             }
@@ -194,7 +194,7 @@ enum TimezoneIDProcessor
     @Override
     public ChronoElement<TZID> getElement() {
 
-        return ZonalElement.TIMEZONE_ID;
+        return TimezoneElement.TIMEZONE_ID;
 
     }
 
