@@ -267,7 +267,9 @@ public abstract class BasicElement<V>
             return "Accessing the local element ["
                    + this.name
                    + "] from a global type requires a timezone. Try to apply "
-                   + "a zonal query or to first convert the global type to "
+                   + "a zonal query like \""
+                   + this.name
+                   + ".atUTC()\" or to first convert the global type to "
                    + "a zonal timestamp: "
                    + "\"moment.toZonalTimestamp(...)\".";
         }
