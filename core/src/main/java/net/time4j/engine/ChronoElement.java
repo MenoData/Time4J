@@ -267,7 +267,7 @@ public interface ChronoElement<V>
     boolean isDateElement();
 
     /**
-     * <p>Queries if this element represents a wall time  element. </p>
+     * <p>Queries if this element represents a wall time element. </p>
      *
      * @return  boolean
      * @see     #isDateElement()

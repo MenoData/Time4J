@@ -50,7 +50,7 @@ enum AmPmElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-     AM_PM_OF_DAY;
+    AM_PM_OF_DAY;
 
     //~ Methoden ----------------------------------------------------------
 
