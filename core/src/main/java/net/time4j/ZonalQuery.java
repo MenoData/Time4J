@@ -75,7 +75,10 @@ class ZonalQuery<V>
     @Override
     public V apply(Moment context) {
 
-        ZonalOffset shift = this.getShift(context);
+        ZonalOffset shift = (
+            (this.offset == null)
+            ? this.tz.getOffset(context)
+            : this.offset);
 
         if (
             (this.element == PlainTime.SECOND_OF_MINUTE)
@@ -87,15 +90,6 @@ class ZonalQuery<V>
         }
 
         return PlainTimestamp.from(context, shift).get(this.element);
-
-    }
-
-    private ZonalOffset getShift(Moment context) {
-
-        return (
-            (this.offset == null)
-            ? this.tz.getOffset(context)
-            : this.offset);
 
     }
 

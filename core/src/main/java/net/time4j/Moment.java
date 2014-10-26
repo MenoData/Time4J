@@ -91,50 +91,21 @@ import static net.time4j.scale.TimeScale.UTC;
  * in millisecond but in nanosecond precision on 96-bit base. </p>
  *
  * <p>Following elements which are declared as constants are registered by
- * this class with access in UTC timezone (always without base unit): </p>
+ * this class with access in UTC timezone: </p>
  *
  * <ul>
- *  <li>{@link PlainDate#YEAR}</li>
- *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
- *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
- *  <li>{@link PlainDate#MONTH_OF_YEAR}</li>
- *  <li>{@link PlainDate#MONTH_AS_NUMBER}</li>
- *  <li>{@link PlainDate#DAY_OF_MONTH}</li>
- *  <li>{@link PlainDate#DAY_OF_QUARTER}</li>
- *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
- *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
- *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
- *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
- *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
- *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
- *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#ISO_HOUR}</li>
- *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
- *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
- *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
- *  <li>{@link PlainTime#SECOND_OF_DAY}</li>
- *  <li>{@link PlainTime#MILLI_OF_SECOND}</li>
- *  <li>{@link PlainTime#MICRO_OF_SECOND}</li>
- *  <li>{@link PlainTime#NANO_OF_SECOND}</li>
- *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
- *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
- *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ *  <li>{@link #POSIX_TIME}</li>
+ *  <li>{@link #FRACTION}</li>
  * </ul>
  *
- * <p>Furthermore, all elements of class {@link Weekmodel} are supported.
- * The elements allow the access to values relative to the timezone UTC.
- * If a {@code Moment} is queried for its hour then it will yield the hour
- * in the timezone UTC. This is different from the JDK-classes
- * {@code java.util.Date} (accessing the default timezone) and
- * {@code java.time.Instant} (no element access possible). A {@code Moment}
- * offers a dual view both on a machine counter as well as on a tuple of
- * date- and time-values, always in the timezone UTC. </p>
- *
- * <p>A {@code Moment} is also capable of delivering the date- and time-values
- * in a different timezone if the method {@link #toZonalTimestamp(TZID)} is called.
- * If zonal operators are defined by any elements then manipulations of related
- * data are possible in any timezone. </p>
+ * <p>Furthermore, most local elements like {@code PlainTime.ISO_HOUR} etc.
+ * registered in class {@code PlainTimestamp} or those defined in
+ * {@link Weekmodel} are indirectly supported via the queries in the
+ * interface {@link ZonalElement}. A {@code Moment} is also capable of
+ * delivering the date- and time-values in a different timezone if the
+ * method {@link #toZonalTimestamp(TZID)} is called. If zonal operators
+ * are defined by any elements then manipulations of related data are
+ * possible in any timezone. </p>
  *
  * <h3>Time arithmetic</h3>
  *
@@ -157,51 +128,23 @@ import static net.time4j.scale.TimeScale.UTC;
  * sondern in Nanosekunden auf 96-Bit-Basis. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente mit
- * Zugriff in der UTC-Zeitzone (immer ohne Basiseinheit): </p>
+ * Zugriff in der UTC-Zeitzone: </p>
  *
  * <ul>
- *  <li>{@link PlainDate#YEAR}</li>
- *  <li>{@link PlainDate#YEAR_OF_WEEKDATE}</li>
- *  <li>{@link PlainDate#QUARTER_OF_YEAR}</li>
- *  <li>{@link PlainDate#MONTH_OF_YEAR}</li>
- *  <li>{@link PlainDate#MONTH_AS_NUMBER}</li>
- *  <li>{@link PlainDate#DAY_OF_MONTH}</li>
- *  <li>{@link PlainDate#DAY_OF_QUARTER}</li>
- *  <li>{@link PlainDate#DAY_OF_WEEK}</li>
- *  <li>{@link PlainDate#DAY_OF_YEAR}</li>
- *  <li>{@link PlainDate#WEEKDAY_IN_MONTH}</li>
- *  <li>{@link PlainTime#AM_PM_OF_DAY}</li>
- *  <li>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</li>
- *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
- *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#ISO_HOUR}</li>
- *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
- *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
- *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
- *  <li>{@link PlainTime#SECOND_OF_DAY}</li>
- *  <li>{@link PlainTime#MILLI_OF_SECOND}</li>
- *  <li>{@link PlainTime#MICRO_OF_SECOND}</li>
- *  <li>{@link PlainTime#NANO_OF_SECOND}</li>
- *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
- *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
- *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ *  <li>{@link #POSIX_TIME}</li>
+ *  <li>{@link #FRACTION}</li>
  * </ul>
  *
- * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}
- * nutzbar. Die Elemente erlauben den Zugriff bezogen auf die Zeitzone UTC.
- * Wird zum Beispiel ein {@code Moment} nach seiner aktuellen Stunde gefragt,
- * dann wird die Stunde in der UTC-Zeitzone zur&uuml;ckgegeben. Das steht im
- * Kontrast zu den JDK-Klassen {@code java.util.Date} (Zugriff auf die lokale
- * Zeitzone) und {@code java.time.Instant} (kein Element- bzw. Feldzugriff
- * m&ouml;glich). Ein {@code Moment} bietet also eine duale Sicht sowohl auf
- * einen maschinellen Z&auml;hler als auch auf ein Tupel von Datums- und
- * Zeitwerten, immer in der Zeitzone UTC. </p>
- *
- * <p>Ein {@code Moment} kann die Datums- und Zeitwerte auch in einer anderen
- * Zeitzone liefern, wenn die Methode {@link #toZonalTimestamp(TZID)} aufgerufen
- * wird. Falls &uuml;ber die Elemente zonale Operatoren zur Verf&uuml;gung
- * stehen, sind auch Manipulationen in beliebigen Zeitzonen m&ouml;glich. </p>
+ * <p>Dar&uuml;berhinaus sind die meisten lokalen Elemente wie
+ * {@code PlainTime.ISO_HOUR} usw., die in der Klasse {@code PlainTimestamp}
+ * registriert sind oder jene definiert in {@link Weekmodel}, indirekt
+ * unterst&uuml;tzt, wenn &uuml;ber die entsprechenden Abfragen im Interface
+ * {@link ZonalElement} eine Zeitzonenreferenz angegeben wird. Ein
+ * {@code Moment} kann auch die Datums- und Zeitwerte in einer beliebigen
+ * Zeitzone ausgeben, wenn die Methode {@link #toZonalTimestamp(TZID)}
+ * aufgerufen wird. Wenn Elemente zonale Operatoren definieren, dann sind
+ * Manipulationen der zugeh&ouml;rigen Daten in einer beliebigen Zeitzone
+ * m&ouml;glich. </p>
  *
  * <h3>Zeitarithmetik</h3>
  *
@@ -254,14 +197,6 @@ public final class Moment
 
     private static final Moment MIN = new Moment(MIN_LIMIT, 0, POSIX);
     private static final Moment MAX = new Moment(MAX_LIMIT, MRD - 1, POSIX);
-
-    /**
-     * <p>Start of UNIX-era = [1970-01-01T00:00:00,000000000Z]. </p>
-     */
-    /*[deutsch]
-     * <p>Start der UNIX-&Auml;ra = [1970-01-01T00:00:00,000000000Z]. </p>
-     */
-    public static final Moment UNIX_EPOCH = new Moment(0, 0, TimeScale.POSIX);
 
     private static final ChronoFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
@@ -321,27 +256,14 @@ public final class Moment
                 UNIT_LENGTHS.keySet());
         }
 
-        Set<ChronoElement<?>> dateElements =
-            Chronology.lookup(PlainDate.class).getRegisteredElements();
-
-        for (ChronoElement<?> element : dateElements) {
-            if (!element.name().equals("CALENDAR_DATE")) {
-                doAppend(builder, element);
-            }
-        }
-
-        Set<ChronoElement<?>> timeElements =
-            Chronology.lookup(PlainTime.class).getRegisteredElements();
-
-        for (ChronoElement<?> element : timeElements) {
-            if (
-                !element.name().startsWith("DECIMAL")
-                && !element.name().equals("PRECISION")
-                && !element.name().equals("WALL_TIME")
-            ) {
-                doAppend(builder, element);
-            }
-        }
+        builder.appendElement(
+            PosixTime.POSIX_TIME,
+            PosixTime.POSIX_TIME,
+            TimeUnit.SECONDS);
+        builder.appendElement(
+            Fraction.FRACTION,
+            Fraction.FRACTION,
+            TimeUnit.NANOSECONDS);
 
         ENGINE = builder.withTimeLine(new SITimeLine()).build();
 
@@ -377,6 +299,40 @@ public final class Moment
             .endSection()
             .build();
     }
+
+    /**
+     * <p>Start of UNIX-era = [1970-01-01T00:00:00,000000000Z]. </p>
+     */
+    /*[deutsch]
+     * <p>Start der UNIX-&Auml;ra = [1970-01-01T00:00:00,000000000Z]. </p>
+     */
+    public static final Moment UNIX_EPOCH = new Moment(0, 0, TimeScale.POSIX);
+
+    /**
+     * <p>Represents the POSIX-time in seconds since UNIX-epoch. </p>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die POSIX-Zeit in Sekunden seit der
+     * UNIX-Epoche. </p>
+     *
+     * @since   2.0
+     */
+    public static final ChronoElement<Long> POSIX_TIME = PosixTime.POSIX_TIME;
+
+    /**
+     * <p>Represents the nano-fraction of current second. </p>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert den Nanosekundenbruchteil der aktuellen
+     * Sekunde. </p>
+     *
+     * @since   2.0
+     */
+    public static final ChronoElement<Integer> FRACTION = Fraction.FRACTION;
 
     private static final long serialVersionUID = -3192884724477742274L;
 
@@ -1768,16 +1724,6 @@ public final class Moment
 
     }
 
-    // wildcard capture
-    private static <V> void doAppend(
-        TimeAxis.Builder<TimeUnit, Moment> builder,
-        ChronoElement<V> element
-    ) {
-
-        builder.appendElement(element, FieldRule.of(element));
-
-    }
-
     private static int getMaxSecondOfMinute(Moment context) {
 
         int minutes = getTimeOfDay(context) / 60;
@@ -2296,186 +2242,276 @@ public final class Moment
 
     }
 
-    private static class FieldRule<V>
-        implements ElementRule<Moment, V> {
+    private static enum PosixTime
+        implements ChronoElement<Long>, ElementRule<Moment, Long> {
 
-        //~ Instanzvariablen ----------------------------------------------
+        //~ Statische Felder/Initialisierungen ----------------------------
 
-        private final ChronoElement<V> element;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private FieldRule(ChronoElement<V> element) {
-            super();
-
-            this.element = element;
-
-        }
+        POSIX_TIME;
 
         //~ Methoden ------------------------------------------------------
 
-        static <V> FieldRule<V> of(ChronoElement<V> element) {
+        @Override
+        public Class<Long> getType() {
 
-            return new FieldRule<V>(element);
+            return Long.class;
 
         }
 
         @Override
-        public V getValue(Moment context) {
+        public char getSymbol() {
 
-            Object ret = null;
-
-            if (this.element.isDateElement()) {
-                return context.getDateUTC().get(this.element);
-            } else if (this.element == SECOND_OF_MINUTE) {
-                ret =
-                    Integer.valueOf(
-                        context.isLeapSecond()
-                        ? 60
-                        : (getTimeOfDay(context) % 60));
-            } else if (this.element.isTimeElement()) {
-                return context.getTimeUTC().get(this.element);
-            }
-
-            assert (ret != null);
-            return this.element.getType().cast(ret);
+            return '\u0000';
 
         }
 
         @Override
-        public V getMinimum(Moment context) {
+        public int compare(
+            ChronoValues o1,
+            ChronoValues o2
+        ) {
 
-            if (this.element.isDateElement()) {
-                return context.getDateUTC().getMinimum(this.element);
-            } else if (this.element.isTimeElement()) {
-                return this.element.getDefaultMinimum();
-            }
-
-            throw new ChronoException(
-                "Missing rule for: " + this.element.name());
+            return o1.get(this).compareTo(o2.get(this));
 
         }
 
         @Override
-        public V getMaximum(Moment context) {
+        public Long getDefaultMinimum() {
 
-            if (this.element.isDateElement()) {
-                return context.getDateUTC().getMaximum(this.element);
-            }
+            return Long.valueOf(MIN_LIMIT);
 
-            Object ret = null;
+        }
 
-            if (this.element == SECOND_OF_MINUTE) {
-                ret = Integer.valueOf(getMaxSecondOfMinute(context));
-            } else if (this.element.isTimeElement()) {
-                return this.element.getDefaultMaximum();
-            }
+        @Override
+        public Long getDefaultMaximum() {
 
-            assert (ret != null);
-            return this.element.getType().cast(ret);
+            return Long.valueOf(MAX_LIMIT);
+
+        }
+
+        @Override
+        public boolean isDateElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public boolean isTimeElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public boolean isLenient() {
+
+            return false;
+
+        }
+
+        @Override
+        public Long getValue(Moment context) {
+
+            return Long.valueOf(context.getPosixTime());
+
+        }
+
+        @Override
+        public Long getMinimum(Moment context) {
+
+            return Long.valueOf(MIN_LIMIT);
+
+        }
+
+        @Override
+        public Long getMaximum(Moment context) {
+
+            return Long.valueOf(MAX_LIMIT);
 
         }
 
         @Override
         public boolean isValid(
             Moment context,
-            V value
+            Long value
         ) {
 
-            if (this.element.isDateElement()) {
-                return context.getDateUTC().isValid(this.element, value);
-            } else if (this.element.isTimeElement()) {
-                if (Number.class.isAssignableFrom(this.element.getType())) {
-                    if (value == null) {
-                        return false;
-                    }
-                    long min =
-                        Number.class.cast(this.getMinimum(context)).longValue();
-                    long max =
-                        Number.class.cast(this.getMaximum(context)).longValue();
-                    long val = Number.class.cast(value).longValue();
-                    return ((min <= val) && (max >= val));
-                } else {
-                    return context.getTimeUTC().isValid(this.element, value);
-                }
+            if (value == null) {
+                return false;
             }
 
-            throw new ChronoException(
-                "Missing rule for: " + this.element.name());
+            long val = value.longValue();
+            return ((val >= MIN_LIMIT) && (val <= MAX_LIMIT));
 
         }
 
         @Override
         public Moment withValue(
             Moment context,
-            V value,
+            Long value,
             boolean lenient
         ) {
 
-            assert (lenient == false);
-
-            if (value == null) {
-                throw new NullPointerException("Missing value.");
-            } else if (!this.isValid(context, value)) {
-                throw new IllegalArgumentException(
-                    value + " invalid on [" + this.element.name()
-                    + "] in context: " + context);
-            }
-
-            if (
-                LOW_TIME_ELEMENTS.containsKey(this.element)
-                && context.isAfter(START_LS_CHECK)
-            ) {
-                long delta =
-                    MathUtils.safeSubtract(
-                        Number.class.cast(value).longValue(),
-                        Number.class.cast(this.getValue(context)).longValue());
-                int step = LOW_TIME_ELEMENTS.get(this.element).intValue();
-
-                switch (step) {
-                    case 1:
-                        return context.plus(delta, SECONDS);
-                    case 1000:
-                        return context.plus(delta * MIO, NANOSECONDS);
-                    case MIO:
-                        return context.plus(delta * 1000, NANOSECONDS);
-                    case MRD:
-                        return context.plus(delta, NANOSECONDS);
-                    default:
-                        throw new AssertionError();
-                }
-            }
-
-            PlainTimestamp ts = context.toZonalTimestamp(ZonalOffset.UTC);
-            ts = ts.with(this.element, value);
-            Moment result = ts.inTimezone(ZonalOffset.UTC);
-
-            if (
-                this.element.isDateElement()
-                || HIGH_TIME_ELEMENTS.contains(this.element)
-            ) {
-                if (context.isLeapSecond()) {
-                    return moveEventuallyToLS(result);
-                }
-            }
-
-            return result;
+            return Moment.of(
+                value.longValue(),
+                context.getNanosecond(),
+                TimeScale.POSIX);
 
         }
 
         @Override
         public ChronoElement<?> getChildAtFloor(Moment context) {
 
-            // Operatoren nur für PlainXYZ definiert!
-            throw new AssertionError("Should never be called.");
+            return Fraction.FRACTION;
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(Moment context) {
 
-            // Operatoren nur für PlainXYZ definiert!
-            throw new AssertionError("Should never be called.");
+            return Fraction.FRACTION;
+
+        }
+
+    }
+
+    private static enum Fraction
+        implements ChronoElement<Integer>, ElementRule<Moment, Integer> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        FRACTION;
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Class<Integer> getType() {
+
+            return Integer.class;
+
+        }
+
+        @Override
+        public char getSymbol() {
+
+            return '\u0000';
+
+        }
+
+        @Override
+        public int compare(
+            ChronoValues o1,
+            ChronoValues o2
+        ) {
+
+            return o1.get(this).compareTo(o2.get(this));
+
+        }
+
+        @Override
+        public Integer getDefaultMinimum() {
+
+            return Integer.valueOf(0);
+
+        }
+
+        @Override
+        public Integer getDefaultMaximum() {
+
+            return Integer.valueOf(MRD - 1);
+
+        }
+
+        @Override
+        public boolean isDateElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public boolean isTimeElement() {
+
+            return false;
+
+        }
+
+        @Override
+        public boolean isLenient() {
+
+            return false;
+
+        }
+
+        @Override
+        public Integer getValue(Moment context) {
+
+            return Integer.valueOf(context.getNanosecond());
+
+        }
+
+        @Override
+        public Integer getMinimum(Moment context) {
+
+            return this.getDefaultMinimum();
+
+        }
+
+        @Override
+        public Integer getMaximum(Moment context) {
+
+            return this.getDefaultMaximum();
+
+        }
+
+        @Override
+        public boolean isValid(
+            Moment context,
+            Integer value
+        ) {
+
+            if (value == null) {
+                return false;
+            }
+
+            int val = value.intValue();
+            return ((val >= 0) && (val < MRD));
+
+        }
+
+        @Override
+        public Moment withValue(
+            Moment context,
+            Integer value,
+            boolean lenient
+        ) {
+
+            if (LeapSeconds.getInstance().isEnabled()) {
+                return Moment.of(
+                    context.getElapsedTime(TimeScale.UTC),
+                    value.intValue(),
+                    TimeScale.UTC);
+            } else {
+                return Moment.of(
+                    context.getPosixTime(),
+                    value.intValue(),
+                    TimeScale.POSIX);
+            }
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(Moment context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(Moment context) {
+
+            return null;
 
         }
 

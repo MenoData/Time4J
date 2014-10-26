@@ -74,7 +74,7 @@ public class TimeLineTest {
             is(
                 PlainTimestamp.of(2012, 6, 30, 23, 59, 59)
                     .atUTC()
-                    .with(PlainTime.SECOND_OF_MINUTE, 60)));
+                    .plus(1, SI.SECONDS)));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TimeLineTest {
                 PlainTimestamp.of(2012, 6, 30, 23, 59, 59)
                     .with(PlainTime.NANO_OF_SECOND, 999999999)
                     .atUTC()
-                    .with(PlainTime.SECOND_OF_MINUTE, 60)));
+                    .plus(1, SI.SECONDS)));
     }
 
 }
