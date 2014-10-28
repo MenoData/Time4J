@@ -234,6 +234,24 @@ public final class ZonalMoment
     }
 
     /**
+     * <p>Yields the timezone offset. </p>
+     * 
+     * @return	offset relative to UTC+00:00
+     * @since	2.0
+     */
+    /*[deutsch]
+     * <p>Liefert den Zeitzonen-Offset. </p>
+     * 
+     * @return	offset relative to UTC+00:00
+     * @since	2.0
+     */
+    public ZonalOffset getOffset() {
+	
+        return this.zone.getOffset(this.moment);
+
+    }
+
+    /**
      * <p>Converts this object to a global UTC-moment. </p>
      *
      * @return  Moment
