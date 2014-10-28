@@ -140,7 +140,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * and {@code isSimultaneous()}. </p>
      *
      * @throws  ClassCastException if there are different date types
-     * @see     EpochDays#compare(ChronoValues, ChronoValues)
+     * @see     EpochDays#compare(ChronoDisplay, ChronoDisplay)
      * @see     #isBefore(Calendrical)
      * @see     #isAfter(Calendrical)
      */
@@ -158,7 +158,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * {@code isBefore()} und {@code isSimultaneous()} verwendet werden. </p>
      *
      * @throws  ClassCastException if there are different date types
-     * @see     EpochDays#compare(ChronoValues, ChronoValues)
+     * @see     EpochDays#compare(ChronoDisplay, ChronoDisplay)
      * @see     #isBefore(Calendrical)
      * @see     #isAfter(Calendrical)
      */

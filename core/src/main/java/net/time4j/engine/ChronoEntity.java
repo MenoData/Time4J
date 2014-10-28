@@ -66,7 +66,7 @@ import net.time4j.tz.TZID;
  * @spec    All public implementations must be immutable.
  */
 public abstract class ChronoEntity<T extends ChronoEntity<T>>
-    implements ChronoValues {
+    implements ChronoDisplay {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -436,21 +436,22 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Queries if this entity contains a timezone. </p>
+     * <p>Queries if this entity contains a timezone for display purposes. </p>
      *
      * <p>This implementation has no timezone by default and yields
-     * {@code false}. Subclasses with timezone reference will override
-     * the method in a suitable way. </p>
+     * {@code false}. Subclasses with a timezone reference intended for
+     * formatted output will override the method in a suitable way. </p>
      *
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
      */
-    /**
-     * <p>Ermittelt, ob eine Zeitzone vorhanden ist. </p>
+    /*[deutsch]
+     * <p>Ermittelt, ob eine Zeitzone f&uuml;r Anzeigezwecke vorhanden ist. </p>
      *
      * <p>Diese Implementierung kennt standardm&auml;&szlig;ig keine Zeitzone
-     * und liefert {@code false}. Subklassen mit Zeitzonenbezug werden die
-     * Methode in geeigneter Weise &uuml;berschreiben. </p>
+     * und liefert {@code false}. Subklassen mit einem Zeitzonenbezug gedacht
+     * f&uuml;r formatierte Darstellungen werden die Methode in geeigneter Weise
+     * &uuml;berschreiben. </p>
      *
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
@@ -463,22 +464,25 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Returns the associated timezone ID if available. </p>
+     * <p>Returns the associated timezone ID for display purposes
+     * if available. </p>
      *
      * <p>This implementation throws a {@code ChronoException}
-     * by default. Subclasses with timezone reference will override
-     * the method in a suitable way. </p>
+     * by default. Subclasses with a timezone reference intended for
+     * formatted output will override the method in a suitable way. </p>
      *
      * @return  timezone identifier if available
      * @throws  ChronoException if the timezone is not available
      * @see     #hasTimezone()
      */
     /*[deutsch]
-     * <p>Liefert die assoziierte Zeitzonen-ID, wenn vorhanden. </p>
+     * <p>Liefert die assoziierte Zeitzonen-ID f&uuml;r Anzeigezwecke,
+     * wenn vorhanden. </p>
      *
      * <p>Diese Implementierung wirft standardm&auml;&szlig;ig eine
-     * {@code ChronoException}. Subklassen mit Zeitzonenbezug werden
-     * die Methode in geeigneter Weise &uuml;berschreiben. </p>
+     * {@code ChronoException}. Subklassen mit einem Zeitzonenbezug
+     * gedacht f&uuml;r formatierte Darstellungen werden die Methode
+     * in geeigneter Weise &uuml;berschreiben. </p>
      *
      * @return  timezone identifier if available
      * @throws  ChronoException if the timezone is not available

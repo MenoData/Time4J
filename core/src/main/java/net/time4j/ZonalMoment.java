@@ -22,8 +22,8 @@
 package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ParseLog;
 import net.time4j.scale.TimeScale;
@@ -61,7 +61,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  * @concurrency This class is immutable as long as the underlying timezone
  *              data are immutable.
  * @see     Moment#inLocalView()
@@ -91,7 +91,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  * @concurrency This class is immutable as long as the underlying timezone
  *              data are immutable.
  * @see     Moment#inLocalView()
@@ -99,7 +99,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inZonalView(String)
  */
 public final class ZonalMoment
-    implements ChronoValues, UniversalTime {
+    implements ChronoDisplay, UniversalTime {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -305,14 +305,14 @@ public final class ZonalMoment
      *
      * @param   formatter   helps to format this instance
      * @return  formatted string
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
      * @param   formatter   helps to format this instance
      * @return  formatted string
-     * @since   1.3
+     * @since   2.0
      */
     public String print(ChronoFormatter<Moment> formatter) {
 
@@ -337,7 +337,7 @@ public final class ZonalMoment
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als {@code ZonalMoment}. </p>
@@ -347,7 +347,7 @@ public final class ZonalMoment
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      */
     public static ZonalMoment parse(
         String text,

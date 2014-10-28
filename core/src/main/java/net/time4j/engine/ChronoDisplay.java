@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (ChronoValues.java) is part of project Time4J.en
+ * This file (ChronoDisplay.java) is part of project Time4J.en
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -28,18 +28,23 @@ import net.time4j.tz.TZID;
  * <p>Represents a view on a set of chronological elements associated
  * with their temporal values. </p>
  *
+ * <p>A {@code ChronoDisplay} serves mainly for formatted output. </p>
+ *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitwertobjekt, das einzelne Werte mit
  * chronologischen Elementen assoziiert und einen Lesezugriff auf diese
  * Werte erlaubt. </p>
  *
+ * <p>Ein {@code ChronoDisplay} dient haupts&auml;chlich der formatierten
+ * Darstellung. </p>
+ *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
-public interface ChronoValues {
+public interface ChronoDisplay {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -188,13 +193,13 @@ public interface ChronoValues {
     <V> V getMaximum(ChronoElement<V> element);
 
     /**
-     * <p>Queries if this object contains a timezone. </p>
+     * <p>Queries if this object contains a timezone for display purposes. </p>
      *
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
      */
     /*[deutsch]
-     * <p>Ermittelt, ob eine Zeitzone vorhanden ist. </p>
+     * <p>Ermittelt, ob eine Zeitzone f&uuml;r Anzeigezwecke vorhanden ist. </p>
      *
      * @return  {@code true} if a timezone is available and can be achieved
      *          with {@link #getTimezone()} else {@code false}
@@ -202,14 +207,32 @@ public interface ChronoValues {
     boolean hasTimezone();
 
     /**
-     * <p>Returns the associated timezone ID if available. </p>
+     * <p>Returns the associated timezone ID for display purposes
+     * if available. </p>
+     *
+     * <p>Note: Although global types like {@code Moment} indeed have a
+     * timezone reference (namely UTC+00:00), such types will not support
+     * formatted output without explicitly giving a timezone for display
+     * purposes. Therefore calling this method on global types will throw
+     * an exception. This method is not just about any timezone reference
+     * but a timezone designed for display purposes. </p>
      *
      * @return  timezone identifier if available
      * @throws  ChronoException if the timezone is not available
      * @see     #hasTimezone()
      */
     /*[deutsch]
-     * <p>Liefert die assoziierte Zeitzonen-ID, wenn vorhanden. </p>
+     * <p>Liefert die assoziierte Zeitzonen-ID f&uuml;r Anzeigezwecke,
+     * wenn vorhanden. </p>
+     *
+     * <p>Hinweis: Obwohl globale Typen wie {@code Moment} sehr wohl einen
+     * Zeitzonenbezug haben (n&auml;mlich UTC+00:00), werden sie keine
+     * formatierte Ausgabe ohne eine explizite Zeitzonenangabe f&uuml;r
+     * Anzeigezwecke unterst&uuml;tzen. Deshalb wird der Aufruf dieser
+     * Methode bei globalen Typen eine Ausnahme werfen. Diese Methode ist
+     * nicht einfach auf irgendeine Zeitzone bezogen, die vorhanden sein
+     * mag, sondern explizit nur f&uuml;r Zeitzonen im Kontext von formatierten
+     * Ausgaben gedacht. </p>
      *
      * @return  timezone identifier if available
      * @throws  ChronoException if the timezone is not available

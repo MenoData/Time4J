@@ -24,7 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
-import net.time4j.engine.ChronoValues;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -92,23 +92,45 @@ public final class Attributes
         PredefinedKey.valueOf("LANGUAGE", Locale.class);
 
     /**
-     * <p>Attribute for the timezone identifier. </p>
+     * <p>Attribute denoting the timezone identifier for display purposes. </p>
      *
-     * <p>If this attribute is missing then Time4J will assume the default
-     * system timezone in lax mode. The attribute value also serves as
-     * replacement timezone if the parsing has not recognized any
-     * timezone. </p>
+     * <p>When printing a global type this attribute controls the zonal
+     * representation. If this attribute is missing then Time4J will throw
+     * an exception because the internal timezone reference UTC+00:00 of
+     * global types is not intended to be used for display purposes. </p>
      *
-     * @see     net.time4j.tz.Timezone#ofSystem()
+     * <p>When parsing a global type this attribute serves as replacement
+     * timezone if the parsing has not recognized any timezone or offset
+     * information in the text to be parsed. If the attribute is also missing
+     * then Time4J will throw an exception. </p>
+     *
+     * <p><i>Note that before version v2.0 the behaviour of Time4J was
+     * different. When printing, the default {@code ZonalOffset.UTC} was used.
+     * When parsing, the system default timezone was used as default in case
+     * of missing attribute and lax mode.</i> </p>
+     *
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
-     * <p>Gibt die Zeitzonen-ID an. </p>
+     * <p>Gibt die Zeitzonen-ID f&uuml;r die Verwendung in formatierten
+     * Darstellungen an. </p>
      *
-     * <p>Fehlt das Attribut, wird im laxen Modus die System-Zeitzone
-     * angenommen. Das Attribut dient auch als Ersatzwert, wenn beim Parsen
-     * keine Zeitzone erkannt worden ist. </p>
+     * <p>In der Textausgabe von globalen Typen kontrolliert dieses Attribut
+     * die zonale Darstellung. Fehlt das Attribut, wird Time4J eine Ausnahme
+     * werfen, weil der interne Zeitzonenbezug UTC+00:00 von globalen Typen
+     * nicht f&uuml;r Anzeigezwecke gedacht ist. </p>
      *
-     * @see     net.time4j.tz.Timezone#ofSystem()
+     * <p>Wenn umgekehrt ein Text als globaler Typ interpretiert werden soll,
+     * dient dieses Attribut als Ersatzwert, falls beim Parsen im Text keine
+     * Zeitzone und auch kein Offset erkannt werden konnten. Fehlt auch hier
+     * das Attribut, wird eine Ausnahme geworfen. </p>
+     *
+     * <p><i>Hinweis: Vor Version v2.0 war das Verhalten von Time4J anders.
+     * In der Textausgabe war der Standard immer {@code ZonalOffset.UTC}.
+     * Beim Parsen war die Systemzeitzone die Vorgabe im laxen Modus
+     * gewesen, bevor eine Ausnahme flog.</i> </p>
+     *
+     * @see     ChronoFormatter#withTimezone(TZID)
      */
     public static final AttributeKey<TZID> TIMEZONE_ID =
         PredefinedKey.valueOf("TIMEZONE_ID", TZID.class);
@@ -372,7 +394,7 @@ public final class Attributes
      * <p>Note: This attribute overrides any reserved area due to
      * <i>adjacent digit parsing</i>. </p>
      *
-     * @since   1.3
+     * @since   2.0
      * @see     ChronoFormatter#withDefault
      */
     /*[deutsch]
@@ -390,7 +412,7 @@ public final class Attributes
      * die dem Modus <i>adjacent digit parsing</i> von nachgelagerten Elementen
      * mit fester Ziffernbreite zuzuschreiben sind. </p>
      *
-     * @since   1.3
+     * @since   2.0
      * @see     ChronoFormatter#withDefault
      */
     public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
@@ -452,13 +474,13 @@ public final class Attributes
     //~ Instanzvariablen --------------------------------------------------
 
     private final Map<String, Object> attributes;
-    private final ChronoCondition<ChronoValues> printCondition;
+    private final ChronoCondition<ChronoDisplay> printCondition;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private Attributes(
         Map<String, Object> map,
-        ChronoCondition<ChronoValues> printCondition
+        ChronoCondition<ChronoDisplay> printCondition
     ) {
         super();
 
@@ -590,7 +612,7 @@ public final class Attributes
      *
      * @return  print condition object maybe {@code null}
      */
-    ChronoCondition<ChronoValues> getCondition() {
+    ChronoCondition<ChronoDisplay> getCondition() {
 
         return this.printCondition;
 
@@ -626,7 +648,7 @@ public final class Attributes
 
         private final Map<String, Object> attributes =
             new HashMap<String, Object>();
-        private ChronoCondition<ChronoValues> printCondition = null;
+        private ChronoCondition<ChronoDisplay> printCondition = null;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1019,7 +1041,7 @@ public final class Attributes
          *
          * @param   printCondition  condition object
          */
-        void setCondition(ChronoCondition<ChronoValues> printCondition) {
+        void setCondition(ChronoCondition<ChronoDisplay> printCondition) {
 
             this.printCondition = printCondition;
 

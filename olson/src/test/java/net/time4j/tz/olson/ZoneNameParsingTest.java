@@ -4,6 +4,7 @@ import net.time4j.Iso8601Format;
 import net.time4j.Moment;
 import net.time4j.PatternType;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.tz.Timezone;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -136,8 +137,8 @@ public class ZoneNameParsingTest {
             Moment.formatter(
                 pattern,
                 PatternType.CLDR,
-                toLocale(locale))
-            .withTimezone(tzid);
+                toLocale(locale),
+                Timezone.of(tzid).getID());
         this.value = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(value);
         this.text = text;
     }

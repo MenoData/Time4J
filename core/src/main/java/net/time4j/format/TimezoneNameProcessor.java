@@ -23,8 +23,8 @@ package net.time4j.format;
 
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -101,7 +101,7 @@ final class TimezoneNameProcessor
 
     @Override
     public void print(
-        ChronoValues formattable,
+        ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,

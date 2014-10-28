@@ -940,7 +940,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
          *
          * @param   timeline    time line to be used
          * @return  this instance for method chaining
-         * @since   1.3
+         * @since   2.0
          */
         /*[deutsch]
          * <p>Definiert das Argument als Zeitstrahl, auf dem schrittweise
@@ -948,7 +948,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
          *
          * @param   timeline    time line to be used
          * @return  this instance for method chaining
-         * @since   1.3
+         * @since   2.0
          */
         public Builder<U, T> withTimeLine(TimeLine<T> timeline) {
 
@@ -1073,8 +1073,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         @Override
         public int compare(
-            ChronoValues o1,
-            ChronoValues o2
+            ChronoDisplay o1,
+            ChronoDisplay o2
         ) {
 
             T t1 = o1.get(this);

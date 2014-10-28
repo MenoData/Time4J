@@ -21,8 +21,8 @@
 
 package net.time4j;
 
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 
 
 /**
@@ -76,8 +76,8 @@ enum PrecisionElement
 
     @Override
     public int compare(
-        ChronoValues o1,
-        ChronoValues o2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     ) {
 
         return o1.get(this).compareTo(o2.get(this));

@@ -72,7 +72,7 @@ import java.util.Comparator;
  * @spec    All implementations must be immutable and serializable.
  */
 public interface ChronoElement<V>
-    extends Comparator<ChronoValues> {
+    extends Comparator<ChronoDisplay> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -188,8 +188,8 @@ public interface ChronoElement<V>
      */
     @Override
     int compare(
-        ChronoValues o1,
-        ChronoValues o2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     );
 
     /**

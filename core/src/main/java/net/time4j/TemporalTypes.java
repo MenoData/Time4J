@@ -23,10 +23,10 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.engine.BasicElement;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -121,11 +121,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             java.util.Date.class,
             Moment.class,
             new JavaUtilDateRule(),
-            new Comparator<ChronoValues>() {
+            new Comparator<ChronoDisplay>() {
                 @Override
                 public int compare(
-                    ChronoValues o1,
-                    ChronoValues o2
+                    ChronoDisplay o1,
+                    ChronoDisplay o2
                 ) {
                     java.util.Date ts1 = o1.get(JAVA_UTIL_DATE);
                     java.util.Date ts2 = o2.get(JAVA_UTIL_DATE);
@@ -175,11 +175,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             Long.class,
             Moment.class,
             new MillisSinceUnixRule(),
-            new Comparator<ChronoValues>() {
+            new Comparator<ChronoDisplay>() {
                 @Override
                 public int compare(
-                    ChronoValues o1,
-                    ChronoValues o2
+                    ChronoDisplay o1,
+                    ChronoDisplay o2
                 ) {
                     Long ts1 = o1.get(MILLIS_SINCE_UNIX);
                     Long ts2 = o2.get(MILLIS_SINCE_UNIX);
@@ -262,11 +262,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             java.sql.Date.class,
             PlainDate.class,
             new SqlDateRule(),
-            new Comparator<ChronoValues>() {
+            new Comparator<ChronoDisplay>() {
                 @Override
                 public int compare(
-                    ChronoValues o1,
-                    ChronoValues o2
+                    ChronoDisplay o1,
+                    ChronoDisplay o2
                 ) {
                     return o1.get(SQL_DATE).compareTo(o2.get(SQL_DATE));
                 }
@@ -339,11 +339,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             java.sql.Time.class,
             PlainTime.class,
             new SqlTimeRule(),
-            new Comparator<ChronoValues>() {
+            new Comparator<ChronoDisplay>() {
                 @Override
                 public int compare(
-                    ChronoValues o1,
-                    ChronoValues o2
+                    ChronoDisplay o1,
+                    ChronoDisplay o2
                 ) {
                     return o1.get(SQL_TIME).compareTo(o2.get(SQL_TIME));
                 }
@@ -407,11 +407,11 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
             java.sql.Timestamp.class,
             PlainTimestamp.class,
             new SqlTimestampRule(),
-            new Comparator<ChronoValues>() {
+            new Comparator<ChronoDisplay>() {
                 @Override
                 public int compare(
-                    ChronoValues o1,
-                    ChronoValues o2
+                    ChronoDisplay o1,
+                    ChronoDisplay o2
                 ) {
                     java.sql.Timestamp ts1 = o1.get(SQL_TIMESTAMP);
                     java.sql.Timestamp ts2 = o2.get(SQL_TIMESTAMP);
@@ -442,7 +442,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
     private transient final Class<S> sourceType;
     private transient final Class<T> targetType;
     private transient final ElementRule<T, S> rule;
-    private transient final Comparator<ChronoValues> comparator;
+    private transient final Comparator<ChronoDisplay> comparator;
     private transient final S dmin;
     private transient final S dmax;
     private transient final boolean dateLike;
@@ -492,7 +492,7 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
         Class<S> sourceType,
         Class<T> targetType,
         ElementRule<T, S> rule,
-        Comparator<ChronoValues> comparator,
+        Comparator<ChronoDisplay> comparator,
         S dmin,
         S dmax,
         boolean dateLike,
@@ -585,8 +585,8 @@ public class TemporalTypes<S extends Comparable<?>, T extends ChronoEntity<T>>
 
     @Override
     public int compare(
-        ChronoValues o1,
-        ChronoValues o2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     ) {
 
         return this.comparator.compare(o1, o2);

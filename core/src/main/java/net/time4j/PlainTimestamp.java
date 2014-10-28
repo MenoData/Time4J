@@ -27,11 +27,11 @@ import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -1041,7 +1041,7 @@ public final class PlainTimestamp
      *
      * @param   timespan    to be normalized
      * @return  normalized duration
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Normalisiert die angegebene Zeitspanne, indem Jahre, Monate, Tage
@@ -1059,7 +1059,7 @@ public final class PlainTimestamp
      *
      * @param   timespan    to be normalized
      * @return  normalized duration
-     * @since   1.3
+     * @since   2.0
      */
     @Override
     public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
@@ -1302,7 +1302,7 @@ public final class PlainTimestamp
         }
 
         @Override
-        public ChronoValues preformat(
+        public ChronoDisplay preformat(
             PlainTimestamp context,
             AttributeQuery attributes
         ) {

@@ -26,10 +26,10 @@ import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -3416,7 +3416,7 @@ public final class PlainTime
         }
 
         @Override
-        public ChronoValues preformat(
+        public ChronoDisplay preformat(
             PlainTime context,
             AttributeQuery attributes
         ) {

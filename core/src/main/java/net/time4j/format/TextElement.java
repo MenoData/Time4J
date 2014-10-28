@@ -22,8 +22,8 @@
 package net.time4j.format;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 
 import java.io.IOException;
 
@@ -51,7 +51,7 @@ public interface TextElement<V>
      * <p>Converts the element value in given context to a formatted text. </p>
      *
      * <p>Implementation note: The concrete element value is obtainable by the
-     * expression {@link ChronoValues#get(ChronoElement) context.get(this)}.
+     * expression {@link ChronoDisplay#get(ChronoElement) context.get(this)}.
      * </p>
      *
      * @param   context     time context with the value of this element
@@ -64,7 +64,7 @@ public interface TextElement<V>
      * einem Text um. </p>
      *
      * <p>Implementierungshinweis: Der konkrete Elementwert ist durch den
-     * Ausdruck {@link ChronoValues#get(ChronoElement) context.get(this)}
+     * Ausdruck {@link ChronoDisplay#get(ChronoElement) context.get(this)}
      * gegeben. </p>
      *
      * @param   context     time context with the value of this element
@@ -73,7 +73,7 @@ public interface TextElement<V>
      * @throws  IOException if writing to buffer fails
      */
     void print(
-        ChronoValues context,
+        ChronoDisplay context,
         Appendable buffer,
         AttributeQuery attributes
     ) throws IOException;

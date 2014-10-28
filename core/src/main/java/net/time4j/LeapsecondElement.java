@@ -22,7 +22,7 @@
 package net.time4j;
 
 import net.time4j.engine.BasicElement;
-import net.time4j.engine.ChronoValues;
+import net.time4j.engine.ChronoDisplay;
 
 
 /**
@@ -75,8 +75,8 @@ final class LeapsecondElement
 
     @Override
     public int compare(
-        ChronoValues o1,
-        ChronoValues o2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     ) {
 
         return o1.get(this).compareTo(o2.get(this));

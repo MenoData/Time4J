@@ -22,8 +22,8 @@
 package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
@@ -193,7 +193,7 @@ final class EnumElement<V extends Enum<V>>
 
     @Override
     public void print(
-        ChronoValues context,
+        ChronoDisplay context,
         Appendable buffer,
         AttributeQuery attributes
     ) throws IOException {

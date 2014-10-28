@@ -22,12 +22,13 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoValues;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.SignPolicy;
+import net.time4j.tz.ZonalOffset;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -62,7 +63,7 @@ public class Iso8601Format {
         new NonZeroCondition(PlainTime.SECOND_OF_MINUTE);
     private static final NonZeroCondition NON_ZERO_FRACTION =
         new NonZeroCondition(PlainTime.NANO_OF_SECOND);
-    private static final ChronoCondition<ChronoValues> SECOND_PART =
+    private static final ChronoCondition<ChronoDisplay> SECOND_PART =
         NON_ZERO_SECOND.or(NON_ZERO_FRACTION);
 
     /**
@@ -209,6 +210,10 @@ public class Iso8601Format {
      * <p>Second and nanosecond elements are optional. Furthermore,
      * the count of decimal digits is flexible (0-9). The minute part is
      * optional during parsing, but will always be printed. </p>
+     *
+     * <p>By default, the timezone offset used for printing is UTC+00:00.
+     * Users can override this offset by calling the method
+     * {@link ChronoFormatter#withTimezone(net.time4j.tz.TZID)}. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
@@ -218,6 +223,11 @@ public class Iso8601Format {
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
      * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
      * optional, wird aber beim Formatieren immer ausgegeben. </p>
+     *
+     * <p>Standardm&auml;&szlig;ig wird f&uuml;r die formatierte Ausgabe der
+     * Zeitzonen-Offset UTC+00:00 verwendet. Diese Vorgabe kann mit Hilfe von
+     * {@link ChronoFormatter#withTimezone(net.time4j.tz.TZID)} ge&auml;ndert
+     * werden. </p>
      */
     public static final ChronoFormatter<Moment> BASIC_DATE_TIME_OFFSET;
 
@@ -229,6 +239,10 @@ public class Iso8601Format {
      * <p>Second and nanosecond elements are optional. Furthermore,
      * the count of decimal digits is flexible (0-9). The minute part is
      * optional during parsing, but will always be printed. </p>
+     *
+     * <p>By default, the timezone offset used for printing is UTC+00:00.
+     * Users can override this offset by calling the method
+     * {@link ChronoFormatter#withTimezone(net.time4j.tz.TZID)}. </p>
      */
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
@@ -238,6 +252,11 @@ public class Iso8601Format {
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
      * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
      * optional, wird aber beim Formatieren immer ausgegeben. </p>
+     *
+     * <p>Standardm&auml;&szlig;ig wird f&uuml;r die formatierte Ausgabe der
+     * Zeitzonen-Offset UTC+00:00 verwendet. Diese Vorgabe kann mit Hilfe von
+     * {@link ChronoFormatter#withTimezone(net.time4j.tz.TZID)} ge&auml;ndert
+     * werden. </p>
      */
     public static final ChronoFormatter<Moment> EXTENDED_DATE_TIME_OFFSET;
 
@@ -357,7 +376,7 @@ public class Iso8601Format {
             extended,
             Collections.singletonList("Z"));
 
-        return builder.build();
+        return builder.build().withTimezone(ZonalOffset.UTC);
 
     }
 
@@ -413,7 +432,7 @@ public class Iso8601Format {
     //~ Innere Klassen ----------------------------------------------------
 
     private static class NonZeroCondition
-        implements ChronoCondition<ChronoValues> {
+        implements ChronoCondition<ChronoDisplay> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -431,7 +450,7 @@ public class Iso8601Format {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public boolean test(ChronoValues context) {
+        public boolean test(ChronoDisplay context) {
 
             return (
                 !context.contains(this.element)
@@ -440,11 +459,11 @@ public class Iso8601Format {
 
         }
 
-        ChronoCondition<ChronoValues> or(final NonZeroCondition other) {
+        ChronoCondition<ChronoDisplay> or(final NonZeroCondition other) {
 
-            return new ChronoCondition<ChronoValues>() {
+            return new ChronoCondition<ChronoDisplay>() {
                 @Override
-                public boolean test(ChronoValues context) {
+                public boolean test(ChronoDisplay context) {
                     return (
                         NonZeroCondition.this.test(context)
                         || other.test(context)

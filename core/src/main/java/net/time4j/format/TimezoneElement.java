@@ -21,8 +21,8 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
 
@@ -60,8 +60,8 @@ enum TimezoneElement
      */
     @Override
     public int compare(
-        ChronoValues o1,
-        ChronoValues o2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     ) {
 
         TZID t1 = o1.getTimezone();

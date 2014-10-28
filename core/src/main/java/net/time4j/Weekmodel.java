@@ -26,9 +26,9 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -984,8 +984,8 @@ public final class Weekmodel
 
         @Override
         public int compare(
-            ChronoValues o1,
-            ChronoValues o2
+            ChronoDisplay o1,
+            ChronoDisplay o2
         ) {
 
             int i1 = o1.get(this).getValue(Weekmodel.this);
@@ -1068,7 +1068,7 @@ public final class Weekmodel
 
         @Override
         public void print(
-            ChronoValues context,
+            ChronoDisplay context,
             Appendable buffer,
             AttributeQuery attributes
         ) throws IOException {

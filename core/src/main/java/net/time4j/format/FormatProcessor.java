@@ -22,8 +22,8 @@
 package net.time4j.format;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoValues;
 
 import java.io.IOException;
 import java.util.Map;
@@ -52,7 +52,7 @@ interface FormatProcessor<V> {
      * @throws  IOException if writing into buffer fails
      */
     void print(
-        ChronoValues formattable,
+        ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,

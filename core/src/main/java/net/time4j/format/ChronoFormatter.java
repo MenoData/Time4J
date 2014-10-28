@@ -25,11 +25,11 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
 import net.time4j.tz.TZID;
@@ -529,7 +529,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  unmodifiable set of element positions in formatted text
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
@@ -549,7 +549,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  unmodifiable set of element positions in formatted text
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
-     * @since   1.3
+     * @since   2.0
      */
     public Set<ElementPosition> print(
         T formattable,
@@ -568,7 +568,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             positions = new LinkedHashSet<ElementPosition>(this.steps.size());
         }
 
-        ChronoValues entity =
+        ChronoDisplay entity =
             this.chronology.preformat(formattable, attributes);
 
         try {
@@ -746,7 +746,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * @param   text        text to be parsed
      * @return  new map-like mutable entity (empty if parsing does not work)
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text zu Rohdaten, ohne eine
@@ -754,7 +754,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * @param   text        text to be parsed
      * @return  new map-like mutable entity (empty if parsing does not work)
-     * @since	1.3
+     * @since	2.0
      */
     public ChronoEntity<?> parseRaw(String text) {
 
@@ -769,7 +769,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   text        text to be parsed
      * @param   offset      start position
      * @return  new map-like mutable entity (empty if parsing does not work)
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text zu Rohdaten, ohne eine
@@ -778,7 +778,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   text        text to be parsed
      * @param   offset      start position
      * @return  new map-like mutable entity (empty if parsing does not work)
-     * @since	1.3
+     * @since	2.0
      */
     public ChronoEntity<?> parseRaw(
         CharSequence text,
@@ -912,6 +912,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
+     * @see     Attributes#TIMEZONE_ID
+     *
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie mit der angegebenen Zeitzone, die beim
@@ -926,6 +928,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
+     * @see     Attributes#TIMEZONE_ID
      */
     public ChronoFormatter<T> withTimezone(TZID tzid) {
 
@@ -951,6 +954,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *          this instance remains unaffected
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #withTimezone(TZID)
+     * @see     Attributes#TIMEZONE_ID
      * @since   1.1
      */
     /*[deutsch]
@@ -962,6 +966,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *          this instance remains unaffected
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #withTimezone(TZID)
+     * @see     Attributes#TIMEZONE_ID
      * @since   1.1
      */
     public ChronoFormatter<T> withTimezone(String tzid) {
@@ -3730,13 +3735,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @return  this instance for method chaining
          */
         public Builder<T> startOptionalSection(
-            final ChronoCondition<ChronoValues> printCondition
+            final ChronoCondition<ChronoDisplay> printCondition
         ) {
 
             this.resetPadding();
             Attributes.Builder ab = new Attributes.Builder();
             Attributes previous = null;
-            ChronoCondition<ChronoValues> cc = null;
+            ChronoCondition<ChronoDisplay> cc = null;
 
             if (!this.stack.isEmpty()) {
                 previous = this.stack.getLast();
@@ -3749,15 +3754,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ab.set(Attributes.OPTIONAL, true);
 
             if (printCondition != null) {
-                final ChronoCondition<ChronoValues> old = cc;
+                final ChronoCondition<ChronoDisplay> old = cc;
 
                 if (old == null) {
                     cc = printCondition;
                 } else {
                     cc =
-                        new ChronoCondition<ChronoValues>(){
+                        new ChronoCondition<ChronoDisplay>(){
                             @Override
-                            public boolean test(ChronoValues context) {
+                            public boolean test(ChronoDisplay context) {
                                 return (
                                     old.test(context)
                                     && printCondition.test(context));

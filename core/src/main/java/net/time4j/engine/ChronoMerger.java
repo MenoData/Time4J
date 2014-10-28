@@ -158,7 +158,7 @@ public interface ChronoMerger<T> {
      * @return  replacement entity which will finally be used for formatting
      * @throws  IllegalArgumentException in any case of inconsistent data
      */
-    ChronoValues preformat(
+    ChronoDisplay preformat(
         T context,
         AttributeQuery attributes
     );

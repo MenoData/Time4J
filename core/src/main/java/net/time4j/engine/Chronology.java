@@ -223,7 +223,7 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     @Override
-    public ChronoValues preformat(
+    public ChronoDisplay preformat(
         T context,
         AttributeQuery attributes
     ) {
