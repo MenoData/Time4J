@@ -24,9 +24,9 @@ package net.time4j.range;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Calendrical;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
@@ -48,7 +48,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @author  Meno Hochschild
  * @param   <T> generic temporal type
  * @param   <I> generic interval type
- * @since   1.3
+ * @since   2.0
  */
 final class IntervalParser
     <T extends ChronoEntity<T> & Temporal<? super T>,
@@ -97,7 +97,7 @@ final class IntervalParser
      * @param   format          boundary formatter
      * @param   policy          bracket policy
      * @return  new interval parser
-     * @since   1.3
+     * @since   2.0
      */
 	static
     <T extends ChronoEntity<T> & Temporal<? super T>, I extends ChronoInterval<T>>
@@ -125,7 +125,7 @@ final class IntervalParser
      * @param   endFormat       formatter for upper interval boundary
      * @param   policy          bracket policy
      * @return  new interval parser
-     * @since   1.3
+     * @since   2.0
      */
 	static
     <T extends ChronoEntity<T> & Temporal<? super T>, I extends ChronoInterval<T>>
@@ -342,7 +342,7 @@ final class IntervalParser
                     if (lowerRaw.hasTimezone()) {
                         attrs = new Wrapper(attrs, lowerRaw.getTimezone());
                     }
-                    ChronoValues cv =
+                    ChronoDisplay cv =
                         this.startFormat.getChronology().preformat(t1, attrs);
                     for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
                         fmt = setDefault(fmt, cv, key);
@@ -471,7 +471,7 @@ final class IntervalParser
     // wildcard capture
     private static <T extends ChronoEntity<T>, V> ChronoFormatter<T> setDefault(
         ChronoFormatter<T> fmt,
-        ChronoValues cv,
+        ChronoDisplay cv,
         ChronoElement<V> key
     ) {
 

@@ -63,13 +63,13 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * <p>Defines a moment interval on global timeline. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Definiert ein Momentintervall auf dem globalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public final class MomentInterval
     extends ChronoInterval<Moment>
@@ -106,7 +106,7 @@ public final class MomentInterval
      * @param   end     moment of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den
@@ -116,7 +116,7 @@ public final class MomentInterval
      * @param   end     moment of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public static MomentInterval between(
         Moment start,
@@ -135,7 +135,7 @@ public final class MomentInterval
      *
      * @param   start       moment of lower boundary (inclusive)
      * @return  new moment interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes halb-offenes Intervall ab dem angegebenen
@@ -143,7 +143,7 @@ public final class MomentInterval
      *
      * @param   start       moment of lower boundary (inclusive)
      * @return  new moment interval
-     * @since   1.3
+     * @since   2.0
      */
     public static MomentInterval since(Moment start) {
 
@@ -157,7 +157,7 @@ public final class MomentInterval
      *
      * @param   end     moment of upper boundary (exclusive)
      * @return  new moment interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes offenes Intervall bis zum angegebenen
@@ -165,7 +165,7 @@ public final class MomentInterval
      *
      * @param   end     moment of upper boundary (exclusive)
      * @return  new moment interval
-     * @since   1.3
+     * @since   2.0
      */
     public static MomentInterval until(Moment end) {
 
@@ -212,7 +212,7 @@ public final class MomentInterval
      *
      * @return  local timestamp interval in system timezone (leap seconds will
      *          always be lost)
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#ofSystem()
      * @see     #toZonalInterval(TZID)
      * @see     #toZonalInterval(String)
@@ -222,7 +222,7 @@ public final class MomentInterval
      *
      * @return  local timestamp interval in system timezone (leap seconds will
      *          always be lost)
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#ofSystem()
      * @see     #toZonalInterval(TZID)
      * @see     #toZonalInterval(String)
@@ -259,7 +259,7 @@ public final class MomentInterval
      * @return  zonal timestamp interval in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     #toLocalInterval()
      */
     /*[deutsch]
@@ -269,7 +269,7 @@ public final class MomentInterval
      * @return  zonal timestamp interval in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     #toLocalInterval()
      */
     public TimestampInterval toZonalInterval(TZID tzid) {
@@ -305,7 +305,7 @@ public final class MomentInterval
      * @return  zonal timestamp interval in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     #toZonalInterval(TZID)
      * @see     #toLocalInterval()
      */
@@ -316,7 +316,7 @@ public final class MomentInterval
      * @return  zonal timestamp interval in given timezone (leap seconds will
      *          always be lost)
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     #toZonalInterval(TZID)
      * @see     #toLocalInterval()
      */
@@ -350,7 +350,7 @@ public final class MomentInterval
      *
      * @return  machine time duration on POSIX-scale
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getRealDuration()
      */
     /*[deutsch]
@@ -358,7 +358,7 @@ public final class MomentInterval
      *
      * @return  machine time duration on POSIX-scale
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getRealDuration()
      */
     public MachineTime<TimeUnit> getSimpleDuration() {
@@ -376,7 +376,7 @@ public final class MomentInterval
      * @return  machine time duration on UTC-scale
      * @throws  UnsupportedOperationException if start is before year 1972
      *          or if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getSimpleDuration()
      */
     /*[deutsch]
@@ -385,7 +385,7 @@ public final class MomentInterval
      * @return  machine time duration on UTC-scale
      * @throws  UnsupportedOperationException if start is before year 1972
      *          or if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getSimpleDuration()
      */
     public MachineTime<SI> getRealDuration() {
@@ -406,7 +406,7 @@ public final class MomentInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     /*[deutsch]
@@ -418,7 +418,7 @@ public final class MomentInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     public static MomentInterval parse(
@@ -444,7 +444,7 @@ public final class MomentInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -456,7 +456,7 @@ public final class MomentInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     public static MomentInterval parse(
         CharSequence text,
@@ -516,7 +516,7 @@ public final class MomentInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     /*[deutsch]
@@ -563,7 +563,7 @@ public final class MomentInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     public static MomentInterval parseISO(String text)

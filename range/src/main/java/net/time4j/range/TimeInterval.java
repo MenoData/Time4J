@@ -45,13 +45,13 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * <p>Defines a finite wall time interval on the local timeline. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Definiert ein endliches Uhrzeitintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public final class TimeInterval
     extends ChronoInterval<PlainTime>
@@ -86,7 +86,7 @@ public final class TimeInterval
      * @param   end     time of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den
@@ -96,7 +96,7 @@ public final class TimeInterval
      * @param   end     time of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public static TimeInterval between(
         PlainTime start,
@@ -118,7 +118,7 @@ public final class TimeInterval
      *
      * @param   start       time of lower boundary (inclusive)
      * @return  new time interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen der
@@ -129,7 +129,7 @@ public final class TimeInterval
      *
      * @param   start       time of lower boundary (inclusive)
      * @return  new time interval
-     * @since   1.3
+     * @since   2.0
      */
     public static TimeInterval since(PlainTime start) {
 
@@ -143,7 +143,7 @@ public final class TimeInterval
      *
      * @param   end     time of upper boundary (exclusive)
      * @return  new time interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen Mitternacht
@@ -151,7 +151,7 @@ public final class TimeInterval
      *
      * @param   end     time of upper boundary (exclusive)
      * @return  new time interval
-     * @since   1.3
+     * @since   2.0
      */
     public static TimeInterval until(PlainTime end) {
 
@@ -195,13 +195,13 @@ public final class TimeInterval
      * <p>Yields the length of this interval. </p>
      *
      * @return  duration in hours, minutes, seconds and nanoseconds
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls. </p>
      *
      * @return  duration in hours, minutes, seconds and nanoseconds
-     * @since   1.3
+     * @since   2.0
      */
     public Duration<ClockUnit> getDuration() {
 
@@ -238,7 +238,7 @@ public final class TimeInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     /*[deutsch]
@@ -250,7 +250,7 @@ public final class TimeInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     public static TimeInterval parse(
@@ -276,7 +276,7 @@ public final class TimeInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -288,7 +288,7 @@ public final class TimeInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     public static TimeInterval parse(
         CharSequence text,

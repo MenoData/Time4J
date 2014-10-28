@@ -60,7 +60,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -82,7 +82,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -104,12 +104,12 @@ public final class MachineTime<U>
     /**
      * Metric on the POSIX scale (without leap seconds).
      *
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * Metrik auf der POSIX-Skala (ohne Schaltsekunden).
      *
-     * @since   1.3
+     * @since   2.0
      */
     public static final
     TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE =
@@ -120,14 +120,14 @@ public final class MachineTime<U>
      * 
      * <p>Time points before 1972 are not supported. </p>
      *
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Metrik auf der UTC-Skala (inklusive Schaltsekunden). </p>
      *
      * <p>Zeitpunkte vor 1972 werden nicht unterst&uuml;tzt. </p>
      *
-     * @since   1.3
+     * @since   2.0
      */
     public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE =
         new Metric<SI>(UTC);
@@ -178,7 +178,7 @@ public final class MachineTime<U>
      * @param   unit    helps to interprete given amount
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
@@ -191,7 +191,7 @@ public final class MachineTime<U>
      * @param   unit    helps to interprete given amount
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<TimeUnit> of(
         long amount,
@@ -226,7 +226,7 @@ public final class MachineTime<U>
      * @param   amount of units
      * @param   unit    helps to interprete given amount
      * @return  new machine time duration
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -238,7 +238,7 @@ public final class MachineTime<U>
      * @param   amount of units
      * @param   unit    helps to interprete given amount
      * @return  new machine time duration
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<SI> of(
         long amount,
@@ -269,7 +269,7 @@ public final class MachineTime<U>
      * @param   fraction    nanosecond part
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
@@ -282,7 +282,7 @@ public final class MachineTime<U>
      * @param   fraction    nanosecond part
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<TimeUnit> ofPosixUnits(
         long seconds,
@@ -308,7 +308,7 @@ public final class MachineTime<U>
      * @param   fraction    nanosecond part
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -321,7 +321,7 @@ public final class MachineTime<U>
      * @param   fraction    nanosecond part
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<SI> ofSIUnits(
         long seconds,
@@ -347,7 +347,7 @@ public final class MachineTime<U>
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -360,7 +360,7 @@ public final class MachineTime<U>
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<TimeUnit> ofPosixSeconds(double seconds) {
 
@@ -384,7 +384,7 @@ public final class MachineTime<U>
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -396,7 +396,7 @@ public final class MachineTime<U>
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<TimeUnit> ofPosixSeconds(BigDecimal seconds) {
 
@@ -421,7 +421,7 @@ public final class MachineTime<U>
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -434,7 +434,7 @@ public final class MachineTime<U>
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<SI> ofSISeconds(double seconds) {
 
@@ -458,7 +458,7 @@ public final class MachineTime<U>
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
@@ -470,7 +470,7 @@ public final class MachineTime<U>
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public static MachineTime<SI> ofSISeconds(BigDecimal seconds) {
 
@@ -488,13 +488,13 @@ public final class MachineTime<U>
      * <p>Yields the seconds of this duration. </p>
      *
      * @return  long
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die Sekunden dieser Dauer. </p>
      *
      * @return  long
-     * @since   1.3
+     * @since   2.0
      */
     public long getSeconds() {
 
@@ -506,13 +506,13 @@ public final class MachineTime<U>
      * <p>Yields the nanosecond fraction of this duration. </p>
      *
      * @return  nanosecond in range {@code 0-999999999}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert den Nanosekundenteil dieser Dauer. </p>
      *
      * @return  nanosecond in range {@code 0-999999999}
-     * @since   1.3
+     * @since   2.0
      */
     public int getFraction() {
 
@@ -524,13 +524,13 @@ public final class MachineTime<U>
      * <p>Yields the related time scale. </p>
      *
      * @return  either {@code TimeScale.POSIX} or {@code TimeScale.UTC}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitskala. </p>
      *
      * @return  either {@code TimeScale.POSIX} or {@code TimeScale.UTC}
-     * @since   1.3
+     * @since   2.0
      */
     public TimeScale getScale() {
 
@@ -628,7 +628,7 @@ public final class MachineTime<U>
      * @param   unit    the related time unit
      * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Addiert den angegebenen Zeitbetrag zu dieser maschinellen Dauer. </p>
@@ -637,7 +637,7 @@ public final class MachineTime<U>
      * @param   unit    the related time unit
      * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> plus(
         long amount,
@@ -694,7 +694,7 @@ public final class MachineTime<U>
      * @param   duration    other machine time to be added
      * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Addiert den angegebenen Zeitbetrag zu dieser maschinellen Dauer. </p>
@@ -702,7 +702,7 @@ public final class MachineTime<U>
      * @param   duration    other machine time to be added
      * @return  result of addition
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> plus(MachineTime<U> duration) {
 
@@ -725,7 +725,7 @@ public final class MachineTime<U>
      * @param   unit    the related time unit
      * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Subtrahiert den angegebenen Zeitbetrag von dieser maschinellen
@@ -735,7 +735,7 @@ public final class MachineTime<U>
      * @param   unit    the related time unit
      * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> minus(
         long amount,
@@ -752,7 +752,7 @@ public final class MachineTime<U>
      * @param   duration    other machine time to be subtracted
      * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Subtrahiert den angegebenen Zeitbetrag von dieser maschinellen
@@ -761,7 +761,7 @@ public final class MachineTime<U>
      * @param   duration    other machine time to be subtracted
      * @return  difference result
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> minus(MachineTime<U> duration) {
 
@@ -782,14 +782,14 @@ public final class MachineTime<U>
      *
      * @return  absolute machine time duration, always non-negative
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Wandelt eine maschinelle Dauer in ihren Absolutbetrag um. </p>
      *
      * @return  absolute machine time duration, always non-negative
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> abs() {
 
@@ -807,7 +807,7 @@ public final class MachineTime<U>
      *
      * @return  negated machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Wandelt eine maschinelle Dauer in ihr negatives &Auml;quivalent
@@ -815,7 +815,7 @@ public final class MachineTime<U>
      *
      * @return  negated machine time duration
      * @throws  ArithmeticException in case of numerical overflow
-     * @since   1.3
+     * @since   2.0
      */
     public MachineTime<U> inverse() {
 

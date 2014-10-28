@@ -33,14 +33,14 @@ import net.time4j.format.ChronoFormatter;
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /**
  * <p>Repr&auml;sentiert ein Zeitintervall auf einem Zeitstrahl. </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public abstract class ChronoInterval
     <T extends ChronoEntity<T> & Temporal<? super T>> {
@@ -94,13 +94,13 @@ public abstract class ChronoInterval
      * <p>Yields the lower bound of this interval. </p>
      *
      * @return  start interval boundary
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die untere Grenze dieses Intervalls. </p>
      *
      * @return  start interval boundary
-     * @since   1.3
+     * @since   2.0
      */
     public final Boundary<T> getStart() {
 
@@ -112,13 +112,13 @@ public abstract class ChronoInterval
      * <p>Yields the upper bound of this interval. </p>
      *
      * @return  end interval boundary
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die obere Grenze dieses Intervalls. </p>
      *
      * @return  end interval boundary
-     * @since   1.3
+     * @since   2.0
      */
     public final Boundary<T> getEnd() {
 
@@ -134,7 +134,7 @@ public abstract class ChronoInterval
      * @throws  IllegalArgumentException if given boundary is infinite and
      *          the concrete interval does not support infinite boundaries
      *          or if new start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen unteren
@@ -145,7 +145,7 @@ public abstract class ChronoInterval
      * @throws  IllegalArgumentException if given boundary is infinite and
      *          the concrete interval does not support infinite boundaries
      *          or if new start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public abstract ChronoInterval<T> withStart(Boundary<T> boundary);
 
@@ -157,7 +157,7 @@ public abstract class ChronoInterval
      * @throws  IllegalArgumentException if given boundary is infinite and
      *          the concrete interval does not support infinite boundaries
      *          or if new end is before start
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen oberen
@@ -168,7 +168,7 @@ public abstract class ChronoInterval
      * @throws  IllegalArgumentException if given boundary is infinite and
      *          the concrete interval does not support infinite boundaries
      *          or if new end is before start
-     * @since   1.3
+     * @since   2.0
      */
     public abstract ChronoInterval<T> withEnd(Boundary<T> boundary);
 
@@ -178,7 +178,7 @@ public abstract class ChronoInterval
      * @param   temporal    new start timepoint
      * @return  possibly changed copy of this interval
      * @throws  IllegalArgumentException if new start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen
@@ -187,7 +187,7 @@ public abstract class ChronoInterval
      * @param   temporal    new start timepoint
      * @return  possibly changed copy of this interval
      * @throws  IllegalArgumentException if new start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public abstract ChronoInterval<T> withStart(T temporal);
 
@@ -197,7 +197,7 @@ public abstract class ChronoInterval
      * @param   temporal    new end timepoint
      * @return  possibly changed copy of this interval
      * @throws  IllegalArgumentException if new end is before start
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen Endzeit. </p>
@@ -205,7 +205,7 @@ public abstract class ChronoInterval
      * @param   temporal    new end timepoint
      * @return  possibly changed copy of this interval
      * @throws  IllegalArgumentException if new end is before start
-     * @since   1.3
+     * @since   2.0
      */
     public abstract ChronoInterval<T> withEnd(T temporal);
 
@@ -213,13 +213,13 @@ public abstract class ChronoInterval
      * <p>Determines if this interval has finite boundaries. </p>
      *
      * @return  {@code true} if start and end are finite else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall endliche Grenzen hat. </p>
      *
      * @return  {@code true} if start and end are finite else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     public boolean isFinite() {
 
@@ -232,14 +232,14 @@ public abstract class ChronoInterval
      *
      * @return  {@code true} if this interval does not contain any time point
      *          else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall leer ist. </p>
      *
      * @return  {@code true} if this interval does not contain any time point
      *          else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     public boolean isEmpty() {
 
@@ -256,7 +256,7 @@ public abstract class ChronoInterval
      * @param   temporal    time point to be queried, maybe {@code null}
      * @return  {@code true} if given time point is not {@code null} and
      *          belongs to this interval else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob der angegebene Zeitpunkt zu diesem Intervall
@@ -265,7 +265,7 @@ public abstract class ChronoInterval
      * @param   temporal    time point to be queried, maybe {@code null}
      * @return  {@code true} if given time point is not {@code null} and
      *          belongs to this interval else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     public boolean contains(T temporal) {
 
@@ -363,7 +363,7 @@ public abstract class ChronoInterval
      *
      * @param   formatter   format object for printing start and end
      * @return  formatted string in format {start}/{end}
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      * @see     #print(ChronoFormatter, BracketPolicy)
      */
@@ -373,7 +373,7 @@ public abstract class ChronoInterval
      *
      * @param   formatter   format object for printing start and end
      * @return  formatted string in format {start}/{end}
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      * @see     #print(ChronoFormatter, BracketPolicy)
      */
@@ -405,7 +405,7 @@ public abstract class ChronoInterval
      * @param   formatter   format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Formatiert den Start und das Ende getrennt mit einem
@@ -430,7 +430,7 @@ public abstract class ChronoInterval
      * @param   formatter   format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
-     * @since   1.3
+     * @since   2.0
      */
     public String print(
         ChronoFormatter<T> formatter,
@@ -470,7 +470,7 @@ public abstract class ChronoInterval
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
-     * @since   1.3
+     * @since   2.0
      */
     protected abstract TimeLine<T> getTimeLine();
 
@@ -479,7 +479,7 @@ public abstract class ChronoInterval
      *
      * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
      * @throws  UnsupportedOperationException wenn unendlich
-     * @since   1.3
+     * @since   2.0
      */
     T getTemporalOfClosedStart() {
 
@@ -501,7 +501,7 @@ public abstract class ChronoInterval
      *
      * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze
      * @throws  UnsupportedOperationException wenn unendlich
-     * @since   1.3
+     * @since   2.0
      */
     T getTemporalOfOpenEnd() {
 

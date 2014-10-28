@@ -31,7 +31,7 @@ package net.time4j.engine;
  *
  * @param   <T> generic type of time points
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Zeitachse, entlang der ein Zeitpunkt schrittweise
@@ -42,7 +42,7 @@ package net.time4j.engine;
  *
  * @param   <T> generic type of time points
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public interface TimeLine<T> {
 
@@ -53,14 +53,14 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved forward
      * @return  new point in time one step after given argument
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Setzt den angegebenen Zeitpunkt einen Schritt vorw&auml;rts. </p>
      *
      * @param   timepoint       point in time to be moved forward
      * @return  new point in time one step after given argument
-     * @since   1.3
+     * @since   2.0
      */
     T stepForward(T timepoint);
 
@@ -69,7 +69,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved backwards
      * @return  new point in time one step before given argument
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Setzt den angegebenen Zeitpunkt einen Schritt
@@ -77,7 +77,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved backwards
      * @return  new point in time one step before given argument
-     * @since   1.3
+     * @since   2.0
      */
     T stepBackwards(T timepoint);
 

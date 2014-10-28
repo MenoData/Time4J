@@ -60,13 +60,13 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * <p>Defines a timestamp interval on local timeline. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Definiert ein Zeitstempelintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public final class TimestampInterval
     extends ChronoInterval<PlainTimestamp>
@@ -105,7 +105,7 @@ public final class TimestampInterval
      * @param   end     timestamp of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den
@@ -115,7 +115,7 @@ public final class TimestampInterval
      * @param   end     timestamp of upper boundary (exclusive)
      * @return  new moment interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public static TimestampInterval between(
         PlainTimestamp start,
@@ -134,7 +134,7 @@ public final class TimestampInterval
      *
      * @param   start       timestamp of lower boundary (inclusive)
      * @return  new timestamp interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes halb-offenes Intervall ab dem angegebenen
@@ -142,7 +142,7 @@ public final class TimestampInterval
      *
      * @param   start       timestamp of lower boundary (inclusive)
      * @return  new timestamp interval
-     * @since   1.3
+     * @since   2.0
      */
     public static TimestampInterval since(PlainTimestamp start) {
 
@@ -156,7 +156,7 @@ public final class TimestampInterval
      *
      * @param   end     timestamp of upper boundary (exclusive)
      * @return  new timestamp interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes offenes Intervall bis zum angegebenen
@@ -164,7 +164,7 @@ public final class TimestampInterval
      *
      * @param   end     timestamp of upper boundary (exclusive)
      * @return  new timestamp interval
-     * @since   1.3
+     * @since   2.0
      */
     public static TimestampInterval until(PlainTimestamp end) {
 
@@ -231,7 +231,7 @@ public final class TimestampInterval
      *
      * @param   offset  timezone offset
      * @return  global timestamp interval interpreted at given offset
-     * @since   1.3
+     * @since   2.0
      * @see     #atUTC()
      * @see     #in(Timezone)
      */
@@ -241,7 +241,7 @@ public final class TimestampInterval
      *
      * @param   offset  timezone offset
      * @return  global timestamp interval interpreted at given offset
-     * @since   1.3
+     * @since   2.0
      * @see     #atUTC()
      * @see     #in(Timezone)
      */
@@ -273,7 +273,7 @@ public final class TimestampInterval
      * to a global UTC-interval. </p>
      *
      * @return  global timestamp interval interpreted in system timezone
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#ofSystem()
      */
     /*[deutsch]
@@ -281,7 +281,7 @@ public final class TimestampInterval
      * zu einem globalen UTC-Intervall. </p>
      *
      * @return  global timestamp interval interpreted in system timezone
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#ofSystem()
      */
     public MomentInterval inStdTimezone() {
@@ -297,7 +297,7 @@ public final class TimestampInterval
      * @param   tzid        timezone id
      * @return  global timestamp interval interpreted in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
      */
@@ -308,7 +308,7 @@ public final class TimestampInterval
      * @param   tzid        timezone id
      * @return  global timestamp interval interpreted in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @since   1.3
+     * @since   2.0
      * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
      */
@@ -324,7 +324,7 @@ public final class TimestampInterval
      *
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Kombiniert dieses lokale Zeitstempelintervall mit der angegebenen
@@ -332,7 +332,7 @@ public final class TimestampInterval
      *
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
-     * @since   1.3
+     * @since   2.0
      */
     public MomentInterval in(Timezone tz) {
 
@@ -363,7 +363,7 @@ public final class TimestampInterval
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
@@ -372,7 +372,7 @@ public final class TimestampInterval
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      */
     public <U extends IsoUnit> Duration<U> getDuration(U... units) {
 
@@ -391,7 +391,7 @@ public final class TimestampInterval
      * @param   units   time units to be used in calculation
      * @return  duration in given units including a zonal correction
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
@@ -401,7 +401,7 @@ public final class TimestampInterval
      * @param   units   time units to be used in calculation
      * @return  duration in given units including a zonal correction
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      */
     public Duration<IsoUnit> getDuration(
         Timezone tz,
@@ -424,7 +424,7 @@ public final class TimestampInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     /*[deutsch]
@@ -436,7 +436,7 @@ public final class TimestampInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
     public static TimestampInterval parse(
@@ -462,7 +462,7 @@ public final class TimestampInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -474,7 +474,7 @@ public final class TimestampInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      */
     public static TimestampInterval parse(
         CharSequence text,
@@ -533,7 +533,7 @@ public final class TimestampInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     /*[deutsch]
@@ -579,7 +579,7 @@ public final class TimestampInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     public static TimestampInterval parseISO(String text)

@@ -1550,7 +1550,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine Dauer in Stundenschritten auf
@@ -1571,7 +1571,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     public static Normalizer<IsoUnit> approximateHours(int steps) {
 
@@ -1586,7 +1586,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine Dauer in Minutenschritten auf
@@ -1596,7 +1596,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     public static Normalizer<IsoUnit> approximateMinutes(int steps) {
 
@@ -1611,7 +1611,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine Dauer in Sekundenschritten auf
@@ -1621,7 +1621,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
-     * @since	1.3
+     * @since	2.0
      */
     public static Normalizer<IsoUnit> approximateSeconds(int steps) {
 
@@ -1905,7 +1905,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <p>Note: The alternative ISO-formats PYYYY-MM-DDThh:mm:ss and
      * PYYYY-DDDThh:mm:ss and their basic variants are supported since
-     * version 1.3. </p>
+     * version v2.0. </p>
      *
      * <p>Examples for supported formats: </p>
      *
@@ -1965,7 +1965,7 @@ public final class Duration<U extends IsoUnit>
      * definiert). </p>
      *
      * <p>Hinweis: Die alternativen ISO-Formate PYYYY-MM-DDThh:mm:ss und
-     * PYYYY-DDDThh:mm:ss und ihre Basisvarianten werden seit Version 1.3
+     * PYYYY-DDDThh:mm:ss und ihre Basisvarianten werden seit Version v2.0
      * ebenfalls unterst&uuml;tzt. </p>
      *
      * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
@@ -3738,7 +3738,7 @@ public final class Duration<U extends IsoUnit>
          *    <td>{@link ClockUnit#NANOS} as fraction, (1-9) chars</td></tr>
          *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
          *  <tr><td>[]</td><td>optional section for parsing</td></tr>
-         *  <tr><td>{}</td><td>section with plural forms, since v1.3</td></tr>
+         *  <tr><td>{}</td><td>section with plural forms, since v2.0</td></tr>
          *  <tr><td>#</td><td>reserved char for future use</td></tr>
          * </table>
          *
@@ -3750,7 +3750,7 @@ public final class Duration<U extends IsoUnit>
          * sections let the parser be error-tolerant and continue with the
          * next section in case of errors. </p>
          *
-         * <p><strong>Enhancement since version 1.3: plural forms</strong></p>
+         * <p><strong>Enhancement since version v2.0: plural forms</strong></p>
          *
          * <p>Every expression inside curly brackets represents a combination
          * of amount, separator and pluralized unit name and has following
@@ -3814,7 +3814,7 @@ public final class Duration<U extends IsoUnit>
          *    <td>{@link ClockUnit#NANOS} als Bruchteil, (1-9) Zeichen</td></tr>
          *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
          *  <tr><td>[]</td><td>optionaler Abschnitt beim Parsen</td></tr>
-         *  <tr><td>{}</td><td>Abschnitt mit Pluralformen, seit v1.3</td></tr>
+         *  <tr><td>{}</td><td>Abschnitt mit Pluralformen, seit v2.0</td></tr>
          *  <tr><td>#</td><td>zuk&uuml;nftiges reserviertes Zeichen</td></tr>
          * </table>
          *
@@ -3828,7 +3828,7 @@ public final class Duration<U extends IsoUnit>
          * sofort abbricht, sondern mit dem n&auml;chsten Abschnitt
          * fortsetzt. </p>
          *
-         * <p><strong>Erweiterung seit Version 1.3: Pluralformen</strong></p>
+         * <p><strong>Erweiterung seit Version v2.0: Pluralformen</strong></p>
          *
          * <p>Jeder in geschweifte Klammern gefasste Ausdruck symbolisiert
          * eine Kombination aus Betrag, Trennzeichen und pluralisierten

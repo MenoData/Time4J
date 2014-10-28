@@ -26,13 +26,13 @@ package net.time4j.range;
  * <p>Characterize the type of an interval boundary. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Characterisiert den Typ einer Intervallgrenze. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public enum IntervalEdge {
 
@@ -41,26 +41,26 @@ public enum IntervalEdge {
     /**
      * A closed interval edge is included for any temporal computation.
      *
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * Eine geschlossene Intervallgrenze ist f&uuml;r jedwede Zeitrechnung
      * immer inklusive.
      *
-     * @since   1.3
+     * @since   2.0
      */
     CLOSED,
 
     /**
      * An open interval edge is excluded for any temporal computation.
      *
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * Eine offene Intervallgrenze ist f&uuml;r jedwede Zeitrechnung
      * immer exklusive.
      *
-     * @since   1.3
+     * @since   2.0
      */
     OPEN;
 

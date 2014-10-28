@@ -33,7 +33,7 @@ import net.time4j.engine.Calendrical;
  * &quot;[&quot; or as trailing &quot;]&quot;. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Legt die Format- und Interpretationsstrategie f&uuml;r Intervallklammern
@@ -46,7 +46,7 @@ import net.time4j.engine.Calendrical;
  * &quot;[&quot; oder &quot;]&quot;. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public enum BracketPolicy {
 
@@ -129,7 +129,7 @@ public enum BracketPolicy {
      *
      * @param   interval    interval whose boundaries are to be printed or not
      * @return  {@code true} if boundaries are displayed else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Entscheidet, ob die Grenzen des angegebenen Intervalls angezeigt
@@ -137,7 +137,7 @@ public enum BracketPolicy {
      *
      * @param   interval    interval whose boundaries are to be printed or not
      * @return  {@code true} if boundaries are displayed else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     public boolean display(ChronoInterval<?> interval) {
         throw new AbstractMethodError();

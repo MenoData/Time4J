@@ -397,13 +397,13 @@ public final class PrettyTime {
      * <p>Determines that weeks will always be normalized to days. </p>
      *
      * @return  changed copy of this instance
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Legt fest, da&szlig; Wochen immer zu Tagen normalisiert werden. </p>
      *
      * @return  changed copy of this instance
-     * @since   1.3
+     * @since   2.0
      */
     public PrettyTime withWeeksToDays() {
 
@@ -624,7 +624,7 @@ public final class PrettyTime {
      * @param   maxLength   maximum count of displayed items
      * @return  formatted list output
      * @throws  IllegalArgumentException if maxLength is smaller than {@code 1}
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Formatiert die angegebene Dauer. </p>
@@ -649,7 +649,7 @@ public final class PrettyTime {
      * @param   maxLength   maximum count of displayed items
      * @return  formatted list output
      * @throws  IllegalArgumentException if maxLength is smaller than {@code 1}
-     * @since   1.3
+     * @since   2.0
      */
     public String print(
         Duration<?> duration,

@@ -32,7 +32,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * Formatieren eines {@code ZonalMoment}. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 final class ZOM
     implements AttributeQuery, AttributeKey<ZonalMoment> {

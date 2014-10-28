@@ -34,7 +34,7 @@ import java.util.Set;
  * <p>Allgemeine Intervallfabrik f&uuml;r ISO-8601-Typen. </p>
  *
  * @author  Meno Hochschild
- * @see     1.3
+ * @see     2.0
  */
 interface IntervalFactory
     <T extends ChronoEntity<T> & Temporal<? super T>,
@@ -53,7 +53,7 @@ interface IntervalFactory
      * @param   end     upper boundary
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      * @see     net.time4j.engine.Calendrical
      */
     /*[deutsch]
@@ -67,7 +67,7 @@ interface IntervalFactory
      * @param   end     upper boundary
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      * @see     net.time4j.engine.Calendrical
      */
     I between(

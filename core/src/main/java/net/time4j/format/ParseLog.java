@@ -243,7 +243,7 @@ public class ParseLog {
      * @param   errorIndex      error index in parsed text
      * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
-     * @since	1.3
+     * @since	2.0
      */
     /*[deutsch]
      * <p>Setzt eine Fehlerinformation. </p>
@@ -251,7 +251,7 @@ public class ParseLog {
      * @param   errorIndex      error index in parsed text
      * @param   errorMessage    error message maybe empty
      * @throws  IllegalArgumentException if given error index is negative
-     * @since	1.3
+     * @since	2.0
      */
     public void setError(
         int errorIndex,
@@ -280,7 +280,7 @@ public class ParseLog {
      * will be created, too. Only customized {@code ChronoParser}-objects
      * might need to call this method. </p>
      *
-     * @since	1.3
+     * @since	2.0
      * @see     ChronoParser
      */
     /*[deutsch]
@@ -292,7 +292,7 @@ public class ParseLog {
      * unspezifizierte Fehlermeldung generiert. Nur spezielle
      * {@code ChronoParser}-Objekte rufen diese Methode bei Bedarf auf. </p>
      *
-     * @since	1.3
+     * @since	2.0
      * @see     ChronoParser
      */
     public void setWarning() {

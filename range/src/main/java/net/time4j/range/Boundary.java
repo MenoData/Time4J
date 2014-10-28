@@ -39,7 +39,7 @@ import java.io.Serializable;
  *
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Intervallgrenze, die entweder die untere
@@ -51,7 +51,7 @@ import java.io.Serializable;
  *
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public final class Boundary<T extends Temporal<? super T>>
     implements Serializable {
@@ -112,7 +112,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @param   <T> generic temporal type
      * @return  open boundary in infinite past without defined time
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Definiert eine symbolische offene Grenze f&uuml;r die unbegrenzte
@@ -120,7 +120,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @param   <T> generic temporal type
      * @return  open boundary in infinite past without defined time
-     * @since   1.3
+     * @since   2.0
      */
     @SuppressWarnings("unchecked")
     public static <T extends Temporal<? super T>> Boundary<T> infinitePast() {
@@ -134,7 +134,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @param   <T> generic temporal type
      * @return  open boundary in infinite future without defined time
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Definiert eine symbolische offene Grenze f&uuml;r die unbegrenzte
@@ -142,7 +142,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @param   <T> generic temporal type
      * @return  open boundary in infinite future without defined time
-     * @since   1.3
+     * @since   2.0
      */
     @SuppressWarnings("unchecked")
     public static <T extends Temporal<? super T>> Boundary<T> infiniteFuture() {
@@ -158,7 +158,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @param   edge        boundary type
      * @param   temporal    time of the boundary
      * @return  finite boundary
-     * @since   1.3
+     * @since   2.0
      * @see     #infinitePast()
      * @see     #infiniteFuture()
      * @see     #isOpen()
@@ -172,7 +172,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @param   edge        boundary type
      * @param   temporal    time of the boundary
      * @return  finite boundary
-     * @since   1.3
+     * @since   2.0
      * @see     #infinitePast()
      * @see     #infiniteFuture()
      * @see     #isOpen()
@@ -191,14 +191,14 @@ public final class Boundary<T extends Temporal<? super T>>
      * <p>Yields the time point of this interval boundary. </p>
      *
      * @return  time point or {@code null} if infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #isInfinite()
      */
     /*[deutsch]
      * <p>Liefert den Zeitpunkt dieser Intervallgrenze. </p>
      *
      * @return  time point or {@code null} if infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #isInfinite()
      */
     public T getTemporal() {
@@ -214,7 +214,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * interval with this boundary. </p>
      *
      * @return  {@code true} if open else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #of(IntervalEdge, Temporal)
      */
     /*[deutsch]
@@ -224,7 +224,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * nicht zu einem Intervall mit dieser Grenze. </p>
      *
      * @return  {@code true} if open else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #of(IntervalEdge, Temporal)
      */
     public boolean isOpen() {
@@ -240,7 +240,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * interval with this boundary. </p>
      *
      * @return  {@code true} if closed else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #of(IntervalEdge, Temporal)
      */
     /*[deutsch]
@@ -250,7 +250,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * zu einem Intervall mit dieser Grenze. </p>
      *
      * @return  {@code true} if closed else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #of(IntervalEdge, Temporal)
      */
     public boolean isClosed() {
@@ -265,7 +265,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * <p>If infinite then the associated time point is not defined. </p>
      *
      * @return  {@code true} if infinite else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #getTemporal()
      */
     /*[deutsch]
@@ -275,7 +275,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * Zeit. </p>
      *
      * @return  {@code true} if infinite else {@code false}
-     * @since   1.3
+     * @since   2.0
      * @see     #getTemporal()
      */
     public boolean isInfinite() {
@@ -366,7 +366,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @param   start   starting boundary
      * @param   end     ending boundary
      * @return  {@code true} if start is after end else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     static <T extends Temporal<? super T>> boolean isAfter(
         Boundary<T> start,
@@ -394,7 +394,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @param   start   starting boundary
      * @param   end     ending boundary
      * @return  {@code true} if start is simultaneous to end else {@code false}
-     * @since   1.3
+     * @since   2.0
      */
     static <T extends Temporal<? super T>> boolean isSimultaneous(
         Boundary<T> start,

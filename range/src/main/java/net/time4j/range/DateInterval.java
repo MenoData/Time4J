@@ -56,13 +56,13 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  * <p>Defines a date interval. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 /*[deutsch]
  * <p>Definiert ein Datumsintervall. </p>
  *
  * @author  Meno Hochschild
- * @since   1.3
+ * @since   2.0
  */
 public final class DateInterval
     extends ChronoInterval<PlainDate>
@@ -92,7 +92,7 @@ public final class DateInterval
      * @param   end     date of upper boundary (inclusive)
      * @return  new date interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein geschlossenes Intervall zwischen den angegebenen
@@ -102,7 +102,7 @@ public final class DateInterval
      * @param   end     date of upper boundary (inclusive)
      * @return  new date interval
      * @throws  IllegalArgumentException if start is after end
-     * @since   1.3
+     * @since   2.0
      */
     public static DateInterval between(
         PlainDate start,
@@ -120,7 +120,7 @@ public final class DateInterval
      *
      * @param   start   date of lower boundary (inclusive)
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes Intervall ab dem angegebenen
@@ -128,7 +128,7 @@ public final class DateInterval
      *
      * @param   start   date of lower boundary (inclusive)
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     public static DateInterval since(PlainDate start) {
 
@@ -142,7 +142,7 @@ public final class DateInterval
      *
      * @param   end     date of upper boundary (inclusive)
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein unbegrenztes Intervall bis zum angegebenen
@@ -150,7 +150,7 @@ public final class DateInterval
      *
      * @param   end     date of upper boundary (inclusive)
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     public static DateInterval until(PlainDate end) {
 
@@ -164,7 +164,7 @@ public final class DateInterval
      *
      * @param   date    single contained date
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt ein geschlossenes Intervall, das nur das angegebene
@@ -172,7 +172,7 @@ public final class DateInterval
      *
      * @param   date    single contained date
      * @return  new date interval
-     * @since   1.3
+     * @since   2.0
      */
     public static DateInterval atomic(PlainDate date) {
 
@@ -241,7 +241,7 @@ public final class DateInterval
      * <p>The resulting interval is half-open if this interval is finite. </p>
      *
      * @return  timestamp interval (from midnight to midnight)
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Wandelt diese Instanz in ein Zeitstempelintervall
@@ -251,7 +251,7 @@ public final class DateInterval
      * endlich ist. </p>
      *
      * @return  timestamp interval (from midnight to midnight)
-     * @since   1.3
+     * @since   2.0
      */
     public TimestampInterval toFullDays() {
 
@@ -293,7 +293,7 @@ public final class DateInterval
      *
      * @return  duration in days as long primitive
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getDurationInYearsMonthsDays()
      * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
      */
@@ -302,7 +302,7 @@ public final class DateInterval
      *
      * @return  duration in days as long primitive
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getDurationInYearsMonthsDays()
      * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
      */
@@ -331,7 +331,7 @@ public final class DateInterval
      *
      * @return  duration in years, months and days
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getLengthInDays()
      * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
      */
@@ -341,7 +341,7 @@ public final class DateInterval
      *
      * @return  duration in years, months and days
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getLengthInDays()
      * @see     #getDuration(CalendarUnit[]) getDuration(CalendarUnit...)
      */
@@ -360,7 +360,7 @@ public final class DateInterval
      * @param   units   calendrical units as calculation base
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getLengthInDays()
      * @see     #getDurationInYearsMonthsDays()
      */
@@ -371,7 +371,7 @@ public final class DateInterval
      * @param   units   calendrical units as calculation base
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
-     * @since   1.3
+     * @since   2.0
      * @see     #getLengthInDays()
      * @see     #getDurationInYearsMonthsDays()
      */
@@ -401,7 +401,7 @@ public final class DateInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      * @see     Iso8601Format
      */
@@ -422,7 +422,7 @@ public final class DateInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      * @see     Iso8601Format
      */
@@ -449,7 +449,7 @@ public final class DateInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      * @see     #parse(String, ChronoFormatter)
      */
     /*[deutsch]
@@ -462,7 +462,7 @@ public final class DateInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
-     * @since   1.3
+     * @since   2.0
      * @see     #parse(String, ChronoFormatter)
      */
     public static DateInterval parse(
@@ -515,7 +515,7 @@ public final class DateInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     /*[deutsch]
@@ -554,7 +554,7 @@ public final class DateInterval
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   1.3
+     * @since   2.0
      * @see     BracketPolicy#SHOW_NEVER
      */
     public static DateInterval parseISO(String text) throws ParseException {
