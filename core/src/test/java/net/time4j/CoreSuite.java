@@ -19,7 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         FormatSuite.class,
         ScaleSuite.class,
         SerializationTest.class,
-        TemporalTypesTest.class,
+        TemporalTypeTest.class,
         TimeLineTest.class,
         TimeSuite.class,
         ZoneSuite.class
