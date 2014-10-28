@@ -26,12 +26,12 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.ChronoValues;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -257,12 +257,12 @@ public final class Moment
         }
 
         builder.appendElement(
-            PosixTime.POSIX_TIME,
-            PosixTime.POSIX_TIME,
+            LongElement.POSIX_TIME,
+            LongElement.POSIX_TIME,
             TimeUnit.SECONDS);
         builder.appendElement(
-            Fraction.FRACTION,
-            Fraction.FRACTION,
+            IntElement.FRACTION,
+            IntElement.FRACTION,
             TimeUnit.NANOSECONDS);
 
         ENGINE = builder.withTimeLine(new SITimeLine()).build();
@@ -297,7 +297,8 @@ public final class Moment
                 false,
                 Arrays.asList("GMT", "UT", "Z"))
             .endSection()
-            .build();
+            .build()
+            .withTimezone(ZonalOffset.UTC);
     }
 
     /**
@@ -319,7 +320,7 @@ public final class Moment
      *
      * @since   2.0
      */
-    public static final ChronoElement<Long> POSIX_TIME = PosixTime.POSIX_TIME;
+    public static final ChronoElement<Long> POSIX_TIME = LongElement.POSIX_TIME;
 
     /**
      * <p>Represents the nano-fraction of current second. </p>
@@ -332,7 +333,7 @@ public final class Moment
      *
      * @since   2.0
      */
-    public static final ChronoElement<Integer> FRACTION = Fraction.FRACTION;
+    public static final ChronoElement<Integer> FRACTION = IntElement.FRACTION;
 
     private static final long serialVersionUID = -3192884724477742274L;
 
@@ -775,7 +776,7 @@ public final class Moment
      * {@link #toLocalTimestamp()}. </p>
      *
      * @return  moment in system timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset
      */
@@ -786,7 +787,7 @@ public final class Moment
      * von {@link #toLocalTimestamp()} erreicht werden. </p>
      *
      * @return  moment in system timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset
      */
@@ -803,7 +804,7 @@ public final class Moment
      * {@link #toZonalTimestamp(TZID)}. </p>
      *
      * @return  moment in given timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
@@ -816,7 +817,7 @@ public final class Moment
      * von {@link #toZonalTimestamp(TZID)} erreicht werden. </p>
      *
      * @return  moment in given timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
@@ -834,7 +835,7 @@ public final class Moment
      * {@link #toZonalTimestamp(String)}. </p>
      *
      * @return  moment in given timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
@@ -847,7 +848,7 @@ public final class Moment
      * von {@link #toZonalTimestamp(String)} erreicht werden. </p>
      *
      * @return  moment in given timezone
-     * @since   1.3
+     * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
@@ -971,7 +972,7 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of addition
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Addiert die angegebene Maschinenzeit in SI-Sekunden zu dieser
@@ -979,7 +980,7 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of addition
-     * @since   1.3
+     * @since   2.0
      */
     public Moment plus(MachineTime<SI> duration) {
 
@@ -994,7 +995,7 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of subtraction
-     * @since   1.3
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Subtrahiert die angegebene Maschinenzeit in SI-Sekunden von dieser
@@ -1002,7 +1003,7 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of subtraction
-     * @since   1.3
+     * @since   2.0
      */
     public Moment minus(MachineTime<SI> duration) {
 
@@ -1129,98 +1130,108 @@ public final class Moment
 
     /**
      * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing UTC-timestamps. </p>
+     * for formatting and parsing moments in given timezone. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales and timezones
-     * however. Without any explicit timezone the timezone UTC will be used
-     * in printing and parsing requires a timezone information in the text
-     * to be parsed. However, if a timezone is explicitly used, this zone
-     * will be used in printing while it serves as replacement value during
-     * parsing (if the text is missing a timezone information). </p>
+     * <p>Note: The given timezone will be used in printing while it serves
+     * as replacement value during parsing (if the text is missing a timezone
+     * information). The formatter can be adjusted to other locales and
+     * timezones however. </p>
      *
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
+     * @param   tzid            timezone id
      * @return  format object for formatting {@code Moment}-objects
-     *          using given locale
+     *          using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   2.0
      * @see     PatternType
      * @see     #localFormatter(String,ChronoPattern)
+     * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters in
+     * der angegebenen Sprach- und L&auml;ndereinstellung sowie Zeitzone. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. Eine
-     * Zeitzone ist nicht angegeben, was bedeutet, da&szlig; beim Formatieren
-     * die UTC-Zeitzone verwendet wird und beim Parsen eine Zeitzoneninformation
-     * im zu interpretierenden Text vorhanden sein mu&szlig;. Wird eine
-     * Zeitzone angegeben, dann wird diese beim Formatieren benutzt und
-     * dient beim Parsen als Ersatzwert. </p>
+     * <p>Hinweis: Das Format-Objekt kann an andere Sprachen oder Zeitzonen
+     * angepasst werden. Die angegebene Zeitzone dient beim Parsen als
+     * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
+     * existiert). </p>
      *
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
+     * @param   tzid            timezone id
      * @return  format object for formatting {@code Moment}-objects
-     *          using given locale
+     *          using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   2.0
      * @see     PatternType
      * @see     #localFormatter(String,ChronoPattern)
+     * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatterUTC(
+    public static ChronoFormatter<Moment> formatter(
         String formatPattern,
         ChronoPattern patternType,
-        Locale locale
+        Locale locale,
+        TZID tzid
     ) {
 
         return ChronoFormatter
             .setUp(Moment.class, locale)
             .addPattern(formatPattern, patternType)
-            .build();
+            .build()
+            .withTimezone(tzid);
 
     }
 
     /**
      * <p>Creates a new formatter which uses the given display mode and locale
-     * for formatting and parsing UTC-timestamps. </p>
+     * for formatting and parsing moments in given timezone. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales and timezones
-     * however. Without any explicit timezone the timezone UTC will be used
-     * in printing and parsing requires a timezone information in the text
-     * to be parsed. However, if a timezone is explicitly used, this zone
-     * will be used in printing while it serves as replacement value during
-     * parsing (if the text is missing a timezone information). </p>
+     * <p>Note: The given timezone will be used in printing while it serves
+     * as replacement value during parsing (if the text is missing a timezone
+     * information). The formatter can be adjusted to other locales and
+     * timezones however. </p>
      *
      * @param   mode        formatting style
      * @param   locale      locale setting
+     * @param   tzid        timezone id
      * @return  format object for formatting {@code Moment}-objects
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @since   2.0
      * @see     #localFormatter(DisplayMode)
+     * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     * und in der angegebenen Sprach- und L&auml;ndereinstellung und
+     * Zeitzone. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. Eine
-     * Zeitzone ist nicht angegeben, was bedeutet, da&szlig; beim Formatieren
-     * die UTC-Zeitzone verwendet wird und beim Parsen eine Zeitzoneninformation
-     * im zu interpretierenden Text vorhanden sein mu&szlig;. </p>
+     * <p>Hinweis: Das Format-Objekt kann an andere Sprachen oder Zeitzonen
+     * angepasst werden. Die angegebene Zeitzone dient beim Parsen als
+     * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
+     * existiert). </p>
      *
      * @param   mode        formatting style
      * @param   locale      locale setting
+     * @param   tzid        timezone id
      * @return  format object for formatting {@code Moment}-objects
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @since   2.0
      * @see     #localFormatter(DisplayMode)
+     * @see     ChronoFormatter#with(Locale)
      * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatterUTC(
+    public static ChronoFormatter<Moment> formatter(
         DisplayMode mode,
-        Locale locale
+        Locale locale,
+        TZID tzid
     ) {
 
         int style = PatternType.getFormatStyle(mode);
@@ -1230,7 +1241,8 @@ public final class Moment
         return ChronoFormatter
             .setUp(Moment.class, locale)
             .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
-            .build();
+            .build()
+            .withTimezone(tzid);
 
     }
 
@@ -1506,40 +1518,6 @@ public final class Moment
     public static TimeAxis<TimeUnit, Moment> axis() {
 
         return ENGINE;
-
-    }
-
-    /**
-     * <p>A {@code Moment} ist always in timezone UTC. </p>
-     *
-     * @return  {@code true}
-     */
-    /*[deutsch]
-     * <p>Ein {@code Moment} ist fest an die Zeitzone UTC gekoppelt. </p>
-     *
-     * @return  {@code true}
-     */
-    @Override
-    public boolean hasTimezone() {
-
-        return true;
-
-    }
-
-    /**
-     * <p>A {@code Moment} ist always in timezone UTC. </p>
-     *
-     * @return  {@link ZonalOffset#UTC}
-     */
-    /*[deutsch]
-     * <p>Ein {@code Moment} ist fest an die Zeitzone UTC gekoppelt. </p>
-     *
-     * @return  {@link ZonalOffset#UTC}
-     */
-    @Override
-    public TZID getTimezone() {
-
-        return ZonalOffset.UTC;
 
     }
 
@@ -2242,7 +2220,7 @@ public final class Moment
 
     }
 
-    private static enum PosixTime
+    private static enum LongElement
         implements ChronoElement<Long>, ElementRule<Moment, Long> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -2267,8 +2245,8 @@ public final class Moment
 
         @Override
         public int compare(
-            ChronoValues o1,
-            ChronoValues o2
+            ChronoDisplay o1,
+            ChronoDisplay o2
         ) {
 
             return o1.get(this).compareTo(o2.get(this));
@@ -2363,20 +2341,20 @@ public final class Moment
         @Override
         public ChronoElement<?> getChildAtFloor(Moment context) {
 
-            return Fraction.FRACTION;
+            return IntElement.FRACTION;
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(Moment context) {
 
-            return Fraction.FRACTION;
+            return IntElement.FRACTION;
 
         }
 
     }
 
-    private static enum Fraction
+    private static enum IntElement
         implements ChronoElement<Integer>, ElementRule<Moment, Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -2401,8 +2379,8 @@ public final class Moment
 
         @Override
         public int compare(
-            ChronoValues o1,
-            ChronoValues o2
+            ChronoDisplay o1,
+            ChronoDisplay o2
         ) {
 
             return o1.get(this).compareTo(o2.get(this));
@@ -2541,6 +2519,13 @@ public final class Moment
 
             if (entity instanceof UnixTime) {
                 return Moment.from(UnixTime.class.cast(entity));
+            } else if (entity.contains(LongElement.POSIX_TIME)) {
+                long posixTime = entity.get(LongElement.POSIX_TIME).longValue();
+                int fraction = 0;
+                if (entity.contains(IntElement.FRACTION)) {
+                    fraction = entity.get(IntElement.FRACTION).intValue();
+                }
+                return Moment.of(posixTime, fraction, POSIX);
             }
 
             Moment result = null;
@@ -2580,13 +2565,6 @@ public final class Moment
                     result = ts.in(Timezone.of(tzid).with(strategy));
                 } else {
                     result = ts.inTimezone(tzid);
-                }
-            } else {
-                Leniency leniency =
-                    attrs.get(Attributes.LENIENCY, Leniency.SMART);
-                if (leniency.isLax()) {
-                    result = ts.inStdTimezone();
-                    tzid = Timezone.ofSystem().getID();
                 }
             }
 
@@ -2641,7 +2619,7 @@ public final class Moment
         }
 
         @Override
-        public ChronoValues preformat(
+        public ChronoDisplay preformat(
             Moment context,
             AttributeQuery attributes
         ) {

@@ -258,7 +258,7 @@ public class BasicMomentRangeTest {
             MomentInterval
                 .until(PlainTimestamp.of(2014, 5, 14, 14, 45).atUTC())
                 .toString(),
-            is("(-∞/2014-05-14T14:45:00,000000000Z)"));
+            is("(-∞/2014-05-14T14:45:00Z)"));
     }
 
     @Test
@@ -267,7 +267,7 @@ public class BasicMomentRangeTest {
             MomentInterval
                 .since(PlainTimestamp.of(2014, 5, 14, 14, 45).atUTC())
                 .toString(),
-            is("[2014-05-14T14:45:00,000000000Z/+∞)"));
+            is("[2014-05-14T14:45:00Z/+∞)"));
     }
 
     @Test
@@ -279,7 +279,7 @@ public class BasicMomentRangeTest {
                 .between(start, end)
                 .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
                 .toString(),
-            is("[2014-02-27T14:45:00,000000000Z/2014-05-14T09:30:00,000000000Z]"));
+            is("[2014-02-27T14:45:00Z/2014-05-14T09:30:00Z]"));
     }
 
     @Test
@@ -290,7 +290,7 @@ public class BasicMomentRangeTest {
             MomentInterval
                 .between(start, end)
                 .toString(),
-            is("[2014-02-27T14:45:00,000000000Z/2014-05-14T09:30:00,000000000Z)"));
+            is("[2014-02-27T14:45:00Z/2014-05-14T09:30:00Z)"));
     }
 
 }

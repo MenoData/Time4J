@@ -109,11 +109,11 @@ public class OffsetPatternTest {
         super();
 
         this.formatter =
-            Moment.formatterUTC(
+            Moment.formatter(
                 pattern,
                 PatternType.CLDR,
-                toLocale(locale))
-            .withTimezone(tzid);
+                toLocale(locale),
+                tzid);
         this.value = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(value);
         this.text = text;
     }

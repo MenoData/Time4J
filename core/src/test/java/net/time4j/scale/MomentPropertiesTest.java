@@ -10,10 +10,11 @@ import net.time4j.PlainTimestamp;
 import net.time4j.Quarter;
 import net.time4j.SI;
 import net.time4j.Weekday;
-import net.time4j.base.GregorianMath;
-import net.time4j.engine.ChronoException;
+import net.time4j.Weekmodel;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.RuleNotFoundException;
 import net.time4j.tz.ZonalOffset;
+import net.time4j.tz.olson.ASIA;
 
 import java.math.BigDecimal;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class MomentPropertiesTest {
     }
 
     @Test
-    public void testToString() {
+    public void testToStringLS() {
         assertThat(
             this.utc.toString(),
             is("2012-06-30T23:59:60,123456789Z"));
@@ -67,750 +68,387 @@ public class MomentPropertiesTest {
     }
 
     @Test
+    public void containsWeekOfYear() {
+        assertThat(this.utc.contains(Weekmodel.ISO.weekOfYear()), is(false));
+    }
+
+    @Test
+    public void getWeekOfYear() {
+        assertThat(
+            this.utc.get(Weekmodel.ISO.weekOfYear().atUTC()),
+            is(26));
+    }
+
+    @Test
+    public void withWeekOfYear() {
+        assertThat(
+            this.utc.with(
+                Weekmodel.ISO.weekOfYear().newValue(1).atUTC()),
+            is(
+                PlainTimestamp.of(
+                    PlainDate.of(2012, 1, 7),
+                    PlainTime.of(23, 59, 59, 123456789)
+                ).atUTC()));
+    }
+
+    @Test
     public void containsAmPm() {
-        assertThat(this.utc.contains(AM_PM_OF_DAY), is(true));
+        assertThat(this.utc.contains(AM_PM_OF_DAY), is(false));
     }
 
     @Test
     public void getAmPm() {
-        assertThat(this.utc.get(AM_PM_OF_DAY), is(Meridiem.PM));
+        assertThat(this.utc.get(AM_PM_OF_DAY.atUTC()), is(Meridiem.PM));
     }
 
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitAmPm() {
-        Moment.axis().getBaseUnit(AM_PM_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumAmPm() {
-        assertThat(this.utc.getMinimum(AM_PM_OF_DAY), is(Meridiem.AM));
-    }
-
-    @Test
-    public void getMaximumAmPm() {
-        assertThat(this.utc.getMaximum(AM_PM_OF_DAY), is(Meridiem.PM));
-    }
-
-    @Test
-    public void isValidAmPm() {
-        assertThat(this.utc.isValid(AM_PM_OF_DAY, Meridiem.AM), is(true));
-    }
-
-    @Test
-    public void isValidAmPmNull() {
-        assertThat(this.utc.isValid(AM_PM_OF_DAY, null), is(false));
-    }
-
-    @Test
+    @Test(expected=RuleNotFoundException.class)
     public void withAmPm() {
-        assertThat(
-            this.utc.with(AM_PM_OF_DAY, Meridiem.AM),
-            is(
-                PlainTimestamp.of(2012, 6, 30, 11, 59, 59)
-                .plus(123456789, ClockUnit.NANOS)
-                .inTimezone(ZonalOffset.UTC)));
-    }
-
-    @Test(expected=NullPointerException.class)
-    public void withAmPmNull() {
-        this.utc.with(AM_PM_OF_DAY, null);
+        this.utc.with(AM_PM_OF_DAY, Meridiem.AM);
     }
 
     @Test
     public void containsMinuteOfDay() {
-        assertThat(this.utc.contains(MINUTE_OF_DAY), is(true));
+        assertThat(this.utc.contains(MINUTE_OF_DAY), is(false));
     }
 
     @Test
     public void getMinuteOfDay() {
         assertThat(
-            this.utc.get(MINUTE_OF_DAY),
+            this.utc.get(MINUTE_OF_DAY.atUTC()),
             is(1439));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMinuteOfDay() {
-        Moment.axis().getBaseUnit(MINUTE_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumMinuteOfDay() {
-        assertThat(this.utc.getMinimum(MINUTE_OF_DAY), is(0));
-    }
-
-    @Test
-    public void getMaximumMinuteOfDay() {
-        assertThat(this.utc.getMaximum(MINUTE_OF_DAY), is(1439));
-    }
-
-    @Test
-    public void isValidMinuteOfDay() {
-        assertThat(this.utc.isValid(MINUTE_OF_DAY, 1439), is(true));
-    }
-
-    @Test
-    public void isValidMinuteOfDayNull() {
-        assertThat(this.utc.isValid(MINUTE_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidMinuteOfDay1440() {
-        assertThat(this.utc.isValid(MINUTE_OF_DAY, 1440), is(false));
     }
 
     @Test
     public void withMinuteOfDay() {
         assertThat(
-            this.utc.with(MINUTE_OF_DAY, 1439),
+            this.utc.with(MINUTE_OF_DAY.newValue(1439).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMinuteOfDayNull() {
-        this.utc.with(MINUTE_OF_DAY, null);
+        this.utc.with(MINUTE_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfDay1440() {
-        this.utc.with(MINUTE_OF_DAY, 1440);
+        this.utc.with(MINUTE_OF_DAY.newValue(1440).atUTC());
     }
 
     @Test
     public void containsSecondOfDay() {
-        assertThat(this.utc.contains(SECOND_OF_DAY), is(true));
+        assertThat(this.utc.contains(SECOND_OF_DAY), is(false));
     }
 
     @Test
     public void getSecondOfDay() {
         assertThat(
-            this.utc.get(SECOND_OF_DAY),
+            this.utc.get(SECOND_OF_DAY.atUTC()),
             is(86399));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitSecondOfDay() {
-        Moment.axis().getBaseUnit(SECOND_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumSecondOfDay() {
-        assertThat(this.utc.getMinimum(SECOND_OF_DAY), is(0));
-    }
-
-    @Test
-    public void getMaximumSecondOfDay() {
-        assertThat(this.utc.getMaximum(SECOND_OF_DAY), is(86399));
-    }
-
-    @Test
-    public void isValidSecondOfDay() {
-        assertThat(this.utc.isValid(SECOND_OF_DAY, 86399), is(true));
-    }
-
-    @Test
-    public void isValidSecondOfDayNull() {
-        assertThat(this.utc.isValid(SECOND_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidSecondOfDay86400() {
-        assertThat(this.utc.isValid(SECOND_OF_DAY, 86400), is(false));
     }
 
     @Test
     public void withSecondOfDay() {
         assertThat(
-            this.utc.with(SECOND_OF_DAY, 86399),
-            is(this.utc));
+            this.utc.with(SECOND_OF_DAY.newValue(86399).atUTC()),
+            is(this.utc.minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withSecondOfDayNull() {
-        this.utc.with(SECOND_OF_DAY, null);
+        this.utc.with(SECOND_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withSecondOfDay86400() {
-        this.utc.with(SECOND_OF_DAY, 86400);
+        this.utc.with(SECOND_OF_DAY.newValue(86400).atUTC());
     }
 
     @Test
     public void containsMilliOfDay() {
-        assertThat(this.utc.contains(MILLI_OF_DAY), is(true));
+        assertThat(this.utc.contains(MILLI_OF_DAY), is(false));
     }
 
     @Test
     public void getMilliOfDay() {
         assertThat(
-            this.utc.get(MILLI_OF_DAY),
+            this.utc.get(MILLI_OF_DAY.atUTC()),
             is(86399 * 1000 + 123));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMilliOfDay() {
-        Moment.axis().getBaseUnit(MILLI_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumMilliOfDay() {
-        assertThat(this.utc.getMinimum(MILLI_OF_DAY), is(0));
-    }
-
-    @Test
-    public void getMaximumMilliOfDay() {
-        assertThat(this.utc.getMaximum(MILLI_OF_DAY), is(86400 * 1000 - 1));
-    }
-
-    @Test
-    public void isValidMilliOfDay() {
-        assertThat(this.utc.isValid(MILLI_OF_DAY, 86399999), is(true));
-    }
-
-    @Test
-    public void isValidMilliOfDayNull() {
-        assertThat(this.utc.isValid(MILLI_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidMilliOfDayT24() {
-        assertThat(this.utc.isValid(MILLI_OF_DAY, 86400000), is(false));
     }
 
     @Test
     public void withMilliOfDay() {
         assertThat(
-            this.utc.with(MILLI_OF_DAY, 86399999),
-            is(this.utc.plus((999 - 123) * MIO, SI.NANOSECONDS)));
+            this.utc.with(MILLI_OF_DAY.newValue(86399999).atUTC()),
+            is(
+                this.utc
+                .plus((999 - 123) * MIO, SI.NANOSECONDS)
+                .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMilliOfDayNull() {
-        this.utc.with(MILLI_OF_DAY, null);
+        this.utc.with(MILLI_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMilliOfDayT24() {
-        this.utc.with(MILLI_OF_DAY, 86400000);
+        this.utc.with(MILLI_OF_DAY.newValue(86400000).atUTC());
     }
 
     @Test
     public void containsMicroOfDay() {
-        assertThat(this.utc.contains(MICRO_OF_DAY), is(true));
+        assertThat(this.utc.contains(MICRO_OF_DAY), is(false));
     }
 
     @Test
     public void getMicroOfDay() {
         assertThat(
-            this.utc.get(MICRO_OF_DAY),
+            this.utc.get(MICRO_OF_DAY.atUTC()),
             is(86399 * MIO + 123456));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMicroOfDay() {
-        Moment.axis().getBaseUnit(MICRO_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumMicroOfDay() {
-        assertThat(this.utc.getMinimum(MICRO_OF_DAY), is(0L));
-    }
-
-    @Test
-    public void getMaximumMicroOfDay() {
-        assertThat(this.utc.getMaximum(MICRO_OF_DAY), is(86400 * MIO - 1));
-    }
-
-    @Test
-    public void isValidMicroOfDay() {
-        assertThat(this.utc.isValid(MICRO_OF_DAY, 86399999999L), is(true));
-    }
-
-    @Test
-    public void isValidMicroOfDayNull() {
-        assertThat(this.utc.isValid(MICRO_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidMicroOfDayT24() {
-        assertThat(this.utc.isValid(MICRO_OF_DAY, 86400000000L), is(false));
     }
 
     @Test
     public void withMicroOfDay() {
         assertThat(
-            this.utc.with(MICRO_OF_DAY, 86399999999L),
-            is(this.utc.plus((999999 - 123456) * 1000L, SI.NANOSECONDS)));
+            this.utc.with(MICRO_OF_DAY.newValue(86399999999L).atUTC()),
+            is(
+                this.utc
+                .plus((999999 - 123456) * 1000L, SI.NANOSECONDS)
+                .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMicroOfDayNull() {
-        this.utc.with(MICRO_OF_DAY, null);
+        this.utc.with(MICRO_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMicroOfDayT24() {
-        this.utc.with(MICRO_OF_DAY, 86400 * MIO);
+        this.utc.with(MICRO_OF_DAY.newValue(86400 * MIO).atUTC());
     }
 
     @Test
     public void containsNanoOfDay() {
-        assertThat(this.utc.contains(NANO_OF_DAY), is(true));
+        assertThat(this.utc.contains(NANO_OF_DAY), is(false));
     }
 
     @Test
     public void getNanoOfDay() {
         assertThat(
-            this.utc.get(NANO_OF_DAY),
+            this.utc.get(NANO_OF_DAY.atUTC()),
             is(86399 * MRD + 123456789));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitNanoOfDay() {
-        Moment.axis().getBaseUnit(NANO_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumNanoOfDay() {
-        assertThat(this.utc.getMinimum(NANO_OF_DAY), is(0L));
-    }
-
-    @Test
-    public void getMaximumNanoOfDay() {
-        assertThat(this.utc.getMaximum(NANO_OF_DAY), is(86400 * MRD - 1));
-    }
-
-    @Test
-    public void isValidNanoOfDay() {
-        assertThat(this.utc.isValid(NANO_OF_DAY, 86399 * MRD), is(true));
-    }
-
-    @Test
-    public void isValidNanoOfDayNull() {
-        assertThat(this.utc.isValid(NANO_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidNanoOfDayT24() {
-        assertThat(this.utc.isValid(NANO_OF_DAY, 86400 * MRD), is(false));
     }
 
     @Test
     public void withNanoOfDay() {
         assertThat(
-            this.utc.with(NANO_OF_DAY, 86399999999999L),
-            is(this.utc.plus((999999999 - 123456789), SI.NANOSECONDS)));
+            this.utc.with(NANO_OF_DAY.newValue(86399999999999L).atUTC()),
+            is(
+                this.utc
+                .plus((999999999 - 123456789), SI.NANOSECONDS)
+                .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withNanoOfDayNull() {
-        this.utc.with(NANO_OF_DAY, null);
+        this.utc.with(NANO_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withNanoOfDayT24() {
-        this.utc.with(NANO_OF_DAY, 86400 * MRD);
+        this.utc.with(NANO_OF_DAY.newValue(86400 * MRD).atUTC());
     }
 
     @Test
     public void containsIsoHour() {
-        assertThat(this.utc.contains(ISO_HOUR), is(true));
+        assertThat(this.utc.contains(ISO_HOUR), is(false));
     }
 
     @Test
     public void getIsoHour() {
-        assertThat(this.utc.get(ISO_HOUR), is(23));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitIsoHour() {
-        Moment.axis().getBaseUnit(ISO_HOUR);
-    }
-
-    @Test
-    public void getMinimumIsoHour() {
-        assertThat(this.utc.getMinimum(ISO_HOUR), is(0));
-    }
-
-    @Test
-    public void getMaximumIsoHour() {
-        assertThat(this.utc.getMaximum(ISO_HOUR), is(23));
-    }
-
-    @Test
-    public void isValidIsoHour() {
-        assertThat(this.utc.isValid(ISO_HOUR, 23), is(true));
-    }
-
-    @Test
-    public void isValidIsoHourNull() {
-        assertThat(this.utc.isValid(ISO_HOUR, null), is(false));
-    }
-
-    @Test
-    public void isValidIsoHour24() {
-        assertThat(this.utc.isValid(ISO_HOUR, 24), is(false));
+        assertThat(this.utc.get(ISO_HOUR.atUTC()), is(23));
     }
 
     @Test
     public void withIsoHour() {
         assertThat(
-            this.utc.with(ISO_HOUR, 23),
+            this.utc.with(ISO_HOUR.newValue(23).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withIsoHourNull() {
-        this.utc.with(ISO_HOUR, null);
+        this.utc.with(ISO_HOUR.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withIsoHour24() {
-        this.utc.with(ISO_HOUR, 24);
+        this.utc.with(ISO_HOUR.newValue(24).atUTC());
     }
 
     @Test
     public void containsMinuteOfHour() {
-        assertThat(this.utc.contains(MINUTE_OF_HOUR), is(true));
+        assertThat(this.utc.contains(MINUTE_OF_HOUR), is(false));
     }
 
     @Test
     public void getMinuteOfHour() {
         assertThat(
-            this.utc.get(MINUTE_OF_HOUR),
+            this.utc.get(MINUTE_OF_HOUR.atUTC()),
             is(59));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMinuteOfHour() {
-        Moment.axis().getBaseUnit(MINUTE_OF_HOUR);
-    }
-
-    @Test
-    public void getMinimumMinuteOfHour() {
-        assertThat(this.utc.getMinimum(MINUTE_OF_HOUR), is(0));
-    }
-
-    @Test
-    public void getMaximumMinuteOfHour() {
-        assertThat(this.utc.getMaximum(MINUTE_OF_HOUR), is(59));
-    }
-
-    @Test
-    public void isValidMinuteOfHour() {
-        assertThat(this.utc.isValid(MINUTE_OF_HOUR, 59), is(true));
-    }
-
-    @Test
-    public void isValidMinuteOfHourNull() {
-        assertThat(this.utc.isValid(MINUTE_OF_HOUR, null), is(false));
-    }
-
-    @Test
-    public void isValidMinuteOfHour60() {
-        assertThat(this.utc.isValid(MINUTE_OF_HOUR, 60), is(false));
     }
 
     @Test
     public void withMinuteOfHour() {
         assertThat(
-            this.utc.with(MINUTE_OF_HOUR, 59),
+            this.utc.with(MINUTE_OF_HOUR.newValue(59).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMinuteOfHourNull() {
-        this.utc.with(MINUTE_OF_HOUR, null);
+        this.utc.with(MINUTE_OF_HOUR.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfHour60() {
-        this.utc.with(MINUTE_OF_HOUR, 60);
+        this.utc.with(MINUTE_OF_HOUR.newValue(60).atUTC());
     }
 
     @Test
     public void containsSecondOfMinute() {
-        assertThat(this.utc.contains(SECOND_OF_MINUTE), is(true));
+        assertThat(this.utc.contains(SECOND_OF_MINUTE), is(false));
     }
 
     @Test
     public void getSecondOfMinute() {
         assertThat(
-            this.utc.get(SECOND_OF_MINUTE),
+            this.utc.get(SECOND_OF_MINUTE.inTimezone(ASIA.TOKYO)),
             is(60));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitSecondOfMinute() {
-        Moment.axis().getBaseUnit(SECOND_OF_MINUTE);
-    }
-
-    @Test
-    public void getMinimumSecondOfMinute() {
-        assertThat(this.utc.getMinimum(SECOND_OF_MINUTE), is(0));
-    }
-
-    @Test
-    public void getMaximumSecondOfMinute() {
-        assertThat(this.utc.getMaximum(SECOND_OF_MINUTE), is(60));
-    }
-
-    @Test
-    public void isValidSecondOfMinute() {
-        assertThat(this.utc.isValid(SECOND_OF_MINUTE, 59), is(true));
-    }
-
-    @Test
-    public void isValidSecondOfMinuteNull() {
-        assertThat(this.utc.isValid(SECOND_OF_MINUTE, null), is(false));
-    }
-
-    @Test
-    public void isValidSecondOfMinute60() {
-        assertThat(this.utc.isValid(SECOND_OF_MINUTE, 60), is(true));
     }
 
     @Test
     public void withSecondOfMinute() {
         assertThat(
-            this.utc.with(SECOND_OF_MINUTE, 60),
+            this.utc.with(SECOND_OF_MINUTE.newValue(60).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withSecondOfMinuteNull() {
-        this.utc.with(SECOND_OF_MINUTE, null);
+        this.utc.with(SECOND_OF_MINUTE.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withSecondOfMinute60() {
-        PlainTimestamp.of(2010, 4, 21, 9, 15)
-            .inTimezone(ZonalOffset.UTC)
-            .with(SECOND_OF_MINUTE, 60);
+        PlainTimestamp.of(2010, 4, 21, 9, 15).atUTC()
+            .with(SECOND_OF_MINUTE.newValue(60).atUTC());
     }
 
     @Test
     public void containsMilliOfSecond() {
-        assertThat(this.utc.contains(MILLI_OF_SECOND), is(true));
+        assertThat(this.utc.contains(MILLI_OF_SECOND), is(false));
     }
 
     @Test
     public void getMilliOfSecond() {
         assertThat(
-            this.utc.get(MILLI_OF_SECOND),
+            this.utc.get(MILLI_OF_SECOND.atUTC()),
             is(123));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMilliOfSecond() {
-        Moment.axis().getBaseUnit(MILLI_OF_SECOND);
-    }
-
-    @Test
-    public void getMinimumMilliOfSecond() {
-        assertThat(this.utc.getMinimum(MILLI_OF_SECOND), is(0));
-    }
-
-    @Test
-    public void getMaximumMilliOfSecond() {
-        assertThat(this.utc.getMaximum(MILLI_OF_SECOND), is(999));
-    }
-
-    @Test
-    public void isValidMilliOfSecond() {
-        assertThat(this.utc.isValid(MILLI_OF_SECOND, 999), is(true));
-    }
-
-    @Test
-    public void isValidMilliOfSecondNull() {
-        assertThat(this.utc.isValid(MILLI_OF_SECOND, null), is(false));
-    }
-
-    @Test
-    public void isValidMilliOfSecond1000() {
-        assertThat(this.utc.isValid(MILLI_OF_SECOND, 1000), is(false));
     }
 
     @Test
     public void withMilliOfSecond() {
         assertThat(
-            this.utc.with(MILLI_OF_SECOND, 999),
+            this.utc.with(MILLI_OF_SECOND.newValue(999).atUTC()),
             is(this.utc.plus((999 - 123) * MIO, SI.NANOSECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMilliOfSecondNull() {
-        this.utc.with(MILLI_OF_SECOND, null);
+        this.utc.with(MILLI_OF_SECOND.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMilliOfSecond1000() {
-        this.utc.with(MILLI_OF_SECOND, 1000);
+        this.utc.with(MILLI_OF_SECOND.newValue(1000).atUTC());
     }
 
     @Test
     public void containsMicroOfSecond() {
-        assertThat(this.utc.contains(MICRO_OF_SECOND), is(true));
+        assertThat(this.utc.contains(MICRO_OF_SECOND), is(false));
     }
 
     @Test
     public void getMicroOfSecond() {
         assertThat(
-            this.utc.get(MICRO_OF_SECOND),
+            this.utc.get(MICRO_OF_SECOND.atUTC()),
             is(123456));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitMicroOfSecond() {
-        Moment.axis().getBaseUnit(MICRO_OF_SECOND);
-    }
-
-    @Test
-    public void getMinimumMicroOfSecond() {
-        assertThat(this.utc.getMinimum(MICRO_OF_SECOND), is(0));
-    }
-
-    @Test
-    public void getMaximumMicroOfSecond() {
-        assertThat(this.utc.getMaximum(MICRO_OF_SECOND), is(999999));
-    }
-
-    @Test
-    public void isValidMicroOfSecond() {
-        assertThat(this.utc.isValid(MICRO_OF_SECOND, 999999), is(true));
-    }
-
-    @Test
-    public void isValidMicroOfSecondNull() {
-        assertThat(this.utc.isValid(MICRO_OF_SECOND, null), is(false));
-    }
-
-    @Test
-    public void isValidMicroOfSecondMIO() {
-        assertThat(this.utc.isValid(MICRO_OF_SECOND, 1000000), is(false));
     }
 
     @Test
     public void withMicroOfSecond() {
         assertThat(
-            this.utc.with(MICRO_OF_SECOND, 999999),
+            this.utc.with(MICRO_OF_SECOND.newValue(999999).atUTC()),
             is(this.utc.plus((999999 - 123456) * 1000, SI.NANOSECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
     public void withMicroOfSecondNull() {
-        this.utc.with(MICRO_OF_SECOND, null);
+        this.utc.with(MICRO_OF_SECOND.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withMicroOfSecondMIO() {
-        this.utc.with(MICRO_OF_SECOND, 1000000);
+        this.utc.with(MICRO_OF_SECOND.newValue(1000000).atUTC());
     }
 
     @Test
     public void containsNanoOfSecond() {
-        assertThat(this.utc.contains(NANO_OF_SECOND), is(true));
+        assertThat(this.utc.contains(NANO_OF_SECOND), is(false));
     }
 
     @Test
     public void getNanoOfSecond() {
         assertThat(
-            this.utc.get(NANO_OF_SECOND),
+            this.utc.get(NANO_OF_SECOND.inTimezone(ASIA.BAGHDAD)),
             is(123456789));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitNanoOfSecond() {
-        Moment.axis().getBaseUnit(NANO_OF_SECOND);
-    }
-
-    @Test
-    public void getMinimumNanoOfSecond() {
-        assertThat(this.utc.getMinimum(NANO_OF_SECOND), is(0));
-    }
-
-    @Test
-    public void getMaximumNanoOfSecond() {
-        assertThat(this.utc.getMaximum(NANO_OF_SECOND), is(999999999));
-    }
-
-    @Test
-    public void isValidNanoOfSecond() {
-        assertThat(this.utc.isValid(NANO_OF_SECOND, 999999999), is(true));
-    }
-
-    @Test
-    public void isValidNanoOfSecondNull() {
-        assertThat(this.utc.isValid(NANO_OF_SECOND, null), is(false));
-    }
-
-    @Test
-    public void isValidNanoOfSecondMRD() {
-        assertThat(this.utc.isValid(NANO_OF_SECOND, 1000000000), is(false));
     }
 
     @Test
     public void withNanoOfSecond() {
         assertThat(
-            this.utc.with(NANO_OF_SECOND, 123456789),
+            this.utc.with(NANO_OF_SECOND.newValue(123456789).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withNanoOfSecondNull() {
-        this.utc.with(NANO_OF_SECOND, null);
+        this.utc.with(NANO_OF_SECOND.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withNanoOfSecondMRD() {
-        this.utc.with(NANO_OF_SECOND, 1000000000);
+        this.utc.with(NANO_OF_SECOND.newValue(1000000000).atUTC());
     }
 
     @Test
     public void containsClockHourOfAmPm() {
-        assertThat(this.utc.contains(CLOCK_HOUR_OF_AMPM), is(true));
+        assertThat(this.utc.contains(CLOCK_HOUR_OF_AMPM), is(false));
     }
 
     @Test
     public void getClockHourOfAmPm() {
         assertThat(
-            this.utc.get(CLOCK_HOUR_OF_AMPM),
+            this.utc.get(CLOCK_HOUR_OF_AMPM.atUTC()),
             is(11));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitClockHourOfAmPm() {
-        Moment.axis().getBaseUnit(CLOCK_HOUR_OF_AMPM);
-    }
-
-    @Test
-    public void getMinimumClockHourOfAmPm() {
-        assertThat(this.utc.getMinimum(CLOCK_HOUR_OF_AMPM), is(1));
-    }
-
-    @Test
-    public void getMaximumClockHourOfAmPm() {
-        assertThat(this.utc.getMaximum(CLOCK_HOUR_OF_AMPM), is(12));
-    }
-
-    @Test
-    public void isValidClockHourOfAmPm() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_AMPM, 12), is(true));
-    }
-
-    @Test
-    public void isValidClockHourOfAmPmNull() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_AMPM, null), is(false));
-    }
-
-    @Test
-    public void isValidClockHourOfAmPm0() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_AMPM, 0), is(false));
     }
 
     @Test
     public void withClockHourOfAmPm() {
         assertThat(
-            this.utc.with(CLOCK_HOUR_OF_AMPM, 12),
+            this.utc.with(CLOCK_HOUR_OF_AMPM.newValue(12).atUTC()),
             is(
                 PlainDate.of(2012, 6, 30)
                 .at(PlainTime.of(12, 59, 59, 123456789))
@@ -819,191 +457,99 @@ public class MomentPropertiesTest {
 
     @Test(expected=NullPointerException.class)
     public void withClockHourOfAmPmNull() {
-        this.utc.with(CLOCK_HOUR_OF_AMPM, null);
+        this.utc.with(CLOCK_HOUR_OF_AMPM.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfAmPm0() {
-        this.utc.with(CLOCK_HOUR_OF_AMPM, 0);
+        this.utc.with(CLOCK_HOUR_OF_AMPM.newValue(0).atUTC());
     }
 
     @Test
     public void containsClockHourOfDay() {
-        assertThat(this.utc.contains(CLOCK_HOUR_OF_DAY), is(true));
+        assertThat(this.utc.contains(CLOCK_HOUR_OF_DAY), is(false));
     }
 
     @Test
     public void getClockHourOfDay() {
         assertThat(
-            this.utc.get(CLOCK_HOUR_OF_DAY),
+            this.utc.get(CLOCK_HOUR_OF_DAY.atUTC()),
             is(23));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitClockHourOfDay() {
-        Moment.axis().getBaseUnit(CLOCK_HOUR_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumClockHourOfDay() {
-        assertThat(this.utc.getMinimum(CLOCK_HOUR_OF_DAY), is(1));
-    }
-
-    @Test
-    public void getMaximumClockHourOfDay() {
-        assertThat(this.utc.getMaximum(CLOCK_HOUR_OF_DAY), is(24));
-    }
-
-    @Test
-    public void isValidClockHourOfDay() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_DAY, 24), is(true));
-    }
-
-    @Test
-    public void isValidClockHourOfDayNull() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidClockHourOfDay0() {
-        assertThat(this.utc.isValid(CLOCK_HOUR_OF_DAY, 0), is(false));
     }
 
     @Test
     public void withClockHourOfDay() {
         assertThat(
-            this.utc.with(CLOCK_HOUR_OF_DAY, 23),
+            this.utc.with(CLOCK_HOUR_OF_DAY.newValue(23).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withClockHourOfDayNull() {
-        this.utc.with(CLOCK_HOUR_OF_DAY, null);
+        this.utc.with(CLOCK_HOUR_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfDay0() {
-        this.utc.with(CLOCK_HOUR_OF_DAY, 0);
+        this.utc.with(CLOCK_HOUR_OF_DAY.newValue(0).atUTC());
     }
 
     @Test
     public void containsDigitalHourOfAmPm() {
-        assertThat(this.utc.contains(DIGITAL_HOUR_OF_AMPM), is(true));
+        assertThat(this.utc.contains(DIGITAL_HOUR_OF_AMPM), is(false));
     }
 
     @Test
     public void getDigitalHourOfAmPm() {
         assertThat(
-            this.utc.get(DIGITAL_HOUR_OF_AMPM),
+            this.utc.get(DIGITAL_HOUR_OF_AMPM.atUTC()),
             is(11));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitDigitalHourOfAmPm() {
-        Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_AMPM);
-    }
-
-    @Test
-    public void getMinimumDigitalHourOfAmPm() {
-        assertThat(this.utc.getMinimum(DIGITAL_HOUR_OF_AMPM), is(0));
-    }
-
-    @Test
-    public void getMaximumDigitalHourOfAmPm() {
-        assertThat(this.utc.getMaximum(DIGITAL_HOUR_OF_AMPM), is(11));
-    }
-
-    @Test
-    public void isValidDigitalHourOfAmPm() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_AMPM, 0), is(true));
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_AMPM, 11), is(true));
-    }
-
-    @Test
-    public void isValidDigitalHourOfAmPmNull() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_AMPM, null), is(false));
-    }
-
-    @Test
-    public void isValidDigitalHourOfAmPm12() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_AMPM, 12), is(false));
     }
 
     @Test
     public void withDigitalHourOfAmPm() {
         assertThat(
-            this.utc.with(DIGITAL_HOUR_OF_AMPM, 11),
+            this.utc.with(DIGITAL_HOUR_OF_AMPM.newValue(11).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withDigitalHourOfAmPmNull() {
-        this.utc.with(DIGITAL_HOUR_OF_AMPM, null);
+        this.utc.with(DIGITAL_HOUR_OF_AMPM.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfAmPm12() {
-        this.utc.with(DIGITAL_HOUR_OF_AMPM, 12);
+        this.utc.with(DIGITAL_HOUR_OF_AMPM.newValue(12).atUTC());
     }
 
     @Test
     public void containsDigitalHourOfDay() {
-        assertThat(this.utc.contains(DIGITAL_HOUR_OF_DAY), is(true));
+        assertThat(this.utc.contains(DIGITAL_HOUR_OF_DAY), is(false));
     }
 
     @Test
     public void getDigitalHourOfDay() {
         assertThat(
-            this.utc.get(DIGITAL_HOUR_OF_DAY),
+            this.utc.get(DIGITAL_HOUR_OF_DAY.atUTC()),
             is(23));
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getBaseUnitDigitalHourOfDay() {
-        Moment.axis().getBaseUnit(DIGITAL_HOUR_OF_DAY);
-    }
-
-    @Test
-    public void getMinimumDigitalHourOfDay() {
-        assertThat(this.utc.getMinimum(DIGITAL_HOUR_OF_DAY), is(0));
-    }
-
-    @Test
-    public void getMaximumDigitalHourOfDay() {
-        assertThat(this.utc.getMaximum(DIGITAL_HOUR_OF_DAY), is(23));
-    }
-
-    @Test
-    public void isValidDigitalHourOfDay() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_DAY, 0), is(true));
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_DAY, 23), is(true));
-    }
-
-    @Test
-    public void isValidDigitalHourOfDayNull() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_DAY, null), is(false));
-    }
-
-    @Test
-    public void isValidDigitalHourOfDay24() {
-        assertThat(this.utc.isValid(DIGITAL_HOUR_OF_DAY, 24), is(false));
     }
 
     @Test
     public void withDigitalHourOfDay() {
         assertThat(
-            this.utc.with(DIGITAL_HOUR_OF_DAY, 23),
+            this.utc.with(DIGITAL_HOUR_OF_DAY.newValue(23).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=NullPointerException.class)
     public void withDigitalHourOfDayNull() {
-        this.utc.with(DIGITAL_HOUR_OF_DAY, null);
+        this.utc.with(DIGITAL_HOUR_OF_DAY.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfDay24() {
-        this.utc.with(DIGITAL_HOUR_OF_DAY, 24);
+        this.utc.with(DIGITAL_HOUR_OF_DAY.newValue(24).atUTC());
     }
 
     @Test
@@ -1011,19 +557,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.contains(PRECISION), is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void getPrecision() {
         this.utc.get(PRECISION);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMinimumPrecision() {
-        this.utc.getMinimum(PRECISION);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMaximumPrecision() {
-        this.utc.getMaximum(PRECISION);
     }
 
     @Test
@@ -1033,7 +569,7 @@ public class MomentPropertiesTest {
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void withPrecision() {
         this.utc.with(PRECISION, ClockUnit.HOURS);
     }
@@ -1043,19 +579,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.contains(DECIMAL_HOUR), is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void getDecimalHour() {
         this.utc.get(DECIMAL_HOUR);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMinimumDecimalHour() {
-        this.utc.getMinimum(DECIMAL_HOUR);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMaximumDecimalHour() {
-        this.utc.getMaximum(DECIMAL_HOUR);
     }
 
     @Test
@@ -1065,7 +591,7 @@ public class MomentPropertiesTest {
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void withDecimalHour() {
         this.utc.with(DECIMAL_HOUR, BigDecimal.ZERO);
     }
@@ -1075,19 +601,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.contains(DECIMAL_MINUTE), is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void getDecimalMinute() {
         this.utc.get(DECIMAL_MINUTE);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMinimumDecimalMinute() {
-        this.utc.getMinimum(DECIMAL_MINUTE);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMaximumDecimalMinute() {
-        this.utc.getMaximum(DECIMAL_MINUTE);
     }
 
     @Test
@@ -1097,7 +613,7 @@ public class MomentPropertiesTest {
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void withDecimalMinute() {
         this.utc.with(DECIMAL_MINUTE, BigDecimal.ZERO);
     }
@@ -1107,19 +623,9 @@ public class MomentPropertiesTest {
         assertThat(this.utc.contains(DECIMAL_SECOND), is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void getDecimalSecond() {
         this.utc.get(DECIMAL_SECOND);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMinimumDecimalSecond() {
-        this.utc.getMinimum(DECIMAL_SECOND);
-    }
-
-    @Test(expected=ChronoException.class)
-    public void getMaximumDecimalSecond() {
-        this.utc.getMaximum(DECIMAL_SECOND);
     }
 
     @Test
@@ -1129,7 +635,7 @@ public class MomentPropertiesTest {
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test(expected=RuleNotFoundException.class)
     public void withDecimalSecond() {
         this.utc.with(DECIMAL_SECOND, BigDecimal.ZERO);
     }
@@ -1138,41 +644,20 @@ public class MomentPropertiesTest {
     public void containsDayOfMonth() {
         assertThat(
             this.utc.contains(DAY_OF_MONTH),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getDayOfMonth() {
         assertThat(
-            this.utc.get(DAY_OF_MONTH),
-            is(30));
-    }
-
-    @Test
-    public void getMinimumDayOfMonth() {
-        assertThat(
-            this.utc.getMinimum(DAY_OF_MONTH),
+            this.utc.get(DAY_OF_MONTH.inTimezone(ASIA.TOKYO)),
             is(1));
-    }
-
-    @Test
-    public void getMaximumDayOfMonth() {
-        assertThat(
-            this.utc.getMaximum(DAY_OF_MONTH),
-            is(30));
-    }
-
-    @Test
-    public void isValidDayOfMonth() {
-        assertThat(
-            this.utc.isValid(DAY_OF_MONTH, 11),
-            is(true));
     }
 
     @Test
     public void withDayOfMonth() {
         assertThat(
-            this.utc.with(DAY_OF_MONTH, 30),
+            this.utc.with(DAY_OF_MONTH.newValue(30).atUTC()),
             is(this.utc));
     }
 
@@ -1180,41 +665,20 @@ public class MomentPropertiesTest {
     public void containsDayOfWeek() {
         assertThat(
             this.utc.contains(DAY_OF_WEEK),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getDayOfWeek() {
         assertThat(
-            this.utc.get(DAY_OF_WEEK),
+            this.utc.get(DAY_OF_WEEK.atUTC()),
             is(Weekday.SATURDAY));
-    }
-
-    @Test
-    public void getMinimumDayOfWeek() {
-        assertThat(
-            this.utc.getMinimum(DAY_OF_WEEK),
-            is(Weekday.MONDAY));
-    }
-
-    @Test
-    public void getMaximumDayOfWeek() {
-        assertThat(
-            this.utc.getMaximum(DAY_OF_WEEK),
-            is(Weekday.SUNDAY));
-    }
-
-    @Test
-    public void isValidDayOfWeek() {
-        assertThat(
-            this.utc.isValid(DAY_OF_WEEK, Weekday.MONDAY),
-            is(true));
     }
 
     @Test
     public void withDayOfWeek() {
         assertThat(
-            this.utc.with(DAY_OF_WEEK, Weekday.SATURDAY),
+            this.utc.with(DAY_OF_WEEK.newValue(Weekday.SATURDAY).atUTC()),
             is(this.utc));
     }
 
@@ -1222,41 +686,20 @@ public class MomentPropertiesTest {
     public void containsDayOfYear() {
         assertThat(
             this.utc.contains(DAY_OF_YEAR),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getDayOfYear() {
         assertThat(
-            this.utc.get(DAY_OF_YEAR),
+            this.utc.get(DAY_OF_YEAR.atUTC()),
             is(31 + 29 + 31 + 30 + 31 + 30));
-    }
-
-    @Test
-    public void getMinimumDayOfYear() {
-        assertThat(
-            this.utc.getMinimum(DAY_OF_YEAR),
-            is(1));
-    }
-
-    @Test
-    public void getMaximumDayOfYear() {
-        assertThat(
-            this.utc.getMaximum(DAY_OF_YEAR),
-            is(366));
-    }
-
-    @Test
-    public void isValidDayOfYear() {
-        assertThat(
-            this.utc.isValid(DAY_OF_YEAR, 1),
-            is(true));
     }
 
     @Test
     public void withDayOfYear() {
         assertThat(
-            this.utc.with(DAY_OF_YEAR, 1),
+            this.utc.with(DAY_OF_YEAR.newValue(1).atUTC()),
             is(
                 PlainTimestamp.of(2012, 1, 1, 23, 59, 59)
                 .plus(123456789, ClockUnit.NANOS)
@@ -1267,41 +710,20 @@ public class MomentPropertiesTest {
     public void containsDayOfQuarter() {
         assertThat(
             this.utc.contains(DAY_OF_QUARTER),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getDayOfQuarter() {
         assertThat(
-            this.utc.get(DAY_OF_QUARTER),
+            this.utc.get(DAY_OF_QUARTER.atUTC()),
             is(91));
-    }
-
-    @Test
-    public void getMinimumDayOfQuarter() {
-        assertThat(
-            this.utc.getMinimum(DAY_OF_QUARTER),
-            is(1));
-    }
-
-    @Test
-    public void getMaximumDayOfQuarter() {
-        assertThat(
-            this.utc.getMaximum(DAY_OF_QUARTER),
-            is(91));
-    }
-
-    @Test
-    public void isValidDayOfQuarter() {
-        assertThat(
-            this.utc.isValid(DAY_OF_QUARTER, 32),
-            is(true));
     }
 
     @Test
     public void withDayOfQuarter() {
         assertThat(
-            this.utc.with(DAY_OF_QUARTER, 91),
+            this.utc.with(DAY_OF_QUARTER.newValue(91).atUTC()),
             is(this.utc));
     }
 
@@ -1309,41 +731,20 @@ public class MomentPropertiesTest {
     public void containsQuarterOfYear() {
         assertThat(
             this.utc.contains(QUARTER_OF_YEAR),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getQuarterOfYear() {
         assertThat(
-            this.utc.get(QUARTER_OF_YEAR),
+            this.utc.get(QUARTER_OF_YEAR.atUTC()),
             is(Quarter.Q2));
-    }
-
-    @Test
-    public void getMinimumQuarterOfYear() {
-        assertThat(
-            this.utc.getMinimum(QUARTER_OF_YEAR),
-            is(Quarter.Q1));
-    }
-
-    @Test
-    public void getMaximumQuarterOfYear() {
-        assertThat(
-            this.utc.getMaximum(QUARTER_OF_YEAR),
-            is(Quarter.Q4));
-    }
-
-    @Test
-    public void isValidQuarterOfYear() {
-        assertThat(
-            this.utc.isValid(QUARTER_OF_YEAR, Quarter.Q3),
-            is(true));
     }
 
     @Test
     public void withQuarterOfYear() {
         assertThat(
-            this.utc.with(QUARTER_OF_YEAR, Quarter.Q2),
+            this.utc.with(QUARTER_OF_YEAR.newValue(Quarter.Q2).atUTC()),
             is(this.utc));
     }
 
@@ -1351,41 +752,20 @@ public class MomentPropertiesTest {
     public void containsMonthAsNumber() {
         assertThat(
             this.utc.contains(MONTH_AS_NUMBER),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getMonthAsNumber() {
         assertThat(
-            this.utc.get(MONTH_AS_NUMBER),
+            this.utc.get(MONTH_AS_NUMBER.atUTC()),
             is(6));
-    }
-
-    @Test
-    public void getMinimumMonthAsNumber() {
-        assertThat(
-            this.utc.getMinimum(MONTH_AS_NUMBER),
-            is(1));
-    }
-
-    @Test
-    public void getMaximumMonthAsNumber() {
-        assertThat(
-            this.utc.getMaximum(MONTH_AS_NUMBER),
-            is(12));
-    }
-
-    @Test
-    public void isValidMonthAsNumber() {
-        assertThat(
-            this.utc.isValid(MONTH_AS_NUMBER, 6),
-            is(true));
     }
 
     @Test
     public void withMonthAsNumber() {
         assertThat(
-            this.utc.with(MONTH_AS_NUMBER, 6),
+            this.utc.with(MONTH_AS_NUMBER.newValue(6).atUTC()),
             is(this.utc));
     }
 
@@ -1393,41 +773,20 @@ public class MomentPropertiesTest {
     public void containsMonthOfYear() {
         assertThat(
             this.utc.contains(MONTH_OF_YEAR),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getMonthOfYear() {
         assertThat(
-            this.utc.get(MONTH_OF_YEAR),
+            this.utc.get(MONTH_OF_YEAR.atUTC()),
             is(Month.JUNE));
-    }
-
-    @Test
-    public void getMinimumMonthOfYear() {
-        assertThat(
-            this.utc.getMinimum(MONTH_OF_YEAR),
-            is(Month.JANUARY));
-    }
-
-    @Test
-    public void getMaximumMonthOfYear() {
-        assertThat(
-            this.utc.getMaximum(MONTH_OF_YEAR),
-            is(Month.DECEMBER));
-    }
-
-    @Test
-    public void isValidMonthOfYear() {
-        assertThat(
-            this.utc.isValid(MONTH_OF_YEAR, Month.JUNE),
-            is(true));
     }
 
     @Test
     public void withMonthOfYear() {
         assertThat(
-            this.utc.with(MONTH_OF_YEAR, Month.JUNE),
+            this.utc.with(MONTH_OF_YEAR.newValue(Month.JUNE).atUTC()),
             is(this.utc));
     }
 
@@ -1435,41 +794,20 @@ public class MomentPropertiesTest {
     public void containsWeekdayInMonth() {
         assertThat(
             this.utc.contains(WEEKDAY_IN_MONTH),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getWeekdayInMonth() {
         assertThat(
-            this.utc.get(WEEKDAY_IN_MONTH),
+            this.utc.get(WEEKDAY_IN_MONTH.atUTC()),
             is(5));
-    }
-
-    @Test
-    public void getMinimumWeekdayInMonth() {
-        assertThat(
-            this.utc.getMinimum(WEEKDAY_IN_MONTH),
-            is(1));
-    }
-
-    @Test
-    public void getMaximumWeekdayInMonth() {
-        assertThat(
-            this.utc.getMaximum(WEEKDAY_IN_MONTH),
-            is(5));
-    }
-
-    @Test
-    public void isValidWeekdayInMonth() {
-        assertThat(
-            this.utc.isValid(WEEKDAY_IN_MONTH, 5),
-            is(true));
     }
 
     @Test
     public void withWeekdayInMonth() {
         assertThat(
-            this.utc.with(WEEKDAY_IN_MONTH, 5),
+            this.utc.with(WEEKDAY_IN_MONTH.newValue(5).atUTC()),
             is(this.utc));
     }
 
@@ -1477,41 +815,20 @@ public class MomentPropertiesTest {
     public void containsYear() {
         assertThat(
             this.utc.contains(YEAR),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getYear() {
         assertThat(
-            this.utc.get(YEAR),
+            this.utc.get(YEAR.atUTC()),
             is(2012));
-    }
-
-    @Test
-    public void getMinimumYear() {
-        assertThat(
-            this.utc.getMinimum(YEAR),
-            is(GregorianMath.MIN_YEAR));
-    }
-
-    @Test
-    public void getMaximumYear() {
-        assertThat(
-            this.utc.getMaximum(YEAR),
-            is(GregorianMath.MAX_YEAR));
-    }
-
-    @Test
-    public void isValidYear() {
-        assertThat(
-            this.utc.isValid(YEAR, 2013),
-            is(true));
     }
 
     @Test
     public void withYear() {
         assertThat(
-            this.utc.with(YEAR, 2013),
+            this.utc.with(YEAR.newValue(2013).atUTC()),
             is(
                 PlainDate.of(2013, 6, 30)
                 .at(PlainTime.of(23, 59, 59, 123456789))
@@ -1522,45 +839,69 @@ public class MomentPropertiesTest {
     public void containsYearOfWeekdate() {
         assertThat(
             this.utc.contains(YEAR_OF_WEEKDATE),
-            is(true));
+            is(false));
     }
 
     @Test
     public void getYearOfWeekdate() {
         assertThat(
-            this.utc.get(YEAR_OF_WEEKDATE),
+            this.utc.get(YEAR_OF_WEEKDATE.atUTC()),
             is(2012));
-    }
-
-    @Test
-    public void getMinimumYearOfWeekdate() {
-        assertThat(
-            this.utc.getMinimum(YEAR_OF_WEEKDATE),
-            is(GregorianMath.MIN_YEAR));
-    }
-
-    @Test
-    public void getMaximumYearOfWeekdate() {
-        assertThat(
-            this.utc.getMaximum(YEAR_OF_WEEKDATE),
-            is(GregorianMath.MAX_YEAR));
-    }
-
-    @Test
-    public void isValidYearOfWeekdate() {
-        assertThat(
-            this.utc.isValid(YEAR_OF_WEEKDATE, 2013),
-            is(true));
     }
 
     @Test
     public void withYearOfWeekdate() {
         assertThat(
-            this.utc.with(YEAR_OF_WEEKDATE, 2013),
+            this.utc.with(YEAR_OF_WEEKDATE.newValue(2013).atUTC()),
             is(
                 PlainDate.of(2013, 6, 29) // gleiche KW + gleicher Wochentag
                 .at(PlainTime.of(23, 59, 59, 123456789))
                 .inTimezone(ZonalOffset.UTC)));
+    }
+
+    @Test
+    public void containsPosixTime() {
+        assertThat(
+            this.utc.contains(Moment.POSIX_TIME),
+            is(true));
+    }
+
+    @Test
+    public void getPosixTime() {
+        assertThat(
+            this.utc.get(Moment.POSIX_TIME),
+            is(this.utc.getPosixTime()));
+    }
+
+    @Test
+    public void withPosixTime() {
+        assertThat(
+            this.utc.with(Moment.POSIX_TIME, 0),
+            is(
+                PlainDate.of(1970, 1, 1)
+                .at(PlainTime.of(0, 0, 0, 123456789))
+                .atUTC()));
+    }
+
+    @Test
+    public void containsFraction() {
+        assertThat(
+            this.utc.contains(Moment.FRACTION),
+            is(true));
+    }
+
+    @Test
+    public void getFraction() {
+        assertThat(
+            this.utc.get(Moment.FRACTION),
+            is(this.utc.getNanosecond()));
+    }
+
+    @Test
+    public void withFraction() {
+        assertThat(
+            this.utc.with(Moment.FRACTION, 0),
+            is(this.utc.minus(123456789, SI.NANOSECONDS)));
     }
 
 }

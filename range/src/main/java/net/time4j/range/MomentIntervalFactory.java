@@ -28,7 +28,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
-import net.time4j.format.Leniency;
 import net.time4j.format.ParseLog;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -130,12 +129,6 @@ final class MomentIntervalFactory
                 return Timezone.of(tzid).with(strategy);
             } else {
                 return Timezone.of(tzid);
-            }
-        } else {
-            Leniency leniency =
-                attrs.get(Attributes.LENIENCY, Leniency.SMART);
-            if (leniency.isLax()) {
-                return Timezone.ofSystem();
             }
         }
 
