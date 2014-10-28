@@ -28,6 +28,12 @@ import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
 
 /**
  * <p>Serves as bridge to temporal types of JDK or other date and time libraries.</p>
@@ -58,6 +64,7 @@ public abstract class TemporalType<S, T> {
         Boolean.getBoolean("net.time4j.sql.utc.conversion");
     private static final PlainDate UNIX_DATE = PlainDate.of(0, EpochDays.UNIX);
     private static final int MIO = 1000000;
+    private static final BigDecimal MRD = BigDecimal.valueOf(1000000000);
 
     /**
      * <p>Bridge between a traditional Java timestamp of type {@code java.util.Date} and the class
@@ -520,6 +527,64 @@ public abstract class TemporalType<S, T> {
                 new java.sql.Timestamp(MathUtils.safeAdd(dateMillis, timeMillis));
             ret.setNanos(target.get(PlainTime.NANO_OF_SECOND).intValue());
             return ret;
+
+        }
+
+    }
+
+    private static class XMLGregorianCalendarRule 
+        extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
+
+        @Override
+        public ZonalMoment toTime4J(XMLGregorianCalendar source) {
+			
+            return null;
+	
+        }
+
+        @Override
+        public XMLGregorianCalendar fromTime4J(ZonalMoment target) {
+
+            PlainDate date = target.get(PlainDate.COMPONENT);
+            int year = date.getYear();
+            int month = date.getMonth();
+            int dom = date.getDayOfMonth();
+        
+            PlainTime time = target.get(PlainTime.COMPONENT);
+            int hour = time.getHour();
+            int minute = time.getMinute();
+            int second = target.get(PlainTime.SECOND_OF_MINUTE).intValue();
+            int nano = time.getNanosecond();
+        
+            ZonalOffset offset = target.getOffset();
+            int tz = offset.getIntegralAmount() / 60;
+        
+            try {
+                if ((nano % MIO) == 0) {
+                    int millis = nano / MIO;
+                    return DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                        year, month, dom, hour, minute, second, millis, tz);
+                } else {
+                    BigDecimal f = BigDecimal.valueOf(nano).setScale(9).divide(MRD);
+                    return DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                        BigInteger.valueOf(year), month, dom, hour, minute, second, f, tz);
+                }
+            } catch (DatatypeConfigurationException ex) {
+                ChronoException ce = new ChronoException("XML-conversion not available.");
+                ce.initCause(ex);
+                throw ce;
+            } catch (IllegalArgumentException iae) {
+                if (target.isLeapSecond()) {
+                    // some XML-implementations are not conform to XML-Schema
+                    ZonalMoment pm = 
+                        target.toMoment()
+                        .minus(1, SI.SECONDS)
+                        .inZonalView(target.getTimezone());
+                    return this.fromTime4J(pm);
+                } else {
+                    throw iae;
+                }
+            }
 
         }
 
