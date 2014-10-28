@@ -266,12 +266,15 @@ public abstract class BasicElement<V>
         ) {
             return "Accessing the local element ["
                    + this.name
-                   + "] from a global type requires a timezone. Try to apply "
-                   + "a zonal query like \""
+                   + "] from a global type requires a timezone.\n"
+                   + "- Try to apply a zonal query like \""
                    + this.name
-                   + ".atUTC()\" or to first convert the global type to "
+                   + ".atUTC()\".\n"
+                   + "- Or try to first convert the global type to "
                    + "a zonal timestamp: "
-                   + "\"moment.toZonalTimestamp(...)\".";
+                   + "\"moment.toZonalTimestamp(...)\".\n"
+                   + "- If used in formatting then consider "
+                   + "\"ChronoFormatter.withTimezone(TZID)\".";
         }
 
         return null;
