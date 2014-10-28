@@ -322,7 +322,7 @@ public abstract class TemporalType<S, T> {
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
-	public abstract T toTime4J(S source);
+    public abstract T toTime4J(S source);
 	
     /**
      * <p>Converts the Time4J-type to an external type.</p>
@@ -344,177 +344,185 @@ public abstract class TemporalType<S, T> {
 	
     //~ Innere Klassen ----------------------------------------------------
 
-	private static class JavaUtilDateRule extends TemporalType<java.util.Date, Moment> {
+    private static class JavaUtilDateRule extends TemporalType<java.util.Date, Moment> {
 
-		private final TemporalType<Long, Moment> rule = new MillisSinceUnixRule();
+        @Override
+        public Moment toTime4J(java.util.Date source) {
 
-		@Override
-		public Moment toTime4J(java.util.Date source) {
+            long millis = source.getTime();
+            long seconds = MathUtils.floorDivide(millis, 1000);
+            int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
+            return Moment.of(seconds, nanos, TimeScale.POSIX);
 
-			return this.rule.toTime4J(Long.valueOf(source.getTime()));
+        }
 
-		}
+        @Override
+        public java.util.Date fromTime4J(Moment target) {
 
-		@Override
-		public java.util.Date fromTime4J(Moment target) {
+            long posixTime = target.getPosixTime();
+            int fraction = target.getNanosecond();
 
-			return new java.util.Date(this.rule.fromTime4J(target).longValue());
+            long millis =
+                MathUtils.safeAdd(
+                    MathUtils.safeMultiply(posixTime, 1000),
+                    fraction / MIO);
+            return new java.util.Date(millis);
 
-		}
+        }
 
-	}
+    }
 
-	private static class MillisSinceUnixRule extends TemporalType<Long, Moment> {
+    private static class MillisSinceUnixRule extends TemporalType<Long, Moment> {
 
-		@Override
-		public Moment toTime4J(Long source) {
+        @Override
+        public Moment toTime4J(Long source) {
 			
-			long millis = source.longValue();
-			long seconds = MathUtils.floorDivide(millis, 1000);
-			int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
-			
-			return Moment.of(seconds, nanos, TimeScale.POSIX);
-			
-		}
+            long millis = source.longValue();
+            long seconds = MathUtils.floorDivide(millis, 1000);
+            int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
+            return Moment.of(seconds, nanos, TimeScale.POSIX);
+	
+        }
 
-		@Override
-		public Long fromTime4J(Moment target) {
+        @Override
+        public Long fromTime4J(Moment target) {
 
-			long posixTime = target.getPosixTime();
-			int fraction = target.getNanosecond();
+            long posixTime = target.getPosixTime();
+            int fraction = target.getNanosecond();
 
-			return MathUtils.safeAdd(
-				MathUtils.safeMultiply(posixTime, 1000), 
-				fraction / MIO);
+            return Long.valueOf(
+                MathUtils.safeAdd(
+                    MathUtils.safeMultiply(posixTime, 1000),
+                    fraction / MIO));
 
-		}
+        }
 
-	}
+    }
 
-	private static class SqlDateRule extends TemporalType<java.sql.Date, PlainDate> {
+    private static class SqlDateRule extends TemporalType<java.sql.Date, PlainDate> {
 
-		@Override
-		public PlainDate toTime4J(java.sql.Date source) {
+        @Override
+        public PlainDate toTime4J(java.sql.Date source) {
 
-			long millis = source.getTime(); // UTC zone
+            long millis = source.getTime(); // UTC zone
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
-				ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
-				millis += offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
 
-			return PlainDate.axis().getCalendarSystem().transform(
-				MathUtils.floorDivide(millis, 86400 * 1000) - 2 * 365
-			);
+            return PlainDate.axis().getCalendarSystem().transform(
+                MathUtils.floorDivide(millis, 86400 * 1000) - 2 * 365
+            );
 
-		}
+        }
 
-		@Override
-		public java.sql.Date fromTime4J(PlainDate target) {
+        @Override
+        public java.sql.Date fromTime4J(PlainDate target) {
 
-			int year = target.getYear();
+            int year = target.getYear();
 
-			if ((year < 1900) || (year > 9999)) {
-				throw new ChronoException("SQL-Date is only defined in year range of 1900-9999.");
-			}
+            if ((year < 1900) || (year > 9999)) {
+                throw new ChronoException("SQL-Date is only defined in year range of 1900-9999.");
+            }
 
-			long millis = // localMillis
-				MathUtils.safeMultiply(target.getDaysSinceUTC() + 2 * 365, 86400 * 1000);
+            long millis = // localMillis
+                MathUtils.safeMultiply(target.getDaysSinceUTC() + 2 * 365, 86400 * 1000);
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				ZonalOffset offset = Timezone.ofSystem().getOffset(target, PlainTime.MIN);
-				millis -= offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset = Timezone.ofSystem().getOffset(target, PlainTime.MIN);
+                millis -= offset.getIntegralAmount() * 1000;
+            }
 
-			return new java.sql.Date(millis);
+            return new java.sql.Date(millis);
 
-		}
+        }
 
-	}
+    }
 
-	private static class SqlTimeRule extends TemporalType<java.sql.Time, PlainTime> {
+    private static class SqlTimeRule extends TemporalType<java.sql.Time, PlainTime> {
 
-		@Override
-		public PlainTime toTime4J(java.sql.Time source) {
+        @Override
+        public PlainTime toTime4J(java.sql.Time source) {
 
-			long millis = source.getTime(); // UTC zone
+            long millis = source.getTime(); // UTC zone
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
-				ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
-				millis += offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
 
-			return PlainTime.MIN.with(
-				PlainTime.MILLI_OF_DAY,
-				MathUtils.floorModulo(millis, 86400 * 1000)
-			);
+            return PlainTime.MIN.with(
+                PlainTime.MILLI_OF_DAY,
+                MathUtils.floorModulo(millis, 86400 * 1000)
+            );
 
-		}
+        }
 
-		@Override
-		public java.sql.Time fromTime4J(PlainTime target) {
+        @Override
+        public java.sql.Time fromTime4J(PlainTime target) {
 
-			long millis = // local millis
-				target.get(PlainTime.MILLI_OF_DAY).intValue();
+            long millis = // local millis
+                target.get(PlainTime.MILLI_OF_DAY).intValue();
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				ZonalOffset offset = Timezone.ofSystem().getOffset(UNIX_DATE, target);
-				millis -= offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset = Timezone.ofSystem().getOffset(UNIX_DATE, target);
+                millis -= offset.getIntegralAmount() * 1000;
+            }
 
-			return new java.sql.Time(millis);
+            return new java.sql.Time(millis);
 
-		}
+       }
 
-	}
+    }
 
-	private static class SqlTimestampRule extends TemporalType<java.sql.Timestamp, PlainTimestamp> {
+    private static class SqlTimestampRule extends TemporalType<java.sql.Timestamp, PlainTimestamp> {
 
-		@Override
-		public PlainTimestamp toTime4J(java.sql.Timestamp source) {
+        @Override
+        public PlainTimestamp toTime4J(java.sql.Timestamp source) {
 
-			long millis = source.getTime(); // UTC zone
+            long millis = source.getTime(); // UTC zone
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
-				ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
-				millis += offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
+                millis += offset.getIntegralAmount() * 1000;
+            }
 
-			PlainDate date =
-				PlainDate.of(MathUtils.floorDivide(millis, 86400 * 1000), EpochDays.UNIX);
-			PlainTime time =
-				PlainTime.createFromMillis(MathUtils.floorModulo(millis, 86400 * 1000));
-			PlainTimestamp ts = PlainTimestamp.of(date, time);
-			return ts.with(PlainTime.NANO_OF_SECOND, source.getNanos());
+            PlainDate date =
+                PlainDate.of(MathUtils.floorDivide(millis, 86400 * 1000), EpochDays.UNIX);
+            PlainTime time =
+                PlainTime.createFromMillis(MathUtils.floorModulo(millis, 86400 * 1000));
+            PlainTimestamp ts = PlainTimestamp.of(date, time);
+            return ts.with(PlainTime.NANO_OF_SECOND, source.getNanos());
 
-		}
+        }
 
-		@Override
-		public java.sql.Timestamp fromTime4J(PlainTimestamp target) {
+        @Override
+        public java.sql.Timestamp fromTime4J(PlainTimestamp target) {
 
-			long dateMillis = // local millis
-				MathUtils.safeMultiply(
-					target.getCalendarDate().getDaysSinceUTC() + 2 * 365,
-					86400 * 1000
-				);
-			long timeMillis = // local millis
-				target.get(PlainTime.MILLI_OF_DAY).intValue();
+            long dateMillis = // local millis
+                MathUtils.safeMultiply(
+                    target.getCalendarDate().getDaysSinceUTC() + 2 * 365,
+                    86400 * 1000
+                );
+            long timeMillis = // local millis
+                target.get(PlainTime.MILLI_OF_DAY).intValue();
 
-			if (!WITH_SQL_UTC_CONVERSION) {
-				ZonalOffset offset = Timezone.ofSystem().getOffset(target, target);
-				timeMillis -= offset.getIntegralAmount() * 1000;
-			}
+            if (!WITH_SQL_UTC_CONVERSION) {
+                ZonalOffset offset = Timezone.ofSystem().getOffset(target, target);
+                timeMillis -= offset.getIntegralAmount() * 1000;
+            }
 
-			java.sql.Timestamp ret = 
-				new java.sql.Timestamp(MathUtils.safeAdd(dateMillis, timeMillis));
-			ret.setNanos(target.get(PlainTime.NANO_OF_SECOND).intValue());
-			return ret;
+            java.sql.Timestamp ret = 
+                new java.sql.Timestamp(MathUtils.safeAdd(dateMillis, timeMillis));
+            ret.setNanos(target.get(PlainTime.NANO_OF_SECOND).intValue());
+            return ret;
 
-		}
+        }
 
-	}
+    }
 
 }
