@@ -790,55 +790,55 @@ public abstract class TemporalType<S, T> {
     }
 
     private static class XmlDateRule
-	    extends TemporalType<XMLGregorianCalendar, PlainDate> {
+        extends TemporalType<XMLGregorianCalendar, PlainDate> {
 	
-	    //~ Methoden ------------------------------------------------------
-	
-	    @Override
-	    public PlainDate translate(XMLGregorianCalendar source) {
-	
-	        BigInteger eon = source.getEon();
-	
-	        if (eon != null) {
-	            BigInteger bi = eon.abs();
-	
-	            if (bi.compareTo(MRD_I) >= 0) {
-	                throw new ChronoException(
-	                    "Out of supported year range: " + source);
-	            }
-	        }
-	
-	        int year = source.getYear();
-	        int month = source.getMonth();
-	        int dom = source.getDay();
-	
-	        if (
-	            (year == DatatypeConstants.FIELD_UNDEFINED)
-	            || (month == DatatypeConstants.FIELD_UNDEFINED)
-	            || (dom == DatatypeConstants.FIELD_UNDEFINED)
-	        ) {
-	            throw new ChronoException("Missing date component: " + source);
-	        } else {
-	        	return PlainDate.of(year, month, dom);
-	        }
-	
-	    }
-	
-	    @Override
-	    public XMLGregorianCalendar from(PlainDate date) {
-	
-	        int year = date.getYear();
-	        int month = date.getMonth();
-	        int dom = date.getDayOfMonth();
+        //~ Methoden ------------------------------------------------------
 
-	        DatatypeFactory factory = getXMLFactory();
-	
-	        return factory.newXMLGregorianCalendarDate(
-	            year, month, dom, DatatypeConstants.FIELD_UNDEFINED);
-	
-	    }
-	
-	}
+        @Override
+        public PlainDate translate(XMLGregorianCalendar source) {
+
+            BigInteger eon = source.getEon();
+
+            if (eon != null) {
+                BigInteger bi = eon.abs();
+
+                if (bi.compareTo(MRD_I) >= 0) {
+                    throw new ChronoException(
+                        "Out of supported year range: " + source);
+                }
+            }
+
+            int year = source.getYear();
+            int month = source.getMonth();
+            int dom = source.getDay();
+
+            if (
+                (year == DatatypeConstants.FIELD_UNDEFINED)
+                || (month == DatatypeConstants.FIELD_UNDEFINED)
+                || (dom == DatatypeConstants.FIELD_UNDEFINED)
+            ) {
+                throw new ChronoException("Missing date component: " + source);
+            } else {
+                return PlainDate.of(year, month, dom);
+            }
+
+        }
+
+        @Override
+        public XMLGregorianCalendar from(PlainDate date) {
+
+            int year = date.getYear();
+            int month = date.getMonth();
+            int dom = date.getDayOfMonth();
+
+            DatatypeFactory factory = getXMLFactory();
+
+            return factory.newXMLGregorianCalendarDate(
+                year, month, dom, DatatypeConstants.FIELD_UNDEFINED);
+
+        }
+
+    }
 	
     private static class XmlTimeRule
         extends TemporalType<XMLGregorianCalendar, PlainTime> {
@@ -904,122 +904,122 @@ public abstract class TemporalType<S, T> {
     }
 
     private static class XmlDateTimeRule
-	    extends TemporalType<XMLGregorianCalendar, PlainTimestamp> {
-	
-	    //~ Methoden ------------------------------------------------------
-	
-	    @Override
-	    public PlainTimestamp translate(XMLGregorianCalendar source) {
-	
-	        BigInteger eon = source.getEon();
-	
-	        if (eon != null) {
-	            BigInteger bi = eon.abs();
-	
-	            if (bi.compareTo(MRD_I) >= 0) {
-	                throw new ChronoException(
-	                    "Out of supported year range: " + source);
-	            }
-	        }
-	
-	        int year = source.getYear();
-	        int month = source.getMonth();
-	        int dom = source.getDay();
-	
-	        if (
-	            (year == DatatypeConstants.FIELD_UNDEFINED)
-	            || (month == DatatypeConstants.FIELD_UNDEFINED)
-	            || (dom == DatatypeConstants.FIELD_UNDEFINED)
-	        ) {
-	            throw new ChronoException("Missing date component: " + source);
-	        }
-	
-	        int hour = source.getHour();
-	
-	        if (hour == DatatypeConstants.FIELD_UNDEFINED) {
-	            throw new ChronoException("Missing hour component: " + source);
-	        }
-	
-	        int minute = source.getMinute();
-	
-	        if (minute == DatatypeConstants.FIELD_UNDEFINED) {
-	            minute = 0;
-	        }
-	
-	        int second = source.getSecond();
-	
-	        if (second == DatatypeConstants.FIELD_UNDEFINED) {
-	            second = 0;
-	        }
-	
-	        int nano = 0;
-	        BigDecimal fraction = source.getFractionalSecond();
-	
-	        if (fraction != null) {
-	            nano = fraction.movePointRight(9).intValue();
-	        }
-	
-	        PlainTimestamp tsp =
-	            PlainTimestamp.of(year, month, dom, hour, minute, second);
-	
-	        if (nano != 0) {
-	            tsp = tsp.with(PlainTime.NANO_OF_SECOND, nano);
-	        }
-	        
-	        return tsp;
-	
-	    }
-	
-	    @Override
-	    public XMLGregorianCalendar from(PlainTimestamp tsp) {
-	
-	    	return toXML(tsp, DatatypeConstants.FIELD_UNDEFINED);
-	
-	    }
-	
-	}
-	
+        extends TemporalType<XMLGregorianCalendar, PlainTimestamp> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainTimestamp translate(XMLGregorianCalendar source) {
+
+            BigInteger eon = source.getEon();
+
+            if (eon != null) {
+                BigInteger bi = eon.abs();
+
+                if (bi.compareTo(MRD_I) >= 0) {
+                    throw new ChronoException(
+                        "Out of supported year range: " + source);
+                }
+            }
+
+            int year = source.getYear();
+            int month = source.getMonth();
+            int dom = source.getDay();
+
+            if (
+                (year == DatatypeConstants.FIELD_UNDEFINED)
+                || (month == DatatypeConstants.FIELD_UNDEFINED)
+                || (dom == DatatypeConstants.FIELD_UNDEFINED)
+            ) {
+                throw new ChronoException("Missing date component: " + source);
+            }
+
+            int hour = source.getHour();
+
+            if (hour == DatatypeConstants.FIELD_UNDEFINED) {
+                throw new ChronoException("Missing hour component: " + source);
+            }
+
+            int minute = source.getMinute();
+
+            if (minute == DatatypeConstants.FIELD_UNDEFINED) {
+                minute = 0;
+            }
+
+            int second = source.getSecond();
+
+            if (second == DatatypeConstants.FIELD_UNDEFINED) {
+                second = 0;
+            }
+
+            int nano = 0;
+            BigDecimal fraction = source.getFractionalSecond();
+
+            if (fraction != null) {
+                nano = fraction.movePointRight(9).intValue();
+            }
+
+            PlainTimestamp tsp =
+                PlainTimestamp.of(year, month, dom, hour, minute, second);
+
+            if (nano != 0) {
+                tsp = tsp.with(PlainTime.NANO_OF_SECOND, nano);
+            }
+
+            return tsp;
+
+        }
+
+        @Override
+        public XMLGregorianCalendar from(PlainTimestamp tsp) {
+
+            return toXML(tsp, DatatypeConstants.FIELD_UNDEFINED);
+
+        }
+
+    }
+
     private static class XmlDateTimeOffsetRule
-	    extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
-	
-	    //~ Methoden ------------------------------------------------------
-	
-	    @Override
-	    public ZonalMoment translate(XMLGregorianCalendar source) {
-	
-	    	PlainTimestamp tsp = XML_DATE_TIME.translate(source);
-	        int offsetMins = source.getTimezone();
-	
-	        if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
-	            throw new ChronoException("Missing timezone offset: " + source);
-	        }
-	
-	        ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
-	        return tsp.at(offset).inZonalView(offset);
-	
-	    }
-	
-	    @Override
-	    public XMLGregorianCalendar from(ZonalMoment zm) {
-	
-	        ZonalOffset offset = zm.getOffset();
-	        int tz = offset.getIntegralAmount() / 60;
-	
-	        try {
-	        	return toXML(zm, tz);
-	        } catch (IllegalArgumentException iae) {
-	            if (zm.isLeapSecond()) {
-	                // some XML-implementations are not conform to XML-Schema
-	                ZonalMoment pm =
-	                    zm.toMoment().minus(1, SI.SECONDS).inZonalView(offset);
-	                return toXML(pm, tz);
-	            } else {
-	                throw iae;
-	            }
-	        }
-	
-	    }
-	    
-	}
+        extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public ZonalMoment translate(XMLGregorianCalendar source) {
+
+            PlainTimestamp tsp = XML_DATE_TIME.translate(source);
+            int offsetMins = source.getTimezone();
+
+            if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
+                throw new ChronoException("Missing timezone offset: " + source);
+            }
+
+            ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
+            return ZonalMoment.of(tsp, offset);
+
+        }
+
+        @Override
+        public XMLGregorianCalendar from(ZonalMoment zm) {
+
+            ZonalOffset offset = zm.getOffset();
+            int tz = offset.getIntegralAmount() / 60;
+
+            try {
+                return toXML(zm, tz);
+            } catch (IllegalArgumentException iae) {
+                if (zm.isLeapSecond()) {
+                    // some XML-implementations are not conform to XML-Schema
+                    ZonalMoment pm =
+                        zm.toMoment().minus(1, SI.SECONDS).inZonalView(offset);
+                    return toXML(pm, tz);
+                } else {
+                    throw iae;
+                }
+            }
+
+        }
+
+    }
 	
 }
