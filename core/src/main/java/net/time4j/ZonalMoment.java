@@ -135,13 +135,26 @@ public final class ZonalMoment
 
     }
 
+    private ZonalMoment(
+        PlainTimestamp tsp,
+        ZonalOffset offset
+    ) {
+        super();
+
+        this.moment = tsp.at(offset);
+        this.zone = Timezone.of(offset);
+        this.timestamp = tsp;
+
+    }
+
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Erzeugt einen zonalen Zeitstempel. </p>
+     * <p>Erzeugt einen zonalen Moment. </p>
      *
      * @param   moment          global timestamp
      * @param   tz              timezone
+     * @returns ZonalMoment
      * @throws  IllegalArgumentException if leapsecond shall be formatted
      *          with non-full-minute-timezone-offset
      */
@@ -151,6 +164,22 @@ public final class ZonalMoment
     ) {
 
         return new ZonalMoment(moment, tz);
+
+    }
+
+    /**
+     * <p>Erzeugt einen zonalen Moment. </p>
+     *
+     * @param   tsp             zonal timestamp
+     * @param   offset          timezone offset
+     * @returns ZonalMoment
+     */
+    static ZonalMoment of(
+        PlainTimestamp tsp,
+        ZonalOffset offset
+    ) {
+
+        return new ZonalMoment(tsp, offset);
 
     }
 
