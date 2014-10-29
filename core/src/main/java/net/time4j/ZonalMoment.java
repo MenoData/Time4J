@@ -424,27 +424,19 @@ public final class ZonalMoment
     }
 
     /**
-     * <p>For debugging support. </p>
+     * <p>Uses {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}. </p>
      *
      * @return  String
      */
     /*[deutsch]
-     * <p>Debugging-Unterst&uuml;tzung. </p>
+     * <p>Verwendet {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}. </p>
      *
      * @return  String
      */
     @Override
     public String toString() {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("[moment=");
-        sb.append(this.moment);
-        sb.append(", timestamp=");
-        sb.append(this.timestamp);
-        sb.append(", timezone=");
-        sb.append(this.zone);
-        sb.append(']');
-        return sb.toString();
+        return this.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
 
     }
 
