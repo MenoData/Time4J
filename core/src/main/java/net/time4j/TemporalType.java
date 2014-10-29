@@ -31,14 +31,17 @@ import net.time4j.tz.ZonalOffset;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Serves as bridge to temporal types of JDK or other date and time libraries.</p>
+ * <p>Serves as bridge to temporal types of JDK or other date and time
+ * libraries.</p>
  *
- * <p>All singleton instances are defined as static constants and are <i>immutable</i>.</p>
+ * <p>All singleton instances are defined as static constants and are
+ * <i>immutable</i>.</p>
  *
  * @param   <S>  source type in other library
  * @param   <T>  target type in Time4J
@@ -46,10 +49,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * @since   2.0
  */
 /*[deutsch]
- * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder anderen Bibliotheken. </p>
+ * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder anderen
+ * Bibliotheken. </p>
  *
- * <p>Alle Singleton-Instanzen sind als statische Konstanten definiert und unver&auml;nderlich
- * (<i>immutable</i>). </p>
+ * <p>Alle Singleton-Instanzen sind als statische Konstanten definiert und
+ * unver&auml;nderlich (<i>immutable</i>). </p>
  *
  * @param   <S>  source type in other library
  * @param   <T>  target type in Time4J
@@ -64,14 +68,17 @@ public abstract class TemporalType<S, T> {
         Boolean.getBoolean("net.time4j.sql.utc.conversion");
     private static final PlainDate UNIX_DATE = PlainDate.of(0, EpochDays.UNIX);
     private static final int MIO = 1000000;
-    private static final BigDecimal MRD = BigDecimal.valueOf(1000000000);
+    private static final int MRD = 1000000000;
+    private static final BigDecimal MRD_D = BigDecimal.valueOf(MRD);
+    private static final BigInteger MRD_I = BigInteger.valueOf(MRD);
 
     /**
-     * <p>Bridge between a traditional Java timestamp of type {@code java.util.Date} and the class
-     * {@code Moment}.</p>
+     * <p>Bridge between a traditional Java timestamp of type
+     * {@code java.util.Date} and the class {@code Moment}.</p>
      *
-     * <p>The conversion does not take into account any UTC-leapseconds. The supported value range
-     * is smaller than in the class {@code Moment}. Example: </p>
+     * <p>The conversion does not take into account any UTC-leapseconds. The
+     * supported value range is smaller than in the class {@code Moment}.
+     * Example: </p>
      *
      * <pre>
      *  java.util.Date instant = new java.util.Date(86401 * 1000);
@@ -83,11 +90,12 @@ public abstract class TemporalType<S, T> {
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel des Typs {@code java.util.Date}
-     * und der Klasse {@code Moment}. </p>
+     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel des Typs
+     * {@code java.util.Date} und der Klasse {@code Moment}. </p>
      *
-     * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der unterst&uuml;tzte
-     * Wertbereich ist kleiner als in der Klasse {@code Moment}. Beispiel: </p>
+     * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden.
+     * Der unterst&uuml;tzte Wertbereich ist kleiner als in der Klasse
+     * {@code Moment}. Beispiel: </p>
      *
      * <pre>
      *  java.util.Date instant = new java.util.Date(86401 * 1000);
@@ -102,11 +110,12 @@ public abstract class TemporalType<S, T> {
         new JavaUtilDateRule();
 
     /**
-     * <p>Bridge between a traditional Java timestamp as count of milliseconds since UNIX-epoch and
-     * the class {@code Moment}.</p>
+     * <p>Bridge between a traditional Java timestamp as count of milliseconds
+     * since UNIX-epoch and the class {@code Moment}.</p>
      *
-     * <p>The conversion does not take into account any UTC-leapseconds. The supported value range
-     * is smaller than in the class {@code Moment}. Example: </p>
+     * <p>The conversion does not take into account any UTC-leapseconds.
+     * The supported value range is smaller than in the class {@code Moment}.
+     * Example: </p>
      *
      * <pre>
      *  long instant = 86401 * 1000L;
@@ -118,11 +127,13 @@ public abstract class TemporalType<S, T> {
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel als Anzahl der Millisekunden
-     * seit der UNIX-Epoche und der Klasse {@code Moment}. </p>
+     * <p>Br&uuml;cke zwischen einem traditionellen Java-Zeitstempel als
+     * Anzahl der Millisekunden seit der UNIX-Epoche und der Klasse
+     * {@code Moment}. </p>
      *
-     * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der unterst&uuml;tzte
-     * Wertbereich ist etwas kleiner als in der Klasse {@code Moment}. Beispiel: </p>
+     * <p>Die Konversion ber&uuml;cksichtigt KEINE UTC-Schaltsekunden. Der
+     * unterst&uuml;tzte Wertbereich ist etwas kleiner als in der Klasse
+     * {@code Moment}. Beispiel: </p>
      *
      * <pre>
      *  long instant = 86401 * 1000L;
@@ -139,11 +150,12 @@ public abstract class TemporalType<S, T> {
     /**
      * <p>Bridge between a JDBC-Date and the class {@code PlainDate}.</p>
      *
-     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is set to the value
-     * &quot;true&quot; then the conversion will not take into account the system timezone
-     * anticipating that a SQL-DATE was created without any timezone calculation on the server side,
-     * too. That is more or less the case if UTC is the default timezone on the application server.
-     * </p>
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
+     * set to the value &quot;true&quot; then the conversion will not take into
+     * account the system timezone anticipating that a SQL-DATE was created
+     * without any timezone calculation on the server side, too. That is more
+     * or less the case if UTC is the default timezone on the application
+     * server. </p>
      *
      * <p>Example (UTC as default timezone):</p>
      *
@@ -154,24 +166,28 @@ public abstract class TemporalType<S, T> {
      *  // output: 1970-01-02
      * </pre>
      *
-     * <p><strong>Note:</strong> The conversion is only possible if a date has a year in the range
-     * {@code 1900-9999} because else a JDBC-compatible database cannot store the date per
-     * SQL-specification. It is strongly recommended to interprete a SQL-DATE only as abstract JDBC
-     * object because its text output via {@code java.sql.Date.toString()}-method is not reliable
-     * (dependency on the gregorian-julian cutover day + possible timezone side effects). The
-     * concrete formatting can be done by Time4J for example via {@code PlainDate.toString()} or a
+     * <p><strong>Note:</strong> The conversion is only possible if a date has
+     * a year in the range {@code 1900-9999} because else a JDBC-compatible
+     * database cannot store the date per SQL-specification. It is strongly
+     * recommended to interprete a SQL-DATE only as abstract JDBC object
+     * because its text output via {@code java.sql.Date.toString()}-method
+     * is not reliable (dependency on the gregorian-julian cutover day
+     * + possible timezone side effects). The concrete formatting can be
+     * done by Time4J for example via {@code PlainDate.toString()} or a
      * suitable {@code ChronoFormatter}.</p>
      *
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse {@code PlainDate}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
+     * {@code PlainDate}. </p>
      *
-     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot; auf den Wert
-     * &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die Konversion NICHT die
-     * Standardzeitzone des Systems und setzt somit voraus, da&szlig; ein SQL-DATE java-seitig
-     * ebenfalls ohne Zeitzonenkalkulation erzeugt wurde. Das ist de facto der Fall, wenn auf dem
-     * Application-Server UTC die Standardzeitzone ist. </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die
+     * Konversion NICHT die Standardzeitzone des Systems und setzt somit voraus,
+     * da&szlig; ein SQL-DATE java-seitig ebenfalls ohne Zeitzonenkalkulation
+     * erzeugt wurde. Das ist de facto der Fall, wenn auf dem Application-Server
+     * UTC die Standardzeitzone ist. </p>
      *
      * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
@@ -182,14 +198,16 @@ public abstract class TemporalType<S, T> {
      *  // output: 1970-01-02
      * </pre>
      *
-     * <p><strong>Zu beachten:</strong> Die Konversion ist nur m&ouml;glich, wenn ein Datum ein Jahr
-     * im Bereich {@code 1900-9999} hat, denn sonst kann eine JDBC-kompatible Datenbank den
-     * Datumswert per SQL-Spezifikation nicht speichern. Es wird dringend empfohlen, ein SQL-DATE
-     * nur als abstraktes JDBC-Objekt zu interpretieren, weil seine Textausgabe via {@code
-     * java.sql.Date.toString()}-Methode nicht zuverl&auml;ssig ist (Abh&auml;ngigkeit vom
-     * gregorianisch-julianischen Umstellungstag + evtl. Zeitzoneneffekte). Die konkrete
-     * Formatierung kann von Time4J korrekt zum Beispiel via {@code PlainDate.toString()} oder
-     * &uuml;ber einen geeigneten {@code ChronoFormatter} geleistet werden. </p>
+     * <p><strong>Zu beachten:</strong> Die Konversion ist nur m&ouml;glich,
+     * wenn ein Datum ein Jahr im Bereich {@code 1900-9999} hat, denn sonst
+     * kann eine JDBC-kompatible Datenbank den Datumswert per SQL-Spezifikation
+     * nicht speichern. Es wird dringend empfohlen, ein SQL-DATE nur als
+     * abstraktes JDBC-Objekt zu interpretieren, weil seine Textausgabe via
+     * {@code java.sql.Date.toString()}-Methode nicht zuverl&auml;ssig ist
+     * (Abh&auml;ngigkeit vom gregorianisch-julianischen Umstellungstag
+     * + evtl. Zeitzoneneffekte). Die konkrete Formatierung kann von Time4J
+     * korrekt zum Beispiel via {@code PlainDate.toString()} oder &uuml;ber
+     * einen geeigneten {@code ChronoFormatter} geleistet werden. </p>
      *
      * @since   2.0
      */
@@ -201,11 +219,12 @@ public abstract class TemporalType<S, T> {
     /**
      * <p>Bridge between a JDBC-Time and the class {@code PlainTime}.</p>
      *
-     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is set to the value
-     * &quot;true&quot; then the conversion will NOT take in account the system timezone
-     * anticipating that a SQL-DATE was created without any timezone calculation on the server side,
-     * too. That is more or less the case if UTC is the default timezone on the application server.
-     * </p>
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
+     * set to the value &quot;true&quot; then the conversion will NOT take into
+     * account the system timezone anticipating that a SQL-DATE was created
+     * without any timezone calculation on the server side, too. That is more
+     * or less the case if UTC is the default timezone on the application
+     * server. </p>
      *
      * <p>Example (UTC as default timezone):</p>
      *
@@ -216,21 +235,24 @@ public abstract class TemporalType<S, T> {
      *  // output: T12:00:00
      * </pre>
      *
-     * <p><strong>Note:</strong> The conversion only occurs in millisecond precision at best not in
-     * in nanosecond precision so there is possible loss of data. Furthermore, the text output via
-     * the method {@code java.sql.Time.toString()} can be misinterpreted by timezone side effects.
-     * Concrete text output should be done by Time4J.</p>
+     * <p><strong>Note:</strong> The conversion only occurs in millisecond
+     * precision at best not in in nanosecond precision so there is possible
+     * loss of data. Furthermore, the text output via the method
+     * {@code java.sql.Time.toString()} can be misinterpreted by timezone
+     * side effects. Concrete text output should be done by Time4J. </p>
      *
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse {@code PlainTime}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
+     * {@code PlainTime}. </p>
      *
-     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot; auf den Wert
-     * &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die Konversion NICHT die
-     * Standardzeitzone des Systems und setzt somit voraus, da&szlig; ein SQL-TIME java-seitig
-     * ebenfalls ohne Zeitzonenkalkulation erzeugt wurde. Das ist de facto der Fall, wenn auf dem
-     * Application-Server UTC die Standardzeitzone ist. </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt
+     * die Konversion NICHT die Standardzeitzone des Systems und setzt somit
+     * voraus, da&szlig; ein SQL-TIME java-seitig ebenfalls ohne
+     * Zeitzonenkalkulation erzeugt wurde. Das ist de facto der Fall, wenn
+     * auf dem Application-Server UTC die Standardzeitzone ist. </p>
      *
      * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
@@ -241,10 +263,11 @@ public abstract class TemporalType<S, T> {
      *  // output: T12:00:00
      * </pre>
      *
-     * <p><strong>Zu beachten:</strong> Die Konversion geschieht nur in Milli-, nicht in
-     * Nanosekundenpr&auml;zision, so da&szlig; eventuell Informationsverluste auftreten
-     * k&ouml;nnen. Auch ist die Textausgabe mittels {@code java.sql.Time.toString()} durch
-     * Zeitzoneneffekte verf&auml;lscht. Konkrete Textausgaben sollen daher immer durch Time4J
+     * <p><strong>Zu beachten:</strong> Die Konversion geschieht nur in
+     * Milli-, nicht in Nanosekundenpr&auml;zision, so da&szlig; eventuell
+     * Informationsverluste auftreten k&ouml;nnen. Auch ist die Textausgabe
+     * mittels {@code java.sql.Time.toString()} durch Zeitzoneneffekte
+     * verf&auml;lscht. Konkrete Textausgaben sollen daher immer durch Time4J
      * erfolgen. </p>
      *
      * @since   2.0
@@ -253,13 +276,15 @@ public abstract class TemporalType<S, T> {
         new SqlTimeRule();
 
     /**
-     * <p>Bridge between a JDBC-Timestamp and the class {@code PlainTimestamp}.</p>
+     * <p>Bridge between a JDBC-Timestamp and the class
+     * {@code PlainTimestamp}.</p>
      *
-     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is set to the value
-     * &quot;true&quot; then the conversion will NOT take in account the system timezone
-     * anticipating that a SQL-DATE was created without any timezone calculation on the server side,
-     * too. That is more or less the case if UTC is the default timezone on the application server.
-     * </p>
+     * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot;
+     * is set to the value &quot;true&quot; then the conversion will NOT take
+     * into account the system timezone anticipating that a SQL-DATE was
+     * created without any timezone calculation on the server side, too.
+     * That is more or less the case if UTC is the default timezone on the
+     * application server. </p>
      *
      * <p>Example (UTC as default timezone):</p>
      *
@@ -274,13 +299,15 @@ public abstract class TemporalType<S, T> {
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse {@code PlainTimestamp}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
+     * {@code PlainTimestamp}. </p>
      *
-     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot; auf den Wert
-     * &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die Konversion NICHT die
-     * Standardzeitzone des Systems und setzt somit voraus, da&szlig; ein SQL-TIMESTAMP java-seitig
-     * auch ohne Zeitzonenkalkulation erzeugt wurde. Das ist de facto der Fall, wenn auf dem
-     * Application-Server UTC die Standardzeitzone ist. </p>
+     * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
+     * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt
+     * die Konversion NICHT die Standardzeitzone des Systems und setzt somit
+     * voraus, da&szlig; ein SQL-TIMESTAMP java-seitig auch ohne
+     * Zeitzonenkalkulation erzeugt wurde. Das ist de facto der Fall, wenn
+     * auf dem Application-Server UTC die Standardzeitzone ist. </p>
      *
      * <p>Beispiel (UTC als Standardzeitzone): </p>
      *
@@ -294,17 +321,53 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final TemporalType<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
+    public static final
+    TemporalType<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
         new SqlTimestampRule();
+
+    /**
+     * <p>Bridge between an XML-timestamp according to {@code xsd:dateTime}
+     * inclusive timezone-offset and the type {@code ZonalMoment}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
+     *          2014, 2, 28, 14, 45, 30, 0, 60);
+     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.toTime4J(xmlGregCal);
+     *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
+     *  // output: 2014-02-28T14:45:30+01:00
+     * </pre>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
+     * {@code xsd:dateTime} inklusive Zeitzonen-Offset und dem Typ
+     * {@code ZonalMoment}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
+     *          2014, 2, 28, 14, 45, 30, 0, 60);
+     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.toTime4J(xmlGregCal);
+     *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
+     *  // output: 2014-02-28T14:45:30+01:00
+     * </pre>
+     *
+     * @since   2.0
+     */
+    public static final
+    TemporalType<XMLGregorianCalendar, ZonalMoment> XML_DATE_TIME_OFFSET =
+        new XMLGregorianCalendarRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Creates a new instance.</p>
-     *
-     * <p>SPECIFICATION: Subclasses must create only one instance and hence assign this instance to
-     * a static constant. Furthermore, the immutability of the concrete and final subclass is
-     * required.</p>
      */
     protected TemporalType() {
         super();
@@ -330,7 +393,7 @@ public abstract class TemporalType<S, T> {
      * @since   2.0
      */
     public abstract T toTime4J(S source);
-	
+
     /**
      * <p>Converts the Time4J-type to an external type.</p>
      *
@@ -348,10 +411,11 @@ public abstract class TemporalType<S, T> {
      * @since   2.0
      */
     public abstract S fromTime4J(T target);
-	
+
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class JavaUtilDateRule extends TemporalType<java.util.Date, Moment> {
+    private static class JavaUtilDateRule
+        extends TemporalType<java.util.Date, Moment> {
 
         @Override
         public Moment toTime4J(java.util.Date source) {
@@ -379,16 +443,17 @@ public abstract class TemporalType<S, T> {
 
     }
 
-    private static class MillisSinceUnixRule extends TemporalType<Long, Moment> {
+    private static class MillisSinceUnixRule
+        extends TemporalType<Long, Moment> {
 
         @Override
         public Moment toTime4J(Long source) {
-			
+
             long millis = source.longValue();
             long seconds = MathUtils.floorDivide(millis, 1000);
             int nanos = MathUtils.floorModulo(millis, 1000) * MIO;
             return Moment.of(seconds, nanos, TimeScale.POSIX);
-	
+
         }
 
         @Override
@@ -406,7 +471,8 @@ public abstract class TemporalType<S, T> {
 
     }
 
-    private static class SqlDateRule extends TemporalType<java.sql.Date, PlainDate> {
+    private static class SqlDateRule
+        extends TemporalType<java.sql.Date, PlainDate> {
 
         @Override
         public PlainDate toTime4J(java.sql.Date source) {
@@ -414,7 +480,10 @@ public abstract class TemporalType<S, T> {
             long millis = source.getTime(); // UTC zone
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                Moment unixTime =
+                    Moment.of(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
                 ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
@@ -431,14 +500,18 @@ public abstract class TemporalType<S, T> {
             int year = target.getYear();
 
             if ((year < 1900) || (year > 9999)) {
-                throw new ChronoException("SQL-Date is only defined in year range of 1900-9999.");
+                throw new ChronoException(
+                    "SQL-Date is only defined in year range of 1900-9999.");
             }
 
             long millis = // localMillis
-                MathUtils.safeMultiply(target.getDaysSinceUTC() + 2 * 365, 86400 * 1000);
+                MathUtils.safeMultiply(
+                    target.getDaysSinceUTC() + 2 * 365,
+                    86400 * 1000);
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                ZonalOffset offset = Timezone.ofSystem().getOffset(target, PlainTime.MIN);
+                ZonalOffset offset =
+                    Timezone.ofSystem().getOffset(target, PlainTime.MIN);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -448,7 +521,8 @@ public abstract class TemporalType<S, T> {
 
     }
 
-    private static class SqlTimeRule extends TemporalType<java.sql.Time, PlainTime> {
+    private static class SqlTimeRule
+        extends TemporalType<java.sql.Time, PlainTime> {
 
         @Override
         public PlainTime toTime4J(java.sql.Time source) {
@@ -456,7 +530,10 @@ public abstract class TemporalType<S, T> {
             long millis = source.getTime(); // UTC zone
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                Moment unixTime =
+                    Moment.of(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
                 ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
@@ -475,7 +552,8 @@ public abstract class TemporalType<S, T> {
                 target.get(PlainTime.MILLI_OF_DAY).intValue();
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                ZonalOffset offset = Timezone.ofSystem().getOffset(UNIX_DATE, target);
+                ZonalOffset offset =
+                    Timezone.ofSystem().getOffset(UNIX_DATE, target);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -485,7 +563,8 @@ public abstract class TemporalType<S, T> {
 
     }
 
-    private static class SqlTimestampRule extends TemporalType<java.sql.Timestamp, PlainTimestamp> {
+    private static class SqlTimestampRule
+        extends TemporalType<java.sql.Timestamp, PlainTimestamp> {
 
         @Override
         public PlainTimestamp toTime4J(java.sql.Timestamp source) {
@@ -493,15 +572,21 @@ public abstract class TemporalType<S, T> {
             long millis = source.getTime(); // UTC zone
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                Moment unixTime = Moment.of(MathUtils.floorDivide(millis, 1000), TimeScale.POSIX);
+                Moment unixTime =
+                    Moment.of(
+                        MathUtils.floorDivide(millis, 1000),
+                        TimeScale.POSIX);
                 ZonalOffset offset = Timezone.ofSystem().getOffset(unixTime);
                 millis += offset.getIntegralAmount() * 1000;
             }
 
             PlainDate date =
-                PlainDate.of(MathUtils.floorDivide(millis, 86400 * 1000), EpochDays.UNIX);
+                PlainDate.of(
+                    MathUtils.floorDivide(millis, 86400 * 1000),
+                    EpochDays.UNIX);
             PlainTime time =
-                PlainTime.createFromMillis(MathUtils.floorModulo(millis, 86400 * 1000));
+                PlainTime.createFromMillis(
+                    MathUtils.floorModulo(millis, 86400 * 1000));
             PlainTimestamp ts = PlainTimestamp.of(date, time);
             return ts.with(PlainTime.NANO_OF_SECOND, source.getNanos());
 
@@ -519,12 +604,14 @@ public abstract class TemporalType<S, T> {
                 target.get(PlainTime.MILLI_OF_DAY).intValue();
 
             if (!WITH_SQL_UTC_CONVERSION) {
-                ZonalOffset offset = Timezone.ofSystem().getOffset(target, target);
+                ZonalOffset offset =
+                    Timezone.ofSystem().getOffset(target, target);
                 timeMillis -= offset.getIntegralAmount() * 1000;
             }
 
-            java.sql.Timestamp ret = 
-                new java.sql.Timestamp(MathUtils.safeAdd(dateMillis, timeMillis));
+            java.sql.Timestamp ret =
+                new java.sql.Timestamp(
+                    MathUtils.safeAdd(dateMillis, timeMillis));
             ret.setNanos(target.get(PlainTime.NANO_OF_SECOND).intValue());
             return ret;
 
@@ -532,14 +619,76 @@ public abstract class TemporalType<S, T> {
 
     }
 
-    private static class XMLGregorianCalendarRule 
+    private static class XMLGregorianCalendarRule
         extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
 
         @Override
         public ZonalMoment toTime4J(XMLGregorianCalendar source) {
-			
-            return null;
-	
+
+            BigInteger eon = source.getEon();
+
+            if (eon != null) {
+                BigInteger bi = eon.abs();
+
+                if (bi.compareTo(MRD_I) >= 0) {
+                    throw new ChronoException(
+                        "Out of supported year range: " + source);
+                }
+            }
+
+            int year = source.getYear();
+            int month = source.getMonth();
+            int dom = source.getDay();
+
+            if (
+                (year == DatatypeConstants.FIELD_UNDEFINED)
+                || (month == DatatypeConstants.FIELD_UNDEFINED)
+                || (dom == DatatypeConstants.FIELD_UNDEFINED)
+            ) {
+                throw new ChronoException("Missing date component: " + source);
+            }
+
+            int hour = source.getHour();
+
+            if (hour == DatatypeConstants.FIELD_UNDEFINED) {
+                throw new ChronoException("Missing hour component: " + source);
+            }
+
+            int minute = source.getMinute();
+
+            if (minute == DatatypeConstants.FIELD_UNDEFINED) {
+                minute = 0;
+            }
+
+            int second = source.getSecond();
+
+            if (second == DatatypeConstants.FIELD_UNDEFINED) {
+                second = 0;
+            }
+
+            int nano = 0;
+            BigDecimal fraction = source.getFractionalSecond();
+
+            if (fraction != null) {
+                nano = fraction.movePointRight(9).intValue();
+            }
+
+            int offsetMins = source.getTimezone();
+
+            if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
+                throw new ChronoException("Missing timezone offset: " + source);
+            }
+
+            PlainTimestamp ts =
+                PlainTimestamp.of(year, month, dom, hour, minute, second);
+
+            if (nano != 0) {
+                ts = ts.with(PlainTime.NANO_OF_SECOND, nano);
+            }
+
+            ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
+            return ts.at(offset).inZonalView(offset);
+
         }
 
         @Override
@@ -549,34 +698,40 @@ public abstract class TemporalType<S, T> {
             int year = date.getYear();
             int month = date.getMonth();
             int dom = date.getDayOfMonth();
-        
+
             PlainTime time = target.get(PlainTime.COMPONENT);
             int hour = time.getHour();
             int minute = time.getMinute();
             int second = target.get(PlainTime.SECOND_OF_MINUTE).intValue();
             int nano = time.getNanosecond();
-        
+
             ZonalOffset offset = target.getOffset();
             int tz = offset.getIntegralAmount() / 60;
-        
+
+            DatatypeFactory factory;
+
+            try {
+                factory = DatatypeFactory.newInstance();
+            } catch (DatatypeConfigurationException ex) {
+                throw new ChronoException("XML-conversion not available.", ex);
+            }
+
             try {
                 if ((nano % MIO) == 0) {
                     int millis = nano / MIO;
-                    return DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                    return factory.newXMLGregorianCalendar(
                         year, month, dom, hour, minute, second, millis, tz);
                 } else {
-                    BigDecimal f = BigDecimal.valueOf(nano).setScale(9).divide(MRD);
-                    return DatatypeFactory.newInstance().newXMLGregorianCalendar(
-                        BigInteger.valueOf(year), month, dom, hour, minute, second, f, tz);
+                    BigInteger y = BigInteger.valueOf(year);
+                    BigDecimal f =
+                        BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
+                    return factory.newXMLGregorianCalendar(
+                        y, month, dom, hour, minute, second, f, tz);
                 }
-            } catch (DatatypeConfigurationException ex) {
-                ChronoException ce = new ChronoException("XML-conversion not available.");
-                ce.initCause(ex);
-                throw ce;
             } catch (IllegalArgumentException iae) {
                 if (target.isLeapSecond()) {
                     // some XML-implementations are not conform to XML-Schema
-                    ZonalMoment pm = 
+                    ZonalMoment pm =
                         target.toMoment()
                         .minus(1, SI.SECONDS)
                         .inZonalView(target.getTimezone());
