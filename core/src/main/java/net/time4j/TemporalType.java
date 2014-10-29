@@ -22,14 +22,17 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import net.time4j.tz.olson.ASIA;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -82,7 +85,7 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.util.Date instant = new java.util.Date(86401 * 1000);
-     *  Moment ut = TemporalType.JAVA_UTIL_DATE.toTime4J(instant);
+     *  Moment ut = TemporalType.JAVA_UTIL_DATE.translate(instant);
      *  System.out.println(ut);
      *  // output: 1970-01-02T00:00:01Z
      * </pre>
@@ -99,9 +102,9 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.util.Date instant = new java.util.Date(86401 * 1000);
-     *  Moment ut = TemporalType.JAVA_UTIL_DATE.toTime4J(instant);
+     *  Moment ut = TemporalType.JAVA_UTIL_DATE.translate(instant);
      *  System.out.println(ut);
-     *  // output: 1970-01-02T00:00:01Z
+     *  // Ausgabe: 1970-01-02T00:00:01Z
      * </pre>
      *
      * @since   2.0
@@ -119,7 +122,7 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  long instant = 86401 * 1000L;
-     *  Moment ut = TemporalType.MILLIS_SINCE_UNIX.toTime4J(instant);
+     *  Moment ut = TemporalType.MILLIS_SINCE_UNIX.translate(instant);
      *  System.out.println(ut);
      *  // output: 1970-01-02T00:00:01Z
      * </pre>
@@ -137,9 +140,9 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  long instant = 86401 * 1000L;
-     *  Moment ut = TemporalType.MILLIS_SINCE_UNIX.toTime4J(instant);
+     *  Moment ut = TemporalType.MILLIS_SINCE_UNIX.translate(instant);
      *  System.out.println(ut);
-     *  // output: 1970-01-02T00:00:01Z
+     *  // Ausgabe: 1970-01-02T00:00:01Z
      * </pre>
      *
      * @since   2.0
@@ -161,7 +164,7 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.sql.Date sqlValue = new java.sql.Date(86400 * 1000);
-     *  PlainDate date = TemporalType.SQL_DATE.toTime4J(sqlValue);
+     *  PlainDate date = TemporalType.SQL_DATE.translate(sqlValue);
      *  System.out.println(date);
      *  // output: 1970-01-02
      * </pre>
@@ -193,9 +196,9 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.sql.Date sqlValue = new java.sql.Date(86400 * 1000);
-     *  PlainDate date = TemporalType.SQL_DATE.toTime4J(sqlValue);
+     *  PlainDate date = TemporalType.SQL_DATE.translate(sqlValue);
      *  System.out.println(date);
-     *  // output: 1970-01-02
+     *  // Ausgabe: 1970-01-02
      * </pre>
      *
      * <p><strong>Zu beachten:</strong> Die Konversion ist nur m&ouml;glich,
@@ -230,7 +233,7 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.sql.Time sqlValue = new java.sql.Time(43200 * 1000);
-     *  PlainTime time = TemporalType.SQL_TIME.toTime4J(sqlValue);
+     *  PlainTime time = TemporalType.SQL_TIME.translate(sqlValue);
      *  System.out.println(time);
      *  // output: T12:00:00
      * </pre>
@@ -258,9 +261,9 @@ public abstract class TemporalType<S, T> {
      *
      * <pre>
      *  java.sql.Time sqlValue = new java.sql.Time(43200 * 1000);
-     *  PlainTime time = TemporalType.SQL_TIME.toTime4J(sqlValue);
+     *  PlainTime time = TemporalType.SQL_TIME.translate(sqlValue);
      *  System.out.println(time);
-     *  // output: T12:00:00
+     *  // Ausgabe: T12:00:00
      * </pre>
      *
      * <p><strong>Zu beachten:</strong> Die Konversion geschieht nur in
@@ -291,7 +294,7 @@ public abstract class TemporalType<S, T> {
      * <pre>
      *  java.sql.Timestamp sqlValue = new java.sql.Timestamp(86401 * 1000);
      *  sqlValue.setNanos(1);
-     *  PlainTimestamp ts = TemporalType.SQL_TIMESTAMP.toTime4J(sqlValue);
+     *  PlainTimestamp ts = TemporalType.SQL_TIMESTAMP.translate(sqlValue);
      *  System.out.println(ts);
      *  // output: 1970-01-02T00:00:01,000000001
      * </pre>
@@ -314,9 +317,9 @@ public abstract class TemporalType<S, T> {
      * <pre>
      *  java.sql.Timestamp sqlValue = new java.sql.Timestamp(86401 * 1000);
      *  sqlValue.setNanos(1);
-     *  PlainTimestamp ts = TemporalType.SQL_TIMESTAMP.toTime4J(sqlValue);
+     *  PlainTimestamp ts = TemporalType.SQL_TIMESTAMP.translate(sqlValue);
      *  System.out.println(ts);
-     *  // output: 1970-01-02T00:00:01,000000001
+     *  // Ausgabe: 1970-01-02T00:00:01,000000001
      * </pre>
      *
      * @since   2.0
@@ -326,7 +329,122 @@ public abstract class TemporalType<S, T> {
         new SqlTimestampRule();
 
     /**
-     * <p>Bridge between an XML-timestamp according to {@code xsd:dateTime}
+     * <p>Bridge between a XML-date according to {@code xsd:date}
+     * and the type {@code PlainDate}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendarDate(
+     *          2014, 2, 28, 60); // here with optional offset
+     *  PlainDate date = TemporalType.XML_DATE.translate(xmlGregCal);
+     *  System.out.println(date);
+     *  // output: 2014-02-28
+     * </pre>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einem XML-Datum entsprechend
+     * {@code xsd:date} und dem Typ {@code PlainDate}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendarDate(
+     *          2014, 2, 28, 60); // hier mit optionalem Offset
+     *  PlainDate date = TemporalType.XML_DATE.translate(xmlGregCal);
+     *  System.out.println(date);
+     *  // Ausgabe: 2014-02-28
+     * </pre>
+     *
+     * @since   2.0
+     */
+    public static final 
+    TemporalType<XMLGregorianCalendar, PlainDate> XML_DATE =
+        new XmlDateRule();
+
+    /**
+     * <p>Bridge between a XML-time according to {@code xsd:time}
+     * and the type {@code PlainTime}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendarTime(
+     *          21, 45, 30, 0, 60); // here with optional offset
+     *  PlainTime time = TemporalType.XML_TIME.translate(xmlGregCal);
+     *  System.out.println(time);
+     *  // output: T21:45:30
+     * </pre>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einer XML-Uhrzeit entsprechend
+     * {@code xsd:time} und dem Typ {@code PlainTime}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendarTime(
+     *          21, 45, 30, 0, 60); // here with optional offset
+     *  PlainTime time = TemporalType.XML_TIME.translate(xmlGregCal);
+     *  System.out.println(time);
+     *  // Ausgabe: T21:45:30
+     * </pre>
+     *
+     * @since   2.0
+     */
+    public static final 
+    TemporalType<XMLGregorianCalendar, PlainTime> XML_TIME =
+        new XmlTimeRule();
+
+    /**
+     * <p>Bridge between a XML-timestamp according to {@code xsd:dateTime}
+     * (without timezone-offset) and the type {@code PlainTimestamp}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
+     *          2014, 2, 28, 14, 45, 30, 0, 60);
+     *  PlainTimestamp tsp = TemporalType.XML_DATE_TIME.translate(xmlGregCal);
+     *  System.out.println(tsp);
+     *  // output: 2014-02-28T14:45:30
+     * </pre>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
+     * {@code xsd:dateTime} ohne Zeitzonen-Offset und dem Typ
+     * {@code PlainTimestamp}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  XMLGregorianCalendar xmlGregCal =
+     *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
+     *          2014, 2, 28, 14, 45, 30, 0, 60);
+     *  PlainTimestamp tsp = TemporalType.XML_DATE_TIME.translate(xmlGregCal);
+     *  System.out.println(tsp);
+     *  // Ausgabe: 2014-02-28T14:45:30
+     * </pre>
+     *
+     * @since   2.0
+     */
+    public static final 
+    TemporalType<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
+        new XmlDateTimeRule();
+
+    /**
+     * <p>Bridge between a XML-timestamp according to {@code xsd:dateTime}
      * inclusive timezone-offset and the type {@code ZonalMoment}. </p>
      *
      * <p>Example: </p>
@@ -335,7 +453,7 @@ public abstract class TemporalType<S, T> {
      *  XMLGregorianCalendar xmlGregCal =
      *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
      *          2014, 2, 28, 14, 45, 30, 0, 60);
-     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.toTime4J(xmlGregCal);
+     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
      *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
      *  // output: 2014-02-28T14:45:30+01:00
      * </pre>
@@ -353,16 +471,16 @@ public abstract class TemporalType<S, T> {
      *  XMLGregorianCalendar xmlGregCal =
      *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
      *          2014, 2, 28, 14, 45, 30, 0, 60);
-     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.toTime4J(xmlGregCal);
+     *  ZonalMoment zm = TemporalType.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
      *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
-     *  // output: 2014-02-28T14:45:30+01:00
+     *  // Ausgabe: 2014-02-28T14:45:30+01:00
      * </pre>
      *
      * @since   2.0
      */
     public static final
     TemporalType<XMLGregorianCalendar, ZonalMoment> XML_DATE_TIME_OFFSET =
-        new XMLGregorianCalendarRule();
+        new XmlDateTimeOffsetRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -392,12 +510,12 @@ public abstract class TemporalType<S, T> {
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
-    public abstract T toTime4J(S source);
+    public abstract T translate(S source);
 
     /**
      * <p>Converts the Time4J-type to an external type.</p>
      *
-     * @param   target Time4J-object
+     * @param   time4j Time4J-object
      * @return  translated object of external type
      * @throws  ChronoException  if conversion fails
      * @since   2.0
@@ -405,20 +523,64 @@ public abstract class TemporalType<S, T> {
     /*[deutsch]
      * <p>Konvertiert den Time4J-Typ zu einem externen Typ.</p>
      *
-     * @param   target Time4J-object
+     * @param   time4j Time4J-object
      * @return  translated object of external type
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
-    public abstract S fromTime4J(T target);
+    public abstract S from(T time4j);
+    
+    private static DatatypeFactory getXMLFactory() {
+    	
+        try {
+            return DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException ex) {
+            throw new ChronoException("XML-conversion not available.", ex);
+        }
 
+    }
+
+    private static XMLGregorianCalendar toXML(
+        ChronoDisplay tsp, 
+        int tz
+    ) {
+    	
+        PlainDate date = tsp.get(PlainDate.COMPONENT);
+        int year = date.getYear();
+        int month = date.getMonth();
+        int dom = date.getDayOfMonth();
+
+        PlainTime time = tsp.get(PlainTime.COMPONENT);
+        int hour = time.getHour();
+        int minute = time.getMinute();
+        int second = tsp.get(PlainTime.SECOND_OF_MINUTE).intValue(); // LS
+        int nano = time.getNanosecond();
+
+        DatatypeFactory factory = getXMLFactory();
+
+        if ((nano % MIO) == 0) {
+            int millis = nano / MIO;
+            return factory.newXMLGregorianCalendar(
+                year, month, dom, hour, minute, second, millis, tz);
+        } else {
+            BigInteger y = BigInteger.valueOf(year);
+            BigDecimal f =
+                BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
+            return factory.newXMLGregorianCalendar(
+                y, month, dom, hour, minute, second, f, tz);
+        }
+
+    }
+    
     //~ Innere Klassen ----------------------------------------------------
 
     private static class JavaUtilDateRule
         extends TemporalType<java.util.Date, Moment> {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
-        public Moment toTime4J(java.util.Date source) {
+        public Moment translate(java.util.Date source) {
 
             long millis = source.getTime();
             long seconds = MathUtils.floorDivide(millis, 1000);
@@ -428,7 +590,7 @@ public abstract class TemporalType<S, T> {
         }
 
         @Override
-        public java.util.Date fromTime4J(Moment target) {
+        public java.util.Date from(Moment target) {
 
             long posixTime = target.getPosixTime();
             int fraction = target.getNanosecond();
@@ -446,8 +608,10 @@ public abstract class TemporalType<S, T> {
     private static class MillisSinceUnixRule
         extends TemporalType<Long, Moment> {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
-        public Moment toTime4J(Long source) {
+        public Moment translate(Long source) {
 
             long millis = source.longValue();
             long seconds = MathUtils.floorDivide(millis, 1000);
@@ -457,10 +621,10 @@ public abstract class TemporalType<S, T> {
         }
 
         @Override
-        public Long fromTime4J(Moment target) {
+        public Long from(Moment moment) {
 
-            long posixTime = target.getPosixTime();
-            int fraction = target.getNanosecond();
+            long posixTime = moment.getPosixTime();
+            int fraction = moment.getNanosecond();
 
             return Long.valueOf(
                 MathUtils.safeAdd(
@@ -474,8 +638,10 @@ public abstract class TemporalType<S, T> {
     private static class SqlDateRule
         extends TemporalType<java.sql.Date, PlainDate> {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
-        public PlainDate toTime4J(java.sql.Date source) {
+        public PlainDate translate(java.sql.Date source) {
 
             long millis = source.getTime(); // UTC zone
 
@@ -495,9 +661,9 @@ public abstract class TemporalType<S, T> {
         }
 
         @Override
-        public java.sql.Date fromTime4J(PlainDate target) {
+        public java.sql.Date from(PlainDate date) {
 
-            int year = target.getYear();
+            int year = date.getYear();
 
             if ((year < 1900) || (year > 9999)) {
                 throw new ChronoException(
@@ -506,12 +672,12 @@ public abstract class TemporalType<S, T> {
 
             long millis = // localMillis
                 MathUtils.safeMultiply(
-                    target.getDaysSinceUTC() + 2 * 365,
+                    date.getDaysSinceUTC() + 2 * 365,
                     86400 * 1000);
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    Timezone.ofSystem().getOffset(target, PlainTime.MIN);
+                    Timezone.ofSystem().getOffset(date, PlainTime.MIN);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -524,8 +690,10 @@ public abstract class TemporalType<S, T> {
     private static class SqlTimeRule
         extends TemporalType<java.sql.Time, PlainTime> {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
-        public PlainTime toTime4J(java.sql.Time source) {
+        public PlainTime translate(java.sql.Time source) {
 
             long millis = source.getTime(); // UTC zone
 
@@ -546,14 +714,14 @@ public abstract class TemporalType<S, T> {
         }
 
         @Override
-        public java.sql.Time fromTime4J(PlainTime target) {
+        public java.sql.Time from(PlainTime time) {
 
             long millis = // local millis
-                target.get(PlainTime.MILLI_OF_DAY).intValue();
+                time.get(PlainTime.MILLI_OF_DAY).intValue();
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    Timezone.ofSystem().getOffset(UNIX_DATE, target);
+                    Timezone.ofSystem().getOffset(UNIX_DATE, time);
                 millis -= offset.getIntegralAmount() * 1000;
             }
 
@@ -566,8 +734,10 @@ public abstract class TemporalType<S, T> {
     private static class SqlTimestampRule
         extends TemporalType<java.sql.Timestamp, PlainTimestamp> {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
-        public PlainTimestamp toTime4J(java.sql.Timestamp source) {
+        public PlainTimestamp translate(java.sql.Timestamp source) {
 
             long millis = source.getTime(); // UTC zone
 
@@ -593,60 +763,90 @@ public abstract class TemporalType<S, T> {
         }
 
         @Override
-        public java.sql.Timestamp fromTime4J(PlainTimestamp target) {
+        public java.sql.Timestamp from(PlainTimestamp tsp) {
 
             long dateMillis = // local millis
                 MathUtils.safeMultiply(
-                    target.getCalendarDate().getDaysSinceUTC() + 2 * 365,
+                    tsp.getCalendarDate().getDaysSinceUTC() + 2 * 365,
                     86400 * 1000
                 );
             long timeMillis = // local millis
-                target.get(PlainTime.MILLI_OF_DAY).intValue();
+                tsp.get(PlainTime.MILLI_OF_DAY).intValue();
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
-                    Timezone.ofSystem().getOffset(target, target);
+                    Timezone.ofSystem().getOffset(tsp, tsp);
                 timeMillis -= offset.getIntegralAmount() * 1000;
             }
 
             java.sql.Timestamp ret =
                 new java.sql.Timestamp(
                     MathUtils.safeAdd(dateMillis, timeMillis));
-            ret.setNanos(target.get(PlainTime.NANO_OF_SECOND).intValue());
+            ret.setNanos(tsp.get(PlainTime.NANO_OF_SECOND).intValue());
             return ret;
 
         }
 
     }
 
-    private static class XMLGregorianCalendarRule
-        extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
+    private static class XmlDateRule
+	    extends TemporalType<XMLGregorianCalendar, PlainDate> {
+	
+	    //~ Methoden ------------------------------------------------------
+	
+	    @Override
+	    public PlainDate translate(XMLGregorianCalendar source) {
+	
+	        BigInteger eon = source.getEon();
+	
+	        if (eon != null) {
+	            BigInteger bi = eon.abs();
+	
+	            if (bi.compareTo(MRD_I) >= 0) {
+	                throw new ChronoException(
+	                    "Out of supported year range: " + source);
+	            }
+	        }
+	
+	        int year = source.getYear();
+	        int month = source.getMonth();
+	        int dom = source.getDay();
+	
+	        if (
+	            (year == DatatypeConstants.FIELD_UNDEFINED)
+	            || (month == DatatypeConstants.FIELD_UNDEFINED)
+	            || (dom == DatatypeConstants.FIELD_UNDEFINED)
+	        ) {
+	            throw new ChronoException("Missing date component: " + source);
+	        } else {
+	        	return PlainDate.of(year, month, dom);
+	        }
+	
+	    }
+	
+	    @Override
+	    public XMLGregorianCalendar from(PlainDate date) {
+	
+	        int year = date.getYear();
+	        int month = date.getMonth();
+	        int dom = date.getDayOfMonth();
+
+	        DatatypeFactory factory = getXMLFactory();
+	
+	        return factory.newXMLGregorianCalendarDate(
+	            year, month, dom, DatatypeConstants.FIELD_UNDEFINED);
+	
+	    }
+	
+	}
+	
+    private static class XmlTimeRule
+        extends TemporalType<XMLGregorianCalendar, PlainTime> {
+
+        //~ Methoden ------------------------------------------------------
 
         @Override
-        public ZonalMoment toTime4J(XMLGregorianCalendar source) {
-
-            BigInteger eon = source.getEon();
-
-            if (eon != null) {
-                BigInteger bi = eon.abs();
-
-                if (bi.compareTo(MRD_I) >= 0) {
-                    throw new ChronoException(
-                        "Out of supported year range: " + source);
-                }
-            }
-
-            int year = source.getYear();
-            int month = source.getMonth();
-            int dom = source.getDay();
-
-            if (
-                (year == DatatypeConstants.FIELD_UNDEFINED)
-                || (month == DatatypeConstants.FIELD_UNDEFINED)
-                || (dom == DatatypeConstants.FIELD_UNDEFINED)
-            ) {
-                throw new ChronoException("Missing date component: " + source);
-            }
+        public PlainTime translate(XMLGregorianCalendar source) {
 
             int hour = source.getHour();
 
@@ -673,76 +873,153 @@ public abstract class TemporalType<S, T> {
                 nano = fraction.movePointRight(9).intValue();
             }
 
-            int offsetMins = source.getTimezone();
-
-            if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
-                throw new ChronoException("Missing timezone offset: " + source);
-            }
-
-            PlainTimestamp ts =
-                PlainTimestamp.of(year, month, dom, hour, minute, second);
-
-            if (nano != 0) {
-                ts = ts.with(PlainTime.NANO_OF_SECOND, nano);
-            }
-
-            ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
-            return ts.at(offset).inZonalView(offset);
+            return PlainTime.of(hour, minute, second, nano);
 
         }
 
         @Override
-        public XMLGregorianCalendar fromTime4J(ZonalMoment target) {
+        public XMLGregorianCalendar from(PlainTime time) {
 
-            PlainDate date = target.get(PlainDate.COMPONENT);
-            int year = date.getYear();
-            int month = date.getMonth();
-            int dom = date.getDayOfMonth();
-
-            PlainTime time = target.get(PlainTime.COMPONENT);
             int hour = time.getHour();
             int minute = time.getMinute();
-            int second = target.get(PlainTime.SECOND_OF_MINUTE).intValue();
+            int second = time.getSecond();
             int nano = time.getNanosecond();
 
-            ZonalOffset offset = target.getOffset();
-            int tz = offset.getIntegralAmount() / 60;
+            DatatypeFactory factory = getXMLFactory();
+            int noTZ = DatatypeConstants.FIELD_UNDEFINED;
 
-            DatatypeFactory factory;
-
-            try {
-                factory = DatatypeFactory.newInstance();
-            } catch (DatatypeConfigurationException ex) {
-                throw new ChronoException("XML-conversion not available.", ex);
-            }
-
-            try {
-                if ((nano % MIO) == 0) {
-                    int millis = nano / MIO;
-                    return factory.newXMLGregorianCalendar(
-                        year, month, dom, hour, minute, second, millis, tz);
-                } else {
-                    BigInteger y = BigInteger.valueOf(year);
-                    BigDecimal f =
-                        BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
-                    return factory.newXMLGregorianCalendar(
-                        y, month, dom, hour, minute, second, f, tz);
-                }
-            } catch (IllegalArgumentException iae) {
-                if (target.isLeapSecond()) {
-                    // some XML-implementations are not conform to XML-Schema
-                    ZonalMoment pm =
-                        target.toMoment()
-                        .minus(1, SI.SECONDS)
-                        .inZonalView(target.getTimezone());
-                    return this.fromTime4J(pm);
-                } else {
-                    throw iae;
-                }
+            if ((nano % MIO) == 0) {
+                int millis = nano / MIO;
+                return factory.newXMLGregorianCalendarTime(
+                    hour, minute, second, millis, noTZ);
+            } else {
+                BigDecimal f =
+                    BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
+                return factory.newXMLGregorianCalendarTime(
+                    hour, minute, second, f, noTZ);
             }
 
         }
 
     }
 
+    private static class XmlDateTimeRule
+	    extends TemporalType<XMLGregorianCalendar, PlainTimestamp> {
+	
+	    //~ Methoden ------------------------------------------------------
+	
+	    @Override
+	    public PlainTimestamp translate(XMLGregorianCalendar source) {
+	
+	        BigInteger eon = source.getEon();
+	
+	        if (eon != null) {
+	            BigInteger bi = eon.abs();
+	
+	            if (bi.compareTo(MRD_I) >= 0) {
+	                throw new ChronoException(
+	                    "Out of supported year range: " + source);
+	            }
+	        }
+	
+	        int year = source.getYear();
+	        int month = source.getMonth();
+	        int dom = source.getDay();
+	
+	        if (
+	            (year == DatatypeConstants.FIELD_UNDEFINED)
+	            || (month == DatatypeConstants.FIELD_UNDEFINED)
+	            || (dom == DatatypeConstants.FIELD_UNDEFINED)
+	        ) {
+	            throw new ChronoException("Missing date component: " + source);
+	        }
+	
+	        int hour = source.getHour();
+	
+	        if (hour == DatatypeConstants.FIELD_UNDEFINED) {
+	            throw new ChronoException("Missing hour component: " + source);
+	        }
+	
+	        int minute = source.getMinute();
+	
+	        if (minute == DatatypeConstants.FIELD_UNDEFINED) {
+	            minute = 0;
+	        }
+	
+	        int second = source.getSecond();
+	
+	        if (second == DatatypeConstants.FIELD_UNDEFINED) {
+	            second = 0;
+	        }
+	
+	        int nano = 0;
+	        BigDecimal fraction = source.getFractionalSecond();
+	
+	        if (fraction != null) {
+	            nano = fraction.movePointRight(9).intValue();
+	        }
+	
+	        PlainTimestamp tsp =
+	            PlainTimestamp.of(year, month, dom, hour, minute, second);
+	
+	        if (nano != 0) {
+	            tsp = tsp.with(PlainTime.NANO_OF_SECOND, nano);
+	        }
+	        
+	        return tsp;
+	
+	    }
+	
+	    @Override
+	    public XMLGregorianCalendar from(PlainTimestamp tsp) {
+	
+	    	return toXML(tsp, DatatypeConstants.FIELD_UNDEFINED);
+	
+	    }
+	
+	}
+	
+    private static class XmlDateTimeOffsetRule
+	    extends TemporalType<XMLGregorianCalendar, ZonalMoment> {
+	
+	    //~ Methoden ------------------------------------------------------
+	
+	    @Override
+	    public ZonalMoment translate(XMLGregorianCalendar source) {
+	
+	    	PlainTimestamp tsp = XML_DATE_TIME.translate(source);
+	        int offsetMins = source.getTimezone();
+	
+	        if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
+	            throw new ChronoException("Missing timezone offset: " + source);
+	        }
+	
+	        ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
+	        return tsp.at(offset).inZonalView(offset);
+	
+	    }
+	
+	    @Override
+	    public XMLGregorianCalendar from(ZonalMoment zm) {
+	
+	        ZonalOffset offset = zm.getOffset();
+	        int tz = offset.getIntegralAmount() / 60;
+	
+	        try {
+	        	return toXML(zm, tz);
+	        } catch (IllegalArgumentException iae) {
+	            if (zm.isLeapSecond()) {
+	                // some XML-implementations are not conform to XML-Schema
+	                ZonalMoment pm =
+	                    zm.toMoment().minus(1, SI.SECONDS).inZonalView(offset);
+	                return toXML(pm, tz);
+	            } else {
+	                throw iae;
+	            }
+	        }
+	
+	    }
+	    
+	}
+	
 }
