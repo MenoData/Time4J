@@ -25,6 +25,7 @@ import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -73,6 +74,7 @@ public abstract class TemporalType<S, T> {
     private static final int MRD = 1000000000;
     private static final BigDecimal MRD_D = BigDecimal.valueOf(MRD);
     private static final BigInteger MRD_I = BigInteger.valueOf(MRD);
+    private static final XmlDateTimeRule XML_TIMESTAMP = new XmlDateTimeRule();
 
     /**
      * <p>Bridge between a traditional Java timestamp of type
@@ -440,7 +442,7 @@ public abstract class TemporalType<S, T> {
      */
     public static final
     TemporalType<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
-        new XmlDateTimeRule();
+        XML_TIMESTAMP;
 
     /**
      * <p>Bridge between a XML-timestamp according to {@code xsd:dateTime}
@@ -929,6 +931,15 @@ public abstract class TemporalType<S, T> {
 
         @Override
         public PlainTimestamp translate(XMLGregorianCalendar source) {
+            
+            return this.translate(source, false);
+            
+        }
+
+        PlainTimestamp translate(
+            XMLGregorianCalendar source,
+            boolean globalContext
+        ) {
 
             BigInteger eon = source.getEon();
 
@@ -969,7 +980,7 @@ public abstract class TemporalType<S, T> {
 
             if (second == DatatypeConstants.FIELD_UNDEFINED) {
                 second = 0;
-            } else if (second == 60) {
+            } else if (globalContext && (second == 60)) {
                 second = 59;
             }
 
@@ -1008,7 +1019,7 @@ public abstract class TemporalType<S, T> {
         @Override
         public ZonalMoment translate(XMLGregorianCalendar source) {
 
-            PlainTimestamp tsp = XML_DATE_TIME.translate(source);
+            PlainTimestamp tsp = XML_TIMESTAMP.translate(source, true);
             int offsetMins = source.getTimezone();
 
             if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
@@ -1017,8 +1028,17 @@ public abstract class TemporalType<S, T> {
 
             ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
 
-            if (source.getSecond() == 60) {
-                return tsp.at(offset).plus(1, SI.SECONDS).inZonalView(offset);
+            if (
+                (source.getSecond() == 60)
+                && LeapSeconds.getInstance().isEnabled()
+            ) {
+                Moment ls = tsp.at(offset).plus(1, SI.SECONDS);
+                if (ls.isLeapSecond()) {
+                    return ls.inZonalView(offset);
+                } else {
+                    throw new ChronoException(
+                        "Leap second not registered: " + source);
+                }
             } else {
                 return ZonalMoment.of(tsp, offset);
             }
