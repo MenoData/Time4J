@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright Â© 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -442,11 +442,7 @@ public abstract class TemporalType<S, T> {
      */
     public static final
     TemporalType<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
-<<<<<<< HEAD
-        new XmlDateTimeRule();
-=======
         XML_TIMESTAMP;
->>>>>>> origin/master
 
     /**
      * <p>Bridge between a XML-timestamp according to {@code xsd:dateTime}
@@ -922,72 +918,6 @@ public abstract class TemporalType<S, T> {
                     BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
                 return factory.newXMLGregorianCalendarTime(
                     hour, minute, second, f, noTZ);
-<<<<<<< HEAD
-            }
-
-        }
-
-    }
-
-    private static class XmlDateTimeRule
-        extends TemporalType<XMLGregorianCalendar, PlainTimestamp> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public PlainTimestamp translate(XMLGregorianCalendar source) {
-
-            BigInteger eon = source.getEon();
-
-            if (eon != null) {
-                BigInteger bi = eon.abs();
-
-                if (bi.compareTo(MRD_I) >= 0) {
-                    throw new ArithmeticException(
-                        "Year out of supported range: " + source);
-                }
-            }
-
-            int year = source.getYear();
-            int month = source.getMonth();
-            int dom = source.getDay();
-
-            if (
-                (year == DatatypeConstants.FIELD_UNDEFINED)
-                || (month == DatatypeConstants.FIELD_UNDEFINED)
-                || (dom == DatatypeConstants.FIELD_UNDEFINED)
-            ) {
-                throw new ChronoException("Missing date component: " + source);
-            }
-
-            int hour = source.getHour();
-
-            if (hour == DatatypeConstants.FIELD_UNDEFINED) {
-                throw new ChronoException("Missing hour component: " + source);
-            }
-
-            int minute = source.getMinute();
-
-            if (minute == DatatypeConstants.FIELD_UNDEFINED) {
-                minute = 0;
-            }
-
-            int second = source.getSecond();
-
-            if (second == DatatypeConstants.FIELD_UNDEFINED) {
-                second = 0;
-            } else if (second == 60) {
-                second = 59;
-            }
-
-            int nano = 0;
-            BigDecimal fraction = source.getFractionalSecond();
-
-            if (fraction != null) {
-                nano = fraction.movePointRight(9).intValue();
-            }
-
-=======
             }
 
         }
@@ -1061,7 +991,6 @@ public abstract class TemporalType<S, T> {
                 nano = fraction.movePointRight(9).intValue();
             }
 
->>>>>>> origin/master
             PlainTimestamp tsp =
                 PlainTimestamp.of(year, month, dom, hour, minute, second);
 
@@ -1090,11 +1019,7 @@ public abstract class TemporalType<S, T> {
         @Override
         public ZonalMoment translate(XMLGregorianCalendar source) {
 
-<<<<<<< HEAD
-            PlainTimestamp tsp = XML_DATE_TIME.translate(source);
-=======
             PlainTimestamp tsp = XML_TIMESTAMP.translate(source, true);
->>>>>>> origin/master
             int offsetMins = source.getTimezone();
 
             if (offsetMins == DatatypeConstants.FIELD_UNDEFINED) {
@@ -1103,10 +1028,6 @@ public abstract class TemporalType<S, T> {
 
             ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
 
-<<<<<<< HEAD
-            if (source.getSecond() == 60) {
-                return tsp.at(offset).plus(1, SI.SECONDS).inZonalView(offset);
-=======
             if (
                 (source.getSecond() == 60)
                 && LeapSeconds.getInstance().isEnabled()
@@ -1118,7 +1039,6 @@ public abstract class TemporalType<S, T> {
                     throw new ChronoException(
                         "Leap second not registered: " + source);
                 }
->>>>>>> origin/master
             } else {
                 return ZonalMoment.of(tsp, offset);
             }
