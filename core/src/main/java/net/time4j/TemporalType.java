@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright Â© 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -28,11 +28,10 @@ import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.olson.ASIA;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
+import java.text.ParseException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -362,7 +361,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final 
+    public static final
     TemporalType<XMLGregorianCalendar, PlainDate> XML_DATE =
         new XmlDateRule();
 
@@ -400,7 +399,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final 
+    public static final
     TemporalType<XMLGregorianCalendar, PlainTime> XML_TIME =
         new XmlTimeRule();
 
@@ -439,7 +438,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final 
+    public static final
     TemporalType<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
         new XmlDateTimeRule();
 
@@ -482,6 +481,22 @@ public abstract class TemporalType<S, T> {
     TemporalType<XMLGregorianCalendar, ZonalMoment> XML_DATE_TIME_OFFSET =
         new XmlDateTimeOffsetRule();
 
+    /**
+     * <p>Bridge between a XML-duration according to {@code xsd:duration}
+     * and the Time4J-type {@code Duration}. </p>
+     *
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einer XML-Dauer entsprechend
+     * {@code xsd:duration} und dem Time4J-Typ {@code Duration}. </p>
+     *
+     * @since   2.0
+     */
+    public static final
+    TemporalType<javax.xml.datatype.Duration, Duration<IsoUnit>> XML_DURATION =
+        new XmlDurationRule();
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -499,6 +514,7 @@ public abstract class TemporalType<S, T> {
      *
      * @param   source  external object
      * @return  translated Time4J-object
+     * @throws  ArithmeticException in case of numerical overflow
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
@@ -507,6 +523,7 @@ public abstract class TemporalType<S, T> {
      *
      * @param   source  external object
      * @return  translated Time4J-object
+     * @throws  ArithmeticException in case of numerical overflow
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
@@ -517,6 +534,7 @@ public abstract class TemporalType<S, T> {
      *
      * @param   time4j Time4J-object
      * @return  translated object of external type
+     * @throws  ArithmeticException in case of numerical overflow
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
@@ -525,13 +543,14 @@ public abstract class TemporalType<S, T> {
      *
      * @param   time4j Time4J-object
      * @return  translated object of external type
+     * @throws  ArithmeticException in case of numerical overflow
      * @throws  ChronoException  if conversion fails
      * @since   2.0
      */
     public abstract S from(T time4j);
-    
+
     private static DatatypeFactory getXMLFactory() {
-    	
+
         try {
             return DatatypeFactory.newInstance();
         } catch (DatatypeConfigurationException ex) {
@@ -541,10 +560,10 @@ public abstract class TemporalType<S, T> {
     }
 
     private static XMLGregorianCalendar toXML(
-        ChronoDisplay tsp, 
+        ChronoDisplay tsp,
         int tz
     ) {
-    	
+
         PlainDate date = tsp.get(PlainDate.COMPONENT);
         int year = date.getYear();
         int month = date.getMonth();
@@ -571,7 +590,7 @@ public abstract class TemporalType<S, T> {
         }
 
     }
-    
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class JavaUtilDateRule
@@ -791,7 +810,7 @@ public abstract class TemporalType<S, T> {
 
     private static class XmlDateRule
         extends TemporalType<XMLGregorianCalendar, PlainDate> {
-	
+
         //~ Methoden ------------------------------------------------------
 
         @Override
@@ -803,8 +822,8 @@ public abstract class TemporalType<S, T> {
                 BigInteger bi = eon.abs();
 
                 if (bi.compareTo(MRD_I) >= 0) {
-                    throw new ChronoException(
-                        "Out of supported year range: " + source);
+                    throw new ArithmeticException(
+                        "Year out of supported range: " + source);
                 }
             }
 
@@ -839,7 +858,7 @@ public abstract class TemporalType<S, T> {
         }
 
     }
-	
+
     private static class XmlTimeRule
         extends TemporalType<XMLGregorianCalendar, PlainTime> {
 
@@ -917,8 +936,8 @@ public abstract class TemporalType<S, T> {
                 BigInteger bi = eon.abs();
 
                 if (bi.compareTo(MRD_I) >= 0) {
-                    throw new ChronoException(
-                        "Out of supported year range: " + source);
+                    throw new ArithmeticException(
+                        "Year out of supported range: " + source);
                 }
             }
 
@@ -950,6 +969,8 @@ public abstract class TemporalType<S, T> {
 
             if (second == DatatypeConstants.FIELD_UNDEFINED) {
                 second = 0;
+            } else if (second == 60) {
+                second = 59;
             }
 
             int nano = 0;
@@ -995,7 +1016,12 @@ public abstract class TemporalType<S, T> {
             }
 
             ZonalOffset offset = ZonalOffset.ofTotalSeconds(offsetMins * 60);
-            return ZonalMoment.of(tsp, offset);
+
+            if (source.getSecond() == 60) {
+                return tsp.at(offset).plus(1, SI.SECONDS).inZonalView(offset);
+            } else {
+                return ZonalMoment.of(tsp, offset);
+            }
 
         }
 
@@ -1021,5 +1047,40 @@ public abstract class TemporalType<S, T> {
         }
 
     }
-	
+
+    private static class XmlDurationRule
+        extends TemporalType<javax.xml.datatype.Duration, Duration<IsoUnit>> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Duration<IsoUnit> translate(javax.xml.datatype.Duration source) {
+
+            if (source.getSign() == 0) {
+                return Duration.ofZero();
+            }
+
+            try {
+                return Duration.parsePeriod(source.toString());
+            } catch (ParseException ex) {
+                if (ex.getCause() instanceof NumberFormatException) {
+                    ArithmeticException ae = new ArithmeticException();
+                    ae.initCause(ex);
+                    throw ae;
+                }
+                throw new ChronoException("Cannot translate: " + source, ex);
+            }
+
+        }
+
+        @Override
+        public javax.xml.datatype.Duration from(Duration<IsoUnit> duration) {
+
+            DatatypeFactory factory = getXMLFactory();
+            return factory.newDuration(duration.toStringXML());
+
+        }
+
+    }
+
 }
