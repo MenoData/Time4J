@@ -152,19 +152,68 @@ public final class Boundary<T extends Temporal<? super T>>
     }
 
     /**
-     * <p>Defines a finite boundary for the specified time point. </p>
+     * <p>Defines a finite open boundary for the specified time
+     * point. </p>
      *
      * @param   <T> generic temporal type
-     * @param   edge        boundary type
      * @param   temporal    time of the boundary
-     * @return  finite boundary
+     * @return  finite open boundary
      * @since   2.0
      * @see     #infinitePast()
      * @see     #infiniteFuture()
      * @see     #isOpen()
+     */
+    /*[deutsch]
+     * <p>Definiert eine feste offene Grenze f&uuml;r den angegebenen
+     * Zeitpunkt. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   temporal    time of the boundary
+     * @return  finite open boundary
+     * @since   2.0
+     * @see     #infinitePast()
+     * @see     #infiniteFuture()
+     * @see     #isOpen()
+     */
+    public static
+    <T extends Temporal<? super T>> Boundary<T> ofOpen(T temporal) {
+
+        return new Boundary<T>(IntervalEdge.OPEN, temporal);
+
+    }
+
+    /**
+     * <p>Defines a finite closed boundary for the specified
+     * time point. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   temporal    time of the boundary
+     * @return  finite closed boundary
+     * @since   2.0
+     * @see     #infinitePast()
+     * @see     #infiniteFuture()
      * @see     #isClosed()
      */
     /*[deutsch]
+     * <p>Definiert eine feste geschlossene Grenze f&uuml;r den
+     * angegebenen Zeitpunkt. </p>
+     *
+     * @param   <T> generic temporal type
+     * @param   temporal    time of the boundary
+     * @return  finite closed boundary
+     * @since   2.0
+     * @see     #infinitePast()
+     * @see     #infiniteFuture()
+     * @see     #isClosed()
+     */
+    public static
+    <T extends Temporal<? super T>> Boundary<T> ofClosed(T temporal) {
+
+        return new Boundary<T>(IntervalEdge.CLOSED, temporal);
+
+    }
+
+    /**
      * <p>Definiert eine feste Grenze f&uuml;r den angegebenen
      * Zeitpunkt. </p>
      *
@@ -178,7 +227,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @see     #isOpen()
      * @see     #isClosed()
      */
-    public static <T extends Temporal<? super T>> Boundary<T> of(
+    static <T extends Temporal<? super T>> Boundary<T> of(
         IntervalEdge edge,
         T temporal
     ) {
@@ -215,7 +264,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if open else {@code false}
      * @since   2.0
-     * @see     #of(IntervalEdge, Temporal)
+     * @see     #ofOpen(Temporal)
      */
     /*[deutsch]
      * <p>Gibt an, ob diese Intervalgrenze offen ist. </p>
@@ -225,7 +274,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if open else {@code false}
      * @since   2.0
-     * @see     #of(IntervalEdge, Temporal)
+     * @see     #ofOpen(Temporal)
      */
     public boolean isOpen() {
 
@@ -241,7 +290,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if closed else {@code false}
      * @since   2.0
-     * @see     #of(IntervalEdge, Temporal)
+     * @see     #ofClosed(Temporal)
      */
     /*[deutsch]
      * <p>Gibt an, ob diese Intervalgrenze geschlossen ist. </p>
@@ -251,7 +300,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if closed else {@code false}
      * @since   2.0
-     * @see     #of(IntervalEdge, Temporal)
+     * @see     #ofClosed(Temporal)
      */
     public boolean isClosed() {
 
@@ -290,7 +339,7 @@ public final class Boundary<T extends Temporal<? super T>>
         if (this == obj) {
             return true;
         } else if (obj instanceof Boundary) {
-            Boundary<?> that = (Boundary) obj;
+            Boundary<?> that = Boundary.class.cast(obj);
             if (
                 (this.edge != that.edge)
                 || (this.mode != that.mode)
