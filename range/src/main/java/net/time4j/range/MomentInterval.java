@@ -72,7 +72,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class MomentInterval
-    extends ChronoInterval<Moment>
+    extends IsoInterval<Moment>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
