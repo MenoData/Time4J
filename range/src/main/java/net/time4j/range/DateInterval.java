@@ -65,7 +65,7 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  * @since   2.0
  */
 public final class DateInterval
-    extends ChronoInterval<PlainDate>
+    extends IsoInterval<PlainDate>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
