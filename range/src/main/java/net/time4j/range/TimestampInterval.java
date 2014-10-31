@@ -69,7 +69,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class TimestampInterval
-    extends ChronoInterval<PlainTimestamp>
+    extends IsoInterval<PlainTimestamp>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
