@@ -92,36 +92,14 @@ public abstract class IsoInterval
 
     //~ Methoden ----------------------------------------------------------
 
-    /**
-     * <p>Yields the lower bound of this interval. </p>
-     *
-     * @return  start interval boundary
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert die untere Grenze dieses Intervalls. </p>
-     *
-     * @return  start interval boundary
-     * @since   2.0
-     */
+    @Override
     public final Boundary<T> getStart() {
 
         return this.start;
 
     }
 
-    /**
-     * <p>Yields the upper bound of this interval. </p>
-     *
-     * @return  end interval boundary
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert die obere Grenze dieses Intervalls. </p>
-     *
-     * @return  end interval boundary
-     * @since   2.0
-     */
+    @Override
     public final Boundary<T> getEnd() {
 
         return this.end;
@@ -211,38 +189,14 @@ public abstract class IsoInterval
      */
     public abstract IsoInterval<T> withEnd(T temporal);
 
-    /**
-     * <p>Determines if this interval has finite boundaries. </p>
-     *
-     * @return  {@code true} if start and end are finite else {@code false}
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Ermittelt, ob dieses Intervall endliche Grenzen hat. </p>
-     *
-     * @return  {@code true} if start and end are finite else {@code false}
-     * @since   2.0
-     */
+    @Override
     public boolean isFinite() {
 
         return !(this.start.isInfinite() || this.end.isInfinite());
 
     }
 
-    /**
-     * <p>Determines if this interval is empty. </p>
-     *
-     * @return  {@code true} if this interval does not contain any time point
-     *          else {@code false}
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Ermittelt, ob dieses Intervall leer ist. </p>
-     *
-     * @return  {@code true} if this interval does not contain any time point
-     *          else {@code false}
-     * @since   2.0
-     */
+    @Override
     public boolean isEmpty() {
 
         return (
@@ -252,23 +206,7 @@ public abstract class IsoInterval
 
     }
 
-    /**
-     * <p>Queries if given time point belongs to this interval. </p>
-     *
-     * @param   temporal    time point to be queried, maybe {@code null}
-     * @return  {@code true} if given time point is not {@code null} and
-     *          belongs to this interval else {@code false}
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Ermittelt, ob der angegebene Zeitpunkt zu diesem Intervall
-     * geh&ouml;rt. </p>
-     *
-     * @param   temporal    time point to be queried, maybe {@code null}
-     * @return  {@code true} if given time point is not {@code null} and
-     *          belongs to this interval else {@code false}
-     * @since   2.0
-     */
+    @Override
     public boolean contains(T temporal) {
 
         if (temporal == null) {
