@@ -37,8 +37,7 @@ import java.util.Set;
  * @see     2.0
  */
 interface IntervalFactory
-    <T extends ChronoEntity<T> & Temporal<? super T>,
-        I extends ChronoInterval<T>> {
+    <T extends Temporal<? super T>, I extends ChronoInterval<T>> {
 
     //~ Methoden ----------------------------------------------------------
 
