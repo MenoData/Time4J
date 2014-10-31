@@ -54,7 +54,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class TimeInterval
-    extends ChronoInterval<PlainTime>
+    extends IsoInterval<PlainTime>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
