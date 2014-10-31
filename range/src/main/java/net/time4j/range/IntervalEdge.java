@@ -34,7 +34,7 @@ package net.time4j.range;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public enum IntervalEdge {
+enum IntervalEdge {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
