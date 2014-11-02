@@ -35,6 +35,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
+import net.time4j.engine.TimeLine;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
@@ -1011,7 +1012,7 @@ public final class PlainTime
                 PRECISION,
                 new PrecisionRule());
         registerUnits(builder);
-        ENGINE = builder.build();
+        ENGINE = builder.withTimeLine(new ClockTimeLine()).build();
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -3429,6 +3430,35 @@ public final class PlainTime
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+    }
+
+    private static class ClockTimeLine
+        implements TimeLine<PlainTime> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainTime stepForward(PlainTime timepoint) {
+
+            if (timepoint.getHour() == 24) {
+                throw new ArithmeticException("Latest time reached.");
+            }
+
+            return timepoint.plus(1, ClockUnit.NANOS);
+
+        }
+
+        @Override
+        public PlainTime stepBackwards(PlainTime timepoint) {
+
+            if (timepoint.isSimultaneous(PlainTime.midnightAtStartOfDay())) {
+                throw new ArithmeticException("Earliest time reached.");
+            }
+
+            return timepoint.minus(1, ClockUnit.NANOS);
 
         }
 

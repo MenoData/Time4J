@@ -435,6 +435,8 @@ public abstract class IsoInterval
      * @param   <T> temporal type
      * @param   <I> interval type
      * @return  Comparator
+     * @throws  ArithmeticException if applied on intervals which are not
+     *          half-open and have boundaries with extreme values
      */
     /*[deutsch]
      * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
@@ -443,6 +445,8 @@ public abstract class IsoInterval
      * @param   <T> temporal type
      * @param   <I> interval type
      * @return  Comparator
+     * @throws  ArithmeticException if applied on intervals which are not
+     *          half-open and have boundaries with extreme values
      */
     public static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     Comparator<I> comparator() {

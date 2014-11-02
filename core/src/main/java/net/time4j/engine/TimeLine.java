@@ -53,6 +53,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved forward
      * @return  new point in time one step after given argument
+     * @throws  ArithmeticException if applied on the latest possible time
      * @since   2.0
      */
     /*[deutsch]
@@ -60,6 +61,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved forward
      * @return  new point in time one step after given argument
+     * @throws  ArithmeticException if applied on the latest possible time
      * @since   2.0
      */
     T stepForward(T timepoint);
@@ -69,6 +71,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved backwards
      * @return  new point in time one step before given argument
+     * @throws  ArithmeticException if applied on the earliest possible time
      * @since   2.0
      */
     /*[deutsch]
@@ -77,6 +80,7 @@ public interface TimeLine<T> {
      *
      * @param   timepoint       point in time to be moved backwards
      * @return  new point in time one step before given argument
+     * @throws  ArithmeticException if applied on the earliest possible time
      * @since   2.0
      */
     T stepBackwards(T timepoint);
