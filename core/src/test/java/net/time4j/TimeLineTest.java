@@ -27,6 +27,16 @@ public class TimeLineTest {
             is(PlainDate.of(2012, Month.FEBRUARY, 29)));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void forwardDateMax() {
+        PlainDate.axis().stepForward(PlainDate.MAX);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void backwardsDateMin() {
+        PlainDate.axis().stepBackwards(PlainDate.MIN);
+    }
+
     @Test
     public void forwardTime() {
         PlainTime time = PlainTime.of(23, 45);
@@ -41,6 +51,16 @@ public class TimeLineTest {
         assertThat(
             PlainTime.axis().stepBackwards(time),
             is(PlainTime.of(23, 44, 59, 999999999)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void forwardTimeMax() {
+        PlainTime.axis().stepForward(PlainTime.midnightAtEndOfDay());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void backwardsTimeMin() {
+        PlainTime.axis().stepBackwards(PlainTime.midnightAtStartOfDay());
     }
 
     @Test

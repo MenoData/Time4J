@@ -3444,7 +3444,7 @@ public final class PlainTime
         public PlainTime stepForward(PlainTime timepoint) {
 
             if (timepoint.getHour() == 24) {
-                throw new ArithmeticException("Latest time reached.");
+                throw new IllegalArgumentException("Latest time reached.");
             }
 
             return timepoint.plus(1, ClockUnit.NANOS);
@@ -3455,7 +3455,7 @@ public final class PlainTime
         public PlainTime stepBackwards(PlainTime timepoint) {
 
             if (timepoint.isSimultaneous(PlainTime.midnightAtStartOfDay())) {
-                throw new ArithmeticException("Earliest time reached.");
+                throw new IllegalArgumentException("Earliest time reached.");
             }
 
             return timepoint.minus(1, ClockUnit.NANOS);
