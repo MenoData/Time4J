@@ -159,38 +159,6 @@ public final class TimeInterval
 
     }
 
-    @Override
-    public TimeInterval withStart(Boundary<PlainTime> boundary) {
-
-        return new TimeInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public TimeInterval withEnd(Boundary<PlainTime> boundary) {
-
-        return new TimeInterval(this.getStart(), boundary);
-
-    }
-
-    @Override
-    public TimeInterval withStart(PlainTime temporal) {
-
-        Boundary<PlainTime> boundary =
-            Boundary.of(this.getStart().getEdge(), temporal);
-        return new TimeInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public TimeInterval withEnd(PlainTime temporal) {
-
-        Boundary<PlainTime> boundary =
-            Boundary.of(this.getEnd().getEdge(), temporal);
-        return new TimeInterval(this.getStart(), boundary);
-
-    }
-
     /**
      * <p>Yields the length of this interval. </p>
      *

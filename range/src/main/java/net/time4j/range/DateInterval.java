@@ -181,60 +181,6 @@ public final class DateInterval
 
     }
 
-    @Override
-    public DateInterval withStart(Boundary<PlainDate> boundary) {
-
-        return new DateInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public DateInterval withEnd(Boundary<PlainDate> boundary) {
-
-        return new DateInterval(this.getStart(), boundary);
-
-    }
-
-    @Override
-    public DateInterval withStart(PlainDate temporal) {
-
-        Boundary<PlainDate> boundary =
-            Boundary.of(this.getStart().getEdge(), temporal);
-        return new DateInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public DateInterval withEnd(PlainDate temporal) {
-
-        Boundary<PlainDate> boundary =
-            Boundary.of(this.getEnd().getEdge(), temporal);
-        return new DateInterval(this.getStart(), boundary);
-
-    }
-
-    /**
-     * <p>Removes the upper boundary from this interval. </p>
-     *
-     * @return  changed copy of this interval excluding upper boundary
-     */
-    /*[deutsch]
-     * <p>Nimmt die obere Grenze von diesem Intervall aus. </p>
-     *
-     * @return  changed copy of this interval excluding upper boundary
-     */
-    public DateInterval withOpenEnd() {
-
-        if (this.getEnd().isInfinite()) {
-            return this;
-        }
-
-        Boundary<PlainDate> boundary =
-            Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
-        return this.withEnd(boundary);
-
-    }
-
     /**
      * <p>Converts this instance to a timestamp interval with
      * dates from midnight to midnight. </p>
@@ -451,7 +397,7 @@ public final class DateInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @since   2.0
-     * @see     #parse(String, ChronoFormatter)
+     * @see     #parse(String, ChronoParser)
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -464,7 +410,7 @@ public final class DateInterval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
      * @since   2.0
-     * @see     #parse(String, ChronoFormatter)
+     * @see     #parse(String, ChronoParser)
      */
     public static DateInterval parse(
         CharSequence text,

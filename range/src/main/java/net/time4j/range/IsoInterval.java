@@ -124,52 +124,6 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Yields a copy of this interval with given start boundary. </p>
-     *
-     * @param   boundary    new start interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new start is after end
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen unteren
-     * Grenze. </p>
-     *
-     * @param   boundary    new start interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new start is after end
-     * @since   2.0
-     */
-    public abstract I withStart(Boundary<T> boundary);
-
-    /**
-     * <p>Yields a copy of this interval with given end boundary. </p>
-     *
-     * @param   boundary    new end interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new end is before start
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen oberen
-     * Grenze. </p>
-     *
-     * @param   boundary    new end interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new end is before start
-     * @since   2.0
-     */
-    public abstract I withEnd(Boundary<T> boundary);
-
-    /**
      * <p>Yields a copy of this interval with given start time. </p>
      *
      * @param   temporal    new start timepoint
@@ -186,7 +140,13 @@ public abstract class IsoInterval
      * @throws  IllegalArgumentException if new start is after end
      * @since   2.0
      */
-    public abstract I withStart(T temporal);
+    public I withStart(T temporal) {
+
+        IntervalEdge edge = this.start.getEdge();
+        Boundary<T> b = Boundary.of(edge, temporal);
+        return this.getFactory().between(b, this.end);
+
+    }
 
     /**
      * <p>Yields a copy of this interval with given end time. </p>
@@ -204,7 +164,64 @@ public abstract class IsoInterval
      * @throws  IllegalArgumentException if new end is before start
      * @since   2.0
      */
-    public abstract I withEnd(T temporal);
+    public I withEnd(T temporal) {
+
+        IntervalEdge edge = this.end.getEdge();
+        Boundary<T> b = Boundary.of(edge, temporal);
+        return this.getFactory().between(this.start, b);
+
+    }
+
+    /**
+     * <p>Removes the upper boundary from this interval. </p>
+     *
+     * @return  changed copy of this interval excluding upper boundary
+     */
+    /*[deutsch]
+     * <p>Nimmt die obere Grenze von diesem Intervall aus. </p>
+     *
+     * @return  changed copy of this interval excluding upper boundary
+     */
+    public I withOpenEnd() {
+
+        Boundary<T> b;
+
+        if (this.getEnd().isInfinite()) {
+            b = Boundary.infiniteFuture();
+        } else {
+            b = Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
+        }
+
+        return this.getFactory().between(this.start, b);
+
+    }
+
+    /**
+     * <p>Includes the upper boundary of this interval. </p>
+     *
+     * @return  changed copy of this interval including upper boundary
+     * @throws  IllegalStateException if the end is infinite future
+     */
+    /*[deutsch]
+     * <p>Schlie&szlig;t die obere Grenze dieses Intervall ein. </p>
+     *
+     * @return  changed copy of this interval including upper boundary
+     * @throws  IllegalStateException if the end is infinite future
+     */
+    public I withClosedEnd() {
+
+        Boundary<T> b;
+
+        if (this.getEnd().isInfinite()) {
+            throw new IllegalStateException(
+                "Infinite future cannot be included.");
+        } else {
+            b = Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
+        }
+
+        return this.getFactory().between(this.start, b);
+
+    }
 
     @Override
     public boolean isFinite() {
@@ -322,7 +339,7 @@ public abstract class IsoInterval
      * @return  formatted string in format {start}/{end}
      * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoFormatter, BracketPolicy)
+     * @see     #print(ChronoPrinter, BracketPolicy)
      */
     /*[deutsch]
      * <p>Entspricht
@@ -332,7 +349,7 @@ public abstract class IsoInterval
      * @return  formatted string in format {start}/{end}
      * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoFormatter, BracketPolicy)
+     * @see     #print(ChronoPrinter, BracketPolicy)
      */
     public String print(ChronoPrinter<T> printer) {
 
@@ -529,6 +546,60 @@ public abstract class IsoInterval
         } else {
             return Attributes.empty();
         }
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given start boundary. </p>
+     *
+     * @param   boundary    new start interval boundary
+     * @return  possibly changed copy of this interval
+     * @throws  IllegalArgumentException if given boundary is infinite and
+     *          the concrete interval does not support infinite boundaries
+     *          or if new start is after end
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen unteren
+     * Grenze. </p>
+     *
+     * @param   boundary    new start interval boundary
+     * @return  possibly changed copy of this interval
+     * @throws  IllegalArgumentException if given boundary is infinite and
+     *          the concrete interval does not support infinite boundaries
+     *          or if new start is after end
+     * @since   2.0
+     */
+    I withStart(Boundary<T> boundary) {
+
+        return this.getFactory().between(boundary, this.end);
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given end boundary. </p>
+     *
+     * @param   boundary    new end interval boundary
+     * @return  possibly changed copy of this interval
+     * @throws  IllegalArgumentException if given boundary is infinite and
+     *          the concrete interval does not support infinite boundaries
+     *          or if new end is before start
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen oberen
+     * Grenze. </p>
+     *
+     * @param   boundary    new end interval boundary
+     * @return  possibly changed copy of this interval
+     * @throws  IllegalArgumentException if given boundary is infinite and
+     *          the concrete interval does not support infinite boundaries
+     *          or if new end is before start
+     * @since   2.0
+     */
+    I withEnd(Boundary<T> boundary) {
+
+        return this.getFactory().between(this.start, boundary);
 
     }
 

@@ -174,38 +174,6 @@ public final class TimestampInterval
 
     }
 
-    @Override
-    public TimestampInterval withStart(Boundary<PlainTimestamp> boundary) {
-
-        return new TimestampInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public TimestampInterval withEnd(Boundary<PlainTimestamp> boundary) {
-
-        return new TimestampInterval(this.getStart(), boundary);
-
-    }
-
-    @Override
-    public TimestampInterval withStart(PlainTimestamp temporal) {
-
-        Boundary<PlainTimestamp> boundary =
-            Boundary.of(this.getStart().getEdge(), temporal);
-        return new TimestampInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public TimestampInterval withEnd(PlainTimestamp temporal) {
-
-        Boundary<PlainTimestamp> boundary =
-            Boundary.of(this.getEnd().getEdge(), temporal);
-        return new TimestampInterval(this.getStart(), boundary);
-
-    }
-
     /**
      * <p>Combines this local timestamp interval with the timezone offset
      * UTC+00:00 to a global UTC-interval. </p>

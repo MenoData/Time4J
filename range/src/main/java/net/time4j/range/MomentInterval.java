@@ -175,38 +175,6 @@ public final class MomentInterval
 
     }
 
-    @Override
-    public MomentInterval withStart(Boundary<Moment> boundary) {
-
-        return new MomentInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public MomentInterval withEnd(Boundary<Moment> boundary) {
-
-        return new MomentInterval(this.getStart(), boundary);
-
-    }
-
-    @Override
-    public MomentInterval withStart(Moment temporal) {
-
-        Boundary<Moment> boundary =
-            Boundary.of(this.getStart().getEdge(), temporal);
-        return new MomentInterval(boundary, this.getEnd());
-
-    }
-
-    @Override
-    public MomentInterval withEnd(Moment temporal) {
-
-        Boundary<Moment> boundary =
-            Boundary.of(this.getEnd().getEdge(), temporal);
-        return new MomentInterval(this.getStart(), boundary);
-
-    }
-
     /**
      * <p>Converts this instance to a local timestamp interval in the system
      * timezone. </p>
