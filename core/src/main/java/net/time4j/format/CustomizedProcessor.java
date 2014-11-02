@@ -25,6 +25,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -41,6 +42,16 @@ import java.util.Set;
  */
 final class CustomizedProcessor<V>
     implements FormatProcessor<V> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
+        new ChronoFunction<ChronoDisplay, Void>() {
+            @Override
+            public Void apply(ChronoDisplay context) {
+                return null;
+            }
+        };
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -113,7 +124,7 @@ final class CustomizedProcessor<V>
                 }
                 positions.addAll(set);
             } else {
-                this.printer.print(value, collector, attributes);
+                this.printer.print(value, collector, attributes, NO_RESULT);
 
                 positions.add(
                     new ElementPosition(
@@ -122,7 +133,7 @@ final class CustomizedProcessor<V>
                         offset + collector.length()));
             }
         } else {
-            this.printer.print(value, collector, attributes);
+            this.printer.print(value, collector, attributes, NO_RESULT);
         }
 
         buffer.append(collector);

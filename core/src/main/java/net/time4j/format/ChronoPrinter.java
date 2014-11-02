@@ -22,6 +22,8 @@
 package net.time4j.format;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoFunction;
 
 import java.io.IOException;
 
@@ -47,13 +49,17 @@ public interface ChronoPrinter<T> {
     /**
      * <p>Creates a text output and writes it into given buffer. </p>
      *
-     * <p>Note: Implementations must document the type and content of
-     * the result to be returned. </p>
+     * <p>Note: Implementations have to call {@code query.apply(...)}
+     * at the end to return a possibly meaningful result. An example
+     * would be a query which produces just the identical input so
+     * the result of printing a {@code Moment} will be the formatted
+     * form of the original {@code Moment}. </p>
      *
-     * @param   formattable  chronological entity to be formatted
-     * @param   buffer       format buffer any text output will be sent to
-     * @param   attributes   control attributes
-     * @return  result (will be redefined by subclasses in covariant way)
+     * @param   formattable chronological entity to be formatted
+     * @param   buffer      format buffer any text output will be sent to
+     * @param   attributes  control attributes
+     * @param   query       custom query returning any kind of result
+     * @return  result of query
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
      */
@@ -61,20 +67,27 @@ public interface ChronoPrinter<T> {
      * <p>Erzeugt eine Textausgabe und schreibt sie in den angegebenen
      * Puffer. </p>
      *
-     * <p>Notiz: Implementierungen m&uuml;ssen dokumentieren, was f&uuml;r ein
-     * Ergebnis zur&uuml;ckgeliefert wird. </p>
+     * <p>Notiz: Implementierungen m&uuml;ssen schlie&szlig;lich
+     * {@code query.apply(...)} aufrufen, um ein Ergebnis
+     * zur&uuml;ckzugeben. Ein Beispiel w&auml;re eine Abfrage, die
+     * einfach die identische Eingabe zur&uuml;ckgibt, so da&szlig;
+     * das Ergebnis dieser Methode angewandt auf einen {@code Moment}
+     * die vorformatierte Form des urspr&uuml;nglichen {@code Moment}
+     * sein wird.</p>
      *
-     * @param   formattable  chronological entity to be formatted
-     * @param   buffer       format buffer any text output will be sent to
-     * @param   attributes   control attributes
-     * @return  result (will be redefined by subclasses in covariant way)
+     * @param   formattable chronological entity to be formatted
+     * @param   buffer      format buffer any text output will be sent to
+     * @param   attributes  control attributes
+     * @param   query       custom query returning any kind of result
+     * @return  result of query
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
      */
-    Object print(
+    <R> R print(
         T formattable,
         Appendable buffer,
-        AttributeQuery attributes
+        AttributeQuery attributes,
+        ChronoFunction<ChronoDisplay, R> query
     ) throws IOException;
 
 }

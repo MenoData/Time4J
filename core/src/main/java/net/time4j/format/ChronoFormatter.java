@@ -30,6 +30,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
 import net.time4j.tz.TZID;
@@ -410,10 +411,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public String format(T formattable) {
 
+        ChronoDisplay display =
+            this.chronology.preformat(formattable, this.defaultAttributes);
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
 
         try {
-            this.print(formattable, buffer, this.defaultAttributes, false);
+            this.print(display, buffer, this.defaultAttributes, false);
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe); // cannot happen
         }
@@ -451,13 +454,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         StringBuilder buffer
     ) {
 
+        ChronoDisplay display =
+            this.chronology.preformat(formattable, this.defaultAttributes);
+
         try {
-            return this.print(
-                formattable,
-                buffer,
-                this.defaultAttributes,
-                true
-            );
+            return this.print(display, buffer, this.defaultAttributes, true);
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe); // cannot happen
         }
@@ -501,58 +502,35 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
      */
-    @Override
     public Set<ElementPosition> print(
         T formattable,
         Appendable buffer,
         AttributeQuery attributes
     ) throws IOException {
 
-        return this.print(formattable, buffer, attributes, true);
+        ChronoDisplay display =
+            this.chronology.preformat(formattable, attributes);
+        return this.print(display, buffer, attributes, true);
 
     }
 
-    /**
-     * <p>Prints given chronological entity as formatted text and writes
-     * the text into given buffer. </p>
-     *
-     * <p>The given attributes cannot change the inner format structure
-     * (for example not change a localized weekmodel), but can override some
-     * format properties like language or certain text attributes for this
-     * run only. If the last argument {@code withPositions} is set to
-     * {@code false} then this method will just return an empty set. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @param   attributes      attributes for limited formatting control
-     * @param   withPositions   controls if element positions shall be tracked
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to buffer fails
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Erzeugt eine Textausgabe und speichert sie im angegebenen Puffer. </p>
-     *
-     * <p>Die mitgegebenen Steuerattribute k&ouml;nnen nicht die innere
-     * Formatstruktur &auml;ndern (zum Beispiel nicht ein lokalisiertes
-     * Wochenmodell wechseln), aber bestimmte Formateigenschaften wie
-     * die Sprachausgabe oder Textattribute individuell nur f&uuml;r diesen
-     * Lauf setzen. Wenn das letzte Argument {@code withPositions} den Wert
-     * {@code false} hat, wird diese Methode lediglich ein leeres {@code Set}
-     * liefern. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @param   attributes      attributes for limited formatting control
-     * @param   withPositions   controls if element positions shall be tracked
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to buffer fails
-     * @since   2.0
-     */
-    public Set<ElementPosition> print(
+    @Override
+    public <R> R print(
         T formattable,
+        Appendable buffer,
+        AttributeQuery attributes,
+        ChronoFunction<ChronoDisplay, R> query
+    ) throws IOException {
+
+        ChronoDisplay display =
+            this.chronology.preformat(formattable, attributes);
+        this.print(display, buffer, attributes, false);
+        return query.apply(display);
+
+    }
+
+    private Set<ElementPosition> print(
+        ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
         boolean withPositions
@@ -568,13 +546,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             positions = new LinkedHashSet<ElementPosition>(this.steps.size());
         }
 
-        ChronoDisplay entity =
-            this.chronology.preformat(formattable, attributes);
-
         try {
             for (FormatStep step : this.steps) {
                 step.print(
-                    entity,
+                    formattable,
                     buffer,
                     attributes,
                     positions
