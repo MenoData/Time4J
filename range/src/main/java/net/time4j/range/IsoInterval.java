@@ -21,10 +21,17 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
+import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoPrinter;
+
+import java.io.IOException;
+import java.util.Comparator;
 
 
 /**
@@ -44,8 +51,18 @@ import net.time4j.format.ChronoFormatter;
  * @since   2.0
  */
 public abstract class IsoInterval
-    <T extends ChronoEntity<T> & Temporal<? super T>>
+    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoInterval<T> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
+        new ChronoFunction<ChronoDisplay, Void>() {
+            @Override
+            public Void apply(ChronoDisplay context) {
+                return null;
+            }
+        };
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -127,7 +144,7 @@ public abstract class IsoInterval
      *          or if new start is after end
      * @since   2.0
      */
-    public abstract IsoInterval<T> withStart(Boundary<T> boundary);
+    public abstract I withStart(Boundary<T> boundary);
 
     /**
      * <p>Yields a copy of this interval with given end boundary. </p>
@@ -150,7 +167,7 @@ public abstract class IsoInterval
      *          or if new end is before start
      * @since   2.0
      */
-    public abstract IsoInterval<T> withEnd(Boundary<T> boundary);
+    public abstract I withEnd(Boundary<T> boundary);
 
     /**
      * <p>Yields a copy of this interval with given start time. </p>
@@ -169,7 +186,7 @@ public abstract class IsoInterval
      * @throws  IllegalArgumentException if new start is after end
      * @since   2.0
      */
-    public abstract IsoInterval<T> withStart(T temporal);
+    public abstract I withStart(T temporal);
 
     /**
      * <p>Yields a copy of this interval with given end time. </p>
@@ -187,7 +204,7 @@ public abstract class IsoInterval
      * @throws  IllegalArgumentException if new end is before start
      * @since   2.0
      */
-    public abstract IsoInterval<T> withEnd(T temporal);
+    public abstract I withEnd(T temporal);
 
     @Override
     public boolean isFinite() {
@@ -247,7 +264,7 @@ public abstract class IsoInterval
         if (this == obj) {
             return true;
         } else if (obj instanceof IsoInterval) {
-            IsoInterval<?> that = (IsoInterval<?>) obj;
+            IsoInterval<?, ?> that = IsoInterval.class.cast(obj);
             return (
                 this.start.equals(that.start)
                 && this.end.equals(that.end)
@@ -299,9 +316,9 @@ public abstract class IsoInterval
 
     /**
      * <p>Equivalent to
-     * {@code print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
      *
-     * @param   formatter   format object for printing start and end
+     * @param   printer     format object for printing start and end
      * @return  formatted string in format {start}/{end}
      * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
@@ -309,17 +326,17 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>Entspricht
-     * {@code print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
      *
-     * @param   formatter   format object for printing start and end
+     * @param   printer     format object for printing start and end
      * @return  formatted string in format {start}/{end}
      * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      * @see     #print(ChronoFormatter, BracketPolicy)
      */
-    public String print(ChronoFormatter<T> formatter) {
+    public String print(ChronoPrinter<T> printer) {
 
-        return this.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD);
+        return this.print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD);
 
     }
 
@@ -342,7 +359,7 @@ public abstract class IsoInterval
      *  // output: 20140131/20140402
      * </pre>
      *
-     * @param   formatter   format object for printing start and end
+     * @param   printer     format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
      * @since   2.0
@@ -367,16 +384,17 @@ public abstract class IsoInterval
      *  // output: 20140131/20140402
      * </pre>
      *
-     * @param   formatter   format object for printing start and end
+     * @param   printer     format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
      * @since   2.0
      */
     public String print(
-        ChronoFormatter<T> formatter,
+        ChronoPrinter<T> printer,
         BracketPolicy policy
     ) {
 
+        AttributeQuery attrs = extractDefaultAttributes(printer);
         boolean showBoundaries = policy.display(this);
         StringBuilder sb = new StringBuilder(64);
 
@@ -384,18 +402,22 @@ public abstract class IsoInterval
             sb.append(this.start.isOpen() ? '(' : '[');
         }
 
-        if (this.start.isInfinite()) {
-            sb.append("-\u221E");
-        } else {
-            formatter.print(this.start.getTemporal(), sb);
-        }
+        try {
+            if (this.start.isInfinite()) {
+                sb.append("-\u221E");
+            } else {
+                printer.print(this.start.getTemporal(), sb, attrs, NO_RESULT);
+            }
 
-        sb.append('/');
+            sb.append('/');
 
-        if (this.end.isInfinite()) {
-            sb.append("+\u221E");
-        } else {
-            formatter.print(this.end.getTemporal(), sb);
+            if (this.end.isInfinite()) {
+                sb.append("+\u221E");
+            } else {
+                printer.print(this.end.getTemporal(), sb, attrs, NO_RESULT);
+            }
+        } catch (IOException ioe) {
+            throw new AssertionError(ioe);
         }
 
         if (showBoundaries) {
@@ -407,12 +429,42 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Defines a comparator which sorts intervals first by start boundary
+     * and then by length. </p>
+     *
+     * @param   <T> temporal type
+     * @param   <I> interval type
+     * @return  Comparator
+     */
+    /*[deutsch]
+     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
+     * Start und dann nach der L&auml;nge sortiert. </p>
+     *
+     * @param   <T> temporal type
+     * @param   <I> interval type
+     * @return  Comparator
+     */
+    public static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+    Comparator<I> comparator() {
+
+        return IntervalComparator.getInstance();
+
+    }
+
+    /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
      * @since   2.0
      */
     protected abstract TimeLine<T> getTimeLine();
+
+    /**
+     * <p>Liefert die zugeh&ouml;rige Fabrik. </p>
+     *
+     * @return  IntervalFactory
+     */
+    abstract IntervalFactory<T, I> getFactory();
 
     /**
      * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
@@ -454,6 +506,24 @@ public abstract class IsoInterval
             return this.getTimeLine().stepForward(temporal);
         } else {
             return temporal;
+        }
+
+    }
+
+    /**
+     * <p>Bestimmt die Standard-Attribute, wenn das Argument ein
+     * Format-Objekt ist. </p>
+     *
+     * @param   obj     object possibly containing format attributes
+     * @return  attribute query
+     */
+    static AttributeQuery extractDefaultAttributes(Object obj) {
+
+        if (obj instanceof ChronoFormatter) {
+            ChronoFormatter<?> fmt = ChronoFormatter.class.cast(obj);
+            return fmt.getDefaultAttributes();
+        } else {
+            return Attributes.empty();
         }
 
     }

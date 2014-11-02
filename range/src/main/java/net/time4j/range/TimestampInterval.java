@@ -32,6 +32,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
 import net.time4j.format.SignPolicy;
 import net.time4j.tz.TZID;
@@ -69,7 +70,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class TimestampInterval
-    extends IsoInterval<PlainTimestamp>
+    extends IsoInterval<PlainTimestamp, TimestampInterval>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -419,7 +420,7 @@ public final class TimestampInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -431,7 +432,7 @@ public final class TimestampInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -441,12 +442,12 @@ public final class TimestampInterval
      */
     public static TimestampInterval parse(
         String text,
-        ChronoFormatter<PlainTimestamp> formatter
+        ChronoParser<PlainTimestamp> parser
     ) throws ParseException {
 
         return IntervalParser.of(
              TimestampIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
 
@@ -456,7 +457,7 @@ public final class TimestampInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -468,7 +469,7 @@ public final class TimestampInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -478,16 +479,16 @@ public final class TimestampInterval
      */
     public static TimestampInterval parse(
         CharSequence text,
-        ChronoFormatter<PlainTimestamp> formatter,
+        ChronoParser<PlainTimestamp> parser,
         BracketPolicy policy,
         ParseLog status
     ) {
 
         return IntervalParser.of(
              TimestampIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              policy
-        ).parse(text, status, formatter.getDefaultAttributes());
+        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
 
     }
 
@@ -675,7 +676,8 @@ public final class TimestampInterval
              TimestampIntervalFactory.INSTANCE,
              startFormat,
              endFormat,
-             BracketPolicy.SHOW_NEVER
+             BracketPolicy.SHOW_NEVER,
+             PlainTimestamp.axis()
         ).parse(text);
 
     }
@@ -684,6 +686,13 @@ public final class TimestampInterval
     protected TimeLine<PlainTimestamp> getTimeLine() {
 
         return PlainTimestamp.axis();
+
+    }
+
+    @Override
+    IntervalFactory<PlainTimestamp, TimestampInterval> getFactory() {
+
+        return TimestampIntervalFactory.INSTANCE;
 
     }
 

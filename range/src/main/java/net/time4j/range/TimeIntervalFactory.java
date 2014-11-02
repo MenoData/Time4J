@@ -99,4 +99,11 @@ final class TimeIntervalFactory
 
     }
 
+    @Override
+    public boolean isCalendrical() {
+
+        return false;
+
+    }
+
 }

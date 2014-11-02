@@ -25,7 +25,7 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeLine;
-import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class TimeInterval
-    extends IsoInterval<PlainTime>
+    extends IsoInterval<PlainTime, TimeInterval>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -233,7 +233,7 @@ public final class TimeInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -245,7 +245,7 @@ public final class TimeInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -255,12 +255,12 @@ public final class TimeInterval
      */
     public static TimeInterval parse(
         String text,
-        ChronoFormatter<PlainTime> formatter
+        ChronoParser<PlainTime> parser
     ) throws ParseException {
 
         return IntervalParser.of(
              TimeIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
 
@@ -270,7 +270,7 @@ public final class TimeInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -282,7 +282,7 @@ public final class TimeInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -292,16 +292,16 @@ public final class TimeInterval
      */
     public static TimeInterval parse(
         CharSequence text,
-        ChronoFormatter<PlainTime> formatter,
+        ChronoParser<PlainTime> parser,
         BracketPolicy policy,
         ParseLog status
     ) {
 
         return IntervalParser.of(
              TimeIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              policy
-        ).parse(text, status, formatter.getDefaultAttributes());
+        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
 
     }
 
@@ -309,6 +309,13 @@ public final class TimeInterval
     protected TimeLine<PlainTime> getTimeLine() {
 
         return PlainTime.axis();
+
+    }
+
+    @Override
+    IntervalFactory<PlainTime, TimeInterval> getFactory() {
+
+        return TimeIntervalFactory.INSTANCE;
 
     }
 

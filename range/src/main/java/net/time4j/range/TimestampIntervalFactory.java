@@ -120,7 +120,7 @@ final class TimestampIntervalFactory
 
     @Override
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
-    	
+
         if (rawData.contains(PlainDate.DAY_OF_MONTH)) {
             return CSET;
     	} else if (rawData.contains(PlainDate.DAY_OF_YEAR)) {
@@ -130,6 +130,13 @@ final class TimestampIntervalFactory
         }
 
         return Collections.emptySet();
+
+    }
+
+    @Override
+    public boolean isCalendrical() {
+
+        return false;
 
     }
 

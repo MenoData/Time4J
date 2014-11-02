@@ -23,10 +23,10 @@ package net.time4j.range;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
@@ -51,26 +51,25 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 final class IntervalParser
-    <T extends ChronoEntity<T> & Temporal<? super T>,
-        I extends ChronoInterval<T>>
-	implements ChronoParser<I> {
+    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+    implements ChronoParser<I> {
 
     //~ Instanzvariablen --------------------------------------------------
 
 	private final IntervalFactory<T, I> factory;
-	private final ChronoFormatter<T> startFormat;
-	private final ChronoFormatter<T> endFormat;
+	private final ChronoParser<T> startFormat;
+	private final ChronoParser<T> endFormat;
 	private final BracketPolicy policy;
-    private final boolean isoMode;
+    private final ChronoMerger<T> merger;
 
     //~ Konstruktoren -----------------------------------------------------
 
 	private IntervalParser(
 		IntervalFactory<T, I> factory,
-		ChronoFormatter<T> startFormat,
-		ChronoFormatter<T> endFormat,
+		ChronoParser<T> startFormat,
+		ChronoParser<T> endFormat,
 		BracketPolicy policy,
-        boolean isoMode
+        ChronoMerger<T> merger // optional
 	) {
 		super();
 
@@ -82,41 +81,40 @@ final class IntervalParser
 		this.startFormat = startFormat;
 		this.endFormat = endFormat;
 		this.policy = policy;
-        this.isoMode = isoMode;
+        this.merger = merger;
 
 	}
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Interne Methode, die von ISO-Intervallen aufgerufen wird. </p>
+     * <p>Fabrikmethode f&uuml;r allgemeine Format-Objekte. </p>
      *
      * @param   <T> generic temporal type
      * @param   <I> generic interval type
      * @param   factory         interval factory
-     * @param   format          boundary formatter
+     * @param   parser          boundary parser
      * @param   policy          bracket policy
      * @return  new interval parser
      * @since   2.0
      */
-	static
-    <T extends ChronoEntity<T> & Temporal<? super T>, I extends ChronoInterval<T>>
+	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     IntervalParser<T, I> of(
 		IntervalFactory<T, I> factory,
-		ChronoFormatter<T> format,
-		BracketPolicy	   policy
+		ChronoParser<T> parser,
+		BracketPolicy policy
 	) {
 
-		if (format == null) {
-			throw new NullPointerException("Missing boundary format.");
+		if (parser == null) {
+			throw new NullPointerException("Missing boundary parser.");
         }
 
-		return new IntervalParser<T, I>(factory, format, format, policy, false);
+		return new IntervalParser<T, I>(factory, parser, parser, policy, null);
 
 	}
 
     /**
-     * <p>Interne Methode, die von ISO-Intervallen aufgerufen wird. </p>
+     * <p>Fabrikmethode im ISO-Modus. </p>
      *
      * @param   <T> generic temporal type
      * @param   <I> generic interval type
@@ -127,13 +125,13 @@ final class IntervalParser
      * @return  new interval parser
      * @since   2.0
      */
-	static
-    <T extends ChronoEntity<T> & Temporal<? super T>, I extends ChronoInterval<T>>
+	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     IntervalParser<T, I> of(
 		IntervalFactory<T, I> factory,
-		ChronoFormatter<T> startFormat,
-		ChronoFormatter<T> endFormat,
-		BracketPolicy	   policy
+		ChronoParser<T> startFormat,
+		ChronoParser<T> endFormat,
+		BracketPolicy policy,
+        ChronoMerger<T> merger
 	) {
 
 		return new IntervalParser<T, I>(
@@ -141,7 +139,7 @@ final class IntervalParser
             startFormat,
             endFormat,
             policy,
-            true);
+            merger);
 
 	}
 
@@ -156,7 +154,11 @@ final class IntervalParser
 	I parse(String text) throws ParseException {
 
         ParseLog plog = new ParseLog();
-        I ret = this.parse(text, plog, this.startFormat.getDefaultAttributes());
+        I ret =
+            this.parse(
+                text,
+                plog,
+                IsoInterval.extractDefaultAttributes(this.startFormat));
 
         if (ret == null) {
             throw new ParseException(
@@ -196,10 +198,8 @@ final class IntervalParser
             attrs = new Wrapper(attributes);
         }
 
-        Class<T> type = this.startFormat.getChronology().getChronoType();
 		IntervalEdge left = CLOSED;
-		IntervalEdge right =
-			Calendrical.class.isAssignableFrom(type) ? CLOSED : OPEN;
+		IntervalEdge right = this.factory.isCalendrical() ? CLOSED : OPEN;
 		T t1 = null;
 		T t2 = null;
         Boundary<T> lower = null;
@@ -333,23 +333,22 @@ final class IntervalParser
 			if (t2 == null || upperLog.isError()) {
                 if (
                     (t1 != null)
-                    && this.isoMode
+                    && (this.merger != null)
                     && !attrs.get(Attributes.LENIENCY, SMART).isStrict()
                 ) {
                     IntervalFactory<T, I> iif = this.factory;
-                    ChronoFormatter<T> fmt = this.endFormat;
+                    ChronoParser<T> parser = this.endFormat;
                     ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
                     if (lowerRaw.hasTimezone()) {
                         attrs = new Wrapper(attrs, lowerRaw.getTimezone());
                     }
-                    ChronoDisplay cv =
-                        this.startFormat.getChronology().preformat(t1, attrs);
+                    ChronoDisplay cv = this.merger.preformat(t1, attrs);
                     for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
-                        fmt = setDefault(fmt, cv, key);
+                        parser = setDefault(parser, cv, key);
                     }
                     upperLog.reset();
                     upperLog.setPosition(pos);
-                    t2 = fmt.parse(text, upperLog, attrs);
+                    t2 = parser.parse(text, upperLog, attrs);
                 }
             }
 			if (t2 == null || upperLog.isError()) {
@@ -468,14 +467,16 @@ final class IntervalParser
 
     }
 
-    // wildcard capture
-    private static <T extends ChronoEntity<T>, V> ChronoFormatter<T> setDefault(
-        ChronoFormatter<T> fmt,
+    @SuppressWarnings("unchecked")
+    private static <T, V> ChronoParser<T> setDefault(
+        ChronoParser<T> parser,
         ChronoDisplay cv,
         ChronoElement<V> key
     ) {
 
-        return fmt.withDefault(key, cv.get(key));
+        ChronoFormatter<?> fmt = ChronoFormatter.class.cast(parser);
+        fmt = fmt.withDefault(key, cv.get(key));
+        return (ChronoParser<T>) fmt;
 
     }
 

@@ -32,6 +32,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoParser;
 import net.time4j.format.ParseLog;
 import net.time4j.format.SignPolicy;
 
@@ -65,7 +66,7 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  * @since   2.0
  */
 public final class DateInterval
-    extends IsoInterval<PlainDate>
+    extends IsoInterval<PlainDate, DateInterval>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -397,7 +398,7 @@ public final class DateInterval
      * </pre>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
@@ -418,7 +419,7 @@ public final class DateInterval
      * </pre>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
@@ -428,12 +429,12 @@ public final class DateInterval
      */
     public static DateInterval parse(
         String text,
-        ChronoFormatter<PlainDate> formatter
+        ChronoParser<PlainDate> parser
     ) throws ParseException {
 
         return IntervalParser.of(
              DateIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
 
@@ -443,7 +444,7 @@ public final class DateInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -456,7 +457,7 @@ public final class DateInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -467,16 +468,16 @@ public final class DateInterval
      */
     public static DateInterval parse(
         CharSequence text,
-        ChronoFormatter<PlainDate> formatter,
+        ChronoParser<PlainDate> parser,
         BracketPolicy policy,
         ParseLog status
     ) {
 
         return IntervalParser.of(
              DateIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              policy
-        ).parse(text, status, formatter.getDefaultAttributes());
+        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
 
     }
 
@@ -646,7 +647,8 @@ public final class DateInterval
              DateIntervalFactory.INSTANCE,
              startFormat,
              endFormat,
-             BracketPolicy.SHOW_NEVER
+             BracketPolicy.SHOW_NEVER,
+             PlainDate.axis()
         ).parse(text);
 
     }
@@ -655,6 +657,13 @@ public final class DateInterval
     protected TimeLine<PlainDate> getTimeLine() {
 
         return PlainDate.axis();
+
+    }
+
+    @Override
+    IntervalFactory<PlainDate, DateInterval> getFactory() {
+
+        return DateIntervalFactory.INSTANCE;
 
     }
 

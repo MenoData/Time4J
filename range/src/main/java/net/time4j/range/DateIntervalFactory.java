@@ -128,4 +128,11 @@ final class DateIntervalFactory
 
     }
 
+    @Override
+    public boolean isCalendrical() {
+
+        return true;
+
+    }
+
 }

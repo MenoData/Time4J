@@ -22,6 +22,8 @@
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.format.ChronoPrinter;
 
 import java.io.IOException;
@@ -37,10 +39,11 @@ enum NoopPrinter
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public Object print(
+    public <R> R print(
         Integer formattable,
         Appendable buffer,
-        AttributeQuery attributes
+        AttributeQuery attributes,
+        ChronoFunction<ChronoDisplay, R> query
     ) throws IOException {
 
         return null;

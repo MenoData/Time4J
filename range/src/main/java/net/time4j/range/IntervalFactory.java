@@ -37,7 +37,7 @@ import java.util.Set;
  * @see     2.0
  */
 interface IntervalFactory
-    <T extends Temporal<? super T>, I extends ChronoInterval<T>> {
+    <T extends Temporal<? super T>, I extends IsoInterval<T, I>> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -116,5 +116,13 @@ interface IntervalFactory
      *          of the end boundary
      */
     Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData);
+
+    /**
+     * <p>Liegt ein kalendarischer Typ vor? </p>
+     *
+     * @return  {@code true} if the underlying chronological type is
+     *          assignable to {@code Calendrical} else {@code false}
+     */
+    boolean isCalendrical();
 
 }

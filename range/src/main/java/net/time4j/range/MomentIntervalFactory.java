@@ -108,6 +108,13 @@ final class MomentIntervalFactory
 
     }
 
+    @Override
+    public boolean isCalendrical() {
+
+        return false;
+
+    }
+
     // übernommen von Moment.Merger
     private static Timezone getTimezone(
         ChronoEntity<?> entity,

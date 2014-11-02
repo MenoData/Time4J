@@ -32,6 +32,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoParser;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.ParseLog;
 import net.time4j.format.SignPolicy;
@@ -72,7 +73,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @since   2.0
  */
 public final class MomentInterval
-    extends IsoInterval<Moment>
+    extends IsoInterval<Moment, MomentInterval>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -401,7 +402,7 @@ public final class MomentInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -413,7 +414,7 @@ public final class MomentInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @return  parsed interval
      * @throws  IndexOutOfBoundsException if the start position is at end of
      *          text or even behind
@@ -423,12 +424,12 @@ public final class MomentInterval
      */
     public static MomentInterval parse(
         String text,
-        ChronoFormatter<Moment> formatter
+        ChronoParser<Moment> parser
     ) throws ParseException {
 
         return IntervalParser.of(
              MomentIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
 
@@ -438,7 +439,7 @@ public final class MomentInterval
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -450,7 +451,7 @@ public final class MomentInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end boundaries
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -460,16 +461,16 @@ public final class MomentInterval
      */
     public static MomentInterval parse(
         CharSequence text,
-        ChronoFormatter<Moment> formatter,
+        ChronoParser<Moment> parser,
         BracketPolicy policy,
         ParseLog status
     ) {
 
         return IntervalParser.of(
              MomentIntervalFactory.INSTANCE,
-             formatter,
+             parser,
              policy
-        ).parse(text, status, formatter.getDefaultAttributes());
+        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
 
     }
 
@@ -666,7 +667,8 @@ public final class MomentInterval
              MomentIntervalFactory.INSTANCE,
              startFormat,
              endFormat,
-             BracketPolicy.SHOW_NEVER
+             BracketPolicy.SHOW_NEVER,
+             Moment.axis()
         ).parse(text);
 
     }
@@ -675,6 +677,13 @@ public final class MomentInterval
     protected TimeLine<Moment> getTimeLine() {
 
         return Moment.axis();
+
+    }
+
+    @Override
+    IntervalFactory<Moment, MomentInterval> getFactory() {
+
+        return MomentIntervalFactory.INSTANCE;
 
     }
 
