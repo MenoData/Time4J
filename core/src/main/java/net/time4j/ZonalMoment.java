@@ -24,7 +24,11 @@ package net.time4j;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoFunction;
+import net.time4j.format.Attributes;
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ChronoParser;
+import net.time4j.format.ChronoPrinter;
 import net.time4j.format.ParseLog;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
@@ -67,6 +71,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
+ * @see     TemporalType#XML_DATE_TIME_OFFSET
  */
 /*[deutsch]
  * <p>Kombination aus UTC-Moment und Zeitzone. </p>
@@ -97,9 +102,20 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
+ * @see     TemporalType#XML_DATE_TIME_OFFSET
  */
 public final class ZonalMoment
     implements ChronoDisplay, UniversalTime {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
+        new ChronoFunction<ChronoDisplay, Void>() {
+            @Override
+            public Void apply(ChronoDisplay context) {
+                return null;
+            }
+        };
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -186,7 +202,10 @@ public final class ZonalMoment
     @Override
     public boolean contains(ChronoElement<?> element) {
 
-        return this.timestamp.contains(element);
+        return (
+            this.timestamp.contains(element)
+            || this.moment.contains(element)
+        );
 
     }
 
@@ -200,7 +219,11 @@ public final class ZonalMoment
             return element.getType().cast(Integer.valueOf(60));
         }
 
-        return this.timestamp.get(element);
+        if (this.timestamp.contains(element)) {
+            return this.timestamp.get(element);
+        } else {
+            return this.moment.get(element);
+        }
 
     }
 
@@ -208,7 +231,11 @@ public final class ZonalMoment
     @Override
     public <V> V getMinimum(ChronoElement<V> element) {
 
-        return this.timestamp.getMinimum(element);
+        if (this.timestamp.contains(element)) {
+            return this.timestamp.getMinimum(element);
+        } else {
+            return this.moment.getMinimum(element);
+        }
 
     }
 
@@ -216,7 +243,13 @@ public final class ZonalMoment
     @Override
     public <V> V getMaximum(ChronoElement<V> element) {
 
-        V max = this.timestamp.getMaximum(element);
+        V max;
+
+        if (this.timestamp.contains(element)) {
+            max = this.timestamp.getMaximum(element);
+        } else {
+            max = this.moment.getMaximum(element);
+        }
 
         if (
             (element == SECOND_OF_MINUTE)
@@ -264,18 +297,18 @@ public final class ZonalMoment
 
     /**
      * <p>Yields the timezone offset. </p>
-     * 
+     *
      * @return	offset relative to UTC+00:00
      * @since	2.0
      */
     /*[deutsch]
      * <p>Liefert den Zeitzonen-Offset. </p>
-     * 
+     *
      * @return	offset relative to UTC+00:00
      * @since	2.0
      */
     public ZonalOffset getOffset() {
-	
+
         return this.zone.getOffset(this.moment);
 
     }
@@ -350,24 +383,24 @@ public final class ZonalMoment
     /**
      * <p>Creates a formatted output of this instance. </p>
      *
-     * @param   formatter   helps to format this instance
+     * @param   printer     helps to format this instance
      * @return  formatted string
      * @since   2.0
      */
     /*[deutsch]
      * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * @param   formatter   helps to format this instance
+     * @param   printer     helps to format this instance
      * @return  formatted string
      * @since   2.0
      */
-    public String print(ChronoFormatter<Moment> formatter) {
+    public String print(ChronoPrinter<Moment> printer) {
 
-        AttributeQuery aq = new ZOM(this, formatter.getDefaultAttributes());
+        AttributeQuery aq = new ZOM(this, getAttributes(printer));
         StringBuilder sb = new StringBuilder();
 
         try {
-            formatter.print(this.moment, sb, aq, false);
+            printer.print(this.moment, sb, aq, NO_RESULT);
         } catch (IOException ex) {
             throw new AssertionError(ex); // never happen
         }
@@ -380,7 +413,7 @@ public final class ZonalMoment
      * <p>Parses given text to a {@code ZonalMoment}. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   helps to parse given text
+     * @param   parser      helps to parse given text
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
@@ -390,7 +423,7 @@ public final class ZonalMoment
      * <p>Interpretiert den angegebenen Text als {@code ZonalMoment}. </p>
      *
      * @param   text        text to be parsed
-     * @param   formatter   helps to parse given text
+     * @param   parser      helps to parse given text
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
@@ -398,11 +431,12 @@ public final class ZonalMoment
      */
     public static ZonalMoment parse(
         String text,
-        ChronoFormatter<Moment> formatter
+        ChronoParser<Moment> parser
     ) throws ParseException {
 
         ParseLog plog = new ParseLog();
-        Moment moment = formatter.parse(text, plog);
+        AttributeQuery aq = getAttributes(parser);
+        Moment moment = parser.parse(text, plog, aq);
         Timezone tz;
 
         if (moment == null) {
@@ -411,15 +445,9 @@ public final class ZonalMoment
                 plog.getErrorIndex()
             );
         } else if (plog.getRawValues().hasTimezone()) {
-            tz =
-                toTimezone(
-                    plog.getRawValues().getTimezone(),
-                    text);
-        } else if (formatter.getDefaultAttributes().contains(TIMEZONE_ID)) {
-            tz =
-                toTimezone(
-                    formatter.getDefaultAttributes().get(TIMEZONE_ID),
-                    text);
+            tz = toTimezone(plog.getRawValues().getTimezone(), text);
+        } else if (aq.contains(TIMEZONE_ID)) {
+            tz = toTimezone(aq.get(TIMEZONE_ID), text);
         } else {
             throw new ParseException("Missing timezone: " + text, 0);
         }
@@ -466,6 +494,16 @@ public final class ZonalMoment
     public String toString() {
 
         return this.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+
+    }
+
+    private static AttributeQuery getAttributes(Object obj) {
+
+        if (obj instanceof ChronoFormatter) {
+            return ChronoFormatter.class.cast(obj).getDefaultAttributes();
+        } else {
+            return Attributes.empty();
+        }
 
     }
 
