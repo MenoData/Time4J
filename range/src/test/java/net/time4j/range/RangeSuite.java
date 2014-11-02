@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BasicTimestampRangeTest.class,
         BoundaryTest.class,
         DateIntervalFormatTest.class,
+        MomentIntervalFormatTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class,
         TimestampIntervalFormatTest.class

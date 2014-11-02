@@ -55,7 +55,7 @@ public class DateIntervalFormatTest {
     public void printSHOW_ALWAYS() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
-        ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
+        DateInterval interval = DateInterval.between(start, end);
         ChronoFormatter<PlainDate> formatter =
             Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
@@ -66,7 +66,7 @@ public class DateIntervalFormatTest {
     @Test
     public void printInfinitePastSHOW_ALWAYS() {
         PlainDate end = PlainDate.of(2014, 5, 14);
-        ChronoInterval<PlainDate> interval = DateInterval.until(end);
+        DateInterval interval = DateInterval.until(end);
         ChronoFormatter<PlainDate> formatter =
             Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
@@ -77,7 +77,7 @@ public class DateIntervalFormatTest {
     @Test
     public void printInfiniteFutureSHOW_ALWAYS() {
         PlainDate start = PlainDate.of(2014, 5, 14);
-        ChronoInterval<PlainDate> interval = DateInterval.since(start);
+        DateInterval interval = DateInterval.since(start);
         ChronoFormatter<PlainDate> formatter =
             Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
@@ -240,7 +240,8 @@ public class DateIntervalFormatTest {
                     .endSection()
                     .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                     .build(),
-                BracketPolicy.SHOW_ALWAYS
+                BracketPolicy.SHOW_ALWAYS,
+                PlainDate.axis()
             ).parse("[20140227/0514]", plog, formatter.getDefaultAttributes()),
             is(interval));
     }
