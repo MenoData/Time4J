@@ -263,7 +263,15 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      */
     public T plus(TimeSpan<? extends U> timeSpan) {
 
-        return timeSpan.addTo(this.getContext());
+        try {
+            return timeSpan.addTo(this.getContext());
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex =
+                new ArithmeticException(
+                    "Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
 
     }
 
@@ -297,7 +305,15 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      */
     public T minus(TimeSpan<? extends U> timeSpan) {
 
-        return timeSpan.subtractFrom(this.getContext());
+        try {
+            return timeSpan.subtractFrom(this.getContext());
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex =
+                new ArithmeticException(
+                    "Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
 
     }
 
@@ -364,7 +380,15 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
             return this.getContext();
         }
 
-        return this.getRule(unit).addTo(this.getContext(), amount);
+        try {
+            return this.getRule(unit).addTo(this.getContext(), amount);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex =
+                new ArithmeticException(
+                    "Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
 
     }
 
@@ -600,7 +624,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * <p>The textual description often follows the conventions of ISO-8601.
      * Usually the description starts with the chronological informations
      * which are coarse-grained and ends with those ones which are
-     * faine-grained (for example the ISO-notation YYYY-MM-DD). </p>
+     * fine-grained (for example the ISO-notation YYYY-MM-DD). </p>
      */
     /*[deutsch]
      * <p>Liefert eine vollst&auml;ndige Beschreibung des Zustands dieses

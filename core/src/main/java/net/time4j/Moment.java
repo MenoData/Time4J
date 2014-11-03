@@ -265,7 +265,7 @@ public final class Moment
             IntElement.FRACTION,
             TimeUnit.NANOSECONDS);
 
-        ENGINE = builder.withTimeLine(new SITimeLine()).build();
+        ENGINE = builder.withTimeLine(new GlobalTimeLine()).build();
 
         FORMATTER_RFC_1123 =
             ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
@@ -866,8 +866,10 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if this moment or the result
-     *          is before 1972
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
+     * @throws  IllegalArgumentException if new moment is out of range limits
      */
     /*[deutsch]
      * <p>Addiert einen Betrag in der angegegebenen SI-Zeiteinheit auf die
@@ -876,59 +878,68 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if this moment or the result
-     *          is before 1972
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      */
     public Moment plus(
         long amount,
         SI unit
     ) {
 
+        Moment.check1972(this);
+
         if (amount == 0) {
             return this;
-        } else if (amount > 0) {
-            Moment.check1972(this);
         }
 
         Moment result;
 
-        switch (unit) {
-            case SECONDS:
-                if (LeapSeconds.getInstance().isEnabled()) {
-                    result = new Moment(
-                        MathUtils.safeAdd(this.getEpochTime(), amount),
-                        this.getNanosecond(),
-                        UTC);
-                } else {
-                    result = Moment.of(
-                        MathUtils.safeAdd(this.posixTime, amount),
-                        this.getNanosecond(),
-                        POSIX
-                    );
-                }
-                break;
-            case NANOSECONDS:
-                long sum =
-                    MathUtils.safeAdd(this.getNanosecond(), amount);
-                int nano = MathUtils.floorModulo(sum, MRD);
-                long second = MathUtils.floorDivide(sum, MRD);
+        try {
+            switch (unit) {
+                case SECONDS:
+                    if (LeapSeconds.getInstance().isEnabled()) {
+                        result = new Moment(
+                            MathUtils.safeAdd(this.getEpochTime(), amount),
+                            this.getNanosecond(),
+                            UTC);
+                    } else {
+                        result = Moment.of(
+                            MathUtils.safeAdd(this.posixTime, amount),
+                            this.getNanosecond(),
+                            POSIX
+                        );
+                    }
+                    break;
+                case NANOSECONDS:
+                    long sum =
+                        MathUtils.safeAdd(this.getNanosecond(), amount);
+                    int nano = MathUtils.floorModulo(sum, MRD);
+                    long second = MathUtils.floorDivide(sum, MRD);
 
-                if (LeapSeconds.getInstance().isEnabled()) {
-                    result = new Moment(
-                        MathUtils.safeAdd(this.getEpochTime(), second),
-                        nano,
-                        UTC
-                    );
-                } else {
-                    result = Moment.of(
-                        MathUtils.safeAdd(this.posixTime, second),
-                        nano,
-                        POSIX
-                    );
-                }
-                break;
-            default:
-                throw new UnsupportedOperationException();
+                    if (LeapSeconds.getInstance().isEnabled()) {
+                        result = new Moment(
+                            MathUtils.safeAdd(this.getEpochTime(), second),
+                            nano,
+                            UTC
+                        );
+                    } else {
+                        result = Moment.of(
+                            MathUtils.safeAdd(this.posixTime, second),
+                            nano,
+                            POSIX
+                        );
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex =
+                new ArithmeticException(
+                    "Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
         }
 
         if (amount < 0) {
@@ -946,7 +957,9 @@ public final class Moment
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if this moment is before 1972
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      */
     /*[deutsch]
      * <p>Subtrahiert einen Betrag in der angegegebenen Zeiteinheit von der
@@ -955,7 +968,9 @@ public final class Moment
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException wenn der Zeitpunkt vor 1972 ist
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      */
     public Moment minus(
         long amount,
@@ -972,6 +987,9 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of addition
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      * @since   2.0
      */
     /*[deutsch]
@@ -980,6 +998,9 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of addition
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      * @since   2.0
      */
     public Moment plus(MachineTime<SI> duration) {
@@ -995,6 +1016,9 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of subtraction
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      * @since   2.0
      */
     /*[deutsch]
@@ -1003,6 +1027,9 @@ public final class Moment
      *
      * @param   duration    machine time in SI-seconds
      * @return  result of subtraction
+     * @throws  UnsupportedOperationException if either this moment
+     *          or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
      * @since   2.0
      */
     public Moment minus(MachineTime<SI> duration) {
@@ -2644,7 +2671,7 @@ public final class Moment
 
     }
 
-    private static class SITimeLine
+    private static class GlobalTimeLine
         implements TimeLine<Moment> {
 
         //~ Methoden ------------------------------------------------------
@@ -2652,14 +2679,39 @@ public final class Moment
         @Override
         public Moment stepForward(Moment timepoint) {
 
-            return timepoint.plus(1, SI.NANOSECONDS);
+            try {
+                if (useSI(timepoint)) {
+                    return timepoint.plus(1, SI.NANOSECONDS);
+                } else {
+                    return timepoint.plus(1, TimeUnit.NANOSECONDS);
+                }
+            } catch (ArithmeticException iae) {
+                return null; // out of range
+            }
 
         }
 
         @Override
         public Moment stepBackwards(Moment timepoint) {
 
-            return timepoint.minus(1, SI.NANOSECONDS);
+            try {
+                if (useSI(timepoint)) {
+                    return timepoint.minus(1, SI.NANOSECONDS);
+                } else {
+                    return timepoint.minus(1, TimeUnit.NANOSECONDS);
+                }
+            } catch (ArithmeticException iae) {
+                return null; // out of range
+            }
+
+        }
+
+        private static boolean useSI(Moment timepoint) {
+
+            return (
+                (timepoint.posixTime > POSIX_UTC_DELTA)
+                && LeapSeconds.getInstance().isEnabled()
+            );
 
         }
 

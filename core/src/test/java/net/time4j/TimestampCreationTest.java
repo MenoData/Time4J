@@ -32,7 +32,7 @@ public class TimestampCreationTest {
         assertThat(ts.getWallTime(), is(PlainTime.midnightAtStartOfDay()));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void ofDateTimeRangeOverflow() {
         PlainDate date = PlainDate.of(999999999, 12, 31);
         PlainTime time = PlainTime.midnightAtEndOfDay();

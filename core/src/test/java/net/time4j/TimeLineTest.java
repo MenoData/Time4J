@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -27,14 +28,18 @@ public class TimeLineTest {
             is(PlainDate.of(2012, Month.FEBRUARY, 29)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void forwardDateMax() {
-        PlainDate.axis().stepForward(PlainDate.MAX);
+        assertThat(
+            PlainDate.axis().stepForward(PlainDate.MAX),
+            nullValue());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void backwardsDateMin() {
-        PlainDate.axis().stepBackwards(PlainDate.MIN);
+        assertThat(
+            PlainDate.axis().stepBackwards(PlainDate.MIN),
+            nullValue());
     }
 
     @Test
@@ -53,14 +58,18 @@ public class TimeLineTest {
             is(PlainTime.of(23, 44, 59, 999999999)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void forwardTimeMax() {
-        PlainTime.axis().stepForward(PlainTime.midnightAtEndOfDay());
+        assertThat(
+            PlainTime.axis().stepForward(PlainTime.midnightAtEndOfDay()),
+            nullValue());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void backwardsTimeMin() {
-        PlainTime.axis().stepBackwards(PlainTime.midnightAtStartOfDay());
+        assertThat(
+            PlainTime.axis().stepBackwards(PlainTime.midnightAtStartOfDay()),
+            nullValue());
     }
 
     @Test
@@ -81,6 +90,22 @@ public class TimeLineTest {
             is(
                 PlainTimestamp.of(2014, 2, 28, 23, 59, 59)
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
+    }
+
+    @Test
+    public void forwardTimestampMax() {
+        assertThat(
+            PlainTimestamp.axis().stepForward(
+                PlainTimestamp.axis().getMaximum()),
+            nullValue());
+    }
+
+    @Test
+    public void backwardsTimestampMin() {
+        assertThat(
+            PlainTimestamp.axis().stepBackwards(
+                PlainTimestamp.axis().getMinimum()),
+            nullValue());
     }
 
     @Test
@@ -107,6 +132,20 @@ public class TimeLineTest {
                     .with(PlainTime.NANO_OF_SECOND, 999999999)
                     .atUTC()
                     .plus(1, SI.SECONDS)));
+    }
+
+    @Test
+    public void forwardMomentMax() {
+        assertThat(
+            Moment.axis().stepForward(Moment.axis().getMaximum()),
+            nullValue());
+    }
+
+    @Test
+    public void backwardsMomentMin() {
+        assertThat(
+            Moment.axis().stepBackwards(Moment.axis().getMinimum()),
+            nullValue());
     }
 
 }

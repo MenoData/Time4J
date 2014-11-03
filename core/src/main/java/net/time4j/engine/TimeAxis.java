@@ -111,7 +111,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                     }
                 });
             U step = registeredUnits.get(0);
-            this.timeline = new DefaultTimeLine<U, T>(step);
+            this.timeline = new DefaultTimeLine<U, T>(step, min, max);
         } else {
             this.timeline = timeline;
         }
@@ -1193,13 +1193,21 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         //~ Instanzvariablen ----------------------------------------------
 
         private final U step;
+        private final T min;
+        private final T max;
 
         //~ Konstruktoren -------------------------------------------------
 
-        DefaultTimeLine(U step) {
+        DefaultTimeLine(
+            U step,
+            T min,
+            T max
+        ) {
             super();
 
             this.step = step;
+            this.min = min;
+            this.max = max;
 
         }
 
@@ -1208,12 +1216,20 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         @Override
         public T stepForward(T timepoint) {
 
+            if (timepoint.compareTo(this.max) >= 0) {
+                return null;
+            }
+
             return timepoint.plus(1, this.step);
 
         }
 
         @Override
         public T stepBackwards(T timepoint) {
+
+            if (timepoint.compareTo(this.min) <= 0) {
+                return null;
+            }
 
             return timepoint.minus(1, this.step);
 

@@ -45,7 +45,7 @@ public class YearMonthArithmeticTest {
             is(PlainDate.of(2016, 2, 29)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void maxPlusYear() {
         PlainDate.of(GregorianMath.MAX_YEAR, 1, 1).plus(1, YEARS);
     }
@@ -76,7 +76,7 @@ public class YearMonthArithmeticTest {
             is(PlainDate.of(2008, 2, 29)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void minMinusYear() {
         PlainDate.of(GregorianMath.MIN_YEAR, 12, 31).minus(1, YEARS);
     }
@@ -125,7 +125,7 @@ public class YearMonthArithmeticTest {
             is(PlainDate.of(2011, 2, 28)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void maxPlusMonth() {
         PlainDate.of(GregorianMath.MAX_YEAR, 12, 1).plus(1, MONTHS);
     }
@@ -171,7 +171,7 @@ public class YearMonthArithmeticTest {
             is(PlainDate.of(2013, 2, 28)));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void minMinusMonth() {
         PlainDate.of(GregorianMath.MIN_YEAR, 1, 31).minus(1, MONTHS);
     }

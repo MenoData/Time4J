@@ -9,6 +9,7 @@ import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.MILLIS;
 import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.NANOS;
 import static net.time4j.PlainTime.MICRO_OF_SECOND;
 import static net.time4j.PlainTime.MILLI_OF_SECOND;
 import static org.hamcrest.CoreMatchers.is;
@@ -82,6 +83,25 @@ public class TimestampArithmeticTest {
             is(
                 PlainDate.of(2012, 1, 31)
                 .at(PlainTime.of(22, 45, 0, 1000000))));
+    }
+
+    @Test
+    public void plusNanos() {
+        assertThat(
+            PlainTimestamp.of(2012, 1, 31, 12, 45, 30).plus(123456789, NANOS),
+            is(
+                PlainDate.of(2012, 1, 31)
+                .at(PlainTime.of(12, 45, 30, 123456789))));
+    }
+
+    @Test(expected=ArithmeticException.class)
+    public void plusNanosOnMax1() {
+        PlainTimestamp.axis().getMaximum().plus(1, NANOS);
+    }
+
+    @Test(expected=ArithmeticException.class)
+    public void plusNanosOnMax2() {
+        PlainTimestamp.axis().getMaximum().plus(Duration.of(1, NANOS));
     }
 
     @Test
