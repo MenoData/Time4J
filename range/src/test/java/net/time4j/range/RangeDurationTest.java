@@ -94,9 +94,7 @@ public class RangeDurationTest {
             TimeInterval.between(
                 PlainTime.midnightAtStartOfDay(),
                 PlainTime.midnightAtEndOfDay()
-            ).withEnd(
-                Boundary.of(IntervalEdge.CLOSED, PlainTime.midnightAtEndOfDay())
-            );
+            ).withClosedEnd();
         assertThat(
             interval.getDuration(),
             is(Duration.of(24, ClockUnit.HOURS).plus(1, ClockUnit.NANOS)));
@@ -108,9 +106,7 @@ public class RangeDurationTest {
             TimeInterval.between(
                 PlainTime.midnightAtEndOfDay(),
                 PlainTime.midnightAtEndOfDay()
-            ).withEnd(
-                Boundary.of(IntervalEdge.CLOSED, PlainTime.midnightAtEndOfDay())
-            );
+            ).withClosedEnd();
         assertThat(
             interval.getDuration(),
             is(Duration.of(1, ClockUnit.NANOS)));

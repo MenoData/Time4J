@@ -31,12 +31,15 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPrinter;
 
 import java.io.IOException;
-import java.util.Comparator;
 
 
 /**
  * <p>Represents an abstract temporal interval on a timeline for
  * ISO-8601-types. </p>
+ *
+ * <p>Note that the start of an interval is always included. The end
+ * is included for date intervals by default and excluded for other
+ * interval types. This default setting can be overwritten however. </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
@@ -45,6 +48,10 @@ import java.util.Comparator;
 /**
  * <p>Repr&auml;sentiert ein abstraktes Zeitintervall auf einem
  * Zeitstrahl f&uuml;r ISO-8601-Typen. </p>
+ *
+ * <p>Hinweis: Der Start eines Intervalls ist immer inklusive. Das Ende
+ * ist f&uuml;r Datumsintervalle inklusive und sonst exklusive per Vorgabe.
+ * Diese Standardeinstellung kann jedoch &uuml;berschrieben werden. </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
@@ -127,7 +134,7 @@ public abstract class IsoInterval
      * <p>Yields a copy of this interval with given start time. </p>
      *
      * @param   temporal    new start timepoint
-     * @return  possibly changed copy of this interval
+     * @return  changed copy of this interval
      * @throws  IllegalArgumentException if new start is after end
      * @since   2.0
      */
@@ -136,7 +143,7 @@ public abstract class IsoInterval
      * Startzeit. </p>
      *
      * @param   temporal    new start timepoint
-     * @return  possibly changed copy of this interval
+     * @return  changed copy of this interval
      * @throws  IllegalArgumentException if new start is after end
      * @since   2.0
      */
@@ -152,7 +159,7 @@ public abstract class IsoInterval
      * <p>Yields a copy of this interval with given end time. </p>
      *
      * @param   temporal    new end timepoint
-     * @return  possibly changed copy of this interval
+     * @return  changed copy of this interval
      * @throws  IllegalArgumentException if new end is before start
      * @since   2.0
      */
@@ -160,7 +167,7 @@ public abstract class IsoInterval
      * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen Endzeit. </p>
      *
      * @param   temporal    new end timepoint
-     * @return  possibly changed copy of this interval
+     * @return  changed copy of this interval
      * @throws  IllegalArgumentException if new end is before start
      * @since   2.0
      */
@@ -173,14 +180,16 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Removes the upper boundary from this interval. </p>
+     * <p>Excludes the upper boundary from this interval. </p>
      *
      * @return  changed copy of this interval excluding upper boundary
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Nimmt die obere Grenze von diesem Intervall aus. </p>
      *
      * @return  changed copy of this interval excluding upper boundary
+     * @since   2.0
      */
     public I withOpenEnd() {
 
@@ -201,12 +210,14 @@ public abstract class IsoInterval
      *
      * @return  changed copy of this interval including upper boundary
      * @throws  IllegalStateException if the end is infinite future
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Schlie&szlig;t die obere Grenze dieses Intervall ein. </p>
      *
      * @return  changed copy of this interval including upper boundary
      * @throws  IllegalStateException if the end is infinite future
+     * @since   2.0
      */
     public I withClosedEnd() {
 
@@ -216,7 +227,7 @@ public abstract class IsoInterval
             throw new IllegalStateException(
                 "Infinite future cannot be included.");
         } else {
-            b = Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
+            b = Boundary.of(IntervalEdge.CLOSED, this.getEnd().getTemporal());
         }
 
         return this.getFactory().between(this.start, b);
@@ -272,6 +283,33 @@ public abstract class IsoInterval
         }
 
         return endCondition;
+
+    }
+
+    /**
+     * <p>Changes this interval to an empty interval with the same
+     * start anchor. </p>
+     *
+     * @return  new empty interval with same start
+     * @throws  IllegalStateException if the start is infinite
+     */
+    /*[deutsch]
+     * <p>Wandelt dieses Intervall in ein leeres Intervall mit dem gleichen
+     * Startanker um. </p>
+     *
+     * @return  new empty interval with same start
+     * @throws  IllegalStateException if the start is infinite
+     */
+    public I collapse() {
+
+        if (this.start.isInfinite()) {
+            throw new IllegalStateException(
+                "An interval with infinite past cannot be collapsed.");
+        }
+
+        Boundary<T> b =
+            Boundary.of(IntervalEdge.OPEN, this.start.getTemporal());
+        return this.getFactory().between(this.getStart(), b);
 
     }
 
@@ -446,33 +484,6 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Defines a comparator which sorts intervals first by start boundary
-     * and then by length. </p>
-     *
-     * @param   <T> temporal type
-     * @param   <I> interval type
-     * @return  Comparator
-     * @throws  ArithmeticException if applied on intervals which are not
-     *          half-open and have boundaries with extreme values
-     */
-    /*[deutsch]
-     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
-     * Start und dann nach der L&auml;nge sortiert. </p>
-     *
-     * @param   <T> temporal type
-     * @param   <I> interval type
-     * @return  Comparator
-     * @throws  ArithmeticException if applied on intervals which are not
-     *          half-open and have boundaries with extreme values
-     */
-    public static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
-    Comparator<I> comparator() {
-
-        return IntervalComparator.getInstance();
-
-    }
-
-    /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
@@ -484,6 +495,7 @@ public abstract class IsoInterval
      * <p>Liefert die zugeh&ouml;rige Fabrik. </p>
      *
      * @return  IntervalFactory
+     * @since   2.0
      */
     abstract IntervalFactory<T, I> getFactory();
 
@@ -501,8 +513,6 @@ public abstract class IsoInterval
         if (temporal == null) {
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
-        } if (this.start.isOpen()) {
-            return this.getTimeLine().stepForward(temporal);
         } else {
             return temporal;
         }
@@ -512,7 +522,8 @@ public abstract class IsoInterval
     /**
      * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
      *
-     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze
+     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
+     *          {@code null} wenn angewandt auf das geschlossene Maximum
      * @throws  UnsupportedOperationException wenn unendlich
      * @since   2.0
      */
@@ -523,7 +534,7 @@ public abstract class IsoInterval
         if (temporal == null) {
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
-        } if (this.end.isClosed()) {
+        } else if (this.end.isClosed()) {
             return this.getTimeLine().stepForward(temporal);
         } else {
             return temporal;
@@ -537,6 +548,7 @@ public abstract class IsoInterval
      *
      * @param   obj     object possibly containing format attributes
      * @return  attribute query
+     * @since   2.0
      */
     static AttributeQuery extractDefaultAttributes(Object obj) {
 
@@ -546,60 +558,6 @@ public abstract class IsoInterval
         } else {
             return Attributes.empty();
         }
-
-    }
-
-    /**
-     * <p>Yields a copy of this interval with given start boundary. </p>
-     *
-     * @param   boundary    new start interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new start is after end
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen unteren
-     * Grenze. </p>
-     *
-     * @param   boundary    new start interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new start is after end
-     * @since   2.0
-     */
-    I withStart(Boundary<T> boundary) {
-
-        return this.getFactory().between(boundary, this.end);
-
-    }
-
-    /**
-     * <p>Yields a copy of this interval with given end boundary. </p>
-     *
-     * @param   boundary    new end interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new end is before start
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert eine Kopie dieses Intervalls mit der angegebenen oberen
-     * Grenze. </p>
-     *
-     * @param   boundary    new end interval boundary
-     * @return  possibly changed copy of this interval
-     * @throws  IllegalArgumentException if given boundary is infinite and
-     *          the concrete interval does not support infinite boundaries
-     *          or if new end is before start
-     * @since   2.0
-     */
-    I withEnd(Boundary<T> boundary) {
-
-        return this.getFactory().between(this.start, boundary);
 
     }
 

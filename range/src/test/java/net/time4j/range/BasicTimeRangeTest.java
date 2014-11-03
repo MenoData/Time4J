@@ -37,26 +37,11 @@ public class BasicTimeRangeTest {
     }
 
     @Test
-    public void containsTemporalLeftEdgeOpen() {
-        PlainTime start = PlainTime.of(14, 45);
-        PlainTime end = PlainTime.of(21, 30);
-        assertThat(
-            TimeInterval
-                .between(start, end)
-                .withStart(Boundary.of(IntervalEdge.OPEN, start))
-                .contains(start),
-            is(false));
-    }
-
-    @Test
     public void containsTemporalRightEdgeClosed() {
         PlainTime start = PlainTime.of(14, 45);
         PlainTime end = PlainTime.of(21, 30);
         assertThat(
-            TimeInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .contains(end),
+            TimeInterval.between(start, end).withClosedEnd().contains(end),
             is(true));
     }
 
@@ -65,9 +50,7 @@ public class BasicTimeRangeTest {
         PlainTime start = PlainTime.of(14, 45);
         PlainTime end = PlainTime.of(21, 30);
         assertThat(
-            TimeInterval
-                .between(start, end)
-                .contains(end),
+            TimeInterval.between(start, end).contains(end),
             is(false));
     }
 
@@ -149,10 +132,7 @@ public class BasicTimeRangeTest {
     public void isEmptyAtomicClosed() {
         PlainTime tsp = PlainTime.of(14, 45);
         assertThat(
-            TimeInterval
-                .between(tsp, tsp)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, tsp))
-                .isEmpty(),
+            TimeInterval.between(tsp, tsp).withClosedEnd().isEmpty(),
             is(false));
     }
 
@@ -230,9 +210,7 @@ public class BasicTimeRangeTest {
             is(false));
         assertThat(
             TimeInterval.between(start1, end1)
-                .equals(
-                    TimeInterval.between(start2, end2)
-                    .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))),
+                .equals(TimeInterval.between(start2, end2).withClosedEnd()),
             is(false));
         assertThat(
             TimeInterval.between(start1, end1)
@@ -253,8 +231,7 @@ public class BasicTimeRangeTest {
             TimeInterval.between(start1, end1).hashCode(),
             not(
                 TimeInterval.between(start2, end2)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))
-                .hashCode()));
+                .withClosedEnd().hashCode()));
         assertThat(
             TimeInterval.between(start1, end1).hashCode(),
             is(TimeInterval.between(start1, end1).hashCode()));
@@ -283,10 +260,7 @@ public class BasicTimeRangeTest {
         PlainTime start = PlainTime.of(19, 45);
         PlainTime end = PlainTime.of(20, 30);
         assertThat(
-            TimeInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .toString(),
+            TimeInterval.between(start, end).withClosedEnd().toString(),
             is("[T19:45/T20:30]"));
     }
 

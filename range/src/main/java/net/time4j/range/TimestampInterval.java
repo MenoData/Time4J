@@ -21,6 +21,7 @@
 
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.Iso8601Format;
 import net.time4j.IsoUnit;
@@ -45,6 +46,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Comparator;
 import java.util.Locale;
 
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -85,6 +87,8 @@ public final class TimestampInterval
         ordinalFormat(false);
     private static final ChronoFormatter<PlainTimestamp> BAS_W =
         weekdateFormat(false);
+    private static final Comparator<TimestampInterval> COMPARATOR =
+        new IntervalComparator<PlainTimestamp, TimestampInterval>(false);
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -98,6 +102,30 @@ public final class TimestampInterval
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Defines a comparator which sorts intervals first
+     * by start boundary and then by length. </p>
+     *
+     * @return  Comparator
+     * @throws  IllegalArgumentException if applied on intervals which have
+     *          boundaries with extreme values
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
+     * Start und dann nach der L&auml;nge sortiert. </p>
+     *
+     * @return  Comparator
+     * @throws  IllegalArgumentException if applied on intervals which have
+     *          boundaries with extreme values
+     * @since   2.0
+     */
+    public static Comparator<TimestampInterval> comparator() {
+
+        return COMPARATOR;
+
+    }
 
     /**
      * <p>Creates a finite half-open interval between given time points. </p>
@@ -179,6 +207,7 @@ public final class TimestampInterval
      * UTC+00:00 to a global UTC-interval. </p>
      *
      * @return  global timestamp interval interpreted at offset UTC+00:00
+     * @since   2.0
      * @see     #at(ZonalOffset)
      */
     /*[deutsch]
@@ -186,6 +215,7 @@ public final class TimestampInterval
      * einem globalen UTC-Intervall. </p>
      *
      * @return  global timestamp interval interpreted at offset UTC+00:00
+     * @since   2.0
      * @see     #at(ZonalOffset)
      */
     public MomentInterval atUTC() {
@@ -345,10 +375,25 @@ public final class TimestampInterval
      */
     public <U extends IsoUnit> Duration<U> getDuration(U... units) {
 
-        return Duration.in(units).between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        PlainTimestamp tsp = this.getTemporalOfOpenEnd();
+        boolean max = (tsp == null);
+
+        if (max) { // max reached
+            tsp = this.getEnd().getTemporal();
+        }
+
+        Duration<U> result =
+            Duration.in(units).between(this.getTemporalOfClosedStart(), tsp);
+
+        if (max) {
+            for (U unit : units) {
+                if (unit.equals(ClockUnit.NANOS)) {
+                    return result.plus(1, unit);
+                }
+            }
+        }
+
+        return result;
 
     }
 
@@ -377,10 +422,27 @@ public final class TimestampInterval
         IsoUnit... units
     ) {
 
-        return Duration.in(tz, units).between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        PlainTimestamp tsp = this.getTemporalOfOpenEnd();
+        boolean max = (tsp == null);
+
+        if (max) { // max reached
+            tsp = this.getEnd().getTemporal();
+        }
+
+        Duration<IsoUnit> result =
+            Duration.in(tz, units).between(
+                this.getTemporalOfClosedStart(),
+                tsp);
+
+        if (max) {
+            for (IsoUnit unit : units) {
+                if (unit.equals(ClockUnit.NANOS)) {
+                    return result.plus(1, unit);
+                }
+            }
+        }
+
+        return result;
 
     }
 

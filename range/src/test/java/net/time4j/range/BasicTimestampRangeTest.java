@@ -37,26 +37,11 @@ public class BasicTimestampRangeTest {
     }
 
     @Test
-    public void containsTemporalLeftEdgeOpen() {
-        PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 0, 0);
-        PlainTimestamp end = PlainTimestamp.of(2014, 5, 14, 0, 0);
-        assertThat(
-            TimestampInterval
-                .between(start, end)
-                .withStart(Boundary.of(IntervalEdge.OPEN, start))
-                .contains(start),
-            is(false));
-    }
-
-    @Test
     public void containsTemporalRightEdgeClosed() {
         PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 0, 0);
         PlainTimestamp end = PlainTimestamp.of(2014, 5, 14, 0, 0);
         assertThat(
-            TimestampInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .contains(end),
+            TimestampInterval.between(start, end).withClosedEnd().contains(end),
             is(true));
     }
 
@@ -65,9 +50,7 @@ public class BasicTimestampRangeTest {
         PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 0, 0);
         PlainTimestamp end = PlainTimestamp.of(2014, 5, 14, 0, 0);
         assertThat(
-            TimestampInterval
-                .between(start, end)
-                .contains(end),
+            TimestampInterval.between(start, end).contains(end),
             is(false));
     }
 
@@ -140,10 +123,7 @@ public class BasicTimestampRangeTest {
     public void isEmptyAtomicClosed() {
         PlainTimestamp tsp = PlainTimestamp.of(2014, 5, 14, 0, 0);
         assertThat(
-            TimestampInterval
-                .between(tsp, tsp)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, tsp))
-                .isEmpty(),
+            TimestampInterval.between(tsp, tsp).withClosedEnd().isEmpty(),
             is(false));
     }
 
@@ -222,8 +202,7 @@ public class BasicTimestampRangeTest {
         assertThat(
             TimestampInterval.between(start1, end1)
                 .equals(
-                    TimestampInterval.between(start2, end2)
-                    .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))),
+                    TimestampInterval.between(start2, end2).withClosedEnd()),
             is(false));
         assertThat(
             TimestampInterval.between(start1, end1)
@@ -244,8 +223,7 @@ public class BasicTimestampRangeTest {
             TimestampInterval.between(start1, end1).hashCode(),
             not(
                 TimestampInterval.between(start2, end2)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))
-                .hashCode()));
+                .withClosedEnd().hashCode()));
         assertThat(
             TimestampInterval.between(start1, end1).hashCode(),
             is(TimestampInterval.between(start1, end1).hashCode()));
@@ -274,10 +252,7 @@ public class BasicTimestampRangeTest {
         PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 14, 45);
         PlainTimestamp end = PlainTimestamp.of(2014, 5, 14, 9, 30);
         assertThat(
-            TimestampInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .toString(),
+            TimestampInterval.between(start, end).withClosedEnd().toString(),
             is("[2014-02-27T14:45/2014-05-14T09:30]"));
     }
 
@@ -290,6 +265,23 @@ public class BasicTimestampRangeTest {
                 .between(start, end)
                 .toString(),
             is("[2014-02-27T14:45/2014-05-14T09:30)"));
+    }
+
+    @Test
+    public void withClosedEndNormal() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 14, 45);
+        PlainTimestamp end = PlainTimestamp.of(2014, 5, 14, 9, 30);
+
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        assertThat(
+            interval.withClosedEnd().getEnd().isClosed(),
+            is(true));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void withClosedEndInfinite() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 14, 45);
+        TimestampInterval.since(start).withClosedEnd();
     }
 
 }

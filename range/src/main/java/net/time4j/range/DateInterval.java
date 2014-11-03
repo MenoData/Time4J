@@ -42,6 +42,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Comparator;
 import java.util.Locale;
 
 import static net.time4j.PlainDate.DAY_OF_MONTH;
@@ -73,6 +74,9 @@ public final class DateInterval
 
     private static final long serialVersionUID = 1L;
 
+    private static final Comparator<DateInterval> COMPARATOR =
+        new IntervalComparator<PlainDate, DateInterval>(true);
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -85,6 +89,26 @@ public final class DateInterval
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Defines a comparator which sorts intervals first
+     * by start boundary and then by length. </p>
+     *
+     * @return  Comparator
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
+     * Start und dann nach der L&auml;nge sortiert. </p>
+     *
+     * @return  Comparator
+     * @since   2.0
+     */
+    public static Comparator<DateInterval> comparator() {
+
+        return COMPARATOR;
+
+    }
 
     /**
      * <p>Creates a closed interval between given dates. </p>
@@ -259,9 +283,6 @@ public final class DateInterval
             long days = CalendarUnit.DAYS.between(
                 this.getStart().getTemporal(),
                 this.getEnd().getTemporal());
-            if (this.getStart().isOpen()) {
-                days--;
-            }
             if (this.getEnd().isClosed()) {
                 days++;
             }
@@ -294,10 +315,23 @@ public final class DateInterval
      */
     public Duration<CalendarUnit> getDurationInYearsMonthsDays() {
 
-        return Duration.inYearsMonthsDays().between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        PlainDate date = this.getTemporalOfOpenEnd();
+        boolean max = (date == null);
+
+        if (max) { // max reached
+            date = this.getEnd().getTemporal();
+        }
+
+        Duration<CalendarUnit> result =
+            Duration.inYearsMonthsDays().between(
+                this.getTemporalOfClosedStart(),
+                date);
+
+        if (max) {
+            return result.plus(1, CalendarUnit.DAYS);
+        }
+
+        return result;
 
     }
 
@@ -324,10 +358,23 @@ public final class DateInterval
      */
     public Duration<CalendarUnit> getDuration(CalendarUnit... units) {
 
-        return Duration.in(units).between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        PlainDate date = this.getTemporalOfOpenEnd();
+        boolean max = (date == null);
+
+        if (max) { // max reached
+            date = this.getEnd().getTemporal();
+        }
+
+        Duration<CalendarUnit> result =
+            Duration.in(units).between(
+                this.getTemporalOfClosedStart(),
+                date);
+
+        if (max) {
+            return result.plus(1, CalendarUnit.DAYS);
+        }
+
+        return result;
 
     }
 

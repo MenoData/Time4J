@@ -34,6 +34,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.util.Comparator;
 
 import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.NANOS;
@@ -61,6 +62,9 @@ public final class TimeInterval
 
     private static final long serialVersionUID = 1L;
 
+    private static final Comparator<TimeInterval> COMPARATOR =
+        new IntervalComparator<PlainTime, TimeInterval>(false);
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -78,6 +82,26 @@ public final class TimeInterval
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Defines a comparator which sorts intervals first
+     * by start boundary and then by length. </p>
+     *
+     * @return  Comparator
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
+     * Start und dann nach der L&auml;nge sortiert. </p>
+     *
+     * @return  Comparator
+     * @since   2.0
+     */
+    public static Comparator<TimeInterval> comparator() {
+
+        return COMPARATOR;
+
+    }
 
     /**
      * <p>Creates a finite half-open interval between given wall times. </p>
@@ -176,21 +200,16 @@ public final class TimeInterval
         PlainTime t1 = this.getStart().getTemporal();
         PlainTime t2 = this.getEnd().getTemporal();
 
-        if (
-            (t2.getHour() == 24)
-            && this.getEnd().isClosed()
-        ) {
-            if (this.getStart().isClosed()) {
+        if (this.getEnd().isClosed()) {
+            if (t2.getHour() == 24) {
                 if (t1.equals(PlainTime.midnightAtStartOfDay())) {
                     return Duration.of(24, HOURS).plus(1, NANOS);
                 } else {
                     t1 = t1.minus(1, NANOS);
                 }
+            } else {
+                t2 = t2.plus(1, NANOS);
             }
-        } else if (this.getStart().isOpen()) {
-            t1 = t1.plus(1, NANOS);
-        } else if (this.getEnd().isClosed()) {
-            t2 = t2.plus(1, NANOS);
         }
 
         return Duration.inClockUnits().between(t1, t2);

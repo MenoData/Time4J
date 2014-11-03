@@ -46,6 +46,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -87,6 +88,9 @@ public final class MomentInterval
     private static final ChronoFormatter<Moment> BAS_O = ordinalFormat(false);
     private static final ChronoFormatter<Moment> BAS_W = weekdateFormat(false);
 
+    private static final Comparator<MomentInterval> COMPARATOR =
+        new IntervalComparator<Moment, MomentInterval>(false);
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -99,6 +103,30 @@ public final class MomentInterval
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Defines a comparator which sorts intervals first
+     * by start boundary and then by length. </p>
+     *
+     * @return  Comparator
+     * @throws  IllegalArgumentException if applied on intervals which have
+     *          boundaries with extreme values
+     * @since   2.0
+     */
+    /*[deutsch]
+     * <p>Definiert ein Vergleichsobjekt, das Intervalle zuerst nach dem
+     * Start und dann nach der L&auml;nge sortiert. </p>
+     *
+     * @return  Comparator
+     * @throws  IllegalArgumentException if applied on intervals which have
+     *          boundaries with extreme values
+     * @since   2.0
+     */
+    public static Comparator<MomentInterval> comparator() {
+
+        return COMPARATOR;
+
+    }
 
     /**
      * <p>Creates a finite half-open interval between given time points. </p>
@@ -332,10 +360,23 @@ public final class MomentInterval
      */
     public MachineTime<TimeUnit> getSimpleDuration() {
 
-        return MachineTime.ON_POSIX_SCALE.between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        Moment tsp = this.getTemporalOfOpenEnd();
+        boolean max = (tsp == null);
+
+        if (max) { // max reached
+            tsp = this.getEnd().getTemporal();
+        }
+
+        MachineTime<TimeUnit> result =
+            MachineTime.ON_POSIX_SCALE.between(
+                this.getTemporalOfClosedStart(),
+                tsp);
+
+        if (max) {
+            return result.plus(1, TimeUnit.NANOSECONDS);
+        }
+
+        return result;
 
     }
 
@@ -359,10 +400,23 @@ public final class MomentInterval
      */
     public MachineTime<SI> getRealDuration() {
 
-        return MachineTime.ON_UTC_SCALE.between(
-            this.getTemporalOfClosedStart(),
-            this.getTemporalOfOpenEnd()
-        );
+        Moment tsp = this.getTemporalOfOpenEnd();
+        boolean max = (tsp == null);
+
+        if (max) { // max reached
+            tsp = this.getEnd().getTemporal();
+        }
+
+        MachineTime<SI> result =
+            MachineTime.ON_UTC_SCALE.between(
+                this.getTemporalOfClosedStart(),
+                tsp);
+
+        if (max) {
+            return result.plus(1, SI.NANOSECONDS);
+        }
+
+        return result;
 
     }
 

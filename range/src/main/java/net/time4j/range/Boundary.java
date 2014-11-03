@@ -34,9 +34,6 @@ import java.io.Serializable;
  * <p>Represents an interval boundary, either the lower one or the
  * upper one. </p>
  *
- * <p>Note: All {@code Temporal}-methods like {@code isAfter()} etc. only
- * compare the temporal state, not the property open/closed. </p>
- *
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
@@ -44,10 +41,6 @@ import java.io.Serializable;
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Intervallgrenze, die entweder die untere
  * oder die obere Grenze eines Intervalls ist. </p>
- *
- * <p>Hinweis: Alle {@code Temporal}-methoden wie {@code isAfter()} etc.
- * vergleichen nur den zeitlichen Zustand, nicht die Eigenschaft
- * open/closed (offen/geschlossen). </p>
  *
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
@@ -401,6 +394,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * <p>Liefert den Intervallrand. </p>
      *
      * @return  IntervalEdge
+     * @since   2.0
      */
     IntervalEdge getEdge() {
 

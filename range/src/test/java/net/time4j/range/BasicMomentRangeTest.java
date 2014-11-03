@@ -38,26 +38,11 @@ public class BasicMomentRangeTest {
     }
 
     @Test
-    public void containsTemporalLeftEdgeOpen() {
-        Moment start = PlainTimestamp.of(2014, 2, 27, 0, 0).atUTC();
-        Moment end = PlainTimestamp.of(2014, 5, 14, 0, 0).atUTC();
-        assertThat(
-            MomentInterval
-                .between(start, end)
-                .withStart(Boundary.of(IntervalEdge.OPEN, start))
-                .contains(start),
-            is(false));
-    }
-
-    @Test
     public void containsTemporalRightEdgeClosed() {
         Moment start = PlainTimestamp.of(2014, 2, 27, 0, 0).atUTC();
         Moment end = PlainTimestamp.of(2014, 5, 14, 0, 0).atUTC();
         assertThat(
-            MomentInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .contains(end),
+            MomentInterval.between(start, end).withClosedEnd().contains(end),
             is(true));
     }
 
@@ -141,10 +126,7 @@ public class BasicMomentRangeTest {
     public void isEmptyAtomicClosed() {
         Moment tsp = PlainTimestamp.of(2014, 5, 14, 0, 0).atUTC();
         assertThat(
-            MomentInterval
-                .between(tsp, tsp)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, tsp))
-                .isEmpty(),
+            MomentInterval.between(tsp, tsp).withClosedEnd().isEmpty(),
             is(false));
     }
 
@@ -222,9 +204,7 @@ public class BasicMomentRangeTest {
             is(false));
         assertThat(
             MomentInterval.between(start1, end1)
-                .equals(
-                    MomentInterval.between(start2, end2)
-                    .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))),
+                .equals(MomentInterval.between(start2, end2).withClosedEnd()),
             is(false));
         assertThat(
             MomentInterval.between(start1, end1)
@@ -245,8 +225,7 @@ public class BasicMomentRangeTest {
             MomentInterval.between(start1, end1).hashCode(),
             not(
                 MomentInterval.between(start2, end2)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end2))
-                .hashCode()));
+                .withClosedEnd().hashCode()));
         assertThat(
             MomentInterval.between(start1, end1).hashCode(),
             is(MomentInterval.between(start1, end1).hashCode()));
@@ -275,10 +254,7 @@ public class BasicMomentRangeTest {
         Moment start = PlainTimestamp.of(2014, 2, 27, 14, 45).atUTC();
         Moment end = PlainTimestamp.of(2014, 5, 14, 9, 30).atUTC();
         assertThat(
-            MomentInterval
-                .between(start, end)
-                .withEnd(Boundary.of(IntervalEdge.CLOSED, end))
-                .toString(),
+            MomentInterval.between(start, end).withClosedEnd().toString(),
             is("[2014-02-27T14:45:00Z/2014-05-14T09:30:00Z]"));
     }
 

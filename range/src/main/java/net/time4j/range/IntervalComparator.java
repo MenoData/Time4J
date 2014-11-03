@@ -36,34 +36,20 @@ final class IntervalComparator
     <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements Comparator<I> {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
+    //~ Instanzvariablen --------------------------------------------------
 
-    @SuppressWarnings("rawtypes")
-    private static final Comparator<?> INSTANCE = new IntervalComparator();
+    private final boolean calendrical;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private IntervalComparator() {
-        // singleton
+    IntervalComparator(boolean calendrical) {
+        super();
+
+        this.calendrical = calendrical;
 
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Liefert die Singleton-Instanz. </p>
-     *
-     * @param   <T> temporal type
-     * @param   <I> interval type
-     * @return  singleton instance
-     */
-    @SuppressWarnings("unchecked")
-    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
-    Comparator<I> getInstance() {
-
-        return (Comparator<I>) INSTANCE;
-
-    }
 
     @Override
     public int compare(I o1, I o2) {
@@ -78,8 +64,8 @@ final class IntervalComparator
             return 1;
         }
 
-        T start1 = o1.getTemporalOfClosedStart();
-        T start2 = o2.getTemporalOfClosedStart();
+        T start1 = o1.getStart().getTemporal();
+        T start2 = o2.getStart().getTemporal();
 
         if (start1.isBefore(start2)) {
             return -1;
@@ -103,9 +89,48 @@ final class IntervalComparator
             return -1;
         }
 
-        T end1 = o1.getTemporalOfOpenEnd();
-        T end2 = o2.getTemporalOfOpenEnd();
+        T end1 = o1.getEnd().getTemporal();
+        T end2 = o2.getEnd().getTemporal();
 
+        if (this.calendrical) {
+            if (o1.getEnd().isOpen()) {
+                end1 = o1.getTimeLine().stepBackwards(end1);
+            }
+            if (o2.getEnd().isOpen()) {
+                end2 = o2.getTimeLine().stepBackwards(end2);
+            }
+
+            // closed min condition (rare edge case)
+            if (end1 == null) {
+                if (end2 == null) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (end2 == null) {
+                return 1;
+            }
+        } else {
+            if (o1.getEnd().isClosed()) {
+                end1 = o1.getTimeLine().stepForward(end1);
+            }
+            if (o2.getEnd().isClosed()) {
+                end2 = o2.getTimeLine().stepForward(end2);
+            }
+
+            // closed max condition (rare edge case)
+            if (end1 == null) {
+                if (end2 == null) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } else if (end2 == null) {
+                return -1;
+            }
+        }
+
+        // default case
         if (end1.isBefore(end2)) {
             return -1;
         } else if (end1.isAfter(end2)) {
