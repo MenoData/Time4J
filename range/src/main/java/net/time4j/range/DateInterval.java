@@ -660,6 +660,13 @@ public final class DateInterval
 
     }
 
+    @Override
+    DateInterval getContext() {
+
+        return this;
+
+    }
+
     private static ChronoFormatter<PlainDate> abbreviatedFormat(
         boolean extended,
         boolean weekStyle,

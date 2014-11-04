@@ -709,6 +709,13 @@ public final class MomentInterval
 
     }
 
+    @Override
+    MomentInterval getContext() {
+
+        return this;
+
+    }
+
     private static boolean hasSameOffsets(
         String text,
         int solidus,

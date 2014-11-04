@@ -306,6 +306,13 @@ public final class TimeInterval
 
     }
 
+    @Override
+    TimeInterval getContext() {
+
+        return this;
+
+    }
+
     /**
      * @serialData  Uses
      *              <a href="../../../serialized-form.html#net.time4j.range.SPX">

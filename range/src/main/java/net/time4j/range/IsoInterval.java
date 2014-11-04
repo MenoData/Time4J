@@ -484,6 +484,224 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Does this interval precede the other one such that there is a gap
+     * between? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other such
+     *          that there is a gap between else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
+     * eine L&uuml;cke existiert? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other such
+     *          that there is a gap between else {@code false}
+     */
+    public boolean precedes(I other) {
+
+        if (
+            other.getStart().isInfinite()
+            || this.getEnd().isInfinite()
+        ) {
+            return false;
+        }
+
+        T first = this.getEnd().getTemporal();
+        T next = other.getStart().getTemporal();
+
+        if (this.getEnd().isClosed()) {
+            first = this.getTimeLine().stepForward(first);
+            if (first == null) {
+                return false;
+            }
+        }
+
+        return first.isBefore(next);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code other.precedes(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other such
+     *          that there is a gap between else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code other.precedes(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other such
+     *          that there is a gap between else {@code false}
+     */
+    public boolean precededBy(I other) {
+
+        return other.precedes(this.getContext());
+
+    }
+
+    /**
+     * <p>Does this interval precede the other one such that there is no gap
+     * between? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other such
+     *          that there is no gap between else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
+     * keine L&uuml;cke existiert? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other such
+     *          that there is no gap between else {@code false}
+     */
+    public boolean meets(I other) {
+
+        if (
+            other.getStart().isInfinite()
+            || this.getEnd().isInfinite()
+        ) {
+            return false;
+        }
+
+        T first = this.getEnd().getTemporal();
+        T next = other.getStart().getTemporal();
+
+        if (this.getEnd().isClosed()) {
+            first = this.getTimeLine().stepForward(first);
+            if (first == null) {
+                return false;
+            }
+        }
+
+        return first.isSimultaneous(next);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code other.meets(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other such
+     *          that there is no gap between else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code other.meets(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other such
+     *          that there is no gap between else {@code false}
+     */
+    public boolean metBy(I other) {
+
+        return other.meets(this.getContext());
+
+    }
+
+    /**
+     * <p>Does this interval overlaps the other one such that the start
+     * of this interval is still before the start of the other one? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval overlaps the other such
+     *          that the start of this interval is still before the start
+     *          of the other one else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Uuml;berlappt dieses Intervall so das andere, da&szlig; der
+     * Start dieses Intervalls noch vor dem Start des anderen liegt? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval overlaps the other such
+     *          that the start of this interval is still before the start
+     *          of the other one else {@code false}
+     */
+    public boolean overlaps(I other) {
+
+        if (
+            other.getStart().isInfinite()
+            || this.getEnd().isInfinite()
+        ) {
+            return false;
+        }
+
+        T startA = this.getStart().getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if (
+            (startA != null)
+            && !startA.isBefore(startB)
+        ) {
+            return false;
+        }
+
+        T endA = this.getEnd().getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (this.getEnd().isClosed()) {
+            endA = this.getTimeLine().stepForward(endA);
+            if (endA == null) {
+                return (endB == null);
+            }
+        }
+
+        if (!endA.isAfter(startB)) {
+            return false;
+        }
+
+        if (other.getEnd().isClosed()) {
+            endB = this.getTimeLine().stepForward(endB);
+        }
+
+        if (
+            (endB != null)
+            && !endA.isBefore(endB)
+        ) {
+            return false;
+        }
+
+        return true;
+
+    }
+
+    /**
+     * <p>Equivalent to {@code other.overlaps(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if the other interval overlaps this such
+     *          that the start of the other one is still before the start
+     *          of this interval else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code other.overlaps(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if the other interval overlaps this such
+     *          that the start of the other one is still before the start
+     *          of this interval else {@code false}
+     */
+    public boolean overlappedBy(I other) {
+
+        return other.overlaps(this.getContext());
+
+    }
+
+    /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
@@ -560,5 +778,12 @@ public abstract class IsoInterval
         }
 
     }
+
+    /**
+     * <p>Liefert den Selbstbezug. </p>
+     *
+     * @return  this instance
+     */
+    abstract I getContext();
 
 }

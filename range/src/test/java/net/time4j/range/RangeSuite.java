@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        AlgebraTest.class,
         BasicDateRangeTest.class,
         BasicMomentRangeTest.class,
         BasicTimeRangeTest.class,

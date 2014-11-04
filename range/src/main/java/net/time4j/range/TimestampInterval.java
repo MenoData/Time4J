@@ -726,6 +726,13 @@ public final class TimestampInterval
 
     }
 
+    @Override
+    TimestampInterval getContext() {
+
+        return this;
+
+    }
+
     private static ChronoFormatter<PlainTimestamp>
     ordinalFormat(boolean extended) {
 
