@@ -702,6 +702,104 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Does this interval finish the other one such that both end
+     * time points are equal and the start of this interval is after the
+     * start of the other one? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same end point as
+     *          the other one and a later start else {@code false}
+     */
+    /*[deutsch]
+     * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
+     * Endzeitpunkten der Start dieses Intervalls nach dem Start des anderen
+     * liegt? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same end point as
+     *          the other one and a later start else {@code false}
+     */
+    public boolean finishes(I other) {
+
+        if (this.getStart().isInfinite()) {
+            return false;
+        }
+
+        T startA = this.getStart().getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if (
+            (startB != null)
+            && !startB.isBefore(startA)
+        ) {
+            return false;
+        }
+
+        T endA = this.getEnd().getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (endB == null) {
+            return (endA == null);
+        }
+
+        if (endA == null) {
+            return (endB == null);
+        }
+
+        if (this.getEnd().isClosed()) {
+            endA = this.getTimeLine().stepForward(endA);
+        }
+
+        if (other.getEnd().isClosed()) {
+            endB = this.getTimeLine().stepForward(endB);
+        }
+
+        if (
+            (endB != null)
+            && !startA.isBefore(endB)
+        ) {
+            return false;
+        }
+
+        if (endA == null) {
+            return (endB == null);
+        } else if (endB == null) {
+            return false;
+        } else {
+            return endA.isSimultaneous(endB);
+        }
+
+    }
+
+    /**
+     * <p>Does this interval finish the other one such that both end
+     * time points are equal and the start of this interval is before the
+     * start of the other one? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same end point as
+     *          the other one and an earlier start else {@code false}
+     */
+    /*[deutsch]
+     * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
+     * Endzeitpunkten der Start dieses Intervalls vor dem Start des anderen
+     * liegt? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same end point as
+     *          the other one and an earlier start else {@code false}
+     */
+    public boolean finishedBy(I other) {
+
+        return other.finishes(this.getContext());
+
+    }
+
+    /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}

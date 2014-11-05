@@ -25,6 +25,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.between(startB, endB);
 
         assertThat(a.precedes(b), is(false));
+        assertThat(b.precededBy(a), is(false));
     }
 
     @Test
@@ -39,6 +40,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.between(startB, endB);
 
         assertThat(a.precedes(b), is(true));
+        assertThat(b.precededBy(a), is(true));
     }
 
     @Test
@@ -53,6 +55,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.between(startB, endB);
 
         assertThat(a.meets(b), is(true));
+        assertThat(b.metBy(a), is(true));
     }
 
     @Test
@@ -67,6 +70,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.between(startB, endB);
 
         assertThat(a.meets(b), is(false));
+        assertThat(b.metBy(a), is(false));
     }
 
     @Test
@@ -111,6 +115,34 @@ public class AlgebraTest {
         DateInterval b = DateInterval.since(startB);
 
         assertThat(a.meets(b), is(false));
+    }
+
+    @Test
+    public void meetsEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.meets(b), is(true));
+        assertThat(b.metBy(a), is(true));
+    }
+
+    @Test
+    public void meetsEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.meets(b), is(false));
+        assertThat(b.metBy(a), is(false));
     }
 
     @Test
@@ -282,6 +314,32 @@ public class AlgebraTest {
     }
 
     @Test
+    public void overlapsEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 15);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.overlaps(b), is(false));
+    }
+
+    @Test
+    public void overlapsEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.overlaps(b), is(false));
+    }
+
+    @Test
     public void overlappedBy() {
         PlainDate startA = PlainDate.of(2014, 5, 13);
         PlainDate endA = PlainDate.of(2014, 6, 15);
@@ -294,6 +352,107 @@ public class AlgebraTest {
 
         assertThat(b.overlaps(a), is(true));
         assertThat(a.overlappedBy(b), is(true));
+    }
+
+    @Test
+    public void finishedByEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 15);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.finishedBy(b), is(false));
+    }
+
+    @Test
+    public void finishedByEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.finishedBy(b), is(false));
+    }
+
+    @Test
+    public void finishes1() {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 17);
+
+        PlainDate startB = PlainDate.of(2014, 5, 11);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishes2() {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 18);
+
+        PlainDate startB = PlainDate.of(2014, 5, 11);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA).withOpenEnd();
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishes3() {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 16);
+
+        PlainDate startB = PlainDate.of(2014, 5, 11);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB).withOpenEnd();
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishes4() { // contains
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 18);
+
+        PlainDate startB = PlainDate.of(2014, 5, 11);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(false));
+    }
+
+    @Test
+    public void finishes5() { // overlaps
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 16);
+
+        PlainDate startB = PlainDate.of(2014, 5, 11);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(false));
     }
 
 }
