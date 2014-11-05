@@ -410,7 +410,7 @@ public final class CalendarText {
      * the text forms contained here. </p>
      *
      * <p>The default implementation handles SHORT as synonym for
-     * ABBREVIATION in the context of ISO-8601. </p>
+     * ABBREVIATED in the context of ISO-8601. </p>
      *
      * @param   textWidth       text width of displayed month name
      * @param   outputContext   output context (stand-alone?)
@@ -492,7 +492,7 @@ public final class CalendarText {
      * etc. and at whole four quarters per calendar year. </p>
      *
      * <p>The default implementation handles SHORT as synonym for
-     * ABBREVIATION in the context of ISO-8601. </p>
+     * ABBREVIATED in the context of ISO-8601. </p>
      *
      * @param   textWidth       text width of displayed quarter name
      * @param   outputContext   output context (stand-alone?)
@@ -1734,10 +1734,10 @@ public final class CalendarText {
             OutputContext oc
     	) {
 
-        	String[] names = new String[len];
+            String[] names = new String[len];
             boolean shortKey = (elementName.length() == 1);
 
-        	for (int i = 0; i < len; i++) {
+            for (int i = 0; i < len; i++) {
             	StringBuilder b = new StringBuilder();
             	b.append(elementName);
                 b.append('(');
@@ -1769,9 +1769,9 @@ public final class CalendarText {
             	} else {
                		return null;
             	}
-        	}
+            }
 
-        	return names;
+            return names;
 
     	}
 
