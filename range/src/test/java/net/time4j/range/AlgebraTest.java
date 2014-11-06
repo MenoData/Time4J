@@ -1,6 +1,8 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -453,6 +455,165 @@ public class AlgebraTest {
 
         assertThat(a.finishes(b), is(false));
         assertThat(a.finishedBy(b), is(false));
+    }
+
+    @Test
+    public void finishesTSP1() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.between(startA, endA);
+        TimestampInterval b = TimestampInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishesTSP2() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA =
+            PlainDate.of(2014, 5, 17).atStartOfDay().minus(1, ClockUnit.NANOS);
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        TimestampInterval a =
+            TimestampInterval.between(startA, endA).withClosedEnd();
+        TimestampInterval b = TimestampInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishesTSP3() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB =
+            PlainDate.of(2014, 5, 17).atStartOfDay().minus(1, ClockUnit.NANOS);
+
+        TimestampInterval a =
+            TimestampInterval.between(startA, endA);
+        TimestampInterval b =
+            TimestampInterval.between(startB, endB).withClosedEnd();
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.finishedBy(b), is(true));
+    }
+
+    @Test
+    public void finishesTSPMax() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainTimestamp.axis().getMaximum();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB = PlainTimestamp.axis().getMaximum();
+
+        TimestampInterval a = TimestampInterval.between(startA, endA);
+        TimestampInterval b = TimestampInterval.between(startB, endB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(b.finishes(a), is(true));
+        assertThat(a.finishedBy(b), is(true));
+        assertThat(b.finishedBy(a), is(false));
+    }
+
+    @Test
+    public void finishesTSPFuture() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.since(startA);
+        TimestampInterval b = TimestampInterval.since(startB);
+
+        assertThat(a.finishes(b), is(false));
+        assertThat(b.finishes(a), is(true));
+        assertThat(a.finishedBy(b), is(true));
+        assertThat(b.finishedBy(a), is(false));
+    }
+
+    @Test
+    public void overlapsTSP1() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainDate.of(2014, 5, 12).atStartOfDay();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        TimestampInterval a =
+            TimestampInterval.between(startA, endA);
+        TimestampInterval b =
+            TimestampInterval.between(startB, endB);
+
+        assertThat(a.overlaps(b), is(true));
+    }
+
+    @Test
+    public void overlapsTSP2() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainDate.of(2014, 5, 12).atStartOfDay();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB =
+            PlainDate.of(2014, 5, 17).atStartOfDay().minus(1, ClockUnit.NANOS);
+
+        TimestampInterval a =
+            TimestampInterval.between(startA, endA);
+        TimestampInterval b =
+            TimestampInterval.between(startB, endB).withClosedEnd();
+
+        assertThat(a.overlaps(b), is(true));
+    }
+
+    @Test
+    public void overlapsTSP3() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA =
+            PlainDate.of(2014, 5, 12).atStartOfDay().minus(1, ClockUnit.NANOS);
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        TimestampInterval a =
+            TimestampInterval.between(startA, endA).withClosedEnd();
+        TimestampInterval b =
+            TimestampInterval.between(startB, endB);
+
+        assertThat(a.overlaps(b), is(true));
+    }
+
+    @Test
+    public void overlapsTSPMaxFuture() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainTimestamp.axis().getMaximum();
+
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.between(startA, endA);
+        TimestampInterval b = TimestampInterval.since(startB);
+
+        assertThat(a.overlaps(b), is(true));
+        assertThat(b.overlaps(a), is(false));
+        assertThat(a.overlappedBy(b), is(false));
+        assertThat(b.overlappedBy(a), is(true));
+    }
+
+    @Test
+    public void overlapsTSPFutureFuture() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.since(startA);
+        TimestampInterval b = TimestampInterval.since(startB);
+
+        assertThat(a.overlaps(b), is(false));
+        assertThat(a.overlappedBy(b), is(false));
     }
 
 }

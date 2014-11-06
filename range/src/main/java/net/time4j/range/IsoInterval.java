@@ -510,17 +510,16 @@ public abstract class IsoInterval
             return false;
         }
 
-        T first = this.getEnd().getTemporal();
-        T next = other.getStart().getTemporal();
+        T endA = this.getEnd().getTemporal();
 
         if (this.getEnd().isClosed()) {
-            first = this.getTimeLine().stepForward(first);
-            if (first == null) {
+            endA = this.getTimeLine().stepForward(endA);
+            if (endA == null) {
                 return false;
             }
         }
 
-        return first.isBefore(next);
+        return endA.isBefore(other.getStart().getTemporal());
 
     }
 
@@ -573,17 +572,16 @@ public abstract class IsoInterval
             return false;
         }
 
-        T first = this.getEnd().getTemporal();
-        T next = other.getStart().getTemporal();
+        T endA = this.getEnd().getTemporal();
 
         if (this.getEnd().isClosed()) {
-            first = this.getTimeLine().stepForward(first);
-            if (first == null) {
+            endA = this.getTimeLine().stepForward(endA);
+            if (endA == null) {
                 return false;
             }
         }
 
-        return first.isSimultaneous(next);
+        return endA.isSimultaneous(other.getStart().getTemporal());
 
     }
 
@@ -651,19 +649,35 @@ public abstract class IsoInterval
         T endA = this.getEnd().getTemporal();
         T endB = other.getEnd().getTemporal();
 
-        if (this.getEnd().isClosed()) {
-            endA = this.getTimeLine().stepForward(endA);
-            if (endA == null) {
-                return (endB == null);
+        if (this.getFactory().isCalendrical()) {
+            if (this.getEnd().isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
             }
-        }
 
-        if (!endA.isAfter(startB)) {
-            return false;
-        }
+            if (endA.isBefore(startB)) {
+                return false;
+            } else if (endB == null) {
+                return true;
+            }
 
-        if (other.getEnd().isClosed()) {
-            endB = this.getTimeLine().stepForward(endB);
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
+        } else {
+            if (this.getEnd().isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+                if (endA == null) {
+                    return (endB == null);
+                }
+            }
+
+            if (!endA.isAfter(startB)) {
+                return false;
+            }
+
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+            }
         }
 
         if (
@@ -743,33 +757,44 @@ public abstract class IsoInterval
         if (endB == null) {
             return (endA == null);
         }
-
         if (endA == null) {
             return (endB == null);
         }
 
-        if (this.getEnd().isClosed()) {
-            endA = this.getTimeLine().stepForward(endA);
-        }
+        if (this.getFactory().isCalendrical()) {
+            if (this.getEnd().isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
 
-        if (other.getEnd().isClosed()) {
-            endB = this.getTimeLine().stepForward(endB);
-        }
-
-        if (
-            (endB != null)
-            && !startA.isBefore(endB)
-        ) {
-            return false;
-        }
-
-        if (endA == null) {
-            return (endB == null);
-        } else if (endB == null) {
-            return false;
+            if (startA.isAfter(endB)) {
+                return false;
+            }
         } else {
-            return endA.isSimultaneous(endB);
+            if (this.getEnd().isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+            }
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+            }
+
+            if (
+                (endB != null)
+                && !startA.isBefore(endB)
+            ) {
+                return false;
+            }
+
+            if (endA == null) {
+                return (endB == null);
+            } else if (endB == null) {
+                return false;
+            }
         }
+
+        return endA.isSimultaneous(endB);
 
     }
 
