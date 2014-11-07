@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 
 
 /**
- * <p>Service-Provider-Implementation for accessing localized unit
+ * <p>{@code ServiceProvider}-implementation for accessing localized unit
  * patterns. </p>
  *
  * <p>The underlying properties files are located in the folder
@@ -46,25 +46,7 @@ import java.util.ResourceBundle;
  *
  * @author  Meno Hochschild
  * @since   1.2
- */
-/*[deutsch]
- * <p>Service-Provider-Implementierung f&uuml;r den Zugang zu lokalisierten
- * Zeiteinheitsmustern. </p>
- *
- * <p>Die zugrundeliegenden properties-Dateien liegen im Ordner
- * &quot;units&quot; relativ zum Klassenpfad und sind in UTF-8 kodiert.
- * Der Basisname der Dateien ist &quot;patternquot;. Diese Klasse verwendet
- * einen ge&auml;nderten Suchalgorithmus, um die richtige properties-Datei
- * zu erhalten. Der Algorithmus ist dokumentiert in
- * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
- * target="_blank">CLDR</a> ver&ouml;ffentlicht vom Unicode-Konsortium. </p>
- *
- * <p>Die Vergangenheits- und Zukunftsmuster verhalten sich genauso - nur mit
- * dem Unterschied, da&szlig; stattdessen der Ordner &quot;reltime&quot;
- * benutzt wird. </p>
- *
- * @author  Meno Hochschild
- * @since   1.2
+ * @exclude
  */
 public final class UnitPatternSPI
     implements UnitPatternProvider {
