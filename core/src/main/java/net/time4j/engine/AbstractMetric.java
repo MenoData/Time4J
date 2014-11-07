@@ -110,7 +110,7 @@ public abstract class AbstractMetric
      * @throws  IllegalArgumentException if any time unit is given more than
      *          once or if there is no time unit at all
      */
-    public AbstractMetric(
+    protected AbstractMetric(
         boolean normalizing,
         U... units
     ) {
@@ -161,7 +161,7 @@ public abstract class AbstractMetric
      * @param   units           time units to be used for calculating time span
      * @throws  IllegalArgumentException if there is not time unit at all
      */
-    public AbstractMetric(
+    protected AbstractMetric(
         boolean normalizing,
         Set<U> units
     ) {
@@ -292,6 +292,12 @@ public abstract class AbstractMetric
     }
 
     /**
+     * <p>Creates an empty time span. </p>
+     *
+     * @return  empty time span without any time units
+     * @see     TimeSpan#isEmpty()
+     */
+    /*[deutsch]
      * <p>Erzeugt eine leere Zeitspanne. </p>
      *
      * @return  empty time span without any time units
@@ -300,6 +306,13 @@ public abstract class AbstractMetric
     protected abstract P createEmptyTimeSpan();
 
     /**
+     * <p>Creates a time span with the given units and amounts. </p>
+     *
+     * @param   items       elements of time span
+     * @param   negative    sign of time span
+     * @return  new time span
+     */
+    /*[deutsch]
      * <p>Erzeugt eine Zeitspanne mit den angegebenen Einheiten und
      * Betr&auml;gen. </p>
      *
