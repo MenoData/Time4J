@@ -1548,6 +1548,9 @@ public final class Moment
 
     }
 
+    /**
+     * @exclude
+     */
     @Override
     protected TimeAxis<TimeUnit, Moment> getChronology() {
 
@@ -1555,6 +1558,9 @@ public final class Moment
 
     }
 
+    /**
+     * @exclude
+     */
     @Override
     protected Moment getContext() {
 
