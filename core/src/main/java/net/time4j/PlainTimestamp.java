@@ -1068,6 +1068,9 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * @exclude
+     */
     @Override
     protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
 
@@ -1075,6 +1078,9 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * @exclude
+     */
     @Override
     protected PlainTimestamp getContext() {
 
