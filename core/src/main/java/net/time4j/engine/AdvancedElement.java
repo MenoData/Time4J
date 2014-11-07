@@ -53,6 +53,15 @@ public abstract class AdvancedElement<V extends Comparable<V>>
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Used by subclasses which usually assign an instance to a
+     * static constant (creating a singleton). </p>
+     *
+     * @param   name            name of element
+     * @throws  IllegalArgumentException if the name is empty or if it only
+     *          contains <i>white space</i> (spaces, tabs etc.)
+     * @see     ChronoElement#name()
+     */
+    /*[deutsch]
      * <p>Konstruktor f&uuml;r Subklassen, die eine so erzeugte Instanz
      * in der Regel statischen Konstanten zuweisen und damit Singletons
      * erzeugen. </p>
