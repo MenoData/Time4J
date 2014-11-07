@@ -281,6 +281,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      *
      * @return  negative, zero or positive integer if this instance is earlier,
      *          simultaneous or later than given date
+     * @exclude
      */
     protected int compareByTime(Calendrical<?, ?> date) {
 
