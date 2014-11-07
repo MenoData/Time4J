@@ -53,6 +53,15 @@ public abstract class BasicElement<V>
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Called by subclasses which will usually assign an instance to
+     * a static constant (creating a singleton). </p>
+     *
+     * @param   name            name of element
+     * @throws  IllegalArgumentException if the name is empty or only
+     *          contains <i>white space</i> (spaces, tabs etc.)
+     * @see     ChronoElement#name()
+     */
+    /*[deutsch]
      * <p>Konstruktor f&uuml;r Subklassen, die eine so erzeugte Instanz
      * in der Regel statischen Konstanten zuweisen und damit Singletons
      * erzeugen k&ouml;nnen. </p>
@@ -127,6 +136,28 @@ public abstract class BasicElement<V>
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    /**
+     * <p>Elements are local by default and can therefore not be used
+     * in a global context. </p>
+     *
+     * @return  {@code true}
+     * @since   1.2
+     * @see     #getVeto(Chronology)
+     */
+    /*[deutsch]
+     * <p>Elemente sind normalerweise lokal und k&ouml;nnen deshalb nicht
+     * in einem globalen Kontext verwendet werden. </p>
+     *
+     * @return  {@code true}
+     * @since   1.2
+     * @see     #getVeto(Chronology)
+     */
+    public boolean isLocal() {
+
+        return true;
 
     }
 
@@ -206,6 +237,17 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Derives an optional element rule for given chronology. </p>
+     *
+     * <p>Note: This implementation yields {@code null}. Subclasses whose
+     * element instances are not registered in a given chronology must
+     * override this method returning a suitable element rule. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology  chronology an element rule is searched for
+     * @return  element rule or {@code null} if given chronology is unsupported
+     */
+    /*[deutsch]
      * <p>Leitet eine optionale Elementregel f&uuml;r die angegebene
      * Chronologie ab. </p>
      *
@@ -226,6 +268,18 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>Points to another element which can have a base unit in a given
+     * chronology. </p>
+     *
+     * <p>This method can be overridden by unregistered extension elements
+     * in order to help a chronology to see which base unit belongs to
+     * this element. </p>
+     *
+     * @return  parent element registered on a time axis for helping
+     *          retrieving a base unit for this element or {@code null}
+     * @see     TimeAxis#getBaseUnit(ChronoElement)
+     */
+    /*[deutsch]
      * <p>Verweist auf ein anderes Element, das eine Basiseinheit in einer
      * Chronologie haben kann. </p>
      *
@@ -244,6 +298,19 @@ public abstract class BasicElement<V>
     }
 
     /**
+     * <p>If this element is not registered in given chronology then this method
+     * will be called by Time4J in order to generate a suitable error message
+     * in cases where this element shall not support the chronological context. </p>
+     *
+     * <p>This implementation yields {@code null} to indicate that there is no
+     * veto against usage in given chronology unless this element is local but
+     * the given chronology is global. </p>
+     *
+     * @param   chronology      chronological context
+     * @return  error message as veto or {@code null}
+     * @since   1.2
+     */
+    /*[deutsch]
      * <p>Falls dieses Element in der angegebenen Chronologie nicht registriert
      * ist, wird diese Methode aufgerufen, um eine passende Veto-Fehlermeldung
      * zu generieren, wenn dieses Element nicht den Kontext unterst&uuml;tzen
@@ -278,19 +345,6 @@ public abstract class BasicElement<V>
         }
 
         return null;
-
-    }
-
-    /**
-     * <p>Elemente sind normalerweise lokal und k&ouml;nnen deshalb nicht
-     * in einem globalen Kontext verwendet werden. </p>
-     *
-     * @return  {@code true}
-     * @see     #getVeto(Chronology)
-     */
-    protected boolean isLocal() {
-
-        return true;
 
     }
 
