@@ -496,6 +496,20 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Returns the assigned chronology which contains all necessary
+     * chronological rules. </p>
+     *
+     * <p>Concrete subclasses must create in a <i>static initializer</i> a
+     * chronology by help of {@code Chronology.Builder}, keep it as static
+     * constant and make it available here. Using the procedure guarantees
+     * that a  basic set of registered elements and rules will be installed. </p>
+     *
+     * @return  chronological system
+     * @throws  UnsupportedOperationException if not available (subclasses
+     *          must document this extreme rare case)
+     * @see     Chronology.Builder
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Chronologie, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *
@@ -516,6 +530,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
      * <p>Liefert den Selbstbezug. </p>
      *
      * @return  time context (usually this instance)
+     * @exclude
      */
     protected T getContext() {
 
