@@ -639,6 +639,19 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
     public abstract String toString();
 
     /**
+     * <p>Returns the assigned time axis which contains all necessary
+     * chronological rules. </p>
+     *
+     * <p>Concrete subclasses must create in a <i>static initializer</i> a
+     * time axis by help of {@code TimeAxis.Builder}, keep it as static
+     * constant and make it available here. Using the procedure guarantees
+     * that a basic set of registered elements, units and rules will be
+     * installed. </p>
+     *
+     * @return  chronological system as time axis (never {@code null})
+     * @see     TimeAxis.Builder
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse, die alle notwendigen
      * chronologischen Regeln enth&auml;lt. </p>
      *
@@ -646,9 +659,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * mit Hilfe von {@code TimeAxis.Builder} eine Zeitachse bauen, in
      * einer eigenen Konstanten halten und hier verf&uuml;gbar machen.
      * &Uuml;ber dieses Verfahren wird zugleich ein Basissatz von Elementen,
-     * Zeiteinheiten und chronologischen Regeln vorinstalliert. Au&szlig;erdem
-     * ist so eine 1:1-Relation zwischen einer {@code TimePoint}-Klasse und
-     * der entsprechenden Zeitachse respektive Chronologie garantiert. </p>
+     * Zeiteinheiten und chronologischen Regeln vorinstalliert. </p>
      *
      * @return  chronological system as time axis (never {@code null})
      * @see     TimeAxis.Builder
