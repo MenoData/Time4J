@@ -144,7 +144,7 @@ public abstract class BasicElement<V>
      * in a global context. </p>
      *
      * @return  {@code true}
-     * @since   1.2
+     * @since   2.0
      * @see     #getVeto(Chronology)
      */
     /*[deutsch]
@@ -152,7 +152,7 @@ public abstract class BasicElement<V>
      * in einem globalen Kontext verwendet werden. </p>
      *
      * @return  {@code true}
-     * @since   1.2
+     * @since   2.0
      * @see     #getVeto(Chronology)
      */
     public boolean isLocal() {
@@ -308,7 +308,7 @@ public abstract class BasicElement<V>
      *
      * @param   chronology      chronological context
      * @return  error message as veto or {@code null}
-     * @since   1.2
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Falls dieses Element in der angegebenen Chronologie nicht registriert
@@ -323,7 +323,7 @@ public abstract class BasicElement<V>
      *
      * @param   chronology      chronologischer Kontext
      * @return  Fehlermeldung als Veto oder {@code null}
-     * @since   1.2
+     * @since   2.0
      */
     protected String getVeto(Chronology<?> chronology) {
 
