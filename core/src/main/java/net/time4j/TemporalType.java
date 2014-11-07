@@ -502,7 +502,17 @@ public abstract class TemporalType<S, T> {
     //~ Konstruktoren -----------------------------------------------------
 
     /**
-     * <p>Creates a new instance.</p>
+     * <p>For subclasses only. </p>
+     * 
+     * <p>Subclasses should never make the constructor <i>public</i>
+     * but are encouraged to assign an instance to a static constant. </p>
+     */
+    /*[deutsch]
+     * <p>Nur f&uuml;r Subklassen. </p>
+     *
+     * <p>Subklassen sollten nie den Konstruktor <i>public</i> machen,
+     * sondern werden eine Instanz einer statischen Konstanten
+     * zuweisen. </p>
      */
     protected TemporalType() {
         super();
