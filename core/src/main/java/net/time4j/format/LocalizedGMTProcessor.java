@@ -25,6 +25,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -34,8 +35,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static net.time4j.tz.ZonalOffset.Sign.AHEAD_OF_UTC;
-import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
+import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
+import static net.time4j.tz.OffsetSign.BEHIND_UTC;
 
 
 /**
@@ -218,7 +219,7 @@ final class LocalizedGMTProcessor
         }
 
         char c = text.charAt(pos);
-        ZonalOffset.Sign sign;
+        OffsetSign sign;
 
         if (c == '+') {
             sign = AHEAD_OF_UTC;

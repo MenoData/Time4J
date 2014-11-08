@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
 
@@ -79,7 +80,7 @@ enum TimezoneElement
     @Override
     public TZID getDefaultMinimum() {
 
-        return ZonalOffset.ofHours(ZonalOffset.Sign.BEHIND_UTC, 14);
+        return ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 14);
 
     }
 
@@ -91,7 +92,7 @@ enum TimezoneElement
     @Override
     public TZID getDefaultMaximum() {
 
-        return ZonalOffset.ofHours(ZonalOffset.Sign.AHEAD_OF_UTC, 14);
+        return ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 14);
 
     }
 

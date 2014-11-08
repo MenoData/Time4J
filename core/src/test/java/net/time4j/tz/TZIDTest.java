@@ -21,7 +21,7 @@ public class TZIDTest {
 
     @Test
     public void canonicalOffsetPlus02() {
-        TZID tzid = ZonalOffset.ofHours(ZonalOffset.Sign.AHEAD_OF_UTC, 2);
+        TZID tzid = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2);
         assertThat(tzid.canonical(), is("UTC+02:00"));
     }
 

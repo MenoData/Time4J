@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
+import static net.time4j.tz.OffsetSign.BEHIND_UTC;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

@@ -297,7 +297,7 @@ public final class ZonalOffset
      * @see     #atLongitude(BigDecimal)
      */
     public static ZonalOffset atLongitude(
-        Sign sign,
+        OffsetSign sign,
         int degrees,
         int arcMinutes,
         int arcSeconds
@@ -334,7 +334,7 @@ public final class ZonalOffset
             longitude = longitude.add(arcSec);
         }
 
-        if (sign == Sign.BEHIND_UTC) {
+        if (sign == OffsetSign.BEHIND_UTC) {
             longitude = longitude.negate();
         }
 
@@ -352,7 +352,7 @@ public final class ZonalOffset
      * @param   hours       hour part ({@code 0 <= hours <= 18})
      * @return  zonal offset in hour precision
      * @throws  IllegalArgumentException if range check fails
-     * @see     #ofHoursMinutes(Sign, int, int)
+     * @see     #ofHoursMinutes(OffsetSign, int, int)
      */
     /*[deutsch]
      * <p>Statische Fabrikmethode f&uuml;r eine Zeitverschiebung, die den
@@ -364,10 +364,10 @@ public final class ZonalOffset
      * @param   hours       hour part ({@code 0 <= hours <= 18})
      * @return  zonal offset in hour precision
      * @throws  IllegalArgumentException if range check fails
-     * @see     #ofHoursMinutes(Sign, int, int)
+     * @see     #ofHoursMinutes(OffsetSign, int, int)
      */
     public static ZonalOffset ofHours(
-        Sign sign,
+        OffsetSign sign,
         int hours
     ) {
 
@@ -416,7 +416,7 @@ public final class ZonalOffset
      * @throws  IllegalArgumentException if range check fails
      */
     public static ZonalOffset ofHoursMinutes(
-        Sign sign,
+        OffsetSign sign,
         int hours,
         int minutes
     ) {
@@ -443,7 +443,7 @@ public final class ZonalOffset
 
         int total = hours * 3600 + minutes * 60;
 
-        if (sign == Sign.BEHIND_UTC) {
+        if (sign == OffsetSign.BEHIND_UTC) {
             total = -total;
         }
 
@@ -538,12 +538,12 @@ public final class ZonalOffset
      *
      * @return  {@code BEHIND_UTC} if sign is negative else {@code AHEAD_OF_UTC}
      */
-    public Sign getSign() {
+    public OffsetSign getSign() {
 
         return (
             ((this.total < 0) || (this.fraction < 0))
-            ? Sign.BEHIND_UTC
-            : Sign.AHEAD_OF_UTC
+            ? OffsetSign.BEHIND_UTC
+            : OffsetSign.AHEAD_OF_UTC
         );
 
     }
@@ -841,36 +841,6 @@ public final class ZonalOffset
         throws IOException, ClassNotFoundException {
 
         throw new InvalidObjectException("Serialization proxy required.");
-
-    }
-
-    //~ Innere Klassen ----------------------------------------------------
-
-    /**
-     * <p>Represents the sign of a zonal shift. </p>
-     */
-    /*[deutsch]
-     * <p>Repr&auml;sentiert das Vorzeichen der zonalen Verschiebung. </p>
-     */
-    public static enum Sign {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        /**
-         * <p>Negative sign (west for Greenwich meridian). </p>
-         */
-        /*[deutsch]
-         * <p>Negatives Vorzeichen. </p>
-         */
-        BEHIND_UTC,
-
-        /**
-         * <p>Positive sign (also in case of zero offset). </p>
-         */
-        /*[deutsch]
-         * <p>Positives Vorzeichen (auch bei Null-Offset). </p>
-         */
-        AHEAD_OF_UTC;
 
     }
 

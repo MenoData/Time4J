@@ -25,6 +25,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -39,8 +40,8 @@ import static net.time4j.format.DisplayMode.FULL;
 import static net.time4j.format.DisplayMode.LONG;
 import static net.time4j.format.DisplayMode.MEDIUM;
 import static net.time4j.format.DisplayMode.SHORT;
-import static net.time4j.tz.ZonalOffset.Sign.AHEAD_OF_UTC;
-import static net.time4j.tz.ZonalOffset.Sign.BEHIND_UTC;
+import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
+import static net.time4j.tz.OffsetSign.BEHIND_UTC;
 
 
 /**
@@ -284,7 +285,7 @@ final class TimezoneOffsetProcessor
 
         char c = text.charAt(pos);
         pos++;
-        ZonalOffset.Sign sign;
+        OffsetSign sign;
 
         if (c == '+') {
             sign = AHEAD_OF_UTC;
