@@ -647,7 +647,7 @@ public final class DateInterval
     }
 
     @Override
-    protected TimeLine<PlainDate> getTimeLine() {
+    TimeLine<PlainDate> getTimeLine() {
 
         return PlainDate.axis();
 

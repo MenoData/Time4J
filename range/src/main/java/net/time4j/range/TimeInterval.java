@@ -293,7 +293,7 @@ public final class TimeInterval
     }
 
     @Override
-    protected TimeLine<PlainTime> getTimeLine() {
+    TimeLine<PlainTime> getTimeLine() {
 
         return PlainTime.axis();
 

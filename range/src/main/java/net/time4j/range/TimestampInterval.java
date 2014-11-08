@@ -713,7 +713,7 @@ public final class TimestampInterval
     }
 
     @Override
-    protected TimeLine<PlainTimestamp> getTimeLine() {
+    TimeLine<PlainTimestamp> getTimeLine() {
 
         return PlainTimestamp.axis();
 

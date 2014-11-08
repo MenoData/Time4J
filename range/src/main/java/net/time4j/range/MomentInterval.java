@@ -696,7 +696,7 @@ public final class MomentInterval
     }
 
     @Override
-    protected TimeLine<Moment> getTimeLine() {
+    TimeLine<Moment> getTimeLine() {
 
         return Moment.axis();
 

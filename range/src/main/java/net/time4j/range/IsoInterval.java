@@ -830,7 +830,7 @@ public abstract class IsoInterval
      * @return  associated {@code TimeLine}
      * @since   2.0
      */
-    protected abstract TimeLine<T> getTimeLine();
+    abstract TimeLine<T> getTimeLine();
 
     /**
      * <p>Liefert die zugeh&ouml;rige Fabrik. </p>
