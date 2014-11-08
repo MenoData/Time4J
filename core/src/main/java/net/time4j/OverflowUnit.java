@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.UnitRule;
@@ -35,7 +36,8 @@ import java.io.Serializable;
  * @concurrency <immutable>
  */
 final class OverflowUnit
-    implements IsoDateUnit, UnitRule.Source, Serializable {
+    extends BasicUnit
+    implements IsoDateUnit, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -110,9 +112,8 @@ final class OverflowUnit
 
     }
 
-    // optional
     @Override
-    public <T extends ChronoEntity<T>> UnitRule<T> derive(
+    protected <T extends ChronoEntity<T>> UnitRule<T> derive(
         Chronology<T> chronology
     ) {
 

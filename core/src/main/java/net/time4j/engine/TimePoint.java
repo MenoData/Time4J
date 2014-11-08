@@ -243,7 +243,8 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @return  result of addition as changed copy, this
      *          instance remains unaffected
      * @throws  RuleNotFoundException if any time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #minus(TimeSpan)
      */
@@ -257,7 +258,8 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @return  result of addition as changed copy, this
      *          instance remains unaffected
      * @throws  RuleNotFoundException if any time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #minus(TimeSpan)
      */
@@ -285,7 +287,8 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @return  result of subtraction as changed copy, this
      *          instance remains unaffected
      * @throws  RuleNotFoundException if any time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(TimeSpan)
      */
@@ -299,7 +302,8 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @return  result of subtraction as changed copy, this
      *          instance remains unaffected
      * @throws  RuleNotFoundException if any time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(TimeSpan)
      */
@@ -339,8 +343,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit        time unit
      * @return  result of addition as changed copy, this instance
      *          remains unaffected
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(TimeSpan)
      */
@@ -366,8 +371,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit        time unit
      * @return  result of addition as changed copy, this instance
      *          remains unaffected
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(TimeSpan)
      */
@@ -400,8 +406,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit        time unit
      * @return  result of subtraction as changed copy, this instance
      *          remains unaffected
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(long, Object) plus(long, U)
      */
@@ -413,8 +420,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit        time unit
      * @return  result of subtraction as changed copy, this instance
      *          remains unaffected
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #plus(long, Object) plus(long, U)
      */
@@ -482,8 +490,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit    time unit
      * @return  difference between this and given end time point
      *          as count of given time unit
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #until(TimePoint, TimeMetric)
      */
@@ -514,8 +523,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * @param   unit    time unit
      * @return  difference between this and given end time point
      *          as count of given time unit
-     * @throws  RuleNotFoundException if the time unit is not registered
-     *          and does also not implement {@link UnitRule.Source}
+     * @throws  RuleNotFoundException if given time unit is not registered
+     *          and does also not implement {@link BasicUnit} to yield
+     *          a suitable unit rule for the underlying time axis
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #until(TimePoint, TimeMetric)
      */

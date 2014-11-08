@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
@@ -33,6 +34,7 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 import static net.time4j.PlainDate.CALENDAR_DATE;
 import static net.time4j.PlainTime.WALL_TIME;
@@ -241,12 +243,23 @@ final class YOWElement
     /**
      * <p>Spezial-Zeiteinheit f&uuml;r wochenbasierte Jahre. </p>
      */
-    static enum YOWUnit
-        implements IsoDateUnit, UnitRule.Source {
+    static class YOWUnit
+        extends BasicUnit
+        implements IsoDateUnit, Serializable {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        WEEK_BASED_YEARS;
+        /** Singleton. */
+        static final YOWUnit WEEK_BASED_YEARS = new YOWUnit();
+
+        private static final long serialVersionUID = -4981215347844372171L;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private YOWUnit() {
+            // singleton
+
+        }
 
         //~ Methoden ------------------------------------------------------
 
@@ -272,7 +285,14 @@ final class YOWElement
         }
 
         @Override
-        public <T extends ChronoEntity<T>> UnitRule<T> derive(
+        public String toString() {
+
+            return "WEEK_BASED_YEARS";
+
+        }
+
+        @Override
+        protected <T extends ChronoEntity<T>> UnitRule<T> derive(
             Chronology<T> chronology
         ) {
 
@@ -281,6 +301,12 @@ final class YOWElement
             }
 
             return null;
+
+        }
+
+        private Object readResolve() throws ObjectStreamException {
+
+            return WEEK_BASED_YEARS;
 
         }
 

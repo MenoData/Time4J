@@ -126,47 +126,4 @@ public interface UnitRule<T> {
      */
     long between(T start, T end);
 
-    //~ Innere Interfaces -------------------------------------------------
-
-    /**
-     * <p>Contains a rule for a time unit. </p>
-     *
-     * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
-     * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
-     * @see     TimePoint#until(TimePoint, Object) TimePoint.until(T, U)
-     */
-    /*[deutsch]
-     * <p>Enth&auml;lt eine Regel f&uuml;r eine Zeiteinheit. </p>
-     *
-     * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
-     * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
-     * @see     TimePoint#until(TimePoint, Object) TimePoint.until(T, U)
-     */
-    public static interface Source {
-
-        //~ Methoden ------------------------------------------------------
-
-        /**
-         * <p>Derives an optional unit rule for given chronology. </p>
-         *
-         * @param   <T> generic type of time context
-         * @param   chronology  chronology an unit rule is searched for
-         * @return  unit rule or {@code null} if given chronology is
-         *          not supported
-         */
-        /*[deutsch]
-         * <p>Leitet eine optionale Einheitsregel f&uuml;r die angegebene
-         * Chronologie ab. </p>
-         *
-         * @param   <T> generic type of time context
-         * @param   chronology  chronology an unit rule is searched for
-         * @return  unit rule or {@code null} if given chronology is
-         *          not supported
-         */
-        <T extends ChronoEntity<T>> UnitRule<T> derive(
-            Chronology<T> chronology
-        );
-
-    }
-
 }

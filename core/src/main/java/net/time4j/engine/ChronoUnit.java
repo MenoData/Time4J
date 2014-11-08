@@ -31,6 +31,7 @@ package net.time4j.engine;
  * plural form. </p>
  *
  * @author  Meno Hochschild
+ * @spec    Implementations must be always <i>immutable</i>.
  */
 /*[deutsch]
  * <p>Externe Zeiteinheiten, die nicht in einer Chronologie (Zeitachse)
@@ -42,6 +43,7 @@ package net.time4j.engine;
  * Pluralform. </p>
  *
  * @author  Meno Hochschild
+ * @spec    Implementations must be always <i>immutable</i>.
  */
 public interface ChronoUnit {
 
@@ -50,7 +52,7 @@ public interface ChronoUnit {
     /**
      * <p>Defines the typical length of this time unit in seconds without
      * taking into account anomalies like timezone effects or leap seconds. </p>
-     * 
+     *
      * <p><strong>Important note:</strong> This method can only yield an
      * estimated value and is not intended to assist in calculations of
      * durations, but only in sorting of units. </p>

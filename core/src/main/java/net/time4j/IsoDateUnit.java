@@ -25,8 +25,8 @@ package net.time4j;
  * <p>Represents a calendar unit conforming to ISO-8601. </p>
  *
  * <p>Most applications will simply use a standard unit of type
- * {@code CalendarUnit}. Other units must implement the interface
- * {@link net.time4j.engine.UnitRule.Source} appropriately. </p>
+ * {@code CalendarUnit}. Other units must inherit from the class
+ * {@link net.time4j.engine.BasicUnit} appropriately. </p>
  *
  * @author  Meno Hochschild
  * @see     CalendarUnit
@@ -36,8 +36,7 @@ package net.time4j;
  *
  * <p>Die meisten Anwendungen werden einfach eine Standardeinheit vom
  * Typ {@code CalendarUnit} benutzen. Andere Zeiteinheiten m&uuml;ssen
- * das Interface {@link net.time4j.engine.UnitRule.Source} geeignet
- * implementieren. </p>
+ * von der Klasse {@link net.time4j.engine.BasicUnit} erben. </p>
  *
  * @author  Meno Hochschild
  * @see     CalendarUnit

@@ -178,7 +178,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      *
      * @param   unit    time unit (optional)
      * @return  {@code true} if supported else {@code false}
-     * @see     UnitRule.Source
+     * @see     BasicUnit#derive(Chronology)
      */
     /*[deutsch]
      * <p>Wird die angegebene Zeiteinheit unterst&uuml;tzt? </p>
@@ -188,14 +188,14 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      *
      * @param   unit    time unit (optional)
      * @return  {@code true} if supported else {@code false}
-     * @see     UnitRule.Source
+     * @see     BasicUnit#derive(Chronology)
      */
     public boolean isSupported(U unit) {
 
         if (this.isRegistered(unit)) {
             return true;
-        } else if (unit instanceof UnitRule.Source) {
-            return (UnitRule.Source.class.cast(unit).derive(this) != null);
+        } else if (unit instanceof BasicUnit) {
+            return (BasicUnit.class.cast(unit).derive(this) != null);
         } else {
             return false;
         }
@@ -493,8 +493,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         if (this.isRegistered(unit)) {
             return this.unitRules.get(unit);
-        } else if (unit instanceof UnitRule.Source) {
-            UnitRule<T> rule = UnitRule.Source.class.cast(unit).derive(this);
+        } else if (unit instanceof BasicUnit) {
+            UnitRule<T> rule = BasicUnit.class.cast(unit).derive(this);
             if (rule != null) {
                 return rule;
             }

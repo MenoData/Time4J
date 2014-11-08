@@ -8,6 +8,7 @@ import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
+import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.UnitRule;
@@ -607,7 +608,8 @@ public class PrettyTimeTest {
     }
 
     private static class FortnightPlusOneDay
-        implements IsoUnit, UnitRule.Source {
+        extends BasicUnit
+        implements IsoUnit {
 
         @Override
         public char getSymbol() {
@@ -617,11 +619,6 @@ public class PrettyTimeTest {
         @Override
         public double getLength() {
             return 86400.0 * 15;
-        }
-
-        @Override
-        public boolean isCalendrical() {
-            return true;
         }
 
         @Override
