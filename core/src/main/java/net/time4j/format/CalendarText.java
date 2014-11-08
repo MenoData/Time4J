@@ -21,7 +21,6 @@
 
 package net.time4j.format;
 
-import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
@@ -53,20 +52,20 @@ import java.util.concurrent.ConcurrentMap;
  * or weekday names. </p>
  *
  * <p>This class is a facade for an underlying implementation of
- * {@code CalendarText.Provider} which will be loaded as SPI-interface
+ * {@link TextProvider} which will be loaded as SPI-interface
  * by help of a {@code ServiceLoader}. If no such SPI-interface can be
  * found then this class will resort to the sources of JDK (usually
  * as wrapper around {@code java.text.DateFormatSymbols}). </p>
  *
  * <p>Furthermore, an instance of {@code CalendarText} can also access
- * the UTF-8 text resources in the folder &quot;data&quot; relative to
+ * the UTF-8 text resources in the folder &quot;calendar&quot; relative to
  * the class path which are not based on JDK-defaults. In all ISO-systems
  * the &quot;iso8601_{locale}.properties&quot;-files will override the
  * JDK-defaults unless it is the ROOT-locale. Example: </p>
  *
  * <p>If you wish to use the name &quot;Sonnabend&quot; instead of the standard
  * word &quot;Samstag&quot; in german locale (english: Saturday) then you can
- * copy the existing file &quot;data/iso8601_de.properties&quot; from the
+ * copy the existing file &quot;calendar/iso8601_de.properties&quot; from the
  * content of &quot;time4j-core-v{version}.jar&quot;-file into a new directory
  * with the same path. Then you can insert these lines extra (all seven entries
  * must be inserted, not just the sixth line): </p>
@@ -104,13 +103,13 @@ import java.util.concurrent.ConcurrentMap;
  * wie zum Beispiel Monats- oder Wochentagsnamen. </p>
  *
  * <p>Diese Klasse ist eine Fassade f&uuml;r eine dahinterstehende
- * {@code CalendarText.Provider}-Implementierung, die als SPI-Interface
+ * {@link TextProvider}-Implementierung, die als SPI-Interface
  * &uuml;ber einen {@code ServiceLoader}-Mechanismus geladen wird. Gibt es
  * keine solche Implementierung, wird intern auf die Quellen des JDK mittels
  * der Schnittstelle {@code java.text.DateFormatSymbols} ausgewichen. </p>
  *
  * <p>Dar&uuml;berhinaus kann eine Instanz von {@code CalendarText} auch
- * auf UTF-8-Textressourcen im Verzeichnis &quot;data&quot; innerhalb des
+ * auf UTF-8-Textressourcen im Verzeichnis &quot;calendar&quot; innerhalb des
  * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. F&uuml;r
  * alle ISO-Systeme gilt, da&szlig; die Eintr&auml;ge in den Dateien
  * &quot;iso8601_{locale}.properties&quot; die JDK-Vorgaben
@@ -118,7 +117,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>Wenn der Name &quot;Sonnabend&quot; anstatt der Standardvorgabe
  * &quot;Samstag&quot; in der deutschen Variante verwendet werden soll,
- * dann kann die existierende Datei &quot;data/iso8601_de.properties&quot;
+ * dann kann die existierende Datei &quot;calendar/iso8601_de.properties&quot;
  * vom Inhalt der Bibliotheksdatei &quot;time4j-core-v{version].jar&quot;
  * in ein neues Verzeichnis mit dem gleichen Pfad kopiert werden. Danach
  * k&ouml;nnen alle folgenden Zeilen extra eingef&uuml;gt werden (nicht nur
@@ -175,12 +174,12 @@ public final class CalendarText {
     private final String provider;
 
     // Standardtexte
-    private final Map<TextWidth, Map<OutputContext, Accessor>> stdMonths;
-    private final Map<TextWidth, Map<OutputContext, Accessor>> leapMonths;
-    private final Map<TextWidth, Map<OutputContext, Accessor>> quarters;
-    private final Map<TextWidth, Map<OutputContext, Accessor>> weekdays;
-    private final Map<TextWidth, Accessor> eras;
-    private final Map<TextWidth, Accessor> meridiems;
+    private final Map<TextWidth, Map<OutputContext, TextAccessor>> stdMonths;
+    private final Map<TextWidth, Map<OutputContext, TextAccessor>> leapMonths;
+    private final Map<TextWidth, Map<OutputContext, TextAccessor>> quarters;
+    private final Map<TextWidth, Map<OutputContext, TextAccessor>> weekdays;
+    private final Map<TextWidth, TextAccessor> eras;
+    private final Map<TextWidth, TextAccessor> meridiems;
 
     // Textformen spezifisch für eine Chronologie
     private final ResourceBundle textForms;
@@ -191,7 +190,7 @@ public final class CalendarText {
     private CalendarText(
         String calendarType,
         Locale locale,
-        Provider p
+        TextProvider p
     ) {
         super();
 
@@ -204,7 +203,7 @@ public final class CalendarText {
         try {
             rb =
                 ResourceBundle.getBundle(
-                    "data/" + calendarType,
+                    "calendar/" + calendarType,
                     locale,
                     getLoader(),
                     CONTROL);
@@ -220,7 +219,7 @@ public final class CalendarText {
             Collections.unmodifiableMap(
                 getMonths(calendarType, locale, p, false));
 
-        Map<TextWidth, Map<OutputContext, Accessor>> tmpLeapMonths =
+        Map<TextWidth, Map<OutputContext, TextAccessor>> tmpLeapMonths =
             getMonths(calendarType, locale, p, true);
 
         if (tmpLeapMonths == null) {
@@ -229,16 +228,16 @@ public final class CalendarText {
             this.leapMonths = Collections.unmodifiableMap(tmpLeapMonths);
         }
 
-        Map<TextWidth, Map<OutputContext, Accessor>> qt =
-            new EnumMap<TextWidth, Map<OutputContext, Accessor>>
+        Map<TextWidth, Map<OutputContext, TextAccessor>> qt =
+            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
                 (TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
-            Map<OutputContext, Accessor> qo =
-                new EnumMap<OutputContext, Accessor>(OutputContext.class);
+            Map<OutputContext, TextAccessor> qo =
+                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 qo.put(
                     oc,
-                    new Accessor(
+                    new TextAccessor(
                         p.quarters(calendarType, locale, tw, oc),
                         locale));
             }
@@ -247,16 +246,16 @@ public final class CalendarText {
 
         this.quarters = Collections.unmodifiableMap(qt);
 
-        Map<TextWidth, Map<OutputContext, Accessor>> wt =
-            new EnumMap<TextWidth, Map<OutputContext, Accessor>>
+        Map<TextWidth, Map<OutputContext, TextAccessor>> wt =
+            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
                 (TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
-            Map<OutputContext, Accessor> wo =
-                new EnumMap<OutputContext, Accessor>(OutputContext.class);
+            Map<OutputContext, TextAccessor> wo =
+                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 wo.put(
                     oc,
-                    new Accessor(
+                    new TextAccessor(
                         p.weekdays(calendarType, locale, tw, oc),
                         locale));
             }
@@ -265,22 +264,24 @@ public final class CalendarText {
 
         this.weekdays = Collections.unmodifiableMap(wt);
 
-        Map<TextWidth, Accessor> et =
-            new EnumMap<TextWidth, Accessor>(TextWidth.class);
+        Map<TextWidth, TextAccessor> et =
+            new EnumMap<TextWidth, TextAccessor>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             et.put(
                 tw,
-                new Accessor(p.eras(calendarType, locale, tw), locale));
+                new TextAccessor(p.eras(calendarType, locale, tw), locale));
         }
 
         this.eras = Collections.unmodifiableMap(et);
 
-        Map<TextWidth, Accessor> mt =
-            new EnumMap<TextWidth, Accessor>(TextWidth.class);
+        Map<TextWidth, TextAccessor> mt =
+            new EnumMap<TextWidth, TextAccessor>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             mt.put(
                 tw,
-                new Accessor(p.meridiems(calendarType, locale, tw), locale));
+                new TextAccessor(
+                    p.meridiems(calendarType, locale, tw),
+                    locale));
         }
 
         this.meridiems = Collections.unmodifiableMap(mt);
@@ -352,15 +353,15 @@ public final class CalendarText {
         CalendarText instance = CACHE.get(key);
 
         if (instance == null) {
-            Provider p = null;
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            TextProvider p = null;
+            ClassLoader c = Thread.currentThread().getContextClassLoader();
 
-            if (cl == null) {
-                cl = Provider.class.getClassLoader();
+            if (c == null) {
+                c = TextProvider.class.getClassLoader();
             }
 
             // ServiceLoader-Mechanismus (Suche nach externen Providern)
-            for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
+            for (TextProvider tmp : ServiceLoader.load(TextProvider.class, c)) {
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
                     && isLocaleSupported(tmp, locale)
@@ -373,7 +374,7 @@ public final class CalendarText {
             // Java-Ressourcen
             if (p == null) {
                 // TODO: Für Java 8 neuen Provider definieren (mit Quartalen)?
-                Provider tmp = new Iso8601Provider();
+                TextProvider tmp = new JDKTextProvider();
 
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
@@ -383,7 +384,7 @@ public final class CalendarText {
                 }
 
                 if (p == null) {
-                    p = new FallbackProvider();
+                    p = new FallbackProvider(); // keine-ISO-Ressource
                 }
             }
 
@@ -436,7 +437,7 @@ public final class CalendarText {
      * @return  accessor for standard month names
      * @see     net.time4j.Month
      */
-    public Accessor getStdMonths(
+    public TextAccessor getStdMonths(
         TextWidth textWidth,
         OutputContext outputContext
     ) {
@@ -474,7 +475,7 @@ public final class CalendarText {
      * @see     net.time4j.Month
      * @see     #getStdMonths(TextWidth, OutputContext)
      */
-    public Accessor getLeapMonths(
+    public TextAccessor getLeapMonths(
         TextWidth textWidth,
         OutputContext outputContext
     ) {
@@ -516,7 +517,7 @@ public final class CalendarText {
      * @return  accessor for quarter names
      * @see     net.time4j.Quarter
      */
-    public Accessor getQuarters(
+    public TextAccessor getQuarters(
         TextWidth textWidth,
         OutputContext outputContext
     ) {
@@ -558,7 +559,7 @@ public final class CalendarText {
      * @return  accessor for weekday names
      * @see     net.time4j.Weekday
      */
-    public Accessor getWeekdays(
+    public TextAccessor getWeekdays(
         TextWidth textWidth,
         OutputContext outputContext
     ) {
@@ -601,7 +602,7 @@ public final class CalendarText {
      * @return  accessor for era names
      * @see     net.time4j.engine.CalendarSystem#getEras()
      */
-    public Accessor getEras(TextWidth textWidth) {
+    public TextAccessor getEras(TextWidth textWidth) {
 
         return this.eras.get(textWidth);
 
@@ -629,7 +630,7 @@ public final class CalendarText {
      * @return  accessor for AM/PM names
      * @see     net.time4j.Meridiem
      */
-    public Accessor getMeridiems(TextWidth textWidth) {
+    public TextAccessor getMeridiems(TextWidth textWidth) {
 
         return this.meridiems.get(textWidth);
 
@@ -649,7 +650,7 @@ public final class CalendarText {
      * etc.are mainly based on JDK-defaults, this method is escpecially
      * designed for querying chronological texts which are not contained in
      * JDK. Text forms will be stored internally in the resource folder
-     * &quot;data&quot; relative to class path in properties-files using
+     * &quot;calendar&quot; relative to class path in properties-files using
      * UTF-8 encoding. The basic name of these resources is the calendar type.
      * The combination of element name and optionally variants in the form
      * &quot;(variant1|variant2|...|variantN)&quot; and the underscore and
@@ -678,7 +679,7 @@ public final class CalendarText {
      * <p>W&auml;hrend {@code getStdMonths()}, {@code getWeekdays()} etc. in
      * erster Linie auf JDK-Vorgaben beruhen, dient diese Methode dazu,
      * chronologiespezifische Texte zu beschaffen, die nicht im JDK enthalten
-     * sind. Textformen werden intern im Ressourcenverzeichnis &quot;data&quot;
+     * sind. Textformen werden intern im Verzeichnis &quot;calendar&quot;
      * des Klassenpfads mit Hilfe von properties-Dateien im UTF-8-Format
      * gespeichert. Der Basisname dieser Ressourcen ist der Kalendertyp. Als
      * Textschluuml;ssel dient die Kombination aus Elementname, optional
@@ -695,7 +696,7 @@ public final class CalendarText {
      * @throws  MissingResourceException if for given calendar type there are
      *          no text resource files
      */
-    public <V extends Enum<V>> Accessor getTextForms(
+    public <V extends Enum<V>> TextAccessor getTextForms(
         ChronoElement<V> element,
         String... variants
     ) {
@@ -746,7 +747,7 @@ public final class CalendarText {
             }
         }
 
-        return new Accessor(tfs, this.textForms.getLocale());
+        return new TextAccessor(tfs, this.textForms.getLocale());
 
     }
 
@@ -777,10 +778,10 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields the name of the internal {@code CalendarText.Provider}. </p>
+     * <p>Yields the name of the internal {@link TextProvider}. </p>
      */
     /*[deutsch]
-     * <p>Liefert den Namen des internen {@code CalendarText.Provider}. </p>
+     * <p>Liefert den Namen des internen {@link TextProvider}. </p>
      */
     @Override
     public String toString() {
@@ -825,7 +826,7 @@ public final class CalendarText {
 
     }
 
-    private Accessor getMonths(
+    private TextAccessor getMonths(
         TextWidth textWidth,
         OutputContext outputContext,
         boolean leapForm
@@ -839,21 +840,21 @@ public final class CalendarText {
 
     }
 
-    private static Map<TextWidth, Map<OutputContext, Accessor>> getMonths(
+    private static Map<TextWidth, Map<OutputContext, TextAccessor>> getMonths(
         String calendarType,
         Locale locale,
-        Provider p,
+        TextProvider p,
         boolean leapForm
     ) {
 
-        Map<TextWidth, Map<OutputContext, Accessor>> mt =
-            new EnumMap<TextWidth, Map<OutputContext, Accessor>>
+        Map<TextWidth, Map<OutputContext, TextAccessor>> mt =
+            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
                 (TextWidth.class);
         boolean usesDifferentLeapForm = false;
 
         for (TextWidth tw : TextWidth.values()) {
-            Map<OutputContext, Accessor> mo =
-                new EnumMap<OutputContext, Accessor>(OutputContext.class);
+            Map<OutputContext, TextAccessor> mo =
+                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 String[] ls =
                     p.months(calendarType, locale, tw, oc, leapForm);
@@ -862,7 +863,7 @@ public final class CalendarText {
                         p.months(calendarType, locale, tw, oc, false);
                     usesDifferentLeapForm = !Arrays.equals(std, ls);
                 }
-                mo.put(oc, new Accessor(ls, locale));
+                mo.put(oc, new TextAccessor(ls, locale));
             }
             mt.put(tw, mo);
         }
@@ -872,7 +873,7 @@ public final class CalendarText {
     }
 
     private static boolean isCalendarTypeSupported(
-        Provider p,
+        TextProvider p,
         String calendarType
     ) {
 
@@ -887,7 +888,7 @@ public final class CalendarText {
     }
 
     private static boolean isLocaleSupported(
-        Provider p,
+        TextProvider p,
         Locale locale
     ) {
 
@@ -931,470 +932,10 @@ public final class CalendarText {
 
 	}
 
-    //~ Innere Interfaces -------------------------------------------------
-
-    /**
-     * <p>This <strong>SPI-interface</strong> enables the access to calendrical
-     * standard text informations and will be instantiated by a
-     * {@code ServiceLoader}-mechanism. </p>
-     *
-     * <p>The motivation is mainly to override the language-dependent forms
-     * of JDK-defaults with respect to standard elements like months, weekdays
-     * etc. Specific text forms which are not contained in JDK will instead
-     * be supplied by help of properties-files in the &quot;data&quot;-folder.
-     * </p>
-     *
-     * @author  Meno Hochschild
-     * @spec    Implementations must have a public no-arg constructor.
-     * @see     java.util.ServiceLoader
-     */
-    /*[deutsch]
-     * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
-     * auf kalendarische Standard-Textinformationen und wird &uuml;ber einen
-     * {@code ServiceLoader}-Mechanismus instanziert. </p>
-     *
-     * <p>Sinn und Zweck dieses Interface ist in erster Linie das sprachliche
-     * Erg&auml;nzen oder &Uuml;berschreiben von JDK-Vorgaben bez&uuml;glich
-     * der Standardelemente Monat, Wochentag etc. Kalenderspezifische Texte,
-     * die gar nicht im JDK vorhanden sind, werden stattdessen mit Hilfe von
-     * properties-Dateien im data-Verzeichnis bereitgestellt. </p>
-     *
-     * @author  Meno Hochschild
-     * @spec    Implementations must have a public no-arg constructor.
-     * @see     java.util.ServiceLoader
-     */
-    public interface Provider {
-
-        //~ Methoden ------------------------------------------------------
-
-        /**
-         * <p>Defines the supported calendar types. </p>
-         *
-         * @return  String-array with calendar types
-         * @see     CalendarType
-         */
-        /*[deutsch]
-         * <p>Definiert die unterst&uuml;tzten Kalendertypen. </p>
-         *
-         * @return  String-array with calendar types
-         * @see     CalendarType
-         */
-        String[] getSupportedCalendarTypes();
-
-        /**
-         * <p>Yields the supported languages. </p>
-         *
-         * @return  Locale-array
-         */
-        /*[deutsch]
-         * <p>Gibt die unterst&uuml;tzten Sprachen an. </p>
-         *
-         * @return  Locale-array
-         */
-        Locale[] getAvailableLocales();
-
-        /**
-         * <p>See {@link CalendarText#getStdMonths}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @param   leapForm        use leap form (for example the hebrew
-         *                          month &quot;Adar II&quot;)?
-         * @return  unmodifiable sorted array of month names
-         */
-        /*[deutsch]
-         * <p>Siehe {@link CalendarText#getStdMonths}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @param   leapForm        use leap form (for example the hebrew
-         *                          month &quot;Adar II&quot;)?
-         * @return  unmodifiable sorted array of month names
-         */
-        String[] months(
-            String calendarType,
-            Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext,
-            boolean leapForm
-        );
-
-        /**
-         * <p>See {@link CalendarText#getQuarters}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @return  unmodifiable sorted array of quarter names
-         */
-        /*[deutsch]
-         * <p>Siehe {@link CalendarText#getQuarters}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @return  unmodifiable sorted array of quarter names
-         */
-        String[] quarters(
-            String calendarType,
-            Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext
-        );
-
-        /**
-         * <p>See {@link CalendarText#getWeekdays}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @return  unmodifiable sorted array of weekday names
-         *          in calendar specific order (ISO-8601 starts with monday)
-         */
-        /*[deutsch]
-         * <p>Siehe {@link CalendarText#getWeekdays}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @param   outputContext   output context
-         * @return  unmodifiable sorted array of weekday names
-         *          in calendar specific order (ISO-8601 starts with monday)
-         */
-        String[] weekdays(
-            String calendarType,
-            Locale locale,
-            TextWidth textWidth,
-            OutputContext outputContext
-        );
-
-        /**
-         * <p>See {@link CalendarText#getEras}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @return  unmodifiable sorted array of era names
-         */
-        /*[deutsch]
-         * <p>Siehe {@link CalendarText#getEras}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @return  unmodifiable sorted array of era names
-         */
-        String[] eras(
-            String calendarType,
-            Locale locale,
-            TextWidth textWidth
-        );
-
-        /**
-         * <p>See {@link CalendarText#getMeridiems}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @return  unmodifiable sorted array of AM/PM-names
-         */
-        /*[deutsch]
-         * <p>Siehe {@link CalendarText#getMeridiems}. </p>
-         *
-         * @param   calendarType    calendar type
-         * @param   locale          language of text output
-         * @param   textWidth       text width
-         * @return  unmodifiable sorted array of AM/PM-names
-         */
-        String[] meridiems(
-            String calendarType,
-            Locale locale,
-            TextWidth textWidth
-        );
-
-    }
-
     //~ Innere Klassen ----------------------------------------------------
 
-    /**
-     * <p>Supplies an access to the internal name list of an enum-based
-     * element value. </p>
-     *
-     * @author      Meno Hochschild
-     * @concurrency <immutable>
-     */
-    /*[deutsch]
-     * <p>Stellt einen Zugriff auf die enthaltenen Namen per Elementwert-Enum
-     * bereit. </p>
-     *
-     * @author      Meno Hochschild
-     * @concurrency <immutable>
-     */
-    public static final class Accessor {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final List<String> textForms;
-        private final Locale locale;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private Accessor(
-            String[] textForms,
-            Locale locale
-        ) {
-            super();
-
-            this.textForms =
-                Collections.unmodifiableList(Arrays.asList(textForms));
-            this.locale = locale;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        /**
-         * <p>Prints the given element value as String. </p>
-         *
-         * <p>If the element value has no localized representation then this
-         * method will simply print the enum name. </p>
-         *
-         * @param   value   current value of element
-         * @return  localized text form
-         */
-        /*[deutsch]
-         * <p>Stellt den angegebenen Elementwert als String dar. </p>
-         *
-         * <p>Hat der Elementwert keine lokalisierte Darstellung, wird einfach
-         * sein Enum-Name ausgegeben. </p>
-         *
-         * @param   value   current value of element
-         * @return  localized text form
-         */
-        public String print(Enum<?> value) {
-
-            int index = value.ordinal();
-
-            if (this.textForms.size() <= index) {
-                return value.name();
-            } else {
-                return this.textForms.get(index);
-            }
-
-        }
-
-        /**
-         * <p>Interpretes given text form as enum-based element value. </p>
-         *
-         * <p>Parsing is case-insensitive. No partial compare is performed,
-         * instead the whole element text will be evaluated. </p>
-         *
-         * @param   <V> generic value type of element
-         * @param   parseable       text to be parsed
-         * @param   status          current parsing position
-         * @param   valueType       value class of element
-         * @return  element value (as enum) or {@code null} if not found
-         * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
-         */
-        /*[deutsch]
-         * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
-         *
-         * <p>Die Gro&szlig;- und Kleinschreibung ist nicht relevant. Es
-         * wird immer jeweils der ganze Text verglichen. </p>
-         *
-         * @param   <V> generic value type of element
-         * @param   parseable       text to be parsed
-         * @param   status          current parsing position
-         * @param   valueType       value class of element
-         * @return  element value (as enum) or {@code null} if not found
-         * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
-         */
-        public <V extends Enum<V>> V parse(
-            CharSequence parseable,
-            ParseLog status,
-            Class<V> valueType
-        ) {
-
-            return this.parse(parseable, status, valueType, true, false);
-
-        }
-
-        /**
-         * <p>Interpretes given text form as enum-based element value. </p>
-         *
-         * <p>The attributes {@code Attributes.PARSE_CASE_INSENSITIVE} and
-         * {@code Attributes.PARSE_PARTIAL_COMPARE} will be evaluated. </p>
-         *
-         * @param   <V> generic value type of element
-         * @param   parseable       text to be parsed
-         * @param   status          current parsing position
-         * @param   valueType       value class of element
-         * @param   attributes      format attributes
-         * @return  element value (as enum) or {@code null} if not found
-         * @see     Attributes#PARSE_CASE_INSENSITIVE
-         * @see     Attributes#PARSE_PARTIAL_COMPARE
-         */
-        /*[deutsch]
-         * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
-         *
-         * <p>Es werden die Attribute {@code Attributes.PARSE_CASE_INSENSITIVE}
-         * und {@code Attributes.PARSE_PARTIAL_COMPARE} ausgewertet. </p>
-         *
-         * @param   <V> generic value type of element
-         * @param   parseable       text to be parsed
-         * @param   status          current parsing position
-         * @param   valueType       value class of element
-         * @param   attributes      format attributes
-         * @return  element value (as enum) or {@code null} if not found
-         * @see     Attributes#PARSE_CASE_INSENSITIVE
-         * @see     Attributes#PARSE_PARTIAL_COMPARE
-         */
-        public <V extends Enum<V>> V parse(
-            CharSequence parseable,
-            ParseLog status,
-            Class<V> valueType,
-            AttributeQuery attributes
-        ) {
-
-            boolean caseInsensitive =
-                attributes
-                    .get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
-                    .booleanValue();
-            boolean partialCompare =
-                attributes
-                    .get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE)
-                    .booleanValue();
-            return this.parse(
-                parseable, status, valueType, caseInsensitive, partialCompare);
-
-        }
-
-        /**
-         * <p>Supports mainly debugging. </p>
-         */
-        /*[deutsch]
-         * <p>Dient im wesentlichen Debugging-Zwecken. </p>
-         */
-        @Override
-        public String toString() {
-
-            int n = this.textForms.size();
-            StringBuilder sb = new StringBuilder(n * 16 + 2);
-            sb.append('{');
-            boolean first = true;
-            for (int i = 0; i < n; i++) {
-                if (first) {
-                    first = false;
-                } else {
-                    sb.append(',');
-                }
-                sb.append(this.textForms.get(i));
-            }
-            sb.append('}');
-            return sb.toString();
-
-        }
-
-        private <V extends Enum<V>> V parse(
-            CharSequence parseable,
-            ParseLog status,
-            Class<V> valueType,
-            boolean caseInsensitive,
-            boolean partialCompare
-        ) {
-
-            V[] enums = valueType.getEnumConstants();
-            int len = this.textForms.size();
-            int start = status.getPosition();
-            int end = parseable.length();
-
-            int maxEq = 0;
-            V candidate = null;
-
-            for (int i = 0; i < enums.length; i++) {
-                String s = (
-                    (i >= len)
-                    ? enums[i].name()
-                    : this.textForms.get(i));
-                int pos = start;
-                int n = s.length();
-                boolean eq = true;
-
-                for (int j = 0; eq && (j < n); j++) {
-                    if (start + j >= end) {
-                        eq = false;
-                    } else {
-                        char c = parseable.charAt(start + j);
-                        char t = s.charAt(j);
-
-                        if (caseInsensitive) {
-                            eq = this.compareIgnoreCase(c, t);
-                        } else {
-                            eq = (c == t);
-                        }
-
-                        if (eq) {
-                            pos++;
-                        }
-                    }
-                }
-
-                if (eq) {
-                    assert pos == start + n;
-                    status.setPosition(pos);
-                    return enums[i];
-                } else if (
-                    partialCompare
-                    && (maxEq < pos - start)
-                ) {
-                    maxEq = pos - start;
-                    candidate = enums[i];
-                }
-            }
-
-            if (candidate == null) {
-                status.setError(
-                    start, 
-                    "No suitable enum found: " + valueType.getName());
-            } else {
-                status.setPosition(start + maxEq);
-            }
-
-            return candidate;
-
-        }
-
-        private boolean compareIgnoreCase(char c1, char c2) {
-
-            if (c1 >= 'a' && c1 <= 'z') {
-                c1 = (char) (c1 - 'a' + 'A');
-            }
-
-            if (c2 >= 'a' && c2 <= 'z') {
-                c2 = (char) (c2 - 'a' + 'A');
-            }
-
-            if (c1 >= 'A' && c1 <= 'Z') {
-                return (c1 == c2);
-            }
-
-            String s1 = String.valueOf(c1).toUpperCase(this.locale);
-            String s2 = String.valueOf(c2).toUpperCase(this.locale);
-            return s1.equals(s2);
-
-        }
-
-    }
-
-    private static class Iso8601Provider
-        implements Provider {
+    private static class JDKTextProvider
+        implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
 
@@ -1421,38 +962,6 @@ public final class CalendarText {
             boolean leapForm
         ) {
 
-            ResourceBundle rb = getBundle(locale);
-
-            if (
-                (rb != null)
-                && !locale.equals(Locale.ROOT)
-            ) {
-            	String[] names;
-                String key = getKey(rb, "MONTH_OF_YEAR");
-
-                if (tw == TextWidth.SHORT) {
-                    tw = TextWidth.ABBREVIATED;
-                }
-
-            	if (
-            		(oc == OutputContext.STANDALONE)
-            		&& "true".equals(rb.getObject("enableStandalone"))
-            	) {
-            		names = lookupBundle(rb, 12, key, tw, oc);
-            	} else {
-            		names = lookupBundle(rb, 12, key, tw);
-            	}
-
-            	if (names != null) {
-            		return names;
-            	} else if (tw == TextWidth.NARROW) {
-                    names = months("", locale, TextWidth.SHORT, oc, false);
-                    return narrow(names, 12);
-
-                }
-            }
-
-            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
             switch (tw) {
@@ -1477,30 +986,6 @@ public final class CalendarText {
             OutputContext oc
         ) {
 
-            ResourceBundle rb = getBundle(locale);
-
-            if (rb != null) {
-            	String[] names;
-                String key = getKey(rb, "QUARTER_OF_YEAR");
-
-                if (tw == TextWidth.SHORT) {
-                    tw = TextWidth.ABBREVIATED;
-                }
-
-            	if (
-            		(oc == OutputContext.STANDALONE)
-            		&& "true".equals(rb.getObject("enableStandalone"))
-            	) {
-            		names = lookupBundle(rb, 4, key, tw, oc);
-            	} else {
-            		names = lookupBundle(rb, 4, key, tw);
-            	}
-
-            	if (names != null) {
-            		return names;
-            	}
-            }
-
             return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
 
         }
@@ -1513,35 +998,6 @@ public final class CalendarText {
             OutputContext oc
         ) {
 
-            ResourceBundle rb = getBundle(locale);
-
-            if (
-                (rb != null)
-                && !locale.equals(Locale.ROOT)
-            ) {
-            	String[] names;
-                String key = getKey(rb, "DAY_OF_WEEK");
-
-            	if (
-            		(oc == OutputContext.STANDALONE)
-            		&& "true".equals(rb.getObject("enableStandalone"))
-            	) {
-            		names = lookupBundle(rb, 7, key, tw, oc);
-            	} else {
-            		names = lookupBundle(rb, 7, key, tw);
-            	}
-
-            	if (names != null) {
-            		return names;
-            	} else if (tw == TextWidth.SHORT) {
-                    return weekdays("", locale, TextWidth.ABBREVIATED, oc);
-            	} else if (tw == TextWidth.NARROW) {
-                    names = weekdays("", locale, TextWidth.SHORT, oc);
-                    return narrow(names, 7);
-                }
-            }
-
-            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
             String[] result;
 
@@ -1586,21 +1042,6 @@ public final class CalendarText {
             TextWidth textWidth
         ) {
 
-            ResourceBundle rb = getBundle(locale);
-
-            if (
-                (rb != null)
-                && !locale.equals(Locale.ROOT)
-            ) {
-                String key = getKey(rb, "ERA");
-            	String[] names = lookupBundle(rb, 2, key, textWidth);
-
-            	if (names != null) {
-            		return names;
-            	}
-            }
-
-            // JDK-Quelle
             DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
             if (textWidth == TextWidth.NARROW) {
@@ -1631,20 +1072,6 @@ public final class CalendarText {
             TextWidth textWidth
         ) {
 
-            ResourceBundle rb = getBundle(locale);
-
-            if (
-                (rb != null)
-                && !locale.equals(Locale.ROOT)
-            ) {
-                String key = getKey(rb, "AM_PM_OF_DAY");
-            	String[] names = lookupBundle(rb, 2, key, textWidth);
-
-            	if (names != null) {
-            		return names;
-            	}
-            }
-
         	if (textWidth == TextWidth.NARROW) {
                 return new String[] {"A", "P"};
         	}
@@ -1657,7 +1084,7 @@ public final class CalendarText {
         @Override
         public String toString() {
 
-            return "Iso8601Provider";
+            return "JDKTextProvider";
 
         }
 
@@ -1701,102 +1128,10 @@ public final class CalendarText {
 
         }
 
-        private static ResourceBundle getBundle(Locale locale) {
-
-            try {
-                return ResourceBundle.getBundle(
-                    "data/" + ISO_CALENDAR_TYPE,
-                    locale,
-                    getLoader(),
-                    CONTROL);
-            } catch (MissingResourceException ex) {
-                return null;
-            }
-
-        }
-
-    	private static String[] lookupBundle(
-      		ResourceBundle rb,
-	       	int len,
-    	   	String elementName,
-       		TextWidth tw
-    	) {
-
-            return lookupBundle(rb, len, elementName, tw, null);
-
-        }
-
-    	private static String[] lookupBundle(
-      		ResourceBundle rb,
-	       	int len,
-    	   	String elementName,
-       		TextWidth tw,
-            OutputContext oc
-    	) {
-
-            String[] names = new String[len];
-            boolean shortKey = (elementName.length() == 1);
-
-            for (int i = 0; i < len; i++) {
-            	StringBuilder b = new StringBuilder();
-            	b.append(elementName);
-                b.append('(');
-
-                if (shortKey) {
-                    char c = tw.name().charAt(0);
-
-                    if (oc != OutputContext.STANDALONE) {
-                        c = Character.toLowerCase(c);
-                    }
-
-                    b.append(c);
-                } else {
-                    b.append(tw.name());
-
-                    if (oc == OutputContext.STANDALONE) {
-                        b.append('|');
-                        b.append(oc.name());
-                    }
-                }
-
-            	b.append(')');
-            	b.append('_');
-            	b.append(i + 1);
-            	String key = b.toString();
-
-            	if (rb.containsKey(key)) {
-               		names[i] = rb.getString(key);
-            	} else {
-               		return null;
-            	}
-            }
-
-            return names;
-
-    	}
-
-        private static String getKey(
-            ResourceBundle bundle,
-            String elementName
-        ) {
-
-            if (
-                bundle.containsKey("useShortKeys")
-                && "true".equals(bundle.getString("useShortKeys"))
-            ) {
-
-                return elementName.substring(0, 1);
-
-            }
-
-            return elementName;
-
-        }
-
     }
 
     private static class FallbackProvider
-        implements Provider {
+        implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
 

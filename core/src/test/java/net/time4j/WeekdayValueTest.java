@@ -1,8 +1,6 @@
 package net.time4j;
 
 
-import net.time4j.format.OutputContext;
-import net.time4j.format.TextWidth;
 
 import java.util.Locale;
 import org.junit.Test;
@@ -87,23 +85,6 @@ public class WeekdayValueTest {
     @Test
     public void test() {
         assertThat(Weekday.FRIDAY.test(PlainDate.of(2014, 4, 11)), is(true));
-    }
-
-    @Test
-    public void getDisplayName_1args() {
-        assertThat(Weekday.TUESDAY.getDisplayName(Locale.US), is("Tuesday"));
-    }
-
-    @Test
-    public void getDisplayName_3args() {
-        assertThat(
-            Weekday.TUESDAY.getDisplayName(
-                Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Di"));
-        assertThat(
-            Weekday.TUESDAY.getDisplayName(
-                Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
-            is("Dienstag"));
     }
 
 }

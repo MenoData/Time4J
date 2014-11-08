@@ -27,6 +27,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.ParseLog;
+import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.TZID;
@@ -175,7 +176,7 @@ enum AmPmElement
 
     }
 
-    private CalendarText.Accessor accessor(AttributeQuery attributes) {
+    private TextAccessor accessor(AttributeQuery attributes) {
 
         CalendarText cnames =
             CalendarText.getInstance(

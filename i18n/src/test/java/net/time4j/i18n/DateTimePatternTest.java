@@ -1,8 +1,9 @@
-package net.time4j.format;
+package net.time4j.i18n;
 
 import net.time4j.Iso8601Format;
 import net.time4j.PatternType;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.ChronoFormatter;
 
 import java.text.ParseException;
 import java.util.Arrays;

@@ -1,10 +1,6 @@
 package net.time4j;
 
 
-import net.time4j.format.OutputContext;
-import net.time4j.format.TextWidth;
-
-import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -50,23 +46,6 @@ public class QuarterValueTest {
     @Test
     public void test() {
         assertThat(Quarter.Q1.test(PlainDate.of(2012, 2, 17)), is(true));
-    }
-
-    @Test
-    public void getDisplayName_1args() {
-        assertThat(Quarter.Q1.getDisplayName(Locale.US), is("1st quarter"));
-    }
-
-    @Test
-    public void getDisplayName_3args() {
-        assertThat(
-            Quarter.Q1.getDisplayName(
-                Locale.ENGLISH, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Q1"));
-        assertThat(
-            Quarter.Q1.getDisplayName(
-                Locale.ENGLISH, TextWidth.WIDE, OutputContext.FORMAT),
-            is("1st quarter"));
     }
 
 }

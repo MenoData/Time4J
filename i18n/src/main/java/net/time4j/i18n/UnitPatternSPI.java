@@ -264,7 +264,7 @@ public final class UnitPatternSPI
         }
 
 		ClassLoader loader = this.getClass().getClassLoader();
-		ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		ResourceBundle rb =
             ResourceBundle.getBundle("units/pattern", lang, loader, control);
         String exact = buildListKey(width, String.valueOf(size));
@@ -365,7 +365,7 @@ public final class UnitPatternSPI
 	) {
 
 		ClassLoader loader = this.getClass().getClassLoader();
-		ResourceBundle.Control control = UnitPatternControl.SINGLETON;
+		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		boolean init = true;
 		ResourceBundle first = null;
 

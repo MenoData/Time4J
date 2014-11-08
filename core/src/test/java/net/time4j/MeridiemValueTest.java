@@ -1,7 +1,6 @@
 package net.time4j;
 
 
-import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -35,12 +34,6 @@ public class MeridiemValueTest {
     public void test() {
         assertThat(Meridiem.AM.test(PlainTime.of(12)), is(false));
         assertThat(Meridiem.PM.test(PlainTime.of(12)), is(true));
-    }
-
-    @Test
-    public void getDisplayName() {
-        assertThat(Meridiem.AM.getDisplayName(Locale.US), is("AM"));
-        assertThat(Meridiem.PM.getDisplayName(Locale.US), is("PM"));
     }
 
 }

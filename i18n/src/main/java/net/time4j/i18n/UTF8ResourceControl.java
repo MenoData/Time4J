@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (UnitPatternControl.java) is part of project Time4J.
+ * This file (UTF8ResourceControl.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -40,17 +40,17 @@ import java.util.ResourceBundle;
  * @author  Meno Hochschild
  * @since   1.2
  */
-class UnitPatternControl
+class UTF8ResourceControl
     extends ResourceBundle.Control {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     public static final ResourceBundle.Control SINGLETON =
-    	new UnitPatternControl();
+    	new UTF8ResourceControl();
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private UnitPatternControl() {
+    private UTF8ResourceControl() {
         super();
 
     }

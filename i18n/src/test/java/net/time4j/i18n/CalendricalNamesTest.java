@@ -1,4 +1,4 @@
-package net.time4j.format;
+package net.time4j.i18n;
 
 import net.time4j.Meridiem;
 import net.time4j.Month;
@@ -8,7 +8,12 @@ import net.time4j.Quarter;
 import net.time4j.Weekday;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
-import net.time4j.format.CalendarText.Provider;
+import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
+import net.time4j.format.OutputContext;
+import net.time4j.format.ParseLog;
+import net.time4j.format.TextProvider;
+import net.time4j.format.TextWidth;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
@@ -41,14 +46,14 @@ public class CalendricalNamesTest {
     public void getInstance_String_Locale() {
         Locale locale = Locale.US;
         CalendarText result = CalendarText.getInstance("iso8601", locale);
-        Provider p = null;
+        TextProvider p = null;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         if (cl == null) {
             cl = CalendarText.class.getClassLoader();
         }
 
-        for (Provider tmp : ServiceLoader.load(Provider.class, cl)) {
+        for (TextProvider tmp : ServiceLoader.load(TextProvider.class, cl)) {
             if (
                 isCalendarTypeSupported(tmp, "iso8601")
                 && isLocaleSupported(tmp, locale)
@@ -58,9 +63,7 @@ public class CalendricalNamesTest {
             }
         }
 
-        if (p == null) {
-            assertThat(result.toString(), is("Iso8601Provider"));
-        } else {
+        if (p != null) {
             assertThat(result.toString(), is(p.toString()));
         }
 
@@ -519,7 +522,7 @@ public class CalendricalNamesTest {
     }
 
     private static boolean isCalendarTypeSupported(
-        Provider p,
+        TextProvider p,
         String calendarType
     ) {
 
@@ -534,7 +537,7 @@ public class CalendricalNamesTest {
     }
 
     private static boolean isLocaleSupported(
-        Provider p,
+        TextProvider p,
         Locale locale
     ) {
 

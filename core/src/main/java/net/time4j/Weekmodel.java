@@ -37,6 +37,7 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.ParseLog;
+import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.WeekdataProvider;
@@ -1129,7 +1130,7 @@ public final class Weekmodel
 
         }
 
-        private CalendarText.Accessor accessor(AttributeQuery attributes) {
+        private TextAccessor accessor(AttributeQuery attributes) {
 
             CalendarText cnames =
                 CalendarText.getInstance(

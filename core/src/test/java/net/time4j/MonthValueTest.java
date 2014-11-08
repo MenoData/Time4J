@@ -1,10 +1,6 @@
 package net.time4j;
 
 
-import net.time4j.format.OutputContext;
-import net.time4j.format.TextWidth;
-
-import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -99,23 +95,6 @@ public class MonthValueTest {
         assertThat(Month.atEndOfQuarterYear(Quarter.Q2), is(Month.JUNE));
         assertThat(Month.atEndOfQuarterYear(Quarter.Q3), is(Month.SEPTEMBER));
         assertThat(Month.atEndOfQuarterYear(Quarter.Q4), is(Month.DECEMBER));
-    }
-
-    @Test
-    public void getDisplayName_1args() {
-        assertThat(Month.FEBRUARY.getDisplayName(Locale.GERMAN), is("Februar"));
-    }
-
-    @Test
-    public void getDisplayName_3args() {
-        assertThat(
-            Month.FEBRUARY.getDisplayName(
-                Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
-            is("Februar"));
-        assertThat(
-            Month.FEBRUARY.getDisplayName(
-                Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Feb"));
     }
 
 }
