@@ -654,7 +654,7 @@ public abstract class IsoInterval
                 endA = this.getTimeLine().stepBackwards(endA);
             }
 
-            if (endA.isBefore(startB)) {
+            if ((endA == null) || endA.isBefore(startB)) {
                 return false;
             } else if (endB == null) {
                 return true;
@@ -769,7 +769,7 @@ public abstract class IsoInterval
                 endB = this.getTimeLine().stepBackwards(endB);
             }
 
-            if (startA.isAfter(endB)) {
+            if ((endA == null) || (endB == null) || startA.isAfter(endB)) {
                 return false;
             }
         } else {
@@ -780,10 +780,7 @@ public abstract class IsoInterval
                 endB = this.getTimeLine().stepForward(endB);
             }
 
-            if (
-                (endB != null)
-                && !startA.isBefore(endB)
-            ) {
+            if ((endB != null) && !startA.isBefore(endB)) {
                 return false;
             }
 
@@ -799,9 +796,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval finish the other one such that both end
-     * time points are equal and the start of this interval is before the
-     * start of the other one? </p>
+     * <p>Equivalent to {@code other.finishes(this)}. </p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -809,9 +804,7 @@ public abstract class IsoInterval
      *          the other one and an earlier start else {@code false}
      */
     /*[deutsch]
-     * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
-     * Endzeitpunkten der Start dieses Intervalls vor dem Start des anderen
-     * liegt? </p>
+     * <p>&Auml;quivalent to {@code other.finishes(this)}. </p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -821,6 +814,120 @@ public abstract class IsoInterval
     public boolean finishedBy(I other) {
 
         return other.finishes(this.getContext());
+
+    }
+
+    /**
+     * <p>Does this interval start the other one such that both start
+     * time points are equal and the end of this interval is after the
+     * end of the other one? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same start point as
+     *          the other one and a earlier end else {@code false}
+     */
+    /*[deutsch]
+     * <p>Beginnt dieses Intervall so das andere, da&szlig; bei gleichen
+     * Beginnzeitpunkten das Ende dieses Intervalls nach dem Ende des anderen
+     * liegt? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same start point as
+     *          the other one and a earlier end else {@code false}
+     */
+    public boolean starts(I other) {
+
+        if (this.getEnd().isInfinite()) {
+            return false;
+        }
+
+        T startA = this.getStart().getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if (startB == null) {
+            if (startA != null) {
+                return false;
+            }
+        } else if (startA == null) {
+            if (startB != null) {
+                return false;
+            }
+        } else if (!startA.isSimultaneous(startB)) {
+            return false;
+        }
+
+        T endA = this.getEnd().getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (endB == null) {
+            if (this.getEnd().isClosed()) {
+                return true;
+            } else if (startB == null) {
+                return (this.getTimeLine().stepBackwards(endA) != null);
+            } else {
+                return endA.isAfter(startB);
+            }
+        }
+
+        if (this.getFactory().isCalendrical()) {
+            if (this.getEnd().isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
+            if ((endA == null) || (endB == null) || !endA.isBefore(endB)) {
+                return false;
+            }
+        } else {
+            if (this.getEnd().isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+                if (endA == null) {
+                    return false;
+                }
+            }
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+            }
+            if (
+                (endB != null)
+                && !endA.isBefore(endB)
+            ) {
+                return false;
+            }
+        }
+
+        if (this.getEnd().isClosed()) {
+            return true;
+        } else if (startB == null) {
+            return (this.getTimeLine().stepBackwards(endA) != null);
+        } else {
+            return endA.isAfter(startB);
+        }
+
+    }
+
+    /**
+     * <p>Equivalent to {@code other.starts(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same start point as
+     *          the other one and an later end else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code other.starts(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the same start point as
+     *          the other one and an later end else {@code false}
+     */
+    public boolean startedBy(I other) {
+
+        return other.starts(this.getContext());
 
     }
 

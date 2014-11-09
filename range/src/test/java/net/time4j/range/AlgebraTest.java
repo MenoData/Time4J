@@ -367,6 +367,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.since(startB).collapse();
 
         assertThat(a.finishedBy(b), is(false));
+        assertThat(b.finishedBy(a), is(false));
     }
 
     @Test
@@ -380,6 +381,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.since(startB).collapse();
 
         assertThat(a.finishedBy(b), is(false));
+        assertThat(b.finishedBy(a), is(false));
     }
 
     @Test
@@ -614,6 +616,157 @@ public class AlgebraTest {
 
         assertThat(a.overlaps(b), is(false));
         assertThat(a.overlappedBy(b), is(false));
+    }
+
+    @Test
+    public void startedByEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 13);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(b.startedBy(a), is(false));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void startedByEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 14);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(b.startedBy(a), is(false));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void starts1() {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 18);
+
+        PlainDate startB = PlainDate.of(2012, 2, 29);
+        PlainDate endB = PlainDate.of(2014, 5, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(true));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void starts2() {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 18);
+
+        PlainDate startB = PlainDate.of(2012, 2, 29);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(false));
+        assertThat(a.startedBy(b), is(true));
+    }
+
+    @Test
+    public void starts3() { // equivalent
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 16);
+
+        PlainDate startB = PlainDate.of(2012, 2, 29);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB).withOpenEnd();
+
+        assertThat(a.starts(b), is(false));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void starts4() { // contains
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 16);
+
+        PlainDate startB = PlainDate.of(2012, 2, 28);
+        PlainDate endB = PlainDate.of(2014, 5, 17);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(false));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void starts5() { // overlaps
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 5, 16);
+
+        PlainDate startB = PlainDate.of(2012, 2, 28);
+        PlainDate endB = PlainDate.of(2014, 5, 14);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(false));
+        assertThat(a.startedBy(b), is(false));
+    }
+
+    @Test
+    public void startsTSP() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endA = PlainDate.of(2014, 5, 17).atStartOfDay();
+
+        PlainTimestamp startB = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 18).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.between(startA, endA);
+        TimestampInterval b = TimestampInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(true));
+        assertThat(b.starts(a), is(false));
+        assertThat(a.startedBy(b), is(false));
+        assertThat(b.startedBy(a), is(true));
+    }
+
+    @Test
+    public void startsTSPMin() {
+        PlainTimestamp startA = PlainTimestamp.axis().getMinimum();
+        PlainTimestamp endA = PlainDate.of(2012, 2, 29).atStartOfDay();
+
+        PlainTimestamp startB = PlainTimestamp.axis().getMinimum();
+        PlainTimestamp endB = PlainDate.of(2014, 5, 11).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.between(startA, endA);
+        TimestampInterval b = TimestampInterval.between(startB, endB);
+
+        assertThat(a.starts(b), is(true));
+        assertThat(b.starts(a), is(false));
+        assertThat(a.startedBy(b), is(false));
+        assertThat(b.startedBy(a), is(true));
+    }
+
+    @Test
+    public void startsTSPPast() {
+        PlainTimestamp startA = PlainDate.of(2012, 2, 29).atStartOfDay();
+        PlainTimestamp startB = PlainDate.of(2014, 5, 11).atStartOfDay();
+
+        TimestampInterval a = TimestampInterval.until(startA);
+        TimestampInterval b = TimestampInterval.until(startB);
+
+        assertThat(a.starts(b), is(true));
+        assertThat(b.starts(a), is(false));
+        assertThat(a.startedBy(b), is(false));
+        assertThat(b.startedBy(a), is(true));
     }
 
 }
