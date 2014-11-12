@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 
 import org.junit.Test;
@@ -338,6 +339,21 @@ public class BasicDateRangeTest {
     public void collapsePast() {
         PlainDate end = PlainDate.of(2014, 2, 27);
         DateInterval.until(end).collapse();
+    }
+
+    @Test
+    public void move() {
+        PlainDate start1 = PlainDate.of(2014, 2, 27);
+        PlainDate end1 = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.between(start1, end1);
+
+        PlainDate start2 = PlainDate.of(2014, 10, 27);
+        PlainDate end2 = PlainDate.of(2015, 1, 14);
+        DateInterval expected = DateInterval.between(start2, end2);
+
+        assertThat(
+            interval.move(8, CalendarUnit.MONTHS),
+            is(expected));
     }
 
 }

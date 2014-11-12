@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 
+import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -267,6 +268,21 @@ public class BasicMomentRangeTest {
                 .between(start, end)
                 .toString(),
             is("[2014-02-27T14:45:00Z/2014-05-14T09:30:00Z)"));
+    }
+
+    @Test
+    public void move() {
+        Moment start1 = PlainTimestamp.of(2014, 5, 1, 23, 0).atUTC();
+        Moment end1 = PlainTimestamp.of(2014, 5, 2, 16, 0).atUTC();
+        MomentInterval interval = MomentInterval.between(start1, end1);
+
+        Moment start2 = PlainTimestamp.of(2014, 5, 2, 11, 0).atUTC();
+        Moment end2 = PlainTimestamp.of(2014, 5, 3, 4, 0).atUTC();
+        MomentInterval expected = MomentInterval.between(start2, end2);
+
+        assertThat(
+            interval.move(12, TimeUnit.HOURS),
+            is(expected));
     }
 
 }

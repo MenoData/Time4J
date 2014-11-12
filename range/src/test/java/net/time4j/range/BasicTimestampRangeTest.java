@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.PlainTimestamp;
 
 import org.junit.Test;
@@ -282,6 +283,21 @@ public class BasicTimestampRangeTest {
     public void withClosedEndInfinite() {
         PlainTimestamp start = PlainTimestamp.of(2014, 2, 27, 14, 45);
         TimestampInterval.since(start).withClosedEnd();
+    }
+
+    @Test
+    public void move() {
+        PlainTimestamp start1 = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end1 = PlainTimestamp.of(2014, 5, 2, 16, 0);
+        TimestampInterval interval = TimestampInterval.between(start1, end1);
+
+        PlainTimestamp start2 = PlainTimestamp.of(2014, 5, 2, 11, 0);
+        PlainTimestamp end2 = PlainTimestamp.of(2014, 5, 3, 4, 0);
+        TimestampInterval expected = TimestampInterval.between(start2, end2);
+
+        assertThat(
+            interval.move(12, ClockUnit.HOURS),
+            is(expected));
     }
 
 }

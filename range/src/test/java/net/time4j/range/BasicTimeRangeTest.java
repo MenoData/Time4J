@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.PlainTime;
 
 import org.junit.Test;
@@ -273,6 +274,21 @@ public class BasicTimeRangeTest {
                 .between(start, end)
                 .toString(),
             is("[T19:45/T20:30)"));
+    }
+
+    @Test
+    public void move() {
+        PlainTime start1 = PlainTime.of(3, 20, 27);
+        PlainTime end1 = PlainTime.of(7, 50, 14);
+        TimeInterval interval = TimeInterval.between(start1, end1);
+
+        PlainTime start2 = PlainTime.of(7, 20, 27);
+        PlainTime end2 = PlainTime.of(11, 50, 14);
+        TimeInterval expected = TimeInterval.between(start2, end2);
+
+        assertThat(
+            interval.move(4, ClockUnit.HOURS),
+            is(expected));
     }
 
 }
