@@ -42,6 +42,7 @@ import java.io.IOException;
  * interval types. This default setting can be overwritten however. </p>
  *
  * @param   <T> temporal type of time points within a given interval
+ * @param   <I> generic self-referencing interval type
  * @author  Meno Hochschild
  * @since   2.0
  */
@@ -54,6 +55,7 @@ import java.io.IOException;
  * Diese Standardeinstellung kann jedoch &uuml;berschrieben werden. </p>
  *
  * @param   <T> temporal type of time points within a given interval
+ * @param   <I> generic self-referencing interval type
  * @author  Meno Hochschild
  * @since   2.0
  */
@@ -681,6 +683,10 @@ public abstract class IsoInterval
      * <p>Does this interval equal the other one taking into account the
      * open or closed state of the boundaries? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/equivalent.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval is temporally equivalent to
@@ -690,6 +696,10 @@ public abstract class IsoInterval
      * <p>Ist dieses Intervall gleich dem anderen Intervall unter
      * Ber&uuml;cksichtigung des offen/geschlossen-Zustands der
      * Intervallgrenzen? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/equivalent.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -754,6 +764,10 @@ public abstract class IsoInterval
      * <p>Does this interval precede the other one such that there is a gap
      * between? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/precedes.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
@@ -762,6 +776,10 @@ public abstract class IsoInterval
     /*[deutsch]
      * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
      * eine L&uuml;cke existiert? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/precedes.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -793,6 +811,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.precedes(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/precededBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
@@ -800,6 +822,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.precedes(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/precededBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -816,6 +842,10 @@ public abstract class IsoInterval
      * <p>Does this interval precede the other one such that there is no gap
      * between? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/meets.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
@@ -824,6 +854,10 @@ public abstract class IsoInterval
     /*[deutsch]
      * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
      * keine L&uuml;cke existiert? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/meets.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -866,6 +900,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.meets(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/metBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
@@ -873,6 +911,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.meets(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/metBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -889,6 +931,10 @@ public abstract class IsoInterval
      * <p>Does this interval overlaps the other one such that the start
      * of this interval is still before the start of the other one? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/overlaps.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval overlaps the other such
@@ -898,6 +944,10 @@ public abstract class IsoInterval
     /*[deutsch]
      * <p>&Uuml;berlappt dieses Intervall so das andere, da&szlig; der
      * Start dieses Intervalls noch vor dem Start des anderen liegt? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/overlaps.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -962,6 +1012,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.overlaps(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/overlappedBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if the other interval overlaps this such
@@ -970,6 +1024,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.overlaps(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/overlappedBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -988,6 +1046,10 @@ public abstract class IsoInterval
      * time points are equal and the start of this interval is after the
      * start of the other one? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/finishes.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
@@ -997,6 +1059,10 @@ public abstract class IsoInterval
      * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
      * Endzeitpunkten der Start dieses Intervalls nach dem Start des anderen
      * liegt? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/finishes.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1071,6 +1137,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.finishes(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/finishedBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
@@ -1078,6 +1148,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.finishes(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/finishedBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1095,6 +1169,10 @@ public abstract class IsoInterval
      * time points are equal and the end of this interval is after the
      * end of the other one? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/starts.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
@@ -1104,6 +1182,10 @@ public abstract class IsoInterval
      * <p>Beginnt dieses Intervall so das andere, da&szlig; bei gleichen
      * Beginnzeitpunkten das Ende dieses Intervalls nach dem Ende des anderen
      * liegt? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/starts.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1190,6 +1272,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.starts(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/startedBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
@@ -1197,6 +1283,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.starts(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/startedBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1214,6 +1304,10 @@ public abstract class IsoInterval
      * is before the start of the other one and this end is after the end
      * of the other one? </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/encloses.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the earlier start point and
@@ -1223,6 +1317,10 @@ public abstract class IsoInterval
      * <p>Umfasst dieses Intervall so das andere, da&szlig; der Start dieses
      * Intervalls vor dem Start des anderen und das Ende dieses Intervalls
      * nach dem Ende des anderen Intervalls liegt? </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/encloses.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1295,6 +1393,10 @@ public abstract class IsoInterval
     /**
      * <p>Equivalent to {@code other.encloses(this)}. </p>
      *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/enclosedBy.jpg" /></p>
+     *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the later start point and
@@ -1302,6 +1404,10 @@ public abstract class IsoInterval
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.encloses(this)}. </p>
+     *
+     * <p>Relation diagram: </p>
+     *
+     * <p><img src="doc-files/enclosedBy.jpg" /></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
