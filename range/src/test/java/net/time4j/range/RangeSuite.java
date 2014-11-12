@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MomentIntervalFormatTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class,
+        RelationTest.class,
         TimestampIntervalFormatTest.class
     }
 )
