@@ -421,6 +421,88 @@ public final class MomentInterval
     }
 
     /**
+     * <p>Moves this interval along the POSIX-axis by given time units. </p>
+     *
+     * @param   amount  amount of units
+     * @param   unit    time unit for moving
+     * @return  moved copy of this interval
+     */
+    public MomentInterval move(
+        long amount,
+        TimeUnit unit
+    ) {
+
+        if (amount == 0) {
+            return this;
+        }
+
+        Boundary<Moment> s;
+        Boundary<Moment> e;
+
+        if (this.getStart().isInfinite()) {
+            s = Boundary.infinitePast();
+        } else {
+            s =
+                Boundary.of(
+                    this.getStart().getEdge(),
+                    this.getStart().getTemporal().plus(amount, unit));
+        }
+
+        if (this.getEnd().isInfinite()) {
+            e = Boundary.infiniteFuture();
+        } else {
+            e =
+                Boundary.of(
+                    this.getEnd().getEdge(),
+                    this.getEnd().getTemporal().plus(amount, unit));
+        }
+
+        return new MomentInterval(s, e);
+
+    }
+
+    /**
+     * <p>Moves this interval along the UTC-axis by given SI-units. </p>
+     *
+     * @param   amount  amount of units
+     * @param   unit    time unit for moving
+     * @return  moved copy of this interval
+     */
+    public MomentInterval move(
+        long amount,
+        SI unit
+    ) {
+
+        if (amount == 0) {
+            return this;
+        }
+
+        Boundary<Moment> s;
+        Boundary<Moment> e;
+
+        if (this.getStart().isInfinite()) {
+            s = Boundary.infinitePast();
+        } else {
+            s =
+                Boundary.of(
+                    this.getStart().getEdge(),
+                    this.getStart().getTemporal().plus(amount, unit));
+        }
+
+        if (this.getEnd().isInfinite()) {
+            e = Boundary.infiniteFuture();
+        } else {
+            e =
+                Boundary.of(
+                    this.getEnd().getEdge(),
+                    this.getEnd().getTemporal().plus(amount, unit));
+        }
+
+        return new MomentInterval(s, e);
+
+    }
+
+    /**
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed

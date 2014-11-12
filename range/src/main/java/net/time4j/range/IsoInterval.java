@@ -195,10 +195,10 @@ public abstract class IsoInterval
 
         Boundary<T> b;
 
-        if (this.getEnd().isInfinite()) {
+        if (this.end.isInfinite()) {
             b = Boundary.infiniteFuture();
         } else {
-            b = Boundary.of(IntervalEdge.OPEN, this.getEnd().getTemporal());
+            b = Boundary.of(IntervalEdge.OPEN, this.end.getTemporal());
         }
 
         return this.getFactory().between(this.start, b);
@@ -252,10 +252,118 @@ public abstract class IsoInterval
     }
 
     @Override
+    public boolean isBefore(T temporal) {
+
+        if (temporal == null) {
+            throw new NullPointerException();
+        } else if (this.end.isInfinite()) {
+            return false;
+        }
+
+        T endA = this.end.getTemporal();
+
+        if (this.end.isOpen()) {
+            endA = this.getTimeLine().stepBackwards(endA);
+            if (endA == null) {
+                return true;
+            }
+        }
+
+        return endA.isBefore(temporal);
+
+    }
+
+    /**
+     * <p>Is this interval before the other one? </p>
+     *
+     * <p>Equivalent to the expression
+     * {@code (precedes(other) || meets(other))}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other one
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall vor dem anderen? </p>
+     *
+     * <p>&Auml;quivalent zum Ausdruck
+     * {@code (precedes(other) || meets(other))}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is before the other one
+     *          else {@code false}
+     */
+    public boolean isBefore(I other) {
+
+        if (
+            other.getStart().isInfinite()
+            || this.end.isInfinite()
+        ) {
+            return false;
+        }
+
+        T endA = this.end.getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if (this.end.isOpen()) {
+            endA = this.getTimeLine().stepBackwards(endA);
+            if (endA == null) {
+                return true;
+            }
+        }
+
+        return endA.isBefore(startB);
+
+    }
+
+    @Override
+    public boolean isAfter(T temporal) {
+
+        if (temporal == null) {
+            throw new NullPointerException();
+        } else if (this.start.isInfinite()) {
+            return false;
+        }
+
+        return this.start.getTemporal().isAfter(temporal);
+
+    }
+
+    /**
+     * <p>Is this interval after the other one? </p>
+     *
+     * <p>Equivalent to the expression
+     * {@code (precededBy(other) || metBy(other))}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other one
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall nach dem anderen? </p>
+     *
+     * <p>&Auml;quivalent zum Ausdruck
+     * {@code (precededBy(other) || metBy(other))}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is after the other one
+     *          else {@code false}
+     */
+    public boolean isAfter(I other) {
+
+        return other.isBefore(this.getContext());
+
+    }
+
+    @Override
     public boolean contains(T temporal) {
 
         if (temporal == null) {
-            return false;
+            throw new NullPointerException();
         }
 
         boolean startCondition;
@@ -287,6 +395,92 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Does this interval contain the other one? </p>
+     *
+     * <p>In contrast to {@link #encloses} the interval boundaries may also
+     * be equal. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval contains the other one
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Enth&auml;lt dieses Intervall das andere Intervall? </p>
+     *
+     * <p>Im Unterschied zu {@link #encloses} d&uuml;rfen die Grenzen der
+     * Intervalle auch gleich sein. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval contains the other one
+     *          else {@code false}
+     */
+    public boolean contains(I other) {
+
+        if (!other.isFinite()) {
+            return false;
+        }
+
+        T startA = this.start.getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if ((startA != null) && startA.isAfter(startB)) {
+            return false;
+        }
+
+        T endA = this.end.getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (endA == null) {
+            return true;
+        }
+
+        if (
+            other.getEnd().isOpen()
+            && startB.isSimultaneous(endB)
+        ) {
+            if (this.end.isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if ((endA == null) || startB.isAfter(endA)) {
+                return false;
+            }
+        } else if (this.getFactory().isCalendrical()) {
+            if (this.end.isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
+            if (
+                (endA == null)
+                || (endB == null) // dann startB = infinite_past
+                || endA.isBefore(endB)
+            ) {
+                return false;
+            }
+        } else {
+            if (this.end.isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+                if (endA == null) {
+                    return true;
+                }
+            }
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+                if (endB == null) {
+                    return false;
+                }
+            }
+            return !endA.isBefore(endB);
+        }
+
+        return true;
+
+    }
+
+    /**
      * <p>Changes this interval to an empty interval with the same
      * start anchor. </p>
      *
@@ -309,7 +503,7 @@ public abstract class IsoInterval
 
         Boundary<T> b =
             Boundary.of(IntervalEdge.OPEN, this.start.getTemporal());
-        return this.getFactory().between(this.getStart(), b);
+        return this.getFactory().between(this.start, b);
 
     }
 
@@ -484,6 +678,79 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Does this interval equal the other one taking into account the
+     * open or closed state of the boundaries? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is temporally equivalent to
+     *          the other one else {@code false}
+     */
+    /*[deutsch]
+     * <p>Ist dieses Intervall gleich dem anderen Intervall unter
+     * Ber&uuml;cksichtigung des offen/geschlossen-Zustands der
+     * Intervallgrenzen? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval is temporally equivalent to
+     *          the other one else {@code false}
+     */
+    public boolean equivalentTo(I other) {
+
+        if (this.getContext() == other) {
+            return true;
+        }
+
+        T startA = this.start.getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if (startA == null) {
+            if (startB != null) {
+                return false;
+            }
+        } else if (startB == null) {
+            return false;
+        } else if (!startA.isSimultaneous(startB)) {
+            return false;
+        }
+
+        T endA = this.end.getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (endA == null) {
+            return (endB == null);
+        } else if (endB == null) {
+            return false;
+        }
+
+        if (this.getFactory().isCalendrical()) {
+            if (this.end.isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
+        } else {
+            if (this.end.isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+            }
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+            }
+        }
+
+        if (endA == null) {
+            return (endB == null);
+        } else if (endB == null) {
+            return false;
+        } else {
+            return endA.isSimultaneous(endB);
+        }
+
+    }
+
+    /**
      * <p>Does this interval precede the other one such that there is a gap
      * between? </p>
      *
@@ -505,14 +772,14 @@ public abstract class IsoInterval
 
         if (
             other.getStart().isInfinite()
-            || this.getEnd().isInfinite()
+            || this.end.isInfinite()
         ) {
             return false;
         }
 
-        T endA = this.getEnd().getTemporal();
+        T endA = this.end.getTemporal();
 
-        if (this.getEnd().isClosed()) {
+        if (this.end.isClosed()) {
             endA = this.getTimeLine().stepForward(endA);
             if (endA == null) {
                 return false;
@@ -567,21 +834,32 @@ public abstract class IsoInterval
 
         if (
             other.getStart().isInfinite()
-            || this.getEnd().isInfinite()
+            || this.end.isInfinite()
         ) {
             return false;
         }
 
-        T endA = this.getEnd().getTemporal();
+        T endA = this.end.getTemporal();
 
-        if (this.getEnd().isClosed()) {
+        if (this.end.isClosed()) {
             endA = this.getTimeLine().stepForward(endA);
             if (endA == null) {
                 return false;
             }
         }
 
-        return endA.isSimultaneous(other.getStart().getTemporal());
+        if (endA.isSimultaneous(other.getStart().getTemporal())) {
+            T startA = this.start.getTemporal();
+            T endB = other.getEnd().getTemporal();
+
+            if ((startA == null) || (endB == null)) {
+                return true;
+            } else {
+                return startA.isBefore(endB); // excludes empty.meets(empty)
+            }
+        }
+
+        return false;
 
     }
 
@@ -631,26 +909,23 @@ public abstract class IsoInterval
 
         if (
             other.getStart().isInfinite()
-            || this.getEnd().isInfinite()
+            || this.end.isInfinite()
         ) {
             return false;
         }
 
-        T startA = this.getStart().getTemporal();
+        T startA = this.start.getTemporal();
         T startB = other.getStart().getTemporal();
 
-        if (
-            (startA != null)
-            && !startA.isBefore(startB)
-        ) {
+        if ((startA != null) && !startA.isBefore(startB)) {
             return false;
         }
 
-        T endA = this.getEnd().getTemporal();
+        T endA = this.end.getTemporal();
         T endB = other.getEnd().getTemporal();
 
         if (this.getFactory().isCalendrical()) {
-            if (this.getEnd().isOpen()) {
+            if (this.end.isOpen()) {
                 endA = this.getTimeLine().stepBackwards(endA);
             }
 
@@ -664,7 +939,7 @@ public abstract class IsoInterval
                 endB = this.getTimeLine().stepBackwards(endB);
             }
         } else {
-            if (this.getEnd().isClosed()) {
+            if (this.end.isClosed()) {
                 endA = this.getTimeLine().stepForward(endA);
                 if (endA == null) {
                     return (endB == null);
@@ -680,14 +955,7 @@ public abstract class IsoInterval
             }
         }
 
-        if (
-            (endB != null)
-            && !endA.isBefore(endB)
-        ) {
-            return false;
-        }
-
-        return true;
+        return ((endB == null) || endA.isBefore(endB));
 
     }
 
@@ -737,22 +1005,27 @@ public abstract class IsoInterval
      */
     public boolean finishes(I other) {
 
-        if (this.getStart().isInfinite()) {
+        if (this.start.isInfinite()) {
             return false;
         }
 
-        T startA = this.getStart().getTemporal();
+        T startA = this.start.getTemporal();
         T startB = other.getStart().getTemporal();
+        T endA = this.end.getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        boolean empty = (
+            this.end.isOpen()
+            && (endA != null)
+            && startA.isSimultaneous(endA)
+        );
 
         if (
-            (startB != null)
-            && !startB.isBefore(startA)
+            empty
+            || ((startB != null) && !startB.isBefore(startA))
         ) {
             return false;
         }
-
-        T endA = this.getEnd().getTemporal();
-        T endB = other.getEnd().getTemporal();
 
         if (endB == null) {
             return (endA == null);
@@ -762,7 +1035,7 @@ public abstract class IsoInterval
         }
 
         if (this.getFactory().isCalendrical()) {
-            if (this.getEnd().isOpen()) {
+            if (this.end.isOpen()) {
                 endA = this.getTimeLine().stepBackwards(endA);
             }
             if (other.getEnd().isOpen()) {
@@ -773,7 +1046,7 @@ public abstract class IsoInterval
                 return false;
             }
         } else {
-            if (this.getEnd().isClosed()) {
+            if (this.end.isClosed()) {
                 endA = this.getTimeLine().stepForward(endA);
             }
             if (other.getEnd().isClosed()) {
@@ -839,11 +1112,11 @@ public abstract class IsoInterval
      */
     public boolean starts(I other) {
 
-        if (this.getEnd().isInfinite()) {
+        if (this.end.isInfinite()) {
             return false;
         }
 
-        T startA = this.getStart().getTemporal();
+        T startA = this.start.getTemporal();
         T startB = other.getStart().getTemporal();
 
         if (startB == null) {
@@ -858,11 +1131,19 @@ public abstract class IsoInterval
             return false;
         }
 
-        T endA = this.getEnd().getTemporal();
+        T endA = this.end.getTemporal();
         T endB = other.getEnd().getTemporal();
 
+        if (
+            this.end.isOpen()
+            && (startA != null)
+            && startA.isSimultaneous(endA)
+        ) {
+            return true;
+        }
+
         if (endB == null) {
-            if (this.getEnd().isClosed()) {
+            if (this.end.isClosed()) {
                 return true;
             } else if (startB == null) {
                 return (this.getTimeLine().stepBackwards(endA) != null);
@@ -872,7 +1153,7 @@ public abstract class IsoInterval
         }
 
         if (this.getFactory().isCalendrical()) {
-            if (this.getEnd().isOpen()) {
+            if (this.end.isOpen()) {
                 endA = this.getTimeLine().stepBackwards(endA);
             }
             if (other.getEnd().isOpen()) {
@@ -882,7 +1163,7 @@ public abstract class IsoInterval
                 return false;
             }
         } else {
-            if (this.getEnd().isClosed()) {
+            if (this.end.isClosed()) {
                 endA = this.getTimeLine().stepForward(endA);
                 if (endA == null) {
                     return false;
@@ -891,15 +1172,12 @@ public abstract class IsoInterval
             if (other.getEnd().isClosed()) {
                 endB = this.getTimeLine().stepForward(endB);
             }
-            if (
-                (endB != null)
-                && !endA.isBefore(endB)
-            ) {
+            if ((endB != null) && !endA.isBefore(endB)) {
                 return false;
             }
         }
 
-        if (this.getEnd().isClosed()) {
+        if (this.end.isClosed()) {
             return true;
         } else if (startB == null) {
             return (this.getTimeLine().stepBackwards(endA) != null);
@@ -928,6 +1206,111 @@ public abstract class IsoInterval
     public boolean startedBy(I other) {
 
         return other.starts(this.getContext());
+
+    }
+
+    /**
+     * <p>Does this interval enclose the other one such that this start
+     * is before the start of the other one and this end is after the end
+     * of the other one? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the earlier start point and
+     *          later end compared to the other one else {@code false}
+     */
+    /*[deutsch]
+     * <p>Umfasst dieses Intervall so das andere, da&szlig; der Start dieses
+     * Intervalls vor dem Start des anderen und das Ende dieses Intervalls
+     * nach dem Ende des anderen Intervalls liegt? </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the earlier start point and
+     *          later end compared to the other one else {@code false}
+     */
+    public boolean encloses(I other) {
+
+        if (!other.isFinite()) {
+            return false;
+        }
+
+        T startA = this.start.getTemporal();
+        T startB = other.getStart().getTemporal();
+
+        if ((startA != null) && !startA.isBefore(startB)) {
+            return false;
+        }
+
+        T endA = this.end.getTemporal();
+        T endB = other.getEnd().getTemporal();
+
+        if (endA == null) {
+            return true;
+        }
+
+        if (
+            other.getEnd().isOpen()
+            && startB.isSimultaneous(endB)
+        ) {
+            if (this.end.isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if ((endA == null) || startB.isAfter(endA)) {
+                return false; // if startB == endA: interval B has zero duration
+            }
+        } else if (this.getFactory().isCalendrical()) {
+            if (this.end.isOpen()) {
+                endA = this.getTimeLine().stepBackwards(endA);
+            }
+            if (other.getEnd().isOpen()) {
+                endB = this.getTimeLine().stepBackwards(endB);
+            }
+            if (
+                (endA == null)
+                || (endB == null) // dann startB = infinite_past
+                || !endA.isAfter(endB)
+            ) {
+                return false;
+            }
+        } else {
+            if (this.end.isClosed()) {
+                endA = this.getTimeLine().stepForward(endA);
+            }
+            if (other.getEnd().isClosed()) {
+                endB = this.getTimeLine().stepForward(endB);
+                if (endB == null) {
+                    return false;
+                }
+            }
+            if ((endA != null) && !endA.isAfter(endB)) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    /**
+     * <p>Equivalent to {@code other.encloses(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the later start point and
+     *          earlier end compared to the other one else {@code false}
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code other.encloses(this)}. </p>
+     *
+     * @param   other   another interval whose relation to this interval
+     *                  is to be investigated
+     * @return  {@code true} if this interval has the later start point and
+     *          earlier end compared to the other one else {@code false}
+     */
+    public boolean enclosedBy(I other) {
+
+        return other.encloses(this.getContext());
 
     }
 

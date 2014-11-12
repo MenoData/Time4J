@@ -14,12 +14,12 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class BasicDateRangeTest {
 
-    @Test
+    @Test(expected=NullPointerException.class)
     public void containsNull() {
         assertThat(
             DateInterval
                 .between(PlainDate.of(2014, 2, 27), PlainDate.of(2014, 5, 14))
-                .contains(null),
+                .contains((DateInterval) null),
             is(false));
     }
 

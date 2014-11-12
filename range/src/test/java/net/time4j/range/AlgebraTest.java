@@ -359,9 +359,9 @@ public class AlgebraTest {
     @Test
     public void finishedByEmpty1() {
         PlainDate startA = PlainDate.of(2014, 5, 13);
-        PlainDate endA = PlainDate.of(2014, 6, 15);
+        PlainDate endA = PlainDate.of(2014, 6, 15); // ende inklusive
 
-        PlainDate startB = PlainDate.of(2014, 6, 15);
+        PlainDate startB = PlainDate.of(2014, 6, 15); // ende exklusive
 
         DateInterval a = DateInterval.between(startA, endA);
         DateInterval b = DateInterval.since(startB).collapse();
@@ -629,7 +629,7 @@ public class AlgebraTest {
         DateInterval b = DateInterval.since(startB).collapse();
 
         assertThat(b.startedBy(a), is(false));
-        assertThat(a.startedBy(b), is(false));
+        assertThat(a.startedBy(b), is(true));
     }
 
     @Test
@@ -767,6 +767,272 @@ public class AlgebraTest {
         assertThat(b.starts(a), is(false));
         assertThat(a.startedBy(b), is(false));
         assertThat(b.startedBy(a), is(true));
+    }
+
+    @Test
+    public void enclosesEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 14);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(b.encloses(a), is(false));
+        assertThat(a.encloses(b), is(true));
+    }
+
+    @Test
+    public void enclosesEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 15);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(b.encloses(a), is(false));
+        assertThat(a.encloses(b), is(true));
+    }
+
+    @Test
+    public void enclosesGreater() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 10);
+        PlainDate endB = PlainDate.of(2014, 6, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.encloses(a), is(true));
+        assertThat(a.encloses(b), is(false));
+        assertThat(a.enclosedBy(b), is(true));
+        assertThat(b.enclosedBy(a), is(false));
+    }
+
+    @Test
+    public void enclosesSmaller() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 10);
+        PlainDate endB = PlainDate.of(2014, 6, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.encloses(a), is(false));
+        assertThat(a.encloses(b), is(true));
+        assertThat(a.enclosedBy(b), is(false));
+        assertThat(b.enclosedBy(a), is(true));
+    }
+
+    @Test
+    public void enclosesSmallerWithSameStart() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 1);
+        PlainDate endB = PlainDate.of(2014, 6, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.encloses(a), is(false));
+        assertThat(a.encloses(b), is(false));
+        assertThat(a.enclosedBy(b), is(false));
+        assertThat(b.enclosedBy(a), is(false));
+    }
+
+    @Test
+    public void enclosesSmallerWithSameEnd() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 10);
+        PlainDate endB = PlainDate.of(2014, 6, 30);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.encloses(a), is(false));
+        assertThat(a.encloses(b), is(false));
+        assertThat(a.enclosedBy(b), is(false));
+        assertThat(b.enclosedBy(a), is(false));
+    }
+
+    @Test
+    public void containsSmaller() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 10);
+        PlainDate endB = PlainDate.of(2014, 6, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.contains(a), is(false));
+        assertThat(a.contains(b), is(true));
+    }
+
+    @Test
+    public void containsSmallerWithSameStart() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 1);
+        PlainDate endB = PlainDate.of(2014, 6, 19);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.contains(a), is(false));
+        assertThat(a.contains(b), is(true));
+    }
+
+    @Test
+    public void containsSmallerWithSameEnd() {
+        PlainDate startA = PlainDate.of(2014, 6, 1);
+        PlainDate endA = PlainDate.of(2014, 6, 30);
+
+        PlainDate startB = PlainDate.of(2014, 6, 10);
+        PlainDate endB = PlainDate.of(2014, 6, 30);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(b.contains(a), is(false));
+        assertThat(a.contains(b), is(true));
+    }
+
+    @Test
+    public void containsEmpty1() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 15);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.contains(b), is(true));
+        assertThat(b.contains(a), is(false));
+    }
+
+    @Test
+    public void containsEmpty2() {
+        PlainDate startA = PlainDate.of(2014, 5, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.contains(b), is(false));
+        assertThat(b.contains(a), is(false));
+    }
+
+    @Test
+    public void equivalentTo1() {
+        PlainDate startA = PlainDate.of(2014, 6, 16);
+        PlainDate endA = PlainDate.of(2014, 6, 20);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+        PlainDate endB = PlainDate.of(2014, 6, 20);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.equivalentTo(b), is(true));
+        assertThat(b.equivalentTo(a), is(true));
+    }
+
+    @Test
+    public void equivalentTo2() {
+        PlainDate startA = PlainDate.of(2014, 6, 16);
+        PlainDate endA = PlainDate.of(2014, 6, 21);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+        PlainDate endB = PlainDate.of(2014, 6, 20);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.equivalentTo(b), is(false));
+        assertThat(b.equivalentTo(a), is(false));
+    }
+
+    @Test
+    public void equivalentTo3() {
+        PlainDate startA = PlainDate.of(2014, 6, 16);
+        PlainDate endA = PlainDate.of(2014, 6, 21);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+        PlainDate endB = PlainDate.of(2014, 6, 20);
+
+        DateInterval a = DateInterval.between(startA, endA).withOpenEnd();
+        DateInterval b = DateInterval.between(startB, endB);
+
+        assertThat(a.equivalentTo(b), is(true));
+        assertThat(b.equivalentTo(a), is(true));
+    }
+
+    @Test
+    public void equivalentTo4() {
+        PlainDate startA = PlainDate.of(2014, 6, 16);
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.since(startA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.equivalentTo(b), is(true));
+        assertThat(b.equivalentTo(a), is(true));
+    }
+
+    @Test
+    public void emptyEquivalentToEmpty() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate startB = PlainDate.of(2014, 6, 13);
+
+        DateInterval a = DateInterval.since(startA).collapse();
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.equivalentTo(b), is(true));
+        assertThat(a.meets(b), is(false));
+        assertThat(a.metBy(b), is(false));
+    }
+
+    @Test
+    public void emptyTest() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.contains(b), is(false));
+
+        assertThat(a.meets(b), is(true));
+        assertThat(a.precedes(b), is(false));
+        assertThat(a.overlaps(b), is(false));
+        assertThat(a.starts(b), is(false));
+        assertThat(a.finishes(b), is(false));
+        assertThat(a.encloses(b), is(false));
+        assertThat(a.metBy(b), is(false));
+        assertThat(a.precededBy(b), is(false));
+        assertThat(a.overlappedBy(b), is(false));
+        assertThat(a.finishedBy(b), is(false));
+        assertThat(a.startedBy(b), is(false));
+        assertThat(a.enclosedBy(b), is(false));
+        assertThat(a.equivalentTo(b), is(false));
     }
 
 }

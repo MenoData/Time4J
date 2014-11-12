@@ -103,20 +103,52 @@ public interface ChronoInterval<T extends Temporal<? super T>> {
     /**
      * <p>Queries if given time point belongs to this interval. </p>
      *
-     * @param   temporal    time point to be queried, maybe {@code null}
-     * @return  {@code true} if given time point is not {@code null} and
-     *          belongs to this interval else {@code false}
+     * @param   temporal    time point to be queried
+     * @return  {@code true} if given time point belongs to this interval
+     *          else {@code false}
      * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob der angegebene Zeitpunkt zu diesem Intervall
      * geh&ouml;rt. </p>
      *
-     * @param   temporal    time point to be queried, maybe {@code null}
-     * @return  {@code true} if given time point is not {@code null} and
-     *          belongs to this interval else {@code false}
+     * @param   temporal    time point to be queried
+     * @return  {@code true} if given time point belongs to this interval
+     *          else {@code false}
      * @since   2.0
      */
     boolean contains(T temporal);
 
+    /**
+     * <p>Is this interval after the given time point? </p>
+     *
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is after given time point
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall nach dem angegebenen Zeitpunkt? </p>
+     *
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is after given time point
+     *          else {@code false}
+     */
+    boolean isAfter(T temporal);
+
+    /**
+     * <p>Is this interval before the given time point? </p>
+     *
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is before given time point
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Intervall vor dem angegebenen Zeitpunkt? </p>
+     *
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is before given time point
+     *          else {@code false}
+     */
+    boolean isBefore(T temporal);
+    
 }

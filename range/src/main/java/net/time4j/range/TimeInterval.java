@@ -217,6 +217,47 @@ public final class TimeInterval
     }
 
     /**
+     * <p>Moves this interval along the time axis by given units. </p>
+     *
+     * @param   amount  amount of units
+     * @param   unit    time unit for moving
+     * @return  moved copy of this interval
+     */
+    public TimeInterval move(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        if (amount == 0) {
+            return this;
+        }
+
+        Boundary<PlainTime> s;
+        Boundary<PlainTime> e;
+
+        if (this.getStart().isInfinite()) {
+            s = Boundary.infinitePast();
+        } else {
+            s =
+                Boundary.of(
+                    this.getStart().getEdge(),
+                    this.getStart().getTemporal().plus(amount, unit));
+        }
+
+        if (this.getEnd().isInfinite()) {
+            e = Boundary.infiniteFuture();
+        } else {
+            e =
+                Boundary.of(
+                    this.getEnd().getEdge(),
+                    this.getEnd().getTemporal().plus(amount, unit));
+        }
+
+        return new TimeInterval(s, e);
+
+    }
+
+    /**
      * <p>Interpretes given text as interval. </p>
      *
      * @param   text        text to be parsed
