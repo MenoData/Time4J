@@ -37,6 +37,7 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Intervallgrenze, die entweder die untere
@@ -45,6 +46,7 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
 public final class Boundary<T extends Temporal<? super T>>
     implements Serializable {
@@ -463,7 +465,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *              <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The format
      *              is bit-compressed. The first byte contains in the six most
-     *              significant bits the type-ID {@code 60}. The lowest bit is
+     *              significant bits the type-ID {@code 57}. The lowest bit is
      *              {@code 1} if this instance is infinite past. The bit (2)
      *              will be set if this instance is infinite future. After this
      *              header byte and in case of finite boundary, one byte
@@ -473,7 +475,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 60;
+     *  int header = 57;
      *  header <<= 2;
      *
      *  if (this == Boundary.infinitePast()) {

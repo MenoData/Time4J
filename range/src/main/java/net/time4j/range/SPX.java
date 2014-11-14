@@ -34,6 +34,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
+import java.util.List;
 
 
 /**
@@ -50,7 +51,7 @@ final class SPX
     /** Serialisierungstyp von {@code DateInterval}. */
     static final int DATE_TYPE = 50;
 
-    /** Serialisierungstyp von {@code TimeInterval}. */
+    /** Serialisierungstyp von {@code ClockInterval}. */
     static final int TIME_TYPE = 51;
 
     /** Serialisierungstyp von {@code TimestampInterval}. */
@@ -60,7 +61,7 @@ final class SPX
     static final int MOMENT_TYPE = 53;
 
     /** Serialisierungstyp von {@code Boundary}. */
-    static final int BOUNDARY_TYPE = 60;
+    static final int BOUNDARY_TYPE = 57;
 
     private static final long serialVersionUID = 1L;
 
@@ -120,7 +121,7 @@ final class SPX
                 this.writeDateInterval(out);
                 break;
             case TIME_TYPE:
-                this.writeTimeInterval(out);
+                this.writeClockInterval(out);
                 break;
             case TIMESTAMP_TYPE:
                 this.writeTimestampInterval(out);
@@ -130,6 +131,14 @@ final class SPX
                 break;
             case BOUNDARY_TYPE:
                 this.writeBoundary(out);
+                break;
+            case IsoTimeWindows.DATE_WINDOW_ID:
+            case IsoTimeWindows.CLOCK_WINDOW_ID:
+            case IsoTimeWindows.TIMESTAMP_WINDOW_ID:
+            case IsoTimeWindows.MOMENT_WINDOW_ID:
+                int header = (this.type << 2);
+                out.writeByte(header);
+                out.writeObject(TimeWindows.class.cast(this.obj).toIntervals());
                 break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
@@ -155,7 +164,7 @@ final class SPX
                 this.obj = this.readDateInterval(in);
                 break;
             case TIME_TYPE:
-                this.obj = this.readTimeInterval(in);
+                this.obj = this.readClockInterval(in);
                 break;
             case TIMESTAMP_TYPE:
                 this.obj = this.readTimestampInterval(in);
@@ -165,6 +174,18 @@ final class SPX
                 break;
             case BOUNDARY_TYPE:
                 this.readBoundary(in, header);
+                break;
+            case IsoTimeWindows.DATE_WINDOW_ID:
+                this.obj = this.readDateWindow(in);
+                break;
+            case IsoTimeWindows.CLOCK_WINDOW_ID:
+                this.obj = this.readClockWindow(in);
+                break;
+            case IsoTimeWindows.TIMESTAMP_WINDOW_ID:
+                this.obj = this.readTimestampWindow(in);
+                break;
+            case IsoTimeWindows.MOMENT_WINDOW_ID:
+                this.obj = this.readMomentWindow(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -188,7 +209,6 @@ final class SPX
 
     }
 
-    @SuppressWarnings("unchecked")
     private Object readDateInterval(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -206,18 +226,17 @@ final class SPX
 
     }
 
-    private void writeTimeInterval(ObjectOutput out)
+    private void writeClockInterval(ObjectOutput out)
         throws IOException {
 
-        TimeInterval interval = (TimeInterval) this.obj;
+        ClockInterval interval = (ClockInterval) this.obj;
         out.writeByte(TIME_TYPE << 2);
         out.writeObject(interval.getStart());
         out.writeObject(interval.getEnd());
 
     }
 
-    @SuppressWarnings("unchecked")
-    private Object readTimeInterval(ObjectInput in)
+    private Object readClockInterval(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         Object o1 = in.readObject();
@@ -227,7 +246,7 @@ final class SPX
         Boundary<PlainTime> end = getBoundary(o2, PlainTime.class, true);
 
         if ((start != null) && (end != null)) {
-            return new TimeInterval(start, end);
+            return new ClockInterval(start, end);
         }
 
         throw new StreamCorruptedException();
@@ -244,7 +263,6 @@ final class SPX
 
     }
 
-    @SuppressWarnings("unchecked")
     private Object readTimestampInterval(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -274,7 +292,6 @@ final class SPX
 
     }
 
-    @SuppressWarnings("unchecked")
     private Object readMomentInterval(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -289,6 +306,38 @@ final class SPX
         }
 
         throw new StreamCorruptedException();
+
+    }
+
+    private Object readDateWindow(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        List<DateInterval> intervals = cast(in.readObject());
+        return TimeWindows.onDateAxis().append(intervals);
+
+    }
+
+    private Object readClockWindow(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        List<ClockInterval> intervals = cast(in.readObject());
+        return TimeWindows.onClockAxis().append(intervals);
+
+    }
+
+    private Object readTimestampWindow(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        List<TimestampInterval> intervals = cast(in.readObject());
+        return TimeWindows.onTimestampAxis().append(intervals);
+
+    }
+
+    private Object readMomentWindow(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        List<MomentInterval> intervals = cast(in.readObject());
+        return TimeWindows.onMomentAxis().append(intervals);
 
     }
 
@@ -349,7 +398,6 @@ final class SPX
 
     }
 
-    @SuppressWarnings("unchecked")
     private static <T extends Temporal<? super T>> Boundary<T> getBoundary(
         Object obj,
         Class<T> type,
@@ -359,7 +407,7 @@ final class SPX
         Boundary<T> ret = null;
 
         if (obj instanceof Boundary) {
-            Boundary<?> b = Boundary.class.cast(obj);
+            Boundary<?> b = cast(obj);
 
             if (b.isInfinite()) {
                 Boundary<T> expected;
@@ -374,12 +422,19 @@ final class SPX
                     ret = expected;
                 }
             } else if (type.isInstance(b.getTemporal())) {
-                ret = (Boundary<T>) b;
+                ret = cast(b);
             }
 
         }
 
         return ret;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object obj) {
+
+        return (T) obj;
 
     }
 

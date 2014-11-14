@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AlgebraTest.class,
         BasicDateRangeTest.class,
         BasicMomentRangeTest.class,
-        BasicTimeRangeTest.class,
+        BasicClockRangeTest.class,
         BasicTimestampRangeTest.class,
         BoundaryTest.class,
         ComparatorTest.class,
@@ -20,7 +20,8 @@ import org.junit.runners.Suite.SuiteClasses;
         RangeConversionTest.class,
         RangeDurationTest.class,
         RelationTest.class,
-        TimestampIntervalFormatTest.class
+        TimestampIntervalFormatTest.class,
+        WindowTest.class
     }
 )
 public class RangeSuite {
