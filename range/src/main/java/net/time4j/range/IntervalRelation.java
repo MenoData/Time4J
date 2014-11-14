@@ -240,8 +240,8 @@ public enum IntervalRelation {
      * @since   2.0
      */
     public boolean matches(
-        TimeInterval a,
-        TimeInterval b
+        ClockInterval a,
+        ClockInterval b
     ) {
 
         return this.matches0(a, b);
@@ -346,8 +346,8 @@ public enum IntervalRelation {
      * @since   2.0
      */
     public static IntervalRelation between(
-        TimeInterval a,
-        TimeInterval b
+        ClockInterval a,
+        ClockInterval b
     ) {
 
         return between0(a, b);

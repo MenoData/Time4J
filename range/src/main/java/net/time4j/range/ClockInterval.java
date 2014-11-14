@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (TimeInterval.java) is part of project Time4J.
+ * This file (ClockInterval.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -47,28 +47,30 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein endliches Uhrzeitintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
-public final class TimeInterval
-    extends IsoInterval<PlainTime, TimeInterval>
+public final class ClockInterval
+    extends IsoInterval<PlainTime, ClockInterval>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final long serialVersionUID = 1L;
 
-    private static final Comparator<TimeInterval> COMPARATOR =
-        new IntervalComparator<PlainTime, TimeInterval>(false);
+    private static final Comparator<ClockInterval> COMPARATOR =
+        new IntervalComparator<PlainTime, ClockInterval>(false);
 
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
-    TimeInterval(
+    ClockInterval(
         Boundary<PlainTime> start,
         Boundary<PlainTime> end
     ) {
@@ -97,7 +99,7 @@ public final class TimeInterval
      * @return  Comparator
      * @since   2.0
      */
-    public static Comparator<TimeInterval> comparator() {
+    public static Comparator<ClockInterval> comparator() {
 
         return COMPARATOR;
 
@@ -122,12 +124,12 @@ public final class TimeInterval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
-    public static TimeInterval between(
+    public static ClockInterval between(
         PlainTime start,
         PlainTime end
     ) {
 
-        return new TimeInterval(
+        return new ClockInterval(
             Boundary.of(CLOSED, start),
             Boundary.of(OPEN, end));
 
@@ -155,7 +157,7 @@ public final class TimeInterval
      * @return  new time interval
      * @since   2.0
      */
-    public static TimeInterval since(PlainTime start) {
+    public static ClockInterval since(PlainTime start) {
 
         return between(start, PlainTime.midnightAtEndOfDay());
 
@@ -177,7 +179,7 @@ public final class TimeInterval
      * @return  new time interval
      * @since   2.0
      */
-    public static TimeInterval until(PlainTime end) {
+    public static ClockInterval until(PlainTime end) {
 
         return between(PlainTime.midnightAtStartOfDay(), end);
 
@@ -223,7 +225,7 @@ public final class TimeInterval
      * @param   unit    time unit for moving
      * @return  moved copy of this interval
      */
-    public TimeInterval move(
+    public ClockInterval move(
         long amount,
         ClockUnit unit
     ) {
@@ -253,7 +255,7 @@ public final class TimeInterval
                     this.getEnd().getTemporal().plus(amount, unit));
         }
 
-        return new TimeInterval(s, e);
+        return new ClockInterval(s, e);
 
     }
 
@@ -281,13 +283,13 @@ public final class TimeInterval
      * @since   2.0
      * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
      */
-    public static TimeInterval parse(
+    public static ClockInterval parse(
         String text,
         ChronoParser<PlainTime> parser
     ) throws ParseException {
 
         return IntervalParser.of(
-             TimeIntervalFactory.INSTANCE,
+             ClockIntervalFactory.INSTANCE,
              parser,
              BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
@@ -318,7 +320,7 @@ public final class TimeInterval
      *          text or even behind
      * @since   2.0
      */
-    public static TimeInterval parse(
+    public static ClockInterval parse(
         CharSequence text,
         ChronoParser<PlainTime> parser,
         BracketPolicy policy,
@@ -326,7 +328,7 @@ public final class TimeInterval
     ) {
 
         return IntervalParser.of(
-             TimeIntervalFactory.INSTANCE,
+             ClockIntervalFactory.INSTANCE,
              parser,
              policy
         ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
@@ -341,14 +343,14 @@ public final class TimeInterval
     }
 
     @Override
-    IntervalFactory<PlainTime, TimeInterval> getFactory() {
+    IntervalFactory<PlainTime, ClockInterval> getFactory() {
 
-        return TimeIntervalFactory.INSTANCE;
+        return ClockIntervalFactory.INSTANCE;
 
     }
 
     @Override
-    TimeInterval getContext() {
+    ClockInterval getContext() {
 
         return this;
 

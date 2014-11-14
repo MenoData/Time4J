@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (TimeIntervalFactory.java) is part of project Time4J.
+ * This file (ClockIntervalFactory.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -33,17 +33,17 @@ import java.util.Collections;
 import java.util.Set;
 
 
-final class TimeIntervalFactory
-    implements IntervalFactory<PlainTime, TimeInterval> {
+final class ClockIntervalFactory
+    implements IntervalFactory<PlainTime, ClockInterval> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    static final TimeIntervalFactory INSTANCE =
-        new TimeIntervalFactory();
+    static final ClockIntervalFactory INSTANCE =
+        new ClockIntervalFactory();
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private TimeIntervalFactory() {
+    private ClockIntervalFactory() {
         super();
 
     }
@@ -51,12 +51,12 @@ final class TimeIntervalFactory
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public TimeInterval between(
+    public ClockInterval between(
         Boundary<PlainTime> start,
         Boundary<PlainTime> end
     ) {
 
-        return new TimeInterval(start, end);
+        return new ClockInterval(start, end);
 
     }
 

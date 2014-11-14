@@ -79,8 +79,8 @@ public class RangeDurationTest {
 
     @Test
     public void durationFromMidnightToMidnightExclusive() {
-        TimeInterval interval =
-            TimeInterval.between(
+        ClockInterval interval =
+            ClockInterval.between(
                 PlainTime.midnightAtStartOfDay(),
                 PlainTime.midnightAtEndOfDay());
         assertThat(
@@ -90,8 +90,8 @@ public class RangeDurationTest {
 
     @Test
     public void durationFromMidnightToMidnightInclusive() {
-        TimeInterval interval =
-            TimeInterval.between(
+        ClockInterval interval =
+            ClockInterval.between(
                 PlainTime.midnightAtStartOfDay(),
                 PlainTime.midnightAtEndOfDay()
             ).withClosedEnd();
@@ -101,9 +101,9 @@ public class RangeDurationTest {
     }
 
     @Test
-    public void durationOfAtomicTimeInterval() {
-        TimeInterval interval =
-            TimeInterval.between(
+    public void durationOfAtomicClockInterval() {
+        ClockInterval interval =
+            ClockInterval.between(
                 PlainTime.midnightAtEndOfDay(),
                 PlainTime.midnightAtEndOfDay()
             ).withClosedEnd();
@@ -113,9 +113,9 @@ public class RangeDurationTest {
     }
 
     @Test
-    public void durationOfEmptyTimeInterval() {
-        TimeInterval interval =
-            TimeInterval.between(
+    public void durationOfEmptyClockInterval() {
+        ClockInterval interval =
+            ClockInterval.between(
                 PlainTime.midnightAtEndOfDay(),
                 PlainTime.midnightAtEndOfDay()
             );
@@ -124,9 +124,9 @@ public class RangeDurationTest {
     }
 
     @Test
-    public void durationOfTimeInterval() {
-        TimeInterval interval =
-            TimeInterval.between(
+    public void durationOfClockInterval() {
+        ClockInterval interval =
+            ClockInterval.between(
                 PlainTime.of(7, 45),
                 PlainTime.of(21, 0)
             );
