@@ -1421,6 +1421,12 @@ public abstract class IsoInterval
     }
 
     /**
+     * <p>Returns the associated time axis. </p>
+     *
+     * @return  associated {@code TimeLine}
+     * @since   2.0
+     */
+    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}

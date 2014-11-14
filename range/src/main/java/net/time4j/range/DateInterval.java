@@ -59,12 +59,14 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  *
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein Datumsintervall. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
+ * @concurrency <immutable>
  */
 public final class DateInterval
     extends IsoInterval<PlainDate, DateInterval>
