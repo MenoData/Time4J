@@ -285,6 +285,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other one
      *          else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall vor dem anderen? </p>
@@ -296,6 +297,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other one
      *          else {@code false}
+     * @since   2.0
      */
     public boolean isBefore(I other) {
 
@@ -343,6 +345,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other one
      *          else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall nach dem anderen? </p>
@@ -354,6 +357,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other one
      *          else {@code false}
+     * @since   2.0
      */
     public boolean isAfter(I other) {
 
@@ -406,6 +410,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval contains the other one
      *          else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Enth&auml;lt dieses Intervall das andere Intervall? </p>
@@ -417,6 +422,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval contains the other one
      *          else {@code false}
+     * @since   2.0
      */
     public boolean contains(I other) {
 
@@ -488,6 +494,7 @@ public abstract class IsoInterval
      *
      * @return  new empty interval with same start
      * @throws  IllegalStateException if the start is infinite
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Wandelt dieses Intervall in ein leeres Intervall mit dem gleichen
@@ -495,6 +502,7 @@ public abstract class IsoInterval
      *
      * @return  new empty interval with same start
      * @throws  IllegalStateException if the start is infinite
+     * @since   2.0
      */
     public I collapse() {
 
@@ -509,6 +517,35 @@ public abstract class IsoInterval
 
     }
 
+    /**
+     * <p>Compares the boundaries (start and end) and also the time axis
+     * of this and the other interval. </p>
+     *
+     * <p>Note: Two intervals which are {@link #equivalentTo} to each other
+     * are not always equal to each other. For example a half-open date interval
+     * whose end is one day later than the end of a closed date interval with
+     * same start is considered <i>equivalent</i>, but not <i>equal</i>. </p>
+     *
+     * @param   obj     object to be compared with this
+     * @return  {@code true} if given object is also an interval on the
+     *          same time axis and has the same boundaries as this interval
+     *          else {@code false}
+     */
+    /*[deutsch]
+     * <p>Vergleicht die Intervallgrenzen und die assoziierte Zeitachse
+     * dieses Intervalls mit denen des angegebenen Objekts. </p>
+     *
+     * <p>Hinweis: Zwei Intervalle, die {@link #equivalentTo} zueinander sind,
+     * sind nicht immer gleich im Sinne dieser Methode. Zum Beispiel ist ein
+     * halb-offenes Datumsintervall, dessen Ende einen Tag sp&auml;ter als
+     * das Ende eines geschlossenen Datumsintervalls mit gleichem Start liegt,
+     * <i>&auml;quivalent</i>, aber nicht <i>gleich</i>. </p>
+     *
+     * @param   obj     object to be compared with this
+     * @return  {@code true} if given object is also an interval on the
+     *          same time axis and has the same boundaries as this interval
+     *          else {@code false}
+     */
     @Override
     public final boolean equals(Object obj) {
 
@@ -691,6 +728,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is temporally equivalent to
      *          the other one else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ist dieses Intervall gleich dem anderen Intervall unter
@@ -705,6 +743,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is temporally equivalent to
      *          the other one else {@code false}
+     * @since   2.0
      */
     public boolean equivalentTo(I other) {
 
@@ -772,6 +811,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
      *          that there is a gap between else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
@@ -785,6 +825,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
      *          that there is a gap between else {@code false}
+     * @since   2.0
      */
     public boolean precedes(I other) {
 
@@ -819,6 +860,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
      *          that there is a gap between else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.precedes(this)}. </p>
@@ -831,6 +873,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
      *          that there is a gap between else {@code false}
+     * @since   2.0
      */
     public boolean precededBy(I other) {
 
@@ -850,6 +893,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
      *          that there is no gap between else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
@@ -863,6 +907,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is before the other such
      *          that there is no gap between else {@code false}
+     * @since   2.0
      */
     public boolean meets(I other) {
 
@@ -908,6 +953,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
      *          that there is no gap between else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.meets(this)}. </p>
@@ -920,6 +966,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval is after the other such
      *          that there is no gap between else {@code false}
+     * @since   2.0
      */
     public boolean metBy(I other) {
 
@@ -940,6 +987,7 @@ public abstract class IsoInterval
      * @return  {@code true} if this interval overlaps the other such
      *          that the start of this interval is still before the start
      *          of the other one else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Uuml;berlappt dieses Intervall so das andere, da&szlig; der
@@ -954,6 +1002,7 @@ public abstract class IsoInterval
      * @return  {@code true} if this interval overlaps the other such
      *          that the start of this interval is still before the start
      *          of the other one else {@code false}
+     * @since   2.0
      */
     public boolean overlaps(I other) {
 
@@ -1021,6 +1070,7 @@ public abstract class IsoInterval
      * @return  {@code true} if the other interval overlaps this such
      *          that the start of the other one is still before the start
      *          of this interval else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.overlaps(this)}. </p>
@@ -1034,6 +1084,7 @@ public abstract class IsoInterval
      * @return  {@code true} if the other interval overlaps this such
      *          that the start of the other one is still before the start
      *          of this interval else {@code false}
+     * @since   2.0
      */
     public boolean overlappedBy(I other) {
 
@@ -1054,6 +1105,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
      *          the other one and a later start else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
@@ -1068,6 +1120,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
      *          the other one and a later start else {@code false}
+     * @since   2.0
      */
     public boolean finishes(I other) {
 
@@ -1145,6 +1198,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
      *          the other one and an earlier start else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.finishes(this)}. </p>
@@ -1157,6 +1211,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same end point as
      *          the other one and an earlier start else {@code false}
+     * @since   2.0
      */
     public boolean finishedBy(I other) {
 
@@ -1166,7 +1221,7 @@ public abstract class IsoInterval
 
     /**
      * <p>Does this interval start the other one such that both start
-     * time points are equal and the end of this interval is after the
+     * time points are equal and the end of this interval is before the
      * end of the other one? </p>
      *
      * <p>Relation diagram: </p>
@@ -1176,11 +1231,12 @@ public abstract class IsoInterval
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
-     *          the other one and a earlier end else {@code false}
+     *          the other one and an earlier end else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Beginnt dieses Intervall so das andere, da&szlig; bei gleichen
-     * Beginnzeitpunkten das Ende dieses Intervalls nach dem Ende des anderen
+     * Beginnzeitpunkten das Ende dieses Intervalls vor dem Ende des anderen
      * liegt? </p>
      *
      * <p>Relation diagram: </p>
@@ -1190,7 +1246,8 @@ public abstract class IsoInterval
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
-     *          the other one and a earlier end else {@code false}
+     *          the other one and an earlier end else {@code false}
+     * @since   2.0
      */
     public boolean starts(I other) {
 
@@ -1279,7 +1336,8 @@ public abstract class IsoInterval
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
-     *          the other one and an later end else {@code false}
+     *          the other one and a later end else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.starts(this)}. </p>
@@ -1291,7 +1349,8 @@ public abstract class IsoInterval
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
      * @return  {@code true} if this interval has the same start point as
-     *          the other one and an later end else {@code false}
+     *          the other one and a later end else {@code false}
+     * @since   2.0
      */
     public boolean startedBy(I other) {
 
@@ -1312,6 +1371,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the earlier start point and
      *          later end compared to the other one else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Umfasst dieses Intervall so das andere, da&szlig; der Start dieses
@@ -1326,6 +1386,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the earlier start point and
      *          later end compared to the other one else {@code false}
+     * @since   2.0
      */
     public boolean encloses(I other) {
 
@@ -1401,6 +1462,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the later start point and
      *          earlier end compared to the other one else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code other.encloses(this)}. </p>
@@ -1413,6 +1475,7 @@ public abstract class IsoInterval
      *                  is to be investigated
      * @return  {@code true} if this interval has the later start point and
      *          earlier end compared to the other one else {@code false}
+     * @since   2.0
      */
     public boolean enclosedBy(I other) {
 
@@ -1421,16 +1484,9 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Returns the associated time axis. </p>
-     *
-     * @return  associated {@code TimeLine}
-     * @since   2.0
-     */
-    /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  associated {@code TimeLine}
-     * @since   2.0
      */
     abstract TimeLine<T> getTimeLine();
 
@@ -1438,7 +1494,6 @@ public abstract class IsoInterval
      * <p>Liefert die zugeh&ouml;rige Fabrik. </p>
      *
      * @return  IntervalFactory
-     * @since   2.0
      */
     abstract IntervalFactory<T, I> getFactory();
 
@@ -1447,7 +1502,6 @@ public abstract class IsoInterval
      *
      * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
      * @throws  UnsupportedOperationException wenn unendlich
-     * @since   2.0
      */
     T getTemporalOfClosedStart() {
 
@@ -1468,7 +1522,6 @@ public abstract class IsoInterval
      * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
      *          {@code null} wenn angewandt auf das geschlossene Maximum
      * @throws  UnsupportedOperationException wenn unendlich
-     * @since   2.0
      */
     T getTemporalOfOpenEnd() {
 
@@ -1491,7 +1544,6 @@ public abstract class IsoInterval
      *
      * @param   obj     object possibly containing format attributes
      * @return  attribute query
-     * @since   2.0
      */
     static AttributeQuery extractDefaultAttributes(Object obj) {
 
