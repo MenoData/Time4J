@@ -90,8 +90,8 @@ public final class MomentInterval
     private static final ChronoFormatter<Moment> BAS_O = ordinalFormat(false);
     private static final ChronoFormatter<Moment> BAS_W = weekdateFormat(false);
 
-    private static final Comparator<MomentInterval> COMPARATOR =
-        new IntervalComparator<Moment, MomentInterval>(false);
+    private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
+        new IntervalComparator<Moment>(false, Moment.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -124,7 +124,7 @@ public final class MomentInterval
      *          boundaries with extreme values
      * @since   2.0
      */
-    public static Comparator<MomentInterval> comparator() {
+    public static Comparator<ChronoInterval<Moment>> comparator() {
 
         return COMPARATOR;
 

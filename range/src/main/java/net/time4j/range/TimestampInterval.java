@@ -89,8 +89,8 @@ public final class TimestampInterval
         ordinalFormat(false);
     private static final ChronoFormatter<PlainTimestamp> BAS_W =
         weekdateFormat(false);
-    private static final Comparator<TimestampInterval> COMPARATOR =
-        new IntervalComparator<PlainTimestamp, TimestampInterval>(false);
+    private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
+        new IntervalComparator<PlainTimestamp>(false, PlainTimestamp.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -123,7 +123,7 @@ public final class TimestampInterval
      *          boundaries with extreme values
      * @since   2.0
      */
-    public static Comparator<TimestampInterval> comparator() {
+    public static Comparator<ChronoInterval<PlainTimestamp>> comparator() {
 
         return COMPARATOR;
 

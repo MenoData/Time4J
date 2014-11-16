@@ -76,8 +76,8 @@ public final class DateInterval
 
     private static final long serialVersionUID = 1L;
 
-    private static final Comparator<DateInterval> COMPARATOR =
-        new IntervalComparator<PlainDate, DateInterval>(true);
+    private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
+        new IntervalComparator<PlainDate>(true, PlainDate.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -106,7 +106,7 @@ public final class DateInterval
      * @return  Comparator
      * @since   2.0
      */
-    public static Comparator<DateInterval> comparator() {
+    public static Comparator<ChronoInterval<PlainDate>> comparator() {
 
         return COMPARATOR;
 

@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.engine.Temporal;
+import net.time4j.engine.TimeLine;
 
 import java.util.Comparator;
 
@@ -32,27 +33,34 @@ import java.util.Comparator;
  *
  * @author  Meno Hochschild
  */
-final class IntervalComparator
-    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
-    implements Comparator<I> {
+final class IntervalComparator<T extends Temporal<? super T>>
+    implements Comparator<ChronoInterval<T>> {
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final boolean calendrical;
+    private final TimeLine<T> axis;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    IntervalComparator(boolean calendrical) {
+    IntervalComparator(
+        boolean calendrical,
+        TimeLine<T> axis
+    ) {
         super();
 
         this.calendrical = calendrical;
+        this.axis = axis;
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public int compare(I o1, I o2) {
+    public int compare(
+        ChronoInterval<T> o1,
+        ChronoInterval<T> o2
+    ) {
 
         if (o1.getStart().isInfinite()) {
             if (o2.getStart().isInfinite()) {
@@ -77,7 +85,10 @@ final class IntervalComparator
 
     }
 
-    private int compareEnd(I o1, I o2) {
+    private int compareEnd(
+        ChronoInterval<T> o1,
+        ChronoInterval<T> o2
+    ) {
 
         if (o1.getEnd().isInfinite()) {
             if (o2.getEnd().isInfinite()) {
@@ -94,10 +105,10 @@ final class IntervalComparator
 
         if (this.calendrical) {
             if (o1.getEnd().isOpen()) {
-                end1 = o1.getTimeLine().stepBackwards(end1);
+                end1 = this.axis.stepBackwards(end1);
             }
             if (o2.getEnd().isOpen()) {
-                end2 = o2.getTimeLine().stepBackwards(end2);
+                end2 = this.axis.stepBackwards(end2);
             }
 
             // closed min condition (rare edge case)
@@ -112,10 +123,10 @@ final class IntervalComparator
             }
         } else {
             if (o1.getEnd().isClosed()) {
-                end1 = o1.getTimeLine().stepForward(end1);
+                end1 = this.axis.stepForward(end1);
             }
             if (o2.getEnd().isClosed()) {
-                end2 = o2.getTimeLine().stepForward(end2);
+                end2 = this.axis.stepForward(end2);
             }
 
             // closed max condition (rare edge case)

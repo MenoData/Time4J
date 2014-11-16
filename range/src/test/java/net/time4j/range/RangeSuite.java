@@ -16,12 +16,12 @@ import org.junit.runners.Suite.SuiteClasses;
         BoundaryTest.class,
         ComparatorTest.class,
         DateIntervalFormatTest.class,
+        IntervalCollectionTest.class,
         MomentIntervalFormatTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class,
         RelationTest.class,
-        TimestampIntervalFormatTest.class,
-        WindowTest.class
+        TimestampIntervalFormatTest.class
     }
 )
 public class RangeSuite {

@@ -64,8 +64,8 @@ public final class ClockInterval
 
     private static final long serialVersionUID = 1L;
 
-    private static final Comparator<ClockInterval> COMPARATOR =
-        new IntervalComparator<PlainTime, ClockInterval>(false);
+    private static final Comparator<ChronoInterval<PlainTime>> COMPARATOR =
+        new IntervalComparator<PlainTime>(false, PlainTime.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -99,7 +99,7 @@ public final class ClockInterval
      * @return  Comparator
      * @since   2.0
      */
-    public static Comparator<ClockInterval> comparator() {
+    public static Comparator<ChronoInterval<PlainTime>> comparator() {
 
         return COMPARATOR;
 

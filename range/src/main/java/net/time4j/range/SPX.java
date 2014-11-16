@@ -63,6 +63,18 @@ final class SPX
     /** Serialisierungstyp von {@code Boundary}. */
     static final int BOUNDARY_TYPE = 57;
 
+    /** Serialisierungstyp von {@code DateWindows}. */
+    static final int DATE_WINDOW_ID = 60;
+
+    /** Serialisierungstyp von {@code ClockWindows}. */
+    static final int CLOCK_WINDOW_ID = 61;
+
+    /** Serialisierungstyp von {@code TimestampWindows}. */
+    static final int TIMESTAMP_WINDOW_ID = 62;
+
+    /** Serialisierungstyp von {@code MomentWindows}. */
+    static final int MOMENT_WINDOW_ID = 63;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -132,13 +144,15 @@ final class SPX
             case BOUNDARY_TYPE:
                 this.writeBoundary(out);
                 break;
-            case IsoTimeWindows.DATE_WINDOW_ID:
-            case IsoTimeWindows.CLOCK_WINDOW_ID:
-            case IsoTimeWindows.TIMESTAMP_WINDOW_ID:
-            case IsoTimeWindows.MOMENT_WINDOW_ID:
+            case DATE_WINDOW_ID:
+            case CLOCK_WINDOW_ID:
+            case TIMESTAMP_WINDOW_ID:
+            case MOMENT_WINDOW_ID:
                 int header = (this.type << 2);
                 out.writeByte(header);
-                out.writeObject(TimeWindows.class.cast(this.obj).toIntervals());
+                IntervalCollection<?> window =
+                    IntervalCollection.class.cast(this.obj);
+                out.writeObject(window.getIntervals());
                 break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
@@ -175,16 +189,16 @@ final class SPX
             case BOUNDARY_TYPE:
                 this.readBoundary(in, header);
                 break;
-            case IsoTimeWindows.DATE_WINDOW_ID:
+            case DATE_WINDOW_ID:
                 this.obj = this.readDateWindow(in);
                 break;
-            case IsoTimeWindows.CLOCK_WINDOW_ID:
+            case CLOCK_WINDOW_ID:
                 this.obj = this.readClockWindow(in);
                 break;
-            case IsoTimeWindows.TIMESTAMP_WINDOW_ID:
+            case TIMESTAMP_WINDOW_ID:
                 this.obj = this.readTimestampWindow(in);
                 break;
-            case IsoTimeWindows.MOMENT_WINDOW_ID:
+            case MOMENT_WINDOW_ID:
                 this.obj = this.readMomentWindow(in);
                 break;
             default:
@@ -312,32 +326,32 @@ final class SPX
     private Object readDateWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        List<DateInterval> intervals = cast(in.readObject());
-        return TimeWindows.onDateAxis().append(intervals);
+        List<ChronoInterval<PlainDate>> intervals = cast(in.readObject());
+        return DateWindows.EMPTY.plus(intervals);
 
     }
 
     private Object readClockWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        List<ClockInterval> intervals = cast(in.readObject());
-        return TimeWindows.onClockAxis().append(intervals);
+        List<ChronoInterval<PlainTime>> intervals = cast(in.readObject());
+        return ClockWindows.EMPTY.plus(intervals);
 
     }
 
     private Object readTimestampWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        List<TimestampInterval> intervals = cast(in.readObject());
-        return TimeWindows.onTimestampAxis().append(intervals);
+        List<ChronoInterval<PlainTimestamp>> intervals = cast(in.readObject());
+        return TimestampWindows.EMPTY.plus(intervals);
 
     }
 
     private Object readMomentWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        List<MomentInterval> intervals = cast(in.readObject());
-        return TimeWindows.onMomentAxis().append(intervals);
+        List<ChronoInterval<Moment>> intervals = cast(in.readObject());
+        return MomentWindows.EMPTY.plus(intervals);
 
     }
 
