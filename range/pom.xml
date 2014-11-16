@@ -11,9 +11,9 @@
     </parent>
     
     <groupId>net.time4j</groupId>
-    <artifactId>time4j-i18n</artifactId>
+    <artifactId>time4j-range</artifactId>
     <packaging>jar</packaging>
-    <name>Time4J-I18n</name>
+    <name>Time4J-Range</name>
     
     <dependencies>
         <dependency>
