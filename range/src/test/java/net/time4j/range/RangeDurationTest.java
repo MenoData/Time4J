@@ -12,7 +12,6 @@ import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.olson.EUROPE;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
@@ -163,7 +162,7 @@ public class RangeDurationTest {
             CalendarUnit.MONTHS, CalendarUnit.DAYS,
             ClockUnit.HOURS, ClockUnit.MINUTES};
         assertThat(
-            interval.getDuration(Timezone.of(EUROPE.BERLIN), units),
+            interval.getDuration(Timezone.of("Europe/Berlin"), units),
             is(
                 Duration.ofPositive().months(2).days(29)
                 .hours(8).minutes(15).build()));

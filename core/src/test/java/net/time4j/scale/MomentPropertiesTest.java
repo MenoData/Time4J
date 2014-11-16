@@ -13,8 +13,8 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.RuleNotFoundException;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.olson.ASIA;
 
 import java.math.BigDecimal;
 import org.junit.Before;
@@ -324,7 +324,7 @@ public class MomentPropertiesTest {
     @Test
     public void getSecondOfMinute() {
         assertThat(
-            this.utc.get(SECOND_OF_MINUTE.inTimezone(ASIA.TOKYO)),
+            this.utc.get(SECOND_OF_MINUTE.in(Timezone.of("Asia/Tokyo"))),
             is(60));
     }
 
@@ -412,7 +412,7 @@ public class MomentPropertiesTest {
     @Test
     public void getNanoOfSecond() {
         assertThat(
-            this.utc.get(NANO_OF_SECOND.inTimezone(ASIA.BAGHDAD)),
+            this.utc.get(NANO_OF_SECOND.in(Timezone.of("Asia/Baghdad"))),
             is(123456789));
     }
 
@@ -650,7 +650,7 @@ public class MomentPropertiesTest {
     @Test
     public void getDayOfMonth() {
         assertThat(
-            this.utc.get(DAY_OF_MONTH.inTimezone(ASIA.TOKYO)),
+            this.utc.get(DAY_OF_MONTH.in(Timezone.of("Asia/Tokyo"))),
             is(1));
     }
 
