@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -47,6 +48,7 @@ import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.TextWidth;
+import net.time4j.scale.LeapSecondEvent;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
@@ -635,6 +637,40 @@ public final class Moment
     public boolean isLeapSecond() {
 
         return (this.isPositiveLS() && LeapSeconds.getInstance().isEnabled());
+
+    }
+
+    /**
+     * <p>Tries to determine the next coming leap second. </p>
+     *
+     * @return  next leap second or {@code null} if unknown or disabled
+     */
+    /*[deutsch]
+     * <p>Versucht, die n&auml;chste bevorstehende UTC-Schaltsekunde zu
+     * ermitteln. </p>
+     *
+     * @return  next leap second or {@code null} if unknown or disabled
+     */
+    public static Moment nextLeapSecond() {
+
+        PlainDate utcToday = SystemClock.inZonalView(ZonalOffset.UTC).today();
+        Moment candidate = null;
+
+        for (LeapSecondEvent lse : LeapSeconds.getInstance()) {
+            GregorianDate event = lse.getDate();
+            PlainDate test =
+                PlainDate.of(
+                    event.getYear(), event.getMonth(), event.getDayOfMonth());
+            if (test.isBefore(utcToday)) {
+                break;
+            } else {
+                candidate =
+                    test.atTime(23, 59, 59).atUTC()
+                        .plus(lse.getShift(), SECONDS);
+            }
+        }
+
+        return candidate;
 
     }
 
