@@ -21,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RangeConversionTest.class,
         RangeDurationTest.class,
         RelationTest.class,
+        SerializationTest.class,
         TimestampIntervalFormatTest.class
     }
 )

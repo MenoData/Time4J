@@ -173,7 +173,7 @@ final class SPX
 
         byte header = in.readByte();
 
-        switch (header >> 2) {
+        switch ((header & 0xFF) >> 2) {
             case DATE_TYPE:
                 this.obj = this.readDateInterval(in);
                 break;
@@ -187,7 +187,7 @@ final class SPX
                 this.obj = this.readMomentInterval(in);
                 break;
             case BOUNDARY_TYPE:
-                this.readBoundary(in, header);
+                this.obj = this.readBoundary(in, header);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = this.readDateWindow(in);
@@ -389,7 +389,7 @@ final class SPX
 
         int future = (header & 0x2);
 
-        if (future == 1) {
+        if (future == 2) {
             return Boundary.infiniteFuture();
         }
 
