@@ -79,7 +79,7 @@ public final class TimestampInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3965530927182499606L;
 
     private static final ChronoFormatter<PlainTimestamp> EXT_O =
         ordinalFormat(true);

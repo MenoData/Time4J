@@ -81,7 +81,7 @@ public final class MomentInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -5403584519478162113L;
 
     private static final ChronoFormatter<Moment> EXT_C = calendarFormat(true);
     private static final ChronoFormatter<Moment> EXT_O = ordinalFormat(true);

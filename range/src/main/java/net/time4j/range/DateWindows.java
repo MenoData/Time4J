@@ -42,7 +42,7 @@ final class DateWindows
 
     static final IntervalCollection<PlainDate> EMPTY = new DateWindows();
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5540919343133887473L;
 
     //~ Konstruktoren -----------------------------------------------------
 

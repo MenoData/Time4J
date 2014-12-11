@@ -42,7 +42,7 @@ final class MomentWindows
 
     static final IntervalCollection<Moment> EMPTY = new MomentWindows();
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 6628458032332509882L;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -81,7 +81,7 @@ final class MomentWindows
         if (intervals.isEmpty()) {
             return MomentWindows.EMPTY;
         }
-        
+
         return new MomentWindows(intervals);
 
     }

@@ -43,7 +43,7 @@ final class TimestampWindows
     static final IntervalCollection<PlainTimestamp> EMPTY =
         new TimestampWindows();
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5075857786753409078L;
 
     //~ Konstruktoren -----------------------------------------------------
 

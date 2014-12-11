@@ -42,7 +42,7 @@ final class ClockWindows
 
     static final IntervalCollection<PlainTime> EMPTY = new ClockWindows();
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 9141581122183129703L;
 
     //~ Konstruktoren -----------------------------------------------------
 

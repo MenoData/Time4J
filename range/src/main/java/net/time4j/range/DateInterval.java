@@ -74,7 +74,7 @@ public final class DateInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
         new IntervalComparator<PlainDate>(true, PlainDate.axis());
