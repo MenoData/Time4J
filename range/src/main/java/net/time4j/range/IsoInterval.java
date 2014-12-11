@@ -46,7 +46,7 @@ import java.io.IOException;
  * @author  Meno Hochschild
  * @since   2.0
  */
-/**
+/*[deutsch]
  * <p>Repr&auml;sentiert ein abstraktes Zeitintervall auf einem
  * Zeitstrahl f&uuml;r ISO-8601-Typen. </p>
  *
