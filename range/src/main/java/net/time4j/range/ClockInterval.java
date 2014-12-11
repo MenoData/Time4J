@@ -23,6 +23,7 @@ package net.time4j.range;
 
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
+import net.time4j.Iso8601Format;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.ChronoParser;
@@ -62,7 +63,7 @@ public final class ClockInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6020908050362634577L;
 
     private static final Comparator<ChronoInterval<PlainTime>> COMPARATOR =
         new IntervalComparator<PlainTime>(false, PlainTime.axis());
@@ -332,6 +333,60 @@ public final class ClockInterval
              parser,
              policy
         ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
+
+    }
+
+    /**
+     * <p>Interpretes given ISO-conforming text as interval. </p>
+     *
+     * <p>Equivalent to
+     * {@link #parse(String, net.time4j.Iso8601Format#EXTENDED_WALL_TIME)},
+     * but can also understand the basic ISO-format. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   2.1
+     * @see     BracketPolicy#SHOW_NEVER
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
+     *
+     * <p>&Auml;quivalent zu
+     * {@link #parse(String, net.time4j.Iso8601Format#EXTENDED_WALL_TIME)},
+     * kann aber auch das <i>basic</i>-ISO-Format verstehen. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   2.1
+     * @see     BracketPolicy#SHOW_NEVER
+     */
+    public static ClockInterval parseISO(String text) throws ParseException {
+
+        ChronoParser<PlainTime> parser;
+        ParseLog plog = new ParseLog();
+
+        if (text.length() > 3 && text.charAt(2) == ':') {
+            parser = Iso8601Format.EXTENDED_WALL_TIME;
+        } else {
+            parser = Iso8601Format.BASIC_WALL_TIME;
+        }
+
+        ClockInterval result =
+            parse(text, parser, BracketPolicy.SHOW_NEVER, plog);
+
+        if (
+            (result == null)
+            && plog.isError()
+        ) {
+            throw new ParseException(
+                plog.getErrorMessage(), plog.getErrorIndex());
+        } else {
+            return result;
+        }
 
     }
 
