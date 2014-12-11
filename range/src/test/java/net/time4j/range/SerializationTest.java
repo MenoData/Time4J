@@ -96,6 +96,46 @@ public class SerializationTest {
         assertThat(interval, is(ser));
     }
 
+    @Test
+    public void roundTripOfIntervalCollection()
+        throws IOException, ClassNotFoundException {
+
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 1),
+                PlainDate.of(2014, 4, 15));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        Object ser = roundtrip(windows);
+        assertThat(windows, is(ser));
+    }
+
+    @Test
+    public void roundTripOfEmptyIntervalCollections()
+        throws IOException, ClassNotFoundException {
+
+        IntervalCollection<PlainDate> w1 = IntervalCollection.onDateAxis();
+        assertThat(w1, is(roundtrip(w1)));
+
+        IntervalCollection<PlainTime> w2 = IntervalCollection.onClockAxis();
+        assertThat(w2, is(roundtrip(w2)));
+
+        IntervalCollection<PlainTimestamp> w3 = IntervalCollection.onTimestampAxis();
+        assertThat(w3, is(roundtrip(w3)));
+
+        IntervalCollection<Moment> w4 = IntervalCollection.onMomentAxis();
+        assertThat(w4, is(roundtrip(w4)));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
