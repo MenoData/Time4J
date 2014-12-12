@@ -22,6 +22,7 @@
 package net.time4j.clock;
 
 import net.time4j.Moment;
+import net.time4j.SystemClock;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.scale.TimeScale;
@@ -50,6 +51,9 @@ public final class AdjustableClock
 
     private static final int MIO = 1000000;
 
+    private static final AdjustableClock SYSTEM_CLOCK_WRAPPER =
+        new AdjustableClock(SystemClock.INSTANCE);
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final TimeSource<?> source;
@@ -58,6 +62,11 @@ public final class AdjustableClock
     private final TimeUnit offsetUnit;
 
     //~ Konstruktoren -----------------------------------------------------
+
+    private AdjustableClock(TimeSource<?> source) {
+        this(source, TimeUnit.NANOSECONDS, 0, TimeUnit.NANOSECONDS);
+
+    }
 
     private AdjustableClock(
         TimeSource<?> source,
@@ -79,6 +88,9 @@ public final class AdjustableClock
     /**
      * <p>Creates a new adjustable clock for given time source. </p>
      *
+     * <p>After construction, the clock can be adjusted using the
+     * {@code with()}-methods. </p>
+     *
      * @param   source      time source which shall be adjusted
      * @return  new adjustable clock wrapper
      * @since   2.1
@@ -87,21 +99,22 @@ public final class AdjustableClock
      * <p>Erzeugt eine neue verstellbare Uhr f&uuml;r die angegebene
      * Zeitquelle. </p>
      *
+     * <p>Nach der Konstruktion kann die Uhr mit Hilfe der
+     * {@code with()}-Methoden verstellt werden. </p>
+     *
      * @param   source      time source which shall be adjusted
      * @return  new adjustable clock wrapper
      * @since   2.1
      */
     public static AdjustableClock of(TimeSource<?> source) {
 
-        if (source == null) {
-            throw new NullPointerException("Missing time source.");
+        if (source.equals(SystemClock.INSTANCE)) {
+            return SYSTEM_CLOCK_WRAPPER;
+        } else if (source instanceof AdjustableClock) {
+            return AdjustableClock.class.cast(source);
         }
 
-        return new AdjustableClock(
-            source,
-            TimeUnit.NANOSECONDS,
-            0,
-            TimeUnit.NANOSECONDS);
+        return new AdjustableClock(source);
 
     }
 
@@ -162,6 +175,11 @@ public final class AdjustableClock
 
         if (unit == null) {
             throw new NullPointerException("Missing offset unit.");
+        } else if (
+            (this.offsetAmount == offset)
+            && (this.offsetUnit == unit)
+        ) {
+            return this;
         }
 
         return new AdjustableClock(
@@ -212,6 +230,64 @@ public final class AdjustableClock
         }
 
         return result;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof AdjustableClock) {
+            AdjustableClock that = (AdjustableClock) obj;
+            return (
+                this.source.equals(that.source)
+                && (this.offsetAmount == that.offsetAmount)
+                && (this.offsetUnit == that.offsetUnit)
+                && (this.pulse == that.pulse)
+            );
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        int hash = 3;
+        hash = 37 * hash + this.source.hashCode();
+        hash = 37 * hash + this.pulse.hashCode();
+        hash = 37 * hash + this.offsetAmount;
+        return 37 * hash + this.offsetUnit.hashCode();
+
+    }
+
+    /**
+     * <p>For debugging purposes. </p>
+     *
+     * @return  description of clock state
+     */
+    /*[deutsch]
+     * <p>F&uuml;r Debugging-Zwecke. </p>
+     *
+     * @return  description of clock state
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("AdjustableClock[");
+        sb.append("source=");
+        sb.append(this.source);
+        sb.append(",offset-amount=");
+        sb.append(this.offsetAmount);
+        sb.append(",offset-unit=");
+        sb.append(this.offsetUnit);
+        sb.append(",pulse=");
+        sb.append(this.pulse);
+        sb.append(']');
+        return sb.toString();
 
     }
 

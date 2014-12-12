@@ -38,7 +38,7 @@ import net.time4j.base.UnixTime;
  * @author  Meno Hochschild
  * @since   2.1
  */
-public class FixedClock
+public final class FixedClock
     extends AbstractClock {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -80,6 +80,49 @@ public class FixedClock
     public Moment currentTime() {
 
         return this.moment;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof FixedClock) {
+            FixedClock that = (FixedClock) obj;
+            return this.moment.equals(that.moment);
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 31 * this.moment.hashCode();
+
+    }
+
+    /**
+     * <p>For debugging purposes. </p>
+     *
+     * @return  description of clock state
+     */
+    /*[deutsch]
+     * <p>F&uuml;r Debugging-Zwecke. </p>
+     *
+     * @return  description of clock state
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("FixedClock[");
+        sb.append("moment=");
+        sb.append(this.moment);
+        sb.append(']');
+        return sb.toString();
 
     }
 

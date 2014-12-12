@@ -28,7 +28,7 @@ package net.time4j.clock;
  *
  * <p>Implementations of this <strong>SPI-interface</strong> must be
  * <i>immutable</i> or at least <i>threadsafe</i>. Instances can be
- * created via a {@code ServiceLoader}. </p>
+ * created manually or via a {@code ServiceLoader}. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
@@ -42,7 +42,7 @@ package net.time4j.clock;
  *
  * <p>Implementierungen dieses <strong>SPI-Interface</strong> m&uuml;ssen
  * <i>immutable</i> oder wenigstens <i>threadsafe</i> sein. Instanzen werden
- * &uuml;ber einen {@code ServiceLoader}-Mechanismus erzeugt. </p>
+ * manuell oder &uuml;ber einen {@code ServiceLoader}-Mechanismus erzeugt. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
