@@ -160,7 +160,10 @@ final class IntervalParser
                 plog,
                 IsoInterval.extractDefaultAttributes(this.startFormat));
 
-        if (ret == null) {
+        if (
+            (ret == null)
+            || plog.isError()
+        ) {
             throw new ParseException(
                 plog.getErrorMessage(),
                 plog.getErrorIndex());

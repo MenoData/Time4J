@@ -380,7 +380,7 @@ public final class ClockInterval
 
         if (
             (result == null)
-            && plog.isError()
+            || plog.isError()
         ) {
             throw new ParseException(
                 plog.getErrorMessage(), plog.getErrorIndex());
