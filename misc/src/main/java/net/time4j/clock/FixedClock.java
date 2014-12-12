@@ -29,12 +29,14 @@ import net.time4j.base.UnixTime;
  * <p>Represents a fixed clock which always display the same current time. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine stillstehende Uhr, die immer die gleiche feste
  * Zeit anzeigt. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 public class FixedClock
     extends AbstractClock {
@@ -59,12 +61,14 @@ public class FixedClock
      *
      * @param   ut      fixed clock time
      * @return  new clock instance with fixed time
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine neue feststehende Uhr. </p>
      *
      * @param   ut      fixed clock time
      * @return  new clock instance with fixed time
+     * @since   2.1
      */
     public static FixedClock of(UnixTime ut) {
 

@@ -33,12 +33,14 @@ import net.time4j.tz.Timezone;
  * any timezone. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 /*[deutsch]
  * <p>Abstrakte Basisimplementierung, die eine lokale Sicht innerhalb einer
  * Zeitzone bietet. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 public abstract class AbstractClock
     implements TimeSource<Moment> {
@@ -61,12 +63,14 @@ public abstract class AbstractClock
      * <p>Creates a local clock in system timezone. </p>
      *
      * @return  local clock in system timezone
+     * @since   2.1
      * @see     Timezone#ofSystem()
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der System-Zeitzone. </p>
      *
      * @return  local clock in system timezone
+     * @since   2.1
      * @see     Timezone#ofSystem()
      */
     public ZonalClock inLocalView() {
@@ -81,6 +85,7 @@ public abstract class AbstractClock
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
@@ -88,6 +93,7 @@ public abstract class AbstractClock
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   2.1
      */
     public ZonalClock inZonalView(TZID tzid) {
 
@@ -101,6 +107,7 @@ public abstract class AbstractClock
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
@@ -108,6 +115,7 @@ public abstract class AbstractClock
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   2.1
      */
     public ZonalClock inZonalView(String tzid) {
 

@@ -35,11 +35,13 @@ import static java.util.concurrent.TimeUnit.DAYS;
  * <p>Allows miscellaneous adjustments to any clock. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 /*[deutsch]
  * <p>Erlaubt verschiedene Verstellungen irgendeiner beliebigen Uhr. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.1
  */
 public final class AdjustableClock
     extends AbstractClock {
@@ -79,6 +81,7 @@ public final class AdjustableClock
      *
      * @param   source      time source which shall be adjusted
      * @return  new adjustable clock wrapper
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine neue verstellbare Uhr f&uuml;r die angegebene
@@ -86,6 +89,7 @@ public final class AdjustableClock
      *
      * @param   source      time source which shall be adjusted
      * @return  new adjustable clock wrapper
+     * @since   2.1
      */
     public static AdjustableClock of(TimeSource<?> source) {
 
@@ -107,6 +111,7 @@ public final class AdjustableClock
      *
      * @param   pulse       new pulse
      * @return  adjusted clock with given pulse
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine getaktete Uhr, die die aktuelle Uhrzeit nur in der
@@ -114,6 +119,7 @@ public final class AdjustableClock
      *
      * @param   pulse       new pulse
      * @return  adjusted clock with given pulse
+     * @since   2.1
      */
     public AdjustableClock withPulse(TimeUnit pulse) {
 
@@ -138,6 +144,7 @@ public final class AdjustableClock
      * @param   amount      amount of shift
      * @param   unit        unit of shift
      * @return  adjusted clock with given shift/offset
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Erzeugt eine getaktete Uhr, die die aktuelle Uhrzeit mit dem
@@ -146,6 +153,7 @@ public final class AdjustableClock
      * @param   amount      amount of shift
      * @param   unit        unit of shift
      * @return  adjusted clock with given shift/offset
+     * @since   2.1
      */
     public AdjustableClock withOffset(
         int offset,
