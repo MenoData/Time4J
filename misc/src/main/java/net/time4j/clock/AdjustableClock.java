@@ -177,7 +177,7 @@ public final class AdjustableClock
      * <p>Creates an adjusted clock which displays the current time with
      * given time shift. </p>
      *
-     * @param   amount      amount of shift
+     * @param   offset      amount of shift
      * @param   unit        unit of shift
      * @return  adjusted clock with given shift/offset
      * @since   2.1
@@ -186,7 +186,7 @@ public final class AdjustableClock
      * <p>Erzeugt eine getaktete Uhr, die die aktuelle Uhrzeit mit dem
      * angegebenen Versatz anzeigt. </p>
      *
-     * @param   amount      amount of shift
+     * @param   offset      amount of shift
      * @param   unit        unit of shift
      * @return  adjusted clock with given shift/offset
      * @since   2.1

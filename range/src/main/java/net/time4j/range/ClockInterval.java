@@ -339,8 +339,8 @@ public final class ClockInterval
     /**
      * <p>Interpretes given ISO-conforming text as interval. </p>
      *
-     * <p>Equivalent to
-     * {@link #parse(String, net.time4j.Iso8601Format#EXTENDED_WALL_TIME)},
+     * <p>Equivalent to {@link #parse(String,ChronoParser)
+     * parse(text, Iso8601Format#EXTENDED_WALL_TIME)},
      * but can also understand the basic ISO-format. </p>
      *
      * @param   text        text to be parsed
@@ -353,8 +353,8 @@ public final class ClockInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
      *
-     * <p>&Auml;quivalent zu
-     * {@link #parse(String, net.time4j.Iso8601Format#EXTENDED_WALL_TIME)},
+     * <p>&Auml;quivalent zu {@link #parse(String,ChronoParser)
+     * parse(text, Iso8601Format#EXTENDED_WALL_TIME)},
      * kann aber auch das <i>basic</i>-ISO-Format verstehen. </p>
      *
      * @param   text        text to be parsed
