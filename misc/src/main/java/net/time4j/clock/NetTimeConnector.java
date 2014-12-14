@@ -359,7 +359,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
      *          connection yet)
      * @see     #connect()
      */
-    public long getLastOffset() {
+    public long getLastOffsetInMicros() {
 
         return this.getLastOffset(SystemClock.INSTANCE.currentTimeInMillis());
 

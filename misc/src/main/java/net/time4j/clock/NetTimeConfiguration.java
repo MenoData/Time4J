@@ -70,7 +70,7 @@ public interface NetTimeConfiguration {
      * <p>Possible values are also addresses of older time servers which
      * still support the elder protocol (RFC 867), for example: </p>
      *
-     * <ul><li>www.nist.gov (US-government)</li>
+     * <ul><li>time.nist.gov (US-government)</li>
      * <li>time.ien.it (electrotechn. institute in Italy)</li></ul>
      *
      * <p>Alternatively, addresses of modern NTP-servers are permitted
@@ -90,7 +90,7 @@ public interface NetTimeConfiguration {
      * Uhrzeit-Servern im Netz, die noch das &auml;ltere Protokoll
      * unterst&uuml;tzen (RFC 867), zum Beispiel: </p>
      *
-     * <ul><li>www.nist.gov (US-Regierung)</li>
+     * <ul><li>time.nist.gov (US-Regierung)</li>
      * <li>time.ien.it (elektrotechn. Institut in Italien)</li></ul>
      *
      * <p>Alternativ sind die Adressen von moderneren NTP-Servern
