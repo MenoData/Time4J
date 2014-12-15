@@ -2,10 +2,10 @@ package net.time4j.clock;
 
 import java.io.IOException;
 
-public class DaytimeConnectorTest {
+public class NetTimeConnectorTest {
 
     public static void main(String[] args) throws IOException {
-        DaytimeConnector dc = DaytimeConnector.ofNIST();
+        DaytimeClock dc = DaytimeClock.NIST;
         System.out.println(
             "Time server configuration: " + dc.getNetTimeConfiguration());
         System.out.println(
@@ -13,6 +13,10 @@ public class DaytimeConnectorTest {
 
         dc.connect();
         System.out.println("Connection result: " + dc.currentTime());
+
+        HttpClock hc = new HttpClock("www.google.com");
+        hc.connect();
+        System.out.println("Google: " + hc.currentTime());
     }
 
 }
