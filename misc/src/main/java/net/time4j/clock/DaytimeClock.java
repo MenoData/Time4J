@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (DaytimeConnector.java) is part of project Time4J.
+ * This file (DaytimeClock.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -67,7 +67,7 @@ import java.text.ParseException;
  * @since       2.1
  * @concurrency <threadsafe>
  */
-public class DaytimeConnector
+public class DaytimeClock
     extends NetTimeConnector<NetTimeConfiguration> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -85,56 +85,53 @@ public class DaytimeConnector
                 ParseLog status,
                 AttributeQuery attrs
             ) {
-                int offset = 0;
-
-                if (text.charAt(0) == '\n') {
-                    offset = 1;
+                int pos = 0;
+                while (!Character.isDigit(text.charAt(pos))) {
+                    pos++;
                 }
-
                 PlainDate date =
                     MJD_PARSER.parse(
-                        text.subSequence(offset, 5 + offset),
-                        status,
-                        attrs);
-                status.setPosition(0);
-                PlainTime time =
-                    TIME_PARSER.parse(
-                        text.subSequence(15 + offset, 23 + offset),
-                        status,
-                        attrs);
-                return date.at(time).atUTC();
+                        text.subSequence(pos, 5 + pos), status, attrs);
+                if (date != null) {
+                    status.setPosition(0);
+                    PlainTime time =
+                        TIME_PARSER.parse(
+                            text.subSequence(15 + pos, 23 + pos),
+                            status,
+                            attrs);
+                    if (time != null) {
+                        // leapsecond will be set to 59 in smart mode
+                        return date.at(time).atUTC();
+                    }
+                }
+                return null;
             }
         };
 
-    private static final DaytimeConnector NIST_CONNECTOR =
-        new DaytimeConnector("time.nist.gov", NIST_PARSER);
-
-    //~ Instanzvariablen --------------------------------------------------
-
-    private final ChronoParser<Moment> parser;
-
-    //~ Konstruktoren -----------------------------------------------------
-
     /**
-     * <p>Gets an instance which supports the NIST-servers using
-     * the address &quot;time.nist.gov&quot; and a specific format. </p>
+     * <p>Defines an instance which supports the NIST-servers using
+     * the multiple-location-address &quot;time.nist.gov&quot; and
+     * a specific format. </p>
      *
      * <p>The format is documented at
      * <a href="http://www.nist.gov/">www.nist.gov</a>. </p>
      */
     /*[deutsch]
-     * <p>Liefert eine Instanz, die die NIST-Server mit der allgemeinen
+     * <p>Definiert eine Instanz, die die NIST-Server mit der allgemeinen
      * Adresse &quot;time.nist.gov&quot; und deren spezifisches
      * Format verwendet. </p>
      *
      * <p>Das Format ist auf der Webseite
      * <a href="http://www.nist.gov/">www.nist.gov</a> dokumentiert. </p>
      */
-    public static DaytimeConnector ofNIST() {
+    public static final DaytimeClock NIST =
+        new DaytimeClock("time.nist.gov", NIST_PARSER);
 
-        return NIST_CONNECTOR;
+    //~ Instanzvariablen --------------------------------------------------
 
-    }
+    private final ChronoParser<Moment> parser;
+
+    //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Creates a new instance which uses the given time server on the
@@ -150,7 +147,7 @@ public class DaytimeConnector
      * @param   server  time server address (example: &quot;time.nist.gov&quot;)
      * @param   parser  object interpreting the server reply
      */
-    public DaytimeConnector(
+    public DaytimeClock(
         String server,
         ChronoParser<Moment> parser
     ) {
