@@ -78,6 +78,7 @@ public interface SntpConfiguration
      * they happen too often. </p>
      *
      * @return  time distance between two messages in seconds as positive number
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Bestimmt die Rate, mit der ein SNTP-Client w&auml;hrend einer
@@ -91,6 +92,7 @@ public interface SntpConfiguration
      *
      * @return  zeitlicher Abstand zwischen zwei Nachrichten in Sekunden als
      *          positive Zahl
+     * @since   2.1
      */
     int getRequestInterval();
 
@@ -107,6 +109,7 @@ public interface SntpConfiguration
      * requests if they happen too often. </p>
      *
      * @return  number in range {@code 0 <= x < 1000}
+     * @since   2.1
      * @see     SntpConnector#connect()
      */
     /*[deutsch]
@@ -121,6 +124,7 @@ public interface SntpConfiguration
      * enthalten. </p>
      *
      * @return  Zahl im Bereich {@code 0 <= x < 1000}
+     * @since   2.1
      * @see     SntpConnector#connect()
      */
     short getRequestCount();

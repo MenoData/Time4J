@@ -681,19 +681,21 @@ public final class SntpMessage {
 
     /**
      * <p>Converts given NTP-timestamp to a microsecond value relative to
-     * the Java epoch. </p>
+     * the UNIX- epoch. </p>
      *
      * @param   ntpTimestamp    NTP-timestamp (seconds since 1900-01-01)
      * @return  long-Wert relative to 1970-01-01 in microseconds without
      *          leap seconds
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Wandelt den NTP-Timestamp in einen Mikrosekundenwert relativ
-     * zur Java-Epoche um. </p>
+     * zur UNIX-Epoche um. </p>
      *
      * @param   ntpTimestamp    NTP-Timestamp (Sekunden seit 1.1.1900)
      * @return  long-Wert relativ zum 1. Januar 1970 (Mikrosekundenwert
      *          ohne Z&auml;hlung von UTC-Schaltsekunden)
+     * @since   2.1
      */
     public static long convert(double ntpTimestamp) {
 

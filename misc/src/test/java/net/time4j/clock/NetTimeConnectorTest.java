@@ -17,6 +17,11 @@ public class NetTimeConnectorTest {
         HttpClock hc = new HttpClock("www.google.com");
         hc.connect();
         System.out.println("Google: " + hc.currentTime());
+
+        SntpConnector clock = new SntpConnector("ptbtime1.ptb.de");
+        clock.connect();
+        System.out.println("PTB: " + clock.currentTime());
+
     }
 
 }
