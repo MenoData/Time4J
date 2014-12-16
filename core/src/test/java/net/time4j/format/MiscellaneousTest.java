@@ -128,4 +128,22 @@ public class MiscellaneousTest {
         assertThat(e1.equals(e2), is(true));
     }
 
+    @Test
+    public void printVariableHourDecimalMinute()
+        throws ParseException {
+
+        ChronoFormatter<PlainTime> formatter =
+            ChronoFormatter
+                .setUp(PlainTime.class, Locale.ROOT)
+                .addInteger(PlainTime.ISO_HOUR, 1, 2)
+                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
+                .build();
+        assertThat(
+            formatter.format(PlainTime.of(17, 8, 30)),
+            is("1708,5"));
+        assertThat(
+            formatter.format(PlainTime.of(7, 8, 30)),
+            is("708,5"));
+    }
+
 }

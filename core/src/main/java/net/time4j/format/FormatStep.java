@@ -344,13 +344,16 @@ final class FormatStep {
     }
 
     /**
-     * <p>Liegt ein fraktional formatiertes Element vor? </p>
+     * <p>Liegt ein fraktional oder dezimal formatiertes Element vor? </p>
      *
      * @return  boolean
      */
-    boolean isFractional() {
+    boolean isDecimal() {
 
-        return (this.processor instanceof FractionProcessor);
+        return (
+            (this.processor instanceof FractionProcessor)
+            || (this.processor instanceof DecimalProcessor)
+        );
 
     }
 

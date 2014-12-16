@@ -150,7 +150,7 @@ final class FractionProcessor
         if (fraction.scale() == 0) {
             // scale ist 0, wenn value das Minimum ist
             if (this.minDigits > 0) {
-                if (this.decimalSeparator != null) {
+                if (this.hasDecimalSeparator()) {
                     this.decimalSeparator.print(
                         formattable,
                         buffer,
@@ -167,7 +167,7 @@ final class FractionProcessor
                 printed += this.minDigits;
             }
         } else {
-            if (this.decimalSeparator != null) {
+            if (this.hasDecimalSeparator()) {
                 this.decimalSeparator.print(
                     formattable,
                     buffer,
@@ -241,7 +241,7 @@ final class FractionProcessor
             return;
         }
 
-        if (this.decimalSeparator != null) {
+        if (this.hasDecimalSeparator()) {
             this.decimalSeparator.parse(
                 text,
                 status,
@@ -322,6 +322,7 @@ final class FractionProcessor
                 this.element.equals(that.element)
                 && (this.minDigits == that.minDigits)
                 && (this.maxDigits == that.maxDigits)
+                && (this.hasDecimalSeparator() == that.hasDecimalSeparator())
             );
         } else {
             return false;
@@ -375,7 +376,7 @@ final class FractionProcessor
             element,
             this.minDigits,
             this.maxDigits,
-            (this.decimalSeparator != null)
+            this.hasDecimalSeparator()
         );
 
     }
@@ -446,6 +447,12 @@ final class FractionProcessor
     private static BigDecimal toDecimal(Number num) {
 
         return BigDecimal.valueOf(num.longValue());
+
+    }
+
+    private boolean hasDecimalSeparator() {
+
+        return (this.decimalSeparator != null);
 
     }
 

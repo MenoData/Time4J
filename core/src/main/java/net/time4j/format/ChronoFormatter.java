@@ -37,6 +37,7 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 import java.text.DateFormat;
@@ -134,7 +135,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         FractionProcessor fp = null;
 
         for (FormatStep step : this.steps) {
-            if (step.isFractional()) {
+            if (step.getProcessor() instanceof FractionProcessor) {
                 fp = FractionProcessor.class.cast(step.getProcessor());
                 break;
             }
@@ -2386,7 +2387,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          range {@code 0-9} or if {@code maxDigits} is out of range
          *          {@code 1-9} or if {@code maxDigits < minDigits} or if
          *          given element is not supported by chronology or its
-         *          preparser or if there is already a fractional part defined
+         *          preparser or if there is already a fractional or decimal
+         *          part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
          */
@@ -2459,7 +2461,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          range {@code 0-9} or if {@code maxDigits} is out of range
          *          {@code 1-9} or if {@code maxDigits < minDigits} or if
          *          given element is not supported by chronology or its
-         *          preparser or if there is already a fractional part defined
+         *          preparser or if there is already a fractional or decimal
+         *          part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
          */
@@ -2495,6 +2498,138 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 if (numStep.getSection() == lastStep.getSection()) {
                     this.reservedIndex = ri;
                     this.steps.set(ri, numStep.reserve(minDigits));
+                }
+            } else {
+                this.addProcessor(processor);
+            }
+
+            return this;
+        }
+
+        /**
+         * <p>Defines a fixed unsigned decimal format for given chronological
+         * element. </p>
+         *
+         * <ol><li><p>PRINT =&gt; If the resulting sequence of digits before
+         * the decimal separator char has less than {@code precision - scale}
+         * digits then it will be left-padded with zero digit chars. Otherwise
+         * if there are more integer digits than allowed then an exception will
+         * be thrown.</p>
+         *
+         * <p>If the resulting sequence of digits after the decimal separator
+         * is smaller than {@code scale} then the sequence will be right-padded
+         * with zero digit chars. Otherwise the sequence of decimal digits will
+         * be truncated if necessary. </p></li>
+         *
+         * <li>PARSE =&gt; Exactly {@code precision} chars will be
+         * interpreted as digits in strict mode. Otherwise as many digits are
+         * parsed as available and found. </li>
+         * </ol>
+         *
+         * <p>Example: </p>
+         * <pre>
+         *  ChronoElement&lt;BigDecimal&gt; element = PlainTime.DECIMAL_MINUTE;
+         *  int precision = 3;
+         *  int scale = 1;
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+         *      .addPattern(&quot;HH:&quot;, PatternType.CLDR)
+         *      .addFixedDecimal(element, precision, scale)
+         *      .build();
+         *  System.out.println(formatter.format(PlainTime.of(12, 8, 30)));
+         *  // output: 12:08.5
+         * </pre>
+         *
+         * <p>Note: A decimal element must not be directly preceded by
+         * another numerical element. </p>
+         *
+         * @param   element         chronological element
+         * @param   precision       total count of digits {@code >= 2}
+         * @param   scale           digits after decimal separator {@code >= 1}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code precision} is smaller
+         *          than {@code 2} or if {@code scale} is smaller than
+         *          {@code 1} or if {@code precision <= scale} or if
+         *          given element is not supported by chronology or its
+         *          preparser or if there is already a fractional or decimal
+         *          part defined
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     Attributes#LENIENCY
+         */
+        /*[deutsch]
+         * <p>Definiert ein festes Dezimalformat ohne Vorzeichen f&uuml;r das
+         * angegebene chronologische Element. </p>
+         *
+         * <ol><li><p>PRINT =&gt; Wenn die Anzahl der Ziffern vor dem
+         * Dezimaltrennzeichen kleiner als {@code precision - scale} ist,
+         * dann wird von links mit Null-Ziffern aufgef&uuml;llt. Gibt es
+         * andererseits mehr Ziffern als vorgegeben, wird eine Ausnahme
+         * geworfen. </p>
+         *
+         * <p>Ist die Anzahl der Ziffern nach dem Dezimaltrennzeichen kleiner
+         * als {@code scale}, dann wird die Sequenz rechts mit Null-Ziffern
+         * aufgef&uuml;llt. Andernfalls wird die Sequenz bei Bedarf
+         * abgeschnitten. </p></li>
+         *
+         * <li>PARSE =&gt; Exakt {@code precision} Zeichen werden nebst dem
+         * Dezimaltrennzeichen als Ziffern im strikten Modus interpretiert.
+         * Andernfalls werden soviele Ziffern interpretiert, wie welche
+         * vorhanden sind. </li>
+         * </ol>
+         *
+         * <p>Beispiel: </p>
+         * <pre>
+         *  ChronoElement&lt;BigDecimal&gt; element = PlainTime.DECIMAL_MINUTE;
+         *  int precision = 3;
+         *  int scale = 1;
+         *
+         *  ChronoFormatter&lt;PlainTime&gt; formatter =
+         *      ChronoFormatter.setUp(PlainTime.class, Locale.US)
+         *      .addPattern(&quot;HH:&quot;, PatternType.CLDR)
+         *      .addFixedDecimal(element, precision, scale)
+         *      .build();
+         *  System.out.println(formatter.format(PlainTime.of(12, 8, 30)));
+         *  // Ausgabe: 12:08.5
+         * </pre>
+         *
+         * <p>Hinweis: Direkt hinter einem dezimalen Element darf kein
+         * anderes numerisches Element folgen. </p>
+         *
+         * @param   element         chronological element
+         * @param   precision       total count of digits {@code >= 2}
+         * @param   scale           digits after decimal separator {@code >= 1}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code precision} is smaller
+         *          than {@code 2} or if {@code scale} is smaller than
+         *          {@code 1} or if {@code precision <= scale} or if
+         *          given element is not supported by chronology or its
+         *          preparser or if there is already a fractional or decimal
+         *          part defined
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     Attributes#LENIENCY
+         */
+        public Builder<T> addFixedDecimal(
+            ChronoElement<BigDecimal> element,
+            int precision,
+            int scale
+        ) {
+
+            this.checkElement(element);
+            this.ensureDecimalDigitsOnlyOnce();
+
+            FormatProcessor<?> processor =
+                new DecimalProcessor(element, precision, scale);
+
+            if (this.reservedIndex != -1) {
+                int ri = this.reservedIndex;
+                FormatStep numStep = this.steps.get(ri);
+                this.addProcessor(processor);
+                FormatStep lastStep = this.steps.get(this.steps.size() - 1);
+
+                if (numStep.getSection() == lastStep.getSection()) {
+                    this.reservedIndex = ri;
+                    this.steps.set(ri, numStep.reserve(precision - scale));
                 }
             } else {
                 this.addProcessor(processor);
@@ -3144,7 +3279,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addTwoDigitYear(ChronoElement<Integer> element) {
 
             this.checkElement(element);
-            this.checkAfterFraction(element);
+            this.checkAfterDecimalDigits(element);
             FormatProcessor<?> processor = new TwoDigitYearProcessor(element);
 
             if (this.reservedIndex == -1) {
@@ -3987,7 +4122,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            FormatStep last = this.checkAfterFraction(element);
+            FormatStep last = this.checkAfterDecimalDigits(element);
 
             NumberProcessor<V> np =
                 new NumberProcessor<V>(
@@ -4035,7 +4170,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            FormatStep last = this.checkAfterFraction(element);
+            FormatStep last = this.checkAfterDecimalDigits(element);
             OrdinalProcessor p = new OrdinalProcessor(element, indicators);
 
             if (
@@ -4123,17 +4258,24 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
+        private void ensureDecimalDigitsOnlyOnce() {
+
+            for (FormatStep step : this.steps) {
+                if (step.isDecimal()) {
+                    throw new IllegalArgumentException(
+                        "Cannot define more than one element"
+                        + " with decimal digits.");
+                }
+            }
+
+        }
+
         private void ensureOnlyOneFractional(
             boolean fixedWidth,
             boolean decimalSeparator
         ) {
 
-            for (FormatStep step : this.steps) {
-                if (step.isFractional()) {
-                    throw new IllegalArgumentException(
-                        "Cannot define more than one fractional element.");
-                }
-            }
+            this.ensureDecimalDigitsOnlyOnce();
 
             if (
                 !fixedWidth
@@ -4147,7 +4289,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private FormatStep checkAfterFraction(ChronoElement<?> element) {
+        private FormatStep checkAfterDecimalDigits(ChronoElement<?> element) {
 
             FormatStep last = (
                 this.steps.isEmpty()
@@ -4155,16 +4297,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 : this.steps.get(this.steps.size() - 1)
             );
 
-            if (
-                (last != null)
-                && last.isFractional()
-            ) {
+            if (last == null) {
+                return null;
+            }
+
+            if (last.isDecimal()) {
                 throw new IllegalStateException(
                     element.name()
-                    + " can't be inserted after fractional element.");
-            } else {
-                return last;
+                    + " can't be inserted after an element"
+                    + " with decimal digits.");
             }
+
+            return last;
 
         }
 
