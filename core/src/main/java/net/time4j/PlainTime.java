@@ -157,13 +157,14 @@ public final class PlainTime
     private static final int MIO = 1000000;
     private static final int KILO = 1000;
 
-    private static final BigDecimal DECIMAL_24 = new BigDecimal(24);
     private static final BigDecimal DECIMAL_60 = new BigDecimal(60);
     private static final BigDecimal DECIMAL_3600 = new BigDecimal(3600);
     private static final BigDecimal DECIMAL_MRD = new BigDecimal(MRD);
 
     private static final BigDecimal DECIMAL_24_0 =
         new BigDecimal("24");
+    private static final BigDecimal DECIMAL_23_9 =
+        new BigDecimal("23.999999999999999");
     private static final BigDecimal DECIMAL_59_9 =
         new BigDecimal("59.999999999999999");
 
@@ -793,34 +794,30 @@ public final class PlainTime
 
     /**
      * <p>Decimal hour in the value range {@code 0.0} inclusive until
-     * {@code 24.0} inclusive. </p>
+     * {@code 24.0} exclusive (inclusive in {@code PlainTime}). </p>
      *
-     * <p>This element does not define any base unit and is only supported
-     * by the class {@code PlainTime}. </p>
+     * <p>This element does not define any base unit. </p>
      */
     /*[deutsch]
      * <p>Dezimal-Stunde im Wertebereich {@code 0.0} inklusive bis
-     * {@code 24.0} inklusive. </p>
+     * {@code 24.0} exklusive (inklusive in {@code PlainTime}). </p>
      *
-     * <p>Dieses Element definiert keine Basiseinheit und wird exklusiv
-     * nur von der Klasse {@code PlainTime} unterst&uuml;tzt. </p>
+     * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
     public static final ChronoElement<BigDecimal> DECIMAL_HOUR =
-        new DecimalTimeElement("DECIMAL_HOUR", DECIMAL_24_0);
+        new DecimalTimeElement("DECIMAL_HOUR", DECIMAL_23_9);
 
     /**
      * <p>Decimal minute in the value range {@code 0.0} inclusive until
      * {@code 60.0} exclusive. </p>
      *
-     * <p>This element does not define any base unit and is only supported
-     * by the class {@code PlainTime}. </p>
+     * <p>This element does not define any base unit. </p>
      */
     /*[deutsch]
      * <p>Dezimal-Minute im Wertebereich {@code 0.0} inklusive bis
      * {@code 60.0} exklusive. </p>
      *
-     * <p>Dieses Element definiert keine Basiseinheit und wird exklusiv
-     * nur von der Klasse {@code PlainTime} unterst&uuml;tzt. </p>
+     * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
     public static final ChronoElement<BigDecimal> DECIMAL_MINUTE =
         new DecimalTimeElement("DECIMAL_MINUTE", DECIMAL_59_9);
@@ -829,15 +826,13 @@ public final class PlainTime
      * <p>Decimal second in the value range {@code 0.0} inclusive until
      * {@code 60.0} exclusive. </p>
      *
-     * <p>This element does not define any base unit and is only supported
-     * by the class {@code PlainTime}. </p>
+     * <p>This element does not define any base unit. </p>
      */
     /*[deutsch]
      * <p>Dezimal-Sekunde im Wertebereich {@code 0.0} inklusive bis
      * {@code 60.0} exklusive. </p>
      *
-     * <p>Dieses Element definiert keine Basiseinheit und wird exklusiv
-     * nur von der Klasse {@code PlainTime} unterst&uuml;tzt. </p>
+     * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
     public static final ChronoElement<BigDecimal> DECIMAL_SECOND =
         new DecimalTimeElement("DECIMAL_SECOND", DECIMAL_59_9);
@@ -3009,7 +3004,7 @@ public final class PlainTime
                 if (context.equals(PlainTime.MIN)) {
                     return BigDecimal.ZERO;
                 } else if (context.hour == 24) {
-                    return DECIMAL_24;
+                    return DECIMAL_24_0;
                 }
 
                 val =
@@ -3173,28 +3168,14 @@ public final class PlainTime
         @Override
         public ChronoElement<?> getChildAtFloor(PlainTime context) {
 
-            return this.getChild();
+            return null; // never called
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(PlainTime context) {
 
-            return this.getChild();
-
-        }
-
-        private ChronoElement<?> getChild() {
-
-            if (this.element == DECIMAL_HOUR) {
-                return DECIMAL_MINUTE;
-            } else if (this.element == DECIMAL_MINUTE) {
-                return DECIMAL_SECOND;
-            } else if (this.element == DECIMAL_SECOND) {
-                return NANO_OF_SECOND;
-            } else {
-                throw new UnsupportedOperationException(this.element.name());
-            }
+            return null; // never called
 
         }
 

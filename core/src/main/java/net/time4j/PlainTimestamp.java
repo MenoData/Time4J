@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -116,6 +117,9 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
  *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
  *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ *  <li>{@link PlainTime#DECIMAL_HOUR}</li>
+ *  <li>{@link PlainTime#DECIMAL_MINUTE}</li>
+ *  <li>{@link PlainTime#DECIMAL_SECOND}</li>
  * </ul>
  *
  * <p>Furthermore, all elements of class {@link Weekmodel} are supported. As
@@ -162,6 +166,9 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#MILLI_OF_DAY}</li>
  *  <li>{@link PlainTime#MICRO_OF_DAY}</li>
  *  <li>{@link PlainTime#NANO_OF_DAY}</li>
+ *  <li>{@link PlainTime#DECIMAL_HOUR}</li>
+ *  <li>{@link PlainTime#DECIMAL_MINUTE}</li>
+ *  <li>{@link PlainTime#DECIMAL_SECOND}</li>
  * </ul>
  *
  * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}
@@ -340,6 +347,15 @@ public final class PlainTimestamp
                     NANO_OF_DAY,
                     FieldRule.of(NANO_OF_DAY),
                     NANOS)
+                .appendElement(
+                    DECIMAL_HOUR,
+                    new DecimalRule(DECIMAL_HOUR))
+                .appendElement(
+                    DECIMAL_MINUTE,
+                    new DecimalRule(DECIMAL_MINUTE))
+                .appendElement(
+                    DECIMAL_SECOND,
+                    new DecimalRule(DECIMAL_SECOND))
                 .appendExtension(new WeekExtension());
         registerCalendarUnits(builder);
         registerClockUnits(builder);
@@ -1487,6 +1503,56 @@ public final class PlainTimestamp
         private long toNumber(V value) {
 
             return Number.class.cast(value).longValue();
+
+        }
+
+    }
+
+    private static class DecimalRule
+        extends FieldRule<BigDecimal> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        DecimalRule(ChronoElement<BigDecimal> element) {
+            super(element);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean isValid(
+            PlainTimestamp context,
+            BigDecimal value
+        ) {
+
+            if (value == null) {
+                return false;
+            }
+
+            BigDecimal min = super.element.getDefaultMinimum();
+            BigDecimal max = super.element.getDefaultMaximum();
+
+            return (
+                (min.compareTo(value) <= 0)
+                && (value.compareTo(max) <= 0)
+            );
+
+        }
+
+        @Override
+        public PlainTimestamp withValue(
+            PlainTimestamp context,
+            BigDecimal value,
+            boolean lenient
+        ) {
+
+            if (!this.isValid(context, value)) {
+                throw new IllegalArgumentException("Out of range: " + value);
+            }
+
+            PlainTime time = context.time.with(super.element, value);
+            return PlainTimestamp.of(context.date, time);
 
         }
 

@@ -1370,22 +1370,28 @@ public class TimestampPropertiesTest {
     @Test
     public void containsDecimalHour() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.contains(DECIMAL_HOUR), is(false));
+        assertThat(anyTS.contains(DECIMAL_HOUR), is(true));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getDecimalHour() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_HOUR);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_HOUR),
+            is(PlainTime.of(1, 45).get(DECIMAL_HOUR)));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMinimumDecimalHour() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_HOUR);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_HOUR),
+            is(BigDecimal.ZERO));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMaximumDecimalHour() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_HOUR);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_HOUR),
+            is(DECIMAL_HOUR.getDefaultMaximum()));
     }
 
     @Test
@@ -1393,34 +1399,50 @@ public class TimestampPropertiesTest {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 1, 45)
                 .isValid(DECIMAL_HOUR, BigDecimal.ZERO),
+            is(true));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_HOUR, null),
+            is(false));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_HOUR, new BigDecimal(24)),
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void withDecimalHour() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45)
-            .with(DECIMAL_HOUR, BigDecimal.ZERO);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+            .with(DECIMAL_HOUR, BigDecimal.ZERO),
+            is(PlainTimestamp.of(2014, 4, 21, 0, 0)));
     }
 
     @Test
     public void containsDecimalMinute() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.contains(DECIMAL_MINUTE), is(false));
+        assertThat(anyTS.contains(DECIMAL_MINUTE), is(true));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getDecimalMinute() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_MINUTE);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_MINUTE),
+            is(PlainTime.of(1, 45).get(DECIMAL_MINUTE)));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMinimumDecimalMinute() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_MINUTE);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_MINUTE),
+            is(BigDecimal.ZERO));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMaximumDecimalMinute() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_MINUTE);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_MINUTE),
+            is(DECIMAL_MINUTE.getDefaultMaximum()));
     }
 
     @Test
@@ -1428,34 +1450,48 @@ public class TimestampPropertiesTest {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 1, 45)
                 .isValid(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(true));
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(DECIMAL_MINUTE, null),
             is(false));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void withDecimalMinute() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45)
-            .with(DECIMAL_MINUTE, BigDecimal.ZERO);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45, 30)
+            .with(DECIMAL_MINUTE, BigDecimal.ZERO),
+            is(PlainTimestamp.of(2014, 4, 21, 1, 0, 0)));
     }
 
     @Test
     public void containsDecimalSecond() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.contains(DECIMAL_SECOND), is(false));
+        assertThat(anyTS.contains(DECIMAL_SECOND), is(true));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getDecimalSecond() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).get(DECIMAL_SECOND);
+        PlainTimestamp tsp =
+            PlainTimestamp.of(2014, 4, 21, 1, 45, 28).plus(1, ClockUnit.MILLIS);
+        assertThat(
+            tsp.get(DECIMAL_SECOND),
+            is(tsp.getWallTime().get(DECIMAL_SECOND)));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMinimumDecimalSecond() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_SECOND);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(DECIMAL_SECOND),
+            is(BigDecimal.ZERO));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMaximumDecimalSecond() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_SECOND);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(DECIMAL_SECOND),
+            is(DECIMAL_SECOND.getDefaultMaximum()));
     }
 
     @Test
@@ -1463,13 +1499,16 @@ public class TimestampPropertiesTest {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 1, 45)
                 .isValid(DECIMAL_SECOND, BigDecimal.ZERO),
-            is(false));
+            is(true));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void withDecimalSecond() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45)
-            .with(DECIMAL_SECOND, BigDecimal.ZERO);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45, 30)
+            .plus(123, ClockUnit.MILLIS)
+            .with(DECIMAL_SECOND, BigDecimal.ZERO),
+            is(PlainTimestamp.of(2014, 4, 21, 1, 45, 0)));
     }
 
     @Test
