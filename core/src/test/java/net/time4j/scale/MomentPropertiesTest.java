@@ -580,8 +580,15 @@ public class MomentPropertiesTest {
     }
 
     @Test(expected=RuleNotFoundException.class)
-    public void getDecimalHour() {
+    public void getDecimalHour1() {
         this.utc.get(DECIMAL_HOUR);
+    }
+
+    @Test
+    public void getDecimalHour2() {
+        assertThat(
+            this.utc.get(DECIMAL_HOUR.atUTC()),
+            is(new BigDecimal("23.999756515774722")));
     }
 
     @Test
@@ -602,8 +609,15 @@ public class MomentPropertiesTest {
     }
 
     @Test(expected=RuleNotFoundException.class)
-    public void getDecimalMinute() {
+    public void getDecimalMinute1() {
         this.utc.get(DECIMAL_MINUTE);
+    }
+
+    @Test
+    public void getDecimalMinute2() {
+        assertThat(
+            this.utc.get(DECIMAL_MINUTE.atUTC()),
+            is(new BigDecimal("59.985390946483333")));
     }
 
     @Test
@@ -624,8 +638,15 @@ public class MomentPropertiesTest {
     }
 
     @Test(expected=RuleNotFoundException.class)
-    public void getDecimalSecond() {
+    public void getDecimalSecond1() {
         this.utc.get(DECIMAL_SECOND);
+    }
+
+    @Test
+    public void getDecimalSecond2() {
+        assertThat(
+            this.utc.get(DECIMAL_SECOND.atUTC()),
+            is(new BigDecimal("59.123456789")));
     }
 
     @Test

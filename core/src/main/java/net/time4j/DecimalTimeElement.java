@@ -23,7 +23,11 @@ package net.time4j;
 
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.format.NumericalElement;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
@@ -39,7 +43,7 @@ import java.math.RoundingMode;
  */
 final class DecimalTimeElement
     extends BasicElement<BigDecimal>
-    implements NumericalElement<BigDecimal> {
+    implements ZonalElement<BigDecimal>, NumericalElement<BigDecimal> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -120,6 +124,41 @@ final class DecimalTimeElement
     ) {
 
         return o1.get(this).compareTo(o2.get(this));
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, BigDecimal> inStdTimezone() {
+
+        return this.in(Timezone.ofSystem());
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, BigDecimal> inTimezone(TZID tzid) {
+
+        return this.in(Timezone.of(tzid));
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, BigDecimal> in(Timezone tz) {
+
+        return new ZonalQuery<BigDecimal>(this, tz);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, BigDecimal> atUTC() {
+
+        return this.at(ZonalOffset.UTC);
+
+    }
+
+    @Override
+    public ChronoFunction<Moment, BigDecimal> at(ZonalOffset offset) {
+
+        return new ZonalQuery<BigDecimal>(this, offset);
 
     }
 

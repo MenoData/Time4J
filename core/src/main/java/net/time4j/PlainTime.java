@@ -804,7 +804,7 @@ public final class PlainTime
      *
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
-    public static final ChronoElement<BigDecimal> DECIMAL_HOUR =
+    public static final ZonalElement<BigDecimal> DECIMAL_HOUR =
         new DecimalTimeElement("DECIMAL_HOUR", DECIMAL_23_9);
 
     /**
@@ -819,7 +819,7 @@ public final class PlainTime
      *
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
-    public static final ChronoElement<BigDecimal> DECIMAL_MINUTE =
+    public static final ZonalElement<BigDecimal> DECIMAL_MINUTE =
         new DecimalTimeElement("DECIMAL_MINUTE", DECIMAL_59_9);
 
     /**
@@ -834,7 +834,7 @@ public final class PlainTime
      *
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
-    public static final ChronoElement<BigDecimal> DECIMAL_SECOND =
+    public static final ZonalElement<BigDecimal> DECIMAL_SECOND =
         new DecimalTimeElement("DECIMAL_SECOND", DECIMAL_59_9);
 
     /**
