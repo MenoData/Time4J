@@ -1,6 +1,7 @@
 package net.time4j.format;
 
 import net.time4j.Iso8601Format;
+import net.time4j.Moment;
 import net.time4j.PatternType;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -8,6 +9,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -144,6 +146,51 @@ public class MiscellaneousTest {
         assertThat(
             formatter.format(PlainTime.of(7, 8, 30)),
             is("708,5"));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void momentFormatterWithoutTimezone1() {
+        Moment.formatter(DisplayMode.FULL, Locale.FRENCH, null);
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void momentFormatterWithoutTimezone2() {
+        Moment.formatter("HH:mm:ss", PatternType.CLDR, Locale.US, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void momentFormatterWithoutTimezoneWhenPrinting() {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.FRENCH)
+                .addPattern("HH:mm:ss", PatternType.CLDR)
+                .build();
+        formatter.format(Moment.UNIX_EPOCH);
+    }
+
+    @Test
+    public void momentFormatterPrintingDecimalMinute() {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .addPattern("uuuu-MM-dd HH:", PatternType.CLDR)
+                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
+                .build()
+                .withTimezone(ZonalOffset.UTC);
+        assertThat(
+            formatter.format(Moment.UNIX_EPOCH),
+            is("1970-01-01 00:00.0"));
+    }
+
+    @Test
+    public void momentFormatterParsingDecimalMinute() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .addPattern("uuuu-MM-dd HH:", PatternType.CLDR)
+                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
+                .build()
+                .withTimezone(ZonalOffset.UTC);
+        assertThat(
+            formatter.parse("1970-01-01 00:00.0"),
+            is(Moment.UNIX_EPOCH));
     }
 
 }
