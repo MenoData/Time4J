@@ -644,12 +644,14 @@ public final class Moment
      * <p>Tries to determine the next coming leap second. </p>
      *
      * @return  next leap second or {@code null} if unknown or disabled
+     * @since   2.1
      */
     /*[deutsch]
      * <p>Versucht, die n&auml;chste bevorstehende UTC-Schaltsekunde zu
      * ermitteln. </p>
      *
      * @return  next leap second or {@code null} if unknown or disabled
+     * @since   2.1
      */
     public static Moment nextLeapSecond() {
 
