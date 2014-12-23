@@ -592,6 +592,42 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Yields the next leapsecond event after given UTC time point. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  following leapsecond event or {@code null} if not known
+     * @since   2.1
+     */
+    /*[deutsch]
+     * <p>Ermittelt das zum angegebenen UTC-Zeitstempel n&auml;chste
+     * Schaltsekundenereignis. </p>
+     *
+     * @param   utc     elapsed SI-seconds relative to UTC epoch
+     *                  [1972-01-01T00:00:00Z] including leap seconds
+     * @return  following leapsecond event or {@code null} if not known
+     * @since   2.1
+     */
+    public GregorianDate getNextEvent(long utc) {
+
+        ExtendedLSE[] events = this.getEventsInDescendingOrder();
+        GregorianDate result = null;
+
+        for (int i = 0; i < events.length; i++) {
+            ExtendedLSE lse = events[i];
+
+            if (utc >= lse.utc()) {
+                break;
+            } else {
+                result = lse.getDate();
+            }
+        }
+
+        return result;
+
+    }
+
+    /**
      * <p>Enhances an UNIX-timestamp with leapseconds and converts it to an
      * UTC-timestamp. </p>
      *
