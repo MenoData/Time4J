@@ -337,6 +337,7 @@ public final class Moment
      */
     public static final ChronoElement<Integer> FRACTION = IntElement.FRACTION;
 
+    private static final ChronoOperator<Moment> NEXT_LS = new NextLS();
     private static final long serialVersionUID = -3192884724477742274L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -643,36 +644,21 @@ public final class Moment
     /**
      * <p>Tries to determine the next coming leap second. </p>
      *
-     * @return  next leap second or {@code null} if unknown or disabled
+     * @return  operator which either gets next leap second or {@code null}
+     *          if unknown or disabled
      * @since   2.1
      */
     /*[deutsch]
      * <p>Versucht, die n&auml;chste bevorstehende UTC-Schaltsekunde zu
      * ermitteln. </p>
      *
-     * @return  next leap second or {@code null} if unknown or disabled
+     * @return  operator which either gets next leap second or {@code null}
+     *          if unknown or disabled
      * @since   2.1
      */
-    public static Moment nextLeapSecond() {
+    public static ChronoOperator<Moment> nextLeapSecond() {
 
-        PlainDate utcToday = SystemClock.inZonalView(ZonalOffset.UTC).today();
-        Moment candidate = null;
-
-        for (LeapSecondEvent lse : LeapSeconds.getInstance()) {
-            GregorianDate event = lse.getDate();
-            PlainDate test =
-                PlainDate.of(
-                    event.getYear(), event.getMonth(), event.getDayOfMonth());
-            if (test.isBefore(utcToday)) {
-                break;
-            } else {
-                candidate =
-                    test.atTime(23, 59, 59).atUTC()
-                        .plus(lse.getShift(), SECONDS);
-            }
-        }
-
-        return candidate;
+        return NEXT_LS;
 
     }
 
@@ -2757,6 +2743,33 @@ public final class Moment
                 && LeapSeconds.getInstance().isEnabled()
             );
 
+        }
+
+    }
+
+    private static class NextLS
+        implements ChronoOperator<Moment> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Moment apply(Moment timepoint) {
+            
+            LeapSeconds ls = LeapSeconds.getInstance();
+
+            if (ls.isEnabled()) {
+                long utc = timepoint.getElapsedTime(TimeScale.UTC);
+                LeapSecondEvent event = ls.getNextEvent(utc);
+                
+                if (event != null) {
+                    PlainTimestamp tsp =
+                        PlainDate.from(event.getDate()).atTime(23, 59, 59);
+                    return tsp.atUTC().plus(event.getShift(), SECONDS);
+                }
+            }
+
+            return null;
+            
         }
 
     }
