@@ -70,7 +70,7 @@ public interface LeapSecondEvent {
      *
      * @return  event-related shift in seconds ({@code != 0})
      */
-    /**
+    /*[deutsch]
      * <p>Liefert die Schaltsekundenverschiebung nur dieses Ereignisses. </p>
      *
      * <p>Anmerkung: Bis zum Jahr 2014 gab es nur den Versatz von jeweils
