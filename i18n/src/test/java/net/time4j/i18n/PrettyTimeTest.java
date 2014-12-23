@@ -16,6 +16,7 @@ import net.time4j.format.TextWidth;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
+import java.io.IOException;
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +45,16 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(Locale.ROOT).getLocale(),
             is(Locale.ROOT));
+    }
+
+    @Test
+    public void withMinusSign() {
+        String minus = "_";
+        assertThat(
+            PrettyTime.of(new Locale("ar", "DZ"))
+                .withMinusSign(minus)
+                .print(-3, MONTHS, TextWidth.SHORT),
+            is(minus + "3 أشهر"));
     }
 
     @Test
@@ -222,14 +233,15 @@ public class PrettyTimeTest {
     @Test
     public void print0MonthsArabic1() {
         assertThat(
-            PrettyTime.of(new Locale("ar")).print(0, MONTHS, TextWidth.SHORT),
+            PrettyTime.of(new Locale("ar", "DZ")).print(
+                0, MONTHS, TextWidth.SHORT),
             is("لا أشهر"));
     }
 
     @Test
     public void print0MonthsArabic2() {
         assertThat(
-            PrettyTime.of(new Locale("ar"))
+            PrettyTime.of(new Locale("ar", "DZ"))
                 .withEmptyUnit(MONTHS)
                 .print(Duration.of(0, MONTHS), TextWidth.SHORT),
             is("لا أشهر"));
@@ -238,24 +250,26 @@ public class PrettyTimeTest {
     @Test
     public void print2MonthsArabic() {
         assertThat(
-            PrettyTime.of(new Locale("ar")).print(2, MONTHS, TextWidth.SHORT),
+            PrettyTime.of(new Locale("ar", "DZ")).print(
+                2, MONTHS, TextWidth.SHORT),
             is("شهران"));
     }
 
     @Test
     public void print3MonthsArabic() {
         assertThat(
-            PrettyTime.of(new Locale("ar")).print(3, MONTHS, TextWidth.SHORT),
-            is("\u200F" + "3 أشهر"));
+            PrettyTime.of(new Locale("ar", "DZ")).print(
+                3, MONTHS, TextWidth.SHORT),
+            is("3 أشهر"));
     }
 
     @Test
     public void print3MonthsArabicU0660() {
         assertThat(
-            PrettyTime.of(new Locale("ar"))
+            PrettyTime.of(new Locale("ar", "DZ"))
                 .withZeroDigit('\u0660')
                 .print(3, MONTHS, TextWidth.SHORT),
-            is("\u200F" + '\u0663' + " أشهر"));
+            is('\u0663' + " أشهر")); // ٣ أشهر
     }
 
     @Test
@@ -371,8 +385,10 @@ public class PrettyTimeTest {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
-            PrettyTime.of(new Locale("ar")).print(duration, TextWidth.WIDE),
-            is("\u200F" + "15 سنة، " + "\u200F" + "3 أشهر، أسبوع، و يومان"));
+            PrettyTime.of(new Locale("ar"))
+                .withZeroDigit('0')
+                .print(duration, TextWidth.WIDE),
+            is("15 سنة، 3 أشهر، أسبوع، و يومان"));
     }
 
     @Test
@@ -381,10 +397,8 @@ public class PrettyTimeTest {
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(new Locale("ar"))
-                .withZeroDigit('\u0660')
                 .print(duration, TextWidth.WIDE),
-            is("\u200F" + "\u0661\u0665" + " سنة، "
-               + "\u200F" + "\u0663" + " أشهر، أسبوع، و يومان"));
+            is("١٥ سنة، ٣ أشهر، أسبوع، و يومان"));
     }
 
     @Test
@@ -393,9 +407,9 @@ public class PrettyTimeTest {
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
         assertThat(
-            PrettyTime.of(new Locale("ar"))
+            PrettyTime.of(new Locale("ar", "DZ"))
                 .print(duration, TextWidth.WIDE),
-            is("\u200F" + "15- سنة، " + "\u200F" + "3- أشهر، أسبوع، و يومان"));
+            is("‎-15 سنة، ‎-3 أشهر، أسبوع، و يومان"));
     }
 
     @Test
@@ -405,10 +419,20 @@ public class PrettyTimeTest {
             .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar"))
-                .withZeroDigit('\u0660')
                 .print(duration, TextWidth.WIDE),
-            is("\u200F" + "\u0661\u0665" + "- سنة، "
-               + "\u200F" + "\u0663" + "- أشهر، أسبوع، و يومان"));
+            is("‏-١٥ سنة، ‏-٣ أشهر، أسبوع، و يومان"));
+    }
+
+    @Test
+    public void print15Years3Months1Week2DaysFarsiMinus() throws IOException {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
+            .inverse();
+        String s =
+            PrettyTime.of(new Locale("fa")).print(duration, TextWidth.WIDE);
+        String expected =
+            "‎−۱۵ سال،‏ ‎−۳ ماه،‏ ‎−۱ هفته، و ‎−۲ روز";
+        assertThat(s, is(expected));
     }
 
     @Test

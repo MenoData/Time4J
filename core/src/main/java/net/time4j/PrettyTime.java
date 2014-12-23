@@ -25,6 +25,7 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeSpan;
+import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
@@ -34,14 +35,13 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
-import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -87,16 +87,39 @@ public final class PrettyTime {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int LEFT = 0;
-    private static final int RIGHT = 1;
+    private static final NumberSymbolProvider NUMBER_SYMBOLS;
+
+    static {
+        NumberSymbolProvider p = null;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = NumberSymbolProvider.class.getClassLoader();
+        }
+
+        for (
+            NumberSymbolProvider tmp
+            : ServiceLoader.load(NumberSymbolProvider.class, cl)
+        ) {
+            p = tmp;
+            break;
+        }
+
+        if (p == null) {
+            p = NumberSymbolProvider.DEFAULT;
+        }
+
+        NUMBER_SYMBOLS = p;
+    }
+
     private static final int MIO = 1000000;
-    private static final char UNICODE_RLM = '\u200F';
 
     private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
         new ConcurrentHashMap<Locale, PrettyTime>();
     private static final IsoUnit[] STD_UNITS;
     private static final IsoUnit[] TSP_UNITS;
     private static final Set<IsoUnit> SUPPORTED_UNITS;
+    private static final Set<String> RTL_LANGUAGES;
 
     static {
         IsoUnit[] stdUnits =
@@ -106,12 +129,25 @@ public final class PrettyTime {
             {YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS};
         TSP_UNITS = tspUnits;
 
-        Set<IsoUnit> tmp = new HashSet<IsoUnit>();
+        Set<IsoUnit> tmp1 = new HashSet<IsoUnit>();
         for (IsoUnit unit : stdUnits) {
-            tmp.add(unit);
+            tmp1.add(unit);
         }
-        tmp.add(NANOS);
-        SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
+        tmp1.add(NANOS);
+        SUPPORTED_UNITS = Collections.unmodifiableSet(tmp1);
+
+        Set<String> tmp2 = new HashSet<String>();
+        tmp2.add("ar");
+        tmp2.add("dv");
+        tmp2.add("fa");
+        tmp2.add("ha");
+        tmp2.add("he");
+        tmp2.add("iw");
+        tmp2.add("ji");
+        tmp2.add("ps");
+        tmp2.add("ur");
+        tmp2.add("yi");
+        RTL_LANGUAGES = Collections.unmodifiableSet(tmp2);
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -121,16 +157,16 @@ public final class PrettyTime {
     private final TimeSource<?> refClock;
     private final char zeroDigit;
     private final IsoUnit emptyUnit;
-    private final int minusOrientation;
-    private final char minusSign;
+    private final String minusSign;
     private final boolean weekToDays;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private PrettyTime(
-        Locale locale,
+        Locale loc,
         TimeSource<?> refClock,
         char zeroDigit,
+        String minusSign,
         IsoUnit emptyUnit,
         boolean weekToDays
     ) {
@@ -143,19 +179,12 @@ public final class PrettyTime {
         }
 
         // throws NPE if language == null
-        this.rules = PluralRules.of(locale, NumberType.CARDINALS);
-        this.locale = locale;
+        this.rules = PluralRules.of(loc, NumberType.CARDINALS);
+        this.locale = loc;
         this.refClock = refClock;
         this.zeroDigit = zeroDigit;
         this.emptyUnit = emptyUnit;
-
-        char c = DecimalFormatSymbols.getInstance(locale).getMinusSign();
-        String s = NumberFormat.getInstance(locale).format(-123L);
-        this.minusOrientation = (
-            (s.charAt(s.length() - 1) == c)
-            ? RIGHT
-            : LEFT);
-        this.minusSign = c;
+        this.minusSign = minusSign;
         this.weekToDays = weekToDays;
 
     }
@@ -187,7 +216,8 @@ public final class PrettyTime {
                 new PrettyTime(
                     locale,
                     SystemClock.INSTANCE,
-                    DecimalFormatSymbols.getInstance(locale).getZeroDigit(),
+                    NUMBER_SYMBOLS.getZeroDigit(locale),
+                    NUMBER_SYMBOLS.getMinusSign(locale),
                     SECONDS,
                     false);
             PrettyTime old = LANGUAGE_MAP.putIfAbsent(locale, ptime);
@@ -271,6 +301,7 @@ public final class PrettyTime {
             this.locale,
             clock,
             this.zeroDigit,
+            this.minusSign,
             this.emptyUnit,
             this.weekToDays);
 
@@ -279,28 +310,32 @@ public final class PrettyTime {
     /**
      * <p>Defines the localized zero digit. </p>
      *
-     * <p>In most languages the zero digit is just ASCII-&quot;0&quot;, but
-     * in arabic locales the digit can also be the char {@code U+0660}. By
-     * default Time4J will try to use the JDK-setting. This method can override
+     * <p>In most languages the zero digit is just ASCII-&quot;0&quot;,
+     * but for example in arabic locales the digit can also be the char
+     * {@code U+0660}. By default Time4J will try to use the configuration
+     * of the module i18n or else the JDK-setting. This method can override
      * it however. </p>
      *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
      * @since   1.2
      * @see     java.text.DecimalFormatSymbols#getZeroDigit()
+     * @see     net.time4j.format.NumberSymbolProvider#getZeroDigit(Locale)
      */
     /*[deutsch]
      * <p>Definiert die lokalisierte Nullziffer. </p>
      *
      * <p>In den meisten Sprachen ist die Nullziffer ASCII-&quot;0&quot;,
-     * aber im arabischen Sprachraum kann das Zeichen auch {@code U+0660}
-     * sein. Per Vorgabe wird Time4J versuchen, die JDK-Einstellung zu
-     * verwenden. Diese Methode &uuml;berschreibt jedoch den Standard. </p>
+     * aber etwa im arabischen Sprachraum kann das Zeichen auch {@code U+0660}
+     * sein. Per Vorgabe wird Time4J versuchen, die Konfiguration des
+     * i18n-Moduls oder sonst die JDK-Einstellung zu verwenden. Diese
+     * Methode &uuml;berschreibt jedoch den Standard. </p>
      *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
      * @since   1.2
      * @see     java.text.DecimalFormatSymbols#getZeroDigit()
+     * @see     net.time4j.format.NumberSymbolProvider#getZeroDigit(Locale)
      */
     public PrettyTime withZeroDigit(char zeroDigit) {
 
@@ -312,6 +347,58 @@ public final class PrettyTime {
             this.locale,
             this.refClock,
             zeroDigit,
+            this.minusSign,
+            this.emptyUnit,
+            this.weekToDays);
+
+    }
+
+    /**
+     * <p>Defines the localized minus sign. </p>
+     *
+     * <p>In most languages the minus sign is just {@code U+002D}. By default
+     * Time4J will try to use the configuration of the module i18n or else the
+     * JDK-setting. This method can override it however. Especially for arabic,
+     * it might make sense to first add a unicode marker (either LRM
+     * {@code U+200E} or RLM {@code U+200F}) in front of the minus sign
+     * in order to control the orientation in right-to-left-style. </p>
+     *
+     * @param   minusSign   localized minus sign (possibly with unicode markers)
+     * @return  changed copy of this instance
+     * @since   2.1
+     * @see     java.text.DecimalFormatSymbols#getMinusSign()
+     * @see     net.time4j.format.NumberSymbolProvider#getMinusSign(Locale)
+     */
+    /*[deutsch]
+     * <p>Definiert das lokalisierte Minuszeichen. </p>
+     *
+     * <p>In den meisten Sprachen ist es einfach das Zeichen {@code U+002D}.
+     * Per Vorgabe wird Time4J versuchen, die Konfiguration des
+     * i18n-Moduls oder sonst die JDK-Einstellung zu verwenden. Diese
+     * Methode &uuml;berschreibt jedoch den Standard. Besonders f&uuml;r
+     * Arabisch kann es sinnvoll sein, vor dem eigentlichen Minuszeichen
+     * einen Unicode-Marker (entweder LRM {@code U+200E} oder RLM
+     * {@code U+200F}) einzuf&uuml;gen, um die Orientierung des Minuszeichens
+     * in der traditionellen Rechts-nach-links-Schreibweise zu
+     * kontrollieren. </p>
+     *
+     * @param   minusSign   localized minus sign (possibly with unicode markers)
+     * @return  changed copy of this instance
+     * @since   2.1
+     * @see     java.text.DecimalFormatSymbols#getMinusSign()
+     * @see     net.time4j.format.NumberSymbolProvider#getMinusSign(Locale)
+     */
+    public PrettyTime withMinusSign(String minusSign) {
+
+        if (minusSign.equals(this.minusSign)) { // NPE-check
+            return this;
+        }
+
+        return new PrettyTime(
+            this.locale,
+            this.refClock,
+            this.zeroDigit,
+            minusSign,
             this.emptyUnit,
             this.weekToDays);
 
@@ -350,6 +437,7 @@ public final class PrettyTime {
             this.locale,
             this.refClock,
             this.zeroDigit,
+            this.minusSign,
             emptyUnit,
             this.weekToDays);
 
@@ -388,6 +476,7 @@ public final class PrettyTime {
             this.locale,
             this.refClock,
             this.zeroDigit,
+            this.minusSign,
             emptyUnit,
             this.weekToDays);
 
@@ -415,6 +504,7 @@ public final class PrettyTime {
             this.locale,
             this.refClock,
             this.zeroDigit,
+            this.minusSign,
             this.emptyUnit,
             true);
 
@@ -1096,15 +1186,15 @@ public final class PrettyTime {
 
     private String format(long amount) {
 
-        StringBuilder sb = new StringBuilder();
         String num = String.valueOf(Math.abs(amount));
         char zero = this.zeroDigit;
+        StringBuilder sb = new StringBuilder();
 
-        if ((this.minusOrientation == LEFT) && (amount < 0)) {
+        if (amount < 0) {
             sb.append(this.minusSign);
-        } else if (this.minusOrientation == RIGHT) {
-            sb.append(UNICODE_RLM);
         }
+//        sb.append('\u200E').append('\u002D');
+//        sb.append('\u200E').append('\u2212');
 
         for (int i = 0, n = num.length(); i < n; i++) {
             char c = num.charAt(i);
@@ -1112,10 +1202,6 @@ public final class PrettyTime {
                 c = (char) (c + zero - '0');
             }
             sb.append(c);
-        }
-
-        if ((this.minusOrientation == RIGHT) && (amount < 0)) {
-            sb.append(this.minusSign);
         }
 
         return sb.toString();

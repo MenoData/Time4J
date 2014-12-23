@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DatePatternTest.class,
         DateTimePatternTest.class,
         EnumDisplayTest.class,
+        NumberSymbolTest.class,
         PrettyTimeTest.class
     }
 )

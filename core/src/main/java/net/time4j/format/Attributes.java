@@ -29,13 +29,12 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -61,6 +60,31 @@ public final class Attributes
     implements AttributeQuery {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final NumberSymbolProvider NUMBER_SYMBOLS;
+
+    static {
+        NumberSymbolProvider p = null;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = NumberSymbolProvider.class.getClassLoader();
+        }
+
+        for (
+            NumberSymbolProvider tmp
+            : ServiceLoader.load(NumberSymbolProvider.class, cl)
+        ) {
+            p = tmp;
+            break;
+        }
+
+        if (p == null) {
+            p = NumberSymbolProvider.DEFAULT;
+        }
+
+        NUMBER_SYMBOLS = p;
+    }
 
     /**
      * <p>Attribute for the calendar type. </p>
@@ -466,7 +490,7 @@ public final class Attributes
     private static final
         ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
             new ConcurrentHashMap<Locale, NumericalSymbols>();
-    private static final NumericalSymbols DEFAULT_NUMBER_SYMBOLS =
+    private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
         new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
     private static final AttributeQuery EMPTY =
         new Attributes.Builder().build();
@@ -1004,16 +1028,14 @@ public final class Attributes
                 NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
 
                 if (symbols == null) {
-                    symbols = DEFAULT_NUMBER_SYMBOLS;
+                    symbols = DEFAULT_NUMERICAL_SYMBOLS;
 
-                    for (Locale test : NumberFormat.getAvailableLocales()) {
+                    for (Locale test : NUMBER_SYMBOLS.getAvailableLocales()) {
                         if (locale.equals(test)) {
-                            final DecimalFormatSymbols dfs =
-                                DecimalFormatSymbols.getInstance(locale);
                             symbols =
                                 new NumericalSymbols(
-                                    dfs.getZeroDigit(),
-                                    dfs.getDecimalSeparator()
+                                    NUMBER_SYMBOLS.getZeroDigit(locale),
+                                    NUMBER_SYMBOLS.getDecimalSeparator(locale)
                                 );
                             break;
                         }
