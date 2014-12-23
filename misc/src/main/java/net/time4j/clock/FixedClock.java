@@ -30,6 +30,7 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @since   2.1
+ * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine stillstehende Uhr, die immer die gleiche feste
@@ -37,6 +38,7 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @since   2.1
+ * @concurrency <immutable>
  */
 public final class FixedClock
     extends AbstractClock {

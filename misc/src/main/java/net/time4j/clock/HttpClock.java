@@ -82,6 +82,7 @@ public class HttpClock
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setConnectTimeout(timeoutMillis);
         conn.setReadTimeout(timeoutMillis);
+        conn.setUseCaches(false);
         conn.setRequestMethod("HEAD");
 
         int responseCode = conn.getResponseCode();
