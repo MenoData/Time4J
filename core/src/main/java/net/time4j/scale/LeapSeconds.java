@@ -608,10 +608,10 @@ public final class LeapSeconds
      * @return  following leapsecond event or {@code null} if not known
      * @since   2.1
      */
-    public GregorianDate getNextEvent(long utc) {
+    public LeapSecondEvent getNextEvent(long utc) {
 
         ExtendedLSE[] events = this.getEventsInDescendingOrder();
-        GregorianDate result = null;
+        LeapSecondEvent result = null;
 
         for (int i = 0; i < events.length; i++) {
             ExtendedLSE lse = events[i];
@@ -619,7 +619,7 @@ public final class LeapSeconds
             if (utc >= lse.utc()) {
                 break;
             } else {
-                result = lse.getDate();
+                result = lse;
             }
         }
 
