@@ -119,7 +119,6 @@ public final class PrettyTime {
     private static final IsoUnit[] STD_UNITS;
     private static final IsoUnit[] TSP_UNITS;
     private static final Set<IsoUnit> SUPPORTED_UNITS;
-    private static final Set<String> RTL_LANGUAGES;
 
     static {
         IsoUnit[] stdUnits =
@@ -129,25 +128,12 @@ public final class PrettyTime {
             {YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS};
         TSP_UNITS = tspUnits;
 
-        Set<IsoUnit> tmp1 = new HashSet<IsoUnit>();
+        Set<IsoUnit> tmp = new HashSet<IsoUnit>();
         for (IsoUnit unit : stdUnits) {
-            tmp1.add(unit);
+            tmp.add(unit);
         }
-        tmp1.add(NANOS);
-        SUPPORTED_UNITS = Collections.unmodifiableSet(tmp1);
-
-        Set<String> tmp2 = new HashSet<String>();
-        tmp2.add("ar");
-        tmp2.add("dv");
-        tmp2.add("fa");
-        tmp2.add("ha");
-        tmp2.add("he");
-        tmp2.add("iw");
-        tmp2.add("ji");
-        tmp2.add("ps");
-        tmp2.add("ur");
-        tmp2.add("yi");
-        RTL_LANGUAGES = Collections.unmodifiableSet(tmp2);
+        tmp.add(NANOS);
+        SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -1193,8 +1179,6 @@ public final class PrettyTime {
         if (amount < 0) {
             sb.append(this.minusSign);
         }
-//        sb.append('\u200E').append('\u002D');
-//        sb.append('\u200E').append('\u2212');
 
         for (int i = 0, n = num.length(); i < n; i++) {
             char c = num.charAt(i);
