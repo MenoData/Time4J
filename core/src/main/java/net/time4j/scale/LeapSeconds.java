@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
- * <p>Holds all leapseconds occurred since the official start of UTC in
+ * <p>Holds all leap seconds occurred since the official start of UTC in
  * 1972. </p>
  *
  * <p>The source is either an implementation of the SPI-interface
@@ -57,20 +57,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * &quot;leapseconds.data&quot;. This resource file must be in the
  * classpath (in folder data). It has the format of a CSV-ASCII-text
  * which has two columns separated by comma. The first column denotes
- * the calendar day after the leapsecond-shift in ISO-8601-format (for
+ * the calendar day after the leap second shift in ISO-8601-format (for
  * example 1972-07-01). The second column determines the sign of the
- * leapsecond (+/-). </p>
+ * leap second (+/-). </p>
  *
  * <p>The source will mainly be loaded by the context classloader else
  * by application classloader. If there is no source at all then Time4J
- * assumes that leapseconds shall not be used. </p>
+ * assumes that leap seconds shall not be used. </p>
  *
  * <p>The system property &quot;time4j.scale.leapseconds.suppressed&quot;
- * determines if leapseconds shall be active at all. If this system
+ * determines if leap seconds shall be active at all. If this system
  * property has the value {@code true} then this class will never
- * register any leapseconds equal if the underlying sources are filled
+ * register any leap seconds equal if the underlying sources are filled
  * or not. Furthermore, the system property
- * &quot;time4j.scale.leapseconds.final&quot; determines if leapseconds
+ * &quot;time4j.scale.leapseconds.final&quot; determines if leap seconds
  * are only registered at system start or if new ones can be lazily
  * registered at runtime using the methods {@code registerXYZ()}.
  * Setting one of both properties can improve the performance. </p>
@@ -116,7 +116,7 @@ public final class LeapSeconds
 
     /**
      * <p>System property &quot;net.time4j.scale.leapseconds.suppressed&quot;
-     * which determines that no leapseconds shall be loaded and used. </p>
+     * which determines that no leap seconds shall be loaded and used. </p>
      *
      * <p>Defined values: &quot;true&quot; (suppressed) or &quot;false&quot;
      * (active - default). </p>
@@ -133,7 +133,7 @@ public final class LeapSeconds
 
     /**
      * <p>System property &quot;net.time4j.scale.leapseconds.final&quot;
-     * which determines that leapseconds can be laoded only one time at
+     * which determines that leap seconds can be loaded only one time at
      * system start. </p>
      *
      * <p>Defined values: &quot;true&quot; (final) or &quot;false&quot;
@@ -276,7 +276,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Queries if the leapsecond support is activated. </p>
+     * <p>Queries if the leap second support is activated. </p>
      *
      * @return  {@code true} if leap seconds are supported and are also
      *          registered else {@code false}
@@ -296,10 +296,10 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Queries if a lazy registration of leapseconds is possible. </p>
+     * <p>Queries if a lazy registration of leap seconds is possible. </p>
      *
-     * <p>If the leapsecond support is switched off then a registration of
-     * leapseconds is never possible so this method will be ignored. </p>
+     * <p>If the leap second support is switched off then a registration of
+     * leap seconds is never possible so this method will be ignored. </p>
      *
      * @return  {@code true} if the method {@code registerXYZ()} can be
      *          called without exception else {@code false}
@@ -330,7 +330,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Yields the count of all registered leapseconds. </p>
+     * <p>Yields the count of all registered leap seconds. </p>
      *
      * @return  count of registered leap seconds
      */
@@ -346,7 +346,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Registers a new positive leapsecond by defining the
+     * <p>Registers a new positive leap second by defining the
      * switch-over-day. </p>
      *
      * @param   year        proleptic iso year
@@ -390,7 +390,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Registers a new negative leapsecond by defining the
+     * <p>Registers a new negative leap second by defining the
      * switch-over-day. </p>
      *
      * @param   year        proleptic iso year
@@ -434,7 +434,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Queries if negative leapseconds are supported. </p>
+     * <p>Queries if negative leap seconds are supported. </p>
      *
      * @return  {@code true} if negative leap seconds are supported
      *          else {@code false}
@@ -454,7 +454,7 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Iterates over all leapsecond events in descending temporal
+     * <p>Iterates over all leap second events in descending temporal
      * order. </p>
      *
      * @return  {@code Iterator} over all stored leap second events
@@ -550,12 +550,12 @@ public final class LeapSeconds
 
     /**
      * <p>Yields the shift in seconds dependent on if given UTC time point
-     * represents a leapsecond or not. </p>
+     * represents a leap second or not. </p>
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  {@code 1, 0, -1} if the argument denotes a positive leapsecond
-                no leapsecond or a negative leapsecond
+     * @return  {@code 1, 0, -1} if the argument denotes a positive leap second,
+                no leap second or a negative leap second
      */
     /*[deutsch]
      * <p>Ermittelt die Verschiebung in Sekunden, wenn dieser Zeitpunkt
@@ -563,8 +563,8 @@ public final class LeapSeconds
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  {@code 1, 0, -1} if the argument denotes a positive leapsecond
-                no leapsecond or a negative leapsecond
+     * @return  {@code 1, 0, -1} if the argument denotes a positive leap second,
+                no leap second or a negative leap second
      */
     public int getShift(long utc) {
 
@@ -592,11 +592,11 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Yields the next leapsecond event after given UTC time point. </p>
+     * <p>Yields the next leap second event after given UTC time point. </p>
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  following leapsecond event or {@code null} if not known
+     * @return  following leap second event or {@code null} if not known
      * @since   2.1
      */
     /*[deutsch]
@@ -605,7 +605,7 @@ public final class LeapSeconds
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  following leapsecond event or {@code null} if not known
+     * @return  following leap second event or {@code null} if not known
      * @since   2.1
      */
     public LeapSecondEvent getNextEvent(long utc) {
@@ -628,12 +628,12 @@ public final class LeapSeconds
     }
 
     /**
-     * <p>Enhances an UNIX-timestamp with leapseconds and converts it to an
+     * <p>Enhances an UNIX-timestamp with leap seconds and converts it to an
      * UTC-timestamp. </p>
      *
-     * <p>Note: A leapsecond itself cannot be restored because the mapping
+     * <p>Note: A leap second itself cannot be restored because the mapping
      * between UNIX- and UTC-time is not bijective. Hence the result of this
-     * method can not represent a leapsecond. </p>
+     * method can not represent a leap second. </p>
      *
      * @param   unixTime    elapsed time in seconds relative to UNIX epoch
      *                      [1970-01-01T00:00:00Z] without leap seconds
@@ -682,7 +682,7 @@ public final class LeapSeconds
 
     /**
      * <p>Converts given UTC-timestamp to an UNIX-timestamp without
-     * leapseconds. </p>
+     * leap seconds. </p>
      *
      * <p>This method is the reversal of {@code enhance()}. Note that
      * there is no bijective mapping, that is sometimes the expression
@@ -737,7 +737,7 @@ public final class LeapSeconds
 
     /**
      * <p>Queries if given UTC-timestamp represents a registered
-     * positive leapsecond. </p>
+     * positive leap second. </p>
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
