@@ -1,6 +1,7 @@
 package net.time4j.scale;
 
 import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 
@@ -12,6 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
+
 @RunWith(JUnit4.class)
 public class NextLeapSecondTest {
 
@@ -19,8 +21,9 @@ public class NextLeapSecondTest {
     public void nextLS2012() {
         Moment ref = PlainDate.of(2012, 1, 1).atTime(0, 0).atUTC();
         if (LeapSeconds.getInstance().isEnabled()) {
-            Moment expected = 
-                PlainDate.of(2012, 6, 30).atTime(23, 59, 59).atUTC().plus(1, SI.SECONDS);
+            Moment expected =
+                PlainDate.of(2012, 6, 30).atTime(23, 59, 59).atUTC()
+                    .plus(1, SI.SECONDS);
             assertThat(ref.with(Moment.nextLeapSecond()), is(expected));
         } else {
             assertThat(ref.with(Moment.nextLeapSecond()), is(nullValue()));
@@ -29,9 +32,10 @@ public class NextLeapSecondTest {
 
     @Test
     public void nextLSIfKnown() {
+        Moment ref = PlainDate.of(2100, 1, 1).atTime(0, 0).atUTC();
+
         if (LeapSeconds.getInstance().isEnabled()) {
             LeapSeconds.getInstance().registerPositiveLS(2115, 12, 31);
-            Moment ref = PlainDate.of(2100, 1, 1).atTime(0, 0).atUTC();
             assertThat(
                 ref.with(Moment.nextLeapSecond()),
                 is(
