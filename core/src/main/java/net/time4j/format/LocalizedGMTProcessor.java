@@ -47,6 +47,10 @@ import static net.time4j.tz.OffsetSign.BEHIND_UTC;
 final class LocalizedGMTProcessor
     implements FormatProcessor<TZID> {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final char UNICODE_LRM = '\u200E';
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final boolean abbreviated;
@@ -112,6 +116,13 @@ final class LocalizedGMTProcessor
         int fraction = offset.getFractionalAmount();
 
         if ((total != 0) || (fraction != 0)) {
+
+            // hack for arabic locales: LRM-marker for following sign required
+            if ("ar".equals(locale.getLanguage())) {
+                buffer.append(UNICODE_LRM);
+                printed++;
+            }
+
             buffer.append((offset.getSign() == BEHIND_UTC) ? '-' : '+');
             printed++;
 
@@ -210,7 +221,9 @@ final class LocalizedGMTProcessor
         }
 
         if (!found) {
-            status.setError(start, "Missing GMT prefix in localized offset.");
+            status.setError(
+                start,
+                "Missing prefix in localized offset: " + gmtPrefix);
             return;
         } else if (pos >= len) {
             parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
@@ -219,6 +232,22 @@ final class LocalizedGMTProcessor
         }
 
         char c = text.charAt(pos);
+
+        // hack for arabic locales: LRM-marker before sign possible
+        if (
+            (c == UNICODE_LRM)
+            && "ar".equals(locale.getLanguage())
+        ) {
+            if (pos + 1 >= len) {
+                parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+                status.setPosition(pos);
+                return;
+            }
+
+            pos++;
+            c = text.charAt(pos);
+        }
+
         OffsetSign sign;
 
         if (c == '+') {

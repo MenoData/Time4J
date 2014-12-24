@@ -196,7 +196,7 @@ public final class CalendarText {
 
         this.provider = p.toString();
 
-	    // Allgemeine Textformen als optionales Bundle vorbereiten
+        // Allgemeine Textformen als optionales Bundle vorbereiten
         ResourceBundle rb = null;
         MissingResourceException tmpMre = null;
 
@@ -214,7 +214,7 @@ public final class CalendarText {
         this.textForms = rb;
         this.mre = tmpMre;
 
-	    // Monate, Quartale, Wochentage, Äras und AM/PM
+        // Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
             Collections.unmodifiableMap(
                 getMonths(calendarType, locale, p, false));
@@ -755,12 +755,23 @@ public final class CalendarText {
      * <p>Yields the localized GMT-prefix which is used in the
      * <i>localized GMT format</i> of CLDR. </p>
      *
+     * <p>Note that using the GMT-notation is at least old-fashioned.
+     * Users should prefer the UTC-notation as combination of the
+     * &quot;UTC&quot;-literal and an ISO-8601-timezone-offset. This
+     * method is mainly a fit to the CLDR data. </p>
+     *
      * @param 	locale 	language and country configuration
      * @return  localized GMT-String defaults to &quot;GMT&quot;
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte GMT-Pr&auml;fix, das im
      * <i>localized GMT format</i> von CLDR benutzt wird. </p>
+     *
+     * <p>Hinweis: Die GMT-Schreibweise ist mindestens veraltet. Anwender
+     * sollten die UTC-Schreibweise als Kombination des Literals
+     * &quot;UTC&quot; mit einem ISO-8601-Zeitzonen-Offset bevorzugen.
+     * Diese Methode ist in erster Linie eine Anpassung an die
+     * CLDR-Daten. </p>
      *
      * @param 	locale 	language and country configuration
      * @return  localized GMT-String defaults to &quot;GMT&quot;
