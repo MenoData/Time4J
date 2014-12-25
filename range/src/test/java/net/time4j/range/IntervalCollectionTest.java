@@ -442,4 +442,23 @@ public class IntervalCollectionTest {
         assertThat(overlap.get(0), is(expected));
     }
 
+    @Test
+    public void noGapsIfSingleInterval() {
+        DateInterval interval =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(interval);
+
+        assertThat(windows.withGaps().isEmpty(), is(true));
+    }
+
+    @Test
+    public void noGapsIfNoIntervals() {
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+
+        assertThat(windows.withGaps().isEmpty(), is(true));
+    }
+
 }

@@ -418,8 +418,11 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         int len = this.intervals.size();
 
-        if (len < 2) {
+        if (len == 0) {
             return this;
+        } else if (len == 1) {
+            List<ChronoInterval<T>> zero = Collections.emptyList();
+            return this.create(zero);
         }
 
         List<ChronoInterval<T>> gaps = new ArrayList<ChronoInterval<T>>();
