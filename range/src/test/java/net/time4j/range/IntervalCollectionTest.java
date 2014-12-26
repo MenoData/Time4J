@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -457,8 +458,171 @@ public class IntervalCollectionTest {
     @Test
     public void noGapsIfNoIntervals() {
         IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
-
         assertThat(windows.withGaps().isEmpty(), is(true));
+    }
+
+    @Test
+    public void timeWindowIfNoInterval() throws ParseException {
+        IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis();
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        assertThat(coll.withTimeWindow(window), is(coll));
+    }
+
+    @Test
+    public void timeWindowIfEnclosing() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2013-06-30/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+            .plus(DateInterval.parseISO("2012-09-01/2014-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        assertThat(coll.withTimeWindow(window), is(coll));
+    }
+
+    @Test
+    public void timeWindowIfOverlap1() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+            .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
+        assertThat(coll.withTimeWindow(window), is(expected));
+    }
+
+    @Test
+    public void timeWindowIfOverlap2() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
+            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-12-31"))
+            .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
+        assertThat(coll.withTimeWindow(window), is(expected));
+    }
+
+    @Test
+    public void complementIfOverlap1() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
+            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"));
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfOverlap2() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"));
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfOverlap3() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis();
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfBigWindow() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2010-06-30/2015-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
+            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+            .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfPastWindow() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.until(PlainDate.of(2015, 12, 31));
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.until(PlainDate.of(2010, 12, 31)))
+            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+            .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfFutureWindow() throws ParseException {
+        IntervalCollection<PlainDate> coll =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+        ChronoInterval<PlainDate> window =
+            DateInterval.since(PlainDate.of(2010, 06, 30));
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis()
+            .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
+            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+            .plus(DateInterval.since(PlainDate.of(2015, 10, 1)));
+        assertThat(coll.withComplement(window), is(expected));
+    }
+
+    @Test
+    public void complementIfEmpty() throws ParseException {
+        IntervalCollection<PlainDate> empty =
+            IntervalCollection.onDateAxis();
+        ChronoInterval<PlainDate> window =
+            DateInterval.parseISO("2012-06-30/2014-12-31");
+        IntervalCollection<PlainDate> expected =
+            IntervalCollection.onDateAxis().plus(window);
+        assertThat(empty.withComplement(window), is(expected));
     }
 
 }

@@ -213,6 +213,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns the overall minimum of this interval collection. </p>
      *
+     * <p>The minimum is always inclusive. </p>
+     *
      * @return  lower limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
      * @since   2.0
@@ -220,6 +222,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      */
     /*[deutsch]
      * <p>Liefert das totale Minimum dieser Intervall-Menge. </p>
+     *
+     * <p>Das Minimum ist immer inklusive. </p>
      *
      * @return  lower limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -240,6 +244,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns the overall maximum of this interval collection. </p>
      *
+     * <p>The maximum is always inclusive. </p>
+     *
      * @return  upper limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
      * @since   2.0
@@ -247,6 +253,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      */
     /*[deutsch]
      * <p>Liefert das totale Maximum dieser Intervall-Menge. </p>
+     *
+     * <p>Das Maximum ist immer inklusive. </p>
      *
      * @return  upper limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -395,6 +403,166 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
         windows.addAll(intervals);
         Collections.sort(windows, this.getComparator());
         return this.create(windows);
+
+    }
+
+    /**
+     * <p>Determines a filtered version of this interval collection within
+     * given range. </p>
+     *
+     * @param   timeWindow  time window filter
+     * @return  new interval collection containing only timepoints within
+     *          given range
+     * @throws  IllegalArgumentException if lower is after upper
+     * @since   2.1
+     */
+    /*[deutsch]
+     * <p>Bestimmt eine gefilterte Version dieser Intervallmenge
+     * innerhalb der angegebenen Grenzen. </p>
+     *
+     * @param   timeWindow  time window filter
+     * @return  new interval collection containing all timepoints within
+     *          given range which do not belong to this instance
+     * @throws  IllegalArgumentException if lower is after upper
+     * @since   2.1
+     */
+    public IntervalCollection<T> withTimeWindow(ChronoInterval<T> timeWindow) {
+
+        Boundary<T> lower = timeWindow.getStart();
+        Boundary<T> upper = timeWindow.getEnd();
+
+        if (
+            this.isEmpty()
+            || (lower.isInfinite() && upper.isInfinite())
+        ) {
+            return this;
+        }
+
+        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
+
+        for (ChronoInterval<T> interval : this.intervals) {
+            if (
+                interval.isFinite()
+                && timeWindow.contains(interval.getStart().getTemporal())
+                && timeWindow.contains(interval.getEnd().getTemporal())
+            ) {
+                parts.add(interval);
+                continue;
+            }
+
+            List<ChronoInterval<T>> pair = new ArrayList<ChronoInterval<T>>(2);
+            pair.add(timeWindow);
+            pair.add(interval);
+            Collections.sort(pair, this.getComparator());
+            IntervalCollection<T> is = this.create(pair).withIntersection();
+
+            if (!is.isEmpty()) {
+                parts.add(is.getIntervals().get(0));
+            }
+        }
+
+        return this.create(parts);
+
+    }
+
+    /**
+     * <p>Determines the complement of this interval collection within
+     * given range. </p>
+     *
+     * @param   timeWindow  time window filter
+     * @return  new interval collection containing all timepoints within
+     *          given range which do not belong to this instance
+     * @throws  IllegalArgumentException if lower is after upper
+     * @since   2.1
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Komplement&auml;rmenge zu dieser Intervallmenge
+     * innerhalb der angegebenen Grenzen. </p>
+     *
+     * @param   timeWindow  time window filter
+     * @return  new interval collection containing all timepoints within
+     *          given range which do not belong to this instance
+     * @throws  IllegalArgumentException if lower is after upper
+     * @since   2.1
+     */
+    public IntervalCollection<T> withComplement(ChronoInterval<T> timeWindow) {
+
+        IntervalCollection<T> coll = this.withTimeWindow(timeWindow);
+
+        if (coll.isEmpty()) {
+            return this.create(Collections.singletonList(timeWindow));
+        }
+
+        Boundary<T> lower = timeWindow.getStart();
+        Boundary<T> upper = timeWindow.getEnd();
+        List<ChronoInterval<T>> gaps = new ArrayList<ChronoInterval<T>>();
+
+        // left edge
+        T min = coll.getMinimum();
+
+        if (min != null) {
+            if (lower.isInfinite()) {
+                this.addLeft(gaps, min);
+            } else {
+                T s = lower.getTemporal();
+                if (lower.isOpen()) {
+                    s = this.getTimeLine().stepBackwards(s);
+                    if (s == null) {
+                        this.addLeft(gaps, min);
+                    } else {
+                        this.addLeft(gaps, s, min);
+                    }
+                } else {
+                    this.addLeft(gaps, s, min);
+                }
+            }
+        }
+
+        // inner gaps
+        gaps.addAll(coll.withGaps().getIntervals());
+
+        // right edge
+        T max = coll.getMaximum();
+
+        if (max != null) {
+            T s = this.getTimeLine().stepForward(max);
+            if (s != null) {
+                Boundary<T> bs = Boundary.ofClosed(s);
+                Boundary<T> be;
+                if (upper.isInfinite()) {
+                    be = upper;
+                    gaps.add(this.newInterval(bs, be));
+                } else if (this.isCalendrical()) {
+                    if (upper.isClosed()) {
+                        be = upper;
+                    } else {
+                        T e = upper.getTemporal();
+                        e = this.getTimeLine().stepBackwards(e);
+                        be = Boundary.ofClosed(e);
+                    }
+                    if (!s.isAfter(be.getTemporal())) {
+                        gaps.add(this.newInterval(bs, be));
+                    }
+                } else {
+                    if (upper.isOpen()) {
+                        be = upper;
+                    } else {
+                        T e = upper.getTemporal();
+                        e = this.getTimeLine().stepForward(e);
+                        if (e == null) {
+                            be = Boundary.infiniteFuture();
+                        } else {
+                            be = Boundary.ofOpen(e);
+                        }
+                    }
+                    if (s.isBefore(be.getTemporal())) {
+                        gaps.add(this.newInterval(bs, be));
+                    }
+                }
+            }
+        }
+
+        return this.create(gaps);
 
     }
 
@@ -764,6 +932,49 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return Boundary.infinitePast();
         } else {
             return Boundary.ofClosed(start);
+        }
+
+    }
+
+    private void addLeft(
+        List<ChronoInterval<T>> gaps,
+        T min
+    ) {
+
+        T e = this.getTimeLine().stepBackwards(min);
+
+        if (e != null) {
+            Boundary<T> be;
+
+            if (this.isCalendrical()) {
+                be = Boundary.ofClosed(e);
+            } else {
+                be = Boundary.ofOpen(min);
+            }
+
+            Boundary<T> bs = Boundary.infinitePast();
+            gaps.add(this.newInterval(bs, be));
+        }
+
+    }
+
+    private void addLeft(
+        List<ChronoInterval<T>> gaps,
+        T start,
+        T min
+    ) {
+
+        if (start.isBefore(min)) {
+            Boundary<T> be;
+
+            if (this.isCalendrical()) {
+                be = Boundary.ofClosed(this.getTimeLine().stepBackwards(min));
+            } else {
+                be = Boundary.ofOpen(min);
+            }
+
+            Boundary<T> bs = Boundary.ofClosed(start);
+            gaps.add(this.newInterval(bs, be));
         }
 
     }
