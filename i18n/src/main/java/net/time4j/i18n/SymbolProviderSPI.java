@@ -142,12 +142,14 @@ public final class SymbolProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(Locale locale) {
+    private static ResourceBundle getBundle(Locale desired) {
+
+        Locale lang = LanguageMatch.getAlias(desired);
 
         try {
             return ResourceBundle.getBundle(
                 "numbers/symbol",
-                locale,
+                lang,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
         } catch (MissingResourceException ex) {

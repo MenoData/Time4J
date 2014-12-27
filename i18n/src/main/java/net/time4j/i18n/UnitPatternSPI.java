@@ -254,7 +254,7 @@ public final class UnitPatternSPI
 
     @Override
     public String getListPattern(
-        Locale lang,
+        Locale desired,
         TextWidth width,
         int size
     ) {
@@ -265,6 +265,7 @@ public final class UnitPatternSPI
 
 		ClassLoader loader = this.getClass().getClassLoader();
 		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
+        Locale lang = LanguageMatch.getAlias(desired);
 		ResourceBundle rb =
             ResourceBundle.getBundle("units/pattern", lang, loader, control);
         String exact = buildListKey(width, String.valueOf(size));
@@ -357,7 +358,7 @@ public final class UnitPatternSPI
 	}
 
 	private String getPattern(
-		Locale		   lang,
+		Locale		   desired,
 		String		   baseName,
 		String		   key,
 		String		   alt,
@@ -368,6 +369,7 @@ public final class UnitPatternSPI
 		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		boolean init = true;
 		ResourceBundle first = null;
+        Locale lang = LanguageMatch.getAlias(desired);
 
 		for (Locale locale : control.getCandidateLocales(baseName, lang)) {
 			ResourceBundle rb = (

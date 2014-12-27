@@ -365,12 +365,14 @@ public final class IsoTextProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(Locale locale) {
+    private static ResourceBundle getBundle(Locale desired) {
+
+        Locale lang = LanguageMatch.getAlias(desired);
 
         try {
             return ResourceBundle.getBundle(
                 "calendar/" + ISO_CALENDAR_TYPE,
-                locale,
+                lang,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
         } catch (MissingResourceException ex) {

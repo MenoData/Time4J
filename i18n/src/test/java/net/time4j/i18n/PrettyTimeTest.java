@@ -591,6 +591,24 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print3WeeksLaterNorsk() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(new Locale("no")) // language match no => nb
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("om 3 uker"));
+    }
+
+    @Test
     public void printCenturiesAndWeekBasedYearsEnglish() {
         Duration<?> dur =
             Duration.ofZero()
