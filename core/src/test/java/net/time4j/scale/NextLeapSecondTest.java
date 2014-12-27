@@ -32,14 +32,14 @@ public class NextLeapSecondTest {
 
     @Test
     public void nextLSIfKnown() {
-        Moment ref = PlainDate.of(2100, 1, 1).atTime(0, 0).atUTC();
+        Moment ref = PlainDate.of(2200, 1, 1).atTime(0, 0).atUTC();
 
         if (LeapSeconds.getInstance().isEnabled()) {
-            LeapSeconds.getInstance().registerPositiveLS(2115, 12, 31);
+            LeapSeconds.getInstance().registerPositiveLS(2215, 12, 31);
             assertThat(
                 ref.with(Moment.nextLeapSecond()),
                 is(
-                    PlainTimestamp.of(2115, 12, 31, 23, 59, 59).atUTC()
+                    PlainTimestamp.of(2215, 12, 31, 23, 59, 59).atUTC()
                     .plus(1, SI.SECONDS)));
          } else {
             assertThat(ref.with(Moment.nextLeapSecond()), is(nullValue()));
@@ -48,7 +48,7 @@ public class NextLeapSecondTest {
 
     @Test
     public void nextLSIfUnknown() {
-        Moment ref = PlainDate.of(2100, 1, 1).atTime(0, 0).atUTC();
+        Moment ref = PlainDate.of(2300, 1, 1).atTime(0, 0).atUTC();
         assertThat(
             ref.with(Moment.nextLeapSecond()),
             is(nullValue()));
