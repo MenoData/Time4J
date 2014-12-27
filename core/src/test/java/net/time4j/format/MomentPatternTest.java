@@ -169,12 +169,7 @@ public class MomentPatternTest {
                         "",
                         "Europe/Berlin",
                         "2012-06-30T23:59:60,123000000Z",
-                        "2012-07-01T01:59:60.123GMT+2"},
-                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
-                        "ar-DZ",
-                        "Asia/Kolkata",
-                        "2012-06-30T23:59:60,123000000Z",
-                        "2012-07-01T05:29:60.123جرينتش\u200E+05:30"}
+                        "2012-07-01T01:59:60.123GMT+2"}
            }
         );
     }
