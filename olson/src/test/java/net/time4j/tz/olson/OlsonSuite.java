@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        DaylightSavingRuleTest.class,
         PredefinedIDTest.class,
         ZoneNameParsingTest.class
     }
