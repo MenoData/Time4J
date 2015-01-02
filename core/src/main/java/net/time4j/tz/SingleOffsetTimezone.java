@@ -145,20 +145,6 @@ final class SingleOffsetTimezone
     }
 
     @Override
-    public List<ZonalTransition> getStdTransitionsBefore(UnixTime time) {
-
-        return Collections.emptyList();
-
-    }
-
-    @Override
-    public List<ZonalTransition> getStdTransitionsAfter(UnixTime time) {
-
-        return Collections.emptyList();
-
-    }
-
-    @Override
     public List<ZonalTransition> getTransitions(
         UnixTime startInclusive,
         UnixTime endExclusive

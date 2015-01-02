@@ -146,7 +146,7 @@ public interface TransitionHistory {
 
     /**
      * <p>Return the offset transitions from UNIX epoch [1970-01-01T00:00Z]
-     * until at maximum the first transition after the current timestamp. </p>
+     * until about one year after the current timestamp. </p>
      *
      * <p>Indeed, a potentially bigger interval is obtainable by
      * {@link #getTransitions(UnixTime,UnixTime)}, but earlier or
@@ -163,8 +163,8 @@ public interface TransitionHistory {
      */
     /*[deutsch]
      * <p>Bestimmt alle vorhandenen zonalen &Uuml;berg&auml;nge ab der
-     * UNIX-Epoche [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
-     * nach dem aktuellen heutigen Zeitpunkt. </p>
+     * UNIX-Epoche [1970-01-01T00:00Z] bis zirka ein Jahr nach dem aktuellen
+     * heutigen Zeitpunkt. </p>
      *
      * <p>Zwar kann mittels {@link #getTransitions(UnixTime,UnixTime)}
      * auch ein potentiell gr&ouml;&szlig;eres Intervall abgefragt werden,
@@ -183,61 +183,6 @@ public interface TransitionHistory {
      *          maybe empty
      */
     List<ZonalTransition> getStdTransitions();
-
-    /**
-     * <p>Returns the previous transitions in descending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp (in descending order on the timeline!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    /*[deutsch]
-     * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
-     * Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge
-     * im Intervall von [1970-01-01T00:00Z] bis maximal zum ersten
-     * &Uuml;bergang vor dem aktuellen Zeitpunkt (in zeitlich umgekehrter
-     * Reihenfolge!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
-
-    /**
-     * <p>Returns the next transitions in ascending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    /*[deutsch]
-     * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
-     * aufsteigender Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge im
-     * Intervall von [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
-     * nach dem aktuellen Zeitpunkt. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
 
     /**
      * <p>Returns the defined transitions in given POSIX-interval. </p>
