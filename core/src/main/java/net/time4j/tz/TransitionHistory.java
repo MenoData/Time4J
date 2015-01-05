@@ -88,6 +88,12 @@ public interface TransitionHistory {
      * <p>Returns the conflict transition where given local timestamp
      * falls either in a gap or in an overlap on the local timeline. </p>
      *
+     * <p>Note that only the expression {@code localDate.getYear()} is used
+     * to determine the daylight saving rules to be applied in calculation.
+     * This is particularly important if there is a wall time of 24:00. Here
+     * only the date before merging to next day matters, not the date of the
+     * whole timestamp. </p>
+     *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
      * @return  conflict transition on the local time axis for gaps or
@@ -98,6 +104,12 @@ public interface TransitionHistory {
      * <p>Bestimmt den passenden &Uuml;bergang, wenn die angegebene lokale
      * Zeit in eine L&uuml;cke oder eine &Uuml;berlappung auf dem lokalen
      * Zeitstrahl f&auml;llt. </p>
+     *
+     * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
+     * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
+     * von Bedeutung, wenn die Uhrzeit 24:00 vorliegt. Hier z&auml;hlt nur
+     * das Jahr des angegebenen Datums, nicht das des Zeitstempels, der
+     * wegen der Uhrzeit evtl. im Folgejahr liegt. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -119,6 +131,12 @@ public interface TransitionHistory {
      * POSIX timescale due to an overlap. Otherwise the offset list
      * will contain exactly one suitable offset. </p>
      *
+     * <p>Note that only the expression {@code localDate.getYear()} is used
+     * to determine the daylight saving rules to be applied in calculation.
+     * This is particularly important if there is a wall time of 24:00. Here
+     * only the date before merging to next day matters, not the date of the
+     * whole timestamp. </p>
+     *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts which fits the given local time
@@ -133,6 +151,12 @@ public interface TransitionHistory {
      * Verschiebungen, wenn die lokale Zeit wegen einer &Uuml;berlappung
      * zu zwei verschiedenen Zeitpunkten auf der POSIX-Zeitskala geh&ouml;rt.
      * Ansonsten wird die Liste genau eine passende Verschiebung enthalten. </p>
+     *
+     * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
+     * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
+     * von Bedeutung, wenn die Uhrzeit 24:00 vorliegt. Hier z&auml;hlt nur
+     * das Jahr des angegebenen Datums, nicht das des Zeitstempels, der
+     * wegen der Uhrzeit evtl. im Folgejahr liegt. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
