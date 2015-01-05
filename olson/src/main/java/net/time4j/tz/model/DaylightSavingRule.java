@@ -21,6 +21,7 @@
 
 package net.time4j.tz.model;
 
+import net.time4j.ClockUnit;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -70,7 +71,7 @@ public class DaylightSavingRule
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial  clock time of time switch
+     * @serial  clock time of time switch in second precision
      */
     private final PlainTime timeOfDay;
 
@@ -95,7 +96,7 @@ public class DaylightSavingRule
 
         check(timeOfDay, indicator, savings);
 
-        this.timeOfDay = timeOfDay;
+        this.timeOfDay = timeOfDay.with(PlainTime.PRECISION, ClockUnit.SECONDS);
         this.indicator = indicator;
         this.savings = savings;
 
@@ -299,7 +300,8 @@ public class DaylightSavingRule
      */
     public PlainDate getDate(int year) {
 
-        throw new AbstractMethodError(); // see java.util.concurrent.TimeUnit
+        // must be overridden by subclasses - see java.util.concurrent.TimeUnit
+        throw new AbstractMethodError();
 
     }
 
@@ -310,7 +312,7 @@ public class DaylightSavingRule
      * <p>The result must be interpreted by mean of {@link #getIndicator()}
      * in order to calculate the UTC time. </p>
      *
-     * @return  clock time of time switch
+     * @return  clock time of time switch in second precision
      * @since   2.2
      */
     /*[deutsch]
@@ -319,7 +321,7 @@ public class DaylightSavingRule
      * <p>Das Ergebnis ist mittels {@link #getIndicator()} geeignet
      * zu interpretieren, um die UTC-Zeit zu bestimmen. </p>
      *
-     * @return  Uhrzeit der Umstellung
+     * @return  Uhrzeit der Umstellung in second precision
      * @since   2.2
      */
     public PlainTime getTimeOfDay() {
