@@ -1,4 +1,4 @@
-/*
+﻿/*
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
@@ -32,13 +32,13 @@ import java.util.List;
  * <p>Keeps all offset transitions and rules of a timezone. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @spec    External implementations are not permitted due to experimental status of this interface.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @spec    External implementations are not permitted due to experimental status of this interface.
  */
 public interface TransitionHistory {
 
@@ -88,6 +88,12 @@ public interface TransitionHistory {
      * <p>Returns the conflict transition where given local timestamp
      * falls either in a gap or in an overlap on the local timeline. </p>
      *
+     * <p>Note that only the expression {@code localDate.getYear()} is used
+     * to determine the daylight saving rules to be applied in calculation.
+     * This is particularly important if there is a wall time of 24:00. Here
+     * only the date before merging to next day matters, not the date of the
+     * whole timestamp. </p>
+     *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
      * @return  conflict transition on the local time axis for gaps or
@@ -98,6 +104,12 @@ public interface TransitionHistory {
      * <p>Bestimmt den passenden &Uuml;bergang, wenn die angegebene lokale
      * Zeit in eine L&uuml;cke oder eine &Uuml;berlappung auf dem lokalen
      * Zeitstrahl f&auml;llt. </p>
+     *
+     * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
+     * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
+     * von Bedeutung, wenn die Uhrzeit 24:00 vorliegt. Hier z&auml;hlt nur
+     * das Jahr des angegebenen Datums, nicht das des Zeitstempels, der
+     * wegen der Uhrzeit evtl. im Folgejahr liegt. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -119,6 +131,12 @@ public interface TransitionHistory {
      * POSIX timescale due to an overlap. Otherwise the offset list
      * will contain exactly one suitable offset. </p>
      *
+     * <p>Note that only the expression {@code localDate.getYear()} is used
+     * to determine the daylight saving rules to be applied in calculation.
+     * This is particularly important if there is a wall time of 24:00. Here
+     * only the date before merging to next day matters, not the date of the
+     * whole timestamp. </p>
+     *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts which fits the given local time
@@ -134,6 +152,12 @@ public interface TransitionHistory {
      * zu zwei verschiedenen Zeitpunkten auf der POSIX-Zeitskala geh&ouml;rt.
      * Ansonsten wird die Liste genau eine passende Verschiebung enthalten. </p>
      *
+     * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
+     * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
+     * von Bedeutung, wenn die Uhrzeit 24:00 vorliegt. Hier z&auml;hlt nur
+     * das Jahr des angegebenen Datums, nicht das des Zeitstempels, der
+     * wegen der Uhrzeit evtl. im Folgejahr liegt. </p>
+     *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts which fits the given local time
@@ -146,7 +170,7 @@ public interface TransitionHistory {
 
     /**
      * <p>Return the offset transitions from UNIX epoch [1970-01-01T00:00Z]
-     * until at maximum the first transition after the current timestamp. </p>
+     * until about one year after the current timestamp. </p>
      *
      * <p>Indeed, a potentially bigger interval is obtainable by
      * {@link #getTransitions(UnixTime,UnixTime)}, but earlier or
@@ -163,8 +187,8 @@ public interface TransitionHistory {
      */
     /*[deutsch]
      * <p>Bestimmt alle vorhandenen zonalen &Uuml;berg&auml;nge ab der
-     * UNIX-Epoche [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
-     * nach dem aktuellen heutigen Zeitpunkt. </p>
+     * UNIX-Epoche [1970-01-01T00:00Z] bis zirka ein Jahr nach dem aktuellen
+     * heutigen Zeitpunkt. </p>
      *
      * <p>Zwar kann mittels {@link #getTransitions(UnixTime,UnixTime)}
      * auch ein potentiell gr&ouml;&szlig;eres Intervall abgefragt werden,
@@ -183,61 +207,6 @@ public interface TransitionHistory {
      *          maybe empty
      */
     List<ZonalTransition> getStdTransitions();
-
-    /**
-     * <p>Returns the previous transitions in descending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp (in descending order on the timeline!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    /*[deutsch]
-     * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
-     * Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge
-     * im Intervall von [1970-01-01T00:00Z] bis maximal zum ersten
-     * &Uuml;bergang vor dem aktuellen Zeitpunkt (in zeitlich umgekehrter
-     * Reihenfolge!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
-
-    /**
-     * <p>Returns the next transitions in ascending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    /*[deutsch]
-     * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
-     * aufsteigender Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge im
-     * Intervall von [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
-     * nach dem aktuellen Zeitpunkt. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     */
-    List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
 
     /**
      * <p>Returns the defined transitions in given POSIX-interval. </p>
@@ -274,5 +243,66 @@ public interface TransitionHistory {
      * @since   1.2.1
      */
     boolean isEmpty();
+
+    /**
+     * <p>Returns the previous transitions in descending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp (in descending order on the timeline!). </p>
+     *
+     * @param   ut      unix reference time
+     * @return  previous transitions before reference time
+     *          (only standard transitions after 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    /*[deutsch]
+     * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
+     * Reihenfolge, falls vorhanden. </p>
+     *
+     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge
+     * im Intervall von [1970-01-01T00:00Z] bis maximal zum ersten
+     * &Uuml;bergang vor dem aktuellen Zeitpunkt (in zeitlich umgekehrter
+     * Reihenfolge!). </p>
+     *
+     * @param   ut      unix reference time
+     * @return  previous transitions before reference time
+     *          (only standard transitions after 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    @Deprecated
+    List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
+
+    /**
+     * <p>Returns the next transitions in ascending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  next transitions after reference time (only standard
+     *          transitions 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    /*[deutsch]
+     * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
+     * aufsteigender Reihenfolge, falls vorhanden. </p>
+     *
+     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge im
+     * Intervall von [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
+     * nach dem aktuellen Zeitpunkt. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  next transitions after reference time (only standard
+     *          transitions 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    @Deprecated
+    List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
 
 }
