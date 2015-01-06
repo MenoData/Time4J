@@ -1,4 +1,4 @@
-﻿/*
+/*
  * -----------------------------------------------------------------------
  * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
@@ -255,7 +255,7 @@ public interface TransitionHistory {
      * @return  previous transitions before reference time
      *          (only standard transitions after 1970-01-01)
      * @see     #getStdTransitions()
-     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
      */
     /*[deutsch]
      * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
@@ -270,7 +270,7 @@ public interface TransitionHistory {
      * @return  previous transitions before reference time
      *          (only standard transitions after 1970-01-01)
      * @see     #getStdTransitions()
-     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
      */
     @Deprecated
     List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
@@ -286,7 +286,7 @@ public interface TransitionHistory {
      * @return  next transitions after reference time (only standard
      *          transitions 1970-01-01)
      * @see     #getStdTransitions()
-     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
      */
     /*[deutsch]
      * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
@@ -300,7 +300,7 @@ public interface TransitionHistory {
      * @return  next transitions after reference time (only standard
      *          transitions 1970-01-01)
      * @see     #getStdTransitions()
-     * @deprecate Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
      */
     @Deprecated
     List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
