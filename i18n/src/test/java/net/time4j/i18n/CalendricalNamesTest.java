@@ -521,7 +521,20 @@ public class CalendricalNamesTest {
         instance.getTextForms(PlainTime.AM_PM_OF_DAY);
     }
 
-    private static boolean isCalendarTypeSupported(
+    @Test
+    public void printQuartersVietnam() {
+        TextWidth textWidth = TextWidth.WIDE;
+        OutputContext outputContext = OutputContext.STANDALONE;
+        CalendarText instance =
+            CalendarText.getInstance("iso8601", new Locale("vi"));
+        String result =
+            instance.getWeekdays(textWidth, outputContext)
+            .print(Weekday.MONDAY);
+        // test for switching from standalone to format context
+        assertThat(result, is("Thứ Hai"));
+    }
+
+   private static boolean isCalendarTypeSupported(
         TextProvider p,
         String calendarType
     ) {
