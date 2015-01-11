@@ -183,6 +183,14 @@ final class SingleOffsetTimezone
 
     }
 
+    // optional
+    @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
     @Override
     public ZonalOffset getInitialOffset() {
 
