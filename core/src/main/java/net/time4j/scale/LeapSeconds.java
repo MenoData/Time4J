@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSeconds.java) is part of project Time4J.
  *
@@ -150,6 +150,37 @@ public final class LeapSeconds
     public static final boolean FINAL_UTC_LEAPSECONDS =
         Boolean.getBoolean("net.time4j.scale.leapseconds.final");
 
+    /**
+     * <p>System property &quot;net.time4j.scale.leapseconds.path&quot;
+     * which determines the path of the leap second file. </p>
+     *
+     * <p>The file will be choosen if there is no other
+     * {@code LeapSecondProvider} which has registered more leap seconds.
+     * The path is an URL which must be understood by
+     * {@link ClassLoader#getResourceAsStream(String)}. The default
+     * value is: &quot;data/leapseconds.data&quot; (relative to
+     * class path). </p>
+     *
+     * @since   2.1.2
+     */
+    /*[deutsch]
+     * <p>System-Property &quot;net.time4j.scale.leapseconds.path&quot;, die
+     * den Pfad der Schaltsekundendatei festlegt. </p>
+     *
+     * <p>Die Schaltsekundendatei wird ausgew&auml;hlt, wenn es keinen
+     * anderen {@code LeapSecondProvider} gibt, der mehr Schaltsekunden
+     * registriert hat. Der Pfad ist ein URL, der von
+     * {@link ClassLoader#getResourceAsStream(String)} verstanden werden
+     * mu&szlig;. Standardwert ist: &quot;data/leapseconds.data&quot;
+     * (relativ zum Klassenpfad). </p>
+     *
+     * @since   2.1.2
+     */
+    public static final String PATH_TO_LEAPSECONDS =
+        System.getProperty(
+            "net.time4j.scale.leapseconds.path",
+            "data/leapseconds.data");
+
     private static final ExtendedLSE[] EMPTY_ARRAY = new ExtendedLSE[0];
     private static final LeapSeconds INSTANCE = new LeapSeconds();
     private static final long UNIX_OFFSET = 2 * 365 * 86400;
@@ -186,8 +217,8 @@ public final class LeapSeconds
 
             ServiceLoader<LeapSecondProvider> sl =
                 ServiceLoader.load(LeapSecondProvider.class, cl);
-            LeapSecondProvider loaded = null;
-            int leapCount = 0;
+            LeapSecondProvider loaded = new DefaultLeapSecondService();
+            int leapCount = loaded.getLeapSecondTable().size();
 
             // Provider mit den meisten Schaltsekunden wählen
             for (LeapSecondProvider temp : sl) {
@@ -197,10 +228,6 @@ public final class LeapSeconds
                     loaded = temp;
                     leapCount = currentCount;
                 }
-            }
-
-            if (loaded == null) {
-                loaded = new DefaultLeapSecondService(); // leapseconds.data
             }
 
             SortedSet<ExtendedLSE> sortedLS =
@@ -1223,7 +1250,7 @@ public final class LeapSeconds
 
             this.table = new LinkedHashMap<GregorianDate, Integer>(50);
             InputStream is = null;
-            String name = "data/leapseconds.data";
+            String name = PATH_TO_LEAPSECONDS;
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
             if (cl != null) {

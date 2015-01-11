@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Moment.java) is part of project Time4J.
  *
@@ -21,7 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -2754,13 +2753,13 @@ public final class Moment
 
         @Override
         public Moment apply(Moment timepoint) {
-            
+
             LeapSeconds ls = LeapSeconds.getInstance();
 
             if (ls.isEnabled()) {
                 long utc = timepoint.getElapsedTime(TimeScale.UTC);
                 LeapSecondEvent event = ls.getNextEvent(utc);
-                
+
                 if (event != null) {
                     PlainTimestamp tsp =
                         PlainDate.from(event.getDate()).atTime(23, 59, 59);
@@ -2769,7 +2768,7 @@ public final class Moment
             }
 
             return null;
-            
+
         }
 
     }

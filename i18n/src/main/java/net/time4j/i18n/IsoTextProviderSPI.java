@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -21,16 +21,18 @@
 
 package net.time4j.i18n;
 
-import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 
 import java.text.DateFormatSymbols;
 import java.text.Normalizer;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 import static net.time4j.format.TextWidth.ABBREVIATED;
@@ -52,6 +54,28 @@ import static net.time4j.format.TextWidth.WIDE;
  */
 public final class IsoTextProviderSPI
     implements TextProvider {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Set<String> LANGUAGES;
+
+    static {
+        ResourceBundle rb =
+            ResourceBundle.getBundle(
+                "calendar/" + ISO_CALENDAR_TYPE,
+                Locale.ROOT,
+                getDefaultLoader(),
+                UTF8ResourceControl.SINGLETON);
+
+        String[] languages = rb.getString("languages").split(" ");
+        Set<String> tmp = new HashSet<String>();
+
+        for (String s : languages) {
+            tmp.add(s);
+        }
+
+        LANGUAGES = Collections.unmodifiableSet(tmp);
+    }
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -86,33 +110,143 @@ public final class IsoTextProviderSPI
         boolean leapForm
     ) {
 
+        return months(locale, tw, oc);
+
+    }
+
+    @Override
+    public String[] quarters(
+        String calendarType,
+        Locale locale,
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        return quarters(locale, tw, oc);
+
+    }
+
+    @Override
+    public String[] weekdays(
+        String calendarType,
+        Locale locale,
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        return weekdays(locale, tw, oc);
+
+    }
+
+    @Override
+    public String[] eras(
+        String calendarType,
+        Locale locale,
+        TextWidth tw
+    ) {
+
+        return eras(locale, tw);
+
+    }
+
+    @Override
+    public String[] meridiems(
+        String calendarType,
+        Locale locale,
+        TextWidth tw
+    ) {
+
+        return meridiems(locale, tw);
+
+    }
+
+    @Override
+    public String toString() {
+
+        return "IsoTextProviderSPI";
+
+    }
+
+    /**
+     * <p>Liefert jene Sprachen, die speziell &uuml;ber properties-Dateien
+     * unterst&uuml;tzt werden. </p>
+     *
+     * <p>Dient dem Zugriff durch Testklassen. </p>
+     *
+     * @return  unmodifiable {@code Set} of ISO-639-1-language codes
+     * @since   2.1.2
+     */
+    static Set<String> getPrimaryLanguages() {
+
+        return LANGUAGES;
+
+    }
+
+    private static String[] months(
+        Locale locale,
+        TextWidth tw,
+        OutputContext oc
+    ) throws MissingResourceException {
+
         ResourceBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && !locale.equals(Locale.ROOT)
-        ) {
+        if (rb != null) {
             String[] names;
             String key = getKey(rb, "MONTH_OF_YEAR");
+            boolean standalone = (
+                (oc == OutputContext.STANDALONE)
+                && "true".equals(rb.getObject("enableStandalone")));
 
             if (tw == TextWidth.SHORT) {
                 tw = TextWidth.ABBREVIATED;
             }
 
-            if (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone"))
-            ) {
+            if (standalone) {
                 names = lookupBundle(rb, 12, key, tw, oc);
             } else {
                 names = lookupBundle(rb, 12, key, tw);
             }
 
-            if (names != null) {
-                return names;
-            } else if (tw == TextWidth.NARROW) {
-                names = months("", locale, TextWidth.SHORT, oc, false);
-                return narrow(names, 12);
+            if (names == null) {
+                if (tw == TextWidth.NARROW) {
+                    names = months(locale, TextWidth.ABBREVIATED, oc);
+                    if (names == null) {
+                        if (standalone) {
+                            names = months(locale, tw, OutputContext.FORMAT);
+                        }
+                        if (names == null) {
+                            throw new MissingResourceException(
+                                "Cannot find ISO-8601-month.",
+                                IsoTextProviderSPI.class.getName(),
+                                locale.toString());
+                        }
+                    }
+                    return narrow(names, 12);
+                }
+                if (standalone) {
+                    names = months(locale, tw, OutputContext.FORMAT);
+                }
+                if (names == null) {
+                    throw new MissingResourceException(
+                        "Cannot find ISO-8601-month.",
+                        IsoTextProviderSPI.class.getName(),
+                        locale.toString());
+                }
+            }
+
+            return names;
+        }
+
+        // Sonderfall: ROOT
+        if (locale.getLanguage().isEmpty()) {
+            if (tw == TextWidth.WIDE) {
+                return new String[] {
+                    "01", "02", "03", "04", "05", "06",
+                    "07", "08", "09", "10", "11", "12"};
+            } else {
+                return new String[] {
+                    "1", "2", "3", "4", "5", "6",
+                    "7", "8", "9", "10", "11", "12"};
             }
         }
 
@@ -133,76 +267,117 @@ public final class IsoTextProviderSPI
 
     }
 
-    @Override
-    public String[] quarters(
-        String calendarType,
+    private static String[] quarters(
         Locale locale,
         TextWidth tw,
         OutputContext oc
-    ) {
+    ) throws MissingResourceException {
 
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
             String[] names;
             String key = getKey(rb, "QUARTER_OF_YEAR");
+            boolean standalone = (
+                (oc == OutputContext.STANDALONE)
+                && "true".equals(rb.getObject("enableStandalone")));
 
             if (tw == TextWidth.SHORT) {
                 tw = TextWidth.ABBREVIATED;
             }
 
-            if (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone"))
-            ) {
+            if (standalone) {
                 names = lookupBundle(rb, 4, key, tw, oc);
             } else {
                 names = lookupBundle(rb, 4, key, tw);
             }
 
-            if (names != null) {
-                return names;
+            if (names == null) {
+                if (tw == TextWidth.NARROW) {
+                    names = quarters(locale, TextWidth.ABBREVIATED, oc);
+                    if (names == null) {
+                        if (standalone) {
+                            names = quarters(locale, tw, OutputContext.FORMAT);
+                        }
+                        if (names == null) {
+                            throw new MissingResourceException(
+                                "Cannot find ISO-8601-quarter-of-year.",
+                                IsoTextProviderSPI.class.getName(),
+                                locale.toString());
+                        }
+                    }
+                    return narrow(names, 4);
+                }
+                if (standalone) {
+                    names = quarters(locale, tw, OutputContext.FORMAT);
+                }
+                if (names == null) {
+                    throw new MissingResourceException(
+                        "Cannot find ISO-8601-quarter-of-year.",
+                        IsoTextProviderSPI.class.getName(),
+                        locale.toString());
+                }
             }
+
+            return names;
         }
 
-        return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
+        // fallback
+        if (tw == TextWidth.NARROW) {
+            return new String[] {"1", "2", "3", "4"};
+        } else {
+            return new String[] {"Q1", "Q2", "Q3", "Q4"};
+        }
 
     }
 
-    @Override
-    public String[] weekdays(
-        String calendarType,
+    private static String[] weekdays(
         Locale locale,
         TextWidth tw,
         OutputContext oc
-    ) {
+    ) throws MissingResourceException {
 
         ResourceBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && !locale.equals(Locale.ROOT)
-        ) {
+        if (rb != null) {
             String[] names;
             String key = getKey(rb, "DAY_OF_WEEK");
-
-            if (
+            boolean standalone = (
                 (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone"))
-            ) {
+                && "true".equals(rb.getObject("enableStandalone")));
+
+            if (standalone) {
                 names = lookupBundle(rb, 7, key, tw, oc);
             } else {
                 names = lookupBundle(rb, 7, key, tw);
             }
 
-            if (names != null) {
-                return names;
-            } else if (tw == TextWidth.SHORT) {
-                return weekdays("", locale, TextWidth.ABBREVIATED, oc);
-            } else if (tw == TextWidth.NARROW) {
-                names = weekdays("", locale, TextWidth.SHORT, oc);
-                return narrow(names, 7);
+            if (names == null) {
+                if (tw == TextWidth.NARROW) {
+                    names = narrow(weekdays(locale, TextWidth.SHORT, oc), 7);
+                } else if (tw == TextWidth.SHORT) {
+                    names = weekdays(locale, TextWidth.ABBREVIATED, oc);
+                    if ((names == null) && standalone) {
+                        names = weekdays(locale, tw, OutputContext.FORMAT);
+                    }
+                } else if (standalone) {
+                    names = weekdays(locale, tw, OutputContext.FORMAT);
+                }
             }
+
+            if (names == null) {
+                throw new MissingResourceException(
+                    "Cannot find ISO-8601-weekday.",
+                    IsoTextProviderSPI.class.getName(),
+                    locale.toString());
+            } else {
+                return names;
+            }
+        }
+
+        // Sonderfall: ROOT
+        if (locale.getLanguage().isEmpty()) {
+            return new String[] {"1", "2", "3", "4", "5", "6", "7"};
         }
 
         // JDK-Quelle
@@ -219,7 +394,7 @@ public final class IsoTextProviderSPI
                 break;
             case NARROW:
                 String[] names = // 7 Elemente
-                    weekdays("", locale, TextWidth.SHORT, oc);
+                    weekdays(locale, TextWidth.SHORT, oc);
                 result = narrow(names, 7);
                 break;
             default:
@@ -243,31 +418,31 @@ public final class IsoTextProviderSPI
 
     }
 
-    @Override
-    public String[] eras(
-        String calendarType,
+    private static String[] eras(
         Locale locale,
-        TextWidth textWidth
-    ) {
+        TextWidth tw
+    ) throws MissingResourceException {
 
         ResourceBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && !locale.equals(Locale.ROOT)
-        ) {
+        if (rb != null) {
             String key = getKey(rb, "ERA");
-            String[] names = lookupBundle(rb, 2, key, textWidth);
+            String[] names = lookupBundle(rb, 2, key, tw);
 
             if (names != null) {
                 return names;
             }
         }
 
+        // Sonderfall: ROOT
+        if (locale.getLanguage().isEmpty()) {
+            return new String[] {"0", "1"};
+        }
+
         // JDK-Quelle
         DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
 
-        if (textWidth == TextWidth.NARROW) {
+        if (tw == TextWidth.NARROW) {
             String[] eras = dfs.getEras();
             String[] ret = new String[eras.length];
             for (int i = 0, n = eras.length; i < n; i++) {
@@ -288,40 +463,34 @@ public final class IsoTextProviderSPI
 
     }
 
-    @Override
-    public String[] meridiems(
-        String calendarType,
+    private static String[] meridiems(
         Locale locale,
-        TextWidth textWidth
-    ) {
+        TextWidth tw
+    ) throws MissingResourceException {
 
         ResourceBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && !locale.equals(Locale.ROOT)
-        ) {
+        if (rb != null) {
             String key = getKey(rb, "AM_PM_OF_DAY");
-            String[] names = lookupBundle(rb, 2, key, textWidth);
+            String[] names = lookupBundle(rb, 2, key, tw);
 
             if (names != null) {
                 return names;
             }
         }
 
-        if (textWidth == TextWidth.NARROW) {
+        // Sonderfall: ROOT
+        if (locale.getLanguage().isEmpty()) {
+            return new String[] {"0", "1"};
+        }
+
+        // Im alten JDK-API ist NARROW unbekannt
+        if (tw == TextWidth.NARROW) {
             return new String[] {"A", "P"};
         }
 
         // JDK-Quelle
         return DateFormatSymbols.getInstance(locale).getAmPmStrings();
-
-    }
-
-    @Override
-    public String toString() {
-
-        return "IsoTextProviderSPI";
 
     }
 
@@ -365,19 +534,20 @@ public final class IsoTextProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(Locale desired) {
+    private static ResourceBundle getBundle(Locale desired)
+        throws MissingResourceException {
 
         Locale lang = LanguageMatch.getAlias(desired);
 
-        try {
+        if (LANGUAGES.contains(lang.getLanguage())) {
             return ResourceBundle.getBundle(
                 "calendar/" + ISO_CALENDAR_TYPE,
                 lang,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
-        } catch (MissingResourceException ex) {
-            return null;
         }
+
+        return null;
 
     }
 
@@ -464,11 +634,17 @@ public final class IsoTextProviderSPI
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
 		if (cl == null) {
-			cl = CalendarText.class.getClassLoader();
+			cl = getDefaultLoader();
 		}
 
 		return cl;
 
 	}
+
+    private static ClassLoader getDefaultLoader() {
+
+        return IsoTextProviderSPI.class.getClassLoader();
+
+    }
 
 }

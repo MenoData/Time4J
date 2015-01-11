@@ -14,7 +14,9 @@ import org.junit.runners.Suite.SuiteClasses;
         EnumDisplayTest.class,
         LocalizedGMTOffsetTest.class,
         NumberSymbolTest.class,
-        PrettyTimeTest.class
+        PrettyTimeTest.class,
+        RootLocaleTest.class,
+        IsoSanityTest.class
     }
 )
 public class I18nSuite {

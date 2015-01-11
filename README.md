@@ -13,11 +13,12 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2014-11-16 the version v2.0 of Time4J was finished and released. The older version line v1.x is no longer recommended (due to several backward incompatibilities) and has reached end-of-life. Time4J is organized in modules. The core is always necessary. Other modules are optional and include:
+On 2014-12-27 the version v2.1 of Time4J was finished and released. The older version line v1.x is no longer recommended (due to several backward incompatibilities) and has reached end-of-life. Time4J is organized in modules. The core is always necessary. Other modules are optional and include:
 
 - time4j-olson which contains some predefined timezone identifiers as enums and enables parsing of localized timezone names. 
 - time4j-i18n for enhanced localization support (especially for formatting of durations)
 - time4j-range for handling intervals
+- time4j-misc containing other features like alternative clocks
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
@@ -26,7 +27,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 - PlainTimestamp = local timestamp as composition of calendar date and wall time
 - Moment = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like (shown code valid for v2.0):
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v2.x):
 
 ```java
 import net.time4j.*;

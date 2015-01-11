@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -32,13 +32,13 @@ import java.util.List;
  * <p>Keeps all offset transitions and rules of a timezone. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @spec    External implementations are not permitted due to experimental status of this interface.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @spec    External implementations are not permitted due to experimental status of this interface.
  */
 public interface TransitionHistory {
 
@@ -244,4 +244,68 @@ public interface TransitionHistory {
      */
     boolean isEmpty();
 
+<<<<<<< HEAD
+=======
+    /**
+     * <p>Returns the previous transitions in descending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp (in descending order on the timeline!). </p>
+     *
+     * @param   ut      unix reference time
+     * @return  previous transitions before reference time
+     *          (only standard transitions after 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    /*[deutsch]
+     * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
+     * Reihenfolge, falls vorhanden. </p>
+     *
+     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge
+     * im Intervall von [1970-01-01T00:00Z] bis maximal zum ersten
+     * &Uuml;bergang vor dem aktuellen Zeitpunkt (in zeitlich umgekehrter
+     * Reihenfolge!). </p>
+     *
+     * @param   ut      unix reference time
+     * @return  previous transitions before reference time
+     *          (only standard transitions after 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    @Deprecated
+    List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
+
+    /**
+     * <p>Returns the next transitions in ascending order if available. </p>
+     *
+     * <p>In general, this method will only yield transitions in the interval
+     * from [1970-01-01T00:00Z] until at maximum the first transition before
+     * the current timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  next transitions after reference time (only standard
+     *          transitions 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    /*[deutsch]
+     * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
+     * aufsteigender Reihenfolge, falls vorhanden. </p>
+     *
+     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge im
+     * Intervall von [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
+     * nach dem aktuellen Zeitpunkt. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  next transitions after reference time (only standard
+     *          transitions 1970-01-01)
+     * @see     #getStdTransitions()
+     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
+     */
+    @Deprecated
+    List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
+
+>>>>>>> origin/master
 }

@@ -26,7 +26,11 @@ public class LeapSecondTest {
     private static final long UTC_2012_06_30_LS = 1341100824L - UTC_OFFSET;
 
     @BeforeClass
-    public static void registerNegativeLS() {
+    public static void initNegativeLS() {
+        System.setProperty(
+            "net.time4j.scale.leapseconds.path",
+            "data/leapseconds2012.data");
+
         LeapSeconds instance = LeapSeconds.getInstance();
 
         if (instance.iterator().next().getDate().getYear() != 2112) {
