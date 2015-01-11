@@ -193,6 +193,48 @@ final class RuleBasedTransitionModel
     }
 
     @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
+
+        long start = Math.max(ut.getPosixTime(), this.initial.getPosixTime());
+        int year = Integer.MIN_VALUE;
+        int stdOffset = initial.getStandardOffset();
+        boolean current = true;
+
+        for (int i = 0, n = this.rules.size(); i < n; i++) {
+            DaylightSavingRule rule = rules.get(i);
+            DaylightSavingRule previous = rules.get((i - 1 + n) % n);
+            int shift = getShift(rule, stdOffset, previous.getSavings());
+
+            if (i == 0) {
+                long mjd =
+                    EpochDays.MODIFIED_JULIAN_DATE.transform(
+                        MathUtils.floorDivide(start + shift, 86400),
+                        EpochDays.UNIX);
+                year = GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
+            } else if ((i % n) == 0) {
+                year++;
+            }
+
+            long tt = getTransitionTime(rule, year, shift);
+
+            if (tt >= start) {
+                if (current) {
+                    current = false;
+                } else {
+                    return new ZonalTransition(
+                        tt,
+                        stdOffset + previous.getSavings(),
+                        stdOffset + rule.getSavings(),
+                        rule.getSavings());
+                }
+            }
+        }
+
+        return null;
+
+    }
+
+    @Override
     public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
