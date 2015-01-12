@@ -155,11 +155,7 @@ final class RuleBasedTransitionModel
             DaylightSavingRule previous = this.rules.get((i - 1 + n) % n);
 
             int shift = getShift(rule, stdOffset, previous.getSavings());
-            long mjd =
-                EpochDays.MODIFIED_JULIAN_DATE.transform(
-                    MathUtils.floorDivide(ut.getPosixTime() + shift, 86400),
-                    EpochDays.UNIX);
-            int year = GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
+            int year = getYear(ut.getPosixTime() + shift);
             long tt = getTransitionTime(rule, year, shift);
 
             if (ut.getPosixTime() < tt) {
@@ -197,40 +193,33 @@ final class RuleBasedTransitionModel
 
         long start = Math.max(ut.getPosixTime(), this.initial.getPosixTime());
         int year = Integer.MIN_VALUE;
-        int stdOffset = initial.getStandardOffset();
-        boolean current = true;
+        int stdOffset = this.initial.getStandardOffset();
+        ZonalTransition next = null;
 
-        for (int i = 0, n = this.rules.size(); i < n; i++) {
-            DaylightSavingRule rule = rules.get(i);
-            DaylightSavingRule previous = rules.get((i - 1 + n) % n);
+        for (int i = 0, n = this.rules.size(); next == null; i++) {
+            DaylightSavingRule rule = this.rules.get(i % n);
+            DaylightSavingRule previous = this.rules.get((i - 1 + n) % n);
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                long mjd =
-                    EpochDays.MODIFIED_JULIAN_DATE.transform(
-                        MathUtils.floorDivide(start + shift, 86400),
-                        EpochDays.UNIX);
-                year = GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
+                year = getYear(start + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
 
             long tt = getTransitionTime(rule, year, shift);
 
-            if (tt >= start) {
-                if (current) {
-                    current = false;
-                } else {
-                    return new ZonalTransition(
+            if (tt > start) {
+                next =
+                    new ZonalTransition(
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
                         rule.getSavings());
-                }
             }
         }
 
-        return null;
+        return next;
 
     }
 
@@ -366,18 +355,12 @@ final class RuleBasedTransitionModel
         int stdOffset = initial.getStandardOffset();
 
         while (true) {
-            DaylightSavingRule rule = rules.get(i);
+            DaylightSavingRule rule = rules.get(i % n);
             DaylightSavingRule previous = rules.get((i - 1 + n) % n);
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                long mjd =
-                    EpochDays.MODIFIED_JULIAN_DATE.transform(
-                        MathUtils.floorDivide(
-                            Math.max(start, preModel) + shift,
-                            86400),
-                        EpochDays.UNIX);
-                year = GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
+                year = getYear(Math.max(start, preModel) + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
@@ -467,6 +450,18 @@ final class RuleBasedTransitionModel
         }
 
         return transitions;
+
+    }
+
+    private static int getYear(long localSecs) {
+
+        return GregorianMath.readYear(
+            GregorianMath.toPackedDate(
+                EpochDays.MODIFIED_JULIAN_DATE.transform(
+                    MathUtils.floorDivide(localSecs, 86400),
+                    EpochDays.UNIX)
+                )
+            );
 
     }
 
