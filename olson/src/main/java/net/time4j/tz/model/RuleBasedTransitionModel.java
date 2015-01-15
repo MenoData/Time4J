@@ -145,22 +145,12 @@ final class RuleBasedTransitionModel
                     + initial);
             }
 
-            for (int i = 0, n = sortedRules.size(); i < n; i++) {
-                DaylightSavingRule current = sortedRules.get(i);
-                DaylightSavingRule previous = sortedRules.get((i - 1 + n) % n);
-                int stdOffset = initial.getStandardOffset();
-
-                if (previous.getSavings() == 0) {
-                    int shift = getShift(current, stdOffset, 0);
-                    zt =
-                        new ZonalTransition( // before first transition in 1970
-                            getTransitionTime(current, 1970, shift) - 1,
-                            stdOffset,
-                            stdOffset,
-                            0);
-                    break;
-                }
-            }
+            zt = new ZonalTransition(
+                Moment.axis().getMinimum().getPosixTime(),
+                initial.getStandardOffset(),
+                initial.getStandardOffset(),
+                0
+            );
         } else {
             ZonalTransition first =
                 getNextTransition(initial.getPosixTime(), initial, sortedRules);

@@ -358,7 +358,8 @@ public class RulesLikeDhaka2009Test {
             is(SUMMER_2010));
     }
 
-     private static RuleBasedTransitionModel createModel() {
+    private static RuleBasedTransitionModel createModel() {
+
         DaylightSavingRule start =
             DaylightSavingRule.ofFixedDay(
                 Month.JUNE,
@@ -373,11 +374,12 @@ public class RulesLikeDhaka2009Test {
                 PlainTime.midnightAtEndOfDay(),
                 OffsetIndicator.WALL_TIME,
                 0);
+        
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
         rules.add(start);
         rules.add(end);
-
         return new RuleBasedTransitionModel(BDT, rules);
+
     }
 
 }
