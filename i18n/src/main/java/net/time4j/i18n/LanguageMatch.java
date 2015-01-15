@@ -33,7 +33,9 @@ enum LanguageMatch {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    no("nb"); // norsk bokmål
+    no("nb"), // norsk bokmål
+    in("id"), // indonesian (old code)
+    iw("he"); // hebrew (old code)
 
     static final LanguageMatch[] ALIASES = LanguageMatch.values();
 
