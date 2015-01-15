@@ -30,6 +30,15 @@ public class RulesOfEuropeanUnionTest {
 
     private static final RuleBasedTransitionModel MODEL = createModel();
 
+    private static final ZonalTransition AUTUMN_1995 =
+        new ZonalTransition(
+            PlainTimestamp.of(1995, 10, 1, 1, 0)
+                .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY))
+                .atUTC()
+                .getPosixTime(),
+            7200,
+            3600,
+            0);
     private static final ZonalTransition SPRING_1996 =
         new ZonalTransition(
             PlainTimestamp.of(1996, 3, 1, 1, 0)
@@ -99,29 +108,19 @@ public class RulesOfEuropeanUnionTest {
     }
 
     @Test
-    public void getTransitions1() {
-        ZonalTransition autumn1995 =
-            new ZonalTransition(
-                PlainTimestamp.of(1995, 10, 1, 1, 0)
-                    .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY))
-                    .atUTC()
-                    .getPosixTime(),
-                7200,
-                3600,
-                0);
-
+    public void getTransitionsAround1996() {
         Moment start =
             PlainTimestamp.of(1995, 10, 29, 1, 0, 0).atUTC();
         Moment end =
             PlainTimestamp.of(1997, 3, 30, 1, 0, 1).atUTC();
         List<ZonalTransition> transitions = MODEL.getTransitions(start, end);
         List<ZonalTransition> expected =
-            Arrays.asList(autumn1995,SPRING_1996, AUTUMN_1996, SPRING_1997);
+            Arrays.asList(AUTUMN_1995, SPRING_1996, AUTUMN_1996, SPRING_1997);
         assertThat(transitions, is(expected));
     }
 
     @Test
-    public void getTransitions2() {
+    public void getTransitionsOf1996Only() {
         Moment start =
             PlainTimestamp.of(1995, 10, 29, 1, 0, 1).atUTC();
         Moment end =
@@ -301,6 +300,26 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getStartTransition1() {
         Moment utc =
+            PlainDate.of(1996, 3, 31)
+                .atTime(1, 0)
+                .atUTC()
+                .minus(1, TimeUnit.SECONDS);
+        assertThat(
+            MODEL.getStartTransition(utc),
+            is(AUTUMN_1995));
+    }
+
+    @Test
+    public void getStartTransition2() {
+        Moment utc = PlainDate.of(1996, 3, 31).atTime(1, 0).atUTC();
+        assertThat(
+            MODEL.getStartTransition(utc),
+            is(SPRING_1996));
+    }
+
+    @Test
+    public void getStartTransition3() {
+        Moment utc =
             PlainDate.of(1996, 10, 27)
                 .atTime(1, 0)
                 .atUTC()
@@ -311,7 +330,7 @@ public class RulesOfEuropeanUnionTest {
     }
 
     @Test
-    public void getStartTransition2() {
+    public void getStartTransition4() {
         Moment utc = PlainDate.of(1996, 10, 27).atTime(1, 0).atUTC();
         assertThat(
             MODEL.getStartTransition(utc),
@@ -359,12 +378,6 @@ public class RulesOfEuropeanUnionTest {
     }
 
     private static RuleBasedTransitionModel createModel() {
-        ZonalTransition initial =
-            new ZonalTransition(
-                Long.MIN_VALUE, // in this test proleptic
-                3600,
-                3600,
-                0);
         DaylightSavingRule spring =
             DaylightSavingRule.ofLastWeekday(
                 Month.MARCH,
@@ -382,7 +395,10 @@ public class RulesOfEuropeanUnionTest {
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
         rules.add(autumn);
         rules.add(spring);
-        return new RuleBasedTransitionModel(initial, rules);
+
+        return new RuleBasedTransitionModel(
+            ZonalOffset.ofTotalSeconds(3600),
+            rules);
     }
 
 }

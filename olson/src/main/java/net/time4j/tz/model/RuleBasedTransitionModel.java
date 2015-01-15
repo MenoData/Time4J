@@ -93,31 +93,86 @@ final class RuleBasedTransitionModel
     //~ Konstruktoren -----------------------------------------------------
 
     RuleBasedTransitionModel(
+        ZonalOffset stdOffset,
+        List<DaylightSavingRule> rules
+    ) {
+        this(
+            new ZonalTransition(
+                Long.MIN_VALUE,
+                stdOffset.getIntegralAmount(),
+                stdOffset.getIntegralAmount(),
+                0),
+            rules
+        );
+
+    }
+
+    RuleBasedTransitionModel(
         ZonalTransition initial,
         List<DaylightSavingRule> rules
     ) {
         super();
 
         // various data sanity checks
-        if (initial == null) {
-            throw new NullPointerException("Missing initial offset.");
-        } else if (rules.size() < 2) {
+        if (rules.size() < 2) {
             throw new IllegalArgumentException(
                 "At least two daylight saving rules required: " + rules);
         }
 
-        List<DaylightSavingRule> tmp = new ArrayList<DaylightSavingRule>(rules);
-        Collections.sort(tmp, RULE_COMPARATOR);
+        List<DaylightSavingRule> sortedRules =
+            new ArrayList<DaylightSavingRule>(rules);
+        Collections.sort(sortedRules, RULE_COMPARATOR);
+        boolean hasRuleWithoutDST = false;
 
-        for (DaylightSavingRule rule : tmp) {
-            if (rule == null) {
-                throw new NullPointerException(
-                    "Missing daylight saving rule: " + rules);
+        for (DaylightSavingRule rule : sortedRules) {
+            if (rule.getSavings() == 0) {
+                hasRuleWithoutDST = true;
+                break;
             }
         }
 
-        this.initial = initial;
-        this.rules = Collections.unmodifiableList(tmp);
+        if (!hasRuleWithoutDST) {
+            throw new IllegalArgumentException(
+                "No daylight saving rule with zero dst-offset found: " + rules);
+        }
+
+        ZonalTransition zt = initial;
+
+        if (initial.getPosixTime() == Long.MIN_VALUE) {
+            if (initial.isDaylightSaving()) {
+                throw new IllegalArgumentException(
+                    "Initial transition must not have any dst-offset: "
+                    + initial);
+            }
+
+            for (int i = 0, n = sortedRules.size(); i < n; i++) {
+                DaylightSavingRule current = sortedRules.get(i);
+                DaylightSavingRule previous = sortedRules.get((i - 1 + n) % n);
+                int stdOffset = initial.getStandardOffset();
+
+                if (previous.getSavings() == 0) {
+                    int shift = getShift(current, stdOffset, 0);
+                    zt =
+                        new ZonalTransition( // before first transition in 1970
+                            getTransitionTime(current, 1970, shift) - 1,
+                            stdOffset,
+                            stdOffset,
+                            0);
+                    break;
+                }
+            }
+        } else {
+            ZonalTransition first =
+                getNextTransition(initial.getPosixTime(), initial, sortedRules);
+            if (initial.getTotalOffset() != first.getPreviousOffset()) {
+                throw new IllegalArgumentException(
+                    "Inconsistent model: " + initial + " / " + rules);
+            }
+        }
+
+        // state initialization
+        this.initial = zt;
+        this.rules = Collections.unmodifiableList(sortedRules);
 
         Moment end =
             SystemClock.inZonalView(ZonalOffset.UTC)
@@ -148,14 +203,18 @@ final class RuleBasedTransitionModel
         }
 
         ZonalTransition current = null;
+        int year = Integer.MIN_VALUE;
         int stdOffset = this.initial.getStandardOffset();
 
         for (int i = 0, n = this.rules.size(); i < n; i++) {
             DaylightSavingRule rule = this.rules.get(i);
             DaylightSavingRule previous = this.rules.get((i - 1 + n) % n);
-
             int shift = getShift(rule, stdOffset, previous.getSavings());
-            int year = getYear(ut.getPosixTime() + shift);
+
+            if (i == 0) {
+                year = getYear(ut.getPosixTime() + shift);
+            }
+
             long tt = getTransitionTime(rule, year, shift);
 
             if (ut.getPosixTime() < tt) {
@@ -191,35 +250,10 @@ final class RuleBasedTransitionModel
     @Override
     public ZonalTransition getNextTransition(UnixTime ut) {
 
-        long start = Math.max(ut.getPosixTime(), this.initial.getPosixTime());
-        int year = Integer.MIN_VALUE;
-        int stdOffset = this.initial.getStandardOffset();
-        ZonalTransition next = null;
-
-        for (int i = 0, n = this.rules.size(); next == null; i++) {
-            DaylightSavingRule rule = this.rules.get(i % n);
-            DaylightSavingRule previous = this.rules.get((i - 1 + n) % n);
-            int shift = getShift(rule, stdOffset, previous.getSavings());
-
-            if (i == 0) {
-                year = getYear(start + shift);
-            } else if ((i % n) == 0) {
-                year++;
-            }
-
-            long tt = getTransitionTime(rule, year, shift);
-
-            if (tt > start) {
-                next =
-                    new ZonalTransition(
-                        tt,
-                        stdOffset + previous.getSavings(),
-                        stdOffset + rule.getSavings(),
-                        rule.getSavings());
-            }
-        }
-
-        return next;
+        return getNextTransition(
+            ut.getPosixTime(),
+            this.initial,
+            this.rules);
 
     }
 
@@ -384,6 +418,44 @@ final class RuleBasedTransitionModel
         }
 
         return Collections.unmodifiableList(transitions);
+
+    }
+
+    private static ZonalTransition getNextTransition(
+        long ut,
+        ZonalTransition initial,
+        List<DaylightSavingRule> rules
+    ) {
+
+        long start = Math.max(ut, initial.getPosixTime());
+        int year = Integer.MIN_VALUE;
+        int stdOffset = initial.getStandardOffset();
+        ZonalTransition next = null;
+
+        for (int i = 0, n = rules.size(); next == null; i++) {
+            DaylightSavingRule rule = rules.get(i % n);
+            DaylightSavingRule previous = rules.get((i - 1 + n) % n);
+            int shift = getShift(rule, stdOffset, previous.getSavings());
+
+            if (i == 0) {
+                year = getYear(start + shift);
+            } else if ((i % n) == 0) {
+                year++;
+            }
+
+            long tt = getTransitionTime(rule, year, shift);
+
+            if (tt > start) {
+                next =
+                    new ZonalTransition(
+                        tt,
+                        stdOffset + previous.getSavings(),
+                        stdOffset + rule.getSavings(),
+                        rule.getSavings());
+            }
+        }
+
+        return next;
 
     }
 
