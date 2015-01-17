@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AdvancedElement.java) is part of project Time4J.
  *
@@ -28,6 +28,7 @@ package net.time4j.engine;
  *
  * @param   <V> generic type of element values
  * @author  Meno Hochschild
+ * @serial  exclude
  */
 /*[deutsch]
  * <p>Standardimplementierung eines chronologischen Elements mit verschiedenen
@@ -35,6 +36,7 @@ package net.time4j.engine;
  *
  * @param   <V> generic type of element values
  * @author  Meno Hochschild
+ * @serial  exclude
  */
 public abstract class AdvancedElement<V extends Comparable<V>>
     extends BasicElement<V> {

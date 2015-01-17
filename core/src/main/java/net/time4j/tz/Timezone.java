@@ -55,6 +55,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>Loads and keeps timezone data including the rules. </p>
  *
  * @author      Meno Hochschild
+ * @serial      exclude
  * @concurrency All static methods are thread-safe while this class is
  *              immutable as long as the underlying timezone data are.
  */
@@ -62,6 +63,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
  *
  * @author      Meno Hochschild
+ * @serial      exclude
  * @concurrency All static methods are thread-safe while this class is
  *              immutable as long as the underlying timezone data are.
  */

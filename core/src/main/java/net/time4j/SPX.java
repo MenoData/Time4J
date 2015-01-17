@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -117,6 +117,18 @@ final class SPX
     //~ Methoden ------------------------------------------------------
 
     /**
+     * <p>Implementation method of interface {@link Externalizable}. </p>
+     *
+     * <p>The first byte contains within the 4 most-significant bits the type
+     * of the object to be serialized. Then the data bytes follow in a
+     * bit-compressed representation. </p>
+     *
+     * @serialData  data layout see {@code writeReplace()}-method of object
+     *              to be serialized
+     * @param       out     output stream
+     * @throws      IOException
+     */
+    /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * <p>Das erste Byte enth&auml;lt um 4 Bits nach links verschoben den
@@ -161,6 +173,13 @@ final class SPX
     }
 
     /**
+     * <p>Implementation method of interface {@link Externalizable}. </p>
+     *
+     * @param   in      input stream
+     * @throws  IOException
+     * @throws  ClassNotFoundException
+     */
+    /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream

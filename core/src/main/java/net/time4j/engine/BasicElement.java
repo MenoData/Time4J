@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BasicElement.java) is part of project Time4J.
  *
@@ -46,6 +46,9 @@ public abstract class BasicElement<V>
     //~ Instanzvariablen --------------------------------------------------
 
     /**
+     * @serial  name of this element
+     */
+    /*[deutsch]
      * @serial  Elementname
      */
     private final String name;

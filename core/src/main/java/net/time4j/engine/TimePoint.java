@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimePoint.java) is part of project Time4J.
  *
@@ -104,6 +104,7 @@ import java.io.Serializable;
  * @param   <U> generic type of time units compatible to {@link ChronoUnit}
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
+ * @serial  exclude
  * @see     Chronology
  * @see     TimeAxis
  * @see     Temporal
@@ -198,6 +199,7 @@ import java.io.Serializable;
  * @param   <U> generic type of time units compatible to {@link ChronoUnit}
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
+ * @serial  exclude
  * @see     Chronology
  * @see     TimeAxis
  * @see     Temporal

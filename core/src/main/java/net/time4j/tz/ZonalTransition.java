@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalTransition.java) is part of project Time4J.
  *
@@ -93,20 +93,32 @@ public final class ZonalTransition
     /**
      * @serial  POSIX time in seconds since 1970-01-01T00:00:00Z
      */
+    /*[deutsch]
+     * @serial  POSIX-Zeit in Sekunden seit 1970-01-01T00:00:00Z
+     */
     private final long posix;
 
     /**
      * @serial  previous total shift in seconds
+     */
+    /*[deutsch]
+     * @serial  alte Gesamtverschiebung in Sekunden
      */
     private final int previous;
 
     /**
      * @serial  new total shift in seconds
      */
+    /*[deutsch]
+     * @serial  neue Gesamtverschiebung in Sekunden
+     */
     private final int total;
 
     /**
      * @serial  new daylight-saving-shift in seconds (DST)
+     */
+    /*[deutsch]
+     * @serial  neue DST-Verschiebung in Sekunden
      */
     private final int dst;
 

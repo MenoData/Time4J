@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlatformTimezone.java) is part of project Time4J.
  *
@@ -35,10 +35,19 @@ import java.util.Locale;
 
 
 /**
+ * <p>A timezone implementation which delegates to {@link java.util.TimeZone}
+ * and will therefore be available on every platform. </p>
+ *
+ * @author      Meno Hochschild
+ * @serial      include
+ * @concurrency <threadsafe>
+ */
+/*[deutsch]
  * <p>Eine Zeitzonenimplementierung, die an {@link java.util.TimeZone}
  * delegiert und daher auf allen Plattformen existieren sollte. </p>
  *
  * @author      Meno Hochschild
+ * @serial      include
  * @concurrency <threadsafe>
  */
 final class PlatformTimezone

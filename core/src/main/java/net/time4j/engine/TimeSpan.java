@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeSpan.java) is part of project Time4J.
  *
@@ -281,10 +281,16 @@ public interface TimeSpan<U> {
         /**
          * @serial  time unit
          */
+        /*[deutsch]
+         * @serial  Zeiteinheit
+         */
         private final U unit;
 
         /**
          * @serial  amount associated with a time unit {@code > 0}
+         */
+        /*[deutsch]
+         * @serial  mit der Zeiteinheit assoziierter Betrag {@code > 0}
          */
         private final long amount;
 
