@@ -351,6 +351,43 @@ final class RuleBasedTransitionModel
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof RuleBasedTransitionModel) {
+            RuleBasedTransitionModel that = (RuleBasedTransitionModel) obj;
+            return (
+                this.initial.equals(that.initial)
+                && this.rules.equals(that.rules));
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 17 * this.initial.hashCode() + 37 * this.rules.hashCode();
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(256);
+        sb.append(this.getClass().getName());
+        sb.append("[initial=");
+        sb.append(this.initial);
+        sb.append(",rules=");
+        sb.append(this.rules);
+        sb.append(']');
+        return sb.toString();
+
+    }
+
     private static List<ZonalTransition> getTransitions(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
