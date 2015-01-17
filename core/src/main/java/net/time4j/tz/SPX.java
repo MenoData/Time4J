@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -31,14 +31,19 @@ import java.io.StreamCorruptedException;
 
 
 /**
- * <p><i>Serialization Proxy</i> f&uuml;r eine zonale Verschiebung. </p>
+ * <p><i>Serialization Proxy</i> f&uuml;r eine zonale Verschiebung
+ * oder eine (historisierte) Zeitzone. </p>
  *
  * @author  Meno Hochschild
+ * @serial  include
  */
 final class SPX
     implements Externalizable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /** Serialisierungstyp von {@code HistorizedTimezone}. */
+    static final int HISTORIZED_TIMEZONE_TYPE = 14;
 
     /** Serialisierungstyp von {@code ZonalOffset}. */
     static final int ZONAL_OFFSET_TYPE = 15;
@@ -81,14 +86,26 @@ final class SPX
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Implementation method of interface {@link Externalizable}. </p>
+     *
+     * <p>The first byte contains within the 4 most-significant bits the type
+     * of the object to be serialized. Then the data bytes follow in a
+     * bit-compressed representation. </p>
+     *
+     * @serialData  data layout see {@code writeReplace()}-method of object
+     *              to be serialized
+     * @param       out     output stream
+     * @throws      IOException
+     */
+    /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * <p>Das erste Byte enth&auml;lt um 4 Bits nach links verschoben den
      * Typ des zu serialisierenden Objekts. Danach folgen die Daten-Bits
      * in einer bit-komprimierten Darstellung. </p>
      *
-     * @serialData  data layout description see method {@code writeReplace()}
-     *              of the class of given object to be serialized
+     * @serialData  data layout see {@code writeReplace()}-method of object
+     *              to be serialized
      * @param       out     output stream
      * @throws      IOException
      */
@@ -97,6 +114,9 @@ final class SPX
         throws IOException {
 
         switch (this.type) {
+            case HISTORIZED_TIMEZONE_TYPE:
+                this.writeZone(out);
+                break;
             case ZONAL_OFFSET_TYPE:
                 this.writeOffset(out);
                 break;
@@ -107,6 +127,13 @@ final class SPX
     }
 
     /**
+     * <p>Implementation method of interface {@link Externalizable}. </p>
+     *
+     * @param   in      input stream
+     * @throws  IOException
+     * @throws  ClassNotFoundException
+     */
+    /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
@@ -120,6 +147,9 @@ final class SPX
         byte header = in.readByte();
 
         switch (header >> 4) {
+            case HISTORIZED_TIMEZONE_TYPE:
+                this.obj = this.readZone(in, header);
+                break;
             case ZONAL_OFFSET_TYPE:
                 this.obj = this.readOffset(in, header);
                 break;
@@ -132,6 +162,45 @@ final class SPX
     private Object readResolve() throws ObjectStreamException {
 
         return this.obj;
+
+    }
+
+    private void writeZone(ObjectOutput out)
+        throws IOException {
+
+        HistorizedTimezone tz = (HistorizedTimezone) this.obj;
+        int header = (HISTORIZED_TIMEZONE_TYPE << 4);
+        boolean specialStrategy =
+            (tz.getStrategy() != Timezone.DEFAULT_CONFLICT_STRATEGY);
+
+        if (specialStrategy) {
+            header |= 1;
+        }
+
+        out.writeByte(header);
+        out.writeObject(tz.getID());
+        out.writeObject(tz.getHistory());
+
+        if (specialStrategy) {
+            out.writeObject(tz.getStrategy());
+        }
+
+    }
+
+    private Object readZone(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
+
+        TZID id = (TZID) in.readObject();
+        TransitionHistory history = (TransitionHistory) in.readObject();
+        TransitionStrategy strategy = Timezone.DEFAULT_CONFLICT_STRATEGY;
+
+        if ((header & 0x0F) == 1) {
+            strategy = (TransitionStrategy) in.readObject();
+        }
+
+        return new HistorizedTimezone(id, history, strategy);
 
     }
 
