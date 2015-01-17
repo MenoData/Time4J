@@ -38,6 +38,7 @@ import java.util.Locale;
  * dar. </p>
  *
  * @author      Meno Hochschild
+ * @serial      include
  * @concurrency <immutable>
  */
 final class SingleOffsetTimezone
