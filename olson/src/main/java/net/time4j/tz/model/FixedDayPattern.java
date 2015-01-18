@@ -27,7 +27,9 @@ import net.time4j.PlainTime;
 import net.time4j.base.GregorianMath;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
 
 
 /**
@@ -43,7 +45,7 @@ final class FixedDayPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1037688575822435302L;
+    private static final long serialVersionUID = -4251253428657027523L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -81,6 +83,38 @@ final class FixedDayPattern
     public PlainDate getDate(int year) {
 
         return PlainDate.of(year, this.month, this.dayOfMonth);
+
+    }
+
+    /**
+     * <p>Yields the month. </p>
+     *
+     * @return  Month
+     */
+    /*[deutsch]
+     * <p>Liefert den Monat. </p>
+     *
+     * @return  Month
+     */
+    public Month getMonth() {
+
+        return Month.valueOf(this.month);
+
+    }
+
+    /**
+     * <p>Yields the day of month. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
+     * <p>Liefert den Tag des Monats. </p>
+     *
+     * @return  int
+     */
+    public int getDayOfMonth() {
+
+        return this.dayOfMonth;
 
     }
 
@@ -129,13 +163,52 @@ final class FixedDayPattern
     }
 
     /**
-     * @serialData  Checks the consistency.
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  byte
+     */
+    byte getMonthByte() {
+
+        return this.month;
+
+    }
+
+    /**
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains in the five
+     *              most significant bits the type id {@code 20}. Then the
+     *              bytes for the month (1-12) and the day of month follow.
+     *              Finally the bytes for time of day (as {@code PlainTime}),
+     *              offset indicator symbol (as char) and the daylight saving
+     *              amount in seconds (as int) follow.
+     *
+     * Schematic algorithm:
+     *
+     * <pre>
+     *  int header = (20 << 3);
+     *
+     *  out.writeByte(header);
+     *  out.writeByte(getMonth().getValue());
+     *  out.writeByte(getDayOfMonth());
+     *  out.writeObject(getTimeOfDay());
+     *  out.writeChar(getIndicator().getSymbol());
+     *  out.writeInt(getSavings());
+     * </pre>
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, SPX.FIXED_DAY_PATTERN_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
 
-        in.defaultReadObject();
-        GregorianMath.checkDate(2000, this.month, this.dayOfMonth);
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

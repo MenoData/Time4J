@@ -111,7 +111,7 @@ public class DaylightSavingRule
      * @param   dayOfMonth  day of month (1 - 31)
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month
@@ -125,7 +125,7 @@ public class DaylightSavingRule
      * @param   dayOfMonth  day of month (1 - 31)
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month
@@ -151,7 +151,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   last day of week
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative
      * @since   2.2
@@ -164,7 +164,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   last day of week
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative
      * @since   2.2
@@ -193,7 +193,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   day of week when time switch happens
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month
@@ -211,7 +211,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   day of week when time switch happens
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month
@@ -239,7 +239,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   day of week when time switch happens
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month
@@ -254,7 +254,7 @@ public class DaylightSavingRule
      * @param   dayOfWeek   day of week when time switch happens
      * @param   timeOfDay   clock time when time switch happens
      * @param   indicator   offset indicator
-     * @param   offset      fixed DST-offset in seconds
+     * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
      * @throws  IllegalArgumentException if the last argument is negative or
      *          if the day of month is not valid in context of given month

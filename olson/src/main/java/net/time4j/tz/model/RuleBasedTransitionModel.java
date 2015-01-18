@@ -34,6 +34,9 @@ import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -74,6 +77,8 @@ final class RuleBasedTransitionModel
                 return result;
             }
         };
+
+    private static final long serialVersionUID = -8510991381885304060L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -388,6 +393,28 @@ final class RuleBasedTransitionModel
 
     }
 
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  ZonalTransition
+     */
+    ZonalTransition getInitialTransition() {
+
+        return this.initial;
+
+    }
+
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  list of rules
+     */
+    List<DaylightSavingRule> getRules() {
+
+        return this.rules;
+
+    }
+
     private static List<ZonalTransition> getTransitions(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
@@ -606,11 +633,41 @@ final class RuleBasedTransitionModel
     }
 
     /**
-     * @serialData  Checks the consistency.
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains in the five
+     *              most significant bits the type id {@code 25}. Then the
+     *              data bytes for the initial transition before this model
+     *              and the list of daylight saving rules follow.
+     *
+     * Schematic algorithm:
+     *
+     * <pre>
+     *  int header = (25 << 3);
+     *  ZonalTransition initial;
+     *  List&lt;DaylightSavingRule&gt; rules;
+     *
+     *  out.writeByte(header);
+     *  out.writeLong(initial.getPosixTime());
+     *  out.writeInt(initial.getPreviousOffset());
+     *  out.writeInt(initial.getTotalOffset());
+     *  out.writeInt(initial.getDaylightSavingOffset());
+     *  out.writeObject(rules);
+     * </pre>
      */
-    private Object readResolve() throws ObjectStreamException {
+    private Object writeReplace() throws ObjectStreamException {
 
-        return new RuleBasedTransitionModel(this.initial, this.rules);
+        return new SPX(this, SPX.RULE_BASED_TRANSITION_MODEL_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

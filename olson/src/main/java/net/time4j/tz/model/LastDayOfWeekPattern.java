@@ -30,6 +30,7 @@ import net.time4j.base.GregorianMath;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
 
 
 /**
@@ -45,7 +46,7 @@ final class LastDayOfWeekPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID =  -4579005438158793324L;
+    private static final long serialVersionUID = 2763354079574837058L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -89,6 +90,38 @@ final class LastDayOfWeekPattern
         }
 
         return PlainDate.of(year, this.month, lastDay - delta);
+
+    }
+
+    /**
+     * <p>Yields the month. </p>
+     *
+     * @return  Month
+     */
+    /*[deutsch]
+     * <p>Liefert den Monat. </p>
+     *
+     * @return  Month
+     */
+    public Month getMonth() {
+
+        return Month.valueOf(this.month);
+
+    }
+
+    /**
+     * <p>Yields the day of week. </p>
+     *
+     * @return  Weekday
+     */
+    /*[deutsch]
+     * <p>Liefert den Wochentag. </p>
+     *
+     * @return  Weekday
+     */
+    public Weekday getDayOfWeek() {
+
+        return Weekday.valueOf(this.dayOfWeek);
 
     }
 
@@ -137,21 +170,64 @@ final class LastDayOfWeekPattern
     }
 
     /**
-     * @serialData  Checks the consistency.
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  byte
+     */
+    byte getMonthByte() {
+
+        return this.month;
+
+    }
+
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  byte
+     */
+    byte getDayOfWeekByte() {
+
+        return this.dayOfWeek;
+
+    }
+
+    /**
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains in the five
+     *              most significant bits the type id {@code 22}. Then the
+     *              byte for the month (1-12) follows. After this the byte
+     *              for the day of the week follows (Mo=1, Tu=2, ..., Su=7).
+     *              Finally the bytes for time of day (as {@code PlainTime}),
+     *              offset indicator symbol (as char) and the daylight saving
+     *              amount in seconds (as int) follow.
+     *
+     * Schematic algorithm:
+     *
+     * <pre>
+     *  int header = (22 << 3);
+     *
+     *  out.writeByte(header);
+     *  out.writeByte(getMonth().getValue());
+     *  out.writeByte(getDayOfWeek().getValue());
+     *  out.writeObject(getTimeOfDay());
+     *  out.writeChar(getIndicator().getSymbol());
+     *  out.writeInt(getSavings());
+     * </pre>
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, SPX.LAST_DAY_OF_WEEK_PATTERN_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
 
-        in.defaultReadObject();
-
-        int m = this.month;
-        int dow = this.dayOfWeek;
-
-        if ((m < 1) || (m > 12)) {
-            throw new InvalidObjectException("Month out of range: " + m);
-        } else if ((dow < 1) || (dow > 7)) {
-            throw new InvalidObjectException("Weekday out of range: " + dow);
-        }
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

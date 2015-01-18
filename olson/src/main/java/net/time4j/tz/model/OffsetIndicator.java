@@ -51,7 +51,12 @@ public enum OffsetIndicator {
     /*[deutsch]
      * Referenz zum UTC-Offset.
      */
-    UTC_TIME,
+    UTC_TIME() {
+        @Override
+        public char getSymbol() {
+            return 'u';
+        }
+    },
 
     /**
      * Local standard time (UTC + standard-offset).
@@ -59,7 +64,12 @@ public enum OffsetIndicator {
     /*[deutsch]
      * Lokale Standardzeit (= UTC + Standard-Offset).
      */
-    STANDARD_TIME,
+    STANDARD_TIME() {
+        @Override
+        public char getSymbol() {
+            return 's';
+        }
+    },
 
     /**
      * Local time (UTC + standard-offset + dst-offset).
@@ -67,7 +77,12 @@ public enum OffsetIndicator {
     /*[deutsch]
      * Lokale Zeit (= UTC + Standard-Offset + DST-Offset).
      */
-    WALL_TIME;
+    WALL_TIME() {
+        @Override
+        public char getSymbol() {
+            return 'w';
+        }
+    };
 
     //~ Methoden ----------------------------------------------------------
 
@@ -85,6 +100,7 @@ public enum OffsetIndicator {
      * @param   symbol  symbol letter to be parsed as found in TZDB-data
      * @return  offset indicator
      * @since   2.2
+     * @throws  IllegalArgumentException if the letter is not supported
      */
     /*[deutsch]
      * <p>Interpretiert das angegebene Symbol als Indikator. </p>
@@ -100,6 +116,7 @@ public enum OffsetIndicator {
      * @param   symbol  symbol letter to be parsed as found in TZDB-data
      * @return  offset indicator
      * @since   2.2
+     * @throws  IllegalArgumentException if the letter is not supported
      */
     public static OffsetIndicator parseSymbol(char symbol) {
 
@@ -116,6 +133,23 @@ public enum OffsetIndicator {
                 throw new IllegalArgumentException(
                     "Unknown offset indicator: " + symbol);
         }
+
+    }
+
+    /**
+     * <p>Yields the symbol for this indicator as used in tzdb-repository. </p>
+     *
+     * @return  char (&quot;u&quot;, &quot;s&quot; or &quot;w&quot;)
+     */
+    /*[deutsch]
+     * <p>Liefert das Symbol dieses Indikators wie im TZDB-Repositorium
+     * benutzt. </p>
+     *
+     * @return  char (&quot;u&quot;, &quot;s&quot; or &quot;w&quot;)
+     */
+    public char getSymbol() {
+
+        throw new AbstractMethodError();
 
     }
 
