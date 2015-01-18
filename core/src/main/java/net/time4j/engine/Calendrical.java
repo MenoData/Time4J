@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Calendrical.java) is part of project Time4J.
  *
@@ -29,6 +29,7 @@ package net.time4j.engine;
  * @param   <U> generic type of time unit compatible to {@link ChronoUnit})
  * @param   <D> generic type of self reference
  * @author  Meno Hochschild
+ * @serial  exclude
  */
 /*[deutsch]
  * <p>Abstrakte Basisklasse aller reinen Datumstypen, die &uuml;ber ihre
@@ -37,6 +38,7 @@ package net.time4j.engine;
  * @param   <U> generic type of time unit compatible to {@link ChronoUnit})
  * @param   <D> generic type of self reference
  * @author  Meno Hochschild
+ * @serial  exclude
  */
 public abstract class Calendrical<U, D extends Calendrical<U, D>>
     extends TimePoint<U, D>

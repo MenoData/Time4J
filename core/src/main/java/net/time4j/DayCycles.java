@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayCycles.java) is part of project Time4J.
  *
@@ -51,10 +51,16 @@ public final class DayCycles implements Serializable {
     /**
      * @serial  day overflow
      */
+    /*[deutsch]
+     * @serial  &Uuml;berlauf in Tagen
+     */
     private final long days;
 
     /**
      * @serial  wall time
+     */
+    /*[deutsch]
+     * @serial  Uhrzeit
      */
     private final PlainTime time;
 

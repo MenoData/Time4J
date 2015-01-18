@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistorizedTimezone.java) is part of project Time4J.
  *
@@ -28,6 +28,7 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
 import java.util.List;
 
 
@@ -35,6 +36,7 @@ import java.util.List;
  * <p>Provider-abh&auml;ngige Implementierung einer Zeitzone. </p>
  *
  * @author      Meno Hochschild
+ * @serial      include
  * @concurrency <immutable>
  */
 final class HistorizedTimezone
@@ -46,20 +48,9 @@ final class HistorizedTimezone
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  timezone id
-     */
-    private final TZID id;
-
-    /**
-     * @serial  offset transition model
-     */
-    private final TransitionHistory history;
-
-    /**
-     * @serial  transition strategy
-     */
-    private final TransitionStrategy strategy;
+    private transient final TZID id;
+    private transient final TransitionHistory history;
+    private transient final TransitionStrategy strategy;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -241,21 +232,48 @@ final class HistorizedTimezone
     }
 
     /**
-     * @serialData  Checks the consistency.
-     * @throws      InvalidObjectException in case of inconsistencies
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains in the four
+     *              most significant bits the type id {@code 14}. If there is
+     *              a non-default transition strategy then the lowest bit is
+     *              set to {@code 1} else to {@code 0}. After that the data bits
+     *              for the id, history and optionally the special strategy
+     *              follow.
+     *
+     * Schematic algorithm:
+     *
+     * <pre>
+     *  boolean specialStrategy =
+            (getStrategy() != Timezone.DEFAULT_CONFLICT_STRATEGY);
+     *  int header = (14 << 4);
+     *
+     *  if (specialStrategy) {
+     *      header |= 1;
+     *  }
+     *
+     *  out.writeByte(header);
+     *  out.writeObject(tz.getID());
+     *  out.writeObject(tz.getHistory());
+     *
+     *  if (specialStrategy) {
+     *      out.writeObject(tz.getStrategy());
+     *  }
+     * </pre>
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, SPX.HISTORIZED_TIMEZONE_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
 
-        in.defaultReadObject();
-
-        if (this.id == null) {
-            throw new InvalidObjectException("Missing id.");
-        } else if (this.history == null) {
-            throw new InvalidObjectException("Missing history.");
-        } else if (this.strategy == null) {
-            throw new InvalidObjectException("Missing strategy.");
-        }
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

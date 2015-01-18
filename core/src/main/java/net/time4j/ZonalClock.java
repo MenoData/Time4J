@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalClock.java) is part of project Time4J.
  *
@@ -35,6 +35,7 @@ import net.time4j.tz.Timezone;
  * of time source and time zone are. </p>
  *
  * @author  Meno Hochschild
+ * @see     SystemClock#inLocalView()
  * @see     SystemClock#inZonalView(TZID)
  */
 /*[deutsch]
@@ -45,9 +46,19 @@ import net.time4j.tz.Timezone;
  * es sind. </p>
  *
  * @author  Meno Hochschild
+ * @see     SystemClock#inLocalView()
  * @see     SystemClock#inZonalView(TZID)
  */
 public final class ZonalClock {
+    // --------------------
+    // Implementation note:
+    // --------------------
+    // This class does not implement the interface TimeSource intentionally
+    // because it is really designed for querying "zonal" times but not for
+    // being injected into any test class or business object. Otherwise
+    // zonal dependencies could be obfuscated from a user-perspective.
+    // Instead users are strongly encouraged to use expressions like
+    // SystemClock#inZonalView(TZID).
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -64,6 +75,10 @@ public final class ZonalClock {
      * <p>Constructs a new clock which can yield the current local time in
      * given timezone. </p>
      *
+     * <p>Most users have no need to directly call this constructor. It is
+     * mainly designed for being called by dedicated expressions like
+     * {@code SystemClock.inZonalView(tzid)} etc. </p>
+     *
      * @param   timeSource  source for current world time (UTC)
      * @param   tzid        timezone id
      * @throws  IllegalArgumentException if given timezone cannot be loaded
@@ -71,6 +86,10 @@ public final class ZonalClock {
     /*[deutsch]
      * <p>Konstruiert eine neue Uhr, die die aktuelle Zeit in einer Zeitzone
      * ermitteln kann. </p>
+     *
+     * <p>Die meisten Anwender brauchen diesen Konstruktor nicht. Er ist
+     * im wesentlichen f&uuml;r den Aufruf durch spezielle Ausdr&uuml;cke
+     * wie {@code SystemClock.inZonalView(tzid)} etc. gedacht. </p>
      *
      * @param   timeSource  source for current world time (UTC)
      * @param   tzid        timezone id
@@ -95,6 +114,10 @@ public final class ZonalClock {
     /**
      * <p>Constructs a new clock which can yield the current local time in
      * given timezone. </p>
+     * 
+     * <p>Most users have no need to directly call this constructor. It is
+     * mainly designed for being called by dedicated expressions like
+     * {@code SystemClock.inZonalView(tzid)} etc. </p>
      *
      * @param   timeSource  source for current world time (UTC)
      * @param   tzid        timezone id
@@ -103,6 +126,10 @@ public final class ZonalClock {
     /*[deutsch]
      * <p>Konstruiert eine neue Uhr, die die aktuelle Zeit in einer Zeitzone
      * ermitteln kann. </p>
+     *
+     * <p>Die meisten Anwender brauchen diesen Konstruktor nicht. Er ist
+     * im wesentlichen f&uuml;r den Aufruf durch spezielle Ausdr&uuml;cke
+     * wie {@code SystemClock.inZonalView(tzid)} etc. gedacht. </p>
      *
      * @param   timeSource  source for current world time (UTC)
      * @param   tzid        timezone id

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Boundary.java) is part of project Time4J.
  *
@@ -67,9 +67,9 @@ public final class Boundary<T extends Temporal<? super T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final int mode;
-    private final IntervalEdge edge;
-    private final T temporal;
+    private transient final int mode;
+    private transient final IntervalEdge edge;
+    private transient final T temporal;
 
     //~ Konstruktoren -----------------------------------------------------
 
