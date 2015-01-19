@@ -86,38 +86,6 @@ final class FixedDayPattern
 
     }
 
-    /**
-     * <p>Yields the month. </p>
-     *
-     * @return  Month
-     */
-    /*[deutsch]
-     * <p>Liefert den Monat. </p>
-     *
-     * @return  Month
-     */
-    public Month getMonth() {
-
-        return Month.valueOf(this.month);
-
-    }
-
-    /**
-     * <p>Yields the day of month. </p>
-     *
-     * @return  int
-     */
-    /*[deutsch]
-     * <p>Liefert den Tag des Monats. </p>
-     *
-     * @return  int
-     */
-    public int getDayOfMonth() {
-
-        return this.dayOfMonth;
-
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -167,9 +135,20 @@ final class FixedDayPattern
      *
      * @return  byte
      */
-    byte getMonthByte() {
+    byte getMonth() {
 
         return this.month;
+
+    }
+
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  int
+     */
+    int getDayOfMonth() {
+
+        return this.dayOfMonth;
 
     }
 
@@ -188,7 +167,7 @@ final class FixedDayPattern
      *  int header = (20 << 3);
      *
      *  out.writeByte(header);
-     *  out.writeByte(getMonth().getValue());
+     *  out.writeByte(getMonth());
      *  out.writeByte(getDayOfMonth());
      *  out.writeObject(getTimeOfDay());
      *  out.writeChar(getIndicator().getSymbol());

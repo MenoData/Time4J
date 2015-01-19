@@ -107,14 +107,16 @@ final class RuleBasedTransitionModel
                 stdOffset.getIntegralAmount(),
                 stdOffset.getIntegralAmount(),
                 0),
-            rules
+            rules,
+            true
         );
 
     }
 
     RuleBasedTransitionModel(
         ZonalTransition initial,
-        List<DaylightSavingRule> rules
+        List<DaylightSavingRule> rules,
+        boolean create
     ) {
         super();
 
@@ -122,10 +124,17 @@ final class RuleBasedTransitionModel
         if (rules.size() < 2) {
             throw new IllegalArgumentException(
                 "At least two daylight saving rules required: " + rules);
+        } else if (rules.size() >= 128) {
+            throw new IllegalArgumentException(
+                "Too many daylight saving rules: " + rules);
         }
 
-        List<DaylightSavingRule> sortedRules =
-            new ArrayList<DaylightSavingRule>(rules);
+        List<DaylightSavingRule> sortedRules = rules;
+
+        if (create) {
+            rules = new ArrayList<DaylightSavingRule>(rules);
+        }
+
         Collections.sort(sortedRules, RULE_COMPARATOR);
         boolean hasRuleWithoutDST = false;
 

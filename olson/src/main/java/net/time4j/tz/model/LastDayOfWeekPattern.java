@@ -93,38 +93,6 @@ final class LastDayOfWeekPattern
 
     }
 
-    /**
-     * <p>Yields the month. </p>
-     *
-     * @return  Month
-     */
-    /*[deutsch]
-     * <p>Liefert den Monat. </p>
-     *
-     * @return  Month
-     */
-    public Month getMonth() {
-
-        return Month.valueOf(this.month);
-
-    }
-
-    /**
-     * <p>Yields the day of week. </p>
-     *
-     * @return  Weekday
-     */
-    /*[deutsch]
-     * <p>Liefert den Wochentag. </p>
-     *
-     * @return  Weekday
-     */
-    public Weekday getDayOfWeek() {
-
-        return Weekday.valueOf(this.dayOfWeek);
-
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -174,7 +142,7 @@ final class LastDayOfWeekPattern
      *
      * @return  byte
      */
-    byte getMonthByte() {
+    byte getMonth() {
 
         return this.month;
 
@@ -185,7 +153,7 @@ final class LastDayOfWeekPattern
      *
      * @return  byte
      */
-    byte getDayOfWeekByte() {
+    byte getDayOfWeek() {
 
         return this.dayOfWeek;
 
@@ -207,8 +175,8 @@ final class LastDayOfWeekPattern
      *  int header = (22 << 3);
      *
      *  out.writeByte(header);
-     *  out.writeByte(getMonth().getValue());
-     *  out.writeByte(getDayOfWeek().getValue());
+     *  out.writeByte(getMonth());
+     *  out.writeByte(getDayOfWeek());
      *  out.writeObject(getTimeOfDay());
      *  out.writeChar(getIndicator().getSymbol());
      *  out.writeInt(getSavings());

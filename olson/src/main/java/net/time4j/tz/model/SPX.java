@@ -33,6 +33,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -163,7 +164,7 @@ final class SPX
 
         byte header = in.readByte();
 
-        switch (header >> 3) {
+        switch ((header & 0xFF) >> 3) {
             case FIXED_DAY_PATTERN_TYPE:
                 this.obj = this.readFixedDayPattern(in);
                 break;
@@ -171,10 +172,10 @@ final class SPX
                 this.obj = this.readDayOfWeekInMonthPattern(in);
                 break;
             case LAST_DAY_OF_WEEK_PATTERN_TYPE:
-                this.readLastDayOfWeekPattern(in);
+                this.obj = this.readLastDayOfWeekPattern(in);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
-                this.readRuleBasedTransitionModel(in);
+                this.obj = this.readRuleBasedTransitionModel(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -205,7 +206,7 @@ final class SPX
         int header = (FIXED_DAY_PATTERN_TYPE << 3);
 
         out.writeByte(header);
-        out.writeByte(rule.getMonthByte());
+        out.writeByte(rule.getMonth());
         out.writeByte(rule.getDayOfMonth());
         writeDaylightSavingRule(out, rule);
 
@@ -236,10 +237,10 @@ final class SPX
         int header = (DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE << 3);
 
         out.writeByte(header);
-        out.writeByte(rule.getMonthByte());
+        out.writeByte(rule.getMonth());
         out.writeByte(rule.getDayOfMonth());
 
-        int dow = rule.getDayOfWeekByte();
+        int dow = rule.getDayOfWeek();
 
         if (rule.isAfter()) {
             dow = -dow;
@@ -280,8 +281,8 @@ final class SPX
         int header = (LAST_DAY_OF_WEEK_PATTERN_TYPE << 3);
 
         out.writeByte(header);
-        out.writeByte(rule.getMonthByte());
-        out.writeByte(rule.getDayOfWeekByte());
+        out.writeByte(rule.getMonth());
+        out.writeByte(rule.getDayOfWeek());
         writeDaylightSavingRule(out, rule);
 
     }
@@ -316,20 +317,31 @@ final class SPX
         out.writeInt(initial.getPreviousOffset());
         out.writeInt(initial.getTotalOffset());
         out.writeInt(initial.getDaylightSavingOffset());
-        out.writeObject(model.getRules());
+
+        List<DaylightSavingRule> rules = model.getRules();
+        out.writeByte(rules.size());
+
+        for (DaylightSavingRule rule : rules) {
+            out.writeObject(rule);
+        }
 
     }
 
-    @SuppressWarnings("unchecked")
     private Object readRuleBasedTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         ZonalTransition initial =
             new ZonalTransition(
                 in.readLong(), in.readInt(), in.readInt(), in.readInt());
-        List<DaylightSavingRule> rules =
-            (List<DaylightSavingRule>) in.readObject();
-        return new RuleBasedTransitionModel(initial, rules);
+        int n = in.readByte();
+        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
+
+        for (int i = 0; i < n; i++) {
+            DaylightSavingRule rule = (DaylightSavingRule) in.readObject();
+            rules.add(rule);
+        }
+
+        return new RuleBasedTransitionModel(initial, rules, false);
 
     }
 

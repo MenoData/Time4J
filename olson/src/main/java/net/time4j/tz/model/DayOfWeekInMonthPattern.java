@@ -121,72 +121,6 @@ final class DayOfWeekInMonthPattern
 
     }
 
-    /**
-     * <p>Yields the month. </p>
-     *
-     * @return  Month
-     */
-    /*[deutsch]
-     * <p>Liefert den Monat. </p>
-     *
-     * @return  Month
-     */
-    public Month getMonth() {
-
-        return Month.valueOf(this.month);
-
-    }
-
-    /**
-     * <p>Yields the day of month. </p>
-     *
-     * @return  int
-     */
-    /*[deutsch]
-     * <p>Liefert den Tag des Monats. </p>
-     *
-     * @return  int
-     */
-    public int getDayOfMonth() {
-
-        return this.dayOfMonth;
-
-    }
-
-    /**
-     * <p>Yields the day of week. </p>
-     *
-     * @return  Weekday
-     */
-    /*[deutsch]
-     * <p>Liefert den Wochentag. </p>
-     *
-     * @return  Weekday
-     */
-    public Weekday getDayOfWeek() {
-
-        return Weekday.valueOf(this.dayOfWeek);
-
-    }
-
-    /**
-     * <p>Indicates if the day of week is searched after a given day of
-     * month. </p>
-     *
-     * @return  boolean
-     */
-    /*[deutsch]
-     * <p>Zeigt an, ob der Wochentag nach einem gegebenen Monatstag gesucht
-     * wird. </p>
-     *
-     * @return  boolean
-     */
-    public boolean isAfter() {
-
-        return this.after;
-
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -244,21 +178,42 @@ final class DayOfWeekInMonthPattern
      *
      * @return  byte
      */
-    byte getMonthByte() {
+    byte getMonth() {
 
         return this.month;
 
     }
 
     /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  int
+     */
+    int getDayOfMonth() {
+
+        return this.dayOfMonth;
+
+    }
+
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
      * @return  byte
      */
-    byte getDayOfWeekByte() {
+    byte getDayOfWeek() {
 
         return this.dayOfWeek;
+
+    }
+
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  boolean
+     */
+    boolean isAfter() {
+
+        return this.after;
 
     }
 
@@ -280,9 +235,9 @@ final class DayOfWeekInMonthPattern
      *  int header = (21 << 3);
      *
      *  out.writeByte(header);
-     *  out.writeByte(getMonth().getValue());
+     *  out.writeByte(getMonth());
      *  out.writeByte(getDayOfMonth());
-     *  int dow = getDayOfWeek().getValue();
+     *  int dow = getDayOfWeek();
      *  if (isAfter()) {
      *      dow = -dow;
      *  }
