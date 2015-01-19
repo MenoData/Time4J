@@ -153,6 +153,15 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfMachineTime()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(
+            MachineTime.ofPosixSeconds(123.5),
+            MachineTime.ofSIUnits(123, 987654321));
+    }
+
+    @Test
     public void sizeOfDuration()
         throws IOException, ClassNotFoundException {
 
