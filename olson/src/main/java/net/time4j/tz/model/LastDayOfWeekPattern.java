@@ -50,15 +50,8 @@ final class LastDayOfWeekPattern
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  month of time switch
-     */
-    private final byte month;
-
-    /**
-     * @serial  last day of week in month
-     */
-    private final byte dayOfWeek;
+    private transient final byte month;
+    private transient final byte dayOfWeek;
 
     //~ Konstruktoren -----------------------------------------------------
 

@@ -82,15 +82,8 @@ final class RuleBasedTransitionModel
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  contains the initial offset before any rule is applied
-     */
-    private final ZonalTransition initial;
-
-    /**
-     * @serial  list of daylight saving rules
-     */
-    private final List<DaylightSavingRule> rules;
+    private transient final ZonalTransition initial;
+    private transient final List<DaylightSavingRule> rules;
 
     // Cache
     private transient final List<ZonalTransition> stdTransitions;
@@ -660,7 +653,10 @@ final class RuleBasedTransitionModel
      *  out.writeInt(initial.getPreviousOffset());
      *  out.writeInt(initial.getTotalOffset());
      *  out.writeInt(initial.getDaylightSavingOffset());
-     *  out.writeObject(rules);
+     *  out.writeByte(rules.size());
+     *  for (int i = 0; i &lt; n; i++) {
+     *      out.writeObject(rules.get(i));
+     *  }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {

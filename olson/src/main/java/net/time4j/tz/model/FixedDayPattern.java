@@ -49,15 +49,8 @@ final class FixedDayPattern
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  month of time switch (1-12)
-     */
-    private final byte month;
-
-    /**
-     * @serial  day of month when the time switch happens
-     */
-    private final byte dayOfMonth;
+    private transient final byte month;
+    private transient final byte dayOfMonth;
 
     //~ Konstruktoren -----------------------------------------------------
 

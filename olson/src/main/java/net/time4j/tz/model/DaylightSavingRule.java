@@ -27,8 +27,6 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 
 
@@ -44,6 +42,7 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
+ * @serial  exclude
  * @concurrency <immutable>
  */
 /*[deutsch]
@@ -59,6 +58,7 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
+ * @serial  exclude
  * @concurrency <immutable>
  */
 public class DaylightSavingRule
@@ -70,20 +70,9 @@ public class DaylightSavingRule
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  clock time of time switch in second precision
-     */
-    private final PlainTime timeOfDay;
-
-    /**
-     * @serial  offset indicator
-     */
-    private final OffsetIndicator indicator;
-
-    /**
-     * @serial  DST-offset in seconds
-     */
-    private final int savings;
+    private transient final PlainTime timeOfDay;
+    private transient final OffsetIndicator indicator;
+    private transient final int savings;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -393,17 +382,6 @@ public class DaylightSavingRule
             throw new IllegalArgumentException(
                 "Negative daylight saving offset: " + savings);
         }
-
-    }
-
-    /**
-     * @serialData  Checks the consistency.
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-
-        in.defaultReadObject();
-        check(this.timeOfDay, this.indicator, this.savings);
 
     }
 

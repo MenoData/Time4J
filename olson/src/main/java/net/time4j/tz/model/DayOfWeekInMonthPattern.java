@@ -51,26 +51,10 @@ final class DayOfWeekInMonthPattern
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial  month
-     */
-    private final byte month;
-
-    /**
-     * @serial  day of month
-     */
-    private final byte dayOfMonth;
-
-    /**
-     * @serial  day of week
-     */
-    private final byte dayOfWeek;
-
-    /**
-     * @serial  determines if the day of week will be searched after the
-     *          day of month
-     */
-    private final boolean after;
+    private transient final byte month;
+    private transient final byte dayOfMonth;
+    private transient final byte dayOfWeek;
+    private transient final boolean after;
 
     //~ Konstruktoren -----------------------------------------------------
 
