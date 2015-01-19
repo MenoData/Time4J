@@ -60,6 +60,9 @@ final class SPX
     /** Serialisierungstyp von {@code RuleBasedTransitionModel}. */
     static final int RULE_BASED_TRANSITION_MODEL_TYPE = 25;
 
+    /** Serialisierungstyp von {@code ArrayTransitionModel}. */
+    static final int ARRAY_TRANSITION_MODEL_TYPE = 26;
+
 //    private static final long serialVersionUID = -1000776907354520172L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -138,6 +141,9 @@ final class SPX
             case RULE_BASED_TRANSITION_MODEL_TYPE:
                 this.writeRuleBasedTransitionModel(out);
                 break;
+            case ARRAY_TRANSITION_MODEL_TYPE:
+                this.writeArrayTransitionModel(out);
+                break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
         }
@@ -176,6 +182,9 @@ final class SPX
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
                 this.obj = this.readRuleBasedTransitionModel(in);
+                break;
+            case ARRAY_TRANSITION_MODEL_TYPE:
+                this.obj = this.readArrayTransitionModel(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -342,6 +351,47 @@ final class SPX
         }
 
         return new RuleBasedTransitionModel(initial, rules, false);
+
+    }
+
+    private void writeArrayTransitionModel(ObjectOutput out)
+        throws IOException {
+
+        ArrayTransitionModel model = (ArrayTransitionModel) this.obj;
+        int header = (ARRAY_TRANSITION_MODEL_TYPE << 3);
+        out.writeByte(header);
+
+        ZonalTransition[] transitions = model.getTransitions();
+        int initial = transitions[0].getPreviousOffset();
+        out.writeInt(initial);
+        out.writeInt(transitions.length);
+
+        for (ZonalTransition transition : transitions) {
+            out.writeLong(transition.getPosixTime());
+            out.writeInt(transition.getTotalOffset());
+            out.writeInt(transition.getDaylightSavingOffset());
+        }
+
+    }
+
+    private Object readArrayTransitionModel(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int previous = in.readInt();
+        int n = in.readByte();
+        List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
+
+        for (int i = 0; i < n; i++) {
+            long posix = in.readLong();
+            int total = in.readInt();
+            int dst = in.readInt();
+            ZonalTransition transition =
+                new ZonalTransition(posix, previous, total, dst);
+            previous = total;
+            transitions.add(transition);
+        }
+
+        return new ArrayTransitionModel(transitions);
 
     }
 
