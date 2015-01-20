@@ -131,7 +131,8 @@ public final class ZonalTransition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
      * @param   daylightSavingOffset    DST-shift in seconds
-     * @throws  IllegalArgumentException if the DST-shift is negative
+     * @throws  IllegalArgumentException if the DST-shift is negative or if any
+     *          offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
      */
@@ -143,7 +144,8 @@ public final class ZonalTransition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
      * @param   daylightSavingOffset    DST-shift in seconds
-     * @throws  IllegalArgumentException if the DST-shift is negative
+     * @throws  IllegalArgumentException if the DST-shift is negative or if any
+     *          offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
      */
@@ -159,6 +161,8 @@ public final class ZonalTransition
         this.total = totalOffset;
         this.dst = daylightSavingOffset;
 
+        checkRange(previousOffset);
+        checkRange(totalOffset);
         checkDST(daylightSavingOffset);
 
     }
@@ -482,10 +486,21 @@ public final class ZonalTransition
 
     }
 
+    private static void checkRange(int offset) {
+
+        if ((offset < -18 * 3600) || (offset > 18 * 3600)) {
+            throw new IllegalArgumentException(
+                "Offset out of range: " + offset);
+        }
+
+    }
+
     private static void checkDST(int dst) {
 
         if (dst < 0) {
             throw new IllegalArgumentException("Negative DST: " + dst);
+        } else if (dst > 18 * 3600) {
+            throw new IllegalArgumentException("DST out of range: " + dst);
         }
 
     }
@@ -497,6 +512,8 @@ public final class ZonalTransition
         throws IOException, ClassNotFoundException {
 
         in.defaultReadObject();
+        checkRange(this.previous);
+        checkRange(this.total);
         checkDST(this.dst);
 
     }
