@@ -147,13 +147,13 @@ public class SerializationTest {
         ZonalTransition second =
             new ZonalTransition(365 * 86400L, 7200, 3600, 3600);
         ZonalTransition third =
-            new ZonalTransition(2 * 365 * 86400L, 3600, -23 * 3600, 0);
+            new ZonalTransition(2 * 365 * 86400L, 3600, -14 * 3600, 0);
         ZonalTransition fourth =
             new ZonalTransition(
                 SystemClock.INSTANCE.currentTime().getPosixTime()
                     + 2 *365 * 86400L,
-                -23 * 3600,
-                -23 * 3600 + 3600,
+                -14 * 3600,
+                -14 * 3600 + 3600,
                 3600);
         return new ArrayTransitionModel(
             Arrays.asList(fourth, first, third, second));

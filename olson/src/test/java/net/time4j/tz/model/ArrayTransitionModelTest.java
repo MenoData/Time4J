@@ -1,5 +1,7 @@
 package net.time4j.tz.model;
 
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.base.UnixTime;
 import net.time4j.tz.OffsetSign;
@@ -8,6 +10,8 @@ import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -26,12 +30,12 @@ public class ArrayTransitionModelTest {
     private static final ZonalTransition SECOND =
         new ZonalTransition(365 * 86400L, 7200, 3600, 3600);
     private static final ZonalTransition THIRD =
-        new ZonalTransition(730 * 86400L, 3600, -23 * 3600, 0);
+        new ZonalTransition(730 * 86400L, 3600, -13 * 3600, 0);
     private static final ZonalTransition FOURTH =
         new ZonalTransition(
             SystemClock.INSTANCE.currentTime().getPosixTime() + 730 * 86400L,
-            -23 * 3600,
-            -23 * 3600 + 3600,
+            -13 * 3600,
+            -13 * 3600 + 3600,
             3600);
     private static final TransitionHistory MODEL =
         new ArrayTransitionModel(Arrays.asList(THIRD, FIRST, FOURTH, SECOND));
@@ -106,6 +110,170 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.getNextTransition(new UT(FOURTH.getPosixTime())),
             nullValue());
+    }
+
+    @Test
+    public void getGapTransition1() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(0, 29, 59)),
+            nullValue());
+    }
+
+    @Test
+    public void getGapTransition2() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(0, 30)),
+            is(FIRST));
+    }
+
+    @Test
+    public void getGapTransition3() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(1, 59, 59)),
+            is(FIRST));
+    }
+
+    @Test
+    public void getGapTransition4() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(2, 0)),
+            nullValue());
+    }
+
+    @Test
+    public void getOverlapTransition1() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(0, 59, 59)),
+            nullValue());
+    }
+
+    @Test
+    public void getOverlapTransition2() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(1, 0)),
+            is(SECOND));
+    }
+
+    @Test
+    public void getOverlapTransition3() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(1, 59, 59)),
+            is(SECOND));
+    }
+
+    @Test
+    public void getOverlapTransition4() {
+        assertThat(
+            MODEL.getConflictTransition(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(2, 0)),
+            nullValue());
+    }
+
+    @Test
+    public void getValidOffsetsOfGapTransition1() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(0, 29, 59)),
+            is(TransitionModel.toList(1800)));
+    }
+
+    @Test
+    public void getValidOffsetsOfGapTransition2() {
+        List<ZonalOffset> offsets = Collections.emptyList();
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(0, 30)),
+            is(offsets));
+    }
+
+    @Test
+    public void getValidOffsetsOfGapTransition3() {
+        List<ZonalOffset> offsets = Collections.emptyList();
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(1, 59, 59)),
+            is(offsets));
+    }
+
+    @Test
+    public void getValidOffsetsOfGapTransition4() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1970, 1, 1),
+                PlainTime.of(2, 0)),
+            is(TransitionModel.toList(7200)));
+    }
+
+    @Test
+    public void getValidOffsetsOfOverlapTransition1() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(0, 59, 59)),
+            is(TransitionModel.toList(7200)));
+    }
+
+    @Test
+    public void getValidOffsetsOfOverlapTransition2() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(1, 0)),
+            is(TransitionModel.toList(3600, 7200)));
+    }
+
+    @Test
+    public void getValidOffsetsOfOverlapTransition3() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(1, 59, 59)),
+            is(TransitionModel.toList(3600, 7200)));
+    }
+
+    @Test
+    public void getValidOffsetsOfOverlapTransition4() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(2, 0)),
+            is(TransitionModel.toList(3600)));
+    }
+
+    @Test
+    public void getValidOffsetsBeforeStart() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(1900, 1, 1),
+                PlainTime.midnightAtStartOfDay()),
+            is(TransitionModel.toList(1800)));
+    }
+
+    @Test
+    public void getValidOffsetsAfterEnd() {
+        assertThat(
+            MODEL.getValidOffsets(
+                PlainDate.of(2100, 1, 1),
+                PlainTime.midnightAtStartOfDay()),
+            is(TransitionModel.toList(-12 * 3600)));
     }
 
     @Test

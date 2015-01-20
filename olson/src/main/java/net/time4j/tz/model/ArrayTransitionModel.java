@@ -55,7 +55,7 @@ final class ArrayTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-//    private static final long serialVersionUID = -1754640139112323489L;
+    private static final long serialVersionUID = -9104454852317745314L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -152,7 +152,30 @@ final class ArrayTransitionModel
         GregorianDate localDate,
         WallTime localTime
     ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
+        int index = searchLocal(localSecs, this.transitions);
+
+        if (index == this.transitions.length) {
+            return null;
+        }
+
+        ZonalTransition test = this.transitions[index];
+
+        if (test.isGap()) {
+            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
+            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
+                return test;
+            }
+        } else if (test.isOverlap()) {
+            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
+            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
+                return test;
+            }
+        }
+
+        return null;
+
     }
 
     @Override
@@ -160,7 +183,33 @@ final class ArrayTransitionModel
         GregorianDate localDate,
         WallTime localTime
     ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
+        int index = searchLocal(localSecs, this.transitions);
+
+        if (index == this.transitions.length) {
+            return TransitionModel.toList(
+                this.transitions[this.transitions.length - 1].getTotalOffset());
+        }
+
+        ZonalTransition test = this.transitions[index];
+
+        if (test.isGap()) {
+            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
+            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
+                return Collections.emptyList();
+            }
+        } else if (test.isOverlap()) {
+            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
+            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
+                return TransitionModel.toList(
+                    test.getTotalOffset(),
+                    test.getPreviousOffset());
+            }
+        }
+
+        return TransitionModel.toList(test.getPreviousOffset());
+
     }
 
     @Override
@@ -177,47 +226,6 @@ final class ArrayTransitionModel
     ) {
 
         return getTransitions(this.transitions, startInclusive, endExclusive);
-
-    }
-
-    private static List<ZonalTransition> getTransitions(
-        ZonalTransition[] transitions,
-        UnixTime startInclusive,
-        UnixTime endExclusive
-    ) {
-
-        long start = startInclusive.getPosixTime();
-        long end = endExclusive.getPosixTime();
-
-        if (start > end) {
-            throw new IllegalArgumentException("Start after end.");
-        }
-
-        int i1 = search(start, transitions);
-        int i2 = search(end, transitions);
-
-        if (i2 == 0) {
-            return Collections.emptyList();
-        } else if ((i1 > 0) && (transitions[i1 - 1].getPosixTime() == start)) {
-            i1--;
-        }
-
-        i2--;
-
-        if (transitions[i2].getPosixTime() == end) {
-            i2--;
-        }
-
-        if (i1 > i2) {
-            return Collections.emptyList();
-        } else {
-            List<ZonalTransition> result =
-                new ArrayList<ZonalTransition>(i2 - i1 + 1);
-            for (int i = i1; i <= i2; i++) {
-                result.add(transitions[i]);
-            }
-            return Collections.unmodifiableList(result);
-        }
 
     }
 
@@ -279,6 +287,48 @@ final class ArrayTransitionModel
 
     }
 
+    private static List<ZonalTransition> getTransitions(
+        ZonalTransition[] transitions,
+        UnixTime startInclusive,
+        UnixTime endExclusive
+    ) {
+
+        long start = startInclusive.getPosixTime();
+        long end = endExclusive.getPosixTime();
+
+        if (start > end) {
+            throw new IllegalArgumentException("Start after end.");
+        }
+
+        int i1 = search(start, transitions);
+        int i2 = search(end, transitions);
+
+        if (i2 == 0) {
+            return Collections.emptyList();
+        } else if ((i1 > 0) && (transitions[i1 - 1].getPosixTime() == start)) {
+            i1--;
+        }
+
+        i2--;
+
+        if (transitions[i2].getPosixTime() == end) {
+            i2--;
+        }
+
+        if (i1 > i2) {
+            return Collections.emptyList();
+        } else {
+            List<ZonalTransition> result =
+                new ArrayList<ZonalTransition>(i2 - i1 + 1);
+            for (int i = i1; i <= i2; i++) {
+                result.add(transitions[i]);
+            }
+            return Collections.unmodifiableList(result);
+        }
+
+    }
+
+    // returns index of first transition after posixTime
     private static int search(
         long posixTime,
         ZonalTransition[] transitions
@@ -291,6 +341,31 @@ final class ArrayTransitionModel
             int middle = (low + high) / 2;
 
             if (transitions[middle].getPosixTime() <= posixTime) {
+                low = middle + 1;
+            } else {
+                high = middle - 1;
+            }
+        }
+
+        return low;
+
+    }
+
+    // returns index of first transition after local date and time
+    private static int searchLocal(
+        long localSecs,
+        ZonalTransition[] transitions
+    ) {
+
+        int low = 0;
+        int high = transitions.length - 1;
+
+        while (low <= high) {
+            int middle = (low + high) / 2;
+            ZonalTransition zt = transitions[middle];
+            int offset = Math.max(zt.getTotalOffset(), zt.getPreviousOffset());
+
+            if (zt.getPosixTime() + offset <= localSecs) {
                 low = middle + 1;
             } else {
                 high = middle - 1;

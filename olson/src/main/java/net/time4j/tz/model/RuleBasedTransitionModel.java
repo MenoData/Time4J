@@ -261,7 +261,7 @@ final class RuleBasedTransitionModel
     ) {
 
         long preModel = this.initial.getPosixTime();
-        long localSecs = toLocalSecs(localDate, localTime);
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
 
         if (localSecs <= preModel + this.initial.getTotalOffset()) {
             return null;
@@ -282,8 +282,6 @@ final class RuleBasedTransitionModel
                 } else if (localSecs < tt + t.getPreviousOffset()) {
                     return t;
                 }
-            } else {
-                // ignore pseudo transition without offset change
             }
         }
 
@@ -298,11 +296,11 @@ final class RuleBasedTransitionModel
     ) {
 
         long preModel = this.initial.getPosixTime();
-        long localSecs = toLocalSecs(localDate, localTime);
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
         int last = this.initial.getTotalOffset();
 
         if (localSecs <= preModel + last) {
-            return toList(last);
+            return TransitionModel.toList(last);
         }
 
         for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
@@ -311,22 +309,20 @@ final class RuleBasedTransitionModel
 
             if (t.isGap()) {
                 if (localSecs < tt + t.getPreviousOffset()) {
-                    return toList(t.getPreviousOffset());
+                    return TransitionModel.toList(t.getPreviousOffset());
                 } else if (localSecs < tt + last) {
                     return Collections.emptyList();
                 }
             } else if (t.isOverlap()) {
                 if (localSecs < tt + last) {
-                    return toList(t.getPreviousOffset());
+                    return TransitionModel.toList(t.getPreviousOffset());
                 } else if (localSecs < tt + t.getPreviousOffset()) {
-                    return toList(last, t.getPreviousOffset());
+                    return TransitionModel.toList(last, t.getPreviousOffset());
                 }
-            } else {
-                // ignore pseudo transition without offset change
             }
         }
 
-        return toList(last);
+        return TransitionModel.toList(last);
 
     }
 
@@ -590,47 +586,6 @@ final class RuleBasedTransitionModel
                     EpochDays.UNIX)
                 )
             );
-
-    }
-
-    private static long toLocalSecs(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        long mjd =
-            GregorianMath.toMJD(
-                localDate.getYear(),
-                localDate.getMonth(),
-                localDate.getDayOfMonth());
-        long localSecs =
-            MathUtils.safeMultiply(
-                EpochDays.UNIX.transform(mjd, EpochDays.MODIFIED_JULIAN_DATE),
-                86400);
-        localSecs += localTime.getHour() * 3600;
-        localSecs += localTime.getMinute() * 60;
-        localSecs += localTime.getSecond();
-        return localSecs;
-
-    }
-
-    private static List<ZonalOffset> toList(int offset) {
-
-        return Collections.singletonList(ZonalOffset.ofTotalSeconds(offset));
-
-    }
-
-    private static List<ZonalOffset> toList(
-        int offset1,
-        int offset2
-    ) {
-
-        ZonalOffset zo1 = ZonalOffset.ofTotalSeconds(offset1);
-        ZonalOffset zo2 = ZonalOffset.ofTotalSeconds(offset2);
-        List<ZonalOffset> offsets = new ArrayList<ZonalOffset>(2);
-        offsets.add(zo1);
-        offsets.add(zo2);
-        return Collections.unmodifiableList(offsets);
 
     }
 
