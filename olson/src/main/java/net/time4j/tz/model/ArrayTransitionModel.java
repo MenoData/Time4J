@@ -21,6 +21,8 @@
 
 package net.time4j.tz.model;
 
+import net.time4j.Moment;
+import net.time4j.SystemClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
@@ -33,8 +35,12 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import static net.time4j.CalendarUnit.YEARS;
 
 /**
  * <p>Array-basiertes &Uuml;bergangsmodell. </p>
@@ -49,28 +55,61 @@ final class ArrayTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = -1754640139112323489L;
+//    private static final long serialVersionUID = -1754640139112323489L;
 
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final ZonalTransition[] transitions;
 
     // Cache
+    private transient final List<ZonalTransition> stdTransitions;
     private transient int hash = 0;
 
     //~ Konstruktoren -----------------------------------------------------
 
     ArrayTransitionModel(List<ZonalTransition> transitions) {
+        this(transitions, true);
+
+    }
+
+    ArrayTransitionModel(
+        List<ZonalTransition> transitions,
+        boolean checkSanity
+    ) {
         super();
 
         if (transitions.isEmpty()) {
-            throw new IllegalArgumentException("Missing timezone transition.");
+            throw new IllegalArgumentException("Missing timezone transitions.");
         }
 
-        ZonalTransition[] tmp = new ZonalTransition[transitions.size()];
+        // initialize state
+        int n = transitions.size();
+        ZonalTransition[] tmp = new ZonalTransition[n];
         tmp = transitions.toArray(tmp);
         Arrays.sort(tmp);
         this.transitions = tmp;
+
+        if (checkSanity) {
+            int previous = tmp[0].getTotalOffset();
+
+            for (int i = 1; i < n; i++) {
+                if (previous != tmp[i].getPreviousOffset()) {
+                    throw new IllegalArgumentException(
+                        "Model inconsistency detected: " + transitions);
+                } else {
+                    previous = tmp[i].getTotalOffset();
+                }
+            }
+        }
+
+        // fill cache
+        Moment end =
+            SystemClock.inZonalView(ZonalOffset.UTC)
+                .now()
+                .plus(1, YEARS)
+                .atUTC();
+        this.stdTransitions =
+            getTransitions(this.transitions, Moment.UNIX_EPOCH, end);
 
     }
 
@@ -86,12 +125,26 @@ final class ArrayTransitionModel
 
     @Override
     public ZonalTransition getStartTransition(UnixTime ut) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        int index = search(ut.getPosixTime(), this.transitions);
+
+        return (
+            (index == 0)
+            ? null
+            : this.transitions[index - 1]);
+
     }
 
     @Override
     public ZonalTransition getNextTransition(UnixTime ut) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        int index = search(ut.getPosixTime(), this.transitions);
+
+        return (
+            (index == this.transitions.length)
+            ? null
+            : this.transitions[index]);
+
     }
 
     @Override
@@ -112,7 +165,9 @@ final class ArrayTransitionModel
 
     @Override
     public List<ZonalTransition> getStdTransitions() {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        return this.stdTransitions;
+
     }
 
     @Override
@@ -120,7 +175,50 @@ final class ArrayTransitionModel
         UnixTime startInclusive,
         UnixTime endExclusive
     ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+
+        return getTransitions(this.transitions, startInclusive, endExclusive);
+
+    }
+
+    private static List<ZonalTransition> getTransitions(
+        ZonalTransition[] transitions,
+        UnixTime startInclusive,
+        UnixTime endExclusive
+    ) {
+
+        long start = startInclusive.getPosixTime();
+        long end = endExclusive.getPosixTime();
+
+        if (start > end) {
+            throw new IllegalArgumentException("Start after end.");
+        }
+
+        int i1 = search(start, transitions);
+        int i2 = search(end, transitions);
+
+        if (i2 == 0) {
+            return Collections.emptyList();
+        } else if ((i1 > 0) && (transitions[i1 - 1].getPosixTime() == start)) {
+            i1--;
+        }
+
+        i2--;
+
+        if (transitions[i2].getPosixTime() == end) {
+            i2--;
+        }
+
+        if (i1 > i2) {
+            return Collections.emptyList();
+        } else {
+            List<ZonalTransition> result =
+                new ArrayList<ZonalTransition>(i2 - i1 + 1);
+            for (int i = i1; i <= i2; i++) {
+                result.add(transitions[i]);
+            }
+            return Collections.unmodifiableList(result);
+        }
+
     }
 
     @Override
@@ -161,10 +259,10 @@ final class ArrayTransitionModel
     @Override
     public String toString() {
 
-        StringBuilder sb = new StringBuilder(this.transitions.length * 32);
+        StringBuilder sb = new StringBuilder(32);
         sb.append(this.getClass().getName());
-        sb.append("[transitions=");
-        sb.append(this.transitions);
+        sb.append("[transition-count=");
+        sb.append(this.transitions.length);
         sb.append(']');
         return sb.toString();
 
@@ -178,6 +276,28 @@ final class ArrayTransitionModel
     ZonalTransition[] getTransitions() {
 
         return this.transitions;
+
+    }
+
+    private static int search(
+        long posixTime,
+        ZonalTransition[] transitions
+    ) {
+
+        int low = 0;
+        int high = transitions.length - 1;
+
+        while (low <= high) {
+            int middle = (low + high) / 2;
+
+            if (transitions[middle].getPosixTime() <= posixTime) {
+                low = middle + 1;
+            } else {
+                high = middle - 1;
+            }
+        }
+
+        return low;
 
     }
 

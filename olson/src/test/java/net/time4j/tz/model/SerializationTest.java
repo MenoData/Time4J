@@ -2,8 +2,10 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.tz.ZonalOffset;
+import net.time4j.tz.ZonalTransition;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,14 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         RuleBasedTransitionModel model = createModelOfEuropeanUnion();
+        assertThat(model, is(roundtrip(model)));
+    }
+
+    @Test
+    public void roundTripOfArrayTransitionModel()
+        throws IOException, ClassNotFoundException {
+
+        ArrayTransitionModel model = createArrayModel();
         assertThat(model, is(roundtrip(model)));
     }
 
@@ -128,6 +139,24 @@ public class SerializationTest {
         return new RuleBasedTransitionModel(
             ZonalOffset.ofTotalSeconds(3600),
             rules);
+    }
+
+    private static ArrayTransitionModel createArrayModel() {
+        ZonalTransition first =
+            new ZonalTransition(0L, 1800, 7200, 3600);
+        ZonalTransition second =
+            new ZonalTransition(365 * 86400L, 7200, 3600, 3600);
+        ZonalTransition third =
+            new ZonalTransition(2 * 365 * 86400L, 3600, -23 * 3600, 0);
+        ZonalTransition fourth =
+            new ZonalTransition(
+                SystemClock.INSTANCE.currentTime().getPosixTime()
+                    + 2 *365 * 86400L,
+                -23 * 3600,
+                -23 * 3600 + 3600,
+                3600);
+        return new ArrayTransitionModel(
+            Arrays.asList(fourth, first, third, second));
     }
 
 }

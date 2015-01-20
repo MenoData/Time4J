@@ -1,5 +1,6 @@
 package net.time4j.tz.olson;
 
+import net.time4j.tz.model.ArrayTransitionModelTest;
 import net.time4j.tz.model.DaylightSavingRuleTest;
 import net.time4j.tz.model.RulesLikeBerlin1947Test;
 import net.time4j.tz.model.RulesLikeDhaka2009Test;
@@ -14,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        ArrayTransitionModelTest.class,
         DaylightSavingRuleTest.class,
         PredefinedIDTest.class,
         RulesLikeBerlin1947Test.class,

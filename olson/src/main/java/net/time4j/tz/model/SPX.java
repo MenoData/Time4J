@@ -362,8 +362,7 @@ final class SPX
         out.writeByte(header);
 
         ZonalTransition[] transitions = model.getTransitions();
-        int initial = transitions[0].getPreviousOffset();
-        out.writeInt(initial);
+        out.writeInt(transitions[0].getPreviousOffset());
         out.writeInt(transitions.length);
 
         for (ZonalTransition transition : transitions) {
@@ -378,7 +377,7 @@ final class SPX
         throws IOException, ClassNotFoundException {
 
         int previous = in.readInt();
-        int n = in.readByte();
+        int n = in.readInt();
         List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
 
         for (int i = 0; i < n; i++) {
@@ -391,7 +390,7 @@ final class SPX
             transitions.add(transition);
         }
 
-        return new ArrayTransitionModel(transitions);
+        return new ArrayTransitionModel(transitions, false);
 
     }
 
