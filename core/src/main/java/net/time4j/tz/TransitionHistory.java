@@ -239,6 +239,7 @@ public interface TransitionHistory {
      * @param   startInclusive  start time on POSIX time scale
      * @param   endExclusive    end time on POSIX time scale
      * @return  unmodifiable list of transitions maybe empty
+     * @throws  IllegalArgumentException if start is after end
      * @see     #getStdTransitions()
      */
     /*[deutsch]
@@ -248,6 +249,7 @@ public interface TransitionHistory {
      * @param   startInclusive  start time on POSIX time scale
      * @param   endExclusive    end time on POSIX time scale
      * @return  unmodifiable list of transitions maybe empty
+     * @throws  IllegalArgumentException if start is after end
      * @see     #getStdTransitions()
      */
     List<ZonalTransition> getTransitions(
