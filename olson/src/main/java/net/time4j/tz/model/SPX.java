@@ -29,11 +29,13 @@ import net.time4j.tz.ZonalTransition;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -62,6 +64,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code ArrayTransitionModel}. */
     static final int ARRAY_TRANSITION_MODEL_TYPE = 26;
+
+    /** Serialisierungstyp von {@code CompositeTransitionModel}. */
+    static final int COMPOSITE_TRANSITION_MODEL_TYPE = 27;
 
 //    private static final long serialVersionUID = -1000776907354520172L;
 
@@ -144,6 +149,9 @@ final class SPX
             case ARRAY_TRANSITION_MODEL_TYPE:
                 this.writeArrayTransitionModel(out);
                 break;
+            case COMPOSITE_TRANSITION_MODEL_TYPE:
+                this.writeCompositeTransitionModel(out);
+                break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
         }
@@ -185,6 +193,9 @@ final class SPX
                 break;
             case ARRAY_TRANSITION_MODEL_TYPE:
                 this.obj = this.readArrayTransitionModel(in);
+                break;
+            case COMPOSITE_TRANSITION_MODEL_TYPE:
+                this.obj = this.readCompositeTransitionModel(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -391,6 +402,39 @@ final class SPX
         }
 
         return new ArrayTransitionModel(transitions, false);
+
+    }
+
+    private void writeCompositeTransitionModel(ObjectOutput out)
+        throws IOException {
+
+        CompositeTransitionModel model = (CompositeTransitionModel) this.obj;
+        int header = (COMPOSITE_TRANSITION_MODEL_TYPE << 3);
+        out.writeByte(header);
+        out.writeObject(model.getArrayModel());
+        out.writeObject(model.getRuleModel());
+
+    }
+
+    private Object readCompositeTransitionModel(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        ArrayTransitionModel arrayModel =
+            (ArrayTransitionModel) in.readObject();
+        RuleBasedTransitionModel ruleModel =
+            (RuleBasedTransitionModel) in.readObject();
+
+        List<ZonalTransition> list = Arrays.asList(arrayModel.getTransitions());
+        List<DaylightSavingRule> rules = ruleModel.getRules();
+
+        ZonalTransition last = list.get(list.size() - 1);
+
+        if (!last.equals(ruleModel.getInitialTransition())) {
+            throw new InvalidObjectException(
+                "Inconsistent transition models detected.");
+        }
+
+        return new CompositeTransitionModel(list, rules);
 
     }
 

@@ -153,28 +153,7 @@ final class ArrayTransitionModel
         WallTime localTime
     ) {
 
-        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
-        int index = searchLocal(localSecs, this.transitions);
-
-        if (index == this.transitions.length) {
-            return null;
-        }
-
-        ZonalTransition test = this.transitions[index];
-
-        if (test.isGap()) {
-            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
-            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
-                return test;
-            }
-        } else if (test.isOverlap()) {
-            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
-            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
-                return test;
-            }
-        }
-
-        return null;
+        return this.getConflictTransition(localDate, localTime, null);
 
     }
 
@@ -184,31 +163,7 @@ final class ArrayTransitionModel
         WallTime localTime
     ) {
 
-        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
-        int index = searchLocal(localSecs, this.transitions);
-
-        if (index == this.transitions.length) {
-            return TransitionModel.toList(
-                this.transitions[this.transitions.length - 1].getTotalOffset());
-        }
-
-        ZonalTransition test = this.transitions[index];
-
-        if (test.isGap()) {
-            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
-            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
-                return Collections.emptyList();
-            }
-        } else if (test.isOverlap()) {
-            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
-            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
-                return TransitionModel.toList(
-                    test.getTotalOffset(),
-                    test.getPreviousOffset());
-            }
-        }
-
-        return TransitionModel.toList(test.getPreviousOffset());
+        return this.getValidOffsets(localDate, localTime, null);
 
     }
 
@@ -273,6 +228,98 @@ final class ArrayTransitionModel
         sb.append(this.transitions.length);
         sb.append(']');
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Wird von {@link #getConflictTransition(GregorianDate, WallTime)}
+     * aufgerufen. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @param   ruleModel   optional last rules
+     * @return  conflict transition on the local time axis for gaps or
+     *          overlaps else {@code null}
+     */
+    ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime,
+        TransitionHistory ruleModel // from CompositeTransitionModel
+    ) {
+
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
+        int index = searchLocal(localSecs, this.transitions);
+
+        if (index == this.transitions.length) {
+            return (
+                (ruleModel == null)
+                ? null
+                : ruleModel.getConflictTransition(localDate, localTime));
+        }
+
+        ZonalTransition test = this.transitions[index];
+
+        if (test.isGap()) {
+            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
+            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
+                return test;
+            }
+        } else if (test.isOverlap()) {
+            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
+            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
+                return test;
+            }
+        }
+
+        return null;
+
+    }
+
+    /**
+     * <p>Wird von {@link #getValidOffsets(GregorianDate, WallTime)}
+     * aufgerufen. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @param   ruleModel   optional last rules
+     * @return  unmodifiable list of shifts which fits the given local time
+     */
+    List<ZonalOffset> getValidOffsets(
+        GregorianDate localDate,
+        WallTime localTime,
+        TransitionHistory ruleModel // from CompositeTransitionModel
+    ) {
+
+        long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
+        int index = searchLocal(localSecs, this.transitions);
+
+        if (index == this.transitions.length) {
+            if (ruleModel == null) {
+                ZonalTransition last =
+                    this.transitions[this.transitions.length - 1];
+                return TransitionModel.toList(last.getTotalOffset());
+            } else {
+                return ruleModel.getValidOffsets(localDate, localTime);
+            }
+        }
+
+        ZonalTransition test = this.transitions[index];
+
+        if (test.isGap()) {
+            assert (test.getPosixTime() + test.getTotalOffset() > localSecs);
+            if (test.getPosixTime() + test.getPreviousOffset() <= localSecs) {
+                return Collections.emptyList();
+            }
+        } else if (test.isOverlap()) {
+            assert (test.getPosixTime() + test.getPreviousOffset() > localSecs);
+            if (test.getPosixTime() + test.getTotalOffset() <= localSecs) {
+                return TransitionModel.toList(
+                    test.getTotalOffset(),
+                    test.getPreviousOffset());
+            }
+        }
+
+        return TransitionModel.toList(test.getPreviousOffset());
 
     }
 

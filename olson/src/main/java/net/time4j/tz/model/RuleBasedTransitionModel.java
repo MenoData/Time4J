@@ -262,8 +262,13 @@ final class RuleBasedTransitionModel
 
         long preModel = this.initial.getPosixTime();
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
+        
+        int max =
+            Math.max(
+                this.initial.getPreviousOffset(),
+                this.initial.getTotalOffset());
 
-        if (localSecs <= preModel + this.initial.getTotalOffset()) {
+        if (localSecs <= preModel + max) {
             return null;
         }
 
@@ -298,8 +303,9 @@ final class RuleBasedTransitionModel
         long preModel = this.initial.getPosixTime();
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
         int last = this.initial.getTotalOffset();
+        int max = Math.max(this.initial.getPreviousOffset(), last);
 
-        if (localSecs <= preModel + last) {
+        if (localSecs <= preModel + max) {
             return TransitionModel.toList(last);
         }
 
