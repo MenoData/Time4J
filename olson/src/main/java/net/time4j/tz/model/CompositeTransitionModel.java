@@ -31,6 +31,7 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -56,23 +57,26 @@ final class CompositeTransitionModel
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private transient final int size;
     private transient final ArrayTransitionModel arrayModel;
     private transient final RuleBasedTransitionModel ruleModel;
 
     // Cache
     private transient final ZonalTransition last;
+    private transient int hash = 0;
 
     //~ Konstruktoren -----------------------------------------------------
 
     CompositeTransitionModel(
+        int size,
         List<ZonalTransition> transitions,
         List<DaylightSavingRule> rules
     ) {
         super();
 
+        this.size = size;
         this.arrayModel = new ArrayTransitionModel(transitions);
-        ZonalTransition[] array = this.arrayModel.getTransitions();
-        this.last = array[array.length - 1];
+        this.last = this.arrayModel.getLastTransition();
         this.ruleModel = new RuleBasedTransitionModel(this.last, rules, true);
 
     }
@@ -173,8 +177,8 @@ final class CompositeTransitionModel
         } else if (obj instanceof CompositeTransitionModel) {
             CompositeTransitionModel that = (CompositeTransitionModel) obj;
             return (
-                this.arrayModel.equals(that.arrayModel)
-                && this.ruleModel.equals(that.ruleModel));
+                this.ruleModel.getRules().equals(that.ruleModel.getRules())
+                && this.getTransitions().equals(that.getTransitions()));
         } else {
             return false;
         }
@@ -184,7 +188,15 @@ final class CompositeTransitionModel
     @Override
     public int hashCode() {
 
-        return 17 * this.arrayModel.hashCode() + 37 * this.ruleModel.hashCode();
+        int h = this.hash;
+
+        if (h == 0) {
+            h = this.getTransitions().hashCode();
+            h += (37 * this.ruleModel.getRules().hashCode());
+            this.hash = h;
+        }
+
+        return h;
 
     }
 
@@ -193,10 +205,12 @@ final class CompositeTransitionModel
 
         StringBuilder sb = new StringBuilder(32);
         sb.append(this.getClass().getName());
-        sb.append("history=");
-        sb.append(this.arrayModel);
+        sb.append("[transition-count=");
+        sb.append(this.size);
+        sb.append(",hash=");
+        sb.append(this.hashCode());
         sb.append(",last-rules=");
-        sb.append(this.ruleModel);
+        sb.append(this.ruleModel.getRules());
         sb.append(']');
         return sb.toString();
 
@@ -205,22 +219,28 @@ final class CompositeTransitionModel
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
-     * @return  TransitionHistory
+     * @param   out     serialization stream
      */
-    TransitionHistory getArrayModel() {
+    void writeTransitions(ObjectOutput out) throws IOException {
 
-        return this.arrayModel;
+        this.arrayModel.writeTransitions(this.size, out);
 
     }
 
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
-     * @return  TransitionHistory
+     * @return  list of daylight saving rules
      */
-    TransitionHistory getRuleModel() {
+    List<DaylightSavingRule> getRules() {
 
-        return this.ruleModel;
+        return this.ruleModel.getRules();
+
+    }
+
+    private List<ZonalTransition> getTransitions() {
+
+        return this.arrayModel.getTransitions(this.size);
 
     }
 
@@ -235,8 +255,21 @@ final class CompositeTransitionModel
      * <pre>
      *  int header = (27 << 3);
      *  out.writeByte(header);
-     *  out.writeObject(getArrayModel());
-     *  out.writeObject(getRuleModel());
+     *
+     *  out.writeInt(getTransitions().size());
+     *  out.writeInt(getTransitions().get(0).getPreviousOffset());
+     *
+     *  for (ZonalTransition transition : getTransitions()) {
+     *      out.writeLong(transition.getPosixTime());
+     *      out.writeInt(transition.getTotalOffset());
+     *      out.writeInt(transition.getDaylightSavingOffset());
+     *  }
+     *
+     *  out.writeByte(rules.size());
+     *
+     *  for (int i = 0; i &lt; n; i++) {
+     *      out.writeObject(rules.get(i));
+     *  }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {

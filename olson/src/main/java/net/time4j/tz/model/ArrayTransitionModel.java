@@ -33,6 +33,7 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -211,7 +212,7 @@ final class ArrayTransitionModel
         int h = this.hash;
 
         if (h == 0) {
-            h = Arrays.deepHashCode(this.transitions);
+            h = Arrays.hashCode(this.transitions);
             this.hash = h;
         }
 
@@ -226,6 +227,8 @@ final class ArrayTransitionModel
         sb.append(this.getClass().getName());
         sb.append("[transition-count=");
         sb.append(this.transitions.length);
+        sb.append(",hash=");
+        sb.append(this.hashCode());
         sb.append(']');
         return sb.toString();
 
@@ -244,7 +247,7 @@ final class ArrayTransitionModel
     ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime,
-        TransitionHistory ruleModel // from CompositeTransitionModel
+        RuleBasedTransitionModel ruleModel // from CompositeTransitionModel
     ) {
 
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
@@ -254,7 +257,7 @@ final class ArrayTransitionModel
             return (
                 (ruleModel == null)
                 ? null
-                : ruleModel.getConflictTransition(localDate, localTime));
+                : ruleModel.getConflictTransition(localDate, localSecs));
         }
 
         ZonalTransition test = this.transitions[index];
@@ -287,7 +290,7 @@ final class ArrayTransitionModel
     List<ZonalOffset> getValidOffsets(
         GregorianDate localDate,
         WallTime localTime,
-        TransitionHistory ruleModel // from CompositeTransitionModel
+        RuleBasedTransitionModel ruleModel // from CompositeTransitionModel
     ) {
 
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
@@ -299,7 +302,7 @@ final class ArrayTransitionModel
                     this.transitions[this.transitions.length - 1];
                 return TransitionModel.toList(last.getTotalOffset());
             } else {
-                return ruleModel.getValidOffsets(localDate, localTime);
+                return ruleModel.getValidOffsets(localDate, localSecs);
             }
         }
 
@@ -323,14 +326,50 @@ final class ArrayTransitionModel
 
     }
 
+    // Called by CompositeTransitionModel
+    ZonalTransition getLastTransition() {
+
+        return this.transitions[this.transitions.length - 1];
+
+    }
+
+    // Called by CompositeTransitionModel
+    List<ZonalTransition> getTransitions(int size) {
+
+        int n = Math.min(size, this.transitions.length);
+        List<ZonalTransition> t = new ArrayList<ZonalTransition>(n);
+
+        for (int i = 0; i < n; i++) {
+            t.add(this.transitions[i]);
+        }
+
+        return t;
+
+    }
+
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
-     * @return  Array
+     * @param   out     serialization stream
      */
-    ZonalTransition[] getTransitions() {
+    void writeTransitions(ObjectOutput out) throws IOException {
 
-        return this.transitions;
+        this.writeTransitions(this.transitions.length, out);
+
+    }
+
+    /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @param   size    maximum count of transitions to be serialized
+     * @param   out     serialization stream
+     */
+    void writeTransitions(
+        int size,
+        ObjectOutput out
+    ) throws IOException {
+
+        SPX.writeTransitions(this.transitions, size, out);
 
     }
 
@@ -434,8 +473,9 @@ final class ArrayTransitionModel
      * <pre>
      *  int header = (26 << 3);
      *  out.writeByte(header);
-     *  out.writeInt(getTransitions().get(0).getPreviousOffset());
+     *
      *  out.writeInt(getTransitions().size());
+     *  out.writeInt(getTransitions().get(0).getPreviousOffset());
      *
      *  for (ZonalTransition transition : getTransitions()) {
      *      out.writeLong(transition.getPosixTime());

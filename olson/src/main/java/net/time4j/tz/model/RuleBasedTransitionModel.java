@@ -260,37 +260,8 @@ final class RuleBasedTransitionModel
         WallTime localTime
     ) {
 
-        long preModel = this.initial.getPosixTime();
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
-        
-        int max =
-            Math.max(
-                this.initial.getPreviousOffset(),
-                this.initial.getTotalOffset());
-
-        if (localSecs <= preModel + max) {
-            return null;
-        }
-
-        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
-            long tt = t.getPosixTime();
-
-            if (t.isGap()) {
-                if (localSecs < tt + t.getPreviousOffset()) {
-                    return null; // offset = t.getPreviousOffset()
-                } else if (localSecs < tt + t.getTotalOffset()) {
-                    return t;
-                }
-            } else if (t.isOverlap()) {
-                if (localSecs < tt + t.getTotalOffset()) {
-                    return null; // offset = t.getPreviousOffset()
-                } else if (localSecs < tt + t.getPreviousOffset()) {
-                    return t;
-                }
-            }
-        }
-
-        return null; // offset = lastTotalOffset
+        return this.getConflictTransition(localDate, localSecs);
 
     }
 
@@ -300,35 +271,8 @@ final class RuleBasedTransitionModel
         WallTime localTime
     ) {
 
-        long preModel = this.initial.getPosixTime();
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
-        int last = this.initial.getTotalOffset();
-        int max = Math.max(this.initial.getPreviousOffset(), last);
-
-        if (localSecs <= preModel + max) {
-            return TransitionModel.toList(last);
-        }
-
-        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
-            long tt = t.getPosixTime();
-            last = t.getTotalOffset();
-
-            if (t.isGap()) {
-                if (localSecs < tt + t.getPreviousOffset()) {
-                    return TransitionModel.toList(t.getPreviousOffset());
-                } else if (localSecs < tt + last) {
-                    return Collections.emptyList();
-                }
-            } else if (t.isOverlap()) {
-                if (localSecs < tt + last) {
-                    return TransitionModel.toList(t.getPreviousOffset());
-                } else if (localSecs < tt + t.getPreviousOffset()) {
-                    return TransitionModel.toList(last, t.getPreviousOffset());
-                }
-            }
-        }
-
-        return TransitionModel.toList(last);
+        return this.getValidOffsets(localDate, localSecs);
 
     }
 
@@ -419,7 +363,81 @@ final class RuleBasedTransitionModel
 
     }
 
-    private static List<ZonalTransition> getTransitions(
+    ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        long localSecs
+    ) {
+
+        long preModel = this.initial.getPosixTime();
+
+        int max =
+            Math.max(
+                this.initial.getPreviousOffset(),
+                this.initial.getTotalOffset());
+
+        if (localSecs <= preModel + max) {
+            return null;
+        }
+
+        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
+            long tt = t.getPosixTime();
+
+            if (t.isGap()) {
+                if (localSecs < tt + t.getPreviousOffset()) {
+                    return null; // offset = t.getPreviousOffset()
+                } else if (localSecs < tt + t.getTotalOffset()) {
+                    return t;
+                }
+            } else if (t.isOverlap()) {
+                if (localSecs < tt + t.getTotalOffset()) {
+                    return null; // offset = t.getPreviousOffset()
+                } else if (localSecs < tt + t.getPreviousOffset()) {
+                    return t;
+                }
+            }
+        }
+
+        return null; // offset = lastTotalOffset
+
+    }
+
+    List<ZonalOffset> getValidOffsets(
+        GregorianDate localDate,
+        long localSecs
+    ) {
+
+        long preModel = this.initial.getPosixTime();
+        int last = this.initial.getTotalOffset();
+        int max = Math.max(this.initial.getPreviousOffset(), last);
+
+        if (localSecs <= preModel + max) {
+            return TransitionModel.toList(last);
+        }
+
+        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
+            long tt = t.getPosixTime();
+            last = t.getTotalOffset();
+
+            if (t.isGap()) {
+                if (localSecs < tt + t.getPreviousOffset()) {
+                    return TransitionModel.toList(t.getPreviousOffset());
+                } else if (localSecs < tt + last) {
+                    return Collections.emptyList();
+                }
+            } else if (t.isOverlap()) {
+                if (localSecs < tt + last) {
+                    return TransitionModel.toList(t.getPreviousOffset());
+                } else if (localSecs < tt + t.getPreviousOffset()) {
+                    return TransitionModel.toList(last, t.getPreviousOffset());
+                }
+            }
+        }
+
+        return TransitionModel.toList(last);
+
+    }
+
+    static List<ZonalTransition> getTransitions(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
         UnixTime startInclusive,
@@ -610,11 +628,14 @@ final class RuleBasedTransitionModel
      *  List&lt;DaylightSavingRule&gt; rules;
      *
      *  out.writeByte(header);
+     *
      *  out.writeLong(initial.getPosixTime());
      *  out.writeInt(initial.getPreviousOffset());
      *  out.writeInt(initial.getTotalOffset());
      *  out.writeInt(initial.getDaylightSavingOffset());
+     * 
      *  out.writeByte(rules.size());
+     *
      *  for (int i = 0; i &lt; n; i++) {
      *      out.writeObject(rules.get(i));
      *  }

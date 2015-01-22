@@ -29,13 +29,11 @@ import net.time4j.tz.ZonalTransition;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
-import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -203,9 +201,71 @@ final class SPX
 
     }
 
-    private Object readResolve() throws ObjectStreamException {
+    // called by CompositeTransitionModel and ArrayTransitionModel
+    static void writeTransitions(
+        ZonalTransition[] transitions,
+        int size,
+        ObjectOutput out
+    ) throws IOException {
 
-        return this.obj;
+        out.writeInt(size);
+        out.writeInt(transitions[0].getPreviousOffset());
+
+        for (int i = 0, n = Math.min(size, transitions.length); i < n; i++) {
+            ZonalTransition transition = transitions[i];
+            out.writeLong(transition.getPosixTime());
+            out.writeInt(transition.getTotalOffset());
+            out.writeInt(transition.getDaylightSavingOffset());
+        }
+
+    }
+
+    private static List<ZonalTransition> readTransitions(ObjectInput in)
+        throws IOException {
+
+        int n = in.readInt();
+        int previous = in.readInt();
+        List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
+
+        for (int i = 0; i < n; i++) {
+            long posix = in.readLong();
+            int total = in.readInt();
+            int dst = in.readInt();
+            ZonalTransition transition =
+                new ZonalTransition(posix, previous, total, dst);
+            previous = total;
+            transitions.add(transition);
+        }
+
+        return transitions;
+
+    }
+
+    private static void writeRules(
+        List<DaylightSavingRule> rules,
+        ObjectOutput out
+    ) throws IOException {
+
+        out.writeByte(rules.size());
+
+        for (DaylightSavingRule rule : rules) {
+            out.writeObject(rule);
+        }
+
+    }
+
+    private static List<DaylightSavingRule> readRules(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int n = in.readByte();
+        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
+
+        for (int i = 0; i < n; i++) {
+            DaylightSavingRule rule = (DaylightSavingRule) in.readObject();
+            rules.add(rule);
+        }
+
+        return rules;
 
     }
 
@@ -337,13 +397,7 @@ final class SPX
         out.writeInt(initial.getPreviousOffset());
         out.writeInt(initial.getTotalOffset());
         out.writeInt(initial.getDaylightSavingOffset());
-
-        List<DaylightSavingRule> rules = model.getRules();
-        out.writeByte(rules.size());
-
-        for (DaylightSavingRule rule : rules) {
-            out.writeObject(rule);
-        }
+        writeRules(model.getRules(), out);
 
     }
 
@@ -353,14 +407,7 @@ final class SPX
         ZonalTransition initial =
             new ZonalTransition(
                 in.readLong(), in.readInt(), in.readInt(), in.readInt());
-        int n = in.readByte();
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
-
-        for (int i = 0; i < n; i++) {
-            DaylightSavingRule rule = (DaylightSavingRule) in.readObject();
-            rules.add(rule);
-        }
-
+        List<DaylightSavingRule> rules = readRules(in);
         return new RuleBasedTransitionModel(initial, rules, false);
 
     }
@@ -371,37 +418,14 @@ final class SPX
         ArrayTransitionModel model = (ArrayTransitionModel) this.obj;
         int header = (ARRAY_TRANSITION_MODEL_TYPE << 3);
         out.writeByte(header);
-
-        ZonalTransition[] transitions = model.getTransitions();
-        out.writeInt(transitions[0].getPreviousOffset());
-        out.writeInt(transitions.length);
-
-        for (ZonalTransition transition : transitions) {
-            out.writeLong(transition.getPosixTime());
-            out.writeInt(transition.getTotalOffset());
-            out.writeInt(transition.getDaylightSavingOffset());
-        }
+        model.writeTransitions(out);
 
     }
 
     private Object readArrayTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        int previous = in.readInt();
-        int n = in.readInt();
-        List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
-
-        for (int i = 0; i < n; i++) {
-            long posix = in.readLong();
-            int total = in.readInt();
-            int dst = in.readInt();
-            ZonalTransition transition =
-                new ZonalTransition(posix, previous, total, dst);
-            previous = total;
-            transitions.add(transition);
-        }
-
-        return new ArrayTransitionModel(transitions, false);
+        return new ArrayTransitionModel(readTransitions(in), false);
 
     }
 
@@ -411,30 +435,23 @@ final class SPX
         CompositeTransitionModel model = (CompositeTransitionModel) this.obj;
         int header = (COMPOSITE_TRANSITION_MODEL_TYPE << 3);
         out.writeByte(header);
-        out.writeObject(model.getArrayModel());
-        out.writeObject(model.getRuleModel());
+        model.writeTransitions(out);
+        writeRules(model.getRules(), out);
 
     }
 
     private Object readCompositeTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        ArrayTransitionModel arrayModel =
-            (ArrayTransitionModel) in.readObject();
-        RuleBasedTransitionModel ruleModel =
-            (RuleBasedTransitionModel) in.readObject();
+        List<ZonalTransition> transitions = readTransitions(in);
+        List<DaylightSavingRule> rules = readRules(in);
+        return TransitionModel.of(transitions, rules);
 
-        List<ZonalTransition> list = Arrays.asList(arrayModel.getTransitions());
-        List<DaylightSavingRule> rules = ruleModel.getRules();
+    }
 
-        ZonalTransition last = list.get(list.size() - 1);
+    private Object readResolve() throws ObjectStreamException {
 
-        if (!last.equals(ruleModel.getInitialTransition())) {
-            throw new InvalidObjectException(
-                "Inconsistent transition models detected.");
-        }
-
-        return new CompositeTransitionModel(list, rules);
+        return this.obj;
 
     }
 

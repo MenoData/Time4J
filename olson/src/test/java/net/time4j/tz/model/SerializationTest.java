@@ -43,6 +43,14 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfCompositeTransitionModel()
+        throws IOException, ClassNotFoundException {
+
+        CompositeTransitionModel model = createCompositeModel();
+        assertThat(model, is(roundtrip(model)));
+    }
+
+    @Test
     public void roundTripOfFixedDayPattern()
         throws IOException, ClassNotFoundException {
 
@@ -157,6 +165,44 @@ public class SerializationTest {
                 3600);
         return new ArrayTransitionModel(
             Arrays.asList(fourth, first, third, second));
+    }
+
+    private static CompositeTransitionModel createCompositeModel() {
+        DaylightSavingRule spring =
+            DaylightSavingRule.ofLastWeekday(
+                Month.MARCH,
+                Weekday.SUNDAY,
+                PlainTime.of(1),
+                OffsetIndicator.UTC_TIME,
+                3600);
+        DaylightSavingRule autumn =
+            DaylightSavingRule.ofLastWeekday(
+                Month.OCTOBER,
+                Weekday.SUNDAY,
+                PlainTime.of(1),
+                OffsetIndicator.UTC_TIME,
+                0);
+        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        rules.add(autumn);
+        rules.add(spring);
+
+        ZonalTransition first =
+            new ZonalTransition(0L, 3600, 7200, 3600);
+        ZonalTransition second =
+            new ZonalTransition(365 * 86400L, 7200, 3600, 0);
+        ZonalTransition third =
+            new ZonalTransition(2 * 365 * 86400L, 3600, 7200, 3600);
+        ZonalTransition fourth =
+            new ZonalTransition(
+                SystemClock.INSTANCE.currentTime().getPosixTime()
+                    + 2 *365 * 86400L,
+                7200,
+                3600,
+                0);
+        return new CompositeTransitionModel(
+            4,
+            Arrays.asList(fourth, first, third, second),
+            rules);
     }
 
 }
