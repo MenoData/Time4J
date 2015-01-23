@@ -77,7 +77,7 @@ final class RuleBasedTransitionModel
     private static final int LAST_CACHED_YEAR =
         SystemClock.inZonalView(ZonalOffset.UTC).today()
         .plus(100, YEARS).getYear();
-    
+
     private static final long serialVersionUID = -8510991381885304060L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -202,43 +202,32 @@ final class RuleBasedTransitionModel
         }
 
         ZonalTransition current = null;
-        int year = Integer.MIN_VALUE;
         int stdOffset = this.initial.getStandardOffset();
+        int n = this.rules.size();
+        DaylightSavingRule rule = this.rules.get(0);
+        DaylightSavingRule previous = this.rules.get(n - 1);
+        int shift = getShift(rule, stdOffset, previous.getSavings());
+        int year = getYear(ut.getPosixTime() + shift);
+        List<ZonalTransition> transitions = this.getTransitions(year);
 
-        for (int i = 0, n = this.rules.size(); i < n; i++) {
-            DaylightSavingRule rule = this.rules.get(i);
-            DaylightSavingRule previous = this.rules.get((i - 1 + n) % n);
-            int shift = getShift(rule, stdOffset, previous.getSavings());
-
-            if (i == 0) {
-                year = getYear(ut.getPosixTime() + shift);
-            }
-
-            long tt = getTransitionTime(rule, year, shift);
+        for (int i = 0; i < n; i++) {
+            ZonalTransition zt = transitions.get(i);
+            long tt = zt.getPosixTime();
 
             if (ut.getPosixTime() < tt) {
                 if (current == null) {
-                    DaylightSavingRule prev2 = this.rules.get((i - 2 + n) % n);
-                    shift = getShift(previous, stdOffset, prev2.getSavings());
-                    tt = getTransitionTime(previous, year - 1, shift);
-
-                    if (tt > preModel) {
-                        current =
-                            new ZonalTransition(
-                                tt,
-                                stdOffset + prev2.getSavings(),
-                                stdOffset + previous.getSavings(),
-                                previous.getSavings());
+                    if (i == 0) {
+                        zt = this.getTransitions(year - 1).get(n - 1);
+                    } else {
+                        zt = transitions.get(i - 1);
+                    }
+                    if (zt.getPosixTime() > preModel) {
+                        current = zt;
                     }
                 }
                 break;
             } else if (tt > preModel) {
-                current =
-                    new ZonalTransition(
-                        tt,
-                        stdOffset + previous.getSavings(),
-                        stdOffset + rule.getSavings(),
-                        rule.getSavings());
+                current = zt;
             }
         }
 
