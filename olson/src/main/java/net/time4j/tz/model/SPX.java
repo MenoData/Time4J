@@ -216,13 +216,13 @@ final class SPX
     ) throws IOException {
 
         out.writeInt(size);
-        out.writeInt(transitions[0].getPreviousOffset());
+        writeOffset(out, transitions[0].getPreviousOffset());
 
         for (int i = 0, n = Math.min(size, transitions.length); i < n; i++) {
             ZonalTransition transition = transitions[i];
             out.writeLong(transition.getPosixTime());
-            out.writeInt(transition.getTotalOffset());
-            out.writeInt(transition.getDaylightSavingOffset());
+            writeOffset(out, transition.getTotalOffset());
+            writeOffset(out, transition.getDaylightSavingOffset());
         }
 
     }
@@ -232,13 +232,13 @@ final class SPX
         throws IOException {
 
         int n = in.readInt();
-        int previous = in.readInt();
+        int previous = readOffset(in);
         List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
 
         for (int i = 0; i < n; i++) {
             long posix = in.readLong();
-            int total = in.readInt();
-            int dst = in.readInt();
+            int total = readOffset(in);
+            int dst = readOffset(in);
             ZonalTransition transition =
                 new ZonalTransition(posix, previous, total, dst);
             previous = total;
@@ -491,9 +491,9 @@ final class SPX
         RuleBasedTransitionModel model = (RuleBasedTransitionModel) this.obj;
         ZonalTransition initial = model.getInitialTransition();
         out.writeLong(initial.getPosixTime());
-        out.writeInt(initial.getPreviousOffset());
-        out.writeInt(initial.getTotalOffset());
-        out.writeInt(initial.getDaylightSavingOffset());
+        writeOffset(out, initial.getPreviousOffset());
+        writeOffset(out, initial.getTotalOffset());
+        writeOffset(out, initial.getDaylightSavingOffset());
         writeRules(model.getRules(), out);
 
     }
@@ -501,9 +501,12 @@ final class SPX
     private Object readRuleBasedTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
+        long posixTime = in.readLong();
+        int previous = readOffset(in);
+        int total = readOffset(in);
+        int dst = readOffset(in);
         ZonalTransition initial =
-            new ZonalTransition(
-                in.readLong(), in.readInt(), in.readInt(), in.readInt());
+            new ZonalTransition(posixTime, previous, total, dst);
         List<DaylightSavingRule> rules = readRules(in);
         return new RuleBasedTransitionModel(initial, rules, false);
 

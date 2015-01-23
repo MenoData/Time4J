@@ -124,12 +124,11 @@ final class RuleBasedTransitionModel
                 "Too many daylight saving rules: " + rules);
         }
 
-        List<DaylightSavingRule> sortedRules = rules;
-
         if (create) {
             rules = new ArrayList<DaylightSavingRule>(rules);
         }
 
+        List<DaylightSavingRule> sortedRules = rules;
         Collections.sort(sortedRules, RULE_COMPARATOR);
         boolean hasRuleWithoutDST = false;
 

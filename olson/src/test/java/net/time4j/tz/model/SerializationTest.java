@@ -89,7 +89,7 @@ public class SerializationTest {
                 Weekday.SUNDAY,
                 PlainTime.of(2, 30),
                 OffsetIndicator.WALL_TIME,
-                3600);
+                1800); // test for unusual dst offset
         assertThat(rule, is(roundtrip(rule)));
     }
 
@@ -104,7 +104,7 @@ public class SerializationTest {
                 Weekday.SUNDAY,
                 PlainTime.of(2, 30),
                 OffsetIndicator.WALL_TIME,
-                3600);
+                1); // test for unusual dst offset
         assertThat(rule, is(roundtrip(rule)));
     }
 
