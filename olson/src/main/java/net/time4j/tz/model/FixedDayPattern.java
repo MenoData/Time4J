@@ -162,9 +162,9 @@ final class FixedDayPattern
      *              is bit-compressed. The first byte contains in the five
      *              most significant bits the type id {@code 20}. Then the
      *              bytes for the month (1-12) and the day of month follow.
-     *              Finally the bytes for time of day (as {@code PlainTime}),
-     *              offset indicator symbol (as char) and the daylight saving
-     *              amount in seconds (as int) follow.
+     *              Finally the bytes for time of day (as seconds of day),
+     *              offset indicator and the daylight saving amount in seconds
+     *              follow in a specialized compressed form.
      *
      * Schematic algorithm:
      *
@@ -174,9 +174,37 @@ final class FixedDayPattern
      *  out.writeByte(header);
      *  out.writeByte(getMonth());
      *  out.writeByte(getDayOfMonth());
-     *  out.writeObject(getTimeOfDay());
-     *  out.writeChar(getIndicator().getSymbol());
-     *  out.writeInt(getSavings());
+     *  writeDaylightSavingRule(out, this);
+     *
+     *  private static void writeDaylightSavingRule(
+     *    DataOutput out,
+     *    DaylightSavingRule rule
+     *  ) throws IOException {
+     *    int tod = (rule.getTimeOfDay().get(SECOND_OF_DAY).intValue() << 8);
+     *    int indicator = rule.getIndicator().ordinal();
+     *    int dst = rule.getSavings();
+     *
+     *    if (dst == 0) {
+     *      out.writeInt(indicator | 4 | tod);
+     *    } else if (dst == 3600) {
+     *      out.writeInt(indicator | 8 | tod);
+     *    } else {
+     *      out.writeInt(indicator | tod);
+     *      writeOffset(out, dst);
+     *    }
+     *  }
+     *
+     *  private static void writeOffset(
+     *    DataOutput out,
+     *    int offset
+     *  ) throws IOException {
+     *    if ((offset % 900) == 0) {
+     *      out.writeByte(offset / 900);
+     *    } else {
+     *      out.writeByte(127);
+     *      out.writeInt(offset);
+     *    }
+     *  }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {
