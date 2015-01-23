@@ -62,10 +62,6 @@ final class RuleBasedTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final
-        ConcurrentMap<Integer, List<ZonalTransition>> TRANSITION_CACHE =
-            new ConcurrentHashMap<Integer, List<ZonalTransition>>();
-
     private static final Comparator<DaylightSavingRule> RULE_COMPARATOR =
         new Comparator<DaylightSavingRule>() {
             @Override
@@ -78,6 +74,10 @@ final class RuleBasedTransitionModel
             }
         };
 
+    private static final int LAST_CACHED_YEAR =
+        SystemClock.inZonalView(ZonalOffset.UTC).today()
+        .plus(100, YEARS).getYear();
+    
     private static final long serialVersionUID = -8510991381885304060L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -85,7 +85,9 @@ final class RuleBasedTransitionModel
     private transient final ZonalTransition initial;
     private transient final List<DaylightSavingRule> rules;
 
-    // Cache
+    private transient final
+        ConcurrentMap<Integer, List<ZonalTransition>> tCache =
+            new ConcurrentHashMap<Integer, List<ZonalTransition>>();
     private transient final List<ZonalTransition> stdTransitions;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -570,7 +572,7 @@ final class RuleBasedTransitionModel
     private List<ZonalTransition> getTransitions(int year) {
 
         Integer key = Integer.valueOf(year);
-        List<ZonalTransition> transitions = TRANSITION_CACHE.get(key);
+        List<ZonalTransition> transitions = this.tCache.get(key);
 
         if (transitions == null) {
             List<ZonalTransition> list = new ArrayList<ZonalTransition>();
@@ -590,10 +592,13 @@ final class RuleBasedTransitionModel
             }
 
             transitions = Collections.unmodifiableList(list);
-            List<ZonalTransition> old =
-                TRANSITION_CACHE.putIfAbsent(key, transitions);
-            if (old != null) {
-                transitions = old;
+
+            if (year <= LAST_CACHED_YEAR) {
+                List<ZonalTransition> old =
+                    this.tCache.putIfAbsent(key, transitions);
+                if (old != null) {
+                    transitions = old;
+                }
             }
         }
 
@@ -633,7 +638,7 @@ final class RuleBasedTransitionModel
      *  out.writeInt(initial.getPreviousOffset());
      *  out.writeInt(initial.getTotalOffset());
      *  out.writeInt(initial.getDaylightSavingOffset());
-     * 
+     *
      *  out.writeByte(rules.size());
      *
      *  for (int i = 0; i &lt; n; i++) {
