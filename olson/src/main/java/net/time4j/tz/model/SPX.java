@@ -314,9 +314,18 @@ final class SPX
         DaylightSavingRule rule
     ) throws IOException {
 
-        out.writeInt(rule.getTimeOfDay().get(SECOND_OF_DAY).intValue());
-        out.writeByte(rule.getIndicator().ordinal());
-        writeOffset(out, rule.getSavings());
+        int tod = (rule.getTimeOfDay().get(SECOND_OF_DAY).intValue() << 8);
+        int indicator = rule.getIndicator().ordinal();
+        int dst = rule.getSavings();
+
+        if (dst == 0) {
+            out.writeInt(indicator | 4 | tod);
+        } else if (dst == 3600) {
+            out.writeInt(indicator | 8 | tod);
+        } else {
+            out.writeInt(indicator | tod);
+            writeOffset(out, dst);
+        }
 
     }
 
@@ -336,12 +345,27 @@ final class SPX
 
     private static int readOffset(DataInput in) throws IOException {
 
-        int offset = in.readByte();
+        int savings = in.readByte();
 
-        if (offset == 127) {
+        if (savings == 127) {
             return in.readInt();
         } else {
-            return offset * 900;
+            return savings * 900;
+        }
+
+    }
+
+    private static int readSavings(
+        byte offsetInfo,
+        DataInput in
+    ) throws IOException {
+
+        if ((offsetInfo & 4) == 4) {
+            return 0;
+        } else if ((offsetInfo & 8) == 8) {
+            return 3600;
+        } else {
+            return readOffset(in);
         }
 
     }
@@ -363,10 +387,13 @@ final class SPX
 
         int month = in.readByte();
         int dayOfMonth = in.readByte();
+
+        int timeInfo = in.readInt();
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
-        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
-        int savings = readOffset(in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
+        byte offsetInfo = (byte) (timeInfo & 0xFF);
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        int savings = readSavings(offsetInfo, in);
 
         return new FixedDayPattern(
             Month.valueOf(month),
@@ -405,10 +432,13 @@ final class SPX
         int dow = in.readByte();
         Weekday dayOfWeek = Weekday.valueOf(Math.abs(dow));
         boolean after = (dow < 0);
+
+        int timeInfo = in.readInt();
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
-        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
-        int savings = readOffset(in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
+        byte offsetInfo = (byte) (timeInfo & 0xFF);
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        int savings = readSavings(offsetInfo, in);
 
         return new DayOfWeekInMonthPattern(
             month,
@@ -438,10 +468,13 @@ final class SPX
 
         Month month = Month.valueOf(in.readByte());
         Weekday dayOfWeek = Weekday.valueOf(in.readByte());
+
+        int timeInfo = in.readInt();
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
-        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
-        int savings = readOffset(in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
+        byte offsetInfo = (byte) (timeInfo & 0xFF);
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        int savings = readSavings(offsetInfo, in);
 
         return new LastDayOfWeekPattern(
             month,
