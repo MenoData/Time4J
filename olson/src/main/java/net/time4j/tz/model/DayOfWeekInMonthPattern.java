@@ -202,6 +202,18 @@ final class DayOfWeekInMonthPattern
     }
 
     /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  int
+     */
+    @Override
+    int getType() {
+
+        return SPX.DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE;
+
+    }
+
+    /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
      *              is bit-compressed. The first byte contains in the five
      *              most significant bits the type id {@code 21}. Then the

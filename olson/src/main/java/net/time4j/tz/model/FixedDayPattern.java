@@ -146,6 +146,18 @@ final class FixedDayPattern
     }
 
     /**
+     * <p>Benutzt in der Serialisierung. </p>
+     *
+     * @return  int
+     */
+    @Override
+    int getType() {
+
+        return SPX.FIXED_DAY_PATTERN_TYPE;
+
+    }
+
+    /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
      *              is bit-compressed. The first byte contains in the five
      *              most significant bits the type id {@code 20}. Then the

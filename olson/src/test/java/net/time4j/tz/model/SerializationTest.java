@@ -191,11 +191,10 @@ public class SerializationTest {
         ZonalTransition second =
             new ZonalTransition(365 * 86400L, 7200, 3600, 0);
         ZonalTransition third =
-            new ZonalTransition(2 * 365 * 86400L, 3600, 7200, 3600);
+            new ZonalTransition(63072000L, 3600, 7200, 3600);
         ZonalTransition fourth =
             new ZonalTransition(
-                SystemClock.INSTANCE.currentTime().getPosixTime()
-                    + 2 *365 * 86400L,
+                SystemClock.INSTANCE.currentTime().getPosixTime() + 63072000L,
                 7200,
                 3600,
                 0);

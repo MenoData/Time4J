@@ -358,6 +358,13 @@ public class DaylightSavingRule
 
     }
 
+    // benutzt in der Serialisierung
+    int getType() {
+
+        return 0; // default value for unknown type
+
+    }
+
     // für Subklassen
     boolean isEqual(DaylightSavingRule rule) {
 

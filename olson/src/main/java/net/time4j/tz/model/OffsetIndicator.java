@@ -84,6 +84,9 @@ public enum OffsetIndicator {
         }
     };
 
+    // Cache
+    static final OffsetIndicator[] VALUES = OffsetIndicator.values();
+
     //~ Methoden ----------------------------------------------------------
 
     /**

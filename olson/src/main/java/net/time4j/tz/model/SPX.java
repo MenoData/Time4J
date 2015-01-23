@@ -26,6 +26,8 @@ import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.tz.ZonalTransition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -35,6 +37,8 @@ import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.time4j.PlainTime.SECOND_OF_DAY;
 
 
 /**
@@ -131,15 +135,18 @@ final class SPX
     public void writeExternal(ObjectOutput out)
         throws IOException {
 
+        int header = (this.type << 3);
+        out.writeByte(header);
+
         switch (this.type) {
             case FIXED_DAY_PATTERN_TYPE:
-                this.writeFixedDayPattern(out);
+                writeFixedDayPattern(this.obj, out);
                 break;
             case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
-                this.writeDayOfWeekInMonthPattern(out);
+                writeDayOfWeekInMonthPattern(this.obj, out);
                 break;
             case LAST_DAY_OF_WEEK_PATTERN_TYPE:
-                this.writeLastDayOfWeekPattern(out);
+                writeLastDayOfWeekPattern(this.obj, out);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
                 this.writeRuleBasedTransitionModel(out);
@@ -178,13 +185,13 @@ final class SPX
 
         switch ((header & 0xFF) >> 3) {
             case FIXED_DAY_PATTERN_TYPE:
-                this.obj = this.readFixedDayPattern(in);
+                this.obj = readFixedDayPattern(in);
                 break;
             case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
-                this.obj = this.readDayOfWeekInMonthPattern(in);
+                this.obj = readDayOfWeekInMonthPattern(in);
                 break;
             case LAST_DAY_OF_WEEK_PATTERN_TYPE:
-                this.obj = this.readLastDayOfWeekPattern(in);
+                this.obj = readLastDayOfWeekPattern(in);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
                 this.obj = this.readRuleBasedTransitionModel(in);
@@ -220,6 +227,7 @@ final class SPX
 
     }
 
+    // called by CompositeTransitionModel and ArrayTransitionModel
     private static List<ZonalTransition> readTransitions(ObjectInput in)
         throws IOException {
 
@@ -241,6 +249,7 @@ final class SPX
 
     }
 
+    // called by CompositeTransitionModel and RuleBasedTransitionModel
     private static void writeRules(
         List<DaylightSavingRule> rules,
         ObjectOutput out
@@ -249,11 +258,26 @@ final class SPX
         out.writeByte(rules.size());
 
         for (DaylightSavingRule rule : rules) {
-            out.writeObject(rule);
+            out.writeByte(rule.getType());
+
+            switch (rule.getType()) {
+                case FIXED_DAY_PATTERN_TYPE:
+                    writeFixedDayPattern(rule, out);
+                    break;
+                case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
+                    writeDayOfWeekInMonthPattern(rule, out);
+                    break;
+                case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+                    writeLastDayOfWeekPattern(rule, out);
+                    break;
+                default:
+                    out.writeObject(rule);
+            }
         }
 
     }
 
+    // called by CompositeTransitionModel and RuleBasedTransitionModel
     private static List<DaylightSavingRule> readRules(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -261,8 +285,24 @@ final class SPX
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
 
         for (int i = 0; i < n; i++) {
-            DaylightSavingRule rule = (DaylightSavingRule) in.readObject();
-            rules.add(rule);
+            int type = in.readByte();
+            Object rule;
+
+            switch (type) {
+                case FIXED_DAY_PATTERN_TYPE:
+                    rule = readFixedDayPattern(in);
+                    break;
+                case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
+                    rule = readDayOfWeekInMonthPattern(in);
+                    break;
+                case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+                    rule = readLastDayOfWeekPattern(in);
+                    break;
+                default:
+                    rule = in.readObject();
+            }
+
+            rules.add((DaylightSavingRule) rule);
         }
 
         return rules;
@@ -270,36 +310,63 @@ final class SPX
     }
 
     private static void writeDaylightSavingRule(
-        ObjectOutput out,
+        DataOutput out,
         DaylightSavingRule rule
     ) throws IOException {
 
-        out.writeObject(rule.getTimeOfDay());
-        out.writeChar(rule.getIndicator().getSymbol());
-        out.writeInt(rule.getSavings());
+        out.writeInt(rule.getTimeOfDay().get(SECOND_OF_DAY).intValue());
+        out.writeByte(rule.getIndicator().ordinal());
+        writeOffset(out, rule.getSavings());
 
     }
 
-    private void writeFixedDayPattern(ObjectOutput out) throws IOException {
+    private static void writeOffset(
+        DataOutput out,
+        int offset
+    ) throws IOException {
 
-        FixedDayPattern rule = (FixedDayPattern) this.obj;
-        int header = (FIXED_DAY_PATTERN_TYPE << 3);
-
-        out.writeByte(header);
-        out.writeByte(rule.getMonth());
-        out.writeByte(rule.getDayOfMonth());
-        writeDaylightSavingRule(out, rule);
+        if ((offset % 900) == 0) {
+            out.writeByte(offset / 900);
+        } else {
+            out.writeByte(127);
+            out.writeInt(offset);
+        }
 
     }
 
-    private Object readFixedDayPattern(ObjectInput in)
+    private static int readOffset(DataInput in) throws IOException {
+
+        int offset = in.readByte();
+
+        if (offset == 127) {
+            return in.readInt();
+        } else {
+            return offset * 900;
+        }
+
+    }
+
+    private static void writeFixedDayPattern(
+        Object rule,
+        DataOutput out
+    ) throws IOException {
+
+        FixedDayPattern pattern = (FixedDayPattern) rule;
+        out.writeByte(pattern.getMonth());
+        out.writeByte(pattern.getDayOfMonth());
+        writeDaylightSavingRule(out, pattern);
+
+    }
+
+    private static Object readFixedDayPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         int month = in.readByte();
         int dayOfMonth = in.readByte();
-        PlainTime timeOfDay = (PlainTime) in.readObject();
-        OffsetIndicator indicator = OffsetIndicator.parseSymbol(in.readChar());
-        int savings = in.readInt();
+        PlainTime timeOfDay =
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
+        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
+        int savings = readOffset(in);
 
         return new FixedDayPattern(
             Month.valueOf(month),
@@ -310,28 +377,27 @@ final class SPX
 
     }
 
-    private void writeDayOfWeekInMonthPattern(ObjectOutput out)
-        throws IOException {
+    private static void writeDayOfWeekInMonthPattern(
+        Object rule,
+        DataOutput out
+    ) throws IOException {
 
-        DayOfWeekInMonthPattern rule = (DayOfWeekInMonthPattern) this.obj;
-        int header = (DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE << 3);
+        DayOfWeekInMonthPattern pattern = (DayOfWeekInMonthPattern) rule;
+        out.writeByte(pattern.getMonth());
+        out.writeByte(pattern.getDayOfMonth());
 
-        out.writeByte(header);
-        out.writeByte(rule.getMonth());
-        out.writeByte(rule.getDayOfMonth());
+        int dow = pattern.getDayOfWeek();
 
-        int dow = rule.getDayOfWeek();
-
-        if (rule.isAfter()) {
+        if (pattern.isAfter()) {
             dow = -dow;
         }
 
         out.writeByte(dow);
-        writeDaylightSavingRule(out, rule);
+        writeDaylightSavingRule(out, pattern);
 
     }
 
-    private Object readDayOfWeekInMonthPattern(ObjectInput in)
+    private static Object readDayOfWeekInMonthPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         Month month = Month.valueOf(in.readByte());
@@ -339,9 +405,10 @@ final class SPX
         int dow = in.readByte();
         Weekday dayOfWeek = Weekday.valueOf(Math.abs(dow));
         boolean after = (dow < 0);
-        PlainTime timeOfDay = (PlainTime) in.readObject();
-        OffsetIndicator indicator = OffsetIndicator.parseSymbol(in.readChar());
-        int savings = in.readInt();
+        PlainTime timeOfDay =
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
+        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
+        int savings = readOffset(in);
 
         return new DayOfWeekInMonthPattern(
             month,
@@ -354,27 +421,27 @@ final class SPX
 
     }
 
-    private void writeLastDayOfWeekPattern(ObjectOutput out)
-        throws IOException {
+    private static void writeLastDayOfWeekPattern(
+        Object rule,
+        DataOutput out
+    ) throws IOException {
 
-        LastDayOfWeekPattern rule = (LastDayOfWeekPattern) this.obj;
-        int header = (LAST_DAY_OF_WEEK_PATTERN_TYPE << 3);
-
-        out.writeByte(header);
-        out.writeByte(rule.getMonth());
-        out.writeByte(rule.getDayOfWeek());
-        writeDaylightSavingRule(out, rule);
+        LastDayOfWeekPattern pattern = (LastDayOfWeekPattern) rule;
+        out.writeByte(pattern.getMonth());
+        out.writeByte(pattern.getDayOfWeek());
+        writeDaylightSavingRule(out, pattern);
 
     }
 
-    private Object readLastDayOfWeekPattern(ObjectInput in)
+    private static Object readLastDayOfWeekPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         Month month = Month.valueOf(in.readByte());
         Weekday dayOfWeek = Weekday.valueOf(in.readByte());
-        PlainTime timeOfDay = (PlainTime) in.readObject();
-        OffsetIndicator indicator = OffsetIndicator.parseSymbol(in.readChar());
-        int savings = in.readInt();
+        PlainTime timeOfDay =
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, in.readInt());
+        OffsetIndicator indicator = OffsetIndicator.VALUES[in.readByte()];
+        int savings = readOffset(in);
 
         return new LastDayOfWeekPattern(
             month,
@@ -389,10 +456,7 @@ final class SPX
         throws IOException {
 
         RuleBasedTransitionModel model = (RuleBasedTransitionModel) this.obj;
-        int header = (RULE_BASED_TRANSITION_MODEL_TYPE << 3);
         ZonalTransition initial = model.getInitialTransition();
-
-        out.writeByte(header);
         out.writeLong(initial.getPosixTime());
         out.writeInt(initial.getPreviousOffset());
         out.writeInt(initial.getTotalOffset());
@@ -416,8 +480,6 @@ final class SPX
         throws IOException {
 
         ArrayTransitionModel model = (ArrayTransitionModel) this.obj;
-        int header = (ARRAY_TRANSITION_MODEL_TYPE << 3);
-        out.writeByte(header);
         model.writeTransitions(out);
 
     }
@@ -433,8 +495,6 @@ final class SPX
         throws IOException {
 
         CompositeTransitionModel model = (CompositeTransitionModel) this.obj;
-        int header = (COMPOSITE_TRANSITION_MODEL_TYPE << 3);
-        out.writeByte(header);
         model.writeTransitions(out);
         writeRules(model.getRules(), out);
 
