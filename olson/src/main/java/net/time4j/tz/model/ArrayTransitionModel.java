@@ -334,16 +334,36 @@ final class ArrayTransitionModel
     }
 
     // Called by CompositeTransitionModel
-    List<ZonalTransition> getTransitions(int size) {
+    boolean equals(
+        ArrayTransitionModel other,
+        int s1,
+        int s2
+    ) {
 
-        int n = Math.min(size, this.transitions.length);
-        List<ZonalTransition> t = new ArrayList<ZonalTransition>(n);
+        int n1 = Math.min(s1, this.transitions.length);
+        int n2 = Math.min(s2, other.transitions.length);
 
-        for (int i = 0; i < n; i++) {
-            t.add(this.transitions[i]);
+        if (n1 != n2) {
+            return false;
         }
 
-        return t;
+        for (int i = 0; i < n1; i++) {
+            if (!this.transitions[i].equals(other.transitions[i])) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    // Called by CompositeTransitionModel
+    int hashCode(int size) {
+
+        int n = Math.min(size, this.transitions.length);
+        ZonalTransition[] tmp = new ZonalTransition[n];
+        System.arraycopy(this.transitions, 0, tmp, 0, n);
+        return Arrays.hashCode(tmp);
 
     }
 

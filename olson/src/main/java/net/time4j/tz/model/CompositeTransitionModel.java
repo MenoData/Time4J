@@ -60,9 +60,9 @@ final class CompositeTransitionModel
     private transient final int size;
     private transient final ArrayTransitionModel arrayModel;
     private transient final RuleBasedTransitionModel ruleModel;
+    private transient final ZonalTransition last;
 
     // Cache
-    private transient final ZonalTransition last;
     private transient int hash = 0;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -177,8 +177,8 @@ final class CompositeTransitionModel
         } else if (obj instanceof CompositeTransitionModel) {
             CompositeTransitionModel that = (CompositeTransitionModel) obj;
             return (
-                this.ruleModel.getRules().equals(that.ruleModel.getRules())
-                && this.getTransitions().equals(that.getTransitions()));
+                this.arrayModel.equals(that.arrayModel, this.size, that.size)
+                && this.ruleModel.getRules().equals(that.ruleModel.getRules()));
         } else {
             return false;
         }
@@ -191,7 +191,7 @@ final class CompositeTransitionModel
         int h = this.hash;
 
         if (h == 0) {
-            h = this.getTransitions().hashCode();
+            h = this.arrayModel.hashCode(this.size);
             h += (37 * this.ruleModel.getRules().hashCode());
             this.hash = h;
         }
@@ -235,12 +235,6 @@ final class CompositeTransitionModel
     List<DaylightSavingRule> getRules() {
 
         return this.ruleModel.getRules();
-
-    }
-
-    private List<ZonalTransition> getTransitions() {
-
-        return this.arrayModel.getTransitions(this.size);
 
     }
 
