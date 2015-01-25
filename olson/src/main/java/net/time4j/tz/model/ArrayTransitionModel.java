@@ -23,10 +23,11 @@ package net.time4j.tz.model;
 
 import net.time4j.Moment;
 import net.time4j.SystemClock;
+import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
-import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -35,7 +36,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,11 +52,11 @@ import static net.time4j.CalendarUnit.YEARS;
  * @concurrency <immutable>
  */
 final class ArrayTransitionModel
-    implements TransitionHistory, Serializable {
+    extends TransitionModel {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = -9104454852317745314L;
+//    private static final long serialVersionUID = -9104454852317745314L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -69,13 +69,15 @@ final class ArrayTransitionModel
     //~ Konstruktoren -----------------------------------------------------
 
     ArrayTransitionModel(List<ZonalTransition> transitions) {
-        this(transitions, true);
+        this(transitions, SystemClock.INSTANCE, true, true);
 
     }
 
     ArrayTransitionModel(
         List<ZonalTransition> transitions,
-        boolean checkSanity
+        TimeSource<?> clock,
+        boolean create,
+        boolean sanityCheck
     ) {
         super();
 
@@ -87,28 +89,20 @@ final class ArrayTransitionModel
         int n = transitions.size();
         ZonalTransition[] tmp = new ZonalTransition[n];
         tmp = transitions.toArray(tmp);
-        Arrays.sort(tmp);
-        this.transitions = tmp;
 
-        if (checkSanity) {
-            int previous = tmp[0].getTotalOffset();
-
-            for (int i = 1; i < n; i++) {
-                if (previous != tmp[i].getPreviousOffset()) {
-                    throw new IllegalArgumentException(
-                        "Model inconsistency detected: " + transitions);
-                } else {
-                    previous = tmp[i].getTotalOffset();
-                }
-            }
+        if (create) {
+            Arrays.sort(tmp);
         }
 
-        // fill cache
-        Moment end =
-            SystemClock.inZonalView(ZonalOffset.UTC)
-                .now()
-                .plus(1, YEARS)
-                .atUTC();
+        if (sanityCheck) {
+            checkSanity(tmp, transitions);
+        }
+
+        this.transitions = tmp;
+
+        // fill standard transition cache
+        ZonalClock c = new ZonalClock(clock, ZonalOffset.UTC);
+        Moment end = c.now().plus(1, YEARS).atUTC();
         this.stdTransitions =
             getTransitions(this.transitions, Moment.UNIX_EPOCH, end);
 
@@ -182,13 +176,6 @@ final class ArrayTransitionModel
     ) {
 
         return getTransitions(this.transitions, startInclusive, endExclusive);
-
-    }
-
-    @Override
-    public boolean isEmpty() {
-
-        return false;
 
     }
 
@@ -364,6 +351,25 @@ final class ArrayTransitionModel
         ZonalTransition[] tmp = new ZonalTransition[n];
         System.arraycopy(this.transitions, 0, tmp, 0, n);
         return Arrays.hashCode(tmp);
+
+    }
+
+    // Called by CompositeTransitionModel
+    static void checkSanity(
+        ZonalTransition[] transitions,
+        List<ZonalTransition> original
+    ) {
+
+        int previous = transitions[0].getTotalOffset();
+
+        for (int i = 1; i < transitions.length; i++) {
+            if (previous != transitions[i].getPreviousOffset()) {
+                throw new IllegalArgumentException(
+                    "Model inconsistency detected: " + original);
+            } else {
+                previous = transitions[i].getTotalOffset();
+            }
+        }
 
     }
 

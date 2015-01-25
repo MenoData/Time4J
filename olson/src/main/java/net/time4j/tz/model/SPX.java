@@ -23,7 +23,9 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
+import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
 import java.io.DataInput;
@@ -31,11 +33,13 @@ import java.io.DataOutput;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static net.time4j.PlainTime.SECOND_OF_DAY;
@@ -45,6 +49,7 @@ import static net.time4j.PlainTime.SECOND_OF_DAY;
  * <p><i>Serialization Proxy</i> f&uuml;r die Zeitzonenhistorie. </p>
  *
  * @author  Meno Hochschild
+ * @since   2.2
  * @serial  include
  */
 final class SPX
@@ -149,13 +154,13 @@ final class SPX
                 writeLastDayOfWeekPattern(this.obj, out);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
-                this.writeRuleBasedTransitionModel(out);
+                writeRuleBasedTransitionModel(this.obj, out);
                 break;
             case ARRAY_TRANSITION_MODEL_TYPE:
-                this.writeArrayTransitionModel(out);
+                writeArrayTransitionModel(this.obj, out);
                 break;
             case COMPOSITE_TRANSITION_MODEL_TYPE:
-                this.writeCompositeTransitionModel(out);
+                writeCompositeTransitionModel(this.obj, out);
                 break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
@@ -194,13 +199,13 @@ final class SPX
                 this.obj = readLastDayOfWeekPattern(in);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
-                this.obj = this.readRuleBasedTransitionModel(in);
+                this.obj = readRuleBasedTransitionModel(in);
                 break;
             case ARRAY_TRANSITION_MODEL_TYPE:
-                this.obj = this.readArrayTransitionModel(in);
+                this.obj = readArrayTransitionModel(in);
                 break;
             case COMPOSITE_TRANSITION_MODEL_TYPE:
-                this.obj = this.readCompositeTransitionModel(in);
+                this.obj = readCompositeTransitionModel(in);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -215,25 +220,61 @@ final class SPX
         ObjectOutput out
     ) throws IOException {
 
-        out.writeInt(size);
-        writeOffset(out, transitions[0].getPreviousOffset());
+        int n = Math.min(size, transitions.length);
+        out.writeInt(n);
 
-        for (int i = 0, n = Math.min(size, transitions.length); i < n; i++) {
-            ZonalTransition transition = transitions[i];
-            out.writeLong(transition.getPosixTime());
-            writeOffset(out, transition.getTotalOffset());
-            writeOffset(out, transition.getDaylightSavingOffset());
+        // TODO: optimization (usually only three!!! bytes per transition)
+        if (n > 0) {
+            writeOffset(out, transitions[0].getPreviousOffset());
+
+            for (int i = 0; i < n; i++) {
+                ZonalTransition transition = transitions[i];
+                out.writeLong(transition.getPosixTime());
+                writeOffset(out, transition.getTotalOffset());
+                writeOffset(out, transition.getDaylightSavingOffset());
+            }
         }
 
     }
 
-    // called by CompositeTransitionModel and ArrayTransitionModel
-    private static List<ZonalTransition> readTransitions(ObjectInput in)
+    // called by tzdb-compiler
+    static void writeTransitions(
+        List<ZonalTransition> transitions,
+        ObjectOutput out
+    ) throws IOException {
+
+        int n = transitions.size();
+        out.writeInt(n);
+
+        // TODO: optimization (usually only three!!! bytes per transition)
+        if (n > 0) {
+            writeOffset(out, transitions.get(0).getPreviousOffset());
+
+            for (int i = 0; i < n; i++) {
+                ZonalTransition transition = transitions.get(i);
+                out.writeLong(transition.getPosixTime());
+                writeOffset(out, transition.getTotalOffset());
+                writeOffset(out, transition.getDaylightSavingOffset());
+            }
+        }
+
+    }
+
+    // called by
+    // tzdb-provider, CompositeTransitionModel and ArrayTransitionModel
+    static List<ZonalTransition> readTransitions(ObjectInput in)
         throws IOException {
 
         int n = in.readInt();
-        int previous = readOffset(in);
+
+        if (n == 0) {
+            return Collections.emptyList();
+        }
+
+        // TODO: check order of items
+        // TODO: optimization (usually only three!!! bytes per transition)
         List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
+        int previous = readOffset(in);
 
         for (int i = 0; i < n; i++) {
             long posix = in.readLong();
@@ -249,8 +290,9 @@ final class SPX
 
     }
 
-    // called by CompositeTransitionModel and RuleBasedTransitionModel
-    private static void writeRules(
+    // called by
+    // tzdb-compiler, CompositeTransitionModel and RuleBasedTransitionModel
+    static void writeRules(
         List<DaylightSavingRule> rules,
         ObjectOutput out
     ) throws IOException {
@@ -277,16 +319,23 @@ final class SPX
 
     }
 
-    // called by CompositeTransitionModel and RuleBasedTransitionModel
-    private static List<DaylightSavingRule> readRules(ObjectInput in)
+    // called by
+    // tzdb-provider, CompositeTransitionModel and RuleBasedTransitionModel
+    static List<DaylightSavingRule> readRules(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         int n = in.readByte();
+
+        if (n == 0) {
+            return Collections.emptyList();
+        }
+
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
+        DaylightSavingRule previous = null;
 
         for (int i = 0; i < n; i++) {
             int type = in.readByte();
-            Object rule;
+            DaylightSavingRule rule;
 
             switch (type) {
                 case FIXED_DAY_PATTERN_TYPE:
@@ -299,10 +348,19 @@ final class SPX
                     rule = readLastDayOfWeekPattern(in);
                     break;
                 default:
-                    rule = in.readObject();
+                    rule = (DaylightSavingRule) in.readObject();
             }
 
-            rules.add((DaylightSavingRule) rule);
+            if (
+                (previous != null)
+                && (RuleComparator.INSTANCE.compare(previous, rule) >= 0)
+            ) {
+                throw new InvalidObjectException(
+                    "Order of daylight saving rules is not ascending.");
+            }
+
+            previous = rule;
+            rules.add(rule);
         }
 
         return rules;
@@ -319,9 +377,9 @@ final class SPX
         int dst = rule.getSavings();
 
         if (dst == 0) {
-            out.writeInt(indicator | 4 | tod);
+            out.writeInt(indicator | tod | 8);
         } else if (dst == 3600) {
-            out.writeInt(indicator | 8 | tod);
+            out.writeInt(indicator | tod | 16);
         } else {
             out.writeInt(indicator | tod);
             writeOffset(out, dst);
@@ -360,9 +418,9 @@ final class SPX
         DataInput in
     ) throws IOException {
 
-        if ((offsetInfo & 4) == 4) {
+        if ((offsetInfo & 8) == 8) {
             return 0;
-        } else if ((offsetInfo & 8) == 8) {
+        } else if ((offsetInfo & 16) == 16) {
             return 3600;
         } else {
             return readOffset(in);
@@ -382,7 +440,7 @@ final class SPX
 
     }
 
-    private static Object readFixedDayPattern(DataInput in)
+    private static DaylightSavingRule readFixedDayPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         int month = in.readByte();
@@ -392,7 +450,7 @@ final class SPX
         PlainTime timeOfDay =
             PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
         byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
         int savings = readSavings(offsetInfo, in);
 
         return new FixedDayPattern(
@@ -424,7 +482,7 @@ final class SPX
 
     }
 
-    private static Object readDayOfWeekInMonthPattern(DataInput in)
+    private static DaylightSavingRule readDayOfWeekInMonthPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         Month month = Month.valueOf(in.readByte());
@@ -437,7 +495,7 @@ final class SPX
         PlainTime timeOfDay =
             PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
         byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
         int savings = readSavings(offsetInfo, in);
 
         return new DayOfWeekInMonthPattern(
@@ -463,7 +521,7 @@ final class SPX
 
     }
 
-    private static Object readLastDayOfWeekPattern(DataInput in)
+    private static DaylightSavingRule readLastDayOfWeekPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
         Month month = Month.valueOf(in.readByte());
@@ -473,7 +531,7 @@ final class SPX
         PlainTime timeOfDay =
             PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
         byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 3];
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
         int savings = readSavings(offsetInfo, in);
 
         return new LastDayOfWeekPattern(
@@ -485,10 +543,12 @@ final class SPX
 
     }
 
-    private void writeRuleBasedTransitionModel(ObjectOutput out)
-        throws IOException {
+    private static void writeRuleBasedTransitionModel(
+        Object obj,
+        ObjectOutput out
+    ) throws IOException {
 
-        RuleBasedTransitionModel model = (RuleBasedTransitionModel) this.obj;
+        RuleBasedTransitionModel model = (RuleBasedTransitionModel) obj;
         ZonalTransition initial = model.getInitialTransition();
         out.writeLong(initial.getPosixTime());
         writeOffset(out, initial.getPreviousOffset());
@@ -498,7 +558,7 @@ final class SPX
 
     }
 
-    private Object readRuleBasedTransitionModel(ObjectInput in)
+    private static Object readRuleBasedTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         long posixTime = in.readLong();
@@ -508,40 +568,58 @@ final class SPX
         ZonalTransition initial =
             new ZonalTransition(posixTime, previous, total, dst);
         List<DaylightSavingRule> rules = readRules(in);
-        return new RuleBasedTransitionModel(initial, rules, false);
+
+        return new RuleBasedTransitionModel(
+            initial,
+            rules,
+            SystemClock.INSTANCE,
+            false);
 
     }
 
-    private void writeArrayTransitionModel(ObjectOutput out)
-        throws IOException {
+    private static void writeArrayTransitionModel(
+        Object obj,
+        ObjectOutput out
+    ) throws IOException {
 
-        ArrayTransitionModel model = (ArrayTransitionModel) this.obj;
+        ArrayTransitionModel model = (ArrayTransitionModel) obj;
         model.writeTransitions(out);
 
     }
 
-    private Object readArrayTransitionModel(ObjectInput in)
+    private static Object readArrayTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        return new ArrayTransitionModel(readTransitions(in), false);
+        return new ArrayTransitionModel(
+            readTransitions(in),
+            SystemClock.INSTANCE,
+            false,
+            false);
 
     }
 
-    private void writeCompositeTransitionModel(ObjectOutput out)
-        throws IOException {
+    private static void writeCompositeTransitionModel(
+        Object obj,
+        ObjectOutput out
+    ) throws IOException {
 
-        CompositeTransitionModel model = (CompositeTransitionModel) this.obj;
+        CompositeTransitionModel model = (CompositeTransitionModel) obj;
+        writeOffset(out, model.getInitialOffset().getIntegralAmount());
         model.writeTransitions(out);
         writeRules(model.getRules(), out);
 
     }
 
-    private Object readCompositeTransitionModel(ObjectInput in)
+    private static Object readCompositeTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        List<ZonalTransition> transitions = readTransitions(in);
-        List<DaylightSavingRule> rules = readRules(in);
-        return TransitionModel.of(transitions, rules);
+        return TransitionModel.of(
+            ZonalOffset.ofTotalSeconds(readOffset(in)),
+            readTransitions(in),
+            readRules(in),
+            SystemClock.INSTANCE,
+            false,
+            false);
 
     }
 

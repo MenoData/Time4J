@@ -22,9 +22,9 @@
 package net.time4j.tz.model;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
-import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -33,7 +33,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +48,7 @@ import java.util.List;
  * @concurrency <immutable>
  */
 final class CompositeTransitionModel
-    implements TransitionHistory, Serializable {
+    extends TransitionModel {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -70,14 +69,19 @@ final class CompositeTransitionModel
     CompositeTransitionModel(
         int size,
         List<ZonalTransition> transitions,
-        List<DaylightSavingRule> rules
+        List<DaylightSavingRule> rules,
+        TimeSource<?> clock,
+        boolean create,
+        boolean sanityCheck
     ) {
         super();
 
         this.size = size;
-        this.arrayModel = new ArrayTransitionModel(transitions);
+        this.arrayModel =
+            new ArrayTransitionModel(transitions, clock, create, sanityCheck);
         this.last = this.arrayModel.getLastTransition();
-        this.ruleModel = new RuleBasedTransitionModel(this.last, rules, true);
+        this.ruleModel =
+            new RuleBasedTransitionModel(this.last, rules, clock, create);
 
     }
 
@@ -159,13 +163,6 @@ final class CompositeTransitionModel
         result.addAll(this.arrayModel.getTransitions(start, end));
         result.addAll(this.ruleModel.getTransitions(start, end));
         return Collections.unmodifiableList(result);
-
-    }
-
-    @Override
-    public boolean isEmpty() {
-
-        return false;
 
     }
 

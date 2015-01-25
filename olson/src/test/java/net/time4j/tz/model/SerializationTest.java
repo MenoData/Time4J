@@ -124,7 +124,6 @@ public class SerializationTest {
     }
 
     private static RuleBasedTransitionModel createModelOfEuropeanUnion() {
-
         DaylightSavingRule spring =
             DaylightSavingRule.ofLastWeekday(
                 Month.MARCH,
@@ -201,7 +200,10 @@ public class SerializationTest {
         return new CompositeTransitionModel(
             4,
             Arrays.asList(fourth, first, third, second),
-            rules);
+            rules,
+            SystemClock.INSTANCE,
+            true,
+            true);
     }
 
 }

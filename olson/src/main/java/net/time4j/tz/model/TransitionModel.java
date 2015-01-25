@@ -23,16 +23,20 @@ package net.time4j.tz.model;
 
 import net.time4j.Moment;
 import net.time4j.SystemClock;
+import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.base.TimeSource;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,19 +50,26 @@ import static net.time4j.tz.ZonalOffset.UTC;
  *
  * @author  Meno Hochschild
  * @since   2.2
+ * @serial  exclude
+ * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Fabrikklasse f&uuml;r die Erzeugung einer {@code TransitionHistory}. </p>
  *
  * @author  Meno Hochschild
  * @since   2.2
+ * @serial  exclude
+ * @concurrency <immutable>
  */
-public class TransitionModel {
+public abstract class TransitionModel
+    implements TransitionHistory, Serializable {
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private TransitionModel() {
-        // no instantiation
+    // package-private for subclasses only
+    TransitionModel() {
+        super();
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -94,7 +105,7 @@ public class TransitionModel {
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 2 or more than 127 rules
+     *          or if there are less than 0 or exactly 1 or more than 127 rules
      * @since   2.2
      */
     /*[deutsch]
@@ -104,7 +115,7 @@ public class TransitionModel {
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 2 or more than 127 rules
+     *          or if there are less than 0 or exactly 1 or more than 127 rules
      * @since   2.2
      */
     public static TransitionHistory of(
@@ -112,7 +123,11 @@ public class TransitionModel {
         List<DaylightSavingRule> rules
     ) {
 
-        return new RuleBasedTransitionModel(standardOffset, rules);
+        if (rules.isEmpty()) {
+            return Timezone.of(standardOffset).getHistory();
+        } else {
+            return new RuleBasedTransitionModel(standardOffset, rules);
+        }
 
     }
 
@@ -120,42 +135,108 @@ public class TransitionModel {
      * <p>Creates a transition history of both historic transitions and
      * rules for future transitions as well. </p>
      *
+     * @param   initialOffset   initial offset
      * @param   transitions     list of zonal transitions
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are no transitions at all
-     *          or if there are less than 2 or more than 127 rules
+     *          or if there are less than 0 or exactly 1 or more than 127 rules
      * @since   2.2
      */
     /*[deutsch]
      * <p>Erzeugt eine {@code TransitionHistory}, die sowohl historische
-     * &Uuml;berg&auml;nge definiert als auch Regeln f&uuml;r die Zukunft. </p>
+     * &Uuml;berg&auml;nge als auch Regeln f&uuml;r die Zukunft definiert. </p>
      *
+     * @param   initialOffset   initial offset
      * @param   transitions     list of zonal transitions
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are no transitions at all
-     *          or if there are less than 2 or more than 127 rules
+     *          or if there are less than 0 or exactly 1 or more than 127 rules
      * @since   2.2
      */
     public static TransitionHistory of(
+        ZonalOffset initialOffset,
         List<ZonalTransition> transitions,
         List<DaylightSavingRule> rules
     ) {
 
-        List<ZonalTransition> t = new ArrayList<ZonalTransition>(transitions);
-        int n = t.size();
-        ZonalTransition z = t.get(n - 1);
-        Moment t1 = Moment.of(z.getPosixTime() + 1, TimeScale.POSIX);
-        Moment t2 = SystemClock.inZonalView(UTC).now().plus(1, YEARS).atUTC();
+        return TransitionModel.of(
+            initialOffset,
+            transitions,
+            rules,
+            SystemClock.INSTANCE,
+            true,
+            true);
 
-        if (t1.isBefore(t2)) {
-            t.addAll(RuleBasedTransitionModel.getTransitions(z, rules, t1, t2));
+    }
+
+    @Override
+    public boolean isEmpty() {
+
+        return false;
+
+    }
+
+    // Hauptmethode
+    static TransitionHistory of(
+        ZonalOffset initialOffset,
+        List<ZonalTransition> transitions,
+        List<DaylightSavingRule> rules,
+        TimeSource<?> clock,
+        boolean create,
+        boolean sanityCheck
+    ) {
+
+        List<ZonalTransition> t;
+        List<DaylightSavingRule> r;
+
+        if (create) {
+            t = new ArrayList<ZonalTransition>(transitions);
+            r = new ArrayList<DaylightSavingRule>(rules);
+            Collections.sort(t);
+            Collections.sort(r, RuleComparator.INSTANCE);
+        } else {
+            t = transitions;
+            r = rules;
         }
 
-        return new CompositeTransitionModel(n, t, rules);
+        int n = t.size();
+
+        if (n == 0) {
+            if (r.isEmpty()) {
+                return Timezone.of(initialOffset).getHistory();
+            } else {
+                return new RuleBasedTransitionModel(
+                    initialOffset,
+                    r,
+                    clock,
+                    false);
+            }
+        }
+
+        ZonalOffset first =
+            ZonalOffset.ofTotalSeconds(t.get(0).getPreviousOffset());
+
+        if (!initialOffset.equals(first)) {
+            throw new IllegalArgumentException(
+                "Initial offset " + initialOffset + " not equal "
+                + "to previous offset of first transition: " + first);
+        } else if (r.isEmpty()) {
+            return new ArrayTransitionModel(t, clock, false, sanityCheck);
+        }
+
+        ZonalTransition last = t.get(n - 1);
+        Moment t1 = Moment.of(last.getPosixTime() + 1, TimeScale.POSIX);
+        ZonalClock c = new ZonalClock(clock, UTC);
+        Moment t2 = c.now().plus(1, YEARS).atUTC();
+
+        if (t1.isBefore(t2)) {
+            t.addAll( // enhance array part
+                RuleBasedTransitionModel.getTransitions(last, r, t1, t2));
+        }
+
+        return new CompositeTransitionModel(n, t, r, clock, false, sanityCheck);
 
     }
 

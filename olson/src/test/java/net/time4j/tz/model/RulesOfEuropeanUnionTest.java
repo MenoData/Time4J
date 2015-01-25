@@ -378,6 +378,7 @@ public class RulesOfEuropeanUnionTest {
     }
 
     private static RuleBasedTransitionModel createModel() {
+
         DaylightSavingRule spring =
             DaylightSavingRule.ofLastWeekday(
                 Month.MARCH,
@@ -392,6 +393,7 @@ public class RulesOfEuropeanUnionTest {
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 0);
+
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
         rules.add(autumn);
         rules.add(spring);

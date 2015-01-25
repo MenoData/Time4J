@@ -24,13 +24,14 @@ package net.time4j.tz.model;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
+import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
-import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -38,10 +39,8 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -58,27 +57,15 @@ import static net.time4j.CalendarUnit.YEARS;
  * @concurrency <immutable>
  */
 final class RuleBasedTransitionModel
-    implements TransitionHistory, Serializable {
+    extends TransitionModel {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final Comparator<DaylightSavingRule> RULE_COMPARATOR =
-        new Comparator<DaylightSavingRule>() {
-            @Override
-            public int compare(DaylightSavingRule o1, DaylightSavingRule o2) {
-                int result = o1.getDate(2000).compareTo(o2.getDate(2000));
-                if (result == 0) {
-                    result = o1.getTimeOfDay().compareTo(o2.getTimeOfDay());
-                }
-                return result;
-            }
-        };
 
     private static final int LAST_CACHED_YEAR =
         SystemClock.inZonalView(ZonalOffset.UTC).today()
         .plus(100, YEARS).getYear();
 
-    private static final long serialVersionUID = -8510991381885304060L;
+//    private static final long serialVersionUID = -8510991381885304060L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -96,6 +83,16 @@ final class RuleBasedTransitionModel
         ZonalOffset stdOffset,
         List<DaylightSavingRule> rules
     ) {
+        this(stdOffset, rules, SystemClock.INSTANCE, true);
+
+    }
+
+    RuleBasedTransitionModel(
+        ZonalOffset stdOffset,
+        List<DaylightSavingRule> rules,
+        TimeSource<?> clock,
+        boolean create
+    ) {
         this(
             new ZonalTransition(
                 Long.MIN_VALUE,
@@ -103,7 +100,8 @@ final class RuleBasedTransitionModel
                 stdOffset.getIntegralAmount(),
                 0),
             rules,
-            true
+            clock,
+            create
         );
 
     }
@@ -111,6 +109,7 @@ final class RuleBasedTransitionModel
     RuleBasedTransitionModel(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
+        TimeSource<?> clock,
         boolean create
     ) {
         super();
@@ -129,7 +128,7 @@ final class RuleBasedTransitionModel
         }
 
         List<DaylightSavingRule> sortedRules = rules;
-        Collections.sort(sortedRules, RULE_COMPARATOR);
+        Collections.sort(sortedRules, RuleComparator.INSTANCE);
         boolean hasRuleWithoutDST = false;
 
         for (DaylightSavingRule rule : sortedRules) {
@@ -172,11 +171,9 @@ final class RuleBasedTransitionModel
         this.initial = zt;
         this.rules = Collections.unmodifiableList(sortedRules);
 
-        Moment end =
-            SystemClock.inZonalView(ZonalOffset.UTC)
-                .now()
-                .plus(1, YEARS)
-                .atUTC();
+        // fill standard transition cache
+        ZonalClock c = new ZonalClock(clock, ZonalOffset.UTC);
+        Moment end = c.now().plus(1, YEARS).atUTC();
         this.stdTransitions =
             getTransitions(this.initial, this.rules, Moment.UNIX_EPOCH, end);
 
@@ -237,10 +234,7 @@ final class RuleBasedTransitionModel
     @Override
     public ZonalTransition getNextTransition(UnixTime ut) {
 
-        return getNextTransition(
-            ut.getPosixTime(),
-            this.initial,
-            this.rules);
+        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
 
     }
 
@@ -263,13 +257,6 @@ final class RuleBasedTransitionModel
 
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
         return this.getValidOffsets(localDate, localSecs);
-
-    }
-
-    @Override
-    public boolean isEmpty() {
-
-        return false;
 
     }
 

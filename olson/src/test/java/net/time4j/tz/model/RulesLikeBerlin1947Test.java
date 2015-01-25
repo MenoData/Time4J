@@ -383,7 +383,7 @@ public class RulesLikeBerlin1947Test {
                 PlainTime.of(2),
                 OffsetIndicator.STANDARD_TIME,
                 0);
-        
+
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
         rules.add(spring);
         rules.add(startHighSummer);
