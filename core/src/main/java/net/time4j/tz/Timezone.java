@@ -234,7 +234,7 @@ public abstract class Timezone
             ) {
                 systemTZ = ZonalOffset.UTC.getModel();
             } else if (zoneID != null) {
-                systemTZ = Timezone.getTZ(new NamedID(zoneID), zoneID, false);
+                systemTZ = Timezone.getTZ(resolve(zoneID), zoneID, false);
             }
         } catch (SecurityException se) {
             // OK, dann Zugriff auf j.u.TimeZone.getDefault()
