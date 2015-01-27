@@ -490,25 +490,12 @@ final class ArrayTransitionModel
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 26}. Then the
-     *              data bytes for the internal transitions follow.
-     *
-     * Schematic algorithm:
-     *
-     * <pre>
-     *  int header = (26 << 3);
-     *  out.writeByte(header);
-     *
-     *  out.writeInt(getTransitions().size());
-     *  out.writeInt(getTransitions().get(0).getPreviousOffset());
-     *
-     *  for (ZonalTransition transition : getTransitions()) {
-     *      out.writeLong(transition.getPosixTime());
-     *      out.writeInt(transition.getTotalOffset());
-     *      out.writeInt(transition.getDaylightSavingOffset());
-     *  }
-     * </pre>
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 126}. Then the data bytes for the internal
+     *              transitions follow. The complex algorithm exploits the
+     *              fact that allmost all transitions happen at full hours
+     *              around midnight in local standard time. Insight in details
+     *              see source code.
      */
     private Object writeReplace() throws ObjectStreamException {
 

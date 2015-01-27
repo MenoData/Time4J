@@ -45,7 +45,7 @@ final class FixedDayPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = -4251253428657027523L;
+//    private static final long serialVersionUID = -4251253428657027523L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -159,19 +159,17 @@ final class FixedDayPattern
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 20}. Then the
-     *              bytes for the month (1-12) and the day of month follow.
-     *              Finally the bytes for time of day (as seconds of day),
-     *              offset indicator and the daylight saving amount in seconds
-     *              follow in a specialized compressed form.
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 120}. Then the bytes for the month (1-12) and the
+     *              day of month follow. Finally the bytes for time of day
+     *              (as seconds of day), offset indicator and the daylight
+     *              saving amount in seconds follow in a specialized compressed
+     *              form.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = (20 << 3);
-     *
-     *  out.writeByte(header);
+     *  out.writeByte(120);
      *  out.writeByte(getMonth());
      *  out.writeByte(getDayOfMonth());
      *  writeDaylightSavingRule(out, this);
@@ -185,9 +183,9 @@ final class FixedDayPattern
      *    int dst = rule.getSavings();
      *
      *    if (dst == 0) {
-     *      out.writeInt(indicator | 4 | tod);
+     *      out.writeInt(indicator | tod | 8);
      *    } else if (dst == 3600) {
-     *      out.writeInt(indicator | 8 | tod);
+     *      out.writeInt(indicator | tod | 16);
      *    } else {
      *      out.writeInt(indicator | tod);
      *      writeOffset(out, dst);

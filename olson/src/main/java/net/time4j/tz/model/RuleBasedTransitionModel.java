@@ -595,31 +595,11 @@ final class RuleBasedTransitionModel
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 25}. Then the
-     *              data bytes for the initial transition before this model
-     *              and the list of daylight saving rules follow.
-     *
-     * Schematic algorithm:
-     *
-     * <pre>
-     *  int header = (25 << 3);
-     *  ZonalTransition initial;
-     *  List&lt;DaylightSavingRule&gt; rules;
-     *
-     *  out.writeByte(header);
-     *
-     *  out.writeLong(initial.getPosixTime());
-     *  out.writeInt(initial.getPreviousOffset());
-     *  out.writeInt(initial.getTotalOffset());
-     *  out.writeInt(initial.getDaylightSavingOffset());
-     *
-     *  out.writeByte(rules.size());
-     *
-     *  for (int i = 0; i &lt; n; i++) {
-     *      out.writeObject(rules.get(i));
-     *  }
-     * </pre>
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 125}. Then the data bytes for the internal
+     *              rules follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
      */
     private Object writeReplace() throws ObjectStreamException {
 

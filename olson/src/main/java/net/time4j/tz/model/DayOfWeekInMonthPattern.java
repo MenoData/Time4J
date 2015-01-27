@@ -47,7 +47,7 @@ final class DayOfWeekInMonthPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 5674275621059626593L;
+//    private static final long serialVersionUID = 5674275621059626593L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -215,22 +215,19 @@ final class DayOfWeekInMonthPattern
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 21}. Then the
-     *              bytes for the month (1-12) and the day of month follow.
-     *              After this the byte for the day of the week follows
-     *              (Mo=1, Tu=2, ..., Su=7) - multiplied with {@code -1} if
-     *              the day of week is searched after the day of month.
-     *              Finally the bytes for time of day (as seconds of day),
-     *              offset indicator and the daylight saving amount in seconds
-     *              follow in a specialized compressed form.
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 121}. Then the bytes for the month (1-12) and the
+     *              day of month follow. After this the byte for the day of the
+     *              week follows (Mo=1, Tu=2, ..., Su=7) - multiplied with
+     *              {@code -1} if the day of week is searched after the day of
+     *              month. Finally the bytes for time of day (as seconds of
+     *              day), offset indicator and the daylight saving amount in
+     *              seconds follow in a specialized compressed form.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = (21 << 3);
-     *
-     *  out.writeByte(header);
+     *  out.writeByte(121);
      *  out.writeByte(getMonth());
      *  out.writeByte(getDayOfMonth());
      *  int dow = getDayOfWeek();
@@ -249,9 +246,9 @@ final class DayOfWeekInMonthPattern
      *    int dst = rule.getSavings();
      *
      *    if (dst == 0) {
-     *      out.writeInt(indicator | 4 | tod);
+     *      out.writeInt(indicator | tod | 8);
      *    } else if (dst == 3600) {
-     *      out.writeInt(indicator | 8 | tod);
+     *      out.writeInt(indicator | tod | 16);
      *    } else {
      *      out.writeInt(indicator | tod);
      *      writeOffset(out, dst);

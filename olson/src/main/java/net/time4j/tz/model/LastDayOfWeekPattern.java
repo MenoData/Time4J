@@ -46,7 +46,7 @@ final class LastDayOfWeekPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 2763354079574837058L;
+//    private static final long serialVersionUID = 2763354079574837058L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -166,22 +166,20 @@ final class LastDayOfWeekPattern
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 22}. Then the
-     *              byte for the month (1-12) follows. After this the byte
-     *              for the day of the week follows (Mo=1, Tu=2, ..., Su=7).
-     *              Finally the bytes for time of day (as seconds of day),
-     *              offset indicator and the daylight saving amount in seconds
-     *              follow in a specialized compressed form.
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 122}. Then the byte for the month (1-12) and the day
+     *              of week (Mo=1, ..., Su=7) follows. Finally the bytes for
+     *              time of day (as seconds of day), offset indicator and the
+     *              daylight saving amount in seconds follow in a specialized
+     *              compressed form.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = (22 << 3);
-     *
-     *  out.writeByte(header);
-     *  out.writeByte(getMonth());
-     *  out.writeByte(getDayOfWeek());
+     *  out.writeByte(122);
+     *  int data = (getDayOfWeek() << 4);
+     *  data |= getMonth();
+     *  out.writeByte(data);
      *  writeDaylightSavingRule(out, this);
      *
      *  private static void writeDaylightSavingRule(
@@ -193,9 +191,9 @@ final class LastDayOfWeekPattern
      *    int dst = rule.getSavings();
      *
      *    if (dst == 0) {
-     *      out.writeInt(indicator | 4 | tod);
+     *      out.writeInt(indicator | tod | 8);
      *    } else if (dst == 3600) {
-     *      out.writeInt(indicator | 8 | tod);
+     *      out.writeInt(indicator | tod | 16);
      *    } else {
      *      out.writeInt(indicator | tod);
      *      writeOffset(out, dst);

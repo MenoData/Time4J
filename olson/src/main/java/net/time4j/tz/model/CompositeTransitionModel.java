@@ -237,31 +237,12 @@ final class CompositeTransitionModel
 
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains in the five
-     *              most significant bits the type id {@code 27}. Then the
-     *              data bytes for the internal transitions and rules follow.
-     *
-     * Schematic algorithm:
-     *
-     * <pre>
-     *  int header = (27 << 3);
-     *  out.writeByte(header);
-     *
-     *  out.writeInt(getTransitions().size());
-     *  out.writeInt(getTransitions().get(0).getPreviousOffset());
-     *
-     *  for (ZonalTransition transition : getTransitions()) {
-     *      out.writeLong(transition.getPosixTime());
-     *      out.writeInt(transition.getTotalOffset());
-     *      out.writeInt(transition.getDaylightSavingOffset());
-     *  }
-     *
-     *  out.writeByte(rules.size());
-     *
-     *  for (int i = 0; i &lt; n; i++) {
-     *      out.writeObject(rules.get(i));
-     *  }
-     * </pre>
+     *              is bit-compressed. The first byte contains the type id
+     *              {@code 127}. Then the data bytes for the internal
+     *              transitions and rules follow. The complex algorithm
+     *              exploits the fact that allmost all transitions happen
+     *              at full hours around midnight in local standard time.
+     *              Insight in details see source code.
      */
     private Object writeReplace() throws ObjectStreamException {
 

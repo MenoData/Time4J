@@ -218,11 +218,13 @@ public abstract class TransitionModel
         ZonalOffset first =
             ZonalOffset.ofTotalSeconds(t.get(0).getPreviousOffset());
 
-        if (!initialOffset.equals(first)) {
+        if (sanityCheck && !initialOffset.equals(first)) {
             throw new IllegalArgumentException(
                 "Initial offset " + initialOffset + " not equal "
                 + "to previous offset of first transition: " + first);
-        } else if (r.isEmpty()) {
+        }
+
+        if (r.isEmpty()) {
             return new ArrayTransitionModel(t, clock, false, sanityCheck);
         }
 

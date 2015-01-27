@@ -23,8 +23,10 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
+import net.time4j.base.MathUtils;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -58,24 +60,30 @@ final class SPX
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /** Serialisierungstyp von {@code FixedDayPattern}. */
-    static final int FIXED_DAY_PATTERN_TYPE = 20;
+    static final int FIXED_DAY_PATTERN_TYPE = 120;
 
     /** Serialisierungstyp von {@code DayOfWeekInMonthPattern}. */
-    static final int DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE = 21;
+    static final int DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE = 121;
 
     /** Serialisierungstyp von {@code LastDayOfWeekPattern}. */
-    static final int LAST_DAY_OF_WEEK_PATTERN_TYPE = 22;
+    static final int LAST_DAY_OF_WEEK_PATTERN_TYPE = 122;
 
     /** Serialisierungstyp von {@code RuleBasedTransitionModel}. */
-    static final int RULE_BASED_TRANSITION_MODEL_TYPE = 25;
+    static final int RULE_BASED_TRANSITION_MODEL_TYPE = 125;
 
     /** Serialisierungstyp von {@code ArrayTransitionModel}. */
-    static final int ARRAY_TRANSITION_MODEL_TYPE = 26;
+    static final int ARRAY_TRANSITION_MODEL_TYPE = 126;
 
     /** Serialisierungstyp von {@code CompositeTransitionModel}. */
-    static final int COMPOSITE_TRANSITION_MODEL_TYPE = 27;
+    static final int COMPOSITE_TRANSITION_MODEL_TYPE = 127;
 
-//    private static final long serialVersionUID = -1000776907354520172L;
+    private static final long POSIX_TIME_1825 =
+        PlainTimestamp.of(1825, 1, 1, 0, 0).atUTC().getPosixTime();
+    private static final long DAYS_IN_18_BITS = 86400L * 365 * 718;
+    private static final long QUARTERS_IN_24_BITS = 15040511099L;
+    private static final int NO_COMPRESSION = 0;
+
+    private static final long serialVersionUID = 6526945678752534989L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -115,9 +123,8 @@ final class SPX
     /**
      * <p>Implementation method of interface {@link Externalizable}. </p>
      *
-     * <p>The first byte contains within the 5 most-significant bits the type
-     * of the object to be serialized. Then the data bytes follow in a
-     * bit-compressed representation. </p>
+     * <p>The first byte contains the type of the object to be serialized.
+     * Then the data bytes follow in a bit-compressed representation. </p>
      *
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
@@ -127,9 +134,8 @@ final class SPX
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
-     * <p>Das erste Byte enth&auml;lt um 3 Bits nach links verschoben den
-     * Typ des zu serialisierenden Objekts. Danach folgen die Daten-Bits
-     * in einer bit-komprimierten Darstellung. </p>
+     * <p>Das erste Byte enth&auml;lt den Typ des zu serialisierenden Objekts.
+     * Danach folgen die Daten-Bits in einer bit-komprimierten Darstellung. </p>
      *
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
@@ -140,8 +146,7 @@ final class SPX
     public void writeExternal(ObjectOutput out)
         throws IOException {
 
-        int header = (this.type << 3);
-        out.writeByte(header);
+        out.writeByte(this.type);
 
         switch (this.type) {
             case FIXED_DAY_PATTERN_TYPE:
@@ -186,9 +191,9 @@ final class SPX
     public void readExternal(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        byte header = in.readByte();
+        int header = in.readByte();
 
-        switch ((header & 0xFF) >> 3) {
+        switch (header) {
             case FIXED_DAY_PATTERN_TYPE:
                 this.obj = readFixedDayPattern(in);
                 break;
@@ -217,51 +222,45 @@ final class SPX
     static void writeTransitions(
         ZonalTransition[] transitions,
         int size,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         int n = Math.min(size, transitions.length);
         out.writeInt(n);
 
-        // TODO: optimization (usually only three!!! bytes per transition)
         if (n > 0) {
-            writeOffset(out, transitions[0].getPreviousOffset());
+            int stdOffset = transitions[0].getPreviousOffset();
+            writeOffset(out, stdOffset);
 
             for (int i = 0; i < n; i++) {
-                ZonalTransition transition = transitions[i];
-                out.writeLong(transition.getPosixTime());
-                writeOffset(out, transition.getTotalOffset());
-                writeOffset(out, transition.getDaylightSavingOffset());
+                stdOffset = writeTransition(transitions[i], stdOffset, out);
             }
         }
 
     }
 
-    // called by tzdb-compiler
+    // called by TZRepositoryCompiler
     static void writeTransitions(
         List<ZonalTransition> transitions,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         int n = transitions.size();
         out.writeInt(n);
 
-        // TODO: optimization (usually only three!!! bytes per transition)
         if (n > 0) {
-            writeOffset(out, transitions.get(0).getPreviousOffset());
+            int stdOffset = transitions.get(0).getPreviousOffset();
+            writeOffset(out, stdOffset);
 
             for (int i = 0; i < n; i++) {
-                ZonalTransition transition = transitions.get(i);
-                out.writeLong(transition.getPosixTime());
-                writeOffset(out, transition.getTotalOffset());
-                writeOffset(out, transition.getDaylightSavingOffset());
+                stdOffset = writeTransition(transitions.get(i), stdOffset, out);
             }
         }
 
     }
 
     // called by
-    // tzdb-provider, CompositeTransitionModel and ArrayTransitionModel
+    // TZRepositoryProvider, CompositeTransitionModel and ArrayTransitionModel
     static List<ZonalTransition> readTransitions(ObjectInput in)
         throws IOException {
 
@@ -271,27 +270,97 @@ final class SPX
             return Collections.emptyList();
         }
 
-        // TODO: check order of items
-        // TODO: optimization (usually only three!!! bytes per transition)
         List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
         int previous = readOffset(in);
+        int rawOffset = previous;
+        long oldTsp = Long.MIN_VALUE;
 
         for (int i = 0; i < n; i++) {
-            long posix = in.readLong();
-            int total = readOffset(in);
-            int dst = readOffset(in);
+            int first = in.readByte();
+            boolean newStdOffset = (first < 0);
+            int dstIndex = ((first >>> 5) & 3);
+            int timeIndex = ((first >>> 2) & 7);
+            int tod;
+
+            switch (timeIndex) {
+                case 1:
+                    tod = 0;
+                    break;
+                case 2:
+                    tod = 60;
+                    break;
+                case 3:
+                    tod = 3600;
+                    break;
+                case 4:
+                    tod = 7200;
+                    break;
+                case 5:
+                    tod = 10800;
+                    break;
+                case 6:
+                    tod = 14400;
+                    break;
+                case 7:
+                    tod = 18000;
+                    break;
+                default:
+                    tod = -1;
+            }
+
+            long posix;
+
+            if (tod == -1) {
+                posix = in.readLong();
+            } else {
+                int dayIndex = ((first & 3) << 16);
+                dayIndex |= ((in.readByte() & 0xFF) << 8);
+                dayIndex |= (in.readByte() & 0xFF);
+                posix = ((dayIndex * 86400L) + POSIX_TIME_1825 + tod - 3600);
+                posix -= rawOffset;
+            }
+
+            if (posix <= oldTsp) {
+                throw new StreamCorruptedException(
+                    "Wrong order of transitions.");
+            } else {
+                oldTsp = posix;
+            }
+
+            int dstOffset;
+
+            switch (dstIndex) {
+                case 1:
+                    dstOffset = 0;
+                    break;
+                case 2:
+                    dstOffset = 3600;
+                    break;
+                case 3:
+                    dstOffset = 7200;
+                    break;
+                default:
+                    dstOffset = readOffset(in);
+            }
+
+            if (newStdOffset) {
+                rawOffset = readOffset(in);
+            }
+
+            int total = rawOffset + dstOffset;
             ZonalTransition transition =
-                new ZonalTransition(posix, previous, total, dst);
+                new ZonalTransition(posix, previous, total, dstOffset);
             previous = total;
             transitions.add(transition);
+
         }
 
         return transitions;
 
     }
 
-    // called by
-    // tzdb-compiler, CompositeTransitionModel and RuleBasedTransitionModel
+    // called by TZRepositoryCompiler,
+    // CompositeTransitionModel and RuleBasedTransitionModel
     static void writeRules(
         List<DaylightSavingRule> rules,
         ObjectOutput out
@@ -319,8 +388,8 @@ final class SPX
 
     }
 
-    // called by
-    // tzdb-provider, CompositeTransitionModel and RuleBasedTransitionModel
+    // called by TZRepositoryProvider,
+    // CompositeTransitionModel and RuleBasedTransitionModel
     static List<DaylightSavingRule> readRules(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -515,8 +584,9 @@ final class SPX
     ) throws IOException {
 
         LastDayOfWeekPattern pattern = (LastDayOfWeekPattern) rule;
-        out.writeByte(pattern.getMonth());
-        out.writeByte(pattern.getDayOfWeek());
+        int data = (pattern.getDayOfWeek() << 4);
+        data |= pattern.getMonth();
+        out.writeByte(data);
         writeDaylightSavingRule(out, pattern);
 
     }
@@ -524,8 +594,9 @@ final class SPX
     private static DaylightSavingRule readLastDayOfWeekPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
-        Month month = Month.valueOf(in.readByte());
-        Weekday dayOfWeek = Weekday.valueOf(in.readByte());
+        int data = in.readByte();
+        Month month = Month.valueOf(data & 15);
+        Weekday dayOfWeek = Weekday.valueOf(data >> 4);
 
         int timeInfo = in.readInt();
         PlainTime timeOfDay =
@@ -550,7 +621,22 @@ final class SPX
 
         RuleBasedTransitionModel model = (RuleBasedTransitionModel) obj;
         ZonalTransition initial = model.getInitialTransition();
-        out.writeLong(initial.getPosixTime());
+        long posixTime = initial.getPosixTime();
+
+        if (
+            (posixTime >= POSIX_TIME_1825)
+            && (posixTime < POSIX_TIME_1825 + QUARTERS_IN_24_BITS)
+            && ((posixTime % 900) == 0)
+        ) {
+            int data = (int) ((posixTime - POSIX_TIME_1825) / 900);
+            out.writeByte((data >>> 16) & 0xFF);
+            out.writeByte((data >>> 8) & 0xFF);
+            out.writeByte(data & 0xFF);
+        } else {
+            out.writeByte(0xFF);
+            out.writeLong(initial.getPosixTime());
+        }
+
         writeOffset(out, initial.getPreviousOffset());
         writeOffset(out, initial.getTotalOffset());
         writeOffset(out, initial.getDaylightSavingOffset());
@@ -561,7 +647,18 @@ final class SPX
     private static Object readRuleBasedTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        long posixTime = in.readLong();
+        long posixTime;
+        int high = in.readByte() & 0xFF;
+
+        if (high == 0xFF) {
+            posixTime = in.readLong();
+        } else {
+            int mid = in.readByte() & 0xFF;
+            int low = in.readByte() & 0xFF;
+            posixTime = ((high << 16) + (mid << 8) + low) * 900L;
+            posixTime += POSIX_TIME_1825;
+        }
+
         int previous = readOffset(in);
         int total = readOffset(in);
         int dst = readOffset(in);
@@ -604,7 +701,6 @@ final class SPX
     ) throws IOException {
 
         CompositeTransitionModel model = (CompositeTransitionModel) obj;
-        writeOffset(out, model.getInitialOffset().getIntegralAmount());
         model.writeTransitions(out);
         writeRules(model.getRules(), out);
 
@@ -613,13 +709,112 @@ final class SPX
     private static Object readCompositeTransitionModel(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
+        List<ZonalTransition> transitions = readTransitions(in);
+
         return TransitionModel.of(
-            ZonalOffset.ofTotalSeconds(readOffset(in)),
-            readTransitions(in),
+            ZonalOffset.ofTotalSeconds(transitions.get(0).getPreviousOffset()),
+            transitions,
             readRules(in),
             SystemClock.INSTANCE,
             false,
             false);
+
+    }
+
+    private static int writeTransition(
+        ZonalTransition transition,
+        int stdOffset,
+        DataOutput out
+    ) throws IOException {
+
+        int rawOffset = transition.getStandardOffset();
+        boolean newStdOffset = (rawOffset != stdOffset);
+        byte first = 0;
+
+        if (newStdOffset) {
+            first |= (1 << 7);
+        }
+
+        int dstIndex;
+
+        switch (transition.getDaylightSavingOffset()) {
+            case 0:
+                dstIndex = 1;
+                break;
+            case 3600:
+                dstIndex = 2;
+                break;
+            case 7200:
+                dstIndex = 3;
+                break;
+            default:
+                dstIndex = NO_COMPRESSION;
+        }
+
+        first |= (dstIndex << 5);
+
+        // local standard time plus two hours: 22:00-3:00 => 0:00-5:00
+        long modTime = transition.getPosixTime() + stdOffset + 3600;
+        int timeIndex;
+
+        if (
+            (modTime >= POSIX_TIME_1825)
+            && (modTime < POSIX_TIME_1825 + DAYS_IN_18_BITS) // 2542-07-11
+        ) {
+            int tod = MathUtils.floorModulo(modTime, 86400);
+
+            switch (tod) {
+                case 0:
+                    timeIndex = 1;
+                    break;
+                case 60:
+                    timeIndex = 2;
+                    break;
+                case 3600:
+                    timeIndex = 3;
+                    break;
+                case 7200:
+                    timeIndex = 4;
+                    break;
+                case 10800:
+                    timeIndex = 5;
+                    break;
+                case 14400:
+                    timeIndex = 6;
+                    break;
+                case 18000:
+                    timeIndex = 7;
+                    break;
+                default:
+                    timeIndex = NO_COMPRESSION;
+            }
+        } else {
+            timeIndex = NO_COMPRESSION;
+        }
+
+        first |= (timeIndex << 2);
+
+        if (timeIndex == NO_COMPRESSION) {
+            out.writeByte(first);
+            out.writeLong(transition.getPosixTime());
+        } else {
+            int dayIndex = (int) ((modTime - POSIX_TIME_1825) / 86400);
+            byte high = (byte) ((dayIndex >>> 16) & 3);
+            first |= high;
+            out.writeByte(first);
+            out.writeByte((dayIndex >>> 8) & 0xFF);
+            out.writeByte(dayIndex & 0xFF);
+        }
+
+        if (dstIndex == NO_COMPRESSION) {
+            writeOffset(out, transition.getDaylightSavingOffset());
+        }
+
+        if (newStdOffset) {
+            writeOffset(out, rawOffset);
+        }
+
+        return rawOffset;
 
     }
 
