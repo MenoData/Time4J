@@ -280,33 +280,7 @@ final class SPX
             boolean newStdOffset = (first < 0);
             int dstIndex = ((first >>> 5) & 3);
             int timeIndex = ((first >>> 2) & 7);
-            int tod;
-
-            switch (timeIndex) {
-                case 1:
-                    tod = 0;
-                    break;
-                case 2:
-                    tod = 60;
-                    break;
-                case 3:
-                    tod = 3600;
-                    break;
-                case 4:
-                    tod = 7200;
-                    break;
-                case 5:
-                    tod = 10800;
-                    break;
-                case 6:
-                    tod = 14400;
-                    break;
-                case 7:
-                    tod = 18000;
-                    break;
-                default:
-                    tod = -1;
-            }
+            int tod = toTimeOfDayT(timeIndex);
 
             long posix;
 
@@ -316,7 +290,7 @@ final class SPX
                 int dayIndex = ((first & 3) << 16);
                 dayIndex |= ((in.readByte() & 0xFF) << 8);
                 dayIndex |= (in.readByte() & 0xFF);
-                posix = ((dayIndex * 86400L) + POSIX_TIME_1825 + tod - 3600);
+                posix = ((dayIndex * 86400L) + POSIX_TIME_1825 + tod - 7200);
                 posix -= rawOffset;
             }
 
@@ -436,26 +410,6 @@ final class SPX
 
     }
 
-    private static void writeDaylightSavingRule(
-        DataOutput out,
-        DaylightSavingRule rule
-    ) throws IOException {
-
-        int tod = (rule.getTimeOfDay().get(SECOND_OF_DAY).intValue() << 8);
-        int indicator = rule.getIndicator().ordinal();
-        int dst = rule.getSavings();
-
-        if (dst == 0) {
-            out.writeInt(indicator | tod | 8);
-        } else if (dst == 3600) {
-            out.writeInt(indicator | tod | 16);
-        } else {
-            out.writeInt(indicator | tod);
-            writeOffset(out, dst);
-        }
-
-    }
-
     private static void writeOffset(
         DataOutput out,
         int offset
@@ -482,17 +436,19 @@ final class SPX
 
     }
 
-    private static int readSavings(
-        byte offsetInfo,
-        DataInput in
-    ) throws IOException {
+    private static int readSavings(int offsetInfo) throws IOException {
 
-        if ((offsetInfo & 8) == 8) {
-            return 0;
-        } else if ((offsetInfo & 16) == 16) {
-            return 3600;
-        } else {
-            return readOffset(in);
+        switch (offsetInfo / 3) {
+            case 0:
+                return 0;
+            case 1:
+                return 1800;
+            case 2:
+                return 3600;
+            case 3:
+                return 7200;
+            default:
+                return -1;
         }
 
     }
@@ -503,31 +459,52 @@ final class SPX
     ) throws IOException {
 
         FixedDayPattern pattern = (FixedDayPattern) rule;
-        out.writeByte(pattern.getMonth());
-        out.writeByte(pattern.getDayOfMonth());
-        writeDaylightSavingRule(out, pattern);
+        boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
+        int second = (pattern.getDayOfMonth() << 3);
+        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int timeIndex = toTimeIndexR(tod);
+        second |= timeIndex;
+        out.writeByte(second & 0xFF);
+
+        if (!offsetWritten) {
+            writeOffset(out, pattern.getSavings());
+        }
+
+        if (timeIndex == NO_COMPRESSION) {
+            out.writeInt(tod);
+        }
 
     }
 
     private static DaylightSavingRule readFixedDayPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
-        int month = in.readByte();
-        int dayOfMonth = in.readByte();
+        int first = (in.readByte() & 0xFF);
+        int month = (first >>> 4);
+        int offsetInfo = first & 0x0F;
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo % 3];
+        int dst = readSavings(offsetInfo);
+        int second = (in.readByte() & 0xFF);
+        int dayOfMonth = (second >>> 3);
+        int tod = toTimeOfDayR(second & 7);
 
-        int timeInfo = in.readInt();
+        if (dst == -1) {
+            dst = readOffset(in);
+        }
+
+        if (tod == -1) {
+            tod = in.readInt();
+        }
+
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
-        byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
-        int savings = readSavings(offsetInfo, in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
 
         return new FixedDayPattern(
             Month.valueOf(month),
             dayOfMonth,
             timeOfDay,
             indicator,
-            savings);
+            dst);
 
     }
 
@@ -537,35 +514,60 @@ final class SPX
     ) throws IOException {
 
         DayOfWeekInMonthPattern pattern = (DayOfWeekInMonthPattern) rule;
-        out.writeByte(pattern.getMonth());
-        out.writeByte(pattern.getDayOfMonth());
+        boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
+        int second = (pattern.getDayOfMonth() << 3);
+        second |= pattern.getDayOfWeek();
+        out.writeByte(second & 0xFF);
+        int third = (pattern.isAfter() ? (1 << 7) : 0);
+        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        boolean timeWritten = false;
 
-        int dow = pattern.getDayOfWeek();
-
-        if (pattern.isAfter()) {
-            dow = -dow;
+        if ((tod % 1800) == 0) {
+            third |= (tod / 1800);
+            timeWritten = true;
+        } else {
+            third |= 63;
         }
 
-        out.writeByte(dow);
-        writeDaylightSavingRule(out, pattern);
+        out.writeByte(third & 0xFF);
+
+        if (!offsetWritten) {
+            writeOffset(out, pattern.getSavings());
+        }
+
+        if (!timeWritten) {
+            out.writeInt(tod);
+        }
 
     }
 
     private static DaylightSavingRule readDayOfWeekInMonthPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
-        Month month = Month.valueOf(in.readByte());
-        int dayOfMonth = in.readByte();
-        int dow = in.readByte();
-        Weekday dayOfWeek = Weekday.valueOf(Math.abs(dow));
-        boolean after = (dow < 0);
+        int first = (in.readByte() & 0xFF);
+        Month month = Month.valueOf(first >>> 4);
+        int offsetInfo = first & 0x0F;
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo % 3];
+        int dst = readSavings(offsetInfo);
+        int second = (in.readByte() & 0xFF);
+        int dayOfMonth = (second >>> 3);
+        Weekday dayOfWeek = Weekday.valueOf(second & 7);
+        int third = (in.readByte() & 0xFF);
+        boolean after = ((third >>> 7) == 1);
+        int tod = (third & 63);
 
-        int timeInfo = in.readInt();
+        if (dst == -1) {
+            dst = readOffset(in);
+        }
+
+        if (tod == 63) {
+            tod = in.readInt();
+        } else {
+            tod *= 1800;
+        }
+
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
-        byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
-        int savings = readSavings(offsetInfo, in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
 
         return new DayOfWeekInMonthPattern(
             month,
@@ -573,7 +575,7 @@ final class SPX
             dayOfWeek,
             timeOfDay,
             indicator,
-            savings,
+            dst,
             after);
 
     }
@@ -584,33 +586,61 @@ final class SPX
     ) throws IOException {
 
         LastDayOfWeekPattern pattern = (LastDayOfWeekPattern) rule;
-        int data = (pattern.getDayOfWeek() << 4);
-        data |= pattern.getMonth();
-        out.writeByte(data);
-        writeDaylightSavingRule(out, pattern);
+        boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
+        int second = (pattern.getDayOfWeek() << 5);
+        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        boolean timeWritten = false;
+
+        if ((tod % 3600) == 0) {
+            second |= (tod / 3600);
+            timeWritten = true;
+        } else {
+            second |= 31;
+        }
+
+        out.writeByte(second & 0xFF);
+
+        if (!offsetWritten) {
+            writeOffset(out, pattern.getSavings());
+        }
+
+        if (!timeWritten) {
+            out.writeInt(tod);
+        }
 
     }
 
     private static DaylightSavingRule readLastDayOfWeekPattern(DataInput in)
         throws IOException, ClassNotFoundException {
 
-        int data = in.readByte();
-        Month month = Month.valueOf(data & 15);
-        Weekday dayOfWeek = Weekday.valueOf(data >> 4);
+        int first = (in.readByte() & 0xFF);
+        Month month = Month.valueOf(first >>> 4);
+        int offsetInfo = first & 0x0F;
+        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo % 3];
+        int dst = readSavings(offsetInfo);
+        int second = (in.readByte() & 0xFF);
+        Weekday dayOfWeek = Weekday.valueOf(second >>> 5);
+        int tod = (second & 31);
 
-        int timeInfo = in.readInt();
+        if (dst == -1) {
+            dst = readOffset(in);
+        }
+
+        if (tod == 31) {
+            tod = in.readInt();
+        } else {
+            tod *= 3600;
+        }
+
         PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, timeInfo >> 8);
-        byte offsetInfo = (byte) (timeInfo & 0xFF);
-        OffsetIndicator indicator = OffsetIndicator.VALUES[offsetInfo & 7];
-        int savings = readSavings(offsetInfo, in);
+            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
 
         return new LastDayOfWeekPattern(
             month,
             dayOfWeek,
             timeOfDay,
             indicator,
-            savings);
+            dst);
 
     }
 
@@ -754,42 +784,14 @@ final class SPX
         first |= (dstIndex << 5);
 
         // local standard time plus two hours: 22:00-3:00 => 0:00-5:00
-        long modTime = transition.getPosixTime() + stdOffset + 3600;
-        int timeIndex;
+        long modTime = transition.getPosixTime() + stdOffset + 7200;
+        int timeIndex = NO_COMPRESSION;
 
         if (
             (modTime >= POSIX_TIME_1825)
             && (modTime < POSIX_TIME_1825 + DAYS_IN_18_BITS) // 2542-07-11
         ) {
-            int tod = MathUtils.floorModulo(modTime, 86400);
-
-            switch (tod) {
-                case 0:
-                    timeIndex = 1;
-                    break;
-                case 60:
-                    timeIndex = 2;
-                    break;
-                case 3600:
-                    timeIndex = 3;
-                    break;
-                case 7200:
-                    timeIndex = 4;
-                    break;
-                case 10800:
-                    timeIndex = 5;
-                    break;
-                case 14400:
-                    timeIndex = 6;
-                    break;
-                case 18000:
-                    timeIndex = 7;
-                    break;
-                default:
-                    timeIndex = NO_COMPRESSION;
-            }
-        } else {
-            timeIndex = NO_COMPRESSION;
+            timeIndex = toTimeIndexT(MathUtils.floorModulo(modTime, 86400));
         }
 
         first |= (timeIndex << 2);
@@ -815,6 +817,131 @@ final class SPX
         }
 
         return rawOffset;
+
+    }
+
+    private static int toTimeIndexT(int tod) {
+
+        switch (tod) {
+            case 0:
+                return 1;
+            case 60:
+                return 2;
+            case 3600:
+                return 3;
+            case 7200:
+                return 4;
+            case 10800:
+                return 5;
+            case 14400:
+                return 6;
+            case 18000:
+                return 7;
+            default:
+                return NO_COMPRESSION;
+        }
+
+    }
+
+    private static int toTimeOfDayT(int timeIndex) {
+
+        switch (timeIndex) {
+            case 1:
+                return 0;
+            case 2:
+                return 60;
+            case 3:
+                return 3600;
+            case 4:
+                return 7200;
+            case 5:
+                return 10800;
+            case 6:
+                return 14400;
+            case 7:
+                return 18000;
+            default:
+                return -1;
+        }
+
+    }
+
+    private static boolean writeMonthIndicatorOffset(
+        GregorianCalendarRule rule,
+        DataOutput out
+    ) throws IOException {
+
+        int first = (rule.getMonth() << 4);
+        int indicator = rule.getIndicator().ordinal();
+        int dst = rule.getSavings();
+        boolean offsetWritten = true;
+
+        switch (dst) {
+            case 0:
+                first |= indicator;
+                break;
+            case 1800:
+                first |= (3 + indicator);
+                break;
+            case 3600:
+                first |= (6 + indicator);
+                break;
+            case 7200:
+                first |= (9 + indicator);
+                break;
+            default:
+                offsetWritten = false;
+                first |= (12 + indicator);
+        }
+
+        out.writeByte(first & 0xFF);
+        return offsetWritten;
+
+    }
+
+    private static int toTimeIndexR(int tod) {
+
+        switch (tod) {
+            case 0:
+                return 1;
+            case 3600:
+                return 2;
+            case 7200:
+                return 3;
+            case 10800:
+                return 4;
+            case 22 * 3600:
+                return 5;
+            case 23 * 3600:
+                return 6;
+            case 86400:
+                return 7;
+            default:
+                return NO_COMPRESSION;
+        }
+
+    }
+
+    private static int toTimeOfDayR(int timeIndex) {
+
+        switch (timeIndex) {
+            case 1:
+                return 0;
+            case 2:
+                return 3600;
+            case 3:
+                return 7200;
+            case 4:
+                return 10800;
+            case 5:
+                return 22 * 3600;
+            case 6:
+                return 23 * 3600;
+            case 7:
+                return 86400;
+            default:
+                return -1;
+        }
 
     }
 

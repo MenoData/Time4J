@@ -1,6 +1,7 @@
 package net.time4j.tz.model;
 
 import net.time4j.Month;
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
@@ -51,7 +52,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void roundTripOfFixedDayPattern()
+    public void roundTripOfFixedDayPatternT24w0()
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
@@ -61,11 +62,55 @@ public class SerializationTest {
                 PlainTime.of(24),
                 OffsetIndicator.WALL_TIME,
                 0);
-        assertThat(rule, is(roundtrip(rule)));
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(0));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(24)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.WALL_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 12, 31)));
+
     }
 
     @Test
-    public void roundTripOfLastDayOfWeekPattern()
+    public void roundTripOfFixedDayPatternT2330u1800()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofFixedDay(
+                Month.JANUARY,
+                1,
+                PlainTime.of(23, 30),
+                OffsetIndicator.UTC_TIME,
+                1800);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(1800));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(23, 30)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.UTC_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 1, 1)));
+    }
+
+    @Test
+    public void roundTripOfFixedDayPatternT0s900()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofFixedDay(
+                Month.FEBRUARY,
+                28,
+                PlainTime.of(0),
+                OffsetIndicator.STANDARD_TIME,
+                900);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(900));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(0)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 2, 28)));
+    }
+
+    @Test
+    public void roundTripOfLastDayOfWeekPatternT0230s3600()
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
@@ -75,11 +120,54 @@ public class SerializationTest {
                 PlainTime.of(2, 30),
                 OffsetIndicator.STANDARD_TIME,
                 3600);
-        assertThat(rule, is(roundtrip(rule)));
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(3600));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(2, 30)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 3, 25)));
     }
 
     @Test
-    public void roundTripOfDayOfWeekInMonthAfterPattern()
+    public void roundTripOfLastDayOfWeekPatternT24s7200()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofLastWeekday(
+                Month.JUNE,
+                Weekday.SUNDAY,
+                PlainTime.of(24),
+                OffsetIndicator.WALL_TIME,
+                7200);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(7200));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(24)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.WALL_TIME));
+        assertThat(copy.getDate(2015), is(PlainDate.of(2015, 6, 28)));
+    }
+
+    @Test
+    public void roundTripOfLastDayOfWeekPatternT09u30()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofLastWeekday(
+                Month.APRIL,
+                Weekday.FRIDAY,
+                PlainTime.of(9),
+                OffsetIndicator.UTC_TIME,
+                30);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(30));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(9)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.UTC_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 4, 27)));
+    }
+
+    @Test
+    public void roundTripOfDayOfWeekInMonthT0230w1800AfterPattern()
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
@@ -89,12 +177,37 @@ public class SerializationTest {
                 Weekday.SUNDAY,
                 PlainTime.of(2, 30),
                 OffsetIndicator.WALL_TIME,
-                1800); // test for unusual dst offset
-        assertThat(rule, is(roundtrip(rule)));
+                1800);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(1800));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(2, 30)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.WALL_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 3, 4)));
     }
 
     @Test
-    public void roundTripOfDayOfWeekInMonthBeforePattern()
+    public void roundTripOfDayOfWeekInMonthT24u30AfterPattern()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofWeekdayAfterDate(
+                Month.MARCH,
+                11,
+                Weekday.SUNDAY,
+                PlainTime.of(24),
+                OffsetIndicator.UTC_TIME,
+                30);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(30));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(24)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.UTC_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 3, 11)));
+    }
+
+    @Test
+    public void roundTripOfDayOfWeekInMonthT0230s3600BeforePattern()
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
@@ -103,9 +216,54 @@ public class SerializationTest {
                 1,
                 Weekday.SUNDAY,
                 PlainTime.of(2, 30),
-                OffsetIndicator.WALL_TIME,
-                1); // test for unusual dst offset
-        assertThat(rule, is(roundtrip(rule)));
+                OffsetIndicator.STANDARD_TIME,
+                3600);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(3600));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(2, 30)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 2, 26)));
+    }
+
+    @Test
+    public void roundTripOfDayOfWeekInMonthT0s7200BeforePattern()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofWeekdayBeforeDate(
+                Month.MARCH,
+                1,
+                Weekday.MONDAY,
+                PlainTime.of(0),
+                OffsetIndicator.STANDARD_TIME,
+                7200);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(7200));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(0)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 2, 27)));
+    }
+
+    @Test
+    public void roundTripOfDayOfWeekInMonthT0215s3600AfterPattern()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            DaylightSavingRule.ofWeekdayAfterDate(
+                Month.MARCH,
+                31,
+                Weekday.SUNDAY,
+                PlainTime.of(2, 15),
+                OffsetIndicator.STANDARD_TIME,
+                3600);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(3600));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(2, 15)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
+        assertThat(copy.getDate(2012), is(PlainDate.of(2012, 4, 1)));
     }
 
     private static Object roundtrip(Object obj)

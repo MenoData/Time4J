@@ -41,15 +41,14 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class FixedDayPattern
-    extends DaylightSavingRule {
+    extends GregorianCalendarRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-//    private static final long serialVersionUID = -4251253428657027523L;
+    private static final long serialVersionUID = 3957240859230862745L;
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final byte month;
     private transient final byte dayOfMonth;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -61,11 +60,9 @@ final class FixedDayPattern
         OffsetIndicator indicator,
         int savings
     ) {
-        super(timeOfDay, indicator, savings);
+        super(month, timeOfDay, indicator, savings);
 
         GregorianMath.checkDate(2000, month.getValue(), dayOfMonth);
-
-        this.month = (byte) month.getValue();
         this.dayOfMonth = (byte) dayOfMonth;
 
     }
@@ -75,7 +72,7 @@ final class FixedDayPattern
     @Override
     public PlainDate getDate(int year) {
 
-        return PlainDate.of(year, this.month, this.dayOfMonth);
+        return PlainDate.of(year, this.getMonth(), this.dayOfMonth);
 
     }
 
@@ -88,7 +85,7 @@ final class FixedDayPattern
             FixedDayPattern that = (FixedDayPattern) obj;
             return (
                 (this.dayOfMonth == that.dayOfMonth)
-                && (this.month == that.month)
+                && (this.getMonth() == that.getMonth())
                 && super.isEqual(that)
             );
         } else {
@@ -100,7 +97,7 @@ final class FixedDayPattern
     @Override
     public int hashCode() {
 
-        return this.dayOfMonth + 37 * this.month;
+        return this.dayOfMonth + 37 * this.getMonth();
 
     }
 
@@ -109,7 +106,7 @@ final class FixedDayPattern
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("FixedDayPattern:[month=");
-        sb.append(this.month);
+        sb.append(this.getMonth());
         sb.append(",day-of-month=");
         sb.append(this.dayOfMonth);
         sb.append(",time-of-day=");
@@ -120,17 +117,6 @@ final class FixedDayPattern
         sb.append(this.getSavings());
         sb.append(']');
         return sb.toString();
-
-    }
-
-    /**
-     * <p>Benutzt in der Serialisierung. </p>
-     *
-     * @return  byte
-     */
-    byte getMonth() {
-
-        return this.month;
 
     }
 
@@ -160,50 +146,10 @@ final class FixedDayPattern
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
      *              is bit-compressed. The first byte contains the type id
-     *              {@code 120}. Then the bytes for the month (1-12) and the
-     *              day of month follow. Finally the bytes for time of day
-     *              (as seconds of day), offset indicator and the daylight
-     *              saving amount in seconds follow in a specialized compressed
-     *              form.
-     *
-     * Schematic algorithm:
-     *
-     * <pre>
-     *  out.writeByte(120);
-     *  out.writeByte(getMonth());
-     *  out.writeByte(getDayOfMonth());
-     *  writeDaylightSavingRule(out, this);
-     *
-     *  private static void writeDaylightSavingRule(
-     *    DataOutput out,
-     *    DaylightSavingRule rule
-     *  ) throws IOException {
-     *    int tod = (rule.getTimeOfDay().get(SECOND_OF_DAY).intValue() << 8);
-     *    int indicator = rule.getIndicator().ordinal();
-     *    int dst = rule.getSavings();
-     *
-     *    if (dst == 0) {
-     *      out.writeInt(indicator | tod | 8);
-     *    } else if (dst == 3600) {
-     *      out.writeInt(indicator | tod | 16);
-     *    } else {
-     *      out.writeInt(indicator | tod);
-     *      writeOffset(out, dst);
-     *    }
-     *  }
-     *
-     *  private static void writeOffset(
-     *    DataOutput out,
-     *    int offset
-     *  ) throws IOException {
-     *    if ((offset % 900) == 0) {
-     *      out.writeByte(offset / 900);
-     *    } else {
-     *      out.writeByte(127);
-     *      out.writeInt(offset);
-     *    }
-     *  }
-     * </pre>
+     *              {@code 120}. Then the data bytes for the internal
+     *              state follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
      */
     private Object writeReplace() throws ObjectStreamException {
 

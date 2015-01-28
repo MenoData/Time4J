@@ -32,6 +32,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 
+import static net.time4j.CalendarUnit.DAYS;
+
 
 /**
  * <p>Ein Datumsmuster f&uuml;r DST-Wechsel an einem Wochentag n&auml;chst
@@ -43,15 +45,14 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class DayOfWeekInMonthPattern
-    extends DaylightSavingRule {
+    extends GregorianCalendarRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-//    private static final long serialVersionUID = 5674275621059626593L;
+    private static final long serialVersionUID = -7354650946442523175L;
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final byte month;
     private transient final byte dayOfMonth;
     private transient final byte dayOfWeek;
     private transient final boolean after;
@@ -67,11 +68,9 @@ final class DayOfWeekInMonthPattern
         int savings,
         boolean after
     ) {
-        super(timeOfDay, indicator, savings);
+        super(month, timeOfDay, indicator, savings);
 
         GregorianMath.checkDate(2000, month.getValue(), dayOfMonth);
-
-        this.month = (byte) month.getValue();
         this.dayOfMonth = (byte) dayOfMonth;
         this.dayOfWeek = (byte) dayOfWeek.getValue();
         this.after = after;
@@ -83,10 +82,12 @@ final class DayOfWeekInMonthPattern
     @Override
     public PlainDate getDate(int year) {
 
-        int ref = GregorianMath.getDayOfWeek(year, this.month, this.dayOfMonth);
+        int month = this.getMonth();
+        int ref = GregorianMath.getDayOfWeek(year, month, this.dayOfMonth);
+        PlainDate result = PlainDate.of(year, month, this.dayOfMonth);
 
         if (ref == this.dayOfWeek) {
-            return PlainDate.of(year, this.month, this.dayOfMonth);
+            return result;
         }
 
         int delta = (ref - this.dayOfWeek);
@@ -101,7 +102,7 @@ final class DayOfWeekInMonthPattern
             delta += 7;
         }
 
-        return PlainDate.of(year, this.month, this.dayOfMonth + delta * sgn);
+        return result.plus(delta * sgn, DAYS);
 
     }
 
@@ -115,7 +116,7 @@ final class DayOfWeekInMonthPattern
             return (
                 (this.dayOfMonth == that.dayOfMonth)
                 && (this.dayOfWeek == that.dayOfWeek)
-                && (this.month == that.month)
+                && (this.getMonth() == that.getMonth())
                 && (this.after == that.after)
                 && super.isEqual(that)
             );
@@ -129,7 +130,7 @@ final class DayOfWeekInMonthPattern
     public int hashCode() {
 
         int h = this.dayOfMonth;
-        h += 17 * (this.dayOfWeek + 37 * this.month);
+        h += 17 * (this.dayOfWeek + 37 * this.getMonth());
         return h + (this.after ? 1 : 0);
 
     }
@@ -139,7 +140,7 @@ final class DayOfWeekInMonthPattern
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("DayOfWeekInMonthPattern:[month=");
-        sb.append(this.month);
+        sb.append(this.getMonth());
         sb.append(",dayOfMonth=");
         sb.append(this.dayOfMonth);
         sb.append(",dayOfWeek=");
@@ -154,17 +155,6 @@ final class DayOfWeekInMonthPattern
         sb.append(this.after);
         sb.append(']');
         return sb.toString();
-
-    }
-
-    /**
-     * <p>Benutzt in der Serialisierung. </p>
-     *
-     * @return  byte
-     */
-    byte getMonth() {
-
-        return this.month;
 
     }
 
@@ -216,57 +206,10 @@ final class DayOfWeekInMonthPattern
     /**
      * @serialData  Uses a specialized serialisation form as proxy. The format
      *              is bit-compressed. The first byte contains the type id
-     *              {@code 121}. Then the bytes for the month (1-12) and the
-     *              day of month follow. After this the byte for the day of the
-     *              week follows (Mo=1, Tu=2, ..., Su=7) - multiplied with
-     *              {@code -1} if the day of week is searched after the day of
-     *              month. Finally the bytes for time of day (as seconds of
-     *              day), offset indicator and the daylight saving amount in
-     *              seconds follow in a specialized compressed form.
-     *
-     * Schematic algorithm:
-     *
-     * <pre>
-     *  out.writeByte(121);
-     *  out.writeByte(getMonth());
-     *  out.writeByte(getDayOfMonth());
-     *  int dow = getDayOfWeek();
-     *  if (isAfter()) {
-     *      dow = -dow;
-     *  }
-     *  out.writeByte(dow);
-     *  writeDaylightSavingRule(out, this);
-     *
-     *  private static void writeDaylightSavingRule(
-     *    DataOutput out,
-     *    DaylightSavingRule rule
-     *  ) throws IOException {
-     *    int tod = (rule.getTimeOfDay().get(SECOND_OF_DAY).intValue() << 8);
-     *    int indicator = rule.getIndicator().ordinal();
-     *    int dst = rule.getSavings();
-     *
-     *    if (dst == 0) {
-     *      out.writeInt(indicator | tod | 8);
-     *    } else if (dst == 3600) {
-     *      out.writeInt(indicator | tod | 16);
-     *    } else {
-     *      out.writeInt(indicator | tod);
-     *      writeOffset(out, dst);
-     *    }
-     *  }
-     *
-     *  private static void writeOffset(
-     *    DataOutput out,
-     *    int offset
-     *  ) throws IOException {
-     *    if ((offset % 900) == 0) {
-     *      out.writeByte(offset / 900);
-     *    } else {
-     *      out.writeByte(127);
-     *      out.writeInt(offset);
-     *    }
-     *  }
-     * </pre>
+     *              {@code 121}. Then the data bytes for the internal
+     *              state follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
      */
     private Object writeReplace() throws ObjectStreamException {
 
