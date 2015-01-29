@@ -49,8 +49,12 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.TransitionHistory;
+import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
+import net.time4j.tz.ZonalTransition;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -976,6 +980,55 @@ public final class PlainDate
      */
     public PlainTimestamp atStartOfDay() {
 
+        return this.at(PlainTime.MIN);
+
+    }
+
+    /**
+     * <p>Creates a new local timestamp with this date at earliest valid time at the
+     * begin of associated day in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local timestamp as composition of this date and earliest valid time
+     * @throws  UnsupportedOperationException if the underlying timezone repository
+     *          does not expose any public transition history
+     * @since   2.2
+     * @see     #atStartOfDay()
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
+     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local timestamp as composition of this date and earliest valid time
+     * @throws  UnsupportedOperationException if the underlying timezone repository
+     *          does not expose any public transition history
+     * @since   2.2
+     * @see     #atStartOfDay()
+     */
+    public PlainTimestamp atStartOfDay(TZID tzid) {
+
+        TransitionHistory history = Timezone.of(tzid).getHistory();
+        
+        if (history == null) {
+            throw new UnsupportedOperationException(
+                "Timezone does not expose its transition history.");
+        }
+        
+        ZonalTransition conflict = 
+            history.getConflictTransition(this, PlainTime.MIN);
+        
+        if (
+            (conflict != null)
+            && conflict.isGap()
+        ) {
+            
+            UnixTime ut = Moment.of(conflict.getPosixTime(), TimeScale.POSIX);
+            ZonalOffset offset = ZonalOffset.ofTotalSeconds(conflict.getTotalOffset());
+            return PlainTimestamp.from(ut, offset);
+            
+        }
+        
         return this.at(PlainTime.MIN);
 
     }
