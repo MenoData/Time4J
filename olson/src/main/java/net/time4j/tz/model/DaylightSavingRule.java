@@ -22,17 +22,15 @@
 package net.time4j.tz.model;
 
 import net.time4j.ClockUnit;
-import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.Weekday;
-
-import java.io.Serializable;
+import net.time4j.base.GregorianDate;
+import net.time4j.format.CalendarType;
 
 
 /**
  * <p>Defines a yearly pattern when and how there is a switch from winter
- to summer time and vice versa. </p>
+ * to summer time and vice versa. </p>
  *
  * <p>This rule describes when such a switch happens. It also determines
  * the DST-offset. For every rule instance, a {@code ZonalTransition} can
@@ -40,10 +38,12 @@ import java.io.Serializable;
  * The change from winter to summer time and back is usually expressed
  * by two rule instances. </p>
  *
+ * <p>Note: The term &quot;year&quot; denotes the year in any calendar which
+ * is not necessarily the gregorian one. Subclasses need to define the
+ * calendar type and some calendar-specific year conversions. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.2
- * @serial  exclude
- * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein j&auml;hrliches Muster, wann und wie im Jahr eine Umstellung
@@ -56,17 +56,15 @@ import java.io.Serializable;
  * Winter- zu Sommerzeit und zur&uuml;ck wird im allgemeinen durch zwei
  * Instanzen dieser Klasse ausgedr&uuml;ckt. </p>
  *
+ * <p>Hinweis: Der Begriff &quot;year&quot; zeigt das Jahr in irgendeinem
+ * Kalender an, der nicht notwendig der gregorianische Kalender sein mu&szlig;.
+ * Subklassen m&uuml;ssen den Kalendertyp und einige kalenderspezifische
+ * Jahreskonversionen definieren. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.2
- * @serial  exclude
- * @concurrency <immutable>
  */
-public class DaylightSavingRule
-    implements Serializable {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final long serialVersionUID = 6813874976190920796L;
+public abstract class DaylightSavingRule {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -76,14 +74,35 @@ public class DaylightSavingRule
 
     //~ Konstruktoren -----------------------------------------------------
 
-    DaylightSavingRule(
+    /**
+     * <p>For non-standard subclasses only. </p>
+     *
+     * @param   timeOfDay   time of day when the rule switches the offset
+     * @param   indicator   offset indicator
+     * @param   savings     daylight saving offset in effect after this rule
+     */
+    /*[deutsch]
+     * <p>Nur f&uuml;r nicht-standardisierte Subklassen. </p>
+     *
+     * @param   timeOfDay   time of day when the rule switches the offset
+     * @param   indicator   offset indicator
+     * @param   savings     daylight saving offset in effect after this rule
+     */
+    protected DaylightSavingRule(
         PlainTime timeOfDay,
         OffsetIndicator indicator,
         int savings
     ) {
         super();
 
-        check(timeOfDay, indicator, savings);
+        if (timeOfDay == null) {
+            throw new NullPointerException("Missing time of day.");
+        } else if (indicator == null) {
+            throw new NullPointerException("Missing offset indicator.");
+        } else if (savings < 0) {
+            throw new IllegalArgumentException(
+                "Negative daylight saving offset: " + savings);
+        }
 
         this.timeOfDay = timeOfDay.with(PlainTime.PRECISION, ClockUnit.SECONDS);
         this.indicator = indicator;
@@ -92,176 +111,6 @@ public class DaylightSavingRule
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Creates a rule for a fixed day in given month. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  day of month (1 - 31)
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    /*[deutsch]
-     * <p>Konstruiert ein Muster f&uuml;r einen festen Tag im angegebenen
-     * Monat. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  day of month (1 - 31)
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    public static DaylightSavingRule ofFixedDay(
-        Month month,
-        int dayOfMonth,
-        PlainTime timeOfDay,
-        OffsetIndicator indicator,
-        int savings
-    ) {
-
-        return new FixedDayPattern(
-            month, dayOfMonth, timeOfDay, indicator, savings);
-
-    }
-
-    /**
-     * <p>Creates a rule for the last day of week in given month. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfWeek   last day of week
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative
-     * @since   2.2
-     */
-    /*[deutsch]
-     * <p>Konstruiert ein Muster f&uuml;r den letzten Wochentag im angegebenen
-     * Monat. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfWeek   last day of week
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative
-     * @since   2.2
-     */
-    public static DaylightSavingRule ofLastWeekday(
-        Month month,
-        Weekday dayOfWeek,
-        PlainTime timeOfDay,
-        OffsetIndicator indicator,
-        int savings
-    ) {
-
-        return new LastDayOfWeekPattern(
-            month, dayOfWeek, timeOfDay, indicator, savings);
-
-    }
-
-    /**
-     * <p>Creates a rule for a day of week after the given reference date. </p>
-     *
-     * <p>Example =&gt; You have to set for the second Sunday in April:
-     * {@code month=APRIL, dayOfMonth=8, dayOfWeek=SUNDAY}. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  reference day of month (1 - 31)
-     * @param   dayOfWeek   day of week when time switch happens
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    /*[deutsch]
-     * <p>Konstruiert ein Muster f&uuml;r einen Wochentag nach einem
-     * festen Monatstag im angegebenen Monat. </p>
-     *
-     * <p>Beispiel =&gt; F&uuml;r den zweiten Sonntag im April sei zu setzen:
-     * {@code month=APRIL, dayOfMonth=8, dayOfWeek=SUNDAY}. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  reference day of month (1 - 31)
-     * @param   dayOfWeek   day of week when time switch happens
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    public static DaylightSavingRule ofWeekdayAfterDate(
-        Month month,
-        int dayOfMonth,
-        Weekday dayOfWeek,
-        PlainTime timeOfDay,
-        OffsetIndicator indicator,
-        int savings
-    ) {
-
-        return new DayOfWeekInMonthPattern(
-            month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, true);
-
-    }
-
-    /**
-     * <p>Creates a rule for a day of week before the given reference date. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  reference day of month (1 - 31)
-     * @param   dayOfWeek   day of week when time switch happens
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    /*[deutsch]
-     * <p>Konstruiert ein Muster f&uuml;r einen Wochentag vor einem
-     * festen Monatstag im angegebenen Monat. </p>
-     *
-     * @param   month       calendar month
-     * @param   dayOfMonth  reference day of month (1 - 31)
-     * @param   dayOfWeek   day of week when time switch happens
-     * @param   timeOfDay   clock time when time switch happens
-     * @param   indicator   offset indicator
-     * @param   savings     fixed DST-offset in seconds
-     * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
-     *          if the day of month is not valid in context of given month
-     * @since   2.2
-     */
-    public static DaylightSavingRule ofWeekdayBeforeDate(
-        Month month,
-        int dayOfMonth,
-        Weekday dayOfWeek,
-        PlainTime timeOfDay,
-        OffsetIndicator indicator,
-        int savings
-    ) {
-
-        return new DayOfWeekInMonthPattern(
-            month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, false);
-
-    }
 
     /**
      * <p>Determines the date of time switch dependent on given year. </p>
@@ -287,12 +136,7 @@ public class DaylightSavingRule
      * @throws  IllegalArgumentException wenn das Jahr nicht passt
      * @since   2.2
      */
-    public PlainDate getDate(int year) {
-
-        // must be overridden by subclasses - see java.util.concurrent.TimeUnit
-        throw new AbstractMethodError();
-
-    }
+    public abstract PlainDate getDate(int year);
 
     /**
      * <p>Determines the clock time when the switch from winter time to
@@ -358,37 +202,73 @@ public class DaylightSavingRule
 
     }
 
+    /**
+     * <p>Extracts the year from given epoch days. </p>
+     *
+     * @param   mjd     modified julian date
+     * @return  year (maybe in a non-gregorian calendar)
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Ermittelt das kalenderspezifische Jahr auf Basis der angegebenen
+     * Epochentage. </p>
+     *
+     * @param   mjd     modified julian date
+     * @return  year (maybe in a non-gregorian calendar)
+     * @since   2.2
+     */
+    protected abstract int toCalendarYear(long mjd);
+
+    /**
+     * <p>Extracts the year from given gregorian date. </p>
+     *
+     * @param   date    gregorian calendar date
+     * @return  year (maybe in a non-gregorian calendar)
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Ermittelt das kalenderspezifische Jahr auf Basis des angegebenen
+     * gregorianischen Kalenderdatums. </p>
+     *
+     * @param   date    gregorian calendar date
+     * @return  year (maybe in a non-gregorian calendar)
+     * @since   2.2
+     */
+    protected abstract int toCalendarYear(GregorianDate date);
+
+    /**
+     * <p>Determines the underlying calendar system. </p>
+     *
+     * @return  String describing the calendar
+     * @throws  IllegalStateException if the subclass does not have any
+     *          annotation of type {@link net.time4j.format.CalendarType}
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Bestimmt das zugrundeliegende Kalendersystem. </p>
+     *
+     * @return  String describing the calendar
+     * @throws  IllegalStateException if the subclass does not have any
+     *          annotation of type {@link net.time4j.format.CalendarType}
+     * @since   2.2
+     */
+    protected String getCalendarType() {
+
+        CalendarType ct = this.getClass().getAnnotation(CalendarType.class);
+
+        if (ct == null) {
+            throw new IllegalStateException(
+                "Cannot find calendar type annotation: " + this.getClass());
+        }
+
+        return ct.value();
+
+    }
+
     // benutzt in der Serialisierung
     int getType() {
 
         return 0; // default value for unknown type
-
-    }
-
-    // für Subklassen
-    boolean isEqual(DaylightSavingRule rule) {
-
-        return (
-            this.timeOfDay.equals(rule.timeOfDay)
-            && (this.indicator == rule.indicator)
-            && (this.savings == rule.savings));
-
-    }
-
-    private static void check(
-        PlainTime timeOfDay,
-        OffsetIndicator indicator,
-        int savings
-    ) {
-
-        if (timeOfDay == null) {
-            throw new NullPointerException("Missing time of day.");
-        } else if (indicator == null) {
-            throw new NullPointerException("Missing offset indicator.");
-        } else if (savings < 0) {
-            throw new IllegalArgumentException(
-                "Negative daylight saving offset: " + savings);
-        }
 
     }
 

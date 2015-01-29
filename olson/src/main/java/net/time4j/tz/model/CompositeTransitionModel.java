@@ -52,7 +52,7 @@ final class CompositeTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-//    private static final long serialVersionUID = -9104454852317745314L;
+    private static final long serialVersionUID = 1749643877954103721L;
 
     //~ Instanzvariablen --------------------------------------------------
 

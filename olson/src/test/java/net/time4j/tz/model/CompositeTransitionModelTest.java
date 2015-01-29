@@ -520,14 +520,14 @@ public class CompositeTransitionModelTest {
     private static TransitionHistory createModel(boolean enlarged) {
         List<ZonalTransition> transitions = Arrays.asList(FIRST, THIRD, SECOND);
         DaylightSavingRule spring =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 3600);
         DaylightSavingRule autumn =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.OCTOBER,
                 Weekday.SUNDAY,
                 PlainTime.of(1),

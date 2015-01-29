@@ -867,7 +867,7 @@ final class SPX
     }
 
     private static boolean writeMonthIndicatorOffset(
-        GregorianCalendarRule rule,
+        GregorianTimezoneRule rule,
         DataOutput out
     ) throws IOException {
 

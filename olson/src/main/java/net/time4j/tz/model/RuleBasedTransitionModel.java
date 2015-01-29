@@ -26,12 +26,12 @@ import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
-import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
+import net.time4j.format.CalendarText;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -65,7 +65,7 @@ final class RuleBasedTransitionModel
         SystemClock.inZonalView(ZonalOffset.UTC).today()
         .plus(100, YEARS).getYear();
 
-//    private static final long serialVersionUID = -8510991381885304060L;
+    private static final long serialVersionUID = 2456700806862862287L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -76,6 +76,7 @@ final class RuleBasedTransitionModel
         ConcurrentMap<Integer, List<ZonalTransition>> tCache =
             new ConcurrentHashMap<Integer, List<ZonalTransition>>();
     private transient final List<ZonalTransition> stdTransitions;
+    private transient final boolean gregorian;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -130,11 +131,17 @@ final class RuleBasedTransitionModel
         List<DaylightSavingRule> sortedRules = rules;
         Collections.sort(sortedRules, RuleComparator.INSTANCE);
         boolean hasRuleWithoutDST = false;
+        String calendarType = null;
 
         for (DaylightSavingRule rule : sortedRules) {
             if (rule.getSavings() == 0) {
                 hasRuleWithoutDST = true;
-                break;
+            }
+            if (calendarType == null) {
+                calendarType = rule.getCalendarType();
+            } else if (!calendarType.equals(rule.getCalendarType())) {
+                throw new IllegalArgumentException(
+                    "Rules with different calendar systems not permitted.");
             }
         }
 
@@ -143,6 +150,7 @@ final class RuleBasedTransitionModel
                 "No daylight saving rule with zero dst-offset found: " + rules);
         }
 
+        this.gregorian = CalendarText.ISO_CALENDAR_TYPE.equals(calendarType);
         ZonalTransition zt = initial;
 
         if (initial.getPosixTime() == Long.MIN_VALUE) {
@@ -203,7 +211,7 @@ final class RuleBasedTransitionModel
         DaylightSavingRule rule = this.rules.get(0);
         DaylightSavingRule previous = this.rules.get(n - 1);
         int shift = getShift(rule, stdOffset, previous.getSavings());
-        int year = getYear(ut.getPosixTime() + shift);
+        int year = getYear(rule, ut.getPosixTime() + shift);
         List<ZonalTransition> transitions = this.getTransitions(year);
 
         for (int i = 0; i < n; i++) {
@@ -356,7 +364,7 @@ final class RuleBasedTransitionModel
             return null;
         }
 
-        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
+        for (ZonalTransition t : this.getTransitions(localDate)) {
             long tt = t.getPosixTime();
 
             if (t.isGap()) {
@@ -391,7 +399,7 @@ final class RuleBasedTransitionModel
             return TransitionModel.toList(last);
         }
 
-        for (ZonalTransition t : this.getTransitions(localDate.getYear())) {
+        for (ZonalTransition t : this.getTransitions(localDate)) {
             long tt = t.getPosixTime();
             last = t.getTotalOffset();
 
@@ -447,7 +455,7 @@ final class RuleBasedTransitionModel
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                year = getYear(Math.max(start, preModel) + shift);
+                year = getYear(rule, Math.max(start, preModel) + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
@@ -491,7 +499,7 @@ final class RuleBasedTransitionModel
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                year = getYear(start + shift);
+                year = getYear(rule, start + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
@@ -544,6 +552,12 @@ final class RuleBasedTransitionModel
 
     }
 
+    private List<ZonalTransition> getTransitions(GregorianDate date) {
+
+        return this.getTransitions(this.rules.get(0).toCalendarYear(date));
+
+    }
+
     private List<ZonalTransition> getTransitions(int year) {
 
         Integer key = Integer.valueOf(year);
@@ -568,7 +582,10 @@ final class RuleBasedTransitionModel
 
             transitions = Collections.unmodifiableList(list);
 
-            if (year <= LAST_CACHED_YEAR) {
+            if (
+                (year <= LAST_CACHED_YEAR)
+                && this.gregorian
+            ) {
                 List<ZonalTransition> old =
                     this.tCache.putIfAbsent(key, transitions);
                 if (old != null) {
@@ -581,14 +598,15 @@ final class RuleBasedTransitionModel
 
     }
 
-    private static int getYear(long localSecs) {
+    private static int getYear(
+        DaylightSavingRule rule,
+        long localSecs
+    ) {
 
-        return GregorianMath.readYear(
-            GregorianMath.toPackedDate(
-                EpochDays.MODIFIED_JULIAN_DATE.transform(
-                    MathUtils.floorDivide(localSecs, 86400),
-                    EpochDays.UNIX)
-                )
+        return rule.toCalendarYear(
+            EpochDays.MODIFIED_JULIAN_DATE.transform(
+                MathUtils.floorDivide(localSecs, 86400),
+                EpochDays.UNIX)
             );
 
     }

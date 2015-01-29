@@ -27,11 +27,6 @@ import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
-
 import static net.time4j.CalendarUnit.DAYS;
 
 
@@ -45,7 +40,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * @concurrency <immutable>
  */
 final class DayOfWeekInMonthPattern
-    extends GregorianCalendarRule {
+    extends GregorianTimezoneRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -116,7 +111,6 @@ final class DayOfWeekInMonthPattern
             return (
                 (this.dayOfMonth == that.dayOfMonth)
                 && (this.dayOfWeek == that.dayOfWeek)
-                && (this.getMonth() == that.getMonth())
                 && (this.after == that.after)
                 && super.isEqual(that)
             );
@@ -200,31 +194,6 @@ final class DayOfWeekInMonthPattern
     int getType() {
 
         return SPX.DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE;
-
-    }
-
-    /**
-     * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains the type id
-     *              {@code 121}. Then the data bytes for the internal
-     *              state follow. The complex algorithm exploits the fact
-     *              that allmost all transitions happen at full hours around
-     *              midnight. Insight in details see source code.
-     */
-    private Object writeReplace() throws ObjectStreamException {
-
-        return new SPX(this, SPX.DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE);
-
-    }
-
-    /**
-     * @serialData  Blocks because a serialization proxy is required.
-     * @throws      InvalidObjectException (always)
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-
-        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

@@ -361,20 +361,20 @@ public class RulesLikeDhaka2009Test {
     private static RuleBasedTransitionModel createModel() {
 
         DaylightSavingRule start =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.JUNE,
                 19,
                 PlainTime.of(23),
                 OffsetIndicator.WALL_TIME,
                 3600);
         DaylightSavingRule end =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.DECEMBER,
                 31,
                 PlainTime.midnightAtEndOfDay(),
                 OffsetIndicator.WALL_TIME,
                 0);
-        
+
         List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
         rules.add(start);
         rules.add(end);

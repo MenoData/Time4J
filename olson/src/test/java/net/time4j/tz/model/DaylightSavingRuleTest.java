@@ -19,7 +19,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
     @Test
     public void getFixedDate() {
         assertThat(
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.MARCH,
                 17,
                 PlainTime.of(24),
@@ -32,7 +32,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
     @Test
     public void getLastWeekdayDate() {
         assertThat(
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(2, 0),
@@ -45,7 +45,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
     @Test
     public void getWeekdayAfterDate() {
         assertThat(
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 8,
                 Weekday.SUNDAY,
@@ -59,7 +59,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
     @Test
     public void getWeekdayBeforeDate() {
         assertThat(
-            DaylightSavingRule.ofWeekdayBeforeDate(
+            GregorianTimezoneRule.ofWeekdayBeforeDate(
                 Month.MARCH,
                 8,
                 Weekday.SUNDAY,
@@ -73,7 +73,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
      @Test
     public void getTimeOfDay() {
         assertThat(
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.MARCH,
                 17,
                 PlainTime.of(24),
@@ -86,7 +86,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
    @Test
     public void getIndicator() {
         assertThat(
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 8,
                 Weekday.SUNDAY,
@@ -100,7 +100,7 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
     @Test
     public void getSavings() {
         assertThat(
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 8,
                 Weekday.SUNDAY,

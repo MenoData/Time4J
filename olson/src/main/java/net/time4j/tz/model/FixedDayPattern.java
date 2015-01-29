@@ -26,11 +26,6 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.GregorianMath;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
-
 
 /**
  * <p>Ein Datumsmuster f&uuml;r DST-Wechsel an einem festen Tag im Monat. </p>
@@ -41,7 +36,7 @@ import java.io.ObjectStreamException;
  * @concurrency <immutable>
  */
 final class FixedDayPattern
-    extends GregorianCalendarRule {
+    extends GregorianTimezoneRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -85,7 +80,6 @@ final class FixedDayPattern
             FixedDayPattern that = (FixedDayPattern) obj;
             return (
                 (this.dayOfMonth == that.dayOfMonth)
-                && (this.getMonth() == that.getMonth())
                 && super.isEqual(that)
             );
         } else {
@@ -140,31 +134,6 @@ final class FixedDayPattern
     int getType() {
 
         return SPX.FIXED_DAY_PATTERN_TYPE;
-
-    }
-
-    /**
-     * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains the type id
-     *              {@code 120}. Then the data bytes for the internal
-     *              state follow. The complex algorithm exploits the fact
-     *              that allmost all transitions happen at full hours around
-     *              midnight. Insight in details see source code.
-     */
-    private Object writeReplace() throws ObjectStreamException {
-
-        return new SPX(this, SPX.FIXED_DAY_PATTERN_TYPE);
-
-    }
-
-    /**
-     * @serialData  Blocks because a serialization proxy is required.
-     * @throws      InvalidObjectException (always)
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-
-        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

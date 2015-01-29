@@ -56,7 +56,7 @@ final class ArrayTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-//    private static final long serialVersionUID = -9104454852317745314L;
+    private static final long serialVersionUID = -5264909488983076587L;
 
     //~ Instanzvariablen --------------------------------------------------
 

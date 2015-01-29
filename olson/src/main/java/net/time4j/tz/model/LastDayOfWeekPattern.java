@@ -27,13 +27,6 @@ import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
-
-import static net.time4j.CalendarUnit.DAYS;
-
 
 /**
  * <p>Ein Datumsmuster f&uuml;r DST-Wechsel am letzten Wochentag im Monat. </p>
@@ -44,7 +37,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * @concurrency <immutable>
  */
 final class LastDayOfWeekPattern
-    extends GregorianCalendarRule {
+    extends GregorianTimezoneRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -83,7 +76,7 @@ final class LastDayOfWeekPattern
             delta += 7;
         }
 
-        return PlainDate.of(year, month, lastDay).minus(delta, DAYS);
+        return PlainDate.of(year, month, lastDay - delta);
 
     }
 
@@ -96,7 +89,6 @@ final class LastDayOfWeekPattern
             LastDayOfWeekPattern that = (LastDayOfWeekPattern) obj;
             return (
                 (this.dayOfWeek == that.dayOfWeek)
-                && (this.getMonth() == that.getMonth())
                 && super.isEqual(that)
             );
         } else {
@@ -151,31 +143,6 @@ final class LastDayOfWeekPattern
     int getType() {
 
         return SPX.LAST_DAY_OF_WEEK_PATTERN_TYPE;
-
-    }
-
-    /**
-     * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains the type id
-     *              {@code 122}. Then the data bytes for the internal
-     *              state follow. The complex algorithm exploits the fact
-     *              that allmost all transitions happen at full hours around
-     *              midnight. Insight in details see source code.
-     */
-    private Object writeReplace() throws ObjectStreamException {
-
-        return new SPX(this, SPX.LAST_DAY_OF_WEEK_PATTERN_TYPE);
-
-    }
-
-    /**
-     * @serialData  Blocks because a serialization proxy is required.
-     * @throws      InvalidObjectException (always)
-     */
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-
-        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

@@ -355,28 +355,28 @@ public class RulesLikeBerlin1947Test {
     private static RuleBasedTransitionModel createModel() {
 
         DaylightSavingRule spring =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.APRIL,
                 6,
                 PlainTime.of(3),
                 OffsetIndicator.STANDARD_TIME,
                 3600);
         DaylightSavingRule startHighSummer =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.MAY,
                 11,
                 PlainTime.of(2),
                 OffsetIndicator.STANDARD_TIME,
                 7200);
         DaylightSavingRule endHighSummer =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.JUNE,
                 29,
                 PlainTime.of(3),
                 OffsetIndicator.WALL_TIME,
                 3600);
         DaylightSavingRule autumn =
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.OCTOBER,
                 1,
                 Weekday.SUNDAY,

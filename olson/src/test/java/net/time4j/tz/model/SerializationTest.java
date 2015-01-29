@@ -56,7 +56,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.DECEMBER,
                 31,
                 PlainTime.of(24),
@@ -76,7 +76,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.JANUARY,
                 1,
                 PlainTime.of(23, 30),
@@ -95,7 +95,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofFixedDay(
+            GregorianTimezoneRule.ofFixedDay(
                 Month.FEBRUARY,
                 28,
                 PlainTime.of(0),
@@ -114,7 +114,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(2, 30),
@@ -133,7 +133,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.JUNE,
                 Weekday.SUNDAY,
                 PlainTime.of(24),
@@ -152,7 +152,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.APRIL,
                 Weekday.FRIDAY,
                 PlainTime.of(9),
@@ -171,7 +171,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 1,
                 Weekday.SUNDAY,
@@ -191,7 +191,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 11,
                 Weekday.SUNDAY,
@@ -211,7 +211,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofWeekdayBeforeDate(
+            GregorianTimezoneRule.ofWeekdayBeforeDate(
                 Month.MARCH,
                 1,
                 Weekday.SUNDAY,
@@ -231,7 +231,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofWeekdayBeforeDate(
+            GregorianTimezoneRule.ofWeekdayBeforeDate(
                 Month.MARCH,
                 1,
                 Weekday.MONDAY,
@@ -251,7 +251,7 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         DaylightSavingRule rule =
-            DaylightSavingRule.ofWeekdayAfterDate(
+            GregorianTimezoneRule.ofWeekdayAfterDate(
                 Month.MARCH,
                 31,
                 Weekday.SUNDAY,
@@ -283,14 +283,14 @@ public class SerializationTest {
 
     private static RuleBasedTransitionModel createModelOfEuropeanUnion() {
         DaylightSavingRule spring =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 3600);
         DaylightSavingRule autumn =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.OCTOBER,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
@@ -326,14 +326,14 @@ public class SerializationTest {
 
     private static CompositeTransitionModel createCompositeModel() {
         DaylightSavingRule spring =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 3600);
         DaylightSavingRule autumn =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.OCTOBER,
                 Weekday.SUNDAY,
                 PlainTime.of(1),

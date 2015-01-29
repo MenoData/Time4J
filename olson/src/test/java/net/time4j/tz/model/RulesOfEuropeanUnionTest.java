@@ -380,14 +380,14 @@ public class RulesOfEuropeanUnionTest {
     private static RuleBasedTransitionModel createModel() {
 
         DaylightSavingRule spring =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.MARCH,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 3600);
         DaylightSavingRule autumn =
-            DaylightSavingRule.ofLastWeekday(
+            GregorianTimezoneRule.ofLastWeekday(
                 Month.OCTOBER,
                 Weekday.SUNDAY,
                 PlainTime.of(1),
