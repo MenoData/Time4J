@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalRelation.java) is part of project Time4J.
  *
@@ -30,7 +30,50 @@ import net.time4j.engine.Temporal;
  * <p>Given any two intervals, there is always a unique and distinct relation
  * between them without ambivalence. There are 13 possible relations. </p>
  *
- * <p><img src="doc-files/allen.jpg" /></p>
+ * <div style="margin-top:10px;">
+ * <table border="1">
+ * <caption>Allen-Relations</caption>
+ * <tr>
+ *  <td>precedes</td><td><img src="doc-files/precedes.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>meets</td><td><img src="doc-files/meets.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>encloses</td><td><img src="doc-files/encloses.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>starts</td><td><img src="doc-files/starts.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>finishes</td><td><img src="doc-files/finishes.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>metBy</td><td><img src="doc-files/metBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg" /></td>
+ * </tr>
+ * </table>
+ * </div>
  *
  * <p>Further explanations can be found at the website of
  * <a href="http://www.ics.uci.edu/~alspaugh/cls/shr/allen.html">Allen's
@@ -46,7 +89,50 @@ import net.time4j.engine.Temporal;
  * genau eine Beziehung zwischen diesen zwei Intervallen angeben. Insgesamt
  * gibt es 13 m&ouml;gliche Beziehungen. </p>
  *
- * <p><img src="doc-files/allen.jpg" /></p>
+ * <div style="margin-top:10px;">
+ * <table border="1">
+ * <caption>Allen-Relationen</caption>
+ * <tr>
+ *  <td>precedes</td><td><img src="doc-files/precedes.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>meets</td><td><img src="doc-files/meets.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>encloses</td><td><img src="doc-files/encloses.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>starts</td><td><img src="doc-files/starts.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>finishes</td><td><img src="doc-files/finishes.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>metBy</td><td><img src="doc-files/metBy.jpg" /></td>
+ * </tr>
+ * <tr>
+ *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg" /></td>
+ * </tr>
+ * </table>
+ * </div>
  *
  * <p>Weitere Erkl&auml;rungen gibt es auf der Webseite von
  * <a href="http://www.ics.uci.edu/~alspaugh/cls/shr/allen.html">Allen's

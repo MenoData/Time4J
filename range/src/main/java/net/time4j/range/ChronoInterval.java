@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoInterval.java) is part of project Time4J.
  *
@@ -27,12 +27,18 @@ import net.time4j.engine.Temporal;
 /**
  * <p>Represents a temporal interval on a timeline. </p>
  *
+ * <p>Note: Time4J-intervals contain every timepoint between start and
+ * end boundary without exception. </p>
+ *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
  * @since   2.0
  */
-/**
+/*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitintervall auf einem Zeitstrahl. </p>
+ *
+ * <p>Hinweis: Time4J-Intervalle enthalten jeden Zeitpunkt zwischen
+ * Start und Ende ohne Ausnahme. </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
@@ -150,5 +156,5 @@ public interface ChronoInterval<T extends Temporal<? super T>> {
      *          else {@code false}
      */
     boolean isBefore(T temporal);
-    
+
 }
