@@ -882,6 +882,13 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
     }
 
+    // Anzahl der internen Intervalle
+    int getSize() {
+
+        return this.intervals.size();
+
+    }
+
     /**
      * <p>Definiert ein Vergleichsobjekt zum Sortieren der Intervalle
      * zuerst nach dem Start und dann nach dem Ende. </p>

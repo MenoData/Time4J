@@ -34,6 +34,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,31 +50,41 @@ final class SPX
     //~ Statische Felder/Initialisierungen ----------------------------
 
     /** Serialisierungstyp von {@code DateInterval}. */
-    static final int DATE_TYPE = 50;
+    static final int DATE_TYPE = 32;
 
     /** Serialisierungstyp von {@code ClockInterval}. */
-    static final int TIME_TYPE = 51;
+    static final int TIME_TYPE = 33;
 
     /** Serialisierungstyp von {@code TimestampInterval}. */
-    static final int TIMESTAMP_TYPE = 52;
+    static final int TIMESTAMP_TYPE = 34;
 
     /** Serialisierungstyp von {@code MomentInterval}. */
-    static final int MOMENT_TYPE = 53;
+    static final int MOMENT_TYPE = 35;
+
+    /** Serialisierungstyp von {@code DateWindows}. */
+    static final int DATE_WINDOW_ID = 40;
+
+    /** Serialisierungstyp von {@code ClockWindows}. */
+    static final int CLOCK_WINDOW_ID = 41;
+
+    /** Serialisierungstyp von {@code TimestampWindows}. */
+    static final int TIMESTAMP_WINDOW_ID = 42;
+
+    /** Serialisierungstyp von {@code MomentWindows}. */
+    static final int MOMENT_WINDOW_ID = 43;
 
     /** Serialisierungstyp von {@code Boundary}. */
     static final int BOUNDARY_TYPE = 57;
 
-    /** Serialisierungstyp von {@code DateWindows}. */
-    static final int DATE_WINDOW_ID = 60;
-
-    /** Serialisierungstyp von {@code ClockWindows}. */
-    static final int CLOCK_WINDOW_ID = 61;
-
-    /** Serialisierungstyp von {@code TimestampWindows}. */
-    static final int TIMESTAMP_WINDOW_ID = 62;
-
-    /** Serialisierungstyp von {@code MomentWindows}. */
-    static final int MOMENT_WINDOW_ID = 63;
+    // for backwards compatibility pre v2.2
+    private static final int OLD_DATE_TYPE = 50;
+    private static final int OLD_TIME_TYPE = 51;
+    private static final int OLD_TIMESTAMP_TYPE = 52;
+    private static final int OLD_MOMENT_TYPE = 53;
+    private static final int OLD_DATE_WINDOW_ID = 60;
+    private static final int OLD_CLOCK_WINDOW_ID = 61;
+    private static final int OLD_TIMESTAMP_WINDOW_ID = 62;
+    private static final int OLD_MOMENT_WINDOW_ID = 63;
 
     private static final long serialVersionUID = 1L;
 
@@ -140,34 +151,67 @@ final class SPX
     public void writeExternal(ObjectOutput out)
         throws IOException {
 
-        switch (this.type) {
-            case DATE_TYPE:
-                this.writeDateInterval(out);
-                break;
-            case TIME_TYPE:
-                this.writeClockInterval(out);
-                break;
-            case TIMESTAMP_TYPE:
-                this.writeTimestampInterval(out);
-                break;
-            case MOMENT_TYPE:
-                this.writeMomentInterval(out);
-                break;
-            case BOUNDARY_TYPE:
-                this.writeBoundary(out);
-                break;
-            case DATE_WINDOW_ID:
-            case CLOCK_WINDOW_ID:
-            case TIMESTAMP_WINDOW_ID:
-            case MOMENT_WINDOW_ID:
-                int header = (this.type << 2);
+        if (this.type == BOUNDARY_TYPE) {
+            Boundary<?> boundary = (Boundary<?>) this.obj;
+            int header = (BOUNDARY_TYPE << 2);
+
+            if (boundary.equals(Boundary.infinitePast())) {
+                header |= 1;
                 out.writeByte(header);
-                IntervalCollection<?> window =
-                    IntervalCollection.class.cast(this.obj);
-                out.writeObject(window.getIntervals());
-                break;
-            default:
-                throw new InvalidClassException("Unknown serialized type.");
+            } else if (boundary.equals(Boundary.infiniteFuture())) {
+                header |= 2;
+                out.writeByte(header);
+            } else {
+                out.writeByte(header);
+                out.writeByte(boundary.isOpen() ? 1 : 0);
+                out.writeObject(boundary.getTemporal());
+            }
+        } else {
+            int header = (this.type << 2);
+            out.writeByte(header);
+
+            switch (this.type) {
+                case DATE_TYPE:
+                case TIME_TYPE:
+                case TIMESTAMP_TYPE:
+                case MOMENT_TYPE:
+                    ChronoInterval<?> interval = (ChronoInterval<?>) this.obj;
+                    writeBoundary(interval.getStart(), out);
+                    writeBoundary(interval.getEnd(), out);
+                    break;
+                case DATE_WINDOW_ID:
+                case CLOCK_WINDOW_ID:
+                case TIMESTAMP_WINDOW_ID:
+                case MOMENT_WINDOW_ID:
+                    IntervalCollection<?> window =
+                        IntervalCollection.class.cast(this.obj);
+                    out.writeInt(window.getSize());
+                    for (ChronoInterval<?> part : window.getIntervals()) {
+                        writeBoundary(part.getStart(), out);
+                        writeBoundary(part.getEnd(), out);
+                    }
+                    break;
+
+//                case OLD_DATE_TYPE:
+//                case OLD_TIME_TYPE:
+//                case OLD_TIMESTAMP_TYPE:
+//                case OLD_MOMENT_TYPE:
+//                    ChronoInterval<?> ci = (ChronoInterval<?>) this.obj;
+//                    out.writeObject(ci.getStart());
+//                    out.writeObject(ci.getEnd());
+//                    break;
+//                case OLD_DATE_WINDOW_ID:
+//                case OLD_CLOCK_WINDOW_ID:
+//                case OLD_TIMESTAMP_WINDOW_ID:
+//                case OLD_MOMENT_WINDOW_ID:
+//                    IntervalCollection<?> ic =
+//                        IntervalCollection.class.cast(this.obj);
+//                    out.writeObject(ic.getIntervals());
+//                    break;
+
+                default:
+                    throw new InvalidClassException("Unknown serialized type.");
+            }
         }
 
     }
@@ -191,35 +235,63 @@ final class SPX
         throws IOException, ClassNotFoundException {
 
         byte header = in.readByte();
+        int typeInfo = (header & 0xFF) >> 2;
 
-        switch ((header & 0xFF) >> 2) {
+        switch (typeInfo) {
             case DATE_TYPE:
-                this.obj = this.readDateInterval(in);
+                this.obj = readDateInterval(in);
                 break;
             case TIME_TYPE:
-                this.obj = this.readClockInterval(in);
+                this.obj = readClockInterval(in);
                 break;
             case TIMESTAMP_TYPE:
-                this.obj = this.readTimestampInterval(in);
+                this.obj = readTimestampInterval(in);
                 break;
             case MOMENT_TYPE:
-                this.obj = this.readMomentInterval(in);
-                break;
-            case BOUNDARY_TYPE:
-                this.obj = this.readBoundary(in, header);
+                this.obj = readMomentInterval(in);
                 break;
             case DATE_WINDOW_ID:
-                this.obj = this.readDateWindow(in);
+                this.obj = readDateWindow2(in);
                 break;
             case CLOCK_WINDOW_ID:
-                this.obj = this.readClockWindow(in);
+                this.obj = readClockWindow2(in);
                 break;
             case TIMESTAMP_WINDOW_ID:
-                this.obj = this.readTimestampWindow(in);
+                this.obj = readTimestampWindow2(in);
                 break;
             case MOMENT_WINDOW_ID:
-                this.obj = this.readMomentWindow(in);
+                this.obj = readMomentWindow2(in);
                 break;
+            case BOUNDARY_TYPE:
+                this.obj = readBoundary(in, header);
+                break;
+
+            // for backward compatibility
+            case OLD_DATE_TYPE:
+                this.obj = readDateInterval(in, true);
+                break;
+            case OLD_TIME_TYPE:
+                this.obj = readClockInterval(in, true);
+                break;
+            case OLD_TIMESTAMP_TYPE:
+                this.obj = readTimestampInterval(in, true);
+                break;
+            case OLD_MOMENT_TYPE:
+                this.obj = readMomentInterval(in, true);
+                break;
+            case OLD_DATE_WINDOW_ID:
+                this.obj = readDateWindow(in);
+                break;
+            case OLD_CLOCK_WINDOW_ID:
+                this.obj = readClockWindow(in);
+                break;
+            case OLD_TIMESTAMP_WINDOW_ID:
+                this.obj = readTimestampWindow(in);
+                break;
+            case OLD_MOMENT_WINDOW_ID:
+                this.obj = readMomentWindow(in);
+                break;
+
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
         }
@@ -232,21 +304,20 @@ final class SPX
 
     }
 
-    private void writeDateInterval(ObjectOutput out)
-        throws IOException {
+    private static DateInterval readDateInterval(ObjectInput in)
+        throws IOException, ClassNotFoundException {
 
-        DateInterval interval = (DateInterval) this.obj;
-        out.writeByte(DATE_TYPE << 2);
-        out.writeObject(interval.getStart());
-        out.writeObject(interval.getEnd());
+        return readDateInterval(in, false);
 
     }
 
-    private Object readDateInterval(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+    private static DateInterval readDateInterval(
+        ObjectInput in,
+        boolean pre22
+    ) throws IOException, ClassNotFoundException {
 
-        Object o1 = in.readObject();
-        Object o2 = in.readObject();
+        Object o1 = (pre22 ? in.readObject() : readBoundary(in));
+        Object o2 = (pre22 ? in.readObject() : readBoundary(in));
 
         Boundary<PlainDate> start = getBoundary(o1, PlainDate.class, false);
         Boundary<PlainDate> end = getBoundary(o2, PlainDate.class, true);
@@ -259,21 +330,20 @@ final class SPX
 
     }
 
-    private void writeClockInterval(ObjectOutput out)
-        throws IOException {
+    private static ClockInterval readClockInterval(ObjectInput in)
+        throws IOException, ClassNotFoundException {
 
-        ClockInterval interval = (ClockInterval) this.obj;
-        out.writeByte(TIME_TYPE << 2);
-        out.writeObject(interval.getStart());
-        out.writeObject(interval.getEnd());
+        return readClockInterval(in, false);
 
     }
 
-    private Object readClockInterval(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+    private static ClockInterval readClockInterval(
+        ObjectInput in,
+        boolean pre22
+    ) throws IOException, ClassNotFoundException {
 
-        Object o1 = in.readObject();
-        Object o2 = in.readObject();
+        Object o1 = (pre22 ? in.readObject() : readBoundary(in));
+        Object o2 = (pre22 ? in.readObject() : readBoundary(in));
 
         Boundary<PlainTime> start = getBoundary(o1, PlainTime.class, false);
         Boundary<PlainTime> end = getBoundary(o2, PlainTime.class, true);
@@ -286,21 +356,20 @@ final class SPX
 
     }
 
-    private void writeTimestampInterval(ObjectOutput out)
-        throws IOException {
+    private static TimestampInterval readTimestampInterval(ObjectInput in)
+        throws IOException, ClassNotFoundException {
 
-        TimestampInterval interval = (TimestampInterval) this.obj;
-        out.writeByte(TIMESTAMP_TYPE << 2);
-        out.writeObject(interval.getStart());
-        out.writeObject(interval.getEnd());
+        return readTimestampInterval(in, false);
 
     }
 
-    private Object readTimestampInterval(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+    private static TimestampInterval readTimestampInterval(
+        ObjectInput in,
+        boolean pre22
+    ) throws IOException, ClassNotFoundException {
 
-        Object o1 = in.readObject();
-        Object o2 = in.readObject();
+        Object o1 = (pre22 ? in.readObject() : readBoundary(in));
+        Object o2 = (pre22 ? in.readObject() : readBoundary(in));
 
         Boundary<PlainTimestamp> start =
             getBoundary(o1, PlainTimestamp.class, false);
@@ -315,21 +384,20 @@ final class SPX
 
     }
 
-    private void writeMomentInterval(ObjectOutput out)
-        throws IOException {
+    private static MomentInterval readMomentInterval(ObjectInput in)
+        throws IOException, ClassNotFoundException {
 
-        MomentInterval interval = (MomentInterval) this.obj;
-        out.writeByte(MOMENT_TYPE << 2);
-        out.writeObject(interval.getStart());
-        out.writeObject(interval.getEnd());
+        return readMomentInterval(in, false);
 
     }
 
-    private Object readMomentInterval(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+    private static MomentInterval readMomentInterval(
+        ObjectInput in,
+        boolean pre22
+    ) throws IOException, ClassNotFoundException {
 
-        Object o1 = in.readObject();
-        Object o2 = in.readObject();
+        Object o1 = (pre22 ? in.readObject() : readBoundary(in));
+        Object o2 = (pre22 ? in.readObject() : readBoundary(in));
 
         Boundary<Moment> start = getBoundary(o1, Moment.class, false);
         Boundary<Moment> end = getBoundary(o2, Moment.class, true);
@@ -342,7 +410,28 @@ final class SPX
 
     }
 
-    private Object readDateWindow(ObjectInput in)
+    private static IntervalCollection<PlainDate> readDateWindow2(
+        ObjectInput in
+    ) throws IOException, ClassNotFoundException {
+
+        int size = in.readInt();
+
+        if (size == 0) {
+            return DateWindows.EMPTY;
+        }
+
+        List<ChronoInterval<PlainDate>> intervals =
+            new ArrayList<ChronoInterval<PlainDate>>(size);
+
+        for (int i = 0; i < size; i++) {
+            intervals.add(readDateInterval(in));
+        }
+
+        return DateWindows.EMPTY.plus(intervals);
+
+    }
+
+    private static Object readDateWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainDate>> intervals = cast(in.readObject());
@@ -350,7 +439,28 @@ final class SPX
 
     }
 
-    private Object readClockWindow(ObjectInput in)
+    private static IntervalCollection<PlainTime> readClockWindow2(
+        ObjectInput in
+    ) throws IOException, ClassNotFoundException {
+
+        int size = in.readInt();
+
+        if (size == 0) {
+            return ClockWindows.EMPTY;
+        }
+
+        List<ChronoInterval<PlainTime>> intervals =
+            new ArrayList<ChronoInterval<PlainTime>>(size);
+
+        for (int i = 0; i < size; i++) {
+            intervals.add(readClockInterval(in));
+        }
+
+        return ClockWindows.EMPTY.plus(intervals);
+
+    }
+
+    private static Object readClockWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainTime>> intervals = cast(in.readObject());
@@ -358,7 +468,28 @@ final class SPX
 
     }
 
-    private Object readTimestampWindow(ObjectInput in)
+    private static IntervalCollection<PlainTimestamp> readTimestampWindow2(
+        ObjectInput in
+    ) throws IOException, ClassNotFoundException {
+
+        int size = in.readInt();
+
+        if (size == 0) {
+            return TimestampWindows.EMPTY;
+        }
+
+        List<ChronoInterval<PlainTimestamp>> intervals =
+            new ArrayList<ChronoInterval<PlainTimestamp>>(size);
+
+        for (int i = 0; i < size; i++) {
+            intervals.add(readTimestampInterval(in));
+        }
+
+        return TimestampWindows.EMPTY.plus(intervals);
+
+    }
+
+    private static Object readTimestampWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainTimestamp>> intervals = cast(in.readObject());
@@ -366,7 +497,27 @@ final class SPX
 
     }
 
-    private Object readMomentWindow(ObjectInput in)
+    private static IntervalCollection<Moment> readMomentWindow2(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int size = in.readInt();
+
+        if (size == 0) {
+            return MomentWindows.EMPTY;
+        }
+
+        List<ChronoInterval<Moment>> intervals =
+            new ArrayList<ChronoInterval<Moment>>(size);
+
+        for (int i = 0; i < size; i++) {
+            intervals.add(readMomentInterval(in));
+        }
+
+        return MomentWindows.EMPTY.plus(intervals);
+
+    }
+
+    private static Object readMomentWindow(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<Moment>> intervals = cast(in.readObject());
@@ -374,28 +525,9 @@ final class SPX
 
     }
 
-    private void writeBoundary(ObjectOutput out)
-        throws IOException {
-
-        Boundary<?> boundary = (Boundary<?>) this.obj;
-        int header = (BOUNDARY_TYPE << 2);
-
-        if (boundary.equals(Boundary.infinitePast())) {
-            header |= 1;
-            out.writeByte(header);
-        } else if (boundary.equals(Boundary.infiniteFuture())) {
-            header |= 2;
-            out.writeByte(header);
-        } else {
-            out.writeByte(header);
-            out.writeByte(boundary.isOpen() ? 1 : 0);
-            out.writeObject(boundary.getTemporal());
-        }
-
-    }
-
+    // serialization of a single boundary object
     @SuppressWarnings("unchecked")
-    private Object readBoundary(
+    private static Object readBoundary(
         ObjectInput in,
         byte header
     ) throws IOException, ClassNotFoundException {
@@ -425,6 +557,44 @@ final class SPX
             default:
                 throw new StreamCorruptedException("Invalid edge state.");
         }
+
+        Object t = in.readObject();
+        return Boundary.of(edge, Temporal.class.cast(t));
+
+    }
+
+    private static void writeBoundary(
+        Boundary<?> boundary,
+        ObjectOutput out
+    ) throws IOException {
+
+        if (boundary.equals(Boundary.infinitePast())) {
+            out.writeByte(1);
+        } else if (boundary.equals(Boundary.infiniteFuture())) {
+            out.writeByte(2);
+        } else {
+            out.writeByte(boundary.isOpen() ? 4 : 0);
+            out.writeObject(boundary.getTemporal());
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object readBoundary(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int header = (in.readByte() & 0xFF);
+
+        if ((header & 0x1) == 1) {
+            return Boundary.infinitePast();
+        } else if ((header & 0x2) == 2) {
+            return Boundary.infiniteFuture();
+        }
+
+        IntervalEdge edge = (
+            ((header & 0x4) == 4)
+            ? IntervalEdge.OPEN
+            : IntervalEdge.CLOSED);
 
         Object t = in.readObject();
         return Boundary.of(edge, Temporal.class.cast(t));

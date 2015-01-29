@@ -97,7 +97,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void roundTripOfIntervalCollection()
+    public void roundTripOfDateIntervalCollection()
         throws IOException, ClassNotFoundException {
 
         DateInterval i1 =
@@ -114,6 +114,73 @@ public class SerializationTest {
                 PlainDate.of(2014, 6, 1));
         IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
         windows = windows.plus(i1).plus(i2).plus(i3);
+
+        Object ser = roundtrip(windows);
+        assertThat(windows, is(ser));
+    }
+
+    @Test
+    public void roundTripOfClockIntervalCollection()
+        throws IOException, ClassNotFoundException {
+
+        ClockInterval i1 =
+            ClockInterval.between(
+                PlainTime.of(20, 45, 30),
+                PlainTime.of(24));
+        ClockInterval i2 =
+            ClockInterval.between(
+                PlainTime.of(0, 45, 30),
+                PlainTime.of(17, 10));
+        ClockInterval i3 =
+            ClockInterval.between(
+                PlainTime.of(0),
+                PlainTime.of(24));
+        ClockInterval i4 =
+            ClockInterval.between(
+                PlainTime.of(11, 59, 59),
+                PlainTime.of(12));
+        IntervalCollection<PlainTime> windows =
+            IntervalCollection.onClockAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3).plus(i4);
+
+        Object ser = roundtrip(windows);
+        assertThat(windows, is(ser));
+    }
+
+    @Test
+    public void roundTripOfTimestampIntervalCollection()
+        throws IOException, ClassNotFoundException {
+
+        TimestampInterval i1 =
+            TimestampInterval.between(
+                PlainTimestamp.of(2014, 2, 27, 0, 0),
+                PlainTimestamp.of(2014, 5, 14, 0, 0));
+        TimestampInterval i2 =
+            TimestampInterval.between(
+                PlainTimestamp.of(2013, 2, 27, 0, 0),
+                PlainTimestamp.of(2014, 4, 30, 0, 0));
+        IntervalCollection<PlainTimestamp> windows =
+            IntervalCollection.onTimestampAxis();
+        windows = windows.plus(i1).plus(i2);
+
+        Object ser = roundtrip(windows);
+        assertThat(windows, is(ser));
+    }
+
+    @Test
+    public void roundTripOfMomentIntervalCollection()
+        throws IOException, ClassNotFoundException {
+
+        MomentInterval i1 =
+            MomentInterval.between(
+                PlainTimestamp.of(2014, 2, 27, 0, 0).atUTC(),
+                PlainTimestamp.of(2014, 5, 14, 0, 0).atUTC());
+        MomentInterval i2 =
+            MomentInterval.between(
+                PlainTimestamp.of(2013, 2, 27, 0, 0).atUTC(),
+                PlainTimestamp.of(2014, 4, 30, 0, 0).atUTC());
+        IntervalCollection<Moment> windows = IntervalCollection.onMomentAxis();
+        windows = windows.plus(i1).plus(i2);
 
         Object ser = roundtrip(windows);
         assertThat(windows, is(ser));

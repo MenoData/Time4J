@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentWindows.java) is part of project Time4J.
  *
@@ -97,16 +97,35 @@ final class MomentWindows
      * @serialData  Uses
      *              <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte
-     *              contains the type-ID 63 in the six most significant
+     *              contains the type-ID 43 in the six most significant
      *              bits. The next bytes represent all contained intervals.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 63;
+     *  int header = 43;
      *  header <<= 2;
      *  out.writeByte(header);
-     *  out.writeObject(getIntervals());
+     *  out.writeInt(getIntervals().size());
+     * 
+     *  for (ChronoInterval<?> part : getIntervals()) {
+     *      writeBoundary(part.getStart(), out);
+     *      writeBoundary(part.getEnd(), out);
+     *  }
+     *
+     *  private static void writeBoundary(
+     *      Boundary<?> boundary,
+     *      ObjectOutput out
+     *  ) throws IOException {
+     *      if (boundary.equals(Boundary.infinitePast())) {
+     *          out.writeByte(1);
+     *      } else if (boundary.equals(Boundary.infiniteFuture())) {
+     *          out.writeByte(2);
+     *      } else {
+     *          out.writeByte(boundary.isOpen() ? 4 : 0);
+     *          out.writeObject(boundary.getTemporal());
+     *      }
+     *  }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {
