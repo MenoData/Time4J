@@ -234,7 +234,7 @@ public abstract class Timezone
             ) {
                 systemTZ = ZonalOffset.UTC.getModel();
             } else if (zoneID != null) {
-                systemTZ = Timezone.getTZ(new NamedID(zoneID), false);
+                systemTZ = Timezone.getTZ(resolve(zoneID), zoneID, false);
             }
         } catch (SecurityException se) {
             // OK, dann Zugriff auf j.u.TimeZone.getDefault()
@@ -371,12 +371,16 @@ public abstract class Timezone
     /**
      * <p>Gets the timezone for given identifier. </p>
      *
+     * <p>Queries the underlying {@code ZoneProvider}. </p>
+     *
      * @param   tzid    timezone id as interface
      * @return  timezone data
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
+     *
+     * <p>Fragt den zugrundeliegenden {@code ZoneProvider} ab. </p>
      *
      * @param   tzid    timezone id as interface
      * @return  timezone data
@@ -391,6 +395,8 @@ public abstract class Timezone
     /**
      * <p>Gets the timezone for given identifier. </p>
      *
+     * <p>Queries the underlying {@code ZoneProvider}. </p>
+     *
      * @param   tzid    timezone id as String
      * @return  timezone data
      * @throws  IllegalArgumentException if given timezone cannot be loaded
@@ -398,13 +404,15 @@ public abstract class Timezone
     /*[deutsch]
      * <p>Liefert die Zeitzone mit der angegebenen ID. </p>
      *
+     * <p>Fragt den zugrundeliegenden {@code ZoneProvider} ab. </p>
+     *
      * @param   tzid    timezone id as String
      * @return  timezone data
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     public static Timezone of(String tzid) {
 
-        return Timezone.getTZ(tzid, true);
+        return Timezone.getTZ(null, tzid, true);
 
     }
 
@@ -417,6 +425,8 @@ public abstract class Timezone
      * of failure, this method will finally load the system timezone.
      * In contrast to {@link #of(TZID)}, this method never throws any
      * exception. </p>
+     *
+     * <p>Queries the underlying {@code ZoneProvider}. </p>
      *
      * @param   tzid        preferred timezone id
      * @param   fallback    alternative timezone id
@@ -432,6 +442,8 @@ public abstract class Timezone
      * Im Gegensatz zu {@link #of(TZID)} wirft diese Methode niemals eine
      * Ausnahme. </p>
      *
+     * <p>Fragt den zugrundeliegenden {@code ZoneProvider} ab. </p>
+     *
      * @param   tzid        preferred timezone id
      * @param   fallback    alternative timezone id
      * @return  timezone data
@@ -441,7 +453,7 @@ public abstract class Timezone
         TZID fallback
     ) {
 
-        Timezone ret = Timezone.getTZ(tzid, false);
+        Timezone ret = Timezone.getTZ(null, tzid, false);
 
         if (ret == null) {
             ret = Timezone.getTZ(fallback, false);
@@ -452,6 +464,34 @@ public abstract class Timezone
         }
 
         return ret;
+
+    }
+
+    /**
+     * <p>Creates a new timezone based only on given data. </p>
+     *
+     * @param   tzid        timezone id
+     * @param   history     history of offset transitions
+     * @return  new instance of timezone data
+     * @since   2.2
+     * @see     net.time4j.tz.model.TransitionModel
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine neue synthetische Zeitzone basierend nur auf den
+     * angegebenen Daten. </p>
+     *
+     * @param   tzid        timezone id
+     * @param   history     history of offset transitions
+     * @return  new instance of timezone data
+     * @since   2.2
+     * @see     net.time4j.tz.model.TransitionModel
+     */
+    public static Timezone of(
+        String tzid,
+        TransitionHistory history
+    ) {
+
+        return new HistorizedTimezone(resolve(tzid), history);
 
     }
 
@@ -761,11 +801,12 @@ public abstract class Timezone
             return ((ZonalOffset) tzid).getModel();
         }
 
-        return Timezone.getTZ(tzid.canonical(), wantsException);
+        return Timezone.getTZ(tzid, tzid.canonical(), wantsException);
 
     }
 
     private static Timezone getTZ(
+        TZID tzid, // optional
         String zoneID,
         boolean wantsException
     ) {
@@ -786,10 +827,10 @@ public abstract class Timezone
         }
 
         // enums bevorzugen
-        TZID resolved = PREDEFINED.get(zoneID);
+        TZID resolved = tzid;
 
         if (resolved == null) {
-            resolved = new NamedID(zoneID);
+            resolved = resolve(zoneID);
         }
 
         // java.util.TimeZone hat keine öffentliche Historie
@@ -884,6 +925,19 @@ public abstract class Timezone
         } else {
             return new HistorizedTimezone(tzid, history);
         }
+
+    }
+
+    private static TZID resolve(String zoneID) {
+
+        // enums bevorzugen
+        TZID resolved = PREDEFINED.get(zoneID);
+
+        if (resolved == null) {
+            resolved = new NamedID(zoneID);
+        }
+
+        return resolved;
 
     }
 

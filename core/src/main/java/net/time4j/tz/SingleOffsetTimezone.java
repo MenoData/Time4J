@@ -38,6 +38,7 @@ import java.util.Locale;
  * dar. </p>
  *
  * @author      Meno Hochschild
+ * @serial      include
  * @concurrency <immutable>
  */
 final class SingleOffsetTimezone
@@ -145,20 +146,6 @@ final class SingleOffsetTimezone
     }
 
     @Override
-    public List<ZonalTransition> getStdTransitionsBefore(UnixTime time) {
-
-        return Collections.emptyList();
-
-    }
-
-    @Override
-    public List<ZonalTransition> getStdTransitionsAfter(UnixTime time) {
-
-        return Collections.emptyList();
-
-    }
-
-    @Override
     public List<ZonalTransition> getTransitions(
         UnixTime startInclusive,
         UnixTime endExclusive
@@ -192,6 +179,14 @@ final class SingleOffsetTimezone
     // optional
     @Override
     public ZonalTransition getStartTransition(UnixTime time) {
+
+        return null;
+
+    }
+
+    // optional
+    @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
 
         return null;
 

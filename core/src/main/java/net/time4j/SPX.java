@@ -192,7 +192,7 @@ final class SPX
 
         byte header = in.readByte();
 
-        switch (header >> 4) {
+        switch ((header & 0xFF) >> 4) {
             case DATE_TYPE:
                 this.obj = this.readDate(in, header);
                 break;

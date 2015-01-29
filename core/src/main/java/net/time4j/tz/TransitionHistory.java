@@ -31,14 +31,22 @@ import java.util.List;
 /**
  * <p>Keeps all offset transitions and rules of a timezone. </p>
  *
+ * <p>Note: This interface can be considered as stable since version v2.2.
+ * Preliminary experimental versions of this interface existed since v1.0
+ * but there was originally not any useable implementation. </p>
+ *
  * @author  Meno Hochschild
- * @spec    External implementations are not permitted due to experimental status of this interface.
+ * @spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
  *
+ * <p>Hinweis: Dieses Interface kann als stabil seit Version 2.2 gelten.
+ * Davor existierten experimentelle Versionen des Interface schon seit v1.0,
+ * aber es gab urspr&uuml;nglich keine nutzbare Implementierung. </p>
+ *
  * @author  Meno Hochschild
- * @spec    External implementations are not permitted due to experimental status of this interface.
+ * @spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionHistory {
 
@@ -83,6 +91,23 @@ public interface TransitionHistory {
      *          is before first defined transition
      */
     ZonalTransition getStartTransition(UnixTime ut);
+
+    /**
+     * <p>Queries the next transition after given global timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time
+     *          is after any defined transition
+     */
+    /*[deutsch]
+     * <p>Ermittelt den n&auml;chsten &Uuml;bergang nach der angegebenen
+     * Referenzzeit. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time
+     *          is after any defined transition
+     */
+    ZonalTransition getNextTransition(UnixTime ut);
 
     /**
      * <p>Returns the conflict transition where given local timestamp
@@ -214,6 +239,7 @@ public interface TransitionHistory {
      * @param   startInclusive  start time on POSIX time scale
      * @param   endExclusive    end time on POSIX time scale
      * @return  unmodifiable list of transitions maybe empty
+     * @throws  IllegalArgumentException if start is after end
      * @see     #getStdTransitions()
      */
     /*[deutsch]
@@ -223,6 +249,7 @@ public interface TransitionHistory {
      * @param   startInclusive  start time on POSIX time scale
      * @param   endExclusive    end time on POSIX time scale
      * @return  unmodifiable list of transitions maybe empty
+     * @throws  IllegalArgumentException if start is after end
      * @see     #getStdTransitions()
      */
     List<ZonalTransition> getTransitions(
@@ -234,75 +261,12 @@ public interface TransitionHistory {
      * <p>Determines if this history does not have any transitions. </p>
      *
      * @return  {@code true} if there are no transitions else {@code false}
-     * @since   1.2.1
      */
     /*[deutsch]
      * <p>Ermittelt ob diese Historie keine &Uuml;berg&auml;nge kennt. </p>
      *
      * @return  {@code true} if there are no transitions else {@code false}
-     * @since   1.2.1
      */
     boolean isEmpty();
-
-    /**
-     * <p>Returns the previous transitions in descending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp (in descending order on the timeline!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
-     */
-    /*[deutsch]
-     * <p>Ermittelt die vorherigen &Uuml;berg&auml;nge in zeitlich absteigender
-     * Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge
-     * im Intervall von [1970-01-01T00:00Z] bis maximal zum ersten
-     * &Uuml;bergang vor dem aktuellen Zeitpunkt (in zeitlich umgekehrter
-     * Reihenfolge!). </p>
-     *
-     * @param   ut      unix reference time
-     * @return  previous transitions before reference time
-     *          (only standard transitions after 1970-01-01)
-     * @see     #getStdTransitions()
-     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
-     */
-    @Deprecated
-    List<ZonalTransition> getStdTransitionsBefore(UnixTime ut);
-
-    /**
-     * <p>Returns the next transitions in ascending order if available. </p>
-     *
-     * <p>In general, this method will only yield transitions in the interval
-     * from [1970-01-01T00:00Z] until at maximum the first transition before
-     * the current timestamp. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
-     */
-    /*[deutsch]
-     * <p>Ermittelt die n&auml;chsten &Uuml;berg&auml;nge in zeitlich
-     * aufsteigender Reihenfolge, falls vorhanden. </p>
-     *
-     * <p>Grunds&auml;tzlich liefert die Methode nur &Uuml;berg&auml;nge im
-     * Intervall von [1970-01-01T00:00Z] bis maximal zum ersten &Uuml;bergang
-     * nach dem aktuellen Zeitpunkt. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  next transitions after reference time (only standard
-     *          transitions 1970-01-01)
-     * @see     #getStdTransitions()
-     * @deprecated Will be removed in v2.2, use {@link #getTransitions(UnixTime,UnixTime)}
-     */
-    @Deprecated
-    List<ZonalTransition> getStdTransitionsAfter(UnixTime ut);
 
 }
