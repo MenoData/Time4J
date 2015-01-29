@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoInterval.java) is part of project Time4J.
  *
@@ -37,9 +37,12 @@ import java.io.IOException;
  * <p>Represents an abstract temporal interval on a timeline for
  * ISO-8601-types. </p>
  *
- * <p>Note that the start of an interval is always included. The end
- * is included for date intervals by default and excluded for other
- * interval types. This default setting can be overwritten however. </p>
+ * <p>Note that the start of an interval is always included (with the
+ * exception of intervals with infinite past). The end is open for
+ * intervals with infinite future and else included for date intervals
+ * by default and excluded for other interval types. This default setting
+ * can be overwritten however (although potentially harmful for the
+ * performance). </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @param   <I> generic self-referencing interval type
@@ -50,9 +53,12 @@ import java.io.IOException;
  * <p>Repr&auml;sentiert ein abstraktes Zeitintervall auf einem
  * Zeitstrahl f&uuml;r ISO-8601-Typen. </p>
  *
- * <p>Hinweis: Der Start eines Intervalls ist immer inklusive. Das Ende
- * ist f&uuml;r Datumsintervalle inklusive und sonst exklusive per Vorgabe.
- * Diese Standardeinstellung kann jedoch &uuml;berschrieben werden. </p>
+ * <p>Hinweis: Der Start eines Intervalls ist au&szlig;er bei Intervallen
+ * mit unbegrenzter Vergangenheit immer inklusive. Das Ende eines Intervalls
+ * ist bei unbegrenzter Zukunft offen, f&uuml;r Datumsintervalle inklusive und
+ * sonst exklusive per Vorgabe. Diese Standardeinstellung kann jedoch
+ * &uuml;berschrieben werden (obwohl potentiell sch&auml;dlich f&uuml;r
+ * das Antwortzeitverhalten). </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @param   <I> generic self-referencing interval type
@@ -265,13 +271,10 @@ public abstract class IsoInterval
         T endA = this.end.getTemporal();
 
         if (this.end.isOpen()) {
-            endA = this.getTimeLine().stepBackwards(endA);
-            if (endA == null) {
-                return true;
-            }
+            return !endA.isAfter(temporal);
+        } else {
+            return endA.isBefore(temporal);
         }
-
-        return endA.isBefore(temporal);
 
     }
 
@@ -312,13 +315,10 @@ public abstract class IsoInterval
         T startB = other.getStart().getTemporal();
 
         if (this.end.isOpen()) {
-            endA = this.getTimeLine().stepBackwards(endA);
-            if (endA == null) {
-                return true;
-            }
+            return !endA.isAfter(startB);
+        } else {
+            return endA.isBefore(startB);
         }
-
-        return endA.isBefore(startB);
 
     }
 
@@ -717,8 +717,8 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval equal the other one taking into account the
-     * open or closed state of the boundaries? </p>
+     * <p>ALLEN-relation: Does this interval equal the other one taking into
+     * account the open or closed state of the boundaries? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -731,8 +731,8 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Ist dieses Intervall gleich dem anderen Intervall unter
-     * Ber&uuml;cksichtigung des offen/geschlossen-Zustands der
+     * <p>ALLEN-Relation: Ist dieses Intervall gleich dem anderen Intervall
+     * unter Ber&uuml;cksichtigung des offen/geschlossen-Zustands der
      * Intervallgrenzen? </p>
      *
      * <p>Relation diagram: </p>
@@ -800,8 +800,8 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval precede the other one such that there is a gap
-     * between? </p>
+     * <p>ALLEN-relation: Does this interval precede the other one such that
+     * there is a gap between? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -814,8 +814,8 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
-     * eine L&uuml;cke existiert? </p>
+     * <p>ALLEN-Relation: Liegt dieses Intervall so vor dem anderen, da&szlig;
+     * dazwischen eine L&uuml;cke existiert? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -850,7 +850,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.precedes(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.precedes(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -863,7 +863,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.precedes(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.precedes(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -882,8 +882,8 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval precede the other one such that there is no gap
-     * between? </p>
+     * <p>ALLEN-relation: Does this interval precede the other one such that
+     * there is no gap between? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -896,8 +896,8 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Liegt dieses Intervall so vor dem anderen, da&szlig; dazwischen
-     * keine L&uuml;cke existiert? </p>
+     * <p>ALLEN-Relation: Liegt dieses Intervall so vor dem anderen, da&szlig;
+     * dazwischen keine L&uuml;cke existiert? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -943,7 +943,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.meets(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.meets(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -956,7 +956,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.meets(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.meets(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -975,8 +975,9 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval overlaps the other one such that the start
-     * of this interval is still before the start of the other one? </p>
+     * <p>ALLEN-relation: Does this interval overlaps the other one such that
+     * the start of this interval is still before the start of the other
+     * one? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -990,8 +991,9 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Uuml;berlappt dieses Intervall so das andere, da&szlig; der
-     * Start dieses Intervalls noch vor dem Start des anderen liegt? </p>
+     * <p>ALLEN-Relation: &Uuml;berlappt dieses Intervall so das andere,
+     * da&szlig; der Start dieses Intervalls noch vor dem Start des anderen
+     * liegt? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1059,7 +1061,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.overlaps(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.overlaps(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1073,7 +1075,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.overlaps(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.overlaps(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1093,9 +1095,9 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval finish the other one such that both end
-     * time points are equal and the start of this interval is after the
-     * start of the other one? </p>
+     * <p>ALLEN-relation: Does this interval finish the other one such that
+     * both end time points are equal and the start of this interval is after
+     * the start of the other one? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1108,9 +1110,9 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Beendet dieses Intervall so das andere, da&szlig; bei gleichen
-     * Endzeitpunkten der Start dieses Intervalls nach dem Start des anderen
-     * liegt? </p>
+     * <p>ALLEN-Relation: Beendet dieses Intervall so das andere, da&szlig; bei
+     * gleichen Endzeitpunkten der Start dieses Intervalls nach dem Start des
+     * anderen liegt? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1188,7 +1190,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.finishes(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.finishes(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1201,7 +1203,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.finishes(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.finishes(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1220,8 +1222,8 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval start the other one such that both start
-     * time points are equal and the end of this interval is before the
+     * <p>ALLEN-relation: Does this interval start the other one such that both
+     * start time points are equal and the end of this interval is before the
      * end of the other one? </p>
      *
      * <p>Relation diagram: </p>
@@ -1235,9 +1237,9 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Beginnt dieses Intervall so das andere, da&szlig; bei gleichen
-     * Beginnzeitpunkten das Ende dieses Intervalls vor dem Ende des anderen
-     * liegt? </p>
+     * <p>ALLEN-Relation: Beginnt dieses Intervall so das andere, da&szlig;
+     * bei gleichen Beginnzeitpunkten das Ende dieses Intervalls vor dem Ende
+     * des anderen liegt? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1327,7 +1329,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.starts(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.starts(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1340,7 +1342,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.starts(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.starts(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1359,9 +1361,9 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Does this interval enclose the other one such that this start
-     * is before the start of the other one and this end is after the end
-     * of the other one? </p>
+     * <p>ALLEN-relation: Does this interval enclose the other one such that
+     * this start is before the start of the other one and this end is after
+     * the end of the other one? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1374,9 +1376,9 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Umfasst dieses Intervall so das andere, da&szlig; der Start dieses
-     * Intervalls vor dem Start des anderen und das Ende dieses Intervalls
-     * nach dem Ende des anderen Intervalls liegt? </p>
+     * <p>ALLEN-Relation: Umfasst dieses Intervall so das andere, da&szlig;
+     * der Start dieses Intervalls vor dem Start des anderen und das Ende
+     * dieses Intervalls nach dem Ende des anderen Intervalls liegt? </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1452,7 +1454,7 @@ public abstract class IsoInterval
     }
 
     /**
-     * <p>Equivalent to {@code other.encloses(this)}. </p>
+     * <p>ALLEN-relation: Equivalent to {@code other.encloses(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
@@ -1465,7 +1467,7 @@ public abstract class IsoInterval
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent to {@code other.encloses(this)}. </p>
+     * <p>ALLEN-Relation: &Auml;quivalent to {@code other.encloses(this)}. </p>
      *
      * <p>Relation diagram: </p>
      *
