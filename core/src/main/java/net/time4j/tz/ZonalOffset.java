@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalOffset.java) is part of project Time4J.
  *
@@ -20,6 +20,7 @@
  */
 
 package net.time4j.tz;
+
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -73,8 +74,8 @@ public final class ZonalOffset
     private static final BigDecimal MRD = new BigDecimal(1000000000);
 
     /**
-     * <p>Constant for the UTC timezone representing a shift of {@code 0} seconds
-     * with the canonical representation &quot;Z&quot;. </p>
+     * <p>Constant for the UTC timezone representing a shift of
+     * {@code 0} seconds with the canonical representation &quot;Z&quot;. </p>
      */
     /*[deutsch]
      * <p>Konstante f&uuml;r eine zeitliche Verschiebung von {@code 0} Sekunden
@@ -708,11 +709,12 @@ public final class ZonalOffset
     }
 
     /**
-     * <p>Returns a complete representation of this shift including
+     * <p>Returns a complete short representation of this shift including
      * the sign. </p>
      *
-     * <p>If there are only full minutes or hours the representation
-     * is exactly as described in ISO-8601. </p>
+     * <p>Notes: If there are only full minutes or hours the representation
+     * is exactly as described in ISO-8601. Another long canonical
+     * representation can be obtained by the method {@code canonical()}. </p>
      *
      * @return  String in ISO-8601 format &quot;&#x00B1;hh:mm&quot; or
      *          &quot;&#x00B1;hh:mm:ss&quot; if there is a second part
@@ -720,11 +722,13 @@ public final class ZonalOffset
      *          part exists
      */
     /*[deutsch]
-     * <p>Liefert eine vollst&auml;ndige Darstellung der Verschiebung
+     * <p>Liefert eine vollst&auml;ndige Kurzdarstellung der Verschiebung
      * mit Vorzeichen. </p>
      *
-     * <p>Sofern nur volle Minuten oder Stunden vorliegen, entspricht die
-     * Darstellung exakt dem empfohlenen ISO-8601-Standard. </p>
+     * <p>Hinweise: Sofern nur volle Minuten oder Stunden vorliegen, entspricht
+     * die Darstellung exakt dem empfohlenen ISO-8601-Standard. Eine andere
+     * lange kanonische Darstellung ist mittels {@code canonical()}
+     * erh&auml;ltlich. </p>
      *
      * @return  String in ISO-8601 format &quot;&#x00B1;hh:mm&quot; or
      *          &quot;&#x00B1;hh:mm:ss&quot; if there is a second part
@@ -739,26 +743,30 @@ public final class ZonalOffset
     }
 
     /**
-     * <p>Returns a canonical representation of this shift. </p>
+     * <p>Returns a long canonical representation of this shift. </p>
      *
-     * <p>Note: If this instance denotes the UTC timezone then this method
-     * will yield the string &quot;Z&quot;. </p>
+     * <p>Notes: If this instance denotes the UTC timezone then this method
+     * will yield the string &quot;Z&quot;. Another short canonical
+     * representation can be obtained by the method {@code toString()}. </p>
      *
      * @return  String in format &quot;UTC&#x00B1;hh:mm&quot; or
      *          &quot;UTC&#x00B1;hh:mm:ss&quot; if there is a second part
      *          or &quot;UTC&#x00B1;hh:mm:ss.fffffffff&quot; if any fractional
      *          part exists or &quot;Z&quot; in timezone UTC
+     * @see     #toString()
      */
-    /**
-     * <p>Liefert eine kanonische Darstellung der Verschiebung. </p>
+    /*[deutsch]
+     * <p>Liefert eine lange kanonische Darstellung der Verschiebung. </p>
      *
-     * <p>Hinweis: Handelt es sich um die UTC-Zeitzone selbst, liefert die
-     * Methode die Darstellung &quot;Z&quot;. </p>
+     * <p>Hinweise: Handelt es sich um die UTC-Zeitzone selbst, liefert die
+     * Methode die Darstellung &quot;Z&quot;. Eine andere kurze kanonische
+     * Darstellung ist mittels {@code toString()} erh&auml;ltlich. </p>
      *
      * @return  String in format &quot;UTC&#x00B1;hh:mm&quot; or
      *          &quot;UTC&#x00B1;hh:mm:ss&quot; if there is a second part
      *          or &quot;UTC&#x00B1;hh:mm:ss.fffffffff&quot; if any fractional
      *          part exists or &quot;Z&quot; in timezone UTC
+     * @see     #toString()
      */
     @Override
     public String canonical() {
@@ -775,6 +783,137 @@ public final class ZonalOffset
     }
 
     /**
+     * <p>Interpretes a canonical representation as zonal offset. </p>
+     *
+     * <p>All string produced by the methods {@code canonical()} or
+     * {@code toString()} are supported. Due to the technical nature
+     * of canonical representations this method is not designed to
+     * parse any kind of user-defined input, especially the use of
+     * GMT-prefix is NOT canonical and outdated from a scientific
+     * point of view. </p>
+     *
+     * @param   canonical       zonal offset in canonical form to be parsed
+     * @return  parsed {@code ZonalOffset}
+     * @throws  IllegalArgumentException if given input is not canonical
+     * @since   2.2
+     * @see     #canonical()
+     * @see     #toString()
+     */
+    /*[deutsch]
+     * <p>Interpretiert eine kanonische Darstellung als Verschiebung. </p>
+     *
+     * <p>Unterst&uuml;tzt werden alle von den Methoden {@code canonical()}
+     * oder {@code toString()} produzierten Ausgaben. Aufgrund der technischen
+     * Natur kanonischer Darstellungen ist diese Methode nicht dazu gedacht,
+     * irgendeine benutzerdefinierte Darstellung zu interpretieren. Zu
+     * beachten: Die Verwendung des GMT-Pr&auml;fix ist NICHT kanonisch
+     * und von einem wissenschaftlichen Standpunkt aus gesehen veraltet. </p>
+     *
+     * @param   canonical       zonal offset in canonical form to be parsed
+     * @return  parsed {@code ZonalOffset}
+     * @throws  IllegalArgumentException if given input is not canonical
+     * @since   2.2
+     * @see     #canonical()
+     * @see     #toString()
+     */
+    public static ZonalOffset parse(String canonical) {
+
+        return parse(canonical, true);
+
+    }
+
+    /**
+     * <p>Interpretiert eine kanonische Darstellung als Verschiebung. </p>
+     *
+     * <p>Unterst&uuml;tzt werden alle von den Methoden {@code canonical} oder
+     * {@code toString()} produzierten Ausgaben. </p>
+     *
+     * @param   offset          zonal offset in canonical form to be parsed
+     * @param   wantsException  shall an exception be thrown in case of error?
+     * @return  parsed {@code ZonalOffset} or {@code null} in case of error
+     * @see     #canonical()
+     * @see     #toString()
+     */
+    static ZonalOffset parse(
+        String offset,
+        boolean wantsException
+    ) {
+
+        if (offset.equals("Z")) {
+            return ZonalOffset.UTC;
+        }
+
+        int n = offset.length();
+        String test = offset;
+
+        if (
+            (n >= 3)
+            && test.startsWith("UTC")
+        ) {
+            test = offset.substring(3);
+            n -= 3;
+        }
+
+        if (n >= 6) {
+            OffsetSign sign = null;
+
+            if (test.charAt(0) == '-') {
+                sign = OffsetSign.BEHIND_UTC;
+            } else if (test.charAt(0) == '+') {
+                sign = OffsetSign.AHEAD_OF_UTC;
+            }
+
+            int hours = parse(test, 1, 2);
+            int minutes = parse(test, 4, 2);
+
+            if (
+                (hours >= 0)
+                && (test.charAt(3) == ':')
+                && (minutes >= 0)
+            ) {
+                if (n == 6) {
+                    return ZonalOffset.ofHoursMinutes(sign, hours, minutes);
+                } else if (
+                    (n >= 9)
+                    && (test.charAt(6) == ':')
+                ) {
+                    int seconds = parse(test, 7, 2);
+                    if (seconds >= 0) {
+                        int total = hours * 3600 + minutes * 60 + seconds;
+                        if (sign == OffsetSign.BEHIND_UTC) {
+                            total = -total;
+                        }
+                        if (n == 9) {
+                            return ZonalOffset.ofTotalSeconds(total);
+                        } else if (
+                            (n == 19)
+                            && (test.charAt(9) == '.')
+                        ) {
+                            int fraction = parse(test, 10, 9);
+                            if (fraction >= 0) {
+                                if (sign == OffsetSign.BEHIND_UTC) {
+                                    fraction = -fraction;
+                                }
+                                return ZonalOffset.ofTotalSeconds(
+                                    total,
+                                    fraction);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (wantsException) {
+            throw new IllegalArgumentException(
+                "No canonical zonal offset: " + offset);
+        } else {
+            return null;
+        }
+
+    }
+
+    /**
      * <p>Liefert die Verschiebung als Zeitzonenmodell. </p>
      *
      * @return  timezone data with fixed shift
@@ -782,6 +921,27 @@ public final class ZonalOffset
     SingleOffsetTimezone getModel() {
 
         return new SingleOffsetTimezone(this);
+
+    }
+
+    private static int parse(
+        String offset,
+        int index,
+        int len
+    ) {
+
+        int amount = 0;
+
+        for (int i = 0; i < len; i++) {
+            char c = offset.charAt(index + i);
+            if ((c >= '0') && (c <= '9')) {
+                amount = amount * 10 + (c - '0');
+            } else {
+                return -1;
+            }
+        }
+
+        return amount;
 
     }
 

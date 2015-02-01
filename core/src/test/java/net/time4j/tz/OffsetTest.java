@@ -283,6 +283,30 @@ public class OffsetTest {
     }
 
     @Test
+    public void parseCanonical() {
+        assertThat(
+            ZonalOffset.parse("Z"),
+            is(ZonalOffset.UTC));
+        assertThat(
+            ZonalOffset.parse("UTC+05:30"),
+            is(ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30)));
+        assertThat(
+            ZonalOffset.parse("-05:00"),
+            is(ZonalOffset.ofHoursMinutes(OffsetSign.BEHIND_UTC, 5, 0)));
+        assertThat(
+            ZonalOffset.parse("-05:00:59"),
+            is(ZonalOffset.ofTotalSeconds(-5 * 3600 - 59)));
+        assertThat(
+            ZonalOffset.parse("+05:00:59.123456789"),
+            is(ZonalOffset.ofTotalSeconds(5 * 3600 + 59, 123456789)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void parseGMT() {
+        ZonalOffset.parse("GMT+01:00"); // non-canonical
+    }
+
+    @Test
     public void constantUTC() {
         assertThat(
             ZonalOffset.UTC,
