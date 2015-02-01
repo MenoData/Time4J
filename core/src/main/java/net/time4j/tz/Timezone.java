@@ -54,6 +54,10 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * <p>Loads and keeps timezone data including the rules. </p>
  *
+ * <p>Timezones are identified by keys in following forms: </p>
+ *
+ *
+ *
  * @author      Meno Hochschild
  * @serial      exclude
  * @concurrency All static methods are thread-safe while this class is
@@ -71,8 +75,6 @@ public abstract class Timezone
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final int MRD = 1000000000;
 
     /**
      * <p>This standard strategy which is also used by JDK subtracts
@@ -109,22 +111,26 @@ public abstract class Timezone
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
         Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
-    private static volatile NameData NAME_DATA = null;
-    private static volatile Timezone SYSTEM_TZ_CURRENT = null;
-    private static volatile boolean ACTIVE = true;
-    private static int SOFT_LIMIT = 11;
+    private static volatile ZonalKeys zonalKeys = null;
+    private static volatile Timezone currentSystemTZ = null;
+    private static volatile boolean cacheActive = true;
+    private static int softLimit = 11;
 
+    private static final String NAME_TZDB = "TZDB";
     private static final Map<String, TZID> PREDEFINED;
     private static final Map<String, Set<TZID>> TERRITORIES;
-    private static final ZoneProvider PROVIDER;
+    private static final ZoneProvider PLATFORM_PROVIDER;
+    private static final ZoneProvider DEFAULT_PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
+    private static final ConcurrentMap<String, ZoneProvider> PROVIDERS;
 
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
     static {
         CACHE = new ConcurrentHashMap<String, NamedReference>();
+        PROVIDERS = new ConcurrentHashMap<String, ZoneProvider>();
         QUEUE = new ReferenceQueue<Timezone>();
         LAST_USED = new LinkedList<Timezone>(); // strong references
 
@@ -205,23 +211,28 @@ public abstract class Timezone
 
         ServiceLoader<ZoneProvider> sl =
             ServiceLoader.load(ZoneProvider.class, cl);
-        ZoneProvider loaded = null;
+        ZoneProvider zp = null;
 
         for (ZoneProvider provider : sl) {
-            if (
-                (loaded == null)
-                || (provider.getVersion().compareTo(loaded.getVersion()) > 0)
-            ) {
-                loaded = provider;
-                break;
+            if (NAME_TZDB.equals(provider.getName())) {
+                if (
+                    (zp == null)
+                    || (provider.getVersion().compareTo(zp.getVersion()) > 0)
+                ) {
+                    zp = provider;
+                }
             }
         }
 
-        PROVIDER = (
-            (loaded == null)
-            ? new PlatformTZProvider()
-            : loaded
-        );
+        PLATFORM_PROVIDER = new PlatformTZProvider();
+        PROVIDERS.put(PLATFORM_PROVIDER.getName(), PLATFORM_PROVIDER);
+
+        if (zp == null) {
+            DEFAULT_PROVIDER = PLATFORM_PROVIDER;
+        } else {
+            PROVIDERS.put(NAME_TZDB, zp);
+            DEFAULT_PROVIDER = zp;
+        }
 
         Timezone systemTZ = null;
 
@@ -247,11 +258,11 @@ public abstract class Timezone
         }
 
         if (ALLOW_SYSTEM_TZ_OVERRIDE) {
-            SYSTEM_TZ_CURRENT = SYSTEM_TZ_ORIGINAL;
+            currentSystemTZ = SYSTEM_TZ_ORIGINAL;
         }
 
-        // Aliases + Available-IDs
-        NAME_DATA = new NameData(PROVIDER);
+        // Cache für Available-IDs
+        zonalKeys = new ZonalKeys(DEFAULT_PROVIDER);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -278,7 +289,7 @@ public abstract class Timezone
      */
     public static List<TZID> getAvailableIDs() {
 
-        return NAME_DATA.availables;
+        return zonalKeys.availables;
 
     }
 
@@ -361,7 +372,7 @@ public abstract class Timezone
     public static Timezone ofSystem() {
 
         if (ALLOW_SYSTEM_TZ_OVERRIDE) {
-            return SYSTEM_TZ_CURRENT;
+            return currentSystemTZ;
         } else {
             return SYSTEM_TZ_ORIGINAL;
         }
@@ -473,6 +484,8 @@ public abstract class Timezone
      * @param   tzid        timezone id
      * @param   history     history of offset transitions
      * @return  new instance of timezone data
+     * @throws  IllegalArgumentException if a fixed zonal offset is combined
+     *          with a non-empty history
      * @since   2.2
      * @see     net.time4j.tz.model.TransitionModel
      */
@@ -483,6 +496,8 @@ public abstract class Timezone
      * @param   tzid        timezone id
      * @param   history     history of offset transitions
      * @return  new instance of timezone data
+     * @throws  IllegalArgumentException if a fixed zonal offset is combined
+     *          with a non-empty history
      * @since   2.2
      * @see     net.time4j.tz.model.TransitionModel
      */
@@ -656,29 +671,37 @@ public abstract class Timezone
     public abstract TransitionHistory getHistory();
 
     /**
-     * <p>Describes the underlying repository with name and optionally
+     * <p>Describes the default underlying repository with name and optionally
      * location and version. </p>
      *
      * @return  String
      */
     /*[deutsch]
-     * <p>Beschreibt die Zeitzonendatenbank mit Name und optional
+     * <p>Beschreibt die Standardzeitzonendatenbank mit Name und optional
      * Ort und Version. </p>
      *
      * @return  String
      */
     public static String getProviderInfo() {
 
+        ZoneProvider provider = DEFAULT_PROVIDER;
         StringBuilder sb = new StringBuilder(128);
         sb.append(Timezone.class.getName());
         sb.append("[provider=");
-        sb.append(PROVIDER.getName());
+        sb.append(provider.getName());
 
-        if (!(PROVIDER instanceof PlatformTZProvider)) {
+        String location = provider.getLocation();
+
+        if (!location.isEmpty()) {
             sb.append(",location=");
-            sb.append(PROVIDER.getLocation());
+            sb.append(location);
+        }
+
+        String version = provider.getVersion();
+
+        if (!version.isEmpty()) {
             sb.append(",version=");
-            sb.append(PROVIDER.getVersion());
+            sb.append(version);
         }
 
         sb.append(']');
@@ -784,6 +807,48 @@ public abstract class Timezone
 
     }
 
+    /**
+     * <p>Registers manually the given zone provider. </p>
+     *
+     * <p>Repeated registrations of the same provider are ignored. </p>
+     *
+     * @param   provider    custom zone provider to be registered
+     * @return  {@code true} if registration was successful else {@code false}
+     * @throws  IllegalArgumentException if given {@code ZoneProvider}
+     *          refers to default, platform or TZDB-provider by name
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Registriert manuell den angegebenen {@code ZoneProvider}. </p>
+     *
+     * <p>Wiederholte Registrierungen des gleichen {@code ZoneProvider}
+     * werden ignoriert. </p>
+     *
+     * @param   provider    custom zone provider to be registered
+     * @return  {@code true} if registration was successful else {@code false}
+     * @throws  IllegalArgumentException if given {@code ZoneProvider}
+     *          refers to default, platform or TZDB-provider by name
+     * @since   2.2
+     */
+    public static boolean registerProvider(ZoneProvider provider) {
+
+        String name = provider.getName();
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                "Default zone provider cannot be overridden.");
+        } else if (name.equals(NAME_TZDB)) {
+            throw new IllegalArgumentException(
+                "TZDB provider cannot be registered after startup.");
+        } else if (name.equals(PLATFORM_PROVIDER.getName())) {
+            throw new IllegalArgumentException(
+                "Platform provider cannot be replaced.");
+        }
+
+        return (PROVIDERS.putIfAbsent(name, provider) == null);
+
+    }
+
     private static Timezone getDefaultTZ() {
 
         String zoneID = java.util.TimeZone.getDefault().getID();
@@ -826,33 +891,82 @@ public abstract class Timezone
             return tz;
         }
 
+        // ZoneProvider auflösen
+        String providerName = "";
+        String zoneKey = zoneID;
+
+        for (int i = 0, n = zoneID.length(); i < n; i++) {
+            if (zoneID.charAt(i) == '~') {
+                providerName = zoneID.substring(0, i);
+                zoneKey = zoneID.substring(i + 1); // maybe empty string
+                break;
+            }
+        }
+
+        if (zoneKey.isEmpty()) {
+            if (wantsException) {
+                throw new IllegalArgumentException("Timezone key is empty.");
+            } else {
+                return null;
+            }
+        }
+
+        ZoneProvider provider = DEFAULT_PROVIDER;
+
+        if (!providerName.isEmpty()) {
+            provider = PROVIDERS.get(providerName);
+
+            if (provider == null) {
+                if (wantsException) {
+                    String msg;
+                    if (providerName.equals(NAME_TZDB)) {
+                        msg = "TZDB provider not available: ";
+                    } else {
+                        msg = "Timezone provider not registered: ";
+                    }
+                    throw new IllegalArgumentException(msg + zoneID);
+                } else {
+                    return null;
+                }
+            }
+        }
+
         // enums bevorzugen
         TZID resolved = tzid;
 
         if (resolved == null) {
-            resolved = resolve(zoneID);
+            if (providerName.isEmpty()) {
+                TZID result = resolve(zoneKey);
+                if (result instanceof ZonalOffset) {
+                    return ((ZonalOffset) result).getModel();
+                } else {
+                    resolved = result;
+                }
+            } else {
+                resolved = new NamedID(zoneKey);
+            }
         }
 
         // java.util.TimeZone hat keine öffentliche Historie
-        if (PROVIDER instanceof PlatformTZProvider) {
-            PlatformTimezone test = new PlatformTimezone(resolved, zoneID);
+        if (provider == PLATFORM_PROVIDER) {
+            PlatformTimezone test = new PlatformTimezone(resolved, zoneKey);
 
             if (
                 test.isGMT()
-                && !zoneID.equals("GMT")
-                && !zoneID.startsWith("UT")
-                && !zoneID.equals("Z")
+                && !zoneKey.equals("GMT")
+                && !zoneKey.startsWith("UT")
+                && !zoneKey.equals("Z")
             ) {
-                // JDK-Fallback verhindern => null
+                // JDK-Fallback verhindern => tz == null
             } else {
                 tz = test;
             }
         } else { // exakte Suche in Historie
-            TransitionHistory history = PROVIDER.load(zoneID, false);
+            TransitionHistory history = provider.load(zoneKey, false);
 
             if (history == null) {
                 // Alias-Suche + Fallback-Option
-                tz = Timezone.getZoneByAlias(resolved, zoneID);
+                tz = Timezone.getZoneByAlias(provider, resolved, zoneKey);
             } else {
                 tz = new HistorizedTimezone(resolved, history);
             }
@@ -869,7 +983,7 @@ public abstract class Timezone
         }
 
         // bei Bedarf im Cache speichern
-        if (ACTIVE) {
+        if (cacheActive) {
             NamedReference oldRef =
                 CACHE.putIfAbsent(
                     zoneID,
@@ -880,7 +994,7 @@ public abstract class Timezone
                 synchronized (Timezone.class) {
                     LAST_USED.addFirst(tz);
 
-                    while (LAST_USED.size() >= SOFT_LIMIT) {
+                    while (LAST_USED.size() >= softLimit) {
                         LAST_USED.removeLast();
                     }
                 }
@@ -898,26 +1012,27 @@ public abstract class Timezone
     }
 
     private static Timezone getZoneByAlias(
+        ZoneProvider provider,
         TZID tzid,
-        String zoneID
+        String zoneKey
     ) {
 
         TransitionHistory history = null;
-        String alias = zoneID;
-        Map<String, String> aliases = NAME_DATA.aliases;
+        String alias = zoneKey;
+        Map<String, String> aliases = provider.getAliases();
 
         while (
             (history == null)
             && ((alias = aliases.get(alias)) != null)
         ) {
-            history = PROVIDER.load(alias, false);
+            history = provider.load(alias, false);
         }
 
         if (
             (history == null)
-            && PROVIDER.isFallbackEnabled()
+            && provider.isFallbackEnabled()
         ) {
-            history = PROVIDER.load(zoneID, true);
+            history = provider.load(zoneKey, true);
         }
 
         if (history == null) {
@@ -934,7 +1049,11 @@ public abstract class Timezone
         TZID resolved = PREDEFINED.get(zoneID);
 
         if (resolved == null) {
-            resolved = new NamedID(zoneID);
+            resolved = ZonalOffset.parse(zoneID, false);
+            
+            if (resolved == null) {
+                resolved = new NamedID(zoneID);
+            }
         }
 
         return resolved;
@@ -1018,11 +1137,11 @@ public abstract class Timezone
                 LAST_USED.clear();
             }
 
-            NAME_DATA = new NameData(PROVIDER);
+            zonalKeys = new ZonalKeys(DEFAULT_PROVIDER);
             CACHE.clear();
 
             if (ALLOW_SYSTEM_TZ_OVERRIDE) {
-                SYSTEM_TZ_CURRENT = Timezone.getDefaultTZ();
+                currentSystemTZ = Timezone.getDefaultTZ();
             }
 
         }
@@ -1049,7 +1168,7 @@ public abstract class Timezone
          */
         public static void setCacheActive(boolean active) {
 
-            ACTIVE = active;
+            cacheActive = active;
 
             if (!active) {
                 CACHE.clear();
@@ -1083,7 +1202,7 @@ public abstract class Timezone
             }
 
             synchronized (Timezone.class) {
-                SOFT_LIMIT = minimumCacheSize + 1;
+                softLimit = minimumCacheSize + 1;
                 int n = LAST_USED.size() - minimumCacheSize;
 
                 for (int i = 0; i < n; i++) {
@@ -1175,16 +1294,15 @@ public abstract class Timezone
 
     }
 
-    private static class NameData {
+    private static class ZonalKeys {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final Map<String, String> aliases;
         private final List<TZID> availables;
 
         //~ Konstruktoren -------------------------------------------------
 
-        NameData(ZoneProvider provider) {
+        ZonalKeys(ZoneProvider provider) {
             super();
 
             Set<String> ids = provider.getAvailableIDs();
@@ -1214,11 +1332,7 @@ public abstract class Timezone
                 }
             );
 
-            this.availables =
-                Collections.unmodifiableList(list);
-            this.aliases =
-                Collections.unmodifiableMap(
-                    new HashMap<String, String>(provider.getAliases()));
+            this.availables = Collections.unmodifiableList(list);
 
         }
 
@@ -1280,7 +1394,7 @@ public abstract class Timezone
             boolean fallback
         ) {
 
-            return null; // keine öffentliche Historie
+            return null; // leider keine öffentliche Historie!
 
         }
 

@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DatelineBorderTest.class,
         OffsetTest.class,
         PlatformTimezoneTest.class,
+        ProviderRegistrationTest.class,
         TZIDTest.class
     }
 )
