@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2014-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NameStyle.java) is part of project Time4J.
  *
