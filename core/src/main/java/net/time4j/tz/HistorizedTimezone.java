@@ -59,6 +59,8 @@ final class HistorizedTimezone
      *
      * @param   id          timezone id
      * @param   history     offset transition model
+     * @throws  IllegalArgumentException if a fixed zonal offset is combined
+     *          with a non-empty history
      */
     HistorizedTimezone(
         TZID id,
@@ -74,6 +76,8 @@ final class HistorizedTimezone
      * @param   id          timezone id
      * @param   history     offset transition model
      * @param   strategy    transition strategy
+     * @throws  IllegalArgumentException if a fixed zonal offset is combined
+     *          with a non-empty history
      */
     HistorizedTimezone(
         TZID id,
@@ -84,6 +88,13 @@ final class HistorizedTimezone
 
         if (id == null) {
             throw new NullPointerException("Missing timezone id.");
+        } else if (
+            (id instanceof ZonalOffset)
+            && !history.isEmpty()
+        ) {
+            throw new IllegalArgumentException(
+                "Fixed zonal offset can't be combined with offset transitions: "
+                + id.canonical());
         } else if (history == null) {
             throw new NullPointerException("Missing timezone history.");
         } else if (strategy == null) {
