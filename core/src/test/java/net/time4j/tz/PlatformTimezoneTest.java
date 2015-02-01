@@ -50,6 +50,14 @@ public class PlatformTimezoneTest {
     }
 
     @Test
+    public void customProviderID() {
+        Timezone tz = Timezone.of("java.util.TimeZone~Europe/Berlin");
+        assertThat(
+            tz,
+            is(loadFromPlatform("Europe/Berlin")));
+    }
+
+    @Test
     public void getOffsetOfLocalDateTimeWithWinterDST() {
         GregorianDate date = PlainDate.of(2014, 3, 30);
         Timezone tz = loadFromPlatform("Europe/Berlin");

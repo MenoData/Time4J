@@ -54,9 +54,8 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * <p>Loads and keeps timezone data including the rules. </p>
  *
- * <p>Timezones are identified by keys in following forms: </p>
- *
- *
+ * <p>Timezones are identified by keys which have canonical forms as
+ * documented in {@link TZID}. </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
@@ -65,6 +64,9 @@ import java.util.concurrent.ConcurrentMap;
  */
 /*[deutsch]
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
+ *
+ * <p>Zeitzonen werden durch Schl&uuml;ssel identifiziert, welche eine
+ * kanonische Form wie in {@link TZID} dokumentiert haben. </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
@@ -1050,7 +1052,7 @@ public abstract class Timezone
 
         if (resolved == null) {
             resolved = ZonalOffset.parse(zoneID, false);
-            
+
             if (resolved == null) {
                 resolved = new NamedID(zoneID);
             }
