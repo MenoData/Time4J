@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -49,10 +49,9 @@ import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
-import net.time4j.scale.TimeScale;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
-import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -985,13 +984,15 @@ public final class PlainDate
     }
 
     /**
-     * <p>Creates a new local timestamp with this date at earliest valid time at the
-     * begin of associated day in given timezone. </p>
+     * <p>Creates a new local timestamp with this date at earliest valid time
+     * at the begin of associated day in given timezone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest valid time
-     * @throws  UnsupportedOperationException if the underlying timezone repository
-     *          does not expose any public transition history
+     * @return  local timestamp as composition of this date and earliest
+     *          valid time
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
      * @since   2.2
      * @see     #atStartOfDay()
      */
@@ -1000,36 +1001,49 @@ public final class PlainDate
      * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest valid time
-     * @throws  UnsupportedOperationException if the underlying timezone repository
-     *          does not expose any public transition history
+     * @return  local timestamp as composition of this date and earliest
+     *          valid time
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
      * @since   2.2
      * @see     #atStartOfDay()
      */
     public PlainTimestamp atStartOfDay(TZID tzid) {
 
-        TransitionHistory history = Timezone.of(tzid).getHistory();
-        
-        if (history == null) {
-            throw new UnsupportedOperationException(
-                "Timezone does not expose its transition history.");
-        }
-        
-        ZonalTransition conflict = 
-            history.getConflictTransition(this, PlainTime.MIN);
-        
-        if (
-            (conflict != null)
-            && conflict.isGap()
-        ) {
-            
-            UnixTime ut = Moment.of(conflict.getPosixTime(), TimeScale.POSIX);
-            ZonalOffset offset = ZonalOffset.ofTotalSeconds(conflict.getTotalOffset());
-            return PlainTimestamp.from(ut, offset);
-            
-        }
-        
-        return this.at(PlainTime.MIN);
+        return this.atStartOfDay(Timezone.of(tzid).getHistory());
+
+    }
+
+    /**
+     * <p>Creates a new local timestamp with this date at earliest valid time
+     * at the begin of associated day in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local timestamp as composition of this date and earliest
+     *          valid time
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @since   2.2
+     * @see     #atStartOfDay()
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
+     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local timestamp as composition of this date and earliest
+     *          valid time
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @since   2.2
+     * @see     #atStartOfDay()
+     */
+    public PlainTimestamp atStartOfDay(String tzid) {
+
+        return this.atStartOfDay(Timezone.of(tzid).getHistory());
 
     }
 
@@ -1703,6 +1717,40 @@ public final class PlainDate
     int getWeekOfYear() {
 
         return this.get(Weekmodel.ISO.weekOfYear()).intValue();
+
+    }
+
+    private PlainTimestamp atStartOfDay(TransitionHistory history) {
+
+        if (history == null) {
+            throw new UnsupportedOperationException(
+                "Timezone repository does not expose its transition history: "
+                + Timezone.getProviderInfo());
+        }
+
+        ZonalTransition conflict =
+            history.getConflictTransition(this, PlainTime.MIN);
+
+        if (
+            (conflict != null)
+            && conflict.isGap()
+        ) {
+            long localSeconds =
+                conflict.getPosixTime() + conflict.getTotalOffset();
+            PlainDate date =
+                PlainDate.of(
+                    MathUtils.floorDivide(localSeconds, 86400),
+                    EpochDays.UNIX);
+            int secondsOfDay = MathUtils.floorModulo(localSeconds, 86400);
+            int second = secondsOfDay % 60;
+            int minutesOfDay = secondsOfDay / 60;
+            int minute = minutesOfDay % 60;
+            int hour = minutesOfDay / 60;
+            PlainTime time = PlainTime.of(hour, minute, second);
+            return PlainTimestamp.of(date, time);
+        }
+
+        return this.at(PlainTime.MIN);
 
     }
 

@@ -7,6 +7,7 @@ import net.time4j.tz.model.RulesLikeBerlin1947Test;
 import net.time4j.tz.model.RulesLikeDhaka2009Test;
 import net.time4j.tz.model.RulesOfEuropeanUnionTest;
 import net.time4j.tz.model.SerializationTest;
+import net.time4j.tz.model.StartOfDayTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -24,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RulesLikeDhaka2009Test.class,
         RulesOfEuropeanUnionTest.class,
         SerializationTest.class,
+        StartOfDayTest.class,
         ZoneNameParsingTest.class
     }
 )
