@@ -151,8 +151,8 @@ public interface TransitionHistory {
      * <p>Determines the suitable offsets at given local timestamp.. </p>
      *
      * <p>The offset list is empty if the local timestamp falls in a gap
-     * on the local timeline. The list has exactly two offsets if the
-     * local timestamp belongs to two different timepoints on the
+     * on the local timeline. The list has exactly two offsets sorted by size
+     * if the local timestamp belongs to two different timepoints on the
      * POSIX timescale due to an overlap. Otherwise the offset list
      * will contain exactly one suitable offset. </p>
      *
@@ -172,10 +172,11 @@ public interface TransitionHistory {
      * zonalen Verschiebungen. </p>
      *
      * <p>Die Liste ist leer, wenn die lokale Zeit in eine L&uuml;cke auf
-     * dem lokalen Zeitstrahl f&auml;llt. Die Liste hat genau zwei
-     * Verschiebungen, wenn die lokale Zeit wegen einer &Uuml;berlappung
-     * zu zwei verschiedenen Zeitpunkten auf der POSIX-Zeitskala geh&ouml;rt.
-     * Ansonsten wird die Liste genau eine passende Verschiebung enthalten. </p>
+     * dem lokalen Zeitstrahl f&auml;llt. Die Liste hat genau zwei nach
+     * Gr&ouml;&szlig;e sortierte Verschiebungen, wenn die lokale Zeit wegen
+     * einer &Uuml;berlappung zu zwei verschiedenen Zeitpunkten auf der
+     * POSIX-Zeitskala geh&ouml;rt. Ansonsten wird die Liste genau eine
+     * passende Verschiebung enthalten. </p>
      *
      * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
      * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
