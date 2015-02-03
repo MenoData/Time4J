@@ -242,6 +242,30 @@ final class TransitionResolver
 
     }
 
+    /**
+     * <p>For debugging purposes. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>F&uuml;r Debugging-Zwecke. </p>
+     *
+     * @return  String
+     */
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(32);
+        sb.append(this.getClass().getName());
+        sb.append(":[gap=");
+        sb.append(this.gapResolver);
+        sb.append(",overlap=");
+        sb.append(this.overlapResolver);
+        sb.append(']');
+        return sb.toString();
+        
+    }
+
     // called by and()-methods in GapResolver and OverlapResolver
     static TransitionResolver of(
         GapResolver gapResolver,

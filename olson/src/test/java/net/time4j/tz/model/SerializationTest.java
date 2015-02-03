@@ -5,6 +5,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -264,6 +265,13 @@ public class SerializationTest {
         assertThat(copy.getTimeOfDay(), is(PlainTime.of(2, 15)));
         assertThat(copy.getIndicator(), is(OffsetIndicator.STANDARD_TIME));
         assertThat(copy.getDate(2012), is(PlainDate.of(2012, 4, 1)));
+    }
+
+    @Test
+    public void serializeHistorizedTimezone()
+        throws IOException, ClassNotFoundException {
+        Object tz = Timezone.of("RulesOfEU", createModelOfEuropeanUnion());
+        assertThat(roundtrip(tz), is(tz));
     }
 
     private static Object roundtrip(Object obj)
