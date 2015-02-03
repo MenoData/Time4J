@@ -141,9 +141,9 @@ final class HistorizedTimezone
         if (offsets.size() == 1) {
             return offsets.get(0);
         } else {
-            ZonalTransition t =
+            ZonalTransition conflict =
                 this.history.getConflictTransition(localDate, localTime);
-            return ZonalOffset.ofTotalSeconds(t.getTotalOffset());
+            return ZonalOffset.ofTotalSeconds(conflict.getTotalOffset());
         }
 
     }

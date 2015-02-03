@@ -3561,7 +3561,7 @@ public final class Duration<U extends IsoUnit>
             t2 = t2.plus(
                 o1.getIntegralAmount() - o2.getIntegralAmount(),
                 SECONDS);
-            t2 = t2.plus(
+            t2 = t2.plus( // should be zero, just for purity
                 o1.getFractionalAmount() - o2.getFractionalAmount(),
                 NANOS);
             Duration<IsoUnit> duration = this.metric.between(t1, t2);

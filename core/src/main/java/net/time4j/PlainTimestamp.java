@@ -1001,7 +1001,7 @@ public final class PlainTimestamp
      */
     public Moment in(Timezone tz) {
 
-        if (tz.isFixed()) {
+        if (tz.isFixed()) { // optimization
             return this.at(tz.getOffset(this.date, this.time));
         }
 
