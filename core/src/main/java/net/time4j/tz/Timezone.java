@@ -22,8 +22,6 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
-import net.time4j.base.GregorianMath;
-import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -34,10 +32,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -55,7 +51,15 @@ import java.util.concurrent.ConcurrentMap;
  * <p>Loads and keeps timezone data including the rules. </p>
  *
  * <p>Timezones are identified by keys which have canonical forms as
- * documented in {@link TZID}. </p>
+ * documented in {@link TZID}. If the keys don't specify any provider
+ * (no char &quot;~&quot;) then the timezone data and rules will be
+ * looked up using the default {@code ZoneProvider}. This default provider
+ * is loaded by {@code java.util.ServiceLoader} if its name is equal
+ * to &quot;TZDB&quot; and its version string is not empty but of
+ * the highest value (lexicographically). If no such provider can be
+ * found then Time4J uses the platform provider based on the public
+ * API of {@code java.util.TimeZone} which does not expose its
+ * transition history however. </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
@@ -66,7 +70,16 @@ import java.util.concurrent.ConcurrentMap;
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
  *
  * <p>Zeitzonen werden durch Schl&uuml;ssel identifiziert, welche eine
- * kanonische Form wie in {@link TZID} dokumentiert haben. </p>
+ * kanonische Form wie in {@link TZID} dokumentiert haben. Wenn die
+ * Schl&uuml;ssel nicht einen spezifischen {@code ZoneProvider} festlegen
+ * (fehlende Tilde &quot;~&quot;), dann werden Zeitzonendaten und Regeln
+ * vom Standard-Provider abgefragt. Dieser wird &uuml;ber einen
+ * {@code java.util.ServiceLoader} geladen, wenn sein Name gleich
+ * &quot;TZDB&quot; ist und seine Version lexikalisch die h&ouml;chste
+ * und nicht-leer ist. Kann kein solcher {@code ZoneProvider} gefunden
+ * werden, dann verwendet Time4J ersatzweise das &ouml;ffentliche API von
+ * {@code java.util.TimeZone} (welches allerdings keine Historie
+ * exponiert). </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
@@ -79,26 +92,38 @@ public abstract class Timezone
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>This standard strategy which is also used by JDK subtracts
-     * the next defined offset from any local timestamp in order to
-     * calculate the global time. </p>
+     * <p>This standard strategy which is also used by the JDK-class
+     * {@code java.util.GregorianCalendar} subtracts the next defined
+     * offset from any local timestamp in order to calculate the global
+     * time while pushing forward an invalid local time. </p>
+     *
+     * <p>Equivalent to
+     * {@code GapResolver.PUSH_FORWARD.and(OverlapResolver.LATER_OFFSET)}. </p>
      *
      * @see     #getOffset(GregorianDate,WallTime)
      */
     /*[deutsch]
-     * <p>Diese auch vom JDK verwendete Standardstrategie zieht von einem
-     * beliebigen lokalen Zeitstempel den jeweils n&auml;chstdefinierten
-     * Offset ab, um die globale Zeit zu erhalten. </p>
+     * <p>Diese auch von der JDK-Klasse {@code java.util.GregorianCalendar}
+     * verwendete Standardstrategie zieht von einem beliebigen lokalen
+     * Zeitstempel den jeweils n&auml;chstdefinierten Offset ab, um die
+     * globale Zeit zu erhalten, wobei eine ung&uuml;ltige lokale Zeit
+     * um die L&auml;nge einer Offset-Verschiebung vorgeschoben wird. </p>
+     *
+     * <p>&Auml;quivalent zu:
+     * {@code GapResolver.PUSH_FORWARD.and(OverlapResolver.LATER_OFFSET)}. </p>
      *
      * @see     #getOffset(GregorianDate,WallTime)
      */
     public static final TransitionStrategy DEFAULT_CONFLICT_STRATEGY =
-        Strategy.DEFAULT;
+        GapResolver.PUSH_FORWARD.and(OverlapResolver.LATER_OFFSET);
 
     /**
      * <p>In addition to the  {@link #DEFAULT_CONFLICT_STRATEGY
      * standard strategy}, this strategy ensures the use of valid local
      * timestamps. </p>
+     *
+     * <p>Equivalent to
+     * {@code GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET)}. </p>
      */
     /*[deutsch]
      * <p>Legt bei Transformationen von lokalen Zeitstempeln zu UTC fest,
@@ -106,9 +131,11 @@ public abstract class Timezone
      * werden. </p>
      *
      * <p>Ansonsten wird die {@link #DEFAULT_CONFLICT_STRATEGY
-     * Standardstrategie} verwendet. </p>
+     * Standardstrategie} verwendet. &Auml;quivalent zu:
+     * {@code GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET)}. </p>
      */
-    public static final TransitionStrategy STRICT_MODE = Strategy.STRICT;
+    public static final TransitionStrategy STRICT_MODE =
+        GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET);
 
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
         Boolean.getBoolean("net.time4j.allow.system.tz.override");
@@ -217,9 +244,13 @@ public abstract class Timezone
 
         for (ZoneProvider provider : sl) {
             if (NAME_TZDB.equals(provider.getName())) {
+                String version = provider.getVersion();
+
                 if (
-                    (zp == null)
-                    || (provider.getVersion().compareTo(zp.getVersion()) > 0)
+                    !version.isEmpty()
+                    && (
+                        (zp == null)
+                        || (version.compareTo(zp.getVersion()) > 0))
                 ) {
                     zp = provider;
                 }
@@ -549,7 +580,8 @@ public abstract class Timezone
      * <p>Calculates the offset for given local timestamp. </p>
      *
      * <p>In case of gaps or overlaps, this method uses the standard strategy
-     * to get the next defined offset. This behaviour is conform to the JDK. </p>
+     * to get the next defined offset. This behaviour is conform to the
+     * JDK-class {@code java.util.GregorianCalendar}. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -564,8 +596,8 @@ public abstract class Timezone
      *
      * <p>Als Konfliktstrategie f&uuml;r L&uuml;cken oder &Uuml;berlappungen
      * auf dem lokalen Zeitstrahl wird die Standardstrategie verwendet, den
-     * n&auml;chstdefinierten Offset zu ermitteln. Dieses Verhalten ist zum
-     * JDK konform. </p>
+     * n&auml;chstdefinierten Offset zu ermitteln. Dieses Verhalten ist zur
+     * JDK-Klasse {@code java.util.GregorianCalendar} konform. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -738,6 +770,8 @@ public abstract class Timezone
      *
      * @param   strategy    transition strategy for resolving local timestamps
      * @return  copy of this timezone with given strategy
+     * @throws  UnsupportedOperationException if given strategy requires
+     *          a transition history and this timezone does not have one
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Zeitzone, die zur Aufl&ouml;sung von
@@ -751,6 +785,8 @@ public abstract class Timezone
      *
      * @param   strategy    transition strategy for resolving local timestamps
      * @return  copy of this timezone with given strategy
+     * @throws  UnsupportedOperationException if given strategy requires
+     *          a transition history and this timezone does not have one
      */
     public abstract Timezone with(TransitionStrategy strategy);
 
@@ -1397,133 +1433,6 @@ public abstract class Timezone
         ) {
 
             return null; // leider keine öffentliche Historie!
-
-        }
-
-    }
-
-    private static enum Strategy
-        implements TransitionStrategy {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        DEFAULT, STRICT;
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public long resolve(
-            GregorianDate date,
-            WallTime time,
-            Timezone tz
-        ) {
-
-            int y = date.getYear();
-            int m = date.getMonth();
-            int d = date.getDayOfMonth();
-            int h = time.getHour();
-            int min = time.getMinute();
-            int s = time.getSecond();
-
-            TransitionHistory history = tz.getHistory();
-
-            if (history != null) {
-                long localSecs = toLocalSeconds(y, m, d, h, min, s);
-                ZonalTransition t = history.getConflictTransition(date, time);
-
-                if ((t != null) && t.isGap()) {
-                    if (this == STRICT) {
-                        this.throwInvalidException(date, time, tz);
-                    }
-
-                    localSecs += t.getSize();
-                }
-
-                return localSecs - t.getTotalOffset();
-            }
-
-            java.util.TimeZone javaTZ =
-                java.util.TimeZone.getTimeZone(tz.getID().canonical());
-            GregorianCalendar cal = new GregorianCalendar(javaTZ);
-            cal.set(Calendar.MILLISECOND, 0);
-            cal.set(y, m - 1, d, h, min, s);
-
-            int year = cal.get(Calendar.YEAR);
-            int month = cal.get(Calendar.MONTH) + 1;
-            int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-            int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
-            int minute = cal.get(Calendar.MINUTE);
-            int second = cal.get(Calendar.SECOND);
-
-            if (this == STRICT) {
-                if (
-                    (y != year)
-                    || (m != month)
-                    || (d != dayOfMonth)
-                    || (h != hourOfDay)
-                    || (min != minute)
-                    || (s != second)
-                ) {
-                    this.throwInvalidException(date, time, tz);
-                }
-            }
-
-            long localSeconds =
-                toLocalSeconds(
-                    year, month, dayOfMonth, hourOfDay, minute, second);
-            return localSeconds - tz.getOffset(date, time).getIntegralAmount();
-
-        }
-
-        @Override
-        public ZonalOffset getOffset(
-            GregorianDate date,
-            WallTime time,
-            Timezone tz
-        ) {
-
-            if (
-                (this == STRICT)
-                && tz.isInvalid(date, time)
-            ) {
-                this.throwInvalidException(date, time, tz);
-            }
-
-            return tz.getOffset(date, time);
-
-        }
-
-        private static long toLocalSeconds(
-            int year,
-            int month,
-            int dayOfMonth,
-            int hourOfDay,
-            int minute,
-            int second
-        ) {
-
-            long localSeconds =
-                MathUtils.safeMultiply(
-                    MathUtils.safeSubtract(
-                        GregorianMath.toMJD(year, month, dayOfMonth),
-                        40587L),
-                    86400L);
-            localSeconds += (hourOfDay * 3600 + minute * 60 + second);
-            return localSeconds;
-
-        }
-
-        private void throwInvalidException(
-            GregorianDate date,
-            WallTime time,
-            Timezone tz
-        ) {
-
-            throw new IllegalArgumentException(
-                "Invalid local timestamp due to timezone transition: "
-                + date + time
-                + " [" + tz.getID() + "]"
-            );
 
         }
 

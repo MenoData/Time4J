@@ -42,6 +42,9 @@ final class SPX
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /** Serialisierungstyp von {@code TransitionResolver}. */
+    static final int TRANSITION_RESOLVER_TYPE = 13;
+
     /** Serialisierungstyp von {@code HistorizedTimezone}. */
     static final int HISTORIZED_TIMEZONE_TYPE = 14;
 
@@ -114,6 +117,9 @@ final class SPX
         throws IOException {
 
         switch (this.type) {
+            case TRANSITION_RESOLVER_TYPE:
+                this.writeStrategy(out);
+                break;
             case HISTORIZED_TIMEZONE_TYPE:
                 this.writeZone(out);
                 break;
@@ -147,6 +153,9 @@ final class SPX
         byte header = in.readByte();
 
         switch ((header & 0xFF) >> 4) {
+            case TRANSITION_RESOLVER_TYPE:
+                this.obj = this.readStrategy(in, header);
+                break;
             case HISTORIZED_TIMEZONE_TYPE:
                 this.obj = this.readZone(in, header);
                 break;
@@ -162,6 +171,28 @@ final class SPX
     private Object readResolve() throws ObjectStreamException {
 
         return this.obj;
+
+    }
+
+    private void writeStrategy(ObjectOutput out)
+        throws IOException {
+
+        TransitionResolver resolver = (TransitionResolver) this.obj;
+        int header = (TRANSITION_RESOLVER_TYPE << 4);
+        header |= resolver.getKey();
+        out.writeByte(header);
+
+    }
+
+    private Object readStrategy(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
+
+        int key = (header & 0x0F);
+        GapResolver gapResolver = GapResolver.values()[key / 2];
+        OverlapResolver overlapResolver = OverlapResolver.values()[key % 2];
+        return TransitionResolver.of(gapResolver, overlapResolver);
 
     }
 
