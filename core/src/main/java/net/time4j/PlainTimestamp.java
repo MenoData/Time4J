@@ -1021,14 +1021,14 @@ public final class PlainTimestamp
     /**
      * <p>Does this local timestamp exist in given timezone? </p>
      *
-     * @param   tzid    timezone id
+     * @param   tzid    timezone id (optional)
      * @return  {@code true} if this timestamp is valid in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Existiert dieser Zeitstempel in der angegebenen Zeitzone? </p>
      *
-     * @param   tzid    timezone id
+     * @param   tzid    timezone id (optional)
      * @return  {@code true} if this timestamp is valid in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
