@@ -210,6 +210,10 @@ final class PlatformTimezone
         WallTime localTime
     ) {
 
+        if (this.isFixed()) {
+            return false;
+        }
+
         int year = localDate.getYear();
         int month = localDate.getMonth();
         int day = localDate.getDayOfMonth();
@@ -236,6 +240,10 @@ final class PlatformTimezone
 
     @Override
     public boolean isDaylightSaving(UnixTime ut) {
+
+        if (this.isFixed()) {
+            return false;
+        }
 
         return this.tz.inDaylightTime(new Date(ut.getPosixTime() * 1000));
 
@@ -375,7 +383,6 @@ final class PlatformTimezone
                 offsetMillis / 1000,
                 (offsetMillis % 1000) * 1000000
             );
-
         }
 
     }

@@ -1,5 +1,10 @@
 package net.time4j.tz;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -311,6 +316,41 @@ public class OffsetTest {
         assertThat(
             ZonalOffset.UTC,
             is(ZonalOffset.ofTotalSeconds(0, 0)));
+    }
+
+    @Test
+    public void serializeUTC() throws IOException, ClassNotFoundException {
+        ZonalOffset offset = ZonalOffset.UTC;
+        assertThat(offset, is(roundtrip(offset)));
+    }
+
+    @Test
+    public void serializeOffset() throws IOException, ClassNotFoundException {
+        ZonalOffset offset = ZonalOffset.ofTotalSeconds(3 * 3600);
+        assertThat(offset, is(roundtrip(offset)));
+    }
+
+    @Test
+    public void serializeLongitudinal()
+        throws IOException, ClassNotFoundException {
+        ZonalOffset offset =
+            ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 90, 15, 40);
+        assertThat(offset, is(roundtrip(offset)));
+    }
+
+    private static Object roundtrip(Object obj)
+        throws IOException, ClassNotFoundException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object ser = ois.readObject();
+        ois.close();
+        return ser;
     }
 
 }

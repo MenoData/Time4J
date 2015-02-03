@@ -846,12 +846,19 @@ public final class ZonalOffset
         int n = offset.length();
         String test = offset;
 
-        if (
-            (n >= 3)
-            && test.startsWith("UTC")
-        ) {
-            test = offset.substring(3);
-            n -= 3;
+        if (n >= 3) {
+            if (test.startsWith("UTC")) {
+                test = offset.substring(3);
+                n -= 3;
+            } else if (test.startsWith("GMT")) {
+                if (wantsException) {
+                    throw new IllegalArgumentException(
+                        "Use UTC-prefix for canonical offset instead: "
+                        + offset);
+                } else {
+                    return null;
+                }
+            }
         }
 
         if (n >= 6) {
