@@ -76,6 +76,7 @@ final class TransitionResolver
 
     private static final String NO_HISTORY =
         "Timezone provider does not expose its transition history.";
+    private static final long serialVersionUID = 1790434289322009750L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -263,7 +264,7 @@ final class TransitionResolver
         sb.append(this.overlapResolver);
         sb.append(']');
         return sb.toString();
-        
+
     }
 
     // called by and()-methods in GapResolver and OverlapResolver

@@ -47,30 +47,31 @@ final class SingleOffsetTimezone
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final SingleOffsetTimezone UTC =
+        new SingleOffsetTimezone(ZonalOffset.UTC);
     private static final long serialVersionUID = 7807230388259573234L;
 
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial  fixed zone shift
+     * @serial  fixed zone shift in full seconds
      */
     private final ZonalOffset offset;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Standard-Konstruktor. </p>
-     *
-     * @param   offset  fixed shift of local time relative to UTC
-     */
-    SingleOffsetTimezone(ZonalOffset offset) {
+    private SingleOffsetTimezone(ZonalOffset offset) {
         super();
 
-        if (offset == null) {
-            throw new NullPointerException("Missing timezone offset.");
+        if (offset.getFractionalAmount() == 0) {
+            this.offset = offset;
+        } else {
+            int total = offset.getIntegralAmount();
+            if (offset.getFractionalAmount() < 0) {
+                total--; // corresponding to floor-divide-algorithm
+            }
+            this.offset = ZonalOffset.ofTotalSeconds(total);
         }
-
-        this.offset = offset;
 
     }
 
@@ -262,6 +263,24 @@ final class SingleOffsetTimezone
     }
 
     /**
+     * <p>Fabrikmethode. </p>
+     *
+     * @param   offset  fixed shift of local time relative to UTC in seconds
+     */
+    static SingleOffsetTimezone of(ZonalOffset offset) {
+
+        if (
+            (offset.getIntegralAmount() == 0)
+            && (offset.getFractionalAmount() == 0)
+        ) {
+            return UTC;
+        } else {
+            return new SingleOffsetTimezone(offset);
+        }
+
+    }
+
+    /**
      * @serialData  Checks the consistency.
      * @throws      InvalidObjectException in case of inconsistencies
      */
@@ -270,8 +289,8 @@ final class SingleOffsetTimezone
 
         in.defaultReadObject();
 
-        if (this.offset == null) {
-            throw new InvalidObjectException("Missing offset.");
+        if (this.offset.getFractionalAmount() != 0) {
+            throw new InvalidObjectException("Fractional offset is invalid.");
         }
 
     }

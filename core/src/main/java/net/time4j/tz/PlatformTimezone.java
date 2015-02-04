@@ -376,14 +376,9 @@ final class PlatformTimezone
 
     private static ZonalOffset fromOffsetMillis(int offsetMillis) {
 
-        if ((offsetMillis % 1000) == 0) {
-            return ZonalOffset.ofTotalSeconds(offsetMillis / 1000);
-        } else {
-            return ZonalOffset.ofTotalSeconds(
-                offsetMillis / 1000,
-                (offsetMillis % 1000) * 1000000
-            );
-        }
+        // never return any millisecond part
+        return ZonalOffset.ofTotalSeconds(
+            MathUtils.floorDivide(offsetMillis, 1000));
 
     }
 

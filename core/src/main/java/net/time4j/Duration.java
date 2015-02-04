@@ -37,7 +37,6 @@ import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.SignPolicy;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -3556,14 +3555,9 @@ public final class Duration<U extends IsoUnit>
                 negative = true;
             }
 
-            ZonalOffset o1 = this.getOffset(t1);
-            ZonalOffset o2 = this.getOffset(t2);
-            t2 = t2.plus(
-                o1.getIntegralAmount() - o2.getIntegralAmount(),
-                SECONDS);
-            t2 = t2.plus( // should be zero, just for purity
-                o1.getFractionalAmount() - o2.getFractionalAmount(),
-                NANOS);
+            int o1 = this.getOffset(t1);
+            int o2 = this.getOffset(t2);
+            t2 = t2.plus(o1 - o2, SECONDS);
             Duration<IsoUnit> duration = this.metric.between(t1, t2);
 
             if (negative) {
@@ -3574,11 +3568,13 @@ public final class Duration<U extends IsoUnit>
 
         }
 
-        private ZonalOffset getOffset(ChronoEntity<?> entity) {
+        private int getOffset(ChronoEntity<?> entity) {
 
-            PlainDate date = entity.get(PlainDate.COMPONENT);
-            PlainTime time = entity.get(PlainTime.COMPONENT);
-            return this.tz.getStrategy().getOffset(date, time, this.tz);
+            return this.tz.getStrategy().getOffset(
+                entity.get(PlainDate.COMPONENT),
+                entity.get(PlainTime.COMPONENT),
+                this.tz
+            ).getIntegralAmount();
 
         }
 

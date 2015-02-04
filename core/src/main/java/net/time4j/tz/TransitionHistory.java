@@ -60,7 +60,7 @@ public interface TransitionHistory {
      * is identical to the shift {@code getPreviousOffset()} of
      * the first defined transition in history. </p>
      *
-     * @return  fixed initial shift
+     * @return  fixed initial shift in full seconds
      */
     /*[deutsch]
      * <p>Ermittelt die initiale Verschiebung unabh&auml;ngig davon, ob es
@@ -70,7 +70,7 @@ public interface TransitionHistory {
      * Verschiebung mit der Verschiebung {@code getPreviousOffset()}
      * des ersten definierten &Uuml;bergangs identisch sein. </p>
      *
-     * @return  fixed initial shift
+     * @return  fixed initial shift in full seconds
      */
     ZonalOffset getInitialOffset();
 
@@ -164,7 +164,8 @@ public interface TransitionHistory {
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
-     * @return  unmodifiable list of shifts which fits the given local time
+     * @return  unmodifiable list of shifts in full seconds which fits the
+     *          given local time
      * @see     #getConflictTransition(GregorianDate,WallTime)
      */
     /*[deutsch]
@@ -186,7 +187,8 @@ public interface TransitionHistory {
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
-     * @return  unmodifiable list of shifts which fits the given local time
+     * @return  unmodifiable list of shifts in full seconds which fits the
+     *          given local time
      * @see     #getConflictTransition(GregorianDate,WallTime)
      */
     List<ZonalOffset> getValidOffsets(

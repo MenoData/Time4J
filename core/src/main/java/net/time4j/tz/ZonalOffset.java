@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * <p>Represents the shift of a local timestamp relative to UTC timezone
- * in seconds. </p>
+ * usually in full seconds. </p>
  *
  * <p>Following rule is the guideline (all data in seconds): </p>
  *
@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Verschiebung der lokalen Zeit relativ zur
- * UTC-Zeitzone in Sekunden. </p>
+ * UTC-Zeitzone normalerweise in vollen Sekunden. </p>
  *
  * <p>Es gilt folgende Beziehung zwischen einer lokalen Zeit und der
  * POSIX-Zeit (alle Angaben in Sekunden): </p>
@@ -185,8 +185,11 @@ public final class ZonalOffset
 //     * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
 //     * L&auml;ngenangabe. </p>
 //     *
-//     * <p>Hinweis: Diese Methode ist weniger genau als die BigDecimal-Variante.
-//     * Ein Beispiel: </p>
+//     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
+//     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
+//     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. Diese
+//     * Methode ist weniger genau als die {@code BigDecimal}-Variante. Ein
+//     * Beispiel: </p>
 //     *
 //     * <pre>
 //     *  System.out.println(ZonalOffset.atLongitude(new BigDecimal("-14.001")));
@@ -230,6 +233,10 @@ public final class ZonalOffset
     /**
      * <p>Creates a new shift based on a geographical longitude. </p>
      *
+     * <p>Note that fractional offsets are not used in context of timezones,
+     * but can only be applied to conversions between {@code PlainTimestamp}
+     * and {@code Moment}. </p>
+     *
      * @param   longitude   geographical longitude in degrees defined in
      *                      range {@code -180.0 <= longitude <= 180.0}
      * @return  zonal offset in decimal precision
@@ -238,6 +245,10 @@ public final class ZonalOffset
     /*[deutsch]
      * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
      * L&auml;ngenangabe. </p>
+     *
+     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
+     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
+     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
      *
      * @param   longitude   geographical longitude in degrees defined in
      *                      range {@code -180.0 <= longitude <= 180.0}
@@ -273,6 +284,10 @@ public final class ZonalOffset
     /**
      * <p>Creates a new shift based on a geographical longitude. </p>
      *
+     * <p>Note that fractional offsets are not used in context of timezones,
+     * but can only be applied to conversions between {@code PlainTimestamp}
+     * and {@code Moment}. </p>
+     *
      * @param   sign        sign of shift relative to zero meridian
      * @param   degrees     geographical length in degreed, defined in
      *                      range {@code 0 <= degrees <= 180}
@@ -286,6 +301,10 @@ public final class ZonalOffset
     /*[deutsch]
      * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
      * L&auml;ngenangabe. </p>
+     *
+     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
+     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
+     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
      * @param   degrees     geographical length in degreed, defined in
@@ -482,6 +501,10 @@ public final class ZonalOffset
      * <p>Creates a shift of the local time relative to UTC timezone
      * in integer seconds or fractional seconds. </p>
      *
+     * <p>Note that fractional offsets are not used in context of timezones,
+     * but can only be applied to conversions between {@code PlainTimestamp}
+     * and {@code Moment}. </p>
+     *
      * @param   total       total shift in seconds defined in range
      *                      {@code -18 * 3600 <= total <= 18 * 3600}
      * @param   fraction    fraction of second
@@ -494,6 +517,10 @@ public final class ZonalOffset
     /*[deutsch]
      * <p>Konstruiert eine Verschiebung der lokalen Zeit relativ zur
      * UTC-Zeitzone in integralen oder fraktionalen Sekunden. </p>
+     *
+     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
+     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
+     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
      *
      * @param   total       total shift in seconds defined in range
      *                      {@code -18 * 3600 <= total <= 18 * 3600}
@@ -624,12 +651,17 @@ public final class ZonalOffset
     /**
      * <p>Returns the fractional second part of this shift in nanoseconds. </p>
      *
+     * <p>Only longitudinal offsets may have fractional parts. </p>
+     *
      * @return  fractional part in range {@code -999999999 <= x <= 999999999}
      * @see     #getIntegralAmount()
      */
     /*[deutsch]
      * <p>Liefert den Sekundenbruchteil der Verschiebung in
      * Nanosekundenform. </p>
+     *
+     * <p>Nur longitudinale Verschiebungen k&ouml;nnen einen fraktionalen
+     * Anteil haben. </p>
      *
      * @return  fractional part in range {@code -999999999 <= x <= 999999999}
      * @see     #getIntegralAmount()
@@ -923,11 +955,11 @@ public final class ZonalOffset
     /**
      * <p>Liefert die Verschiebung als Zeitzonenmodell. </p>
      *
-     * @return  timezone data with fixed shift
+     * @return  timezone data with fixed shift in full seconds
      */
     SingleOffsetTimezone getModel() {
 
-        return new SingleOffsetTimezone(this);
+        return SingleOffsetTimezone.of(this);
 
     }
 

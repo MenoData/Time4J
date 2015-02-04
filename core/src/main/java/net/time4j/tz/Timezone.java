@@ -61,6 +61,17 @@ import java.util.concurrent.ConcurrentMap;
  * API of {@code java.util.TimeZone} which does not expose its
  * transition history however. </p>
  *
+ * <p>Note: The concept of timezones is strongly based on the idea to
+ * avoid any unrounded amounts of seconds or subseconds. Timezones were
+ * historically first introduced by british railway companies to
+ * guarantee fixed departure timetables. Consequently ISO-8601 only
+ * knows timezone offsets in full minutes. The widely used TZDB-repository
+ * of IANA knows in extreme case offsets in full seconds which is also
+ * allowed by Time4J. Although the Time4J-library recognizes
+ * {@link ZonalOffset#atLongitude(java.math.BigDecimal) fractional offsets}
+ * based on the geographical longitude, its {@code Timezone}-API will
+ * always ignore any fractional parts. </p>
+ *
  * @author      Meno Hochschild
  * @serial      exclude
  * @concurrency All static methods are thread-safe while this class is
@@ -80,6 +91,19 @@ import java.util.concurrent.ConcurrentMap;
  * werden, dann verwendet Time4J ersatzweise das &ouml;ffentliche API von
  * {@code java.util.TimeZone} (welches allerdings keine Historie
  * exponiert). </p>
+ *
+ * <p>Hinweis: Das Zeitzonenkonzept fu&szlig;t stark auf der Idee,
+ * irgendwelche nicht-runden Sekunden- oder Subsekundenbetr&auml;ge
+ * zu vermeiden. Historisch wurden Zeitzonen zuerst von britischen
+ * Eisenbahngesellschaften mit der Motivation eingef&uuml;hrt, landesweit
+ * feste Fahrpl&auml;ne zu erm&ouml;glichen. Konsequenterweise kennt
+ * ISO-8601 nur Zeitzonen-Offsets (Verschiebungen) in vollen Minuten.
+ * Die weit verbreitete Zeitzonendatenbank TZDB von IANA kennt in
+ * Extremf&auml;llen auch Offsets in vollen Sekunden, was von Time4J
+ * akzeptiert wird. Obwohl die Time4J-Bibliothek
+ * {@link ZonalOffset#atLongitude(java.math.BigDecimal) fraktionale Offsets}
+ * basierend auf der geographischen L&auml;nge kennt, wird das
+ * {@code Timezone}-API immer fraktionale Subsekunden ignorieren. </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
@@ -512,7 +536,7 @@ public abstract class Timezone
     }
 
     /**
-     * <p>Creates a new timezone based only on given data. </p>
+     * <p>Creates a new synthetic timezone based only on given data. </p>
      *
      * @param   tzid        timezone id
      * @param   history     history of offset transitions
@@ -560,6 +584,9 @@ public abstract class Timezone
     /**
      * <p>Calculates the offset for given global timestamp. </p>
      *
+     * <p>Note: The returned offset has never any subsecond part, normally
+     * not even seconds but full minutes or hours. </p>
+     *
      * @param   ut      unix time
      * @return  shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
@@ -568,6 +595,10 @@ public abstract class Timezone
     /*[deutsch]
      * <p>Ermittelt die Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
      * der UT-Weltzeitlinie in Sekunden. </p>
+     *
+     * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
+     * Subsekundenteile, normalerweise auch nicht Sekundenteile, sondern
+     * nur volle Minuten oder Stunden. </p>
      *
      * @param   ut      unix time
      * @return  shift in seconds which yields local time if added to unix time
@@ -579,9 +610,13 @@ public abstract class Timezone
     /**
      * <p>Calculates the offset for given local timestamp. </p>
      *
-     * <p>In case of gaps or overlaps, this method uses the standard strategy
+     * <p>In case of gaps or overlaps, this method uses the
+     * {@link #DEFAULT_CONFLICT_STRATEGY standard strategy}
      * to get the next defined offset. This behaviour is conform to the
      * JDK-class {@code java.util.GregorianCalendar}. </p>
+     *
+     * <p>Note: The returned offset has never any subsecond part, normally
+     * not even seconds but full minutes or hours. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
@@ -595,9 +630,14 @@ public abstract class Timezone
      * Zeitpunkt in Sekunden. </p>
      *
      * <p>Als Konfliktstrategie f&uuml;r L&uuml;cken oder &Uuml;berlappungen
-     * auf dem lokalen Zeitstrahl wird die Standardstrategie verwendet, den
-     * n&auml;chstdefinierten Offset zu ermitteln. Dieses Verhalten ist zur
-     * JDK-Klasse {@code java.util.GregorianCalendar} konform. </p>
+     * auf dem lokalen Zeitstrahl wird die {@link #DEFAULT_CONFLICT_STRATEGY
+     * Standardstrategie} verwendet, den n&auml;chstdefinierten Offset zu
+     * ermitteln. Dieses Verhalten ist zur JDK-Klasse
+     * {@code java.util.GregorianCalendar} konform. </p>
+     *
+     * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
+     * Subsekundenteile, normalerweise auch nicht Sekundenteile, sondern
+     * nur volle Minuten oder Stunden. </p>
      *
      * @param   localDate   local date in timezone
      * @param   localTime   local wall time in timezone
