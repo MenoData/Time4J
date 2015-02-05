@@ -93,7 +93,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>For subclasses only. </p>
      *
-     * @param   intervals   sorted list of finite intervals
+     * @param   intervals   sorted list of intervals
      */
     IntervalCollection(List<ChronoInterval<T>> intervals) {
         super();
@@ -215,7 +215,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns the overall minimum of this interval collection. </p>
      *
-     * <p>The minimum is always inclusive. </p>
+     * <p>The minimum is always inclusive, if finite. </p>
      *
      * @return  lower limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -225,7 +225,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /*[deutsch]
      * <p>Liefert das totale Minimum dieser Intervall-Menge. </p>
      *
-     * <p>Das Minimum ist immer inklusive. </p>
+     * <p>Das Minimum ist immer inklusive, wenn endlich. </p>
      *
      * @return  lower limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -246,7 +246,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns the overall maximum of this interval collection. </p>
      *
-     * <p>The maximum is always inclusive. </p>
+     * <p>The maximum is always inclusive, if finite. </p>
      *
      * @return  upper limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -256,7 +256,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /*[deutsch]
      * <p>Liefert das totale Maximum dieser Intervall-Menge. </p>
      *
-     * <p>Das Maximum ist immer inklusive. </p>
+     * <p>Das Maximum ist immer inklusive, wenn endlich. </p>
      *
      * @return  upper limit of this instance or {@code null} if infinite
      * @throws  NoSuchElementException if there are no intervals
@@ -409,13 +409,36 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     }
 
     /**
+     * <p>Subtracts all timepoints of given interval from this interval
+     * collection. </p>
+     *
+     * @param   interval    other interval to be subtracted from this
+     * @return  new interval collection containing all timepoints of
+     *          this instance excluding those of given interval
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Subtrahiert alle im angegebenen Zeitintervall enthaltenen
+     * Zeitpunkte von dieser Intervallmenge. </p>
+     *
+     * @param   interval    other interval to be subtracted from this
+     * @return  new interval collection containing all timepoints of
+     *          this instance excluding those of given interval
+     * @since   2.2
+     */
+    public IntervalCollection<T> minus(ChronoInterval<T> interval) {
+        
+        throw new UnsupportedOperationException("Not yet implemented.");
+
+    }
+
+    /**
      * <p>Determines a filtered version of this interval collection within
      * given range. </p>
      *
      * @param   timeWindow  time window filter
      * @return  new interval collection containing only timepoints within
      *          given range
-     * @throws  IllegalArgumentException if lower is after upper
      * @since   2.1
      */
     /*[deutsch]
@@ -423,9 +446,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * innerhalb der angegebenen Grenzen. </p>
      *
      * @param   timeWindow  time window filter
-     * @return  new interval collection containing all timepoints within
-     *          given range which do not belong to this instance
-     * @throws  IllegalArgumentException if lower is after upper
+     * @return  new interval collection containing only timepoints within
+     *          given range
      * @since   2.1
      */
     public IntervalCollection<T> withTimeWindow(ChronoInterval<T> timeWindow) {
@@ -474,7 +496,6 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing all timepoints within
      *          given range which do not belong to this instance
-     * @throws  IllegalArgumentException if lower is after upper
      * @since   2.1
      */
     /*[deutsch]
@@ -484,7 +505,6 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing all timepoints within
      *          given range which do not belong to this instance
-     * @throws  IllegalArgumentException if lower is after upper
      * @since   2.1
      */
     public IntervalCollection<T> withComplement(ChronoInterval<T> timeWindow) {
@@ -654,6 +674,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Combines all intervals to disjunct blocks which never overlap. </p>
      *
+     * <p>Any overlapping intervals will be merged to one block. </p>
+     *
      * @return  new interval collection containing disjunct blocks
      *          while this instance remains unaffected
      * @since   2.0
@@ -661,6 +683,9 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /*[deutsch]
      * <p>Kombiniert alle Intervalle zu disjunkten Bl&ouml;cken, die sich
      * nicht &uuml;berlappen. </p>
+     *
+     * <p>Alle Intervalle, die sich &uuml;berlappen, werden zu jeweils
+     * einem Block verschmolzen. </p>
      *
      * @return  new interval collection containing disjunct blocks
      *          while this instance remains unaffected
