@@ -1,6 +1,6 @@
-/*
+﻿/*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoMerger.java) is part of project Time4J.
  *
@@ -34,8 +34,10 @@ import net.time4j.base.TimeSource;
  * of chronological entities. </p>
  *
  * <p>Using this low-level-interface is usually reserved for Time4J and
- * serves for internal format support. Implementation note: All classes
- * of this type must be <i>immutable</i>. </p>
+ * serves for internal format support. However, for constructing new
+ * calendar systems implementing this interface is an essential part
+ * for parsing support. Implementation note: All classes of this type
+ * must be <i>immutable</i>. </p>
  *
  * @param   <T> generic type of time context
  *          (compatible to {@link ChronoEntity})
@@ -52,8 +54,10 @@ import net.time4j.base.TimeSource;
  *
  * <p>Die Benutzung dieses Low-Level-Interface bleibt in der Regel Time4J
  * vorbehalten und dient vorwiegend der internen Formatunterst&uuml;tzung.
- * Implementierungshinweis: Alle Klassen dieses Typs m&uuml;ssen
- * <i>immutable</i>, also unver&auml;nderlich sein. </p>
+ * Zur Konstruktion von neuen Kalendersystemen ist die Implementierung
+ * dieses Interface ein wichtiger Bestandteil. Implementierungshinweis:
+ * Alle Klassen dieses Typs m&uuml;ssen <i>immutable</i>, also
+ * unver&auml;nderlich sein. </p>
  *
  * @param   <T> generic type of time context
  *          (compatible to {@link ChronoEntity})
@@ -105,7 +109,11 @@ public interface ChronoMerger<T> {
      * (year)-(day-of-year) etc. </p>
      *
      * <p>A text parser will call this method after having resolved a text
-     * in single chronological elements and values. </p>
+     * into single chronological elements and values. Implementations should
+     * always validate the parsed values. In case of error, they are free to
+     * either throw an {@code IllegalArgumentException} or to generate
+     * and to save an error message by mean of the expression
+     * {@code entity.with(ValidationElement.ERROR_MESSAGE, message}. </p>
      *
      * @param   entity          any chronological entity like parsed
      *                          elements with their values
@@ -113,8 +121,9 @@ public interface ChronoMerger<T> {
      * @param   preparsing      preparsing phase active?
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
+     * @see     ValidationElement#ERROR_MESSAGE
      */
-    /**
+    /*[deutsch]
      * <p>Konstruiert eine neue Entit&auml;t basierend auf den angegebenen
      * chronologischen Daten. </p>
      *
@@ -126,7 +135,11 @@ public interface ChronoMerger<T> {
      *
      * <p>Ein Textinterpretierer ruft diese Methode auf, nachdem ein Text
      * elementweise in chronologische Elemente und Werte aufgel&ouml;st
-     * wurde. </p>
+     * wurde. Implementierungen sollten immer die interpretierten Werte
+     * validieren. Im Fehlerfall sind Implementierungen frei, entweder eine
+     * {@code IllegalArgumentException} zu werfen oder mittels des Ausdrucks
+     * {@code entity.with(ValidationElement.ERROR_MESSAGE, message} eine
+     * Fehlermeldung nur zu generieren und zu speichern. </p>
      *
      * @param   entity          any chronological entity like parsed
      *                          elements with their values
@@ -134,6 +147,7 @@ public interface ChronoMerger<T> {
      * @param   preparsing      preparsing phase active?
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
+     * @see     ValidationElement#ERROR_MESSAGE
      */
     T createFrom(
         ChronoEntity<?> entity,

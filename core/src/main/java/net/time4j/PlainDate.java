@@ -43,6 +43,7 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeSpan;
+import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoFormatter;
@@ -728,8 +729,6 @@ public final class PlainDate
     ) {
         super();
 
-        GregorianMath.checkDate(year, month, dayOfMonth);
-
         this.year = year;
         this.month = (byte) month;
         this.dayOfMonth = (byte) dayOfMonth;
@@ -768,8 +767,7 @@ public final class PlainDate
         int dayOfMonth
     ) {
 
-        // TODO: konfigurierbaren Cache einbauen?
-        return new PlainDate(year, month, dayOfMonth);
+        return of(year, month, dayOfMonth, true);
 
     }
 
@@ -799,7 +797,7 @@ public final class PlainDate
         int dayOfMonth
     ) {
 
-        return PlainDate.of(year, month.getValue(), dayOfMonth);
+        return PlainDate.of(year, month.getValue(), dayOfMonth, true);
 
     }
 
@@ -839,7 +837,7 @@ public final class PlainDate
         for (int i = (dayOfYear > table[6] ? 7 : 1); i < 12; i++) {
             if (dayOfYear <= table[i]) {
                 int dom = dayOfYear - table[i - 1];
-                return PlainDate.of(year, i + 1, dom);
+                return PlainDate.of(year, i + 1, dom, false);
             }
         }
 
@@ -872,48 +870,7 @@ public final class PlainDate
         Weekday dayOfWeek
     ) {
 
-        if (
-            (weekOfYear < 1)
-            || (weekOfYear > 53)
-        ) {
-            throw new IllegalArgumentException(
-                "Week of year out of range: " + weekOfYear);
-        }
-
-        GregorianMath.checkDate(yearOfWeekdate, 1, 1);
-
-        Weekday wdNewYear =
-            Weekday.valueOf(GregorianMath.getDayOfWeek(yearOfWeekdate, 1, 1));
-        int dow = wdNewYear.getValue();
-        int doy = (
-            ((dow <= 4) ? 2 - dow : 9 - dow)
-            + (weekOfYear - 1) * 7
-            + dayOfWeek.getValue() - 1
-        );
-
-        if (doy <= 0) {
-            yearOfWeekdate--;
-            doy += (GregorianMath.isLeapYear(yearOfWeekdate) ? 366 : 365);
-        } else {
-            int yearlen =
-                (GregorianMath.isLeapYear(yearOfWeekdate) ? 366 : 365);
-            if (doy > yearlen) {
-                doy -= yearlen;
-                yearOfWeekdate++;
-            }
-        }
-
-        PlainDate result = PlainDate.of(yearOfWeekdate, doy);
-
-        if (
-            (weekOfYear == 53)
-            && (result.getWeekOfYear() != 53)
-        ) {
-            throw new IllegalArgumentException(
-                "Week of year out of range: " + weekOfYear);
-        }
-
-        return result;
+        return of(yearOfWeekdate, weekOfYear, dayOfWeek, true);
 
     }
 
@@ -2003,6 +1960,98 @@ public final class PlainDate
 
     }
 
+    private static PlainDate of(
+        int yearOfWeekdate,
+        int weekOfYear,
+        Weekday dayOfWeek,
+        boolean validating
+    ) {
+
+        if (
+            (weekOfYear < 1)
+            || (weekOfYear > 53)
+        ) {
+            if (validating) {
+                throw new IllegalArgumentException(woyFailed(weekOfYear));
+            } else {
+                return null;
+            }
+        }
+
+        if (
+            validating
+            && ((yearOfWeekdate < MIN_YEAR) || (yearOfWeekdate > MAX_YEAR))
+        ) {
+            throw new IllegalArgumentException(yowFailed(yearOfWeekdate));
+        }
+
+        Weekday wdNewYear =
+            Weekday.valueOf(GregorianMath.getDayOfWeek(yearOfWeekdate, 1, 1));
+        int dow = wdNewYear.getValue();
+        int doy = (
+            ((dow <= 4) ? 2 - dow : 9 - dow)
+            + (weekOfYear - 1) * 7
+            + dayOfWeek.getValue() - 1
+        );
+        int y = yearOfWeekdate;
+
+        if (doy <= 0) {
+            y--;
+            doy += (GregorianMath.isLeapYear(y) ? 366 : 365);
+        } else {
+            int yearlen =
+                (GregorianMath.isLeapYear(y) ? 366 : 365);
+            if (doy > yearlen) {
+                doy -= yearlen;
+                y++;
+            }
+        }
+
+        PlainDate result = PlainDate.of(y, doy);
+
+        if (
+            (weekOfYear == 53)
+            && (result.getWeekOfYear() != 53)
+        ) {
+            if (validating) {
+                throw new IllegalArgumentException(woyFailed(weekOfYear));
+            } else {
+                return null;
+            }
+        }
+
+        return result;
+
+    }
+
+    private static String yowFailed(int yearOfWeekdate) {
+
+        return "YEAR_OF_WEEKDATE (ISO) out of range: " + yearOfWeekdate;
+
+    }
+
+    private static String woyFailed(int weekOfYear) {
+
+        return "WEEK_OF_YEAR (ISO) out of range: " + weekOfYear;
+
+    }
+
+    private static PlainDate of(
+        int year,
+        int month,
+        int dayOfMonth,
+        boolean validating
+    ) {
+
+        if (validating) {
+            GregorianMath.checkDate(year, month, dayOfMonth);
+        }
+
+        // TODO: konfigurierbaren Cache einbauen?
+        return new PlainDate(year, month, dayOfMonth);
+
+    }
+
     /**
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The format
@@ -2145,6 +2194,8 @@ public final class PlainDate
             }
 
             if (year != null) {
+                int y = year.intValue();
+
                 Integer month = null;
                 if (entity.contains(MONTH_OF_YEAR)) {
                     month =
@@ -2158,29 +2209,38 @@ public final class PlainDate
                     && entity.contains(DAY_OF_MONTH)
                 ) {
                     Integer dom = entity.get(DAY_OF_MONTH);
+                    int m = month.intValue();
+                    int d = dom.intValue();
 
                     if (leniency.isLax()) {
-                        PlainDate d = PlainDate.of(year.intValue(), 1, 1);
-                        d = d.with(MONTH_AS_NUMBER.setLenient(month));
-                        return d.with(DAY_OF_MONTH.setLenient(dom));
+                        PlainDate date = PlainDate.of(y, 1, 1);
+                        date = date.with(MONTH_AS_NUMBER.setLenient(month));
+                        return date.with(DAY_OF_MONTH.setLenient(dom));
+                    } else if ( // Standardszenario
+                        validateYear(entity, y)
+                        && validateMonth(entity, m)
+                        && validateDayOfMonth(entity, y, m, d)
+                    ) {
+                        return PlainDate.of(y, m, d, false);
                     } else {
-                        // Standardszenario
-                        return PlainDate.of(
-                            year.intValue(),
-                            month.intValue(),
-                            dom.intValue());
+                        return null;
                     }
                 }
 
                 if (entity.contains(DAY_OF_YEAR)) {
                     Integer doy = entity.get(DAY_OF_YEAR);
+                    int d = doy.intValue();
 
                     if (leniency.isLax()) {
-                        PlainDate d = PlainDate.of(year.intValue(), 1);
-                        return d.with(DAY_OF_YEAR.setLenient(doy));
+                        PlainDate date = PlainDate.of(y, 1);
+                        return date.with(DAY_OF_YEAR.setLenient(doy));
+                    } else if ( // Ordinaldatum
+                        validateYear(entity, y)
+                        && validateDayOfYear(entity, y, d)
+                    ) {
+                        return PlainDate.of(y, d);
                     } else {
-                        // Ordinaldatum
-                        return PlainDate.of(year.intValue(), doy.intValue());
+                        return null;
                     }
                 }
 
@@ -2189,19 +2249,29 @@ public final class PlainDate
                     && entity.contains(DAY_OF_QUARTER)
                 ) {
                     Quarter q = entity.get(QUARTER_OF_YEAR);
-                    Integer doq = entity.get(DAY_OF_QUARTER);
+                    boolean leapYear = GregorianMath.isLeapYear(y);
+                    int doq = entity.get(DAY_OF_QUARTER).intValue();
+                    int doy = doq + (leapYear ? 91 : 90);
 
-                    // Quartalsdatum
-                    int doy = doq.intValue();
-                    boolean leap = GregorianMath.isLeapYear(year.intValue());
-                    if (q == Quarter.Q2) {
-                        doy += ((leap ? 91 : 90));
+                    if (q == Quarter.Q1) {
+                        doy = doq;
                     } else if (q == Quarter.Q3) {
-                        doy += ((leap ? 91 : 90) + 91);
+                        doy += 91;
                     } else if (q == Quarter.Q4) {
-                        doy += ((leap ? 91 : 90) + 91 + 92);
+                        doy += (91 + 92);
                     }
-                    return PlainDate.of(year.intValue(), doy);
+
+                    if (leniency.isLax()) {
+                        PlainDate date = PlainDate.of(y, 1);
+                        return date.with(DAY_OF_YEAR.setLenient(doy));
+                    } else if ( // Quartalsdatum
+                        validateYear(entity, y)
+                        && validateDayOfQuarter(entity, leapYear, q, doq)
+                    ) {
+                        return PlainDate.of(y, doy);
+                    } else {
+                        return null;
+                    }
                 }
             }
 
@@ -2209,10 +2279,10 @@ public final class PlainDate
                 entity.contains(YEAR_OF_WEEKDATE)
                 && entity.contains(Weekmodel.ISO.weekOfYear())
             ) {
-                Integer yearOfWeekdate =
-                    entity.get(YEAR_OF_WEEKDATE);
-                Integer weekOfYear =
-                    entity.get(Weekmodel.ISO.weekOfYear());
+                int yearOfWeekdate =
+                    entity.get(YEAR_OF_WEEKDATE).intValue();
+                int weekOfYear =
+                    entity.get(Weekmodel.ISO.weekOfYear()).intValue();
                 Weekday dayOfWeek = null;
 
                 if (entity.contains(DAY_OF_WEEK)) {
@@ -2223,11 +2293,31 @@ public final class PlainDate
                     return null;
                 }
 
-                // Wochendatum
-                return PlainDate.of(
-                    yearOfWeekdate.intValue(),
-                    weekOfYear.intValue(),
-                    dayOfWeek);
+                // Wochendatum validieren und erzeugen
+                if (
+                    (yearOfWeekdate < GregorianMath.MIN_YEAR)
+                    || (yearOfWeekdate > GregorianMath.MAX_YEAR)
+                ) {
+                    flagValidationError(
+                        entity,
+                        yowFailed(yearOfWeekdate));
+                    return null;
+                }
+
+                PlainDate date =
+                    PlainDate.of(
+                        yearOfWeekdate,
+                        weekOfYear,
+                        dayOfWeek,
+                        false);
+
+                if (date == null) {
+                    flagValidationError(
+                        entity,
+                        woyFailed(weekOfYear));
+                }
+
+                return date;
             }
 
             return null;
@@ -2248,6 +2338,130 @@ public final class PlainDate
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+        private static boolean validateYear(
+            ChronoEntity<?> entity,
+            int year
+        ) {
+
+            if (
+                (year < GregorianMath.MIN_YEAR)
+                || (year > GregorianMath.MAX_YEAR)
+            ) {
+                flagValidationError(
+                    entity,
+                    "YEAR out of range: " + year);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private static boolean validateMonth(
+            ChronoEntity<?> entity,
+            int month
+        ) {
+
+            if (
+                (month < 1)
+                || (month > 12)
+            ) {
+                flagValidationError(
+                    entity,
+                    "MONTH_OF_YEAR out of range: " + month);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private static boolean validateDayOfMonth(
+            ChronoEntity<?> entity,
+            int year,
+            int month,
+            int dom
+        ) {
+
+            if (
+                (dom < 1)
+                || (dom > GregorianMath.getLengthOfMonth(year, month))
+            ) {
+                flagValidationError(
+                    entity,
+                    "DAY_OF_MONTH out of range: " + dom);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private static boolean validateDayOfYear(
+            ChronoEntity<?> entity,
+            int year,
+            int doy
+        ) {
+
+            if (
+                (doy < 1)
+                || (doy > (GregorianMath.isLeapYear(year) ? 366 : 365))
+            ) {
+                flagValidationError(
+                    entity,
+                    "DAY_OF_YEAR out of range: " + doy);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private static boolean validateDayOfQuarter(
+            ChronoEntity<?> entity,
+            boolean leapYear,
+            Quarter q,
+            int doq
+        ) {
+
+            int max;
+
+            switch (q) {
+                case Q1:
+                    max = (leapYear ? 91 : 90);
+                    break;
+                case Q2:
+                    max = 91;
+                    break;
+                default:
+                    max = 92;
+            }
+
+            if (
+                (doq < 1)
+                || (doq > max)
+            ) {
+                flagValidationError(
+                    entity,
+                    "DAY_OF_QUARTER out of range: " + doq);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        private static void flagValidationError(
+            ChronoEntity<?> entity,
+            String message
+        ) {
+
+            if (entity.isValid(ValidationElement.ERROR_MESSAGE, message)) {
+                entity.with(ValidationElement.ERROR_MESSAGE, message);
+            }
 
         }
 

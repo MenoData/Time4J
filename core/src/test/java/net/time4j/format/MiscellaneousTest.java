@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -54,11 +55,19 @@ public class MiscellaneousTest {
         assertThat(status.getErrorIndex(), is(-1));
     }
 
-    @Test(expected=ParseException.class)
+    @Test
     public void parseTime24Smart() throws ParseException {
-        PlainTime.formatter("HH:mm", PatternType.CLDR, Locale.ENGLISH)
+        ParseLog plog = new ParseLog();
+        assertThat(
+            PlainTime.formatter("HH:mm", PatternType.CLDR, Locale.ENGLISH)
             .with(Attributes.LENIENCY, Leniency.SMART)
-            .parse("24:00");
+            .parse("24:00", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(5));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Time 24:00 not allowed"),
+                is(true));
     }
 
     @Test
@@ -67,7 +76,16 @@ public class MiscellaneousTest {
             PlainTime.formatter("HH:mm", PatternType.CLDR, Locale.ENGLISH)
             .with(Attributes.LENIENCY, Leniency.LAX)
             .parse("24:00"),
-            is(PlainTime.midnightAtStartOfDay()));
+            is(PlainTime.midnightAtEndOfDay()));
+    }
+
+    @Test
+    public void parseTime48Lax() throws ParseException {
+        assertThat(
+            PlainTime.formatter("HH:mm", PatternType.CLDR, Locale.ENGLISH)
+            .with(Attributes.LENIENCY, Leniency.LAX)
+            .parse("48:00"),
+            is(PlainTime.midnightAtEndOfDay()));
     }
 
     @Test(expected=ParseException.class)
@@ -191,6 +209,211 @@ public class MiscellaneousTest {
         assertThat(
             formatter.parse("1970-01-01 00:00.0"),
             is(Moment.UNIX_EPOCH));
+    }
+
+    @Test
+    public void parseWallTimeWithInvalidHour() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("24:00:00"),
+            is(PlainTime.midnightAtEndOfDay()));
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("24:15:34", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(8));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Time component out of range."),
+                is(true));
+    }
+
+    @Test
+    public void parseWallTimeWithInvalidSecond() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:59"),
+            is(PlainTime.of(23, 59, 59)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME
+                .with(Attributes.LENIENCY, Leniency.LAX).parse("23:59:60"),
+            is(PlainTime.of(24)));
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:60", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(8));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Time component out of range."),
+                is(true));
+    }
+
+    @Test
+    public void parseIsoCalendarDateInvalidMonth() throws ParseException {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2015-13-10", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(10));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => MONTH_OF_YEAR out of range: 13"),
+                is(true));
+    }
+
+    @Test
+    public void parseIsoCalendarDateInvalidDayOfMonth() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2012-02-29"),
+            is(PlainDate.of(2012, 2, 29)));
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2015-02-29", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(10));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => DAY_OF_MONTH out of range: 29"),
+                is(true));
+    }
+
+    @Test
+    public void parseIsoOrdinalDateInvalidDayOfYear() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_ORDINAL_DATE.parse("2012-366"),
+            is(PlainDate.of(2012, 12, 31)));
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_ORDINAL_DATE.parse("2015-366", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(8));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => DAY_OF_YEAR out of range: 366"),
+                is(true));
+    }
+
+    @Test
+    public void parseIsoWeekdateInvalidWeekOfYear() throws ParseException {
+        assertThat(
+            Iso8601Format.EXTENDED_WEEK_DATE.parse("2015-W53-1"),
+            is(PlainDate.of(2015, 12, 28)));
+        ParseLog plog = new ParseLog();
+        assertThat(
+            Iso8601Format.EXTENDED_WEEK_DATE.parse("2016-W53-1", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(10));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => WEEK_OF_YEAR (ISO) out of range: 53"),
+                is(true));
+    }
+
+    @Test
+    public void parseQuarterDateQ1Valid() throws ParseException {
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q1-90"),
+            is(PlainDate.of(2015, 3, 31)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseQuarterDateQ1Invalid() throws ParseException {
+        getQuarterDateFormatter().parse("2015-Q1-91");
+    }
+
+    @Test
+    public void parseQuarterDateQ1LeapValid() throws ParseException {
+        assertThat(
+            getQuarterDateFormatter().parse("2012-Q1-91"),
+            is(PlainDate.of(2012, 3, 31)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseQuarterDateQ1LeapInvalid() throws ParseException {
+        getQuarterDateFormatter().parse("2012-Q1-92");
+    }
+
+    @Test
+    public void parseQuarterDateQ2Valid() throws ParseException {
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q2-91"),
+            is(PlainDate.of(2015, 6, 30)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseQuarterDateQ2Invalid() throws ParseException {
+        getQuarterDateFormatter().parse("2015-Q2-92");
+    }
+
+    @Test
+    public void parseQuarterDateQ3Valid() throws ParseException {
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q3-92"),
+            is(PlainDate.of(2015, 9, 30)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseQuarterDateQ3Invalid() throws ParseException {
+        getQuarterDateFormatter().parse("2015-Q3-93");
+    }
+
+    @Test
+    public void parseQuarterDateQ4Valid() throws ParseException {
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q4-92"),
+            is(PlainDate.of(2015, 12, 31)));
+    }
+
+    @Test
+    public void parseQuarterDateQ4Invalid() throws ParseException {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q4-93", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(10));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => DAY_OF_QUARTER out of range: 93"),
+                is(true));
+    }
+
+    @Test
+    public void parseQuarterDateBefore1() throws ParseException {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            getQuarterDateFormatter().parse("2015-Q1-00", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(10));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => DAY_OF_QUARTER out of range: 0"),
+                is(true));
+    }
+
+    @Test
+    public void parseTimeWithSecondOfDay() throws ParseException {
+        ChronoFormatter<PlainTime> formatter =
+            ChronoFormatter.setUp(PlainTime.class, Locale.US)
+                .addFixedInteger(PlainTime.SECOND_OF_DAY, 5)
+                .addLiteral('-')
+                .addFixedInteger(PlainTime.MILLI_OF_SECOND, 3)
+                .build();
+        assertThat(
+            formatter.parse("86399-123"),
+            is(PlainTime.of(23, 59, 59, 123000000)));
+        assertThat(
+            formatter.parse("86400-000"),
+            is(PlainTime.of(24)));
+    }
+
+    private static ChronoFormatter<PlainDate> getQuarterDateFormatter() {
+        return ChronoFormatter.setUp(PlainDate.class, Locale.US)
+            .addFixedInteger(PlainDate.YEAR, 4)
+            .addLiteral('-')
+            .addText(PlainDate.QUARTER_OF_YEAR)
+            .addLiteral('-')
+            .addFixedInteger(PlainDate.DAY_OF_QUARTER, 2)
+            .build()
+            .with(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED);
     }
 
 }

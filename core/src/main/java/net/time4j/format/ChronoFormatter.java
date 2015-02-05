@@ -1,6 +1,6 @@
-/*
+﻿/*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -33,6 +33,7 @@ import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
+import net.time4j.engine.ValidationElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -706,7 +707,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 if (!status.isError()) {
                     status.setError(
                         text.length(),
-                        "Insufficient data:" + getDescription(parsed.toMap()));
+                        getReason(parsed) + getDescription(parsed.toMap()));
                 }
                 return null;
             }
@@ -1523,12 +1524,30 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 5: Konsistenzprüfung
         if (result == null) {
-            String reason = "Insufficient data:" + getDescription(data.peek());
-            status.setError(text.length(), reason);
+            status.setError(
+                text.length(),
+                getReason(parsed) + getDescription(data.peek()));
             return null;
         } else {
             return checkConsistency(parsed, result, text, status, attributes);
         }
+
+    }
+
+    private static String getReason(ParsedValues parsed) {
+
+        String reason;
+
+        if (parsed.contains(ValidationElement.ERROR_MESSAGE)) {
+            reason =
+                "Validation failed => "
+                + parsed.get(ValidationElement.ERROR_MESSAGE);
+            parsed.with(ValidationElement.ERROR_MESSAGE, null);
+        } else {
+            reason = "Insufficient data:";
+        }
+
+        return reason;
 
     }
 

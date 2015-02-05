@@ -1,6 +1,6 @@
-/*
+﻿/*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTime.java) is part of project Time4J.
  *
@@ -37,6 +37,7 @@ import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
+import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoFormatter;
@@ -173,7 +174,7 @@ public final class PlainTime
 
     static {
         for (int i = 0; i <= 24; i++) {
-            HOURS[i] = new PlainTime(i, 0, 0, 0);
+            HOURS[i] = new PlainTime(i, 0, 0, 0, false);
         }
     }
 
@@ -1022,20 +1023,23 @@ public final class PlainTime
         int hour,
         int minute,
         int second,
-        int nanosecond
+        int nanosecond,
+        boolean validating
     ) {
         super();
 
-        checkHour(hour);
-        checkMinute(minute);
-        checkSecond(second);
-        checkNano(nanosecond);
+        if (validating) {
+            checkHour(hour);
+            checkMinute(minute);
+            checkSecond(second);
+            checkNano(nanosecond);
 
-        if (
-            (hour == 24)
-            && ((minute | second | nanosecond) != 0)
-        ) {
-            throw new IllegalArgumentException("T24:00:00 exceeded.");
+            if (
+                (hour == 24)
+                && ((minute | second | nanosecond) != 0)
+            ) {
+                throw new IllegalArgumentException("T24:00:00 exceeded.");
+            }
         }
 
         this.hour = (byte) hour;
@@ -1161,7 +1165,7 @@ public final class PlainTime
             return PlainTime.of(hour);
         }
 
-        return new PlainTime(hour, minute, 0, 0);
+        return new PlainTime(hour, minute, 0, 0, true);
 
     }
 
@@ -1195,7 +1199,7 @@ public final class PlainTime
             return PlainTime.of(hour);
         }
 
-        return new PlainTime(hour, minute, second, 0);
+        return new PlainTime(hour, minute, second, 0, true);
 
     }
 
@@ -1237,11 +1241,7 @@ public final class PlainTime
         int nanosecond
     ) {
 
-        if ((minute | second | nanosecond) == 0) {
-            return PlainTime.of(hour);
-        }
-
-        return new PlainTime(hour, minute, second, nanosecond);
+        return PlainTime.of(hour, minute, second, nanosecond, true);
 
     }
 
@@ -1801,6 +1801,26 @@ public final class PlainTime
             || ((element == SECOND_OF_DAY) && (this.nano != 0))
             || ((element == MICRO_OF_DAY) && ((this.nano % KILO) != 0))
         );
+
+    }
+
+    private static PlainTime of(
+        int hour,
+        int minute,
+        int second,
+        int nanosecond,
+        boolean validating
+    ) {
+
+        if ((minute | second | nanosecond) == 0) {
+            if (validating) {
+                return PlainTime.of(hour);
+            } else {
+                return HOURS[hour];
+            }
+        }
+
+        return new PlainTime(hour, minute, second, nanosecond, validating);
 
     }
 
@@ -3264,9 +3284,11 @@ public final class PlainTime
                     (hour == 24)
                     && !leniency.isLax()
                 ) {
-                    throw new IllegalArgumentException(
+                    flagValidationError(
+                        entity,
                         "Time 24:00 not allowed, "
-                        + "use lax mode or ISO_HOUR in smart mode instead.");
+                        + "use lax mode or element ISO_HOUR instead.");
+                    return null;
                 }
             }
 
@@ -3298,13 +3320,6 @@ public final class PlainTime
 
             if (entity.contains(SECOND_OF_MINUTE)) {
                 second = entity.get(SECOND_OF_MINUTE).intValue();
-
-                if (
-                    (second == 60) // Spezialfall: UTC-Schaltsekunde
-                    && !leniency.isStrict()
-                ) {
-                    second = 59;
-                }
             }
 
             // Nanoteil -------------------------------------------------------
@@ -3335,12 +3350,34 @@ public final class PlainTime
                     );
                 long nanoOfDay = floorMod(total, 86400L * MRD);
                 long overflow = floorDiv(total, 86400L * MRD);
-                if (entity.isValid(LongElement.DAY_OVERFLOW, overflow)) {
+                if (
+                    (overflow != 0)
+                    && entity.isValid(LongElement.DAY_OVERFLOW, overflow)
+                ) {
                     entity.with(LongElement.DAY_OVERFLOW, overflow);
                 }
-                return PlainTime.createFromNanos(nanoOfDay);
+                if ((nanoOfDay == 0) && (overflow > 0)) {
+                    return PlainTime.MAX;
+                } else {
+                    return PlainTime.createFromNanos(nanoOfDay);
+                }
+            } else if (
+                (hour >= 0)
+                && (minute >= 0)
+                && (second >= 0)
+                && (nanosecond >= 0)
+                && (
+                    ((hour == 24) && (minute | second | nanosecond) == 0))
+                    || (
+                        (hour < 24)
+                        && (minute <= 59)
+                        && (second <= 59)
+                        && (nanosecond <= MRD))
+            ) {
+                return PlainTime.of(hour, minute, second, nanosecond, false);
             } else {
-                return PlainTime.of(hour, minute, second, nanosecond);
+                flagValidationError(entity, "Time component out of range.");
+                return null;
             }
 
         }
@@ -3382,23 +3419,71 @@ public final class PlainTime
 
         private static PlainTime readSpecialCases(ChronoEntity<?> entity) {
 
-            // Spezialfall CLDR-Symbol A --------------------------------------
-            if (entity.contains(MILLI_OF_DAY)) {
+            if (entity.contains(NANO_OF_DAY)) {
+                return PlainTime.createFromNanos(
+                    entity.get(NANO_OF_DAY).intValue());
+            } else if (entity.contains(MICRO_OF_DAY)) {
+                int nanos = 0;
+                if (entity.contains(NANO_OF_SECOND)) {
+                    nanos = entity.get(NANO_OF_SECOND).intValue() % KILO;
+                }
+                return PlainTime.createFromMicros(
+                    entity.get(MICRO_OF_DAY).intValue(),
+                    nanos
+                );
+            } else if (entity.contains(MILLI_OF_DAY)) { // CLDR-Symbol A
                 int micros = 0;
                 if (entity.contains(NANO_OF_SECOND)) {
-                    micros =
-                      entity.get(NANO_OF_SECOND).intValue() % MIO;
+                    micros = entity.get(NANO_OF_SECOND).intValue() % MIO;
                 } else if (entity.contains(MICRO_OF_SECOND)) {
-                    micros =
-                      entity.get(MICRO_OF_SECOND).intValue() % KILO;
+                    micros = entity.get(MICRO_OF_SECOND).intValue() % KILO;
                 }
                 return PlainTime.createFromMillis(
                     entity.get(MILLI_OF_DAY).intValue(),
                     micros
                 );
+            } else if (entity.contains(SECOND_OF_DAY)) {
+                int nanos = 0;
+                if (entity.contains(NANO_OF_SECOND)) {
+                    nanos = entity.get(NANO_OF_SECOND).intValue();
+                } else if (entity.contains(MICRO_OF_SECOND)) {
+                    nanos = entity.get(MICRO_OF_SECOND).intValue() * KILO;
+                } else if (entity.contains(MILLI_OF_SECOND)) {
+                    nanos = entity.get(MILLI_OF_SECOND).intValue() * MIO;
+                }
+                return PlainTime.of(0, 0, 0, nanos).with(
+                    SECOND_OF_DAY,
+                    entity.get(SECOND_OF_DAY));
+            } else if (entity.contains(MINUTE_OF_DAY)) {
+                int nanos = 0;
+                if (entity.contains(NANO_OF_SECOND)) {
+                    nanos = entity.get(NANO_OF_SECOND).intValue();
+                } else if (entity.contains(MICRO_OF_SECOND)) {
+                    nanos = entity.get(MICRO_OF_SECOND).intValue() * KILO;
+                } else if (entity.contains(MILLI_OF_SECOND)) {
+                    nanos = entity.get(MILLI_OF_SECOND).intValue() * MIO;
+                }
+                int secs = 0;
+                if (entity.contains(SECOND_OF_MINUTE)) {
+                    secs = entity.get(SECOND_OF_MINUTE).intValue();
+                }
+                return PlainTime.of(0, 0, secs, nanos).with(
+                    MINUTE_OF_DAY,
+                    entity.get(MINUTE_OF_DAY));
             }
 
             return null;
+
+        }
+
+        private static void flagValidationError(
+            ChronoEntity<?> entity,
+            String message
+        ) {
+
+            if (entity.isValid(ValidationElement.ERROR_MESSAGE, message)) {
+                entity.with(ValidationElement.ERROR_MESSAGE, message);
+            }
 
         }
 
