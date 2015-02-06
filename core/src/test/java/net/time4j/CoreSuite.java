@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DurationSuite.class,
         OperatorSuite.class,
         FormatSuite.class,
+        MinMaxTest.class,
         ScaleSuite.class,
         SerializationTest.class,
         TemporalTypeTest.class,
