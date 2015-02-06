@@ -405,6 +405,31 @@ public class MiscellaneousTest {
             is(PlainTime.of(24)));
     }
 
+    @Test
+    public void parseTimeWithNanoOfDay() throws ParseException {
+        ChronoFormatter<PlainTime> formatter =
+            ChronoFormatter.setUp(PlainTime.class, Locale.US)
+                .addLongNumber(
+                    PlainTime.NANO_OF_DAY, 14, 14, SignPolicy.SHOW_NEVER)
+                .build();
+        long nanoOfDay = 86400 * 1000000000L;
+        ParseLog plog = new ParseLog();
+        assertThat(
+            formatter.parse(String.valueOf(nanoOfDay - 1)),
+            is(PlainTime.of(23, 59, 59, 999999999)));
+        assertThat(
+            formatter.parse(String.valueOf(nanoOfDay)),
+            is(PlainTime.of(24)));
+        assertThat(
+            formatter.parse(String.valueOf(nanoOfDay + 1), plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(14));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => NANO_OF_DAY out of range:"),
+            is(true));
+    }
+
     private static ChronoFormatter<PlainDate> getQuarterDateFormatter() {
         return ChronoFormatter.setUp(PlainDate.class, Locale.US)
             .addFixedInteger(PlainDate.YEAR, 4)

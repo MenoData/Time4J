@@ -1,4 +1,4 @@
-﻿/*
+/*
  * -----------------------------------------------------------------------
  * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
@@ -3419,29 +3419,53 @@ public final class PlainTime
 
         private static PlainTime readSpecialCases(ChronoEntity<?> entity) {
 
-            if (entity.contains(NANO_OF_DAY)) {
-                return PlainTime.createFromNanos(
-                    entity.get(NANO_OF_DAY).intValue());
+            if (entity.contains(NANO_OF_DAY)) { // Threeten-Symbol N
+                long nanoOfDay = entity.get(NANO_OF_DAY).longValue();
+                if ((nanoOfDay < 0) || (nanoOfDay > 86400L * MRD)) {
+                    flagValidationError(
+                        entity,
+                        "NANO_OF_DAY out of range: " + nanoOfDay);
+                    return null;
+                }
+                return PlainTime.createFromNanos(nanoOfDay);
             } else if (entity.contains(MICRO_OF_DAY)) {
                 int nanos = 0;
                 if (entity.contains(NANO_OF_SECOND)) {
                     nanos = entity.get(NANO_OF_SECOND).intValue() % KILO;
                 }
                 return PlainTime.createFromMicros(
-                    entity.get(MICRO_OF_DAY).intValue(),
+                    entity.get(MICRO_OF_DAY).longValue(),
                     nanos
                 );
             } else if (entity.contains(MILLI_OF_DAY)) { // CLDR-Symbol A
-                int micros = 0;
+                int submillis = 0;
                 if (entity.contains(NANO_OF_SECOND)) {
-                    micros = entity.get(NANO_OF_SECOND).intValue() % MIO;
+                    int nanoOfSecond = entity.get(NANO_OF_SECOND).intValue();
+                    if ((nanoOfSecond < 0) || (nanoOfSecond >= MRD)) {
+                        flagValidationError(
+                            entity,
+                            "NANO_OF_SECOND out of range: " + nanoOfSecond);
+                        return null;
+                    }
+                    submillis = nanoOfSecond % MIO;
                 } else if (entity.contains(MICRO_OF_SECOND)) {
-                    micros = entity.get(MICRO_OF_SECOND).intValue() % KILO;
+                    int microOfSecond = entity.get(MICRO_OF_SECOND).intValue();
+                    if ((microOfSecond < 0) || (microOfSecond >= MIO)) {
+                        flagValidationError(
+                            entity,
+                            "MICRO_OF_SECOND out of range: " + microOfSecond);
+                        return null;
+                    }
+                    submillis = microOfSecond % KILO;
                 }
-                return PlainTime.createFromMillis(
-                    entity.get(MILLI_OF_DAY).intValue(),
-                    micros
-                );
+                int milliOfDay = entity.get(MILLI_OF_DAY).intValue();
+                if ((milliOfDay < 0) || (milliOfDay > 86400 * KILO)) {
+                    flagValidationError(
+                        entity,
+                        "MILLI_OF_DAY out of range: " + milliOfDay);
+                    return null;
+                }
+                return PlainTime.createFromMillis(milliOfDay, submillis);
             } else if (entity.contains(SECOND_OF_DAY)) {
                 int nanos = 0;
                 if (entity.contains(NANO_OF_SECOND)) {
