@@ -28,7 +28,7 @@ import net.time4j.engine.Temporal;
  * <p>Represents a temporal interval on a timeline. </p>
  *
  * <p>Note: Time4J-intervals contain every timepoint between start and
- * end boundary without exception. </p>
+ * end boundary without exception (continuous intervals). </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
@@ -38,7 +38,7 @@ import net.time4j.engine.Temporal;
  * <p>Repr&auml;sentiert ein Zeitintervall auf einem Zeitstrahl. </p>
  *
  * <p>Hinweis: Time4J-Intervalle enthalten jeden Zeitpunkt zwischen
- * Start und Ende ohne Ausnahme. </p>
+ * Start und Ende ohne Ausnahme (kontinuierliche Intervalle). </p>
  *
  * @param   <T> temporal type of time points within a given interval
  * @author  Meno Hochschild
