@@ -625,4 +625,210 @@ public class IntervalCollectionTest {
         assertThat(empty.withComplement(window), is(expected));
     }
 
+    @Test
+    public void minusIntermediateInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval i4 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 9),
+                PlainDate.of(2014, 6, 2));
+        DateInterval i5 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 21),
+                PlainDate.of(2014, 5, 30));
+
+
+        assertThat(
+            windows.minus(i4),
+            is(
+                IntervalCollection.onDateAxis()
+                .plus(
+                    DateInterval.between(
+                        PlainDate.of(2014, 2, 28),
+                        PlainDate.of(2014, 4, 8)))
+                .plus(i3)));
+        assertThat(
+            windows.minus(i5),
+            is(
+                IntervalCollection.onDateAxis()
+                .plus(
+                    DateInterval.between(
+                        PlainDate.of(2014, 2, 28),
+                        PlainDate.of(2014, 4, 20)))
+                .plus(
+                    DateInterval.between(
+                        PlainDate.of(2014, 4, 10),
+                        PlainDate.of(2014, 4, 20)))
+                .plus(DateInterval.atomic(PlainDate.of(2014, 5, 31)))
+                .plus(
+                    DateInterval.between(
+                        PlainDate.of(2014, 5, 31),
+                        PlainDate.of(2014, 6, 1)))
+                .plus(i3)));
+    }
+
+    @Test
+    public void minusEarlierInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval earlier =
+            DateInterval.between(
+                PlainDate.of(2012, 4, 9),
+                PlainDate.of(2013, 6, 2));
+
+        assertThat(
+            windows.minus(earlier),
+            is(windows));
+    }
+
+    @Test
+    public void minusLaterInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval later =
+            DateInterval.between(
+                PlainDate.of(2017, 4, 9),
+                PlainDate.of(2018, 6, 2));
+
+        assertThat(
+            windows.minus(later),
+            is(windows));
+    }
+
+    @Test
+    public void minusBigInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval big =
+            DateInterval.between(
+                PlainDate.of(2012, 4, 9),
+                PlainDate.of(2018, 6, 2));
+
+        assertThat(
+            windows.minus(big),
+            is(IntervalCollection.onDateAxis()));
+    }
+
+    @Test
+    public void minusEmptyInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval empty =
+            DateInterval.atomic(PlainDate.of(2012, 4, 9)).withOpenEnd();
+
+        assertThat(
+            windows.minus(empty),
+            is(windows));
+    }
+
+    @Test
+    public void minusListOfIntervals() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        DateInterval big =
+            DateInterval.between(
+                PlainDate.of(2012, 4, 9),
+                PlainDate.of(2018, 6, 2));
+        IntervalCollection<PlainDate> minuend =
+            IntervalCollection.onDateAxis().plus(big);
+
+        DateInterval d1 =
+            DateInterval.between(
+                PlainDate.of(2012, 4, 9),
+                PlainDate.of(2014, 2, 27));
+        DateInterval d2 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 2),
+                PlainDate.of(2014, 6, 14));
+        DateInterval d3 =
+            DateInterval.between(
+                PlainDate.of(2014, 7, 1),
+                PlainDate.of(2018, 6, 2));
+        IntervalCollection<PlainDate> delta = IntervalCollection.onDateAxis();
+        delta = delta.plus(d1).plus(d2).plus(d3);
+
+        assertThat(
+            minuend.minus(windows.getIntervals()),
+            is(delta));
+    }
+
 }

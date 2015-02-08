@@ -179,11 +179,16 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns all appended intervals. </p>
      *
+     * <p>Note that all contained finite intervals have closed start. </p>
+     *
      * @return  unmodifiable sorted list of intervals
      * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert alle hinzugef&uuml;gten Intervalle. </p>
+     *
+     * <p>Alle enthaltenen endlichen Intervalle haben einen geschlossenen
+     * Start. </p>
      *
      * @return  unmodifiable sorted list of intervals
      * @since   2.0
@@ -350,6 +355,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance
      *          remains unaffected
+     * @throws  IllegalArgumentException if given interval is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.0
      */
     /*[deutsch]
@@ -359,17 +366,15 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance
      *          remains unaffected
+     * @throws  IllegalArgumentException if given interval is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.0
      */
     public IntervalCollection<T> plus(ChronoInterval<T> interval) {
 
-        if (interval == null) {
-            throw new NullPointerException("Missing interval.");
-        }
-
         List<ChronoInterval<T>> windows =
             new ArrayList<ChronoInterval<T>>(this.intervals);
-        windows.add(interval);
+        windows.add(this.adjust(interval));
         Collections.sort(windows, this.getComparator());
         return this.create(windows);
 
@@ -382,6 +387,9 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance
      *          remains unaffected
+     * @throws  IllegalArgumentException if given list contains a finite
+     *          interval with open start which cannot be adjusted to one
+     *          with closed start
      * @since   2.0
      */
     /*[deutsch]
@@ -391,6 +399,9 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance
      *          remains unaffected
+     * @throws  IllegalArgumentException if given list contains a finite
+     *          interval with open start which cannot be adjusted to one
+     *          with closed start
      * @since   2.0
      */
     public IntervalCollection<T> plus(
@@ -402,7 +413,11 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         List<ChronoInterval<T>> windows =
             new ArrayList<ChronoInterval<T>>(this.intervals);
-        windows.addAll(intervals);
+
+        for (ChronoInterval<T> i : intervals) {
+            windows.add(this.adjust(i));
+        }
+
         Collections.sort(windows, this.getComparator());
         return this.create(windows);
 
@@ -415,6 +430,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   interval    other interval to be subtracted from this
      * @return  new interval collection containing all timepoints of
      *          this instance excluding those of given interval
+     * @throws  IllegalArgumentException if given interval is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.2
      */
     /*[deutsch]
@@ -424,11 +441,119 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   interval    other interval to be subtracted from this
      * @return  new interval collection containing all timepoints of
      *          this instance excluding those of given interval
+     * @throws  IllegalArgumentException if given interval is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.2
      */
     public IntervalCollection<T> minus(ChronoInterval<T> interval) {
-        
-        throw new UnsupportedOperationException("Not yet implemented.");
+
+        if (
+            this.isEmpty()
+            || interval.isEmpty()
+        ) {
+            return this;
+        }
+
+        ChronoInterval<T> minuend = this.intervals.get(0);
+        ChronoInterval<T> iv = this.adjust(interval);
+
+        if (
+            !minuend.getStart().isInfinite()
+            && iv.isBefore(minuend.getStart().getTemporal())
+        ) {
+            return this;
+        }
+
+        List<ChronoInterval<T>> parts =
+            new ArrayList<ChronoInterval<T>>();
+        IntervalCollection<T> subtrahend =
+            this.create(Collections.singletonList(iv));
+        IntervalCollection<T> diff = subtrahend.withComplement(minuend);
+
+        if (!diff.isEmpty()) {
+            parts.addAll(diff.intervals);
+        }
+
+        for (int i = 1, n = this.intervals.size(); i < n; i++) {
+            minuend = this.intervals.get(i);
+
+            if (
+                !minuend.getStart().isInfinite()
+                && iv.isBefore(minuend.getStart().getTemporal())
+            ) {
+                parts.add(minuend);
+                for (int j = i + 1; j < n; j++) {
+                    parts.add(this.intervals.get(j));
+                }
+                break; // short cut
+            } else {
+                diff = subtrahend.withComplement(minuend);
+                if (!diff.isEmpty()) {
+                    parts.addAll(diff.intervals);
+                }
+            }
+        }
+
+        Collections.sort(parts, this.getComparator());
+        return this.create(parts);
+
+    }
+
+    /**
+     * <p>Subtracts all timepoints of given intervals from this interval
+     * collection. </p>
+     *
+     * @param   intervals   list of intervals to be subtracted
+     * @return  new interval collection containing all timepoints of
+     *          this instance excluding those of given intervals
+     * @throws  IllegalArgumentException if given list contains a finite
+     *          interval with open start which cannot be adjusted to one
+     *          with closed start
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Subtrahiert alle in den angegebenen Zeitintervallen enthaltenen
+     * Zeitpunkte von dieser Intervallmenge. </p>
+     *
+     * @param   intervals   list of intervals to be subtracted
+     * @return  new interval collection containing all timepoints of
+     *          this instance excluding those of given intervals
+     * @throws  IllegalArgumentException if given list contains a finite
+     *          interval with open start which cannot be adjusted to one
+     *          with closed start
+     * @since   2.2
+     */
+    public IntervalCollection<T> minus(
+        List<? extends ChronoInterval<T>> intervals) {
+
+        if (
+            this.isEmpty()
+            || intervals.isEmpty()
+        ) {
+            return this;
+        }
+
+        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> list = new ArrayList<ChronoInterval<T>>();
+
+        for (ChronoInterval<T> i : intervals) {
+            list.add(this.adjust(i));
+        }
+
+        Collections.sort(list, this.getComparator());
+        IntervalCollection<T> subtrahend = this.create(list);
+
+        for (int i = 0, n = this.intervals.size(); i < n; i++) {
+            ChronoInterval<T> minuend = this.intervals.get(i);
+            IntervalCollection<T> diff = subtrahend.withComplement(minuend);
+
+            if (!diff.isEmpty()) {
+                parts.addAll(diff.intervals);
+            }
+        }
+
+        Collections.sort(parts, this.getComparator());
+        return this.create(parts);
 
     }
 
@@ -439,6 +564,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing only timepoints within
      *          given range
+     * @throws  IllegalArgumentException if given window is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.1
      */
     /*[deutsch]
@@ -448,44 +575,13 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing only timepoints within
      *          given range
+     * @throws  IllegalArgumentException if given window is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.1
      */
     public IntervalCollection<T> withTimeWindow(ChronoInterval<T> timeWindow) {
 
-        Boundary<T> lower = timeWindow.getStart();
-        Boundary<T> upper = timeWindow.getEnd();
-
-        if (
-            this.isEmpty()
-            || (lower.isInfinite() && upper.isInfinite())
-        ) {
-            return this;
-        }
-
-        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
-
-        for (ChronoInterval<T> interval : this.intervals) {
-            if (
-                interval.isFinite()
-                && timeWindow.contains(interval.getStart().getTemporal())
-                && timeWindow.contains(interval.getEnd().getTemporal())
-            ) {
-                parts.add(interval);
-                continue;
-            }
-
-            List<ChronoInterval<T>> pair = new ArrayList<ChronoInterval<T>>(2);
-            pair.add(timeWindow);
-            pair.add(interval);
-            Collections.sort(pair, this.getComparator());
-            IntervalCollection<T> is = this.create(pair).withIntersection();
-
-            if (!is.isEmpty()) {
-                parts.add(is.getIntervals().get(0));
-            }
-        }
-
-        return this.create(parts);
+        return this.withFilter(this.adjust(timeWindow));
 
     }
 
@@ -496,6 +592,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing all timepoints within
      *          given range which do not belong to this instance
+     * @throws  IllegalArgumentException if given window is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.1
      */
     /*[deutsch]
@@ -505,18 +603,21 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @param   timeWindow  time window filter
      * @return  new interval collection containing all timepoints within
      *          given range which do not belong to this instance
+     * @throws  IllegalArgumentException if given window is finite and has
+     *          open start which cannot be adjusted to one with closed start
      * @since   2.1
      */
     public IntervalCollection<T> withComplement(ChronoInterval<T> timeWindow) {
 
-        IntervalCollection<T> coll = this.withTimeWindow(timeWindow);
+        ChronoInterval<T> window = this.adjust(timeWindow);
+        IntervalCollection<T> coll = this.withFilter(window);
 
         if (coll.isEmpty()) {
-            return this.create(Collections.singletonList(timeWindow));
+            return this.create(Collections.singletonList(window));
         }
 
-        Boundary<T> lower = timeWindow.getStart();
-        Boundary<T> upper = timeWindow.getEnd();
+        Boundary<T> lower = window.getStart();
+        Boundary<T> upper = window.getEnd();
         List<ChronoInterval<T>> gaps = new ArrayList<ChronoInterval<T>>();
 
         // left edge
@@ -957,6 +1058,68 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     boolean isCalendrical() {
 
         return false;
+
+    }
+
+    private ChronoInterval<T> adjust(ChronoInterval<T> interval) {
+
+        Boundary<T> start = interval.getStart();
+
+        if (
+            !start.isInfinite()
+            && start.isOpen()
+        ) {
+            T s = this.getTimeLine().stepForward(start.getTemporal());
+
+            if (s == null) {
+                throw new IllegalArgumentException(
+                    "Interval start with open maximum: " + interval);
+            } else {
+                start = Boundary.ofClosed(s);
+                return this.newInterval(start, interval.getEnd());
+            }
+        }
+
+        return interval;
+
+    }
+
+    private IntervalCollection<T> withFilter(ChronoInterval<T> window) {
+
+        Boundary<T> lower = window.getStart();
+        Boundary<T> upper = window.getEnd();
+
+        if (
+            this.isEmpty()
+            || (lower.isInfinite() && upper.isInfinite())
+        ) {
+            return this;
+        }
+
+        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
+
+        for (ChronoInterval<T> interval : this.intervals) {
+            if (
+                interval.isFinite()
+                && window.contains(interval.getStart().getTemporal())
+                && window.contains(interval.getEnd().getTemporal())
+            ) {
+                parts.add(interval);
+                continue;
+            }
+
+            List<ChronoInterval<T>> pair = new ArrayList<ChronoInterval<T>>(2);
+            pair.add(window);
+            pair.add(interval);
+            Collections.sort(pair, this.getComparator());
+            IntervalCollection<T> is = this.create(pair).withIntersection();
+
+            if (!is.isEmpty()) {
+                parts.add(is.getIntervals().get(0));
+            }
+        }
+
+        return this.create(parts);
 
     }
 
