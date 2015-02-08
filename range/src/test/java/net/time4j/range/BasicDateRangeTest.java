@@ -1,8 +1,10 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 
+import java.text.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -142,6 +144,15 @@ public class BasicDateRangeTest {
         assertThat(
             DateInterval.atomic(date).withOpenEnd().isEmpty(),
             is(true));
+    }
+
+    @Test
+    public void isEmptyReverseBoundaries() throws ParseException {
+        DateInterval interval =
+            DateInterval.parse(
+                "(2012-01-01/2012-01-01]",
+                Iso8601Format.EXTENDED_CALENDAR_DATE);
+        assertThat(interval.isEmpty(), is(true));
     }
 
     @Test

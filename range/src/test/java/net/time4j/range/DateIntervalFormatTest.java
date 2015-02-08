@@ -460,4 +460,27 @@ public class DateIntervalFormatTest {
         DateInterval.parseISO("2012001P775D");
     }
 
+    @Test
+    public void parseExtendedOpenCalendardate() throws ParseException {
+        PlainDate start = PlainDate.of(2012, 1, 1);
+        PlainDate end = PlainDate.of(2014, 2, 14);
+        DateInterval parsed = DateInterval.parse(
+            "(2012-01-01/2014-02-14)",
+            Iso8601Format.EXTENDED_CALENDAR_DATE);
+
+        assertThat(
+            parsed.getStart(),
+            is(Boundary.ofOpen(start)));
+        assertThat(
+            parsed.getEnd(),
+            is(Boundary.ofOpen(end)));
+    }
+
+    @Test(expected=IllegalArgumentException.class) // open start equals open end
+    public void parseInvalidOpenCalendardate() throws ParseException {
+        DateInterval.parse(
+            "(2012-01-01/2012-01-01)",
+            Iso8601Format.EXTENDED_CALENDAR_DATE);
+    }
+
 }

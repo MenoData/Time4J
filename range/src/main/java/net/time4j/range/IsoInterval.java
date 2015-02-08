@@ -37,8 +37,8 @@ import java.io.IOException;
  * <p>Represents an abstract temporal interval on a timeline for
  * ISO-8601-types. </p>
  *
- * <p>Note that the start of an interval is always included (with the
- * exception of intervals with infinite past). The end is open for
+ * <p>Note that the start of an interval is (almost) always included (with
+ * the exception of intervals with infinite past). The end is open for
  * intervals with infinite future and else included for date intervals
  * by default and excluded for other interval types. This default setting
  * can be overwritten however (although potentially harmful for the
@@ -54,10 +54,10 @@ import java.io.IOException;
  * Zeitstrahl f&uuml;r ISO-8601-Typen. </p>
  *
  * <p>Hinweis: Der Start eines Intervalls ist au&szlig;er bei Intervallen
- * mit unbegrenzter Vergangenheit immer inklusive. Das Ende eines Intervalls
- * ist bei unbegrenzter Zukunft offen, f&uuml;r Datumsintervalle inklusive und
- * sonst exklusive per Vorgabe. Diese Standardeinstellung kann jedoch
- * &uuml;berschrieben werden (obwohl potentiell sch&auml;dlich f&uuml;r
+ * mit unbegrenzter Vergangenheit (fast) immer inklusive. Das Ende eines
+ * Intervalls ist bei unbegrenzter Zukunft offen, f&uuml;r Datumsintervalle
+ * inklusive und sonst exklusive per Vorgabe. Diese Standardeinstellung kann
+ * jedoch &uuml;berschrieben werden (obwohl potentiell sch&auml;dlich f&uuml;r
  * das Antwortzeitverhalten). </p>
  *
  * @param   <T> temporal type of time points within a given interval
@@ -113,7 +113,7 @@ public abstract class IsoInterval
                     "Infinite boundaries must not be equal.");
             } else {
                 throw new IllegalArgumentException(
-                    "Open start after open end: " + start + "/" + end);
+                    "Open start equal to open end: " + start + "/" + end);
             }
         }
 
@@ -252,10 +252,24 @@ public abstract class IsoInterval
     @Override
     public boolean isEmpty() {
 
-        return (
-            this.isFinite()
-            && this.start.getTemporal().isSimultaneous(this.end.getTemporal())
-            && (this.start.getEdge() != this.end.getEdge())); // half-open
+        if (!this.isFinite()) {
+            return false;
+        }
+
+        T s = this.start.getTemporal();
+        T e = this.end.getTemporal();
+
+        if (this.start.isOpen()) {
+            if (this.end.isClosed()) {
+                return s.isSimultaneous(e);
+            }
+            s = this.getTimeLine().stepForward(s);
+            if (s == null) {
+                return false;
+            }
+        }
+
+        return (this.end.isOpen() && s.isSimultaneous(e));
 
     }
 
@@ -312,7 +326,7 @@ public abstract class IsoInterval
         }
 
         T endA = this.end.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startB = other.getClosedFiniteStart();
 
         if (this.end.isOpen()) {
             return !endA.isAfter(startB);
@@ -331,7 +345,7 @@ public abstract class IsoInterval
             return false;
         }
 
-        return this.start.getTemporal().isAfter(temporal);
+        return this.getClosedFiniteStart().isAfter(temporal);
 
     }
 
@@ -430,8 +444,8 @@ public abstract class IsoInterval
             return false;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
 
         if ((startA != null) && startA.isAfter(startB)) {
             return false;
@@ -492,7 +506,7 @@ public abstract class IsoInterval
      * <p>Changes this interval to an empty interval with the same
      * start anchor. </p>
      *
-     * @return  new empty interval with same start
+     * @return  new empty interval with same start (anchor always inclusive)
      * @throws  IllegalStateException if the start is infinite
      * @since   2.0
      */
@@ -500,7 +514,7 @@ public abstract class IsoInterval
      * <p>Wandelt dieses Intervall in ein leeres Intervall mit dem gleichen
      * Startanker um. </p>
      *
-     * @return  new empty interval with same start
+     * @return  new empty interval with same start (anchor always inclusive)
      * @throws  IllegalStateException if the start is infinite
      * @since   2.0
      */
@@ -511,9 +525,10 @@ public abstract class IsoInterval
                 "An interval with infinite past cannot be collapsed.");
         }
 
-        Boundary<T> b =
-            Boundary.of(IntervalEdge.OPEN, this.start.getTemporal());
-        return this.getFactory().between(this.start, b);
+        T t = this.getClosedFiniteStart();
+        Boundary<T> s = Boundary.ofClosed(t);
+        Boundary<T> e = Boundary.ofOpen(t);
+        return this.getFactory().between(s, e);
 
     }
 
@@ -751,8 +766,8 @@ public abstract class IsoInterval
             return true;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
 
         if (startA == null) {
             if (startB != null) {
@@ -845,7 +860,7 @@ public abstract class IsoInterval
             }
         }
 
-        return endA.isBefore(other.getStart().getTemporal());
+        return endA.isBefore(other.getClosedFiniteStart());
 
     }
 
@@ -927,8 +942,8 @@ public abstract class IsoInterval
             }
         }
 
-        if (endA.isSimultaneous(other.getStart().getTemporal())) {
-            T startA = this.start.getTemporal();
+        if (endA.isSimultaneous(other.getClosedFiniteStart())) {
+            T startA = this.getClosedFiniteStart();
             T endB = other.getEnd().getTemporal();
 
             if ((startA == null) || (endB == null)) {
@@ -1015,8 +1030,8 @@ public abstract class IsoInterval
             return false;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
 
         if ((startA != null) && !startA.isBefore(startB)) {
             return false;
@@ -1130,8 +1145,8 @@ public abstract class IsoInterval
             return false;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
         T endA = this.end.getTemporal();
         T endB = other.getEnd().getTemporal();
 
@@ -1257,8 +1272,8 @@ public abstract class IsoInterval
             return false;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
 
         if (startB == null) {
             if (startA != null) {
@@ -1396,8 +1411,8 @@ public abstract class IsoInterval
             return false;
         }
 
-        T startA = this.start.getTemporal();
-        T startB = other.getStart().getTemporal();
+        T startA = this.getClosedFiniteStart();
+        T startB = other.getClosedFiniteStart();
 
         if ((startA != null) && !startA.isBefore(startB)) {
             return false;
@@ -1512,6 +1527,28 @@ public abstract class IsoInterval
         if (temporal == null) {
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
+        } else if (this.start.isOpen()) {
+            return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    /**
+     * <p>Liefert die Startbasis f&uuml;r Vergleiche. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
+     */
+    T getClosedFiniteStart() {
+
+        T temporal = this.start.getTemporal();
+
+        if (
+            (temporal != null)
+            && this.start.isOpen()
+        ) {
+            return this.getTimeLine().stepForward(temporal);
         } else {
             return temporal;
         }
@@ -1533,6 +1570,27 @@ public abstract class IsoInterval
             throw new UnsupportedOperationException(
                 "An infinite interval has no finite duration.");
         } else if (this.end.isClosed()) {
+            return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    /**
+     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
+     *          {@code null} wenn angewandt auf das geschlossene Maximum
+     */
+    T getOpenFiniteEnd() {
+
+        T temporal = this.end.getTemporal();
+
+        if (
+            (temporal != null)
+            && this.end.isClosed()
+        ) {
             return this.getTimeLine().stepForward(temporal);
         } else {
             return temporal;

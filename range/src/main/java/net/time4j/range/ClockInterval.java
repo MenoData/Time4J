@@ -200,7 +200,7 @@ public final class ClockInterval
      */
     public Duration<ClockUnit> getDuration() {
 
-        PlainTime t1 = this.getStart().getTemporal();
+        PlainTime t1 = this.getTemporalOfClosedStart();
         PlainTime t2 = this.getEnd().getTemporal();
 
         if (this.getEnd().isClosed()) {

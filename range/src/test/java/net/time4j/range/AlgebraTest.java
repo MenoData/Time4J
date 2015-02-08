@@ -1,9 +1,12 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
+import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 
+import java.text.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -73,6 +76,42 @@ public class AlgebraTest {
 
         assertThat(a.meets(b), is(false));
         assertThat(b.metBy(a), is(false));
+    }
+
+    @Test
+    public void meetsOpenInterval() throws ParseException {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 1, 1);
+
+        DateInterval a =
+            DateInterval.between(startA, endA);
+        DateInterval b =
+            DateInterval.parse(
+                "(2014-01-01/2014-05-31]",
+                Iso8601Format.EXTENDED_CALENDAR_DATE);
+
+        assertThat(a.meets(b), is(true));
+        assertThat(b.metBy(a), is(true));
+    }
+
+    @Test
+    public void precedesOpenInterval() throws ParseException {
+        PlainDate startA = PlainDate.of(2012, 2, 29);
+        PlainDate endA = PlainDate.of(2014, 1, 1);
+
+        DateInterval a =
+            DateInterval.between(startA, endA);
+        DateInterval b =
+            DateInterval.parse(
+                "(2014-01-01/2014-05-31]",
+                Iso8601Format.EXTENDED_CALENDAR_DATE);
+
+        assertThat(a.precedes(b), is(false));
+        assertThat(b.precededBy(a), is(false));
+
+        a = a.move(-1, CalendarUnit.DAYS);
+        assertThat(a.precedes(b), is(true));
+        assertThat(b.precededBy(a), is(true));
     }
 
     @Test

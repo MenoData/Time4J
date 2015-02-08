@@ -35,6 +35,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -251,16 +252,16 @@ final class SPX
                 this.obj = readMomentInterval(in);
                 break;
             case DATE_WINDOW_ID:
-                this.obj = readDateWindow2(in);
+                this.obj = readDateWindows(in);
                 break;
             case CLOCK_WINDOW_ID:
-                this.obj = readClockWindow2(in);
+                this.obj = readClockWindows(in);
                 break;
             case TIMESTAMP_WINDOW_ID:
-                this.obj = readTimestampWindow2(in);
+                this.obj = readTimestampWindows(in);
                 break;
             case MOMENT_WINDOW_ID:
-                this.obj = readMomentWindow2(in);
+                this.obj = readMomentWindows(in);
                 break;
             case BOUNDARY_TYPE:
                 this.obj = readBoundary(in, header);
@@ -280,16 +281,16 @@ final class SPX
                 this.obj = readMomentInterval(in, true);
                 break;
             case OLD_DATE_WINDOW_ID:
-                this.obj = readDateWindow(in);
+                this.obj = readOldDateWindows(in);
                 break;
             case OLD_CLOCK_WINDOW_ID:
-                this.obj = readClockWindow(in);
+                this.obj = readOldClockWindows(in);
                 break;
             case OLD_TIMESTAMP_WINDOW_ID:
-                this.obj = readTimestampWindow(in);
+                this.obj = readOldTimestampWindows(in);
                 break;
             case OLD_MOMENT_WINDOW_ID:
-                this.obj = readMomentWindow(in);
+                this.obj = readOldMomentWindows(in);
                 break;
 
             default:
@@ -410,7 +411,7 @@ final class SPX
 
     }
 
-    private static IntervalCollection<PlainDate> readDateWindow2(
+    private static IntervalCollection<PlainDate> readDateWindows(
         ObjectInput in
     ) throws IOException, ClassNotFoundException {
 
@@ -427,11 +428,12 @@ final class SPX
             intervals.add(readDateInterval(in));
         }
 
+        Collections.sort(intervals, DateInterval.comparator());
         return DateWindows.EMPTY.plus(intervals);
 
     }
 
-    private static Object readDateWindow(ObjectInput in)
+    private static Object readOldDateWindows(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainDate>> intervals = cast(in.readObject());
@@ -439,7 +441,7 @@ final class SPX
 
     }
 
-    private static IntervalCollection<PlainTime> readClockWindow2(
+    private static IntervalCollection<PlainTime> readClockWindows(
         ObjectInput in
     ) throws IOException, ClassNotFoundException {
 
@@ -456,11 +458,12 @@ final class SPX
             intervals.add(readClockInterval(in));
         }
 
+        Collections.sort(intervals, ClockInterval.comparator());
         return ClockWindows.EMPTY.plus(intervals);
 
     }
 
-    private static Object readClockWindow(ObjectInput in)
+    private static Object readOldClockWindows(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainTime>> intervals = cast(in.readObject());
@@ -468,7 +471,7 @@ final class SPX
 
     }
 
-    private static IntervalCollection<PlainTimestamp> readTimestampWindow2(
+    private static IntervalCollection<PlainTimestamp> readTimestampWindows(
         ObjectInput in
     ) throws IOException, ClassNotFoundException {
 
@@ -485,11 +488,12 @@ final class SPX
             intervals.add(readTimestampInterval(in));
         }
 
+        Collections.sort(intervals, TimestampInterval.comparator());
         return TimestampWindows.EMPTY.plus(intervals);
 
     }
 
-    private static Object readTimestampWindow(ObjectInput in)
+    private static Object readOldTimestampWindows(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<PlainTimestamp>> intervals = cast(in.readObject());
@@ -497,7 +501,7 @@ final class SPX
 
     }
 
-    private static IntervalCollection<Moment> readMomentWindow2(ObjectInput in)
+    private static IntervalCollection<Moment> readMomentWindows(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         int size = in.readInt();
@@ -513,11 +517,12 @@ final class SPX
             intervals.add(readMomentInterval(in));
         }
 
+        Collections.sort(intervals, MomentInterval.comparator());
         return MomentWindows.EMPTY.plus(intervals);
 
     }
 
-    private static Object readMomentWindow(ObjectInput in)
+    private static Object readOldMomentWindows(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         List<ChronoInterval<Moment>> intervals = cast(in.readObject());

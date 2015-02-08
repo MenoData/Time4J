@@ -377,6 +377,9 @@ final class IntervalParser
                 } else {
                     rightVisible = true;
                     right = ((c == ']') ? CLOSED : OPEN);
+                    if (t2 != null) {
+                        upper = Boundary.of(right, t2);
+                    }
                     pos++;
                 }
             } else if (this.policy == BracketPolicy.SHOW_ALWAYS) {

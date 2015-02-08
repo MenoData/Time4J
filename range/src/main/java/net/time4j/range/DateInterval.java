@@ -285,6 +285,9 @@ public final class DateInterval
             long days = CalendarUnit.DAYS.between(
                 this.getStart().getTemporal(),
                 this.getEnd().getTemporal());
+            if (this.getStart().isOpen()) {
+                days--;
+            }
             if (this.getEnd().isClosed()) {
                 days++;
             }

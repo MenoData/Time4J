@@ -62,18 +62,39 @@ final class IntervalComparator<T extends Temporal<? super T>>
         ChronoInterval<T> o2
     ) {
 
-        if (o1.getStart().isInfinite()) {
-            if (o2.getStart().isInfinite()) {
+        Boundary<T> bs1 = o1.getStart();
+        Boundary<T> bs2 = o2.getStart();
+
+        if (bs1.isInfinite()) {
+            if (bs2.isInfinite()) {
                 return this.compareEnd(o1, o2);
             } else {
                 return -1;
             }
-        } else if (o2.getStart().isInfinite()) {
+        } else if (bs2.isInfinite()) {
             return 1;
         }
 
-        T start1 = o1.getStart().getTemporal();
-        T start2 = o2.getStart().getTemporal();
+        T start1 = bs1.getTemporal();
+        T start2 = bs2.getTemporal();
+
+        if (bs1.isOpen()) {
+            start1 = this.axis.stepForward(start1);
+        }
+        if (bs2.isOpen()) {
+            start2 = this.axis.stepForward(start2);
+        }
+
+        // open max condition (rare edge case)
+        if (start1 == null) {
+            if (start2 == null) {
+                return 0;
+            } else {
+                return 1;
+            }
+        } else if (start2 == null) {
+            return -1;
+        }
 
         if (start1.isBefore(start2)) {
             return -1;
@@ -90,24 +111,27 @@ final class IntervalComparator<T extends Temporal<? super T>>
         ChronoInterval<T> o2
     ) {
 
-        if (o1.getEnd().isInfinite()) {
-            if (o2.getEnd().isInfinite()) {
+        Boundary<T> be1 = o1.getEnd();
+        Boundary<T> be2 = o2.getEnd();
+
+        if (be1.isInfinite()) {
+            if (be2.isInfinite()) {
                 return 0;
             } else {
                 return 1;
             }
-        } else if (o2.getEnd().isInfinite()) {
+        } else if (be2.isInfinite()) {
             return -1;
         }
 
-        T end1 = o1.getEnd().getTemporal();
-        T end2 = o2.getEnd().getTemporal();
+        T end1 = be1.getTemporal();
+        T end2 = be2.getTemporal();
 
         if (this.calendrical) {
-            if (o1.getEnd().isOpen()) {
+            if (be1.isOpen()) {
                 end1 = this.axis.stepBackwards(end1);
             }
-            if (o2.getEnd().isOpen()) {
+            if (be2.isOpen()) {
                 end2 = this.axis.stepBackwards(end2);
             }
 
@@ -122,10 +146,10 @@ final class IntervalComparator<T extends Temporal<? super T>>
                 return 1;
             }
         } else {
-            if (o1.getEnd().isClosed()) {
+            if (be1.isClosed()) {
                 end1 = this.axis.stepForward(end1);
             }
-            if (o2.getEnd().isClosed()) {
+            if (be2.isClosed()) {
                 end2 = this.axis.stepForward(end2);
             }
 
