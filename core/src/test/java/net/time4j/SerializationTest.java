@@ -102,8 +102,8 @@ public class SerializationTest {
             sers[i] = PlainTimestamp.of(2012 + i, 12, 30, 13, i % 60);
         }
         Info info = analyze("[PlainTimestamp]", sers);
-        assertThat(info.first, is(62));
-        assertThat(info.next, is(34));
+        assertThat(info.first, is(42)); // old = 62
+        assertThat(info.next, is(14)); // old = 34
     }
 
     @Test

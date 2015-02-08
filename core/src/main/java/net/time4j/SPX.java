@@ -71,13 +71,16 @@ final class SPX
     static final int MOMENT_TYPE = 4;
 
     /** Serialisierungstyp von {@code PlainTimestamp}. */
-    static final int TIMESTAMP_TYPE = 5;
+    static final int OLD_TIMESTAMP_TYPE = 5;
 
     /** Serialisierungstyp von {@code Duration}. */
     static final int DURATION_TYPE = 6;
 
     /** Serialisierungstyp von {@code MachineTime}. */
     static final int MACHINE_TIME_TYPE = 7;
+
+    /** Serialisierungstyp von {@code PlainTimestamp}. */
+    static final int NEW_TIMESTAMP_TYPE = 8;
 
     private static final long serialVersionUID = 1L;
 
@@ -157,14 +160,17 @@ final class SPX
             case MOMENT_TYPE:
                 this.writeMoment(out);
                 break;
-            case TIMESTAMP_TYPE:
-                this.writeTimestamp(out);
-                break;
+//            case OLD_TIMESTAMP_TYPE:
+//                this.writeTimestampOld(out);
+//                break;
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
             case MACHINE_TIME_TYPE:
                 this.writeMachineTime(out);
+                break;
+            case NEW_TIMESTAMP_TYPE:
+                this.writeTimestampNew(out);
                 break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
@@ -205,14 +211,17 @@ final class SPX
             case MOMENT_TYPE:
                 this.obj = this.readMoment(in, header);
                 break;
-            case TIMESTAMP_TYPE:
-                this.obj = this.readTimestamp(in);
+            case OLD_TIMESTAMP_TYPE:
+                this.obj = this.readTimestampOld(in);
                 break;
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
                 break;
             case MACHINE_TIME_TYPE:
                 this.obj = this.readMachineTime(in, header);
+                break;
+            case NEW_TIMESTAMP_TYPE:
+                this.obj = this.readTimestampNew(in, header);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -230,6 +239,16 @@ final class SPX
         throws IOException {
 
         PlainDate date = (PlainDate) this.obj;
+        writeDate(date, DATE_TYPE, out);
+
+    }
+
+    private static void writeDate(
+        PlainDate date,
+        int type,
+        ObjectOutput out
+    ) throws IOException {
+
         int year = date.getYear();
 
         // Bit 0-3 => type (4)
@@ -249,7 +268,7 @@ final class SPX
             range = 3;
         }
 
-        int header = DATE_TYPE;
+        int header = type;
         header <<= 4;
         header |= date.getMonth();
         out.writeByte(header);
@@ -269,7 +288,7 @@ final class SPX
 
     }
 
-    private Object readDate(
+    private PlainDate readDate(
         ObjectInput in,
         byte header
     ) throws IOException {
@@ -303,6 +322,14 @@ final class SPX
 
         PlainTime time = (PlainTime) this.obj;
         out.writeByte(TIME_TYPE << 4);
+        writeTime(time, out);
+
+    }
+
+    private static void writeTime(
+        PlainTime time,
+        ObjectOutput out
+    ) throws IOException {
 
         if (time.getNanosecond() == 0) {
             if (time.getSecond() == 0) {
@@ -326,7 +353,7 @@ final class SPX
 
     }
 
-    private Object readTime(ObjectInput in)
+    private PlainTime readTime(ObjectInput in)
         throws IOException {
 
         int minute = 0, second = 0, nano = 0;
@@ -435,17 +462,17 @@ final class SPX
 
     }
 
-    private void writeTimestamp(ObjectOutput out)
-        throws IOException {
+//    private void writeTimestampOld(ObjectOutput out)
+//        throws IOException {
+//
+//        PlainTimestamp ts = (PlainTimestamp) this.obj;
+//        out.writeByte(OLD_TIMESTAMP_TYPE << 4);
+//        out.writeObject(ts.getCalendarDate());
+//        out.writeObject(ts.getWallTime());
+//
+//    }
 
-        PlainTimestamp ts = (PlainTimestamp) this.obj;
-        out.writeByte(TIMESTAMP_TYPE << 4);
-        out.writeObject(ts.getCalendarDate());
-        out.writeObject(ts.getWallTime());
-
-    }
-
-    private Object readTimestamp(ObjectInput in)
+    private Object readTimestampOld(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         Object date = in.readObject();
@@ -462,6 +489,26 @@ final class SPX
         } else {
             throw new InvalidObjectException("Missing date or time object.");
         }
+
+    }
+
+    private void writeTimestampNew(ObjectOutput out)
+        throws IOException {
+
+        PlainTimestamp ts = (PlainTimestamp) this.obj;
+        writeDate(ts.getCalendarDate(), NEW_TIMESTAMP_TYPE, out);
+        writeTime(ts.getWallTime(), out);
+
+    }
+
+    private Object readTimestampNew(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
+
+        PlainDate date = readDate(in, header);
+        PlainTime time = readTime(in);
+        return PlainTimestamp.of(date, time);
 
     }
 

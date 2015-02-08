@@ -1187,20 +1187,64 @@ public final class PlainTimestamp
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
-     *              four most significant bits the type id {@code 5}. Then
+     *              four most significant bits the type id {@code 8}. Then
      *              the data bytes for date and time component follow.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *      out.writeByte(5 << 4);
-     *      out.writeObject(timestamp.getCalendarDate());
-     *      out.writeObject(timestamp.getWallTime());
+     *  int range;
+     *
+     *  if (year >= 1850 && year <= 2100) {
+     *      range = 1;
+     *  } else if (Math.abs(year) < 10000) {
+     *      range = 2;
+     *  } else {
+     *      range = 3;
+     *  }
+     *
+     *  int header = 8; // type-id
+     *  header <<= 4;
+     *  header |= month;
+     *  out.writeByte(header);
+     *
+     *  int header2 = range;
+     *  header2 <<= 5;
+     *  header2 |= dayOfMonth;
+     *  out.writeByte(header2);
+     *
+     *  if (range == 1) {
+     *      out.writeByte(year - 1850 - 128);
+     *  } else if (range == 2) {
+     *      out.writeShort(year);
+     *  } else {
+     *      out.writeInt(year);
+     *  }
+     *
+     *  if (time.nano == 0) {
+     *      if (time.second == 0) {
+     *          if (time.minute == 0) {
+     *              out.writeByte(~time.hour);
+     *          } else {
+     *              out.writeByte(time.hour);
+     *              out.writeByte(~time.minute);
+     *          }
+     *      } else {
+     *          out.writeByte(time.hour);
+     *          out.writeByte(time.minute);
+     *          out.writeByte(~time.second);
+     *      }
+     *  } else {
+     *      out.writeByte(time.hour);
+     *      out.writeByte(time.minute);
+     *      out.writeByte(time.second);
+     *      out.writeInt(time.nano);
+     *  }
      * </pre>
      */
     private Object writeReplace() throws ObjectStreamException {
 
-        return new SPX(this, SPX.TIMESTAMP_TYPE);
+        return new SPX(this, SPX.NEW_TIMESTAMP_TYPE);
 
     }
 
