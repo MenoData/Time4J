@@ -174,6 +174,7 @@ public abstract class Timezone
     private static final Map<String, Set<TZID>> TERRITORIES;
     private static final ZoneProvider PLATFORM_PROVIDER;
     private static final ZoneProvider DEFAULT_PROVIDER;
+    private static final NameProvider NAME_PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
@@ -290,6 +291,15 @@ public abstract class Timezone
             PROVIDERS.put(NAME_TZDB, zp);
             DEFAULT_PROVIDER = zp;
         }
+
+        NameProvider np = new PlatformNameProvider();
+        ServiceLoader<NameProvider> nameProviders =
+            ServiceLoader.load(NameProvider.class, cl);
+        for (NameProvider provider : nameProviders) {
+            np = provider;
+            break;
+        }
+        NAME_PROVIDER = np;
 
         Timezone systemTZ = null;
 
@@ -864,24 +874,9 @@ public abstract class Timezone
         Locale locale
     ) {
 
-        if (locale == null) {
-            throw new NullPointerException("Missing locale.");
-        }
-
-        String id = this.getID().canonical();
-        java.util.TimeZone tz = PlatformTimezone.findZone(id);
-
-        if (tz.getID().equals(id)) {
-            return tz.getDisplayName(
-                style.isDaylightSaving(),
-                style.isAbbreviation()
-                    ? java.util.TimeZone.SHORT
-                    : java.util.TimeZone.LONG,
-                locale
-            );
-        } else {
-            return id;
-        }
+        String tzid = this.getID().canonical();
+        String name = NAME_PROVIDER.getDisplayName(tzid, style, locale);
+        return ((name == null) ? tzid : name);
 
     }
 
@@ -1411,6 +1406,40 @@ public abstract class Timezone
             );
 
             this.availables = Collections.unmodifiableList(list);
+
+        }
+
+    }
+
+    private static class PlatformNameProvider
+        implements NameProvider {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getDisplayName(
+            String tzid,
+            NameStyle style,
+            Locale locale
+        ) {
+
+            if (locale == null) {
+                throw new NullPointerException("Missing locale.");
+            }
+
+            java.util.TimeZone tz = PlatformTimezone.findZone(tzid);
+
+            if (tz.getID().equals(tzid)) {
+                return tz.getDisplayName(
+                    style.isDaylightSaving(),
+                    style.isAbbreviation()
+                        ? java.util.TimeZone.SHORT
+                        : java.util.TimeZone.LONG,
+                    locale
+                );
+            }
+
+            return null;
 
         }
 
