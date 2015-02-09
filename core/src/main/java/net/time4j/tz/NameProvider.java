@@ -30,7 +30,7 @@ import java.util.Locale;
  *
  * <p>The fact that this interface is used per {@code java.util.ServiceLoader}
  * requires a concrete implementation to offer a public no-arg
- * constructor. Time4J can register only one {@code NameProvider}. </p>
+ * constructor. Time4J can register several {@code NameProvider}s. </p>
  *
  * @author  Meno Hochschild
  * @since   2.2
@@ -43,7 +43,7 @@ import java.util.Locale;
  * <p>Die Tatsache, da&szlig; dieses Interface mittels eines
  * {@code java.util.ServiceLoader}-Mechanismus benutzt wird, erfordert
  * von jedweder konkreten Implementierung einen &ouml;ffentlichen
- * parameterlosen Konstruktor. Time4J kann nur einen {@code NameProvider}
+ * parameterlosen Konstruktor. Time4J kann mehrere {@code NameProvider}
  * registrieren. </p>
  *
  * @author  Meno Hochschild

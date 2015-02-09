@@ -174,7 +174,7 @@ public abstract class Timezone
     private static final Map<String, Set<TZID>> TERRITORIES;
     private static final ZoneProvider PLATFORM_PROVIDER;
     private static final ZoneProvider DEFAULT_PROVIDER;
-    private static final NameProvider NAME_PROVIDER;
+    private static final List<NameProvider> NAME_PROVIDERS;
     private static final ConcurrentMap<String, NamedReference> CACHE;
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
@@ -292,14 +292,14 @@ public abstract class Timezone
             DEFAULT_PROVIDER = zp;
         }
 
-        NameProvider np = new PlatformNameProvider();
+        List<NameProvider> tmp = new ArrayList<NameProvider>();
         ServiceLoader<NameProvider> nameProviders =
             ServiceLoader.load(NameProvider.class, cl);
         for (NameProvider provider : nameProviders) {
-            np = provider;
-            break;
+            tmp.add(provider);
         }
-        NAME_PROVIDER = np;
+        tmp.add(new PlatformNameProvider());
+        NAME_PROVIDERS = Collections.unmodifiableList(tmp);
 
         Timezone systemTZ = null;
 
@@ -875,8 +875,15 @@ public abstract class Timezone
     ) {
 
         String tzid = this.getID().canonical();
-        String name = NAME_PROVIDER.getDisplayName(tzid, style, locale);
-        return ((name == null) ? tzid : name);
+
+        for (NameProvider np : NAME_PROVIDERS) {
+            String name = np.getDisplayName(tzid, style, locale);
+            if (name != null) {
+                return name;
+            }
+        }
+
+        return tzid;
 
     }
 
