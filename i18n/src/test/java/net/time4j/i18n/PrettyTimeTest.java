@@ -127,6 +127,27 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print0DaysLatvian() {
+        assertThat(
+            PrettyTime.of(new Locale("lv")).print(0, DAYS, TextWidth.WIDE),
+            is("0 dienas"));
+    }
+
+    @Test
+    public void print1DayLatvian() {
+        assertThat(
+            PrettyTime.of(new Locale("lv")).print(1, DAYS, TextWidth.WIDE),
+            is("1 diena"));
+    }
+
+    @Test
+    public void print67DaysLatvian() {
+        assertThat(
+            PrettyTime.of(new Locale("lv")).print(67, DAYS, TextWidth.WIDE),
+            is("67 dienas"));
+    }
+
+    @Test
     public void print3WeeksDanish() {
         assertThat(
             PrettyTime.of(new Locale("da")).print(3, WEEKS, TextWidth.WIDE),
