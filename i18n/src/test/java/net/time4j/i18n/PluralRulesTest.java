@@ -1,6 +1,10 @@
-package net.time4j.format;
+package net.time4j.i18n;
 
 import java.util.Locale;
+
+import net.time4j.format.NumberType;
+import net.time4j.format.PluralCategory;
+import net.time4j.format.PluralRules;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

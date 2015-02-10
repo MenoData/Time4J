@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EnumDisplayTest.class,
         LocalizedGMTOffsetTest.class,
         NumberSymbolTest.class,
+        PluralRulesTest.class,
         PrettyTimeTest.class,
         RootLocaleTest.class,
         IsoSanityTest.class
