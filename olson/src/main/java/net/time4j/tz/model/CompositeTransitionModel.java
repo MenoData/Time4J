@@ -167,6 +167,14 @@ final class CompositeTransitionModel
     }
 
     @Override
+    public void dump(Appendable buffer) throws IOException {
+
+        this.arrayModel.dump(this.size, buffer);
+        this.ruleModel.dump(buffer);
+
+    }
+
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {

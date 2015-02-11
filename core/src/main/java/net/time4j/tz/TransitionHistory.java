@@ -25,6 +25,7 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -271,5 +272,20 @@ public interface TransitionHistory {
      * @return  {@code true} if there are no transitions else {@code false}
      */
     boolean isEmpty();
+
+    /**
+     * <p>Creates a dump of this history and writes it to the given buffer. </p>
+     *
+     * @param   buffer          buffer to write the dump to
+     * @throws  IOException     in any case of I/O-errors
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Textzusammenfassung dieser Instanz und schreibt sie
+     * in den angegebenen Puffer. </p>
+     *
+     * @param   buffer          buffer to write the dump to
+     * @throws  IOException     in any case of I/O-errors
+     */
+    void dump(Appendable buffer) throws IOException;
 
 }

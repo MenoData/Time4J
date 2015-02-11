@@ -180,6 +180,13 @@ final class ArrayTransitionModel
     }
 
     @Override
+    public void dump(Appendable buffer) throws IOException {
+
+        this.dump(this.transitions.length, buffer);
+
+    }
+
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -310,6 +317,19 @@ final class ArrayTransitionModel
         }
 
         return TransitionModel.toList(test.getPreviousOffset());
+
+    }
+
+    // Called by CompositeTransitionModel
+    void dump(
+        int size,
+        Appendable buffer
+    ) throws IOException {
+
+        for (int i = 0; i < size; i++) {
+            ZonalTransition transition = this.transitions[i];
+            TransitionModel.dump(transition, buffer);
+        }
 
     }
 

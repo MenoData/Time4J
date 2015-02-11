@@ -326,6 +326,17 @@ final class RuleBasedTransitionModel
 
     }
 
+    @Override
+    public void dump(Appendable buffer) throws IOException {
+
+        buffer.append("*** Last rules:").append(NEW_LINE);
+
+        for (DaylightSavingRule rule : this.rules) {
+            buffer.append(">>> ").append(rule.toString()).append(NEW_LINE);
+        }
+
+    }
+
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *

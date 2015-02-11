@@ -3,20 +3,14 @@ package net.time4j.tz.model;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.ZonalTransition;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -32,24 +26,28 @@ public class SerializationTest {
     public void roundTripOfRuleBasedTransitionModel()
         throws IOException, ClassNotFoundException {
 
-        RuleBasedTransitionModel model = createModelOfEuropeanUnion();
+        RuleBasedTransitionModel model =
+            CustomZoneTest.createModelOfEuropeanUnion();
         assertThat(model, is(roundtrip(model)));
+        Timezone.of("rule-model", model).dump(System.out);
     }
 
     @Test
     public void roundTripOfArrayTransitionModel()
         throws IOException, ClassNotFoundException {
 
-        ArrayTransitionModel model = createArrayModel();
+        ArrayTransitionModel model = CustomZoneTest.createArrayModel();
         assertThat(model, is(roundtrip(model)));
+        Timezone.of("array-model", model).dump(System.out);
     }
 
     @Test
     public void roundTripOfCompositeTransitionModel()
         throws IOException, ClassNotFoundException {
 
-        CompositeTransitionModel model = createCompositeModel();
+        CompositeTransitionModel model = CustomZoneTest.createCompositeModel();
         assertThat(model, is(roundtrip(model)));
+        Timezone.of("composite-model", model).dump(System.out);
     }
 
     @Test
@@ -270,7 +268,10 @@ public class SerializationTest {
     @Test
     public void serializeHistorizedTimezone()
         throws IOException, ClassNotFoundException {
-        Object tz = Timezone.of("RulesOfEU", createModelOfEuropeanUnion());
+        Object tz =
+            Timezone.of(
+                "RulesOfEU",
+                CustomZoneTest.createModelOfEuropeanUnion());
         assertThat(roundtrip(tz), is(tz));
     }
 
@@ -287,89 +288,6 @@ public class SerializationTest {
         Object ser = ois.readObject();
         ois.close();
         return ser;
-    }
-
-    private static RuleBasedTransitionModel createModelOfEuropeanUnion() {
-        DaylightSavingRule spring =
-            GregorianTimezoneRule.ofLastWeekday(
-                Month.MARCH,
-                Weekday.SUNDAY,
-                PlainTime.of(1),
-                OffsetIndicator.UTC_TIME,
-                3600);
-        DaylightSavingRule autumn =
-            GregorianTimezoneRule.ofLastWeekday(
-                Month.OCTOBER,
-                Weekday.SUNDAY,
-                PlainTime.of(1),
-                OffsetIndicator.UTC_TIME,
-                0);
-
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
-        rules.add(autumn);
-        rules.add(spring);
-
-        return new RuleBasedTransitionModel(
-            ZonalOffset.ofTotalSeconds(3600),
-            rules);
-    }
-
-    private static ArrayTransitionModel createArrayModel() {
-        ZonalTransition first =
-            new ZonalTransition(7L, 1800, 7200, 3600);
-        ZonalTransition second =
-            new ZonalTransition(365 * 86400L, 7200, 3600, 3600);
-        ZonalTransition third =
-            new ZonalTransition(2 * 365 * 86400L, 3600, -14 * 3600, 0);
-        ZonalTransition fourth =
-            new ZonalTransition(
-                SystemClock.INSTANCE.currentTime().getPosixTime()
-                    + 2 *365 * 86400L,
-                -14 * 3600,
-                -14 * 3600 + 1800,
-                3600);
-        return new ArrayTransitionModel(
-            Arrays.asList(fourth, first, third, second));
-    }
-
-    private static CompositeTransitionModel createCompositeModel() {
-        DaylightSavingRule spring =
-            GregorianTimezoneRule.ofLastWeekday(
-                Month.MARCH,
-                Weekday.SUNDAY,
-                PlainTime.of(1),
-                OffsetIndicator.UTC_TIME,
-                3600);
-        DaylightSavingRule autumn =
-            GregorianTimezoneRule.ofLastWeekday(
-                Month.OCTOBER,
-                Weekday.SUNDAY,
-                PlainTime.of(1),
-                OffsetIndicator.UTC_TIME,
-                0);
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
-        rules.add(autumn);
-        rules.add(spring);
-
-        ZonalTransition first =
-            new ZonalTransition(0L, 3600, 7200, 3600);
-        ZonalTransition second =
-            new ZonalTransition(365 * 86400L, 7200, 3600, 0);
-        ZonalTransition third =
-            new ZonalTransition(63072000L, 3600, 7200, 3600);
-        ZonalTransition fourth =
-            new ZonalTransition(
-                SystemClock.INSTANCE.currentTime().getPosixTime() + 63072000L,
-                7200,
-                3600,
-                0);
-        return new CompositeTransitionModel(
-            4,
-            Arrays.asList(fourth, first, third, second),
-            rules,
-            SystemClock.INSTANCE,
-            true,
-            true);
     }
 
 }

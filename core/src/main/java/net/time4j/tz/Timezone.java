@@ -25,6 +25,7 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -114,6 +115,8 @@ public abstract class Timezone
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final String NEW_LINE = System.getProperty("line.separator");
 
     /**
      * <p>This standard strategy which is also used by the JDK-class
@@ -260,7 +263,7 @@ public abstract class Timezone
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
         if (cl == null) {
-            cl = ZoneProvider.class.getClassLoader();
+            cl = Timezone.class.getClassLoader();
         }
 
         ServiceLoader<ZoneProvider> sl =
@@ -329,7 +332,7 @@ public abstract class Timezone
         }
 
         // Cache für Available-IDs
-        zonalKeys = new ZonalKeys(DEFAULT_PROVIDER);
+        zonalKeys = new ZonalKeys();
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -929,6 +932,51 @@ public abstract class Timezone
 
     }
 
+    /**
+     * <p>Creates a dump of this timezone and writes it to the given
+     * buffer. </p>
+     *
+     * @param   buffer          buffer to write the dump to
+     * @throws  IOException     in any case of I/O-errors
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Textzusammenfassung dieser Instanz und schreibt sie
+     * in den angegebenen Puffer. </p>
+     *
+     * @param   buffer          buffer to write the dump to
+     * @throws  IOException     in any case of I/O-errors
+     * @since   2.2
+     */
+    public void dump(Appendable buffer) throws IOException {
+
+        StringBuilder sb = new StringBuilder(4096);
+        sb.append("Start Of Dump =>").append(NEW_LINE);
+        sb.append("*** Timezone-ID:").append(NEW_LINE);
+        sb.append(">>> ").append(this.getID().canonical()).append(NEW_LINE);
+
+        if (this.isFixed()) {
+            sb.append("*** Fixed offset:").append(NEW_LINE).append(">>> ");
+            sb.append(this.getHistory().getInitialOffset()).append(NEW_LINE);
+        } else {
+            sb.append("*** Strategy:").append(NEW_LINE);
+            sb.append(">>> ").append(this.getStrategy()).append(NEW_LINE);
+
+            TransitionHistory history = this.getHistory();
+            sb.append("*** History:").append(NEW_LINE);
+
+            if (history == null) {
+                sb.append(">>> Not public!").append(NEW_LINE);
+            } else {
+                history.dump(sb);
+            }
+        }
+
+        sb.append("<= End Of Dump").append(NEW_LINE);
+        buffer.append(sb.toString());
+
+    }
+
     private static Timezone getDefaultTZ() {
 
         String zoneID = java.util.TimeZone.getDefault().getID();
@@ -1023,7 +1071,7 @@ public abstract class Timezone
                     resolved = result;
                 }
             } else {
-                resolved = new NamedID(zoneKey);
+                resolved = new NamedID(zoneID);
             }
         }
 
@@ -1129,6 +1177,10 @@ public abstract class Timezone
         TZID resolved = PREDEFINED.get(zoneID);
 
         if (resolved == null) {
+            if (zoneID.startsWith("GMT")) {
+                zoneID = "UTC" + zoneID.substring(3);
+            }
+
             resolved = ZonalOffset.parse(zoneID, false);
 
             if (resolved == null) {
@@ -1217,7 +1269,7 @@ public abstract class Timezone
                 LAST_USED.clear();
             }
 
-            zonalKeys = new ZonalKeys(DEFAULT_PROVIDER);
+            zonalKeys = new ZonalKeys();
             CACHE.clear();
 
             if (ALLOW_SYSTEM_TZ_OVERRIDE) {
@@ -1382,20 +1434,21 @@ public abstract class Timezone
 
         //~ Konstruktoren -------------------------------------------------
 
-        ZonalKeys(ZoneProvider provider) {
+        ZonalKeys() {
             super();
 
-            Set<String> ids = provider.getAvailableIDs();
-            List<TZID> list = new ArrayList<TZID>();
+            List<TZID> list = new ArrayList<TZID>(1024);
             list.add(ZonalOffset.UTC);
 
-            for (String id : ids) {
-                TZID tzid = PREDEFINED.get(id);
+            for (Map.Entry<String, ZoneProvider> e : PROVIDERS.entrySet()) {
+                for (String id : e.getValue().getAvailableIDs()) {
+                    TZID tzid = PREDEFINED.get(id);
 
-                if (tzid == null) {
-                    list.add(new NamedID(id));
-                } else if (tzid != ZonalOffset.UTC) {
-                    list.add(tzid);
+                    if (tzid == null) {
+                        list.add(new NamedID(id));
+                    } else if (tzid != ZonalOffset.UTC) {
+                        list.add(tzid);
+                    }
                 }
             }
 
@@ -1407,7 +1460,18 @@ public abstract class Timezone
                         TZID o1,
                         TZID o2
                     ) {
-                        return o1.canonical().compareTo(o2.canonical());
+                        String c1 = o1.canonical();
+                        int i1 = c1.indexOf('~');
+                        String c2 = o2.canonical();
+                        int i2 = c2.indexOf('~');
+
+                        if (i1 >= 0) {
+                            return ((i2 == -1) ? 1 : c1.compareTo(c2));
+                        } else if (i2 >= 0) {
+                            return -1;
+                        } else {
+                            return c1.compareTo(c2);
+                        }
                     }
                 }
             );

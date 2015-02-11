@@ -36,6 +36,7 @@ import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +64,10 @@ import static net.time4j.tz.ZonalOffset.UTC;
  */
 public abstract class TransitionModel
     implements TransitionHistory, Serializable {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    static final String NEW_LINE = System.getProperty("line.separator");
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -280,6 +285,27 @@ public abstract class TransitionModel
         localSecs += localTime.getMinute() * 60;
         localSecs += localTime.getSecond();
         return localSecs;
+
+    }
+
+    static void dump(
+        ZonalTransition transition,
+        Appendable buffer
+    ) throws IOException {
+
+        Moment ut = Moment.of(transition.getPosixTime(), TimeScale.POSIX);
+        buffer.append(">>> Transition at: ").append(ut.toString());
+        buffer.append(" from ").append(format(transition.getPreviousOffset()));
+        buffer.append(" to ").append(format(transition.getTotalOffset()));
+        buffer.append(", DST=");
+        buffer.append(format(transition.getDaylightSavingOffset()));
+        buffer.append(NEW_LINE);
+
+    }
+
+    private static String format(int offset) {
+
+        return ZonalOffset.ofTotalSeconds(offset).toString();
 
     }
 
