@@ -344,7 +344,14 @@ final class TimezoneNameProcessor
             Timezone zone = Timezone.of(tzid);
 
             String tzName =
-                zone.getDisplayName(this.getStyle(daylightSaving), locale);
+                zone.getDisplayName(
+                    this.getStyle(daylightSaving),
+                    locale);
+
+            if (tzName.equals(tzid.canonical())) {
+                continue; // registrierte NameProvider haben nichts gefunden!
+            }
+
             zones = map.get(tzName);
 
             if (zones == null) {
