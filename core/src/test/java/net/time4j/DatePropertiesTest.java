@@ -4,7 +4,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 
 import java.math.BigDecimal;
-import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -45,55 +44,6 @@ public class DatePropertiesTest {
         assertThat(PlainDate.of(2000, 4, 7).toString(), is("2000-04-07"));
         assertThat(PlainDate.of(-2000, 10, 17).toString(), is("-2000-10-17"));
         assertThat(PlainDate.of(10000, 4, 7).toString(), is("+10000-04-07"));
-    }
-
-    @Test
-    public void isWeekendISO() {
-        assertThat(
-            PlainDate.of(2014, 4, 4).isWeekend(Locale.ROOT),
-            is(false));
-        assertThat(
-            PlainDate.of(2014, 4, 5).isWeekend(Locale.ROOT),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 6).isWeekend(Locale.ROOT),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 7).isWeekend(Locale.ROOT),
-            is(false));
-    }
-
-    @Test
-    public void isWeekendUS() {
-        assertThat(
-            PlainDate.of(2014, 4, 4).isWeekend(Locale.US),
-            is(false));
-        assertThat(
-            PlainDate.of(2014, 4, 5).isWeekend(Locale.US),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 6).isWeekend(Locale.US),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 7).isWeekend(Locale.US),
-            is(false));
-    }
-
-    @Test
-    public void isWeekendYemen() {
-        Locale yemen = new Locale("ar", "Ye"); // Thursday + Friday
-        assertThat(
-            PlainDate.of(2014, 4, 2).isWeekend(yemen),
-            is(false));
-        assertThat(
-            PlainDate.of(2014, 4, 3).isWeekend(yemen),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 4).isWeekend(yemen),
-            is(true));
-        assertThat(
-            PlainDate.of(2014, 4, 5).isWeekend(yemen),
-            is(false));
     }
 
     @Test

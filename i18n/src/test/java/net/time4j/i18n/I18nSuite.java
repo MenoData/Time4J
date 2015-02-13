@@ -12,12 +12,13 @@ import org.junit.runners.Suite.SuiteClasses;
         DatePatternTest.class,
         DateTimePatternTest.class,
         EnumDisplayTest.class,
+        IsoSanityTest.class,
         LocalizedGMTOffsetTest.class,
         NumberSymbolTest.class,
         PluralRulesTest.class,
         PrettyTimeTest.class,
         RootLocaleTest.class,
-        IsoSanityTest.class
+        WeekendTest.class
     }
 )
 public class I18nSuite {

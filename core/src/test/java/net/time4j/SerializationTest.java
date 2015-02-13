@@ -110,12 +110,14 @@ public class SerializationTest {
     public void roundtripOfWeekmodel()
         throws IOException, ClassNotFoundException {
 
-        assertThat(
+        int result =
             roundtrip(
                 Weekmodel.ISO,
                 Weekmodel.of(Locale.US),
-                Weekmodel.of(new Locale("", "YE"))),
-            is(40 + 11 + 12)); // erstes, zweites und drittes Datenpaket
+                Weekmodel.of(new Locale("", "YE")));
+        assertThat(
+            (result == 63 || result == 62), // depends on if i18n-module exists
+            is(true)); // erstes, zweites und drittes Datenpaket
     }
 
     @Test

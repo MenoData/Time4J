@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekmodel.java) is part of project Time4J.
  *
@@ -42,18 +42,13 @@ import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.WeekdataProvider;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -149,10 +144,6 @@ public final class Weekmodel
         ) {
             tmp = p;
             break;
-        }
-
-        if (tmp == null) {
-            tmp = new DefaultWeekdataProvider();
         }
 
         LOCALIZED_WEEKDATA = tmp;
@@ -342,12 +333,20 @@ public final class Weekmodel
     /**
      * <p>Gets a suitable weekmodel for the default locale of system. </p>
      *
+     * <p>Note: In order to get a weekend definition deviating from the
+     * standard Saturday + Sunday, the i18n-module must be present in
+     * classpath since v2.2. </p>
+     *
      * @return  week model in system locale
      * @see     Locale#getDefault()
      */
     /*[deutsch]
      * <p>Ermittelt ein geeignetes Wochenmodell f&uuml;r die aktuelle
      * Landeseinstellung des Systems. </p>
+     *
+     * <p>Hinweis: Damit eine von Samstag und Sonntag abweichende
+     * lokalisierte Wochenenddefinition erzeugt werden kann, mu&szlig;
+     * seit Version v2.2 das i18n-Modul im Klassenpfad vorhanden sein. </p>
      *
      * @return  week model in system locale
      * @see     Locale#getDefault()
@@ -361,12 +360,20 @@ public final class Weekmodel
     /**
      * <p>Gets a suitable weekmodel for the given country. </p>
      *
+     * <p>Note: In order to get a weekend definition deviating from the
+     * standard Saturday + Sunday, the i18n-module must be present in
+     * classpath since v2.2. </p>
+     *
      * @param   locale      country setting
      * @return  localized week model
      */
     /*[deutsch]
      * <p>Ermittelt ein geeignetes Wochenmodell f&uuml;r das angegebene
      * Land. </p>
+     *
+     * <p>Hinweis: Damit eine von Samstag und Sonntag abweichende
+     * lokalisierte Wochenenddefinition erzeugt werden kann, mu&szlig;
+     * seit Version v2.2 das i18n-Modul im Klassenpfad vorhanden sein. </p>
      *
      * @param   locale      country setting
      * @return  localized week model
@@ -387,6 +394,15 @@ public final class Weekmodel
         }
 
         WeekdataProvider p = LOCALIZED_WEEKDATA;
+
+        if (p == null) { // fallback
+            GregorianCalendar gc = new GregorianCalendar(locale);
+            int fd = gc.getFirstDayOfWeek();
+            int firstDayOfWeek = ((fd == 1) ? 7 : (fd - 1));
+            return Weekmodel.of(
+                Weekday.valueOf(firstDayOfWeek),
+                gc.getMinimalDaysInFirstWeek());
+        }
 
         model =
             new Weekmodel(
@@ -1915,236 +1931,6 @@ public final class Weekmodel
                     date.getMonth()
                 );
             }
-
-        }
-
-    }
-
-    private static class DefaultWeekdataProvider
-        implements WeekdataProvider {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final Map<String, Weekday> START_OF_WEEKEND;
-        static final Map<String, Weekday> END_OF_WEEKEND;
-
-        // Daten aus CLDR 23
-        static {
-            Map<String, Weekday> tmp = new HashMap<String, Weekday>(28);
-            tmp.put("AF", Weekday.THURSDAY);
-            tmp.put("DZ", Weekday.THURSDAY);
-            tmp.put("IR", Weekday.THURSDAY);
-            tmp.put("OM", Weekday.THURSDAY);
-            tmp.put("SA", Weekday.THURSDAY);
-            tmp.put("YE", Weekday.THURSDAY);
-            tmp.put("AE", Weekday.FRIDAY);
-            tmp.put("BH", Weekday.FRIDAY);
-            tmp.put("EG", Weekday.FRIDAY);
-            tmp.put("IL", Weekday.FRIDAY);
-            tmp.put("IQ", Weekday.FRIDAY);
-            tmp.put("JO", Weekday.FRIDAY);
-            tmp.put("KW", Weekday.FRIDAY);
-            tmp.put("LY", Weekday.FRIDAY);
-            tmp.put("MA", Weekday.FRIDAY);
-            tmp.put("QA", Weekday.FRIDAY);
-            tmp.put("SD", Weekday.FRIDAY);
-            tmp.put("SY", Weekday.FRIDAY);
-            tmp.put("TN", Weekday.FRIDAY);
-            tmp.put("IN", Weekday.SUNDAY);
-            START_OF_WEEKEND = Collections.unmodifiableMap(tmp);
-
-            tmp = new HashMap<String, Weekday>(25);
-            tmp.put("AF", Weekday.FRIDAY);
-            tmp.put("DZ", Weekday.FRIDAY);
-            tmp.put("IR", Weekday.FRIDAY);
-            tmp.put("OM", Weekday.FRIDAY);
-            tmp.put("SA", Weekday.FRIDAY);
-            tmp.put("YE", Weekday.FRIDAY);
-            tmp.put("AE", Weekday.SATURDAY);
-            tmp.put("BH", Weekday.SATURDAY);
-            tmp.put("EG", Weekday.SATURDAY);
-            tmp.put("IL", Weekday.SATURDAY);
-            tmp.put("IQ", Weekday.SATURDAY);
-            tmp.put("JO", Weekday.SATURDAY);
-            tmp.put("KW", Weekday.SATURDAY);
-            tmp.put("LY", Weekday.SATURDAY);
-            tmp.put("MA", Weekday.SATURDAY);
-            tmp.put("QA", Weekday.SATURDAY);
-            tmp.put("SD", Weekday.SATURDAY);
-            tmp.put("SY", Weekday.SATURDAY);
-            tmp.put("TN", Weekday.SATURDAY);
-            END_OF_WEEKEND = Collections.unmodifiableMap(tmp);
-        }
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final String source;
-        private final Map<String, Weekday> startOfWeekend;
-        private final Map<String, Weekday> endOfWeekend;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        DefaultWeekdataProvider() {
-            super();
-
-            InputStream is = null;
-            String name = "data/weekend.data";
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-            if (cl != null) {
-                is = cl.getResourceAsStream(name);
-            }
-
-            if (is == null) {
-                cl = Weekmodel.class.getClassLoader();
-                is = cl.getResourceAsStream(name);
-            }
-
-            if (is != null) {
-
-                this.source = "@" + cl.getResource(name).toString();
-                Map<String, Weekday> tmpStart =
-                    new HashMap<String, Weekday>(START_OF_WEEKEND.size());
-                Map<String, Weekday> tmpEnd =
-                    new HashMap<String, Weekday>(END_OF_WEEKEND.size());
-
-                try {
-
-                    BufferedReader br =
-                        new BufferedReader(
-                            new InputStreamReader(is, "US-ASCII"));
-
-                    String line;
-
-                    while ((line = br.readLine()) != null) {
-
-                        if (line.startsWith("#")) {
-                            continue; // Kommentarzeile überspringen
-                        }
-
-                        int equal = line.indexOf('=');
-                        String prefix = line.substring(0, equal).trim();
-                        String[] list = line.substring(equal + 1).split(" ");
-                        String wd = "";
-                        Weekday weekday;
-                        Map<String, Weekday> map;
-
-                        if (prefix.startsWith("start-")) {
-                            wd = prefix.substring(6);
-                            weekday = Weekday.SATURDAY;
-                            map = tmpStart;
-                        } else if (prefix.startsWith("end-")) {
-                            wd = prefix.substring(4);
-                            weekday = Weekday.SUNDAY;
-                            map = tmpEnd;
-                        } else {
-                            throw new IllegalStateException(
-                                "Unexpected format: " + this.source);
-                        }
-
-                        if (wd.equals("sun")) {
-                            weekday = Weekday.SUNDAY;
-                        } else if (wd.equals("sat")) {
-                            weekday = Weekday.SATURDAY;
-                        } else if (wd.equals("fri")) {
-                            weekday = Weekday.FRIDAY;
-                        } else if (wd.equals("thu")) {
-                            weekday = Weekday.THURSDAY;
-                        } else if (wd.equals("wed")) {
-                            weekday = Weekday.WEDNESDAY;
-                        } else if (wd.equals("tue")) {
-                            weekday = Weekday.TUESDAY;
-                        } else if (wd.equals("mon")) {
-                            weekday = Weekday.MONDAY;
-                        }
-
-                        for (String country : list) {
-                            String key = country.trim().toUpperCase(Locale.US);
-
-                            if (!key.isEmpty()) {
-                                map.put(key, weekday);
-                            }
-                        }
-
-                    }
-
-                    this.startOfWeekend = Collections.unmodifiableMap(tmpStart);
-                    this.endOfWeekend = Collections.unmodifiableMap(tmpEnd);
-
-                } catch (UnsupportedEncodingException uee) {
-                    throw new AssertionError(uee);
-                } catch (Exception ex) {
-                    throw new IllegalStateException(
-                        "Unexpected format: " + this.source, ex);
-                } finally {
-                    try {
-                        is.close();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace(System.err);
-                    }
-                }
-
-            } else {
-                this.source = "@STATIC";
-                this.startOfWeekend = START_OF_WEEKEND;
-                this.endOfWeekend = END_OF_WEEKEND;
-
-                System.out.println("Warning: File \"" + name + "\" not found.");
-            }
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public int getFirstDayOfWeek(Locale country) {
-
-            GregorianCalendar gc = new GregorianCalendar(country);
-            int fd = gc.getFirstDayOfWeek();
-            return ((fd == 1) ? 7 : (fd - 1));
-
-        }
-
-        @Override
-        public int getMinimalDaysInFirstWeek(Locale country) {
-
-            GregorianCalendar gc = new GregorianCalendar(country);
-            return gc.getMinimalDaysInFirstWeek();
-
-        }
-
-        @Override
-        public int getStartOfWeekend(Locale country) {
-
-            String key = country.getCountry();
-            Weekday start = Weekday.SATURDAY;
-
-            if (this.startOfWeekend.containsKey(key)) {
-                start = this.startOfWeekend.get(key);
-            }
-
-            return start.getValue();
-
-        }
-
-        @Override
-        public int getEndOfWeekend(Locale country) {
-
-            String key = country.getCountry();
-            Weekday end = Weekday.SUNDAY;
-
-            if (this.endOfWeekend.containsKey(key)) {
-                end = this.endOfWeekend.get(key);
-            }
-
-            return end.getValue();
-
-        }
-
-        @Override
-        public String toString() {
-
-            return this.getClass().getName() + this.source;
 
         }
 
