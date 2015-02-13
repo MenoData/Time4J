@@ -1,6 +1,7 @@
 package net.time4j.tz;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.Test;
@@ -37,6 +38,7 @@ public class ProviderRegistrationTest {
         assertThat(
             Timezone.registerProvider(new DummyProvider("dummy")),
             is(false));
+        System.out.println(Timezone.getProviderInfo());
     }
 
     private static class DummyProvider
@@ -54,18 +56,26 @@ public class ProviderRegistrationTest {
         }
 
         @Override
+        public Set<String> getPreferredIDs(
+            Locale locale,
+            boolean smart
+        ) {
+            return Collections.emptySet();
+        }
+
+        @Override
         public Map<String, String> getAliases() {
             return Collections.emptyMap();
         }
 
         @Override
-        public TransitionHistory load(String zoneID, boolean fallback) {
+        public TransitionHistory load(String zoneID) {
             return null;
         }
 
         @Override
-        public boolean isFallbackEnabled() {
-            return false;
+        public String getFallback() {
+            return "";
         }
 
         @Override
@@ -80,6 +90,15 @@ public class ProviderRegistrationTest {
 
         @Override
         public String getVersion() {
+            return "";
+        }
+
+        @Override
+        public String getDisplayName(
+            String tzid,
+            NameStyle style,
+            Locale locale
+        ) {
             return "";
         }
 

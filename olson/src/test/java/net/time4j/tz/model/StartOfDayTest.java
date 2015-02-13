@@ -5,6 +5,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
@@ -13,6 +14,7 @@ import net.time4j.tz.ZoneProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.junit.BeforeClass;
@@ -95,12 +97,20 @@ public class StartOfDayTest {
         }
 
         @Override
+        public Set<String> getPreferredIDs(
+            Locale locale,
+            boolean smart
+        ) {
+            return Collections.emptySet();
+        }
+
+        @Override
         public Map<String, String> getAliases() {
             return Collections.emptyMap();
         }
 
         @Override
-        public TransitionHistory load(String zoneID, boolean fallback) {
+        public TransitionHistory load(String zoneID) {
             if (zoneID.equals("America/Sao_Paulo")) {
                 return TEST_HISTORY;
             }
@@ -108,8 +118,8 @@ public class StartOfDayTest {
         }
 
         @Override
-        public boolean isFallbackEnabled() {
-            return false;
+        public String getFallback() {
+            return "";
         }
 
         @Override
@@ -127,6 +137,15 @@ public class StartOfDayTest {
             return "";
         }
 
-    }
+         @Override
+        public String getDisplayName(
+            String tzid,
+            NameStyle style,
+            Locale locale
+        ) {
+            return "";
+        }
+
+   }
 
 }

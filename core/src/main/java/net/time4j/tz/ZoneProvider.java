@@ -21,8 +21,10 @@
 
 package net.time4j.tz;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 
 /**
  * <p>SPI interface which encapsulates the timezone repository and
@@ -35,7 +37,7 @@ import java.util.Set;
  * constructor. </p>
  *
  * @author  Meno Hochschild
- * @since   2.0
+ * @since   2.2
  * @see     java.util.ServiceLoader
  */
 /*[deutsch]
@@ -51,7 +53,7 @@ import java.util.Set;
  * Argumente definieren. </p>
  *
  * @author  Meno Hochschild
- * @since   2.0
+ * @since   2.2
  * @see     java.util.ServiceLoader
  */
 public interface ZoneProvider {
@@ -73,6 +75,35 @@ public interface ZoneProvider {
     Set<String> getAvailableIDs();
 
     /**
+     * <p>Gets a {@code Set} of preferred timezone IDs for given
+     * ISO-3166-country code. </p>
+     *
+     * <p>This information is necessary to enable parsing of
+     * timezone names. </p>
+     *
+     * @param   locale      ISO-3166-alpha-2-country to be evaluated
+     * @param   smart       if {@code true} then try to select zone ids such
+     *                      that there is only one preferred id per zone name
+     * @return  unmodifiable set of preferred timezone ids
+     */
+    /*[deutsch]
+     * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
+     * bevorzugten Zeitzonenkennungen. </p>
+     *
+     * <p>Diese Information ist f&uuml;r die Interpretation von Zeitzonennamen
+     * notwendig. </p>
+     *
+     * @param   locale      ISO-3166-alpha-2-country to be evaluated
+     * @param   smart       if {@code true} then try to select zone ids such
+     *                      that there is only one preferred id per zone name
+     * @return  unmodifiable set of preferred timezone ids
+     */
+    Set<String> getPreferredIDs(
+        Locale locale,
+        boolean smart
+    );
+
+    /**
      * <p>Gets an alias table whose keys represent alternative identifiers
      * mapped to other aliases or finally canonical timezone IDs.. </p>
      *
@@ -92,65 +123,43 @@ public interface ZoneProvider {
     Map<String, String> getAliases();
 
     /**
-     * <p>Loads an offset transition table for given timezone id. </p>
-     *
-     * <p>This callback method has a second argument which indicates if
-     * Time4J wants this method to return exactly matching data (default)
-     * or permits the use of aliases (only possible if the method
-     * {@code isFallbackEnabled()} returns {@code true}). </p>
+     * <p>Loads an offset transition history for given timezone id. </p>
      *
      * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @param   fallback    fallback allowed if a timezone id cannot be
-     *                      found, not even by alias?
      * @return  timezone history or {@code null} if there are no data
      * @throws  IllegalStateException if timezone database is broken
      * @see     #getAvailableIDs()
      * @see     #getAliases()
-     * @see     #isFallbackEnabled()
      * @see     java.util.TimeZone#getTimeZone(String)
      */
     /*[deutsch]
      * <p>L&auml;dt die Zeitzonendaten zur angegebenen Zonen-ID. </p>
      *
-     * <p>Diese Methode wird von {@code Timezone} aufgerufen. Das zweite
-     * Argument ist normalerweise {@code false}, so da&szlig; es sich um
-     * eine exakte Suchanforderung handelt. Nur wenn die Methode
-     * {@code isFallbackEnabled()} den Wert {@code true} zur&uuml;ckgibt
-     * und vorher weder die exakte Suche noch die Alias-Suche erfolgreich
-     * waren, kann ein erneuter Aufruf mit dem zweiten Argument
-     * {@code true} erfolgen. </p>
-     *
      * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @param   fallback    fallback allowed if a timezone id cannot be
-     *                      found, not even by alias?
      * @return  timezone history or {@code null} if there are no data
      * @throws  IllegalStateException if timezone database is broken
      * @see     #getAvailableIDs()
      * @see     #getAliases()
-     * @see     #isFallbackEnabled()
      * @see     java.util.TimeZone#getTimeZone(String)
      */
-    TransitionHistory load(
-        String zoneID,
-        boolean fallback
-    );
+    TransitionHistory load(String zoneID);
 
     /**
-     * <p>Determines if in case of a failed search another timezone should
-     * be permitted as alternative with possibly different rules. </p>
+     * <p>Determines if in case of a failed search another {@code ZoneProvider}
+     * should be called as alternative with possibly different rules. </p>
      *
-     * @return  boolean
-     * @see     #load(String, boolean)
+     * @return  name of alternative provider or empty if no fallback happens
+     * @see     #load(String)
      */
     /*[deutsch]
-     * <p>Soll eine alternative Zeitzone mit eventuell anderen Regeln
-     * geliefert werden, wenn die Suche nach einer Zeitzone erfolglos
-     * war? </p>
+     * <p>Legt fest, ob ein alternativer {@code ZoneProvider} mit eventuell
+     * anderen Regeln gerufen werden soll, wenn die Suche nach einer Zeitzone
+     * erfolglos war. </p>
      *
-     * @return  boolean
-     * @see     #load(String, boolean)
+     * @return  name of alternative provider or empty if no fallback happens
+     * @see     #load(String)
      */
-    boolean isFallbackEnabled();
+    String getFallback();
 
     /**
      * <p>Gets the name of the underlying repository. </p>
@@ -201,5 +210,34 @@ public interface ZoneProvider {
      * @return  String (for example &quot;2011n&quot;) or empty if unknown
      */
     String getVersion();
+
+    /**
+     * <p>Returns the name of this timezone suitable for presentation to
+     * users in given style and locale. </p>
+     *
+     * @param   tzid                timezone identifier
+     * @param   style               name style
+     * @param   locale              language setting
+     * @return  localized timezone name for display purposes
+     *          or empty if not supported
+     * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
+     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
+     */
+    /*[deutsch]
+     * <p>Liefert den anzuzeigenden Zeitzonennamen. </p>
+     *
+     * @param   tzid                timezone identifier
+     * @param   style               name style
+     * @param   locale              language setting
+     * @return  localized timezone name for display purposes
+     *          or empty if not supported
+     * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
+     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
+     */
+    String getDisplayName(
+        String tzid,
+        NameStyle style,
+        Locale locale
+    );
 
 }

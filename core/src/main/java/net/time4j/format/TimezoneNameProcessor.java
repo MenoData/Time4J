@@ -57,19 +57,7 @@ final class TimezoneNameProcessor
         new ConcurrentHashMap<Locale, TZNames>();
     private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
-    private static final int MAX = 25;
-
-    private static final boolean WITH_OLSON_MODULE;
-
-    static {
-        boolean hasOlsonModule = true;
-        try {
-            Class.forName("net.time4j.tz.olson.StdZoneIdentifier");
-        } catch (ClassNotFoundException ex) {
-            hasOlsonModule = false;
-        }
-        WITH_OLSON_MODULE = hasOlsonModule;
-    }
+    private static final int MAX = 25; // maximum size of cache
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -78,6 +66,20 @@ final class TimezoneNameProcessor
     private final Set<TZID> preferredZones;
 
     //~ Konstruktoren -----------------------------------------------------
+
+    /**
+     * <p>Erzeugt eine neue Instanz. </p>
+     *
+     * @param   abbreviated     abbreviations to be used?
+     */
+    TimezoneNameProcessor(boolean abbreviated) {
+        super();
+
+        this.abbreviated = abbreviated;
+        this.fallback = new LocalizedGMTProcessor(abbreviated);
+        this.preferredZones = null;
+
+    }
 
     /**
      * <p>Erzeugt eine neue Instanz. </p>
@@ -265,17 +267,31 @@ final class TimezoneNameProcessor
                 "Unknown timezone name: " + key);
             return;
         } else if (
-            WITH_OLSON_MODULE
-            && (zones.size() > 1)
+            (zones.size() > 1)
             && !leniency.isLax()
         ) { // tz name not unique
             List<TZID> candidates = new ArrayList<TZID>(zones);
 
             for (TZID tz : zones) {
                 boolean found = false;
+                String id = tz.canonical();
+                Set<TZID> prefs = this.preferredZones;
 
-                for (TZID p : this.preferredZones) {
-                    if (p.canonical().equals(tz.canonical())) {
+                if (prefs == null) {
+                    String provider = "";
+                    int index = id.indexOf('~');
+                    if (index >= 0) {
+                        provider = id.substring(0, index);
+                    }
+                    prefs =
+                        Timezone.getPreferredIDs(
+                            locale,
+                            leniency.isSmart(),
+                            provider);
+                }
+
+                for (TZID p : prefs) {
+                    if (p.canonical().equals(id)) {
                         found = true;
                         break;
                     }
@@ -289,7 +305,8 @@ final class TimezoneNameProcessor
             if (candidates.isEmpty()) {
                 status.setError(
                     start,
-                    "Time zone id not found among preferred timezones.");
+                    "Time zone id not found among preferred timezones "
+                    + "in locale " + locale);
                 return;
             } else {
                 zones = candidates;
@@ -302,7 +319,9 @@ final class TimezoneNameProcessor
         ) {
             parsedResult.put(TimezoneElement.TIMEZONE_ID, zones.get(0));
             status.setPosition(pos);
-            status.setDaylightSaving(daylightSaving);
+            if (tzNames.isDaylightSensitive()) {
+                status.setDaylightSaving(daylightSaving);
+            }
         } else {
             status.setError(
                 start,
@@ -388,6 +407,7 @@ final class TimezoneNameProcessor
 
         //~ Instanzvariablen ----------------------------------------------
 
+        private final boolean dstSensitive;
         private final Map<String, List<TZID>> stdNames;
         private final Map<String, List<TZID>> dstNames;
 
@@ -402,9 +422,17 @@ final class TimezoneNameProcessor
             this.stdNames = stdNames;
             this.dstNames = dstNames;
 
+            this.dstSensitive = !stdNames.keySet().equals(dstNames.keySet());
+
         }
 
         //~ Methoden ------------------------------------------------------
+
+        boolean isDaylightSensitive() {
+
+            return this.dstSensitive;
+
+        }
 
         // quick search via hash-access
         List<TZID> search(

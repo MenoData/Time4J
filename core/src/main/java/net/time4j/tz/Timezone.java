@@ -29,15 +29,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -118,6 +115,28 @@ public abstract class Timezone
 
     private static final String NEW_LINE = System.getProperty("line.separator");
 
+    private static final Comparator<TZID> ID_COMPARATOR =
+        new Comparator<TZID>() {
+            @Override
+            public int compare(
+                TZID o1,
+                TZID o2
+            ) {
+                String c1 = o1.canonical();
+                int i1 = c1.indexOf('~');
+                String c2 = o2.canonical();
+                int i2 = c2.indexOf('~');
+
+                if (i1 >= 0) {
+                    return ((i2 == -1) ? 1 : c1.compareTo(c2));
+                } else if (i2 >= 0) {
+                    return -1;
+                } else {
+                    return c1.compareTo(c2);
+                }
+            }
+        };
+
     /**
      * <p>This standard strategy which is also used by the JDK-class
      * {@code java.util.GregorianCalendar} subtracts the next defined
@@ -174,14 +193,13 @@ public abstract class Timezone
 
     private static final String NAME_TZDB = "TZDB";
     private static final Map<String, TZID> PREDEFINED;
-    private static final Map<String, Set<TZID>> TERRITORIES;
     private static final ZoneProvider PLATFORM_PROVIDER;
     private static final ZoneProvider DEFAULT_PROVIDER;
-    private static final List<NameProvider> NAME_PROVIDERS;
     private static final ConcurrentMap<String, NamedReference> CACHE;
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
     private static final ConcurrentMap<String, ZoneProvider> PROVIDERS;
+    private static final ZoneProvider NAME_PROVIDER;
 
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
@@ -191,11 +209,18 @@ public abstract class Timezone
         QUEUE = new ReferenceQueue<Timezone>();
         LAST_USED = new LinkedList<Timezone>(); // strong references
 
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = Timezone.class.getClassLoader();
+        }
+
         List<Class<? extends TZID>> areas;
 
         try {
             areas =
                 loadPredefined(
+                    cl,
                     "AFRICA",
                     "AMERICA",
                     "AMERICA$ARGENTINA",
@@ -228,50 +253,15 @@ public abstract class Timezone
 
         PREDEFINED = Collections.unmodifiableMap(temp1);
 
-        Map<String, Set<TZID>> temp2 = new HashMap<String, Set<TZID>>();
-        Class<?>[] emptyTypes =  new Class<?>[0];
-        Object[] emptyParams = new Object[0];
-
-        try {
-            for (Class<? extends TZID> area : areas) {
-                Method m = area.getDeclaredMethod("getCountry", emptyTypes);
-                m.setAccessible(true);
-                for (TZID tzid : area.getEnumConstants()) {
-                    String country = (String) m.invoke(tzid, emptyParams);
-                    addTerritory(temp2, country, tzid);
-                }
-            }
-        } catch (IllegalAccessException ex) {
-            throw new IllegalStateException(ex);
-        } catch (NoSuchMethodException ex) {
-            throw new IllegalStateException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new IllegalStateException(ex);
-        }
-
-        if (areas.isEmpty()) {
-            System.out.println(
-                "Warning: olson-module is not available "
-                + "so there are no preferred timezones for any locale.");
-        } else {
-            TZID svalbard = new NamedID("Arctic/Longyearbyen");
-            temp2.put("SJ", Collections.singleton(svalbard));
-        }
-
-        TERRITORIES = Collections.unmodifiableMap(temp2);
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = Timezone.class.getClassLoader();
-        }
-
         ServiceLoader<ZoneProvider> sl =
             ServiceLoader.load(ZoneProvider.class, cl);
         ZoneProvider zp = null;
+        ZoneProvider np = null;
 
         for (ZoneProvider provider : sl) {
-            if (NAME_TZDB.equals(provider.getName())) {
+            String name = provider.getName();
+
+            if (name.equals(NAME_TZDB)) {
                 String version = provider.getVersion();
 
                 if (
@@ -282,9 +272,14 @@ public abstract class Timezone
                 ) {
                     zp = provider;
                 }
+            } else if (name.equals("#STD_ZONE_NAMES")) {
+                np = provider;
+            } else if (!name.isEmpty()) {
+                PROVIDERS.put(name, provider);
             }
         }
 
+        NAME_PROVIDER = np;
         PLATFORM_PROVIDER = new PlatformTZProvider();
         PROVIDERS.put(PLATFORM_PROVIDER.getName(), PLATFORM_PROVIDER);
 
@@ -294,15 +289,6 @@ public abstract class Timezone
             PROVIDERS.put(NAME_TZDB, zp);
             DEFAULT_PROVIDER = zp;
         }
-
-        List<NameProvider> tmp = new ArrayList<NameProvider>();
-        ServiceLoader<NameProvider> nameProviders =
-            ServiceLoader.load(NameProvider.class, cl);
-        for (NameProvider provider : nameProviders) {
-            tmp.add(provider);
-        }
-        tmp.add(new PlatformNameProvider());
-        NAME_PROVIDERS = Collections.unmodifiableList(tmp);
 
         Timezone systemTZ = null;
 
@@ -364,36 +350,133 @@ public abstract class Timezone
     }
 
     /**
-     * <p>Gets a {@code Set} of preferred timezone IDs for given
-     * ISO-3166-country code. </p>
+     * <p>Gets all available timezone IDs for given {@code ZoneProvider}. </p>
+     *
+     * <p>Note that this method will return an empty list if given provider
+     * name does not refer to any registered provider. If the name is empty
+     * then the default {@code ZoneProvider} will be queried. </p>
+     *
+     * @param   provider    the registered zone provider whose ids are searched
+     * @return  unmodifiable list of available timezone ids in ascending order
+     * @since   2.2
+     * @see     ZoneProvider#getName()
+     */
+    /*[deutsch]
+     * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen zum angegebenen
+     * {@code ZoneProvider}. </p>
+     *
+     * <p>Hinweis: Wenn das Argument keinen registrierten {@code ZoneProvider}
+     * referenziert, dann liefert diese Methode eine leere Liste. Wenn das
+     * Argument leer ist, dann wird der Standard-{@code ZoneProvider}
+     * abgefragt. </p>
+     *
+     * @param   provider    the registered zone provider whose ids are searched
+     * @return  unmodifiable list of available timezone ids in ascending order
+     * @since   2.2
+     * @see     ZoneProvider#getName()
+     */
+    public static List<TZID> getAvailableIDs(String provider) {
+
+        ZoneProvider zp = (
+            provider.isEmpty() ? DEFAULT_PROVIDER : PROVIDERS.get(provider));
+
+        if (zp == null) {
+            return Collections.emptyList();
+        }
+
+        List<TZID> result = new ArrayList<TZID>();
+
+        for (String id : zp.getAvailableIDs()) {
+            result.add(resolve(id));
+        }
+
+        Collections.sort(result, ID_COMPARATOR);
+        return Collections.unmodifiableList(result);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code getPreferredIDs(locale, false, "")}. </p>
+     *
+     * @param       locale  ISO-3166-alpha-2-country to be evaluated
+     * @return      unmodifiable set of preferred timezone ids
+     * @see         #getPreferredIDs(Locale, boolean, String)
+     * @deprecated  For clarity, use the 3-parameter-method instead
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code getPreferredIDs(locale, false, "")}. </p>
+     *
+     * @param       locale  ISO-3166-alpha-2-country to be evaluated
+     * @return      unmodifiable set of preferred timezone ids
+     * @see         #getPreferredIDs(Locale, boolean, String)
+     * @deprecated  For clarity, use the 3-parameter-method instead
+     */
+    @Deprecated
+    public static Set<TZID> getPreferredIDs(Locale locale) {
+
+        return getPreferredIDs(locale, false, "");
+
+    }
+
+    /**
+     * <p>Gets a provider-specific {@code Set} of preferred timezone IDs
+     * for given ISO-3166-country code. </p>
      *
      * <p>This information is necessary to enable parsing of timezone names
-     * and is only available if the olson-module &quot;net.time4j.tz.olson&quot;
-     * is accessible in class path. </p>
+     * and is only available if the given provider supports it and denotes
+     * a valid registered provider. Otherwise this method will produce an
+     * empty set. if given provider name is empty then the default zone provider
+     * will be queried. </p>
      *
-     * @param   locale  ISO-3166-alpha-2-country to be evaluated
+     * @param   locale      ISO-3166-alpha-2-country to be evaluated
+     * @param   smart       if {@code true} then try to select zone ids such
+     *                      that there is only one preferred id per zone name
+     * @param   provider    the registered zone provider whose preferred ids
+     *                      are queried
      * @return  unmodifiable set of preferred timezone ids
+     * @since   2.2
+     * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
      */
     /*[deutsch]
      * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
-     * bevorzugten Zeitzonenkennungen. </p>
+     * und {@code ZoneProvider} bevorzugten Zeitzonenkennungen. </p>
      *
      * <p>Diese Information ist f&uuml;r die Interpretation von Zeitzonennamen
-     * notwendig und steht nur dann zur Verf&uuml;gung, wenn das olson-Modul
-     * &quot;net.time4j.tz.olson&quot; im Klassenpfad existiert. </p>
+     * notwendig und steht nur dann zur Verf&uuml;gung, wenn der angegebene
+     * {@code ZoneProvider} das unterst&uuml;tzt. Wenn hingegen das Argument
+     * {@code provider} keinen registrierten {@code ZoneProvider} referenziert,
+     * liefert diese Methode eine leere Menge. Wenn es leer ist, dann wird der
+     * Standard-{@code ZoneProvider} abgefragt. </p>
      *
-     * @param   locale  ISO-3166-alpha-2-country to be evaluated
+     * @param   locale      ISO-3166-alpha-2-country to be evaluated
+     * @param   smart       if {@code true} then try to select zone ids such
+     *                      that there is only one preferred id per zone name
+     * @param   provider    the registered zone provider whose preferred ids
+     *                      are queried
      * @return  unmodifiable set of preferred timezone ids
+     * @since   2.2
+     * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
      */
-    public static Set<TZID> getPreferredIDs(Locale locale) {
+    public static Set<TZID> getPreferredIDs(
+        Locale locale,
+        boolean smart,
+        String provider
+    ) {
 
-        Set<TZID> p = TERRITORIES.get(locale.getCountry());
+        ZoneProvider zp = (
+            provider.isEmpty() ? DEFAULT_PROVIDER : PROVIDERS.get(provider));
 
-        if (p == null) {
+        if (zp == null) {
             return Collections.emptySet();
-        } else {
-            return Collections.unmodifiableSet(p);
         }
+
+        Set<TZID> p = new HashSet<TZID>();
+
+        for (String id : zp.getPreferredIDs(locale, smart)) {
+            p.add(resolve(id));
+        }
+
+        return Collections.unmodifiableSet(p);
 
     }
 
@@ -758,41 +841,73 @@ public abstract class Timezone
     public abstract TransitionHistory getHistory();
 
     /**
-     * <p>Describes the default underlying repository with name and optionally
-     * location and version. </p>
+     * <p>Describes all registered {@code ZoneProvider}-instances with
+     * name and optionally location and version. </p>
      *
      * @return  String
      */
     /*[deutsch]
-     * <p>Beschreibt die Standardzeitzonendatenbank mit Name und optional
-     * Ort und Version. </p>
+     * <p>Beschreibt alle registrierten {@code ZoneProvider}-Instanzen
+     * mit Namen und optional Ort und Version. </p>
      *
      * @return  String
      */
     public static String getProviderInfo() {
 
-        ZoneProvider provider = DEFAULT_PROVIDER;
         StringBuilder sb = new StringBuilder(128);
         sb.append(Timezone.class.getName());
-        sb.append("[provider=");
-        sb.append(provider.getName());
+        sb.append(":[default-provider=");
+        sb.append(DEFAULT_PROVIDER.getName());
+        sb.append(", registered={");
 
-        String location = provider.getLocation();
+        for (String key : PROVIDERS.keySet()) {
+            ZoneProvider provider = PROVIDERS.get(key);
+            if (provider != null) { // defensive against parallel threads
+                sb.append("(name=");
+                sb.append(provider.getName());
 
-        if (!location.isEmpty()) {
-            sb.append(",location=");
-            sb.append(location);
+                String location = provider.getLocation();
+
+                if (!location.isEmpty()) {
+                    sb.append(",location=");
+                    sb.append(location);
+                }
+
+                String version = provider.getVersion();
+
+                if (!version.isEmpty()) {
+                    sb.append(",version=");
+                    sb.append(version);
+                }
+
+                sb.append(')');
+            }
         }
 
-        String version = provider.getVersion();
-
-        if (!version.isEmpty()) {
-            sb.append(",version=");
-            sb.append(version);
-        }
-
-        sb.append(']');
+        sb.append("}]");
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Yields the names of all registered
+     * {@code ZoneProvider}-instances. </p>
+     *
+     * @return  unmodifiable list of provider names
+     * @since   2.2
+     * @see     ZoneProvider#getName()
+     */
+    /*[deutsch]
+     * <p>Liefert die Namen aller registrierten
+     * {@code ZoneProvider}-Instanzen. </p>
+     *
+     * @return  unmodifiable list of provider names
+     * @since   2.2
+     * @see     ZoneProvider#getName()
+     */
+    public static Set<String> getRegisteredProviders() {
+
+        return Collections.unmodifiableSet(PROVIDERS.keySet());
 
     }
 
@@ -878,15 +993,26 @@ public abstract class Timezone
     ) {
 
         String tzid = this.getID().canonical();
+        int index = tzid.indexOf('~');
+        ZoneProvider provider = DEFAULT_PROVIDER;
+        String zoneID = tzid;
 
-        for (NameProvider np : NAME_PROVIDERS) {
-            String name = np.getDisplayName(tzid, style, locale);
-            if (name != null) {
-                return name;
-            }
+        if (index >= 0) {
+            provider = PROVIDERS.get(tzid.substring(0, index));
+            zoneID = tzid.substring(index);
         }
 
-        return tzid;
+        String name = provider.getDisplayName(zoneID, style, locale);
+
+        if (
+            name.isEmpty()
+            && (provider != PLATFORM_PROVIDER)
+        ) {
+            // platform provider never returns empty name unless zoneID is empty
+            return PLATFORM_PROVIDER.getDisplayName(zoneID, style, locale);
+        }
+
+        return name;
 
     }
 
@@ -928,7 +1054,13 @@ public abstract class Timezone
                 "Platform provider cannot be replaced.");
         }
 
-        return (PROVIDERS.putIfAbsent(name, provider) == null);
+        boolean inserted = (PROVIDERS.putIfAbsent(name, provider) == null);
+
+        if (inserted) {
+            zonalKeys = new ZonalKeys();
+        }
+
+        return inserted;
 
     }
 
@@ -1090,7 +1222,7 @@ public abstract class Timezone
                 tz = test;
             }
         } else { // exakte Suche in Historie
-            TransitionHistory history = provider.load(zoneKey, false);
+            TransitionHistory history = provider.load(zoneKey);
 
             if (history == null) {
                 // Alias-Suche + Fallback-Option
@@ -1153,18 +1285,17 @@ public abstract class Timezone
             (history == null)
             && ((alias = aliases.get(alias)) != null)
         ) {
-            history = provider.load(alias, false);
-        }
-
-        if (
-            (history == null)
-            && provider.isFallbackEnabled()
-        ) {
-            history = provider.load(zoneKey, true);
+            history = provider.load(alias);
         }
 
         if (history == null) {
-            return null;
+            String fallback = provider.getFallback();
+
+            if (fallback.isEmpty()) {
+                return null;
+            } else {
+                return Timezone.of(fallback + "~" + zoneKey);
+            }
         } else {
             return new HistorizedTimezone(tzid, history);
         }
@@ -1193,14 +1324,17 @@ public abstract class Timezone
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Class<? extends TZID>> loadPredefined(String... names)
-        throws ClassNotFoundException {
+    private static List<Class<? extends TZID>> loadPredefined(
+        ClassLoader loader,
+        String... names
+    ) throws ClassNotFoundException {
 
         List<Class<? extends TZID>> classes =
             new ArrayList<Class<? extends TZID>>();
 
         for (String name : names) {
-            Class<?> clazz = Class.forName("net.time4j.tz.olson." + name);
+            Class<?> clazz =
+                Class.forName("net.time4j.tz.olson." + name, true, loader);
 
             if (TZID.class.isAssignableFrom(clazz)) {
                 classes.add((Class<? extends TZID>) clazz);
@@ -1208,23 +1342,6 @@ public abstract class Timezone
         }
 
         return Collections.unmodifiableList(classes);
-
-    }
-
-    private static void addTerritory(
-        Map<String, Set<TZID>> map,
-        String country,
-        TZID tz
-    ) {
-
-        Set<TZID> preferred = map.get(country);
-
-        if (preferred == null) {
-            preferred = new LinkedHashSet<TZID>();
-            map.put(country, preferred);
-        }
-
-        preferred.add(tz);
 
     }
 
@@ -1442,75 +1559,17 @@ public abstract class Timezone
 
             for (Map.Entry<String, ZoneProvider> e : PROVIDERS.entrySet()) {
                 for (String id : e.getValue().getAvailableIDs()) {
-                    TZID tzid = PREDEFINED.get(id);
+                    TZID tzid = resolve(id);
 
-                    if (tzid == null) {
-                        list.add(new NamedID(id));
-                    } else if (tzid != ZonalOffset.UTC) {
+                    // wegen resolve() genügt Vergleich per equals()
+                    if (!list.contains(tzid)) {
                         list.add(tzid);
                     }
                 }
             }
 
-            Collections.sort(
-                list,
-                new Comparator<TZID>() {
-                    @Override
-                    public int compare(
-                        TZID o1,
-                        TZID o2
-                    ) {
-                        String c1 = o1.canonical();
-                        int i1 = c1.indexOf('~');
-                        String c2 = o2.canonical();
-                        int i2 = c2.indexOf('~');
-
-                        if (i1 >= 0) {
-                            return ((i2 == -1) ? 1 : c1.compareTo(c2));
-                        } else if (i2 >= 0) {
-                            return -1;
-                        } else {
-                            return c1.compareTo(c2);
-                        }
-                    }
-                }
-            );
-
+            Collections.sort(list, ID_COMPARATOR);
             this.availables = Collections.unmodifiableList(list);
-
-        }
-
-    }
-
-    private static class PlatformNameProvider
-        implements NameProvider {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public String getDisplayName(
-            String tzid,
-            NameStyle style,
-            Locale locale
-        ) {
-
-            if (locale == null) {
-                throw new NullPointerException("Missing locale.");
-            }
-
-            java.util.TimeZone tz = PlatformTimezone.findZone(tzid);
-
-            if (tz.getID().equals(tzid)) {
-                return tz.getDisplayName(
-                    style.isDaylightSaving(),
-                    style.isAbbreviation()
-                        ? java.util.TimeZone.SHORT
-                        : java.util.TimeZone.LONG,
-                    locale
-                );
-            }
-
-            return null;
 
         }
 
@@ -1532,6 +1591,22 @@ public abstract class Timezone
         }
 
         @Override
+        public Set<String> getPreferredIDs(
+            Locale locale,
+            boolean smart
+        ) {
+
+            ZoneProvider zp = NAME_PROVIDER;
+
+            if (zp == null) {
+                return Collections.emptySet();
+            }
+
+            return zp.getPreferredIDs(locale, smart);
+
+        }
+
+        @Override
         public Map<String, String> getAliases() {
 
             return Collections.emptyMap(); // JDK hat eingebaute Alias-Suche!
@@ -1539,9 +1614,9 @@ public abstract class Timezone
         }
 
         @Override
-        public boolean isFallbackEnabled() {
+        public String getFallback() {
 
-            return false; // JDK hat eingebauten Fallback-Mechanismus!
+            return "";
 
         }
 
@@ -1567,12 +1642,38 @@ public abstract class Timezone
         }
 
         @Override
-        public TransitionHistory load(
-            String zoneID,
-            boolean fallback
+        public TransitionHistory load(String zoneID) {
+
+            return null; // leider keine öffentliche Historie!!!
+
+        }
+
+        @Override
+        public String getDisplayName(
+            String tzid,
+            NameStyle style,
+            Locale locale
         ) {
 
-            return null; // leider keine öffentliche Historie!
+            if (locale == null) {
+                throw new NullPointerException("Missing locale.");
+            } else if (tzid.isEmpty()) {
+                return "";
+            }
+
+            java.util.TimeZone tz = PlatformTimezone.findZone(tzid);
+
+            if (tz.getID().equals(tzid)) {
+                return tz.getDisplayName(
+                    style.isDaylightSaving(),
+                    style.isAbbreviation()
+                        ? java.util.TimeZone.SHORT
+                        : java.util.TimeZone.LONG,
+                    locale
+                );
+            }
+
+            return tzid;
 
         }
 

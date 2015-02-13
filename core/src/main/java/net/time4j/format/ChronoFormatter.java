@@ -3376,7 +3376,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * timezone names is case-sensitive. </p>
          *
          * @return  this instance for method chaining
-         * @see     Timezone#getPreferredIDs(Locale)
          * @see     #addShortTimezoneName(Set)
          */
         /*[deutsch]
@@ -3387,18 +3386,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
          *
          * @return  this instance for method chaining
-         * @see     Timezone#getPreferredIDs(Locale)
          * @see     #addShortTimezoneName(Set)
          */
         public Builder<T> addShortTimezoneName() {
 
-            Locale loc = this.locale;
-
-            if (!this.stack.isEmpty()) {
-                loc = this.stack.getLast().get(Attributes.LOCALE, loc);
-            }
-
-            return this.addShortTimezoneName(Timezone.getPreferredIDs(loc));
+            this.addProcessor(new TimezoneNameProcessor(true));
+            return this;
 
         }
 
@@ -3410,7 +3403,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * timezone names is case-sensitive. </p>
          *
          * @return  this instance for method chaining
-         * @see     Timezone#getPreferredIDs(Locale)
          * @see     #addLongTimezoneName(Set)
          */
         /*[deutsch]
@@ -3421,18 +3413,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
          *
          * @return  this instance for method chaining
-         * @see     Timezone#getPreferredIDs(Locale)
          * @see     #addLongTimezoneName(Set)
          */
         public Builder<T> addLongTimezoneName() {
 
-            Locale loc = this.locale;
-
-            if (!this.stack.isEmpty()) {
-                loc = this.stack.getLast().get(Attributes.LOCALE, loc);
-            }
-
-            return this.addLongTimezoneName(Timezone.getPreferredIDs(loc));
+            this.addProcessor(new TimezoneNameProcessor(false));
+            return this;
 
         }
 
@@ -3459,8 +3445,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addShortTimezoneName(Set<TZID> preferredZones) {
 
-            this.addProcessor(
-                new TimezoneNameProcessor(true, preferredZones));
+            this.addProcessor(new TimezoneNameProcessor(true, preferredZones));
             return this;
 
         }
@@ -3488,8 +3473,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addLongTimezoneName(Set<TZID> preferredZones) {
 
-            this.addProcessor(
-                new TimezoneNameProcessor(false, preferredZones));
+            this.addProcessor(new TimezoneNameProcessor(false, preferredZones));
             return this;
 
         }

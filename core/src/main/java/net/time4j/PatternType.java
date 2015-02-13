@@ -30,8 +30,6 @@ import net.time4j.format.DisplayMode;
 import net.time4j.format.OutputContext;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextWidth;
-import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -959,11 +957,10 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-                Set<TZID> preferredZones = Timezone.getPreferredIDs(locale);
                 if (count < 4) {
-                    builder.addShortTimezoneName(preferredZones);
+                    builder.addShortTimezoneName();
                 } else if ((count == 4) || sdf) {
-                    builder.addLongTimezoneName(preferredZones);
+                    builder.addLongTimezoneName();
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
