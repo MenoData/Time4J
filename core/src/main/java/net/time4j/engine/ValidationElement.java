@@ -74,7 +74,9 @@ public enum ValidationElement
         ChronoDisplay o2
     ) {
 
-        return Boolean.compare(o1.contains(this), o2.contains(this));
+        boolean b1 = o1.contains(this);
+        boolean b2 = o2.contains(this);
+        return ((b1 == b2) ? 0 : (b1 ? 1 : -1));
 
     }
 
