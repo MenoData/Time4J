@@ -94,6 +94,7 @@ public class PredefinedIDTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void getPreferredIDs() {
         TZID tzid = EUROPE.BERLIN;
         assertThat(
