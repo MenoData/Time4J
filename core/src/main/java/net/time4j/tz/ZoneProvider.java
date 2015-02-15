@@ -125,8 +125,12 @@ public interface ZoneProvider {
     /**
      * <p>Loads an offset transition history for given timezone id. </p>
      *
+     * <p>The argument never contains the provider name as prefix. It is
+     * instead the part after the &quot;~&quot;-char (if not absent). </p>
+     *
      * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
      * @return  timezone history or {@code null} if there are no data
+     * @throws  IllegalArgumentException if given id is wrong
      * @throws  IllegalStateException if timezone database is broken
      * @see     #getAvailableIDs()
      * @see     #getAliases()
@@ -135,8 +139,13 @@ public interface ZoneProvider {
     /*[deutsch]
      * <p>L&auml;dt die Zeitzonendaten zur angegebenen Zonen-ID. </p>
      *
+     * <p>Das erste Argument enth&auml;lt nie den Provider-Namen als
+     * Pr&auml;fix. Stattdessen ist es der Teil nach dem Zeichen
+     * &quot;~&quot; (falls vorhanden). </p>
+     *
      * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
      * @return  timezone history or {@code null} if there are no data
+     * @throws  IllegalArgumentException if given id is wrong
      * @throws  IllegalStateException if timezone database is broken
      * @see     #getAvailableIDs()
      * @see     #getAliases()
@@ -229,9 +238,12 @@ public interface ZoneProvider {
      * <p>Returns the name of this timezone suitable for presentation to
      * users in given style and locale. </p>
      *
-     * @param   tzid                timezone identifier
-     * @param   style               name style
-     * @param   locale              language setting
+     * <p>The first argument never contains the provider name as prefix. It is
+     * instead the part after the &quot;~&quot;-char (if not absent). </p>
+     *
+     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
+     * @param   style       name style
+     * @param   locale      language setting
      * @return  localized timezone name for display purposes
      *          or empty if not supported
      * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
@@ -240,16 +252,20 @@ public interface ZoneProvider {
     /*[deutsch]
      * <p>Liefert den anzuzeigenden Zeitzonennamen. </p>
      *
-     * @param   tzid                timezone identifier
-     * @param   style               name style
-     * @param   locale              language setting
+     * <p>Das erste Argument enth&auml;lt nie den Provider-Namen als
+     * Pr&auml;fix. Stattdessen ist es der Teil nach dem Zeichen
+     * &quot;~&quot; (falls vorhanden). </p>
+     *
+     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
+     * @param   style       name style
+     * @param   locale      language setting
      * @return  localized timezone name for display purposes
      *          or empty if not supported
      * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
      *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
      */
     String getDisplayName(
-        String tzid,
+        String zoneID,
         NameStyle style,
         Locale locale
     );
