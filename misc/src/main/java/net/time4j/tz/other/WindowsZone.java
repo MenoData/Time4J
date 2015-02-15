@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (WinZoneName.java) is part of project Time4J.
+ * This file (WindowsZone.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -49,7 +49,7 @@ import javax.xml.stream.events.XMLEvent;
  * <p>Example: </p>
  *
  * <pre>
- *  WinZoneName wzn = WinZoneName.of(&quot;Eastern Standard Time&quot;);
+ *  WindowsZone wzn = WindowsZone.of(&quot;Eastern Standard Time&quot;);
  *  TZID winzone = wzn.resolveSmart(Locale.US);
  *  System.out.println(winzone.canonical());
  *  // output: WINDOWS~America/New_York
@@ -65,7 +65,7 @@ import javax.xml.stream.events.XMLEvent;
  * <p>Beispiel: </p>
  *
  * <pre>
- *  WinZoneName wzn = WinZoneName.of(&quot;Eastern Standard Time&quot;);
+ *  WindowsZone wzn = WindowsZone.of(&quot;Eastern Standard Time&quot;);
  *  TZID winzone = wzn.resolveSmart(Locale.US);
  *  System.out.println(winzone.canonical());
  *  // output: WINDOWS~America/New_York
@@ -74,8 +74,8 @@ import javax.xml.stream.events.XMLEvent;
  * @author  Meno Hochschild
  * @since   2.2
  */
-public final class WinZoneName
-    implements Comparable<WinZoneName>, Serializable {
+public final class WindowsZone
+    implements Comparable<WindowsZone>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -105,7 +105,7 @@ public final class WinZoneName
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private WinZoneName(String name) {
+    private WindowsZone(String name) {
         super();
 
         this.name = name;
@@ -118,7 +118,7 @@ public final class WinZoneName
      * <p>Creates a name reference to a windows zone. </p>
      *
      * @param   name    standardized windows zone name
-     * @return  new instance of {@code WinZoneName}
+     * @return  new instance of {@code WindowsZone}
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
      */
@@ -126,14 +126,14 @@ public final class WinZoneName
      * <p>Erzeugt einen Namensbezug zu einer Windows-Zeitzone. </p>
      *
      * @param   name    standardized windows zone name
-     * @return  new instance of {@code WinZoneName}
+     * @return  new instance of {@code WindowsZone}
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
      */
-    public static WinZoneName of(String name) {
+    public static WindowsZone of(String name) {
 
         check(name);
-        return new WinZoneName(name);
+        return new WindowsZone(name);
 
     }
 
@@ -142,8 +142,8 @@ public final class WinZoneName
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof WinZoneName) {
-            WinZoneName that = (WinZoneName) obj;
+        } else if (obj instanceof WindowsZone) {
+            WindowsZone that = (WindowsZone) obj;
             return this.name.equals(that.name);
         } else {
             return false;
@@ -192,7 +192,7 @@ public final class WinZoneName
      *          is less than, equal to, or greater than the specified object.
      */
     @Override
-    public int compareTo(WinZoneName other) {
+    public int compareTo(WindowsZone other) {
 
         return this.name.compareTo(other.name);
 
@@ -363,7 +363,7 @@ public final class WinZoneName
             f.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
             String source = "data/windowsZones.xml";
             InputStream is =
-                WinZoneName.class.getClassLoader().getResourceAsStream(source);
+                WindowsZone.class.getClassLoader().getResourceAsStream(source);
             XMLEventReader reader = f.createXMLEventReader(is);
 
             while (reader.hasNext()) {

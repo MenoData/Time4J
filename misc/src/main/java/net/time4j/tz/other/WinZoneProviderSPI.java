@@ -107,7 +107,7 @@ public class WinZoneProviderSPI
         boolean smart
     ) {
 
-        return WinZoneName.getPreferredIDs(locale.getCountry(), smart);
+        return WindowsZone.getPreferredIDs(locale.getCountry(), smart);
 
     }
 
@@ -122,7 +122,7 @@ public class WinZoneProviderSPI
             return "";
         }
 
-        Map<String, String> map = WinZoneName.idsToNames(locale.getCountry());
+        Map<String, String> map = WindowsZone.idsToNames(locale.getCountry());
         String name = map.get("WINDOWS~" + tzid);
         return ((name == null) ? "" : name);
 
