@@ -148,6 +148,10 @@ public interface ZoneProvider {
      * <p>Determines if in case of a failed search another {@code ZoneProvider}
      * should be called as alternative with possibly different rules. </p>
      *
+     * <p>The special name &quot;DEFAULT&quot; can be used to denote the
+     * default zone provider. Note that the fallback provider will only affect
+     * the rules but not the id or display names of a new timezone. </p>
+     *
      * @return  name of alternative provider or empty if no fallback happens
      * @see     #load(String)
      */
@@ -155,6 +159,11 @@ public interface ZoneProvider {
      * <p>Legt fest, ob ein alternativer {@code ZoneProvider} mit eventuell
      * anderen Regeln gerufen werden soll, wenn die Suche nach einer Zeitzone
      * erfolglos war. </p>
+     *
+     * <p>Der spezielle Name &quot;DEFAULT&quot; kann verwendet werden, um
+     * den Standard-{@code ZoneProvider} anzuzeigen. Zu beachten: Die
+     * Alternative wird nur die Regeln betreffen, nicht aber die ID oder
+     * Anzeigenamen einer neuen Zeitzone. </p>
      *
      * @return  name of alternative provider or empty if no fallback happens
      * @see     #load(String)
@@ -164,8 +173,10 @@ public interface ZoneProvider {
     /**
      * <p>Gets the name of the underlying repository. </p>
      *
-     * <p>The Olson/IANA-repository has the name
-     * &quot;TZDB&quot;. </p>
+     * <p>The Olson/IANA-repository (and any provider which makes use of
+     * these data (direct or indirect)) has the name &quot;TZDB&quot;.
+     * The names &quot;java.util.TimeZone&quot; and &quot;DEFAULT&quot;
+     * are reserved and cannot be used. </p>
      *
      * @return  String
      */
@@ -173,7 +184,10 @@ public interface ZoneProvider {
      * <p>Gibt den Namen dieser Zeitzonendatenbank an. </p>
      *
      * <p>Die Olson/IANA-Zeitzonendatenbank hat den Namen
-     * &quot;TZDB&quot;. </p>
+     * &quot;TZDB&quot;. Jeder {@code ZoneProvider}, der sich auf diese
+     * Daten bezieht, mu&szlig; diesen Namen haben. Die Namen
+     * &quot;java.util.TimeZone&quot; and &quot;DEFAULT&quot; sind
+     * reserviert und k&ouml;nnen nicht verwendet werden. </p>
      *
      * @return  String
      */

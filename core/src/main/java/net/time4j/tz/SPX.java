@@ -42,6 +42,9 @@ final class SPX
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /** Serialisierungstyp von {@code FallbackTimezone}. */
+    static final int FALLBACK_TIMEZONE_TYPE = 12;
+
     /** Serialisierungstyp von {@code TransitionResolver}. */
     static final int TRANSITION_RESOLVER_TYPE = 13;
 
@@ -117,6 +120,9 @@ final class SPX
         throws IOException {
 
         switch (this.type) {
+            case FALLBACK_TIMEZONE_TYPE:
+                this.writeFallback(out);
+                break;
             case TRANSITION_RESOLVER_TYPE:
                 this.writeStrategy(out);
                 break;
@@ -153,6 +159,9 @@ final class SPX
         byte header = in.readByte();
 
         switch ((header & 0xFF) >> 4) {
+            case FALLBACK_TIMEZONE_TYPE:
+                this.obj = this.readFallback(in, header);
+                break;
             case TRANSITION_RESOLVER_TYPE:
                 this.obj = this.readStrategy(in, header);
                 break;
@@ -171,6 +180,29 @@ final class SPX
     private Object readResolve() throws ObjectStreamException {
 
         return this.obj;
+
+    }
+
+    private void writeFallback(ObjectOutput out)
+        throws IOException {
+
+        FallbackTimezone tz = (FallbackTimezone) this.obj;
+        int header = (FALLBACK_TIMEZONE_TYPE << 4);
+
+        out.writeByte(header);
+        out.writeObject(tz.getID());
+        out.writeObject(tz.getFallback());
+
+    }
+
+    private Object readFallback(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
+
+        TZID id = (TZID) in.readObject();
+        Timezone fallback = (Timezone) in.readObject();
+        return new FallbackTimezone(id, fallback);
 
     }
 

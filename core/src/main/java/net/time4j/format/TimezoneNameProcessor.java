@@ -58,6 +58,7 @@ final class TimezoneNameProcessor
     private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
         new ConcurrentHashMap<Locale, TZNames>();
     private static final int MAX = 25; // maximum size of cache
+    private static final String DEFAULT_PROVIDER = "DEFAULT";
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -270,19 +271,19 @@ final class TimezoneNameProcessor
             (zones.size() > 1)
             && !leniency.isLax()
         ) { // tz name not unique
-            List<TZID> candidates = new ArrayList<TZID>(zones);
+            Map<String, List<TZID>> matched = new HashMap<String, List<TZID>>();
 
             for (TZID tz : zones) {
-                boolean found = false;
                 String id = tz.canonical();
                 Set<TZID> prefs = this.preferredZones;
+                String provider = DEFAULT_PROVIDER;
+                int index = id.indexOf('~');
+
+                if (index >= 0) {
+                    provider = id.substring(0, index);
+                }
 
                 if (prefs == null) {
-                    String provider = "";
-                    int index = id.indexOf('~');
-                    if (index >= 0) {
-                        provider = id.substring(0, index);
-                    }
                     prefs =
                         Timezone.getPreferredIDs(
                             locale,
@@ -292,22 +293,37 @@ final class TimezoneNameProcessor
 
                 for (TZID p : prefs) {
                     if (p.canonical().equals(id)) {
-                        found = true;
+                        List<TZID> candidates = matched.get(provider);
+                        if (candidates == null) {
+                            candidates = new ArrayList<TZID>();
+                            matched.put(provider, candidates);
+                        }
+                        candidates.add(p);
                         break;
                     }
                 }
-
-                if (!found) {
-                    candidates.remove(tz);
-                }
             }
 
+            List<TZID> candidates = matched.get(DEFAULT_PROVIDER);
+
             if (candidates.isEmpty()) {
-                status.setError(
-                    start,
-                    "Time zone id not found among preferred timezones "
-                    + "in locale " + locale);
-                return;
+                matched.remove(DEFAULT_PROVIDER);
+                boolean found = false;
+                for (String provider : matched.keySet()) {
+                    candidates = matched.get(provider);
+                    if (!candidates.isEmpty()) {
+                        found = true;
+                        zones = candidates;
+                        break;
+                    }
+                }
+                if (!found) {
+                    status.setError(
+                        start,
+                        "Time zone id not found among preferred timezones "
+                        + "in locale " + locale);
+                    return;
+                }
             } else {
                 zones = candidates;
             }
@@ -325,7 +341,8 @@ final class TimezoneNameProcessor
         } else {
             status.setError(
                 start,
-                "Time zone name is not unique: \"" + key + "\" in " + zones);
+                "Time zone name is not unique: \"" + key + "\" in "
+                + toString(zones));
         }
 
     }
@@ -398,6 +415,25 @@ final class TimezoneNameProcessor
                 ? NameStyle.SHORT_STANDARD_TIME
                 : NameStyle.LONG_STANDARD_TIME);
         }
+
+    }
+
+    private static String toString(List<TZID> ids) {
+
+        StringBuilder sb = new StringBuilder(ids.size() * 16);
+        sb.append('{');
+        boolean first = true;
+
+        for (TZID tzid : ids) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(',');
+            }
+            sb.append(tzid.canonical());
+        }
+
+        return sb.append('}').toString();
 
     }
 

@@ -191,7 +191,11 @@ public abstract class Timezone
     private static volatile boolean cacheActive = true;
     private static int softLimit = 11;
 
+    private static final String NAME_JUT = "java.util.TimeZone";
     private static final String NAME_TZDB = "TZDB";
+    private static final String NAME_ZONENAMES = "#STD_ZONE_NAMES";
+    private static final String NAME_DEFAULT = "DEFAULT";
+
     private static final Map<String, TZID> PREDEFINED;
     private static final ZoneProvider PLATFORM_PROVIDER;
     private static final ZoneProvider DEFAULT_PROVIDER;
@@ -199,7 +203,7 @@ public abstract class Timezone
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
     private static final ConcurrentMap<String, ZoneProvider> PROVIDERS;
-    private static final ZoneProvider NAME_PROVIDER;
+    private static final ZoneProvider ZONENAME_PROVIDER;
 
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
@@ -272,16 +276,19 @@ public abstract class Timezone
                 ) {
                     zp = provider;
                 }
-            } else if (name.equals("#STD_ZONE_NAMES")) {
+            } else if (name.equals(NAME_ZONENAMES)) {
                 np = provider;
-            } else if (!name.isEmpty()) {
+            } else if (
+                !name.isEmpty()
+                && !name.equals(NAME_DEFAULT)
+            ) {
                 PROVIDERS.put(name, provider);
             }
         }
 
-        NAME_PROVIDER = np;
+        ZONENAME_PROVIDER = np;
         PLATFORM_PROVIDER = new PlatformTZProvider();
-        PROVIDERS.put(PLATFORM_PROVIDER.getName(), PLATFORM_PROVIDER);
+        PROVIDERS.put(NAME_JUT, PLATFORM_PROVIDER);
 
         if (zp == null) {
             DEFAULT_PROVIDER = PLATFORM_PROVIDER;
@@ -353,11 +360,13 @@ public abstract class Timezone
      * <p>Gets all available timezone IDs for given {@code ZoneProvider}. </p>
      *
      * <p>Note that this method will return an empty list if given provider
-     * name does not refer to any registered provider. If the name is empty
-     * then the default {@code ZoneProvider} will be queried. </p>
+     * name does not refer to any registered provider. If the name is equal
+     * to &quot;DEFAULT&quot; then the default {@code ZoneProvider} will be
+     * queried. </p>
      *
      * @param   provider    the registered zone provider whose ids are searched
      * @return  unmodifiable list of available timezone ids in ascending order
+     * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
      * @see     ZoneProvider#getName()
      */
@@ -367,18 +376,18 @@ public abstract class Timezone
      *
      * <p>Hinweis: Wenn das Argument keinen registrierten {@code ZoneProvider}
      * referenziert, dann liefert diese Methode eine leere Liste. Wenn das
-     * Argument leer ist, dann wird der Standard-{@code ZoneProvider}
-     * abgefragt. </p>
+     * Argument gleich &quot;DEFAULT&quot; ist, dann wird der
+     * Standard-{@code ZoneProvider} abgefragt. </p>
      *
      * @param   provider    the registered zone provider whose ids are searched
      * @return  unmodifiable list of available timezone ids in ascending order
+     * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
      * @see     ZoneProvider#getName()
      */
     public static List<TZID> getAvailableIDs(String provider) {
 
-        ZoneProvider zp = (
-            provider.isEmpty() ? DEFAULT_PROVIDER : PROVIDERS.get(provider));
+        ZoneProvider zp = getProvider(provider);
 
         if (zp == null) {
             return Collections.emptyList();
@@ -396,7 +405,7 @@ public abstract class Timezone
     }
 
     /**
-     * <p>Equivalent to {@code getPreferredIDs(locale, false, "")}. </p>
+     * <p>Equivalent to {@code getPreferredIDs(locale, false, "DEFAULT")}. </p>
      *
      * @param       locale  ISO-3166-alpha-2-country to be evaluated
      * @return      unmodifiable set of preferred timezone ids
@@ -404,7 +413,8 @@ public abstract class Timezone
      * @deprecated  For clarity, use the 3-parameter-method instead
      */
     /*[deutsch]
-     * <p>&Auml;quivalent zu {@code getPreferredIDs(locale, false, "")}. </p>
+     * <p>&Auml;quivalent zu
+     * {@code getPreferredIDs(locale, false, "DEFAULT")}. </p>
      *
      * @param       locale  ISO-3166-alpha-2-country to be evaluated
      * @return      unmodifiable set of preferred timezone ids
@@ -414,7 +424,7 @@ public abstract class Timezone
     @Deprecated
     public static Set<TZID> getPreferredIDs(Locale locale) {
 
-        return getPreferredIDs(locale, false, "");
+        return getPreferredIDs(locale, false, NAME_DEFAULT);
 
     }
 
@@ -425,8 +435,8 @@ public abstract class Timezone
      * <p>This information is necessary to enable parsing of timezone names
      * and is only available if the given provider supports it and denotes
      * a valid registered provider. Otherwise this method will produce an
-     * empty set. if given provider name is empty then the default zone provider
-     * will be queried. </p>
+     * empty set. if given provider name is &quot;DEFAULT&quot; then the
+     * default zone provider will be queried. </p>
      *
      * @param   locale      ISO-3166-alpha-2-country to be evaluated
      * @param   smart       if {@code true} then try to select zone ids such
@@ -434,6 +444,7 @@ public abstract class Timezone
      * @param   provider    the registered zone provider whose preferred ids
      *                      are queried
      * @return  unmodifiable set of preferred timezone ids
+     * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
      * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
      */
@@ -445,8 +456,9 @@ public abstract class Timezone
      * notwendig und steht nur dann zur Verf&uuml;gung, wenn der angegebene
      * {@code ZoneProvider} das unterst&uuml;tzt. Wenn hingegen das Argument
      * {@code provider} keinen registrierten {@code ZoneProvider} referenziert,
-     * liefert diese Methode eine leere Menge. Wenn es leer ist, dann wird der
-     * Standard-{@code ZoneProvider} abgefragt. </p>
+     * liefert diese Methode eine leere Menge. Wenn das Argument gleich
+     * &quot;DEFAULT&quot; ist, dann wird der Standard-{@code ZoneProvider}
+     * abgefragt. </p>
      *
      * @param   locale      ISO-3166-alpha-2-country to be evaluated
      * @param   smart       if {@code true} then try to select zone ids such
@@ -454,6 +466,7 @@ public abstract class Timezone
      * @param   provider    the registered zone provider whose preferred ids
      *                      are queried
      * @return  unmodifiable set of preferred timezone ids
+     * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
      * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
      */
@@ -463,8 +476,7 @@ public abstract class Timezone
         String provider
     ) {
 
-        ZoneProvider zp = (
-            provider.isEmpty() ? DEFAULT_PROVIDER : PROVIDERS.get(provider));
+        ZoneProvider zp = getProvider(provider);
 
         if (zp == null) {
             return Collections.emptySet();
@@ -998,8 +1010,11 @@ public abstract class Timezone
         String zoneID = tzid;
 
         if (index >= 0) {
-            provider = PROVIDERS.get(tzid.substring(0, index));
-            zoneID = tzid.substring(index);
+            String pname = tzid.substring(0, index);
+            if (!pname.equals(NAME_DEFAULT)) {
+                provider = PROVIDERS.get(pname);
+            }
+            zoneID = tzid.substring(index + 1);
         }
 
         String name = provider.getDisplayName(zoneID, style, locale);
@@ -1045,13 +1060,19 @@ public abstract class Timezone
 
         if (name.isEmpty()) {
             throw new IllegalArgumentException(
-                "Default zone provider cannot be overridden.");
+                "Missing name of zone provider.");
         } else if (name.equals(NAME_TZDB)) {
             throw new IllegalArgumentException(
                 "TZDB provider cannot be registered after startup.");
-        } else if (name.equals(PLATFORM_PROVIDER.getName())) {
+        } else if (name.equals(NAME_JUT)) {
             throw new IllegalArgumentException(
                 "Platform provider cannot be replaced.");
+        } else if (name.equals(NAME_DEFAULT)) {
+            throw new IllegalArgumentException(
+                "Default zone provider cannot be overridden.");
+        } else if (name.equals(NAME_ZONENAMES)) {
+            throw new IllegalArgumentException(
+                "Reserved zone name provider cannot be used.");
         }
 
         boolean inserted = (PROVIDERS.putIfAbsent(name, provider) == null);
@@ -1173,7 +1194,10 @@ public abstract class Timezone
 
         ZoneProvider provider = DEFAULT_PROVIDER;
 
-        if (!providerName.isEmpty()) {
+        if (
+            !providerName.isEmpty()
+            && !providerName.equals(NAME_DEFAULT)
+        ) {
             provider = PROVIDERS.get(providerName);
 
             if (provider == null) {
@@ -1293,8 +1317,13 @@ public abstract class Timezone
 
             if (fallback.isEmpty()) {
                 return null;
+            } else if (fallback.equals(provider.getName())) {
+                throw new IllegalArgumentException(
+                    "Circular zone provider fallback: " + provider.getName());
             } else {
-                return Timezone.of(fallback + "~" + zoneKey);
+                return new FallbackTimezone(
+                    tzid,
+                    Timezone.of(fallback + "~" + zoneKey));
             }
         } else {
             return new HistorizedTimezone(tzid, history);
@@ -1342,6 +1371,19 @@ public abstract class Timezone
         }
 
         return Collections.unmodifiableList(classes);
+
+    }
+
+    private static ZoneProvider getProvider(String provider) {
+
+        if (provider.isEmpty()) {
+            throw new IllegalArgumentException("Missing zone provider.");
+        }
+
+        return (
+            provider.equals(NAME_DEFAULT)
+            ? DEFAULT_PROVIDER
+            : PROVIDERS.get(provider));
 
     }
 
@@ -1596,7 +1638,7 @@ public abstract class Timezone
             boolean smart
         ) {
 
-            ZoneProvider zp = NAME_PROVIDER;
+            ZoneProvider zp = ZONENAME_PROVIDER;
 
             if (zp == null) {
                 return Collections.emptySet();
