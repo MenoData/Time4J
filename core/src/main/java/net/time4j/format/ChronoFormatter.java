@@ -3375,6 +3375,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * in a country will be determined first. The parsing of
          * timezone names is case-sensitive. </p>
          *
+         * <p>Note that Time4J will try to find a unique mapping from names to
+         * IDs for US in smart parsing mode. However, this is only an imperfect
+         * approximation to current practice. A counter example is Phoenix
+         * which does not observe daylight savings although it has the same
+         * name &quot;MST&quot; as Denver. </p>
+         *
          * @return  this instance for method chaining
          * @see     #addShortTimezoneName(Set)
          */
@@ -3384,6 +3390,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
          * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         *
+         * <p>Hinweis: Time4J versucht das Beste, um eine eindeutige Abbildung
+         * von Namen auf IDs f&uuml;r die USA im smart-Modus zu finden. Aber
+         * das ist nur eine nicht perfekte Ann&auml;herung an die aktuelle
+         * Praxis. Ein Gegenbeispiel ist Phoenix, das keine Sommerzeit kennt,
+         * obwohl es den gleichen Namen &quot;MST&quot; wie Denver hat. </p>
          *
          * @return  this instance for method chaining
          * @see     #addShortTimezoneName(Set)
@@ -3402,6 +3414,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * in a country will be determined first. The parsing of
          * timezone names is case-sensitive. </p>
          *
+         * <p>Note that Time4J will try to find a unique mapping from names to
+         * IDs for US in smart parsing mode. However, this is only an imperfect
+         * approximation to current practice. A counter example is Phoenix
+         * which does not observe daylight savings although it has the same
+         * name &quot;Mountain Standard Time&quot; as Denver. </p>
+         *
          * @return  this instance for method chaining
          * @see     #addLongTimezoneName(Set)
          */
@@ -3411,6 +3429,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
          * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         *
+         * <p>Hinweis: Time4J versucht das Beste, um eine eindeutige Abbildung
+         * von Namen auf IDs f&uuml;r die USA im smart-Modus zu finden. Aber
+         * das ist nur eine nicht perfekte Ann&auml;herung an die aktuelle
+         * Praxis. Ein Gegenbeispiel ist Phoenix, das keine Sommerzeit kennt,
+         * obwohl es den gleichen Namen &quot;Mountain Standard Time&quot;
+         * wie Denver hat. </p>
          *
          * @return  this instance for method chaining
          * @see     #addLongTimezoneName(Set)

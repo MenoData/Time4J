@@ -1,10 +1,16 @@
 package net.time4j.tz.olson;
 
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -95,11 +101,43 @@ public class PredefinedIDTest {
 
     @Test
     @SuppressWarnings("deprecation")
-    public void getPreferredIDs() {
+    public void getPreferredIDsOfBerlin() {
         TZID tzid = EUROPE.BERLIN;
         assertThat(
             Timezone.getPreferredIDs(Locale.GERMANY),
             is(Collections.singleton(tzid)));
+    }
+
+    @Test
+    public void getSmartPreferredIDsOfUS() {
+        Set<TZID> prefs = Timezone.getPreferredIDs(Locale.US, true, "DEFAULT");
+        Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
+
+        for (TZID tzid : prefs) {
+            String name =
+                Timezone.of(tzid).getDisplayName(
+                    NameStyle.LONG_STANDARD_TIME, Locale.US);
+            List<TZID> ids = map.get(name);
+            if (ids == null) {
+                ids = new ArrayList<TZID>();
+                map.put(name, ids);
+            }
+            ids.add(tzid);
+
+            System.out.println(
+                "TZID="
+                + tzid.canonical()
+                + "\tName="
+                + name);
+        }
+
+        for (String name : map.keySet()) {
+            assertThat(map.get(name).size(), is(1));
+        }
+
+        System.out.println("Phoenix: "
+            + Timezone.of("America/Phoenix").getDisplayName(
+                NameStyle.LONG_DAYLIGHT_TIME, Locale.US));
     }
 
 }

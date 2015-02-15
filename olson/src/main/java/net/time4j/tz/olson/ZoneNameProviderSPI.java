@@ -112,7 +112,22 @@ public class ZoneNameProviderSPI
         boolean smart
     ) {
 
-        Set<String> result = TERRITORIES.get(locale.getCountry());
+        String country = locale.getCountry();
+
+        if (smart && country.equals("US")) {
+            Set<String> tzids = new LinkedHashSet<String>();
+            tzids.add("America/New_York");
+            tzids.add("America/Chicago");
+            tzids.add("America/Denver");
+            tzids.add("America/Los_Angeles");
+            tzids.add("America/Metlakatla");
+            tzids.add("America/Anchorage");
+            tzids.add("Pacific/Honolulu");
+            tzids.add("America/Adak");
+            return Collections.unmodifiableSet(tzids);
+        }
+
+        Set<String> result = TERRITORIES.get(country);
 
         if (result == null) {
             result = Collections.emptySet();
