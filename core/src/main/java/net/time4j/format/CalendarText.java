@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -24,23 +24,14 @@ package net.time4j.format;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.DateFormatSymbols;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
@@ -165,8 +156,6 @@ public final class CalendarText {
 
     private static final ConcurrentMap<String, CalendarText> CACHE =
         new ConcurrentHashMap<String, CalendarText>();
-    private static final ResourceBundle.Control CONTROL =
-    	new UTF8NoFallbackControl();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -195,24 +184,6 @@ public final class CalendarText {
         super();
 
         this.provider = p.toString();
-
-        // Allgemeine Textformen als optionales Bundle vorbereiten
-        ResourceBundle rb = null;
-        MissingResourceException tmpMre = null;
-
-        try {
-            rb =
-                ResourceBundle.getBundle(
-                    "calendar/" + calendarType,
-                    locale,
-                    getLoader(),
-                    CONTROL);
-        } catch (MissingResourceException ex) {
-            tmpMre = ex;
-        }
-
-        this.textForms = rb;
-        this.mre = tmpMre;
 
         // Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
@@ -286,6 +257,25 @@ public final class CalendarText {
 
         this.meridiems = Collections.unmodifiableMap(mt);
 
+        // Allgemeine Textformen als optionales Bundle vorbereiten
+        // Wichtig: Letzter Schritt im Konstruktor wg. Bundle-Cache
+        ResourceBundle rb = null;
+        MissingResourceException tmpMre = null;
+
+        try {
+            rb =
+                ResourceBundle.getBundle(
+                    "calendar/" + calendarType,
+                    locale,
+                    getLoader(),
+                    p.getControl());
+        } catch (MissingResourceException ex) {
+            tmpMre = ex;
+        }
+
+        this.textForms = rb;
+        this.mre = tmpMre;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -346,8 +336,11 @@ public final class CalendarText {
         sb.append(calendarType);
         sb.append(':');
         sb.append(locale.getLanguage());
-        sb.append('-');
-        sb.append(locale.getCountry());
+        String country = locale.getCountry();
+        if (!country.isEmpty()) {
+            sb.append('-');
+            sb.append(country);
+        }
         String key = sb.toString();
 
         CalendarText instance = CACHE.get(key);
@@ -1093,6 +1086,14 @@ public final class CalendarText {
         }
 
         @Override
+        public ResourceBundle.Control getControl() {
+
+            return ResourceBundle.Control.getNoFallbackControl(
+                ResourceBundle.Control.FORMAT_DEFAULT);
+
+        }
+
+        @Override
         public String toString() {
 
             return "JDKTextProvider";
@@ -1236,92 +1237,17 @@ public final class CalendarText {
         }
 
         @Override
+        public ResourceBundle.Control getControl() {
+
+            return ResourceBundle.Control.getNoFallbackControl(
+                ResourceBundle.Control.FORMAT_DEFAULT);
+
+        }
+
+        @Override
         public String toString() {
 
             return "FallbackProvider";
-
-        }
-
-    }
-
-    private static class UTF8NoFallbackControl
-        extends ResourceBundle.Control {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Locale getFallbackLocale(
-            String baseName,
-            Locale locale
-        ) {
-
-        	if (baseName == null || locale == null) {
-        	    throw new NullPointerException();
-        	}
-
-	        return null;
-
-        }
-
-        @Override
-        public List<String> getFormats(String baseName) {
-
-            return ResourceBundle.Control.FORMAT_PROPERTIES;
-
-        }
-
-        @Override
-        public ResourceBundle newBundle(
-            String baseName,
-            Locale locale,
-            String format,
-            ClassLoader loader,
-            boolean reload
-        ) throws IllegalAccessException, InstantiationException, IOException {
-
-            if (format.equals("java.properties")) {
-
-                ResourceBundle bundle = null;
-                InputStream stream = null;
-
-                String bundleName =
-                    this.toBundleName(baseName, locale);
-                String resourceName =
-                    this.toResourceName(bundleName, "properties");
-
-                if (reload) {
-                    URL url = loader.getResource(resourceName);
-
-                    if (url != null) {
-                        URLConnection uconn = url.openConnection();
-                        uconn.setUseCaches(false);
-                        stream = uconn.getInputStream();
-                    }
-                } else {
-                    stream = loader.getResourceAsStream(resourceName);
-                }
-
-                if (stream != null) {
-                    Reader reader = null;
-
-                    try {
-                        reader =
-                            new BufferedReader(
-                                new InputStreamReader(stream, "UTF-8"));
-                        bundle = new PropertyResourceBundle(reader);
-                    } finally {
-                        if (reader != null) {
-                            reader.close();
-                        }
-                    }
-                }
-
-                return bundle;
-
-            } else {
-                throw new UnsupportedOperationException(
-                    "Unknown resource bundle format: " + format);
-            }
 
         }
 

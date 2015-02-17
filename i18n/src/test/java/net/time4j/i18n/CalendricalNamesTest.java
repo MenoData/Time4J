@@ -96,14 +96,14 @@ public class CalendricalNamesTest {
         textWidth = TextWidth.SHORT;
         result =
             instance.getStdMonths(textWidth, OutputContext.FORMAT)
-            .print(Month.MARCH);
-        assertThat(result, is("Mrz"));
+            .print(Month.SEPTEMBER);
+        assertThat(result, is("Sep."));
 
         textWidth = TextWidth.ABBREVIATED;
         result =
             instance.getStdMonths(textWidth, OutputContext.FORMAT)
-            .print(Month.MARCH);
-        assertThat(result, is("Mrz"));
+            .print(Month.SEPTEMBER);
+        assertThat(result, is("Sep."));
     }
 
     @Test
@@ -160,8 +160,8 @@ public class CalendricalNamesTest {
         ParseLog status = new ParseLog();
         Month value =
             instance.getStdMonths(TextWidth.ABBREVIATED, outputContext)
-            .parse("Mrz", status, Month.class);
-        assertThat(value, is(Month.MARCH));
+            .parse("Sep.", status, Month.class);
+        assertThat(value, is(Month.SEPTEMBER));
 
         status.reset();
         value =
@@ -178,14 +178,14 @@ public class CalendricalNamesTest {
         status.reset();
         value =
             instance.getStdMonths(TextWidth.SHORT, outputContext)
-            .parse("MR", status, Month.class, toAttributes(true, true));
+            .parse("MÄ", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
         status.reset();
         value =
             instance.getStdMonths(TextWidth.SHORT, outputContext)
-            .parse("Mrz", status, Month.class);
-        assertThat(value, is(Month.MARCH));
+            .parse("Sep.", status, Month.class);
+        assertThat(value, is(Month.SEPTEMBER));
 
         status.reset();
         value =
@@ -252,7 +252,7 @@ public class CalendricalNamesTest {
         result =
             instance.getQuarters(textWidth, outputContext)
             .print(Quarter.Q1);
-        assertThat(result, is("erstes Quartal"));
+        assertThat(result, is("1. Quartal"));
     }
 
     @Test
@@ -432,13 +432,13 @@ public class CalendricalNamesTest {
         result =
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.FRIDAY);
-        assertThat(result, is("Fr"));
+        assertThat(result, is("Fr."));
 
         textWidth = TextWidth.ABBREVIATED;
         result =
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.FRIDAY);
-        assertThat(result, is("Fr"));
+        assertThat(result, is("Fr."));
 
         textWidth = TextWidth.WIDE;
         result =

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -144,12 +144,10 @@ public final class SymbolProviderSPI
 
     private static ResourceBundle getBundle(Locale desired) {
 
-        Locale lang = LanguageMatch.getAlias(desired);
-
         try {
             return ResourceBundle.getBundle(
                 "numbers/symbol",
-                lang,
+                desired,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
         } catch (MissingResourceException ex) {

@@ -1,8 +1,8 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (UnitPatternSPI.java) is part of project Time4J.
+ * This file (UnitPatternProviderSPI.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
  * @since   1.2
  * @exclude
  */
-public final class UnitPatternSPI
+public final class UnitPatternProviderSPI
     implements UnitPatternProvider {
 
     //~ Methoden ----------------------------------------------------------
@@ -265,9 +265,8 @@ public final class UnitPatternSPI
 
 		ClassLoader loader = this.getClass().getClassLoader();
 		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
-        Locale lang = LanguageMatch.getAlias(desired);
 		ResourceBundle rb =
-            ResourceBundle.getBundle("units/pattern", lang, loader, control);
+            ResourceBundle.getBundle("units/pattern", desired, loader, control);
         String exact = buildListKey(width, String.valueOf(size));
 
         if (rb.containsKey(exact)) {
@@ -369,9 +368,8 @@ public final class UnitPatternSPI
 		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		boolean init = true;
 		ResourceBundle first = null;
-        Locale lang = LanguageMatch.getAlias(desired);
 
-		for (Locale locale : control.getCandidateLocales(baseName, lang)) {
+		for (Locale locale : control.getCandidateLocales(baseName, desired)) {
 			ResourceBundle rb = (
 				init && (first != null)
 				? first

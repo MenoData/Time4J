@@ -58,6 +58,7 @@ public final class IsoTextProviderSPI
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final Set<String> LANGUAGES;
+    private static final Set<Locale> LOCALES;
 
     static {
         ResourceBundle rb =
@@ -75,6 +76,18 @@ public final class IsoTextProviderSPI
         }
 
         LANGUAGES = Collections.unmodifiableSet(tmp);
+
+        Set<Locale> locs = new HashSet<Locale>();
+
+        for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
+            locs.add(loc);
+        }
+
+        for (String lang : LANGUAGES) {
+            locs.add(new Locale(lang));
+        }
+
+        LOCALES = Collections.unmodifiableSet(locs);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -97,7 +110,7 @@ public final class IsoTextProviderSPI
     @Override
     public Locale[] getAvailableLocales() {
 
-        return DateFormatSymbols.getAvailableLocales();
+        return LOCALES.toArray(new Locale[LOCALES.size()]);
 
     }
 
@@ -157,6 +170,13 @@ public final class IsoTextProviderSPI
     ) {
 
         return meridiems(locale, tw);
+
+    }
+
+    @Override
+    public ResourceBundle.Control getControl() {
+
+        return UTF8ResourceControl.SINGLETON;
 
     }
 
@@ -537,12 +557,10 @@ public final class IsoTextProviderSPI
     private static ResourceBundle getBundle(Locale desired)
         throws MissingResourceException {
 
-        Locale lang = LanguageMatch.getAlias(desired);
-
-        if (LANGUAGES.contains(lang.getLanguage())) {
+        if (LANGUAGES.contains(LanguageMatch.getAlias(desired))) {
             return ResourceBundle.getBundle(
                 "calendar/" + ISO_CALENDAR_TYPE,
-                lang,
+                desired,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
         }

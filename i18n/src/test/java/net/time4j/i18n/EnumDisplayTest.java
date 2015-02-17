@@ -33,14 +33,14 @@ public class EnumDisplayTest {
         assertThat(
             Month.FEBRUARY.getDisplayName(
                 Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Feb"));
+            is("Feb."));
     }
 
     @Test
     public void getQuarterDisplayName_1args() {
         assertThat(
             Quarter.Q1.getDisplayName(Locale.GERMAN),
-            is("erstes Quartal"));
+            is("1. Quartal"));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class EnumDisplayTest {
         assertThat(
             Quarter.Q1.getDisplayName(
                 Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
-            is("erstes Quartal"));
+            is("1. Quartal"));
         assertThat(
             Quarter.Q1.getDisplayName(
                 Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
@@ -65,7 +65,7 @@ public class EnumDisplayTest {
         assertThat(
             Weekday.TUESDAY.getDisplayName(
                 Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Di"));
+            is("Di."));
         assertThat(
             Weekday.TUESDAY.getDisplayName(
                 Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),

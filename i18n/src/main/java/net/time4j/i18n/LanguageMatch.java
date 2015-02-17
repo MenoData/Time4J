@@ -41,12 +41,12 @@ enum LanguageMatch {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final Locale alias;
+    private final String alias;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private LanguageMatch(String alias) {
-        this.alias = new Locale(alias);
+        this.alias = alias;
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -57,7 +57,7 @@ enum LanguageMatch {
      * @param   desired     gew&uuml;nschte Sprache
      * @return  Ausweichsprache oder {@code desired} wenn nicht gefunden
      */
-    static Locale getAlias(Locale desired) {
+    static String getAlias(Locale desired) {
 
         String key = desired.getLanguage();
 
@@ -67,7 +67,7 @@ enum LanguageMatch {
             }
         }
 
-        return desired;
+        return key;
 
     }
 

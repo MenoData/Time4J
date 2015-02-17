@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextProvider.java) is part of project Time4J.
  *
@@ -22,6 +22,8 @@
 package net.time4j.format;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
+
 
 /**
  * <p>This <strong>SPI-interface</strong> enables the access to calendrical
@@ -210,5 +212,20 @@ public interface TextProvider {
         Locale locale,
         TextWidth textWidth
     );
+
+    /**
+     * <p>Returns a suitable object for controlling access to resources. </p>
+     *
+     * @return  helper object for accessing resources
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Liefert ein geeignetes Hilfsobjekt zur fein-granularen Kontrolle
+     * des Zugangs zu Ressourcen. </p>
+     *
+     * @return  helper object for accessing resources
+     * @since   2.2
+     */
+    ResourceBundle.Control getControl();
 
 }

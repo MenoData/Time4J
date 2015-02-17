@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UTF8ResourceControl.java) is part of project Time4J.
  *
@@ -130,6 +130,37 @@ class UTF8ResourceControl
             throw new UnsupportedOperationException(
                 "Unknown resource bundle format: " + format);
         }
+
+    }
+
+    @Override
+    public String toBundleName(
+        String baseName,
+        Locale locale
+    ) {
+
+        if (locale == Locale.ROOT) {
+            return baseName;
+        }
+
+        String language = LanguageMatch.getAlias(locale);
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        if (language.isEmpty() && country.isEmpty() && variant.isEmpty()) {
+            return baseName;
+        }
+
+        StringBuilder sb = new StringBuilder(baseName);
+        sb.append('_').append(language);
+
+        if (!variant.isEmpty()) {
+            sb.append('_').append(country).append('_').append(variant);
+        } else if (!country.isEmpty()) {
+            sb.append('_').append(country);
+        }
+
+        return sb.toString();
 
     }
 
