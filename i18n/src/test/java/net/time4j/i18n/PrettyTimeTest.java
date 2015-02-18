@@ -256,7 +256,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 0, MONTHS, TextWidth.SHORT),
-            is("لا أشهر"));
+            is("0 شهر"));
     }
 
     @Test
@@ -265,7 +265,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withEmptyUnit(MONTHS)
                 .print(Duration.of(0, MONTHS), TextWidth.SHORT),
-            is("لا أشهر"));
+            is("0 شهر"));
     }
 
     @Test
@@ -387,7 +387,7 @@ public class PrettyTimeTest {
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
             PrettyTime.of(Locale.FRANCE).print(duration, TextWidth.WIDE),
-            is("15 années, 3 mois, 1 semaine et 2 jours"));
+            is("15 ans, 3 mois, 1 semaine et 2 jours"));
     }
 
     @Test
