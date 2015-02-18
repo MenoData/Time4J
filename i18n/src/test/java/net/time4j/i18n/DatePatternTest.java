@@ -68,7 +68,7 @@ public class DatePatternTest {
                 {"uuuu-MM-dd (QQQQ)",
                         "de",
                         "2009-12-28",
-                        "2009-12-28 (viertes Quartal)"},
+                        "2009-12-28 (4. Quartal)"},
                 {"dd.MM.yyyy G",
                         "de",
                         "2009-12-28",
