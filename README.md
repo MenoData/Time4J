@@ -106,7 +106,7 @@ difference between local and global types. Conversion between these types always
 Plans for next releases:
 ----------------------------------
 
-There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/issues/milestones.
+There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/milestones.
 
 While the main focus of the next releases are standard business use cases, you can expect later more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project. A smooth integration with JSR-310 and Joda-Time is also planned.
 
