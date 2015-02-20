@@ -408,6 +408,7 @@ class JVMZoneReader {
             ) {
                 ots = new ZonalTransition[transitions.length];
                 int previous = rawOffset;
+                int j = 0;
 
                 for (int i = 0; i < transitions.length; i++) {
                     long value = transitions[i];
@@ -415,9 +416,16 @@ class JVMZoneReader {
                     int total = offsets[(int) (value & 0x0FL)];
                     int didx = (int) ((value >>> 4) & 0x0FL);
                     int dst = ((didx == 0) ? 0 : offsets[didx]);
-                    ots[i] = new ZonalTransition(ut, previous, total, dst);
-                    previous = total;
+                    if (previous != total) {
+                        ots[j] = new ZonalTransition(ut, previous, total, dst);
+                        j++;
+                        previous = total;
+                    }
                 }
+
+                ZonalTransition[] copy = new ZonalTransition[j];
+                System.arraycopy(ots, 0, copy, 0, j);
+                ots = copy;
             }
 
             if (simpleTimeZoneParams == null) {

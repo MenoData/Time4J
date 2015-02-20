@@ -50,6 +50,27 @@ public class TraditionalZoneProviderSPI
 
     private static final ZoneProvider NAME_PROVIDER = new ZoneNameProviderSPI();
 
+    //~ Instanzvariablen --------------------------------------------------
+
+    private final String version;
+    private final Map<String, String> aliases;
+
+    //~ Konstruktoren -----------------------------------------------------
+
+    public TraditionalZoneProviderSPI() {
+        super();
+
+        String v = JVMZoneReader.getVersion();
+
+        if (v.startsWith("tzdata")) {
+            v = v.substring(6);
+        }
+
+        this.version = v;
+        this.aliases = JVMZoneReader.getZoneAliases();
+
+    }
+
     //~ Methoden ----------------------------------------------------------
 
     @Override
@@ -68,7 +89,7 @@ public class TraditionalZoneProviderSPI
     @Override
     public Map<String, String> getAliases() {
 
-        return JVMZoneReader.getZoneAliases();
+        return this.aliases;
 
     }
 
@@ -96,13 +117,7 @@ public class TraditionalZoneProviderSPI
     @Override
     public String getVersion() {
 
-        String version = JVMZoneReader.getVersion();
-
-        if (version.startsWith("tzdata")) {
-            version = version.substring(6);
-        }
-
-        return version;
+        return this.version;
 
     }
 
