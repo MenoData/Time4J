@@ -1,9 +1,12 @@
 package net.time4j.tz.model;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
 import net.time4j.base.UnixTime;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
@@ -182,6 +185,19 @@ public class ArrayTransitionModelTest {
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
+    }
+
+    @Test
+    public void getOverlapTransition5() {
+        Moment m = Moment.of(THIRD.getPosixTime(), TimeScale.POSIX);
+        ZonalOffset offset =
+            ZonalOffset.ofTotalSeconds(THIRD.getPreviousOffset());
+        PlainTimestamp tsp = m.toZonalTimestamp(offset);
+        assertThat(
+            MODEL.getConflictTransition(
+                tsp.getCalendarDate(),
+                tsp.getWallTime()),
+            is(THIRD));
     }
 
     @Test
