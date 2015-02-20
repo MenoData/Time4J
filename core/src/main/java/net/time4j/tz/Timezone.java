@@ -410,7 +410,8 @@ public abstract class Timezone
      * @param       locale  ISO-3166-alpha-2-country to be evaluated
      * @return      unmodifiable set of preferred timezone ids
      * @see         #getPreferredIDs(Locale, boolean, String)
-     * @deprecated  For clarity, use the 3-parameter-method instead
+     * @deprecated  For clarity, use the 3-parameter-method instead (will
+     *              be removed in next major release)
      */
     /*[deutsch]
      * <p>&Auml;quivalent zu
@@ -419,7 +420,8 @@ public abstract class Timezone
      * @param       locale  ISO-3166-alpha-2-country to be evaluated
      * @return      unmodifiable set of preferred timezone ids
      * @see         #getPreferredIDs(Locale, boolean, String)
-     * @deprecated  For clarity, use the 3-parameter-method instead
+     * @deprecated  For clarity, use the 3-parameter-method instead (will
+     *              be removed in next major release)
      */
     @Deprecated
     public static Set<TZID> getPreferredIDs(Locale locale) {
@@ -902,6 +904,28 @@ public abstract class Timezone
     }
 
     /**
+     * <p>Tries to get the version of given registered zone provider. </p>
+     *
+     * @return  String (empty if unknown)
+     * @throws  IllegalArgumentException if the provider argument is empty
+     * @since   2.2
+     */
+    /*[deutsch]
+     * <p>Versucht die Version des angegebenen und registrierten
+     * {@code ZoneProvider} zu ermitteln. </p>
+     *
+     * @return  String (empty if unknown)
+     * @throws  IllegalArgumentException if the provider argument is empty
+     * @since   2.2
+     */
+    public static String getVersion(String provider) {
+
+        ZoneProvider zp = getProvider(provider);
+        return ((zp == null) ? "" : zp.getVersion());
+
+    }
+
+    /**
      * <p>Yields the names of all registered
      * {@code ZoneProvider}-instances. </p>
      *
@@ -1072,7 +1096,7 @@ public abstract class Timezone
                 "Default zone provider cannot be overridden.");
         } else if (name.equals(NAME_ZONENAMES)) {
             throw new IllegalArgumentException(
-                "Reserved zone name provider cannot be used.");
+                "Reserved zone name provider cannot be replaced.");
         }
 
         boolean inserted = (PROVIDERS.putIfAbsent(name, provider) == null);
