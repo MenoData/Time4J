@@ -25,6 +25,7 @@ import net.time4j.ClockUnit;
 import net.time4j.Month;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -41,8 +42,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SimpleTimeZone;
 
 
@@ -89,6 +92,16 @@ class JVMZoneReader {
 
     private static final byte TAG_TZ_DATA_VERSION = 68; // 0x44
     private static final byte TAG_ZONE_ALIASES = 67; // 0x43
+
+    private static final Set<String> SOLAR;
+
+    static {
+        Set<String> solar = new HashSet<String>();
+        solar.add("Asia/Riyadh87");
+        solar.add("Asia/Riyadh88");
+        solar.add("Asia/Riyadh89");
+        SOLAR = Collections.unmodifiableSet(solar);
+    }
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -414,8 +427,14 @@ class JVMZoneReader {
                     long value = transitions[i];
                     long ut = (value >> 12) / 1000; // Vorzeichen konservieren!
                     int total = offsets[(int) (value & 0x0FL)];
+
                     int didx = (int) ((value >>> 4) & 0x0FL);
                     int dst = ((didx == 0) ? 0 : offsets[didx]);
+
+                    if (SOLAR.contains(id)) {
+                        dst = 0; // workaround for negative dst
+                    }
+
                     if (previous != total) {
                         ots[j] = new ZonalTransition(ut, previous, total, dst);
                         j++;
@@ -423,13 +442,18 @@ class JVMZoneReader {
                     }
                 }
 
-                ZonalTransition[] copy = new ZonalTransition[j];
-                System.arraycopy(ots, 0, copy, 0, j);
-                ots = copy;
+                if (j < transitions.length) {
+                    ZonalTransition[] copy = new ZonalTransition[j];
+                    System.arraycopy(ots, 0, copy, 0, j);
+                    ots = copy;
+                }
             }
 
             if (simpleTimeZoneParams == null) {
-                if (ots != null) {
+                if (ots == null) {
+                    ZonalOffset offset = ZonalOffset.ofTotalSeconds(rawOffset);
+                    model = Timezone.of(offset).getHistory();
+                } else {
                     model = TransitionModel.of(Arrays.asList(ots));
                 }
             } else {
@@ -488,11 +512,18 @@ class JVMZoneReader {
                             ZonalOffset.ofTotalSeconds(rawOffset),
                             rules);
                 } else {
-                    model =
-                        TransitionModel.of(
-                            ZonalOffset.ofTotalSeconds(rawOffset),
-                            Arrays.asList(ots),
-                            rules);
+                    try {
+                        model =
+                            TransitionModel.of(
+                                ZonalOffset.ofTotalSeconds(rawOffset),
+                                Arrays.asList(ots),
+                                rules);
+                    } catch (IllegalArgumentException iae) {
+                        // hack for handling broken data (removing last rules)
+                        // sometimes inconsistent rules like in 2013h/Casablanca
+                        model = TransitionModel.of(Arrays.asList(ots));
+                        System.err.println("Inconsistent timezone data: " + id);
+                    }
                 }
             }
 
