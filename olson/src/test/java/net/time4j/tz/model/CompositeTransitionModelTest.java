@@ -1,8 +1,10 @@
 package net.time4j.tz.model;
 
+import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.base.UnixTime;
 import net.time4j.tz.OffsetSign;
@@ -36,6 +38,8 @@ public class CompositeTransitionModelTest {
 
     private static final TransitionHistory MODEL = createModel(false);
     private static final TransitionHistory MODEL_EXT = createModel(true);
+    private static final TransitionHistory MODEL_SINGLE =
+        createSingleRuleModel();
 
     private static final ZonalTransition FOURTH =
         new ZonalTransition(
@@ -67,18 +71,21 @@ public class CompositeTransitionModelTest {
             ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 0, 30);
         assertThat(MODEL.getInitialOffset(), is(expected));
         assertThat(MODEL_EXT.getInitialOffset(), is(expected));
+        assertThat(MODEL_SINGLE.getInitialOffset(), is(expected));
     }
 
     @Test
     public void getStartTransition1() {
         assertThat(MODEL.getStartTransition(new UT(-1)), nullValue());
         assertThat(MODEL_EXT.getStartTransition(new UT(-1)), nullValue());
+        assertThat(MODEL_SINGLE.getStartTransition(new UT(-1)), nullValue());
     }
 
     @Test
     public void getStartTransition2() {
         assertThat(MODEL.getStartTransition(new UT(0)), is(FIRST));
         assertThat(MODEL_EXT.getStartTransition(new UT(0)), is(FIRST));
+        assertThat(MODEL_SINGLE.getStartTransition(new UT(0)), is(FIRST));
     }
 
     @Test
@@ -88,6 +95,9 @@ public class CompositeTransitionModelTest {
             is(FIRST));
         assertThat(
             MODEL_EXT.getStartTransition(new UT(365 * 86400L - 1)),
+            is(FIRST));
+        assertThat(
+            MODEL_SINGLE.getStartTransition(new UT(365 * 86400L - 1)),
             is(FIRST));
     }
 
@@ -99,6 +109,9 @@ public class CompositeTransitionModelTest {
         assertThat(
             MODEL_EXT.getStartTransition(new UT(365 * 86400L)),
             is(SECOND));
+        assertThat(
+            MODEL_SINGLE.getStartTransition(new UT(365 * 86400L)),
+            is(SECOND));
     }
 
     @Test
@@ -108,8 +121,11 @@ public class CompositeTransitionModelTest {
             MODEL.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
         ZonalTransition ztExt =
             MODEL_EXT.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
+        ZonalTransition ztSingle =
+            MODEL_SINGLE.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
         assertThat(zt, is(expected));
         assertThat(ztExt, is(expected));
+        assertThat(ztSingle, is(expected));
     }
 
     @Test
@@ -130,12 +146,14 @@ public class CompositeTransitionModelTest {
     public void getNextTransition1() {
         assertThat(MODEL.getNextTransition(new UT(-1)), is(FIRST));
         assertThat(MODEL_EXT.getNextTransition(new UT(-1)), is(FIRST));
+        assertThat(MODEL_SINGLE.getNextTransition(new UT(-1)), is(FIRST));
     }
 
     @Test
     public void getNextTransition2() {
         assertThat(MODEL.getNextTransition(new UT(0)), is(SECOND));
         assertThat(MODEL_EXT.getNextTransition(new UT(0)), is(SECOND));
+        assertThat(MODEL_SINGLE.getNextTransition(new UT(0)), is(SECOND));
     }
 
     @Test
@@ -145,6 +163,9 @@ public class CompositeTransitionModelTest {
             is(THIRD));
         assertThat(
             MODEL_EXT.getNextTransition(new UT(THIRD.getPosixTime() - 1)),
+            is(THIRD));
+        assertThat(
+            MODEL_SINGLE.getNextTransition(new UT(THIRD.getPosixTime() - 1)),
             is(THIRD));
     }
 
@@ -156,6 +177,13 @@ public class CompositeTransitionModelTest {
         assertThat(
             MODEL_EXT.getNextTransition(new UT(THIRD.getPosixTime())),
             is(FOURTH));
+        Moment m =
+            PlainTimestamp.of(1973, 3, 1, 1, 0)
+                .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY))
+                .atUTC();
+        assertThat(
+            MODEL_SINGLE.getNextTransition(new UT(THIRD.getPosixTime())),
+            is(new ZonalTransition(m.getPosixTime(), 7200, 7200, 3600)));
     }
 
     @Test
@@ -510,6 +538,7 @@ public class CompositeTransitionModelTest {
     public void isEmpty() {
         assertThat(MODEL.isEmpty(), is(false));
         assertThat(MODEL_EXT.isEmpty(), is(false));
+        assertThat(MODEL_SINGLE.isEmpty(), is(false));
     }
 
     @Test
@@ -557,6 +586,26 @@ public class CompositeTransitionModelTest {
                 true,
                 true);
         }
+    }
+
+    private static TransitionHistory createSingleRuleModel() {
+        List<ZonalTransition> transitions = Arrays.asList(FIRST, THIRD, SECOND);
+        DaylightSavingRule rule =
+            GregorianTimezoneRule.ofLastWeekday(
+                Month.MARCH,
+                Weekday.SUNDAY,
+                PlainTime.of(1),
+                OffsetIndicator.UTC_TIME,
+                3600);
+        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        rules.add(rule);
+
+        return new CompositeTransitionModel(
+            1,
+            transitions,
+            rules,
+            true,
+            true);
     }
 
     // Hilfsklasse

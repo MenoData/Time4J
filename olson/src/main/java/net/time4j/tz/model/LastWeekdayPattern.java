@@ -111,7 +111,7 @@ final class LastWeekdayPattern
         sb.append("LastDayOfWeekPattern:[month=");
         sb.append(this.getMonth());
         sb.append(",day-of-week=");
-        sb.append(this.dayOfWeek);
+        sb.append(Weekday.valueOf(this.dayOfWeek));
         sb.append(",time-of-day=");
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");

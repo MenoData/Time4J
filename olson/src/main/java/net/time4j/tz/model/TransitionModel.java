@@ -104,7 +104,7 @@ public abstract class TransitionModel
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 0 or exactly 1 or more than 127 rules
+     *          or if there are more than 127 rules
      * @since   2.2
      */
     /*[deutsch]
@@ -114,7 +114,7 @@ public abstract class TransitionModel
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 0 or exactly 1 or more than 127 rules
+     *          or if there are more than 127 rules
      * @since   2.2
      */
     public static TransitionHistory of(
@@ -139,7 +139,7 @@ public abstract class TransitionModel
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 0 or exactly 1 or more than 127 rules
+     *          or if there are more than 127 rules
      * @since   2.2
      */
     /*[deutsch]
@@ -151,7 +151,7 @@ public abstract class TransitionModel
      * @param   rules           list of daylight saving rules
      * @return  new transition history
      * @throws  IllegalArgumentException in any case of inconsistencies
-     *          or if there are less than 0 or exactly 1 or more than 127 rules
+     *          or if there are more than 127 rules
      * @since   2.2
      */
     public static TransitionHistory of(

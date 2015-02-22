@@ -114,9 +114,9 @@ final class RuleBasedTransitionModel
         super();
 
         // various data sanity checks
-        if (rules.size() < 2) {
+        if (rules.isEmpty()) {
             throw new IllegalArgumentException(
-                "At least two daylight saving rules required: " + rules);
+                "Missing daylight saving rules.");
         } else if (rules.size() >= 128) {
             throw new IllegalArgumentException(
                 "Too many daylight saving rules: " + rules);
@@ -131,21 +131,24 @@ final class RuleBasedTransitionModel
         boolean hasRuleWithoutDST = false;
         String calendarType = null;
 
-        for (DaylightSavingRule rule : sortedRules) {
-            if (rule.getSavings() == 0) {
-                hasRuleWithoutDST = true;
+        if (sortedRules.size() > 1) {
+            for (DaylightSavingRule rule : sortedRules) {
+                if (rule.getSavings() == 0) {
+                    hasRuleWithoutDST = true;
+                }
+                if (calendarType == null) {
+                    calendarType = rule.getCalendarType();
+                } else if (!calendarType.equals(rule.getCalendarType())) {
+                    throw new IllegalArgumentException(
+                        "Rules with different calendar systems not permitted.");
+                }
             }
-            if (calendarType == null) {
-                calendarType = rule.getCalendarType();
-            } else if (!calendarType.equals(rule.getCalendarType())) {
-                throw new IllegalArgumentException(
-                    "Rules with different calendar systems not permitted.");
-            }
-        }
 
-        if (!hasRuleWithoutDST) {
-            throw new IllegalArgumentException(
-                "No daylight saving rule with zero dst-offset found: " + rules);
+            if (!hasRuleWithoutDST) {
+                throw new IllegalArgumentException(
+                    "No daylight saving rule with zero dst-offset found: "
+                    + rules);
+            }
         }
 
         this.gregorian = CalendarText.ISO_CALENDAR_TYPE.equals(calendarType);
