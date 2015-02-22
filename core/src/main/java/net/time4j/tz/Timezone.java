@@ -248,6 +248,8 @@ public abstract class Timezone
         temp1.put("UT", ZonalOffset.UTC);
         temp1.put("UTC", ZonalOffset.UTC);
         temp1.put("GMT", ZonalOffset.UTC);
+        temp1.put("UTC0", ZonalOffset.UTC);
+        temp1.put("GMT0", ZonalOffset.UTC);
 
         for (Class<? extends TZID> area : areas) {
             for (TZID tzid : area.getEnumConstants()) {
@@ -538,9 +540,11 @@ public abstract class Timezone
      */
     public static Timezone ofSystem() {
 
-        if (ALLOW_SYSTEM_TZ_OVERRIDE) {
+        if (ALLOW_SYSTEM_TZ_OVERRIDE && (currentSystemTZ != null)) {
             return currentSystemTZ;
         } else {
+            // detect premature class initialization
+            assert (SYSTEM_TZ_ORIGINAL != null);
             return SYSTEM_TZ_ORIGINAL;
         }
 
@@ -1218,10 +1222,11 @@ public abstract class Timezone
 
         ZoneProvider provider = DEFAULT_PROVIDER;
 
-        if (
-            !providerName.isEmpty()
-            && !providerName.equals(NAME_DEFAULT)
-        ) {
+        boolean useDefault = (
+            providerName.isEmpty()
+            || providerName.equals(NAME_DEFAULT));
+
+        if (!useDefault) {
             provider = PROVIDERS.get(providerName);
 
             if (provider == null) {
@@ -1243,7 +1248,7 @@ public abstract class Timezone
         TZID resolved = tzid;
 
         if (resolved == null) {
-            if (providerName.isEmpty()) {
+            if (useDefault) {
                 TZID result = resolve(zoneKey);
                 if (result instanceof ZonalOffset) {
                     return ((ZonalOffset) result).getModel();
@@ -1355,20 +1360,20 @@ public abstract class Timezone
 
     }
 
-    private static TZID resolve(String zoneID) {
+    private static TZID resolve(String zoneKey) {
 
         // enums bevorzugen
-        TZID resolved = PREDEFINED.get(zoneID);
+        TZID resolved = PREDEFINED.get(zoneKey);
 
         if (resolved == null) {
-            if (zoneID.startsWith("GMT")) {
-                zoneID = "UTC" + zoneID.substring(3);
+            if (zoneKey.startsWith("GMT")) {
+                zoneKey = "UTC" + zoneKey.substring(3);
             }
 
-            resolved = ZonalOffset.parse(zoneID, false);
+            resolved = ZonalOffset.parse(zoneKey, false);
 
             if (resolved == null) {
-                resolved = new NamedID(zoneID);
+                resolved = new NamedID(zoneKey);
             }
         }
 
@@ -1624,7 +1629,16 @@ public abstract class Timezone
             list.add(ZonalOffset.UTC);
 
             for (Map.Entry<String, ZoneProvider> e : PROVIDERS.entrySet()) {
-                for (String id : e.getValue().getAvailableIDs()) {
+                ZoneProvider zp = e.getValue();
+
+                if (
+                    (zp == PLATFORM_PROVIDER)
+                    && (DEFAULT_PROVIDER != PLATFORM_PROVIDER)
+                ) {
+                    continue;
+                }
+
+                for (String id : zp.getAvailableIDs()) {
                     TZID tzid = resolve(id);
 
                     // wegen resolve() genügt Vergleich per equals()

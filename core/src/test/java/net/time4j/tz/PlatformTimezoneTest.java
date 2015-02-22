@@ -21,6 +21,8 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class PlatformTimezoneTest {
 
+    private static final String PREFIX = "java.util.TimeZone~";
+
     @Test
     public void getOffsetOfUnixTimeSTD() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
@@ -258,24 +260,18 @@ public class PlatformTimezoneTest {
 
     @Test
     public void ofTZID() {
-        TZID tzid = Timezone.of("Europe/Berlin").getID();
+        TZID tzid = Timezone.of(PREFIX + "Europe/Berlin").getID();
         Timezone expected = loadFromPlatform("Europe/Berlin");
         assertThat(Timezone.of(tzid), is(expected));
     }
 
     @Test
     public void ofTZIDFallback() {
-        TZID fallback = Timezone.of("Europe/Berlin").getID();
+        TZID fallback = Timezone.of(PREFIX + "Europe/Berlin").getID();
         Timezone expected = loadFromPlatform("Europe/Berlin");
         assertThat(
             Timezone.of("???", fallback),
             is(expected));
-    }
-
-    @Test
-    public void ofValidTZIDAsString() {
-        Timezone expected = loadFromPlatform("Europe/Berlin");
-        assertThat(Timezone.of("Europe/Berlin"), is(expected));
     }
 
     @Test(expected=IllegalArgumentException.class)
