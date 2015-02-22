@@ -24,10 +24,22 @@ import org.junit.runners.JUnit4;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(JUnit4.class)
 public class WindowsZoneTest {
+
+    @Test
+    public void loadAll() {
+        for (TZID tzid : Timezone.getAvailableIDs("WINDOWS")) {
+            try {
+                Timezone.of(tzid);
+            } catch (RuntimeException ex) {
+                fail(ex.getMessage());
+            }
+        }
+    }
 
     @Test(expected=IllegalArgumentException.class)
     public void ofInvalidNameXYZ() {
