@@ -245,6 +245,18 @@ public enum MilitaryZone
 
     }
 
+    /**
+     * <p>Yields a canonical form of this timezone identifier, for
+     * example &quot;MILITARY~UTC+01:00&quot;. </p>
+     *
+     * @return  String in format &quot;MILITARY~{offset}&quot;
+     */
+    /*[deutsch]
+     * <p>Liefert eine kanonische Form dieser Zeitzonen-ID, zum Beispiel
+     * &quot;MILITARY~UTC+01:00&quot;. </p>
+     *
+     * @return  String in format &quot;MILITARY~{offset}&quot;
+     */
     @Override
     public String canonical() {
 
