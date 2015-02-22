@@ -22,7 +22,6 @@
 package net.time4j.tz.model;
 
 import net.time4j.base.GregorianDate;
-import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.tz.ZonalOffset;
@@ -70,7 +69,6 @@ final class CompositeTransitionModel
         int size,
         List<ZonalTransition> transitions,
         List<DaylightSavingRule> rules,
-        TimeSource<?> clock,
         boolean create,
         boolean sanityCheck
     ) {
@@ -78,10 +76,10 @@ final class CompositeTransitionModel
 
         this.size = size;
         this.arrayModel =
-            new ArrayTransitionModel(transitions, clock, create, sanityCheck);
+            new ArrayTransitionModel(transitions, create, sanityCheck);
         this.last = this.arrayModel.getLastTransition();
         this.ruleModel =
-            new RuleBasedTransitionModel(this.last, rules, clock, create);
+            new RuleBasedTransitionModel(this.last, rules, create);
 
     }
 

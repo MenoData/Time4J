@@ -22,12 +22,9 @@
 package net.time4j.tz.model;
 
 import net.time4j.Moment;
-import net.time4j.SystemClock;
-import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
-import net.time4j.base.TimeSource;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -41,9 +38,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.tz.ZonalOffset.UTC;
 
 
 /**
@@ -170,7 +164,6 @@ public abstract class TransitionModel
             initialOffset,
             transitions,
             rules,
-            SystemClock.INSTANCE,
             true,
             true);
 
@@ -188,7 +181,6 @@ public abstract class TransitionModel
         ZonalOffset initialOffset,
         List<ZonalTransition> transitions,
         List<DaylightSavingRule> rules,
-        TimeSource<?> clock,
         boolean create,
         boolean sanityCheck
     ) {
@@ -215,7 +207,6 @@ public abstract class TransitionModel
                 return new RuleBasedTransitionModel(
                     initialOffset,
                     r,
-                    clock,
                     false);
             }
         }
@@ -230,20 +221,19 @@ public abstract class TransitionModel
         }
 
         if (r.isEmpty()) {
-            return new ArrayTransitionModel(t, clock, false, sanityCheck);
+            return new ArrayTransitionModel(t, false, sanityCheck);
         }
 
         ZonalTransition last = t.get(n - 1);
-        Moment t1 = Moment.of(last.getPosixTime() + 1, TimeScale.POSIX);
-        ZonalClock c = new ZonalClock(clock, UTC);
-        Moment t2 = c.now().plus(1, YEARS).atUTC();
+        long t1 = last.getPosixTime() + 1;
+        long t2 = getFutureMoment(1);
 
-        if (t1.isBefore(t2)) {
+        if (t1 < t2) {
             t.addAll( // enhance array part
                 RuleBasedTransitionModel.getTransitions(last, r, t1, t2));
         }
 
-        return new CompositeTransitionModel(n, t, r, clock, false, sanityCheck);
+        return new CompositeTransitionModel(n, t, r, false, sanityCheck);
 
     }
 
@@ -300,6 +290,12 @@ public abstract class TransitionModel
         buffer.append(", DST=");
         buffer.append(format(transition.getDaylightSavingOffset()));
         buffer.append(NEW_LINE);
+
+    }
+
+    static long getFutureMoment(int years) {
+
+        return (System.currentTimeMillis() / 1000) + 366 * years * 86400L;
 
     }
 

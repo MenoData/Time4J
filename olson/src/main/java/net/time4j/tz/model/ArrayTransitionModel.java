@@ -21,11 +21,7 @@
 
 package net.time4j.tz.model;
 
-import net.time4j.Moment;
-import net.time4j.SystemClock;
-import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
-import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.tz.ZonalOffset;
@@ -41,7 +37,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static net.time4j.CalendarUnit.YEARS;
 
 /**
  * <p>Array-basiertes &Uuml;bergangsmodell. </p>
@@ -69,13 +64,12 @@ final class ArrayTransitionModel
     //~ Konstruktoren -----------------------------------------------------
 
     ArrayTransitionModel(List<ZonalTransition> transitions) {
-        this(transitions, SystemClock.INSTANCE, true, true);
+        this(transitions, true, true);
 
     }
 
     ArrayTransitionModel(
         List<ZonalTransition> transitions,
-        TimeSource<?> clock,
         boolean create,
         boolean sanityCheck
     ) {
@@ -101,10 +95,8 @@ final class ArrayTransitionModel
         this.transitions = tmp;
 
         // fill standard transition cache
-        ZonalClock c = new ZonalClock(clock, ZonalOffset.UTC);
-        Moment end = c.now().plus(1, YEARS).atUTC();
-        this.stdTransitions =
-            getTransitions(this.transitions, Moment.UNIX_EPOCH, end);
+        long end = TransitionModel.getFutureMoment(1);
+        this.stdTransitions = getTransitions(this.transitions, 0L, end);
 
     }
 
@@ -175,7 +167,10 @@ final class ArrayTransitionModel
         UnixTime endExclusive
     ) {
 
-        return getTransitions(this.transitions, startInclusive, endExclusive);
+        return getTransitions(
+            this.transitions,
+            startInclusive.getPosixTime(),
+            endExclusive.getPosixTime());
 
     }
 
@@ -421,12 +416,12 @@ final class ArrayTransitionModel
 
     private static List<ZonalTransition> getTransitions(
         ZonalTransition[] transitions,
-        UnixTime startInclusive,
-        UnixTime endExclusive
+        long startInclusive,
+        long endExclusive
     ) {
 
-        long start = startInclusive.getPosixTime();
-        long end = endExclusive.getPosixTime();
+        long start = startInclusive;
+        long end = endExclusive;
 
         if (start > end) {
             throw new IllegalArgumentException("Start after end.");

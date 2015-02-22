@@ -23,11 +23,9 @@ package net.time4j.tz.model;
 
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
-import net.time4j.SystemClock;
-import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
-import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
@@ -45,8 +43,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.time4j.CalendarUnit.YEARS;
-
 
 /**
  * <p>Regelbasiertes &Uuml;bergangsmodell. </p>
@@ -61,9 +57,14 @@ final class RuleBasedTransitionModel
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int LAST_CACHED_YEAR =
-        SystemClock.inZonalView(ZonalOffset.UTC).today()
-        .plus(100, YEARS).getYear();
+    private static final int LAST_CACHED_YEAR;
+
+    static {
+        long ly = TransitionModel.getFutureMoment(100);
+        long mjd = EpochDays.MODIFIED_JULIAN_DATE.transform(ly, EpochDays.UNIX);
+        LAST_CACHED_YEAR =
+            GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
+    }
 
     private static final long serialVersionUID = 2456700806862862287L;
 
@@ -84,14 +85,13 @@ final class RuleBasedTransitionModel
         ZonalOffset stdOffset,
         List<DaylightSavingRule> rules
     ) {
-        this(stdOffset, rules, SystemClock.INSTANCE, true);
+        this(stdOffset, rules, true);
 
     }
 
     RuleBasedTransitionModel(
         ZonalOffset stdOffset,
         List<DaylightSavingRule> rules,
-        TimeSource<?> clock,
         boolean create
     ) {
         this(
@@ -101,7 +101,6 @@ final class RuleBasedTransitionModel
                 stdOffset.getIntegralAmount(),
                 0),
             rules,
-            clock,
             create
         );
 
@@ -110,7 +109,6 @@ final class RuleBasedTransitionModel
     RuleBasedTransitionModel(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
-        TimeSource<?> clock,
         boolean create
     ) {
         super();
@@ -180,10 +178,8 @@ final class RuleBasedTransitionModel
         this.rules = Collections.unmodifiableList(sortedRules);
 
         // fill standard transition cache
-        ZonalClock c = new ZonalClock(clock, ZonalOffset.UTC);
-        Moment end = c.now().plus(1, YEARS).atUTC();
-        this.stdTransitions =
-            getTransitions(this.initial, this.rules, Moment.UNIX_EPOCH, end);
+        long end = TransitionModel.getFutureMoment(1);
+        this.stdTransitions = getTransitions(this.initial, this.rules, 0L, end);
 
     }
 
@@ -284,8 +280,8 @@ final class RuleBasedTransitionModel
         return getTransitions(
             this.initial,
             this.rules,
-            startInclusive,
-            endExclusive);
+            startInclusive.getPosixTime(),
+            endExclusive.getPosixTime());
 
     }
 
@@ -436,13 +432,13 @@ final class RuleBasedTransitionModel
     static List<ZonalTransition> getTransitions(
         ZonalTransition initial,
         List<DaylightSavingRule> rules,
-        UnixTime startInclusive,
-        UnixTime endExclusive
+        long startInclusive,
+        long endExclusive
     ) {
 
         long preModel = initial.getPosixTime();
-        long start = startInclusive.getPosixTime();
-        long end = endExclusive.getPosixTime();
+        long start = startInclusive;
+        long end = endExclusive;
 
         if (start > end) {
             throw new IllegalArgumentException("Start after end.");

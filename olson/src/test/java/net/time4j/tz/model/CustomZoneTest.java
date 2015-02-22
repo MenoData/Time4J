@@ -167,7 +167,6 @@ public class CustomZoneTest {
             4,
             Arrays.asList(fourth, first, third, second),
             rules,
-            SystemClock.INSTANCE,
             true,
             true);
     }

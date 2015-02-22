@@ -3,15 +3,14 @@ package net.time4j.tz.model;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.SystemClock;
 import net.time4j.Weekday;
-import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -466,17 +465,23 @@ public class CompositeTransitionModelTest {
     }
 
     @Test
-    public void getStdTransitions() {
+    public void getStdTransitions() throws IOException {
         List<ZonalTransition> expected =
             Arrays.asList(FIRST, SECOND, THIRD);
         List<ZonalTransition> expectedExt =
             Arrays.asList(FIRST, SECOND, THIRD, FOURTH, FIFTH);
+        long t1 = THIRD.getPosixTime() + 1;
+        long t2 = TransitionModel.getFutureMoment(1);
+
         assertThat(
             MODEL.getStdTransitions(),
             is(expected));
         assertThat(
-            MODEL_EXT.getStdTransitions(),
-            is(expectedExt));
+            MODEL_EXT.getStdTransitions().containsAll(expectedExt),
+            is(true));
+        assertThat(
+            (long) MODEL_EXT.getStdTransitions().size(),
+            is((t2 - t1) * 2 / (366 * 86400) + 3));
     }
 
     @Test
@@ -542,12 +547,6 @@ public class CompositeTransitionModelTest {
                 ZonalOffset.ofTotalSeconds(FIRST.getPreviousOffset()),
                 transitions,
                 rules,
-                new TimeSource<UnixTime>() {
-                    @Override
-                    public UnixTime currentTime() {
-                        return PlainDate.of(1972, 6, 30).atStartOfDay().atUTC();
-                    }
-                },
                 true,
                 true);
         } else {
@@ -555,7 +554,6 @@ public class CompositeTransitionModelTest {
                 3,
                 transitions,
                 rules,
-                SystemClock.INSTANCE,
                 true,
                 true);
         }

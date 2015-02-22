@@ -1,5 +1,6 @@
 package net.time4j.tz.model;
 
+import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -192,7 +193,12 @@ public class ArrayTransitionModelTest {
         Moment m = Moment.of(THIRD.getPosixTime(), TimeScale.POSIX);
         ZonalOffset offset =
             ZonalOffset.ofTotalSeconds(THIRD.getPreviousOffset());
+
+        // go back to first ambivalent local timestamp
         PlainTimestamp tsp = m.toZonalTimestamp(offset);
+        int delta = -THIRD.getSize();
+        tsp = tsp.minus(delta, ClockUnit.SECONDS);
+
         assertThat(
             MODEL.getConflictTransition(
                 tsp.getCalendarDate(),
