@@ -323,13 +323,13 @@ public final class ZonalTransition
      * <p>Gets the difference between new and old total shift as
      * measure for the size of this transition. </p>
      *
-     * @return  change of total shift in seconds
+     * @return  change of total shift in seconds (negative in case of overlap)
      */
     /*[deutsch]
      * <p>Liefert die Differenz zwischen neuer und alter Gesamtverschiebung
      * als Ma&szlig; f&uuml;r die Gr&ouml;&szlig;e des &Uuml;bergangs. </p>
      *
-     * @return  change of total shift in seconds
+     * @return  change of total shift in seconds (negative in case of overlap)
      */
     public int getSize() {
 

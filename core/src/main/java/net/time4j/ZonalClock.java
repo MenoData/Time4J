@@ -114,7 +114,7 @@ public final class ZonalClock {
     /**
      * <p>Constructs a new clock which can yield the current local time in
      * given timezone. </p>
-     * 
+     *
      * <p>Most users have no need to directly call this constructor. It is
      * mainly designed for being called by dedicated expressions like
      * {@code SystemClock.inZonalView(tzid)} etc. </p>

@@ -138,7 +138,7 @@ final class DayOfWeekInMonthPattern
         sb.append(",dayOfMonth=");
         sb.append(this.dayOfMonth);
         sb.append(",dayOfWeek=");
-        sb.append(this.dayOfWeek);
+        sb.append(Weekday.valueOf(this.dayOfWeek));
         sb.append(",time-of-day=");
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");
