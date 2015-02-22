@@ -24,7 +24,6 @@ package net.time4j.tz.model;
 import net.time4j.Month;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
 import net.time4j.tz.ZonalOffset;
@@ -65,8 +64,8 @@ final class SPX
     /** Serialisierungstyp von {@code DayOfWeekInMonthPattern}. */
     static final int DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE = 121;
 
-    /** Serialisierungstyp von {@code LastDayOfWeekPattern}. */
-    static final int LAST_DAY_OF_WEEK_PATTERN_TYPE = 122;
+    /** Serialisierungstyp von {@code LastWeekdayPattern}. */
+    static final int LAST_WEEKDAY_PATTERN_TYPE = 122;
 
     /** Serialisierungstyp von {@code RuleBasedTransitionModel}. */
     static final int RULE_BASED_TRANSITION_MODEL_TYPE = 125;
@@ -155,7 +154,7 @@ final class SPX
             case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
                 writeDayOfWeekInMonthPattern(this.obj, out);
                 break;
-            case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+            case LAST_WEEKDAY_PATTERN_TYPE:
                 writeLastDayOfWeekPattern(this.obj, out);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
@@ -200,7 +199,7 @@ final class SPX
             case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
                 this.obj = readDayOfWeekInMonthPattern(in);
                 break;
-            case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+            case LAST_WEEKDAY_PATTERN_TYPE:
                 this.obj = readLastDayOfWeekPattern(in);
                 break;
             case RULE_BASED_TRANSITION_MODEL_TYPE:
@@ -352,7 +351,7 @@ final class SPX
                 case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
                     writeDayOfWeekInMonthPattern(rule, out);
                     break;
-                case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+                case LAST_WEEKDAY_PATTERN_TYPE:
                     writeLastDayOfWeekPattern(rule, out);
                     break;
                 default:
@@ -387,7 +386,7 @@ final class SPX
                 case DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE:
                     rule = readDayOfWeekInMonthPattern(in);
                     break;
-                case LAST_DAY_OF_WEEK_PATTERN_TYPE:
+                case LAST_WEEKDAY_PATTERN_TYPE:
                     rule = readLastDayOfWeekPattern(in);
                     break;
                 default:
@@ -585,7 +584,7 @@ final class SPX
         DataOutput out
     ) throws IOException {
 
-        LastDayOfWeekPattern pattern = (LastDayOfWeekPattern) rule;
+        LastWeekdayPattern pattern = (LastWeekdayPattern) rule;
         boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
         int second = (pattern.getDayOfWeek() << 5);
         int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
@@ -635,7 +634,7 @@ final class SPX
         PlainTime timeOfDay =
             PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
 
-        return new LastDayOfWeekPattern(
+        return new LastWeekdayPattern(
             month,
             dayOfWeek,
             timeOfDay,
@@ -699,7 +698,6 @@ final class SPX
         return new RuleBasedTransitionModel(
             initial,
             rules,
-            SystemClock.INSTANCE,
             false);
 
     }
@@ -719,7 +717,6 @@ final class SPX
 
         return new ArrayTransitionModel(
             readTransitions(in),
-            SystemClock.INSTANCE,
             false,
             false);
 
@@ -745,7 +742,6 @@ final class SPX
             ZonalOffset.ofTotalSeconds(transitions.get(0).getPreviousOffset()),
             transitions,
             readRules(in),
-            SystemClock.INSTANCE,
             false,
             false);
 

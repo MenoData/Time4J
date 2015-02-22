@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (LastDayOfWeekPattern.java) is part of project Time4J.
+ * This file (LastWeekdayPattern.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -36,7 +36,7 @@ import net.time4j.base.GregorianMath;
  * @serial      include
  * @concurrency <immutable>
  */
-final class LastDayOfWeekPattern
+final class LastWeekdayPattern
     extends GregorianTimezoneRule {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -49,7 +49,7 @@ final class LastDayOfWeekPattern
 
     //~ Konstruktoren -----------------------------------------------------
 
-    LastDayOfWeekPattern(
+    LastWeekdayPattern(
         Month month,
         Weekday dayOfWeek,
         PlainTime timeOfDay,
@@ -85,8 +85,8 @@ final class LastDayOfWeekPattern
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof LastDayOfWeekPattern) {
-            LastDayOfWeekPattern that = (LastDayOfWeekPattern) obj;
+        } else if (obj instanceof LastWeekdayPattern) {
+            LastWeekdayPattern that = (LastWeekdayPattern) obj;
             return (
                 (this.dayOfWeek == that.dayOfWeek)
                 && super.isEqual(that)
@@ -142,7 +142,7 @@ final class LastDayOfWeekPattern
     @Override
     int getType() {
 
-        return SPX.LAST_DAY_OF_WEEK_PATTERN_TYPE;
+        return SPX.LAST_WEEKDAY_PATTERN_TYPE;
 
     }
 

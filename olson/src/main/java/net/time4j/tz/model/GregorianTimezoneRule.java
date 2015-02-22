@@ -155,7 +155,7 @@ public class GregorianTimezoneRule
         int savings
     ) {
 
-        return new LastDayOfWeekPattern(
+        return new LastWeekdayPattern(
             month, dayOfWeek, timeOfDay, indicator, savings);
 
     }
