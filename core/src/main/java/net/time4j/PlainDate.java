@@ -1585,6 +1585,7 @@ public final class PlainDate
                 long months =
                     MathUtils.safeAdd(context.getEpochMonths(), amount);
                 return PlainDate.fromEpochMonths(
+                    context,
                     months,
                     context.dayOfMonth,
                     policy);
@@ -1810,10 +1811,18 @@ public final class PlainDate
     }
 
     private static PlainDate fromEpochMonths(
+        PlainDate context,
         long emonths,
         int dayOfMonth,
         OverflowPolicy policy
     ) {
+
+        if (
+            (policy == OverflowPolicy.KEEPING_LAST_DATE)
+            && (context.dayOfMonth == context.lengthOfMonth())
+        ) {
+            policy = OverflowPolicy.END_OF_MONTH;
+        }
 
         int year =
             MathUtils.safeCast(
@@ -1830,15 +1839,18 @@ public final class PlainDate
             switch (policy) {
                 case PREVIOUS_VALID_DATE:
                 case END_OF_MONTH:
+                case KEEPING_LAST_DATE:
                     dom = max;
                     break;
                 case NEXT_VALID_DATE:
                     return PlainDate.fromEpochMonths(
+                        context,
                         MathUtils.safeAdd(emonths, 1),
                         1,
                         policy);
                 case CARRY_OVER:
                     return PlainDate.fromEpochMonths(
+                        context,
                         MathUtils.safeAdd(emonths, 1),
                         dayOfMonth - max,
                         policy);

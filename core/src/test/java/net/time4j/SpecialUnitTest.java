@@ -44,6 +44,22 @@ public class SpecialUnitTest {
             PlainDate.of(2011, 6, 30)
                 .plus(Duration.of(7, DAYS.atEndOfMonth())),
             is(PlainDate.of(2011, 7, 31)));
+        assertThat(
+            PlainDate.of(2015, 1, 30).plus(1, MONTHS.atEndOfMonth()),
+            is(PlainDate.of(2015, 2, 28)));
+    }
+
+    @Test
+    public void keepingEndOfMonth() {
+        assertThat(
+            PlainDate.of(2015, 2, 27).plus(2, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 4, 27)));
+        assertThat(
+            PlainDate.of(2015, 2, 28).plus(2, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 4, 30)));
+        assertThat(
+            PlainDate.of(2015, 1, 31).plus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 2, 28)));
     }
 
     @Test(expected=ChronoException.class)

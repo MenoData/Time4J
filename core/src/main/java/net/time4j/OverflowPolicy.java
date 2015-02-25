@@ -56,6 +56,14 @@ enum OverflowPolicy {
     /**
      * This policy causes an exception in case of day overflow.
      */
-    UNLESS_INVALID;
+    UNLESS_INVALID,
+
+    /**
+     * Moves the day of month to the last day of month if the original date
+     * is the last day of month.
+     *
+     * @since   2.3
+     */
+    KEEPING_LAST_DATE;
 
 }

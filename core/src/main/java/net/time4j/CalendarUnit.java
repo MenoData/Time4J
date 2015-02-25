@@ -177,6 +177,8 @@ public enum CalendarUnit
 
     private final IsoDateUnit eof =
         new OverflowUnit(this, OverflowPolicy.END_OF_MONTH);
+    private final IsoDateUnit kld =
+        new OverflowUnit(this, OverflowPolicy.KEEPING_LAST_DATE);
     private final IsoDateUnit ui =
         new OverflowUnit(this, OverflowPolicy.UNLESS_INVALID);
     private final IsoDateUnit nvd =
@@ -388,13 +390,18 @@ public enum CalendarUnit
      * <p>Example for months: </p>
      *
      * <pre>
-     *  PlainDate date = PlainDate.of(2013, 2, 28);
-     *  System.out.println(date.plus(2, MONTHS.atEndOfMonth()));
-     *  // Output: 2013-04-30
+     *  PlainDate date1 = PlainDate.of(2013, 2, 27);
+     *  System.out.println(date1.plus(2, MONTHS.atEndOfMonth()));
+     *  // Ausgabe: 2013-04-30
+     *  PlainDate date2 = PlainDate.of(2013, 2, 28);
+     *  System.out.println(date2.plus(2, MONTHS.atEndOfMonth()));
+     *  // Ausgabe: 2013-04-30
      * </pre>
      *
      * <p>Note: The metric for calculation of temporal distances remains
-     * unaffected. </p>
+     * unaffected. An alternative which only jumps to the end of month
+     * if the original date is the last day of month can be achieved
+     * by {@link #keepingEndOfMonth()}. </p>
      *
      * @return  calendar unit with modified addition behaviour, but still
      *          the same metric
@@ -407,13 +414,18 @@ public enum CalendarUnit
      * <p>Beispiel f&uuml;r Monate: </p>
      *
      * <pre>
-     *  PlainDate date = PlainDate.of(2013, 2, 28);
-     *  System.out.println(date.plus(2, MONTHS.atEndOfMonth()));
+     *  PlainDate date1 = PlainDate.of(2013, 2, 27);
+     *  System.out.println(date1.plus(2, MONTHS.atEndOfMonth()));
+     *  // Ausgabe: 2013-04-30
+     *  PlainDate date2 = PlainDate.of(2013, 2, 28);
+     *  System.out.println(date2.plus(2, MONTHS.atEndOfMonth()));
      *  // Ausgabe: 2013-04-30
      * </pre>
      *
      * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
-     * unver&auml;ndert erhalten. </p>
+     * unver&auml;ndert erhalten. Eine Alternative, die nur dann zum Ende
+     * des Monats springt, wenn das aktuelle Datum der letzte Tag des Monats
+     * ist, ist mittels {@link #keepingEndOfMonth()} erh&auml;ltlich. </p>
      *
      * @return  calendar unit with modified addition behaviour, but still
      *          the same metric
@@ -421,6 +433,61 @@ public enum CalendarUnit
     public IsoDateUnit atEndOfMonth() {
 
         return this.eof;
+
+    }
+
+    /**
+     * <p>Defines a variation of this unit which always sets the resulting
+     * date in additions and subtractions to the end of month if the original
+     * date is the last day of month. </p>
+     *
+     * <p>Example for months: </p>
+     *
+     * <pre>
+     *  PlainDate date1 = PlainDate.of(2013, 2, 27);
+     *  System.out.println(date1.plus(2, MONTHS.keepingEndOfMonth()));
+     *  // Ausgabe: 2013-04-27
+     *  PlainDate date2 = PlainDate.of(2013, 2, 28);
+     *  System.out.println(date2.plus(2, MONTHS.keepingEndOfMonth()));
+     *  // Ausgabe: 2013-04-30
+     * </pre>
+     *
+     * <p>Note: The metric for calculation of temporal distances remains
+     * unaffected. An alternative which unconditionally jumps to the end
+     * of month can be achieved by {@link #atEndOfMonth()}. </p>
+     *
+     * @return  calendar unit with modified addition behaviour, but still
+     *          the same metric
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
+     * und Subtraktionen grunds&auml;tzlich der letzte Tag des Monats gesetzt
+     * wird, wenn das Ausgangsdatum bereits der letzte Tag des Monats ist. </p>
+     *
+     * <p>Beispiel f&uuml;r Monate: </p>
+     *
+     * <pre>
+     *  PlainDate date1 = PlainDate.of(2013, 2, 27);
+     *  System.out.println(date1.plus(2, MONTHS.keepingEndOfMonth()));
+     *  // Ausgabe: 2013-04-27
+     *  PlainDate date2 = PlainDate.of(2013, 2, 28);
+     *  System.out.println(date2.plus(2, MONTHS.keepingEndOfMonth()));
+     *  // Ausgabe: 2013-04-30
+     * </pre>
+     *
+     * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
+     * unver&auml;ndert erhalten. Eine Alternative, die bedingungslos zum
+     * Ende des Monats springt, ist mittels {@link #atEndOfMonth()}
+     * erh&auml;ltlich. </p>
+     *
+     * @return  calendar unit with modified addition behaviour, but still
+     *          the same metric
+     * @since   2.3
+     */
+    public IsoDateUnit keepingEndOfMonth() {
+
+        return this.kld;
 
     }
 
