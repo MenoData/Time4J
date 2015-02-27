@@ -235,6 +235,24 @@ public final class SystemClock
 
     }
 
+    /**
+     * <p>Equivalent to {@code SystemClock.INSTANCE.currentTime()}. </p>
+     *
+     * @return  current time
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code SystemClock.INSTANCE.currentTime()}. </p>
+     *
+     * @return  current time
+     * @since   2.3
+     */
+    public static Moment currentMoment() {
+
+        return SystemClock.INSTANCE.currentTime();
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static enum Clock {
