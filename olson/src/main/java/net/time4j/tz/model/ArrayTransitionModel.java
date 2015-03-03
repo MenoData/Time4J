@@ -21,9 +21,11 @@
 
 package net.time4j.tz.model;
 
+import net.time4j.Moment;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 
@@ -379,8 +381,12 @@ final class ArrayTransitionModel
 
         for (int i = 1; i < transitions.length; i++) {
             if (previous != transitions[i].getPreviousOffset()) {
+                Moment m =
+                    Moment.of(transitions[i].getPosixTime(), TimeScale.POSIX);
                 throw new IllegalArgumentException(
-                    "Model inconsistency detected: " + original);
+                    "Model inconsistency detected at: " + m
+                    + " (" + transitions[i].getPosixTime() + ") "
+                    + " in transitions: " + original);
             } else {
                 previous = transitions[i].getTotalOffset();
             }
