@@ -80,6 +80,7 @@ public abstract class DaylightSavingRule {
      * @param   timeOfDay   time of day when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
+     * @throws  IllegalArgumentException if the last argument is negative
      */
     /*[deutsch]
      * <p>Nur f&uuml;r nicht-standardisierte Subklassen. </p>
@@ -87,6 +88,7 @@ public abstract class DaylightSavingRule {
      * @param   timeOfDay   time of day when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
+     * @throws  IllegalArgumentException if the last argument is negative
      */
     protected DaylightSavingRule(
         PlainTime timeOfDay,
