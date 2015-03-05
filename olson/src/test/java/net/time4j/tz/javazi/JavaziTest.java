@@ -5,7 +5,6 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.tz.OffsetSign;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -19,6 +18,7 @@ import org.junit.runners.JUnit4;
 
 import static net.time4j.ClockUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -65,18 +65,13 @@ public class JavaziTest {
     }
 
     @Test
-    public void compareAliasWithOriginal() {
+    public void compareAliasWithOriginal() throws IOException {
         if (testable) {
             TransitionHistory histJanMayen = zp.load("Atlantic/Jan_Mayen");
             TransitionHistory histOslo = zp.load("Europe/Oslo");
-            Timezone tzJanMayen = Timezone.of("Atlantic/Jan_Mayen");
-            Timezone tzOslo = Timezone.of("Europe/Oslo");
 
             assertThat(histJanMayen, nullValue());
-            assertThat(tzJanMayen.equals(tzOslo), is(false));
-            assertThat(
-                tzJanMayen.getHistory().equals(histOslo),
-                is(true));
+            assertThat(histOslo, notNullValue());
         }
     }
 
