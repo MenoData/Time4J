@@ -113,7 +113,10 @@ public abstract class Timezone
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final String NEW_LINE = System.getProperty("line.separator");
+    private static final String NEW_LINE =
+        System.getProperty("line.separator");
+    private static final String REPOSITORY_VERSION =
+        System.getProperty("net.time4j.tz.repository.version");
 
     private static final Comparator<TZID> ID_COMPARATOR =
         new Comparator<TZID>() {
@@ -268,15 +271,17 @@ public abstract class Timezone
             String name = provider.getName();
 
             if (name.equals(NAME_TZDB)) {
-                String version = provider.getVersion();
+                String v = provider.getVersion();
 
-                if (
-                    !version.isEmpty()
-                    && (
-                        (zp == null)
-                        || (version.compareTo(zp.getVersion()) > 0))
-                ) {
-                    zp = provider;
+                if (!v.isEmpty()) {
+                    if (v.equals(REPOSITORY_VERSION)) {
+                        zp = provider;
+                    } else if (
+                        (REPOSITORY_VERSION == null)
+                        && ((zp == null) || (v.compareTo(zp.getVersion()) > 0))
+                    ) {
+                        zp = provider;
+                    }
                 }
             } else if (name.equals(NAME_ZONENAMES)) {
                 np = provider;
