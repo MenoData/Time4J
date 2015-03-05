@@ -141,11 +141,19 @@ public final class TimezoneRepositoryCompiler {
     static {
         List<String> tmp = new ArrayList<String>();
         tmp.add("yearistype.sh");
+        tmp.add("factory");
+        tmp.add("systemv");
         tmp.add("pacificnew");
         tmp.add("backzone");
         tmp.add("solar87");
         tmp.add("solar88");
         tmp.add("solar89");
+        tmp.add("checklinks.awk");
+        tmp.add("checktab.awk");
+        tmp.add("leapseconds.awk");
+        tmp.add("leap-seconds.list");
+        tmp.add("Makefile");
+        tmp.add("zoneinfo2tdf.pl");
         IGNORED_FILES = Collections.unmodifiableList(tmp);
     }
 
@@ -703,11 +711,28 @@ public final class TimezoneRepositoryCompiler {
             }
         }
 
+        File subdir = new File(this.workdir, TZDATA + version);
+
+        if (
+            !subdir.exists()
+            && !subdir.mkdir()
+        ) {
+            throw new IOException(
+                "Cannot create subdirectory for compiled version: " + subdir);
+        }
+
         ObjectOutputStream oos =
             new ObjectOutputStream(
                 new FileOutputStream(
-                    new File(this.workdir, TZDATA + version + ".repository")));
+                    new File(subdir, TZDATA + ".repository")));
         try {
+            oos.writeByte('t');
+            oos.writeByte('z');
+            oos.writeByte('r');
+            oos.writeByte('e');
+            oos.writeByte('p');
+            oos.writeByte('o');
+            oos.writeUTF(version);
             this.compile(oos, zones, rules);
             this.compileLinks(oos, zones.keySet(), links);
             this.compileLeapSeconds(oos, leaps);
@@ -1685,10 +1710,7 @@ public final class TimezoneRepositoryCompiler {
 
                 String rulesave = fields[startIndex + 1];
 
-                if (rulesave.equals("-")) {
-                    this.ruleName = null;
-                    this.fixedSaving = null;
-                } else if (Character.isLetter(rulesave.charAt(0))) {
+                if (Character.isLetter(rulesave.charAt(0))) {
                     this.ruleName = rulesave;
                     this.fixedSaving = null;
                 } else {
