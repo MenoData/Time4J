@@ -9,7 +9,8 @@
  *
  * <ul>
  *  <li>net.time4j.format.iso.decimal.dot =&gt;
- *      controls formatting of decimal separator in ISO-8601-output (default is the comma)</li>
+ *      controls formatting of decimal separator in ISO-8601-output
+ *      (default is the comma)</li>
  *  <li>net.time4j.sql.utc.conversion =&gt;
  *      SQL-conversion in <a href="TemporalType.html">TemporalType</a>-constants</li>
  *  <li>net.time4j.systemclock.nanoTime =&gt;
@@ -22,6 +23,14 @@
  *      <a href="scale/LeapSeconds.html#FINAL_UTC_LEAPSECONDS">LeapSeconds.FINAL_UTC_LEAPSECONDS</a></li>
  *  <li>net.time4j.scale.leapseconds.path =&gt; see
  *      <a href="scale/LeapSeconds.html#PATH_TO_LEAPSECONDS">LeapSeconds.PATH_TO_LEAPSECONDS</a></li>
+ *  <li>net.time4j.tz.repository.path =&gt;
+ *      determines the absolute path of the directory for the timezone data of
+ *      Time4J (default is the folder &quot;tzrepo&quot; in class path)</li>
+ *  <li>net.time4j.tz.repository.version =&gt;
+ *      preferred version for the timezone data of Time4J (example: 2015a),
+ *      if specified then Time4J will look for a file with name
+ *      &quot;tzdata{version}.repository&quot; in given directory path
+ *      otherwise the name will not contain the version</li>
  * </ul>
  */
 /*[deutsch]
@@ -34,7 +43,8 @@
  *
  * <ul>
  *  <li>net.time4j.format.iso.decimal.dot =&gt;
- *      steuert die Textausgabe des Dezimaltrennzeichens in ISO-8601 (Vorgabe ist das Komma)</li>
+ *      steuert die Textausgabe des Dezimaltrennzeichens in ISO-8601 (Vorgabe
+ *      ist das Komma)</li>
  *  <li>net.time4j.sql.utc.conversion =&gt;
  *      SQL-Konversion in <a href="TemporalType.html">TemporalType</a></li>
  *  <li>net.time4j.systemclock.nanoTime =&gt;
@@ -49,6 +59,14 @@
  *      <a href="scale/LeapSeconds.html#FINAL_UTC_LEAPSECONDS">LeapSeconds.FINAL_UTC_LEAPSECONDS</a></li>
  *  <li>net.time4j.scale.leapseconds.path =&gt; siehe
  *      <a href="scale/LeapSeconds.html#PATH_TO_LEAPSECONDS">LeapSeconds.PATH_TO_LEAPSECONDS</a></li>
+ *  <li>net.time4j.tz.repository.path =&gt;
+ *      legt den absoluten Verzeichnispfad f&uuml;r die eigenen Zeitzonendaten
+ *      fest (Vorgabe ist &quot;tzrepo&quot; im Klassenpfad)</li>
+ *  <li>net.time4j.tz.repository.version =&gt;
+ *      bevorzugte Version f&uuml;r die eigenen Zeitzonendaten (z.B. 2015a),
+ *      wenn angegeben wird Time4J im Verzeichnispfad nach einer Datei mit dem
+ *      Namen &quot;tzdata{version}.repository&quot; suchen, ansonsten wird
+ *      der Name der Datei nicht die Version enthalten</li>
  * </ul>
  */
 package net.time4j;
