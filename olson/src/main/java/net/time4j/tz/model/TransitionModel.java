@@ -28,7 +28,6 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -123,7 +122,7 @@ public abstract class TransitionModel
     ) {
 
         if (rules.isEmpty()) {
-            return Timezone.of(standardOffset).getHistory();
+            return new EmptyTransitionModel(standardOffset);
         } else {
             return new RuleBasedTransitionModel(standardOffset, rules);
         }
@@ -202,7 +201,7 @@ public abstract class TransitionModel
 
         if (n == 0) {
             if (r.isEmpty()) {
-                return Timezone.of(initialOffset).getHistory();
+                return new EmptyTransitionModel(initialOffset);
             } else {
                 return new RuleBasedTransitionModel(
                     initialOffset,

@@ -25,7 +25,6 @@ import net.time4j.ClockUnit;
 import net.time4j.Month;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -452,7 +451,8 @@ class JVMZoneReader {
             if (simpleTimeZoneParams == null) {
                 if (ots == null) {
                     ZonalOffset offset = ZonalOffset.ofTotalSeconds(rawOffset);
-                    model = Timezone.of(offset).getHistory();
+                    List<DaylightSavingRule> rules = Collections.emptyList();
+                    model = TransitionModel.of(offset, rules);
                 } else {
                     model = TransitionModel.of(Arrays.asList(ots));
                 }
