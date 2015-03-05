@@ -65,7 +65,7 @@ public class JavaziTest {
     }
 
     @Test
-    public void compareAliasWithOriginal() throws IOException {
+    public void compareAliasWithOriginal() {
         if (testable) {
             TransitionHistory histJanMayen = zp.load("Atlantic/Jan_Mayen");
             TransitionHistory histOslo = zp.load("Europe/Oslo");
