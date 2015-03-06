@@ -85,6 +85,10 @@ public abstract class PluralRules {
             cl = PluralProvider.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         for (
             PluralProvider tmp
             : ServiceLoader.load(PluralProvider.class, cl)

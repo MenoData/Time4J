@@ -347,11 +347,7 @@ public final class CalendarText {
 
         if (instance == null) {
             TextProvider p = null;
-            ClassLoader c = Thread.currentThread().getContextClassLoader();
-
-            if (c == null) {
-                c = TextProvider.class.getClassLoader();
-            }
+            ClassLoader c = getLoader();
 
             // ServiceLoader-Mechanismus (Suche nach externen Providern)
             for (TextProvider tmp : ServiceLoader.load(TextProvider.class, c)) {
@@ -931,6 +927,10 @@ public final class CalendarText {
 		if (cl == null) {
 			cl = CalendarText.class.getClassLoader();
 		}
+
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
 
 		return cl;
 

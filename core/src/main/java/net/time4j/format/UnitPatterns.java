@@ -72,6 +72,10 @@ public final class UnitPatterns {
             cl = UnitPatternProvider.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         for (
             UnitPatternProvider tmp
             : ServiceLoader.load(UnitPatternProvider.class, cl)

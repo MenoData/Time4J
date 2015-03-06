@@ -215,6 +215,10 @@ public final class LeapSeconds
                 cl = LeapSecondProvider.class.getClassLoader();
             }
 
+            if (cl == null) {
+                cl = ClassLoader.getSystemClassLoader();
+            }
+
             ServiceLoader<LeapSecondProvider> sl =
                 ServiceLoader.load(LeapSecondProvider.class, cl);
             LeapSecondProvider loaded = new DefaultLeapSecondService();

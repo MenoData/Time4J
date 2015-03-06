@@ -53,6 +53,10 @@ public class CalendricalNamesTest {
             cl = CalendarText.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         for (TextProvider tmp : ServiceLoader.load(TextProvider.class, cl)) {
             if (
                 isCalendarTypeSupported(tmp, "iso8601")

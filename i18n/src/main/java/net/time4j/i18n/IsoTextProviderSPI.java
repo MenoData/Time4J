@@ -655,6 +655,10 @@ public final class IsoTextProviderSPI
 			cl = getDefaultLoader();
 		}
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
 		return cl;
 
 	}

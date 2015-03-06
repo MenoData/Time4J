@@ -97,6 +97,10 @@ public final class PrettyTime {
             cl = NumberSymbolProvider.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         for (
             NumberSymbolProvider tmp
             : ServiceLoader.load(NumberSymbolProvider.class, cl)

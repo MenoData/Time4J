@@ -222,6 +222,10 @@ public abstract class Timezone
             cl = Timezone.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         List<Class<? extends TZID>> areas;
 
         try {

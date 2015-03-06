@@ -139,6 +139,10 @@ public final class Weekmodel
             cl = WeekdataProvider.class.getClassLoader();
         }
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
         for (
             WeekdataProvider p : ServiceLoader.load(WeekdataProvider.class, cl)
         ) {

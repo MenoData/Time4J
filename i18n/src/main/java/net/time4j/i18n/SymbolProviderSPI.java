@@ -164,6 +164,10 @@ public final class SymbolProviderSPI
 			cl = NumberSymbolProvider.class.getClassLoader();
 		}
 
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
 		return cl;
 
 	}
