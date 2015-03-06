@@ -24,8 +24,9 @@
  *  <li>net.time4j.scale.leapseconds.path =&gt; see
  *      <a href="scale/LeapSeconds.html#PATH_TO_LEAPSECONDS">LeapSeconds.PATH_TO_LEAPSECONDS</a></li>
  *  <li>net.time4j.tz.repository.path =&gt;
- *      determines the absolute path of the directory for the timezone data of
- *      Time4J (default is the folder &quot;tzrepo&quot; in class path)</li>
+ *      determines the path of the directory for the timezone data of
+ *      Time4J, either absolute or relative to class path (default is
+ *      the folder &quot;tzrepo&quot; in class path)</li>
  *  <li>net.time4j.tz.repository.version =&gt;
  *      preferred version for the timezone data of Time4J (example: 2015a),
  *      if specified then Time4J will look for a file with name
@@ -60,8 +61,9 @@
  *  <li>net.time4j.scale.leapseconds.path =&gt; siehe
  *      <a href="scale/LeapSeconds.html#PATH_TO_LEAPSECONDS">LeapSeconds.PATH_TO_LEAPSECONDS</a></li>
  *  <li>net.time4j.tz.repository.path =&gt;
- *      legt den absoluten Verzeichnispfad f&uuml;r die eigenen Zeitzonendaten
- *      fest (Vorgabe ist &quot;tzrepo&quot; im Klassenpfad)</li>
+ *      legt den Verzeichnispfad f&uuml;r die eigenen Zeitzonendaten
+ *      fest, entweder absolut oder relativ zum Klassenpfad (Vorgabe ist
+ *      &quot;tzrepo&quot; im Klassenpfad)</li>
  *  <li>net.time4j.tz.repository.version =&gt;
  *      bevorzugte Version f&uuml;r die eigenen Zeitzonendaten (z.B. 2015a),
  *      wenn angegeben wird Time4J im Verzeichnispfad nach einer Datei mit dem
