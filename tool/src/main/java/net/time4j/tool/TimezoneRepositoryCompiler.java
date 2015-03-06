@@ -72,7 +72,7 @@ import static net.time4j.ClockUnit.SECONDS;
 
 /**
  * <p>Compiler for translating timezone data in original format invented
- * from Arthur David Olson. </p>
+ * by Arthur David Olson. </p>
  *
  * <p>The tz-database is currently maintained (in March 2015) by the
  * organization <a href="http://www.iana.org/time-zones">IANA</a>. File

@@ -29,6 +29,7 @@ import net.time4j.tz.ZoneProvider;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,11 +56,6 @@ public class TimezoneRepositoryProviderSPI
 
     private static final ZoneProvider NAME_PROVIDER = new ZoneNameProviderSPI();
 
-    private static final String REPOSITORY_PATH =
-        System.getProperty("net.time4j.tz.repository.path");
-    private static final String REPOSITORY_VERSION =
-        System.getProperty("net.time4j.tz.repository.version");
-
     //~ Instanzvariablen --------------------------------------------------
 
     private final String version;
@@ -72,8 +68,8 @@ public class TimezoneRepositoryProviderSPI
     public TimezoneRepositoryProviderSPI() {
         super();
 
-        URL url;
-        String file;
+        URL url = null;
+        InputStream is = null;
         ObjectInputStream ois = null;
 
         String tmpVersion = "";
@@ -84,65 +80,75 @@ public class TimezoneRepositoryProviderSPI
         Map<String, String> tmpAliases =
             new HashMap<String, String>();
 
-        if (REPOSITORY_VERSION == null) {
+        String repositoryPath =
+            System.getProperty("net.time4j.tz.repository.path");
+        String repositoryVersion =
+            System.getProperty("net.time4j.tz.repository.version");
+        String file;
+
+        if (repositoryVersion == null) {
             file = "tzdata.repository";
         } else {
-            file = "tzdata" + REPOSITORY_VERSION + ".repository";
+            file = "tzdata" + repositoryVersion + ".repository";
         }
 
         try {
-            if (REPOSITORY_PATH == null) {
-                ClassLoader cl = Thread.currentThread().getContextClassLoader();
-                if (cl == null) {
-                    cl = ZoneProvider.class.getClassLoader();
-                }
-                String internalResource = "tzrepo/tzdata.repository";
-                url = cl.getResource(internalResource);
-                tmpLocation = url.toString();
-            } else {
-                File path = new File(REPOSITORY_PATH, file);
-                tmpLocation = path.toString();
-                if (path.exists()) {
-                    url = path.toURI().toURL();
+            if (repositoryPath != null) {
+                File path = new File(repositoryPath, file);
+
+                if (path.isAbsolute()) {
+                    if (path.exists()) {
+                        url = path.toURI().toURL();
+                    } else {
+                        throw new FileNotFoundException(
+                            "Path to tz-repository not found: " + path);
+                    }
                 } else {
-                    throw new FileNotFoundException(
-                        "Path to tz-repository not found: " + path);
+                    String internalResource = path.toString();
+                    url = classLoader().getResource(internalResource);
                 }
+            } else {
+                String internalResource = "tzrepo/" + file;
+                url = classLoader().getResource(internalResource);
             }
 
-            ois = new ObjectInputStream(url.openStream());
-            checkMagicLabel(ois, url);
-            String v = ois.readUTF();
-            int sizeOfZones = ois.readInt();
+            if (url != null) {
+                is = url.openStream();
+                ois = new ObjectInputStream(is);
+                tmpLocation = url.toString();
+                checkMagicLabel(ois, tmpLocation);
+                String v = ois.readUTF();
+                int sizeOfZones = ois.readInt();
 
-            List<String> zones = new ArrayList<String>();
+                List<String> zones = new ArrayList<String>();
 
-            for (int i = 0; i < sizeOfZones; i++) {
-                String zoneID = ois.readUTF();
-                TransitionHistory th = (TransitionHistory) ois.readObject();
-                zones.add(zoneID);
-                tmpData.put(zoneID, th);
+                for (int i = 0; i < sizeOfZones; i++) {
+                    String zoneID = ois.readUTF();
+                    TransitionHistory th = (TransitionHistory) ois.readObject();
+                    zones.add(zoneID);
+                    tmpData.put(zoneID, th);
+                }
+
+                int sizeOfLinks = ois.readShort();
+
+                for (int i = 0; i < sizeOfLinks; i++) {
+                    String alias = ois.readUTF();
+                    String id = zones.get(ois.readShort());
+                    tmpAliases.put(alias, id);
+                }
+
+                int sizeOfLeaps = ois.readShort();
+
+                for (int i = 0; i < sizeOfLeaps; i++) {
+                    int year = ois.readShort();
+                    int month = ois.readByte();
+                    int dom = ois.readByte();
+                    int shift = ois.readByte();
+                    // TODO: register leapseconds
+                }
+
+                tmpVersion = v; // here all is okay, so let us set the version
             }
-
-            int sizeOfLinks = ois.readShort();
-
-            for (int i = 0; i < sizeOfLinks; i++) {
-                String alias = ois.readUTF();
-                String id = zones.get(ois.readShort());
-                tmpAliases.put(alias, id);
-            }
-
-            int sizeOfLeaps = ois.readShort();
-
-            for (int i = 0; i < sizeOfLeaps; i++) {
-                int year = ois.readShort();
-                int month = ois.readByte();
-                int dom = ois.readByte();
-                int shift = ois.readByte();
-                // TODO: register leapseconds
-            }
-
-            tmpVersion = v; // here all is okay, so let us set the version
 
         } catch (ClassNotFoundException cnfe) {
             System.out.println(
@@ -151,9 +157,9 @@ public class TimezoneRepositoryProviderSPI
             System.out.println(
                 "Note: TZ-repository not available. => " + ioe.getMessage());
         } finally {
-            if (ois != null) {
+            if (is != null) {
                 try {
-                    ois.close();
+                    is.close();
                 } catch (IOException ex) {
                     // ignored
                 }
@@ -242,7 +248,7 @@ public class TimezoneRepositoryProviderSPI
 
     private static void checkMagicLabel(
         ObjectInputStream ois,
-        URL url
+        String location
     ) throws IOException {
 
         int b1 = ois.readByte();
@@ -260,8 +266,24 @@ public class TimezoneRepositoryProviderSPI
             || (b5 != 'p')
             || (b6 != 'o')
         )  {
-            throw new IOException("Invalid tz-repository: " + url);
+            throw new IOException("Invalid tz-repository: " + location);
         }
+
+    }
+
+    private static ClassLoader classLoader() {
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = ZoneProvider.class.getClassLoader();
+        }
+
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        return cl;
 
     }
 

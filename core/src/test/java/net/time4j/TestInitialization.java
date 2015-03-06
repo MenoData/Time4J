@@ -13,6 +13,9 @@ public class TestInitialization {
         System.setProperty(
             "net.time4j.scale.leapseconds.path",
             "data/leapseconds2012.data");
+        System.setProperty(
+            "net.time4j.tz.repository.version",
+            "2012c");
     }
 
 }

@@ -26,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DaylightSavingRuleTest.class,
         JavaziTest.class,
         PredefinedIDTest.class,
+        RepositoryTest.class,
         RulesLikeBerlin1947Test.class,
         RulesLikeDhaka2009Test.class,
         RulesOfEuropeanUnionTest.class,
