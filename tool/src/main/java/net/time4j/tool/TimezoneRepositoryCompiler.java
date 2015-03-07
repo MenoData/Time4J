@@ -809,11 +809,21 @@ public final class TimezoneRepositoryCompiler {
                     hasLMT = current.format.equals("LMT");
                 } else {
                     int oldDst = dstOffset;
+                    int shift = getShift(previous, oldDst);
+                    long startTime = previous.until - shift;
+                    int startYear = getStartYear(startTime);
+
                     if (current.fixedSaving != null) {
                         dstOffset = current.fixedSaving.intValue();
+                    } else if (current.ruleName != null) {
+                        dstOffset =
+                            getRuleOffset(
+                                ruleMap.get(current.ruleName),
+                                current.rawOffset,
+                                oldDst,
+                                startYear,
+                                startTime);
                     }
-
-                    int shift = getShift(previous, oldDst);
 
                     if (
                         (previous.rawOffset != current.rawOffset)
@@ -822,7 +832,7 @@ public final class TimezoneRepositoryCompiler {
                         addTransition(
                             transitions,
                             new ZonalTransition(
-                                previous.until - shift,
+                                startTime,
                                 previous.rawOffset + oldDst,
                                 current.rawOffset + dstOffset,
                                 dstOffset));
@@ -836,8 +846,8 @@ public final class TimezoneRepositoryCompiler {
                                 current,
                                 dstOffset,
                                 ruleMap.get(current.ruleName),
-                                getEstimatedYear(previous),
-                                previous.until - shift);
+                                startYear,
+                                startTime);
                     }
                 }
 
@@ -920,6 +930,42 @@ public final class TimezoneRepositoryCompiler {
             oos.writeByte(ll.day);
             oos.writeByte(ll.shift);
         }
+
+    }
+
+    private static int getRuleOffset(
+        List<RuleLine> rules,
+        int rawOffset,
+        int oldDst,
+        int startYear,
+        long startTime
+    ) {
+
+        List<RuleLine> filteredLines = new ArrayList<RuleLine>(rules.size());
+
+        for (RuleLine rline : rules) {
+            if (
+                (rline.from <= startYear)
+                && (rline.to >= startYear)
+            ) {
+                filteredLines.add(rline);
+            }
+        }
+
+        for (int i = filteredLines.size() - 1; i >= 0; i--) {
+            RuleLine rline = filteredLines.get(i);
+            int prevSavings = (
+                (i > 0)
+                ? filteredLines.get(i - 1).pattern.getSavings()
+                : oldDst);
+            int shift =
+                getShift(rline.pattern.getIndicator(), rawOffset, prevSavings);
+            if (startTime >= rline.getPosixTime(startYear, shift)) {
+                return rline.pattern.getSavings();
+            }
+        }
+
+        return 0;
 
     }
 
@@ -1009,15 +1055,23 @@ public final class TimezoneRepositoryCompiler {
         int index = transitions.size() - 1;
         ZonalTransition last = transitions.get(index);
 
-        if (last.getPosixTime() == newTransition.getPosixTime()) {
+        int total = newTransition.getTotalOffset();
+        int dst = newTransition.getDaylightSavingOffset();
+        long tt = newTransition.getPosixTime();
+
+        if (last.getPosixTime() == tt) {
+            // TODO: Wird das wirklich gebraucht?
             ZonalTransition zt =
                 new ZonalTransition(
                     last.getPosixTime(),
                     last.getPreviousOffset(),
-                    newTransition.getTotalOffset(),
-                    newTransition.getDaylightSavingOffset());
+                    total,
+                    dst);
             transitions.set(index, zt);
-        } else {
+        } else if (
+            (last.getTotalOffset() != total)
+            || (last.getDaylightSavingOffset() != dst)
+        ) {
             transitions.add(newTransition);
         }
 
@@ -1025,9 +1079,15 @@ public final class TimezoneRepositoryCompiler {
 
     private static int getEstimatedYear(ZoneLine zoneLine) {
 
+        return getStartYear(zoneLine.until);
+
+    }
+
+    private static int getStartYear(long time) {
+
         long mjd =
             EpochDays.MODIFIED_JULIAN_DATE.transform(
-                MathUtils.floorDivide(zoneLine.until, 86400),
+                MathUtils.floorDivide(time, 86400),
                 EpochDays.UNIX);
         return GregorianMath.readYear(GregorianMath.toPackedDate(mjd));
 
