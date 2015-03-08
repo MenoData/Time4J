@@ -109,6 +109,23 @@ public class RepositoryTest {
     }
 
     @Test
+    public void tzEuropeLondon() throws ParseException {
+        String zoneID = "Europe/London";
+        int start = 1967;
+        int end = 1972;
+        Object[][] data = {
+            {"1967-03-19T02:00+00:00", 0, 1, 1},
+            {"1967-10-29T03:00+01:00", 1, 0, 0},
+            {"1968-02-18T02:00+00:00", 0, 1, 1},
+            {"1968-10-27T00:00+01:00", 1, 1, 0},
+            {"1971-10-31T03:00+01:00", 1, 0, 0},
+            {"1972-03-19T02:00+00:00", 0, 1, 1},
+            {"1972-10-29T03:00+01:00", 1, 0, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
     public void tzEuropeOslo() throws ParseException {
         String zoneID = "Europe/Oslo";
         int start = 1940;
@@ -123,9 +140,13 @@ public class RepositoryTest {
     @Test
     public void tzEuropeBerlin() throws ParseException {
         String zoneID = "Europe/Berlin";
-        int start = 1944;
+        int start = 1937;
         int end = 1981;
         Object[][] data = {
+            {"1940-04-01T02:00+01:00", 1, 2, 1},
+            {"1942-11-02T03:00+02:00", 2, 1, 0},
+            {"1943-03-29T02:00+01:00", 1, 2, 1},
+            {"1943-10-04T03:00+02:00", 2, 1, 0},
             {"1944-04-03T02:00+01:00", 1, 2, 1},
             {"1944-10-02T03:00+02:00", 2, 1, 0},
             {"1945-04-02T02:00+01:00", 1, 2, 1},
@@ -151,6 +172,48 @@ public class RepositoryTest {
     }
 
     @Test
+    public void tzEuropeBucharest() throws ParseException {
+        String zoneID = "Europe/Bucharest";
+        int start = 1977;
+        int end = 1994;
+        Object[][] data = {
+            {"1979-05-27T00:00+02:00", 2, 3, 1},
+            {"1979-09-30T00:00+03:00", 3, 2, 0},
+            {"1980-04-05T23:00+02:00", 2, 3, 1},
+            {"1980-09-28T01:00+03:00", 3, 2, 0},
+            {"1981-03-29T02:00+02:00", 2, 3, 1},
+            {"1981-09-27T03:00+03:00", 3, 2, 0},
+            {"1982-03-28T02:00+02:00", 2, 3, 1},
+            {"1982-09-26T03:00+03:00", 3, 2, 0},
+            {"1983-03-27T02:00+02:00", 2, 3, 1},
+            {"1983-09-25T03:00+03:00", 3, 2, 0},
+            {"1984-03-25T02:00+02:00", 2, 3, 1},
+            {"1984-09-30T03:00+03:00", 3, 2, 0},
+            {"1985-03-31T02:00+02:00", 2, 3, 1},
+            {"1985-09-29T03:00+03:00", 3, 2, 0},
+            {"1986-03-30T02:00+02:00", 2, 3, 1},
+            {"1986-09-28T03:00+03:00", 3, 2, 0},
+            {"1987-03-29T02:00+02:00", 2, 3, 1},
+            {"1987-09-27T03:00+03:00", 3, 2, 0},
+            {"1988-03-27T02:00+02:00", 2, 3, 1},
+            {"1988-09-25T03:00+03:00", 3, 2, 0},
+            {"1989-03-26T02:00+02:00", 2, 3, 1},
+            {"1989-09-24T03:00+03:00", 3, 2, 0},
+            {"1990-03-25T02:00+02:00", 2, 3, 1},
+            {"1990-09-30T03:00+03:00", 3, 2, 0},
+            {"1991-03-31T00:00+02:00", 2, 3, 1},
+            {"1991-09-29T01:00+03:00", 3, 2, 0},
+            {"1992-03-29T00:00+02:00", 2, 3, 1},
+            {"1992-09-27T01:00+03:00", 3, 2, 0},
+            {"1993-03-28T00:00+02:00", 2, 3, 1},
+            {"1993-09-26T01:00+03:00", 3, 2, 0},
+            {"1994-03-27T00:00+02:00", 2, 3, 1},
+            {"1994-09-25T00:00+03:00", 3, 2, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
     public void tzEuropeTallinn() throws ParseException {
         String zoneID = "Europe/Tallinn";
         int start = 1999;
@@ -169,15 +232,15 @@ public class RepositoryTest {
         String zoneID = "Australia/Broken_Hill";
         int start = 1999;
         int end = 2001;
-        int low = 9 * 60 + 30;
-        int high = 10 * 60 + 30;
+        int winter = 9 * 60 + 30;
+        int summer = 10 * 60 + 30;
         Object[][] data = {
-            {"1999-03-28T03:00+10:30", high, low, 0},
-            {"1999-10-31T02:00+09:30", low, high, 60},
-            {"2000-03-26T03:00+10:30", high, low, 0},
-            {"2000-10-29T02:00+09:30", low, high, 60},
-            {"2001-03-25T03:00+10:30", high, low, 0},
-            {"2001-10-28T02:00+09:30", low, high, 60},
+            {"1999-03-28T03:00+10:30", summer, winter, 0},
+            {"1999-10-31T02:00+09:30", winter, summer, 60},
+            {"2000-03-26T03:00+10:30", summer, winter, 0},
+            {"2000-10-29T02:00+09:30", winter, summer, 60},
+            {"2001-03-25T03:00+10:30", summer, winter, 0},
+            {"2001-10-28T02:00+09:30", winter, summer, 60},
         };
         checkTransitions(zoneID, start, end, data, true);
     }
@@ -229,6 +292,22 @@ public class RepositoryTest {
             {"2009-12-31T24:00+07:00", 7, 6, 0},
         };
         checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAsiaKolkata() throws ParseException {
+        String zoneID = "Asia/Kolkata";
+        int start = 1942;
+        int end = 2000;
+        int burma = 6 * 60 + 30;
+        int india = 5 * 60 + 30;
+        int indiaDST = 6 * 60 + 30;
+        Object[][] data = {
+            {"1942-05-15T00:00+06:30", burma, india, 0},
+            {"1942-09-01T00:00+05:30", india, indiaDST, 60},
+            {"1945-10-15T00:00+06:30", indiaDST, india, 0},
+        };
+        checkTransitions(zoneID, start, end, data, true);
     }
 
     private static void checkTransitions(
