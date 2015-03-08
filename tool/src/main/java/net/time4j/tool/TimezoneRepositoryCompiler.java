@@ -81,10 +81,10 @@ import static net.time4j.ClockUnit.SECONDS;
  * &quot;tzdata2011n.tar.gz&quot;. </p>
  *
  * <p>The existence of an editable directory with the name &quot;tzrepo&quot;
- * in the classpath is provided. This directory either contains the original
- * files (&quot;tzdata&lt;version&gt;.tar.gz&quot;) packed as tar.gz or the
- * unpacked contents as subdirectories. This compiler will create the
- * translated binaries - in the same directory - with the name
+ * in the classpath is provided if not specified otherwise. This directory
+ * either contains the original files (&quot;tzdata&lt;version&gt;.tar.gz&quot;)
+ * packed as tar.gz or the unpacked contents as subdirectories. This compiler
+ * will create the translated binaries - in the same directory - with the name
  * &quot;tzdata&lt;version&gt;.repository&quot; which can then be loaded
  * by the class {@code TimezoneRepositoryProvider}. The directory
  * &quot;tzrepo&quot; is editable if it is not an archive file and if
@@ -103,10 +103,11 @@ import static net.time4j.ClockUnit.SECONDS;
  * ist. Beispiel: &quot;tzdata2011n.tar.gz&quot;. </p>
  *
  * <p>Vorausgesetzt wird die Existenz eines editierbaren Verzeichnisses mit
- * dem Namen &quot;tzrepo&quot; im Klassenpfad. Dieses Verzeichnis enth&auml;lt
- * entweder die Original-Dateien (&quot;tzdata&lt;version&gt;.tar.gz&quot;) im
- * tar.gz-Format verpackt oder die ausgepackten Inhalte als Unterverzeichnisse.
- * Dieser Compiler erstellt im selben Verzeichnis die &Uuml;bersetzungsdateien
+ * dem Namen &quot;tzrepo&quot; im Klassenpfad wenn nicht explizit angegeben.
+ * Dieses Verzeichnis enth&auml;lt entweder die Original-Dateien
+ * (&quot;tzdata&lt;version&gt;.tar.gz&quot;) im tar.gz-Format verpackt
+ * oder die ausgepackten Inhalte als Unterverzeichnisse. Dieser Compiler
+ * erstellt im selben Verzeichnis die &Uuml;bersetzungsdateien
  * (&quot;tzdata&lt;version&gt;.repository&quot;), welche dann zur Laufzeit vom
  * {@code TimezoneRepositoryProvider} ausgewertet werden k&ouml;nnen. Editierbar
  * ist das Verzeichnis &quot;tzrepo&quot;, wenn es nicht in einer Archivdatei
@@ -115,7 +116,7 @@ import static net.time4j.ClockUnit.SECONDS;
  * @author  Meno Hochschild
  * @since   2.3
  */
-public final class TimezoneRepositoryCompiler {
+public class TimezoneRepositoryCompiler {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -819,7 +820,7 @@ public final class TimezoneRepositoryCompiler {
                         dstOffset =
                             getRuleOffset(
                                 ruleMap.get(current.ruleName),
-                                current.rawOffset,
+                                previous.rawOffset,
                                 oldDst,
                                 startYear,
                                 startTime);
@@ -941,22 +942,13 @@ public final class TimezoneRepositoryCompiler {
         long startTime
     ) {
 
-        List<RuleLine> filteredLines = new ArrayList<RuleLine>(rules.size());
+        List<RuleLine> lines = getFilteredRules(rules, startYear);
 
-        for (RuleLine rline : rules) {
-            if (
-                (rline.from <= startYear)
-                && (rline.to >= startYear)
-            ) {
-                filteredLines.add(rline);
-            }
-        }
-
-        for (int i = filteredLines.size() - 1; i >= 0; i--) {
-            RuleLine rline = filteredLines.get(i);
+        for (int i = lines.size() - 1; i >= 0; i--) {
+            RuleLine rline = lines.get(i);
             int prevSavings = (
                 (i > 0)
-                ? filteredLines.get(i - 1).pattern.getSavings()
+                ? lines.get(i - 1).pattern.getSavings()
                 : oldDst);
             int shift =
                 getShift(rline.pattern.getIndicator(), rawOffset, prevSavings);
@@ -965,7 +957,29 @@ public final class TimezoneRepositoryCompiler {
             }
         }
 
+        // experiments with getting dst offset of last rule of either
+        // previous or current year failed so let's go with zero offset
         return 0;
+
+    }
+
+    private static List<RuleLine> getFilteredRules(
+        List<RuleLine> rules,
+        int year
+    ) {
+
+        List<RuleLine> filteredLines = new ArrayList<RuleLine>(rules.size());
+
+        for (RuleLine rline : rules) {
+            if (
+                (rline.from <= year)
+                && (rline.to >= year)
+            ) {
+                filteredLines.add(rline);
+            }
+        }
+
+        return filteredLines;
 
     }
 
