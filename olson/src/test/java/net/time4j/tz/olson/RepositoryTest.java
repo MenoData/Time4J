@@ -53,6 +53,51 @@ public class RepositoryTest {
     }
 
     @Test
+    public void tzAfricaCasablanca() throws ParseException {
+        use2015a();
+        String zoneID = "Africa/Casablanca";
+        int start = 2015;
+        int end = 2015;
+        Object[][] data = {
+            {"2015-03-29T02:00+00:00", 0, 1, 1},
+            {"2015-06-13T03:00+01:00", 1, 0, 0},
+            {"2015-07-18T02:00+00:00", 0, 1, 1},
+            {"2015-10-25T03:00+01:00", 1, 0, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAmericaNewYork() throws ParseException {
+        String zoneID = "America/New_York";
+        int start = 1940;
+        int end = 1946;
+        Object[][] data = {
+            {"1940-04-28T02:00-05:00", -5, -4, 1},
+            {"1940-09-29T02:00-04:00", -4, -5, 0},
+            {"1941-04-27T02:00-05:00", -5, -4, 1},
+            {"1941-09-28T02:00-04:00", -4, -5, 0},
+            {"1942-02-09T02:00-05:00", -5, -4, 1},
+            {"1945-09-30T02:00-04:00", -4, -5, 0},
+            {"1946-04-28T02:00-05:00", -5, -4, 1},
+            {"1946-09-29T02:00-04:00", -4, -5, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAmericaLosAngeles() throws ParseException {
+        String zoneID = "America/Los_Angeles";
+        int start = 2018; // future test of last rules
+        int end = 2018;
+        Object[][] data = {
+            {"2018-03-11T02:00-08:00", -8, -7, 1},
+            {"2018-11-04T02:00-07:00", -7, -8, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
     public void tzAmericaKentuckyLouisville() throws ParseException {
         String zoneID = "America/Kentucky/Louisville";
         int start = 1942;
@@ -80,6 +125,17 @@ public class RepositoryTest {
             {"1983-10-30T02:00-09:00", -9, -9, 0},
             {"1984-04-29T02:00-09:00", -9, -8, 1},
             {"1984-10-28T02:00-08:00", -8, -9, 0}
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAmericaJuneau() throws ParseException {
+        String zoneID = "America/Juneau";
+        int start = 1850; // test of LMT-filter
+        int end = 1942;
+        Object[][] data = {
+            {"1942-02-09T02:00-08:00", -8, -7, 1}
         };
         checkTransitions(zoneID, start, end, data);
     }
@@ -246,6 +302,25 @@ public class RepositoryTest {
     }
 
     @Test
+    public void tzPacificApia() throws ParseException {
+        use2015a();
+        String zoneID = "Pacific/Apia";
+        int start = 2000;
+        int end = 2013;
+        Object[][] data = {
+            {"2010-09-26T00:00-11:00", -11, -10, 1},
+            {"2011-04-02T04:00-10:00", -10, -11, 0},
+            {"2011-09-24T03:00-11:00", -11, -10, 1},
+            {"2011-12-29T24:00-10:00", -10, 14, 1},
+            {"2012-04-01T04:00+14:00", 14, 13, 0},
+            {"2012-09-30T03:00+13:00", 13, 14, 1},
+            {"2013-04-07T04:00+14:00", 14, 13, 0},
+            {"2013-09-29T03:00+13:00", 13, 14, 1},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
     public void tzAtlanticStanley() throws ParseException {
         String zoneID = "Atlantic/Stanley";
         int start = 1980;
@@ -281,9 +356,7 @@ public class RepositoryTest {
 
     @Test
     public void tzAsiaDhaka() throws ParseException {
-        String propertyKey = "net.time4j.tz.repository.version";
-        System.setProperty(propertyKey, "2015a"); // this version with 24:00
-
+        use2015a(); // this version with T24:00
         String zoneID = "Asia/Dhaka";
         int start = 2009;
         int end = 2011;
@@ -366,4 +439,8 @@ public class RepositoryTest {
         return PlainTimestamp.of(year, 1, 1, 0, 0).atUTC();
     }
 
+    private static void use2015a() {
+        String propertyKey = "net.time4j.tz.repository.version";
+        System.setProperty(propertyKey, "2015a");
+    }
 }

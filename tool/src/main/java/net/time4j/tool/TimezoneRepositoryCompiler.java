@@ -782,7 +782,8 @@ public class TimezoneRepositoryCompiler {
             ZoneLine previous = null;
             int initialOffset = 0;
             int dstOffset = 0;
-            boolean hasLMT = false;
+            boolean hasLMT = true;
+            int lmtCount = 0;
 
             for (ZoneLine current : zoneEntry.getValue()) {
                 if (previous == null) { // first line
@@ -807,7 +808,6 @@ public class TimezoneRepositoryCompiler {
                                 Long.MIN_VALUE);
                     }
                     initialOffset = current.rawOffset + dstOffset;
-                    hasLMT = current.format.equals("LMT");
                 } else {
                     int oldDst = dstOffset;
                     int shift = getShift(previous, oldDst);
@@ -853,11 +853,18 @@ public class TimezoneRepositoryCompiler {
                 }
 
                 previous = current;
+                hasLMT = hasLMT && current.format.equals("LMT");
+                if (hasLMT) {
+                    lmtCount++;
+                }
             }
 
-            if (hasLMT && !this.lmt && !transitions.isEmpty()) {
-                ZonalTransition lmtTransition = transitions.remove(0);
-                initialOffset = lmtTransition.getTotalOffset();
+            if (!this.lmt) {
+                while ((lmtCount > 0) && !transitions.isEmpty()) {
+                    ZonalTransition lmtTransition = transitions.remove(0);
+                    initialOffset = lmtTransition.getTotalOffset();
+                    lmtCount--;
+                }
             }
 
             try {
