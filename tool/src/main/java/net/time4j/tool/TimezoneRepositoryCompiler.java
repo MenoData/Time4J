@@ -945,11 +945,17 @@ public class TimezoneRepositoryCompiler {
         List<RuleLine> rules,
         int rawOffset,
         int oldDst,
-        int startYear,
+        int year,
         long startTime
     ) {
 
-        List<RuleLine> lines = getFilteredRules(rules, startYear);
+        List<RuleLine> lines = new ArrayList<RuleLine>(rules.size());
+
+        for (RuleLine rline : rules) {
+            if ((rline.from <= year) && (rline.to >= year)) {
+                lines.add(rline);
+            }
+        }
 
         for (int i = lines.size() - 1; i >= 0; i--) {
             RuleLine rline = lines.get(i);
@@ -959,34 +965,12 @@ public class TimezoneRepositoryCompiler {
                 : oldDst);
             int shift =
                 getShift(rline.pattern.getIndicator(), rawOffset, prevSavings);
-            if (startTime >= rline.getPosixTime(startYear, shift)) {
+            if (startTime >= rline.getPosixTime(year, shift)) {
                 return rline.pattern.getSavings();
             }
         }
 
-        // experiments with getting dst offset of last rule of either
-        // previous or current year failed so let's go with zero offset
-        return 0;
-
-    }
-
-    private static List<RuleLine> getFilteredRules(
-        List<RuleLine> rules,
-        int year
-    ) {
-
-        List<RuleLine> filteredLines = new ArrayList<RuleLine>(rules.size());
-
-        for (RuleLine rline : rules) {
-            if (
-                (rline.from <= year)
-                && (rline.to >= year)
-            ) {
-                filteredLines.add(rline);
-            }
-        }
-
-        return filteredLines;
+        return (lines.isEmpty() ? 0 : oldDst);
 
     }
 

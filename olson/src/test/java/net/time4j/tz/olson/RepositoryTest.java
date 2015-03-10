@@ -165,6 +165,21 @@ public class RepositoryTest {
     }
 
     @Test
+    public void tzAmericaArgentinaJujuy() throws ParseException {
+        String zoneID = "America/Argentina/Jujuy";
+        int start = 1991;
+        int end = 1995;
+        Object[][] data = {
+            {"1991-03-17T00:00-03:00", -3, -4, 0},
+            {"1991-10-06T00:00-04:00", -4, -2, 1},
+            {"1992-03-01T00:00-02:00", -2, -3, 0},
+            {"1992-10-18T00:00-03:00", -3, -2, 1},
+            {"1993-03-07T00:00-02:00", -2, -3, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
     public void tzEuropeLondon() throws ParseException {
         String zoneID = "Europe/London";
         int start = 1967;
