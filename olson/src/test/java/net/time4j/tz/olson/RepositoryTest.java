@@ -2,6 +2,7 @@ package net.time4j.tz.olson;
 
 import net.time4j.Iso8601Format;
 import net.time4j.Moment;
+import net.time4j.PatternType;
 import net.time4j.PlainTimestamp;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.tz.ZonalTransition;
@@ -54,7 +55,7 @@ public class RepositoryTest {
 
     @Test
     public void tzAfricaCasablanca() throws ParseException {
-        use2015a();
+        use("2015a"); // this version with ramadan modification
         String zoneID = "Africa/Casablanca";
         int start = 2015;
         int end = 2015;
@@ -130,7 +131,8 @@ public class RepositoryTest {
     }
 
     @Test
-    public void tzAmericaJuneau() throws ParseException {
+    public void tzAmericaJuneauNoLMT() throws ParseException {
+        use("2015a"); // without LMT
         String zoneID = "America/Juneau";
         int start = 1850; // test of LMT-filter
         int end = 1942;
@@ -138,6 +140,67 @@ public class RepositoryTest {
             {"1942-02-09T02:00-08:00", -8, -7, 1}
         };
         checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAmericaJuneauWithLMT() throws ParseException {
+        use("_lmt");
+        String zoneID = "America/Juneau";
+        int start = 1850;
+        int end = 1942;
+        ZoneProvider repo = new TimezoneRepositoryProviderSPI();
+        List<ZonalTransition> transitions =
+            repo.load(zoneID).getTransitions(
+                atStartOfYear(start),
+                atStartOfYear(end + 1));
+        int n = transitions.size();
+        assertThat(n, is(3));
+        for (int i = 0; i < n; i++) {
+            ZonalTransition zt = transitions.get(i);
+            switch (i) {
+                case 0:
+                    assertThat(
+                        zt.getPosixTime(),
+                        is(parse("1867-10-18T00:00+15:02:19")));
+                    assertThat(
+                        zt.getPreviousOffset(),
+                        is(15 * 3600 + 2 * 60 + 19));
+                    assertThat(
+                        zt.getTotalOffset(),
+                        is(-8 * 3600 - 57 * 60 - 41));
+                    assertThat(
+                        zt.getDaylightSavingOffset(),
+                        is(0));
+                    break;
+                case 1:
+                    assertThat(
+                        zt.getPosixTime(),
+                        is(parse("1900-08-20T12:00-8:57:41")));
+                    assertThat(
+                        zt.getPreviousOffset(),
+                        is(-8 * 3600 - 57 * 60 - 41));
+                    assertThat(
+                        zt.getTotalOffset(),
+                        is(-8 * 3600));
+                    assertThat(
+                        zt.getDaylightSavingOffset(),
+                        is(0));
+                    break;
+                case 2:
+                    assertThat(
+                        zt.getPosixTime(),
+                        is(parse("1942-02-09T02:00-08:00")));
+                    assertThat(
+                        zt.getPreviousOffset(),
+                        is(-8 * 3600));
+                    assertThat(
+                        zt.getTotalOffset(),
+                        is(-7 * 3600));
+                    assertThat(
+                        zt.getDaylightSavingOffset(),
+                        is(3600));
+            }
+        }
     }
 
     @Test
@@ -160,6 +223,21 @@ public class RepositoryTest {
         Object[][] data = {
             {"2000-10-29T02:00-04:00", -4, -5, 0},
             {"2000-12-03T01:00-05:00", -5, -4, 0}
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzAmericaSaoPaulo() throws ParseException {
+        String zoneID = "America/Sao_Paulo";
+        int start = 1962;
+        int end = 1965;
+        Object[][] data = {
+            {"1963-10-23T00:00-03:00", -3, -2, 1},
+            {"1964-03-01T00:00-02:00", -2, -3, 0},
+            {"1965-01-31T00:00-03:00", -3, -2, 1},
+            {"1965-03-31T00:00-02:00", -2, -3, 0},
+            {"1965-12-01T00:00-03:00", -3, -2, 1},
         };
         checkTransitions(zoneID, start, end, data);
     }
@@ -204,6 +282,25 @@ public class RepositoryTest {
         Object[][] data = {
             {"1940-08-10T23:00+01:00", 1, 2, 1},
             {"1942-11-02T03:00+02:00", 2, 1, 0},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzEuropeBrussels() throws ParseException {
+        String zoneID = "Europe/Brussels";
+        int start = 1940;
+        int end = 1945;
+        Object[][] data = {
+            {"1940-02-25T02:00+00:00", 0, 1, 1},
+            {"1940-05-20T03:00+01:00", 1, 2, 1},
+            {"1942-11-02T03:00+02:00", 2, 1, 0},
+            {"1943-03-29T02:00+01:00", 1, 2, 1},
+            {"1943-10-04T03:00+02:00", 2, 1, 0},
+            {"1944-04-03T02:00+01:00", 1, 2, 1},
+            {"1944-09-17T03:00+02:00", 2, 1, 0},
+            {"1945-04-02T02:00+01:00", 1, 2, 1},
+            {"1945-09-16T03:00+02:00", 2, 1, 0},
         };
         checkTransitions(zoneID, start, end, data);
     }
@@ -318,7 +415,7 @@ public class RepositoryTest {
 
     @Test
     public void tzPacificApia() throws ParseException {
-        use2015a();
+        use("2015a"); // this version with dateline change
         String zoneID = "Pacific/Apia";
         int start = 2000;
         int end = 2013;
@@ -331,6 +428,22 @@ public class RepositoryTest {
             {"2012-09-30T03:00+13:00", 13, 14, 1},
             {"2013-04-07T04:00+14:00", 14, 13, 0},
             {"2013-09-29T03:00+13:00", 13, 14, 1},
+        };
+        checkTransitions(zoneID, start, end, data);
+    }
+
+    @Test
+    public void tzPacificEaster() throws ParseException {
+        String zoneID = "Pacific/Easter";
+        int start = 1981;
+        int end = 1983;
+        Object[][] data = {
+            {"1981-03-15T03:00Z", -6, -7, 0},
+            {"1981-10-11T04:00Z", -7, -6, 1},
+            {"1982-03-14T03:00Z", -6, -6, 0},
+            {"1982-10-10T04:00Z", -6, -5, 1},
+            {"1983-03-13T03:00Z", -5, -6, 0},
+            {"1983-10-09T04:00Z", -6, -5, 1},
         };
         checkTransitions(zoneID, start, end, data);
     }
@@ -371,7 +484,7 @@ public class RepositoryTest {
 
     @Test
     public void tzAsiaDhaka() throws ParseException {
-        use2015a(); // this version with T24:00
+        use("2015a"); // this version with T24:00
         String zoneID = "Asia/Dhaka";
         int start = 2009;
         int end = 2011;
@@ -454,8 +567,16 @@ public class RepositoryTest {
         return PlainTimestamp.of(year, 1, 1, 0, 0).atUTC();
     }
 
-    private static void use2015a() {
+    private static long parse(String time) throws ParseException {
+        ChronoFormatter<Moment> p =
+            Moment.localFormatter(
+                "uuuu-MM-dd'T'HH:mmXXXXX",
+                PatternType.CLDR);
+        return p.parse(time).getPosixTime();
+    }
+
+    private static void use(String version) {
         String propertyKey = "net.time4j.tz.repository.version";
-        System.setProperty(propertyKey, "2015a");
+        System.setProperty(propertyKey, version);
     }
 }
