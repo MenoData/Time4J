@@ -23,6 +23,7 @@ package net.time4j.tz.other;
 
 import net.time4j.tz.TZID;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -33,13 +34,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 
 /**
@@ -88,10 +82,17 @@ public final class WindowsZone
     // Map<name, Map<country, Set<tzid>>>
     private static final Map<String, Map<String, Set<TZID>>> NAME_BASED_MAP;
 
+    // Version of windowsZones.xml
+    private static final String VERSION;
+
+    private static final String VKEY = "VERSION";
     private static final long serialVersionUID = -6071278077083785308L;
 
     static {
-        REPOSITORY = loadCLDR(); // TODO: optimize storage size
+        Map<String, Map<String, String>> map = loadData();
+        VERSION = map.get(VKEY).keySet().iterator().next();
+        map.remove(VKEY);
+        REPOSITORY = Collections.unmodifiableMap(map);
         PREFERRED_KEYS = prepareSmartMode();
         NAME_BASED_MAP = prepareResolvers();
     }
@@ -115,12 +116,31 @@ public final class WindowsZone
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Yields all available names of windows zones. </p>
+     *
+     * @return  unmodifiable set of zone names for Windows
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Liefert alle verf&uuml;gbaren Namen von Windows-Zeitzonen. </p>
+     *
+     * @return  unmodifiable set of zone names for Windows
+     * @since   2.3
+     */
+    public static Set<String> getAvailableNames() {
+
+        return NAME_BASED_MAP.keySet();
+
+    }
+
+    /**
      * <p>Creates a name reference to a windows zone. </p>
      *
      * @param   name    standardized windows zone name
      * @return  new instance of {@code WindowsZone}
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
+     * @see     #getAvailableNames()
      */
     /*[deutsch]
      * <p>Erzeugt einen Namensbezug zu einer Windows-Zeitzone. </p>
@@ -129,6 +149,7 @@ public final class WindowsZone
      * @return  new instance of {@code WindowsZone}
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
+     * @see     #getAvailableNames()
      */
     public static WindowsZone of(String name) {
 
@@ -279,6 +300,24 @@ public final class WindowsZone
 
     }
 
+    /**
+     * <p>Yields the repository version. </p>
+     *
+     * @return  String
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Liefert die zugrundeliegende Version der CLDR-Daten. </p>
+     *
+     * @return  String
+     * @since   2.3
+     */
+    static String getVersion() {
+
+        return VERSION;
+
+    }
+
     // called by WinZoneProviderSPI
     static Map<String, String> idsToNames(String country) {
 
@@ -352,73 +391,6 @@ public final class WindowsZone
 
     }
 
-    private static Map<String, Map<String, String>> loadCLDR() {
-
-        Map<String, Map<String, String>> repository =
-            new HashMap<String, Map<String, String>>();
-
-        try {
-            XMLInputFactory f = XMLInputFactory.newInstance();
-            f.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.FALSE);
-            f.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
-            String source = "data/windowsZones.xml";
-            InputStream is =
-                WindowsZone.class.getClassLoader().getResourceAsStream(source);
-            XMLEventReader reader = f.createXMLEventReader(is);
-
-            while (reader.hasNext()) {
-                XMLEvent event = reader.nextEvent();
-
-                if (event.isStartElement()) {
-                    StartElement element = (StartElement) event;
-                    if (element.getName().getLocalPart().equals("mapZone")) {
-                        String country = getAttribute(element, "territory");
-                        String id = getAttribute(element, "type");
-                        String name = getAttribute(element, "other");
-                        fill(repository, country, id, name);
-                    }
-                }
-            }
-        } catch (FactoryConfigurationError error) {
-            throw new IllegalStateException(error);
-        } catch (XMLStreamException ex) {
-            throw new IllegalStateException(ex);
-        }
-
-        return Collections.unmodifiableMap(repository);
-
-    }
-
-    private static String getAttribute(
-        StartElement element,
-        String name
-    ) {
-
-        return element.getAttributeByName(new QName(name)).getValue();
-
-    }
-
-    private static void fill(
-        Map<String, Map<String, String>> repository,
-        String country,
-        String id,
-        String name
-    ) {
-
-        Map<String, String> data = repository.get(country);
-
-        if (data == null) {
-            data = new HashMap<String, String>();
-            repository.put(country, data);
-        }
-
-        for (String tzid : id.split(" ")) {
-            // assumption: no ambivalent mapping from ids to names
-            data.put("WINDOWS~" + tzid, name);
-        }
-
-    }
-
     private static Map<String, Map<String, Set<TZID>>> prepareResolvers() {
 
         Map<String, Map<String, Set<TZID>>> nameBasedMap =
@@ -448,6 +420,58 @@ public final class WindowsZone
         }
 
         return Collections.unmodifiableMap(nameBasedMap);
+
+    }
+
+    private static Map<String, Map<String, String>> loadData() {
+
+        ObjectInputStream ois = null;
+
+        try {
+            InputStream is = null;
+            String source = "data/winzone.ser";
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+
+            if (loader != null) {
+                is = loader.getResourceAsStream(source);
+            }
+
+            if (is == null) {
+                loader = WindowsZone.class.getClassLoader();
+                is = loader.getResourceAsStream(source);
+            }
+
+            if (is == null) {
+                throw new FileNotFoundException(source);
+            } else {
+                ois = new ObjectInputStream(is);
+                String version = ois.readUTF();
+                Map<String, Map<String, String>> data = cast(ois.readObject());
+                Map<String, Map<String, String>> map =
+                    new HashMap<String, Map<String, String>>(data);
+                map.put(VKEY, Collections.singletonMap(version, version));
+                return map;
+            }
+        } catch (ClassNotFoundException ex) {
+            throw new IllegalStateException(ex);
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        } finally {
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
+            }
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object obj) {
+
+        return (T) obj;
 
     }
 

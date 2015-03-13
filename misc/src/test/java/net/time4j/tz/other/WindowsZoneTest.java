@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.Locale;
+import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -29,6 +30,13 @@ import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class WindowsZoneTest {
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void getAvailableNamesIsUnmodifiable() {
+        Set<String> names = WindowsZone.getAvailableNames();
+        System.out.println("windows-zones=" + names);
+        names.clear();
+    }
 
     @Test
     public void loadAll() {
