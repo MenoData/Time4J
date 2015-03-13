@@ -3733,7 +3733,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>f</td>
          *    <td>{@link ClockUnit#NANOS} as fraction, (1-9) chars</td></tr>
          *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
-         *  <tr><td>[]</td><td>optional section for parsing</td></tr>
+         *  <tr><td>[]</td><td>optional section</td></tr>
          *  <tr><td>{}</td><td>section with plural forms, since v2.0</td></tr>
          *  <tr><td>#</td><td>reserved char for future use</td></tr>
          * </table>
@@ -3742,9 +3742,12 @@ public final class Duration<U extends IsoUnit>
          * and must be escaped by apostrophes for interpretation as literals.
          * If such a letter is repeated then the count of symbols controls
          * the minimum width for formatted output. If necessary a number
-         * (of units) will be padded from left with the zero digt. Optional
-         * sections let the parser be error-tolerant and continue with the
-         * next section in case of errors. </p>
+         * (of units) will be padded from left with the zero digt. </p>
+         *
+         * <p>Optional sections let the parser be error-tolerant and continue
+         * with the next section in case of errors. Since v2.3: During printing,
+         * an optional section will only be printed if there is any non-zero
+         * part. </p>
          *
          * <p><strong>Enhancement since version v2.0: plural forms</strong></p>
          *
@@ -3809,7 +3812,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>f</td>
          *    <td>{@link ClockUnit#NANOS} als Bruchteil, (1-9) Zeichen</td></tr>
          *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
-         *  <tr><td>[]</td><td>optionaler Abschnitt beim Parsen</td></tr>
+         *  <tr><td>[]</td><td>optionaler Abschnitt</td></tr>
          *  <tr><td>{}</td><td>Abschnitt mit Pluralformen, seit v2.0</td></tr>
          *  <tr><td>#</td><td>zuk&uuml;nftiges reserviertes Zeichen</td></tr>
          * </table>
@@ -3819,10 +3822,14 @@ public final class Duration<U extends IsoUnit>
          * gefasst werden. Wird ein Buchstabensymbol mehrfach wiederholt,
          * dann regelt die Anzahl der Symbole die Mindestbreite in der
          * formatierten Ausgabe. Bei Bedarf wird eine Zahl (von Einheiten)
-         * von links mit der Nullziffer aufgef&uuml;llt. Optionale Abschnitte
-         * regeln, da&szlig; der Interpretationsvorgang bei Fehlern nicht
-         * sofort abbricht, sondern mit dem n&auml;chsten Abschnitt
-         * fortsetzt. </p>
+         * von links mit der Nullziffer aufgef&uuml;llt. </p>
+         *
+         * <p>Optionale Abschnitte regeln, da&szlig; der Interpretationsvorgang
+         * bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
+         * Abschnitt fortsetzt und den fehlerhaften Abschnitt ignoriert. Seit
+         * v2.3 gilt auch, da&szlig; optionale Abschnitte nur dann etwas
+         * ausgeben, wenn es darin irgendeine von {code 0} verschiedene
+         * Dauerkomponente gibt. </p>
          *
          * <p><strong>Erweiterung seit Version v2.0: Pluralformen</strong></p>
          *
