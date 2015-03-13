@@ -4107,10 +4107,6 @@ public final class Duration<U extends IsoUnit>
 				}
 			}
 
-            if (pos == offset) {
-                throw new ParseException("Cannot parse: " + text, offset);
-            }
-
 			Long sign = unitsToValues.remove(SIGN_KEY);
 			boolean negative = ((sign != null) && (sign.longValue() < 0));
 			Map<U, Long> map = new HashMap<U, Long>();
@@ -4329,6 +4325,12 @@ public final class Duration<U extends IsoUnit>
 
         //~ Methoden ------------------------------------------------------
 
+        boolean isZero(Duration<?> duration) {
+
+            return true;
+
+        }
+
     	abstract void print(
     		Duration<?> duration,
     		Appendable buffer
@@ -4427,6 +4429,13 @@ public final class Duration<U extends IsoUnit>
 			}
 
 		}
+
+        @Override
+        boolean isZero(Duration<?> duration) {
+
+            return (this.getAmount(duration) == 0);
+
+        }
 
         long getAmount(Duration<?> duration) {
 
@@ -4535,6 +4544,13 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
+        @Override
+        boolean isZero(Duration<?> duration) {
+
+            return (duration.getPartialAmount(NANOS) == 0);
+
+        }
+
 	}
 
     private static class PluralItem
@@ -4611,6 +4627,13 @@ public final class Duration<U extends IsoUnit>
             }
 
             return pos + n;
+
+        }
+
+        @Override
+        boolean isZero(Duration<?> duration) {
+
+            return this.numItem.isZero(duration);
 
         }
 
@@ -4871,9 +4894,11 @@ public final class Duration<U extends IsoUnit>
     		Appendable buffer
     	) throws IOException {
 
-			for (FormatItem item : this.items) {
-				item.print(duration, buffer);
-			}
+            if (!this.isZero(duration)) {
+                for (FormatItem item : this.items) {
+                    item.print(duration, buffer);
+                }
+            }
 
 		}
 
@@ -4901,6 +4926,19 @@ public final class Duration<U extends IsoUnit>
 			return pos;
 
 		}
+
+        @Override
+        boolean isZero(Duration<?> duration) {
+
+			for (FormatItem item : this.items) {
+                if (!item.isZero(duration)) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
 
 	}
 

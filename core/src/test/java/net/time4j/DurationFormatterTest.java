@@ -22,6 +22,24 @@ public class DurationFormatterTest {
                 {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
                         "-P2Y7M15DT30H5M",
                         "P-2Y-7M-15DT-30H-5M"},
+                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                        "P2Y7M15DT30H5M",
+                        "P2Y7M15DT30H5M"},
+                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                        "-P2Y7M15DT0H5M", // optional test for zero hours
+                        "P-2Y-7M-15DT-5M"},
+                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                        "P2Y7M15DT0H5M", // optional test for zero hours
+                        "P2Y7M15DT5M"},
+                {"[+hh:mm:ss]",
+                        "PT0S",
+                        ""},
+                {"+[hh:mm:ss]",
+                        "PT0S",
+                        "+"},
+                {"-[hh:mm:ss]",
+                        "PT0S",
+                        ""},
                 {"+hh:mm:ss",
                         "PT5H30M34S",
                         "+05:30:34"},
@@ -37,9 +55,15 @@ public class DurationFormatterTest {
                 {"+hh:mm:ss.fff",
                         "PT5H30M34,012S",
                         "+05:30:34.012"},
+                {"+hh:mm:ss,fff",
+                        "PT5H30M34,012S",
+                        "+05:30:34,012"},
                 {"{D: :en:ONE=day:OTHER=days}",
                         "P3D",
                         "3 days"},
+                {"-{W: :en:ONE=week:OTHER=weeks}",
+                        "-P3W",
+                        "-3 weeks"},
                 {"{s:::ONE=sec:OTHER=secs}",
                         "PT3S",
                         "3secs"},
@@ -51,6 +75,16 @@ public class DurationFormatterTest {
                  + "{D: :en:ONE=day:OTHER=days}",
                         "P1Y0M3D",
                         "1 year, 0 months, 3 days"},
+                {"[{Y: :en:ONE=year:OTHER=years}', ']"
+                 + "[{M: :en:ONE=month:OTHER=months}', ']"
+                 + "{D: :en:ONE=day:OTHER=days}",
+                        "P1Y0M3D",
+                        "1 year, 3 days"},
+                {"{Y:_:en:ONE=Y:OTHER=YY}' + '"
+                 + "{M:_:en:ONE=M:OTHER=MM}' + '"
+                 + "{D:_:en:ONE=D:OTHER=DD}",
+                        "P1Y0M3D",
+                        "1_Y + 0_MM + 3_DD"},
             }
         );
     }
