@@ -32,6 +32,7 @@ public class LeapSecondTest {
             "data/leapseconds2012.data");
 
         LeapSeconds instance = LeapSeconds.getInstance();
+        System.out.println("Initialization => " + instance);
 
         if (instance.iterator().next().getDate().getYear() != 2112) {
             int year = 2112;

@@ -21,6 +21,7 @@
 
 package net.time4j.tool;
 
+import net.time4j.ClockUnit;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -137,25 +138,32 @@ public class TimezoneRepositoryCompiler {
     private static final String[] SHORT_DAYS =
         {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-    private static final List<String> IGNORED_FILES;
+    private static final List<String> FILES_IGNORED_ALWAYS;
+    private static final List<String> FILES_IGNORED_BY_COMPILER;
 
     static {
-        List<String> tmp = new ArrayList<String>();
-        tmp.add("yearistype.sh");
-        tmp.add("factory");
-        tmp.add("systemv");
-        tmp.add("pacificnew");
-        tmp.add("backzone");
-        tmp.add("solar87");
-        tmp.add("solar88");
-        tmp.add("solar89");
-        tmp.add("checklinks.awk");
-        tmp.add("checktab.awk");
-        tmp.add("leapseconds.awk");
-        tmp.add("leap-seconds.list");
-        tmp.add("Makefile");
-        tmp.add("zoneinfo2tdf.pl");
-        IGNORED_FILES = Collections.unmodifiableList(tmp);
+        List<String> tmp1 = new ArrayList<String>();
+        tmp1.add("yearistype.sh");
+        tmp1.add("factory");
+        tmp1.add("systemv");
+        tmp1.add("pacificnew");
+        tmp1.add("backzone");
+        tmp1.add("solar87");
+        tmp1.add("solar88");
+        tmp1.add("solar89");
+        tmp1.add("checklinks.awk");
+        tmp1.add("checktab.awk");
+        tmp1.add("leapseconds.awk");
+        tmp1.add("Makefile");
+        tmp1.add("zoneinfo2tdf.pl");
+        FILES_IGNORED_ALWAYS = Collections.unmodifiableList(tmp1);
+
+        List<String> tmp2 = new ArrayList<String>();
+        tmp2.add("Theory");
+        tmp2.add("CONTRIBUTING");
+        tmp2.add("NEWS");
+        tmp2.add("README");
+        FILES_IGNORED_BY_COMPILER = Collections.unmodifiableList(tmp2);
     }
 
     private static final Comparator<RuleLine> RC = new RuleComparator();
@@ -482,7 +490,7 @@ public class TimezoneRepositoryCompiler {
         try {
             for (Map.Entry<String, String> entry : contents.entrySet()) {
                 String name = entry.getKey();
-                if (IGNORED_FILES.contains(name)) {
+                if (FILES_IGNORED_ALWAYS.contains(name)) {
                     continue;
                 }
                 File file = new File(subdir, name);
@@ -617,18 +625,27 @@ public class TimezoneRepositoryCompiler {
             new HashMap<String, List<RuleLine>>();
         List<LinkLine> links = new ArrayList<LinkLine>();
         List<LeapLine> leaps = new ArrayList<LeapLine>();
+        PlainDate expires = PlainDate.axis().getMinimum();
+        boolean expireMode = false;
 
         for (Map.Entry<String, String> e : contents.entrySet()) {
 
             String key = e.getKey();
 
-            if (IGNORED_FILES.contains(key)) {
+            if (
+                FILES_IGNORED_ALWAYS.contains(key)
+                || FILES_IGNORED_BY_COMPILER.contains(key)
+            ) {
                 continue;
             } else if (this.verbose && !key.endsWith(".tab")) {
                 System.out.println(
                     "Parsing content of \""
                     + key
                     + "\" in process...");
+            }
+
+            if (key.equals("leap-seconds.list")) {
+                expireMode = true;
             }
 
             BufferedReader br = // Zeilenumbrüche herausfiltern
@@ -649,11 +666,26 @@ public class TimezoneRepositoryCompiler {
                     if (c == '\"') {
                         quotation = !quotation;
                     } else if (quotation) {
-                        sb.append(c);
+                        // ignore char
                     } else if (c == '#') {
+                        if (
+                            expireMode
+                            && (i + 1 < n)
+                            && (line.charAt(i + 1) == '@')
+                        ) {
+                            long ntp = Long.parseLong(line.substring(2).trim());
+                            expires =
+                                PlainTimestamp.of(1900, 1, 1, 0, 0)
+                                .plus(ntp, ClockUnit.SECONDS)
+                                .getCalendarDate();
+                            expireMode = false;
+                        }
                         break;
                     } else if (Character.isWhitespace(c)) {
-                        if (sb.charAt(sb.length() - 1) != '\t') {
+                        if (
+                            (sb.length() == 0)
+                            || (sb.charAt(sb.length() - 1) != '\t')
+                        ) {
                             sb.append('\t');
                         }
                     } else {
@@ -736,7 +768,7 @@ public class TimezoneRepositoryCompiler {
             oos.writeUTF(version);
             this.compile(oos, zones, rules);
             this.compileLinks(oos, zones.keySet(), links);
-            this.compileLeapSeconds(oos, leaps);
+            this.compileLeapSeconds(oos, leaps, expires);
         } finally {
             try {
                 oos.close();
@@ -927,7 +959,8 @@ public class TimezoneRepositoryCompiler {
 
     private void compileLeapSeconds(
         ObjectOutputStream oos,
-        List<LeapLine> leaps
+        List<LeapLine> leaps,
+        PlainDate expires
     ) throws IOException {
 
         oos.writeShort(leaps.size());
@@ -938,6 +971,8 @@ public class TimezoneRepositoryCompiler {
             oos.writeByte(ll.day);
             oos.writeByte(ll.shift);
         }
+
+        oos.writeObject(expires);
 
     }
 

@@ -21,6 +21,9 @@
 
 package net.time4j.tz.olson;
 
+import net.time4j.PlainDate;
+import net.time4j.base.GregorianDate;
+import net.time4j.scale.LeapSecondProvider;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
@@ -35,6 +38,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,7 +54,7 @@ import java.util.Set;
  * @exclude
  */
 public class TimezoneRepositoryProviderSPI
-    implements ZoneProvider {
+    implements ZoneProvider, LeapSecondProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -62,6 +66,8 @@ public class TimezoneRepositoryProviderSPI
     private final String location;
     private final Map<String, TransitionHistory> data;
     private final Map<String, String> aliases;
+    private final PlainDate expires;
+    private final Map<GregorianDate, Integer> leapsecs;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -74,11 +80,20 @@ public class TimezoneRepositoryProviderSPI
 
         String tmpVersion = "";
         String tmpLocation = "";
+        PlainDate tmpExpires = PlainDate.axis().getMinimum();
 
         Map<String, TransitionHistory> tmpData =
             new HashMap<String, TransitionHistory>();
         Map<String, String> tmpAliases =
             new HashMap<String, String>();
+
+        boolean noLeaps =
+            (System.getProperty("net.time4j.scale.leapseconds.path") != null);
+        if (noLeaps) {
+            this.leapsecs = Collections.emptyMap();
+        } else {
+            this.leapsecs = new LinkedHashMap<GregorianDate, Integer>(50);
+        }
 
         String repositoryPath =
             System.getProperty("net.time4j.tz.repository.path");
@@ -137,14 +152,21 @@ public class TimezoneRepositoryProviderSPI
                     tmpAliases.put(alias, id);
                 }
 
-                int sizeOfLeaps = ois.readShort();
+                if (!noLeaps) {
+                    int sizeOfLeaps = ois.readShort();
 
-                for (int i = 0; i < sizeOfLeaps; i++) {
-                    int year = ois.readShort();
-                    int month = ois.readByte();
-                    int dom = ois.readByte();
-                    int shift = ois.readByte();
-                    // TODO: register leapseconds
+                    for (int i = 0; i < sizeOfLeaps; i++) {
+                        int year = ois.readShort();
+                        int month = ois.readByte();
+                        int dom = ois.readByte();
+                        int shift = ois.readByte();
+
+                        this.leapsecs.put(
+                            PlainDate.of(year, month, dom),
+                            Integer.valueOf(shift));
+                    }
+
+                    tmpExpires = (PlainDate) ois.readObject();
                 }
 
                 tmpVersion = v; // here all is okay, so let us set the version
@@ -170,6 +192,7 @@ public class TimezoneRepositoryProviderSPI
         this.location = tmpLocation;
         this.data = Collections.unmodifiableMap(tmpData);
         this.aliases = Collections.unmodifiableMap(tmpAliases);
+        this.expires = tmpExpires;
 
     }
 
@@ -243,6 +266,45 @@ public class TimezoneRepositoryProviderSPI
     public String getVersion() {
 
         return this.version;
+
+    }
+
+    @Override
+    public Map<GregorianDate, Integer> getLeapSecondTable() {
+
+        return Collections.unmodifiableMap(this.leapsecs);
+
+    }
+
+    @Override
+    public boolean supportsNegativeLS() {
+
+        return !this.leapsecs.isEmpty();
+
+    }
+
+    @Override
+    public PlainDate getDateOfEvent(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        return PlainDate.of(year, month, dayOfMonth);
+
+    }
+
+    @Override
+    public PlainDate getDateOfExpiration() {
+
+        return this.expires;
+
+    }
+
+    @Override
+    public String toString() {
+
+        return "TZ-REPOSITORY(" + this.version + ")";
 
     }
 
