@@ -146,9 +146,9 @@ public final class LeapSeconds
      * <p>System property &quot;net.time4j.scale.leapseconds.path&quot;
      * which determines the path of the leap second file. </p>
      *
-     * <p>The file will be choosen if there is no other
-     * {@code LeapSecondProvider} which has registered more leap seconds.
-     * The path is an URL which must be understood by
+     * <p>Setting this property will usually suppress other leap second
+     * providers even if they have registered more leap seconds. The path
+     * is an URL which must be understood by
      * {@link ClassLoader#getResourceAsStream(String)}. The default
      * value is: &quot;data/leapseconds.data&quot; (relative to
      * class path). </p>
@@ -159,9 +159,9 @@ public final class LeapSeconds
      * <p>System-Property &quot;net.time4j.scale.leapseconds.path&quot;, die
      * den Pfad der Schaltsekundendatei festlegt. </p>
      *
-     * <p>Die Schaltsekundendatei wird ausgew&auml;hlt, wenn es keinen
-     * anderen {@code LeapSecondProvider} gibt, der mehr Schaltsekunden
-     * registriert hat. Der Pfad ist ein URL, der von
+     * <p>Das Setzen dieser Property wird gew&ouml;hnlich andere
+     * {@code LeapSecondProvider} ausschalten, selbst wenn sie mehr
+     * Schaltsekunden registriert haben. Der Pfad ist ein URL, der von
      * {@link ClassLoader#getResourceAsStream(String)} verstanden werden
      * mu&szlig;. Standardwert ist: &quot;data/leapseconds.data&quot;
      * (relativ zum Klassenpfad). </p>
