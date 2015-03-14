@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @spec    All implementations must have a public no-arg constructor.
- * @since   2.0
+ * @since   2.3
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> beschreibt, wann
@@ -51,7 +51,7 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @spec    All implementations must have a public no-arg constructor.
- * @since   2.0
+ * @since   2.3
  */
 public interface LeapSecondProvider {
 
@@ -67,6 +67,7 @@ public interface LeapSecondProvider {
      * leapsecond. Other values are not supported. </p>
      *
      * @return  map from leap second event day to sign of leap second
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert alle UTC-Schaltsekunden mit Datum und Vorzeichen. </p>
@@ -79,6 +80,7 @@ public interface LeapSecondProvider {
      * unterst&uuml;tzt. </p>
      *
      * @return  map from leap second event day to sign of leap second
+     * @since   2.0
      */
     Map<GregorianDate, Integer> getLeapSecondTable();
 
@@ -90,6 +92,7 @@ public interface LeapSecondProvider {
      * return {@code false} in order to improve the performance. </p>
      *
      * @return  {@code true} if supported else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Werden auch negative Schaltsekunden unterst&uuml;tzt? </p>
@@ -100,7 +103,46 @@ public interface LeapSecondProvider {
      * zur&uuml;ckgeben. </p>
      *
      * @return  {@code true} if supported else {@code false}
+     * @since   2.0
      */
     boolean supportsNegativeLS();
+
+    /**
+     * <p>Creates the date of a leap second event. </p>
+     *
+     * @param   year        proleptic gregorian year &gt;= 1972
+     * @param   month       gregorian month
+     * @param   dayOfMonth  day of leap second switch
+     * @return  immutable date of leap second event
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt das Datum eines Schaltsekundenereignisses. </p>
+     *
+     * @param   year        proleptic gregorian year &gt;= 1972
+     * @param   month       gregorian month
+     * @param   dayOfMonth  day of leap second switch
+     * @return  immutable date of leap second event
+     * @since   2.3
+     */
+    GregorianDate getDateOfEvent(
+        int year,
+        int month,
+        int dayOfMonth
+    );
+
+    /**
+     * <p>Determines the expiration date of underlying data. </p>
+     *
+     * @return  immutable date of expiration
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Verfallsdatum der zugrundeliegenden Daten. </p>
+     *
+     * @return  immutable date of expiration
+     * @since   2.3
+     */
+    GregorianDate getDateOfExpiration();
 
 }

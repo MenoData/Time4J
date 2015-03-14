@@ -255,6 +255,14 @@ public class LeapSecondTest {
             is(1341100801L + NLS_OFFSET));
     }
 
+    @Test
+    public void getDateOfExpiration() {
+        GregorianDate expected = PlainDate.of(2012, 12, 28);
+        assertThat(
+            LeapSeconds.getInstance().getDateOfExpiration(),
+            is(expected));
+    }
+
     private static PlainDate toPlainDate(GregorianDate date) {
         return PlainDate.of(
             date.getYear(), date.getMonth(), date.getDayOfMonth());

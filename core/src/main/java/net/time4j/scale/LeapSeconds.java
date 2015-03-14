@@ -25,22 +25,14 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -188,7 +180,7 @@ public final class LeapSeconds
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final String provider;
+    private final LeapSecondProvider provider;
     private final List<ExtendedLSE> list;
     private final ExtendedLSE[] reverseFinal;
     private volatile ExtendedLSE[] reverseVolatile;
@@ -199,16 +191,10 @@ public final class LeapSeconds
     private LeapSeconds() {
         super();
 
-        if (SUPPRESS_UTC_LEAPSECONDS) {
+        LeapSecondProvider loaded = null;
+        int leapCount = 0;
 
-            this.provider = "<none>";
-            this.list = Collections.emptyList();
-            this.reverseFinal = EMPTY_ARRAY;
-            this.reverseVolatile = EMPTY_ARRAY;
-            this.supportsNegativeLS = false;
-
-        } else {
-
+        if (!SUPPRESS_UTC_LEAPSECONDS) {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
             if (cl == null) {
@@ -221,8 +207,6 @@ public final class LeapSeconds
 
             ServiceLoader<LeapSecondProvider> sl =
                 ServiceLoader.load(LeapSecondProvider.class, cl);
-            LeapSecondProvider loaded = new DefaultLeapSecondService();
-            int leapCount = loaded.getLeapSecondTable().size();
 
             // Provider mit den meisten Schaltsekunden wählen
             for (LeapSecondProvider temp : sl) {
@@ -233,7 +217,18 @@ public final class LeapSeconds
                     leapCount = currentCount;
                 }
             }
+        }
 
+        if (
+            (loaded == null)
+            || (leapCount == 0)
+        ) {
+            this.provider = null;
+            this.list = Collections.emptyList();
+            this.reverseFinal = EMPTY_ARRAY;
+            this.reverseVolatile = EMPTY_ARRAY;
+            this.supportsNegativeLS = false;
+        } else {
             SortedSet<ExtendedLSE> sortedLS =
                 new TreeSet<ExtendedLSE>(new EventComparator());
 
@@ -247,6 +242,7 @@ public final class LeapSeconds
                 sortedLS.add(
                     new SimpleLeapSecondEvent(
                         date,
+                        Long.MIN_VALUE,
                         unixTime + (1 - 2 * 365) * 86400 - 1,
                         entry.getValue().intValue()
                     )
@@ -265,7 +261,7 @@ public final class LeapSeconds
 
             this.reverseFinal = this.initReverse();
             this.reverseVolatile = this.reverseFinal;
-            this.provider = loaded.toString();
+            this.provider = loaded;
 
             if (FINAL_UTC_LEAPSECONDS) {
                 boolean snls = loaded.supportsNegativeLS();
@@ -283,7 +279,6 @@ public final class LeapSeconds
             } else {
                 this.supportsNegativeLS = true;
             }
-
         }
 
     }
@@ -502,27 +497,7 @@ public final class LeapSeconds
     public Iterator<LeapSecondEvent> iterator() {
 
         final LeapSecondEvent[] events = this.getEventsInDescendingOrder();
-
-        return new Iterator<LeapSecondEvent>() {
-            private int index = 0;
-            @Override
-            public boolean hasNext() {
-                return (this.index < events.length);
-            }
-            @Override
-            public LeapSecondEvent next() {
-                if (this.index >= events.length) {
-                    throw new NoSuchElementException();
-                }
-                LeapSecondEvent event = events[this.index];
-                this.index++;
-                return event;
-            }
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-        };
+        return Collections.unmodifiableList(Arrays.asList(events)).iterator();
 
     }
 
@@ -807,6 +782,24 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Determines the expiration date of underlying data. </p>
+     *
+     * @return  immutable date of expiration
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Verfallsdatum der zugrundeliegenden Daten. </p>
+     *
+     * @return  immutable date of expiration
+     * @since   2.3
+     */
+    public GregorianDate getDateOfExpiration() {
+
+        return this.provider.getDateOfExpiration();
+
+    }
+
+    /**
      * <p>For debugging purposes. </p>
      *
      * @return  table of leap seconds as String
@@ -822,6 +815,8 @@ public final class LeapSeconds
         StringBuilder sb = new StringBuilder(2048);
         sb.append("[PROVIDER=");
         sb.append(this.provider);
+        sb.append(",EXPIRES=");
+        sb.append(format(this.getDateOfExpiration()));
         sb.append(",EVENTS=[");
 
         if (this.isEnabled()) {
@@ -891,9 +886,10 @@ public final class LeapSeconds
                     "New leap second must be after last leap second.");
             }
 
-            GregorianDate newLS = new IsoDate(year, month, dayOfMonth);
             int shift = (negativeLS ? -1 : 1);
-            this.list.add(createLSE(newLS, shift, last));
+            GregorianDate newDate =
+                this.provider.getDateOfEvent(year, month, dayOfMonth);
+            this.list.add(createLSE(newDate, shift, last));
             this.reverseVolatile = this.initReverse();
         }
 
@@ -935,28 +931,14 @@ public final class LeapSeconds
         ExtendedLSE last
     ) {
 
-        ExtendedLSE lse =
-            new ExtendedLSE() {
-                @Override
-                public GregorianDate getDate() {
-                    return date;
-                }
-                @Override
-                public int getShift() {
-                    return shift;
-                }
-                @Override
-                public long utc() {
-                    return Long.MIN_VALUE;
-                }
-                @Override
-                public long raw() {
-                    return toPosix(date) + (1 - 2 * 365) * 86400 - 1;
-                }
-            };
-
+        long raw = toPosix(date) + (1 - 2 * 365) * 86400 - 1;
         int diff = (int) (last.utc() - last.raw() + shift);
-        return new SimpleLeapSecondEvent(lse, diff);
+
+        return new SimpleLeapSecondEvent(
+            date,
+            raw + diff,
+            raw,
+            shift);
 
     }
 
@@ -982,156 +964,17 @@ public final class LeapSeconds
 
     }
 
-    //~ Innere Klassen ----------------------------------------------------
+    private static String format(GregorianDate date) {
 
-    private static class IsoDate
-        implements GregorianDate, Serializable {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        private static final long serialVersionUID = 786391662682108754L;
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        /**
-         * @serial  proleptic iso year
-         */
-        private final int year;
-
-        /**
-         * @serial  gregorian month in range (1-12)
-         */
-        private final int month;
-
-        /**
-         * @serial  day of month in range (1-31)
-         */
-        private final int dayOfMonth;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        IsoDate(
-            int year,
-            int month,
-            int dayOfMonth
-        ) {
-            super();
-
-            GregorianMath.checkDate(year, month, dayOfMonth);
-
-            this.year = year;
-            this.month = month;
-            this.dayOfMonth = dayOfMonth;
-
-        }
-
-        //~ Methoden ----------------------------------------------------------
-
-        @Override
-        public int getYear() {
-
-            return this.year;
-
-        }
-
-        @Override
-        public int getMonth() {
-
-            return this.month;
-
-        }
-
-        @Override
-        public int getDayOfMonth() {
-
-            return this.dayOfMonth;
-
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (this == obj) {
-                return true;
-            } else if (obj instanceof IsoDate) {
-                IsoDate that = (IsoDate) obj;
-                return (
-                    (this.dayOfMonth == that.dayOfMonth)
-                    && (this.month == that.month)
-                    && (this.year == that.year)
-                );
-            } else {
-                return false;
-            }
-
-        }
-
-        @Override
-        public int hashCode() {
-
-            return this.year + 31 * this.month + 37 * this.dayOfMonth;
-
-        }
-
-        @Override
-        public String toString() {
-
-            StringBuilder sb = new StringBuilder();
-
-            if (this.year < 0) {
-                sb.append('-');
-            }
-
-            int y = Math.abs(this.year);
-
-            if (y < 1000) {
-                sb.append('0');
-                if (y < 100) {
-                    sb.append('0');
-                    if (y < 10) {
-                        sb.append('0');
-                    }
-                }
-            }
-
-            sb.append(y);
-            sb.append('-');
-
-            if (this.month < 10) {
-                sb.append('0');
-            }
-
-            sb.append(this.month);
-            sb.append('-');
-
-            if (this.dayOfMonth < 10) {
-                sb.append('0');
-            }
-
-            sb.append(this.dayOfMonth);
-            return sb.toString();
-
-        }
-
-        /**
-         * @serialData  Checks the consistency.
-         */
-        private void readObject(ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-
-            in.defaultReadObject();
-
-            int y = this.year;
-            int m = this.month;
-            int d = this.dayOfMonth;
-
-            if (!GregorianMath.isValid(y, m, d)) {
-                throw new InvalidObjectException("Corrupt date.");
-            }
-
-        }
+        return String.format(
+            "%1$04d-%2$02d-%3$02d",
+            date.getYear(),
+            date.getMonth(),
+            date.getDayOfMonth());
 
     }
+
+    //~ Innere Klassen ----------------------------------------------------
 
     private static class SimpleLeapSecondEvent
         implements ExtendedLSE, Serializable {
@@ -1143,7 +986,7 @@ public final class LeapSeconds
         //~ Instanzvariablen ----------------------------------------------
 
         /**
-         * @serial  date of leap second day
+         * @serial  date of leap second event
          */
         private final GregorianDate date;
 
@@ -1164,20 +1007,17 @@ public final class LeapSeconds
 
         //~ Konstruktoren -------------------------------------------------
 
-        // Standard-Konstruktor
         SimpleLeapSecondEvent(
             GregorianDate date,
+            long utcTime,
             long rawTime,
             int shift
         ) {
             super();
 
-            this.date =
-                new IsoDate( // defensives Kopieren
-                    date.getYear(), date.getMonth(), date.getDayOfMonth());
+            this.date = date;
             this.shift = shift;
-
-            this._utc = Long.MIN_VALUE;
+            this._utc = utcTime;
             this._raw = rawTime;
 
         }
@@ -1225,7 +1065,7 @@ public final class LeapSeconds
             StringBuilder sb = new StringBuilder(128);
             sb.append(LeapSecondEvent.class.getName());
             sb.append('[');
-            sb.append(this.date);
+            sb.append(format(this.date));
             sb.append(": utc=");
             sb.append(this._utc);
             sb.append(", raw=");
@@ -1234,140 +1074,6 @@ public final class LeapSeconds
             sb.append(this.shift);
             sb.append(")]");
             return sb.toString();
-
-        }
-
-    }
-
-    private static class DefaultLeapSecondService
-        implements LeapSecondProvider {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final String source;
-        private final Map<GregorianDate, Integer> table;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        DefaultLeapSecondService() {
-            super();
-
-            this.table = new LinkedHashMap<GregorianDate, Integer>(50);
-            InputStream is = null;
-            String name = PATH_TO_LEAPSECONDS;
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-            if (cl != null) {
-                is = cl.getResourceAsStream(name);
-            }
-
-            if (is == null) {
-                cl = LeapSecondProvider.class.getClassLoader();
-                is = cl.getResourceAsStream(name);
-            }
-
-            if (is != null) {
-
-                this.source = cl.getResource(name).toString();
-
-                try {
-
-                    BufferedReader br =
-                        new BufferedReader(
-                            new InputStreamReader(is, "US-ASCII"));
-
-                    String line;
-
-                    while ((line = br.readLine()) != null) {
-
-                        if (line.startsWith("#")) {
-                            continue; // Kommentarzeile überspringen
-                        }
-
-                        int comma = line.indexOf(',');
-                        String date;
-                        Boolean sign = null;
-
-                        if (comma == -1) {
-                            date = line.trim();
-                            sign = Boolean.TRUE;
-                        } else {
-                            date = line.substring(0, comma).trim();
-                            String s = line.substring(comma + 1).trim();
-
-                            if (s.length() == 1) {
-                                char c = s.charAt(0);
-                                if (c == '+') {
-                                    sign = Boolean.TRUE;
-                                } else if (c == '-') {
-                                    sign = Boolean.FALSE;
-                                }
-                            }
-
-                            if (sign == null) {
-                                throw new IllegalStateException(
-                                    "Missing leap second sign.");
-                            }
-                        }
-
-                        int year = Integer.parseInt(date.substring(0, 4));
-                        int month = Integer.parseInt(date.substring(5, 7));
-                        int dom = Integer.parseInt(date.substring(8, 10));
-
-                        Object old =
-                            this.table.put(
-                                new IsoDate(year, month, dom),
-                                Integer.valueOf(sign.booleanValue() ? 1 : -1)
-                            );
-
-                        if (old != null) {
-                            throw new IllegalStateException(
-                                "Duplicate leap second event found.");
-                        }
-
-                    }
-
-                } catch (UnsupportedEncodingException uee) {
-                    throw new AssertionError(uee);
-                } catch (IllegalStateException ise) {
-                    throw ise;
-                } catch (Exception ex) {
-                    throw new IllegalStateException(ex);
-                } finally {
-                    try {
-                        is.close();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace(System.err);
-                    }
-                }
-
-            } else {
-                this.source = "";
-                System.out.println("Warning: File \"" + name + "\" not found.");
-            }
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Map<GregorianDate, Integer> getLeapSecondTable() {
-
-            return Collections.unmodifiableMap(this.table);
-
-        }
-
-        @Override
-        public boolean supportsNegativeLS() {
-
-            return true;
-
-        }
-
-        @Override
-        public String toString() {
-
-            return this.source;
 
         }
 
