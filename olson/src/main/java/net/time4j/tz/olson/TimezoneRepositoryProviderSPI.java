@@ -38,11 +38,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 
 /**
@@ -57,6 +59,18 @@ public class TimezoneRepositoryProviderSPI
     implements ZoneProvider, LeapSecondProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Set<String> JDK_NAME_REFS;
+
+    static {
+        Set<String> jdkNameRefs = new HashSet<String>();
+
+        for (String key : TimeZone.getAvailableIDs()) {
+            jdkNameRefs.add(key);
+        }
+
+        JDK_NAME_REFS = Collections.unmodifiableSet(jdkNameRefs);
+    }
 
     private static final ZoneProvider NAME_PROVIDER = new ZoneNameProviderSPI();
 
@@ -222,8 +236,13 @@ public class TimezoneRepositoryProviderSPI
         Locale locale
     ) {
 
-        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid);
-        return tz.getDisplayName(style, locale);
+
+        if (JDK_NAME_REFS.contains(tzid)) {
+            Timezone tz = Timezone.of("java.util.TimeZone~" + tzid);
+            return tz.getDisplayName(style, locale);
+        }
+
+        return tzid; // fallback if jdk-name-data are too old
 
     }
 
