@@ -1981,28 +1981,9 @@ public class TimezoneRepositoryCompiler {
             super();
 
             try {
-
-                int y = Integer.parseInt(fields[1]);
-                int m = getMonth(fields[2]);
-                int d = Integer.parseInt(fields[3]);
-
-                // add one day
-                if (d == GregorianMath.getLengthOfMonth(y, m)) {
-                    d = 1;
-                    if (m == 12) {
-                        m = 1;
-                        y++;
-                    } else {
-                        m++;
-                    }
-                } else {
-                    d++;
-                }
-
-                this.year = y;
-                this.month = m;
-                this.day = d;
-
+                this.year = Integer.parseInt(fields[1]);
+                this.month = getMonth(fields[2]);
+                this.day = Integer.parseInt(fields[3]);
             } catch (RuntimeException re) {
                 throw new IllegalStateException(Arrays.toString(fields), re);
             }
