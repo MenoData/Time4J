@@ -1,3 +1,2 @@
 net.time4j.tz.olson.ZoneNameProviderSPI
-net.time4j.tz.olson.TimezoneRepositoryProviderSPI
 net.time4j.tz.javazi.TraditionalZoneProviderSPI

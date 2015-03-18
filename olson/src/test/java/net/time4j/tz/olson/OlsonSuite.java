@@ -11,6 +11,7 @@ import net.time4j.tz.model.RulesOfEuropeanUnionTest;
 import net.time4j.tz.model.SerializationTest;
 import net.time4j.tz.model.StartOfDayTest;
 import net.time4j.tz.model.TransitionResolverTest;
+import net.time4j.tz.repository.RepositoryTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

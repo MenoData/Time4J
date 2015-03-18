@@ -1,4 +1,4 @@
-package net.time4j.tz.olson;
+package net.time4j.tz.repository;
 
 import net.time4j.Iso8601Format;
 import net.time4j.Moment;

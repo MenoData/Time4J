@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.tz.olson;
+package net.time4j.tz.repository;
 
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
@@ -28,6 +28,7 @@ import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.olson.ZoneNameProviderSPI;
 
 import java.io.File;
 import java.io.FileNotFoundException;
