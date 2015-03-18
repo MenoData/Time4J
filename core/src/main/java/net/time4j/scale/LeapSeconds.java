@@ -102,7 +102,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @concurrency <threadsafe>
  */
 public final class LeapSeconds
-    implements Iterable<LeapSecondEvent> {
+    implements Iterable<LeapSecondEvent>, Comparator<LeapSecondEvent> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -229,8 +229,7 @@ public final class LeapSeconds
             this.reverseVolatile = EMPTY_ARRAY;
             this.supportsNegativeLS = false;
         } else {
-            SortedSet<ExtendedLSE> sortedLS =
-                new TreeSet<ExtendedLSE>(new EventComparator());
+            SortedSet<ExtendedLSE> sortedLS = new TreeSet<ExtendedLSE>(this);
 
             for (
                 Map.Entry<GregorianDate, Integer> entry
@@ -800,6 +799,59 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Compares two leap second events by their date in ascending order. </p>
+     *
+     * @param   o1  first leap second event
+     * @param   o2  second leap second event
+     * @return  {@code -1}, {@code 0} or {@code 1} if first event is before,
+     *          equal to or later than second event
+     * @since   2.3
+     */
+    /*[deutsch]
+     * <p>Vergleicht zwei Schaltsekundenereignisse nach ihrem Datum in
+     * aufsteigender Reihenfolge. </p>
+     * 
+     * @param   o1  first leap second event
+     * @param   o2  second leap second event
+     * @return  {@code -1}, {@code 0} or {@code 1} if first event is before,
+     *          equal to or later than second event
+     * @since   2.3
+     */
+    @Override
+    public int compare(
+        LeapSecondEvent o1,
+        LeapSecondEvent o2
+    ) {
+
+        GregorianDate d1 = o1.getDate();
+        GregorianDate d2 = o2.getDate();
+
+        int y1 = d1.getYear();
+        int y2 = d2.getYear();
+
+        if (y1 < y2) {
+            return -1;
+        } else if (y1 > y2) {
+            return 1;
+        }
+
+        int m1 = d1.getMonth();
+        int m2 = d2.getMonth();
+
+        if (m1 < m2) {
+            return -1;
+        } else if (m1 > m2) {
+            return 1;
+        }
+
+        int dom1 = d1.getDayOfMonth();
+        int dom2 = d2.getDayOfMonth();
+
+        return (dom1 < dom2 ? -1 : (dom1 == dom2 ? 0 : 1));
+
+    }
+
+    /**
      * <p>For debugging purposes. </p>
      *
      * @return  table of leap seconds as String
@@ -1074,42 +1126,6 @@ public final class LeapSeconds
             sb.append(this.shift);
             sb.append(")]");
             return sb.toString();
-
-        }
-
-    }
-
-    private static class EventComparator
-        implements Comparator<ExtendedLSE> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public int compare(
-            ExtendedLSE o1,
-            ExtendedLSE o2
-        ) {
-
-            GregorianDate d1 = o1.getDate();
-            GregorianDate d2 = o2.getDate();
-
-            int y1 = d1.getYear();
-            int y2 = d2.getYear();
-            if (y1 < y2) {
-                return -1;
-            } else if (y1 > y2) {
-                return 1;
-            }
-            int m1 = d1.getMonth();
-            int m2 = d2.getMonth();
-            if (m1 < m2) {
-                return -1;
-            } else if (m1 > m2) {
-                return 1;
-            }
-            int dom1 = d1.getDayOfMonth();
-            int dom2 = d2.getDayOfMonth();
-            return (dom1 < dom2 ? -1 : (dom1 == dom2 ? 0 : 1));
 
         }
 
