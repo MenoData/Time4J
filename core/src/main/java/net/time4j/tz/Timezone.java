@@ -275,18 +275,7 @@ public abstract class Timezone
             String name = provider.getName();
 
             if (name.equals(NAME_TZDB)) {
-                String v = provider.getVersion();
-
-                if (!v.isEmpty()) {
-                    if (v.equals(REPOSITORY_VERSION)) {
-                        zp = provider;
-                    } else if (
-                        (REPOSITORY_VERSION == null)
-                        && ((zp == null) || (v.compareTo(zp.getVersion()) > 0))
-                    ) {
-                        zp = provider;
-                    }
-                }
+                zp = compareTZDB(provider, zp);
             } else if (name.equals(NAME_ZONENAMES)) {
                 np = provider;
             } else if (
@@ -1422,6 +1411,35 @@ public abstract class Timezone
             provider.equals(NAME_DEFAULT)
             ? DEFAULT_PROVIDER
             : PROVIDERS.get(provider));
+
+    }
+
+    private static ZoneProvider compareTZDB(
+        ZoneProvider provider,
+        ZoneProvider zp
+    ) {
+
+        String v = provider.getVersion();
+
+        if (!v.isEmpty()) {
+            if (v.equals(REPOSITORY_VERSION)) {
+                zp = provider;
+            } else if (REPOSITORY_VERSION == null) {
+                if (
+                    (zp == null)
+                    || (v.compareTo(zp.getVersion()) > 0)
+                ) {
+                    zp = provider;
+                } else if (
+                    (v.compareTo(zp.getVersion()) == 0)
+                    && !provider.getLocation().contains("{java.home}")
+                ) {
+                    zp = provider;
+                }
+            }
+        }
+
+        return zp;
 
     }
 
