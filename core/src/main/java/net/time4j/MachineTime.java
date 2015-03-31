@@ -32,7 +32,6 @@ import net.time4j.scale.UniversalTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -65,7 +64,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
  * @see     SI#NANOSECONDS
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Dauer f&uuml;r maschinelle Zeiten in dezimalen
@@ -87,7 +86,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
  * @see     SI#NANOSECONDS
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class MachineTime<U>
     implements TimeSpan<U>, Serializable {
@@ -1064,8 +1063,10 @@ public final class MachineTime<U>
      *          out.writeInt(getFraction());
      *      }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.MACHINE_TIME_TYPE);
 
@@ -1073,10 +1074,11 @@ public final class MachineTime<U>
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

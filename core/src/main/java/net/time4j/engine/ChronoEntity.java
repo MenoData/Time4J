@@ -42,7 +42,7 @@ import net.time4j.tz.TZID;
  *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @spec    All public implementations must be immutable.
+ * @doctags.spec    All public implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitwertobjekt, das einzelne Werte mit
@@ -63,7 +63,7 @@ import net.time4j.tz.TZID;
  *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @spec    All public implementations must be immutable.
+ * @doctags.spec    All public implementations must be immutable.
  */
 public abstract class ChronoEntity<T extends ChronoEntity<T>>
     implements ChronoDisplay {
@@ -530,7 +530,7 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
      * <p>Liefert den Selbstbezug. </p>
      *
      * @return  time context (usually this instance)
-     * @exclude
+     * @doctags.exclude
      */
     protected T getContext() {
 

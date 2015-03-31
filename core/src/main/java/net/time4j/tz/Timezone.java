@@ -72,8 +72,8 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Meno Hochschild
  * @serial      exclude
- * @concurrency All static methods are thread-safe while this class is
- *              immutable as long as the underlying timezone data are.
+ * @doctags.concurrency All static methods are thread-safe while this class is
+ *                      immutable as long as the underlying timezone data are.
  */
 /*[deutsch]
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
@@ -105,8 +105,8 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Meno Hochschild
  * @serial      exclude
- * @concurrency All static methods are thread-safe while this class is
- *              immutable as long as the underlying timezone data are.
+ * @doctags.concurrency All static methods are thread-safe while this class is
+ *                      immutable as long as the underlying timezone data are.
  */
 public abstract class Timezone
     implements Serializable {
@@ -656,7 +656,6 @@ public abstract class Timezone
      * @throws  IllegalArgumentException if a fixed zonal offset is combined
      *          with a non-empty history
      * @since   2.2
-     * @see     net.time4j.tz.model.TransitionModel
      */
     /*[deutsch]
      * <p>Erzeugt eine neue synthetische Zeitzone basierend nur auf den
@@ -668,7 +667,6 @@ public abstract class Timezone
      * @throws  IllegalArgumentException if a fixed zonal offset is combined
      *          with a non-empty history
      * @since   2.2
-     * @see     net.time4j.tz.model.TransitionModel
      */
     public static Timezone of(
         String tzid,
@@ -908,6 +906,7 @@ public abstract class Timezone
     /**
      * <p>Tries to get the version of given registered zone provider. </p>
      *
+     * @param   provider    name of zone provider
      * @return  String (empty if unknown)
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
@@ -916,6 +915,7 @@ public abstract class Timezone
      * <p>Versucht die Version des angegebenen und registrierten
      * {@code ZoneProvider} zu ermitteln. </p>
      *
+     * @param   provider    name of zone provider
      * @return  String (empty if unknown)
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2

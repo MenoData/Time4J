@@ -48,13 +48,13 @@ import static net.time4j.format.Leniency.STRICT;
  * and parsing. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Formatattribute zum Steuern des Format- und Interpretierungsvorgangs. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class Attributes
     implements AttributeQuery {
@@ -189,6 +189,7 @@ public final class Attributes
      * <p>Setting of this attribute also changes other attributes: </p>
      *
      * <table border="1" style="margin-top:5px;">
+     *  <caption>Legend</caption>
      *  <tr>
      *      <th>LENIENCY</th>
      *      <th>PARSE_CASE_INSENSITIVE</th>
@@ -208,6 +209,7 @@ public final class Attributes
      * Attribute: </p>
      *
      * <table border="1" style="margin-top:5px;">
+     *  <caption>Legende</caption>
      *  <tr>
      *      <th>LENIENCY</th>
      *      <th>PARSE_CASE_INSENSITIVE</th>

@@ -159,6 +159,7 @@ public interface ChronoMerger<T> {
      * <p>Transforms the current context/entity into another set of chronological
      * values which finally shall be formatted using given attributes. </p>
      *
+     * @param   context         actual chronological context to be formatted
      * @param   attributes      controls attributes during formatting
      * @return  replacement entity which will finally be used for formatting
      * @throws  IllegalArgumentException in any case of inconsistent data
@@ -168,6 +169,7 @@ public interface ChronoMerger<T> {
      * bei Bedarf in den tats&auml;chlich zu formatierenden Satz von
      * chronologischen Werten. </p>
      *
+     * @param   context         actual chronological context to be formatted
      * @param   attributes      controls attributes during formatting
      * @return  replacement entity which will finally be used for formatting
      * @throws  IllegalArgumentException in any case of inconsistent data

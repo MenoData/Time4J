@@ -35,7 +35,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -49,7 +49,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface UnitPatternProvider {
 

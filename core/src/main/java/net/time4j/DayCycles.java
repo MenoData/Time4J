@@ -28,17 +28,17 @@ import java.io.Serializable;
  * <p>Represents the rolling result of a plain time if a possible day overflow
  * is to be taken into account. </p>
  *
- * @author      Meno Hochschild
- * @concurrency <immutable>
- * @see         PlainTime#roll(long,ClockUnit)
+ * @author              Meno Hochschild
+ * @doctags.concurrency <immutable>
+ * @see                 PlainTime#roll(long,ClockUnit)
  */
 /*[deutsch]
  * <p>Verk&ouml;rpert das Rollergebnis auf einer Uhrzeit, wenn auch ein
  * tageweiser &Uuml;berlauf gez&auml;hlt werden soll. </p>
  *
- * @author      Meno Hochschild
- * @concurrency <immutable>
- * @see         PlainTime#roll(long,ClockUnit)
+ * @author              Meno Hochschild
+ * @doctags.concurrency <immutable>
+ * @see                 PlainTime#roll(long,ClockUnit)
  */
 public final class DayCycles implements Serializable {
 

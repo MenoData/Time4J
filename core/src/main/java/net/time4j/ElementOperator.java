@@ -34,7 +34,7 @@ import net.time4j.tz.ZonalOffset;
  *
  * @param       <T> generic target type this operator is applied to
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert eine Manipulation von Datums- oder Uhrzeitobjekten nach
@@ -42,7 +42,7 @@ import net.time4j.tz.ZonalOffset;
  *
  * @param       <T> generic target type this operator is applied to
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public abstract class ElementOperator<T>
     implements ChronoOperator<T> {

@@ -35,7 +35,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Stellt einen Zugriff auf die enthaltenen Namen per Elementwert-Enum
@@ -43,7 +43,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class TextAccessor {
 

@@ -45,7 +45,7 @@ import java.util.Comparator;
  *          sortable form)
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoElement)
- * @spec    All implementations must be immutable and serializable.
+ * @doctags.spec    All implementations must be immutable and serializable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein chronologisches Element, das einen Teil eines
@@ -69,7 +69,7 @@ import java.util.Comparator;
  *          sortable form)
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoElement)
- * @spec    All implementations must be immutable and serializable.
+ * @doctags.spec    All implementations must be immutable and serializable.
  */
 public interface ChronoElement<V>
     extends Comparator<ChronoDisplay> {

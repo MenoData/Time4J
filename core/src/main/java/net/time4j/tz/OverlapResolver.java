@@ -30,7 +30,6 @@ package net.time4j.tz;
  * @since   2.2
  * @see     GapResolver
  * @see     TransitionStrategy
- * @concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Komponente einer &Uuml;bergangsstrategie, wie
@@ -40,7 +39,6 @@ package net.time4j.tz;
  * @since   2.2
  * @see     GapResolver
  * @see     TransitionStrategy
- * @concurrency <immutable>
  */
 public enum OverlapResolver {
 

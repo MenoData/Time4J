@@ -50,7 +50,6 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
@@ -98,7 +97,7 @@ import java.util.Set;
  * </ul>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine reine Uhrzeit ohne Zeitzonen- oder Datumsteil
@@ -136,7 +135,7 @@ import java.util.Set;
  * </ul>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class PlainTime
@@ -241,6 +240,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legend</caption>
      * <tr>
      *  <td>AM_PM_OF_DAY</td><td>AM</td><td>AM</td><td>...</td><td>AM</td>
      *  <td>PM</td><td>PM</td><td>...</td><td>PM</td><td>AM</td>
@@ -259,7 +259,7 @@ public final class PlainTime
      *
      *  PlainTime time = PlainTime.of(12, 45, 20);
      *  System.out.println(time.get(AM_PM_OF_DAY));
-     *  // Ausgabe: PM
+     *  // Output: PM
      * </pre>
      *
      * <p>This element does not define a base unit. </p>
@@ -274,6 +274,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legende</caption>
      * <tr>
      *  <td>AM_PM_OF_DAY</td><td>AM</td><td>AM</td><td>...</td><td>AM</td>
      *  <td>PM</td><td>PM</td><td>...</td><td>PM</td><td>AM</td>
@@ -314,6 +315,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legend</caption>
      * <tr>
      *  <td>CLOCK_HOUR_OF_AMPM</td><td>12</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>1</td><td>...</td><td>11</td><td>12</td>
@@ -338,6 +340,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legende</caption>
      * <tr>
      *  <td>CLOCK_HOUR_OF_AMPM</td><td>12</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>1</td><td>...</td><td>11</td><td>12</td>
@@ -367,6 +370,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legend</caption>
      * <tr>
      *  <td>CLOCK_HOUR_OF_DAY</td><td>24</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>24</td>
@@ -390,6 +394,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legende</caption>
      * <tr>
      *  <td>CLOCK_HOUR_OF_DAY</td><td>24</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>24</td>
@@ -419,6 +424,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legend</caption>
      * <tr>
      *  <td>DIGITAL_HOUR_OF_AMPM</td><td>0</td><td>1</td><td>...</td><td>11</td>
      *  <td>0</td><td>1</td><td>...</td><td>11</td><td>0</td>
@@ -442,6 +448,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legende</caption>
      * <tr>
      *  <td>DIGITAL_HOUR_OF_AMPM</td><td>0</td><td>1</td><td>...</td><td>11</td>
      *  <td>0</td><td>1</td><td>...</td><td>11</td><td>0</td>
@@ -475,6 +482,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legend</caption>
      * <tr>
      *  <td>DIGITAL_HOUR_OF_DAY</td><td>0</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>0</td>
@@ -498,6 +506,7 @@ public final class PlainTime
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     * <caption>Legende</caption>
      * <tr>
      *  <td>DIGITAL_HOUR_OF_DAY</td><td>0</td><td>1</td><td>...</td><td>11</td>
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>0</td>
@@ -1702,7 +1711,7 @@ public final class PlainTime
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected TimeAxis<IsoTimeUnit, PlainTime> getChronology() {
@@ -1712,7 +1721,7 @@ public final class PlainTime
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected PlainTime getContext() {
@@ -1788,7 +1797,6 @@ public final class PlainTime
      * <p>Wird von der {@code ratio()}-Function des angegebenenElements
      * aufgerufen. </p>
      *
-     * @param   context     walltime context
      * @param   element     reference time element
      * @return  {@code true} if element maximum is reduced else {@code false}
      */
@@ -2028,8 +2036,10 @@ public final class PlainTime
      *          out.writeInt(time.nano);
      *      }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.TIME_TYPE);
 
@@ -2037,10 +2047,11 @@ public final class PlainTime
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

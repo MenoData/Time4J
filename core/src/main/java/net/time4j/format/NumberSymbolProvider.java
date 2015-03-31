@@ -38,7 +38,7 @@ import java.util.Locale;
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -52,7 +52,7 @@ import java.util.Locale;
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface NumberSymbolProvider {
 

@@ -37,7 +37,7 @@ import java.util.List;
  * but there was originally not any useable implementation. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
@@ -47,7 +47,7 @@ import java.util.List;
  * aber es gab urspr&uuml;nglich keine nutzbare Implementierung. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionHistory {
 

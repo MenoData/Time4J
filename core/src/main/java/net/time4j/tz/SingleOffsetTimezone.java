@@ -282,7 +282,9 @@ final class SingleOffsetTimezone
 
     /**
      * @serialData  Checks the consistency.
+     * @param       in      object input stream
      * @throws      InvalidObjectException in case of inconsistencies
+     * @throws      ClassNotFoundException
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {

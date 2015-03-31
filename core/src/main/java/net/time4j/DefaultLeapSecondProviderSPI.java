@@ -42,7 +42,7 @@ import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
  * &quot;leapseconds.data&quot; in class path. </p>
  *
  * @author  Meno Hochschild
- * @exclude
+ * @doctags.exclude
  */
 public final class DefaultLeapSecondProviderSPI
     implements LeapSecondProvider {

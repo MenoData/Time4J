@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author  Meno Hochschild
  * @since   1.2
  * @see     UnitPatternProvider
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Bietet lokalisierte Zeiteinheitsmuster zur Formatierung einer
@@ -47,7 +47,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author  Meno Hochschild
  * @since   1.2
  * @see     UnitPatternProvider
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class UnitPatterns {
 

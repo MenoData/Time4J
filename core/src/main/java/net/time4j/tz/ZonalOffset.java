@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>{@code [Total Offset] = [Local Wall Time] - [POSIX Time]}</p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Verschiebung der lokalen Zeit relativ zur
@@ -54,7 +54,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>{@code [Total Offset] = [Local Wall Time] - [POSIX Time]}</p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class ZonalOffset
     implements Comparable<ZonalOffset>, TZID, Serializable {
@@ -1025,8 +1025,10 @@ public final class ZonalOffset
      *      out.writeInt(this.getFractionalAmount());
      *  }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.ZONAL_OFFSET_TYPE);
 
@@ -1034,10 +1036,11 @@ public final class ZonalOffset
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

@@ -22,6 +22,7 @@
 package net.time4j.tz;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
@@ -50,7 +51,7 @@ import java.io.Serializable;
  * gaps and ambivalent in overlapping regions. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Beschreibt einen Wechsel der Verschiebung der lokalen Zeit relativ
@@ -79,7 +80,7 @@ import java.io.Serializable;
  * nicht definiert und auf &Uuml;berlappungen zweideutig. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class ZonalTransition
     implements Comparable<ZonalTransition>, Serializable {
@@ -507,14 +508,22 @@ public final class ZonalTransition
 
     /**
      * @serialData  Checks the consistency.
+     * @param       in      object input stream
+     * @throws      IOException in any case of inconsistencies
+     * @throws      ClassNotFoundException
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
 
         in.defaultReadObject();
-        checkRange(this.previous);
-        checkRange(this.total);
-        checkDST(this.dst);
+
+        try {
+            checkRange(this.previous);
+            checkRange(this.total);
+            checkDST(this.dst);
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidObjectException(iae.getMessage());
+        }
 
     }
 

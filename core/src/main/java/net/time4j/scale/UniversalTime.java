@@ -93,6 +93,7 @@ import net.time4j.base.UnixTime;
  * <p>&nbsp;</p>
  *
  * <table border="1">
+ *  <caption>Legend</caption>
  *  <tr>
  *      <th>Section</th>
  *      <th>Name</th>
@@ -119,7 +120,7 @@ import net.time4j.base.UnixTime;
  *      date or last leapsecond in the future. The institute IERS is
  *      responsible for announcing leapseconds around 6 months in advance.
  *      A second precision is not given for any kind of time calculations
- *      if the calculation includes the future further than 6 months. </td
+ *      if the calculation includes the future further than 6 months. </td>
  *  </tr>
  *  <tr>
  *      <td>after day X</td>
@@ -171,7 +172,7 @@ import net.time4j.base.UnixTime;
  * like ISO-8601 or internet protocols like RFC 3339. This API has the
  * goal to follow these standards as much as possible. Leapseconds are
  * rare but nevertheless present in civil life if they happen. They are
- * always published in the broad mass media. </p>
+ * always published in the broad mass media. </li>
  * <li>DEFINITION OF SECOND: UTC based on atomic clocks ensures that
  * every second has exactly the same length what is not true for the
  * usual mean solar time (UT1) which is more present in civil life.
@@ -194,7 +195,7 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @see     LeapSeconds
- * @spec    Implementations are required to be immutable.
+ * @doctags.spec    Implementations are required to be immutable.
  */
 /*[deutsch]
  * <p>Definiert einen Zeitstempel als Koordinate/Punkt auf der Weltzeitlinie mit
@@ -268,6 +269,7 @@ import net.time4j.base.UnixTime;
  * <p>&nbsp;</p>
  *
  * <table border="1">
+ *  <caption>Legende</caption>
  *  <tr>
  *      <th>Zeitabschnitt</th>
  *      <th>Name</th>
@@ -352,7 +354,7 @@ import net.time4j.base.UnixTime;
  * Dieses API hat das Ziel, auch in der Darstellung diesen Normen so genau wie
  * m&ouml;glich zu folgen. Schaltsekunden sind zwar selten, aber dennoch im
  * zivilen Alltag pr&auml;sent, wenn sie denn vorkommen. Sie werden immer
- * wieder in den Massenmedien der breiten &Ouml;ffentlichkeit vorgestellt. </p>
+ * wieder in den Massenmedien der breiten &Ouml;ffentlichkeit vorgestellt. </li>
  * <li>SEKUNDEN-DEFINITION: UTC stellt als atomuhrzeitbasierte Skala sicher,
  * da&szlig; jede Sekunde physikalisch gleich lang ist, was bei der im zivilen
  * Alltagsleben gebr&auml;chlichen mittleren Sonnenzeit bzw. gregorianischen
@@ -376,7 +378,7 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @see     LeapSeconds
- * @spec    Implementations are required to be immutable.
+ * @doctags.spec    Implementations are required to be immutable.
  */
 public interface UniversalTime
     extends UnixTime {

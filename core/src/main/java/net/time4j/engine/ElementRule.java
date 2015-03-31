@@ -51,7 +51,7 @@ package net.time4j.engine;
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable.
+ * @doctags.spec    All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Regel eines chronologischen Elements, indem
@@ -86,7 +86,7 @@ package net.time4j.engine;
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable.
+ * @doctags.spec    All implementations must be immutable.
  */
 public interface ElementRule<T, V> {
 

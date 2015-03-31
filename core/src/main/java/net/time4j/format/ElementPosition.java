@@ -29,14 +29,14 @@ import net.time4j.engine.ChronoElement;
  * with a formatted text. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Positionsinformation eines chronologischen
  * Elements in einem formatierten Text. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class ElementPosition {
 

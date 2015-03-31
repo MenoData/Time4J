@@ -120,11 +120,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     @Override
     public boolean isSimultaneous(Calendrical<?, ?> date) {
 
-        if (this == date) {
-            return true;
-        }
-
-        return (this.compareByTime(date) == 0);
+        return ((this == date) || (this.compareByTime(date) == 0));
 
     }
 
@@ -281,9 +277,10 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * <p>Diese Implementierung wertet die zeitliche Position auf dem
      * gemeinsamen Zeitstrahl aus, also die Epochentage. </p>
      *
+     * @param   date    another date to be compared with
      * @return  negative, zero or positive integer if this instance is earlier,
      *          simultaneous or later than given date
-     * @exclude
+     * @doctags.exclude
      */
     protected int compareByTime(Calendrical<?, ?> date) {
 

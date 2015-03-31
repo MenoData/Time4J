@@ -75,7 +75,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @param       <T> generic type of chronological entity
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitformat zur Konversion zwischen einem
@@ -91,7 +91,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @param       <T> generic type of chronological entity
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class ChronoFormatter<T extends ChronoEntity<T>>
     implements ChronoPrinter<T>, ChronoParser<T> {
@@ -288,6 +288,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * {@code with()}-method. Following attributes are predefined: </p>
      *
      * <table border="1" style="margin-top:5px;">
+     *  <caption>Legend</caption>
      *  <tr>
      *      <td>{@link Attributes#CALENDAR_TYPE}</td>
      *      <td>dependent on associated chronology</td>
@@ -344,6 +345,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * werden vordefiniert: </p>
      *
      * <table border="1" style="margin-top:5px;">
+     *  <caption>Legende</caption>
      *  <tr>
      *      <td>{@link Attributes#CALENDAR_TYPE}</td>
      *      <td>dependent on associated chronology</td>
@@ -1147,6 +1149,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <p>Note: Sectional attributes cannot be overridden. </p>
      *
+     * @param   <A> generic attribute value type
      * @param   key     attribute key
      * @param   value   attribute value
      * @return  changed copy with the new or changed attribute while
@@ -1157,7 +1160,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
      *
-     * @param   <A> generic attribute type
+     * @param   <A> generic attribute value type
      * @param   key     attribute key
      * @param   value   attribute value
      * @return  changed copy with the new or changed attribute while
@@ -1815,7 +1818,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @concurrency <mutable>
+     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Formatobjekt. </p>
@@ -1827,7 +1830,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @concurrency <mutable>
+     * @doctags.concurrency <mutable>
      */
     public static final class Builder<T extends ChronoEntity<T>> {
 
@@ -3542,6 +3545,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <div style="margin-top:5px;">
          * <table border="1">
+         * <caption>Legend</caption>
          * <tr>
          *  <th>&nbsp;</th>
          *  <th>SHORT</th>
@@ -3597,6 +3601,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <div style="margin-top:5px;">
          * <table border="1">
+         * <caption>Legende</caption>
          * <tr>
          *  <th>&nbsp;</th>
          *  <th>SHORT</th>

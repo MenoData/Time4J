@@ -56,7 +56,6 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -130,7 +129,7 @@ import static net.time4j.PlainTime.*;
  * day. In element access and manipulations this value is not supported. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Komposition aus Datum und Uhrzeit nach dem ISO-8601-Standard. </p>
@@ -180,7 +179,7 @@ import static net.time4j.PlainTime.*;
  * normalisieren, nicht aber in den Elementen. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class PlainTimestamp
@@ -1085,7 +1084,7 @@ public final class PlainTimestamp
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
@@ -1095,7 +1094,7 @@ public final class PlainTimestamp
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected PlainTimestamp getContext() {
@@ -1241,8 +1240,10 @@ public final class PlainTimestamp
      *      out.writeInt(time.nano);
      *  }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.NEW_TIMESTAMP_TYPE);
 
@@ -1250,10 +1251,11 @@ public final class PlainTimestamp
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 
@@ -1320,8 +1322,8 @@ public final class PlainTimestamp
                 entity.with(SECOND_OF_MINUTE, Integer.valueOf(59));
             }
 
-            PlainDate date = null;
-            PlainTime time = null;
+            PlainDate date;
+            PlainTime time;
 
             if (entity.contains(CALENDAR_DATE)) {
                 date = entity.get(CALENDAR_DATE);

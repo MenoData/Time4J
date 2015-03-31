@@ -441,6 +441,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * <p>Calculates the (most normalized) time span between this time point
      * and given end time point using the given metric. </p>
      *
+     * @param   <P> generic type of time span result
      * @param   end             end time point
      * @param   metric          temporal distance metric
      * @return  difference between this and given end time point
@@ -451,6 +452,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      * <p>Ermittelt die (meist normalisierte) Zeitspanne zwischen dieser
      * Bezugszeit und dem Endzeitpunkt in der angegebenen Metrik. </p>
      *
+     * @param   <P> generic type of time span result
      * @param   end             end time point
      * @param   metric          temporal distance metric
      * @return  difference between this and given end time point

@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  */
 /*[deutsch]
@@ -54,7 +54,7 @@ import java.util.ResourceBundle;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @spec    Implementations must have a public no-arg constructor.
+ * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  */
 public interface TextProvider {

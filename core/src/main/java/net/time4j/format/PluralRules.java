@@ -44,7 +44,7 @@ import static net.time4j.format.PluralCategory.TWO;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @spec    All concrete classes must be immutable.
+ * @doctags.spec    All concrete classes must be immutable.
  */
 /*[deutsch]
  * <p>Hilfsklasse zur Bestimmung der Pluralkategorie f&uuml;r eine gegebene
@@ -60,7 +60,7 @@ import static net.time4j.format.PluralCategory.TWO;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @spec    All concrete classes must be immutable.
+ * @doctags.spec    All concrete classes must be immutable.
  */
 public abstract class PluralRules {
 

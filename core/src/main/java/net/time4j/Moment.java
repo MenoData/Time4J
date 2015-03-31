@@ -61,7 +61,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.util.Arrays;
@@ -118,7 +117,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * {@code until(Moment, unit)}. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen Zeitpunkt auf der Weltzeitlinie mit Bezug
@@ -157,7 +156,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * {@code until(Moment, unit)} verwendet. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class Moment
@@ -826,6 +825,7 @@ public final class Moment
      * <p>A direct conversion to a zonal timestamp can be achieved by
      * {@link #toZonalTimestamp(TZID)}. </p>
      *
+     * @param   tzid    timezone id
      * @return  moment in given timezone
      * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
@@ -839,6 +839,7 @@ public final class Moment
      * <p>Eine Direktumwandlung zu einem zonalen Zeitstempel kann mit Hilfe
      * von {@link #toZonalTimestamp(TZID)} erreicht werden. </p>
      *
+     * @param   tzid    timezone id
      * @return  moment in given timezone
      * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
@@ -857,6 +858,7 @@ public final class Moment
      * <p>A direct conversion to a zonal timestamp can be achieved by
      * {@link #toZonalTimestamp(String)}. </p>
      *
+     * @param   tzid    timezone id
      * @return  moment in given timezone
      * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
@@ -870,6 +872,7 @@ public final class Moment
      * <p>Eine Direktumwandlung zu einem zonalen Zeitstempel kann mit Hilfe
      * von {@link #toZonalTimestamp(String)} erreicht werden. </p>
      *
+     * @param   tzid    timezone id
      * @return  moment in given timezone
      * @since   2.0
      * @throws  IllegalArgumentException if this moment is a leapsecond and
@@ -1572,7 +1575,7 @@ public final class Moment
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected TimeAxis<TimeUnit, Moment> getChronology() {
@@ -1582,7 +1585,7 @@ public final class Moment
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected Moment getContext() {
@@ -1806,8 +1809,10 @@ public final class Moment
      *      out.writeInt(fraction);
      *  }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.MOMENT_TYPE);
 
@@ -1815,10 +1820,11 @@ public final class Moment
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

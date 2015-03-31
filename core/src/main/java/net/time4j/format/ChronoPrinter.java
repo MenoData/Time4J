@@ -55,6 +55,7 @@ public interface ChronoPrinter<T> {
      * the result of printing a {@code Moment} will be the formatted
      * form of the original {@code Moment}. </p>
      *
+     * @param   <R> generic result type
      * @param   formattable chronological entity to be formatted
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  control attributes
@@ -75,6 +76,7 @@ public interface ChronoPrinter<T> {
      * die vorformatierte Form des urspr&uuml;nglichen {@code Moment}
      * sein wird.</p>
      *
+     * @param   <R> generic result type
      * @param   formattable chronological entity to be formatted
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  control attributes

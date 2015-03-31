@@ -33,7 +33,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     Calendrical
  * @see     net.time4j.engine.EpochDays
- * @spec    All implementations must be immutable.
+ * @doctags.spec    All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Kalendersystem, das Datumsangaben eindeutig auf
@@ -44,7 +44,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     Calendrical
  * @see     net.time4j.engine.EpochDays
- * @spec    All implementations must be immutable.
+ * @doctags.spec    All implementations must be immutable.
  */
 public interface CalendarSystem<D> {
 

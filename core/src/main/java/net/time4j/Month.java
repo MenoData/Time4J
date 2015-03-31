@@ -180,11 +180,13 @@ public enum Month
     /**
      * <p>Gets the first month of given quarter of year. </p>
      *
+     * @param   quarterOfYear   quarter of year (Q1-Q4)
      * @return  first month in given quarteryear
      */
     /*[deutsch]
      * <p>Liefert den ersten Monat des angegebenen Quartals. </p>
      *
+     * @param   quarterOfYear   quarter of year (Q1-Q4)
      * @return  first month in given quarteryear
      */
     public static Month atStartOfQuarterYear(Quarter quarterOfYear) {
@@ -205,11 +207,13 @@ public enum Month
     /**
      * <p>Gets the last month of given quarter of year. </p>
      *
+     * @param   quarterOfYear   quarter of year (Q1-Q4)
      * @return  last month in given quarteryear
      */
     /*[deutsch]
      * <p>Liefert den letzten Monat des angegebenen Quartals. </p>
      *
+     * @param   quarterOfYear   quarter of year (Q1-Q4)
      * @return  last month in given quarteryear
      */
     public static Month atEndOfQuarterYear(Quarter quarterOfYear) {

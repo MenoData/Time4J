@@ -107,7 +107,7 @@ public interface ZoneProvider {
      * <p>Gets an alias table whose keys represent alternative identifiers
      * mapped to other aliases or finally canonical timezone IDs.. </p>
      *
-     * <p>Example: &quot;PST&quot; => &quot;America/Los_Angeles&quot;. </p>
+     * <p>Example: &quot;PST&quot; =&gt; &quot;America/Los_Angeles&quot;. </p>
      *
      * @return  map from all timezone aliases to canoncial ids
      */
@@ -116,7 +116,7 @@ public interface ZoneProvider {
      * Zonen-IDs darstellen und in der die zugeordneten Werte wieder
      * Aliasnamen oder letztlich kanonische Zonen-IDs sind. </p>
      *
-     * <p>Beispiel: &quot;PST&quot; => &quot;America/Los_Angeles&quot;. </p>
+     * <p>Beispiel: &quot;PST&quot; =&gt; &quot;America/Los_Angeles&quot;. </p>
      *
      * @return  map from all timezone aliases to canoncial ids
      */

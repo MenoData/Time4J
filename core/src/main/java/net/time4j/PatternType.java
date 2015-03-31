@@ -69,6 +69,7 @@ public enum PatternType
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     *  <caption>Legend</caption>
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>
@@ -289,6 +290,7 @@ public enum PatternType
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     *  <caption>Legende</caption>
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>
@@ -515,6 +517,7 @@ public enum PatternType
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     *  <caption>Legend</caption>
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>
@@ -605,6 +608,7 @@ public enum PatternType
      *
      * <div style="margin-top:5px;">
      * <table border="1">
+     *  <caption>Legende</caption>
      *  <tr>
      *      <th>Element</th>
      *      <th>Symbol</th>

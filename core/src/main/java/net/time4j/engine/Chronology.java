@@ -152,11 +152,7 @@ public class Chronology<T extends ChronoEntity<T>>
      */
     public boolean isRegistered(ChronoElement<?> element) {
 
-        if (element == null) {
-            return false;
-        }
-
-        return this.ruleMap.containsKey(element);
+        return ((element != null) && this.ruleMap.containsKey(element));
 
     }
 
@@ -535,7 +531,7 @@ public class Chronology<T extends ChronoEntity<T>>
      *
      * @param       <T> generic type of time context
      * @author      Meno Hochschild
-     * @concurrency <mutable>
+     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Chronologie ohne Zeitachse und wird
@@ -544,7 +540,7 @@ public class Chronology<T extends ChronoEntity<T>>
      *
      * @param       <T> generic type of time context
      * @author      Meno Hochschild
-     * @concurrency <mutable>
+     * @doctags.concurrency <mutable>
      */
     public static class Builder<T extends ChronoEntity<T>> {
 

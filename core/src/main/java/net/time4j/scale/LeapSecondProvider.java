@@ -36,7 +36,7 @@ import java.util.Map;
  * in POSIX-time instead of UTC. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must have a public no-arg constructor.
+ * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   2.3
  */
 /*[deutsch]
@@ -50,7 +50,7 @@ import java.util.Map;
  * statt UTC. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must have a public no-arg constructor.
+ * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   2.3
  */
 public interface LeapSecondProvider {

@@ -59,7 +59,6 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -102,7 +101,7 @@ import java.util.Set;
  * {@link EpochDays} are supported. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein reines Kalenderdatum im ISO-8601-Standard. </p>
@@ -134,7 +133,7 @@ import java.util.Set;
  * und der Klasse {@link EpochDays} nutzbar. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class PlainDate
@@ -877,6 +876,8 @@ public final class PlainDate
     /**
      * <p>Creates a new date based on count of days since given epoch. </p>
      *
+     * @param   amount      count of days
+     * @param   epoch       reference date scale
      * @return  found calendar date based on given epoch days
      * @throws  IllegalArgumentException if first argument is out of range
      */
@@ -884,6 +885,8 @@ public final class PlainDate
      * <p>Erzeugt ein Datum zur gegebenen Anzahl von Tagen seit einer
      * Epoche. </p>
      *
+     * @param   amount      count of days
+     * @param   epoch       reference date scale
      * @return  found calendar date based on given epoch days
      * @throws  IllegalArgumentException if first argument is out of range
      */
@@ -1419,7 +1422,7 @@ public final class PlainDate
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected TimeAxis<IsoDateUnit, PlainDate> getChronology() {
@@ -1429,7 +1432,7 @@ public final class PlainDate
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected PlainDate getContext() {
@@ -1439,7 +1442,7 @@ public final class PlainDate
     }
 
     /**
-     * @exclude
+     * @doctags.exclude
      */
     @Override
     protected int compareByTime(Calendrical<?, ?> date) {
@@ -2109,8 +2112,10 @@ public final class PlainDate
      *      out.writeInt(year);
      *  }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.DATE_TYPE);
 
@@ -2118,10 +2123,11 @@ public final class PlainDate
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

@@ -77,7 +77,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert Regeln f&uuml;r den lokalisierten Umgang mit Wochentagen
@@ -95,7 +95,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class Weekmodel
     implements Serializable {
@@ -943,8 +943,10 @@ public final class Weekmodel
      *      out.writeByte(state);
      *  }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.WEEKMODEL_TYPE);
 
@@ -952,10 +954,11 @@ public final class Weekmodel
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

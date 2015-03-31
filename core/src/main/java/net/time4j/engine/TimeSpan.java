@@ -71,7 +71,7 @@ public interface TimeSpan<U> {
      * <pre>
      *  for (Item&lt;?&gt; item : getTotalLength()) {
      *      if (item.getUnit().equals(unit)) {
-     *          return (item.getAmount() > 0);
+     *          return (item.getAmount() &gt; 0);
      *      }
      *  }
      *  return false;
@@ -90,7 +90,7 @@ public interface TimeSpan<U> {
      * <pre>
      *  for (Item&lt;?&gt; item : getTotalLength()) {
      *      if (item.getUnit().equals(unit)) {
-     *          return (item.getAmount() > 0);
+     *          return (item.getAmount() &gt; 0);
      *      }
      *  }
      *  return false;
@@ -260,14 +260,14 @@ public interface TimeSpan<U> {
      * time unit and has a non-negative amount. </p>
      *
      * @param   <U> type of time unit
-     * @concurrency <immutable>
+     * @doctags.concurrency <immutable>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert ein atomares Element einer Zeitspanne, das auf nur
      * einer Zeiteinheit beruht und einen nicht-negativen Betrag hat. </p>
      *
      * @param   <U> type of time unit
-     * @concurrency <immutable>
+     * @doctags.concurrency <immutable>
      */
     public static final class Item<U>
         implements Serializable {
@@ -319,6 +319,7 @@ public interface TimeSpan<U> {
         /**
          * <p>Creates a new time span item. </p>
          *
+         * @param   <U> type of time unit
          * @param   amount  amount in units {@code >= 0}
          * @param   unit    time unit
          * @return  new time span item
@@ -327,6 +328,7 @@ public interface TimeSpan<U> {
         /*[deutsch]
          * <p>Konstruiert ein neues Zeitspannenelement. </p>
          *
+         * @param   <U> type of time unit
          * @param   amount  amount in units {@code >= 0}
          * @param   unit    time unit
          * @return  new time span item
@@ -426,6 +428,9 @@ public interface TimeSpan<U> {
 
         /**
          * @serialData  Checks the consistency.
+         * @param       in      object input stream
+         * @throws      InvalidObjectException if the state is inconsistent
+         * @throws      ClassNotFoundException
          */
         private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {

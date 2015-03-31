@@ -105,7 +105,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>ISO-konforme Zeitspanne zwischen zwei Zeitpunkten. </p>
@@ -145,7 +145,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class Duration<U extends IsoUnit>
     extends AbstractDuration<U>
@@ -3063,7 +3063,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *      boolean useLong = ...;
-     *      byte header = (6 << 4);
+     *      byte header = (6 &lt;&lt; 4);
      *      if (useLong) header |= 1;
      *      out.writeByte(header);
      *      out.writeInt(getTotalLength().size());
@@ -3075,12 +3075,14 @@ public final class Duration<U extends IsoUnit>
      *          }
      *          out.writeObject(item.getUnit());
      *      }
-     *      if (getTotalLength().size() > 0) {
+     *      if (getTotalLength().size() &gt; 0) {
      *          out.writeBoolean(isNegative());
      *      }
      * </pre>
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.DURATION_TYPE);
 
@@ -3088,10 +3090,12 @@ public final class Duration<U extends IsoUnit>
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
+     *
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 
@@ -3615,7 +3619,7 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @concurrency <immutable>
+     * @doctags.concurrency <immutable>
      */
     /*[deutsch]
      * <p>Nicht-lokalisiertes benutzerdefiniertes Dauerformat, das auf
@@ -3636,7 +3640,7 @@ public final class Duration<U extends IsoUnit>
      *  Duration.Formatter&lt;IsoUnit&gt; f =
      *      Duration.Formatter.ofPattern(IsoUnit.class, jodaPattern);
      *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
-     *  System.out.println(dur); // output: -P2Y15DT30H5M
+     *  System.out.println(dur); // Ausgabe: -P2Y15DT30H5M
      * </pre>
      *
      * <p>Second example (printing a wall-time-like duration): </p>
@@ -3645,7 +3649,7 @@ public final class Duration<U extends IsoUnit>
      *  Duration.Formatter&lt;ClockUnit&gt; f =
      *      Duration.Formatter.ofPattern(ClockUnit.class, "+hh:mm:ss");
      *  String s = f.print(Duration.ofClockUnits(27, 30, 5));
-     *  System.out.println(s); // output: +27:30:05
+     *  System.out.println(s); // Ausgabe: +27:30:05
      * </pre>
      *
      * @param   <U> generic type of time units
@@ -3653,7 +3657,7 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @concurrency <immutable>
+     * @doctags.concurrency <immutable>
      */
     public static final class Formatter<U extends IsoUnit> {
 
@@ -3714,6 +3718,7 @@ public final class Duration<U extends IsoUnit>
          * <p>Uses a pattern with symbols as followed: <br>&nbsp;</p>
          *
          * <table border="1">
+         *  <caption>Legend</caption>
          *  <tr><th>Symbol</th><th>Description</th></tr>
          *  <tr><td>+</td><td>sign of duration, printing + or -</td></tr>
          *  <tr><td>-</td><td>sign of duration, printing only -</td></tr>
@@ -3793,6 +3798,7 @@ public final class Duration<U extends IsoUnit>
          * <p>Benutzt ein Formatmuster mit Symbolen wie folgt: <br>&nbsp;</p>
          *
          * <table border="1">
+         *  <caption>Legende</caption>
          *  <tr><th>Symbol</th><th>Beschreibung</th></tr>
          *  <tr><td>+</td><td>Vorzeichen der Dauer, gibt + oder - aus</td></tr>
          *  <tr><td>-</td><td>Vorzeichen der Dauer, gibt nur - aus</td></tr>

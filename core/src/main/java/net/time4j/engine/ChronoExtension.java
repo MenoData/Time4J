@@ -76,6 +76,7 @@ public interface ChronoExtension {
      * {@code parsedValues.with(element, null)}. Note: The argument has
      * exceptionally no chronology. </p>
      *
+     * @param   <T> generic type of applicable chronological entity
      * @param   entity  any kind of map from chronological elements to
      *                  their values (note that the main use case of parsed
      *                  data has no chronology and allows the virtual value
@@ -95,6 +96,7 @@ public interface ChronoExtension {
      * aus der Wertquelle zu l&ouml;schen. Zu beachten: Das Argument hat als
      * Ausnahmefall keine Chronologie. </p>
      *
+     * @param   <T> generic type of applicable chronological entity
      * @param   entity  any kind of map from chronological elements to
      *                  their values (note that the main use case of parsed
      *                  data has no chronology and allows the virtual value

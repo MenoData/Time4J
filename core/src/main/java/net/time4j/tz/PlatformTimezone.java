@@ -384,8 +384,9 @@ final class PlatformTimezone
 
     /**
      * @serialData  Asserts consistency of model.
+     * @return      replacement object in serialization graph
      */
-    private Object readResolve() throws ObjectStreamException {
+    private Object readResolve() {
 
         return new PlatformTimezone(this.id, this.tz, this.strict);
 

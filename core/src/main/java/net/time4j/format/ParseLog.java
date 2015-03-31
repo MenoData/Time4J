@@ -32,7 +32,7 @@ import net.time4j.engine.ChronoEntity;
  * is to be created per thread (usually per parsing process). </p>
  *
  * @author      Meno Hochschild
- * @concurrency <mutable>
+ * @doctags.concurrency <mutable>
  */
 /*[deutsch]
  * <p>Zeichnet den Status und Fehlermeldungen beim Parsen auf. </p>
@@ -42,7 +42,7 @@ import net.time4j.engine.ChronoEntity;
  * Parse-Vorgang). </p>
  *
  * @author      Meno Hochschild
- * @concurrency <mutable>
+ * @doctags.concurrency <mutable>
  */
 public class ParseLog {
 

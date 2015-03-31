@@ -31,7 +31,7 @@ import net.time4j.base.WallTime;
  * timeline. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>Dient der Aufl&ouml;sung von lokalen Zeitangaben zu einer UTC-Weltzeit,
@@ -39,7 +39,7 @@ import net.time4j.base.WallTime;
  * Konflikte auftreten. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionStrategy {
 
