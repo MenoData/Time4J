@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SystemClock.java) is part of project Time4J.
  *
@@ -95,16 +95,10 @@ public final class SystemClock
      */
     public static final SystemClock INSTANCE = new SystemClock();
 
-    //~ Instanzvariablen --------------------------------------------------
-
-    private final Clock source;
-
     //~ Konstruktoren -----------------------------------------------------
 
     private SystemClock() {
         super();
-
-        this.source = (HIGH_PRECISION ? Clock.PRECISION : Clock.STANDARD);
 
     }
 
@@ -113,7 +107,17 @@ public final class SystemClock
     @Override
     public Moment currentTime() {
 
-        return this.source.getTime();
+        if (HIGH_PRECISION) {
+            long nanos = getNanos();
+            return Moment.of(
+                nanos / MRD,
+                (int) (nanos % MRD),
+                TimeScale.POSIX);
+        } else {
+            long millis = System.currentTimeMillis();
+            int nanos = ((int) (millis % 1000)) * MIO;
+            return Moment.of(millis / 1000, nanos, TimeScale.POSIX);
+        }
 
     }
 
@@ -173,7 +177,11 @@ public final class SystemClock
      */
     public long currentTimeInMicros() {
 
-        return this.source.getMicros();
+        if (HIGH_PRECISION) {
+            return getNanos() / 1000;
+        } else {
+            return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
+        }
 
     }
 
@@ -253,52 +261,10 @@ public final class SystemClock
 
     }
 
-    //~ Innere Klassen ----------------------------------------------------
-
-    private static enum Clock {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        STANDARD() {
-            @Override
-            Moment getTime() {
-                long millis = System.currentTimeMillis();
-                int nanos = ((int) (millis % 1000)) * MIO;
-                return Moment.of(millis / 1000, nanos, TimeScale.POSIX);
-            }
-            @Override
-            long getMicros() {
-                return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
-            }
-        },
-
-        PRECISION() {
-            @Override
-            Moment getTime() {
-                long nanos = getNanos();
-                return Moment.of(
-                    nanos / MRD,
-                    (int) (nanos % MRD),
-                    TimeScale.POSIX);
-            }
-            @Override
-            long getMicros() {
-                return getNanos() / 1000;
-            }
-            private long getNanos() {
-                return MathUtils.safeAdd(
-                    System.nanoTime(),
-                    CALIBRATED_OFFSET
-                );
-            }
-        };
-
-        //~ Methoden ------------------------------------------------------
-
-        abstract Moment getTime();
-
-        abstract long getMicros();
-
+    private long getNanos() {
+        
+        return MathUtils.safeAdd(System.nanoTime(), CALIBRATED_OFFSET);
+        
     }
 
 }
