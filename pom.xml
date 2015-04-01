@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.time4j</groupId>
     <artifactId>time4j-parent</artifactId>
-    <version>2.3</version>
+    <version>2.4</version>
     <packaging>pom</packaging>
     <name>Time4J</name>
     <description>Advanced Date and Time library for Java</description>
@@ -16,8 +16,6 @@
         <module>range</module>
         <module>misc</module>
         <module>olson</module>
-        <module>tool</module>
-        <module>tzdata</module>
     </modules>
     
     <licenses>
@@ -65,7 +63,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
@@ -110,8 +108,30 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.2</version>
                 <configuration>
+                    <doclet>de.menodata.tools.ExcludeDoclet</doclet>
+                    <docletArtifact>
+                        <groupId>de.menodata</groupId>
+                        <artifactId>doctags</artifactId>
+                        <version>1.0</version>
+                    </docletArtifact>
+                    <taglets>
+                        <taglet>
+                            <tagletClass>de.menodata.taglets.ConcurrencyTaglet</tagletClass>
+                        </taglet>
+                        <taglet>
+                            <tagletClass>de.menodata.taglets.ExperimentalTaglet</tagletClass>
+                        </taglet>
+                        <taglet>
+                            <tagletClass>de.menodata.taglets.SpecificationTaglet</tagletClass>
+                        </taglet>
+                    </taglets>
+                    <tagletArtifact>
+                        <groupId>de.menodata</groupId>
+                        <artifactId>doctags</artifactId>
+                        <version>1.0</version>
+                    </tagletArtifact>
                     <show>protected</show>
                 </configuration>
             </plugin>
