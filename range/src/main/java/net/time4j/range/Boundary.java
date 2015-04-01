@@ -37,7 +37,7 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Intervallgrenze, die entweder die untere
@@ -46,7 +46,7 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class Boundary<T extends Temporal<? super T>>
     implements Serializable {

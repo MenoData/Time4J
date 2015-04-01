@@ -500,6 +500,8 @@ public class CompositeTransitionModelTest {
             Arrays.asList(FIRST, SECOND, THIRD, FOURTH, FIFTH);
         long t1 = THIRD.getPosixTime() + 1;
         long t2 = TransitionModel.getFutureMoment(1);
+        long factor = (long) (365.2425 * 86400L);
+        long minExpected = (t2 - t1) * 2 / factor + 3;
 
         assertThat(
             MODEL.getStdTransitions(),
@@ -508,8 +510,8 @@ public class CompositeTransitionModelTest {
             MODEL_EXT.getStdTransitions().containsAll(expectedExt),
             is(true));
         assertThat(
-            (long) MODEL_EXT.getStdTransitions().size(),
-            is((t2 - t1) * 2 / (366 * 86400) + 3));
+            (MODEL_EXT.getStdTransitions().size() >= minExpected),
+            is(true));
     }
 
     @Test

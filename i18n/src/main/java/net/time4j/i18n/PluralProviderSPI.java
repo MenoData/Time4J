@@ -30,8 +30,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static net.time4j.format.NumberType.CARDINALS;
-import static net.time4j.format.NumberType.ORDINALS;
 import static net.time4j.format.PluralCategory.FEW;
 import static net.time4j.format.PluralCategory.MANY;
 import static net.time4j.format.PluralCategory.ONE;
@@ -46,7 +44,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @exclude
+ * @doctags.exclude
  */
 public final class PluralProviderSPI
     implements PluralProvider {

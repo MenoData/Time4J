@@ -45,7 +45,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Fabrikklasse f&uuml;r die Erzeugung einer {@code TransitionHistory}. </p>
@@ -53,7 +53,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public abstract class TransitionModel
     implements TransitionHistory, Serializable {
@@ -294,7 +294,8 @@ public abstract class TransitionModel
 
     static long getFutureMoment(int years) {
 
-        return (System.currentTimeMillis() / 1000) + 366 * years * 86400L;
+        long y = (long) (365.2425 * 86400L * years);
+        return (System.currentTimeMillis() / 1000) + y;
 
     }
 

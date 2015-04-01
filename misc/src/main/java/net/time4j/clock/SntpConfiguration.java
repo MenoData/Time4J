@@ -32,9 +32,9 @@ package net.time4j.clock;
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a constructor without any arguments.
+ * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
-/**
+/*[deutsch]
  * <p>Repr&auml;sentiert eine Konfiguration f&uuml;r eine Verbindung zu
  * einem NTP-Server. </p>
  *
@@ -45,7 +45,7 @@ package net.time4j.clock;
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a constructor without any arguments.
+ * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
 public interface SntpConfiguration
     extends NetTimeConfiguration {

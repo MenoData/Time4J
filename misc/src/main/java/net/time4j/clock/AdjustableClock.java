@@ -29,24 +29,20 @@ import net.time4j.scale.TimeScale;
 
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.DAYS;
-
 
 /**
  * <p>Allows miscellaneous adjustments to any clock. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @concurrency This class is immutable as long as the underlying time source
- *              is immutable.
+ * @doctags.concurrency This class is immutable as long as the underlying time source is immutable.
  */
 /*[deutsch]
  * <p>Erlaubt verschiedene Verstellungen irgendeiner beliebigen Uhr. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @concurrency This class inherits the concurrency behaviour fromg as the underlying time source
- *              is immutable.
+ * @doctags.concurrency This class is immutable as long as the underlying time source is immutable.
  */
 public final class AdjustableClock
     extends AbstractClock {

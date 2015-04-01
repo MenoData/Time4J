@@ -47,7 +47,7 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()
@@ -65,7 +65,7 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()

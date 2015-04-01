@@ -48,14 +48,14 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein endliches Uhrzeitintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 public final class ClockInterval
     extends IsoInterval<PlainTime, ClockInterval>

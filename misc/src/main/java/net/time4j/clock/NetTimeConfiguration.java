@@ -34,7 +34,7 @@ package net.time4j.clock;
  * @since   2.1
  * @see     NetTimeConnector
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a constructor without any arguments.
+ * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
 /*[deutsch]
  * <p>Enth&auml;lt die Konfiguration einer Verbindung zu einem
@@ -48,7 +48,7 @@ package net.time4j.clock;
  * @since   2.1
  * @see     NetTimeConnector
  * @see     java.util.ServiceLoader
- * @spec    Implementations must have a constructor without any arguments.
+ * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
 public interface NetTimeConfiguration {
 

@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
  * The basic bundle name is &quot;symbol&quot;. </p>
  *
  * @author  Meno Hochschild
- * @exclude
+ * @doctags.exclude
  */
 public final class SymbolProviderSPI
     implements NumberSymbolProvider {

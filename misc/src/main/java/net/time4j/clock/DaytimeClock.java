@@ -51,7 +51,7 @@ import java.text.ParseException;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @concurrency <threadsafe>
+ * @doctags.concurrency <threadsafe>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Verbindung zu einem DAYTIME-Server nach der
@@ -65,7 +65,7 @@ import java.text.ParseException;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @concurrency <threadsafe>
+ * @doctags.concurrency <threadsafe>
  */
 public class DaytimeClock
     extends NetTimeConnector<NetTimeConfiguration> {
@@ -234,7 +234,7 @@ public class DaytimeClock
             InputStreamReader ir = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(ir);
 
-            int len = 0;
+            int len;
             char[] chars = new char[100];
             sb = new StringBuilder();
 

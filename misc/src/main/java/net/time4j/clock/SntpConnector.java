@@ -45,7 +45,7 @@ import java.util.ServiceLoader;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @concurrency <threadsafe>
+ * @doctags.concurrency <threadsafe>
  */
 /*[deutsch]
  * <p>Nimmt die Verbindung zu einem modernen Uhrzeit-Server gem&auml;&szlig;
@@ -66,7 +66,7 @@ import java.util.ServiceLoader;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @concurrency <threadsafe>
+ * @doctags.concurrency <threadsafe>
  */
 public class SntpConnector
     extends NetTimeConnector<SntpConfiguration> {
@@ -419,14 +419,9 @@ public class SntpConnector
 
     private boolean isLastConnectionAtSameDay(long seconds) {
 
+        // 2-Tage-Frist
         Moment lc = this.getLastConnectionTime();
-
-        if (lc == null) {
-            return false;
-        } else {
-            // 2-Tage-Frist
-            return (seconds - lc.getPosixTime() < 2 * 86400);
-        }
+        return ((lc != null) && (seconds - lc.getPosixTime() < 2 * 86400));
 
     }
 

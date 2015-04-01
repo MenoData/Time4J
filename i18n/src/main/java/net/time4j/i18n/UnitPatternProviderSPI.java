@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @exclude
+ * @doctags.exclude
  */
 public final class UnitPatternProviderSPI
     implements UnitPatternProvider {

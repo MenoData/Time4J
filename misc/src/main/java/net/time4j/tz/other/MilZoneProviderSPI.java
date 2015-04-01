@@ -40,7 +40,7 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @exclude
+ * @doctags.exclude
  */
 public class MilZoneProviderSPI
     implements ZoneProvider {

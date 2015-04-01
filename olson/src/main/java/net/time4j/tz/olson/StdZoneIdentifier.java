@@ -64,7 +64,7 @@ import net.time4j.tz.TZID;
  * correct. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>Identifiziert eine Zeitzone per IANA-Standard. </p>
@@ -96,7 +96,7 @@ import net.time4j.tz.TZID;
  * historischen Zeitzonendaten nicht notwendig korrekt sein m&uuml;ssen. </p>
  *
  * @author  Meno Hochschild
- * @spec    All implementations must be immutable, thread-safe and serializable.
+ * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface StdZoneIdentifier
     extends TZID {

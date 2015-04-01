@@ -41,7 +41,7 @@ import java.util.TimeZone;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @exclude
+ * @doctags.exclude
  */
 public class TraditionalZoneProviderSPI
     implements ZoneProvider {
