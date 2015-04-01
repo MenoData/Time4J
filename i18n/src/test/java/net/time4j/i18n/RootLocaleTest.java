@@ -84,7 +84,7 @@ public class RootLocaleTest {
         IsoTextProviderSPI spi = new IsoTextProviderSPI();
         assertThat(
             spi.eras("", Locale.ROOT, TextWidth.WIDE)[0],
-            is("0"));
+            is("BC"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class RootLocaleTest {
         IsoTextProviderSPI spi = new IsoTextProviderSPI();
         assertThat(
             spi.meridiems("", Locale.ROOT, TextWidth.WIDE)[0],
-            is("0"));
+            is("AM"));
     }
 
 }

@@ -145,7 +145,9 @@ public class DateTimePatternTest {
     }
 
     private static Locale toLocale(String locale) {
-        if (locale.equals("en")) {
+        if (locale.isEmpty()) {
+            return Locale.ROOT;
+        } else if (locale.equals("en")) {
             return Locale.UK;
         } else if (locale.equals("us")) {
             return Locale.US;

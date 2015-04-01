@@ -35,10 +35,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
-import static net.time4j.format.TextWidth.ABBREVIATED;
-import static net.time4j.format.TextWidth.NARROW;
-import static net.time4j.format.TextWidth.SHORT;
-import static net.time4j.format.TextWidth.WIDE;
 
 
 /**
@@ -50,7 +46,7 @@ import static net.time4j.format.TextWidth.WIDE;
  * The basic bundle name is &quot;iso8601&quot;. </p>
  *
  * @author  Meno Hochschild
- * @exclude
+ * @doctags.exclude
  */
 public final class IsoTextProviderSPI
     implements TextProvider {
@@ -80,7 +76,11 @@ public final class IsoTextProviderSPI
         Set<Locale> locs = new HashSet<Locale>();
 
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
-            locs.add(loc);
+            // Java-pre-8 has no root locale but Java-8 has the root!
+            // => ensure equal behaviour
+            if (!loc.getLanguage().isEmpty()) {
+                locs.add(loc);
+            }
         }
 
         for (String lang : LANGUAGES) {
@@ -456,7 +456,11 @@ public final class IsoTextProviderSPI
 
         // Sonderfall: ROOT
         if (locale.getLanguage().isEmpty()) {
-            return new String[] {"0", "1"};
+            if (tw == TextWidth.NARROW) {
+                return new String[] {"B", "A"};
+            } else {
+                return new String[] {"BC", "AD"};
+            }
         }
 
         // JDK-Quelle
@@ -501,7 +505,11 @@ public final class IsoTextProviderSPI
 
         // Sonderfall: ROOT
         if (locale.getLanguage().isEmpty()) {
-            return new String[] {"0", "1"};
+            if (tw == TextWidth.NARROW) {
+                return new String[] {"A", "P"};
+            } else {
+                return new String[] {"AM", "PM"};
+            }
         }
 
         // Im alten JDK-API ist NARROW unbekannt

@@ -1,5 +1,6 @@
 package net.time4j.i18n;
 
+import java.text.DateFormatSymbols;
 import net.time4j.Iso8601Format;
 import net.time4j.PatternType;
 import net.time4j.PlainDate;
@@ -113,7 +114,9 @@ public class DatePatternTest {
     }
 
     private static Locale toLocale(String locale) {
-        if (locale.equals("en")) {
+        if (locale.isEmpty()) {
+            return Locale.ROOT;
+        } else if (locale.equals("en")) {
             return Locale.UK;
         } else if (locale.equals("us")) {
             return Locale.US;
