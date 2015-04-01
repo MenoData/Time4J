@@ -12,7 +12,7 @@
  *      controls formatting of decimal separator in ISO-8601-output
  *      (default is the comma)</li>
  *  <li>net.time4j.sql.utc.conversion =&gt;
- *      SQL-conversion in <a href="TemporalType.html">TemporalType</a>-constants</li>
+ *      SQL-Konversion in <a href="sql/JDBCAdapter.html">JDBCAdapter</a></li>
  *  <li>net.time4j.systemclock.nanoTime =&gt;
  *      controls precision of <a href="SystemClock.html">SystemClock</a></li>
  *  <li>net.time4j.allow.system.tz.override =&gt;
@@ -47,7 +47,7 @@
  *      steuert die Textausgabe des Dezimaltrennzeichens in ISO-8601 (Vorgabe
  *      ist das Komma)</li>
  *  <li>net.time4j.sql.utc.conversion =&gt;
- *      SQL-Konversion in <a href="TemporalType.html">TemporalType</a></li>
+ *      SQL-Konversion in <a href="sql/JDBCAdapter.html">JDBCAdapter</a></li>
  *  <li>net.time4j.systemclock.nanoTime =&gt;
  *      steuert die Genauigkeit von
  *      <a href="SystemClock.html">SystemClock</a></li>

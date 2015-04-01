@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -180,7 +180,9 @@ public abstract class TemporalType<S, T> {
      * done by Time4J for example via {@code PlainDate.toString()} or a
      * suitable {@code ChronoFormatter}.</p>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
@@ -213,8 +215,11 @@ public abstract class TemporalType<S, T> {
      * korrekt zum Beispiel via {@code PlainDate.toString()} oder &uuml;ber
      * einen geeigneten {@code ChronoFormatter} geleistet werden. </p>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final TemporalType<java.sql.Date, PlainDate> SQL_DATE =
         new SqlDateRule();
     // min = new java.sql.Date(-2208988800000L), // 1900-01-01
@@ -245,7 +250,9 @@ public abstract class TemporalType<S, T> {
      * {@code java.sql.Time.toString()} can be misinterpreted by timezone
      * side effects. Concrete text output should be done by Time4J. </p>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
@@ -274,8 +281,11 @@ public abstract class TemporalType<S, T> {
      * verf&auml;lscht. Konkrete Textausgaben sollen daher immer durch Time4J
      * erfolgen. </p>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final TemporalType<java.sql.Time, PlainTime> SQL_TIME =
         new SqlTimeRule();
 
@@ -300,7 +310,9 @@ public abstract class TemporalType<S, T> {
      *  // output: 1970-01-02T00:00:01,000000001
      * </pre>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
@@ -323,10 +335,12 @@ public abstract class TemporalType<S, T> {
      *  // Ausgabe: 1970-01-02T00:00:01,000000001
      * </pre>
      *
-     * @since   2.0
+     * @since       2.0
+     * @deprecated  Use class {@code net.time4j.sql.JDBCAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
-    public static final
-    TemporalType<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
+    @Deprecated
+    public static final TemporalType<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
         new SqlTimestampRule();
 
     /**
@@ -345,6 +359,8 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Datum entsprechend
@@ -362,7 +378,10 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final
     TemporalType<XMLGregorianCalendar, PlainDate> XML_DATE =
         new XmlDateRule();
@@ -383,6 +402,8 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einer XML-Uhrzeit entsprechend
@@ -400,7 +421,10 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final
     TemporalType<XMLGregorianCalendar, PlainTime> XML_TIME =
         new XmlTimeRule();
@@ -421,6 +445,8 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
@@ -439,7 +465,10 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final
     TemporalType<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
         XML_TIMESTAMP;
@@ -460,6 +489,8 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
@@ -478,7 +509,10 @@ public abstract class TemporalType<S, T> {
      * </pre>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final
     TemporalType<XMLGregorianCalendar, ZonalMoment> XML_DATE_TIME_OFFSET =
         new XmlDateTimeOffsetRule();
@@ -488,13 +522,18 @@ public abstract class TemporalType<S, T> {
      * and the Time4J-type {@code Duration}. </p>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einer XML-Dauer entsprechend
      * {@code xsd:duration} und dem Time4J-Typ {@code Duration}. </p>
      *
      * @since   2.0
+     * @deprecated  Use class {@code net.time4j.xml.XMLAdapter} in misc module instead, 
+     *              this constant will be removed in v2.5
      */
+    @Deprecated
     public static final
     TemporalType<javax.xml.datatype.Duration, Duration<IsoUnit>> XML_DURATION =
         new XmlDurationRule();
