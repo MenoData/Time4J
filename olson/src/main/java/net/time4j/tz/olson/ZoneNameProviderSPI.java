@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @exclude
+ * @doctags.exclude
  */
 public class ZoneNameProviderSPI
     implements ZoneProvider {
@@ -120,7 +120,6 @@ public class ZoneNameProviderSPI
             tzids.add("America/Chicago");
             tzids.add("America/Denver");
             tzids.add("America/Los_Angeles");
-            tzids.add("America/Metlakatla");
             tzids.add("America/Anchorage");
             tzids.add("Pacific/Honolulu");
             tzids.add("America/Adak");

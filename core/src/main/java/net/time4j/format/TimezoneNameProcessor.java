@@ -241,102 +241,69 @@ final class TimezoneNameProcessor
         }
 
         // Zeitzonen-IDs bestimmen
-        boolean daylightSaving = false;
-        List<TZID> zones = tzNames.search(key, false);
+        int[] lenbuf = new int[2];
+        lenbuf[0] = pos;
+        lenbuf[1] = pos;
+        List<TZID> stdZones = readZones(text, start, lenbuf, tzNames, key, false);
+        List<TZID> dstZones = readZones(text, start, lenbuf, tzNames, key, true);
+        int sum = stdZones.size() + dstZones.size();
 
-        if (zones.isEmpty()) {
-            zones = tzNames.search(key, true);
-            if (zones.isEmpty()) {
-                int[] lenbuf = new int[1];
-                lenbuf[0] = 0;
-                zones = tzNames.search(text, start, false, lenbuf);
-                if (zones.isEmpty()) {
-                    zones = tzNames.search(text, start, true, lenbuf);
-                    if (!zones.isEmpty()) {
-                        daylightSaving = true;
-                    }
-                }
-                pos = start + lenbuf[0];
-            } else {
-                daylightSaving = true;
-            }
-        }
-
-        if (zones.isEmpty()) {
+        if (sum == 0) {
             status.setError(
                 start,
                 "Unknown timezone name: " + key);
             return;
-        } else if (
-            (zones.size() > 1)
+        }
+        
+        if (
+            (sum > 1)
             && !leniency.isLax()
         ) { // tz name not unique
-            Map<String, List<TZID>> matched = new HashMap<String, List<TZID>>();
-
-            for (TZID tz : zones) {
-                String id = tz.canonical();
-                Set<TZID> prefs = this.preferredZones;
-                String provider = DEFAULT_PROVIDER;
-                int index = id.indexOf('~');
-
-                if (index >= 0) {
-                    provider = id.substring(0, index);
-                }
-
-                if (prefs == null) {
-                    prefs =
-                        Timezone.getPreferredIDs(
-                            locale,
-                            leniency.isSmart(),
-                            provider);
-                }
-
-                for (TZID p : prefs) {
-                    if (p.canonical().equals(id)) {
-                        List<TZID> candidates = matched.get(provider);
-                        if (candidates == null) {
-                            candidates = new ArrayList<TZID>();
-                            matched.put(provider, candidates);
-                        }
-                        candidates.add(p);
-                        break;
-                    }
-                }
+            if (stdZones.size() > 0) {
+                stdZones = this.resolve(stdZones, locale, leniency);
             }
-
-            List<TZID> candidates = matched.get(DEFAULT_PROVIDER);
-
-            if (candidates.isEmpty()) {
-                matched.remove(DEFAULT_PROVIDER);
-                boolean found = false;
-                for (String provider : matched.keySet()) {
-                    candidates = matched.get(provider);
-                    if (!candidates.isEmpty()) {
-                        found = true;
-                        zones = candidates;
-                        break;
-                    }
-                }
-                if (!found) {
-                    status.setError(
-                        start,
-                        "Time zone id not found among preferred timezones "
-                        + "in locale " + locale);
-                    return;
-                }
-            } else {
-                zones = candidates;
+            if (dstZones.size() > 0) {
+                dstZones = this.resolve(dstZones, locale, leniency);
             }
         }
 
+        sum = stdZones.size() + dstZones.size();
+        
+        if (sum == 0) {
+            status.setError(
+                start,
+                "Time zone id not found among preferred timezones in locale " 
+                + locale);
+            return;
+        }
+
+        List<TZID> zones;
+        int index;
+
+        if (stdZones.size() > 0) {
+            zones = stdZones;
+            index = 0;
+            if (
+                (sum == 2)
+                && (dstZones.size() > 0)
+                && (stdZones.get(0).canonical().equals(dstZones.get(0).canonical()))
+            ) {
+                dstZones.remove(0);
+                sum--;
+            }
+        } else {
+            zones = dstZones;
+            index = 1;
+        }
+
         if (
-            (zones.size() == 1)
+            (sum == 1)
             || leniency.isLax()
         ) {
             parsedResult.put(TimezoneElement.TIMEZONE_ID, zones.get(0));
-            status.setPosition(pos);
+            status.setPosition(lenbuf[index]);
             if (tzNames.isDaylightSensitive()) {
-                status.setDaylightSaving(daylightSaving);
+                status.setDaylightSaving(index == 1);
             }
         } else {
             status.setError(
@@ -402,6 +369,92 @@ final class TimezoneNameProcessor
 
     }
 
+    private static List<TZID> readZones(
+        CharSequence text,
+        int start,
+        int[] lenbuf,
+        TZNames tzNames,
+        String key,
+        boolean daylightSaving
+    ) {
+        
+        List<TZID> zones = tzNames.search(key, daylightSaving);
+
+        if (zones.isEmpty()) {
+            int index = (daylightSaving ? 1 : 0);
+            lenbuf[index] = 0;
+            zones = tzNames.search(text, start, daylightSaving, lenbuf);
+            lenbuf[index] += start;
+        }
+        
+        return zones;
+        
+    }
+    
+    private List<TZID> resolve(
+        List<TZID> zones,
+        Locale locale,
+        Leniency leniency
+    ) {
+
+        Map<String, List<TZID>> matched = new HashMap<String, List<TZID>>();
+        matched.put(DEFAULT_PROVIDER, new ArrayList<TZID>());
+
+        for (TZID tz : zones) {
+            String id = tz.canonical();
+            Set<TZID> prefs = this.preferredZones;
+            String provider = DEFAULT_PROVIDER;
+            int index = id.indexOf('~');
+
+            if (index >= 0) {
+                provider = id.substring(0, index);
+            }
+
+            if (prefs == null) {
+                prefs =
+                    Timezone.getPreferredIDs(
+                        locale,
+                        leniency.isSmart(),
+                        provider);
+            }
+
+            for (TZID p : prefs) {
+                if (p.canonical().equals(id)) {
+                    List<TZID> candidates = matched.get(provider);
+                    if (candidates == null) {
+                        candidates = new ArrayList<TZID>();
+                        matched.put(provider, candidates);
+                    }
+                    candidates.add(p);
+                    break;
+                }
+            }
+        }
+
+        List<TZID> candidates = matched.get(DEFAULT_PROVIDER);
+
+        if (candidates.isEmpty()) {
+            matched.remove(DEFAULT_PROVIDER);
+            boolean found = false;
+            for (String provider : matched.keySet()) {
+                candidates = matched.get(provider);
+                if (!candidates.isEmpty()) {
+                    found = true;
+                    zones = candidates;
+                    break;
+                }
+            }
+            if (!found) {
+                zones = Collections.emptyList();
+            }
+        } else {
+            zones = candidates;
+        }
+
+        return zones;
+
+    }
+    
     private NameStyle getStyle(boolean daylightSaving) {
 
         if (daylightSaving) {
@@ -501,6 +554,7 @@ final class TimezoneNameProcessor
                 daylightSaving
                 ? this.dstNames
                 : this.stdNames);
+            int index = (daylightSaving ? 1 : 0);
 
             int len = text.length();
 
@@ -524,7 +578,7 @@ final class TimezoneNameProcessor
                 }
 
                 if (found) {
-                    lenbuf[0] = count;
+                    lenbuf[index] = count;
                     return names.get(name);
                 }
             }

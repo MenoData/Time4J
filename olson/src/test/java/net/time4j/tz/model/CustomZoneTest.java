@@ -1,9 +1,7 @@
 package net.time4j.tz.model;
 
-import net.time4j.Month;
-import net.time4j.PlainTime;
-import net.time4j.SystemClock;
-import net.time4j.Weekday;
+import net.time4j.*;
+import net.time4j.engine.ChronoUnit;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -152,14 +150,15 @@ public class CustomZoneTest {
         rules.add(spring);
 
         ZonalTransition first =
-            new ZonalTransition(0L, 3600, 7200, 3600);
+            new ZonalTransition(0L, 3600, 7200, 3600); // 1970-01-01
         ZonalTransition second =
-            new ZonalTransition(365 * 86400L, 7200, 3600, 0);
+            new ZonalTransition(365 * 86400L, 7200, 3600, 0); // 1971-01-01
         ZonalTransition third =
-            new ZonalTransition(63072000L, 3600, 7200, 3600);
+            new ZonalTransition(63072000L, 3600, 7200, 3600); // 1972-01-01
         ZonalTransition fourth =
             new ZonalTransition(
-                SystemClock.INSTANCE.currentTime().getPosixTime() + 63072000L,
+                SystemClock.currentMoment().toZonalTimestamp(ZonalOffset.UTC)
+                        .with(PlainDate.DAY_OF_YEAR, 1).plus(2, CalendarUnit.YEARS).atUTC().getPosixTime(),
                 7200,
                 3600,
                 0);
