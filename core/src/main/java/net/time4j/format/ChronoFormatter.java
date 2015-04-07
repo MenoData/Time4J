@@ -148,7 +148,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     // Aufruf durch withAttribute-Methoden
     private ChronoFormatter(
-        ChronoFormatter<T> formatter,
+        ChronoFormatter<T> old,
         Attributes defaultAttributes
     ) {
         super();
@@ -157,15 +157,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             throw new NullPointerException("Missing default attributes.");
         }
 
-        this.chronology = formatter.chronology;
+        this.chronology = old.chronology;
         this.defaultAttributes = defaultAttributes;
         this.defaults =
             Collections.unmodifiableMap(
-                new NonAmbivalentMap(formatter.defaults));
-        this.fracproc = formatter.fracproc;
+                new NonAmbivalentMap(old.defaults));
+        this.fracproc = old.fracproc;
 
-        int len = formatter.steps.size();
-        List<FormatStep> copy = new ArrayList<FormatStep>(formatter.steps);
+        // finally update extension elements
+        int len = old.steps.size();
+        List<FormatStep> copy = new ArrayList<FormatStep>(old.steps);
 
         for (int i = 0; i < len; i++) {
             FormatStep step = copy.get(i);
@@ -176,26 +177,21 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 && !this.chronology.isRegistered(element)
             ) {
 
-                boolean found = false;
-
-                // Beispiel: week-of-year in Abhängigkeit von LOCALE
+                // example: week-of-year dependent on LOCALE
                 for (ChronoExtension ext : this.chronology.getExtensions()) {
-                    Set<ChronoElement<?>> elements =
-                        ext.getElements(
-                            defaultAttributes.getLocale(),
-                            defaultAttributes);
+                    if (ext.getElements(old.getLocale(), old.defaultAttributes).contains(element)) {
+                        Set<ChronoElement<?>> elements =
+                            ext.getElements(defaultAttributes.getLocale(), defaultAttributes);
 
-                    for (ChronoElement<?> e : elements) {
-                        if (e.name().equals(element.name())) {
-                            if (e != element) {
-                                copy.set(i, step.updateElement(e));
+                        for (ChronoElement<?> e : elements) {
+                            if (e.name().equals(element.name())) {
+                                if (e != element) {
+                                    copy.set(i, step.updateElement(e));
+                                }
+                                break;
                             }
-                            found = true;
-                            break;
                         }
-                    }
 
-                    if (found) {
                         break;
                     }
                 }
@@ -678,7 +674,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) {
 
-        T result = null;
+        T result;
         Chronology<?> preparser = this.chronology.preparser();
 
         if (preparser == null) {
