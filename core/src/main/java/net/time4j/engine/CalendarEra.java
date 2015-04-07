@@ -87,13 +87,18 @@ public interface CalendarEra {
      *
      * @return  gregorian date
      * @see     #isStarting()
+     * @deprecated  no clear answer dependent on the applied chronology,
+     *              will be removed in next version v2.5
      */
     /*[deutsch]
      * <p>Liefert das Bezugsdatum (Start oder Ende einer &Auml;ra). </p>
      *
      * @return  gregorian date
      * @see     #isStarting()
+     * @deprecated  no clear answer dependent on the applied chronology,
+     *              will be removed in next version v2.5
      */
+    @Deprecated
     GregorianDate getDate();
 
     /**
