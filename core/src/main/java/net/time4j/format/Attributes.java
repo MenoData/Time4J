@@ -38,10 +38,6 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.time4j.format.Leniency.LAX;
-import static net.time4j.format.Leniency.SMART;
-import static net.time4j.format.Leniency.STRICT;
-
 
 /**
  * <p>A collection of format attributes for controlling the formatting
@@ -93,12 +89,20 @@ public final class Attributes
     /**
      * <p>Attribute for the calendar type. </p>
      *
-     * <p>Default value: {@link CalendarText#ISO_CALENDAR_TYPE} </p>
+     * <p>This attribute is effectively read-only and usually derived
+     * from the corresponding annotation value of any given chronology.
+     * Default value: {@link CalendarText#ISO_CALENDAR_TYPE} </p>
+     *
+     * @see     CalendarType
      */
     /*[deutsch]
      * <p>Gibt den Kalendertyp an. </p>
      *
-     * <p>Standardwert: {@link CalendarText#ISO_CALENDAR_TYPE} </p>
+     * <p>Dieses Attribut ist effektiv nur mit Lesezugriff und wird aus
+     * der Annotation einer Chronologie abgeleitet. Standardwert:
+     * {@link CalendarText#ISO_CALENDAR_TYPE} </p>
+     *
+     * @see     CalendarType
      */
     public static final AttributeKey<String> CALENDAR_TYPE =
         PredefinedKey.valueOf("CALENDAR_TYPE", String.class);
@@ -696,25 +700,6 @@ public final class Attributes
         //~ Methoden ------------------------------------------------------
 
         /**
-         * <p>Sets the calendar type. </p>
-         *
-         * @param   calendarType    calendar type for resource lookup
-         * @return  this instance for method chaining
-         */
-        /*[deutsch]
-         * <p>Legt den Kalendertyp fest. </p>
-         *
-         * @param   calendarType    calendar type for resource lookup
-         * @return  this instance for method chaining
-         */
-        public Builder setCalendarType(String calendarType) {
-
-            this.setInternal(CALENDAR_TYPE, calendarType);
-            return this;
-
-        }
-
-        /**
          * <p>Sets the language. </p>
          *
          * @param   locale      new language setting
@@ -1060,6 +1045,25 @@ public final class Attributes
 
             this.setInternal(LOCALE, locale);
             this.setInternal(LANGUAGE, locale);
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the calendar type. </p>
+         *
+         * @param   calendarType    calendar type for resource lookup
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
+         * <p>Legt den Kalendertyp fest. </p>
+         *
+         * @param   calendarType    calendar type for resource lookup
+         * @return  this instance for method chaining
+         */
+        Builder setCalendarType(String calendarType) {
+
+            this.setInternal(CALENDAR_TYPE, calendarType);
             return this;
 
         }
