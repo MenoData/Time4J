@@ -111,6 +111,8 @@ public interface CalendarEra {
      *
      * @return  boolean
      * @see     #getDate()
+     * @deprecated  no clear answer dependent on the applied chronology,
+     *              will be removed in next version v2.5
      */
     /*[deutsch]
      * <p>Definiert das zugeh&ouml;rige Bezugsdatum den Start oder das Ende
@@ -122,7 +124,10 @@ public interface CalendarEra {
      *
      * @return  boolean
      * @see     #getDate()
+     * @deprecated  no clear answer dependent on the applied chronology,
+     *              will be removed in next version v2.5
      */
+    @Deprecated
     boolean isStarting();
 
 }
