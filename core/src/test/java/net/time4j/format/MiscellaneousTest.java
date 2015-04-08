@@ -56,6 +56,17 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void changeOfWeekmodelExtensionElement() throws IOException {
+        PlainDate wednesday = PlainDate.of(2015, 4, 8);
+        ChronoFormatter<PlainDate> f = PlainDate.formatter("e", PatternType.CLDR, Locale.GERMANY);
+        String de = f.format(wednesday);
+        assertThat(de, is("3"));
+        f = f.with(Locale.US);
+        String us = f.format(wednesday);
+        assertThat(us, is("4"));
+    }
+
+    @Test
     public void parseTime24Smart() throws ParseException {
         ParseLog plog = new ParseLog();
         assertThat(
