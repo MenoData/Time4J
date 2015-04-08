@@ -1400,7 +1400,7 @@ public final class PlainTime
 
         int style = PatternType.getFormatStyle(mode);
         DateFormat df = DateFormat.getTimeInstance(style);
-        String pattern = PatternType.getFormatPattern(df);
+        String pattern = removeZones(PatternType.getFormatPattern(df));
 
         return ChronoFormatter
             .setUp(PlainTime.class, Locale.getDefault())
@@ -1485,7 +1485,7 @@ public final class PlainTime
 
         int style = PatternType.getFormatStyle(mode);
         DateFormat df = DateFormat.getTimeInstance(style, locale);
-        String pattern = PatternType.getFormatPattern(df);
+        String pattern = removeZones(PatternType.getFormatPattern(df));
 
         return ChronoFormatter
             .setUp(PlainTime.class, locale)
@@ -1958,8 +1958,7 @@ public final class PlainTime
 
     }
 
-    private static
-    void registerUnits(TimeAxis.Builder<IsoTimeUnit, PlainTime> builder) {
+    private static void registerUnits(TimeAxis.Builder<IsoTimeUnit, PlainTime> builder) {
 
         Set<ClockUnit> convertibles = EnumSet.allOf(ClockUnit.class);
 
@@ -1996,6 +1995,33 @@ public final class PlainTime
         } else {
             return ((value + 1) / divisor) - 1;
         }
+
+    }
+
+    // JDK-Patterns hinten, mittig und vorne von Zeitzonen-Symbolen befreien
+    private static String removeZones(String pattern) {
+
+        String s = pattern.replace(" z", ""); // for en-CA
+
+        if (s.charAt(s.length() - 1) == 'z') {
+            for (int i = s.length() - 1; i > 0; i--) {
+                if (s.charAt(i - 1) != 'z') {
+                    s = s.substring(0, i).trim();
+                    break;
+                }
+            }
+        }
+
+        if (s.charAt(0) == 'z') {
+            for (int i = 1; i < s.length(); i++) {
+                if (s.charAt(i) != 'z') {
+                    s = s.substring(i).trim();
+                    break;
+                }
+            }
+        }
+
+        return s;
 
     }
 

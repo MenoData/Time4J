@@ -12,7 +12,10 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +24,7 @@ import org.junit.runners.JUnit4;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(JUnit4.class)
@@ -64,6 +68,34 @@ public class MiscellaneousTest {
         f = f.with(Locale.US);
         String us = f.format(wednesday);
         assertThat(us, is("4"));
+    }
+
+    @Test
+    public void testGenericFullTimeFormats() {
+        PlainTime time = PlainTime.of(22, 40);
+        for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
+            try {
+                PlainTime.formatter(DisplayMode.FULL, loc).format(time);
+            } catch (RuntimeException re){
+                DateFormat df = DateFormat.getTimeInstance(DateFormat.FULL);
+                String pattern = SimpleDateFormat.class.cast(df).toPattern();
+                fail("locale=" + loc + ", pattern=[" + pattern + "] => " + re.getMessage() + ")");
+            }
+        }
+    }
+
+    @Test
+    public void testGenericLongTimeFormats() {
+        PlainTime time = PlainTime.of(22, 40);
+        for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
+            try {
+                PlainTime.formatter(DisplayMode.LONG, loc).format(time);
+            } catch (RuntimeException re){
+                DateFormat df = DateFormat.getTimeInstance(DateFormat.LONG);
+                String pattern = SimpleDateFormat.class.cast(df).toPattern();
+                fail("locale=" + loc + ", pattern=[" + pattern + "] => " + re.getMessage() + ")");
+            }
+        }
     }
 
     @Test
