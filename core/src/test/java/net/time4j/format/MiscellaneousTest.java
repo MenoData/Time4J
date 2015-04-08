@@ -77,7 +77,7 @@ public class MiscellaneousTest {
             try {
                 PlainTime.formatter(DisplayMode.FULL, loc).format(time);
             } catch (RuntimeException re){
-                DateFormat df = DateFormat.getTimeInstance(DateFormat.FULL);
+                DateFormat df = DateFormat.getTimeInstance(DateFormat.FULL, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
                 fail("locale=" + loc + ", pattern=[" + pattern + "] => " + re.getMessage() + ")");
             }
@@ -91,7 +91,7 @@ public class MiscellaneousTest {
             try {
                 PlainTime.formatter(DisplayMode.LONG, loc).format(time);
             } catch (RuntimeException re){
-                DateFormat df = DateFormat.getTimeInstance(DateFormat.LONG);
+                DateFormat df = DateFormat.getTimeInstance(DateFormat.LONG, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
                 fail("locale=" + loc + ", pattern=[" + pattern + "] => " + re.getMessage() + ")");
             }
