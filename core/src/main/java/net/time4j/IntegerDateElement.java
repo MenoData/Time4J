@@ -21,8 +21,6 @@
 
 package net.time4j;
 
-import net.time4j.base.GregorianMath;
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
@@ -43,8 +41,7 @@ import java.math.BigDecimal;
  */
 final class IntegerDateElement
     extends AbstractDateElement<Integer>
-    implements ProportionalElement<Integer, PlainDate>,
-               NumericalElement<Integer> {
+    implements ProportionalElement<Integer, PlainDate>, NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -59,7 +56,9 @@ final class IntegerDateElement
     /** Element-Index */
     static final int DAY_OF_QUARTER = 18;
     /** Element-Index */
-    static final int YEAR_OF_ERA = 19;
+    static final int YEAR_OF_ERA_DATE = 19;
+    /** Element-Index */
+    static final int YEAR_OF_ERA_TSP = 20;
 
     private static final long serialVersionUID = -1337148214680014674L;
 
@@ -70,15 +69,17 @@ final class IntegerDateElement
     private transient final Integer defaultMax;
     private transient final char symbol;
     private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
+    private transient final ElementRule<?, Integer> rule;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private IntegerDateElement(
+    IntegerDateElement(
         String name,
         int index,
         Integer defaultMin,
         Integer defaultMax,
-        char symbol
+        char symbol,
+        ElementRule<?, Integer> rule
     ) {
         super(name);
 
@@ -86,6 +87,7 @@ final class IntegerDateElement
         this.defaultMin = defaultMin;
         this.defaultMax = defaultMax;
         this.symbol = symbol;
+        this.rule = rule;
 
         this.rf = new ProportionalFunction(this, false);
 
@@ -183,63 +185,16 @@ final class IntegerDateElement
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(
         Chronology<T> chronology
     ) {
 
         if (
-            (this.index == YEAR_OF_ERA)
+            ((this.index == YEAR_OF_ERA_DATE) || (this.index == YEAR_OF_ERA_TSP))
             && chronology.isRegistered(PlainDate.CALENDAR_DATE)
         ) {
-            return new ElementRule<T, Integer>() {
-                @Override
-                public Integer getValue(T context) {
-                    int year = context.get(PlainDate.CALENDAR_DATE).getYear();
-                    return Integer.valueOf((year <= 0) ? (1 - year) : year);
-                }
-                @Override
-                public Integer getMinimum(T context) {
-                    return Integer.valueOf(1);
-                }
-                @Override
-                public Integer getMaximum(T context) {
-                    return Integer.valueOf(GregorianMath.MAX_YEAR);
-                }
-                @Override
-                public boolean isValid(T context, Integer value) {
-                    return (
-                        (value != null)
-                        && (value.compareTo(this.getMaximum(context)) <= 0)
-                        && (value.compareTo(this.getMinimum(context)) >= 0)
-                    );
-                }
-                @Override
-                public T withValue(T context, Integer value, boolean lenient) {
-                    if (value == null) {
-                        throw new NullPointerException("Missing year of era.");
-                    } else if (!this.isValid(context, value)) {
-                        throw new IllegalArgumentException(
-                            "Invalid year of era: " + value);
-                    } else {
-                        PlainDate date = context.get(PlainDate.CALENDAR_DATE);
-                        if (date.getYear() <= 0) {
-                            int year = 1 - value.intValue();
-                            date = date.with(PlainDate.YEAR, year);
-                        } else {
-                            date = date.with(PlainDate.YEAR, value);
-                        }
-                        return context.with(PlainDate.CALENDAR_DATE, date);
-                    }
-                }
-                @Override
-                public ChronoElement<?> getChildAtFloor(T context) {
-                    return PlainDate.MONTH_AS_NUMBER;
-                }
-                @Override
-                public ChronoElement<?> getChildAtCeiling(T context) {
-                    return PlainDate.MONTH_AS_NUMBER;
-                }
-            };
+            return (ElementRule<T, Integer>) this.rule;
         }
 
         return null;
@@ -280,15 +235,19 @@ final class IntegerDateElement
             index,
             Integer.valueOf(dmin),
             Integer.valueOf(dmax),
-            symbol
+            symbol,
+            null
         );
 
     }
 
     private Object readResolve() throws ObjectStreamException {
 
-        Object element = PlainDate.lookupElement(this.name());
-
+        String n = this.name();
+        Object element = (
+            n.equals(PlainTimestamp.YEAR_OF_ERA.name())
+                ? PlainTimestamp.YEAR_OF_ERA
+                : PlainDate.lookupElement(n));
         if (element == null) {
             throw new InvalidObjectException(this.name());
         } else {

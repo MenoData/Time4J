@@ -630,12 +630,17 @@ public final class PlainDate
      */
     @FormattableElement(format = "y")
     static final ChronoElement<Integer> YEAR_OF_ERA =
-        IntegerDateElement.create(
-            "YEAR_OF_ERA",
-            IntegerDateElement.YEAR_OF_ERA,
+        new IntegerDateElement(
+            "YEAR_OF_SIMPLE_ERA_IN_DATE",
+            IntegerDateElement.YEAR_OF_ERA_DATE,
             1,
             GregorianMath.MAX_YEAR,
-            'y');
+            'y',
+            new IntegerElementRule(
+                "YEAR_OF_SIMPLE_ERA_IN_DATE",
+                IntegerDateElement.YEAR_OF_ERA_DATE,
+                YEAR
+            ));
 
     // Dient der Serialisierungsunterstützung.
     private static final long serialVersionUID = -6698431452072325688L;
@@ -2647,21 +2652,27 @@ public final class PlainDate
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final ChronoElement<Integer> element;
+        private final ChronoElement<?> ref;
+        private final String name;
         private final int index;
 
         //~ Konstruktoren -------------------------------------------------
 
         IntegerElementRule(ChronoElement<Integer> element) {
+            this(element.name(), ((IntegerDateElement) element).getIndex(), element);
+
+        }
+
+        IntegerElementRule(
+            String name,
+            int index,
+            ChronoElement<?> ref
+        ) {
             super();
 
-            this.element = element;
-
-            if (element instanceof IntegerDateElement) {
-                this.index = ((IntegerDateElement) element).getIndex();
-            } else {
-                this.index = -1;
-            }
+            this.ref = ref;
+            this.name = name;
+            this.index = index;
 
         }
 
@@ -2681,9 +2692,11 @@ public final class PlainDate
                     return Integer.valueOf(context.getDayOfYear());
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(context.getDayOfQuarter());
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
+                    int year = context.year;
+                    return Integer.valueOf((year <= 0) ? (1 - year) : year);
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2698,7 +2711,7 @@ public final class PlainDate
             int v = value.intValue();
 
             if (lenient) { // nur auf numerischen Elementen definiert
-                IsoDateUnit unit = ENGINE.getBaseUnit(this.element);
+                IsoDateUnit unit = ENGINE.getBaseUnit(this.ref);
                 int old = Number.class.cast(this.getValue(context)).intValue();
                 int amount = MathUtils.safeSubtract(v, old);
                 return context.plus(amount, unit);
@@ -2719,12 +2732,23 @@ public final class PlainDate
                             (v - context.getDayOfQuarter()),
                             CalendarUnit.DAYS);
                     } else {
-                        throw new IllegalArgumentException(
-                            "Out of range: " + value);
+                        throw new IllegalArgumentException("Out of range: " + value);
+                    }
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
+                    if (value == null) {
+                        throw new NullPointerException("Missing year of era.");
+                    } else if (!this.isValid(context, value)) {
+                        throw new IllegalArgumentException("Invalid year of era: " + value);
+                    } else {
+                        if (context.year <= 0) {
+                            int year = 1 - value.intValue();
+                            return context.with(PlainDate.YEAR, year);
+                        } else {
+                            return context.with(PlainDate.YEAR, value);
+                        }
                     }
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2761,9 +2785,10 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_QUARTER:
                     int max = getMaximumOfQuarterDay(context);
                     return ((v >= 1) && (v <= max));
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
+                    return ((v <= GregorianMath.MAX_YEAR) && (v >= 1));
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2778,10 +2803,10 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_MONTH:
                 case IntegerDateElement.DAY_OF_YEAR:
                 case IntegerDateElement.DAY_OF_QUARTER:
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return Integer.valueOf(1);
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2791,6 +2816,7 @@ public final class PlainDate
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return MAX_YEAR;
                 case IntegerDateElement.MONTH:
                     return Integer.valueOf(12);
@@ -2807,8 +2833,7 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(getMaximumOfQuarterDay(context));
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2831,6 +2856,7 @@ public final class PlainDate
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
+                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return MONTH_AS_NUMBER;
                 case IntegerDateElement.MONTH:
                     return DAY_OF_MONTH;
@@ -2839,8 +2865,7 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return null;
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }

@@ -776,18 +776,24 @@ public enum PatternType
                         "Too many pattern letters: " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
-                if (PlainTimestamp.class.isAssignableFrom(builder.getChronology().getChronoType())) {
-                    builder.addText(PlainTimestamp.ERA);
-                } else {
+                if (PlainDate.class.isAssignableFrom(builder.getChronology().getChronoType())) {
                     builder.addText(PlainDate.ERA);
+                } else {
+                    builder.addText(PlainTimestamp.ERA); // Moment and PlainTimestamp
                 }
                 builder.endSection();
                 break;
             case 'y':
-                if (count == 2) {
-                    builder.addTwoDigitYear(PlainDate.YEAR_OF_ERA);
+                ChronoElement<Integer> yoe;
+                if (PlainDate.class.isAssignableFrom(builder.getChronology().getChronoType())) {
+                    yoe = PlainDate.YEAR_OF_ERA;
                 } else {
-                    builder.addInteger(PlainDate.YEAR_OF_ERA, count, 9);
+                    yoe = PlainTimestamp.YEAR_OF_ERA; // Moment and PlainTimestamp
+                }
+                if (count == 2) {
+                    builder.addTwoDigitYear(yoe);
+                } else {
+                    builder.addInteger(yoe, count, 9);
                 }
                 break;
             case 'Y':

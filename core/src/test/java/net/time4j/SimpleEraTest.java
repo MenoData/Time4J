@@ -1,6 +1,8 @@
 package net.time4j;
 
 import net.time4j.format.ChronoFormatter;
+import net.time4j.format.ParseLog;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -13,6 +15,54 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class SimpleEraTest {
+
+    @Test
+    public void parseYearOfEra() {
+        ChronoFormatter<PlainDate> f = PlainDate.localFormatter("yyyyMMdd", PatternType.CLDR);
+        ParseLog plog = new ParseLog();
+        PlainDate date = f.parse("20140101", plog);
+        assertThat(date, is(PlainDate.of(2014, 1)));
+        assertThat(plog.getRawValues().contains(PlainDate.YEAR_OF_ERA), is(true));
+    }
+
+    @Test
+    public void printYearOfEra() {
+        ChronoFormatter<PlainDate> f = PlainDate.localFormatter("yyyyMMdd", PatternType.CLDR);
+        String yoe = f.format(PlainDate.of(-1, 1));
+        assertThat(yoe, is("00020101"));
+    }
+
+    @Test
+    public void parseYearOfEraTSP() {
+        ChronoFormatter<PlainTimestamp> f = PlainTimestamp.localFormatter("yyyyMMddHHmm", PatternType.CLDR);
+        ParseLog plog = new ParseLog();
+        PlainTimestamp tsp = f.parse("201401011345", plog);
+        assertThat(tsp, is(PlainTimestamp.of(2014, 1, 1, 13, 45)));
+        assertThat(plog.getRawValues().contains(PlainTimestamp.YEAR_OF_ERA), is(true));
+    }
+
+    @Test
+    public void printYearOfEraTSP() {
+        ChronoFormatter<PlainTimestamp> f = PlainTimestamp.localFormatter("yyyyMMddHHmm", PatternType.CLDR);
+        String yoe = f.format(PlainTimestamp.of(-1, 1, 1, 13, 45));
+        assertThat(yoe, is("000201011345"));
+    }
+
+    @Test
+    public void parseYearOfEraMoment() {
+        ChronoFormatter<Moment> f = Moment.formatter("yyyyMMddHHmmX", PatternType.CLDR, Locale.US, ZonalOffset.UTC);
+        ParseLog plog = new ParseLog();
+        Moment moment = f.parse("201401011345Z", plog);
+        assertThat(moment, is(PlainTimestamp.of(2014, 1, 1, 13, 45).atUTC()));
+        assertThat(plog.getRawValues().contains(PlainTimestamp.YEAR_OF_ERA), is(true));
+    }
+
+    @Test
+    public void printYearOfEraMoment() {
+        ChronoFormatter<Moment> f = Moment.formatter("yyyyMMddHHmmX", PatternType.CLDR, Locale.US, ZonalOffset.UTC);
+        String yoe = f.format(PlainTimestamp.of(-1, 1, 1, 13, 45).atUTC());
+        assertThat(yoe, is("000201011345Z"));
+    }
 
     @Test
     public void eraName() {
