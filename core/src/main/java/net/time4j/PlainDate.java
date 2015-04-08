@@ -611,12 +611,18 @@ public final class PlainDate
     @FormattableElement(format = "G")
     static final ChronoElement<SimpleEra> ERA =
         new EnumElement<SimpleEra>(
-            "ERA",
+            "SIMPLE_ERA_IN_DATE",
             SimpleEra.class,
             SimpleEra.BC,
             SimpleEra.AD,
-            EnumElement.ERA,
-            'G');
+            EnumElement.ERA_DATE,
+            'G',
+            new EnumElementRule<SimpleEra>(
+                "SIMPLE_ERA_IN_DATE",
+                SimpleEra.class,
+                SimpleEra.BC,
+                SimpleEra.AD,
+                EnumElement.ERA_DATE));
 
     /**
      * <p>Element mit dem Jahr der &Auml;ra des proleptischen gregorianischen
@@ -677,11 +683,11 @@ public final class PlainDate
                 YOWElement.YOWUnit.WEEK_BASED_YEARS)
             .appendElement(
                 QUARTER_OF_YEAR,
-                new EnumElementRule<Quarter>(QUARTER_OF_YEAR),
+                EnumElementRule.of(QUARTER_OF_YEAR),
                 CalendarUnit.QUARTERS)
             .appendElement(
                 MONTH_OF_YEAR,
-                new EnumElementRule<Month>(MONTH_OF_YEAR),
+                EnumElementRule.of(MONTH_OF_YEAR),
                 CalendarUnit.MONTHS)
             .appendElement(
                 MONTH_AS_NUMBER,
@@ -693,7 +699,7 @@ public final class PlainDate
                 CalendarUnit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new EnumElementRule<Weekday>(DAY_OF_WEEK),
+                EnumElementRule.of(DAY_OF_WEEK),
                 CalendarUnit.DAYS)
             .appendElement(
                 DAY_OF_YEAR,
@@ -2860,25 +2866,44 @@ public final class PlainDate
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final ChronoElement<V> element;
+        private final String name;
+        private final Class<V> type;
+        private final V min;
+        private final V max;
         private final int index;
 
         //~ Konstruktoren -------------------------------------------------
 
-        EnumElementRule(ChronoElement<V> element) {
+        EnumElementRule(
+            String name,
+            Class<V> type,
+            V min,
+            V max,
+            int index
+        ) {
             super();
 
-            this.element = element;
-
-            if (element instanceof EnumElement) {
-                this.index = ((EnumElement) element).getIndex();
-            } else {
-                this.index = -1;
-            }
+            this.name = name;
+            this.type = type;
+            this.min = min;
+            this.max = max;
+            this.index = index;
 
         }
 
         //~ Methoden ------------------------------------------------------
+
+        static <V extends Enum<V>> EnumElementRule<V> of(ChronoElement<V> element) {
+
+            return new EnumElementRule<V>(
+                element.name(),
+                element.getType(),
+                element.getDefaultMinimum(),
+                element.getDefaultMaximum(),
+                ((EnumElement<?>) element).getIndex()
+            );
+
+        }
 
         @Override
         public V getValue(PlainDate context) {
@@ -2895,26 +2920,28 @@ public final class PlainDate
                 case EnumElement.QUARTER_OF_YEAR:
                     ret = Quarter.valueOf(((context.month - 1) / 3) + 1);
                     break;
+                case EnumElement.ERA_DATE:
+                    ret = ((context.year <= 0) ? SimpleEra.BC : SimpleEra.AD);
+                    break;
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
-            return this.element.getType().cast(ret);
+            return this.type.cast(ret);
 
         }
 
         @Override
         public V getMinimum(PlainDate context) {
 
-            return this.element.getDefaultMinimum();
+            return this.min;
 
         }
 
         @Override
         public V getMaximum(PlainDate context) {
 
-            return this.element.getDefaultMaximum();
+            return this.max;
 
         }
 
@@ -2937,17 +2964,24 @@ public final class PlainDate
 
             switch (this.index) {
                 case EnumElement.MONTH:
-                    return context.withMonth(
-                        Month.class.cast(value).getValue());
+                    return context.withMonth(Month.class.cast(value).getValue());
                 case EnumElement.DAY_OF_WEEK:
                     return context.withDayOfWeek(Weekday.class.cast(value));
                 case EnumElement.QUARTER_OF_YEAR:
                     int q1 = ((context.month - 1) / 3) + 1;
                     int q2 = Quarter.class.cast(value).getValue();
                     return context.plus((q2 - q1), CalendarUnit.QUARTERS);
+                case EnumElement.ERA_DATE:
+                    if (
+                        ((context.year <= 0) && (value == SimpleEra.AD))
+                        || ((context.year > 0) && (value == SimpleEra.BC))
+                    ) {
+                        return context.with(PlainDate.YEAR, 1 - context.year);
+                    } else {
+                        return context;
+                    }
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }
@@ -2975,9 +3009,10 @@ public final class PlainDate
                     return null;
                 case EnumElement.QUARTER_OF_YEAR:
                     return DAY_OF_QUARTER;
+                case EnumElement.ERA_DATE:
+                    return YEAR_OF_ERA;
                 default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
+                    throw new UnsupportedOperationException(this.name);
             }
 
         }

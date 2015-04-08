@@ -776,7 +776,11 @@ public enum PatternType
                         "Too many pattern letters: " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
-                builder.addText(PlainDate.ERA);
+                if (PlainTimestamp.class.isAssignableFrom(builder.getChronology().getChronoType())) {
+                    builder.addText(PlainTimestamp.ERA);
+                } else {
+                    builder.addText(PlainDate.ERA);
+                }
                 builder.endSection();
                 break;
             case 'y':

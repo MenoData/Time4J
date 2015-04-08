@@ -35,6 +35,7 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
@@ -198,6 +199,21 @@ public final class PlainTimestamp
     private static final PlainTimestamp MAX =
         new PlainTimestamp(PlainDate.MAX, WALL_TIME.getDefaultMaximum());
 
+    /**
+     * <p>Element mit der &Auml;ra des proleptischen gregorianischen
+     * Kalenders. </p>
+     */
+    @FormattableElement(format = "G")
+    static final ChronoElement<SimpleEra> ERA =
+        new EnumElement<SimpleEra>(
+            "SIMPLE_ERA_IN_TSP",
+            SimpleEra.class,
+            SimpleEra.BC,
+            SimpleEra.AD,
+            EnumElement.ERA_TSP,
+            'G',
+            FieldRule.of(PlainDate.ERA));
+
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
     private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
@@ -205,6 +221,8 @@ public final class PlainTimestamp
     static {
         Map<Object, ChronoElement<?>> children =
             new HashMap<Object, ChronoElement<?>>();
+        children.put(ERA, YEAR_OF_ERA);
+        children.put(YEAR_OF_ERA, MONTH_AS_NUMBER);
         children.put(CALENDAR_DATE, WALL_TIME);
         children.put(YEAR, MONTH_AS_NUMBER);
         children.put(YEAR_OF_WEEKDATE, Weekmodel.ISO.weekOfYear());

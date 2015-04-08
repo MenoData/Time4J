@@ -48,7 +48,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class EnumElement<V extends Enum<V>>
     extends AbstractDateElement<V>
@@ -63,7 +63,9 @@ final class EnumElement<V extends Enum<V>>
     /** Element-Index. */
     static final int QUARTER_OF_YEAR = 103;
     /** Element-Index. */
-    static final int ERA = 104;
+    static final int ERA_DATE = 104;
+    /** Element-Index. */
+    static final int ERA_TSP = 105;
 
     private static final long serialVersionUID = 2055272540517425102L;
 
@@ -74,6 +76,7 @@ final class EnumElement<V extends Enum<V>>
     private transient final V dmax;
     private transient final int index;
     private transient final char symbol;
+    private transient final  ElementRule<?, V> rule;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -95,6 +98,29 @@ final class EnumElement<V extends Enum<V>>
         int index,
         char symbol
     ) {
+        this(name, type, defaultMin, defaultMax, index, symbol, null);
+
+    }
+
+    /**
+     * <p>Konstruiert ein neues Element mit den angegebenen Details. </p>
+     *
+     * @param   name        name of element
+     * @param   type        reified type of element values
+     * @param   defaultMin  default minimum
+     * @param   defaultMax  default maximum
+     * @param   index       element index
+     * @param   symbol      CLDR-symbol used in format patterns
+     */
+    EnumElement(
+        String name,
+        Class<V> type,
+        V defaultMin,
+        V defaultMax,
+        int index,
+        char symbol,
+        ElementRule<?, V> rule
+    ) {
         super(name);
 
         this.type = type;
@@ -102,6 +128,7 @@ final class EnumElement<V extends Enum<V>>
         this.dmax = defaultMax;
         this.index = index;
         this.symbol = symbol;
+        this.rule = rule;
 
     }
 
@@ -184,11 +211,7 @@ final class EnumElement<V extends Enum<V>>
     @Override
     public int numerical(V value) {
 
-        if (this.index == ERA) {
-            return value.ordinal();
-        }
-
-        return (value.ordinal() + 1);
+        return (this.isEraElement() ? value.ordinal() : value.ordinal() + 1);
 
     }
 
@@ -226,11 +249,10 @@ final class EnumElement<V extends Enum<V>>
     ) {
 
         if (
-            (this.index == ERA)
+            this.isEraElement()
             && chronology.isRegistered(PlainDate.CALENDAR_DATE)
         ) {
-            ElementRule<T, SimpleEra> rule = new SimpleEra.Rule<T>();
-            return (ElementRule<T, V>) rule;
+            return (ElementRule<T, V>) this.rule;
         }
 
         return null;
@@ -245,6 +267,12 @@ final class EnumElement<V extends Enum<V>>
     int getIndex() {
 
         return this.index;
+
+    }
+
+    private boolean isEraElement() {
+
+        return ((this.index == ERA_DATE) || (this.index == ERA_TSP));
 
     }
 
@@ -277,7 +305,8 @@ final class EnumElement<V extends Enum<V>>
                     attributes.get(
                         Attributes.OUTPUT_CONTEXT,
                         OutputContext.FORMAT));
-            case ERA:
+            case ERA_DATE:
+            case ERA_TSP:
                 return cnames.getEras(textWidth);
             default:
                 throw new UnsupportedOperationException(this.name());
@@ -287,8 +316,11 @@ final class EnumElement<V extends Enum<V>>
 
     private Object readResolve() throws ObjectStreamException {
 
-        Object element = PlainDate.lookupElement(this.name());
-
+        String n = this.name();
+        Object element = (
+            n.equals(PlainTimestamp.ERA.name())
+            ? PlainTimestamp.ERA
+            : PlainDate.lookupElement(n));
         if (element == null) {
             throw new InvalidObjectException(this.name());
         } else {
