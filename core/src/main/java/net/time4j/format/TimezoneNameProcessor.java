@@ -300,6 +300,24 @@ final class TimezoneNameProcessor
             index = 1;
         }
 
+        // remove alternative provider zones if default provider zone exists
+        if (sum > 1) {
+            List<TZID> filtered = null;
+            for (TZID id : zones) {
+                if (id.canonical().indexOf('~') == -1) {
+                    if (filtered == null) {
+                        filtered = new ArrayList<TZID>();
+                    }
+                    filtered.add(id);
+                }
+            }
+            if (filtered != null) {
+                zones = filtered;
+                sum = zones.size();
+            }
+        }
+
+        // final step: determining the result
         if (
             (sum == 1)
             || leniency.isLax()
