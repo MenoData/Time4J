@@ -187,7 +187,7 @@ final class TimezoneNameProcessor
         Leniency leniency =
             step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
-        // short evaluation
+        // evaluation of relevant part of input which might contain the timezone name
         StringBuilder name = new StringBuilder();
 
         while (pos < len) {
@@ -206,6 +206,7 @@ final class TimezoneNameProcessor
         }
 
         String key = name.toString().trim();
+        pos = start + key.length();
 
         // fallback-case (fixed offset)
         if (
@@ -244,8 +245,8 @@ final class TimezoneNameProcessor
         int[] lenbuf = new int[2];
         lenbuf[0] = pos;
         lenbuf[1] = pos;
-        List<TZID> stdZones = readZones(text, start, lenbuf, tzNames, key, false);
-        List<TZID> dstZones = readZones(text, start, lenbuf, tzNames, key, true);
+        List<TZID> stdZones = readZones(tzNames, key, false, lenbuf);
+        List<TZID> dstZones = readZones(tzNames, key, true, lenbuf);
         int sum = stdZones.size() + dstZones.size();
 
         if (sum == 0) {
@@ -373,21 +374,23 @@ final class TimezoneNameProcessor
     }
 
     private static List<TZID> readZones(
-        CharSequence text,
-        int start,
-        int[] lenbuf,
         TZNames tzNames,
         String key,
-        boolean daylightSaving
+        boolean daylightSaving,
+        int[] lenbuf
     ) {
         
         List<TZID> zones = tzNames.search(key, daylightSaving);
 
         if (zones.isEmpty()) {
-            int index = (daylightSaving ? 1 : 0);
-            lenbuf[index] = 0;
-            zones = tzNames.search(text, start, daylightSaving, lenbuf);
-            lenbuf[index] += start;
+            int last = key.length() - 1;
+            if (!Character.isLetter(key.charAt(last))) { // maybe interpunctuation char?
+                zones = tzNames.search(key.substring(0, last), daylightSaving);
+                if (!zones.isEmpty()) {
+                    int index = (daylightSaving ? 1 : 0);
+                    lenbuf[index]--;
+                }
+            }
         }
         
         return zones;
@@ -539,51 +542,6 @@ final class TimezoneNameProcessor
 
             if (names.containsKey(key)) {
                 return names.get(key);
-            }
-
-            return Collections.emptyList();
-
-        }
-
-        // slow linear search for partial agreement (name smaller than input)
-        List<TZID> search(
-            CharSequence text,
-            int start,
-            boolean daylightSaving,
-            int[] lenbuf
-        ) {
-
-            Map<String, List<TZID>> names = (
-                daylightSaving
-                ? this.dstNames
-                : this.stdNames);
-            int index = (daylightSaving ? 1 : 0);
-
-            int len = text.length();
-
-            for (String name : names.keySet()) {
-                int pos = start;
-                boolean found = true;
-                int count = name.length();
-
-                while (pos < start + count) {
-                    if (pos >= len) {
-                        found = false;
-                        break;
-                    }
-
-                    if (name.charAt(pos - start) == text.charAt(pos)) {
-                        pos++;
-                    } else {
-                        found = false;
-                        break;
-                    }
-                }
-
-                if (found) {
-                    lenbuf[index] = count;
-                    return names.get(name);
-                }
             }
 
             return Collections.emptyList();
