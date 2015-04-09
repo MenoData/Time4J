@@ -522,7 +522,7 @@ class JVMZoneReader {
                         // hack for handling broken data (removing last rules)
                         // sometimes inconsistent rules like in 2013h/Casablanca
                         model = TransitionModel.of(Arrays.asList(ots));
-                        System.err.println("Inconsistent timezone data: " + id);
+                        System.err.println("[JVMZoneReader] Inconsistent timezone data: " + id);
                     }
                 }
             }
