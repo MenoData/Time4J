@@ -290,6 +290,9 @@ final class TimezoneNameProcessor
             ) {
                 dstZones.remove(0);
                 sum--;
+            } else if (!dstZones.isEmpty()) {
+                zones = new ArrayList<TZID>(zones);
+                zones.addAll(dstZones); // for better error message if not unique
             }
         } else {
             zones = dstZones;
@@ -542,7 +545,7 @@ final class TimezoneNameProcessor
 
         }
 
-        // slow linear search
+        // slow linear search for partial agreement (name smaller than input)
         List<TZID> search(
             CharSequence text,
             int start,
