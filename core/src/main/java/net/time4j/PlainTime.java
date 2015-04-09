@@ -2001,7 +2001,7 @@ public final class PlainTime
     // JDK-Patterns hinten, mittig und vorne von Zeitzonen-Symbolen befreien
     private static String removeZones(String pattern) {
 
-        String s = pattern.replace(" z", ""); // for en-CA
+        String s = pattern.replace(" z", "");
 
         if (s.charAt(s.length() - 1) == 'z') {
             for (int i = s.length() - 1; i > 0; i--) {
