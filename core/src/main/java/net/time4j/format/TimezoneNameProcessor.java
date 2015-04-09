@@ -194,10 +194,10 @@ final class TimezoneNameProcessor
             char c = text.charAt(pos);
 
             if (
-                Character.isLetter(c)
-                || (!this.abbreviated
-                    && (Character.isWhitespace(c)) || (c == '\''))
+                Character.isLetter(c) // tz names must start with a letter
+                || (!this.abbreviated && (pos > start) && !Character.isDigit(c))
             ) {
+                // long tz names can contain almost every char - with the exception of digits
                 name.append(c);
                 pos++;
             } else {
@@ -205,7 +205,7 @@ final class TimezoneNameProcessor
             }
         }
 
-        String key = name.toString();
+        String key = name.toString().trim();
 
         // fallback-case (fixed offset)
         if (
