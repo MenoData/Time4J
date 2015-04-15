@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoPattern.java) is part of project Time4J.
  *
@@ -21,53 +21,37 @@
 
 package net.time4j.format;
 
-import net.time4j.engine.ChronoElement;
-
-import java.util.Locale;
-import java.util.Set;
-
 
 /**
  * <p>Allows a flexible interpretation of symbols in format patterns. </p>
  *
+ * @param   <F> self-referencing type parameter as discriminator for the format engine to be used
  * @author  Meno Hochschild
+ * @since   3.0
  */
 /*[deutsch]
  * <p>Erlaubt eine flexible Interpretation von Symbolen in Formatmustern. </p>
  *
+ * @param   <F> self-referencing type parameter as discriminator for the format engine to be used
  * @author  Meno Hochschild
+ * @since   3.0
  */
-public interface ChronoPattern {
+public interface ChronoPattern<F extends ChronoPattern<F>> {
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Registers a format symbol. </p>
+     * <p>Yields the format engine this pattern is designed for. </p>
      *
-     * @param   builder     serves for construction of {@code ChronoFormatter}
-     * @param   locale      current language- and country setting
-     * @param   symbol      pattern symbol to be interpreted
-     * @param   count       count of symbols in format pattern
-     * @return  set of elements which will replace other already registered
-     *          elements of same name after pattern processing
-     * @throws  IllegalArgumentException if symbol resolution fails
+     * @return  format and parse engine to be used
+     * @since   3.0
      */
     /*[deutsch]
-     * <p>Registriert ein Formatsymbol. </p>
+     * <p>Liefert die {@code FormatEngine}, f&uuml;r die dieses Formatmuster gedacht ist. </p>
      *
-     * @param   builder     serves for construction of {@code ChronoFormatter}
-     * @param   locale      current language- and country setting
-     * @param   symbol      pattern symbol to be interpreted
-     * @param   count       count of symbols in format pattern
-     * @return  set of elements which will replace other already registered
-     *          elements of same name after pattern processing
-     * @throws  IllegalArgumentException if symbol resolution fails
+     * @return  format and parse engine to be used
+     * @since   3.0
      */
-    Set<ChronoElement<?>> registerSymbol(
-        ChronoFormatter.Builder<?> builder,
-        Locale locale,
-        char symbol,
-        int count
-    );
+    FormatEngine<F> getFormatEngine();
 
 }
