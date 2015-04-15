@@ -50,14 +50,15 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>Furthermore, an instance of {@code CalendarText} can also access
  * the UTF-8 text resources in the folder &quot;calendar&quot; relative to
- * the class path which are not based on JDK-defaults. In all ISO-systems
- * the &quot;iso8601_{locale}.properties&quot;-files will override the
+ * the class path which are not based on JDK-defaults. In this case the
+ * presence of the i18n-module is required. In all ISO-systems the
+ * &quot;iso8601_{locale}.properties&quot;-files will override the
  * JDK-defaults unless it is the ROOT-locale. Example: </p>
  *
  * <p>If you wish to use the name &quot;Sonnabend&quot; instead of the standard
  * word &quot;Samstag&quot; in german locale (english: Saturday) then you can
  * copy the existing file &quot;calendar/iso8601_de.properties&quot; from the
- * content of &quot;time4j-core-v{version}.jar&quot;-file into a new directory
+ * content of &quot;time4j-i18n-v{version}.jar&quot;-file into a new directory
  * with the same path. Then you can insert these lines extra (all seven entries
  * must be inserted, not just the sixth line): </p>
  *
@@ -101,15 +102,16 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>Dar&uuml;berhinaus kann eine Instanz von {@code CalendarText} auch
  * auf UTF-8-Textressourcen im Verzeichnis &quot;calendar&quot; innerhalb des
- * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. F&uuml;r
- * alle ISO-Systeme gilt, da&szlig; die Eintr&auml;ge in den Dateien
- * &quot;iso8601_{locale}.properties&quot; die JDK-Vorgaben
- * &uuml;berschreiben, sofern es nicht die ROOT-locale ist. Beispiel: </p>
+ * Klassenpfads zugreifen, die nicht auf JDK-Vorgaben beruhen. In diesem Fall
+ * ist das i18n-Modul notwendig. F&uuml;r alle ISO-Systeme gilt, da&szlig; die
+ * Eintr&auml;ge in den Dateien &quot;iso8601_{locale}.properties&quot; die
+ * JDK-Vorgaben &uuml;berschreiben, sofern es nicht die ROOT-locale ist.
+ * Beispiel: </p>
  *
  * <p>Wenn der Name &quot;Sonnabend&quot; anstatt der Standardvorgabe
  * &quot;Samstag&quot; in der deutschen Variante verwendet werden soll,
  * dann kann die existierende Datei &quot;calendar/iso8601_de.properties&quot;
- * vom Inhalt der Bibliotheksdatei &quot;time4j-core-v{version].jar&quot;
+ * vom Inhalt der Bibliotheksdatei &quot;time4j-i18n-v{version].jar&quot;
  * in ein neues Verzeichnis mit dem gleichen Pfad kopiert werden. Danach
  * k&ouml;nnen alle folgenden Zeilen extra eingef&uuml;gt werden (nicht nur
  * die sechste Zeile allein): </p>

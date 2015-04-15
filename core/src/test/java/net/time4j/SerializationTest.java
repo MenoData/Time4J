@@ -1,6 +1,5 @@
 package net.time4j;
 
-import net.time4j.format.ParseLog;
 import net.time4j.scale.TimeScale;
 
 import java.io.ByteArrayInputStream;
@@ -174,16 +173,6 @@ public class SerializationTest {
         Info info = analyze("[Duration]", sers);
         assertThat(info.first, is(126));
         assertThat(info.next, is(47));
-    }
-
-    @Test
-    public void roundTripOfParsedValues()
-        throws IOException, ClassNotFoundException {
-
-        ParseLog plog = new ParseLog();
-        Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2012-02-29", plog);
-        Object obj = plog.getRawValues();
-        roundtrip(obj);
     }
 
     private Info analyze(String msg, Object[] sers)

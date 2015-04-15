@@ -1,14 +1,14 @@
 package net.time4j.i18n;
 
-import java.text.DateFormatSymbols;
-import net.time4j.Iso8601Format;
-import net.time4j.PatternType;
 import net.time4j.PlainDate;
-import net.time4j.format.ChronoFormatter;
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Locale;
+
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -91,10 +91,8 @@ public class DatePatternTest {
         super();
 
         this.formatter =
-            PlainDate.formatter(
-                pattern,
-                PatternType.CLDR,
-                toLocale(locale));
+            ChronoFormatter.setUp(PlainDate.class, toLocale(locale))
+                .addPattern(pattern, PatternType.CLDR).build();
         this.value = Iso8601Format.EXTENDED_CALENDAR_DATE.parse(value);
         this.text = text;
     }

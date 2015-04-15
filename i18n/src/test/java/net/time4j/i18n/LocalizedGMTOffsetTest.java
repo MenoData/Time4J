@@ -1,14 +1,13 @@
 package net.time4j.i18n;
 
-import net.time4j.Iso8601Format;
 import net.time4j.Moment;
-import net.time4j.PatternType;
-import net.time4j.tz.Timezone;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.PatternType;
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Locale;
-import net.time4j.format.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -49,11 +48,9 @@ public class LocalizedGMTOffsetTest {
         super();
 
         this.formatter =
-            Moment.formatter(
-                pattern,
-                PatternType.CLDR,
-                toLocale(locale),
-                Timezone.of(tzid).getID());
+            ChronoFormatter.setUp(Moment.class, toLocale(locale))
+                .addPattern(pattern, PatternType.CLDR).build()
+                .withTimezone(tzid);
         this.value = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(value);
         this.text = text;
     }

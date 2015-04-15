@@ -1,13 +1,14 @@
 package net.time4j.i18n;
 
-import net.time4j.Iso8601Format;
-import net.time4j.PatternType;
 import net.time4j.PlainTimestamp;
-import net.time4j.format.ChronoFormatter;
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Locale;
+
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -122,10 +123,8 @@ public class DateTimePatternTest {
         super();
 
         this.formatter =
-            PlainTimestamp.formatter(
-                pattern,
-                PatternType.CLDR,
-                toLocale(locale));
+            ChronoFormatter.setUp(PlainTimestamp.class, toLocale(locale))
+                .addPattern(pattern, PatternType.CLDR).build();
         this.value = Iso8601Format.EXTENDED_DATE_TIME.parse(value);
         this.text = text;
     }

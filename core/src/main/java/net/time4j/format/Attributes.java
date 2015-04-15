@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Attributes.java) is part of project Time4J.
  *
@@ -23,8 +23,7 @@ package net.time4j.format;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoCondition;
-import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.Chronology;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -34,57 +33,25 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 
 /**
  * <p>A collection of format attributes for controlling the formatting
  * and parsing. </p>
  *
- * @author      Meno Hochschild
+ * @author  Meno Hochschild
  * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Formatattribute zum Steuern des Format- und Interpretierungsvorgangs. </p>
  *
- * @author      Meno Hochschild
+ * @author  Meno Hochschild
  * @doctags.concurrency <immutable>
  */
 public final class Attributes
     implements AttributeQuery {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final NumberSymbolProvider NUMBER_SYMBOLS;
-
-    static {
-        NumberSymbolProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = NumberSymbolProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            NumberSymbolProvider tmp
-            : ServiceLoader.load(NumberSymbolProvider.class, cl)
-        ) {
-            p = tmp;
-            break;
-        }
-
-        if (p == null) {
-            p = NumberSymbolProvider.DEFAULT;
-        }
-
-        NUMBER_SYMBOLS = p;
-    }
 
     /**
      * <p>Attribute for the calendar type. </p>
@@ -140,8 +107,6 @@ public final class Attributes
      * different. When printing, the default {@code ZonalOffset.UTC} was used.
      * When parsing, the system default timezone was used as default in case
      * of missing attribute and lax mode.</i> </p>
-     *
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Gibt die Zeitzonen-ID f&uuml;r die Verwendung in formatierten
@@ -161,8 +126,6 @@ public final class Attributes
      * In der Textausgabe war der Standard immer {@code ZonalOffset.UTC}.
      * Beim Parsen war die Systemzeitzone die Vorgabe im laxen Modus
      * gewesen, bevor eine Ausnahme flog.</i> </p>
-     *
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
     public static final AttributeKey<TZID> TIMEZONE_ID =
         PredefinedKey.valueOf("TIMEZONE_ID", TZID.class);
@@ -308,11 +271,11 @@ public final class Attributes
     /**
      * <p>Determines the unicode char for the decimal separator. </p>
      *
-     * <p>In case of changing the language setting this attribute will
-     * automatically be adjusted. Default value is the comma in ISO-8601
-     * corresponding to the ASCII-value 44. With help of the boolean
-     * system property &quot;net.time4j.format.iso.decimal.dot&quot;,
-     * the dot can be defined as alternative default value. </p>
+     * <p>In case of changing the language setting this attribute will automatically
+     * be adjusted. In ISO-8601 (for the root locale), the comma is the default value
+     * is the comma corresponding to the ASCII-value 44. With help of the boolean
+     * system property &quot;net.time4j.format.iso.decimal.dot&quot;, the dot can be
+     * defined as alternative default value. </p>
      */
     /*[deutsch]
      * <p>Legt das Unicode-Zeichen f&uuml;r das Dezimaltrennzeichen fest. </p>
@@ -429,7 +392,6 @@ public final class Attributes
      * <i>adjacent digit parsing</i>. </p>
      *
      * @since   2.0
-     * @see     ChronoFormatter#withDefault
      */
     /*[deutsch]
      * <p>Legt fest, wieviele der verbleibenden Zeichen in einem zu
@@ -447,49 +409,9 @@ public final class Attributes
      * mit fester Ziffernbreite zuzuschreiben sind. </p>
      *
      * @since   2.0
-     * @see     ChronoFormatter#withDefault
      */
     public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
         PredefinedKey.valueOf("PROTECTED_CHARACTERS", Integer.class);
-
-    /**
-     * <p>Gibt die Sprach- und L&auml;ndereinstellung an, die die
-     * Sprachausgabe von chronologischen Texten (Beispiel Monatsnamen)
-     * und andere Aspekte wie Wochennummerierungen steuert. </p>
-     *
-     * <p>Standardwert: {@code Locale.ROOT}. </p>
-     */
-    static final AttributeKey<Locale> LOCALE =
-        PredefinedKey.valueOf("_LOCALE", Locale.class);
-
-    /**
-     * <p>Steuert, ob eine optionale Sektion vorliegt, in der eventuelle Fehler
-     * beim Parsen nicht zum Abbruch f&uuml;hren, sondern nur zum Ignorieren
-     * der interpretierten Werte. </p>
-     *
-     * <p>Der f&uuml;hrende Unterstrich im Namen zeigt die rein interne
-     * Verwendung an. Standardwert: {@code false} </p>
-     */
-    static final AttributeKey<Boolean> OPTIONAL =
-        PredefinedKey.valueOf("_OPTIONAL", Boolean.class);
-
-    /**
-     * <p>Zeigt die Ebene der optionalen Verarbeitungshierarchie an. </p>
-     *
-     * <p>Der f&uuml;hrende Unterstrich im Namen zeigt die rein interne
-     * Verwendung an. Standardwert: {@code 0} </p>
-     */
-    static final AttributeKey<Integer> LEVEL =
-        PredefinedKey.valueOf("_LEVEL", Integer.class);
-
-    /**
-     * <p>Identifiziert eine optionale Attributsektion. </p>
-     *
-     * <p>Der f&uuml;hrende Unterstrich im Namen zeigt die rein interne
-     * Verwendung an. Standardwert: {@code 0} </p>
-     */
-    static final AttributeKey<Integer> SECTION =
-        PredefinedKey.valueOf("_SECTION", Integer.class);
 
     private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
@@ -497,30 +419,18 @@ public final class Attributes
         : ',' // Empfehlung des ISO-Standards
     );
 
-    private static final
-        ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
-            new ConcurrentHashMap<Locale, NumericalSymbols>();
-    private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
-        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
-    private static final AttributeQuery EMPTY =
-        new Attributes.Builder().build();
+    private static final AttributeQuery EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final Map<String, Object> attributes;
-    private final ChronoCondition<ChronoDisplay> printCondition;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private Attributes(
-        Map<String, Object> map,
-        ChronoCondition<ChronoDisplay> printCondition
-    ) {
+    private Attributes(Map<String, Object> map) {
         super();
 
-        this.attributes =
-            Collections.unmodifiableMap(new HashMap<String, Object>(map));
-        this.printCondition = printCondition;
+        this.attributes = Collections.unmodifiableMap(new HashMap<String, Object>(map));
 
     }
 
@@ -626,63 +536,23 @@ public final class Attributes
 
     }
 
-    /**
-     * <p>Ermittelt die Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * <p>Falls ein Bezug zu ISO-8601 ohne eine konkrete Sprache vorliegt,
-     * liefert die Methode ein {@code Locale.ROOT}. </p>
-     *
-     * @return  Locale (empty if related to ISO-8601, never {@code null})
-     * @see     #LOCALE
-     */
-    Locale getLocale() {
-
-        return this.get(Attributes.LOCALE, Locale.ROOT);
-
-    }
-
-    /**
-     * <p>Ermittelt eine Print-Bedingung. </p>
-     *
-     * @return  print condition object maybe {@code null}
-     */
-    ChronoCondition<ChronoDisplay> getCondition() {
-
-        return this.printCondition;
-
-    }
-
-    /**
-     * <p>Konstruiert einen {@code Builder} mit der angegebenen Sprach- und
-     * L&auml;ndereinstellung. </p>
-     *
-     * @param   locale  Sprach- und L&auml;ndereinstellung
-     * @return  builder instance with some predefined localized attributes
-     */
-    static Attributes.Builder createDefaults(Locale locale) {
-
-        Attributes.Builder builder = new Attributes.Builder();
-        builder.setStandardAttributes();
-        builder.setLocale(locale);
-        return builder;
-
-    }
-
     //~ Innere Klassen ----------------------------------------------------
 
     /**
      * <p>Builds a collection of format attributes. </p>
+     *
+     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Baut eine Menge von Formatattributen. </p>
+     *
+     * @doctags.concurrency <mutable>
      */
     public static final class Builder {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final Map<String, Object> attributes =
-            new HashMap<String, Object>();
-        private ChronoCondition<ChronoDisplay> printCondition = null;
+        private final Map<String, Object> attributes = new HashMap<String, Object>();
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -694,6 +564,27 @@ public final class Attributes
          */
         public Builder() {
             super();
+
+        }
+
+        /**
+         * <p>Constructor for determining the calendar type. </p>
+         *
+         * @param   chronology  object with possible calendar type
+         * @since   3.0
+         * @see     #CALENDAR_TYPE
+         */
+        /*[deutsch]
+         * <p>Konstruktor zum Ableiten des Kalendertyps. </p>
+         *
+         * @param   chronology  object with possible calendar type
+         * @since   3.0
+         * @see     #CALENDAR_TYPE
+         */
+        public Builder(Chronology<?> chronology) {
+            super();
+
+            this.setInternal(CALENDAR_TYPE, CalendarText.extractCalendarType(chronology));
 
         }
 
@@ -956,25 +847,16 @@ public final class Attributes
          *
          * @param   key     attribute key to be removed
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given attribute is internal
          */
         /*[deutsch]
          * <p>Entfernt das angegebene Attribut. </p>
          *
          * @param   key     attribute key to be removed
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given attribute is internal
          */
         public Builder remove(AttributeKey<?> key) {
 
-            String name = key.name();
-
-            if (name.startsWith("_")) {
-                throw new IllegalArgumentException(
-                    "Internal attribute cannot be removed: " + name);
-            }
-
-            this.attributes.remove(name);
+            this.attributes.remove(key.name());
             return this;
 
         }
@@ -992,101 +874,7 @@ public final class Attributes
          */
         public Attributes build() {
 
-            return new Attributes(this.attributes, this.printCondition);
-
-        }
-
-        /**
-         * <p>Setzt die Sprach- und L&auml;ndereinstellung. </p>
-         *
-         * <p>Die Attribute {@link #ZERO_DIGIT}, {@link #DECIMAL_SEPARATOR}
-         * und {@link #LANGUAGE} werden automatisch mit angepasst. </p>
-         *
-         * @param   locale      new language and country setting
-         * @return  this instance for method chaining
-         * @see     #LOCALE
-         */
-        Builder setLocale(Locale locale) {
-
-            if (
-                locale.getLanguage().isEmpty()
-                && locale.getCountry().isEmpty()
-            ) {
-                locale = Locale.ROOT;
-                this.set(ZERO_DIGIT, '0');
-                this.set(DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
-            } else {
-                NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
-
-                if (symbols == null) {
-                    symbols = DEFAULT_NUMERICAL_SYMBOLS;
-
-                    for (Locale test : NUMBER_SYMBOLS.getAvailableLocales()) {
-                        if (locale.equals(test)) {
-                            symbols =
-                                new NumericalSymbols(
-                                    NUMBER_SYMBOLS.getZeroDigit(locale),
-                                    NUMBER_SYMBOLS.getDecimalSeparator(locale)
-                                );
-                            break;
-                        }
-                    }
-
-                    NumericalSymbols old =
-                        NUMBER_SYMBOL_CACHE.putIfAbsent(locale, symbols);
-                    if (old != null) {
-                        symbols = old;
-                    }
-                }
-
-                this.set(ZERO_DIGIT, symbols.zeroDigit);
-                this.set(DECIMAL_SEPARATOR, symbols.decimalSeparator);
-            }
-
-            this.setInternal(LOCALE, locale);
-            this.setInternal(LANGUAGE, locale);
-            return this;
-
-        }
-
-        /**
-         * <p>Sets the calendar type. </p>
-         *
-         * @param   calendarType    calendar type for resource lookup
-         * @return  this instance for method chaining
-         */
-        /*[deutsch]
-         * <p>Legt den Kalendertyp fest. </p>
-         *
-         * @param   calendarType    calendar type for resource lookup
-         * @return  this instance for method chaining
-         */
-        Builder setCalendarType(String calendarType) {
-
-            this.setInternal(CALENDAR_TYPE, calendarType);
-            return this;
-
-        }
-
-        /**
-         * <p>Setzt eine Print-Bedingung. </p>
-         *
-         * @param   printCondition  condition object
-         */
-        void setCondition(ChronoCondition<ChronoDisplay> printCondition) {
-
-            this.printCondition = printCondition;
-
-        }
-
-        private Builder setStandardAttributes() {
-
-            this.set(LENIENCY, Leniency.SMART);
-            this.set(TEXT_WIDTH, TextWidth.WIDE);
-            this.set(OUTPUT_CONTEXT, OutputContext.FORMAT);
-            this.set(PAD_CHAR, ' ');
-
-            return this;
+            return new Attributes(this.attributes);
 
         }
 
@@ -1100,28 +888,6 @@ public final class Attributes
             }
 
             this.attributes.put(key.name(), value);
-
-        }
-
-    }
-
-    private static class NumericalSymbols {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final char zeroDigit;
-        private final char decimalSeparator;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        NumericalSymbols(
-            char zeroDigit,
-            char decimalSeparator
-        ) {
-            super();
-
-            this.zeroDigit = zeroDigit;
-            this.decimalSeparator = decimalSeparator;
 
         }
 

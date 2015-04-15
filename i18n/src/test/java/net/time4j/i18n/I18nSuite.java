@@ -1,5 +1,6 @@
 package net.time4j.i18n;
 
+import net.time4j.format.expert.FormatSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -12,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DatePatternTest.class,
         DateTimePatternTest.class,
         EnumDisplayTest.class,
+        FormatSuite.class,
         IsoSanityTest.class,
         LocalizedGMTOffsetTest.class,
         NumberSymbolTest.class,
