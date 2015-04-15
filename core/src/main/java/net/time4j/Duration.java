@@ -31,7 +31,6 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
-import net.time4j.format.ChronoFormatter;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
@@ -41,7 +40,6 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -166,14 +164,18 @@ public final class Duration<U extends IsoUnit>
     @SuppressWarnings("rawtypes")
     private static final Duration ZERO = new Duration();
 
-    private static final ChronoFormatter<?> CF_EXT_CAL =
-        createDateFormat(true, false);
-    private static final ChronoFormatter<?> CF_EXT_ORD =
-        createDateFormat(true, true);
-    private static final ChronoFormatter<?> CF_BAS_CAL =
-        createDateFormat(false, false);
-    private static final ChronoFormatter<?> CF_BAS_ORD =
-        createDateFormat(false, true);
+    private static final Duration.Formatter<CalendarUnit> CF_EXT_CAL =
+        createAlternativeDateFormat(true, false);
+    private static final Duration.Formatter<CalendarUnit> CF_EXT_ORD =
+        createAlternativeDateFormat(true, true);
+    private static final Duration.Formatter<CalendarUnit> CF_BAS_CAL =
+        createAlternativeDateFormat(false, false);
+    private static final Duration.Formatter<CalendarUnit> CF_BAS_ORD =
+        createAlternativeDateFormat(false, true);
+    private static final Duration.Formatter<ClockUnit> TF_EXT =
+        createAlternativeTimeFormat(true);
+    private static final Duration.Formatter<ClockUnit> TF_BAS =
+        createAlternativeTimeFormat(false);
 
     private static final
     Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
@@ -316,7 +318,7 @@ public final class Duration<U extends IsoUnit>
             this.items = Collections.unmodifiableList(items);
         }
 
-        this.negative = (empty ? false : negative);
+        this.negative = (!empty && negative);
 
     }
 
@@ -1245,7 +1247,7 @@ public final class Duration<U extends IsoUnit>
             MathUtils.safeSubtract(
                 MathUtils.safeMultiply(
                     absAmount,
-                    (amount < 0) ? - 1 : 1
+                    (amount < 0) ? -1 : 1
                 ),
                 MathUtils.safeMultiply(
                     oldAmount,
@@ -2286,7 +2288,7 @@ public final class Duration<U extends IsoUnit>
             U key = entry.getKey();
 
             if (amount == 0) {
-                continue;
+                // no-op
             } else if (key == MILLIS) {
                 nanos =
                     MathUtils.safeAdd(
@@ -2809,7 +2811,6 @@ public final class Duration<U extends IsoUnit>
     ) throws ParseException {
 
         boolean extended = false;
-        ChronoFormatter<?> fmt;
 
         if (date) {
             if (from + 4 < to) {
@@ -2819,20 +2820,16 @@ public final class Duration<U extends IsoUnit>
                 extended
                 ? (from + 8 == to)
                 : (from + 7 == to));
-            fmt = getDateFormat(extended, ordinalStyle);
-            ChronoEntity<?> entity = fmt.parseRaw(period, from);
-            if (!entity.contains(PlainDate.YEAR)) {
-                throw new ParseException(period, from);
-            }
-            int years = entity.get(PlainDate.YEAR).intValue();
-            int months = 0;
-            int days = 0;
+            Duration<?> dur = getAlternativeDateFormat(extended, ordinalStyle).parse(period, from);
+            long years = dur.getPartialAmount(YEARS);
+            long months = 0;
+            long days = 0;
             if (ordinalStyle) {
-                days = entity.get(PlainDate.DAY_OF_YEAR).intValue();
+                days = dur.getPartialAmount(DAYS);
                 // ISO does not specify any constraint here
             } else {
-                months = entity.get(PlainDate.MONTH_AS_NUMBER).intValue();
-                days = entity.get(PlainDate.DAY_OF_MONTH).intValue();
+                months = dur.getPartialAmount(MONTHS);
+                days = dur.getPartialAmount(DAYS);
                 if (months > 12) {
                     throw new ParseException(
                         "ISO-8601 prohibits months-part > 12: " + period,
@@ -2860,16 +2857,8 @@ public final class Duration<U extends IsoUnit>
             if (from + 2 < to) {
                 extended = (period.charAt(from + 2) == ':');
             }
-            if (extended) {
-                fmt = Iso8601Format.EXTENDED_WALL_TIME;
-            } else {
-                fmt = Iso8601Format.BASIC_WALL_TIME;
-            }
-            ChronoEntity<?> entity = fmt.parseRaw(period, from);
-            if (!entity.contains(PlainTime.ISO_HOUR)) {
-                throw new ParseException(period, from);
-            }
-            int hours = entity.get(PlainTime.ISO_HOUR).intValue();
+            Duration<?> dur = getAlternativeTimeFormat(extended).parse(period, from);
+            long hours = dur.getPartialAmount(HOURS);
             if (hours > 0) {
                 if (hours > 24) {
                     throw new ParseException(
@@ -2879,70 +2868,61 @@ public final class Duration<U extends IsoUnit>
                 U unit = cast(HOURS);
                 items.add(Item.of(hours, unit));
             }
-            int minutes = 0;
-            if (entity.contains(PlainTime.MINUTE_OF_HOUR)) {
-                minutes = entity.get(PlainTime.MINUTE_OF_HOUR).intValue();
+            long minutes = dur.getPartialAmount(MINUTES);
+            if (minutes > 0) {
                 if (minutes > 60) {
                     throw new ParseException(
                         "ISO-8601 prohibits minutes-part > 60: " + period,
                         from + 2 + (extended ? 1 : 0));
-                } else if (minutes > 0) {
-                    U unit = cast(MINUTES);
-                    items.add(Item.of(minutes, unit));
                 }
+                U unit = cast(MINUTES);
+                items.add(Item.of(minutes, unit));
             }
-            int seconds = 0;
-            if (entity.contains(PlainTime.SECOND_OF_MINUTE)) {
-                seconds = entity.get(PlainTime.SECOND_OF_MINUTE).intValue();
+            long seconds = dur.getPartialAmount(SECONDS);
+            if (seconds > 0) {
                 if (seconds > 60) {
                     throw new ParseException(
                         "ISO-8601 prohibits seconds-part > 60: " + period,
                         from + 4 + (extended ? 2 : 0));
-                } else if (seconds > 0) {
-                    U unit = cast(SECONDS);
-                    items.add(Item.of(seconds, unit));
                 }
+                U unit = cast(SECONDS);
+                items.add(Item.of(seconds, unit));
             }
-            int nanos = 0;
-            if (entity.contains(PlainTime.NANO_OF_SECOND)) {
-                nanos = entity.get(PlainTime.NANO_OF_SECOND).intValue();
-                if (nanos > 0) {
-                    U unit = cast(NANOS);
-                    items.add(Item.of(nanos, unit));
-                }
+            long nanos = dur.getPartialAmount(NANOS);
+            if (nanos > 0) {
+                U unit = cast(NANOS);
+                items.add(Item.of(nanos, unit));
             }
         }
 
     }
 
-    private static ChronoFormatter<?> createDateFormat(
+    private static Duration.Formatter<CalendarUnit> createAlternativeDateFormat(
         boolean extended,
         boolean ordinalStyle
     ) {
 
-        ChronoFormatter.Builder<PlainDate> builder =
-            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
-        builder.addFixedInteger(PlainDate.YEAR, 4);
+        String pattern;
 
         if (extended) {
-            builder.addLiteral('-');
-        }
-
-        if (ordinalStyle) {
-            builder.addFixedInteger(PlainDate.DAY_OF_YEAR, 3);
-        } else {
-            builder.addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2);
-            if (extended) {
-                 builder.addLiteral('-');
+            if (ordinalStyle) {
+                pattern = "YYYY-DDD";
+            } else {
+                pattern = "YYYY-MM-DD";
             }
-            builder.addFixedInteger(PlainDate.DAY_OF_MONTH, 2);
+        } else {
+            if (ordinalStyle) {
+                pattern = "YYYYDDD";
+            } else {
+                pattern = "YYYYMMDD";
+            }
         }
 
-        return builder.build();
+        return Duration.Formatter.ofPattern(CalendarUnit.class, pattern);
 
     }
 
-    private static ChronoFormatter<?> getDateFormat(
+    private static Duration.Formatter<CalendarUnit> getAlternativeDateFormat(
         boolean extended,
         boolean ordinalStyle
     ) {
@@ -2952,6 +2932,24 @@ public final class Duration<U extends IsoUnit>
         } else {
             return (ordinalStyle ? CF_BAS_ORD : CF_BAS_CAL);
         }
+
+    }
+
+    private static Duration.Formatter<ClockUnit> createAlternativeTimeFormat(boolean extended) {
+
+        String pattern = (
+            extended
+            ? "hh[:mm[:ss[,fffffffff]]]"
+            : "hh[mm[ss[,fffffffff]]]"
+        );
+
+        return Duration.Formatter.ofPattern(ClockUnit.class, pattern);
+
+    }
+
+    private static Duration.Formatter<ClockUnit> getAlternativeTimeFormat(boolean extended) {
+
+        return (extended ? TF_EXT : TF_BAS);
 
     }
 
@@ -3643,7 +3641,7 @@ public final class Duration<U extends IsoUnit>
      *  System.out.println(dur); // Ausgabe: -P2Y15DT30H5M
      * </pre>
      *
-     * <p>Second example (printing a wall-time-like duration): </p>
+     * <p>Zweites Beispiel (Ausgabe einer uhrzeit&auml;hnlichen Dauer): </p>
      *
      * <pre>
      *  Duration.Formatter&lt;ClockUnit&gt; f =
@@ -3680,6 +3678,15 @@ public final class Duration<U extends IsoUnit>
                 throw new NullPointerException("Missing unit type.");
             } else if (items.isEmpty()) {
             	throw new IllegalArgumentException("Missing format pattern.");
+            }
+
+            int n = items.size();
+            int reserved = items.get(n - 1).getMinWidth();
+
+            for (int i = n - 2; i >= 0; i--) {
+                FormatItem item = items.get(i);
+                items.set(i, item.update(reserved));
+                reserved += item.getMinWidth();
             }
 
             this.type = type;
@@ -3746,8 +3753,9 @@ public final class Duration<U extends IsoUnit>
          * <p>All letters in range a-z and A-Z are always reserved chars
          * and must be escaped by apostrophes for interpretation as literals.
          * If such a letter is repeated then the count of symbols controls
-         * the minimum width for formatted output. If necessary a number
-         * (of units) will be padded from left with the zero digt. </p>
+         * the minimum width for formatted output. Such a minimum width also
+         * reserves this area for parsing of any preceding item. If necessary a
+         * number (of units) will be padded from left with the zero digit. </p>
          *
          * <p>Optional sections let the parser be error-tolerant and continue
          * with the next section in case of errors. Since v2.3: During printing,
@@ -3826,9 +3834,10 @@ public final class Duration<U extends IsoUnit>
          * <p>Alle Buchstaben im Bereich a-z und A-Z sind grunds&auml;tzlich
          * reservierte Zeichen und m&uuml;ssen als Literale in Apostrophe
          * gefasst werden. Wird ein Buchstabensymbol mehrfach wiederholt,
-         * dann regelt die Anzahl der Symbole die Mindestbreite in der
-         * formatierten Ausgabe. Bei Bedarf wird eine Zahl (von Einheiten)
-         * von links mit der Nullziffer aufgef&uuml;llt. </p>
+         * dann regelt die Anzahl der Symbole die Mindestbreite in der formatierten
+         * Ausgabe. Solch eine Mindestbreite reserviert auch das zugeh&ouml;rige Element,
+         * wenn vorangehende Dauerelemente interpretiert werden. Bei Bedarf wird eine
+         * Zahl (von Einheiten) von links mit der Nullziffer aufgef&uuml;llt. </p>
          *
          * <p>Optionale Abschnitte regeln, da&szlig; der Interpretationsvorgang
          * bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
@@ -3927,11 +3936,9 @@ public final class Duration<U extends IsoUnit>
                 } else if (c == ',') {
                     lastOn(stack).add(new SeparatorItem(',', '.'));
                 } else if (c == '-') {
-                    lastOn(stack).add(
-                        new SignItem(SignPolicy.SHOW_WHEN_NEGATIVE));
+                    lastOn(stack).add(new SignItem(SignPolicy.SHOW_WHEN_NEGATIVE));
                 } else if (c == '+') {
-                    lastOn(stack).add(
-                        new SignItem(SignPolicy.SHOW_ALWAYS));
+                    lastOn(stack).add(new SignItem(SignPolicy.SHOW_ALWAYS));
                 } else if (c == '{') {
                     int start = ++i;
                     while ((i < n) && pattern.charAt(i) != '}') {
@@ -3963,7 +3970,7 @@ public final class Duration<U extends IsoUnit>
          * @return  String
          * @since   1.2
          */
-        /**
+        /*[deutsch]
          * <p>Liefert das zugrundeliegende Formatmuster. </p>
          *
          * @return  String
@@ -3981,7 +3988,7 @@ public final class Duration<U extends IsoUnit>
          * @return  Class
          * @since   1.2
          */
-        /**
+        /*[deutsch]
          * <p>Liefert den zugeh&ouml;rigen Zeiteinheitstyp. </p>
          *
          * @return  Class
@@ -4156,7 +4163,7 @@ public final class Duration<U extends IsoUnit>
         	List<FormatItem> items = stack.get(stack.size() - 1);
 
             if (symbol == 'f') {
-                items.add(new FractionItem(count));
+                items.add(new FractionItem(0, count));
             } else {
                 items.add(new NumberItem(count, unit));
             }
@@ -4301,8 +4308,7 @@ public final class Duration<U extends IsoUnit>
                     "Missing plural category OTHER: " + pluralInfo);
             }
 
-        	lastOn(stack).add(
-                new PluralItem(unit, parts[1], rules, pluralForms));
+        	lastOn(stack).add(new PluralItem(unit, parts[1], rules, pluralForms));
 
         }
 
@@ -4336,12 +4342,23 @@ public final class Duration<U extends IsoUnit>
 
     private abstract static class FormatItem {
 
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final int reserved;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        FormatItem(int reserved){
+            super();
+
+            this.reserved = reserved;
+
+        }
+
         //~ Methoden ------------------------------------------------------
 
         boolean isZero(Duration<?> duration) {
-
             return true;
-
         }
 
     	abstract void print(
@@ -4355,11 +4372,18 @@ public final class Duration<U extends IsoUnit>
     		int pos
     	);
 
+        int getReserved() {
+            return this.reserved;
+        }
+
+        abstract int getMinWidth();
+
+        abstract FormatItem update(int reserved);
+
     }
 
     private static class NumberItem
     	extends FormatItem {
-
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -4368,11 +4392,20 @@ public final class Duration<U extends IsoUnit>
 
         //~ Konstruktoren -------------------------------------------------
 
+        private NumberItem(
+            int minWidth,
+            IsoUnit unit
+        ) {
+            this(0, minWidth, unit);
+
+        }
+
     	private NumberItem(
+            int reserved,
     		int minWidth,
     		IsoUnit unit
     	) {
-    		super();
+    		super(reserved);
 
     		if (minWidth < 1 || minWidth > 18) {
     			throw new IllegalArgumentException(
@@ -4414,7 +4447,7 @@ public final class Duration<U extends IsoUnit>
 			long total = 0;
 			int pos = start;
 
-			for (int i = start, n = text.length(); i < n; i++) {
+			for (int i = start, n = text.length() - this.getReserved(); i < n; i++) {
 				char c = text.charAt(i);
 				if ((c >= '0') && (c <= '9')) {
 					if (i - start >= 18) {
@@ -4444,6 +4477,20 @@ public final class Duration<U extends IsoUnit>
 		}
 
         @Override
+        int getMinWidth() {
+
+            return this.minWidth;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new NumberItem(reserved, this.minWidth, this.unit);
+
+        }
+
+        @Override
         boolean isZero(Duration<?> duration) {
 
             return (this.getAmount(duration) == 0);
@@ -4467,15 +4514,17 @@ public final class Duration<U extends IsoUnit>
     private static class FractionItem
 		extends FormatItem {
 
-
 	    //~ Instanzvariablen ----------------------------------------------
 
     	private final int width;
 
 	    //~ Konstruktoren -------------------------------------------------
 
-		private FractionItem(int width) {
-			super();
+		private FractionItem(
+            int reserved,
+            int width
+        ) {
+			super(reserved);
 
     		if (width < 1 || width > 9) {
     			throw new IllegalArgumentException(
@@ -4525,7 +4574,7 @@ public final class Duration<U extends IsoUnit>
 			int pos = start;
 
 			for (
-                int i = start, n = Math.min(text.length(), start + this.width);
+                int i = start, n = Math.min(text.length() - this.getReserved(), start + this.width);
                 i < n;
                 i++
             ) {
@@ -4558,6 +4607,20 @@ public final class Duration<U extends IsoUnit>
 		}
 
         @Override
+        int getMinWidth() {
+
+            return this.width;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new FractionItem(reserved, width);
+
+        }
+
+        @Override
         boolean isZero(Duration<?> duration) {
 
             return (duration.getPartialAmount(NANOS) == 0);
@@ -4575,6 +4638,7 @@ public final class Duration<U extends IsoUnit>
         private final FormatItem sepItem;
     	private final PluralRules rules;
     	private final Map<PluralCategory, String> pluralForms;
+        private final int minWidth;
 
 	    //~ Konstruktoren -------------------------------------------------
 
@@ -4584,16 +4648,44 @@ public final class Duration<U extends IsoUnit>
 			PluralRules rules,
 			Map<PluralCategory, String> pluralForms
 	    ) {
-			super();
+			super(0);
 
             this.numItem = new NumberItem(1, unit);
             this.sepItem = new LiteralItem(separator, true);
 			this.rules = rules;
 			this.pluralForms = pluralForms;
 
+            int width = Integer.MAX_VALUE;
+
+            for (String s : pluralForms.values()) {
+                if (s.length() < width) {
+                    width = s.length();
+                }
+            }
+
+            this.minWidth = width;
+
 		}
 
-	    //~ Methoden ------------------------------------------------------
+        private PluralItem(
+            int reserved,
+            NumberItem numItem,
+            FormatItem sepItem,
+            PluralRules rules,
+            Map<PluralCategory, String> pluralForms,
+            int minWidth
+        ) {
+            super(reserved);
+
+            this.numItem = numItem;
+            this.sepItem = sepItem;
+            this.rules = rules;
+            this.pluralForms = pluralForms;
+            this.minWidth = minWidth;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
 
 		@Override
 		void print(
@@ -4633,6 +4725,10 @@ public final class Duration<U extends IsoUnit>
             String s = this.pluralForms.get(this.rules.getCategory(value));
             int n = s.length();
 
+            if (pos + n > text.length() - this.getReserved()) {
+                return ~start;
+            }
+
             for (int i = 0; i < n; i++) {
                 if (s.charAt(i) != text.charAt(pos + i)) {
                     return ~start;
@@ -4640,6 +4736,20 @@ public final class Duration<U extends IsoUnit>
             }
 
             return pos + n;
+
+        }
+
+        @Override
+        int getMinWidth() {
+
+            return this.minWidth;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new PluralItem(reserved, this.numItem, this.sepItem, this.rules, this.pluralForms, this.minWidth);
 
         }
 
@@ -4655,7 +4765,6 @@ public final class Duration<U extends IsoUnit>
     private static class SeparatorItem
 		extends FormatItem {
 
-
 	    //~ Instanzvariablen ----------------------------------------------
 
     	private final char separator;
@@ -4663,11 +4772,20 @@ public final class Duration<U extends IsoUnit>
 
 	    //~ Konstruktoren -------------------------------------------------
 
+        private SeparatorItem(
+            char separator,
+            char alt
+        ) {
+            this(0, separator, alt);
+
+        }
+
 		private SeparatorItem(
+            int reserved,
 			char separator,
 			char alt
 	    ) {
-			super();
+			super(reserved);
 
 			this.separator = separator;
 			this.alt = alt;
@@ -4693,7 +4811,7 @@ public final class Duration<U extends IsoUnit>
             int start
         ) {
 
-			if (start >= text.length()) {
+			if (start >= text.length() - this.getReserved()) {
                 return ~start; // end of text
             }
 
@@ -4707,11 +4825,24 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
-	}
+        @Override
+        int getMinWidth() {
+
+            return 1;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new SeparatorItem(reserved, this.separator, this.alt);
+
+        }
+
+    }
 
     private static class LiteralItem
 		extends FormatItem {
-
 
 	    //~ Instanzvariablen ----------------------------------------------
 
@@ -4728,7 +4859,7 @@ public final class Duration<U extends IsoUnit>
             String literal,
             boolean withEmpty
         ) {
-			super();
+			super(0);
 
 			if (!withEmpty && literal.isEmpty()) {
 				throw new IllegalArgumentException("Literal is empty.");
@@ -4738,7 +4869,17 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
-	    //~ Methoden ------------------------------------------------------
+        private LiteralItem(
+            int reserved,
+            String literal
+        ) {
+            super(reserved);
+
+            this.literal = literal;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
 
 		@Override
 		void print(
@@ -4759,7 +4900,7 @@ public final class Duration<U extends IsoUnit>
 
             int end = start + this.literal.length();
 
-            if (end > text.length()) {
+            if (end > text.length() - this.getReserved()) {
                 return ~start; // end of line
             }
 
@@ -4773,11 +4914,24 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
-	}
+        @Override
+        int getMinWidth() {
+
+            return this.literal.length();
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new LiteralItem(reserved, this.literal);
+
+        }
+
+    }
 
     private static class SignItem
 		extends FormatItem {
-
 
 	    //~ Instanzvariablen ----------------------------------------------
 
@@ -4786,17 +4940,30 @@ public final class Duration<U extends IsoUnit>
 	    //~ Konstruktoren -------------------------------------------------
 
 		private SignItem(SignPolicy policy) {
-			super();
+			super(0);
 
-			if (policy == null) {
-				throw new NullPointerException("Missing sign policy.");
-			}
-
-			this.policy = policy;
+            switch (policy) {
+                case SHOW_WHEN_NEGATIVE:
+                case SHOW_ALWAYS:
+                    this.policy = policy;
+                    break;
+                default:
+                    throw new UnsupportedOperationException(policy.name());
+            }
 
 		}
 
-	    //~ Methoden ------------------------------------------------------
+        private SignItem(
+            int reserved,
+            SignPolicy policy
+        ) {
+            super(reserved);
+
+            this.policy = policy;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
 
 		@Override
 		void print(
@@ -4826,7 +4993,7 @@ public final class Duration<U extends IsoUnit>
             int start
         ) {
 
-			if (start >= text.length()) {
+			if (start >= text.length() - this.getReserved()) {
 				if (this.policy == SignPolicy.SHOW_ALWAYS) {
 					return ~start; // sign expected
 				} else {
@@ -4875,11 +5042,24 @@ public final class Duration<U extends IsoUnit>
 
 		}
 
-	}
+        @Override
+        int getMinWidth() {
+
+            return ((this.policy == SignPolicy.SHOW_ALWAYS) ? 1 : 0);
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return new SignItem(reserved, this.policy);
+
+        }
+
+    }
 
     private static class OptionalSectionItem
 		extends FormatItem {
-
 
 	    //~ Instanzvariablen ----------------------------------------------
 
@@ -4888,18 +5068,18 @@ public final class Duration<U extends IsoUnit>
 	    //~ Konstruktoren -------------------------------------------------
 
     	private OptionalSectionItem(List<FormatItem> items) {
-			super();
+			super(0);
 
 			if (items.isEmpty()) {
 				throw new IllegalArgumentException(
                     "Optional section is empty.");
 			}
 
-			this.items = items;
+			this.items = Collections.unmodifiableList(items);
 
 		}
 
-	    //~ Methoden ------------------------------------------------------
+        //~ Methoden ------------------------------------------------------
 
 		@Override
 		void print(
@@ -4939,6 +5119,29 @@ public final class Duration<U extends IsoUnit>
 			return pos;
 
 		}
+
+        @Override
+        int getMinWidth() {
+
+            return 0;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            List<FormatItem> tmp = new ArrayList<FormatItem>(this.items);
+            int n = tmp.size();
+
+            for (int i = n - 1; i >= 0; i--) {
+                FormatItem item = tmp.get(i);
+                tmp.set(i, item.update(reserved));
+                reserved += item.getMinWidth();
+            }
+
+            return new OptionalSectionItem(tmp);
+
+        }
 
         @Override
         boolean isZero(Duration<?> duration) {
