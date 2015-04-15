@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PredefinedKey.java) is part of project Time4J.
  *
@@ -27,9 +27,9 @@ import net.time4j.engine.AttributeKey;
 /**
  * <p>Repr&auml;sentiert einen vordefinierten Attributschl&uuml;ssel. </p>
  *
- * @param       <A> generic type of associated attribute values
- * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @param   <A> generic type of associated attribute values
+ * @author  Meno Hochschild
+ * @doctags.concurrency <immutable>
  */
 final class PredefinedKey<A>
     implements AttributeKey<A> {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarType.java) is part of project Time4J.
  *
@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
 
 /**
  * <p>This {@code Annotation} can be used to mark all types of {@code ChronoEntity}
- * which need formatted representations and access to text resource dependent on
+ * which need formatted representations and access to text resources dependent on
  * a calendar system. </p>
  *
  * @author  Meno Hochschild
