@@ -688,8 +688,8 @@ public class PrettyTimeTest {
         @SuppressWarnings("unchecked")
         public <T extends ChronoEntity<T>> UnitRule<T> derive(Chronology<T> c) {
 
-            if (c == PlainTimestamp.axis()) {
-                UnitRule<PlainTimestamp> rule =
+            if (c.equals(PlainTimestamp.axis())) {
+                Object rule =
                     new UnitRule<PlainTimestamp>() {
                         @Override
                         public PlainTimestamp addTo(
