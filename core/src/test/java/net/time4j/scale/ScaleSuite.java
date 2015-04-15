@@ -15,7 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MomentPropertiesTest.class,
         NextLeapSecondTest.class,
         TimeScaleTest.class,
-        ZonalMomentTest.class
+        ZonalDateTimeTest.class
     }
 )
 public class ScaleSuite {

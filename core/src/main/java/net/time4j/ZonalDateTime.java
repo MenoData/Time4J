@@ -1,8 +1,8 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (ZonalMoment.java) is part of project Time4J.
+ * This file (ZonalDateTime.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -26,18 +26,16 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
-import net.time4j.format.ChronoFormatter;
-import net.time4j.format.ChronoParser;
-import net.time4j.format.ChronoPrinter;
-import net.time4j.format.ParseLog;
+import net.time4j.format.RawValues;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
-import java.io.IOException;
 import java.text.ParseException;
+import java.text.ParsePosition;
 
 import static net.time4j.PlainTime.SECOND_OF_MINUTE;
 import static net.time4j.format.Attributes.TIMEZONE_ID;
@@ -55,13 +53,13 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * <pre>
  *  Moment moment = ...;
- *  ZonalMoment zm = moment.inLocalView();
+ *  ZonalDateTime zdt = moment.inLocalView();
  *
  *  // manipulation on local timeline
- *  PlainTimestamp localTSP = zm.toTimestamp().plus(30, ClockUnit.SECONDS);
+ *  PlainTimestamp localTSP = zdt.toTimestamp().plus(30, ClockUnit.SECONDS);
  *
  *  // manipulation on global timeline
- *  Moment globalTSP = zm.toMoment().plus(30, SI.SECONDS);
+ *  Moment globalTSP = zdt.toMoment().plus(30, SI.SECONDS);
  * </pre>
  *
  * @author  Meno Hochschild
@@ -86,13 +84,13 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * <pre>
  *  Moment moment = ...;
- *  ZonalMoment zm = moment.inLocalView();
+ *  ZonalDateTime zdt = moment.inLocalView();
  *
- *  // Manipulation auf dem lokalen Zeitstrahl
- *  PlainTimestamp localTSP = zm.toTimestamp().plus(30, ClockUnit.SECONDS);
+ *  // manipulation on local timeline
+ *  PlainTimestamp localTSP = zdt.toTimestamp().plus(30, ClockUnit.SECONDS);
  *
- *  // Manipulation auf dem globalen Zeitstrahl
- *  Moment globalTSP = zm.toMoment().plus(30, SI.SECONDS);
+ *  // manipulation on global timeline
+ *  Moment globalTSP = zdt.toMoment().plus(30, SI.SECONDS);
  * </pre>
  *
  * @author  Meno Hochschild
@@ -104,7 +102,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inZonalView(String)
  * @see     TemporalType#XML_DATE_TIME_OFFSET
  */
-public final class ZonalMoment
+public final class ZonalDateTime
     implements ChronoDisplay, UniversalTime {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -125,7 +123,7 @@ public final class ZonalMoment
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private ZonalMoment(
+    private ZonalDateTime(
         Moment moment,
         Timezone tz
     ) {
@@ -151,7 +149,7 @@ public final class ZonalMoment
 
     }
 
-    private ZonalMoment(
+    private ZonalDateTime(
         PlainTimestamp tsp,
         ZonalOffset offset
     ) {
@@ -170,16 +168,16 @@ public final class ZonalMoment
      *
      * @param   moment          global timestamp
      * @param   tz              timezone
-     * @returns ZonalMoment
+     * @return  ZonalDateTime
      * @throws  IllegalArgumentException if leapsecond shall be formatted
      *          with non-full-minute-timezone-offset
      */
-    static ZonalMoment of(
+    static ZonalDateTime of(
         Moment moment,
         Timezone tz
     ) {
 
-        return new ZonalMoment(moment, tz);
+        return new ZonalDateTime(moment, tz);
 
     }
 
@@ -188,14 +186,14 @@ public final class ZonalMoment
      *
      * @param   tsp             zonal timestamp
      * @param   offset          timezone offset
-     * @returns ZonalMoment
+     * @return  ZonalDateTime
      */
-    static ZonalMoment of(
+    static ZonalDateTime of(
         PlainTimestamp tsp,
         ZonalOffset offset
     ) {
 
-        return new ZonalMoment(tsp, offset);
+        return new ZonalDateTime(tsp, offset);
 
     }
 
@@ -385,74 +383,62 @@ public final class ZonalMoment
      *
      * @param   printer     helps to format this instance
      * @return  formatted string
-     * @since   2.0
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
      * @param   printer     helps to format this instance
      * @return  formatted string
-     * @since   2.0
+     * @since   3.0
      */
-    public String print(ChronoPrinter<Moment> printer) {
+    public String print(TemporalFormatter<Moment> printer) {
 
-        AttributeQuery aq = new ZOM(this, getAttributes(printer));
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            printer.print(this.moment, sb, aq, NO_RESULT);
-        } catch (IOException ex) {
-            throw new AssertionError(ex); // never happen
-        }
-
-        return sb.toString();
+        return printer.withTimezone(this.getTimezone()).format(this.moment);
 
     }
 
     /**
-     * <p>Parses given text to a {@code ZonalMoment}. </p>
+     * <p>Parses given text to a {@code ZonalDateTime}. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
+     * @since   3.0
      */
     /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als {@code ZonalMoment}. </p>
+     * <p>Interpretiert den angegebenen Text als {@code ZonalDateTime}. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
      * @return  parsed zonal moment
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
+     * @since   3.0
      */
-    public static ZonalMoment parse(
+    public static ZonalDateTime parse(
         String text,
-        ChronoParser<Moment> parser
+        TemporalFormatter<Moment> parser
     ) throws ParseException {
 
-        ParseLog plog = new ParseLog();
-        AttributeQuery aq = getAttributes(parser);
-        Moment moment = parser.parse(text, plog, aq);
+        ParsePosition pos = new ParsePosition(0);
+        RawValues rawValues = new RawValues();
+        Moment moment = parser.parse(text, pos, rawValues);
         Timezone tz;
 
         if (moment == null) {
-            throw new ParseException(
-                plog.getErrorMessage(),
-                plog.getErrorIndex()
-            );
-        } else if (plog.getRawValues().hasTimezone()) {
-            tz = toTimezone(plog.getRawValues().getTimezone(), text);
-        } else if (aq.contains(TIMEZONE_ID)) {
-            tz = toTimezone(aq.get(TIMEZONE_ID), text);
+            throw new ParseException("Cannot parse: " + text, pos.getErrorIndex());
+        } else if (rawValues.get().hasTimezone()) {
+            tz = toTimezone(rawValues.get().getTimezone(), text);
+        } else if (parser.getAttributes().contains(TIMEZONE_ID)) {
+            tz = toTimezone(parser.getAttributes().get(TIMEZONE_ID), text);
         } else {
             throw new ParseException("Missing timezone: " + text, 0);
         }
 
-        return ZonalMoment.of(moment, tz);
+        return ZonalDateTime.of(moment, tz);
 
     }
 
@@ -461,8 +447,8 @@ public final class ZonalMoment
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof ZonalMoment) {
-            ZonalMoment that = (ZonalMoment) obj;
+        } else if (obj instanceof ZonalDateTime) {
+            ZonalDateTime that = (ZonalDateTime) obj;
             return (
                 this.moment.equals(that.moment)
                 && this.zone.equals(that.zone)
@@ -481,26 +467,38 @@ public final class ZonalMoment
     }
 
     /**
-     * <p>Uses {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}. </p>
+     * <p>Yields a canonical representation in ISO-like-style. </p>
      *
      * @return  String
      */
     /*[deutsch]
-     * <p>Verwendet {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}. </p>
+     * <p>Liefert eine kanonische Darstellung &auml;hnlich zu ISO-8601. </p>
      *
      * @return  String
      */
     @Override
     public String toString() {
 
-        return this.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+        StringBuilder sb = new StringBuilder(40);
+        sb.append(this.timestamp);
+        sb.append(this.getOffset().canonical());
+        TZID tzid = this.getTimezone();
+        boolean offset = (tzid instanceof ZonalOffset);
+
+        if (!offset) {
+            sb.append('[');
+            sb.append(tzid.canonical());
+            sb.append(']');
+        }
+
+        return sb.toString();
 
     }
 
     private static AttributeQuery getAttributes(Object obj) {
 
-        if (obj instanceof ChronoFormatter) {
-            return ChronoFormatter.class.cast(obj).getDefaultAttributes();
+        if (obj instanceof TemporalFormatter) {
+            return TemporalFormatter.class.cast(obj).getAttributes();
         } else {
             return Attributes.empty();
         }

@@ -97,8 +97,8 @@ public class TemporalTypeTest {
         String xml = "2012-06-30T23:59:60.123456789Z";
         XMLGregorianCalendar cal =
             DatatypeFactory.newInstance().newXMLGregorianCalendar(xml);
-        ZonalMoment expected =
-            ZonalMoment.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+        ZonalDateTime expected =
+            ZonalDateTime.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
         assertThat(
             TemporalType.XML_DATE_TIME_OFFSET.translate(cal),
             is(expected));
@@ -110,8 +110,8 @@ public class TemporalTypeTest {
             DatatypeFactory.newInstance()
                 .newXMLGregorianCalendar(2012, 6, 30, 23, 59, 60, 123, 0);
         String xml = "2012-06-30T23:59:60.123Z";
-        ZonalMoment zm =
-            ZonalMoment.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+        ZonalDateTime zm =
+            ZonalDateTime.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
         assertThat(
             TemporalType.XML_DATE_TIME_OFFSET.from(zm),
             is(expected));

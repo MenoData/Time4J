@@ -5,7 +5,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.ZonalMoment;
+import net.time4j.ZonalDateTime;
 import net.time4j.format.ChronoFormatter;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class ZonalMomentTest {
+public class ZonalDateTimeTest {
 
     @Test
     public void toMoment() {
@@ -58,7 +58,7 @@ public class ZonalMomentTest {
         ChronoFormatter<Moment> formatter =
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
         assertThat(
-            ZonalMoment.parse("2012-07-01T08:59:60+09:00", formatter),
+            ZonalDateTime.parse("2012-07-01T08:59:60+09:00", formatter),
             is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
     }
 
