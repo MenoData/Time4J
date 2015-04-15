@@ -19,9 +19,11 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j;
+package net.time4j.format.platform;
 
+import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondProvider;
 
 import java.io.BufferedReader;
@@ -33,7 +35,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static net.time4j.Iso8601Format.EXTENDED_CALENDAR_DATE;
 import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
 
 
@@ -58,7 +59,7 @@ public final class DefaultLeapSecondProviderSPI
     public DefaultLeapSecondProviderSPI() {
         super();
 
-        PlainDate tmpExpires = PlainDate.MIN;
+        PlainDate tmpExpires = PlainDate.axis().getMinimum();
         this.table = new LinkedHashMap<GregorianDate, Integer>(50);
         InputStream is = null;
         String name = PATH_TO_LEAPSECONDS;
@@ -76,6 +77,7 @@ public final class DefaultLeapSecondProviderSPI
         if (is != null) {
 
             this.source = cl.getResource(name).toString();
+            TemporalFormatter<PlainDate> f = PlainDate.localFormatter("yyyy-MM-dd", Platform.PATTERN);
 
             try {
 
@@ -91,7 +93,7 @@ public final class DefaultLeapSecondProviderSPI
                         continue; // Kommentarzeile überspringen
                     } else if (line.startsWith("@expires=")) {
                         String date = line.substring(9);
-                        tmpExpires = EXTENDED_CALENDAR_DATE.parse(date);
+                        tmpExpires = f.parse(date);
                         continue;
                     }
 
