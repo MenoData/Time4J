@@ -23,8 +23,8 @@ package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.format.Attributes;
-import net.time4j.format.ChronoParser;
-import net.time4j.format.ParseLog;
+import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.ParseLog;
 
 
 enum FixedNumParser

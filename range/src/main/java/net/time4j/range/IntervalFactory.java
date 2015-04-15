@@ -25,7 +25,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
-import net.time4j.format.ParseLog;
+import net.time4j.format.expert.ParseLog;
 
 import java.util.Set;
 

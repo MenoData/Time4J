@@ -24,7 +24,7 @@ package net.time4j.range;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
-import net.time4j.format.ChronoPrinter;
+import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
 

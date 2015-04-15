@@ -1,10 +1,10 @@
 package net.time4j.tz.other;
 
-import net.time4j.Iso8601Format;
 import net.time4j.Moment;
-import net.time4j.PatternType;
 import net.time4j.SystemClock;
-import net.time4j.format.ChronoFormatter;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -142,11 +142,9 @@ public class WindowsZoneTest {
     @Test
     public void parseName() throws ParseException {
         ChronoFormatter<Moment> formatter =
-            Moment.formatter(
-                "uuuu-MM-dd'T'HH:mm:ss.SSSzzzz",
-                PatternType.CLDR,
-                Locale.FRANCE,
-                Timezone.of("America/New_York").getID());
+            ChronoFormatter.setUp(Moment.class, Locale.FRANCE)
+                .addPattern("uuuu-MM-dd'T'HH:mm:ss.SSSzzzz", PatternType.CLDR).build()
+                .withTimezone("America/New_York");
         String input = "2012-07-01T01:59:60.123Romance Standard Time";
         String v = "2012-06-30T23:59:60,123000000Z";
         Moment leapsecond = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(v);

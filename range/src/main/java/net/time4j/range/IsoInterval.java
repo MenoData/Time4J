@@ -27,8 +27,8 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
-import net.time4j.format.ChronoFormatter;
-import net.time4j.format.ChronoPrinter;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
 
@@ -1609,7 +1609,7 @@ public abstract class IsoInterval
 
         if (obj instanceof ChronoFormatter) {
             ChronoFormatter<?> fmt = ChronoFormatter.class.cast(obj);
-            return fmt.getDefaultAttributes();
+            return fmt.getAttributes();
         } else {
             return Attributes.empty();
         }

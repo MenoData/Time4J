@@ -1,13 +1,14 @@
 package net.time4j.range;
 
-import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 import net.time4j.format.Attributes;
-import net.time4j.format.ChronoFormatter;
-import net.time4j.format.ParseLog;
 
 import java.text.ParseException;
 import java.util.Locale;
+
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.ParseLog;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -242,7 +243,7 @@ public class DateIntervalFormatTest {
                     .build(),
                 BracketPolicy.SHOW_ALWAYS,
                 PlainDate.axis()
-            ).parse("[20140227/0514]", plog, formatter.getDefaultAttributes()),
+            ).parse("[20140227/0514]", plog, formatter.getAttributes()),
             is(interval));
     }
 

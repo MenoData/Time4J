@@ -36,7 +36,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.TemporalType;
-import net.time4j.ZonalMoment;
+import net.time4j.ZonalDateTime;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.LeapSeconds;
@@ -191,7 +191,7 @@ public abstract class XMLAdapter<S, T>
 
     /**
      * <p>Bridge between a XML-timestamp according to {@code xsd:dateTime}
-     * inclusive timezone-offset and the type {@code ZonalMoment}. </p>
+     * inclusive timezone-offset and the type {@code ZonalDateTime}. </p>
      *
      * <p>Example: </p>
      *
@@ -199,8 +199,8 @@ public abstract class XMLAdapter<S, T>
      *  XMLGregorianCalendar xmlGregCal =
      *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
      *          2014, 2, 28, 14, 45, 30, 0, 60);
-     *  ZonalMoment zm = XMLAdapter.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
-     *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
+     *  ZonalDateTime zdt = XMLAdapter.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
+     *  System.out.println(zdt.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
      *  // output: 2014-02-28T14:45:30+01:00
      * </pre>
      *
@@ -209,7 +209,7 @@ public abstract class XMLAdapter<S, T>
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
      * {@code xsd:dateTime} inklusive Zeitzonen-Offset und dem Typ
-     * {@code ZonalMoment}. </p>
+     * {@code ZonalDateTime}. </p>
      *
      * <p>Beispiel: </p>
      *
@@ -217,14 +217,14 @@ public abstract class XMLAdapter<S, T>
      *  XMLGregorianCalendar xmlGregCal =
      *      DatatypeFactory.newInstance().newXMLGregorianCalendar(
      *          2014, 2, 28, 14, 45, 30, 0, 60);
-     *  ZonalMoment zm = XMLAdapter.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
-     *  System.out.println(zm.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
+     *  ZonalDateTime zdt = XMLAdapter.XML_DATE_TIME_OFFSET.translate(xmlGregCal);
+     *  System.out.println(zdt.print(Iso8601Format.EXTENDED_DATE_TIME_OFFSET));
      *  // Ausgabe: 2014-02-28T14:45:30+01:00
      * </pre>
      *
      * @since   2.4
      */
-    public static final XMLAdapter<XMLGregorianCalendar, ZonalMoment> XML_DATE_TIME_OFFSET =
+    public static final XMLAdapter<XMLGregorianCalendar, ZonalDateTime> XML_DATE_TIME_OFFSET =
         new XmlDateTimeOffsetRule();
 
     /**
@@ -497,12 +497,12 @@ public abstract class XMLAdapter<S, T>
     }
 
     private static class XmlDateTimeOffsetRule
-        extends XMLAdapter<XMLGregorianCalendar, ZonalMoment> {
+        extends XMLAdapter<XMLGregorianCalendar, ZonalDateTime> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public ZonalMoment translate(XMLGregorianCalendar source) {
+        public ZonalDateTime translate(XMLGregorianCalendar source) {
 
             PlainTimestamp tsp = XML_TIMESTAMP.translate(source, true);
             int offsetMins = source.getTimezone();
@@ -532,7 +532,7 @@ public abstract class XMLAdapter<S, T>
         }
 
         @Override
-        public XMLGregorianCalendar from(ZonalMoment zm) {
+        public XMLGregorianCalendar from(ZonalDateTime zm) {
 
             ZonalOffset offset = zm.getOffset();
             int tz = offset.getIntegralAmount() / 60;
@@ -542,7 +542,7 @@ public abstract class XMLAdapter<S, T>
             } catch (IllegalArgumentException iae) {
                 if (zm.isLeapSecond()) {
                     // some XML-implementations are not conform to XML-Schema
-                    ZonalMoment pm =
+                    ZonalDateTime pm =
                         zm.toMoment().minus(1, SI.SECONDS).inZonalView(offset);
                     return toXML(pm, tz);
                 } else {

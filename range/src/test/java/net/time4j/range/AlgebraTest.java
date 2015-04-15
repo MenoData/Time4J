@@ -2,11 +2,12 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
-import net.time4j.Iso8601Format;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
+
+import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

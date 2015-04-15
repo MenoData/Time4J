@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import net.time4j.Duration;
-import net.time4j.Iso8601Format;
 import net.time4j.IsoUnit;
-import net.time4j.ZonalMoment;
+import net.time4j.ZonalDateTime;
+import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -24,8 +24,8 @@ public class XMLAdapterTest {
         String xml = "2012-06-30T23:59:60.123456789Z";
         XMLGregorianCalendar cal =
             DatatypeFactory.newInstance().newXMLGregorianCalendar(xml);
-        ZonalMoment expected =
-            ZonalMoment.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+        ZonalDateTime expected =
+            ZonalDateTime.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
         assertThat(
             XMLAdapter.XML_DATE_TIME_OFFSET.translate(cal),
             is(expected));
@@ -37,8 +37,8 @@ public class XMLAdapterTest {
             DatatypeFactory.newInstance()
                 .newXMLGregorianCalendar(2012, 6, 30, 23, 59, 60, 123, 0);
         String xml = "2012-06-30T23:59:60.123Z";
-        ZonalMoment zm =
-            ZonalMoment.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
+        ZonalDateTime zm =
+            ZonalDateTime.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
         assertThat(
             XMLAdapter.XML_DATE_TIME_OFFSET.from(zm),
             is(expected));

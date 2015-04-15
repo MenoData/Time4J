@@ -28,7 +28,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
-import net.time4j.format.ParseLog;
+import net.time4j.format.expert.ParseLog;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;

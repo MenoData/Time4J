@@ -23,11 +23,11 @@ package net.time4j.range;
 
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
-import net.time4j.Iso8601Format;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeLine;
-import net.time4j.format.ChronoParser;
-import net.time4j.format.ParseLog;
+import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.ParseLog;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;

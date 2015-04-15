@@ -22,13 +22,14 @@
 package net.time4j.clock;
 
 import net.time4j.Moment;
-import net.time4j.PatternType;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.format.Attributes;
-import net.time4j.format.ChronoParser;
-import net.time4j.format.ParseLog;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.PatternType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.text.ParseException;
+import java.util.Locale;
 
 
 /**
@@ -73,9 +75,9 @@ public class DaytimeClock
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final ChronoParser<PlainDate> MJD_PARSER =
-        PlainDate.localFormatter("ggggg", PatternType.CLDR);
+        ChronoFormatter.setUp(PlainDate.class, Locale.ROOT).addPattern("ggggg", PatternType.CLDR).build();
     private static final ChronoParser<PlainTime> TIME_PARSER =
-        PlainTime.localFormatter("HH:mm:ss", PatternType.CLDR);
+        ChronoFormatter.setUp(PlainTime.class, Locale.ROOT).addPattern("HH:mm:ss", PatternType.CLDR).build();
 
     private static final ChronoParser<Moment> NIST_PARSER =
         new ChronoParser<Moment>() {

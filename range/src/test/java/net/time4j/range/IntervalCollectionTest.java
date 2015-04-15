@@ -604,7 +604,7 @@ public class IntervalCollectionTest {
             .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
             .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
-            DateInterval.since(PlainDate.of(2010, 06, 30));
+            DateInterval.since(PlainDate.of(2010, 6, 30));
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
             .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
