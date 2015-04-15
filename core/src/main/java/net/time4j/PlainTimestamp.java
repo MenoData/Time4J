@@ -46,9 +46,10 @@ import net.time4j.engine.TimeSpan;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.Leniency;
+import net.time4j.format.TemporalFormatter;
+import net.time4j.format.TextElement;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -205,7 +206,7 @@ public final class PlainTimestamp
      * Kalenders. </p>
      */
     @FormattableElement(format = "G")
-    static final ChronoElement<SimpleEra> ERA =
+    static final TextElement<SimpleEra> ERA =
         new EnumElement<SimpleEra>(
             "SIMPLE_ERA_IN_TSP",
             SimpleEra.class,
@@ -788,39 +789,32 @@ public final class PlainTimestamp
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing plain timestamps. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTimestamp}-objects
      *          using system locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTimestamp}-objects
      *          using system locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
-    public static ChronoFormatter<PlainTimestamp> localFormatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTimestamp> localFormatter(
         String formatPattern,
-        ChronoPattern patternType
+        F patternType
     ) {
 
-        return ChronoFormatter
-            .setUp(PlainTimestamp.class, Locale.getDefault())
-            .addPattern(formatPattern, patternType)
-            .build();
+        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, Locale.getDefault());
 
     }
 
@@ -828,42 +822,35 @@ public final class PlainTimestamp
      * <p>Creates a new formatter which uses the given pattern and locale
      * for formatting and parsing plain timestamps. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using given locale
+     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
+     * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using given locale
+     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
+     * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
      */
-    public static ChronoFormatter<PlainTimestamp> formatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTimestamp> formatter(
         String formatPattern,
-        ChronoPattern patternType,
+        F patternType,
         Locale locale
     ) {
 
-        return ChronoFormatter
-            .setUp(PlainTimestamp.class, locale)
-            .addPattern(formatPattern, patternType)
-            .build();
+        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, locale);
 
     }
 

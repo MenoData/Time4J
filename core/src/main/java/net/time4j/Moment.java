@@ -42,11 +42,10 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
-import net.time4j.format.TextWidth;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondEvent;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
@@ -62,8 +61,8 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -76,10 +75,7 @@ import java.util.concurrent.TimeUnit;
 import static net.time4j.PlainTime.*;
 import static net.time4j.SI.NANOSECONDS;
 import static net.time4j.SI.SECONDS;
-import static net.time4j.scale.TimeScale.GPS;
-import static net.time4j.scale.TimeScale.POSIX;
-import static net.time4j.scale.TimeScale.TAI;
-import static net.time4j.scale.TimeScale.UTC;
+import static net.time4j.scale.TimeScale.*;
 
 
 /**
@@ -198,7 +194,7 @@ public final class Moment
     private static final Moment MIN = new Moment(MIN_LIMIT, 0, POSIX);
     private static final Moment MAX = new Moment(MAX_LIMIT, MRD - 1, POSIX);
 
-    private static final ChronoFormatter<Moment> FORMATTER_RFC_1123;
+    private static final TemporalFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
         new Moment(86400 + POSIX_UTC_DELTA, 0, POSIX);
     private static final Set<ChronoElement<?>> HIGH_TIME_ELEMENTS;
@@ -267,38 +263,7 @@ public final class Moment
 
         ENGINE = builder.withTimeLine(new GlobalTimeLine()).build();
 
-        FORMATTER_RFC_1123 =
-            ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
-            .startSection(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
-            .startOptionalSection()
-            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
-            .addText(PlainDate.DAY_OF_WEEK)
-            .endSection()
-            .addLiteral(", ")
-            .endSection()
-            .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
-            .addLiteral(' ')
-            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
-            .addText(PlainDate.MONTH_OF_YEAR)
-            .endSection()
-            .addLiteral(' ')
-            .addFixedInteger(PlainDate.YEAR, 4)
-            .addLiteral(' ')
-            .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
-            .addLiteral(':')
-            .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
-            .startOptionalSection()
-            .addLiteral(':')
-            .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
-            .endSection()
-            .addLiteral(' ')
-            .addTimezoneOffset(
-                DisplayMode.MEDIUM,
-                false,
-                Arrays.asList("GMT", "UT", "Z"))
-            .endSection()
-            .build()
-            .withTimezone(ZonalOffset.UTC);
+        FORMATTER_RFC_1123 = createRFC1123();
     }
 
     /**
@@ -680,7 +645,7 @@ public final class Moment
     public BigDecimal transform(TimeScale scale) {
 
         BigDecimal elapsedTime =
-            new BigDecimal(this.getElapsedTime(scale)).setScale(9);
+            new BigDecimal(this.getElapsedTime(scale)).setScale(9, RoundingMode.UNNECESSARY);
         BigDecimal nanosecond = new BigDecimal(this.getNanosecond(scale));
         return elapsedTime.add(nanosecond.movePointLeft(9));
 
@@ -813,9 +778,9 @@ public final class Moment
      * @throws  IllegalArgumentException if this moment is a leapsecond and
      *          shall be combined with a non-full-minute-timezone-offset
      */
-    public ZonalMoment inLocalView() {
+    public ZonalDateTime inLocalView() {
 
-        return ZonalMoment.of(this, Timezone.ofSystem());
+        return ZonalDateTime.of(this, Timezone.ofSystem());
 
     }
 
@@ -846,9 +811,9 @@ public final class Moment
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
      */
-    public ZonalMoment inZonalView(TZID tzid) {
+    public ZonalDateTime inZonalView(TZID tzid) {
 
-        return ZonalMoment.of(this, Timezone.of(tzid));
+        return ZonalDateTime.of(this, Timezone.of(tzid));
 
     }
 
@@ -879,9 +844,9 @@ public final class Moment
      *          shall be combined with a non-full-minute-timezone-offset or
      *          if given timezone cannot be loaded
      */
-    public ZonalMoment inZonalView(String tzid) {
+    public ZonalDateTime inZonalView(String tzid) {
 
-        return ZonalMoment.of(this, Timezone.of(tzid));
+        return ZonalDateTime.of(this, Timezone.of(tzid));
 
     }
 
@@ -1099,14 +1064,13 @@ public final class Moment
      * <p>Note: The formatter can be adjusted to other locales and timezones
      * however. </p>
      *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code Moment}-objects
      *          using system locale and system timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
@@ -1116,25 +1080,21 @@ public final class Moment
      * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
      * angepasst werden. </p>
      *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code Moment}-objects
      *          using system locale and system timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     * @since   3.0
      */
-    public static ChronoFormatter<Moment> localFormatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<Moment> localFormatter(
         String formatPattern,
-        ChronoPattern patternType
+        F patternType
     ) {
 
-        return ChronoFormatter
-            .setUp(Moment.class, Locale.getDefault())
-            .addPattern(formatPattern, patternType)
-            .build()
-            .withStdTimezone();
+        return FormatSupport.createFormatter(
+            Moment.class, formatPattern, patternType, Locale.getDefault(), Timezone.ofSystem().getID());
 
     }
 
@@ -1149,8 +1109,7 @@ public final class Moment
      * @return  format object for formatting {@code Moment}-objects
      *          using system locale and system timezone
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
@@ -1164,20 +1123,15 @@ public final class Moment
      * @return  format object for formatting {@code Moment}-objects
      *          using system locale and system timezone
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(net.time4j.tz.TZID)
+     * @since   3.0
      */
-    public static ChronoFormatter<Moment> localFormatter(DisplayMode mode) {
+    public static TemporalFormatter<Moment> localFormatter(DisplayMode mode) {
 
-        int style = PatternType.getFormatStyle(mode);
+        int style = FormatSupport.getFormatStyle(mode);
         DateFormat df = DateFormat.getDateTimeInstance(style, style);
-        String pattern = PatternType.getFormatPattern(df);
-
-        return ChronoFormatter
-            .setUp(Moment.class, Locale.getDefault())
-            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
-            .build()
-            .withStdTimezone();
+        String formatPattern = FormatSupport.getFormatPattern(df);
+        return FormatSupport.createFormatter(
+            Moment.class, formatPattern, Locale.getDefault(), Timezone.ofSystem().getID());
 
     }
 
@@ -1190,6 +1144,7 @@ public final class Moment
      * information). The formatter can be adjusted to other locales and
      * timezones however. </p>
      *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -1197,11 +1152,8 @@ public final class Moment
      * @return  format object for formatting {@code Moment}-objects
      *          using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   2.0
-     * @see     PatternType
+     * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters in
@@ -1212,6 +1164,7 @@ public final class Moment
      * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
      * existiert). </p>
      *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -1219,24 +1172,17 @@ public final class Moment
      * @return  format object for formatting {@code Moment}-objects
      *          using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   2.0
-     * @see     PatternType
+     * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<Moment> formatter(
         String formatPattern,
-        ChronoPattern patternType,
+        F patternType,
         Locale locale,
         TZID tzid
     ) {
 
-        return ChronoFormatter
-            .setUp(Moment.class, locale)
-            .addPattern(formatPattern, patternType)
-            .build()
-            .withTimezone(tzid);
+        return FormatSupport.createFormatter(Moment.class, formatPattern, patternType, locale, tzid);
 
     }
 
@@ -1252,13 +1198,10 @@ public final class Moment
      * @param   mode        formatting style
      * @param   locale      locale setting
      * @param   tzid        timezone id
-     * @return  format object for formatting {@code Moment}-objects
-     *          using given locale
+     * @return  format object for formatting {@code Moment}-objects using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   2.0
+     * @since   3.0
      * @see     #localFormatter(DisplayMode)
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
@@ -1273,29 +1216,21 @@ public final class Moment
      * @param   mode        formatting style
      * @param   locale      locale setting
      * @param   tzid        timezone id
-     * @return  format object for formatting {@code Moment}-objects
-     *          using given locale
+     * @return  format object for formatting {@code Moment}-objects using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   2.0
+     * @since   3.0
      * @see     #localFormatter(DisplayMode)
-     * @see     ChronoFormatter#with(Locale)
-     * @see     ChronoFormatter#withTimezone(TZID)
      */
-    public static ChronoFormatter<Moment> formatter(
+    public static TemporalFormatter<Moment> formatter(
         DisplayMode mode,
         Locale locale,
         TZID tzid
     ) {
 
-        int style = PatternType.getFormatStyle(mode);
+        int style = FormatSupport.getFormatStyle(mode);
         DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
-        String pattern = PatternType.getFormatPattern(df);
-
-        return ChronoFormatter
-            .setUp(Moment.class, locale)
-            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
-            .build()
-            .withTimezone(tzid);
+        String formatPattern = FormatSupport.getFormatPattern(df);
+        return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }
 
@@ -1332,7 +1267,7 @@ public final class Moment
      *
      * @return  formatter object for RFC-1123 (technical internet-timestamp)
      */
-    public static ChronoFormatter<Moment> formatterRFC1123() {
+    public static TemporalFormatter<Moment> formatterRFC1123() {
 
         return FORMATTER_RFC_1123;
 
@@ -1775,6 +1710,13 @@ public final class Moment
 
     }
 
+    @SuppressWarnings("unchecked")
+    private static TemporalFormatter<Moment> createRFC1123() {
+
+        return (TemporalFormatter<Moment>) FormatSupport.getDefaultFormatEngine().createRFC1123();
+
+    }
+
     /**
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The format
@@ -1942,7 +1884,7 @@ public final class Moment
      * <p>Delegiert Anpassungen von {@code Moment}-Instanzen an einen
      * {@code ChronoOperator<PlainTimestamp>} mit Hilfe einer Zeitzone. </p>
      *
-     * @concurrency <immutable>
+     * @doctags.concurrency <immutable>
      */
     static final class Operator
         implements ChronoOperator<Moment> {
@@ -2686,9 +2628,7 @@ public final class Moment
             AttributeQuery attributes
         ) {
 
-            if (attributes instanceof ZOM) {
-                return attributes.get((ZOM) attributes);
-            } else if (attributes.contains(Attributes.TIMEZONE_ID)) {
+            if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
                 return context.inZonalView(tzid);
             }

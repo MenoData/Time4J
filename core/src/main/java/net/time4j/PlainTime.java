@@ -40,10 +40,10 @@ import net.time4j.engine.UnitRule;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoFormatter;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -1336,39 +1336,32 @@ public final class PlainTime
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing plain times. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTime}-objects
      *          using system locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTime}-objects
      *          using system locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
-    public static ChronoFormatter<PlainTime> localFormatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTime> localFormatter(
         String formatPattern,
-        ChronoPattern patternType
+        F patternType
     ) {
 
-        return ChronoFormatter
-            .setUp(PlainTime.class, Locale.getDefault())
-            .addPattern(formatPattern, patternType)
-            .build();
+        return FormatSupport.createFormatter(PlainTime.class, formatPattern, patternType, Locale.getDefault());
 
     }
 
@@ -1376,36 +1369,28 @@ public final class PlainTime
      * <p>Creates a new formatter which uses the given display mode in the
      * default locale for formatting and parsing plain times. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
      * @param   mode        formatting style
      * @return  format object for formatting {@code PlainTime}-objects
      *          using system locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
      * @param   mode        formatting style
      * @return  format object for formatting {@code PlainTime}-objects
      *          using system locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @see     ChronoFormatter#with(Locale)
+     * @since   3.0
      */
-    public static ChronoFormatter<PlainTime> localFormatter(DisplayMode mode) {
+    public static TemporalFormatter<PlainTime> localFormatter(DisplayMode mode) {
 
-        int style = PatternType.getFormatStyle(mode);
+        int style = FormatSupport.getFormatStyle(mode);
         DateFormat df = DateFormat.getTimeInstance(style);
-        String pattern = removeZones(PatternType.getFormatPattern(df));
-
-        return ChronoFormatter
-            .setUp(PlainTime.class, Locale.getDefault())
-            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
-            .build();
+        String formatPattern = removeZones(FormatSupport.getFormatPattern(df));
+        return FormatSupport.createFormatter(PlainTime.class, formatPattern, Locale.getDefault());
 
     }
 
@@ -1413,42 +1398,37 @@ public final class PlainTime
      * <p>Creates a new formatter which uses the given pattern and locale
      * for formatting and parsing plain times. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
      * @return  format object for formatting {@code PlainTime}-objects
      *          using given locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     #localFormatter(String,ChronoPattern)
+     * @since   3.0
+     * @see     #localFormatter(String, ChronoPattern)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
+     * @param   <F> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
      * @return  format object for formatting {@code PlainTime}-objects
      *          using given locale
      * @throws  IllegalArgumentException if resolving of pattern fails
-     * @see     PatternType
-     * @see     #localFormatter(String,ChronoPattern)
+     * @since   3.0
+     * @see     #localFormatter(String, ChronoPattern)
      */
-    public static ChronoFormatter<PlainTime> formatter(
+    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTime> formatter(
         String formatPattern,
-        ChronoPattern patternType,
+        F patternType,
         Locale locale
     ) {
 
-        return ChronoFormatter
-            .setUp(PlainTime.class, locale)
-            .addPattern(formatPattern, patternType)
-            .build();
+        return FormatSupport.createFormatter(PlainTime.class, formatPattern, patternType, locale);
 
     }
 
@@ -1456,41 +1436,35 @@ public final class PlainTime
      * <p>Creates a new formatter which uses the given display mode and locale
      * for formatting and parsing plain times. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales however. </p>
-     *
      * @param   mode        formatting style
      * @param   locale      locale setting
      * @return  format object for formatting {@code PlainTime}-objects
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @since   3.0
      * @see     #localFormatter(DisplayMode)
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
      * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen angepasst werden. </p>
-     *
      * @param   mode        formatting style
      * @param   locale      locale setting
      * @return  format object for formatting {@code PlainTime}-objects
      *          using given locale
      * @throws  IllegalStateException if format pattern cannot be retrieved
+     * @since   3.0
      * @see     #localFormatter(DisplayMode)
      */
-    public static ChronoFormatter<PlainTime> formatter(
+    public static TemporalFormatter<PlainTime> formatter(
         DisplayMode mode,
         Locale locale
     ) {
 
-        int style = PatternType.getFormatStyle(mode);
+        int style = FormatSupport.getFormatStyle(mode);
         DateFormat df = DateFormat.getTimeInstance(style, locale);
-        String pattern = removeZones(PatternType.getFormatPattern(df));
-
-        return ChronoFormatter
-            .setUp(PlainTime.class, locale)
-            .addPattern(pattern, PatternType.SIMPLE_DATE_FORMAT)
-            .build();
+        String formatPattern = removeZones(FormatSupport.getFormatPattern(df));
+        return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
 
     }
 
