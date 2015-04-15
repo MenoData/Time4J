@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextAccessor.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import net.time4j.engine.AttributeQuery;
 
+import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,16 +34,18 @@ import java.util.Locale;
  * <p>Supplies an access to the internal name list of an enum-based
  * element value. </p>
  *
- * @author      Meno Hochschild
- * @since       2.0
+ * @author  Meno Hochschild
+ * @since   2.0
+ * @see     CalendarText
  * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Stellt einen Zugriff auf die enthaltenen Namen per Elementwert-Enum
  * bereit. </p>
  *
- * @author      Meno Hochschild
- * @since       2.0
+ * @author  Meno Hochschild
+ * @since   2.0
+ * @see     CalendarText
  * @doctags.concurrency <immutable>
  */
 public final class TextAccessor {
@@ -115,7 +118,7 @@ public final class TextAccessor {
      * @param   status          current parsing position
      * @param   valueType       value class of element
      * @return  element value (as enum) or {@code null} if not found
-     * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
+     * @see     #parse(CharSequence, ParsePosition, Class, AttributeQuery)
      */
     /*[deutsch]
      * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
@@ -128,11 +131,11 @@ public final class TextAccessor {
      * @param   status          current parsing position
      * @param   valueType       value class of element
      * @return  element value (as enum) or {@code null} if not found
-     * @see     #parse(CharSequence, ParseLog, Class, AttributeQuery)
+     * @see     #parse(CharSequence, ParsePosition, Class, AttributeQuery)
      */
     public <V extends Enum<V>> V parse(
         CharSequence parseable,
-        ParseLog status,
+        ParsePosition status,
         Class<V> valueType
     ) {
 
@@ -172,7 +175,7 @@ public final class TextAccessor {
      */
     public <V extends Enum<V>> V parse(
         CharSequence parseable,
-        ParseLog status,
+        ParsePosition status,
         Class<V> valueType,
         AttributeQuery attributes
     ) {
@@ -218,7 +221,7 @@ public final class TextAccessor {
 
     private <V extends Enum<V>> V parse(
         CharSequence parseable,
-        ParseLog status,
+        ParsePosition status,
         Class<V> valueType,
         boolean caseInsensitive,
         boolean partialCompare
@@ -226,7 +229,7 @@ public final class TextAccessor {
 
         V[] enums = valueType.getEnumConstants();
         int len = this.textForms.size();
-        int start = status.getPosition();
+        int start = status.getIndex();
         int end = parseable.length();
 
         int maxEq = 0;
@@ -262,7 +265,7 @@ public final class TextAccessor {
 
             if (eq) {
                 assert pos == start + n;
-                status.setPosition(pos);
+                status.setIndex(pos);
                 return enums[i];
             } else if (
                 partialCompare
@@ -274,11 +277,9 @@ public final class TextAccessor {
         }
 
         if (candidate == null) {
-            status.setError(
-                start,
-                "No suitable enum found: " + valueType.getName());
+            status.setErrorIndex(start);
         } else {
-            status.setPosition(start + maxEq);
+            status.setIndex(start + maxEq);
         }
 
         return candidate;

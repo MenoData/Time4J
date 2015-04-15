@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextElement.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
 import java.io.IOException;
+import java.text.ParsePosition;
 
 
 /**
@@ -82,7 +83,7 @@ public interface TextElement<V>
      * <p>Interpretes the given text as element value. </p>
      *
      * <p>Implementation note: Any implementation will start first at the
-     * position {@link ParseLog#getPosition() status.getPosition()} and
+     * position {@link ParsePosition#getIndex() status.getIndex()} and
      * either set the new position after successful parsing or return
      * {@code null} in case of error. </p>
      *
@@ -97,8 +98,8 @@ public interface TextElement<V>
      * als Elementwert. </p>
      *
      * <p>Implementierungshinweis: Eine Implementierung wird den Text
-     * erst ab der angegebenen Position {@link ParseLog#getPosition()
-     * status.getPosition()} auswerten und nach erfolgreicher Interpretierung
+     * erst ab der angegebenen Position {@link ParsePosition#getIndex()
+     * status.getIndex()} auswerten und nach erfolgreicher Interpretierung
      * den Index neu setzen oder im Fehlerfall {@code null} zur&uuml;ckgeben.
      * </p>
      *
@@ -110,7 +111,7 @@ public interface TextElement<V>
      */
     V parse(
         CharSequence text,
-        ParseLog status,
+        ParsePosition status,
         AttributeQuery attributes
     );
 

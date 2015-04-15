@@ -26,7 +26,6 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
-import net.time4j.format.ParseLog;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
@@ -35,6 +34,7 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.text.ParsePosition;
 import java.util.Locale;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
@@ -163,7 +163,7 @@ enum AmPmElement
     @Override
     public Meridiem parse(
         CharSequence text,
-        ParseLog status,
+        ParsePosition status,
         AttributeQuery attributes
     ) {
 
