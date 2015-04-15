@@ -36,7 +36,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
-import net.time4j.format.ParseLog;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
@@ -47,6 +46,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParsePosition;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -1104,7 +1104,7 @@ public final class Weekmodel
         @Override
         public Weekday parse(
             CharSequence text,
-            ParseLog status,
+            ParsePosition status,
             AttributeQuery attributes
         ) {
 
