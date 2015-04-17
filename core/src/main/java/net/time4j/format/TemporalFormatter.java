@@ -37,6 +37,7 @@ import java.util.Locale;
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
+ * @doctags.spec All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Allgemeine Fassade von Zeitformatobjekten, die temporale Objekte zu Text oder umgekehrt Text als
@@ -45,6 +46,7 @@ import java.util.Locale;
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
+ * @doctags.spec All implementations must be immutable.
  */
 public interface TemporalFormatter<T> {
 
@@ -229,6 +231,11 @@ public interface TemporalFormatter<T> {
     /**
      * <p>Creates a copy of this formatter with given locale. </p>
      *
+     * <p>Note that changing the locale cannot change the inner structure
+     * of this formatter even if the structure is no longer appropriate for
+     * given locale. An example is the English AM/PM-pattern which will be
+     * preserved even if the language changes from English to German. </p>
+     *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
      *          this instance remains unaffected
@@ -237,6 +244,12 @@ public interface TemporalFormatter<T> {
     /*[deutsch]
      * <p>Erzeugt eine Kopie mit der alternativ angegebenen
      * Sprach- und L&auml;ndereinstellung. </p>
+     *
+     * <p>Hinweis: Das &Auml;ndern der Sprach- und L&auml;ndereinstellung kann
+     * nicht die innere Struktur dieses Formatierers &auml;ndern, selbst wenn die
+     * innere Struktur f&uuml;r die gegebene Sprache nicht mehr geeignet ist.
+     * Zum Beispiel wird das englische AM/PM-Format beibehalten, auch wenn sich
+     * die Sprache von Englisch zu Deutsch &auml;ndert. </p>
      *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while

@@ -108,6 +108,8 @@ public class RawValues {
     private static class EmptyRawValues
         implements ChronoDisplay {
 
+        //~ Methoden ------------------------------------------------------
+
         @Override
         public boolean contains(ChronoElement<?> element) {
             return false;
