@@ -94,8 +94,7 @@ public final class UnitPatterns {
     //~ Instanzvariablen --------------------------------------------------
 
     private final Locale locale;
-    private final
-        Map<Character, Map<TextWidth, Map<PluralCategory, String>>> patterns;
+    private final Map<Character, Map<TextWidth, Map<PluralCategory, String>>> patterns;
     private final Map<Character, Map<PluralCategory, String>> past;
     private final Map<Character, Map<PluralCategory, String>> future;
     private final Map<Integer, Map<TextWidth, String>> list;
