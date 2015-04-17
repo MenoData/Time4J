@@ -21,7 +21,6 @@
 
 package net.time4j;
 
-
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.ChronoPattern;
@@ -78,7 +77,7 @@ public class FormatSupport
 
         if (best == null) {
             if (last == null) {
-                throw new IllegalStateException("Cannot find any format engine.");
+                best = Platform.PATTERN.getFormatEngine();
             } else {
                 best = last;
             }
