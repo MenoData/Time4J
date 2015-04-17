@@ -1,1 +1,1 @@
-net.time4j.format.platform.DefaultLeapSecondProviderSPI
+net.time4j.DefaultLeapSecondProviderSPI

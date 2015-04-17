@@ -19,9 +19,8 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.format.platform;
+package net.time4j;
 
-import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondProvider;
