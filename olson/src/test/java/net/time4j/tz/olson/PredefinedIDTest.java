@@ -104,7 +104,7 @@ public class PredefinedIDTest {
     public void getPreferredIDsOfBerlin() {
         TZID tzid = EUROPE.BERLIN;
         assertThat(
-            Timezone.getPreferredIDs(Locale.GERMANY),
+            Timezone.getPreferredIDs(Locale.GERMANY, false, "DEFAULT"),
             is(Collections.singleton(tzid)));
     }
 

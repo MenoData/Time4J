@@ -69,7 +69,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
- * @see     TemporalType#XML_DATE_TIME_OFFSET
  */
 /*[deutsch]
  * <p>Kombination aus UTC-Moment und Zeitzone. </p>
@@ -100,7 +99,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
- * @see     TemporalType#XML_DATE_TIME_OFFSET
  */
 public final class ZonalDateTime
     implements ChronoDisplay, UniversalTime {

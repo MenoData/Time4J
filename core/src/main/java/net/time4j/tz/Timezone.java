@@ -406,32 +406,6 @@ public abstract class Timezone
     }
 
     /**
-     * <p>Equivalent to {@code getPreferredIDs(locale, false, "DEFAULT")}. </p>
-     *
-     * @param       locale  ISO-3166-alpha-2-country to be evaluated
-     * @return      unmodifiable set of preferred timezone ids
-     * @see         #getPreferredIDs(Locale, boolean, String)
-     * @deprecated  For clarity, use the 3-parameter-method instead (will
-     *              be removed in next major release)
-     */
-    /*[deutsch]
-     * <p>&Auml;quivalent zu
-     * {@code getPreferredIDs(locale, false, "DEFAULT")}. </p>
-     *
-     * @param       locale  ISO-3166-alpha-2-country to be evaluated
-     * @return      unmodifiable set of preferred timezone ids
-     * @see         #getPreferredIDs(Locale, boolean, String)
-     * @deprecated  For clarity, use the 3-parameter-method instead (will
-     *              be removed in next major release)
-     */
-    @Deprecated
-    public static Set<TZID> getPreferredIDs(Locale locale) {
-
-        return getPreferredIDs(locale, false, NAME_DEFAULT);
-
-    }
-
-    /**
      * <p>Gets a provider-specific {@code Set} of preferred timezone IDs
      * for given ISO-3166-country code. </p>
      *
