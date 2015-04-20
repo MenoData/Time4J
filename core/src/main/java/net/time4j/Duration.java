@@ -3592,11 +3592,11 @@ public final class Duration<U extends IsoUnit>
      * {@link PrettyTime} is usually the best choice. This class is mainly
      * designed for handling non-standardized formats. </p>
      *
-     * <p>First example (parsing a Joda-Time-Period): </p>
+     * <p>First example (parsing a Joda-Time-Period using a max width of 2): </p>
      *
      * <pre>
      *  String jodaPattern =
-     *      "'P'[-Y'Y'][-M'M'][-W'W'][-D'D']['T'[-h'H'][-m'M']]";
+     *      "'P'[-#Y'Y'][-#M'M'][-#W'W'][-#D'D']['T'[-#h'H'][-#m'M']]";
      *  Duration.Formatter&lt;IsoUnit&gt; f =
      *      Duration.Formatter.ofPattern(IsoUnit.class, jodaPattern);
      *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
@@ -3634,7 +3634,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *  String jodaPattern =
-     *      "'P'[-Y'Y'][-M'M'][-W'W'][-D'D']['T'[-h'H'][-m'M']]";
+     *      "'P'[-#Y'Y'][-#M'M'][-#W'W'][-#D'D']['T'[-#h'H'][-#m'M']]";
      *  Duration.Formatter&lt;IsoUnit&gt; f =
      *      Duration.Formatter.ofPattern(IsoUnit.class, jodaPattern);
      *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
@@ -3658,6 +3658,12 @@ public final class Duration<U extends IsoUnit>
      * @doctags.concurrency <immutable>
      */
     public static final class Formatter<U extends IsoUnit> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final String JODA_PATTERN =
+            "'P'[-#################Y'Y'][-#################M'M'][-#################W'W'][-#################D'D']"
+            + "['T'[-#################h'H'][-#################m'M'][-#################s'S'[.fffffffff]]]";
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -3696,6 +3702,38 @@ public final class Duration<U extends IsoUnit>
         }
 
         //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Handles Joda-Time-style-patterns which in general follow XML-schema
+         * - with the exception of sign handling. </p>
+         *
+         * <p>The sign handling of Joda-Time allows and even enforces in contrast
+         * to XML-schema negative signs not before the P-symbol but for every
+         * single duration item repeatedly. Warning: Mixed signs are never supported
+         * by Time4J. </p>
+         *
+         * @return  new formatter instance for parsing Joda-Style period expressions
+         * @since   1.2
+         * @see     #ofPattern(Class, String)
+         */
+        /*[deutsch]
+         * <p>Behandelt Joda-Time-Stil-Formatmuster, die im allgemeinen XML-Schema
+         * folgen - mit der Ausnahme der Vorzeichenbehandlung. </p>
+         *
+         * <p>Die Vorzeichenbehandlung von Joda-Time erlaubt und erzwingt im Kontrast
+         * zu XML-Schema negative Vorzeichen nicht vor dem P-Symbol, sondern wiederholt
+         * f&uuml;r jedes einzelne Dauerelement. Warnung: Gemischte Vorzeichen werden
+         * von Tim4J dennoch nicht unterst&uuml;tzt. </p>
+         *
+         * @return  new formatter instance for parsing Joda-Style period expressions
+         * @since   1.2
+         * @see     #ofPattern(Class, String)
+         */
+        public static Formatter<IsoUnit> ofJodaStyle() {
+
+            return ofPattern(IsoUnit.class, JODA_PATTERN);
+
+        }
 
         /**
          * <p>Equivalent to {@code ofPattern(IsoUnit.class, pattern)}. </p>
@@ -3747,7 +3785,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
          *  <tr><td>[]</td><td>optional section</td></tr>
          *  <tr><td>{}</td><td>section with plural forms, since v2.0</td></tr>
-         *  <tr><td>#</td><td>reserved char for future use</td></tr>
+         *  <tr><td>#</td><td>placeholder for an optional digit, since v3.0</td></tr>
          * </table>
          *
          * <p>All letters in range a-z and A-Z are always reserved chars
@@ -3755,7 +3793,11 @@ public final class Duration<U extends IsoUnit>
          * If such a letter is repeated then the count of symbols controls
          * the minimum width for formatted output. Such a minimum width also
          * reserves this area for parsing of any preceding item. If necessary a
-         * number (of units) will be padded from left with the zero digit. </p>
+         * number (of units) will be padded from left with the zero digit. The
+         * unit symbol (with exception of &quot;f&quot;) can be preceded by
+         * any count of char &quot;#&quot; (&gt;= 0). The sum of min width and
+         * count of #-chars define the maximum width for formatted output and
+         * parsing.</p>
          *
          * <p>Optional sections let the parser be error-tolerant and continue
          * with the next section in case of errors. Since v2.3: During printing,
@@ -3792,6 +3834,22 @@ public final class Duration<U extends IsoUnit>
          *          &quot;{D: :en:ONE=day:OTHER=days}&quot;);
          *  String s = formatter.format(Duration.of(3, DAYS));
          *  System.out.println(s); // output: 3 days
+         * </pre>
+         *
+         * <p><strong>Enhancement since version v3.0: numerical placeholders</strong></p>
+         *
+         * <p>Before version v3.0, the maximum numerical width was always 18. Now it is
+         * the sum of min width and the count of preceding #-chars. Example: </p>
+         *
+         * <pre>
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter1 =
+         *      Duration.Formatter.ofPattern(CalendarUnit.class, &quot;D&quot;);
+         *  formatter1.format(Duration.of(123, DAYS)); throws IllegalArgumentException
+         *
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter2 =
+         *      Duration.Formatter.ofPattern(CalendarUnit.class, &quot;##D&quot;);
+         *  String s = formatter2.format(Duration.of(123, DAYS));
+         *  System.out.println(s); // output: 123
          * </pre>
          *
          * @param   <U>     generic unit type
@@ -3837,7 +3895,11 @@ public final class Duration<U extends IsoUnit>
          * dann regelt die Anzahl der Symbole die Mindestbreite in der formatierten
          * Ausgabe. Solch eine Mindestbreite reserviert auch das zugeh&ouml;rige Element,
          * wenn vorangehende Dauerelemente interpretiert werden. Bei Bedarf wird eine
-         * Zahl (von Einheiten) von links mit der Nullziffer aufgef&uuml;llt. </p>
+         * Zahl (von Einheiten) von links mit der Nullziffer aufgef&uuml;llt. Ein
+         * Einheitensymbol kann eine beliebige Zahl von numerischen Platzhaltern
+         * &quot;#&quot; vorangestellt haben (&gt;= 0). Die Summe aus minimaler Breite
+         * und der Anzahl der #-Zeichen definiert die maximale Breite, die ein
+         * Dauerelement numerisch haben darf. </p>
          *
          * <p>Optionale Abschnitte regeln, da&szlig; der Interpretationsvorgang
          * bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
@@ -3877,6 +3939,23 @@ public final class Duration<U extends IsoUnit>
          *  System.out.println(s); // output: 3 Tage
          * </pre>
          *
+         * <p><strong>Erweiterung seit Version v3.0: numerische Platzhalter</strong></p>
+         *
+         * <p>Vor Version 3.0 war die maximale numerische Breite immer 18 Zeichen lang,
+         * nun immer die Summe aus minimaler Breite und der Anzahl der vorangehenden
+         * #-Zeichen. Beispiel: </p>
+         *
+         * <pre>
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter1 =
+         *      Duration.Formatter.ofPattern(CalendarUnit.class, &quot;D&quot;);
+         *  formatter1.format(Duration.of(123, DAYS)); throws IllegalArgumentException
+         *
+         *  Duration.Formatter&lt;CalendarUnit&gt; formatter2 =
+         *      Duration.Formatter.ofPattern(CalendarUnit.class, &quot;##D&quot;);
+         *  String s = formatter2.format(Duration.of(123, DAYS));
+         *  System.out.println(s); // output: 123
+         * </pre>
+         *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
          * @param   pattern format pattern
@@ -3891,17 +3970,23 @@ public final class Duration<U extends IsoUnit>
             int n = pattern.length();
             List<List<FormatItem>> stack = new ArrayList<List<FormatItem>>();
             stack.add(new ArrayList<FormatItem>());
+            int digits = 0;
 
             for (int i = 0; i < n; i++) {
                 char c = pattern.charAt(i);
 
-                if (isSymbol(c)) {
+                if (c == '#') {
+                    digits++;
+                } else if (isSymbol(c)) {
                     int start = i++;
                     while ((i < n) && pattern.charAt(i) == c) {
                         i++;
                     }
-                    addSymbol(c, i - start, stack);
+                    addSymbol(c, i - start, digits, stack);
+                    digits = 0;
                     i--;
+                } else if (digits > 0) {
+                    throw new IllegalArgumentException("Char # must be followed by unit symbol.");
                 } else if (c == '\'') { // Literalsektion
                     int start = i++;
                     while (i < n) {
@@ -3945,9 +4030,6 @@ public final class Duration<U extends IsoUnit>
                         i++;
                     }
                     addPluralItem(pattern.substring(start, i), stack);
-                } else if ((c == '#') || (c == '}')) {
-                    throw new IllegalArgumentException(
-                        "Pattern contains reserved character: '" + c + "'");
                 } else {
                     addLiteral(c, stack);
                 }
@@ -4156,6 +4238,7 @@ public final class Duration<U extends IsoUnit>
         private static void addSymbol(
         	char symbol,
         	int count,
+            int digits,
         	List<List<FormatItem>> stack
         ) {
 
@@ -4163,9 +4246,13 @@ public final class Duration<U extends IsoUnit>
         	List<FormatItem> items = stack.get(stack.size() - 1);
 
             if (symbol == 'f') {
-                items.add(new FractionItem(0, count));
+                if (digits > 0) {
+                    throw new IllegalArgumentException("Combination of # and f-symbol not allowed.");
+                } else {
+                    items.add(new FractionItem(0, count));
+                }
             } else {
-                items.add(new NumberItem(count, unit));
+                items.add(new NumberItem(0, count, count + digits, unit));
             }
 
         }
@@ -4388,33 +4475,31 @@ public final class Duration<U extends IsoUnit>
         //~ Instanzvariablen ----------------------------------------------
 
     	private final int minWidth;
+        private final int maxWidth;
     	private final IsoUnit unit;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private NumberItem(
-            int minWidth,
-            IsoUnit unit
-        ) {
-            this(0, minWidth, unit);
-
-        }
-
     	private NumberItem(
             int reserved,
     		int minWidth,
+            int maxWidth,
     		IsoUnit unit
     	) {
     		super(reserved);
 
     		if (minWidth < 1 || minWidth > 18) {
-    			throw new IllegalArgumentException(
-                    "Min width out of bounds: " + minWidth);
+                throw new IllegalArgumentException("Min width out of bounds: " + minWidth);
+            } else if (maxWidth < minWidth) {
+                throw new IllegalArgumentException("Max width smaller than min width.");
+            } else if (maxWidth > 18) {
+                throw new IllegalArgumentException("Max width out of bounds: " + maxWidth);
     		} else if (unit == null) {
     			throw new NullPointerException("Missing unit.");
     		}
 
     		this.minWidth = minWidth;
+            this.maxWidth = maxWidth;
     		this.unit = unit;
 
     	}
@@ -4428,6 +4513,10 @@ public final class Duration<U extends IsoUnit>
     	) throws IOException {
 
 			String num = String.valueOf(duration.getPartialAmount(this.unit));
+
+            if (num.length() > this.maxWidth) {
+                throw new IllegalArgumentException("Too many digits for: " + this.unit + " [" + duration + "]");
+            }
 
 			for (int i = this.minWidth - num.length(); i > 0; i--) {
 				buffer.append('0');
@@ -4450,8 +4539,8 @@ public final class Duration<U extends IsoUnit>
 			for (int i = start, n = text.length() - this.getReserved(); i < n; i++) {
 				char c = text.charAt(i);
 				if ((c >= '0') && (c <= '9')) {
-					if (i - start >= 18) {
-						return ~start; // too many digits
+					if (i - start >= this.maxWidth) {
+						break;
 					}
 					int digit = (c - '0');
 					total = total * 10 + digit;
@@ -4486,7 +4575,7 @@ public final class Duration<U extends IsoUnit>
         @Override
         FormatItem update(int reserved) {
 
-            return new NumberItem(reserved, this.minWidth, this.unit);
+            return new NumberItem(reserved, this.minWidth, this.maxWidth, this.unit);
 
         }
 
@@ -4650,7 +4739,7 @@ public final class Duration<U extends IsoUnit>
 	    ) {
 			super(0);
 
-            this.numItem = new NumberItem(1, unit);
+            this.numItem = new NumberItem(0, 1, 18, unit);
             this.sepItem = new LiteralItem(separator, true);
 			this.rules = rules;
 			this.pluralForms = pluralForms;

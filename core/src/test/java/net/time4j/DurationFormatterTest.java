@@ -19,16 +19,16 @@ public class DurationFormatterTest {
  	public static Iterable<Object[]> data() {
  		return Arrays.asList(
             new Object[][] {
-                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                {"'P'[-###Y'Y'][-#M'M'][-#D'D']['T'[-#h'H'][-#m'M']]",
                         "-P2Y7M15DT30H5M",
                         "P-2Y-7M-15DT-30H-5M"},
-                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                {"'P'[-###Y'Y'][-#M'M'][-#D'D']['T'[-#h'H'][-#m'M']]",
                         "P2Y7M15DT30H5M",
                         "P2Y7M15DT30H5M"},
-                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                {"'P'[-###Y'Y'][-#M'M'][-#D'D']['T'[-#h'H'][-#m'M']]",
                         "-P2Y7M15DT0H5M", // optional test for zero hours
                         "P-2Y-7M-15DT-5M"},
-                {"'P'[-Y'Y'][-M'M'][-D'D']['T'[-h'H'][-m'M']]",
+                {"'P'[-###Y'Y'][-#M'M'][-#D'D']['T'[-#h'H'][-#m'M']]",
                         "P2Y7M15DT0H5M", // optional test for zero hours
                         "P2Y7M15DT5M"},
                 {"[+hh:mm:ss]",
@@ -58,6 +58,18 @@ public class DurationFormatterTest {
                 {"+hh:mm:ss,fff",
                         "PT5H30M34,012S",
                         "+05:30:34,012"},
+                {"[#D:]hh:mm",
+                    "PT17H45M",
+                    "17:45"},
+                {"[#D:]hh:mm",
+                    "P1DT17H45M",
+                    "1:17:45"},
+                {"[#D]hhmm", // adjacent digit parsing
+                    "PT17H45M",
+                    "1745"},
+                {"[#D]hhmm", // adjacent digit parsing
+                    "P1DT17H45M",
+                    "11745"},
                 {"{D: :en:ONE=day:OTHER=days}",
                         "P3D",
                         "3 days"},
