@@ -65,6 +65,18 @@ final class SystemTemporalFormatter<T>
     private static final Date PROLEPTIC_GREGORIAN = new Date(Long.MIN_VALUE);
     private static final PlainDate UNIX_EPOCH_DATE = PlainDate.of(1970, 1, 1);
 
+    private static final Map<Class<?>, Chronology<?>> SUPPORTED_TYPES;
+
+    static {
+        Map<Class<?>, Chronology<?>> tmp = new HashMap<Class<?>, Chronology<?>>();
+        tmp.put(PlainDate.class, PlainDate.axis());
+        tmp.put(PlainTime.class, PlainTime.axis());
+        tmp.put(PlainTimestamp.class, PlainTimestamp.axis());
+        tmp.put(Moment.class, Moment.axis());
+        tmp.put(ZonalDateTime.class, null);
+        SUPPORTED_TYPES = Collections.unmodifiableMap(tmp);
+    }
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final Class<T> type;
@@ -266,7 +278,7 @@ final class SystemTemporalFormatter<T>
     @Override
     public AttributeQuery getAttributes() {
 
-        Chronology<?> chronology = SystemFormatEngine.getSupportedTypes().get(this.type);
+        Chronology<?> chronology = SUPPORTED_TYPES.get(this.type);
         Attributes.Builder ab = (
             (chronology == null)
             ? new Attributes.Builder()

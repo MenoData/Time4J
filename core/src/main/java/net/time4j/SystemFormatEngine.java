@@ -21,16 +21,15 @@
 
 package net.time4j;
 
-import net.time4j.engine.Chronology;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.UniversalTime;
 
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -47,16 +46,16 @@ class SystemFormatEngine
     static final FormatEngine<Platform> INSTANCE = new SystemFormatEngine();
     static final String RFC_1123_PATTERN = "<RFC-1123>";
 
-    private static final Map<Class<?>, Chronology<?>> SUPPORTED_TYPES;
+    private static final Set<Class<?>> SUPPORTED_TYPES;
 
     static {
-        Map<Class<?>, Chronology<?>> tmp = new HashMap<Class<?>, Chronology<?>>();
-        tmp.put(PlainDate.class, PlainDate.axis());
-        tmp.put(PlainTime.class, PlainTime.axis());
-        tmp.put(PlainTimestamp.class, PlainTimestamp.axis());
-        tmp.put(Moment.class, Moment.axis());
-        tmp.put(ZonalDateTime.class, null);
-        SUPPORTED_TYPES = Collections.unmodifiableMap(tmp);
+        Set<Class<?>> tmp = new HashSet<Class<?>>();
+        tmp.add(PlainDate.class);
+        tmp.add(PlainTime.class);
+        tmp.add(PlainTimestamp.class);
+        tmp.add(Moment.class);
+        tmp.add(ZonalDateTime.class);
+        SUPPORTED_TYPES = Collections.unmodifiableSet(tmp);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -116,18 +115,7 @@ class SystemFormatEngine
     @Override
     public boolean isSupported(Class<?> chronoType) {
 
-        return SUPPORTED_TYPES.containsKey(chronoType);
-
-    }
-
-    /**
-     * Liefert die unterst&uuml;tzen Typen.
-     *
-     * @return  unmodifiable type map
-     */
-    static Map<Class<?>, Chronology<?>> getSupportedTypes() {
-
-        return SUPPORTED_TYPES;
+        return SUPPORTED_TYPES.contains(chronoType);
 
     }
 
