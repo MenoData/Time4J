@@ -89,7 +89,7 @@ public class FormatSupport
     //~ Konstruktoren -----------------------------------------------------
 
     // For service loader only.
-    public FormatSupport() { // TODO: MAKE THIS CLASS PRIVATE IF HISTORIZATION IS AVAILABLE
+    public FormatSupport() { // TODO: MAKE THIS CONSTRUCTOR PRIVATE IF HISTORIZATION IS AVAILABLE
         super();
 
     }

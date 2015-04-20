@@ -60,6 +60,8 @@ final class SystemTemporalFormatter<T>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final String RFC_1123_WIDE = "EEE, d MMM yyyy HH:mm:ss Z";
+    private static final String RFC_1123_SHORT = "d MMM yyyy HH:mm:ss Z";
     private static final Date PROLEPTIC_GREGORIAN = new Date(Long.MIN_VALUE);
     private static final PlainDate UNIX_EPOCH_DATE = PlainDate.of(1970, 1, 1);
 
@@ -148,7 +150,11 @@ final class SystemTemporalFormatter<T>
             if (this.tzid == null) {
                 throw new IllegalArgumentException("Cannot print moment without timezone.");
             }
-            SimpleDateFormat sdf = setUp(this.pattern, this.locale, !this.leniency.isStrict(), this.tzid);
+            String p = this.pattern;
+            if (p.equals(SystemFormatEngine.RFC_1123_PATTERN)) {
+                p = RFC_1123_WIDE;
+            }
+            SimpleDateFormat sdf = setUp(p, this.locale, !this.leniency.isStrict(), this.tzid);
             text = sdf.format(jud);
         } else if (this.type.equals(ZonalDateTime.class)) {
             ZonalDateTime zdt = ZonalDateTime.class.cast(formattable);
@@ -329,7 +335,25 @@ final class SystemTemporalFormatter<T>
                 (this.tzid == null)
                 ? "GMT-18:00"
                 : this.tzid);
-            SimpleDateFormat sdf = setUp(this.pattern, this.locale, !this.leniency.isStrict(), timezone);
+            String realPattern = this.pattern;
+            if (realPattern.equals(SystemFormatEngine.RFC_1123_PATTERN)) {
+                String test = parseable.substring(position.getIndex());
+                if ((test.length() >= 4) && (test.charAt(3) == ',')) {
+                    realPattern = RFC_1123_WIDE;
+                } else {
+                    realPattern = RFC_1123_SHORT;
+                }
+                int count = 0;
+                for (int i = test.length() - 1; i >= 0 && count < 2; i--) {
+                    if (test.charAt(i) == ':') {
+                        count++;
+                    }
+                }
+                if (count >= 2) {
+                    realPattern = realPattern.replace(":ss", "");
+                }
+            }
+            SimpleDateFormat sdf = setUp(realPattern, this.locale, !this.leniency.isStrict(), timezone);
             Date jud = sdf.parse(parseable, position);
             Moment moment = TemporalType.JAVA_UTIL_DATE.translate(jud);
             Calendar cal = sdf.getCalendar();

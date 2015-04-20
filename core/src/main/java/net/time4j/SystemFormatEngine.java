@@ -99,7 +99,7 @@ class SystemFormatEngine
         return new SystemTemporalFormatter<Moment>(
             Moment.class,
             RFC_1123_PATTERN,
-            Locale.US,
+            Locale.ENGLISH,
             Leniency.SMART,
             "GMT"
         );
