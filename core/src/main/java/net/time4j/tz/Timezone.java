@@ -187,7 +187,8 @@ public abstract class Timezone
         GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET);
 
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
-        Boolean.getBoolean("net.time4j.allow.system.tz.override");
+        Boolean.getBoolean("net.time4j.allow.system.tz.override")
+        || "Dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
 
     private static volatile ZonalKeys zonalKeys = null;
     private static volatile Timezone currentSystemTZ = null;
