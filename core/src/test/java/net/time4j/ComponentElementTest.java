@@ -23,12 +23,17 @@ public class ComponentElementTest {
     }
 
     @Test
-    public void timeComponent() throws ParseException {
-        PlainTimestamp tsp =
-          PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
-            .withDefault(PlainTime.COMPONENT, PlainTime.midnightAtEndOfDay())
-            .parse("2014-08-20");
-        assertThat(tsp, is(PlainTimestamp.of(2014, 8, 21, 0, 0)));
+    public void timeComponent1() throws ParseException {
+        PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
+        tsp = tsp.with(PlainTime.COMPONENT, PlainTime.of(23, 59));
+        assertThat(tsp, is(PlainTimestamp.of(2014, 8, 21, 23, 59)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void timeComponent2() throws ParseException {
+        PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
+        tsp = tsp.with(PlainTime.COMPONENT, PlainTime.midnightAtEndOfDay());
+        //assertThat(tsp, is(PlainTimestamp.of(2014, 8, 22, 0, 0)));
     }
 
     @Test(expected=RuleNotFoundException.class)

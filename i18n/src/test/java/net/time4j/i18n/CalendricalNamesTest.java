@@ -11,18 +11,18 @@ import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
-import net.time4j.format.ParseLog;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.text.DateFormatSymbols;
+import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ServiceLoader;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -161,37 +161,37 @@ public class CalendricalNamesTest {
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
         OutputContext outputContext = OutputContext.FORMAT;
-        ParseLog status = new ParseLog();
+        ParsePosition status = new ParsePosition(0);
         Month value =
             instance.getStdMonths(TextWidth.ABBREVIATED, outputContext)
             .parse("Sep.", status, Month.class);
         assertThat(value, is(Month.SEPTEMBER));
 
-        status.reset();
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.WIDE, outputContext)
             .parse("MÄR", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
-        status.reset();
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.WIDE, outputContext)
             .parse("MÄRz", status, Month.class, toAttributes(true, false));
         assertThat(value, is(Month.MARCH));
 
-        status.reset();
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.SHORT, outputContext)
             .parse("MÄ", status, Month.class, toAttributes(true, true));
         assertThat(value, is(Month.MARCH));
 
-        status.reset();
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.SHORT, outputContext)
             .parse("Sep.", status, Month.class);
         assertThat(value, is(Month.SEPTEMBER));
 
-        status.reset();
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.NARROW, outputContext)
             .parse("m", status, Month.class, toAttributes(true, true));
@@ -201,7 +201,7 @@ public class CalendricalNamesTest {
         DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
         instance =
            CalendarText.getInstance("iso8601", locale);
-        status.setPosition(0);
+        status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.NARROW, outputContext)
             .parse(
@@ -333,7 +333,7 @@ public class CalendricalNamesTest {
            CalendarText.getInstance("iso8601", Locale.GERMAN);
         Quarter result =
             instance.getQuarters(textWidth, outputContext)
-            .parse("Q3", new ParseLog(), Quarter.class);
+            .parse("Q3", new ParsePosition(0), Quarter.class);
         assertThat(result, is(Quarter.Q3));
     }
 
@@ -455,17 +455,15 @@ public class CalendricalNamesTest {
     public void parseWeekdays() {
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.GERMAN);
-        ParseLog status = new ParseLog();
         Weekday w =
             instance.getWeekdays(TextWidth.WIDE, OutputContext.FORMAT)
-            .parse("FRE", status, Weekday.class, toAttributes(true, true));
+            .parse("FRE", new ParsePosition(0), Weekday.class, toAttributes(true, true));
         assertThat(w, is(Weekday.FRIDAY));
 
         instance = CalendarText.getInstance("iso8601", Locale.ENGLISH);
-        ParseLog status2 = new ParseLog();
         Weekday w2 =
             instance.getWeekdays(TextWidth.WIDE, OutputContext.FORMAT)
-            .parse("FRI", status2, Weekday.class, toAttributes(true, true));
+            .parse("FRI", new ParsePosition(0), Weekday.class, toAttributes(true, true));
         assertThat(w2, is(Weekday.FRIDAY));
     }
 
@@ -505,7 +503,7 @@ public class CalendricalNamesTest {
            CalendarText.getInstance("iso8601", Locale.ENGLISH);
         Meridiem result =
             instance.getMeridiems(textWidth).parse(
-                "PM", new ParseLog(), Meridiem.class);
+                "PM", new ParsePosition(0), Meridiem.class);
         assertThat(result, is(Meridiem.PM));
     }
 

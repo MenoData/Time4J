@@ -6,6 +6,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.ZonalDateTime;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
@@ -13,6 +14,8 @@ import net.time4j.format.Leniency;
 import net.time4j.format.SignPolicy;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.scale.TimeScale;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.ByteArrayInputStream;
@@ -29,6 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
@@ -178,6 +182,17 @@ public class MiscellaneousTest {
                 .with(Attributes.LENIENCY, Leniency.LAX)
                 .parse("2014-13-31 27:00"),
             is(PlainTimestamp.of(2015, 2, 1, 3, 0)));
+    }
+
+    @Test
+    public void parseTimestampDefaultingEndOfDay() throws ParseException {
+        PlainTimestamp tsp =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ENGLISH)
+                .addPattern("uuuu-MM-dd", PatternType.CLDR)
+                .build()
+                .withDefault(PlainTime.COMPONENT, PlainTime.midnightAtEndOfDay())
+                .parse("2014-08-20");
+        assertThat(tsp, is(PlainTimestamp.of(2014, 8, 21, 0, 0)));
     }
 
     @Test(expected=ParseException.class)
@@ -430,7 +445,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => DAY_OF_QUARTER out of range: 93"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -485,6 +500,27 @@ public class MiscellaneousTest {
             plog.getErrorMessage().startsWith(
                 "Validation failed => NANO_OF_DAY out of range:"),
             is(true));
+    }
+
+    @Test
+    public void printZDT() {
+        Moment moment = Moment.of(1278028824, TimeScale.UTC);
+        Timezone tz = Timezone.of("Asia/Tokyo");
+        ChronoFormatter<Moment> formatter =
+            Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
+        assertThat(
+            moment.inZonalView(tz.getID()).print(formatter),
+            is("2012-07-01T08:59:60+09:00"));
+    }
+
+    @Test
+    public void parseZDT() throws ParseException {
+        Moment moment = Moment.of(1278028824, TimeScale.UTC);
+        ChronoFormatter<Moment> formatter =
+            Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
+        assertThat(
+            ZonalDateTime.parse("2012-07-01T08:59:60+09:00", formatter),
+            is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
     }
 
     @Test

@@ -1,8 +1,8 @@
 package net.time4j.tz.other;
 
 import net.time4j.Moment;
-import net.time4j.PatternType;
-import net.time4j.format.ChronoFormatter;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.Timezone;
@@ -86,11 +86,9 @@ public class MilitaryZoneTest {
     @Test
     public void militaryTime() {
         ChronoFormatter<Moment> formatter =
-            Moment.formatter(
-                "HHmmz",
-                PatternType.CLDR,
-                Locale.US,
-                MilitaryZone.FOXTROT);
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .addPattern("HHmmz", PatternType.CLDR).build()
+                .withTimezone(MilitaryZone.FOXTROT);
         String s = formatter.format(Moment.UNIX_EPOCH);
         assertThat(s, is("0600F")); // zero six hundred Foxtrot
     }
@@ -98,11 +96,9 @@ public class MilitaryZoneTest {
     @Test
     public void print() {
         ChronoFormatter<Moment> formatter =
-            Moment.formatter(
-                "yyyy-MM-dd HH:mm zzzz",
-                PatternType.CLDR,
-                Locale.FRENCH,
-                MilitaryZone.FOXTROT);
+            ChronoFormatter.setUp(Moment.class, Locale.FRENCH)
+                .addPattern("yyyy-MM-dd HH:mm zzzz", PatternType.CLDR).build()
+                .withTimezone(MilitaryZone.FOXTROT);
         String s = formatter.format(Moment.UNIX_EPOCH);
         assertThat(s, is("1970-01-01 06:00 Foxtrot"));
     }
@@ -110,11 +106,9 @@ public class MilitaryZoneTest {
     @Test
     public void parse() throws ParseException {
         ChronoFormatter<Moment> formatter =
-            Moment.formatter(
-                "yyyy-MM-dd HH:mm zzzz",
-                PatternType.CLDR,
-                Locale.FRENCH,
-                ZonalOffset.UTC);
+            ChronoFormatter.setUp(Moment.class, Locale.FRENCH)
+                .addPattern("yyyy-MM-dd HH:mm zzzz", PatternType.CLDR).build()
+                .withTimezone(ZonalOffset.UTC);
         String input = "1970-01-01 06:00 Foxtrot";
         Moment m = formatter.parse(input);
         assertThat(m, is(Moment.UNIX_EPOCH));

@@ -22,7 +22,6 @@ import org.junit.runners.Suite.SuiteClasses;
         MonthRangeArithmeticTest.class,
         MonthValueTest.class,
         QuarterValueTest.class,
-        SimpleEraTest.class,
         SpecialUnitTest.class,
         StdYearOrdinalDateTest.class,
         StdYearRangeArithmeticTest.class,

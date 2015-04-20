@@ -1,21 +1,15 @@
 package net.time4j.scale;
 
-import net.time4j.Iso8601Format;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.ZonalDateTime;
-import net.time4j.format.ChronoFormatter;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-
-import java.text.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -39,27 +33,6 @@ public class ZonalDateTimeTest {
         assertThat(
             moment.inZonalView(tz.getID()).toTimestamp(),
             is(PlainTimestamp.of(2012, 7, 1, 8, 59, 59)));
-    }
-
-    @Test
-    public void print() {
-        Moment moment = Moment.of(1278028824, TimeScale.UTC);
-        Timezone tz = Timezone.of("Asia/Tokyo");
-        ChronoFormatter<Moment> formatter =
-            Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
-        assertThat(
-            moment.inZonalView(tz.getID()).print(formatter),
-            is("2012-07-01T08:59:60+09:00"));
-    }
-
-    @Test
-    public void parse() throws ParseException {
-        Moment moment = Moment.of(1278028824, TimeScale.UTC);
-        ChronoFormatter<Moment> formatter =
-            Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
-        assertThat(
-            ZonalDateTime.parse("2012-07-01T08:59:60+09:00", formatter),
-            is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
     }
 
     @Test
