@@ -70,6 +70,9 @@ public class DurationFormatterTest {
                 {"[#D]hhmm", // adjacent digit parsing
                     "P1DT17H45M",
                     "11745"},
+                {"[##D]hhmm", // adjacent digit parsing
+                    "P15DT17H45M",
+                    "151745"},
                 {"{D: :en:ONE=day:OTHER=days}",
                         "P3D",
                         "3 days"},
