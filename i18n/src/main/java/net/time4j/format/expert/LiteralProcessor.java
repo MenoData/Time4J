@@ -169,7 +169,8 @@ final class LiteralProcessor
             char alternative = literal;
 
             if (
-                Attributes.DECIMAL_SEPARATOR.name().equals(this.attribute.name())
+                (this.attribute != null)
+                && Attributes.DECIMAL_SEPARATOR.name().equals(this.attribute.name())
                 && Locale.ROOT.equals(attributes.get(Attributes.LANGUAGE, Locale.ROOT))
             ) { // Spezialfall: ISO-8601
                 alternative = (
