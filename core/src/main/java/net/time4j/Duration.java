@@ -2053,6 +2053,53 @@ public final class Duration<U extends IsoUnit>
 
     }
 
+    /**
+     * <p>Equivalent to {@link net.time4j.Duration.Formatter#ofPattern(String)}. </p>
+     *
+     * @param   pattern format pattern
+     * @return  new formatter instance
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@link net.time4j.Duration.Formatter#ofPattern(String)}. </p>
+     *
+     * @param   pattern format pattern
+     * @return  new formatter instance
+     * @since   3.0
+     */
+    public static Duration.Formatter<IsoUnit> formatter(String pattern) {
+
+        return Duration.Formatter.ofPattern(pattern);
+
+    }
+
+    /**
+     * <p>Equivalent to {@link net.time4j.Duration.Formatter#ofPattern(Class, String)}. </p>
+     *
+     * @param   <U>     generic unit type
+     * @param   type    reified unit type
+     * @param   pattern format pattern
+     * @return  new formatter instance
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@link net.time4j.Duration.Formatter#ofPattern(Class, String)}. </p>
+     *
+     * @param   <U>     generic unit type
+     * @param   type    reified unit type
+     * @param   pattern format pattern
+     * @return  new formatter instance
+     * @since   3.0
+     */
+    public static <U extends IsoUnit> Duration.Formatter<U> formatter(
+        Class<U> type,
+        String pattern
+    ) {
+
+        return Duration.Formatter.ofPattern(type, pattern);
+
+    }
+
     private String toString(int style) {
 
         if (
@@ -3713,7 +3760,7 @@ public final class Duration<U extends IsoUnit>
          * by Time4J. </p>
          *
          * @return  new formatter instance for parsing Joda-Style period expressions
-         * @since   1.2
+         * @since   3.0
          * @see     #ofPattern(Class, String)
          */
         /*[deutsch]
@@ -3726,7 +3773,7 @@ public final class Duration<U extends IsoUnit>
          * von Tim4J dennoch nicht unterst&uuml;tzt. </p>
          *
          * @return  new formatter instance for parsing Joda-Style period expressions
-         * @since   1.2
+         * @since   3.0
          * @see     #ofPattern(Class, String)
          */
         public static Formatter<IsoUnit> ofJodaStyle() {
