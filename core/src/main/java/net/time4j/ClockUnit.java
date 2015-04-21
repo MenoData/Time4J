@@ -296,9 +296,59 @@ public enum ClockUnit
      * @since   1.2
      * @see     #convert(TimeSpan)
      */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in eine andere Dauer nur mit dieser
+     * Zeiteinheit konvertiert. </p>
+     *
+     * @return  normalizer
+     * @since   1.2
+     * @see     #convert(TimeSpan)
+     */
     public Normalizer<ClockUnit> only() {
 
-        return OnlyNormalizer.of(this);
+        return ClockNormalizer.ofOnlyMode(this);
+
+    }
+
+    /**
+     * <p>Yields a normalizer which converts a given duration in another
+     * duration with smaller units truncated. </p>
+     *
+     * @return  normalizer
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in eine andere Dauer so
+     * konvertiert, da&szlig; Dauerelemente mit kleineren Zeiteinheiten
+     * abgeschnitten werden. </p>
+     *
+     * @return  normalizer
+     * @since   3.0
+     */
+    public Normalizer<ClockUnit> truncated() {
+
+        return ClockNormalizer.ofTruncateMode(this);
+
+    }
+
+    /**
+     * <p>Yields a normalizer which converts a given duration in another
+     * normalized duration with smaller units truncated and this unit rounded. </p>
+     *
+     * @return  normalizer
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine Dauer in eine andere normalisierte Dauer so
+     * konvertiert, da&szlig; Dauerelemente mit kleineren Zeiteinheiten abgeschnitten werden
+     * und diese Zeiteinheit gerundet wird. </p>
+     *
+     * @return  normalizer
+     * @since   3.0
+     */
+    public Normalizer<ClockUnit> rounded() {
+
+        return ClockNormalizer.ofRoundingMode(this);
 
     }
 

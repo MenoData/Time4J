@@ -149,8 +149,8 @@ public class DurationNormalizerTest {
         assertThat(
             dur.with(PlainTimestamp.of(2012, 2, 29, 14, 25)),
             is(
-            	Duration.ofPositive().years(3).months(2).days(4)
-            	.hours(2).minutes(12).build()));
+                Duration.ofPositive().years(3).months(2).days(4)
+                    .hours(2).minutes(12).build()));
     }
 
     @Test
@@ -159,6 +159,76 @@ public class DurationNormalizerTest {
         assertThat(
             PlainTimestamp.of(2012, 2, 28, 0, 0).normalize(dur),
             is(Duration.ofPositive().months(1).days(1).build()));
+    }
+
+    @Test
+    public void withMinutesTruncated() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 700);
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.truncated()),
+            is(Duration.ofClockUnits(4, 55, 0)));
+    }
+
+    @Test
+    public void withNegativeMinutesTruncated() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 700).inverse();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.truncated()),
+            is(Duration.ofClockUnits(4, 55, 0).inverse()));
+    }
+
+    @Test
+    public void withMinutesTruncatedIfEmpty() {
+        Duration<ClockUnit> timePeriod = Duration.ofZero();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.truncated()).isEmpty(),
+            is(true));
+    }
+
+    @Test
+    public void withMinutesRounded1() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 89);
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            is(Duration.ofClockUnits(4, 56, 0)));
+    }
+
+    @Test
+    public void withMinutesRounded2() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 90);
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            is(Duration.ofClockUnits(4, 57, 0)));
+    }
+
+    @Test
+    public void withNegativeMinutesRounded() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 55, 90).inverse();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            is(Duration.ofClockUnits(4, 57, 0).inverse()));
+    }
+
+    @Test
+    public void withMinutesRoundedIfEmpty() {
+        Duration<ClockUnit> timePeriod = Duration.ofZero();
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.rounded()).isEmpty(),
+            is(true));
+    }
+
+    @Test
+    public void withNanosRounded() {
+        Duration<ClockUnit> timePeriod =
+            Duration.ofClockUnits(4, 65, 1).plus(500000000, ClockUnit.NANOS);
+        assertThat(
+            timePeriod.with(ClockUnit.NANOS.rounded()),
+            is(Duration.ofClockUnits(5, 5, 1).plus(500000000, ClockUnit.NANOS)));
     }
 
 }
