@@ -3642,10 +3642,7 @@ public final class Duration<U extends IsoUnit>
      * <p>First example (parsing a Joda-Time-Period using a max width of 2): </p>
      *
      * <pre>
-     *  String jodaPattern =
-     *      "'P'[-#Y'Y'][-#M'M'][-#W'W'][-#D'D']['T'[-#h'H'][-#m'M']]";
-     *  Duration.Formatter&lt;IsoUnit&gt; f =
-     *      Duration.Formatter.ofPattern(IsoUnit.class, jodaPattern);
+     *  Duration.Formatter&lt;IsoUnit&gt; f = Duration.Formatter.ofJodaStyle();
      *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
      *  System.out.println(dur); // output: -P2Y15DT30H5M
      * </pre>
@@ -3680,10 +3677,7 @@ public final class Duration<U extends IsoUnit>
      * <p>Beispiel 1 (Analyse einer Joda-Time-Periode): </p>
      *
      * <pre>
-     *  String jodaPattern =
-     *      "'P'[-#Y'Y'][-#M'M'][-#W'W'][-#D'D']['T'[-#h'H'][-#m'M']]";
-     *  Duration.Formatter&lt;IsoUnit&gt; f =
-     *      Duration.Formatter.ofPattern(IsoUnit.class, jodaPattern);
+     *  Duration.Formatter&lt;IsoUnit&gt; f = Duration.Formatter.ofJodaStyle();
      *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
      *  System.out.println(dur); // Ausgabe: -P2Y15DT30H5M
      * </pre>
