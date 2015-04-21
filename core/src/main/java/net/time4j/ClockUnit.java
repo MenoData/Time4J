@@ -335,16 +335,36 @@ public enum ClockUnit
      * <p>Yields a normalizer which converts a given duration in another
      * normalized duration with smaller units truncated and this unit rounded. </p>
      *
+     * <p>This normalizer is a combination of {@code Duration.STD_CLOCK_PERIOD},
+     * {@code truncated()} and a special half-up rounding. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;ClockUnit&gt; timePeriod = Duration.ofClockUnits(4, 55, 90);
+     *  System.out.println(timePeriod.with(ClockUnit.MINUTES.rounded()));
+     *  // output: P4H57M
+     * </pre>
+     *
      * @return  normalizer
      * @since   3.0
+     * @see     Duration#STD_CLOCK_PERIOD
      */
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine Dauer in eine andere normalisierte Dauer so
      * konvertiert, da&szlig; Dauerelemente mit kleineren Zeiteinheiten abgeschnitten werden
      * und diese Zeiteinheit gerundet wird. </p>
      *
+     * <p>Dieser Normalisierer ist eine Kombination aus {@code Duration.STD_CLOCK_PERIOD},
+     * {@code truncated()} und einer kaufm&auml;nnischen Rundung. Beispiel: </p>
+     *
+     * <pre>
+     *  Duration&lt;ClockUnit&gt; timePeriod = Duration.ofClockUnits(4, 55, 90);
+     *  System.out.println(timePeriod.with(ClockUnit.MINUTES.rounded()));
+     *  // Ausgabe: P4H57M
+     * </pre>
+     *
      * @return  normalizer
      * @since   3.0
+     * @see     Duration#STD_CLOCK_PERIOD
      */
     public Normalizer<ClockUnit> rounded() {
 
