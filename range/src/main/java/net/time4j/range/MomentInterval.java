@@ -21,6 +21,9 @@
 
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
+import net.time4j.Duration;
+import net.time4j.IsoUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -340,6 +343,38 @@ public final class MomentInterval
         }
 
         return new TimestampInterval(b1, b2);
+
+    }
+
+    /**
+     * <p>Yields the nominal duration of this interval in given timezone and units. </p>
+     *
+     * @param   tz          timezone
+     * @param   units       time units to be used in calculation
+     * @return  nominal duration
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   3.0
+     * @see     #getSimpleDuration()
+     * @see     #getRealDuration()
+     */
+    /*[deutsch]
+     * <p>Liefert die nominelle Dauer dieses Intervalls in der angegebenen Zeitzone
+     * und den angegebenen Zeiteinheiten. </p>
+     *
+     * @param   tz          timezone
+     * @param   units       time units to be used in calculation
+     * @return  nominal duration
+     * @throws  UnsupportedOperationException if this interval is infinite
+     * @since   3.0
+     * @see     #getSimpleDuration()
+     * @see     #getRealDuration()
+     */
+    public Duration<IsoUnit> getNominalDuration(
+        Timezone tz,
+        IsoUnit... units
+    ) {
+
+        return this.toZonalInterval(tz.getID()).getDuration(tz, units);
 
     }
 
