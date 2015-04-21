@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.TimeSpan;
-import net.time4j.scale.TimeScale;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -75,9 +74,6 @@ final class SPX
 
     /** Serialisierungstyp von {@code Duration}. */
     static final int DURATION_TYPE = 6;
-
-    /** Serialisierungstyp von {@code MachineTime}. */
-    static final int MACHINE_TIME_TYPE = 7;
 
     /** Serialisierungstyp von {@code PlainTimestamp}. */
     static final int NEW_TIMESTAMP_TYPE = 8;
@@ -166,9 +162,6 @@ final class SPX
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
-            case MACHINE_TIME_TYPE:
-                this.writeMachineTime(out);
-                break;
             case NEW_TIMESTAMP_TYPE:
                 this.writeTimestampNew(out);
                 break;
@@ -216,9 +209,6 @@ final class SPX
                 break;
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
-                break;
-            case MACHINE_TIME_TYPE:
-                this.obj = this.readMachineTime(in, header);
                 break;
             case NEW_TIMESTAMP_TYPE:
                 this.obj = this.readTimestampNew(in, header);
@@ -573,47 +563,6 @@ final class SPX
 
         boolean negative = in.readBoolean();
         return new Duration<IsoUnit>(items, negative);
-    }
-
-    private void writeMachineTime(ObjectOutput out)
-        throws IOException {
-
-        MachineTime<?> mt = MachineTime.class.cast(this.obj);
-        int header = MACHINE_TIME_TYPE;
-        header <<= 4;
-
-        if (mt.getScale() == TimeScale.UTC) {
-            header |= 1;
-        }
-
-        if (mt.getFraction() == 0) {
-            out.writeByte(header);
-            out.writeLong(mt.getSeconds());
-        } else {
-            header |= 2;
-            out.writeByte(header);
-            out.writeLong(mt.getSeconds());
-            out.writeInt(mt.getFraction());
-        }
-
-    }
-
-    private Object readMachineTime(
-        ObjectInput in,
-        byte header
-    ) throws IOException, ClassNotFoundException {
-
-        TimeScale scale = (
-            ((header & 0x1) == 1) ? TimeScale.UTC : TimeScale.POSIX);
-        long secs = in.readLong();
-        int fraction = (((header & 0x2) == 2) ? in.readInt() : 0);
-
-        if (scale == TimeScale.UTC) {
-            return MachineTime.ofSIUnits(secs, fraction);
-        } else {
-            return MachineTime.ofPosixUnits(secs, fraction);
-        }
-
     }
 
 }

@@ -203,6 +203,20 @@ public class SerializationTest {
         assertThat(w4, is(roundtrip(w4)));
     }
 
+    @Test
+    public void roundTripOfMachineTimePOSIX()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(MachineTime.ofPosixSeconds(123.5));
+    }
+
+    @Test
+    public void roundTripOfMachineTimeUTC()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(MachineTime.ofSIUnits(123, 987654321));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

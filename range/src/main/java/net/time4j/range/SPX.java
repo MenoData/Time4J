@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.Temporal;
+import net.time4j.scale.TimeScale;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -76,6 +77,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code Boundary}. */
     static final int BOUNDARY_TYPE = 57;
+
+    /** Serialisierungstyp von {@code MachineTime}. */
+    static final int MACHINE_TIME_TYPE = 7;
 
     // for backwards compatibility pre v2.2
     private static final int OLD_DATE_TYPE = 50;
@@ -192,6 +196,9 @@ final class SPX
                         writeBoundary(part.getEnd(), out);
                     }
                     break;
+                case MACHINE_TIME_TYPE:
+                    this.writeMachineTime(out);
+                    break;
 
 //                case OLD_DATE_TYPE:
 //                case OLD_TIME_TYPE:
@@ -265,6 +272,9 @@ final class SPX
                 break;
             case BOUNDARY_TYPE:
                 this.obj = readBoundary(in, header);
+                break;
+            case MACHINE_TIME_TYPE:
+                this.obj = this.readMachineTime(in, header);
                 break;
 
             // for backward compatibility
@@ -636,6 +646,47 @@ final class SPX
         }
 
         return ret;
+
+    }
+
+    private void writeMachineTime(ObjectOutput out)
+        throws IOException {
+
+        MachineTime<?> mt = MachineTime.class.cast(this.obj);
+        int header = MACHINE_TIME_TYPE;
+        header <<= 2;
+
+        if (mt.getScale() == TimeScale.UTC) {
+            header |= 1;
+        }
+
+        if (mt.getFraction() == 0) {
+            out.writeByte(header);
+            out.writeLong(mt.getSeconds());
+        } else {
+            header |= 2;
+            out.writeByte(header);
+            out.writeLong(mt.getSeconds());
+            out.writeInt(mt.getFraction());
+        }
+
+    }
+
+    private Object readMachineTime(
+        ObjectInput in,
+        byte header
+    ) throws IOException, ClassNotFoundException {
+
+        TimeScale scale = (
+            ((header & 0x1) == 1) ? TimeScale.UTC : TimeScale.POSIX);
+        long secs = in.readLong();
+        int fraction = (((header & 0x2) == 2) ? in.readInt() : 0);
+
+        if (scale == TimeScale.UTC) {
+            return MachineTime.ofSIUnits(secs, fraction);
+        } else {
+            return MachineTime.ofPosixUnits(secs, fraction);
+        }
 
     }
 

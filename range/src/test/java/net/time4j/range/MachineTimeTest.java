@@ -1,5 +1,7 @@
-package net.time4j;
+package net.time4j.range;
 
+import net.time4j.Moment;
+import net.time4j.SI;
 import net.time4j.scale.TimeScale;
 
 import java.math.BigDecimal;
@@ -322,6 +324,26 @@ public class MachineTimeTest {
         assertThat(
             MachineTime.ofSIUnits(7, 500000001).dividedBy(3),
             is(MachineTime.ofSIUnits(2, 500000000)));
+    }
+
+    @Test
+    public void plusMachineTimeUTC() {
+        Moment m1 = Moment.of(1278028823, TimeScale.UTC);
+        Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
+        MachineTime<SI> mt = MachineTime.ON_UTC_SCALE.between(m1, m2);
+        assertThat(mt.getSeconds(), is(3L));
+        assertThat(mt.getFraction(), is(1));
+        assertThat(m1.plus(mt.getSeconds(), SI.SECONDS).plus(mt.getFraction(), SI.NANOSECONDS), is(m2));
+    }
+
+    @Test
+    public void plusMachineTimePOSIX() {
+        Moment m1 = Moment.of(1278028823, TimeScale.UTC);
+        Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
+        MachineTime<TimeUnit> mt = MachineTime.ON_POSIX_SCALE.between(m1, m2);
+        assertThat(mt.getSeconds(), is(2L));
+        assertThat(mt.getFraction(), is(1));
+        assertThat(m1.plus(mt), is(m2));
     }
 
 }

@@ -4,7 +4,6 @@ import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
-import net.time4j.MachineTime;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;

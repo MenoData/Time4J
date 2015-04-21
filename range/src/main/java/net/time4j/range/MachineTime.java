@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -19,8 +19,9 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j;
+package net.time4j.range;
 
+import net.time4j.*;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeMetric;
@@ -59,7 +60,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   2.0
+ * @since   3.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -81,7 +82,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   2.0
+ * @since   3.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -1044,7 +1045,7 @@ public final class MachineTime<U>
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
-     *              four most significant bits the type id {@code 7} and as
+     *              six most significant bits the type id {@code 7} and as
      *              least significant bit the value 1 if this instance uses
      *              the UTC-scale. Then the bytes for the seconds and fraction
      *              follow. The fraction bytes are only written if the fraction
@@ -1054,7 +1055,7 @@ public final class MachineTime<U>
      * Schematic algorithm:
      *
      * <pre>
-     *      byte header = (7 << 4);
+     *      byte header = (7 << 2);
      *      if (scale == TimeScale.UTC) header |= 1;
      *      if (this.getFraction() > 0) header |= 2;
      *      out.writeByte(header);
