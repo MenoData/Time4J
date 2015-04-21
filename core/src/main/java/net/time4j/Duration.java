@@ -1501,6 +1501,106 @@ public final class Duration<U extends IsoUnit>
 	}
 
     /**
+     * <p>Creates a composition of a calendar period and a clock period. </p>
+     *
+     * @param   calendarPeriod  calendrical duration
+     * @param   clockPeriod     duration with clock units
+     * @return  composite duration
+     * @since   3.0
+     * @see     #toCalendarPeriod()
+     * @see     #toClockPeriod()
+     */
+    /*[deutsch]
+     * <p>Bildet eine aus kalendarischer Dauer und Uhrzeitperiode zusammengesetzte Dauer. </p>
+     *
+     * @param   calendarPeriod  calendrical duration
+     * @param   clockPeriod     duration with clock units
+     * @return  composite duration
+     * @since   3.0
+     * @see     #toCalendarPeriod()
+     * @see     #toClockPeriod()
+     */
+    public static Duration<IsoUnit> compose(
+        Duration<CalendarUnit> calendarPeriod,
+        Duration<ClockUnit> clockPeriod
+    ) {
+
+        Duration<IsoUnit> dur = Duration.ofZero();
+        return dur.plus(calendarPeriod).plus(clockPeriod);
+
+    }
+
+    /**
+     * <p>Extracts a new duration with all contained calendar units only. </p>
+     *
+     * @return  new duration with calendar units only
+     * @since   3.0
+     * @see     #compose(Duration, Duration)
+     * @see     #toClockPeriod()
+     */
+    /*[deutsch]
+     * <p>Extrahiert eine neue Dauer, die nur alle kalendarischen Zeiteinheiten
+     * dieser Dauer enth&auml;lt. </p>
+     *
+     * @return  new duration with calendar units only
+     * @since   3.0
+     * @see     #compose(Duration, Duration)
+     * @see     #toClockPeriod()
+     */
+    public Duration<CalendarUnit> toCalendarPeriod() {
+
+        if (this.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        List<Item<CalendarUnit>> calItems = new ArrayList<Item<CalendarUnit>>();
+
+        for (Item<U> item : this.items) {
+            if (item.getUnit() instanceof CalendarUnit) {
+                calItems.add(Item.of(item.getAmount(), CalendarUnit.class.cast(item.getUnit())));
+            }
+        }
+
+        return new Duration<CalendarUnit>(calItems, this.isNegative());
+
+    }
+
+    /**
+     * <p>Extracts a new duration with all contained calendar units only. </p>
+     *
+     * @return  new duration with calendar units only
+     * @since   3.0
+     * @see     #compose(Duration, Duration)
+     * @see     #toCalendarPeriod()
+     */
+    /*[deutsch]
+     * <p>Extrahiert eine neue Dauer, die nur alle kalendarischen Zeiteinheiten
+     * dieser Dauer enth&auml;lt. </p>
+     *
+     * @return  new duration with calendar units only
+     * @since   3.0
+     * @see     #compose(Duration, Duration)
+     * @see     #toCalendarPeriod()
+     */
+    public Duration<ClockUnit> toClockPeriod() {
+
+        if (this.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        List<Item<ClockUnit>> clockItems = new ArrayList<Item<ClockUnit>>();
+
+        for (Item<U> item : this.items) {
+            if (item.getUnit() instanceof ClockUnit) {
+                clockItems.add(Item.of(item.getAmount(), ClockUnit.class.cast(item.getUnit())));
+            }
+        }
+
+        return new Duration<ClockUnit>(clockItems, this.isNegative());
+
+    }
+
+    /**
      * <p>Normalizes this duration by given normalizer. </p>
      *
      * @param   normalizer  help object for normalizing this duration
@@ -1914,6 +2014,7 @@ public final class Duration<U extends IsoUnit>
      *  date := -P7Y4M3D (negative: 7 years, 4 months, 3 days)
      *  time := PT3H2M1,4S (positive: 3 hours, 2 minutes, 1400 milliseconds)
      *  date-time := P1Y1M5DT15H59M10.400S (dot as decimal separator)
+     *  alternative := P0000-02-15T17:45
      * </pre>
      *
      * @param   period          duration in canonical, ISO-8601-compatible or
@@ -1975,6 +2076,7 @@ public final class Duration<U extends IsoUnit>
      *  date := -P7Y4M3D (negativ: 7 Jahre, 4 Monate, 3 Tage)
      *  time := PT3H2M1,4S (positiv: 3 Stunden, 2 Minuten, 1400 Millisekunden)
      *  date-time := P1Y1M5DT15H59M10.400S (Punkt als Dezimaltrennzeichen)
+     *  alternative := P0000-02-15T17:45
      * </pre>
      *
      * @param   period          duration in canonical, ISO-8601-compatible or
@@ -5294,8 +5396,7 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Duration<IsoUnit>
-        normalize(TimeSpan<? extends IsoUnit> timespan) {
+        public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
             List<Item<IsoUnit>> items =
@@ -5468,8 +5569,7 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Duration<CalendarUnit>
-        normalize(TimeSpan<? extends CalendarUnit> timespan) {
+        public Duration<CalendarUnit> normalize(TimeSpan<? extends CalendarUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
             long years = 0, months = 0, weeks = 0, days = 0;
@@ -5557,8 +5657,7 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Duration<ClockUnit>
-        normalize(TimeSpan<? extends ClockUnit> timespan) {
+        public Duration<ClockUnit> normalize(TimeSpan<? extends ClockUnit> timespan) {
 
             int count = timespan.getTotalLength().size();
             long hours = 0, minutes = 0, seconds = 0, nanos = 0;

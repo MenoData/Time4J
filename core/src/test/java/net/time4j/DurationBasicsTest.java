@@ -1335,4 +1335,47 @@ public class DurationBasicsTest {
         assertThat(item.getUnit(), is(NANOS));
     }
 
+    @Test
+    public void compose() {
+        Duration<CalendarUnit> calDur = Duration.ofCalendarUnits(1, 2, 15);
+        Duration<ClockUnit> clockDur = Duration.ofClockUnits(25, 10, 70);
+        assertThat(
+            Duration.compose(calDur, clockDur),
+            is(Duration.ofPositive().years(1).months(2).days(15).hours(25).minutes(10).seconds(70).build()));
+    }
+
+    @Test
+    public void toCalendarPeriod1() {
+        Duration<CalendarUnit> calDur = Duration.ofCalendarUnits(1, 2, 15);
+        Duration<ClockUnit> clockDur = Duration.ofClockUnits(25, 10, 70);
+        assertThat(
+            Duration.compose(calDur, clockDur).toCalendarPeriod(),
+            is(calDur));
+    }
+
+    @Test
+    public void toCalendarPeriod2() {
+        Duration<CalendarUnit> calDur = Duration.ofCalendarUnits(1, 2, 15);
+        assertThat(
+            calDur.toCalendarPeriod(),
+            is(calDur));
+    }
+
+    @Test
+    public void toClockPeriod1() {
+        Duration<CalendarUnit> calDur = Duration.ofCalendarUnits(1, 2, 15);
+        Duration<ClockUnit> clockDur = Duration.ofClockUnits(25, 10, 70);
+        assertThat(
+            Duration.compose(calDur, clockDur).toClockPeriod(),
+            is(clockDur));
+    }
+
+    @Test
+    public void toClockPeriod2() {
+        Duration<ClockUnit> clockDur = Duration.ofClockUnits(25, 10, 70);
+        assertThat(
+            clockDur.toClockPeriod(),
+            is(clockDur));
+    }
+
 }
