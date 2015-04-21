@@ -44,7 +44,7 @@ import net.time4j.tz.ZonalOffset;
  * @param   <S>  source type in JDBC
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  */
 /*[deutsch]
  * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus der 
@@ -56,7 +56,7 @@ import net.time4j.tz.ZonalOffset;
  * @param   <S>  source type in JDBC
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  */
 public abstract class JDBCAdapter<S, T>
     extends TemporalType<S, T> {
@@ -96,7 +96,7 @@ public abstract class JDBCAdapter<S, T>
      * done by Time4J for example via {@code PlainDate.toString()} or a
      * suitable {@code ChronoFormatter}.</p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
@@ -129,7 +129,7 @@ public abstract class JDBCAdapter<S, T>
      * korrekt zum Beispiel via {@code PlainDate.toString()} oder &uuml;ber
      * einen geeigneten {@code ChronoFormatter} geleistet werden. </p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final JDBCAdapter<java.sql.Date, PlainDate> SQL_DATE =
         new SqlDateRule();
@@ -161,7 +161,7 @@ public abstract class JDBCAdapter<S, T>
      * {@code java.sql.Time.toString()} can be misinterpreted by timezone
      * side effects. Concrete text output should be done by Time4J. </p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
@@ -190,7 +190,7 @@ public abstract class JDBCAdapter<S, T>
      * verf&auml;lscht. Konkrete Textausgaben sollen daher immer durch Time4J
      * erfolgen. </p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final JDBCAdapter<java.sql.Time, PlainTime> SQL_TIME =
         new SqlTimeRule();
@@ -216,7 +216,7 @@ public abstract class JDBCAdapter<S, T>
      *  // output: 1970-01-02T00:00:01,000000001
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
@@ -239,7 +239,7 @@ public abstract class JDBCAdapter<S, T>
      *  // Ausgabe: 1970-01-02T00:00:01,000000001
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final JDBCAdapter<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
         new SqlTimestampRule();

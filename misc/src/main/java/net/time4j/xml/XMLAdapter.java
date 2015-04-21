@@ -52,7 +52,7 @@ import net.time4j.tz.ZonalOffset;
  * @param   <S>  source type in XML-Java
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  */
 /*[deutsch]
  * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus den
@@ -64,7 +64,7 @@ import net.time4j.tz.ZonalOffset;
  * @param   <S>  source type in XML-Java
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  */
 public abstract class XMLAdapter<S, T>
     extends TemporalType<S, T> {
@@ -92,7 +92,7 @@ public abstract class XMLAdapter<S, T>
      *  // output: 2014-02-28
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Datum entsprechend
@@ -109,7 +109,7 @@ public abstract class XMLAdapter<S, T>
      *  // Ausgabe: 2014-02-28
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final XMLAdapter<XMLGregorianCalendar, PlainDate> XML_DATE =
         new XmlDateRule();
@@ -129,7 +129,7 @@ public abstract class XMLAdapter<S, T>
      *  // output: T21:45:30
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einer XML-Uhrzeit entsprechend
@@ -146,7 +146,7 @@ public abstract class XMLAdapter<S, T>
      *  // Ausgabe: T21:45:30
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final XMLAdapter<XMLGregorianCalendar, PlainTime> XML_TIME =
         new XmlTimeRule();
@@ -166,7 +166,7 @@ public abstract class XMLAdapter<S, T>
      *  // output: 2014-02-28T14:45:30
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
@@ -184,7 +184,7 @@ public abstract class XMLAdapter<S, T>
      *  // Ausgabe: 2014-02-28T14:45:30
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final XMLAdapter<XMLGregorianCalendar, PlainTimestamp> XML_DATE_TIME =
         XML_TIMESTAMP;
@@ -204,7 +204,7 @@ public abstract class XMLAdapter<S, T>
      *  // output: 2014-02-28T14:45:30+01:00
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einem XML-Zeitstempel entsprechend
@@ -222,7 +222,7 @@ public abstract class XMLAdapter<S, T>
      *  // Ausgabe: 2014-02-28T14:45:30+01:00
      * </pre>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final XMLAdapter<XMLGregorianCalendar, ZonalDateTime> XML_DATE_TIME_OFFSET =
         new XmlDateTimeOffsetRule();
@@ -231,13 +231,13 @@ public abstract class XMLAdapter<S, T>
      * <p>Bridge between a XML-duration according to {@code xsd:duration}
      * and the Time4J-type {@code Duration}. </p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen einer XML-Dauer entsprechend
      * {@code xsd:duration} und dem Time4J-Typ {@code Duration}. </p>
      *
-     * @since   2.4
+     * @since   3.0
      */
     public static final XMLAdapter<javax.xml.datatype.Duration, Duration<IsoUnit>> XML_DURATION =
         new XmlDurationRule();

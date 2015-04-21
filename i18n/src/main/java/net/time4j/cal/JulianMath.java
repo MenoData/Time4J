@@ -28,14 +28,14 @@ import net.time4j.base.MathUtils;
  * <p>Contains conversion methods for the rules of julian calendar. </p>
  *
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  * @doctags.experimental Will probably be replaced by a proleptic julian calendar in later releases.
  */
 /*[deutsch]
  * <p>Enth&auml;lt Konversionsmethoden f&uuml;r die Regeln des julianischen Kalenders. </p>
  *
  * @author  Meno Hochschild
- * @since   2.4
+ * @since   3.0
  * @doctags.experimental Will probably be replaced by a proleptic julian calendar in later releases.
  */
 public final class JulianMath {
