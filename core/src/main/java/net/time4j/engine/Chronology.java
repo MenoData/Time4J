@@ -183,7 +183,6 @@ public class Chronology<T extends ChronoEntity<T>>
             return (
                 this.isRegistered(element)
                 || (this.getDerivedRule(element, false) != null)
-                || (this.getEpochRule(element) != null)
             );
         }
 
@@ -312,8 +311,7 @@ public class Chronology<T extends ChronoEntity<T>>
      * @param   chronoType  chronological type
      * @return  chronology or {@code null} if not found
      */
-    public static <T extends ChronoEntity<T>>
-    Chronology<T> lookup(Class<T> chronoType) {
+    public static <T extends ChronoEntity<T>> Chronology<T> lookup(Class<T> chronoType) {
 
         try {
             // Initialisierung der Klasse anstoßen, wenn noch nicht erfolgt
@@ -390,15 +388,6 @@ public class Chronology<T extends ChronoEntity<T>>
      */
     <V> ElementRule<T, V> getRule(ChronoElement<V> element) {
 
-        return this.getRule(element, true);
-
-    }
-
-    private <V> ElementRule<T, V> getRule(
-        ChronoElement<V> element,
-        boolean withEpochMechanism
-    ) {
-
         if (element == null) {
             throw new NullPointerException("Missing chronological element.");
         }
@@ -408,12 +397,8 @@ public class Chronology<T extends ChronoEntity<T>>
         if (rule == null) {
             rule = this.getDerivedRule(element, true);
 
-            if ((rule == null) && withEpochMechanism) {
-                rule = this.getEpochRule(element);
-
-                if (rule == null) {
-                    throw new RuleNotFoundException(this, element);
-                }
+            if (rule == null) {
+                throw new RuleNotFoundException(this, element);
             }
         }
 
@@ -443,48 +428,6 @@ public class Chronology<T extends ChronoEntity<T>>
 
     }
 
-    // optional
-    private <V> ElementRule<?, ?> getEpochRule(ChronoElement<V> element) {
-
-        ElementRule<?, ?> ret = null;
-
-        if (Calendrical.class.isAssignableFrom(this.chronoType)) {
-            Chronology<?> foreign = null;
-            boolean purged = false;
-
-            for (ChronoReference cref : CHRONOS) {
-                Chronology<?> c = cref.get();
-
-                if (c == null) {
-                    purged = true;
-                } else if (
-                    (c != this)
-                    && c.isRegistered(element)
-                    && Calendrical.class.isAssignableFrom(c.getChronoType())
-                ) {
-                    foreign = c;
-                    break;
-                }
-            }
-
-            if (purged) {
-                purgeQueue();
-            }
-
-            if (foreign != null) {
-                ret =
-                    createRuleByEpoch(
-                        element,
-                        foreign.getChronoType(),
-                        this.chronoType
-                    );
-            }
-        }
-
-        return ret;
-
-    }
-
     // vom GC behandelte Referenzen wegräumen
     private static void purgeQueue() {
 
@@ -498,19 +441,6 @@ public class Chronology<T extends ChronoEntity<T>>
                 }
             }
         }
-
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static ElementRule<?, ?> createRuleByEpoch(
-        ChronoElement<?> element,
-        Class fc, // foreign chronology
-        Class tc // this chronology
-    ) {
-
-
-        ElementRule rule = Chronology.lookup(fc).getRule(element, false);
-        return new TransformingRule(rule, fc, tc);
 
     }
 
@@ -737,99 +667,6 @@ public class Chronology<T extends ChronoEntity<T>>
                         "Element duplicate found: " + elementName);
                 }
             }
-
-        }
-
-    }
-
-    // Transformiert eine Elementregel zwischen S und T via Calendrical
-    private static class TransformingRule
-        <S extends Calendrical<?, S>, T extends Calendrical<?, T>, V>
-        implements ElementRule<T, V> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final ElementRule<S, V> rule;
-        private final Class<S> s;
-        private final Class<T> t;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        TransformingRule(
-            ElementRule<S, V> rule,
-            Class<S> s,
-            Class<T> t
-        ) {
-            super();
-
-            this.rule = rule;
-            this.s = s;
-            this.t = t;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public V getValue(T context) {
-
-            S src = context.transform(this.s);
-            return this.rule.getValue(src);
-
-        }
-
-        @Override
-        public T withValue(
-            T context,
-            V value,
-            boolean lenient
-        ) {
-
-            S src = context.transform(this.s);
-            return this.rule.withValue(src, value, lenient).transform(this.t);
-
-        }
-
-        @Override
-        public boolean isValid(
-            T context,
-            V value
-        ) {
-
-            S src = context.transform(this.s);
-            return this.rule.isValid(src, value);
-
-        }
-
-        @Override
-        public V getMinimum(T context) {
-
-            S src = context.transform(this.s);
-            return this.rule.getMinimum(src);
-
-        }
-
-        @Override
-        public V getMaximum(T context) {
-
-            S src = context.transform(this.s);
-            return this.rule.getMaximum(src);
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(T context) {
-
-            S src = context.transform(this.s);
-            return this.rule.getChildAtFloor(src);
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(T context) {
-
-            S src = context.transform(this.s);
-            return this.rule.getChildAtCeiling(src);
 
         }
 

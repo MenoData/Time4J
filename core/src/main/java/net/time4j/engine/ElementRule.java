@@ -37,11 +37,6 @@ package net.time4j.engine;
  * then Time4J checks if the associated element is a {@code BasicElement}
  * and if the element supports the chronology. If yes then its internal
  * rule will be evaluated. </li>
- * <li>As last resort Time4J checks if there is any other chronology which
- * is compatible to {@link Calendrical} and contains the element in question
- * as registered element. In this case the current chronology must also be
- * compatible to {@code Calendrical}. If yes then Time4J will generate an
- * element rule which automatically converts between both chronologies. </li>
  * <li>If the search did not yield any result then a
  * {@link RuleNotFoundException} will be thrown. </li></ol>
  *
@@ -71,12 +66,6 @@ package net.time4j.engine;
  * die Chronologie unterst&uuml;tzt. Wenn ja, wird dessen interne Regel
  * ausgewertet. Passt die Regel vom chronologischen Typ her, dann wird
  * sie verwendet. </li>
- * <li>Als letzter Versuch wird gepr&uuml;ft, ob es eine andere geladene
- * Chronologie gibt, die kompatibel zur Klasse {@link Calendrical} ist
- * und das fragliche Element registriert hat. In diesem Fall mu&szlig;
- * auch die aktuelle Chronologie zu {@code Calendrical} kompatibel sein.
- * Wenn ja, wird eine Elementregel generiert, die die zwischen den
- * Chronologien notwendige Konvertierung automatisch vornimmt. </li>
  * <li>Wenn die Suche letztlich nichts ergeben hat, wird eine
  * {@link RuleNotFoundException} geworfen. </li></ol>
  *
