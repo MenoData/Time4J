@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.cal;
+package net.time4j.historic;
 
 import net.time4j.base.MathUtils;
 
@@ -29,14 +29,14 @@ import net.time4j.base.MathUtils;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.experimental Will probably be replaced by a proleptic julian calendar in later releases.
+ * @doctags.experimental Might be replaced by a proleptic julian calendar in later releases.
  */
 /*[deutsch]
  * <p>Enth&auml;lt Konversionsmethoden f&uuml;r die Regeln des julianischen Kalenders. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.experimental Will probably be replaced by a proleptic julian calendar in later releases.
+ * @doctags.experimental Might be replaced by a proleptic julian calendar in later releases.
  */
 public final class JulianMath {
 
