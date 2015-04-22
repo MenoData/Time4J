@@ -25,7 +25,6 @@ package net.time4j.tz;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -63,8 +62,6 @@ public final class ZonalOffset
 
     private static final ConcurrentMap<Integer, ZonalOffset> OFFSET_CACHE =
         new ConcurrentHashMap<Integer, ZonalOffset>();
-    private static final ConcurrentMap<String, ZonalOffset> ID_CACHE =
-        new ConcurrentHashMap<String, ZonalOffset>();
 
     private static final BigDecimal DECIMAL_60 = new BigDecimal(60);
     private static final BigDecimal DECIMAL_3600 = new BigDecimal(3600);
@@ -86,7 +83,6 @@ public final class ZonalOffset
     static {
         UTC = new ZonalOffset(0, 0);
         OFFSET_CACHE.put(Integer.valueOf(0), UTC);
-        ID_CACHE.put("Z", UTC);
     }
 
     private static final long serialVersionUID = -1410512619471503090L;
@@ -341,7 +337,7 @@ public final class ZonalOffset
         if (arcMinutes != 0) {
             BigDecimal arcMin =
                 BigDecimal.valueOf(arcMinutes)
-                    .setScale(15)
+                    .setScale(15, RoundingMode.UNNECESSARY)
                     .divide(DECIMAL_60, RoundingMode.HALF_UP);
             longitude = longitude.add(arcMin);
         }
@@ -349,7 +345,7 @@ public final class ZonalOffset
         if (arcSeconds != 0) {
             BigDecimal arcSec =
                 BigDecimal.valueOf(arcSeconds)
-                    .setScale(15)
+                    .setScale(15, RoundingMode.UNNECESSARY)
                     .divide(DECIMAL_3600, RoundingMode.HALF_UP);
             longitude = longitude.add(arcSec);
         }
@@ -547,7 +543,6 @@ public final class ZonalOffset
                 result = new ZonalOffset(total, 0);
                 OFFSET_CACHE.putIfAbsent(value, result);
                 result = OFFSET_CACHE.get(value);
-                ID_CACHE.putIfAbsent(result.name, result);
             }
             return result;
         } else {
