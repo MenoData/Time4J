@@ -46,14 +46,28 @@ public enum Platform
      * <p>The details of the platform pattern syntax are platform-dependent. </p>
      *
      * <p>In Java-pre-8 environment - the pattern syntax will follow the details
-     * in the class {@code SimpleDateFormat}. </p>
+     * in the class {@code SimpleDateFormat}. Note that this configuration will
+     * not use the best available format engine. For higher quality requirements
+     * users are advised to use {@code net.time4j.format.expert.PatternType} in
+     * i18n-module. </p>
+     *
+     * <p>Timezone conversions always rely on the best available timezone data
+     * which are not necessarily those of the JDK. This is even true in context
+     * of using {@code SimpleDateFormat}. </p>
      */
     /*[deutsch]
      * <p>Die Details der Plattform-Formatmuster-Syntax sind naturgem&auml;&szlig;
      * abh&auml;ngig von der aktuellen Plattform. </p>
      *
      * <p>In einer Java-pre-8-Umgebung folgt die Formatmustersyntax den Details der
-     * Klasse {@code SimpleDateFormat}. </p>
+     * Klasse {@code SimpleDateFormat}. Hinweis: Diese Konfiguration wird nicht
+     * die bestm&ouml;gliche {@code FormatEngine} nutzen. F&uuml;r h&ouml;here
+     * Anspr&uuml;che sollten Anwender {@code net.time4j.format.expert.PatternType}
+     * im i18n-Modul nutzen. </p>
+     *
+     * <p>Zeitzonenkonversionen beruhen immer auf den besten verf&uuml;gbaren
+     * Zeitzonendaten, also nicht notwendig denen des JDK. Das gilt selbst dann,
+     * wenn die interne {@code FormatEngine} auf {@code SimpleDateFormat} basiert. </p>
      */
     PATTERN;
 

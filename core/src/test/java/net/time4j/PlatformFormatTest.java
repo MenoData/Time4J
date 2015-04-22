@@ -1,9 +1,12 @@
 package net.time4j;
 
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -44,6 +47,36 @@ public class PlatformFormatTest {
         assertThat(
             PlainDate.formatter("MM/dd/yyyy", Platform.PATTERN, Locale.US).parse("05/31/1425"),
             is(date));
+    }
+
+    @Test
+    public void printMoment() {
+        TZID tzid = Timezone.of("Europe/London").getID();
+        String expected;
+        if (Timezone.of(tzid).isDaylightSaving(Moment.UNIX_EPOCH)) {
+            expected = "01.01.1970 01:00 AM BST";
+        } else {
+            expected = "01.01.1970 12:00 AM GMT";
+        }
+        assertThat(
+            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).format(Moment.UNIX_EPOCH),
+            is(expected)
+        );
+    }
+
+    @Test
+    public void parseMoment() throws ParseException {
+        TZID tzid = Timezone.of("Europe/London").getID();
+        String text;
+        if (Timezone.of(tzid).isDaylightSaving(Moment.UNIX_EPOCH)) {
+            text = "01.01.1970 01:00 AM BST";
+        } else {
+            text = "01.01.1970 12:00 AM GMT";
+        }
+        assertThat(
+            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).parse(text),
+            is(Moment.UNIX_EPOCH)
+        );
     }
 
 }

@@ -22,19 +22,22 @@
 package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -162,21 +165,43 @@ final class SystemTemporalFormatter<T>
             if (this.tzid == null) {
                 throw new IllegalArgumentException("Cannot print moment without timezone.");
             }
-            String p = this.pattern;
-            if (p.equals(SystemFormatEngine.RFC_1123_PATTERN)) {
-                p = RFC_1123_WIDE;
+            String realPattern = this.pattern;
+            if (realPattern.equals(SystemFormatEngine.RFC_1123_PATTERN)) {
+                realPattern = RFC_1123_WIDE;
             }
-            SimpleDateFormat sdf = setUp(p, this.locale, !this.leniency.isStrict(), this.tzid);
-            text = sdf.format(jud);
+            SystemTemporalFormatter<ZonalDateTime> stf =
+                new SystemTemporalFormatter<ZonalDateTime>(
+                    ZonalDateTime.class, realPattern, this.locale, this.leniency, this.tzid);
+            text = stf.format(moment.inZonalView(this.tzid));
         } else if (this.type.equals(ZonalDateTime.class)) {
             ZonalDateTime zdt = ZonalDateTime.class.cast(formattable);
-            Date jud = TemporalType.JAVA_UTIL_DATE.from(zdt.toMoment());
+            Moment moment = zdt.toMoment();
+            Date jud = TemporalType.JAVA_UTIL_DATE.from(moment);
             String timezone = (
                 this.tzid == null
                 ? zdt.getTimezone().canonical()
                 : this.tzid);
-            SimpleDateFormat sdf = setUp(this.pattern, this.locale, !this.leniency.isStrict(), timezone);
-            text = sdf.format(jud);
+            Timezone tz = Timezone.of(timezone);
+            String replaceTZ = tz.getOffset(moment).toString().replace("UTC", "GMT");
+            XCalendar gcal = new XCalendar(TimeZone.getTimeZone(replaceTZ), this.locale);
+            SimpleDateFormat sdf = setUp(this.pattern, this.locale, gcal, !this.leniency.isStrict());
+            FieldPosition fp = new FieldPosition(DateFormat.TIMEZONE_FIELD);
+            StringBuffer sb = new StringBuffer();
+            text = sdf.format(jud, sb, fp).toString();
+            int start = fp.getBeginIndex();
+            int end = fp.getEndIndex();
+
+            if ((end > start) && (start > 0) && this.hasTimezoneField()) {
+                boolean dst = tz.isDaylightSaving(moment);
+                boolean abbreviated = !this.pattern.contains("zzzz");
+                NameStyle style = (
+                    abbreviated
+                        ? (dst ? NameStyle.SHORT_DAYLIGHT_TIME : NameStyle.SHORT_STANDARD_TIME)
+                        : (dst ? NameStyle.LONG_DAYLIGHT_TIME : NameStyle.LONG_STANDARD_TIME)
+                    );
+                String name = tz.getDisplayName(style, this.locale);
+                text = text.substring(0, start) + name + text.substring(end);
+            }
         } else {
             throw new IllegalArgumentException("Not formattable: " + formattable);
         }
@@ -292,22 +317,49 @@ final class SystemTemporalFormatter<T>
 
     }
 
+    private boolean hasTimezoneField() {
+
+        boolean literal = false;
+
+        for (int i = this.pattern.length() - 1; i >= 0; i++) {
+            char c = this.pattern.charAt(i);
+            if (c == '\'') {
+                literal = !literal;
+            } else if (!literal && (c == 'z')) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    private static void updateRawValues(
+        RawValues rawValues,
+        SimpleDateFormat sdf
+    ) {
+
+        if (rawValues != null) {
+            rawValues.accept(new Parsed(XCalendar.class.cast(sdf.getCalendar())));
+        }
+
+    }
+
     private SimpleDateFormat setUpLocal() {
 
-        return setUp(this.pattern, this.locale, !this.leniency.isStrict(), "GMT");
+        XCalendar gcal = new XCalendar(TimeZone.getTimeZone("GMT"), this.locale);
+        return setUp(this.pattern, this.locale, gcal, !this.leniency.isStrict());
 
     }
 
     private static SimpleDateFormat setUp(
         String pattern,
         Locale locale,
-        boolean lenient,
-        String tzid
+        XCalendar gcal,
+        boolean lenient
     ) {
 
         SimpleDateFormat sdf = new SimpleDateFormat(pattern, locale);
-        GregorianCalendar gcal = new GregorianCalendar(TimeZone.getTimeZone(tzid), locale);
-        gcal.setGregorianChange(PROLEPTIC_GREGORIAN);
         sdf.setCalendar(gcal);
         sdf.setLenient(lenient);
         return sdf;
@@ -329,24 +381,20 @@ final class SystemTemporalFormatter<T>
             Date jud = sdf.parse(parseable, position);
             PlainTimestamp tsp = TemporalType.JAVA_UTIL_DATE.translate(jud).toZonalTimestamp(ZonalOffset.UTC);
             result = tsp.getCalendarDate();
-            updateRawValues(rawValues, sdf, null);
+            updateRawValues(rawValues, sdf);
         } else if (this.type.equals(PlainTime.class)) {
             SimpleDateFormat sdf = this.setUpLocal();
             Date jud = sdf.parse(parseable, position);
             PlainTimestamp tsp = TemporalType.JAVA_UTIL_DATE.translate(jud).toZonalTimestamp(ZonalOffset.UTC);
             result = tsp.getWallTime();
-            updateRawValues(rawValues, sdf, null);
+            updateRawValues(rawValues, sdf);
         } else if (this.type.equals(PlainTimestamp.class)) {
             SimpleDateFormat sdf = this.setUpLocal();
             Date jud = sdf.parse(parseable, position);
             PlainTimestamp tsp = TemporalType.JAVA_UTIL_DATE.translate(jud).toZonalTimestamp(ZonalOffset.UTC);
             result = tsp;
-            updateRawValues(rawValues, sdf, null);
+            updateRawValues(rawValues, sdf);
         } else if (this.type.equals(Moment.class)) {
-            String timezone = (
-                (this.tzid == null)
-                ? "GMT-18:00"
-                : this.tzid);
             String realPattern = this.pattern;
             if (realPattern.equals(SystemFormatEngine.RFC_1123_PATTERN)) {
                 String test = parseable.substring(position.getIndex());
@@ -365,32 +413,30 @@ final class SystemTemporalFormatter<T>
                     realPattern = realPattern.replace(":ss", "");
                 }
             }
-            SimpleDateFormat sdf = setUp(realPattern, this.locale, !this.leniency.isStrict(), timezone);
-            Date jud = sdf.parse(parseable, position);
-            Moment moment = TemporalType.JAVA_UTIL_DATE.translate(jud);
-            Calendar cal = sdf.getCalendar();
-            int offset = cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET);
-            if (offset == -1080) {
-                position.setErrorIndex(text.length());
-                if (wantsException) {
-                    throw new IllegalArgumentException("Cannot parse text without timezone: " + parseable);
-                } else {
-                    return null;
-                }
-            }
-            result = moment;
-            TZID parsedTimezone = this.getParsedTimezone(cal, offset, timezone);
-            updateRawValues(rawValues, sdf, parsedTimezone);
+            SystemTemporalFormatter<ZonalDateTime> stf =
+                new SystemTemporalFormatter<ZonalDateTime>(
+                    ZonalDateTime.class, realPattern, this.locale, this.leniency, this.tzid);
+            ZonalDateTime zdt = stf.parseInternal(text, position, wantsException, rawValues);
+            result = zdt.toMoment();
         } else if (this.type.equals(ZonalDateTime.class)) {
             String timezone = (
                 (this.tzid == null)
                 ? "GMT-18:00"
                 : this.tzid);
-            SimpleDateFormat sdf = setUp(this.pattern, this.locale, !this.leniency.isStrict(), timezone);
+            XCalendar gcal = new XCalendar(TimeZone.getTimeZone(timezone), this.locale);
+            SimpleDateFormat sdf = setUp(this.pattern, this.locale, gcal, !this.leniency.isStrict());
             Date jud = sdf.parse(parseable, position);
-            Moment moment = TemporalType.JAVA_UTIL_DATE.translate(jud);
-            Calendar cal = sdf.getCalendar();
-            int offset = cal.get(Calendar.ZONE_OFFSET) + cal.get(Calendar.DST_OFFSET);
+
+            if (
+                (jud == null)
+                || (position.getErrorIndex() >= 0)
+            ) {
+                return null;
+            }
+
+            Parsed parsed = new Parsed(gcal);
+            int offset = gcal.get(Calendar.ZONE_OFFSET) + gcal.get(Calendar.DST_OFFSET);
+
             if (offset == -1080) {
                 position.setErrorIndex(position.getIndex());
                 if (wantsException) {
@@ -398,18 +444,27 @@ final class SystemTemporalFormatter<T>
                 } else {
                     return null;
                 }
-            } else if (!cal.getTimeZone().getID().equals(timezone)) {
-                result = moment.inZonalView(cal.getTimeZone().getID());
+            } else if (!gcal.getTimeZone().getID().equals(timezone)) {
+                timezone = gcal.getTimeZone().getID();
             } else {
                 ZonalOffset zo = ZonalOffset.ofTotalSeconds(offset / 1000);
-                if ((this.tzid != null) && Timezone.of(this.tzid).getOffset(moment).equals(zo)) {
-                    result = moment.inZonalView(this.tzid);
+                if (
+                    (this.tzid != null)
+                    && (gcal.getTimeZone().getOffset(jud.getTime()) == offset)
+                ) {
+                    timezone = this.tzid;
                 } else {
-                    result = moment.inZonalView(zo);
+                    timezone = zo.canonical();
                 }
             }
-            TZID parsedTimezone = this.getParsedTimezone(cal, offset, timezone);
-            updateRawValues(rawValues, sdf, parsedTimezone);
+
+            TZID parsedTimezone = Timezone.of(timezone).getID();
+            parsed.setTimezone(parsedTimezone);
+            PlainTimestamp tsp = PlainTimestamp.axis().createFrom(parsed, this.getAttributes(), false);
+            result = tsp.inTimezone(parsedTimezone).inZonalView(parsedTimezone);
+            if (rawValues != null) {
+                rawValues.accept(parsed);
+            }
         } else {
             result = null;
         }
@@ -418,70 +473,53 @@ final class SystemTemporalFormatter<T>
 
     }
 
-    private TZID getParsedTimezone(
-        Calendar cal,
-        int offset,
-        String timezone
-    ) {
-
-        if (!cal.getTimeZone().getID().equals(timezone)) {
-            return Timezone.of(cal.getTimeZone().getID()).getID();
-        } else {
-            ZonalOffset zo = ZonalOffset.ofTotalSeconds(offset / 1000);
-            return ((this.tzid == null) ? zo : null);
-        }
-
-    }
-
-    private static void updateRawValues(
-        RawValues rawValues,
-        SimpleDateFormat sdf,
-        TZID parsedTimezone
-    ) {
-
-        if (rawValues != null) {
-            rawValues.accept(new Parsed(sdf.getCalendar(), parsedTimezone));
-        }
-
-    }
-
     //~ Innere Klassen ----------------------------------------------------
 
     private static class Parsed
-        implements ChronoDisplay {
+        extends ChronoEntity<Parsed> {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final Map<ChronoElement<?>, Object> values;
-        private final TZID tzid;
+        private TZID tzid = null;
 
         //~ Konstruktoren -------------------------------------------------
 
-        Parsed(
-            Calendar cal,
-            TZID tzid
-        ) {
+        Parsed(XCalendar cal) {
             super();
 
             Map<ChronoElement<?>, Object> map = new HashMap<ChronoElement<?>, Object>();
-            map.put(PlainDate.YEAR, cal.get(Calendar.YEAR));
-            map.put(PlainDate.MONTH_AS_NUMBER, cal.get(Calendar.MONTH) + 1);
-            map.put(PlainDate.DAY_OF_YEAR, cal.get(Calendar.DAY_OF_YEAR));
-            map.put(PlainDate.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH));
-            int wd = cal.get(Calendar.DAY_OF_WEEK) - 1;
-            map.put(PlainDate.DAY_OF_WEEK, Weekday.valueOf((wd == 0) ? 7 : wd));
-            map.put(PlainTime.AM_PM_OF_DAY, Meridiem.values()[cal.get(Calendar.AM_PM)]);
-            map.put(PlainTime.DIGITAL_HOUR_OF_AMPM, cal.get(Calendar.HOUR));
-            map.put(PlainTime.DIGITAL_HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-            map.put(PlainTime.MINUTE_OF_HOUR, cal.get(Calendar.MINUTE));
-            map.put(PlainTime.SECOND_OF_MINUTE, cal.get(Calendar.SECOND));
-            map.put(PlainTime.MILLI_OF_SECOND, cal.get(Calendar.MILLISECOND));
-            int fw = cal.getFirstDayOfWeek() - 1;
-            map.put(
-                Weekmodel.of(Weekday.valueOf((fw == 0) ? 7 : fw), cal.getMinimalDaysInFirstWeek()).weekOfYear(),
-                cal.get(Calendar.WEEK_OF_YEAR));
+            if (cal.isSet(Calendar.YEAR)) {
+                map.put(PlainDate.YEAR, cal.getRawValue(Calendar.YEAR));
+            }
+            if (cal.isSet(Calendar.MONTH)) {
+                map.put(PlainDate.MONTH_AS_NUMBER, cal.getRawValue(Calendar.MONTH) + 1);
+            }
+            if (cal.isSet(Calendar.DAY_OF_YEAR)) {
+                map.put(PlainDate.DAY_OF_YEAR, cal.getRawValue(Calendar.DAY_OF_YEAR));
+            }
+            if (cal.isSet(Calendar.DAY_OF_MONTH)) {
+                map.put(PlainDate.DAY_OF_MONTH, cal.getRawValue(Calendar.DAY_OF_MONTH));
+            }
+            if (cal.isSet(Calendar.AM_PM)) {
+                map.put(PlainTime.AM_PM_OF_DAY, Meridiem.values()[cal.getRawValue(Calendar.AM_PM)]);
+            }
+            if (cal.isSet(Calendar.HOUR)) {
+                map.put(PlainTime.DIGITAL_HOUR_OF_AMPM, cal.getRawValue(Calendar.HOUR));
+            }
+            if (cal.isSet(Calendar.HOUR_OF_DAY)) {
+                map.put(PlainTime.DIGITAL_HOUR_OF_DAY, cal.getRawValue(Calendar.HOUR_OF_DAY));
+            }
+            if (cal.isSet(Calendar.MINUTE)) {
+                map.put(PlainTime.MINUTE_OF_HOUR, cal.getRawValue(Calendar.MINUTE));
+            }
+            if (cal.isSet(Calendar.SECOND)) {
+                map.put(PlainTime.SECOND_OF_MINUTE, cal.getRawValue(Calendar.SECOND));
+            }
+            if (cal.isSet(Calendar.MILLISECOND)) {
+                map.put(PlainTime.MILLI_OF_SECOND, cal.getRawValue(Calendar.MILLISECOND));
+            }
             this.values = Collections.unmodifiableMap(map);
-            this.tzid = tzid;
 
         }
 
@@ -519,6 +557,34 @@ final class SystemTemporalFormatter<T>
         }
 
         @Override
+        public <V> boolean isValid(
+            ChronoElement<V> element,
+            V value // optional
+        ) {
+
+            return (element != null);
+
+        }
+
+        @Override
+        public <V> Parsed with(
+            ChronoElement<V> element,
+            V value // optional
+        ) {
+
+            if (element == null) {
+                throw new NullPointerException();
+            } else if (value == null) {
+                this.values.remove(element);
+            } else {
+                this.values.put(element, value);
+            }
+
+            return this;
+
+        }
+
+        @Override
         public boolean hasTimezone() {
 
             return (this.tzid != null);
@@ -536,11 +602,50 @@ final class SystemTemporalFormatter<T>
 
         }
 
+        void setTimezone(TZID tzid) {
+
+            this.tzid = tzid;
+
+        }
+
+        @Override
+        protected Chronology<Parsed> getChronology() {
+
+            throw new UnsupportedOperationException(
+                "Parsed values do not have any chronology.");
+
+        }
+
         private void check(ChronoElement<?> element) {
 
             if (!this.values.containsKey(element)) {
                 throw new ChronoException("Element not supported: " + element.name());
             }
+
+        }
+
+    }
+
+    private static class XCalendar
+        extends GregorianCalendar {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        XCalendar(
+            TimeZone tz,
+            Locale locale
+        ) {
+            super(tz, locale);
+
+            this.setGregorianChange(PROLEPTIC_GREGORIAN);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        int getRawValue(int field) {
+
+            return super.internalGet(field);
 
         }
 
