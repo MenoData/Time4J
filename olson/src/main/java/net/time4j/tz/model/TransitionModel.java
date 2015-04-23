@@ -130,7 +130,7 @@ public abstract class TransitionModel
     }
 
     /**
-     * <p>Creates a transition history of both historic transitions and
+     * <p>Creates a transition history of both history transitions and
      * rules for future transitions as well. </p>
      *
      * @param   initialOffset   initial offset
