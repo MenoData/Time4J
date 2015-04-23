@@ -21,11 +21,7 @@
 
 package net.time4j;
 
-import net.time4j.base.GregorianDate;
 import net.time4j.engine.CalendarEra;
-import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ElementRule;
 
 
 /**
@@ -45,32 +41,14 @@ enum SimpleEra
      *
      * <p>BC = Before Christian</p>
      */
-    BC {
-        @Override
-        public GregorianDate getDate() {
-            return PlainDate.of(0, Month.DECEMBER, 31);
-        }
-        @Override
-        public boolean isStarting() {
-            return false;
-        }
-    },
+    BC,
 
     /**
      * <p>&Auml;ra nach Christi Geburt. </p>
      *
      * <p>AD = Anno Domini</p>
      */
-    AD {
-        @Override
-        public GregorianDate getDate() {
-            return PlainDate.of(1, Month.JANUARY, 1);
-        }
-        @Override
-        public boolean isStarting() {
-            return true;
-        }
-    };
+    AD;
 
     //~ Methoden ----------------------------------------------------------
 

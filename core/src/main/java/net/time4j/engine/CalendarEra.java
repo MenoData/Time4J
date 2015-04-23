@@ -21,8 +21,6 @@
 
 package net.time4j.engine;
 
-import net.time4j.base.GregorianDate;
-
 
 /**
  * <p>Represents an era in a calendar system. </p>
@@ -82,52 +80,5 @@ public interface CalendarEra {
      */
     int getValue();
 
-    /**
-     * <p>Yields the reference date (start or end of an era). </p>
-     *
-     * @return  gregorian date
-     * @see     #isStarting()
-     * @deprecated  no clear answer dependent on the applied chronology,
-     *              will be removed in next version v2.5
-     */
-    /*[deutsch]
-     * <p>Liefert das Bezugsdatum (Start oder Ende einer &Auml;ra). </p>
-     *
-     * @return  gregorian date
-     * @see     #isStarting()
-     * @deprecated  no clear answer dependent on the applied chronology,
-     *              will be removed in next version v2.5
-     */
-    @Deprecated
-    GregorianDate getDate();
-
-    /**
-     * <p>Queries if the associated reference date defines the start of
-     * this era. </p>
-     *
-     * <p>A system of eras is required to define at most one ending era and
-     * if so then only as first era. In such an ending era the year 1 is the
-     * last and not the first year of era! </p>
-     *
-     * @return  boolean
-     * @see     #getDate()
-     * @deprecated  no clear answer dependent on the applied chronology,
-     *              will be removed in next version v2.5
-     */
-    /*[deutsch]
-     * <p>Definiert das zugeh&ouml;rige Bezugsdatum den Start oder das Ende
-     * dieser &Auml;ra? </p>
-     *
-     * <p>Ein System von &Auml;ren darf maximal eine &Auml;ra mit Endedatum
-     * definieren, und dann nur als allererste &Auml;ra. In einer solchen
-     * &Auml;ra ist das Jahr 1 das letzte und nicht das erste Jahr! </p>
-     *
-     * @return  boolean
-     * @see     #getDate()
-     * @deprecated  no clear answer dependent on the applied chronology,
-     *              will be removed in next version v2.5
-     */
-    @Deprecated
-    boolean isStarting();
 
 }
