@@ -182,7 +182,7 @@ final class SystemTemporalFormatter<T>
                 ? zdt.getTimezone().canonical()
                 : this.tzid);
             Timezone tz = Timezone.of(timezone);
-            String replaceTZ = tz.getOffset(moment).toString().replace("UTC", "GMT");
+            String replaceTZ = "GMT" + tz.getOffset(moment).toString();
             XCalendar gcal = new XCalendar(TimeZone.getTimeZone(replaceTZ), this.locale);
             SimpleDateFormat sdf = setUp(this.pattern, this.locale, gcal, !this.leniency.isStrict());
             FieldPosition fp = new FieldPosition(DateFormat.TIMEZONE_FIELD);
@@ -191,7 +191,12 @@ final class SystemTemporalFormatter<T>
             int start = fp.getBeginIndex();
             int end = fp.getEndIndex();
 
-            if ((end > start) && (start > 0) && this.hasTimezoneField()) {
+            if (
+                (end > start)
+                && (start > 0)
+                && !(tz.getID() instanceof ZonalOffset)
+                && this.hasTimezoneField()
+            ) {
                 boolean dst = tz.isDaylightSaving(moment);
                 boolean abbreviated = !this.pattern.contains("zzzz");
                 NameStyle style = (
@@ -260,10 +265,6 @@ final class SystemTemporalFormatter<T>
     @Override
     public TemporalFormatter<T> withTimezone(String tzid) {
 
-        if (tzid.isEmpty()) {
-            throw new IllegalArgumentException("Timezone id must not be empty.");
-        }
-
         return new SystemTemporalFormatter<T>(
             this.type,
             this.pattern,
@@ -321,7 +322,7 @@ final class SystemTemporalFormatter<T>
 
         boolean literal = false;
 
-        for (int i = this.pattern.length() - 1; i >= 0; i++) {
+        for (int i = this.pattern.length() - 1; i >= 0; i--) {
             char c = this.pattern.charAt(i);
             if (c == '\'') {
                 literal = !literal;
@@ -417,12 +418,12 @@ final class SystemTemporalFormatter<T>
                 new SystemTemporalFormatter<ZonalDateTime>(
                     ZonalDateTime.class, realPattern, this.locale, this.leniency, this.tzid);
             ZonalDateTime zdt = stf.parseInternal(text, position, wantsException, rawValues);
-            result = zdt.toMoment();
+            result = ((zdt == null) ? null : zdt.toMoment());
         } else if (this.type.equals(ZonalDateTime.class)) {
             String timezone = (
                 (this.tzid == null)
                 ? "GMT-18:00"
-                : this.tzid);
+                : this.tzid.replace("UTC", "GMT"));
             XCalendar gcal = new XCalendar(TimeZone.getTimeZone(timezone), this.locale);
             SimpleDateFormat sdf = setUp(this.pattern, this.locale, gcal, !this.leniency.isStrict());
             Date jud = sdf.parse(parseable, position);
@@ -461,7 +462,11 @@ final class SystemTemporalFormatter<T>
             TZID parsedTimezone = Timezone.of(timezone).getID();
             parsed.setTimezone(parsedTimezone);
             PlainTimestamp tsp = PlainTimestamp.axis().createFrom(parsed, this.getAttributes(), false);
-            result = tsp.inTimezone(parsedTimezone).inZonalView(parsedTimezone);
+            if (tsp == null) {
+                result = null;
+            } else {
+                result = tsp.inTimezone(parsedTimezone).inZonalView(parsedTimezone);
+            }
             if (rawValues != null) {
                 rawValues.accept(parsed);
             }

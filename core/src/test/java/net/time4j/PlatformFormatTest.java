@@ -1,12 +1,13 @@
 package net.time4j;
 
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -50,14 +51,9 @@ public class PlatformFormatTest {
     }
 
     @Test
-    public void printMoment() {
-        TZID tzid = Timezone.of("Europe/London").getID();
-        String expected;
-        if (Timezone.of(tzid).isDaylightSaving(Moment.UNIX_EPOCH)) {
-            expected = "01.01.1970 01:00 AM BST";
-        } else {
-            expected = "01.01.1970 12:00 AM GMT";
-        }
+    public void printMomentWithOffset() {
+        TZID tzid = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30);
+        String expected = "01.01.1970 05:30 AM GMT+05:30";
         assertThat(
             Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).format(Moment.UNIX_EPOCH),
             is(expected)
@@ -65,17 +61,54 @@ public class PlatformFormatTest {
     }
 
     @Test
-    public void parseMoment() throws ParseException {
-        TZID tzid = Timezone.of("Europe/London").getID();
-        String text;
-        if (Timezone.of(tzid).isDaylightSaving(Moment.UNIX_EPOCH)) {
-            text = "01.01.1970 01:00 AM BST";
-        } else {
-            text = "01.01.1970 12:00 AM GMT";
-        }
+    public void printMomentInLondon() {
+        Timezone timezone = Timezone.of("Europe/London");
+        TZID tzid = timezone.getID();
+        String name = (timezone.isDaylightSaving(Moment.UNIX_EPOCH) ? "BST" : "GMT");
+        String expected = "01.01.1970 01:00 AM " + name;
+        assertThat(
+            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.UK, tzid).format(Moment.UNIX_EPOCH),
+            is(expected)
+        );
+    }
+
+    @Test
+    public void parseMomentWithOffset() throws ParseException {
+        TZID tzid = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30);
+        String text = "01.01.1970 05:30 AM GMT+05:30";
         assertThat(
             Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).parse(text),
             is(Moment.UNIX_EPOCH)
+        );
+    }
+
+    @Test
+    public void parseMomentInLondon() throws ParseException {
+        TZID tzid = Timezone.of("Europe/London").getID();
+        String text = "01.01.1970 12:00 AM GMT";
+        assertThat(
+            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).parse(text),
+            is(Moment.UNIX_EPOCH)
+        );
+    }
+
+    @Test
+    public void printMomentInGermany() throws ParseException {
+        TZID tzid = Timezone.of("Europe/Berlin").getID();
+        Moment moment = PlainDate.of(2015, 7, 1).atTime(15, 0, 0).inTimezone(tzid);
+        assertThat(
+            Moment.formatter("dd.MM.yyyy HH:mm (zzzz)", Platform.PATTERN, Locale.GERMANY, tzid).format(moment),
+            is("01.07.2015 15:00 (Mitteleuropäische Sommerzeit)")
+        );
+    }
+
+    @Test
+    public void parseMomentInGermany() throws ParseException {
+        TZID tzid = Timezone.of("Europe/Berlin").getID();
+        String text = "01.07.2015 15:00 (Mitteleuropäische Sommerzeit)";
+        assertThat(
+            Moment.formatter("dd.MM.yyyy HH:mm (zzzz)", Platform.PATTERN, Locale.GERMANY, tzid).parse(text),
+            is(PlainDate.of(2015, 7, 1).atTime(15, 0, 0).inTimezone(tzid))
         );
     }
 

@@ -43,13 +43,14 @@ public enum Platform
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>The details of the platform pattern syntax are platform-dependent. </p>
+     * <p>The details of the platform pattern syntax are platform-dependent and will
+     * follow the syntax described in the Java-6-version of {@code SimpleDateFormat}. </p>
      *
-     * <p>In Java-pre-8 environment - the pattern syntax will follow the details
-     * in the class {@code SimpleDateFormat}. Note that this configuration will
-     * not use the best available format engine. For higher quality requirements
-     * users are advised to use {@code net.time4j.format.expert.PatternType} in
-     * i18n-module. </p>
+     * <p>Note that this configuration will not use the best available format engine. A
+     * counter example are ISO-weekdates which are not supported in parsing in order to
+     * preserve compatibility with Java-6. The performance cannot be the best, too. For
+     * higher quality requirements users are strongly advised to use the alternative
+     * {@code net.time4j.format.expert.PatternType} in i18n-module. </p>
      *
      * <p>Timezone conversions always rely on the best available timezone data
      * which are not necessarily those of the JDK. This is even true in context
@@ -57,13 +58,14 @@ public enum Platform
      */
     /*[deutsch]
      * <p>Die Details der Plattform-Formatmuster-Syntax sind naturgem&auml;&szlig;
-     * abh&auml;ngig von der aktuellen Plattform. </p>
+     * abh&auml;ngig von der aktuellen Plattform, folgen aber im wesentlichen der
+     * Syntax beschrieben in der Java-6-Version von {@code SimpleDateFormat}. </p>
      *
-     * <p>In einer Java-pre-8-Umgebung folgt die Formatmustersyntax den Details der
-     * Klasse {@code SimpleDateFormat}. Hinweis: Diese Konfiguration wird nicht
-     * die bestm&ouml;gliche {@code FormatEngine} nutzen. F&uuml;r h&ouml;here
-     * Anspr&uuml;che sollten Anwender {@code net.time4j.format.expert.PatternType}
-     * im i18n-Modul nutzen. </p>
+     * <p>Hinweis: Diese Konfiguration wird nicht die bestm&ouml;gliche {@code FormatEngine}
+     * nutzen. Zum Beispiel wird das ISO-Wochendatumsformat beim Parsen nicht unterst&uuml;tzt,
+     * weil sonst die Kompatibilit&auml;t zu Java 6 nicht gegeben w&auml;re. Die Performance
+     * ist auch nicht die beste. F&uuml;r h&ouml;here Anspr&uuml;che sollten Anwender dringend
+     * {@code net.time4j.format.expert.PatternType} im i18n-Modul nutzen. </p>
      *
      * <p>Zeitzonenkonversionen beruhen immer auf den besten verf&uuml;gbaren
      * Zeitzonendaten, also nicht notwendig denen des JDK. Das gilt selbst dann,
