@@ -353,7 +353,7 @@ public final class JulianMath {
      * @param   month       julian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
      * @return  days since [1858-11-17] (modified julian date)
-     * @throws  IllegalArgumentException if the argument is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
     /*[deutsch]
      * <p>Ermittelt das modifizierte julianische Datum. </p>
@@ -362,7 +362,7 @@ public final class JulianMath {
      * @param   month       julian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
      * @return  days since [1858-11-17] (modified julian date)
-     * @throws  IllegalArgumentException if the argument is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
     public static long toMJD(
         int year,
