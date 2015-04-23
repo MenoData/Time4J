@@ -19,12 +19,13 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.historic;
+package net.time4j.history;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
@@ -46,80 +47,31 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf enum-Basis. </p>
  *
- * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
  * @doctags.concurrency <immutable>
  */
-final class HistoricalEraElement<V extends Enum<V>>
-    extends BasicElement<V>
-    implements NumericalElement<V>, TextElement<V> {
+final class HistoricalEraElement
+    extends BasicElement<HistoricEra>
+    implements NumericalElement<HistoricEra>, TextElement<HistoricEra> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    /** Element-Index. */
-    static final int ERA = 1;
 
     //private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final Class<V> type;
-    private transient final V dmin;
-    private transient final V dmax;
-    private transient final int index;
-    private transient final char symbol;
-    private transient final  ElementRule<?, V> rule;
+    private transient final ElementRule<?, HistoricEra> rule;
 
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Konstruiert ein neues Element mit den angegebenen Details. </p>
      *
-     * @param   name        name of element
-     * @param   type        reified type of element values
-     * @param   defaultMin  default minimum
-     * @param   defaultMax  default maximum
-     * @param   index       element index
-     * @param   symbol      CLDR-symbol used in format patterns
+     * @param   rule    element rule
      */
-    HistoricalEraElement(
-        String name,
-        Class<V> type,
-        V defaultMin,
-        V defaultMax,
-        int index,
-        char symbol
-    ) {
-        this(name, type, defaultMin, defaultMax, index, symbol, null);
+    HistoricalEraElement(ElementRule<?, HistoricEra> rule) {
+        super("ERA");
 
-    }
-
-    /**
-     * <p>Konstruiert ein neues Element mit den angegebenen Details. </p>
-     *
-     * @param   name        name of element
-     * @param   type        reified type of element values
-     * @param   defaultMin  default minimum
-     * @param   defaultMax  default maximum
-     * @param   index       element index
-     * @param   symbol      CLDR-symbol used in format patterns
-     */
-    HistoricalEraElement(
-        String name,
-        Class<V> type,
-        V defaultMin,
-        V defaultMax,
-        int index,
-        char symbol,
-        ElementRule<?, V> rule
-    ) {
-        super(name);
-
-        this.type = type;
-        this.dmin = defaultMin;
-        this.dmax = defaultMax;
-        this.index = index;
-        this.symbol = symbol;
         this.rule = rule;
 
     }
@@ -127,16 +79,16 @@ final class HistoricalEraElement<V extends Enum<V>>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public Class<V> getType() {
+    public Class<HistoricEra> getType() {
 
-        return this.type;
+        return HistoricEra.class;
 
     }
 
     @Override
     public char getSymbol() {
 
-        return this.symbol;
+        return 'G';
 
     }
 
@@ -151,16 +103,16 @@ final class HistoricalEraElement<V extends Enum<V>>
     }
 
     @Override
-    public V getDefaultMinimum() {
+    public HistoricEra getDefaultMinimum() {
 
-        return this.dmin;
+        return HistoricEra.BC;
 
     }
 
     @Override
-    public V getDefaultMaximum() {
+    public HistoricEra getDefaultMaximum() {
 
-        return this.dmax;
+        return HistoricEra.AD;
 
     }
 
@@ -179,9 +131,9 @@ final class HistoricalEraElement<V extends Enum<V>>
     }
 
     @Override
-    public int numerical(V value) {
+    public int numerical(HistoricEra value) {
 
-        return (this.isEraElement() ? value.ordinal() : value.ordinal() + 1);
+        return value.getValue();
 
     }
 
@@ -197,7 +149,7 @@ final class HistoricalEraElement<V extends Enum<V>>
     }
 
     @Override
-    public V parse(
+    public HistoricEra parse(
         CharSequence text,
         ParsePosition status,
         AttributeQuery attributes
@@ -214,35 +166,13 @@ final class HistoricalEraElement<V extends Enum<V>>
 
     @Override
     @SuppressWarnings("unchecked")
-    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(
-        Chronology<T> chronology
-    ) {
+    protected <T extends ChronoEntity<T>> ElementRule<T, HistoricEra> derive(Chronology<T> chronology) {
 
-        if (
-            this.isEraElement()
-            && chronology.isRegistered(PlainDate.COMPONENT)
-        ) {
-            return (ElementRule<T, V>) this.rule;
+        if (chronology.isRegistered(PlainDate.COMPONENT)) {
+            return (ElementRule<T, HistoricEra>) this.rule;
         }
 
         return null;
-
-    }
-
-    /**
-     * <p>Liefert einen Zugriffsindex zur Optimierung der Elementsuche. </p>
-     *
-     * @return  int
-     */
-    int getIndex() {
-
-        return this.index;
-
-    }
-
-    private boolean isEraElement() {
-
-        return (this.index == ERA);
 
     }
 
@@ -263,6 +193,81 @@ final class HistoricalEraElement<V extends Enum<V>>
     private Object readResolve() throws ObjectStreamException {
 
         return this; // TODO: improve
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class EraRule<T extends ChronoEntity<T>>
+        implements ElementRule<T, HistoricEra> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        //~ Konstruktoren -------------------------------------------------
+
+        EraRule() {
+            super();
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public HistoricEra getValue(T context) {
+
+            PlainDate date = context.get(PlainDate.COMPONENT);
+            return ((date.getYear() >= 1) ? HistoricEra.AD : HistoricEra.BC);
+
+        }
+
+        @Override
+        public HistoricEra getMinimum(T context) {
+
+            return HistoricEra.BC;
+
+        }
+
+        @Override
+        public HistoricEra getMaximum(T context) {
+
+            return HistoricEra.AD;
+
+        }
+
+        @Override
+        public boolean isValid(
+            T context,
+            HistoricEra value
+        ) {
+
+            return (value != null);
+
+        }
+
+        @Override
+        public T withValue(
+            T context,
+            HistoricEra value,
+            boolean lenient
+        ) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(T context) {
+
+            throw new UnsupportedOperationException("Never called.");
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(T context) {
+
+            throw new UnsupportedOperationException("Never called.");
+
+        }
 
     }
 

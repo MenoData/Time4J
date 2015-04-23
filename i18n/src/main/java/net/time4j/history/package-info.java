@@ -10,4 +10,4 @@
  * <p><strong>Dieses Paket geh&ouml;rt zum &quot;i18n&quot;-Modul
  * und ist kein Teil des Kerns von Time4J.</strong></p>
  */
-package net.time4j.historic;
+package net.time4j.history;

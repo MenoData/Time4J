@@ -1,4 +1,4 @@
-package net.time4j.historic;
+package net.time4j.history;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.EpochDays;

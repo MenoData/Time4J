@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.historic;
+package net.time4j.history;
 
 import net.time4j.base.MathUtils;
 
