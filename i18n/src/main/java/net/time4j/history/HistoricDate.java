@@ -52,6 +52,24 @@ public final class HistoricDate
 
     //~ Konstruktoren -----------------------------------------------------
 
+    // package-private
+    HistoricDate(
+        HistoricEra era,
+        int yearOfEra,
+        int month,
+        int dom
+    ) {
+        super();
+
+        this.era = era;
+        this.yearOfEra = yearOfEra;
+        this.month = month;
+        this.dom = dom;
+
+    }
+
+    //~ Methoden ----------------------------------------------------------
+
     /**
      * <p>Constructs a new tuple of given historical chronological components. </p>
      *
@@ -62,6 +80,7 @@ public final class HistoricDate
      * @param   yearOfEra   year of related era ({@code >= 1})
      * @param   month       historical month (1-12)
      * @param   dom         historical day of month (1-31)
+     * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
@@ -76,36 +95,31 @@ public final class HistoricDate
      * @param   yearOfEra   year of related era ({@code >= 1})
      * @param   month       historical month (1-12)
      * @param   dom         historical day of month (1-31)
+     * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
      */
-    public HistoricDate(
+    public static HistoricDate of(
         HistoricEra era,
         int yearOfEra,
         int month,
         int dom
     ) {
-        super();
 
         if (
             (dom < 1 || dom > 31)
             || (month < 1 || month > 12)
-            || (yearOfEra < 1 || yearOfEra >= GregorianMath.MAX_YEAR)
+            || (yearOfEra < 1 || yearOfEra > (GregorianMath.MAX_YEAR + (era == HistoricEra.BC ? 1 : 0)))
         ) {
             throw new IllegalArgumentException("Out of range: " + toString(era, yearOfEra, month, dom));
         } else if (era == null) {
             throw new NullPointerException("Missing historical era.");
         }
 
-        this.era = era;
-        this.yearOfEra = yearOfEra;
-        this.month = month;
-        this.dom = dom;
+        return new HistoricDate(era, yearOfEra, month, dom);
 
     }
-
-    //~ Methoden ----------------------------------------------------------
 
     /**
      * <p>Yields the historical era. </p>

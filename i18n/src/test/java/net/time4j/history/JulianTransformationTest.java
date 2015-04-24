@@ -19,6 +19,7 @@ public class JulianTransformationTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][]{
+                {-999979466, 11, 21, PlainDate.axis().getMinimum().get(EpochDays.MODIFIED_JULIAN_DATE)},
                 {-4712, 1, 1, PlainDate.of(-4713, 11, 24).get(EpochDays.MODIFIED_JULIAN_DATE)},
                 {0, 1, 1, PlainDate.of(-1, 12, 30).get(EpochDays.MODIFIED_JULIAN_DATE)},
                 {1582, 10, 5, PlainDate.of(1582, 10, 15).get(EpochDays.MODIFIED_JULIAN_DATE)},

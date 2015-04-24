@@ -23,6 +23,7 @@ package net.time4j.history;
 
 
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.EpochDays;
 
 /**
@@ -53,8 +54,14 @@ final class CutOverEvent {
         this.start = mjd;
         this.algorithm = newAlgorithm;
 
-        this.dateAtCutOver = algorithm.fromMJD(mjd);
-        this.dateBeforeCutOver = oldAlgorithm.fromMJD(mjd - 1);
+        if (mjd == Long.MIN_VALUE) {
+            HistoricDate date = new HistoricDate(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1);
+            this.dateAtCutOver = date;
+            this.dateBeforeCutOver = date;
+        } else {
+            this.dateAtCutOver = algorithm.fromMJD(mjd);
+            this.dateBeforeCutOver = oldAlgorithm.fromMJD(mjd - 1);
+        }
 
     }
 

@@ -87,7 +87,16 @@ enum CalendarAlgorithm {
 
         @Override
         boolean isValid(HistoricDate date) {
-            return JulianMath.isValid(getProlepticYear(date), date.getMonth(), date.getDayOfMonth());
+            int year = getProlepticYear(date);
+            int month = date.getMonth();
+            int dom = date.getDayOfMonth();
+            if (
+                (year < -999979466) // value limit of PlainDate.axis().getMinimum()
+                || ((year == -999979466) && ((month < 11) || ((month == 11) && (dom < 21))))
+            ) {
+                return false;
+            }
+            return JulianMath.isValid(year, month, dom);
         }
 
         @Override
