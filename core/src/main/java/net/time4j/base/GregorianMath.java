@@ -463,7 +463,7 @@ public final class GregorianMath {
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
      * @return  days since [1858-11-17] (modified julian date)
-     * @throws  IllegalArgumentException if the argument is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
     /*[deutsch]
      * <p>Ermittelt das modifizierte julianische Datum. </p>
@@ -472,7 +472,7 @@ public final class GregorianMath {
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
      * @return  days since [1858-11-17] (modified julian date)
-     * @throws  IllegalArgumentException if the argument is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
     // TODO: Optimierung der Performance mit Jahres-Array im Bereich 1901-2099
     public static long toMJD(

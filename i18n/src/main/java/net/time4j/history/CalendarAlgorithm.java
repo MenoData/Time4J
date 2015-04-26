@@ -105,6 +105,7 @@ enum CalendarAlgorithm {
         }
     },
 
+    // das betrifft nur den Abschnitt mit der schwedischen Anomalie im Zeitraum 1700-03-01/1712-02-30
     SWEDISH {
         @Override
         long toMJD(HistoricDate date) {

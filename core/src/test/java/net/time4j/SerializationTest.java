@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.engine.ChronoElement;
 import net.time4j.scale.TimeScale;
 
 import java.io.ByteArrayInputStream;
@@ -117,6 +118,24 @@ public class SerializationTest {
         assertThat(
             (result == 63 || result == 62), // depends on if i18n-module exists
             is(true)); // erstes, zweites und drittes Datenpaket
+    }
+
+    @Test
+    public void roundtripOfWeekmodelElement()
+        throws IOException, ClassNotFoundException {
+
+        ChronoElement<Integer> element = Weekmodel.ISO.weekOfYear();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(element);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object ser = ois.readObject();
+        ois.close();
+        assertThat(ser == element, is(true)); // test of readResolve
+        assertThat(PlainDate.of(2012, 1, 1).get((ChronoElement<Integer>) ser), is(Integer.valueOf(52)));
     }
 
     @Test
