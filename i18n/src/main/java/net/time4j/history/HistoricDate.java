@@ -28,6 +28,8 @@ import net.time4j.base.GregorianMath;
  * <p>Defines a historical date which consists of era, year of era, month
  * and day of month. </p>
  *
+ * <p>The natural order is based on the timeline order. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
  * @doctags.concurrency <immutable>
@@ -35,6 +37,8 @@ import net.time4j.base.GregorianMath;
 /*[deutsch]
  * <p>Definiert ein historisches Datum, das aus &Auml;ra, Jahr der &Auml;ra, Monat
  * und Tag des Monats besteht. </p>
+ *
+ * <p>Die nat&uuml;rliche Ordnung basiert auf der zeitlichen Reihenfolge. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
@@ -73,7 +77,7 @@ public final class HistoricDate
     /**
      * <p>Constructs a new tuple of given historical chronological components. </p>
      *
-     * <p>Note: A detailed validation is not done. This validation is the responsibility
+     * <p>Note: A detailed validation is not done. Such a validation is the responsibility
      * of any {@code ChronoHistory}, however. </p>
      *
      * @param   era         historical era (AD or BC)
