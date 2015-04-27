@@ -258,4 +258,25 @@ public class HistoryTest {
             is(PlainDate.axis().getMinimum()));
     }
 
+    @Test
+    public void lengthOfYearInItaly() {
+        assertThat(ChronoHistory.ofFirstGregorianReform().getLengthOfYear(HistoricEra.AD, 1500), is(366));
+        assertThat(ChronoHistory.ofFirstGregorianReform().getLengthOfYear(HistoricEra.AD, 1582), is(355));
+        assertThat(ChronoHistory.ofFirstGregorianReform().getLengthOfYear(HistoricEra.AD, 1600), is(366));
+        assertThat(ChronoHistory.ofFirstGregorianReform().getLengthOfYear(HistoricEra.AD, 1700), is(365));
+    }
+
+    @Test
+    public void lengthOfYearInSweden() {
+        ChronoHistory sweden = ChronoHistory.SWEDEN;
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1500), is(366));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1600), is(366));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1700), is(365));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1704), is(366));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1711), is(365));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1712), is(367));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1800), is(365));
+        assertThat(sweden.getLengthOfYear(HistoricEra.AD, 2000), is(366));
+    }
+
 }
