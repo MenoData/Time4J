@@ -21,7 +21,9 @@
 
 package net.time4j.history;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
 
 import java.util.ArrayList;
@@ -115,7 +117,11 @@ public final class ChronoHistory {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final List<CutOverEvent> events;
+    private transient final List<CutOverEvent> events;
+    private transient final ChronoElement<HistoricEra> eraElement;
+    private transient final ChronoElement<Integer> yearOfEraElement;
+    private transient final ChronoElement<Integer> monthElement;
+    private transient final ChronoElement<Integer> dayOfMonthElement;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -128,6 +134,11 @@ public final class ChronoHistory {
         }
 
         this.events = events;
+
+        this.eraElement = new HistoricalEraElement(this);
+        this.yearOfEraElement = HistoricalIntegerElement.forYearOfEra(this);
+        this.monthElement = HistoricalIntegerElement.forMonth(this);
+        this.dayOfMonthElement = HistoricalIntegerElement.forDayOfMonth(this);
 
     }
 
@@ -211,19 +222,13 @@ public final class ChronoHistory {
             return false;
         }
 
-        CalendarAlgorithm algorithm = null;
+        CalendarAlgorithm algorithm = this.getAlgorithm(date);
 
-        for (int i = this.events.size() - 1; i >= 0; i--) {
-            CutOverEvent event = this.events.get(i);
-            algorithm = event.algorithm;
-            if (date.compareTo(event.dateAtCutOver) >= 0) {
-                return algorithm.isValid(date);
-            } else if (date.compareTo(event.dateBeforeCutOver) > 0) {
-                return false; // gap at cutover
-            }
+        if (algorithm == null) {
+            return false; // gap at cutover
         }
 
-        return CalendarAlgorithm.JULIAN.isValid(date);
+        return algorithm.isValid(date);
 
     }
 
@@ -245,19 +250,13 @@ public final class ChronoHistory {
      */
     public PlainDate convert(HistoricDate date) {
 
-        CalendarAlgorithm algorithm = null;
+        CalendarAlgorithm algorithm = this.getAlgorithm(date);
 
-        for (int i = this.events.size() - 1; i >= 0; i--) {
-            CutOverEvent event = this.events.get(i);
-            algorithm = event.algorithm;
-            if (date.compareTo(event.dateAtCutOver) >= 0) {
-                return PlainDate.of(algorithm.toMJD(date), EpochDays.MODIFIED_JULIAN_DATE);
-            } else if (date.compareTo(event.dateBeforeCutOver) > 0) {
-                throw new IllegalArgumentException("Invalid historical date: " + date);
-            }
+        if (algorithm == null) {
+            throw new IllegalArgumentException("Invalid historical date: " + date);
         }
 
-        return PlainDate.of(CalendarAlgorithm.JULIAN.toMJD(date), EpochDays.MODIFIED_JULIAN_DATE);
+        return PlainDate.of(algorithm.toMJD(date), EpochDays.MODIFIED_JULIAN_DATE);
 
     }
 
@@ -278,13 +277,12 @@ public final class ChronoHistory {
     public HistoricDate convert(PlainDate date) {
 
         long mjd = date.get(EpochDays.MODIFIED_JULIAN_DATE);
-        CalendarAlgorithm algorithm = null;
 
         for (int i = this.events.size() - 1; i >= 0; i--) {
             CutOverEvent event = this.events.get(i);
-            algorithm = event.algorithm;
+
             if (mjd >= event.start) {
-                return algorithm.fromMJD(mjd);
+                return event.algorithm.fromMJD(mjd);
             }
         }
 
@@ -307,6 +305,209 @@ public final class ChronoHistory {
     public PlainDate getGregorianCutOverDate() {
 
         return PlainDate.of(this.events.get(this.events.size() - 1).start, EpochDays.MODIFIED_JULIAN_DATE);
+
+    }
+
+    /**
+     * <p>Determines the length of given historical year in days. </p>
+     *
+     * @param   era         historical era
+     * @param   yearOfEra   historical year of era
+     * @return  length of historical year in days or {@code -1} if the length cannot be determined
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Bestimmt die L&auml;nge des angegebenen historischen Jahres in Tagen. </p>
+     *
+     * @param   era         historical era
+     * @param   yearOfEra   historical year of era
+     * @return  length of historical year in days or {@code -1} if the length cannot be determined
+     * @since   3.0
+     */
+    public int getLengthOfYear(
+        HistoricEra era,
+        int yearOfEra
+    ) {
+
+        try {
+            HistoricDate min = HistoricDate.of(era, yearOfEra, 1, 1);
+            HistoricDate max = HistoricDate.of(era, yearOfEra, 12, 31);
+            return (int) (CalendarUnit.DAYS.between(this.convert(min), this.convert(max)) + 1);
+        } catch (RuntimeException re) {
+            return -1; // only in very exotic circumstances (for example if given year is out of range)
+        }
+
+    }
+
+    /**
+     * <p>Defines the element for the historical era. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * @return  era-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r die historische &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     *
+     * @return  era-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<HistoricEra> era() {
+
+        return this.eraElement;
+
+    }
+
+    /**
+     * <p>Defines the element for the year of a given historical era. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * @return  year-of-era-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r das Jahr einer historischen &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     *
+     * @return  year-of-era-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<Integer> yearOfEra() {
+
+        return this.yearOfEraElement;
+
+    }
+
+    /**
+     * <p>Defines the element for the historical month. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * @return  month-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r den historischen Monat. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     *
+     * @return  month-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<Integer> month() {
+
+        return this.monthElement;
+
+    }
+
+    /**
+     * <p>Defines the element for the historical day of month. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * @return  day-of-month-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r den historischen Tag des Monats. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     *
+     * @return  day-of-month-related element
+     * @since   3.0
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<Integer> dayOfMonth() {
+
+        return this.dayOfMonthElement;
+
+    }
+
+    /**
+     * <p>Yields the proper calendar algorithm. </p>
+     *
+     * @param   date    historical date
+     * @return  appropriate calendar algorithm or {@code null} if not found (in case of an invalid date)
+     * @since   3.0
+     */
+    CalendarAlgorithm getAlgorithm(HistoricDate date) {
+
+        for (int i = this.events.size() - 1; i >= 0; i--) {
+            CutOverEvent event = this.events.get(i);
+
+            if (date.compareTo(event.dateAtCutOver) >= 0) {
+                return event.algorithm;
+            } else if (date.compareTo(event.dateBeforeCutOver) > 0) {
+                return null; // gap at cutover
+            }
+        }
+
+        return CalendarAlgorithm.JULIAN;
+
+    }
+
+    /**
+     * <p>Adjusts given historical date with respect to actual maximum of day-of-month if necessary. </p>
+     *
+     * @param   date    historical date
+     * @return  adjusted date
+     * @since   3.0
+     */
+    HistoricDate adjustDayOfMonth(HistoricDate date) {
+
+        CalendarAlgorithm algorithm = this.getAlgorithm(date);
+
+        if (algorithm == null) {
+            return date; // gap at cutover, let it be unchanged
+        }
+
+        int max = algorithm.getMaximumDayOfMonth(date);
+
+        if (max < date.getDayOfMonth()) {
+            return HistoricDate.of(date.getEra(), date.getYearOfEra(), date.getMonth(), max);
+        } else {
+            return date;
+        }
+
+    }
+
+    /**
+     * <p>Returns the list of all associated cutover events. </p>
+     *
+     * @return  unmodifiable list
+     * @since   3.0
+     */
+    List<CutOverEvent> getEvents() {
+
+        return this.events;
 
     }
 

@@ -47,7 +47,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf enum-Basis. </p>
  *
- * @author      Meno Hochschild
+ * @author  Meno Hochschild
+ * @since   3.0
  * @doctags.concurrency <immutable>
  */
 final class HistoricalEraElement
@@ -60,19 +61,22 @@ final class HistoricalEraElement
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final ElementRule<?, HistoricEra> rule;
+    /**
+     * @serial  associated chronological history
+     */
+    private final ChronoHistory history;
 
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Konstruiert ein neues Element mit den angegebenen Details. </p>
      *
-     * @param   rule    element rule
+     * @param   history     associated chronological history
      */
-    HistoricalEraElement(ElementRule<?, HistoricEra> rule) {
+    HistoricalEraElement(ChronoHistory history) {
         super("ERA");
 
-        this.rule = rule;
+        this.history = history;
 
     }
 
@@ -165,11 +169,10 @@ final class HistoricalEraElement
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected <T extends ChronoEntity<T>> ElementRule<T, HistoricEra> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
-            return (ElementRule<T, HistoricEra>) this.rule;
+            return new Rule<T>(this.history);
         }
 
         return null;
@@ -192,43 +195,46 @@ final class HistoricalEraElement
 
     private Object readResolve() throws ObjectStreamException {
 
-        return this; // TODO: improve
+        return this.history.era();
 
     }
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class EraRule<T extends ChronoEntity<T>>
-        implements ElementRule<T, HistoricEra> {
+    private static class Rule<C extends ChronoEntity<C>>
+        implements ElementRule<C, HistoricEra> {
 
         //~ Instanzvariablen ----------------------------------------------
 
+        private final ChronoHistory history;
+
         //~ Konstruktoren -------------------------------------------------
 
-        EraRule() {
+        Rule(ChronoHistory history) {
             super();
+
+            this.history = history;
 
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public HistoricEra getValue(T context) {
+        public HistoricEra getValue(C context) {
 
-            PlainDate date = context.get(PlainDate.COMPONENT);
-            return ((date.getYear() >= 1) ? HistoricEra.AD : HistoricEra.BC);
+            return this.history.convert(context.get(PlainDate.COMPONENT)).getEra();
 
         }
 
         @Override
-        public HistoricEra getMinimum(T context) {
+        public HistoricEra getMinimum(C context) {
 
             return HistoricEra.BC;
 
         }
 
         @Override
-        public HistoricEra getMaximum(T context) {
+        public HistoricEra getMaximum(C context) {
 
             return HistoricEra.AD;
 
@@ -236,34 +242,44 @@ final class HistoricalEraElement
 
         @Override
         public boolean isValid(
-            T context,
+            C context,
             HistoricEra value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            }
+
+            HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
+            HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
+            newHD = this.history.adjustDayOfMonth(newHD);
+            return this.history.isValid(newHD);
 
         }
 
         @Override
-        public T withValue(
-            T context,
+        public C withValue(
+            C context,
             HistoricEra value,
             boolean lenient
         ) {
 
-            return null;
+            HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
+            HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
+            newHD = this.history.adjustDayOfMonth(newHD);
+            return context.with(PlainDate.COMPONENT, this.history.convert(newHD));
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(T context) {
+        public ChronoElement<?> getChildAtFloor(C context) {
 
             throw new UnsupportedOperationException("Never called.");
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(T context) {
+        public ChronoElement<?> getChildAtCeiling(C context) {
 
             throw new UnsupportedOperationException("Never called.");
 
