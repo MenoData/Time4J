@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         JulianTransformationTest.class,
-        HistoryTest.class
+        HistoryTest.class,
+        SerializationTest.class
     }
 )
 public class HistorySuite {

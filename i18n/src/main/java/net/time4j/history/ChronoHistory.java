@@ -21,11 +21,14 @@
 
 package net.time4j.history;
 
-import net.time4j.CalendarUnit;
-import net.time4j.PlainDate;
+import net.time4j.*;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,7 +48,8 @@ import java.util.List;
  * @since   3.0
  * @doctags.concurrency <immutable>
  */
-public final class ChronoHistory {
+public final class ChronoHistory
+    implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -99,15 +103,17 @@ public final class ChronoHistory {
         events.add(new CutOverEvent(-57959, CalendarAlgorithm.JULIAN, CalendarAlgorithm.SWEDISH)); // 1700-03-01
         events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
         events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
-        SWEDEN = new ChronoHistory(Collections.unmodifiableList(events));
+        SWEDEN = new ChronoHistory(4, Collections.unmodifiableList(events));
 
         PROLEPTIC_GREGORIAN =
             new ChronoHistory(
+                1,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.GREGORIAN, CalendarAlgorithm.GREGORIAN)));
 
         PROLEPTIC_JULIAN =
             new ChronoHistory(
+                2,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.JULIAN, CalendarAlgorithm.JULIAN)));
 
@@ -117,6 +123,7 @@ public final class ChronoHistory {
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private transient final int variant;
     private transient final List<CutOverEvent> events;
     private transient final ChronoElement<HistoricEra> eraElement;
     private transient final ChronoElement<Integer> yearOfEraElement;
@@ -125,7 +132,10 @@ public final class ChronoHistory {
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private ChronoHistory(List<CutOverEvent> events) {
+    private ChronoHistory(
+        int variant,
+        List<CutOverEvent> events
+    ) {
         super();
 
         if (events.isEmpty()) {
@@ -133,6 +143,7 @@ public final class ChronoHistory {
                 "At least one cutover event must be present in chronological history.");
         }
 
+        this.variant = variant;
         this.events = events;
 
         this.eraElement = new HistoricalEraElement(this);
@@ -451,6 +462,53 @@ public final class ChronoHistory {
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof ChronoHistory) {
+            ChronoHistory that = (ChronoHistory) obj;
+            if (this.variant != that.variant) {
+                return false;
+            } else if (this.variant == 0) {
+                return (this.events.get(0).start == that.events.get(0).start);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        if (this.variant > 0) {
+            long h = this.events.get(0).start;
+            return (int) (h ^ (h << 32));
+        }
+
+        return this.variant;
+
+    }
+
+    public String toString() {
+
+        switch (this.variant) {
+            case 1:
+                return "ChronoHistory[PROLEPTIC-GREGORIAN]";
+            case 2:
+                return "ChronoHistory[PROLEPTIC-JULIAN]";
+            case 4:
+                return "ChronoHistory[SWEDEN]";
+            default:
+                PlainDate date = this.getGregorianCutOverDate();
+                return "ChronoHistory[" + date + "]";
+        }
+    }
+
     /**
      * <p>Yields the proper calendar algorithm. </p>
      *
@@ -514,8 +572,40 @@ public final class ChronoHistory {
     private static ChronoHistory ofGregorianReform(long mjd) {
 
         return new ChronoHistory(
+            ((mjd == EARLIEST_CUTOVER) ? 7 : 0),
             Collections.singletonList(
                 new CutOverEvent(mjd, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)));
+
+    }
+
+    /**
+     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     *              a dedicated serialization form</a> as proxy. The format
+     *              is bit-compressed. The first byte contains in the four
+     *              most significant bits the type-ID {@code 1}. The following
+     *              bits 4-7 contain the variant of history. The variant is usually
+     *              zero, but for PROLEPTIC_GREGORIAN 1, for PROLEPTIC_JULIAN 2,
+     *              for SWEDEN 4 and for the first gregorian reform 7. If the
+     *              variant is zero then the cutover date in question will be
+     *              written as long (modified julian date) into the stream.
+     *
+     * @return  replacement object in serialization graph
+     */
+    private Object writeReplace() {
+
+        return new SPX(this, SPX.VERSION_1);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 
