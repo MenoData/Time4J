@@ -22,6 +22,13 @@
 package net.time4j.history;
 
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.ChronoElement;
+import net.time4j.format.CalendarText;
+import net.time4j.format.TextWidth;
+
+import java.util.Locale;
+
+import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -66,6 +73,65 @@ public enum HistoricEra
     public int getValue() {
 
         return this.ordinal();
+
+    }
+
+    /**
+     * <p>Gets the description text dependent on the locale and text width. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  descriptive text for given locale and width (never {@code null})
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  descriptive text for given locale and width (never {@code null})
+     * @since   3.0
+     */
+    public String getDisplayName(
+        Locale locale,
+        TextWidth width
+    ) {
+
+        CalendarText names = CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
+        return names.getEras(width).print(this);
+
+    }
+
+    /**
+     * <p>Gets an alternative description text dependent on the locale and text width. </p>
+     *
+     * <p>Actually this method only yields the English notations of
+     * &quot;(Before) Common Era&quot; (BCE/CE). </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  alternative descriptive text for given locale and width (never {@code null})
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen alternativen sprachabh&auml;ngigen Beschreibungstext. </p>
+     *
+     * <p>Aktuell liefert diese Methode nur die englischen Bezeichnungen
+      * &quot;Common Era&quot; bzw. &quot;CE&quot; f&uuml;r {@code AD}. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  alternative descriptive text for given locale and width (never {@code null})
+     * @since   3.0
+     */
+    public String getAlternativeName(
+        Locale locale,
+        TextWidth width
+    ) {
+
+        CalendarText names = CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
+        ChronoElement<HistoricEra> element = ChronoHistory.ofFirstGregorianReform().era();
+        return names.getTextForms(element, ((width == TextWidth.WIDE) ? "w" : "a"), "alt").print(this);
 
     }
 
