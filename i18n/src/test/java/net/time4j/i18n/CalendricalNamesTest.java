@@ -13,6 +13,7 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -476,14 +477,9 @@ public class CalendricalNamesTest {
                 .isEmpty(),
            is(true));
         TextWidth textWidth = TextWidth.WIDE;
-        CalendarText instance =
-           CalendarText.getInstance("iso8601", Locale.GERMAN);
-        Enum<?> e =
-            Enum.class.cast(
-                Class.forName("net.time4j.SimpleEra").getEnumConstants()[1]);
-        String result =
-            instance.getEras(textWidth).print(e);
-        assertThat(result, is("n. Chr."));
+        CalendarText instance = CalendarText.getInstance("iso8601", Locale.GERMAN);
+        String result = instance.getEras(textWidth).print(HistoricEra.AD);
+        assertThat(result, is("nach Christi Geburt"));
     }
 
     @Test
