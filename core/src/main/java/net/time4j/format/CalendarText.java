@@ -712,6 +712,7 @@ public final class CalendarText {
             for (int v = 0; v < variants.length; v++) {
                 if (first) {
                     sb.append('(');
+                    first = false;
                 } else {
                     sb.append('|');
                 }
