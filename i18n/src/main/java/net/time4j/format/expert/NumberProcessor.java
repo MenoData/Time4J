@@ -27,7 +27,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumericalElement;
-import net.time4j.format.SignPolicy;
 
 import java.io.IOException;
 import java.util.Map;

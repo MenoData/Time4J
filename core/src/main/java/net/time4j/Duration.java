@@ -34,7 +34,6 @@ import net.time4j.engine.TimeSpan;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
-import net.time4j.format.SignPolicy;
 import net.time4j.tz.Timezone;
 
 import java.io.IOException;
@@ -4164,9 +4163,9 @@ public final class Duration<U extends IsoUnit>
                 } else if (c == ',') {
                     lastOn(stack).add(new SeparatorItem(',', '.'));
                 } else if (c == '-') {
-                    lastOn(stack).add(new SignItem(SignPolicy.SHOW_WHEN_NEGATIVE));
+                    lastOn(stack).add(new SignItem(false));
                 } else if (c == '+') {
-                    lastOn(stack).add(new SignItem(SignPolicy.SHOW_ALWAYS));
+                    lastOn(stack).add(new SignItem(true));
                 } else if (c == '{') {
                     int start = ++i;
                     while ((i < n) && pattern.charAt(i) != '}') {
@@ -5167,31 +5166,24 @@ public final class Duration<U extends IsoUnit>
 
 	    //~ Instanzvariablen ----------------------------------------------
 
-		private final SignPolicy policy;
+		private final boolean always;
 
 	    //~ Konstruktoren -------------------------------------------------
 
-		private SignItem(SignPolicy policy) {
+		private SignItem(boolean always) {
 			super(0);
 
-            switch (policy) {
-                case SHOW_WHEN_NEGATIVE:
-                case SHOW_ALWAYS:
-                    this.policy = policy;
-                    break;
-                default:
-                    throw new UnsupportedOperationException(policy.name());
-            }
+            this.always = always;
 
 		}
 
         private SignItem(
             int reserved,
-            SignPolicy policy
+            boolean always
         ) {
             super(reserved);
 
-            this.policy = policy;
+            this.always = always;
 
         }
 
@@ -5203,18 +5195,11 @@ public final class Duration<U extends IsoUnit>
     		Appendable buffer
     	) throws IOException {
 
-			switch (this.policy) {
-				case SHOW_WHEN_NEGATIVE:
-					if (duration.isNegative()) {
-						buffer.append('-');
-					}
-					break;
-				case SHOW_ALWAYS:
-					buffer.append(duration.isNegative() ? '-' : '+');
-					break;
-				default:
-					throw new UnsupportedOperationException(this.policy.name());
-			}
+            if (this.always) {
+                buffer.append(duration.isNegative() ? '-' : '+');
+            } else if (duration.isNegative()) {
+                buffer.append('-');
+            }
 
 		}
 
@@ -5226,7 +5211,7 @@ public final class Duration<U extends IsoUnit>
         ) {
 
 			if (start >= text.length() - this.getReserved()) {
-				if (this.policy == SignPolicy.SHOW_ALWAYS) {
+                if (this.always) {
 					return ~start; // sign expected
 				} else {
 					Long old = unitsToValues.put(SIGN_KEY, Long.valueOf(1));
@@ -5241,28 +5226,23 @@ public final class Duration<U extends IsoUnit>
 			Long sign = Long.valueOf(1);
 			int ret = start;
 
-			switch (this.policy) {
-				case SHOW_WHEN_NEGATIVE:
-					if (c == '+') {
-						return ~start; // positive sign not allowed
-					} else if (c == '-') {
-						sign = Long.valueOf(-1);
-						ret = start + 1;
-					}
-					break;
-				case SHOW_ALWAYS:
-					if (c == '+') {
-						ret = start + 1;
-					} else if (c == '-') {
-						sign = Long.valueOf(-1);
-						ret = start + 1;
-					} else {
-						return ~start; // sign expected
-					}
-					break;
-				default:
-					throw new UnsupportedOperationException(this.policy.name());
-			}
+            if (this.always) {
+                if (c == '+') {
+                    ret = start + 1;
+                } else if (c == '-') {
+                    sign = Long.valueOf(-1);
+                    ret = start + 1;
+                } else {
+                    return ~start; // sign expected
+                }
+            } else {
+                if (c == '+') {
+                    return ~start; // positive sign not allowed
+                } else if (c == '-') {
+                    sign = Long.valueOf(-1);
+                    ret = start + 1;
+                }
+            }
 
 			Long old = unitsToValues.put(SIGN_KEY, sign);
 
@@ -5277,14 +5257,14 @@ public final class Duration<U extends IsoUnit>
         @Override
         int getMinWidth() {
 
-            return ((this.policy == SignPolicy.SHOW_ALWAYS) ? 1 : 0);
+            return (this.always ? 1 : 0);
 
         }
 
         @Override
         FormatItem update(int reserved) {
 
-            return new SignItem(reserved, this.policy);
+            return new SignItem(reserved, this.always);
 
         }
 

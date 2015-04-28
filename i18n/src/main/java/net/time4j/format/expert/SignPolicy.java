@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.format;
+package net.time4j.format.expert;
 
 
 /**

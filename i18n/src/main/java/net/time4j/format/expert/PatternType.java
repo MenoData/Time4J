@@ -33,7 +33,6 @@ import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.OutputContext;
-import net.time4j.format.SignPolicy;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 

@@ -8,7 +8,6 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import net.time4j.format.Attributes;
-import net.time4j.format.SignPolicy;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

@@ -32,7 +32,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.SignPolicy;
+import net.time4j.format.expert.SignPolicy;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;

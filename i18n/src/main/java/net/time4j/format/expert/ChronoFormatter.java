@@ -41,7 +41,6 @@ import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.RawValues;
-import net.time4j.format.SignPolicy;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;

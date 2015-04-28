@@ -31,7 +31,7 @@ import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
-import net.time4j.format.SignPolicy;
+import net.time4j.format.expert.SignPolicy;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;

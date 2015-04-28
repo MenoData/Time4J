@@ -11,7 +11,6 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
-import net.time4j.format.SignPolicy;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.scale.TimeScale;
