@@ -146,7 +146,7 @@ public class HistoryTest {
 
     @Test
     public void isValidInSweden() {
-        ChronoHistory history = ChronoHistory.SWEDEN;
+        ChronoHistory history = ChronoHistory.ofSweden();
         assertThat(
             history.isValid(HistoricDate.of(HistoricEra.AD, 1700, 2, 29)),
             is(false));
@@ -178,7 +178,7 @@ public class HistoryTest {
 
     @Test
     public void convertToISOInSweden() {
-        ChronoHistory sweden = ChronoHistory.SWEDEN;
+        ChronoHistory sweden = ChronoHistory.ofSweden();
         ChronoHistory julian = ChronoHistory.PROLEPTIC_JULIAN;
         assertThat(
             sweden.convert(HistoricDate.of(HistoricEra.AD, 1700, 3, 1)),
@@ -208,7 +208,7 @@ public class HistoryTest {
 
     @Test
     public void convertToHistoricInSweden() {
-        ChronoHistory sweden = ChronoHistory.SWEDEN;
+        ChronoHistory sweden = ChronoHistory.ofSweden();
         ChronoHistory julian = ChronoHistory.PROLEPTIC_JULIAN;
         assertThat(
             sweden.convert(julian.convert(HistoricDate.of(HistoricEra.AD, 1700, 2, 29))),
@@ -268,7 +268,7 @@ public class HistoryTest {
 
     @Test
     public void lengthOfYearInSweden() {
-        ChronoHistory sweden = ChronoHistory.SWEDEN;
+        ChronoHistory sweden = ChronoHistory.ofSweden();
         assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1500), is(366));
         assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1600), is(366));
         assertThat(sweden.getLengthOfYear(HistoricEra.AD, 1700), is(365));

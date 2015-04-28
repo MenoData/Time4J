@@ -162,24 +162,14 @@ final class SPX
         throws IOException {
 
         ChronoHistory history = (ChronoHistory) this.obj;
-        int variant = 0;
-
-        if (history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-            variant = 1;
-        } else if (history == ChronoHistory.PROLEPTIC_JULIAN) {
-            variant = 2;
-        } else if (history == ChronoHistory.SWEDEN) {
-            variant = 4;
-        } else if (history == ChronoHistory.ofFirstGregorianReform()) {
-            variant = 7;
-        }
+        int variant = history.getVariant();
 
         int header = this.type;
         header <<= 4;
         header |= variant;
         out.writeByte(header);
 
-        if (variant == 0) {
+        if (variant == ChronoHistory.VARIANT_OTHER) {
             out.writeLong(history.getEvents().get(0).start);
         }
 
@@ -193,16 +183,16 @@ final class SPX
         int variant = header & 0xF;
 
         switch (variant) {
-            case 0:
+            case ChronoHistory.VARIANT_OTHER:
                 long mjd = in.readLong();
                 return ChronoHistory.ofGregorianReform(PlainDate.of(mjd, EpochDays.MODIFIED_JULIAN_DATE));
-            case 1:
+            case ChronoHistory.VARIANT_PROLEPTIC_GREGORIAN:
                 return ChronoHistory.PROLEPTIC_GREGORIAN;
-            case 2:
+            case ChronoHistory.VARIANT_PROLEPTIC_JULIAN:
                 return ChronoHistory.PROLEPTIC_JULIAN;
-            case 4:
-                return ChronoHistory.SWEDEN;
-            case 7:
+            case ChronoHistory.VARIANT_SWEDEN:
+                return ChronoHistory.ofSweden();
+            case ChronoHistory.VARIANT_FIRST_GREGORIAN_REFORM:
                 return ChronoHistory.ofFirstGregorianReform();
             default:
                 throw new StreamCorruptedException("Unknown variant of chronological history.");

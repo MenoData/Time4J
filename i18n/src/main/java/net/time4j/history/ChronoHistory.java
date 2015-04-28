@@ -21,9 +21,12 @@
 
 package net.time4j.history;
 
-import net.time4j.*;
+import net.time4j.CalendarUnit;
+import net.time4j.PlainDate;
+import net.time4j.engine.AttributeKey;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
+import net.time4j.format.TextElement;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -31,7 +34,9 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -54,14 +59,33 @@ public final class ChronoHistory
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>The Swedish calendar has three cutover dates due to a failed experiment
-     * when switching to gregorian calendar in the years 1700-1712 step by step. </p>
+     * <p>Format attribute which can cause the format engine to create a chronological history with
+     * given cutover date. </p>
      */
     /*[deutsch]
-     * <p>Der schwedische Kalender hat drei Umstellungszeitpunkte, weil ein Experiment in den
-     * Jahren 1700-1712 zur schrittweisen Einf&uuml;hrung des gregorianischen Kalenders mi&szlig;lang. </p>
+     * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
+     * den angegebenen Attributwert als Umstellungsdatum zu erzeugen. </p>
      */
-    public static final ChronoHistory SWEDEN;
+    public static final AttributeKey<PlainDate> ATTRIBUTE_CUTOVER_DATE =
+        Key.valueOf("CUTOVER_DATE", PlainDate.class);
+
+    /**
+     * <p>Format attribute which prefers the notation of &quot;Common Era&quot; in formatting
+     * an enum of type {@link HistoricEra}. </p>
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das eine alternative nicht-christliche Schreibweise f&uuml;r die Formatierung
+     * eines Enums des Typs {@link HistoricEra} bevorzugt. </p>
+     */
+    public static final AttributeKey<Boolean> ATTRIBUTE_COMMON_ERA =
+        Key.valueOf("COMMON_ERA", Boolean.class);
+
+    // some variant constants used in serialization
+    static final int VARIANT_PROLEPTIC_GREGORIAN = 1;
+    static final int VARIANT_PROLEPTIC_JULIAN = 2;
+    static final int VARIANT_SWEDEN = 4;
+    static final int VARIANT_FIRST_GREGORIAN_REFORM = 7;
+    static final int VARIANT_OTHER = 0;
 
     /**
      * <p>Describes no real historical event but just the proleptic gregorian calendar which is assumed
@@ -97,38 +121,43 @@ public final class ChronoHistory
 
     private static final long EARLIEST_CUTOVER;
     private static final ChronoHistory INTRODUCTION_BY_POPE_GREGOR;
+    private static final ChronoHistory SWEDEN;
 
     static {
-        List<CutOverEvent> events = new ArrayList<CutOverEvent>();
-        events.add(new CutOverEvent(-57959, CalendarAlgorithm.JULIAN, CalendarAlgorithm.SWEDISH)); // 1700-03-01
-        events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
-        events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
-        SWEDEN = new ChronoHistory(4, Collections.unmodifiableList(events));
-
         PROLEPTIC_GREGORIAN =
             new ChronoHistory(
-                1,
+                VARIANT_PROLEPTIC_GREGORIAN,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.GREGORIAN, CalendarAlgorithm.GREGORIAN)));
 
         PROLEPTIC_JULIAN =
             new ChronoHistory(
-                2,
+                VARIANT_PROLEPTIC_JULIAN,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.JULIAN, CalendarAlgorithm.JULIAN)));
 
         EARLIEST_CUTOVER = PlainDate.of(1582, 10, 15).get(EpochDays.MODIFIED_JULIAN_DATE);
         INTRODUCTION_BY_POPE_GREGOR = ChronoHistory.ofGregorianReform(EARLIEST_CUTOVER);
+
+        List<CutOverEvent> events = new ArrayList<CutOverEvent>();
+        events.add(new CutOverEvent(-57959, CalendarAlgorithm.JULIAN, CalendarAlgorithm.SWEDISH)); // 1700-03-01
+        events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
+        events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
+        SWEDEN = new ChronoHistory(VARIANT_SWEDEN, Collections.unmodifiableList(events));
     }
+
+    // Dient der Serialisierungsunterstützung.
+    private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int variant;
     private transient final List<CutOverEvent> events;
-    private transient final ChronoElement<HistoricEra> eraElement;
-    private transient final ChronoElement<Integer> yearOfEraElement;
-    private transient final ChronoElement<Integer> monthElement;
-    private transient final ChronoElement<Integer> dayOfMonthElement;
+    private transient final TextElement<HistoricEra> eraElement;
+    private transient final TextElement<Integer> yearOfEraElement;
+    private transient final TextElement<Integer> monthElement;
+    private transient final TextElement<Integer> dayOfMonthElement;
+    private transient final Set<ChronoElement<?>> elements;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -150,6 +179,13 @@ public final class ChronoHistory
         this.yearOfEraElement = HistoricalIntegerElement.forYearOfEra(this);
         this.monthElement = HistoricalIntegerElement.forMonth(this);
         this.dayOfMonthElement = HistoricalIntegerElement.forDayOfMonth(this);
+
+        Set<ChronoElement<?>> tmp = new HashSet<ChronoElement<?>>();
+        tmp.add(this.eraElement);
+        tmp.add(this.yearOfEraElement);
+        tmp.add(this.monthElement);
+        tmp.add(this.dayOfMonthElement);
+        this.elements = Collections.unmodifiableSet(tmp);
 
     }
 
@@ -206,6 +242,26 @@ public final class ChronoHistory
         }
 
         return ChronoHistory.ofGregorianReform(mjd);
+
+    }
+
+    /**
+     * <p>The Swedish calendar has three cutover dates due to a failed experiment
+     * when switching to gregorian calendar in the years 1700-1712 step by step. </p>
+     *
+     * @return  swedish chronological history
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Der schwedische Kalender hat drei Umstellungszeitpunkte, weil ein Experiment in den
+     * Jahren 1700-1712 zur schrittweisen Einf&uuml;hrung des gregorianischen Kalenders mi&szlig;lang. </p>
+     *
+     * @return  swedish chronological history
+     * @since   3.0
+     */
+    public static ChronoHistory ofSweden() {
+
+        return SWEDEN;
 
     }
 
@@ -372,7 +428,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    public ChronoElement<HistoricEra> era() {
+    public TextElement<HistoricEra> era() {
 
         return this.eraElement;
 
@@ -400,7 +456,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    public ChronoElement<Integer> yearOfEra() {
+    public TextElement<Integer> yearOfEra() {
 
         return this.yearOfEraElement;
 
@@ -428,7 +484,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    public ChronoElement<Integer> month() {
+    public TextElement<Integer> month() {
 
         return this.monthElement;
 
@@ -456,7 +512,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    public ChronoElement<Integer> dayOfMonth() {
+    public TextElement<Integer> dayOfMonth() {
 
         return this.dayOfMonthElement;
 
@@ -471,7 +527,7 @@ public final class ChronoHistory
             ChronoHistory that = (ChronoHistory) obj;
             if (this.variant != that.variant) {
                 return false;
-            } else if (this.variant == 0) {
+            } else if (this.variant == VARIANT_OTHER) {
                 return (this.events.get(0).start == that.events.get(0).start);
             } else {
                 return true;
@@ -485,7 +541,7 @@ public final class ChronoHistory
     @Override
     public int hashCode() {
 
-        if (this.variant > 0) {
+        if (this.variant == VARIANT_OTHER) {
             long h = this.events.get(0).start;
             return (int) (h ^ (h << 32));
         }
@@ -497,11 +553,11 @@ public final class ChronoHistory
     public String toString() {
 
         switch (this.variant) {
-            case 1:
+            case VARIANT_PROLEPTIC_GREGORIAN:
                 return "ChronoHistory[PROLEPTIC-GREGORIAN]";
-            case 2:
+            case VARIANT_PROLEPTIC_JULIAN:
                 return "ChronoHistory[PROLEPTIC-JULIAN]";
-            case 4:
+            case VARIANT_SWEDEN:
                 return "ChronoHistory[SWEDEN]";
             default:
                 PlainDate date = this.getGregorianCutOverDate();
@@ -569,10 +625,34 @@ public final class ChronoHistory
 
     }
 
+    /**
+     * <p>Yields the variant. </p>
+     *
+     * @return  int
+     * @since   3.0
+     */
+    int getVariant() {
+
+        return this.variant;
+
+    }
+
+    /**
+     * <p>Yields all associated elements. </p>
+     *
+     * @return  unmodifiable set
+     * @since   3.0
+     */
+    Set<ChronoElement<?>> getElements() {
+
+        return this.elements;
+
+    }
+
     private static ChronoHistory ofGregorianReform(long mjd) {
 
         return new ChronoHistory(
-            ((mjd == EARLIEST_CUTOVER) ? 7 : 0),
+            ((mjd == EARLIEST_CUTOVER) ? VARIANT_FIRST_GREGORIAN_REFORM : VARIANT_OTHER),
             Collections.singletonList(
                 new CutOverEvent(mjd, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)));
 
@@ -606,6 +686,81 @@ public final class ChronoHistory
         throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class Key<T>
+        implements AttributeKey<T> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final String name;
+        private final Class<T> type;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Key(String name, Class<T> type) {
+            super();
+
+            this.name = name;
+            this.type = type;
+
+        }
+
+        //~ Methoden ----------------------------------------------------------
+
+        static <T> Key<T> valueOf(
+            String name,
+            Class<T> type
+        ) {
+
+            return new Key<T>(name, type);
+
+        }
+
+        @Override
+        public String name() {
+
+            return this.name;
+
+        }
+
+        @Override
+        public Class<T> type() {
+
+            return this.type;
+
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof Key) {
+                Key<?> that = (Key) obj;
+                return (this.name.equals(that.name) && this.type.equals(that.type));
+            } else {
+                return false;
+            }
+
+        }
+
+        @Override
+        public int hashCode() {
+
+            return this.name.hashCode();
+
+        }
+
+        @Override
+        public String toString() {
+
+            return this.type.getName() + "@" + this.name;
+
+        }
 
     }
 

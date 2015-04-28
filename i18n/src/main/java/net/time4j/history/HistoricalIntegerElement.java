@@ -21,19 +21,32 @@
 
 package net.time4j.history;
 
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
+import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextAccessor;
+import net.time4j.format.TextElement;
+import net.time4j.format.TextWidth;
 
+import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
+import java.text.ParsePosition;
 import java.util.List;
+import java.util.Locale;
+
+import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -45,7 +58,7 @@ import java.util.List;
  */
 final class HistoricalIntegerElement
     extends BasicElement<Integer>
-    implements NumericalElement<Integer> {
+    implements NumericalElement<Integer>, TextElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -90,10 +103,10 @@ final class HistoricalIntegerElement
     //~ Methoden ----------------------------------------------------------
 
     // factory method
-    static ChronoElement<Integer> forYearOfEra(ChronoHistory history) {
+    static TextElement<Integer> forYearOfEra(ChronoHistory history) {
 
         return new HistoricalIntegerElement(
-            "YEAR_OF_ERA_INDEX",
+            "YEAR_OF_ERA",
             'y',
             Integer.valueOf(1),
             Integer.valueOf(GregorianMath.MAX_YEAR),
@@ -104,10 +117,10 @@ final class HistoricalIntegerElement
     }
 
     // factory method
-    static ChronoElement<Integer> forMonth(ChronoHistory history) {
+    static TextElement<Integer> forMonth(ChronoHistory history) {
 
         return new HistoricalIntegerElement(
-            "MONTH_AS_NUMBER",
+            "HISTORIC_MONTH",
             'M',
             Integer.valueOf(1),
             Integer.valueOf(12),
@@ -118,10 +131,10 @@ final class HistoricalIntegerElement
     }
 
     // factory method
-    static ChronoElement<Integer> forDayOfMonth(ChronoHistory history) {
+    static TextElement<Integer> forDayOfMonth(ChronoHistory history) {
 
         return new HistoricalIntegerElement(
-            "DAY_OF_MONTH_INDEX",
+            "HISTORIC_DAY_OF_MONTH",
             'd',
             Integer.valueOf(1),
             Integer.valueOf(31),
@@ -191,6 +204,67 @@ final class HistoricalIntegerElement
     }
 
     @Override
+    public void print(
+        ChronoDisplay context,
+        Appendable buffer,
+        AttributeQuery attributes
+    ) throws IOException {
+
+        int v = context.get(this).intValue();
+
+        switch (this.index) {
+            case MONTH_INDEX:
+                buffer.append(this.monthAccessor(attributes).print(Month.valueOf(v)));
+                break;
+            default:
+                // numerical case
+                buffer.append(String.valueOf(v));
+        }
+
+    }
+
+    @Override
+    public Integer parse(
+        CharSequence text,
+        ParsePosition status,
+        AttributeQuery attributes
+    ) {
+
+        switch (this.index) {
+            case MONTH_INDEX:
+                Month month =
+                    this.monthAccessor(attributes).parse(
+                        text,
+                        status,
+                        Month.class,
+                        attributes
+                    );
+                return Integer.valueOf(month.getValue());
+            default:
+                char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+                int value = 0;
+                int pos = status.getIndex();
+                for (int i = pos, n = text.length(); i < n; i++) {
+                    int digit = text.charAt(i) - zero;
+                    if ((digit >= 0) && (digit <= 9)) {
+                        value = value * 10 + digit;
+                        pos++;
+                    } else {
+                        break;
+                    }
+                }
+                if (pos == status.getIndex()) {
+                    status.setErrorIndex(pos);
+                    return null;
+                } else {
+                    status.setIndex(pos);
+                    return Integer.valueOf(value);
+                }
+        }
+
+    }
+
+    @Override
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
@@ -198,6 +272,20 @@ final class HistoricalIntegerElement
         }
 
         return null;
+
+    }
+
+    private TextAccessor monthAccessor(AttributeQuery attributes) {
+
+        CalendarText cnames =
+            CalendarText.getInstance(
+                attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
+                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+
+        TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+        OutputContext outputContext = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+
+        return cnames.getStdMonths(textWidth, outputContext);
 
     }
 

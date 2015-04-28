@@ -50,7 +50,7 @@ public class SerializationTest {
     public void roundTripOfSweden()
         throws IOException, ClassNotFoundException {
 
-        roundtrip(ChronoHistory.SWEDEN);
+        roundtrip(ChronoHistory.ofSweden());
     }
 
     private static int roundtrip(Object obj)

@@ -185,9 +185,11 @@ final class HistoricalEraElement
             CalendarText.getInstance(
                 attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
                 attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+        TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
 
-        TextWidth textWidth =
-            attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+        if (attributes.get(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE).booleanValue()) {
+            return cnames.getTextForms(this, ((textWidth == TextWidth.WIDE) ? "w" : "a"), "alt");
+        }
 
         return cnames.getEras(textWidth);
 
