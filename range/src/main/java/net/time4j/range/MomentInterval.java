@@ -21,7 +21,6 @@
 
 package net.time4j.range;
 
-import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
 import net.time4j.Moment;
