@@ -32,6 +32,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
@@ -388,10 +389,10 @@ public final class PlainTimestamp
                     new DecimalRule(DECIMAL_MINUTE))
                 .appendElement(
                     DECIMAL_SECOND,
-                    new DecimalRule(DECIMAL_SECOND))
-                .appendExtension(new WeekExtension());
+                    new DecimalRule(DECIMAL_SECOND));
         registerCalendarUnits(builder);
         registerClockUnits(builder);
+        registerExtensions(builder);
         ENGINE = builder.build();
 
         IsoUnit[] units =
@@ -1198,6 +1199,19 @@ public final class PlainTimestamp
                 unit.getLength(),
                 EnumSet.allOf(ClockUnit.class)
             );
+        }
+
+    }
+
+    private static void registerExtensions(
+        TimeAxis.Builder<IsoUnit, PlainTimestamp> builder
+    ) {
+
+        for (ChronoExtension extension : PlainDate.axis().getExtensions()) {
+            builder.appendExtension(extension);
+        }
+        for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
+            builder.appendExtension(extension);
         }
 
     }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekExtension.java) is part of project Time4J.
  *
@@ -41,6 +41,13 @@ class WeekExtension
     //~ Methoden ------------------------------------------------------
 
     @Override
+    public boolean accept(Class<?> chronoType) {
+
+        return false; // never called
+
+    }
+
+    @Override
     public Set<ChronoElement<?>> getElements(
         Locale locale,
         AttributeQuery attributes
@@ -51,7 +58,11 @@ class WeekExtension
     }
 
     @Override
-    public <T extends ChronoEntity<T>> T resolve(T entity) {
+    public <T extends ChronoEntity<T>> T resolve(
+        T entity,
+        Locale locale,
+        AttributeQuery attributes
+    ) {
 
         return entity; // no-op
 

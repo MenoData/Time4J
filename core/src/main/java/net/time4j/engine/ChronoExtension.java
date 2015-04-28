@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoExtension.java) is part of project Time4J.
  *
@@ -42,6 +42,24 @@ public interface ChronoExtension {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Will be called by a {@code java.util.ServiceLoader} in order to determine
+     * if the given chronological type should register this extension or not. </p>
+     *
+     * @param   chronoType  chronological type
+     * @return  {@code true} if given type should register this extension else {@code false}
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Wird von einem {@code java.util.ServiceLoader} aufgerufen, um zu bestimmen,
+     * ob der angegebene chronologische Typ diese Erweiterung registrieren soll. </p>
+     *
+     * @param   chronoType  chronological type
+     * @return  {@code true} if given type should register this extension else {@code false}
+     * @since   3.0
+     */
+    boolean accept(Class<?> chronoType);
+
+    /**
      * <p>Returns the element set for given configuration. </p>
      *
      * <p>An empty {@code Set} indicates that this extension is not relevant
@@ -73,7 +91,7 @@ public interface ChronoExtension {
      *
      * <p>Implementations are allowed to use {@code null} as pseudo-value
      * in order to delete an element from given source via the expression
-     * {@code parsedValues.with(element, null)}. Note: The argument has
+     * {@code entity.with(element, null)}. Note: The argument has
      * exceptionally no chronology. </p>
      *
      * @param   <T> generic type of applicable chronological entity
@@ -82,9 +100,12 @@ public interface ChronoExtension {
      *                  data has no chronology and allows the virtual value
      *                  {@code null} to be set as indication for removing
      *                  associated element)
-     * @return  eventually changed argument
-     * @see     ChronoEntity#with(ChronoElement, Object)
-     *          ChronoEntity.with(ChronoElement, V)
+     * @param   locale          language and country setting
+     * @param   attributes      configuration attributes
+     * @return  eventually changed entity
+     * @throws  IllegalArgumentException if resolving fails due to inconsistencies
+     * @since   3.0
+     * @see     ChronoEntity#with(ChronoElement, Object) ChronoEntity.with(ChronoElement, V)
      */
     /*[deutsch]
      * <p>Aktualisiert bei Bedarf die angegebene Wertquelle, um die Werte von
@@ -92,7 +113,7 @@ public interface ChronoExtension {
      * </p>
      *
      * <p>Implementierungen d&uuml;rfen hier auch {@code null} als Pseudo-Wert
-     * benutzen, um ein Element mittels {@code parsedValues.with(element, null)}
+     * benutzen, um ein Element mittels {@code entity.with(element, null)}
      * aus der Wertquelle zu l&ouml;schen. Zu beachten: Das Argument hat als
      * Ausnahmefall keine Chronologie. </p>
      *
@@ -102,10 +123,17 @@ public interface ChronoExtension {
      *                  data has no chronology and allows the virtual value
      *                  {@code null} to be set as indication for removing
      *                  associated element)
-     * @return  eventually changed argument
-     * @see     ChronoEntity#with(ChronoElement, Object)
-     *          ChronoEntity.with(ChronoElement, V)
+     * @param   locale          language and country setting
+     * @param   attributes      configuration attributes
+     * @return  eventually changed entity
+     * @throws  IllegalArgumentException if resolving fails due to inconsistencies
+     * @since   3.0
+     * @see     ChronoEntity#with(ChronoElement, Object) ChronoEntity.with(ChronoElement, V)
      */
-    <T extends ChronoEntity<T>> T resolve(T entity);
+    <T extends ChronoEntity<T>> T resolve(
+        T entity,
+        Locale locale,
+        AttributeQuery attributes
+    );
 
 }

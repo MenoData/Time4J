@@ -34,6 +34,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
@@ -67,6 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 
@@ -669,6 +671,7 @@ public final class PlainDate
 
         TRANSFORMER = new Transformer();
 
+
         TimeAxis.Builder<IsoDateUnit, PlainDate> builder =
             TimeAxis.Builder.setUp(
                 IsoDateUnit.class,
@@ -718,10 +721,10 @@ public final class PlainDate
             .appendElement(
                 WEEKDAY_IN_MONTH,
                 new WIMRule(WEEKDAY_IN_MONTH),
-                CalendarUnit.WEEKS)
-            // TODO: .appendExtension(new HistoryExtension())
-            .appendExtension(new WeekExtension());
+                CalendarUnit.WEEKS);
         registerUnits(builder);
+        registerExtensions(builder);
+        builder.appendExtension(new WeekExtension());
         ENGINE = builder.build();
     }
 
@@ -1942,8 +1945,30 @@ public final class PlainDate
 
     }
 
-    private static
-    void registerUnits(TimeAxis.Builder<IsoDateUnit, PlainDate> builder) {
+    private static void registerExtensions(TimeAxis.Builder<IsoDateUnit, PlainDate> builder) {
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        if (cl == null) {
+            cl = PlainDate.class.getClassLoader();
+        }
+
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        ServiceLoader<ChronoExtension> sl =
+            ServiceLoader.load(ChronoExtension.class, cl);
+
+        for (ChronoExtension extension : sl) {
+            if (extension.accept(PlainDate.class)) {
+                builder.appendExtension(extension);
+            }
+        }
+
+    }
+
+    private static void registerUnits(TimeAxis.Builder<IsoDateUnit, PlainDate> builder) {
 
         Set<CalendarUnit> monthly =
             EnumSet.range(CalendarUnit.MILLENNIA, CalendarUnit.MONTHS);

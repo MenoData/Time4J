@@ -842,9 +842,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
         for (ChronoExtension ext : chronology.getExtensions()) {
-            if (!ext.getElements(this.getLocale(), attributes).isEmpty()) {
-                parsed = ext.resolve(parsed);
-            }
+            parsed = ext.resolve(parsed, this.getLocale(), attributes);
         }
 
         return parsed;
@@ -1534,9 +1532,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
         for (ChronoExtension ext : chronology.getExtensions()) {
-            if (!ext.getElements(cf.getLocale(), attributes).isEmpty()) {
-                parsed = ext.resolve(parsed);
-            }
+            parsed = ext.resolve(parsed, cf.getLocale(), attributes);
         }
 
         // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
