@@ -41,7 +41,6 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Normalizer;
-import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.ValidationElement;
@@ -679,7 +678,7 @@ public final class PlainDate
                 CalendarUnit.DAYS)
             .appendElement(
                 WEEKDAY_IN_MONTH,
-                new WIMRule(WEEKDAY_IN_MONTH),
+                new WIMRule(),
                 CalendarUnit.WEEKS);
         registerUnits(builder);
         registerExtensions(builder);
@@ -2506,13 +2505,6 @@ public final class PlainDate
         }
 
         @Override
-        public StartOfDay getStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
         public List<CalendarEra> getEras() {
 
             return Collections.emptyList();
@@ -2952,19 +2944,6 @@ public final class PlainDate
 
     private static class WIMRule
         implements ElementRule<PlainDate, Integer> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final ChronoElement<Integer> element;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        WIMRule(ChronoElement<Integer> element) {
-            super();
-
-            this.element = element;
-
-        }
 
         //~ Methoden ------------------------------------------------------
 

@@ -239,39 +239,6 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     }
 
     /**
-     * <p>Yields the start of this calendar day. </p>
-     *
-     * <p>If a calendar date is combined with a clock time then this
-     * method has impact on the conversion of day numbers which occurs
-     * on the local timeline at noon. </p>
-     *
-     * @return  shift in seconds relative to midnight
-     * @see     StartOfDay
-     */
-    /*[deutsch]
-     * <p>Ermittelt den Beginn des Tages. </p>
-     *
-     * <p>Falls zu einer Datumsangabe eine Uhrzeit hinzukommt, hat diese
-     * Methode Einflu&szlig; auf die Konversion zwischen Tagesnummern, die
-     * immer zur Referenzzeit von 12 Uhr mittags stattfindet. </p>
-     *
-     * @return  shift in seconds relative to midnight
-     * @see     StartOfDay
-     */
-    public int getStartOfDay() {
-
-        CalendarSystem<D> calsys = this.getCalendarSystem();
-        StartOfDay sod = calsys.getStartOfDay();
-
-        if (sod.isFixed()) {
-            return sod.getShift(0); // Optimierung
-        } else {
-            return sod.getShift(calsys.transform(this.getContext()));
-        }
-
-    }
-
-    /**
      * <p>Definiert eine rein zeitliche Ordnung. </p>
      *
      * <p>Diese Implementierung wertet die zeitliche Position auf dem

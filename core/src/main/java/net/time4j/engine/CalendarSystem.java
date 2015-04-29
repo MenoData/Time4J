@@ -115,28 +115,6 @@ public interface CalendarSystem<D> {
     long getMaximumSinceUTC();
 
     /**
-     * <p>Gets the start time of a calendar day. </p>
-     *
-     * <p>If a calendar date is combined with a clock time then this method
-     * controls the conversion of day numbers which else have the reference
-     * time of noon. </p>
-     *
-     * @return  help object to calculate the start of day (eventually dependent
-     *          on the season)
-     */
-    /*[deutsch]
-     * <p>Ermittelt den Beginn des Tages. </p>
-     *
-     * <p>Falls zu einer Datumsangabe eine Uhrzeit hinzukommt, hat diese
-     * Methode Einflu&szlig; auf die Konversion zwischen Tagesnummern, die
-     * sonst die Referenzzeit von 12 Uhr mittags haben. </p>
-     *
-     * @return  help object to calculate the start of day (eventually dependent
-     *          on the season)
-     */
-    StartOfDay getStartOfDay();
-
-    /**
      * <p>Yields an enumeration of valid eras in ascending order. </p>
      *
      * <p>All ISO-systems only yield an empty list. A gregorian calendar
