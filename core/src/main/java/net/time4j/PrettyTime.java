@@ -30,7 +30,6 @@ import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.TextWidth;
-import net.time4j.format.UnitPatterns;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -133,9 +132,7 @@ public final class PrettyTime {
         TSP_UNITS = tspUnits;
 
         Set<IsoUnit> tmp = new HashSet<IsoUnit>();
-        for (IsoUnit unit : stdUnits) {
-            tmp.add(unit);
-        }
+        Collections.addAll(tmp, stdUnits);
         tmp.add(NANOS);
         SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
     }
@@ -534,46 +531,47 @@ public final class PrettyTime {
     ) {
 
         UnitPatterns p = UnitPatterns.of(this.locale);
-        String pattern;
+        CalendarUnit u;
 
         switch (unit) {
             case MILLENNIA:
                 amount = MathUtils.safeMultiply(amount, 1000);
-                pattern = p.getYears(width, this.getCategory(amount));
+                u = CalendarUnit.YEARS;
                 break;
             case CENTURIES:
                 amount = MathUtils.safeMultiply(amount, 100);
-                pattern = p.getYears(width, this.getCategory(amount));
+                u = CalendarUnit.YEARS;
                 break;
             case DECADES:
                 amount = MathUtils.safeMultiply(amount, 10);
-                pattern = p.getYears(width, this.getCategory(amount));
+                u = CalendarUnit.YEARS;
                 break;
             case YEARS:
-                pattern = p.getYears(width, this.getCategory(amount));
+                u = CalendarUnit.YEARS;
                 break;
             case QUARTERS:
                 amount = MathUtils.safeMultiply(amount, 3);
-                pattern = p.getMonths(width, this.getCategory(amount));
+                u = CalendarUnit.MONTHS;
                 break;
             case MONTHS:
-                pattern = p.getMonths(width, this.getCategory(amount));
+                u = CalendarUnit.MONTHS;
                 break;
             case WEEKS:
                 if (this.weekToDays) {
                     amount = MathUtils.safeMultiply(amount, 7);
-                    pattern = p.getDays(width, this.getCategory(amount));
+                    u = CalendarUnit.DAYS;
                 } else {
-                    pattern = p.getWeeks(width, this.getCategory(amount));
+                    u = CalendarUnit.WEEKS;
                 }
                 break;
             case DAYS:
-                pattern = p.getDays(width, this.getCategory(amount));
+                u = CalendarUnit.DAYS;
                 break;
             default:
                 throw new UnsupportedOperationException(unit.name());
         }
 
+        String pattern = p.getPattern(width, this.getCategory(amount), u);
         return this.format(pattern, amount);
 
     }
@@ -604,32 +602,7 @@ public final class PrettyTime {
         TextWidth width
     ) {
 
-        UnitPatterns p = UnitPatterns.of(this.locale);
-        String pattern;
-
-        switch (unit) {
-            case HOURS:
-                pattern = p.getHours(width, this.getCategory(amount));
-                break;
-            case MINUTES:
-                pattern = p.getMinutes(width, this.getCategory(amount));
-                break;
-            case SECONDS:
-                pattern = p.getSeconds(width, this.getCategory(amount));
-                break;
-            case MILLIS:
-                pattern = p.getMillis(width, this.getCategory(amount));
-                break;
-            case MICROS:
-                pattern = p.getMicros(width, this.getCategory(amount));
-                break;
-            case NANOS:
-                pattern = p.getNanos(width, this.getCategory(amount));
-                break;
-            default:
-                throw new UnsupportedOperationException(unit.name());
-        }
-
+        String pattern = UnitPatterns.of(this.locale).getPattern(width, this.getCategory(amount), unit);
         return this.format(pattern, amount);
 
     }
@@ -902,19 +875,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-
-        switch (unit) {
-            case YEARS:
-                return patterns.getYearsInPast(category);
-            case MONTHS:
-                return patterns.getMonthsInPast(category);
-            case WEEKS:
-                return patterns.getWeeksInPast(category);
-            case DAYS:
-                return patterns.getDaysInPast(category);
-            default:
-                throw new UnsupportedOperationException(unit.name());
-        }
+        return patterns.getPatternInPast(category, unit);
 
     }
 
@@ -925,19 +886,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-
-        switch (unit) {
-            case YEARS:
-                return patterns.getYearsInFuture(category);
-            case MONTHS:
-                return patterns.getMonthsInFuture(category);
-            case WEEKS:
-                return patterns.getWeeksInFuture(category);
-            case DAYS:
-                return patterns.getDaysInFuture(category);
-            default:
-                throw new UnsupportedOperationException(unit.name());
-        }
+        return patterns.getPatternInFuture(category, unit);
 
     }
 
@@ -948,17 +897,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-
-        switch (unit) {
-            case HOURS:
-                return patterns.getHoursInPast(category);
-            case MINUTES:
-                return patterns.getMinutesInPast(category);
-            case SECONDS:
-                return patterns.getSecondsInPast(category);
-            default:
-                throw new UnsupportedOperationException(unit.name());
-        }
+        return patterns.getPatternInPast(category, unit);
 
     }
 
@@ -969,17 +908,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-
-        switch (unit) {
-            case HOURS:
-                return patterns.getHoursInFuture(category);
-            case MINUTES:
-                return patterns.getMinutesInFuture(category);
-            case SECONDS:
-                return patterns.getSecondsInFuture(category);
-            default:
-                throw new UnsupportedOperationException(unit.name());
-        }
+        return patterns.getPatternInFuture(category, unit);
 
     }
 
