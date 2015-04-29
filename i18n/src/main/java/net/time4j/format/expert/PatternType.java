@@ -88,7 +88,7 @@ public enum PatternType
      *      <td>The count of symbols normally controls the minimum count of
      *      digits. If it is 2 however then the year will be printed with
      *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}.
-     *      Important: If the era is not present then this element will simply
+     *      Important: If the era is not present then this symbol will simply
      *      be mapped to {@link PlainDate#YEAR}. </td>
      *  </tr>
      *  <tr>
@@ -121,14 +121,15 @@ public enum PatternType
      *      a special grammar. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>MONTH_OF_YEAR</td>
      *      <td>M</td>
      *      <td>One or two symbols for the numerical form, three symbols
      *      for the abbreviation, four for the full name and five for
-     *      a letter symbol (NARROW). </td>
+     *      a letter symbol (NARROW). Important: If the era is not present
+     *      then this symbol will simply be mapped to {@link PlainDate#MONTH_OF_YEAR}. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>MONTH_OF_YEAR</td>
      *      <td>L</td>
      *      <td>Like M, but in the version {@link OutputContext#STANDALONE}.
      *      In some languages (not english) the stand-alone-version requires
@@ -145,9 +146,10 @@ public enum PatternType
      *      <td>One symbol for the country-dependent week of month. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#DAY_OF_MONTH}</td>
+     *      <td>DAY_OF_MONTH</td>
      *      <td>d</td>
-     *      <td>One or two symbols for the day of month. </td>
+     *      <td>One or two symbols for the day of month.  Important: If the era is not present
+     *      then this symbol will simply be mapped to {@link PlainDate#DAY_OF_MONTH}. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#DAY_OF_YEAR}</td>
@@ -306,7 +308,7 @@ public enum PatternType
      *      Buchstabensymbol. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
+     *      <td>YEAR_OF_ERA</td>
      *      <td>y</td>
      *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
      *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
@@ -345,14 +347,16 @@ public enum PatternType
      *      Deklination. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>MONTH_OF_YEAR</td>
      *      <td>M</td>
      *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
      *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
-     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW). </td>
+     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW).
+     *      Wichtig: Ist die &Auml;ra nicht im Muster vorhanden, wird dieses
+     *      Symbol dem Element {@link PlainDate#MONTH_OF_YEAR} zugeordnet. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#MONTH_OF_YEAR}</td>
+     *      <td>MONTH_OF_YEAR</td>
      *      <td>L</td>
      *      <td>Wie M, aber in der {@link OutputContext#STANDALONE
      *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
@@ -372,9 +376,11 @@ public enum PatternType
      *      Woche des Monats. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#DAY_OF_MONTH}</td>
+     *      <td>DAY_OF_MONTH</td>
      *      <td>d</td>
-     *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats. </td>
+     *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats.
+     *      Wichtig: Ist die &Auml;ra nicht im Muster vorhanden, wird dieses
+     *      Symbol dem Element {@link PlainDate#DAY_OF_MONTH} zugeordnet.</td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#DAY_OF_YEAR}</td>

@@ -34,9 +34,11 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -144,6 +146,8 @@ public final class ChronoHistory
     private static final ChronoHistory INTRODUCTION_BY_POPE_GREGOR;
     private static final ChronoHistory SWEDEN;
 
+    private static final Map<String, ChronoHistory> LOOKUP;
+
     static {
         PROLEPTIC_GREGORIAN =
             new ChronoHistory(
@@ -165,6 +169,12 @@ public final class ChronoHistory
         events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
         events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
         SWEDEN = new ChronoHistory(VARIANT_SWEDEN, Collections.unmodifiableList(events));
+
+        Map<String, ChronoHistory> tmp = new HashMap<String, ChronoHistory>();
+        tmp.put("GB", ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14)));
+        tmp.put("RU", ChronoHistory.ofGregorianReform(PlainDate.of(1918, 2, 14)));
+        tmp.put("SE", SWEDEN);
+        LOOKUP = Collections.unmodifiableMap(tmp);
     }
 
     // Dient der Serialisierungsunterstützung.
@@ -269,8 +279,8 @@ public final class ChronoHistory
      * <p>Determines the history of gregorian calendar reforms for given locale. </p>
      *
      * <p>The actual implementation just falls back to the introduction of gregorian calendar by
-     * pope Gregor - with the exception of Sweden and England. Later releases of Time4J will refine the
-     * implementation for most European countries. For any cutover date not supported by this
+     * pope Gregor - with the exception of Russia, Sweden and England. Later releases of Time4J will
+     * refine the implementation for most European countries. For any cutover date not supported by this
      * method, users can call {@code ofGregorianReform(PlainDate)} instead. </p>
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166). </p>
@@ -283,8 +293,8 @@ public final class ChronoHistory
      * <p>Ermittelt die Geschichte der gregorianischen Kalenderreformen f&uuml;r die
      * angegebene Region. </p>
      *
-     * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Schweden und England auf die erste
-     * Einf&uuml;hrung des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck.
+     * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Russland, Schweden und England
+     * auf die erste Einf&uuml;hrung des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck.
      * Sp&auml;tere Releases von Time4J werden diesen Ansatz f&uuml;r die meisten europ&auml;ischen
      * L&auml;nder verfeinern. F&uuml;r jedes hier nicht unterst&uuml;tzte Umstellungsdatum k&ouml;nnen
      * Anwender stattdessen {@code ofGregorianReform(PlainDate)} nutzen. </p>
@@ -297,15 +307,15 @@ public final class ChronoHistory
      */
     public static ChronoHistory of(Locale locale) {
 
-        if (locale.getCountry().equals("SE")) {
-            return SWEDEN;
-        } else if (locale.getCountry().equals("GB")) {
-            return ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14));
+        // TODO: support more gregorian cutover dates (for example Scotland, Germany-various locations etc.)
+
+        ChronoHistory history = LOOKUP.get(locale.getCountry());
+
+        if (history == null) {
+            return ChronoHistory.ofFirstGregorianReform();
+        } else {
+            return history;
         }
-
-        // TODO: support more gregorian cutover dates (for example Scotland, Germany-various locations, Russia etc.)
-
-        return ChronoHistory.ofFirstGregorianReform();
 
     }
 
