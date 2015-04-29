@@ -1236,7 +1236,7 @@ public final class PlainTimestamp
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.NEW_TIMESTAMP_TYPE);
+        return new SPX(this, SPX.TIMESTAMP_TYPE);
 
     }
 
