@@ -104,13 +104,7 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
-        ChronoHistory history = ChronoHistory.ofFirstGregorianReform();
-
-        if (locale.getCountry().equals("SE")) {
-            history = ChronoHistory.ofSweden();
-        }
-
-        return history;
+        return ChronoHistory.of(locale);
 
     }
 

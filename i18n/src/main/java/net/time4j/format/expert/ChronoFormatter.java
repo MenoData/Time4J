@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -3019,7 +3018,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 throw new NullPointerException("Missing pattern type.");
             }
 
-            Set<ChronoElement<?>> replacement = Collections.emptySet();
+            Map<ChronoElement<?>, ChronoElement<?>> replacement = Collections.emptyMap();
             int n = formatPattern.length();
             Locale loc = this.locale;
 
@@ -3037,14 +3036,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         i++;
                     }
 
-                    Set<ChronoElement<?>> set = patternType.registerSymbol(this, loc, c, i - start);
+                    Map<ChronoElement<?>, ChronoElement<?>> map =
+                        patternType.registerSymbol(this, loc, c, i - start);
 
                     if (replacement.isEmpty()) {
-                        replacement = set;
+                        replacement = map;
                     } else {
-                        Set<ChronoElement<?>> tmp =
-                            new HashSet<ChronoElement<?>>(replacement);
-                        tmp.addAll(set);
+                        Map<ChronoElement<?>, ChronoElement<?>> tmp =
+                            new HashMap<ChronoElement<?>, ChronoElement<?>>(replacement);
+                        tmp.putAll(map);
                         replacement = tmp;
                     }
 
@@ -3098,13 +3098,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     ChronoElement<?> element = step.getProcessor().getElement();
 
                     if (this.chronology.isRegistered(element)) {
-                        for (ChronoElement<?> e : replacement) {
-                            if (e.name().equals(element.name())) {
-                                if (e != element) {
-                                    this.steps.set(i, step.updateElement(e));
-                                }
-                                break;
-                            }
+                        if (replacement.containsKey(element)) {
+                            ChronoElement<?> newElement = replacement.get(element);
+                            this.steps.set(i, step.updateElement(newElement));
                         }
                     }
                 }

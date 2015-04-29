@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        EraFormatTest.class,
         EraNameTest.class,
         JulianTransformationTest.class,
         HistoryTest.class,

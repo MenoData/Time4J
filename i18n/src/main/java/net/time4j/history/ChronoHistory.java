@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -242,6 +243,40 @@ public final class ChronoHistory
         }
 
         return ChronoHistory.ofGregorianReform(mjd);
+
+    }
+
+    /**
+     * <p>Determines the history of gregorian calendar reforms for given locale. </p>
+     *
+     * <p>The actual implementation just falls back to the introduction of gregorian calendar by
+     * pope Gregor - with the exception of Sweden. Later releases of Time4J will refine the
+     * implementation for most European countries. </p>
+     *
+     * @return  localized chronological history
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Geschichte der gregorianischen Kalenderreformen f&uuml;r die
+     * angegebene Region. </p>
+     *
+     * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Schweden auf die erste
+     * Einf&uuml;hrung des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck.
+     * Sp&auml;tere Releases von Time4J werden diesen Ansatz f&uuml;r die meisten europ&auml;ischen
+     * L&auml;nder verfeinern. </p>
+     *
+     * @return  localized chronological history
+     * @since   3.0
+     */
+    public static ChronoHistory of(Locale locale) {
+
+        if (locale.getCountry().equals("SE")) {
+            return SWEDEN;
+        }
+
+        // TODO: support more gregorian cutover dates (for example England, Russia etc.)
+
+        return ChronoHistory.ofFirstGregorianReform();
 
     }
 

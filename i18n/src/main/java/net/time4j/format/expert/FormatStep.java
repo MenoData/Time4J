@@ -623,7 +623,10 @@ final class FormatStep {
 
         if (fp.getElement() == null) {
             return fp;
-        } else if (fp.getElement().getType() != element.getType()) {
+        } else if (
+            (fp.getElement().getType() != element.getType())
+            && !element.name().equals("HISTORIC_MONTH")
+        ) {
             throw new IllegalArgumentException(
                 "Cannot change element value type: " + element.name());
         }

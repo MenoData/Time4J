@@ -21,7 +21,6 @@
 
 package net.time4j.format.expert;
 
-import net.time4j.ElementProvider;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -35,11 +34,12 @@ import net.time4j.format.FormatEngine;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.history.ChronoHistory;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.Map;
 
 
 /**
@@ -77,18 +77,19 @@ public enum PatternType
      *      <th>Description</th>
      *  </tr>
      *  <tr>
-     *      <td>ERA (not registered)</td>
+     *      <td>{@link ChronoHistory#era() ERA}</td>
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
      *      indicate the long form and five symbols stand for a letter. </td>
      *  </tr>
      *  <tr>
-     *      <td>YEAR_OF_ERA (not registered)</td>
+     *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
      *      <td>y</td>
      *      <td>The count of symbols normally controls the minimum count of
      *      digits. If it is 2 however then the year will be printed with
      *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}.
-     *      </td>
+     *      Important: If the era is not present then this element will simply
+     *      be mapped to {@link PlainDate#YEAR}. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
@@ -298,18 +299,20 @@ public enum PatternType
      *      <th>Beschreibung</th>
      *  </tr>
      *  <tr>
-     *      <td>ERA (nicht registriert)</td>
+     *      <td>{@link ChronoHistory#era() ERA}</td>
      *      <td>G</td>
      *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
      *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
      *      Buchstabensymbol. </td>
      *  </tr>
      *  <tr>
-     *      <td>YEAR_OF_ERA (nicht registriert)</td>
+     *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
      *      <td>y</td>
      *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
      *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
-     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
+     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}.
+     *      Wichtig: Ist die &Auml;ra nicht im Muster vorhanden, wird dieses
+     *      Symbol dem Element {@link PlainDate#YEAR} zugeordnet. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
@@ -694,39 +697,6 @@ public enum PatternType
      */
     SIMPLE_DATE_FORMAT;
 
-    // initialization of era-related elements
-    private static final TextElement<?> DATE_ERA_ELEMENT;
-    private static final TextElement<?> TIMESTAMP_ERA_ELEMENT;
-    private static final ChronoElement<Integer> DATE_YEAR_OF_ERA_ELEMENT;
-    private static final ChronoElement<Integer> TIMESTAMP_YEAR_OF_ERA_ELEMENT;
-
-    static {
-        ElementProvider provider = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = PatternType.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (ElementProvider p : ServiceLoader.load(ElementProvider.class, cl)) {
-            provider = p;
-            break;
-        }
-
-        if (provider == null) {
-            throw new IllegalStateException("Critical failure: Missing core of Time4J.");
-        }
-
-        DATE_ERA_ELEMENT = provider.getDateEraElement();
-        TIMESTAMP_ERA_ELEMENT = provider.getTimestampEraElement();
-        DATE_YEAR_OF_ERA_ELEMENT = provider.getDateYearOfEraElement();
-        TIMESTAMP_YEAR_OF_ERA_ELEMENT = provider.getTimestampYearOfEraElement();
-    }
-
     //~ Methoden ----------------------------------------------------------
 
     @Override
@@ -743,8 +713,8 @@ public enum PatternType
      * @param   locale      current language- and country setting
      * @param   symbol      pattern symbol to be interpreted
      * @param   count       count of symbols in format pattern
-     * @return  set of elements which will replace other already registered
-     *          elements of same name after pattern processing
+     * @return  map of elements which will replace other already registered
+     *          elements after pattern processing
      * @throws  IllegalArgumentException if symbol resolution fails
      */
     /*[deutsch]
@@ -754,11 +724,11 @@ public enum PatternType
      * @param   locale      current language- and country setting
      * @param   symbol      pattern symbol to be interpreted
      * @param   count       count of symbols in format pattern
-     * @return  set of elements which will replace other already registered
-     *          elements of same name after pattern processing
+     * @return  map of elements which will replace other already registered
+     *          elements after pattern processing
      * @throws  IllegalArgumentException if symbol resolution fails
      */
-    Set<ChronoElement<?>> registerSymbol(
+    Map<ChronoElement<?>, ChronoElement<?>> registerSymbol(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
@@ -776,7 +746,7 @@ public enum PatternType
 
     }
 
-    private Set<ChronoElement<?>> cldr(
+    private Map<ChronoElement<?>, ChronoElement<?>> cldr(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
@@ -798,24 +768,32 @@ public enum PatternType
                         "Too many pattern letters: " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
-                if (PlainDate.class.isAssignableFrom(builder.getChronology().getChronoType())) {
-                    builder.addText(DATE_ERA_ELEMENT);
-                } else {
-                    builder.addText(TIMESTAMP_ERA_ELEMENT); // Moment and PlainTimestamp
-                }
+                ChronoHistory history = ChronoHistory.of(locale);
+                TextElement<?> eraElement = history.era();
+                builder.addText(eraElement);
                 builder.endSection();
-                break;
+                Map<ChronoElement<?>, ChronoElement<?>> replacement =
+                    new HashMap<ChronoElement<?>, ChronoElement<?>>();
+                replacement.put(PlainDate.YEAR, history.yearOfEra());
+                replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
+                replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
+                replacement.put(PlainDate.DAY_OF_MONTH, history.dayOfMonth());
+                return replacement;
             case 'y':
-                ChronoElement<Integer> yoe;
-                if (PlainDate.class.isAssignableFrom(builder.getChronology().getChronoType())) {
-                    yoe = DATE_YEAR_OF_ERA_ELEMENT;
-                } else {
-                    yoe = TIMESTAMP_YEAR_OF_ERA_ELEMENT; // Moment and PlainTimestamp
-                }
                 if (count == 2) {
-                    builder.addTwoDigitYear(yoe);
+                    builder.addTwoDigitYear(PlainDate.YEAR);
+                } else if (count < 4) {
+                    builder.addInteger(
+                        PlainDate.YEAR,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(yoe, count, 9);
+                    builder.addInteger(
+                        PlainDate.YEAR,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
                 }
                 break;
             case 'Y':
@@ -1053,11 +1031,11 @@ public enum PatternType
                     "Unsupported pattern symbol: " + symbol);
         }
 
-        return Collections.emptySet();
+        return Collections.emptyMap();
 
     }
 
-    private Set<ChronoElement<?>> sdf(
+    private Map<ChronoElement<?>, ChronoElement<?>> sdf(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
@@ -1102,7 +1080,7 @@ public enum PatternType
                 return cldr(builder, locale, symbol, count, true);
         }
 
-        return Collections.emptySet();
+        return Collections.emptyMap();
 
     }
 
