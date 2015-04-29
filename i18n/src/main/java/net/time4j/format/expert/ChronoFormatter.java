@@ -44,6 +44,7 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.history.ChronoHistory;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -911,6 +912,33 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public ChronoFormatter<T> with(Leniency leniency) {
 
         return this.with(Attributes.LENIENCY, leniency);
+
+    }
+
+    /**
+     * <p>Creates a copy of this formatter with alternative era names. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @return  changed copy with alternative era names while this instance remains unaffected
+     * @see     ChronoHistory#ATTRIBUTE_COMMON_ERA
+     * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie, die statt der Standard-&Auml;ra-Bezeichnungen
+     * alternative Namen verwendet. </p>
+     *
+     * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
+     *
+     * @return  changed copy with alternative era names while this instance remains unaffected
+     * @see     ChronoHistory#ATTRIBUTE_COMMON_ERA
+     * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
+     * @since   3.0
+     */
+    public ChronoFormatter<T> withAlternativeEraNames() {
+
+        return this.with(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.TRUE);
 
     }
 
