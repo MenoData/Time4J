@@ -54,12 +54,6 @@ public class DatePropertiesTest {
     }
 
     @Test
-    public void getStartOfDay() {
-        PlainDate any = PlainDate.of(2000, 1);
-        assertThat(any.getStartOfDay(), is(0));
-    }
-
-    @Test
     public void containsCalendarDate() {
         PlainDate any = PlainDate.of(2000, 1);
         assertThat(any.contains(CALENDAR_DATE), is(true));
