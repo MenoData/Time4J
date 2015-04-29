@@ -62,10 +62,20 @@ public final class ChronoHistory
     /**
      * <p>Format attribute which can cause the format engine to create a chronological history with
      * given cutover date. </p>
+     *
+     * <p>Users will usually not directly use this attribute but adjust a given {@code ChronoFormatter}
+     * by its method {@code withGregorianCutOver()}. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
      */
     /*[deutsch]
      * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
      * den angegebenen Attributwert als Umstellungsdatum zu erzeugen. </p>
+     *
+     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
+     * Methode {@code ChronoFormatter.withGregorianCutOver()} aufrufen. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
      */
     public static final AttributeKey<PlainDate> ATTRIBUTE_CUTOVER_DATE =
         Key.valueOf("CUTOVER_DATE", PlainDate.class);
@@ -73,10 +83,20 @@ public final class ChronoHistory
     /**
      * <p>Format attribute which prefers the notation of &quot;Common Era&quot; in formatting
      * an enum of type {@link HistoricEra}. </p>
+     *
+     * <p>Users will usually not directly use this attribute but call the method
+     * {@code ChronoFormatter.withAlternativeEraNames()} instead. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withAlternativeEraNames()
      */
     /*[deutsch]
      * <p>Formatattribut, das eine alternative nicht-christliche Schreibweise f&uuml;r die Formatierung
      * eines Enums des Typs {@link HistoricEra} bevorzugt. </p>
+     *
+     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
+     * Methode {@code ChronoFormatter.withAlternativeEraNames()} aufrufen. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withAlternativeEraNames()
      */
     public static final AttributeKey<Boolean> ATTRIBUTE_COMMON_ERA =
         Key.valueOf("COMMON_ERA", Boolean.class);

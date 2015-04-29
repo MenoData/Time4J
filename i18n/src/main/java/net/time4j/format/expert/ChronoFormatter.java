@@ -946,6 +946,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Creates a copy of this formatter with the given date of gregorian calendar reform. </p>
      *
+     * <p>Note that this configuration will override any gregorian cutover date which might be inferred
+     * from current locale. </p>
+     *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
      * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
@@ -954,6 +957,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie, die das angegebene Datum der gregorianischen Kalenderreform verwendet. </p>
+     *
+     * <p>Zu beachten: Diese Methode wird jedes gregorianische Umstellungsdatum &uuml;berschreiben, das
+     * von der L&auml;ndereinstellung dieses Formatierers abgeleitet werden mag. </p>
      *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
