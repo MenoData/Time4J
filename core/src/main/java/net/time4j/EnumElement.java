@@ -23,8 +23,6 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
-import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -62,10 +60,6 @@ final class EnumElement<V extends Enum<V>>
     static final int DAY_OF_WEEK = 102;
     /** Element-Index. */
     static final int QUARTER_OF_YEAR = 103;
-    /** Element-Index. */
-    static final int ERA_DATE = 104;
-    /** Element-Index. */
-    static final int ERA_TSP = 105;
 
     private static final long serialVersionUID = 2055272540517425102L;
 
@@ -211,7 +205,7 @@ final class EnumElement<V extends Enum<V>>
     @Override
     public int numerical(V value) {
 
-        return (this.isEraElement() ? value.ordinal() : value.ordinal() + 1);
+        return value.ordinal() + 1;
 
     }
 
@@ -242,23 +236,6 @@ final class EnumElement<V extends Enum<V>>
 
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(
-        Chronology<T> chronology
-    ) {
-
-        if (
-            this.isEraElement()
-            && chronology.isRegistered(PlainDate.CALENDAR_DATE)
-        ) {
-            return (ElementRule<T, V>) this.rule;
-        }
-
-        return null;
-
-    }
-
     /**
      * <p>Liefert einen Zugriffsindex zur Optimierung der Elementsuche. </p>
      *
@@ -267,12 +244,6 @@ final class EnumElement<V extends Enum<V>>
     int getIndex() {
 
         return this.index;
-
-    }
-
-    private boolean isEraElement() {
-
-        return ((this.index == ERA_DATE) || (this.index == ERA_TSP));
 
     }
 
@@ -305,9 +276,6 @@ final class EnumElement<V extends Enum<V>>
                     attributes.get(
                         Attributes.OUTPUT_CONTEXT,
                         OutputContext.FORMAT));
-            case ERA_DATE:
-            case ERA_TSP:
-                return cnames.getEras(textWidth);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -316,11 +284,8 @@ final class EnumElement<V extends Enum<V>>
 
     private Object readResolve() throws ObjectStreamException {
 
-        String n = this.name();
-        Object element = (
-            n.equals(PlainTimestamp.ERA.name())
-            ? PlainTimestamp.ERA
-            : PlainDate.lookupElement(n));
+        Object element = PlainDate.lookupElement(this.name());
+
         if (element == null) {
             throw new InvalidObjectException(this.name());
         } else {

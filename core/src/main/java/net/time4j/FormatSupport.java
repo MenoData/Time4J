@@ -21,13 +21,11 @@
 
 package net.time4j;
 
-import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.TemporalFormatter;
-import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 
 import java.text.DateFormat;
@@ -39,15 +37,10 @@ import java.util.ServiceLoader;
 /**
  * <p>Defines some helper routines for format support of basic types. </p>
  *
- * <p>Note: This class is for internal usage and only public because the
- * {@code ServiceLoader}-API requires it. </p>
- *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.exclude
  */
-public class FormatSupport
-    implements ElementProvider { // TODO: MAKE THIS CLASS PRIVATE IF HISTORIZATION IS AVAILABLE
+class FormatSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -88,9 +81,8 @@ public class FormatSupport
 
     //~ Konstruktoren -----------------------------------------------------
 
-    // For service loader only.
-    public FormatSupport() { // TODO: MAKE THIS CONSTRUCTOR PRIVATE IF HISTORIZATION IS AVAILABLE
-        super();
+    private FormatSupport() {
+        // no instantiation
 
     }
 
@@ -250,34 +242,6 @@ public class FormatSupport
     ) {
 
         return formatEngine.create(chronoType, formatPattern, formatEngine.getDefaultPatternType(), locale);
-
-    }
-
-    @Override
-    public TextElement<?> getDateEraElement() {
-
-        return PlainDate.ERA;
-
-    }
-
-    @Override
-    public TextElement<?> getTimestampEraElement() {
-
-        return PlainTimestamp.ERA;
-
-    }
-
-    @Override
-    public ChronoElement<Integer> getDateYearOfEraElement() {
-
-        return PlainDate.YEAR_OF_ERA;
-
-    }
-
-    @Override
-    public ChronoElement<Integer> getTimestampYearOfEraElement() {
-
-        return PlainTimestamp.YEAR_OF_ERA;
 
     }
 

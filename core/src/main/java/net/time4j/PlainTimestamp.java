@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.base.GregorianDate;
-import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
@@ -37,7 +36,6 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
-import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
@@ -50,7 +48,6 @@ import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
-import net.time4j.format.TextElement;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -68,18 +65,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.MILLENNIA;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.QUARTERS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
-import static net.time4j.ClockUnit.SECONDS;
+import static net.time4j.ClockUnit.*;
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
 
@@ -202,35 +190,6 @@ public final class PlainTimestamp
     private static final PlainTimestamp MAX =
         new PlainTimestamp(PlainDate.MAX, WALL_TIME.getDefaultMaximum());
 
-    /**
-     * <p>Element mit der &Auml;ra des proleptischen gregorianischen
-     * Kalenders. </p>
-     */
-    @FormattableElement(format = "G")
-    static final TextElement<SimpleEra> ERA =
-        new EnumElement<SimpleEra>(
-            "SIMPLE_ERA_IN_TSP",
-            SimpleEra.class,
-            SimpleEra.BC,
-            SimpleEra.AD,
-            EnumElement.ERA_TSP,
-            'G',
-            FieldRule.of(PlainDate.ERA));
-
-    /**
-     * <p>Element mit dem Jahr der &Auml;ra des proleptischen gregorianischen
-     * Kalenders. </p>
-     */
-    @FormattableElement(format = "y")
-    static final ChronoElement<Integer> YEAR_OF_ERA =
-        new IntegerDateElement(
-            "YEAR_OF_SIMPLE_ERA_IN_TSP",
-            IntegerDateElement.YEAR_OF_ERA_TSP,
-            1,
-            GregorianMath.MAX_YEAR,
-            'y',
-            FieldRule.of(PlainDate.YEAR_OF_ERA));
-
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
     private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
@@ -238,8 +197,6 @@ public final class PlainTimestamp
     static {
         Map<Object, ChronoElement<?>> children =
             new HashMap<Object, ChronoElement<?>>();
-        children.put(PlainTimestamp.ERA, PlainTimestamp.YEAR_OF_ERA);
-        children.put(PlainTimestamp.YEAR_OF_ERA, MONTH_AS_NUMBER);
         children.put(CALENDAR_DATE, WALL_TIME);
         children.put(YEAR, MONTH_AS_NUMBER);
         children.put(YEAR_OF_WEEKDATE, Weekmodel.ISO.weekOfYear());
@@ -1362,12 +1319,6 @@ public final class PlainTimestamp
             if (entity.contains(CALENDAR_DATE)) {
                 date = entity.get(CALENDAR_DATE);
             } else {
-                if (entity.contains(PlainTimestamp.YEAR_OF_ERA)) {
-                    entity = entity.with(PlainDate.YEAR_OF_ERA, entity.get(PlainTimestamp.YEAR_OF_ERA));
-                    if (entity.contains(PlainTimestamp.ERA)) {
-                        entity = entity.with(PlainDate.ERA, entity.get(PlainTimestamp.ERA));
-                    }
-                }
                 date = PlainDate.axis().createFrom(entity, attributes, false);
             }
 
@@ -1536,10 +1487,7 @@ public final class PlainTimestamp
             if (value.equals(this.getValue(context))) {
                 return context;
             } else if (lenient) { // nur auf numerischen Elementen definiert
-                IsoUnit unit = (
-                    this.element.equals(PlainDate.YEAR_OF_ERA)
-                    ?  CalendarUnit.YEARS
-                    : ENGINE.getBaseUnit(this.element));
+                IsoUnit unit = ENGINE.getBaseUnit(this.element);
                 long oldValue = this.toNumber(this.getValue(context));
                 long newValue = this.toNumber(value);
                 long amount = MathUtils.safeSubtract(newValue, oldValue);

@@ -51,7 +51,6 @@ import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
-import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
@@ -607,44 +606,6 @@ public final class PlainDate
     public static final OrdinalWeekdayElement WEEKDAY_IN_MONTH =
         WeekdayInMonthElement.INSTANCE;
 
-    /**
-     * <p>Element mit der &Auml;ra des proleptischen gregorianischen
-     * Kalenders. </p>
-     */
-    @FormattableElement(format = "G")
-    static final TextElement<SimpleEra> ERA =
-        new EnumElement<SimpleEra>(
-            "SIMPLE_ERA_IN_DATE",
-            SimpleEra.class,
-            SimpleEra.BC,
-            SimpleEra.AD,
-            EnumElement.ERA_DATE,
-            'G',
-            new EnumElementRule<SimpleEra>(
-                "SIMPLE_ERA_IN_DATE",
-                SimpleEra.class,
-                SimpleEra.BC,
-                SimpleEra.AD,
-                EnumElement.ERA_DATE));
-
-    /**
-     * <p>Element mit dem Jahr der &Auml;ra des proleptischen gregorianischen
-     * Kalenders. </p>
-     */
-    @FormattableElement(format = "y")
-    static final ChronoElement<Integer> YEAR_OF_ERA =
-        new IntegerDateElement(
-            "YEAR_OF_SIMPLE_ERA_IN_DATE",
-            IntegerDateElement.YEAR_OF_ERA_DATE,
-            1,
-            GregorianMath.MAX_YEAR,
-            'y',
-            new IntegerElementRule(
-                "YEAR_OF_SIMPLE_ERA_IN_DATE",
-                IntegerDateElement.YEAR_OF_ERA_DATE,
-                YEAR
-            ));
-
     // Dient der Serialisierungsunterstützung.
     private static final long serialVersionUID = -6698431452072325688L;
 
@@ -665,8 +626,6 @@ public final class PlainDate
         fill(constants, DAY_OF_YEAR);
         fill(constants, DAY_OF_QUARTER);
         fill(constants, WEEKDAY_IN_MONTH);
-        fill(constants, ERA);
-        fill(constants, YEAR_OF_ERA);
         ELEMENTS = Collections.unmodifiableMap(constants);
 
         TRANSFORMER = new Transformer();
@@ -2202,24 +2161,6 @@ public final class PlainDate
 
             if (entity.contains(YEAR)) {
                 year = entity.get(YEAR);
-            } else if (entity.contains(YEAR_OF_ERA)) {
-                if (entity.contains(ERA)) {
-                    int yearOfEra = entity.get(YEAR_OF_ERA).intValue();
-                    switch (entity.get(ERA)) {
-                        case AD:
-                            year = Integer.valueOf(yearOfEra);
-                            break;
-                        case BC:
-                            year = Integer.valueOf(1 - yearOfEra);
-                            break;
-                        default:
-                            // no year;
-                    }
-                } else {
-                    if (!leniency.isStrict()) {
-                        year = entity.get(YEAR_OF_ERA);
-                    }
-                }
             }
 
             if (year != null) {
@@ -2692,9 +2633,6 @@ public final class PlainDate
                     return Integer.valueOf(context.getDayOfYear());
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(context.getDayOfQuarter());
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
-                    int year = context.year;
-                    return Integer.valueOf((year <= 0) ? (1 - year) : year);
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2734,19 +2672,6 @@ public final class PlainDate
                     } else {
                         throw new IllegalArgumentException("Out of range: " + value);
                     }
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
-                    if (value == null) {
-                        throw new NullPointerException("Missing year of era.");
-                    } else if (!this.isValid(context, value)) {
-                        throw new IllegalArgumentException("Invalid year of era: " + value);
-                    } else {
-                        if (context.year <= 0) {
-                            int year = 1 - value.intValue();
-                            return context.with(PlainDate.YEAR, year);
-                        } else {
-                            return context.with(PlainDate.YEAR, value);
-                        }
-                    }
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2785,8 +2710,6 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_QUARTER:
                     int max = getMaximumOfQuarterDay(context);
                     return ((v >= 1) && (v <= max));
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
-                    return ((v <= GregorianMath.MAX_YEAR) && (v >= 1));
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2803,7 +2726,6 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_MONTH:
                 case IntegerDateElement.DAY_OF_YEAR:
                 case IntegerDateElement.DAY_OF_QUARTER:
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return Integer.valueOf(1);
                 default:
                     throw new UnsupportedOperationException(this.name);
@@ -2816,7 +2738,6 @@ public final class PlainDate
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return MAX_YEAR;
                 case IntegerDateElement.MONTH:
                     return Integer.valueOf(12);
@@ -2856,7 +2777,6 @@ public final class PlainDate
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
-                case IntegerDateElement.YEAR_OF_ERA_DATE:
                     return MONTH_AS_NUMBER;
                 case IntegerDateElement.MONTH:
                     return DAY_OF_MONTH;
@@ -2945,9 +2865,6 @@ public final class PlainDate
                 case EnumElement.QUARTER_OF_YEAR:
                     ret = Quarter.valueOf(((context.month - 1) / 3) + 1);
                     break;
-                case EnumElement.ERA_DATE:
-                    ret = ((context.year <= 0) ? SimpleEra.BC : SimpleEra.AD);
-                    break;
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2996,15 +2913,6 @@ public final class PlainDate
                     int q1 = ((context.month - 1) / 3) + 1;
                     int q2 = Quarter.class.cast(value).getValue();
                     return context.plus((q2 - q1), CalendarUnit.QUARTERS);
-                case EnumElement.ERA_DATE:
-                    if (
-                        ((context.year <= 0) && (value == SimpleEra.AD))
-                        || ((context.year > 0) && (value == SimpleEra.BC))
-                    ) {
-                        return context.with(PlainDate.YEAR, 1 - context.year);
-                    } else {
-                        return context;
-                    }
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -3034,8 +2942,6 @@ public final class PlainDate
                     return null;
                 case EnumElement.QUARTER_OF_YEAR:
                     return DAY_OF_QUARTER;
-                case EnumElement.ERA_DATE:
-                    return YEAR_OF_ERA;
                 default:
                     throw new UnsupportedOperationException(this.name);
             }

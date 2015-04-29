@@ -24,7 +24,6 @@ package net.time4j;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.NumericalElement;
 
@@ -55,10 +54,6 @@ final class IntegerDateElement
     static final int DAY_OF_YEAR = 17;
     /** Element-Index */
     static final int DAY_OF_QUARTER = 18;
-    /** Element-Index */
-    static final int YEAR_OF_ERA_DATE = 19;
-    /** Element-Index */
-    static final int YEAR_OF_ERA_TSP = 20;
 
     private static final long serialVersionUID = -1337148214680014674L;
 
@@ -184,23 +179,6 @@ final class IntegerDateElement
 
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(
-        Chronology<T> chronology
-    ) {
-
-        if (
-            ((this.index == YEAR_OF_ERA_DATE) || (this.index == YEAR_OF_ERA_TSP))
-            && chronology.isRegistered(PlainDate.CALENDAR_DATE)
-        ) {
-            return (ElementRule<T, Integer>) this.rule;
-        }
-
-        return null;
-
-    }
-
     /**
      * <p>Liefert einen Zugriffsindex zur Optimierung der Elementsuche. </p>
      *
@@ -243,11 +221,8 @@ final class IntegerDateElement
 
     private Object readResolve() throws ObjectStreamException {
 
-        String n = this.name();
-        Object element = (
-            n.equals(PlainTimestamp.YEAR_OF_ERA.name())
-                ? PlainTimestamp.YEAR_OF_ERA
-                : PlainDate.lookupElement(n));
+        Object element = PlainDate.lookupElement(this.name());
+
         if (element == null) {
             throw new InvalidObjectException(this.name());
         } else {
