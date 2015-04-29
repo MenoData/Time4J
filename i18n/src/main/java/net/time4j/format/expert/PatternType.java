@@ -105,7 +105,8 @@ public enum PatternType
      *      <td>Proleptic ISO-8601 calendar year. This year never uses
      *      a pivot year, also not for &quot;uu&quot;. A positive sign
      *      will be used exactly if the year has more digits than given
-     *      by count of symbols. </td>
+     *      by count of symbols. In contrast to the symbol y, this year
+     *      can never be the historized year-of-era. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -330,7 +331,9 @@ public enum PatternType
      *      <td>Proleptisches ISO-Kalenderjahr. Diese Jahresangabe erfolgt
      *      nie mit Kippjahr, auch nicht f&uuml;r &quot;uu&quot;. Ein
      *      positives Vorzeichen wird genau dann ausgegeben, wenn das Jahr
-     *      mehr Stellen hat als an Symbolen vorgegeben. </td>
+     *      mehr Stellen hat als an Symbolen vorgegeben. Im Kontrast zum
+     *      Symbol y kann dieses Jahr niemals das historische Jahr einer
+     *      &Auml;ra sein. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -821,16 +824,12 @@ public enum PatternType
                 break;
             case 'u':
                 if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR,
+                    builder.addProlepticIsoYear(
                         count,
-                        9,
                         SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR,
+                    builder.addProlepticIsoYear(
                         count,
-                        9,
                         SignPolicy.SHOW_WHEN_BIG_NUMBER);
                 }
                 break;

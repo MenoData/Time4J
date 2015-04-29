@@ -51,6 +51,7 @@ final class NumberProcessor<V>
     private final int minDigits;
     private final int maxDigits;
     private final SignPolicy signPolicy;
+    private final boolean protectedMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -62,6 +63,7 @@ final class NumberProcessor<V>
      * @param   minDigits       minimum count of digits
      * @param   maxDigits       maximum count of digits
      * @param   signPolicy      sign policy
+     * @param   protectedMode   allow replacement?
      * @throws  IllegalArgumentException in case of inconsistencies
      */
     NumberProcessor(
@@ -69,7 +71,8 @@ final class NumberProcessor<V>
         boolean fixedWidth,
         int minDigits,
         int maxDigits,
-        SignPolicy signPolicy
+        SignPolicy signPolicy,
+        boolean protectedMode
     ) {
         super();
 
@@ -78,6 +81,7 @@ final class NumberProcessor<V>
         this.minDigits = minDigits;
         this.maxDigits = maxDigits;
         this.signPolicy = signPolicy;
+        this.protectedMode = protectedMode;
 
         if (element == null) {
             throw new NullPointerException("Missing element.");
@@ -486,6 +490,7 @@ final class NumberProcessor<V>
                 && (this.minDigits == that.minDigits)
                 && (this.maxDigits == that.maxDigits)
                 && (this.signPolicy == that.signPolicy)
+                && (this.protectedMode == that.protectedMode)
             );
         } else {
             return false;
@@ -533,7 +538,10 @@ final class NumberProcessor<V>
     @Override
     public FormatProcessor<V> withElement(ChronoElement<V> element) {
 
-        if (this.element == element) {
+        if (
+            this.protectedMode
+            || (this.element == element)
+        ) {
             return this;
         }
 
@@ -542,7 +550,8 @@ final class NumberProcessor<V>
             this.fixedWidth,
             this.minDigits,
             this.maxDigits,
-            this.signPolicy
+            this.signPolicy,
+            false
         );
 
     }

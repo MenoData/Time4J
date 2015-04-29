@@ -4282,12 +4282,42 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
+        // Spezialmethode, um das CLDR-Symbol u immer als proleptic-iso-year zu schützen
+        Builder<T> addProlepticIsoYear(
+            int count,
+            SignPolicy signPolicy
+        ) {
+
+            return this.addNumber(
+                PlainDate.YEAR,
+                false,
+                count,
+                9,
+                signPolicy,
+                true
+            );
+
+        }
+
         private <V> Builder<T> addNumber(
             ChronoElement<V> element,
             boolean fixedWidth,
             int minDigits,
             int maxDigits,
             SignPolicy signPolicy
+        ) {
+
+            return this.addNumber(element, fixedWidth, minDigits, maxDigits, signPolicy, false);
+
+        }
+
+        private <V> Builder<T> addNumber(
+            ChronoElement<V> element,
+            boolean fixedWidth,
+            int minDigits,
+            int maxDigits,
+            SignPolicy signPolicy,
+            boolean protectedMode
         ) {
 
             this.checkElement(element);
@@ -4299,7 +4329,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     fixedWidth,
                     minDigits,
                     maxDigits,
-                    signPolicy
+                    signPolicy,
+                    protectedMode
                 );
 
             if (fixedWidth) {
