@@ -21,11 +21,8 @@
 
 package net.time4j;
 
-import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoFunction;
-import net.time4j.format.Attributes;
 import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.TimeScale;
@@ -102,16 +99,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  */
 public final class ZonalDateTime
     implements ChronoDisplay, UniversalTime {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
-        new ChronoFunction<ChronoDisplay, Void>() {
-            @Override
-            public Void apply(ChronoDisplay context) {
-                return null;
-            }
-        };
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -490,16 +477,6 @@ public final class ZonalDateTime
         }
 
         return sb.toString();
-
-    }
-
-    private static AttributeQuery getAttributes(Object obj) {
-
-        if (obj instanceof TemporalFormatter) {
-            return TemporalFormatter.class.cast(obj).getAttributes();
-        } else {
-            return Attributes.empty();
-        }
 
     }
 
