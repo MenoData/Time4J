@@ -235,10 +235,9 @@ public final class ChronoHistory
     public static ChronoHistory ofGregorianReform(PlainDate start) {
 
         long mjd = start.get(EpochDays.MODIFIED_JULIAN_DATE);
+        check(mjd);
 
-        if (mjd < EARLIEST_CUTOVER) {
-            throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
-        } else if (mjd == EARLIEST_CUTOVER) {
+        if (mjd == EARLIEST_CUTOVER) {
             return INTRODUCTION_BY_POPE_GREGOR;
         }
 
@@ -685,6 +684,14 @@ public final class ChronoHistory
     Set<ChronoElement<?>> getElements() {
 
         return this.elements;
+
+    }
+
+    private static void check(long mjd) {
+
+        if (mjd < EARLIEST_CUTOVER) {
+            throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
+        }
 
     }
 

@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.PlainDate;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
@@ -31,8 +32,10 @@ import net.time4j.format.Leniency;
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
+import net.time4j.history.ChronoHistory;
 
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -100,11 +103,12 @@ final class AttributeSet
     private final int level; // Ebene der optionalen Verarbeitungshierarchie
     private final int section; // Identifiziert eine optionale Attributsektion
     private final ChronoCondition<ChronoDisplay> printCondition; // nullable
+    private final PlainDate cutover; // nullable
 
     //~ Konstruktoren -----------------------------------------------------
 
     AttributeSet(Attributes attributes) {
-        this(attributes, Locale.ROOT, 0, 0, null);
+        this(attributes, Locale.ROOT, 0, 0, null, null);
 
     }
 
@@ -113,7 +117,8 @@ final class AttributeSet
         Locale locale,
         int level,
         int section,
-        ChronoCondition<ChronoDisplay> printCondition
+        ChronoCondition<ChronoDisplay> printCondition,
+        PlainDate cutover
     ) {
         super();
 
@@ -126,6 +131,7 @@ final class AttributeSet
         this.level = level;
         this.section = section;
         this.printCondition = printCondition;
+        this.cutover = cutover;
 
     }
 
@@ -134,12 +140,24 @@ final class AttributeSet
     @Override
     public boolean contains(AttributeKey<?> key) {
 
+        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+            return (this.cutover != null);
+        }
+
         return this.attributes.contains(key);
 
     }
 
     @Override
     public <A> A get(AttributeKey<A> key) {
+
+        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+            if (this.cutover == null) {
+                throw new NoSuchElementException(key.name());
+            } else {
+                return key.type().cast(this.cutover);
+            }
+        }
 
         return this.attributes.get(key);
 
@@ -150,6 +168,14 @@ final class AttributeSet
         AttributeKey<A> key,
         A defaultValue
     ) {
+
+        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+            if (this.cutover == null) {
+                throw new NoSuchElementException(key.name());
+            } else {
+                return defaultValue;
+            }
+        }
 
         return this.attributes.get(key, defaultValue);
 
@@ -173,7 +199,8 @@ final class AttributeSet
                 && this.locale.equals(that.locale)
                 && (this.level == that.level)
                 && (this.section == that.section)
-                && this.printCondition.equals(that.printCondition)
+                && isEqual(this.printCondition, that.printCondition)
+                && isEqual(this.cutover, that.cutover)
             );
         } else {
             return false;
@@ -212,6 +239,8 @@ final class AttributeSet
         sb.append(this.section);
         sb.append(",print-condition=");
         sb.append(this.printCondition);
+        sb.append(",cutover-date=");
+        sb.append(this.cutover);
         sb.append(']');
         return sb.toString();
 
@@ -269,7 +298,7 @@ final class AttributeSet
      */
     AttributeSet withAttributes(Attributes attributes) {
 
-        return new AttributeSet(attributes, this.locale, this.level, this.section, this.printCondition);
+        return new AttributeSet(attributes, this.locale, this.level, this.section, this.printCondition, this.cutover);
 
     }
 
@@ -323,7 +352,17 @@ final class AttributeSet
         }
 
         builder.setLanguage(locale);
-        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition);
+        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, this.cutover);
+
+    }
+
+    private static boolean isEqual(Object o1, Object o2) {
+
+        if (o1 == null) {
+            return (o2 == null);
+        } else {
+            return o1.equals(o2);
+        }
 
     }
 

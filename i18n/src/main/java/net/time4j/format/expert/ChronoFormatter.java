@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.PlainDate;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
@@ -939,6 +940,43 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public ChronoFormatter<T> withAlternativeEraNames() {
 
         return this.with(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.TRUE);
+
+    }
+
+    /**
+     * <p>Creates a copy of this formatter with the given date of gregorian calendar reform. </p>
+     *
+     * @param   date        first gregorian date after gregorian calendar reform takes effect
+     * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @see     ChronoHistory#ofGregorianReform(PlainDate)
+     * @since   3.0
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie, die das angegebene Datum der gregorianischen Kalenderreform verwendet. </p>
+     *
+     * @param   date        first gregorian date after gregorian calendar reform takes effect
+     * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @see     ChronoHistory#ofGregorianReform(PlainDate)
+     * @since   3.0
+     */
+    public ChronoFormatter<T> withGregorianCutOver(PlainDate date) {
+
+        if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
+            throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
+        }
+
+        AttributeSet as =
+            new AttributeSet(
+                this.globalAttributes.getAttributes(),
+                this.globalAttributes.getLocale(),
+                this.globalAttributes.getLevel(),
+                this.globalAttributes.getSection(),
+                this.globalAttributes.getCondition(),
+                date);
+
+        return new ChronoFormatter<T>(this, as);
 
     }
 
@@ -3971,7 +4009,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 }
             }
 
-            AttributeSet as = new AttributeSet(ab.build(), this.locale, newLevel, newSection, cc);
+            AttributeSet as = new AttributeSet(ab.build(), this.locale, newLevel, newSection, cc, null);
             this.stack.addLast(as);
             return this;
 

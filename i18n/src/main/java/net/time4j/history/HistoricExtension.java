@@ -104,6 +104,11 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
+        if (attributes.contains(ChronoHistory.ATTRIBUTE_CUTOVER_DATE)) {
+            PlainDate date = attributes.get(ChronoHistory.ATTRIBUTE_CUTOVER_DATE);
+            return ChronoHistory.ofGregorianReform(date);
+        }
+
         return ChronoHistory.of(locale);
 
     }
