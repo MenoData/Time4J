@@ -251,10 +251,12 @@ public final class ChronoHistory
      *
      * <p>The actual implementation just falls back to the introduction of gregorian calendar by
      * pope Gregor - with the exception of Sweden. Later releases of Time4J will refine the
-     * implementation for most European countries. </p>
+     * implementation for most European countries. For any cutover date not supported by this
+     * method, users can call {@code ofGregorianReform(PlainDate)} instead. </p>
      *
      * @return  localized chronological history
      * @since   3.0
+     * @see     #ofGregorianReform(PlainDate)
      */
     /*[deutsch]
      * <p>Ermittelt die Geschichte der gregorianischen Kalenderreformen f&uuml;r die
@@ -263,10 +265,12 @@ public final class ChronoHistory
      * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Schweden auf die erste
      * Einf&uuml;hrung des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck.
      * Sp&auml;tere Releases von Time4J werden diesen Ansatz f&uuml;r die meisten europ&auml;ischen
-     * L&auml;nder verfeinern. </p>
+     * L&auml;nder verfeinern. F&uuml;r jedes hier nicht unterst&uuml;tzte Umstellungsdatum k&ouml;nnen
+     * Anwender stattdessen {@code ofGregorianReform(PlainDate)} nutzen. </p>
      *
      * @return  localized chronological history
      * @since   3.0
+     * @see     #ofGregorianReform(PlainDate)
      */
     public static ChronoHistory of(Locale locale) {
 
