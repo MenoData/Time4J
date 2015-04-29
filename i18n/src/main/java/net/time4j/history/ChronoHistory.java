@@ -269,9 +269,11 @@ public final class ChronoHistory
      * <p>Determines the history of gregorian calendar reforms for given locale. </p>
      *
      * <p>The actual implementation just falls back to the introduction of gregorian calendar by
-     * pope Gregor - with the exception of Sweden. Later releases of Time4J will refine the
+     * pope Gregor - with the exception of Sweden and England. Later releases of Time4J will refine the
      * implementation for most European countries. For any cutover date not supported by this
      * method, users can call {@code ofGregorianReform(PlainDate)} instead. </p>
+     *
+     * <p>This method does not use the language part of given locale but the country part (ISO-3166). </p>
      *
      * @return  localized chronological history
      * @since   3.0
@@ -281,11 +283,13 @@ public final class ChronoHistory
      * <p>Ermittelt die Geschichte der gregorianischen Kalenderreformen f&uuml;r die
      * angegebene Region. </p>
      *
-     * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Schweden auf die erste
+     * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r Schweden und England auf die erste
      * Einf&uuml;hrung des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck.
      * Sp&auml;tere Releases von Time4J werden diesen Ansatz f&uuml;r die meisten europ&auml;ischen
      * L&auml;nder verfeinern. F&uuml;r jedes hier nicht unterst&uuml;tzte Umstellungsdatum k&ouml;nnen
      * Anwender stattdessen {@code ofGregorianReform(PlainDate)} nutzen. </p>
+     *
+     * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166). </p>
      *
      * @return  localized chronological history
      * @since   3.0
@@ -295,9 +299,11 @@ public final class ChronoHistory
 
         if (locale.getCountry().equals("SE")) {
             return SWEDEN;
+        } else if (locale.getCountry().equals("GB")) {
+            return ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14));
         }
 
-        // TODO: support more gregorian cutover dates (for example England, Russia etc.)
+        // TODO: support more gregorian cutover dates (for example Scotland, Germany-various locations, Russia etc.)
 
         return ChronoHistory.ofFirstGregorianReform();
 

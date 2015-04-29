@@ -63,7 +63,7 @@ public class EraFormatTest {
     }
 
     @Test
-    public void printEngland() {
+    public void printEngland1() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.GERMANY)
                 .addPattern("d. MMMM yyyy G", PatternType.CLDR)
@@ -75,7 +75,7 @@ public class EraFormatTest {
     }
 
     @Test
-    public void parseEngland() throws ParseException {
+    public void parseEngland1() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.GERMANY)
                 .addPattern("d. MMMM yyyy G", PatternType.CLDR)
@@ -84,6 +84,50 @@ public class EraFormatTest {
         assertThat(
             formatter.parse("2. September 1752 n. Chr."),
             is(PlainDate.of(1752, 9, 13)));
+    }
+
+    @Test
+    public void printEngland2() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.UK)
+                .addPattern("d. MMMM G yyyy", PatternType.CLDR)
+                .build();
+        assertThat(
+            formatter.format(PlainDate.of(1752, 9, 13)),
+            is("2. September AD 1752"));
+    }
+
+    @Test
+    public void parseEngland2() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.UK)
+                .addPattern("d. MMMM G yyyy", PatternType.CLDR)
+                .build();
+        assertThat(
+            formatter.parse("2. September AD 1752"),
+            is(PlainDate.of(1752, 9, 13)));
+    }
+
+    @Test
+    public void printSweden() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
+                .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR)
+                .build();
+        assertThat(
+            formatter.format(PlainDate.of(1712, 3, 11)),
+            is("30. februari 1712 efter Kristus"));
+    }
+
+    @Test
+    public void parseSweden() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
+                .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR)
+                .build();
+        assertThat(
+            formatter.parse("30. februari 1712 efter Kristus"),
+            is(PlainDate.of(1712, 3, 11)));
     }
 
 }
