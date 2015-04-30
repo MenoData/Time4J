@@ -895,14 +895,10 @@ public final class CalendarText {
         Locale locale
     ) {
 
-        for (Locale l : p.getAvailableLocales()) {
-            String lang = locale.getLanguage();
-            String country = locale.getCountry();
+        String lang = locale.getLanguage();
 
-            if (
-                lang.equals(l.getLanguage())
-                && (country.isEmpty() || country.equals(l.getCountry()))
-            ) {
+        for (Locale l : p.getAvailableLocales()) {
+            if (lang.equals(l.getLanguage())) {
                 return true;
             }
         }
