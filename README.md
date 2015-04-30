@@ -33,6 +33,7 @@ Here some examples as a flavour of how Time4J-code looks like (shown code valid 
 ```java
 import net.time4j.*;
 import net.time4j.format.TextWidth;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.olson.*;
 
 import java.util.Locale;
