@@ -161,7 +161,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ChronoFormatter<T> old,
         Attributes attrs
     ) {
-        this(old, old.globalAttributes.withAttributes(attrs));
+        this(old, old.globalAttributes.withAttributes(attrs), null);
 
     }
 
@@ -169,6 +169,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private ChronoFormatter(
         ChronoFormatter<T> old,
         AttributeSet globalAttributes
+    ) {
+        this(old, globalAttributes, null);
+
+    }
+
+    // Aufruf durch withGregorianCutOver
+    private ChronoFormatter(
+        ChronoFormatter<T> old,
+        AttributeSet globalAttributes,
+        ChronoHistory history
     ) {
         super();
 
@@ -183,7 +193,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 new NonAmbivalentMap(old.defaults));
         this.fracproc = old.fracproc;
 
-        // finally update extension elements
+        // update extension elements and historizable elements
         int len = old.steps.size();
         List<FormatStep> copy = new ArrayList<FormatStep>(old.steps);
 
@@ -191,11 +201,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             FormatStep step = copy.get(i);
             ChronoElement<?> element = step.getProcessor().getElement();
 
+            // update extension elements
             if (
                 (element != null) // no literal steps etc.
                 && !this.chronology.isRegistered(element)
             ) {
-
                 // example: week-of-year dependent on LOCALE
                 for (ChronoExtension ext : this.chronology.getExtensions()) {
                     if (ext.getElements(old.getLocale(), old.globalAttributes).contains(element)) {
@@ -213,6 +223,24 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                         break;
                     }
+                }
+            }
+
+            // update historizable elements
+            if (history != null) {
+                ChronoElement<?> replacement = null;
+                if (element == PlainDate.YEAR) {
+                    replacement = history.yearOfEra();
+                } else if (
+                    (element == PlainDate.MONTH_OF_YEAR)
+                    || (element == PlainDate.MONTH_AS_NUMBER)
+                ) {
+                    replacement = history.month();
+                } else if (element == PlainDate.DAY_OF_MONTH) {
+                    replacement = history.dayOfMonth();
+                }
+                if (replacement != null) {
+                    copy.set(i, step.updateElement(replacement));
                 }
             }
         }
@@ -982,7 +1010,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 this.globalAttributes.getCondition(),
                 date);
 
-        return new ChronoFormatter<T>(this, as);
+        return new ChronoFormatter<T>(this, as, ChronoHistory.ofGregorianReform(date));
 
     }
 

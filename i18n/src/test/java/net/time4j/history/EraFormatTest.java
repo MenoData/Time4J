@@ -130,4 +130,35 @@ public class EraFormatTest {
             is(PlainDate.of(1712, 3, 11)));
     }
 
+    @Test
+    public void printRedOctober() {
+        Locale russia = new Locale("en", "RU");
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, russia)
+                .addPattern("d. MMMM yyyy", PatternType.CLDR)
+                .build()
+                .withGregorianCutOver(ChronoHistory.of(russia).getGregorianCutOverDate());
+        assertThat(
+            formatter.format(PlainDate.of(1917, 11, 7)),
+            is("25. October 1917"));
+    }
+
+    @Test
+    public void parseRedOctober() throws ParseException {
+        Locale russia = new Locale("en", "RU");
+        ChronoHistory history = ChronoHistory.of(russia);
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, russia)
+                .addInteger(history.dayOfMonth(), 1, 2)
+                .addLiteral(". ")
+                .addText(history.month())
+                .addLiteral(' ')
+                .addFixedInteger(history.yearOfEra(), 4)
+                .build()
+                .withDefault(history.era(), HistoricEra.AD);
+        assertThat(
+            formatter.parse("25. October 1917"),
+            is(PlainDate.of(1917, 11, 7)));
+    }
+
 }
