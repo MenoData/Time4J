@@ -28,7 +28,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 - `PlainTimestamp` = local timestamp as composition of calendar date and wall time
 - `Moment` = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like (shown code valid for v2.3 or later):
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v3.0 or later):
 
 ```java
 import net.time4j.*;
