@@ -5,6 +5,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.TemporalType;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
@@ -27,6 +28,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -543,7 +545,7 @@ public class MiscellaneousTest {
                 .startSection(Attributes.PAD_CHAR, '#')
                 .addNumerical(PlainDate.MONTH_OF_YEAR, 1, 2)
                 .padPrevious(2)
-                .endSection() // until here: Attributes.ZERO_DIGIT is sectional and equal to zero
+                .endSection()
                 .addLiteral(' ')
                 .addText(PlainDate.DAY_OF_WEEK, Collections.singletonMap(Weekday.THURSDAY, "Donnerstag"))
                 .addLiteral(" (attribute-value=")
@@ -554,8 +556,27 @@ public class MiscellaneousTest {
                 .with(Attributes.ZERO_DIGIT, '8'); // just done here for better test coverage
         assertThat(
             formatter.format(PlainDate.of(2015, 1)),
-            is("1# Donnerstag (attribute-value=8) 9st") // "9st" because of value of Attributes.ZERO_DIGIT
+            is("9# Donnerstag (attribute-value=8) 9st") // "9" because of value of Attributes.ZERO_DIGIT
         );
+    }
+
+    @Test
+    public void toJavaTextFormat() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .addPattern("M/dd/yyyy hh:mm a ", PatternType.CLDR)
+                .addTimezoneOffset()
+                .build()
+                .withTimezone("America/New_York");
+        PlainTimestamp tsp = PlainDate.of(2015, 1, 2).atStartOfDay();
+        Moment moment = tsp.in(Timezone.of("America/New_York"));
+        FieldPosition fpos = new FieldPosition(DateFormat.Field.TIME_ZONE); //.TIMEZONE_FIELD);
+        assertThat(
+            formatter.toFormat().format(moment, new StringBuffer(), fpos).toString(),
+            is("1/02/2015 12:00 AM -05:00")
+        );
+        assertThat(fpos.getBeginIndex(), is(19));
+        assertThat(fpos.getEndIndex(), is(25));
     }
 
     @Test

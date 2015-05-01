@@ -339,10 +339,6 @@ final class TimezoneOffsetProcessor
             return;
         }
 
-        int minutes = 0;
-        int seconds = 0;
-        int fraction = 0;
-
         if (this.extended) {
             if (text.charAt(pos) == ':') {
                 pos++;
@@ -358,7 +354,9 @@ final class TimezoneOffsetProcessor
             }
         }
 
-        minutes = parseNum(text, pos, Leniency.STRICT);
+        int minutes = parseNum(text, pos, Leniency.STRICT);
+        int seconds = 0;
+        int fraction = 0;
 
         if (minutes == -1000) {
             if (
