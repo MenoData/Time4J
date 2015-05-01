@@ -93,8 +93,6 @@ final class AttributeSet
             new ConcurrentHashMap<Locale, NumericalSymbols>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
         new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
-    private static final AttributeQuery EMPTY =
-        new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -107,8 +105,11 @@ final class AttributeSet
 
     //~ Konstruktoren -----------------------------------------------------
 
-    AttributeSet(Attributes attributes) {
-        this(attributes, Locale.ROOT, 0, 0, null, null);
+    AttributeSet(
+        Attributes attributes,
+        Locale locale
+    ) {
+        this(attributes, locale, 0, 0, null, null);
 
     }
 
@@ -286,7 +287,7 @@ final class AttributeSet
         builder.set(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         builder.set(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
         builder.set(Attributes.PAD_CHAR, ' ');
-        AttributeSet as = new AttributeSet(builder.build());
+        AttributeSet as = new AttributeSet(builder.build(), locale);
         return as.withLocale(locale);
 
     }

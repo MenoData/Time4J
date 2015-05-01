@@ -4082,8 +4082,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (this.stack.isEmpty()) {
                 ab = new Attributes.Builder(this.chronology);
-                as = new AttributeSet(ab.set(key, value).build());
-                as = as.withLocale(this.locale);
+                as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
                 ab = new Attributes.Builder();
@@ -4134,8 +4133,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (this.stack.isEmpty()) {
                 ab = new Attributes.Builder(this.chronology);
-                as = new AttributeSet(ab.set(key, value).build());
-                as = as.withLocale(this.locale);
+                as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
                 ab = new Attributes.Builder();
@@ -4186,8 +4184,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (this.stack.isEmpty()) {
                 ab = new Attributes.Builder(this.chronology);
-                as = new AttributeSet(ab.set(key, value).build());
-                as = as.withLocale(this.locale);
+                as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
                 ab = new Attributes.Builder();
@@ -4240,8 +4237,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (this.stack.isEmpty()) {
                 ab = new Attributes.Builder(this.chronology);
-                as = new AttributeSet(ab.set(key, value).build());
-                as = as.withLocale(this.locale);
+                as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
                 ab = new Attributes.Builder();
@@ -4547,12 +4543,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Map<String, DateFormat.Field> map =
                 new HashMap<String, DateFormat.Field>();
             map.put("YEAR", DateFormat.Field.YEAR);
+            map.put("YEAR_OF_ERA", DateFormat.Field.YEAR);
+            map.put("YEAR_OF_WEEKDATE", DateFormat.Field.YEAR);
             map.put("WEEK_OF_YEAR", DateFormat.Field.WEEK_OF_YEAR);
             map.put("WEEK_OF_MONTH", DateFormat.Field.WEEK_OF_MONTH);
             map.put("BOUNDED_WEEK_OF_YEAR", DateFormat.Field.WEEK_OF_YEAR);
             map.put("BOUNDED_WEEK_OF_MONTH", DateFormat.Field.WEEK_OF_MONTH);
             map.put("MONTH_OF_YEAR", DateFormat.Field.MONTH);
             map.put("MONTH_AS_NUMBER", DateFormat.Field.MONTH);
+            map.put("HISTORIC_MONTH", DateFormat.Field.MONTH);
             map.put("WEEKDAY_IN_MONTH", DateFormat.Field.DAY_OF_WEEK_IN_MONTH);
             map.put("SECOND_OF_MINUTE", DateFormat.Field.SECOND);
             map.put("MINUTE_OF_HOUR", DateFormat.Field.MINUTE);
@@ -4563,12 +4562,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             map.put("CLOCK_HOUR_OF_AMPM", DateFormat.Field.HOUR1);
             map.put("AM_PM_OF_DAY", DateFormat.Field.AM_PM);
             map.put("DAY_OF_MONTH", DateFormat.Field.DAY_OF_MONTH);
+            map.put("HISTORIC_DAY_OF_MONTH", DateFormat.Field.DAY_OF_MONTH);
             map.put("DAY_OF_WEEK", DateFormat.Field.DAY_OF_WEEK);
             map.put("LOCAL_DAY_OF_WEEK", DateFormat.Field.DAY_OF_WEEK);
             map.put("DAY_OF_YEAR", DateFormat.Field.DAY_OF_YEAR);
             map.put("TIMEZONE_ID", DateFormat.Field.TIME_ZONE);
-            // TODO: DateFormat.Field-Instanzen ergänzen
-            // map.put("", DateFormat.Field.ERA);
+            map.put("ERA", DateFormat.Field.ERA);
             FIELD_MAP = Collections.unmodifiableMap(map);
         }
 
@@ -4612,7 +4611,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         if (
                             (field != null)
                             && (field.equals(pos.getFieldAttribute())
-                                || (field.getCalendarField() == pos.getField()))
+                                || ((field.getCalendarField() == pos.getField())
+                                    && (pos.getField() != -1))
+                                || (field.equals(DateFormat.Field.TIME_ZONE)
+                                    && (pos.getField() == DateFormat.TIMEZONE_FIELD))
+                                || (field.equals(DateFormat.Field.HOUR_OF_DAY1)
+                                    && (pos.getField() == DateFormat.HOUR_OF_DAY1_FIELD))
+                                || (field.equals(DateFormat.Field.HOUR1)
+                                    && (pos.getField() == DateFormat.HOUR1_FIELD))
+                            )
                         ) {
                             pos.setBeginIndex(position.getStartIndex());
                             pos.setEndIndex(position.getEndIndex());
