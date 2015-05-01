@@ -134,7 +134,7 @@ final class NumberProcessor<V>
         Class<V> type = this.element.getType();
         V value = formattable.get(this.element);
         boolean negative = false;
-        String digits = "";
+        String digits;
 
         if (type == Integer.class) {
             int v = Integer.class.cast(value).intValue();

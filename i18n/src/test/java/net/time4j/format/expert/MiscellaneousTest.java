@@ -12,6 +12,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.PluralCategory;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.scale.TimeScale;
@@ -127,7 +128,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => Time 24:00 not allowed"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -298,7 +299,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => Time component out of range."),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -363,7 +364,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => DAY_OF_YEAR out of range: 366"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -460,7 +461,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => DAY_OF_QUARTER out of range: 0"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -505,7 +506,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void printIndividualFormat() throws ParseException {
+    public void printIndividualFormat1() throws ParseException {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.US)
                 .startSection(Attributes.PAD_CHAR, '#')
@@ -513,15 +514,47 @@ public class MiscellaneousTest {
                 .addPattern("M/dd/yyyy hh:mm a ", PatternType.CLDR)
                 .endSection()
                 .addLongTimezoneName(Timezone.getPreferredIDs(Locale.US, false, "DEFAULT"))
+                .addLiteral('/')
+                .addShortTimezoneName(Timezone.getPreferredIDs(Locale.US, false, "DEFAULT"))
+                .addLiteral('/')
+                .addTimezoneOffset()
                 .build()
                 .withStdTimezone();
         PlainTimestamp tsp = PlainDate.of(2015, 2).atStartOfDay();
         Moment moment = tsp.in(Timezone.of("America/New_York"));
-        tsp = moment.toZonalTimestamp(Timezone.ofSystem().getOffset(moment));
+        ZonalOffset offset = Timezone.ofSystem().getOffset(moment);
+        String displayedOffset = (offset.equals(ZonalOffset.UTC) ? "Z" : offset.toString());
+        tsp = moment.toZonalTimestamp(offset);
         String s = PlainTimestamp.localFormatter("MM/dd/yyyy hh:mm a ", PatternType.CLDR).format(tsp);
         assertThat(
             formatter.format(moment),
-            is("#" + s.substring(1) + Timezone.ofSystem().getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.US))
+            is("#" + s.substring(1)
+                    + Timezone.ofSystem().getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.US)
+                    + "/" + Timezone.ofSystem().getDisplayName(NameStyle.SHORT_STANDARD_TIME, Locale.US)
+                    + "/" + displayedOffset
+            )
+        );
+    }
+
+    @Test
+    public void printIndividualFormat2() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.US)
+                .startSection(Attributes.PAD_CHAR, '#')
+                .addNumerical(PlainDate.MONTH_OF_YEAR, 1, 2)
+                .padPrevious(2)
+                .endSection() // until here: Attributes.ZERO_DIGIT is sectional and equal to zero
+                .addLiteral(' ')
+                .addText(PlainDate.DAY_OF_WEEK, Collections.singletonMap(Weekday.THURSDAY, "Donnerstag"))
+                .addLiteral(" (attribute-value=")
+                .addLiteral(Attributes.ZERO_DIGIT)
+                .addLiteral(") ")
+                .addOrdinal(PlainDate.DAY_OF_MONTH, Collections.singletonMap(PluralCategory.OTHER, "st"))
+                .build()
+                .with(Attributes.ZERO_DIGIT, '8'); // just done here for better test coverage
+        assertThat(
+            formatter.format(PlainDate.of(2015, 1)),
+            is("1# Donnerstag (attribute-value=8) 9st") // "9st" because of value of Attributes.ZERO_DIGIT
         );
     }
 
