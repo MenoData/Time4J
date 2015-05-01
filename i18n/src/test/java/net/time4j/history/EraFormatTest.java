@@ -144,7 +144,22 @@ public class EraFormatTest {
     }
 
     @Test
-    public void parseRedOctober() throws ParseException {
+    public void parseRedOctober1() throws ParseException {
+        Locale russia = new Locale("en", "RU");
+        ChronoHistory history = ChronoHistory.of(russia);
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, russia)
+                .addPattern("d. MMMM yyyy", PatternType.CLDR)
+                .build()
+                .withGregorianCutOver(history.getGregorianCutOverDate())
+                .withDefault(history.era(), HistoricEra.AD);
+        assertThat(
+            formatter.parse("25. October 1917"),
+            is(PlainDate.of(1917, 11, 7)));
+    }
+
+    @Test
+    public void parseRedOctober2() throws ParseException {
         Locale russia = new Locale("en", "RU");
         ChronoHistory history = ChronoHistory.of(russia);
         ChronoFormatter<PlainDate> formatter =
