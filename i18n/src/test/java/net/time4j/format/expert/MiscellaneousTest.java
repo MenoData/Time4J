@@ -1,5 +1,6 @@
 package net.time4j.format.expert;
 
+import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -14,6 +15,7 @@ import net.time4j.format.Leniency;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -26,6 +28,7 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -499,6 +502,27 @@ public class MiscellaneousTest {
             plog.getErrorMessage().startsWith(
                 "Validation failed => NANO_OF_DAY out of range:"),
             is(true));
+    }
+
+    @Test
+    public void printIndividualFormat() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .startSection(Attributes.PAD_CHAR, '#')
+                .padNext(2)
+                .addPattern("M/dd/yyyy hh:mm a ", PatternType.CLDR)
+                .endSection()
+                .addLongTimezoneName(Timezone.getPreferredIDs(Locale.US, false, "DEFAULT"))
+                .build()
+                .withStdTimezone();
+        PlainTimestamp tsp = PlainDate.of(2015, 2).atStartOfDay();
+        Moment moment = tsp.in(Timezone.of("America/New_York"));
+        tsp = moment.toZonalTimestamp(Timezone.ofSystem().getOffset(moment));
+        String s = PlainTimestamp.localFormatter("MM/dd/yyyy hh:mm a ", PatternType.CLDR).format(tsp);
+        assertThat(
+            formatter.format(moment),
+            is("#" + s.substring(1) + Timezone.ofSystem().getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.US))
+        );
     }
 
     @Test

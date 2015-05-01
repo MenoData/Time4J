@@ -109,10 +109,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 public final class ChronoFormatter<T extends ChronoEntity<T>>
     implements ChronoPrinter<T>, ChronoParser<T>, TemporalFormatter<T> {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final Integer ZERO = Integer.valueOf(0);
-
     //~ Instanzvariablen --------------------------------------------------
 
     private final Chronology<T> chronology;
@@ -869,7 +865,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
-        for (ChronoExtension ext : chronology.getExtensions()) {
+        for (ChronoExtension ext : c.getExtensions()) {
             parsed = ext.resolve(parsed, this.getLocale(), attributes);
         }
 
@@ -1634,7 +1630,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
-        T result = null;
+        T result;
 
         try {
             result = chronology.createFrom(parsed, attributes, preparsing);
