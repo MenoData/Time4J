@@ -25,6 +25,10 @@ import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.TimeScale;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 
 /**
  * <p>Serves as bridge to temporal types of JDK or other date and time
@@ -130,6 +134,105 @@ public abstract class TemporalType<S, T> {
      */
     public static final TemporalType<Long, Moment> MILLIS_SINCE_UNIX =
         new MillisSinceUnixRule();
+
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.LocalDate} and
+     * the class {@code PlainDate}. </p>
+     *
+     * <p>The conversion is always exact. Example: </p>
+     *
+     * <pre>
+     *  PlainDate date = TemporalType.LOCAL_DATE.translate(LocalDate.of(2015, 4, 30));
+     *  System.out.println(date);
+     *  // output: 2015-04-30
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.LocalDate} und
+     * der Klasse {@code PlainDate}. </p>
+     *
+     * <p>Die Konversion ist immer exakt. Beispiel: </p>
+     *
+     * <pre>
+     *  PlainDate date = TemporalType.LOCAL_DATE.translate(LocalDate.of(2015, 4, 30));
+     *  System.out.println(date);
+     *  // Ausgabe: 2015-04-30
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<LocalDate, PlainDate> LOCAL_DATE =
+        new LocalDateRule();
+
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.LocalTime} and
+     * the class {@code PlainTime}. </p>
+     *
+     * <p>The conversion is exact with the exception of midnight at end of day (T24:00). Example: </p>
+     *
+     * <pre>
+     *  PlainTime time = TemporalType.LOCAL_TIME.translate(LocalTime.of(17, 45));
+     *  System.out.println(time);
+     *  // output: T17:45
+     *
+     *  // Following line always throws an exception!
+     *  TemporalType.LOCAL_TIME.from(PlainTime.midnightAtEndOfDay());
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.LocalTime} und
+     * der Klasse {@code PlainTime}. </p>
+     *
+     * <p>Die Konversion ist mit Ausnahme von Mitternacht am Ende des Tages (T24:00) exakt. Beispiel: </p>
+     *
+     * <pre>
+     *  PlainTime time = TemporalType.LOCAL_TIME.translate(LocalTime.of(17, 45));
+     *  System.out.println(time);
+     *  // Ausgabe: T17:45
+     *
+     *  // Folgende Zeile wirft immer eine Ausnahme!
+     *  TemporalType.LOCAL_TIME.from(PlainTime.midnightAtEndOfDay());
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<LocalTime, PlainTime> LOCAL_TIME =
+        new LocalTimeRule();
+
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.LocalDateTime} and
+     * the class {@code PlainTimestamp}. </p>
+     *
+     * <p>The conversion is always exact. Example: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp = TemporalType.LOCAL_DATE_TIME.translate(LocalDateTime.of(2015, 4, 30, 17, 45));
+     *  System.out.println(tsp);
+     *  // output: 2015-04-30T17:45
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.LocalDateTime} und
+     * der Klasse {@code PlainTimestamp}. </p>
+     *
+     * <p>Die Konversion ist immer exakt. Beispiel: </p>
+     *
+     * <pre>
+     *  PlainTimestamp tsp = TemporalType.LOCAL_DATE_TIME.translate(LocalDateTime.of(2015, 4, 30, 17, 45));
+     *  System.out.println(tsp);
+     *  // Ausgabe: 2015-04-30T17:45
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<LocalDateTime, PlainTimestamp> LOCAL_DATE_TIME =
+        new LocalDateTimeRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -251,6 +354,84 @@ public abstract class TemporalType<S, T> {
                 MathUtils.safeAdd(
                     MathUtils.safeMultiply(posixTime, 1000),
                     fraction / MIO));
+
+        }
+
+    }
+
+    private static class LocalDateRule
+        extends TemporalType<LocalDate, PlainDate> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainDate translate(LocalDate source) {
+
+            return PlainDate.of(source.getYear(), source.getMonthValue(), source.getDayOfMonth());
+
+        }
+
+        @Override
+        public LocalDate from(PlainDate date) {
+
+            return LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
+
+        }
+
+    }
+
+    private static class LocalTimeRule
+        extends TemporalType<LocalTime, PlainTime> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainTime translate(LocalTime source) {
+
+            return PlainTime.of(source.getHour(), source.getMinute(), source.getSecond(), source.getNano());
+
+        }
+
+        @Override
+        public LocalTime from(PlainTime time) {
+
+            if (time.getHour() == 24) {
+                throw new ChronoException("T24:00 cannot be mapped to 'java.time.LocalTime'.");
+            }
+
+            return LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), time.getNanosecond());
+
+        }
+
+    }
+
+    private static class LocalDateTimeRule
+        extends TemporalType<LocalDateTime, PlainTimestamp> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainTimestamp translate(LocalDateTime source) {
+
+            return PlainTimestamp.of(
+                PlainDate.of(source.getYear(), source.getMonthValue(), source.getDayOfMonth()),
+                PlainTime.of(source.getHour(), source.getMinute(), source.getSecond(), source.getNano())
+            );
+
+        }
+
+        @Override
+        public LocalDateTime from(PlainTimestamp tsp) {
+
+            return LocalDateTime.of(
+                tsp.getYear(),
+                tsp.getMonth(),
+                tsp.getDayOfMonth(),
+                tsp.getHour(),
+                tsp.getMinute(),
+                tsp.getSecond(),
+                tsp.getNanosecond()
+            );
 
         }
 
