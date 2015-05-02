@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.time4j</groupId>
     <artifactId>time4j-parent</artifactId>
-    <version>3.0</version>
+    <version>4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Time4J</name>
     <description>Advanced Date and Time library for Java</description>
@@ -70,7 +70,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.2</version>
                 <configuration>
                     <verbose>true</verbose>
                     <fork>true</fork>
@@ -79,8 +79,6 @@
                     -->
                     <compilerVersion>${jdk.min.version}</compilerVersion>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <debug>true</debug>
@@ -221,7 +219,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jdk.min.version>1.7</jdk.min.version>
+        <jdk.min.version>1.8</jdk.min.version>
     </properties>
 
 </project>
