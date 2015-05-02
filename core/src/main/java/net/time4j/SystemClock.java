@@ -21,10 +21,12 @@
 
 package net.time4j;
 
-import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
+
+import java.time.Clock;
+import java.time.Instant;
 
 
 /**
@@ -54,7 +56,7 @@ public final class SystemClock
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MIO = 1000000;
+    private static final int MIO = 1000_000;
     private static final int MRD = MIO * 1000;
     private static final long CALIBRATED_OFFSET;
     private static final boolean HIGH_PRECISION;
@@ -62,26 +64,11 @@ public final class SystemClock
     static {
         HIGH_PRECISION = Boolean.getBoolean("net.time4j.systemclock.nanoTime");
 
-        if (HIGH_PRECISION) {
-            long millis = System.currentTimeMillis();
-            long nanos = 0;
-
-            for (int i = 0; i < 10; i++) {
-                nanos = System.nanoTime();
-                long next = System.currentTimeMillis();
-                if (millis == next) {
-                    break; // nun ist sicher, daß nanos zu millis synchron ist
-                } else {
-                    millis = next;
-                }
-            }
-
-            CALIBRATED_OFFSET = (
-                MathUtils.safeSubtract(
-                    MathUtils.safeMultiply(millis, MIO),
-                    nanos
-                )
-            );
+        if (HIGH_PRECISION) { // see https://bugs.openjdk.java.net/browse/JDK-8068730 (affects Java 9 or later)
+            Instant instant = Clock.systemUTC().instant();
+            long compare = System.nanoTime();
+            long instantNanos = Math.multiplyExact(instant.getEpochSecond(), MRD) + instant.getNano();
+            CALIBRATED_OFFSET = Math.subtractExact(instantNanos, compare);
         } else {
             CALIBRATED_OFFSET = 0;
         }
@@ -180,7 +167,7 @@ public final class SystemClock
         if (HIGH_PRECISION) {
             return getNanos() / 1000;
         } else {
-            return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
+            return Math.multiplyExact(System.currentTimeMillis(), 1000);
         }
 
     }
@@ -263,8 +250,8 @@ public final class SystemClock
 
     private long getNanos() {
         
-        return MathUtils.safeAdd(System.nanoTime(), CALIBRATED_OFFSET);
-        
+        return Math.addExact(System.nanoTime(), CALIBRATED_OFFSET);
+
     }
 
 }
