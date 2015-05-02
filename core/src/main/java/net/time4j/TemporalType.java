@@ -25,6 +25,7 @@ import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.TimeScale;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -234,6 +235,40 @@ public abstract class TemporalType<S, T> {
     public static final TemporalType<LocalDateTime, PlainTimestamp> LOCAL_DATE_TIME =
         new LocalDateTimeRule();
 
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.Instant} and
+     * the class {@code Moment}. </p>
+     *
+     * <p>The conversion is usually exact. However, leap seconds will throw an exception. The
+     * outer value range limits of the class {@code Moment} is a little bit smaller. Example: </p>
+     *
+     * <pre>
+     *  Moment moment = TemporalType.INSTANT.translate(Instant.ofEpochSecond(86401, 450_000_000));
+     *  System.out.println(moment);
+     *  // Ausgabe: 1970-01-02T00:00:01,450000000Z
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Instant} und
+     * der Klasse {@code Moment}. </p>
+     *
+     * <p>Die Konversion ist normalerweise exakt. Schaltsekunden werfen jedoch eine Ausnahme.
+     * Die &auml;&szlig;eren Wertgrenzen der Klasse {@code Moment} sind geringf&uuml;gig kleiner.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *  Moment moment = TemporalType.INSTANT.translate(Instant.ofEpochSecond(86401, 450_000_000));
+     *  System.out.println(moment);
+     *  // Ausgabe: 1970-01-02T00:00:01,450000000Z
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<Instant, Moment> INSTANT =
+        new InstantRule();
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -432,6 +467,31 @@ public abstract class TemporalType<S, T> {
                 tsp.getSecond(),
                 tsp.getNanosecond()
             );
+
+        }
+
+    }
+
+    private static class InstantRule
+        extends TemporalType<Instant, Moment> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Moment translate(Instant source) {
+
+            return Moment.of(source.getEpochSecond(), source.getNano(), TimeScale.POSIX);
+
+        }
+
+        @Override
+        public Instant from(Moment moment) {
+
+            if (moment.isLeapSecond()) {
+                throw new ChronoException("Leap second cannot be mapped to 'java.time.Instant'.");
+            }
+
+            return Instant.ofEpochSecond(moment.getPosixTime(), moment.getNanosecond());
 
         }
 

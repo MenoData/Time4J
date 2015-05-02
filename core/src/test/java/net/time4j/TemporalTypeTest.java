@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoException;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -145,6 +146,33 @@ public class TemporalTypeTest {
             TemporalType.LOCAL_DATE_TIME.from(PlainTimestamp.axis().getMaximum()),
             is(LocalDateTime.MAX)
         );
+    }
+
+    @Test
+    public void instantToTime4J() {
+        Moment expected = Moment.of(86401, 123_456_789, TimeScale.POSIX);
+        assertThat(
+            TemporalType.INSTANT.translate(Instant.ofEpochSecond(86401, 123_456_789)),
+            is(expected)
+        );
+    }
+
+    @Test
+    public void instantFromTime4J() {
+        assertThat(
+            TemporalType.INSTANT.from(Moment.of(86401, 123_456_789, TimeScale.POSIX)),
+            is(Instant.ofEpochSecond(86401, 123_456_789))
+        );
+    }
+
+    @Test(expected=ChronoException.class)
+    public void instantFromTime4JLS() {
+        if (LeapSeconds.getInstance().isEnabled()) {
+            Moment ls = PlainDate.of(2012, 7, 1).atStartOfDay().atUTC().minus(1, SI.SECONDS);
+            TemporalType.INSTANT.from(ls);
+        } else {
+            throw new ChronoException("Cannot test disabled leap second.");
+        }
     }
 
 }
