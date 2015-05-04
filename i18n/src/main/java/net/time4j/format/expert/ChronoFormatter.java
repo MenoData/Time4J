@@ -1383,6 +1383,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK_IN_MONTH}</li>
      *  <li>{@link net.time4j.PlainDate#YEAR} =&gt;
      *  {@link java.text.DateFormat.Field#YEAR}</li>
+     *  <li>{@link net.time4j.PlainDate#YEAR_OF_WEEKDATE} =&gt;
+     *  {@link java.text.DateFormat.Field#YEAR}</li>
      *  <li>{@link net.time4j.Weekmodel#boundedWeekOfMonth()} =&gt;
      *  {@link java.text.DateFormat.Field#WEEK_OF_MONTH}</li>
      *  <li>{@link net.time4j.Weekmodel#boundedWeekOfYear()} =&gt;
@@ -1395,6 +1397,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
      *  <li>{@link net.time4j.engine.ChronoEntity#getTimezone()} =&gt;
      *  {@link java.text.DateFormat.Field#TIME_ZONE}</li>
+     *  <li>{@link ChronoHistory#era()} =&gt;
+     *  {@link java.text.DateFormat.Field#ERA}</li>
+     *  <li>{@link ChronoHistory#yearOfEra()} =&gt;
+     *  {@link java.text.DateFormat.Field#YEAR}</li>
+     *  <li>{@link ChronoHistory#month()} =&gt;
+     *  {@link java.text.DateFormat.Field#MONTH}</li>
+     *  <li>{@link ChronoHistory#dayOfMonth()} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_MONTH}</li>
      * </ul>
      *
      * <p>Note: The returned {@code Format}-object is not serializable. </p>
@@ -1442,6 +1452,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK_IN_MONTH}</li>
      *  <li>{@link net.time4j.PlainDate#YEAR} =&gt;
      *  {@link java.text.DateFormat.Field#YEAR}</li>
+     *  <li>{@link net.time4j.PlainDate#YEAR_OF_WEEKDATE} =&gt;
+     *  {@link java.text.DateFormat.Field#YEAR}</li>
      *  <li>{@link net.time4j.Weekmodel#boundedWeekOfMonth()} =&gt;
      *  {@link java.text.DateFormat.Field#WEEK_OF_MONTH}</li>
      *  <li>{@link net.time4j.Weekmodel#boundedWeekOfYear()} =&gt;
@@ -1454,6 +1466,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  {@link java.text.DateFormat.Field#DAY_OF_WEEK}</li>
      *  <li>{@link net.time4j.engine.ChronoEntity#getTimezone()} =&gt;
      *  {@link java.text.DateFormat.Field#TIME_ZONE}</li>
+     *  <li>{@link ChronoHistory#era()} =&gt;
+     *  {@link java.text.DateFormat.Field#ERA}</li>
+     *  <li>{@link ChronoHistory#yearOfEra()} =&gt;
+     *  {@link java.text.DateFormat.Field#YEAR}</li>
+     *  <li>{@link ChronoHistory#month()} =&gt;
+     *  {@link java.text.DateFormat.Field#MONTH}</li>
+     *  <li>{@link ChronoHistory#dayOfMonth()} =&gt;
+     *  {@link java.text.DateFormat.Field#DAY_OF_MONTH}</li>
      * </ul>
      *
      * <p>Zu beachten: Das {@code Format}-Objekt ist nicht serialisierbar. </p>
