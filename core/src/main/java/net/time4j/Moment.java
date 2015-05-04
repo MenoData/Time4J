@@ -1069,11 +1069,7 @@ public final class Moment
      */
     public static TemporalFormatter<Moment> localFormatter(DisplayMode mode) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getDateTimeInstance(style, style);
-        String formatPattern = FormatSupport.getFormatPattern(df);
-        return FormatSupport.createFormatter(
-            Moment.class, formatPattern, Locale.getDefault(), Timezone.ofSystem().getID());
+        return formatter(mode, Locale.getDefault(), Timezone.ofSystem().getID());
 
     }
 
@@ -2109,7 +2105,7 @@ public final class Moment
             Moment end
         ) {
 
-            long delta = 0;
+            long delta;
 
             if (this.unit.compareTo(TimeUnit.SECONDS) >= 0) {
                 delta = (end.getPosixTime() - start.getPosixTime());
@@ -2475,7 +2471,6 @@ public final class Moment
             }
 
             Moment result = null;
-            PlainTimestamp ts = null;
             boolean leapsecond = false;
 
             if (entity.contains(LeapsecondElement.INSTANCE)) {
@@ -2483,8 +2478,8 @@ public final class Moment
                 entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
             }
 
-            ChronoElement<PlainTimestamp> self =
-                PlainTimestamp.axis().element();
+            ChronoElement<PlainTimestamp> self = PlainTimestamp.axis().element();
+            PlainTimestamp ts;
 
             if (entity.contains(self)) {
                 ts = entity.get(self);
