@@ -1898,7 +1898,7 @@ public final class PlainTime
 
         return (
             this.nano
-            + this.second * MRD
+            + (long) this.second * MRD
             + this.minute * 60L * MRD
             + this.hour * 3600L * MRD
         );
