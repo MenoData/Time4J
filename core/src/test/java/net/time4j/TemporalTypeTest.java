@@ -3,6 +3,7 @@ package net.time4j;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.Timezone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -173,6 +174,28 @@ public class TemporalTypeTest {
         } else {
             throw new ChronoException("Cannot test disabled leap second.");
         }
+    }
+
+    @Test
+    public void zdtToTime4J() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        Moment moment = PlainDate.of(2015, 3, 29).atTime(2, 30).in(tz);
+        Instant instant = TemporalType.INSTANT.from(moment);
+        assertThat(
+            TemporalType.ZONED_DATE_TIME.translate(instant.atZone(ZoneId.of("Europe/Berlin"))),
+            is(moment.inZonalView(tz.getID()))
+        );
+    }
+
+    @Test
+    public void zdtFromTime4J() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        Moment moment = PlainDate.of(2015, 3, 29).atTime(2, 30).in(tz);
+        Instant instant = TemporalType.INSTANT.from(moment);
+        assertThat(
+            TemporalType.ZONED_DATE_TIME.from(moment.inZonalView(tz.getID())),
+            is(instant.atZone(ZoneId.of("Europe/Berlin")))
+        );
     }
 
 }

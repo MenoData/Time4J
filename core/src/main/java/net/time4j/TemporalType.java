@@ -24,11 +24,17 @@ package net.time4j;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 
 /**
@@ -245,7 +251,7 @@ public abstract class TemporalType<S, T> {
      * <pre>
      *  Moment moment = TemporalType.INSTANT.translate(Instant.ofEpochSecond(86401, 450_000_000));
      *  System.out.println(moment);
-     *  // Ausgabe: 1970-01-02T00:00:01,450000000Z
+     *  // output: 1970-01-02T00:00:01,450000000Z
      * </pre>
      *
      * @since   4.0
@@ -268,6 +274,40 @@ public abstract class TemporalType<S, T> {
      */
     public static final TemporalType<Instant, Moment> INSTANT =
         new InstantRule();
+
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.ZonedDateTime} and
+     * the class {@code ZonalDateTime}. </p>
+     *
+     * <p>The conversion is usually exact. However, leap seconds will throw an exception. The
+     * outer value range limits of the class {@code ZonalDateTime} is a little bit different. Example: </p>
+     *
+     * <pre>
+     *  Moment moment = TemporalType.ZONED_DATE_TIME.translate(Instant.ofEpochSecond(86401, 450_000_000));
+     *  System.out.println(moment);
+     *  // Ausgabe: 1970-01-02T00:00:01,450000000Z
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.ZonedDateTime} und
+     * der Klasse {@code ZonalDateTime}. </p>
+     *
+     * <p>Die Konversion ist normalerweise exakt. Schaltsekunden werfen jedoch eine Ausnahme.
+     * Die &auml;&szlig;eren Wertgrenzen der Klasse {@code ZonalDateTime} sind geringf&uuml;gig anders.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *  Moment moment = TemporalType.ZONED_DATE_TIME.translate(Instant.ofEpochSecond(86401, 450_000_000));
+     *  System.out.println(moment);
+     *  // Ausgabe: 1970-01-02T00:00:01,450000000Z
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<ZonedDateTime, ZonalDateTime> ZONED_DATE_TIME =
+        new ZonedDateTimeRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -492,6 +532,38 @@ public abstract class TemporalType<S, T> {
             }
 
             return Instant.ofEpochSecond(moment.getPosixTime(), moment.getNanosecond());
+
+        }
+
+    }
+
+    private static class ZonedDateTimeRule
+        extends TemporalType<ZonedDateTime, ZonalDateTime> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public ZonalDateTime translate(ZonedDateTime source) {
+
+            Moment moment = TemporalType.INSTANT.translate(source.toInstant());
+            return moment.inZonalView(source.getZone().getId());
+
+        }
+
+        @Override
+        public ZonedDateTime from(ZonalDateTime zdt) {
+
+            Instant instant = TemporalType.INSTANT.from(zdt.toMoment()); // fails for leap seconds
+            ZoneId zone;
+
+            try {
+                zone = ZoneId.of(zdt.getTimezone().canonical());
+            } catch (DateTimeException ex) {
+                ZonalOffset zo = Timezone.of(zdt.getTimezone()).getOffset(zdt.toMoment());
+                zone = ZoneOffset.of(zo.toString());
+            }
+
+            return ZonedDateTime.ofInstant(instant, zone);
 
         }
 
