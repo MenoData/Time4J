@@ -247,7 +247,7 @@ final class SPX
             return Collections.emptyList();
         }
 
-        List<ZonalTransition> transitions = new ArrayList<ZonalTransition>(n);
+        List<ZonalTransition> transitions = new ArrayList<>(n);
         int previous = readOffset(in);
         int rawOffset = previous;
         long oldTsp = Long.MIN_VALUE;
@@ -346,7 +346,7 @@ final class SPX
             return Collections.emptyList();
         }
 
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>(n);
+        List<DaylightSavingRule> rules = new ArrayList<>(n);
         DaylightSavingRule previous = null;
 
         for (int i = 0; i < n; i++) {
