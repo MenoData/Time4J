@@ -186,7 +186,7 @@ public abstract class DaylightSavingRule {
     }
 
     /**
-     * <p>Yields the dayight saving amount after the time switch
+     * <p>Yields the daylight saving amount after the time switch
      * in seconds. </p>
      *
      * @return  DST-Offset in seconds (without standard offset)

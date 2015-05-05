@@ -68,7 +68,25 @@ public class GregorianTimezoneRule
 
     //~ Konstruktoren -----------------------------------------------------
 
-    GregorianTimezoneRule(
+    /**
+     * <p>Constructor for subclasses only. </p>
+     *
+     * @param   month       gregorian month
+     * @param   timeOfDay   time of day
+     * @param   indicator   offset indicator
+     * @param   savings     daylight saving amount
+     * @since  4.0
+     */
+    /*[deutsch]
+     * <p>Konstruktor nur f&uuml;r Subklassen. </p>
+     *
+     * @param   month       gregorian month
+     * @param   timeOfDay   time of day
+     * @param   indicator   offset indicator
+     * @param   savings     daylight saving amount
+     * @since  4.0
+     */
+    protected GregorianTimezoneRule(
         Month month,
         PlainTime timeOfDay,
         OffsetIndicator indicator,
@@ -259,6 +277,24 @@ public class GregorianTimezoneRule
 
     }
 
+    /**
+     * <p>Yields the gregorian month of time switch. </p>
+     *
+     * @return  month
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Liefert den gregorianischen Monat der Zeitumstellung. </p>
+     *
+     * @return  month
+     * @since   3.1
+     */
+    public Month getMonth() {
+
+        return Month.valueOf(this.month);
+
+    }
+
     @Override
     protected int toCalendarYear(long mjd) {
 
@@ -296,34 +332,9 @@ public class GregorianTimezoneRule
      *
      * @return  byte
      */
-    byte getMonth() {
+    byte getMonthValue() {
 
         return this.month;
-
-    }
-
-    /**
-     * @serialData  Uses a specialized serialisation form as proxy. The format
-     *              is bit-compressed. The first byte contains the type id of
-     *              the concrete subclass. Then the data bytes for the internal
-     *              state follow. The complex algorithm exploits the fact
-     *              that allmost all transitions happen at full hours around
-     *              midnight. Insight in details see source code.
-     */
-    Object writeReplace() throws ObjectStreamException {
-
-        return new SPX(this, this.getType());
-
-    }
-
-    /**
-     * @serialData  Blocks because a serialization proxy is required.
-     * @throws      InvalidObjectException (always)
-     */
-    void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-
-        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 
