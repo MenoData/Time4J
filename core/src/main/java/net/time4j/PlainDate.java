@@ -1206,10 +1206,7 @@ public final class PlainDate
      */
     public static TemporalFormatter<PlainDate> localFormatter(DisplayMode mode) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getDateInstance(style);
-        String formatPattern = FormatSupport.getFormatPattern(df);
-        return FormatSupport.createFormatter(PlainDate.class, formatPattern, Locale.getDefault());
+        return formatter(mode, Locale.getDefault());
 
     }
 
@@ -2252,7 +2249,7 @@ public final class PlainDate
                     entity.get(YEAR_OF_WEEKDATE).intValue();
                 int weekOfYear =
                     entity.get(Weekmodel.ISO.weekOfYear()).intValue();
-                Weekday dayOfWeek = null;
+                Weekday dayOfWeek;
 
                 if (entity.contains(DAY_OF_WEEK)) {
                     dayOfWeek = entity.get(DAY_OF_WEEK);

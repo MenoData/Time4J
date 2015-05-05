@@ -1387,10 +1387,7 @@ public final class PlainTime
      */
     public static TemporalFormatter<PlainTime> localFormatter(DisplayMode mode) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getTimeInstance(style);
-        String formatPattern = removeZones(FormatSupport.getFormatPattern(df));
-        return FormatSupport.createFormatter(PlainTime.class, formatPattern, Locale.getDefault());
+        return formatter(mode, Locale.getDefault());
 
     }
 
@@ -1756,18 +1753,6 @@ public final class PlainTime
     }
 
     /**
-     * <p>Wird von SQL-TIMESTAMP gebraucht. </p>
-     *
-     * @param   millisOfDay     milliseconds of day
-     * @return  new instance
-     */
-    static PlainTime createFromMillis(int millisOfDay) {
-
-        return PlainTime.createFromMillis(millisOfDay, 0);
-
-    }
-
-    /**
      * <p>Wird von der {@code ratio()}-Function des angegebenenElements
      * aufgerufen. </p>
      *
@@ -1913,7 +1898,7 @@ public final class PlainTime
 
         return (
             this.nano
-            + this.second * 1L * MRD
+            + this.second * MRD
             + this.minute * 60L * MRD
             + this.hour * 3600L * MRD
         );
@@ -3077,11 +3062,10 @@ public final class PlainTime
         @Override
         public PlainTime withValue(
             PlainTime context,
-            BigDecimal value,
+            BigDecimal bd,
             boolean lenient
         ) {
 
-            BigDecimal bd = value;
             int h, m, s, f;
             long hv;
 
@@ -3138,7 +3122,7 @@ public final class PlainTime
                 }
             } else if (hv < 0 || hv > 24) {
                 throw new IllegalArgumentException(
-                    "Value out of range: " + value);
+                    "Value out of range: " + bd);
             } else {
                 h = (int) hv;
             }
@@ -3281,7 +3265,7 @@ public final class PlainTime
 
             Leniency leniency =
                 attributes.get(Attributes.LENIENCY, Leniency.SMART);
-            int hour = 0;
+            int hour;
 
             if (entity.contains(ISO_HOUR)) {
                 hour = entity.get(ISO_HOUR).intValue();
