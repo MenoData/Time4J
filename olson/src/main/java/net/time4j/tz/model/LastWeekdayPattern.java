@@ -27,6 +27,11 @@ import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
+
 
 /**
  * <p>Ein Datumsmuster f&uuml;r DST-Wechsel am letzten Wochentag im Monat. </p>
@@ -34,7 +39,7 @@ import net.time4j.base.GregorianMath;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class LastWeekdayPattern
     extends GregorianTimezoneRule {
@@ -67,7 +72,7 @@ final class LastWeekdayPattern
     @Override
     public PlainDate getDate(int year) {
 
-        int month = this.getMonth();
+        int month = this.getMonthValue();
         int lastDay = GregorianMath.getLengthOfMonth(year, month);
         int lastW = GregorianMath.getDayOfWeek(year, month, lastDay);
         int delta = (lastW - this.dayOfWeek);
@@ -100,7 +105,7 @@ final class LastWeekdayPattern
     @Override
     public int hashCode() {
 
-        return 17 * this.dayOfWeek + 37 * this.getMonth();
+        return 17 * this.dayOfWeek + 37 * this.getMonthValue();
 
     }
 
@@ -109,7 +114,7 @@ final class LastWeekdayPattern
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("LastDayOfWeekPattern:[month=");
-        sb.append(this.getMonth());
+        sb.append(this.getMonthValue());
         sb.append(",day-of-week=");
         sb.append(Weekday.valueOf(this.dayOfWeek));
         sb.append(",time-of-day=");
@@ -143,6 +148,31 @@ final class LastWeekdayPattern
     int getType() {
 
         return SPX.LAST_WEEKDAY_PATTERN_TYPE;
+
+    }
+
+    /**
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains the type id of
+     *              the concrete subclass. Then the data bytes for the internal
+     *              state follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, this.getType());
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

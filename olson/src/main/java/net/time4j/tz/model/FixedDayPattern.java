@@ -26,6 +26,11 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.GregorianMath;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
+
 
 /**
  * <p>Ein Datumsmuster f&uuml;r DST-Wechsel an einem festen Tag im Monat. </p>
@@ -33,7 +38,7 @@ import net.time4j.base.GregorianMath;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class FixedDayPattern
     extends GregorianTimezoneRule {
@@ -67,7 +72,7 @@ final class FixedDayPattern
     @Override
     public PlainDate getDate(int year) {
 
-        return PlainDate.of(year, this.getMonth(), this.dayOfMonth);
+        return PlainDate.of(year, this.getMonthValue(), this.dayOfMonth);
 
     }
 
@@ -91,7 +96,7 @@ final class FixedDayPattern
     @Override
     public int hashCode() {
 
-        return this.dayOfMonth + 37 * this.getMonth();
+        return this.dayOfMonth + 37 * this.getMonthValue();
 
     }
 
@@ -100,7 +105,7 @@ final class FixedDayPattern
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("FixedDayPattern:[month=");
-        sb.append(this.getMonth());
+        sb.append(this.getMonthValue());
         sb.append(",day-of-month=");
         sb.append(this.dayOfMonth);
         sb.append(",time-of-day=");
@@ -134,6 +139,31 @@ final class FixedDayPattern
     int getType() {
 
         return SPX.FIXED_DAY_PATTERN_TYPE;
+
+    }
+
+    /**
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains the type id of
+     *              the concrete subclass. Then the data bytes for the internal
+     *              state follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, this.getType());
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

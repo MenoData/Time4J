@@ -27,6 +27,11 @@ import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
+
 import static net.time4j.CalendarUnit.DAYS;
 
 
@@ -37,7 +42,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class DayOfWeekInMonthPattern
     extends GregorianTimezoneRule {
@@ -77,7 +82,7 @@ final class DayOfWeekInMonthPattern
     @Override
     public PlainDate getDate(int year) {
 
-        int month = this.getMonth();
+        int month = this.getMonthValue();
         int ref = GregorianMath.getDayOfWeek(year, month, this.dayOfMonth);
         PlainDate result = PlainDate.of(year, month, this.dayOfMonth);
 
@@ -124,7 +129,7 @@ final class DayOfWeekInMonthPattern
     public int hashCode() {
 
         int h = this.dayOfMonth;
-        h += 17 * (this.dayOfWeek + 37 * this.getMonth());
+        h += 17 * (this.dayOfWeek + 37 * this.getMonthValue());
         return h + (this.after ? 1 : 0);
 
     }
@@ -134,7 +139,7 @@ final class DayOfWeekInMonthPattern
 
         StringBuilder sb = new StringBuilder(64);
         sb.append("DayOfWeekInMonthPattern:[month=");
-        sb.append(this.getMonth());
+        sb.append(this.getMonthValue());
         sb.append(",dayOfMonth=");
         sb.append(this.dayOfMonth);
         sb.append(",dayOfWeek=");
@@ -194,6 +199,31 @@ final class DayOfWeekInMonthPattern
     int getType() {
 
         return SPX.DAY_OF_WEEK_IN_MONTH_PATTERN_TYPE;
+
+    }
+
+    /**
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains the type id of
+     *              the concrete subclass. Then the data bytes for the internal
+     *              state follow. The complex algorithm exploits the fact
+     *              that allmost all transitions happen at full hours around
+     *              midnight. Insight in details see source code.
+     */
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, this.getType());
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws      InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 

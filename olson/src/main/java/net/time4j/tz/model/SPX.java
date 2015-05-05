@@ -217,7 +217,7 @@ final class SPX
 
     }
 
-    // called by CompositeTransitionModel and ArrayTransitionModel
+    // called by ArrayTransitionModel
     static void writeTransitions(
         ZonalTransition[] transitions,
         int size,
@@ -238,29 +238,7 @@ final class SPX
 
     }
 
-    // called by TZRepositoryCompiler
-    static void writeTransitions(
-        List<ZonalTransition> transitions,
-        DataOutput out
-    ) throws IOException {
-
-        int n = transitions.size();
-        out.writeInt(n);
-
-        if (n > 0) {
-            int stdOffset = transitions.get(0).getPreviousOffset();
-            writeOffset(out, stdOffset);
-
-            for (int i = 0; i < n; i++) {
-                stdOffset = writeTransition(transitions.get(i), stdOffset, out);
-            }
-        }
-
-    }
-
-    // called by
-    // TZRepositoryProvider, CompositeTransitionModel and ArrayTransitionModel
-    static List<ZonalTransition> readTransitions(ObjectInput in)
+    private static List<ZonalTransition> readTransitions(ObjectInput in)
         throws IOException {
 
         int n = in.readInt();
@@ -332,9 +310,7 @@ final class SPX
 
     }
 
-    // called by TZRepositoryCompiler,
-    // CompositeTransitionModel and RuleBasedTransitionModel
-    static void writeRules(
+    private static void writeRules(
         List<DaylightSavingRule> rules,
         ObjectOutput out
     ) throws IOException {
@@ -361,9 +337,7 @@ final class SPX
 
     }
 
-    // called by TZRepositoryProvider,
-    // CompositeTransitionModel and RuleBasedTransitionModel
-    static List<DaylightSavingRule> readRules(ObjectInput in)
+    private static List<DaylightSavingRule> readRules(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         int n = in.readByte();
@@ -867,7 +841,7 @@ final class SPX
         DataOutput out
     ) throws IOException {
 
-        int first = (rule.getMonth() << 4);
+        int first = (rule.getMonthValue() << 4);
         int indicator = rule.getIndicator().ordinal();
         int dst = rule.getSavings();
         boolean offsetWritten = true;
