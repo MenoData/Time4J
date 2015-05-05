@@ -614,12 +614,14 @@ public final class PlainTimestamp
      *
      * @param   date    new calendar date component
      * @return  changed copy of this timestamp
+     * @see     PlainDate#COMPONENT
      */
     /*[deutsch]
      * <p>Passt die Datumskomponente an. </p>
      *
      * @param   date    new calendar date component
      * @return  changed copy of this timestamp
+     * @see     PlainDate#COMPONENT
      */
     public PlainTimestamp with(PlainDate date) {
 
@@ -632,12 +634,14 @@ public final class PlainTimestamp
      *
      * @param   time    new wall time component
      * @return  changed copy of this timestamp
+     * @see     PlainTime#COMPONENT
      */
     /*[deutsch]
      * <p>Passt die Uhrzeitkomponente an. </p>
      *
      * @param   time    new wall time component
      * @return  changed copy of this timestamp
+     * @see     PlainTime#COMPONENT
      */
     public PlainTimestamp with(PlainTime time) {
 
