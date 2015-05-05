@@ -12,6 +12,7 @@ import net.time4j.tz.model.SerializationTest;
 import net.time4j.tz.model.StartOfDayTest;
 import net.time4j.tz.model.TransitionResolverTest;
 
+import net.time4j.tz.threeten.NegativeDayOfMonthPatternTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -25,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CustomZoneTest.class,
         DaylightSavingRuleTest.class,
         JdkZoneProviderTest.class,
+        NegativeDayOfMonthPatternTest.class,
         PredefinedIDTest.class,
         RulesLikeBerlin1947Test.class,
         RulesLikeDhaka2009Test.class,

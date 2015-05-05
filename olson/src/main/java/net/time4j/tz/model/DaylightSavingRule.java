@@ -40,7 +40,9 @@ import net.time4j.format.CalendarType;
  *
  * <p>Note: The term &quot;year&quot; denotes the year in any calendar which
  * is not necessarily the gregorian one. Subclasses need to define the
- * calendar type and some calendar-specific year conversions. </p>
+ * calendar type and some calendar-specific year conversions. If subclasses
+ * also want to be serializable then they have to apply the
+ * <i>serialization proxy pattern</i> described by Joshua Bloch. </p>
  *
  * @author  Meno Hochschild
  * @since   2.2
@@ -59,7 +61,9 @@ import net.time4j.format.CalendarType;
  * <p>Hinweis: Der Begriff &quot;year&quot; zeigt das Jahr in irgendeinem
  * Kalender an, der nicht notwendig der gregorianische Kalender sein mu&szlig;.
  * Subklassen m&uuml;ssen den Kalendertyp und einige kalenderspezifische
- * Jahreskonversionen definieren. </p>
+ * Jahreskonversionen definieren. Wenn Subklassen auch serialisierbar sein
+ * wollen, m&uuml;ssen sie das <i>serialization proxy pattern</i> realisieren,
+ * das von Joshua Bloch beschrieben worden ist. </p>
  *
  * @author  Meno Hochschild
  * @since   2.2

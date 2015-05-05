@@ -30,8 +30,9 @@ import net.time4j.tz.model.GregorianTimezoneRule;
 import net.time4j.tz.model.OffsetIndicator;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
 
 import static net.time4j.CalendarUnit.DAYS;
 
@@ -43,7 +44,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * leider notwendig. </p>
  *
  * @author      Meno Hochschild
- * @since       2.2
+ * @since       4.0
  * @serial      include
  * @doctags.concurrency <immutable>
  */
@@ -52,24 +53,12 @@ final class NegativeDayOfMonthPattern
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 8126036678681103120L;
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient Month sMonth;
-    private transient PlainTime sTimeOfDay;
-    private transient int sSavings;
-    private transient OffsetIndicator sIndicator;
-
-    /**
-     * @serial  day-of-month-indicator (-28 until -2)
-     */
-    private final int domIndicator;
-
-    /**
-     * @serial  ISO-day-of-week-number (1-7)
-     */
-    private final byte dayOfWeek;
+    private transient final int domIndicator;
+    private transient final byte dayOfWeek;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -167,54 +156,40 @@ final class NegativeDayOfMonthPattern
 
     }
 
-    /**
-     * @serialData  Writes the bytes into given stream.
-     * @param       stream      object output stream
-     * @throws      IOException
-     */
-    private void writeObject(ObjectOutputStream stream) throws IOException {
+    // used in serialization
+    byte getDayOfWeek() {
 
-        stream.defaultWriteObject();
+        return this.dayOfWeek;
 
-        stream.writeInt(this.getMonth().getValue());
-        stream.writeObject(this.getTimeOfDay());
-        stream.writeObject(this.getIndicator());
-        stream.writeInt(this.getSavings());
+    }
+
+    // used in serialization
+    int getDomIndicator() {
+
+        return this.domIndicator;
 
     }
 
     /**
-     * @serialData  Reads the bytes from given stream.
-     * @param       stream      object input stream
-     * @throws      IOException in any case of inconsistencies
-     * @throws      ClassNotFoundException
+     * @serialData  Uses a specialized serialisation form as proxy. The format
+     *              is bit-compressed. The first byte contains the type id of
+     *              the concrete subclass. Then the data bytes for the internal
+     *              state follow. Insight in details see source code.
      */
-    private void readObject(ObjectInputStream stream)
+    private Object writeReplace() throws ObjectStreamException {
+
+        return new SPX(this, SPX.NEGATIVE_DAY_OF_MONTH_PATTERN_TYPE);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
 
-        stream.defaultReadObject();
-
-        this.sMonth = Month.valueOf(stream.readInt());
-        this.sTimeOfDay = (PlainTime) stream.readObject();
-        this.sIndicator = (OffsetIndicator) stream.readObject();
-        this.sSavings = stream.readInt();
-
-    }
-
-    /**
-     * @serialData  Checks the consistency.
-     * @return      immutable replacement object
-     */
-    private Object readResolve() {
-
-        return new NegativeDayOfMonthPattern(
-            this.sMonth,
-            this.domIndicator,
-            Weekday.valueOf(this.dayOfWeek),
-            this.sTimeOfDay,
-            this.sIndicator,
-            this.sSavings
-        );
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 
