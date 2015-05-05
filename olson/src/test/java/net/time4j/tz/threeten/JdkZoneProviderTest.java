@@ -3,23 +3,21 @@ package net.time4j.tz.threeten;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 import net.time4j.tz.ZoneProvider;
-
-import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.IOException;
+
 import static net.time4j.ClockUnit.MINUTES;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -32,10 +30,7 @@ public class JdkZoneProviderTest {
     @BeforeClass
     public static void init() {
         zp = new JdkZoneProviderSPI();
-
-        System.out.println(
-            "Test of Threeten-ZoneProvider: version="
-            + zp.getVersion());
+        System.out.println("Test of Threeten-ZoneProvider: version=" + zp.getVersion());
     }
 
     @Test
@@ -56,17 +51,24 @@ public class JdkZoneProviderTest {
     @Test
     public void getAliases() {
         assertThat(
-            zp.getAliases().get("Atlantic/Jan_Mayen"),
-            is("Europe/Oslo"));
+            zp.getAliases().isEmpty(),
+            is(true));
     }
+
+    /*
+    @Test
+    public void normalized() {
+        assertThat(
+            ZoneId.of("Atlantic/Jan_Mayen").normalized().getId(),
+            is("Europe/Oslo")); // normalization does not work (is just relevant for resolving fixed offsets)
+    }
+    */
 
     @Test
     public void compareAliasWithOriginal() {
         TransitionHistory histJanMayen = zp.load("Atlantic/Jan_Mayen");
         TransitionHistory histOslo = zp.load("Europe/Oslo");
-
-        assertThat(histJanMayen, nullValue());
-        assertThat(histOslo, notNullValue());
+        assertThat(histJanMayen, is(histOslo)); // same rules as expected for an alias
     }
 
     @Test
@@ -79,26 +81,11 @@ public class JdkZoneProviderTest {
     }
 
     @Test
-    public void loadCasablanca() {
-        try {
-            // special test for tzdb-version 2013h
-            TransitionHistory h = zp.load("Africa/Casablanca");
-            assertThat(h.isEmpty(), is(false));
-        } catch (RuntimeException ex) {
-            fail("No workaround for handling broken timezone data.");
-        }
-    }
-
-    @Test
     public void loadAllData() {
         for (String tzid : zp.getAvailableIDs()) {
             try {
                 TransitionHistory history = zp.load(tzid);
-                if (history == null) {
-                    assertThat(
-                        zp.getAliases().containsKey(tzid),
-                        is(true));
-                }
+                assertThat(history, notNullValue());
             } catch (RuntimeException ex) {
                 fail("Problem with loading history of: " + tzid);
             }
@@ -106,15 +93,21 @@ public class JdkZoneProviderTest {
     }
 
     @Test
-    public void dumpBerlin() throws IOException {
-        zp.load("Europe/Berlin").dump(System.out);
+    public void dumpCasablanca() throws IOException {
+        System.out.println("Africa/Casablanca ----------------------");
+        zp.load("Africa/Casablanca").dump(System.out);
     }
 
     @Test
-    public void hasHistory() throws IOException {
-        assertThat(
-            (zp.load("Europe/Berlin") != null),
-            is(true));
+    public void dumpDhaka() throws IOException {
+        System.out.println("Asia/Dhaka -----------------------------");
+        zp.load("Asia/Dhaka").dump(System.out);
+    }
+
+    @Test
+    public void dumpBerlin() throws IOException {
+        System.out.println("Europe/Berlin --------------------------");
+        zp.load("Europe/Berlin").dump(System.out);
     }
 
     @Test
@@ -190,11 +183,11 @@ public class JdkZoneProviderTest {
     public void dhakaAtEndOf2009a() throws IOException {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 12, 31);
-        PlainTime time = PlainTime.of(23, 59); // dirty hack in JDK for T24
+        PlainTime time = PlainTime.midnightAtEndOfDay();
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
         ZonalTransition conflict = // at first ambivalent time
-            history.getConflictTransition(date, PlainTime.of(22, 59));
+            history.getConflictTransition(date, PlainTime.of(23, 0));
 
         assertThat(
             conflict.getPosixTime(),
@@ -214,7 +207,7 @@ public class JdkZoneProviderTest {
     public void dhakaAtEndOf2009b() throws IOException {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 12, 31);
-        PlainTime time = PlainTime.of(23, 59); // dirty hack in JDK for T24
+        PlainTime time = PlainTime.midnightAtEndOfDay();
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
         ZonalTransition conflict = // any ambivalent time
