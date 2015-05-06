@@ -25,18 +25,18 @@ package net.time4j.format;
 /**
  * <p>Allows a flexible interpretation of symbols in format patterns. </p>
  *
- * @param   <F> self-referencing type parameter as discriminator for the format engine to be used
+ * @param   <P> self-referencing type parameter as discriminator for the format engine to be used
  * @author  Meno Hochschild
  * @since   3.0
  */
 /*[deutsch]
  * <p>Erlaubt eine flexible Interpretation von Symbolen in Formatmustern. </p>
  *
- * @param   <F> self-referencing type parameter as discriminator for the format engine to be used
+ * @param   <P> self-referencing type parameter as discriminator for the format engine to be used
  * @author  Meno Hochschild
  * @since   3.0
  */
-public interface ChronoPattern<F extends ChronoPattern<F>> {
+public interface ChronoPattern<P extends ChronoPattern<P>> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -52,6 +52,6 @@ public interface ChronoPattern<F extends ChronoPattern<F>> {
      * @return  format and parse engine to be used
      * @since   3.0
      */
-    FormatEngine<F> getFormatEngine();
+    FormatEngine<P> getFormatEngine();
 
 }

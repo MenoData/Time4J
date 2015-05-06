@@ -76,7 +76,6 @@ final class SystemTemporalFormatter<T>
         tmp.put(PlainTime.class, PlainTime.axis());
         tmp.put(PlainTimestamp.class, PlainTimestamp.axis());
         tmp.put(Moment.class, Moment.axis());
-        tmp.put(ZonalDateTime.class, null);
         SUPPORTED_TYPES = Collections.unmodifiableMap(tmp);
     }
 
@@ -161,7 +160,6 @@ final class SystemTemporalFormatter<T>
             text = this.setUpLocal().format(jud);
         } else if (this.type.equals(Moment.class)) {
             Moment moment = Moment.class.cast(formattable);
-            Date jud = TemporalType.JAVA_UTIL_DATE.from(moment);
             if (this.tzid == null) {
                 throw new IllegalArgumentException("Cannot print moment without timezone.");
             }
@@ -392,8 +390,7 @@ final class SystemTemporalFormatter<T>
         } else if (this.type.equals(PlainTimestamp.class)) {
             SimpleDateFormat sdf = this.setUpLocal();
             Date jud = sdf.parse(parseable, position);
-            PlainTimestamp tsp = TemporalType.JAVA_UTIL_DATE.translate(jud).toZonalTimestamp(ZonalOffset.UTC);
-            result = tsp;
+            result = TemporalType.JAVA_UTIL_DATE.translate(jud).toZonalTimestamp(ZonalOffset.UTC);
             updateRawValues(rawValues, sdf);
         } else if (this.type.equals(Moment.class)) {
             String realPattern = this.pattern;
