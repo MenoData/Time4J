@@ -92,7 +92,7 @@ class FormatSupport {
      * <p>Erzeugt einen Formatierer f&uuml;r lokale Entit&auml;ten. </p>
      *
      * @param   <T> generic type of associated chronological entities
-     * @param   <F> generic type of pattern
+     * @param   <P> generic type of pattern
      * @param   chronoType      chronological type
      * @param   formatPattern   pattern defining the structure of formatter
      * @param   patternType     type of pattern indicating the format engine
@@ -100,14 +100,14 @@ class FormatSupport {
      * @return  new temporal formatter
      * @since   3.0
      */
-    static <T extends ChronoEntity<T>, F extends ChronoPattern<F>> TemporalFormatter<T> createFormatter(
+    static <T extends ChronoEntity<T>, P extends ChronoPattern<P>> TemporalFormatter<T> createFormatter(
         Class<T> chronoType,
         String formatPattern,
-        F patternType,
+        P patternType,
         Locale locale
     ) {
 
-        FormatEngine<F> formatEngine = patternType.getFormatEngine();
+        FormatEngine<P> formatEngine = patternType.getFormatEngine();
         return formatEngine.create(chronoType, formatPattern, patternType, locale);
 
     }
@@ -116,7 +116,7 @@ class FormatSupport {
      * <p>Erzeugt einen Formatierer f&uuml;r globale Entit&auml;ten. </p>
      *
      * @param   <T> generic type of associated chronological entities
-     * @param   <F> generic type of pattern
+     * @param   <P> generic type of pattern
      * @param   chronoType      chronological type
      * @param   formatPattern   pattern defining the structure of formatter
      * @param   patternType     type of pattern indicating the format engine
@@ -125,10 +125,10 @@ class FormatSupport {
      * @return  new temporal formatter
      * @since   3.0
      */
-    static <T extends ChronoEntity<T>, F extends ChronoPattern<F>> TemporalFormatter<T> createFormatter(
+    static <T extends ChronoEntity<T>, P extends ChronoPattern<P>> TemporalFormatter<T> createFormatter(
         Class<T> chronoType,
         String formatPattern,
-        F patternType,
+        P patternType,
         Locale locale,
         TZID tzid
     ) {
@@ -234,9 +234,9 @@ class FormatSupport {
 
     }
 
-    private static <T extends ChronoEntity<T>, F extends ChronoPattern<F>> TemporalFormatter<T> createFormatter(
+    private static <T extends ChronoEntity<T>, P extends ChronoPattern<P>> TemporalFormatter<T> createFormatter(
         Class<T> chronoType,
-        FormatEngine<F> formatEngine,
+        FormatEngine<P> formatEngine,
         String formatPattern,
         Locale locale
     ) {

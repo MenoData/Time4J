@@ -1006,7 +1006,7 @@ public final class Moment
      * <p>Note: The formatter can be adjusted to other locales and timezones
      * however. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code Moment}-objects
@@ -1022,7 +1022,7 @@ public final class Moment
      * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
      * angepasst werden. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code Moment}-objects
@@ -1030,9 +1030,9 @@ public final class Moment
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      */
-    public static <F extends ChronoPattern<F>> TemporalFormatter<Moment> localFormatter(
+    public static <P extends ChronoPattern<P>> TemporalFormatter<Moment> localFormatter(
         String formatPattern,
-        F patternType
+        P patternType
     ) {
 
         return FormatSupport.createFormatter(
@@ -1082,7 +1082,7 @@ public final class Moment
      * information). The formatter can be adjusted to other locales and
      * timezones however. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -1102,7 +1102,7 @@ public final class Moment
      * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
      * existiert). </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -1113,9 +1113,9 @@ public final class Moment
      * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
      */
-    public static <F extends ChronoPattern<F>> TemporalFormatter<Moment> formatter(
+    public static <P extends ChronoPattern<P>> TemporalFormatter<Moment> formatter(
         String formatPattern,
-        F patternType,
+        P patternType,
         Locale locale,
         TZID tzid
     ) {
@@ -1651,6 +1651,7 @@ public final class Moment
     @SuppressWarnings("unchecked")
     private static TemporalFormatter<Moment> createRFC1123() {
 
+        // Typecast is okay because the type Moment is required per specification.
         return (TemporalFormatter<Moment>) FormatSupport.getDefaultFormatEngine().createRFC1123();
 
     }

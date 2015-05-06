@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.ChronoEntity;
 import net.time4j.scale.UniversalTime;
 
 import java.util.Locale;
@@ -29,7 +30,7 @@ import java.util.Locale;
 /**
  * <p>This <strong>SPI-interface</strong> allows the creation of temporal formats via a builder-approach. </p>
  *
- * @param   <F> generic type of applicable format patterns
+ * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
  * @doctags.spec    Implementations must have a public no-arg constructor.
@@ -38,12 +39,12 @@ import java.util.Locale;
  * <p>Dieses <strong>SPI-Interface</strong> erlaubt die Erzeugung von temporalen Formatobjekten
  * via Builder-Entwurfsmuster. </p>
  *
- * @param   <F> generic type of applicable format patterns
+ * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
  * @doctags.spec    Implementations must have a public no-arg constructor.
  */
-public interface FormatEngine<F extends ChronoPattern<F>> {
+public interface FormatEngine<P extends ChronoPattern<P>> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -71,15 +72,17 @@ public interface FormatEngine<F extends ChronoPattern<F>> {
      * @throws  IllegalArgumentException if given chronological type is not formattable
      * @since   3.0
      */
-    <T> TemporalFormatter<T> create(
+    <T extends ChronoEntity<T>> TemporalFormatter<T> create(
         Class<T> chronoType,
         String formatPattern,
-        F patternType,
+        P patternType,
         Locale locale
     );
 
     /**
      * <p>Creates a specialized formatter for RFC-1123. </p>
+     *
+     * <p>SPECIFICATION: The chronological type must be <code>net.time4j.Moment</code>. </p>
      *
      * @return  temporal format object
      * @doctags.exclude
@@ -98,7 +101,7 @@ public interface FormatEngine<F extends ChronoPattern<F>> {
      * @return  {@code ChronoPattern}
      * @since   3.0
      */
-    F getDefaultPatternType();
+    P getDefaultPatternType();
 
     /**
      * <p>Helps to find out if given chronological type is supported. </p>

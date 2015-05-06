@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.engine.ChronoEntity;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
@@ -54,7 +55,6 @@ class SystemFormatEngine
         tmp.add(PlainTime.class);
         tmp.add(PlainTimestamp.class);
         tmp.add(Moment.class);
-        tmp.add(ZonalDateTime.class);
         SUPPORTED_TYPES = Collections.unmodifiableSet(tmp);
     }
 
@@ -69,7 +69,7 @@ class SystemFormatEngine
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public <T> TemporalFormatter<T> create(
+    public <T extends ChronoEntity<T>> TemporalFormatter<T> create(
         Class<T> chronoType,
         String formatPattern,
         Platform patternType,

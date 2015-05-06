@@ -62,23 +62,18 @@ public final class UltimateFormatEngine
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public <T> TemporalFormatter<T> create(
+    public <T extends ChronoEntity<T>> TemporalFormatter<T> create(
         Class<T> chronoType,
         String formatPattern,
         PatternType patternType,
         Locale locale
     ) {
 
-        TemporalFormatter<?> formatter;
-
         if (this.isSupported(chronoType)) {
-            Class<? extends ChronoEntity> ct = chronoType.asSubclass(ChronoEntity.class);
-            formatter = this.createEntityFormatter(ct, formatPattern, patternType, locale);
+            return ChronoFormatter.setUp(chronoType, locale).addPattern(formatPattern, patternType).build();
         } else {
             throw new IllegalArgumentException("Not formattable: " + chronoType);
         }
-
-        return cast(formatter);
 
     }
 
@@ -130,24 +125,6 @@ public final class UltimateFormatEngine
     public boolean isSupported(Class<?> chronoType) {
 
         return ChronoEntity.class.isAssignableFrom(chronoType);
-
-    }
-
-    private TemporalFormatter<?> createEntityFormatter(
-        Class<? extends ChronoEntity> chronoType,
-        String formatPattern,
-        PatternType patternType,
-        Locale locale
-    ) {
-
-        return ChronoFormatter.setUp(chronoType, locale).addPattern(formatPattern, patternType).build();
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T cast(Object obj) {
-
-        return (T) obj;
 
     }
 

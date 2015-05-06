@@ -28,11 +28,17 @@ import net.time4j.format.FormatEngine;
 /**
  * <p>Defines the default format pattern of the actual platform. </p>
  *
+ * <p>This pattern type is applicable on the four basic types of Time4J, namely
+ * {@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp} and {@code Moment}. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
  */
 /*[deutsch]
  * <p>Definiert das Standard-Formatmuster der aktuellen Plattform. </p>
+ *
+ * <p>Dieser Mustertyp ist auf die vier Basistypen von Time4J anwendbar, n&auml;mlich
+ * {@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp} und {@code Moment}. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0

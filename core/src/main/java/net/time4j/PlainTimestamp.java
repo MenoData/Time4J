@@ -751,7 +751,7 @@ public final class PlainTimestamp
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing plain timestamps. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTimestamp}-objects
@@ -763,7 +763,7 @@ public final class PlainTimestamp
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @return  format object for formatting {@code PlainTimestamp}-objects
@@ -771,9 +771,9 @@ public final class PlainTimestamp
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      */
-    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTimestamp> localFormatter(
+    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> localFormatter(
         String formatPattern,
-        F patternType
+        P patternType
     ) {
 
         return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, Locale.getDefault());
@@ -784,7 +784,7 @@ public final class PlainTimestamp
      * <p>Creates a new formatter which uses the given pattern and locale
      * for formatting and parsing plain timestamps. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -797,7 +797,7 @@ public final class PlainTimestamp
      * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
      * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
      *
-     * @param   <F> generic pattern type
+     * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
@@ -806,9 +806,9 @@ public final class PlainTimestamp
      * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
      */
-    public static <F extends ChronoPattern<F>> TemporalFormatter<PlainTimestamp> formatter(
+    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> formatter(
         String formatPattern,
-        F patternType,
+        P patternType,
         Locale locale
     ) {
 
