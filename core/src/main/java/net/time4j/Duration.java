@@ -176,17 +176,7 @@ public final class Duration<U extends IsoUnit>
     private static final Duration.Formatter<ClockUnit> TF_BAS =
         createAlternativeTimeFormat(false);
 
-    private static final
-    Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
-        new Comparator<Item<? extends ChronoUnit>>() {
-            @Override
-            public int compare(
-                Item<? extends ChronoUnit> o1,
-                Item<? extends ChronoUnit> o2
-            ) {
-                return Duration.compare(o1.getUnit(), o2.getUnit());
-            }
-        };
+    private static final Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR = StdNormalizer.comparator();
 
     /**
      * <p>Normalizes the duration items on the base of
@@ -223,7 +213,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @see     PlainTimestamp#normalize(TimeSpan)
      */
-    public static Normalizer<IsoUnit> STD_PERIOD = new TimestampNormalizer();
+    public static Normalizer<IsoUnit> STD_PERIOD = StdNormalizer.ofMixedUnits();
 
     /**
      * <p>Normalizes the calendrical items of a duration on the base
@@ -246,8 +236,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @see     PlainDate#normalize(TimeSpan)
      */
-    public static Normalizer<CalendarUnit> STD_CALENDAR_PERIOD =
-        new DateNormalizer();
+    public static Normalizer<CalendarUnit> STD_CALENDAR_PERIOD = StdNormalizer.ofCalendarUnits();
 
     /**
      * <p>Normalizes the wall time items of a duration on the base
@@ -274,18 +263,16 @@ public final class Duration<U extends IsoUnit>
      *
      * @see     PlainTime
      */
-    public static Normalizer<ClockUnit> STD_CLOCK_PERIOD = new TimeNormalizer();
+    public static Normalizer<ClockUnit> STD_CLOCK_PERIOD = StdNormalizer.ofClockUnits();
 
     private static final int PRINT_STYLE_NORMAL = 0;
     private static final int PRINT_STYLE_ISO = 1;
     private static final int PRINT_STYLE_XML = 2;
     private static final long serialVersionUID = -6321211763598951499L;
 
-    private static final
-    TimeMetric<CalendarUnit, Duration<CalendarUnit>> YMD_METRIC =
+    private static final TimeMetric<CalendarUnit, Duration<CalendarUnit>> YMD_METRIC =
         Duration.in(YEARS, MONTHS, DAYS);
-    private static final
-    TimeMetric<ClockUnit, Duration<ClockUnit>> CLOCK_METRIC =
+    private static final TimeMetric<ClockUnit, Duration<ClockUnit>> CLOCK_METRIC =
         Duration.in(HOURS, MINUTES, SECONDS, NANOS);
 
     //~ Instanzvariablen --------------------------------------------------
@@ -2493,7 +2480,7 @@ public final class Duration<U extends IsoUnit>
         while (low <= high) {
             int mid = (low + high) >>> 1;
             ChronoUnit midUnit = list.get(mid).getUnit();
-            int cmp = compare(midUnit, unit);
+            int cmp = StdNormalizer.compare(midUnit, unit);
 
             if (cmp < 0) {
                 low = mid + 1;
@@ -2505,25 +2492,6 @@ public final class Duration<U extends IsoUnit>
         }
 
         return -1;
-
-    }
-
-    private static int compare(
-        ChronoUnit u1,
-        ChronoUnit u2
-    ) {
-
-        int result = Double.compare(u2.getLength(), u1.getLength());
-
-        if (
-            (result == 0)
-            && !u1.equals(u2)
-        ) {
-            throw new IllegalArgumentException(
-                "Mixing different units of same length not allowed.");
-        }
-
-        return result;
 
     }
 
@@ -5378,340 +5346,6 @@ public final class Duration<U extends IsoUnit>
         }
 
 	}
-
-    private static class TimestampNormalizer
-        implements Normalizer<IsoUnit> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> timespan) {
-
-            int count = timespan.getTotalLength().size();
-            List<Item<IsoUnit>> items =
-                new ArrayList<Item<IsoUnit>>(count);
-            long years = 0, months = 0, weeks = 0, days = 0;
-            long hours = 0, minutes = 0, seconds = 0, nanos = 0;
-
-            for (int i = 0; i < count; i++) {
-                Item<? extends IsoUnit> item =
-                    timespan.getTotalLength().get(i);
-                long amount = item.getAmount();
-                IsoUnit unit = item.getUnit();
-
-                if (unit instanceof CalendarUnit) {
-                    switch ((CalendarUnit.class.cast(unit))) {
-                        case MILLENNIA:
-                            years =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, 1000),
-                                    years
-                                );
-                            break;
-                        case CENTURIES:
-                            years =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, 100),
-                                    years
-                                );
-                            break;
-                        case DECADES:
-                            years =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, 10),
-                                    years
-                                );
-                            break;
-                        case YEARS:
-                            years = MathUtils.safeAdd(amount, years);
-                            break;
-                        case QUARTERS:
-                            months =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, 3),
-                                    months
-                                );
-                            break;
-                        case MONTHS:
-                            months = MathUtils.safeAdd(amount, months);
-                            break;
-                        case WEEKS:
-                            weeks = amount;
-                            break;
-                        case DAYS:
-                            days = amount;
-                            break;
-                        default:
-                            throw new UnsupportedOperationException(
-                                unit.toString());
-                    }
-                } else if (unit instanceof ClockUnit) {
-                    switch ((ClockUnit.class.cast(unit))) {
-                        case HOURS:
-                            hours = amount;
-                            break;
-                        case MINUTES:
-                            minutes = amount;
-                            break;
-                        case SECONDS:
-                            seconds = amount;
-                            break;
-                        case MILLIS:
-                            nanos =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, MIO),
-                                    nanos
-                                );
-                            break;
-                        case MICROS:
-                            nanos =
-                                MathUtils.safeAdd(
-                                    MathUtils.safeMultiply(amount, 1000L),
-                                    nanos
-                                );
-                            break;
-                        case NANOS:
-                            nanos = MathUtils.safeAdd(amount, nanos);
-                            break;
-                        default:
-                            throw new UnsupportedOperationException(
-                                unit.toString());
-                    }
-                } else {
-                    items.add(Item.of(amount, unit));
-                }
-            }
-
-            long f = 0, s = 0, n = 0, h = 0;
-
-            if ((hours | minutes | seconds | nanos) != 0) {
-                f = nanos % MRD;
-                seconds = MathUtils.safeAdd(seconds, nanos / MRD);
-                s = seconds % 60;
-                minutes = MathUtils.safeAdd(minutes, seconds / 60);
-                n = minutes % 60;
-                hours = MathUtils.safeAdd(hours, minutes / 60);
-                h = hours % 24;
-                days = MathUtils.safeAdd(days, hours / 24);
-            }
-
-            IsoUnit unit;
-
-            if ((years | months | days) != 0) {
-                long y = MathUtils.safeAdd(years, months / 12);
-                long m = months % 12;
-                long d =
-                    MathUtils.safeAdd(
-                        MathUtils.safeMultiply(weeks, 7),
-                        days
-                    );
-
-                if (y != 0) {
-                    unit = YEARS;
-                    items.add(Item.of(y, unit));
-                }
-                if (m != 0) {
-                    unit = MONTHS;
-                    items.add(Item.of(m, unit));
-                }
-                if (d != 0) {
-                    unit = DAYS;
-                    items.add(Item.of(d, unit));
-                }
-            } else if (weeks != 0) {
-                unit = WEEKS;
-                items.add(Item.of(weeks, unit));
-            }
-
-            if (h != 0) {
-                unit = HOURS;
-                items.add(Item.of(h, unit));
-            }
-
-            if (n != 0) {
-                unit = MINUTES;
-                items.add(Item.of(n, unit));
-            }
-
-            if (s != 0) {
-                unit = SECONDS;
-                items.add(Item.of(s, unit));
-            }
-
-            if (f != 0) {
-                unit = NANOS;
-                items.add(Item.of(f, unit));
-            }
-
-            return new Duration<IsoUnit>(
-                items,
-                timespan.isNegative()
-            );
-
-        }
-
-    }
-
-    private static class DateNormalizer
-        implements Normalizer<CalendarUnit> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Duration<CalendarUnit> normalize(TimeSpan<? extends CalendarUnit> timespan) {
-
-            int count = timespan.getTotalLength().size();
-            long years = 0, months = 0, weeks = 0, days = 0;
-
-            for (int i = 0; i < count; i++) {
-                Item<? extends CalendarUnit> item =
-                    timespan.getTotalLength().get(i);
-                long amount = item.getAmount();
-                CalendarUnit unit = item.getUnit();
-
-                switch (unit) {
-                    case MILLENNIA:
-                        years =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, 1000),
-                                years
-                            );
-                        break;
-                    case CENTURIES:
-                        years =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, 100),
-                                years
-                            );
-                        break;
-                    case DECADES:
-                        years =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, 10),
-                                years
-                            );
-                        break;
-                    case YEARS:
-                        years = MathUtils.safeAdd(amount, years);
-                        break;
-                    case QUARTERS:
-                        months =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, 3),
-                                months
-                            );
-                        break;
-                    case MONTHS:
-                        months = MathUtils.safeAdd(amount, months);
-                        break;
-                    case WEEKS:
-                        weeks = amount;
-                        break;
-                    case DAYS:
-                        days = amount;
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(
-                            unit.toString());
-                }
-            }
-
-            boolean negative = timespan.isNegative();
-
-            if ((years | months | days) != 0) {
-                long y = MathUtils.safeAdd(years, months / 12);
-                long m = months % 12;
-                long d =
-                    MathUtils.safeAdd(
-                        MathUtils.safeMultiply(weeks, 7),
-                        days
-                    );
-                return Duration.ofCalendarUnits(y, m, d, negative);
-            } else if (weeks != 0) {
-                if (negative) {
-                    weeks = MathUtils.safeNegate(weeks);
-                }
-                return Duration.of(weeks, WEEKS);
-            }
-
-            return Duration.of(0, DAYS);
-
-        }
-
-    }
-
-    private static class TimeNormalizer
-        implements Normalizer<ClockUnit> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Duration<ClockUnit> normalize(TimeSpan<? extends ClockUnit> timespan) {
-
-            int count = timespan.getTotalLength().size();
-            long hours = 0, minutes = 0, seconds = 0, nanos = 0;
-
-            for (int i = 0; i < count; i++) {
-                Item<? extends ClockUnit> item =
-                    timespan.getTotalLength().get(i);
-                long amount = item.getAmount();
-                ClockUnit unit = item.getUnit();
-
-                switch (unit) {
-                    case HOURS:
-                        hours = amount;
-                        break;
-                    case MINUTES:
-                        minutes = amount;
-                        break;
-                    case SECONDS:
-                        seconds = amount;
-                        break;
-                    case MILLIS:
-                        nanos =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, MIO),
-                                nanos
-                            );
-                        break;
-                    case MICROS:
-                        nanos =
-                            MathUtils.safeAdd(
-                                MathUtils.safeMultiply(amount, 1000L),
-                                nanos
-                            );
-                        break;
-                    case NANOS:
-                        nanos = MathUtils.safeAdd(amount, nanos);
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(unit.name());
-                }
-            }
-
-            long f = 0, s = 0, n = 0, h = 0;
-
-            if ((hours | minutes | seconds | nanos) != 0) {
-                f = nanos % MRD;
-                seconds = MathUtils.safeAdd(seconds, nanos / MRD);
-                s = seconds % 60;
-                minutes = MathUtils.safeAdd(minutes, seconds / 60);
-                n = minutes % 60;
-                hours = MathUtils.safeAdd(hours, minutes / 60);
-                h = hours;
-            }
-
-            return Duration.ofClockUnits(
-                h,
-                n,
-                s,
-                f,
-                timespan.isNegative()
-            );
-
-        }
-
-    }
 
     private static class Metric<U extends IsoUnit>
         extends AbstractMetric<U, Duration<U>> {
