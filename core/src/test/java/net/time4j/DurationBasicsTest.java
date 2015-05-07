@@ -1385,4 +1385,12 @@ public class DurationBasicsTest {
             is(clockDur));
     }
 
+    @Test
+    public void jodaStyle() throws ParseException {
+        Duration.Formatter<IsoUnit> f = Duration.Formatter.ofJodaStyle();
+        assertThat(
+            f.parse("P-2Y-15DT-30H-5M"),
+            is(Duration.ofNegative().years(2).days(15).hours(30).minutes(5).build()));
+    }
+
 }
