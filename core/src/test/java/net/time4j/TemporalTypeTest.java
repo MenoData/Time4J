@@ -222,4 +222,33 @@ public class TemporalTypeTest {
         );
     }
 
+    @Test
+    public void periodToTime4J1() {
+        assertThat(
+            TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45)),
+            is(Duration.ofCalendarUnits(3, 8, 45))
+        );
+    }
+
+    @Test(expected=ChronoException.class)
+    public void periodToTime4J2() {
+        TemporalType.THREETEN_PERIOD.translate(Period.of(0, 1, -30));
+    }
+
+    @Test
+    public void periodFromTime4J1() {
+        assertThat(
+            TemporalType.THREETEN_PERIOD.from(Duration.ofCalendarUnits(3, 8, 45)),
+            is(Period.of(3, 8, 45))
+        );
+    }
+
+    @Test
+    public void periodFromTime4J2() {
+        assertThat(
+            TemporalType.THREETEN_PERIOD.from(Duration.of(3, CalendarUnit.WEEKS).inverse()),
+            is(Period.ofDays(-21))
+        );
+    }
+
 }

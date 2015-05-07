@@ -32,10 +32,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 
 /**
@@ -343,6 +345,39 @@ public abstract class TemporalType<S, T> {
     public static final TemporalType<java.time.Duration, Duration<ClockUnit>> THREETEN_DURATION =
         new DurationRule();
 
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.Period} and
+     * the class {@code net.time4j.Duration}. </p>
+     *
+     * <p>Note that mixed signs in original period like &quot;P1M-30D&quot; will be rejected by Time4J.
+     * Example for a correct input: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45));
+     *  System.out.println(duration);
+     *  // output: P3Y8M45D
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Period} und
+     * der Klasse {@code net.time4j.Duration}. </p>
+     *
+     * <p>Man beachte, da&szlig; gemischte Vorzeichen in der Original-Periode wie &quot;P1M-30D&quot;
+     * von Time4J verworfen werden. Beispiel f&uuml;r eine korrekte Eingabe: </p>
+     *
+     * <pre>
+     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45));
+     *  System.out.println(duration);
+     *  // Ausgabe: P3Y8M45D
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<Period, Duration<CalendarUnit>> THREETEN_PERIOD =
+        new PeriodRule();
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -624,7 +659,7 @@ public abstract class TemporalType<S, T> {
 
             for (ClockUnit unit : ClockUnit.values()) {
                 long amount = time4j.getPartialAmount(unit);
-                ChronoUnit threetenUnit;
+                TemporalUnit threetenUnit;
 
                 switch (unit) {
                     case HOURS:
@@ -658,6 +693,73 @@ public abstract class TemporalType<S, T> {
             }
 
             return threetenDuration;
+
+        }
+
+    }
+
+    private static class PeriodRule
+        extends TemporalType<Period, Duration<CalendarUnit>> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Duration<CalendarUnit> translate(Period source) {
+
+            try {
+                return Duration.ofCalendarUnits(source.getYears(), source.getMonths(), source.getDays());
+            } catch (RuntimeException ex) {
+                throw new ChronoException("Cannot convert period: " + source, ex);
+            }
+
+        }
+
+        @Override
+        public Period from(Duration<CalendarUnit> time4j) {
+
+            Period period = Period.ZERO;
+
+            for (CalendarUnit unit : CalendarUnit.values()) {
+                long amount = time4j.getPartialAmount(unit);
+
+                if (amount != 0) {
+                    if (time4j.isNegative()) {
+                        amount = Math.negateExact(amount);
+                    }
+
+                    switch (unit) {
+                        case MILLENNIA:
+                            period = period.plusYears(Math.multiplyExact(amount, 1000));
+                            break;
+                        case CENTURIES:
+                            period = period.plusYears(Math.multiplyExact(amount, 100));
+                            break;
+                        case DECADES:
+                            period = period.plusYears(Math.multiplyExact(amount, 10));
+                            break;
+                        case YEARS:
+                            period = period.plusYears(amount);
+                            break;
+                        case QUARTERS:
+                            period = period.plusMonths(Math.multiplyExact(amount, 3));
+                            break;
+                        case MONTHS:
+                            period = period.plusMonths(amount);
+                            break;
+                        case WEEKS:
+                            period = period.plusDays(Math.multiplyExact(amount, 7));
+                            break;
+                        case DAYS:
+                            period = period.plusDays(amount);
+                            break;
+                        default:
+                            throw new UnsupportedOperationException(unit.name());
+
+                    }
+                }
+            }
+
+            return period;
 
         }
 
