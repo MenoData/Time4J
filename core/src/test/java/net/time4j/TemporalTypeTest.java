@@ -198,4 +198,28 @@ public class TemporalTypeTest {
         );
     }
 
+    @Test
+    public void durationToTime4J() {
+        assertThat(
+            TemporalType.THREETEN_DURATION.translate(java.time.Duration.ofSeconds(7265)),
+            is(Duration.ofClockUnits(2, 1, 5))
+        );
+        assertThat(
+            TemporalType.THREETEN_DURATION.translate(java.time.Duration.ofSeconds(-1).plusNanos(999_999_999)),
+            is(Duration.of(-1, ClockUnit.NANOS))
+        );
+    }
+
+    @Test
+    public void durationFromTime4J() {
+        assertThat(
+            TemporalType.THREETEN_DURATION.from(Duration.ofClockUnits(2, 1, 5)),
+            is(java.time.Duration.ofSeconds(7265))
+        );
+        assertThat(
+            TemporalType.THREETEN_DURATION.from(Duration.of(-1, ClockUnit.NANOS)),
+            is(java.time.Duration.ofSeconds(-1).plusNanos(999_999_999))
+        );
+    }
+
 }

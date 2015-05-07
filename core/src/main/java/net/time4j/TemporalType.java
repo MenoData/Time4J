@@ -35,6 +35,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 
 /**
@@ -309,6 +310,39 @@ public abstract class TemporalType<S, T> {
     public static final TemporalType<ZonedDateTime, ZonalDateTime> ZONED_DATE_TIME =
         new ZonedDateTimeRule();
 
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.Duration} and
+     * the class {@code net.time4j.Duration}. </p>
+     *
+     * <p>The conversion is usually exact but will always perform a normalization on the side
+     * of Time4J. Example: </p>
+     *
+     * <pre>
+     *  Duration&lt;ClockUnit&gt; duration = TemporalType.THREETEN_DURATION.translate(java.time.Duration.ofSeconds(65));
+     *  System.out.println(duration);
+     *  // output: PT1M5S
+     * </pre>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Duration} und
+     * der Klasse {@code net.time4j.Duration}. </p>
+     *
+     * <p>Die Konversion ist normalerweise exakt, f&uuml;hrt aber auf der Seite von Time4J immer
+     * eine Normalisierung durch. Beispiel: </p>
+     *
+     * <pre>
+     *  Duration&lt;ClockUnit&gt; duration = TemporalType.THREETEN_DURATION.translate(java.time.Duration.ofSeconds(65));
+     *  System.out.println(duration);
+     *  // Ausgabe: PT1M5S
+     * </pre>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<java.time.Duration, Duration<ClockUnit>> THREETEN_DURATION =
+        new DurationRule();
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -564,6 +598,66 @@ public abstract class TemporalType<S, T> {
             }
 
             return ZonedDateTime.ofInstant(instant, zone);
+
+        }
+
+    }
+
+    private static class DurationRule
+        extends TemporalType<java.time.Duration, Duration<ClockUnit>> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Duration<ClockUnit> translate(java.time.Duration source) {
+
+            Duration<ClockUnit> duration =
+                Duration.of(source.getSeconds(), ClockUnit.SECONDS).plus(source.getNano(), ClockUnit.NANOS);
+            return duration.with(Duration.STD_CLOCK_PERIOD);
+
+        }
+
+        @Override
+        public java.time.Duration from(Duration<ClockUnit> time4j) {
+
+            java.time.Duration threetenDuration = java.time.Duration.ZERO;
+
+            for (ClockUnit unit : ClockUnit.values()) {
+                long amount = time4j.getPartialAmount(unit);
+                ChronoUnit threetenUnit;
+
+                switch (unit) {
+                    case HOURS:
+                        threetenUnit = ChronoUnit.HOURS;
+                        break;
+                    case MINUTES:
+                        threetenUnit = ChronoUnit.MINUTES;
+                        break;
+                    case SECONDS:
+                        threetenUnit = ChronoUnit.SECONDS;
+                        break;
+                    case MILLIS:
+                        threetenUnit = ChronoUnit.MILLIS;
+                        break;
+                    case MICROS:
+                        threetenUnit = ChronoUnit.MICROS;
+                        break;
+                    case NANOS:
+                        threetenUnit = ChronoUnit.NANOS;
+                        break;
+                    default:
+                        throw new UnsupportedOperationException(unit.name());
+
+                }
+
+                threetenDuration = threetenDuration.plus(amount, threetenUnit);
+            }
+
+            if (time4j.isNegative()) {
+                threetenDuration = threetenDuration.negated();
+            }
+
+            return threetenDuration;
 
         }
 
