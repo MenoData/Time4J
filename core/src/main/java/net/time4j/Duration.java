@@ -176,8 +176,7 @@ public final class Duration<U extends IsoUnit>
     private static final Duration.Formatter<ClockUnit> TF_BAS =
         createAlternativeTimeFormat(false);
 
-    private static final
-    Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
+    private static final Comparator<Item<? extends ChronoUnit>> ITEM_COMPARATOR =
         new Comparator<Item<? extends ChronoUnit>>() {
             @Override
             public int compare(
@@ -1148,11 +1147,8 @@ public final class Duration<U extends IsoUnit>
                     daytime = days;
                 }
 
-                boolean negMonths = (months < 0);
-                boolean negDaytime = (daytime < 0);
-
-                if (negMonths == negDaytime) {
-                    boolean neg = negMonths;
+                if (!hasMixedSigns(months, daytime)) {
+                    boolean neg = ((months < 0) || (daytime < 0));
 
                     if (neg) {
                         months = MathUtils.safeNegate(months);
@@ -1165,8 +1161,8 @@ public final class Duration<U extends IsoUnit>
                     months = months % 12;
                     long nanosecs = 0;
                     if (nanos != 0) {
-                        nanosecs = nanos / MRD;
-                        secs = nanos % MRD;
+                        nanosecs = nanos % MRD;
+                        secs = nanos / MRD;
                     }
                     long hours = secs / 3600;
                     secs = secs % 3600;
@@ -2343,6 +2339,17 @@ public final class Duration<U extends IsoUnit>
 
     }
 
+    private static boolean hasMixedSigns(
+        long months,
+        long daytime
+    ) {
+
+        return (
+            ((months < 0) && (daytime > 0))
+            || ((months > 0) && (daytime < 0)));
+
+    }
+
     private int count() {
 
         return this.getTotalLength().size();
@@ -2433,24 +2440,25 @@ public final class Duration<U extends IsoUnit>
 
         for (Map.Entry<U, Long> entry : map.entrySet()) {
             long amount = entry.getValue().longValue();
-            U key = entry.getKey();
 
-            if (amount == 0) {
-                // no-op
-            } else if (key == MILLIS) {
-                nanos =
-                    MathUtils.safeAdd(
-                        nanos,
-                        MathUtils.safeMultiply(amount, MIO));
-            } else if (key == MICROS) {
-                nanos =
-                    MathUtils.safeAdd(
-                        nanos,
-                        MathUtils.safeMultiply(amount, 1000));
-            } else if (key == NANOS) {
-                nanos = MathUtils.safeAdd(nanos, amount);
-            } else {
-                temp.add(Item.of(amount, key));
+            if (amount != 0) {
+                U key = entry.getKey();
+
+                if (key == MILLIS) {
+                    nanos =
+                        MathUtils.safeAdd(
+                            nanos,
+                            MathUtils.safeMultiply(amount, MIO));
+                } else if (key == MICROS) {
+                    nanos =
+                        MathUtils.safeAdd(
+                            nanos,
+                            MathUtils.safeMultiply(amount, 1000));
+                } else if (key == NANOS) {
+                    nanos = MathUtils.safeAdd(nanos, amount);
+                } else {
+                    temp.add(Item.of(amount, key));
+                }
             }
         }
 
@@ -2547,8 +2555,7 @@ public final class Duration<U extends IsoUnit>
             if (isEmpty(timespan)) {
                 return duration;
             } else if (timespan instanceof Duration) {
-                Duration<U> result = cast(timespan);
-                return result;
+                return cast(timespan);
             }
         }
 
@@ -2970,9 +2977,10 @@ public final class Duration<U extends IsoUnit>
                 : (from + 7 == to));
             Duration<?> dur = getAlternativeDateFormat(extended, ordinalStyle).parse(period, from);
             long years = dur.getPartialAmount(YEARS);
-            long months = 0;
-            long days = 0;
+            long months;
+            long days;
             if (ordinalStyle) {
+                months = 0;
                 days = dur.getPartialAmount(DAYS);
                 // ISO does not specify any constraint here
             } else {
@@ -5822,7 +5830,7 @@ public final class Duration<U extends IsoUnit>
 	        }
 
 			long value = (long) total;
-			int y = 0, m = 0, d = 0, h = 0, min = 0, s = 0;
+			int y, m, d, h, min = 0, s = 0;
 
             y = safeCast(value / YEARS.getLength());
 			value -= y * YEARS.getLength();

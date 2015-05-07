@@ -552,6 +552,13 @@ public class DurationBasicsTest {
             is(Duration.ofClockUnits(0, 59, 30)));
     }
 
+    @Test
+    public void plusWithMixedSigns4() {
+        assertThat(
+            Duration.of(-1, ClockUnit.SECONDS).plus(999999999, ClockUnit.NANOS),
+            is(Duration.of(-1, ClockUnit.NANOS)));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void plusWithUnitsOfSameLength() {
         Duration.of(1, CalendarUnit.QUARTERS.unlessInvalid())
