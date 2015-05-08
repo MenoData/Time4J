@@ -279,4 +279,20 @@ public class HistoryTest {
         assertThat(sweden.getLengthOfYear(HistoricEra.AD, 2000), is(366));
     }
 
+    @Test
+    public void testProlepticJulianCutOver() {
+        assertThat(
+            ChronoHistory.ofGregorianReform(PlainDate.axis().getMaximum()),
+            is(ChronoHistory.PROLEPTIC_JULIAN)
+        );
+    }
+
+    @Test
+    public void testProlepticGregorianCutOver() {
+        assertThat(
+            ChronoHistory.ofGregorianReform(PlainDate.axis().getMinimum()),
+            is(ChronoHistory.PROLEPTIC_GREGORIAN)
+        );
+    }
+
 }

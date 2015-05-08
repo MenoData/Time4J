@@ -21,7 +21,10 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
@@ -973,9 +976,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Note that this configuration will override any gregorian cutover date which might be inferred
      * from current locale. </p>
      *
+     * <p>Since version 3.1: The special case if given date is the minimum on the date axis is permitted
+     * and will result in a proleptic gregorian calendar. Note that the proleptic julian calendar is
+     * supported if given date is the maximum on the date axis. </p>
+     *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
-     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
+     *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
      * @since   3.0
      */
@@ -985,16 +993,31 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Zu beachten: Diese Methode wird jedes gregorianische Umstellungsdatum &uuml;berschreiben, das
      * von der L&auml;ndereinstellung dieses Formatierers abgeleitet werden mag. </p>
      *
+     * <p>Seit Version 3.1 gilt: Der Sonderfall der Angabe des Minimums auf der Datumsachse ist zul&auml;ssig
+     * und f&uuml;hrt zu einem rein gregorianischen Kalender ohne Historie. Hinweis: Wenn das angegebene Datum
+     * das Maximum auf der Datumsachse ist, dann f&uuml;hrt diese Einstellung zu einem proleptisch julianischen
+     * Kalender. </p>
+     *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
-     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
+     *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
      * @since   3.0
      */
     public ChronoFormatter<T> withGregorianCutOver(PlainDate date) {
 
-        if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
+        ChronoHistory history;
+        PlainDate cutover;
+
+        if (date.equals(PlainDate.axis().getMinimum())) {
+            history = null;
+            cutover = null;
+        } else if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
             throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
+        } else {
+            history = ChronoHistory.ofGregorianReform(date);
+            cutover = date;
         }
 
         AttributeSet as =
@@ -1004,9 +1027,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 this.globalAttributes.getLevel(),
                 this.globalAttributes.getSection(),
                 this.globalAttributes.getCondition(),
-                date);
+                cutover);
 
-        return new ChronoFormatter<T>(this, as, ChronoHistory.ofGregorianReform(date));
+        return new ChronoFormatter<T>(this, as, history);
 
     }
 
@@ -1484,6 +1507,137 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public Format toFormat() {
 
         return new TraditionalFormat<T>(this);
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for plain date objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainDate> ofDatePattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for clock time objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r Uhrzeitobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainTime> ofTimePattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for plain timestamps. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r einfache Zeitstempelobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainTimestamp> ofTimestampPattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for global timestamp objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   tzid            timezone id
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempelobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   tzid            timezone id
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<Moment> ofMomentPattern(
+        String pattern,
+        PatternType type,
+        Locale locale,
+        TZID tzid
+    ) {
+
+        Builder<Moment> builder = new Builder<Moment>(Moment.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build().withTimezone(tzid);
 
     }
 
