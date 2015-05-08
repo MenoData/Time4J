@@ -21,7 +21,10 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
@@ -191,7 +194,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // update extension elements and historizable elements
         int len = old.steps.size();
-        List<FormatStep> copy = new ArrayList<FormatStep>(old.steps);
+        List<FormatStep> copy = new ArrayList<>(old.steps);
 
         for (int i = 0; i < len; i++) {
             FormatStep step = copy.get(i);
@@ -274,7 +277,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         this.defaults = Collections.unmodifiableMap(map);
 
-        List<FormatStep> copy = new ArrayList<FormatStep>(formatter.steps);
+        List<FormatStep> copy = new ArrayList<>(formatter.steps);
         this.steps = Collections.unmodifiableList(copy);
 
     }
@@ -585,7 +588,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Set<ElementPosition> positions = null;
 
         if (withPositions) {
-            positions = new LinkedHashSet<ElementPosition>(this.steps.size());
+            positions = new LinkedHashSet<>(this.steps.size());
         }
 
         try {
@@ -838,7 +841,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
+        Deque<NonAmbivalentMap> data = new LinkedList<>();
         ParsedValues parsed = status.getRawValues0();
 
         try {
@@ -929,7 +932,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return this;
         }
 
-        return new ChronoFormatter<T>(this, this.globalAttributes.withLocale(locale));
+        return new ChronoFormatter<>(this, this.globalAttributes.withLocale(locale));
 
     }
 
@@ -973,9 +976,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Note that this configuration will override any gregorian cutover date which might be inferred
      * from current locale. </p>
      *
+     * <p>Since version 3.1: The special case if given date is the minimum on the date axis is permitted
+     * and will result in a proleptic gregorian calendar. Note that the proleptic julian calendar is
+     * supported if given date is the maximum on the date axis. </p>
+     *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
-     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
+     *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
      * @since   3.0
      */
@@ -985,16 +993,31 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Zu beachten: Diese Methode wird jedes gregorianische Umstellungsdatum &uuml;berschreiben, das
      * von der L&auml;ndereinstellung dieses Formatierers abgeleitet werden mag. </p>
      *
+     * <p>Seit Version 3.1 gilt: Der Sonderfall der Angabe des Minimums auf der Datumsachse ist zul&auml;ssig
+     * und f&uuml;hrt zu einem rein gregorianischen Kalender ohne Historie. Hinweis: Wenn das angegebene Datum
+     * das Maximum auf der Datumsachse ist, dann f&uuml;hrt diese Einstellung zu einem proleptisch julianischen
+     * Kalender. </p>
+     *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
-     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
+     * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
+     *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
      * @since   3.0
      */
     public ChronoFormatter<T> withGregorianCutOver(PlainDate date) {
 
-        if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
+        ChronoHistory history;
+        PlainDate cutover;
+
+        if (date.equals(PlainDate.axis().getMinimum())) {
+            history = null;
+            cutover = null;
+        } else if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
             throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
+        } else {
+            history = ChronoHistory.ofGregorianReform(date);
+            cutover = date;
         }
 
         AttributeSet as =
@@ -1004,9 +1027,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 this.globalAttributes.getLevel(),
                 this.globalAttributes.getSection(),
                 this.globalAttributes.getCondition(),
-                date);
+                cutover);
 
-        return new ChronoFormatter<T>(this, as, ChronoHistory.ofGregorianReform(date));
+        return new ChronoFormatter<>(this, as, history);
 
     }
 
@@ -1053,7 +1076,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .setTimezone(tzid)
             .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
@@ -1172,7 +1195,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         V value
     ) {
 
-        return new ChronoFormatter<T>(this, element, value);
+        return new ChronoFormatter<>(this, element, value);
 
     }
 
@@ -1206,7 +1229,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .set(key, value)
             .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
@@ -1240,7 +1263,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .set(key, value)
             .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
@@ -1274,7 +1297,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .set(key, value)
             .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
@@ -1310,7 +1333,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .set(key, value)
             .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
@@ -1339,7 +1362,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(this.globalAttributes.getAttributes())
             .setAll(attributes)
             .build();
-        return new ChronoFormatter<T>(this, newAttrs);
+        return new ChronoFormatter<>(this, newAttrs);
 
     }
 
@@ -1483,7 +1506,138 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public Format toFormat() {
 
-        return new TraditionalFormat<T>(this);
+        return new TraditionalFormat<>(this);
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for plain date objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainDate> ofDatePattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainDate> builder = new Builder<>(PlainDate.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for clock time objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r Uhrzeitobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainTime> ofTimePattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainTime> builder = new Builder<>(PlainTime.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for plain timestamps. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r einfache Zeitstempelobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<PlainTimestamp> ofTimestampPattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<PlainTimestamp> builder = new Builder<>(PlainTimestamp.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a pattern-based formatter for global timestamp objects. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   tzid            timezone id
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempelobjekte. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   tzid            timezone id
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @since   3.1
+     */
+    public static ChronoFormatter<Moment> ofMomentPattern(
+        String pattern,
+        PatternType type,
+        Locale locale,
+        TZID tzid
+    ) {
+
+        Builder<Moment> builder = new Builder<>(Moment.class, locale);
+        builder.addPattern(pattern, type);
+        return builder.build().withTimezone(tzid);
 
     }
 
@@ -1514,7 +1668,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        return new Builder<T>(type, locale);
+        return new Builder<>(type, locale);
 
     }
 
@@ -1605,7 +1759,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
+        Deque<NonAmbivalentMap> data = new LinkedList<>();
         ParsedValues parsed = status.getRawValues0();
 
         try {
@@ -2018,8 +2172,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     "Not formattable: " + chronoType);
             }
 
-            this.steps = new ArrayList<FormatStep>();
-            this.stack = new LinkedList<AttributeSet>();
+            this.steps = new ArrayList<>();
+            this.stack = new LinkedList<>();
             this.sectionID = 0;
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
@@ -3158,8 +3312,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     if (replacement.isEmpty()) {
                         replacement = map;
                     } else {
-                        Map<ChronoElement<?>, ChronoElement<?>> tmp =
-                            new HashMap<ChronoElement<?>, ChronoElement<?>>(replacement);
+                        Map<ChronoElement<?>, ChronoElement<?>> tmp = new HashMap<>(replacement);
                         tmp.putAll(map);
                         replacement = tmp;
                     }
@@ -3284,7 +3437,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             } else {
                 // String-Ressource ist enum.toString()
                 Map<V, String> empty = Collections.emptyMap();
-                this.addProcessor(new LookupProcessor<V>(element, empty));
+                this.addProcessor(new LookupProcessor<>(element, empty));
             }
 
             return this;
@@ -3321,7 +3474,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.addProcessor(new LookupProcessor<V>(element, lookup));
+            this.addProcessor(new LookupProcessor<>(element, lookup));
             return this;
 
         }
@@ -3393,7 +3546,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             this.checkElement(element);
             this.addProcessor(
-                new CustomizedProcessor<V>(element, printer, parser));
+                new CustomizedProcessor<>(element, printer, parser));
             return this;
 
         }
@@ -4048,14 +4201,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     cc = printCondition;
                 } else {
                     cc =
-                        new ChronoCondition<ChronoDisplay>(){
-                            @Override
-                            public boolean test(ChronoDisplay context) {
-                                return (
-                                    old.test(context)
-                                    && printCondition.test(context));
-                            }
-                        };
+                        context -> (
+                            old.test(context)
+                            && printCondition.test(context));
                 }
             }
 
@@ -4314,7 +4462,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public ChronoFormatter<T> build() {
 
-            return new ChronoFormatter<T>(
+            return new ChronoFormatter<>(
                 this.chronology,
                 this.locale,
                 this.steps
@@ -4364,7 +4512,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             FormatStep last = this.checkAfterDecimalDigits(element);
 
             NumberProcessor<V> np =
-                new NumberProcessor<V>(
+                new NumberProcessor<>(
                     element,
                     fixedWidth,
                     minDigits,
@@ -4560,8 +4708,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         private static final Map<String, DateFormat.Field> FIELD_MAP;
 
         static {
-            Map<String, DateFormat.Field> map =
-                new HashMap<String, DateFormat.Field>();
+            Map<String, DateFormat.Field> map = new HashMap<>();
             map.put("YEAR", DateFormat.Field.YEAR);
             map.put("YEAR_OF_ERA", DateFormat.Field.YEAR);
             map.put("YEAR_OF_WEEKDATE", DateFormat.Field.YEAR);

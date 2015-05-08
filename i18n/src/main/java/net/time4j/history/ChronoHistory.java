@@ -247,6 +247,9 @@ public final class ChronoHistory
     /**
      * <p>Describes a single switch from julian to gregorian calendar at given date. </p>
      *
+     * <p>Since version 3.1 there are two special cases to consider. If the given date is the maximum/minimum
+     * of the date axis then this method will return the proleptic julian/gregorian {@code ChronoHistory}. </p>
+     *
      * @param   start   calendar date when the gregorian calendar was introduced
      * @return  new chronological history with only one cutover from julian to gregorian calendar
      * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
@@ -256,6 +259,10 @@ public final class ChronoHistory
     /*[deutsch]
      * <p>Beschreibt die Umstellung vom julianischen zum gregorianischen Kalender am angegebenen Datum. </p>
      *
+     * <p>Seit Version 3.1 gibt es zwei Sonderf&auml;lle. Wenn das angegebene Datum das Maximum/Minimum der
+     * Datumsachse darstellt, dann wird diese Methode die proleptisch julianische/gregorianische Variante
+     * von {@code ChronoHistory} zur&uuml;ckgeben. </p>
+     *
      * @param   start   calendar date when the gregorian calendar was introduced
      * @return  new chronological history with only one cutover from julian to gregorian calendar
      * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar on 1582-10-15
@@ -263,6 +270,12 @@ public final class ChronoHistory
      * @since   3.0
      */
     public static ChronoHistory ofGregorianReform(PlainDate start) {
+
+        if (start.equals(PlainDate.axis().getMaximum())) {
+            return ChronoHistory.PROLEPTIC_JULIAN;
+        } else if (start.equals(PlainDate.axis().getMinimum())) {
+            return ChronoHistory.PROLEPTIC_GREGORIAN;
+        }
 
         long mjd = start.get(EpochDays.MODIFIED_JULIAN_DATE);
         check(mjd);
