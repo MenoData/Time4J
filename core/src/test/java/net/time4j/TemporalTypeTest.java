@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.base.TimeSource;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
@@ -248,6 +249,38 @@ public class TemporalTypeTest {
         assertThat(
             TemporalType.THREETEN_PERIOD.from(Duration.of(3, CalendarUnit.WEEKS).inverse()),
             is(Period.ofDays(-21))
+        );
+    }
+
+    @Test
+    public void clockToTime4J() {
+        TimeSource<?> expected = () -> PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC();
+
+        assertThat(
+            TemporalType.CLOCK.translate(
+                Clock.fixed(
+                    LocalDateTime.of(2012, 6, 30, 23, 59, 59).atOffset(ZoneOffset.UTC).toInstant(),
+                    ZoneId.systemDefault())
+            ).currentTime(),
+            is(expected.currentTime())
+        );
+    }
+
+    @Test
+    public void clockFromTime4J() {
+        Moment moment = PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC();
+        if (LeapSeconds.getInstance().isEnabled()) {
+            moment = moment.plus(1, SI.SECONDS);
+        }
+        Moment currentTime = moment;
+        TimeSource<?> time4j = () -> currentTime;
+        assertThat(
+            TemporalType.CLOCK.from(time4j).instant(),
+            is(
+                Clock.fixed(
+                    LocalDateTime.of(2012, 6, 30, 23, 59, 59).atOffset(ZoneOffset.UTC).toInstant(),
+                    ZoneId.systemDefault()
+                ).instant())
         );
     }
 

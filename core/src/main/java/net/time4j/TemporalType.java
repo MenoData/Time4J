@@ -22,11 +22,13 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.TimeSource;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
+import java.time.Clock;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -68,7 +70,7 @@ public abstract class TemporalType<S, T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MIO = 1000000;
+    private static final int MIO = 1000_000;
 
     /**
      * <p>Bridge between a traditional Java timestamp of type
@@ -104,8 +106,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final TemporalType<java.util.Date, Moment> JAVA_UTIL_DATE =
-        new JavaUtilDateRule();
+    public static final TemporalType<java.util.Date, Moment> JAVA_UTIL_DATE = new JavaUtilDateRule();
 
     /**
      * <p>Bridge between a traditional Java timestamp as count of milliseconds
@@ -142,8 +143,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   2.0
      */
-    public static final TemporalType<Long, Moment> MILLIS_SINCE_UNIX =
-        new MillisSinceUnixRule();
+    public static final TemporalType<Long, Moment> MILLIS_SINCE_UNIX = new MillisSinceUnixRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.LocalDate} and
@@ -173,8 +173,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<LocalDate, PlainDate> LOCAL_DATE =
-        new LocalDateRule();
+    public static final TemporalType<LocalDate, PlainDate> LOCAL_DATE = new LocalDateRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.LocalTime} and
@@ -210,8 +209,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<LocalTime, PlainTime> LOCAL_TIME =
-        new LocalTimeRule();
+    public static final TemporalType<LocalTime, PlainTime> LOCAL_TIME = new LocalTimeRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.LocalDateTime} and
@@ -241,8 +239,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<LocalDateTime, PlainTimestamp> LOCAL_DATE_TIME =
-        new LocalDateTimeRule();
+    public static final TemporalType<LocalDateTime, PlainTimestamp> LOCAL_DATE_TIME = new LocalDateTimeRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.Instant} and
@@ -275,8 +272,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<Instant, Moment> INSTANT =
-        new InstantRule();
+    public static final TemporalType<Instant, Moment> INSTANT = new InstantRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.ZonedDateTime} and
@@ -309,8 +305,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<ZonedDateTime, ZonalDateTime> ZONED_DATE_TIME =
-        new ZonedDateTimeRule();
+    public static final TemporalType<ZonedDateTime, ZonalDateTime> ZONED_DATE_TIME = new ZonedDateTimeRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.Duration} and
@@ -342,8 +337,7 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<java.time.Duration, Duration<ClockUnit>> THREETEN_DURATION =
-        new DurationRule();
+    public static final TemporalType<java.time.Duration, Duration<ClockUnit>> THREETEN_DURATION = new DurationRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.Period} and
@@ -375,8 +369,26 @@ public abstract class TemporalType<S, T> {
      *
      * @since   4.0
      */
-    public static final TemporalType<Period, Duration<CalendarUnit>> THREETEN_PERIOD =
-        new PeriodRule();
+    public static final TemporalType<Period, Duration<CalendarUnit>> THREETEN_PERIOD = new PeriodRule();
+
+    /**
+     * <p>Bridge between the JSR-310-class {@code java.time.Clock} and
+     * the class {@code net.time4j.base.TimeSource}. </p>
+     *
+     * <p>The conversion will always ignore leap seconds and initially use {@code ZoneId.systemDefault()}. </p>
+     *
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Clock} und
+     * der Klasse {@code net.time4j.base.TimeSource}. </p>
+     *
+     * <p>Die Konversion wird Schaltsekunden immer ignorieren und initial {@code ZoneId.systemDefault()}
+     * verwenden. </p>
+     *
+     * @since   4.0
+     */
+    public static final TemporalType<Clock, TimeSource<?>> CLOCK = new ClockRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -760,6 +772,87 @@ public abstract class TemporalType<S, T> {
             }
 
             return period;
+
+        }
+
+    }
+
+    private static class ClockRule
+        extends TemporalType<Clock, TimeSource<?>> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public TimeSource<?> translate(Clock source) {
+
+            return () -> TemporalType.INSTANT.translate(source.instant());
+
+        }
+
+        @Override
+        public Clock from(TimeSource<?> time4j) {
+
+            return new DelegateClock(ZoneId.systemDefault(), time4j);
+
+        }
+
+    }
+
+    private static class DelegateClock
+        extends Clock {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final ZoneId zoneId;
+        private final TimeSource<?> source;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private DelegateClock(
+            ZoneId zoneId,
+            TimeSource<?> source
+        ) {
+            super();
+
+            if (source == null) {
+                throw new NullPointerException("Missing time source.");
+            }
+
+            this.zoneId = zoneId;
+            this.source = source;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public ZoneId getZone() {
+
+            return this.zoneId;
+
+        }
+
+        @Override
+        public Clock withZone(ZoneId zoneId) {
+
+            if (zoneId.equals(this.zoneId)) {
+                return this;
+            }
+
+            return new DelegateClock(zoneId, this.source);
+
+        }
+
+        @Override
+        public Instant instant() {
+
+            Moment moment = Moment.from(this.source.currentTime());
+
+            if (moment.isLeapSecond()) {
+                moment = moment.minus(1, SI.SECONDS); // repeat leap second as second 59
+            }
+
+            return TemporalType.INSTANT.from(moment);
 
         }
 
