@@ -33,6 +33,7 @@ import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.time.ZonedDateTime;
 
 import static net.time4j.PlainTime.SECOND_OF_MINUTE;
 import static net.time4j.format.Attributes.TIMEZONE_ID;
@@ -325,6 +326,28 @@ public final class ZonalDateTime
     public PlainTimestamp toTimestamp() {
 
         return this.timestamp;
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.ZONED_DATE_TIME.translate(zdt)}. </p>
+     *
+     * @param   zdt         Threeten-equivalent of a zonal date-time
+     * @return  ZonalDateTime
+     * @since   4.0
+     * @see     TemporalType#ZONED_DATE_TIME
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.ZONED_DATE_TIME.translate(zdt)}. </p>
+     *
+     * @param   zdt         Threeten-equivalent of a zonal date-time
+     * @return  ZonalDateTime
+     * @since   4.0
+     * @see     TemporalType#ZONED_DATE_TIME
+     */
+    public static ZonalDateTime from(ZonedDateTime zdt) {
+
+        return TemporalType.ZONED_DATE_TIME.translate(zdt);
 
     }
 
