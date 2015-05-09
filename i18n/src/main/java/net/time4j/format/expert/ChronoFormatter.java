@@ -61,6 +61,9 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -445,8 +448,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     @Override
     public String format(T formattable) {
 
-        ChronoDisplay display =
-            this.chronology.preformat(formattable, this.globalAttributes);
+        ChronoDisplay display = this.chronology.preformat(formattable, this.globalAttributes);
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
 
         try {
@@ -456,6 +458,42 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         return buffer.toString();
+
+    }
+
+    /**
+     * <p>Prints the given Threeten-object. </p>
+     *
+     * @param   formattable     temporal accessor
+     * @return  formatted text
+     * @throws  IllegalArgumentException if given argument cannot be formatted
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Threeten-Objekt. </p>
+     *
+     * @param   formattable     temporal accessor
+     * @return  formatted text
+     * @throws  IllegalArgumentException if given argument cannot be formatted
+     * @since   4.0
+     */
+    public String format(TemporalAccessor formattable) {
+
+        T entity = this.chronology.createFrom(formattable, this.globalAttributes);
+
+        if (entity == null) {
+            throw new IllegalArgumentException("Insufficient data to convert temporal accessor: " + formattable);
+        }
+
+        if (!this.getAttributes().contains(Attributes.TIMEZONE_ID)) {
+            ZoneId zoneId = formattable.query(TemporalQueries.zone());
+
+            if (zoneId != null) {
+                return this.withTimezone(zoneId.getId()).format(entity);
+            }
+        }
+
+        return this.format(entity);
 
     }
 

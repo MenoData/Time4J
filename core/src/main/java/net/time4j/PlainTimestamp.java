@@ -59,6 +59,8 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1301,6 +1303,23 @@ public final class PlainTimestamp
 
             final UnixTime ut = clock.currentTime();
             return PlainTimestamp.from(ut, zone.getOffset(ut));
+
+        }
+
+        @Override
+        public PlainTimestamp createFrom(
+            TemporalAccessor threeten,
+            AttributeQuery attributes
+        ) {
+
+            PlainDate date = PlainDate.axis().createFrom(threeten, attributes);
+            PlainTime time = PlainTime.axis().createFrom(threeten, attributes);
+
+            if ((date != null) && (time != null)) {
+                return PlainTimestamp.of(date, time);
+            }
+
+            return null;
 
         }
 

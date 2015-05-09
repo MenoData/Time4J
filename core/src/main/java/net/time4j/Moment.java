@@ -64,6 +64,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -2471,6 +2475,56 @@ public final class Moment
         ) {
 
             return Moment.from(clock.currentTime());
+
+        }
+
+        @Override
+        public Moment createFrom(
+            TemporalAccessor threeten,
+            AttributeQuery attributes
+        ) {
+
+            if (threeten.isSupported(ChronoField.INSTANT_SECONDS)) {
+                long secs = threeten.getLong(ChronoField.INSTANT_SECONDS);
+                int nano = 0;
+
+                if (threeten.isSupported(ChronoField.NANO_OF_SECOND)) {
+                    nano = threeten.get(ChronoField.NANO_OF_SECOND);
+                }
+
+                Moment moment = Moment.of(secs, nano, TimeScale.POSIX);
+
+                if (threeten.query(DateTimeFormatter.parsedLeapSecond())) {
+                    moment = moment.plus(1, SI.SECONDS);
+                    if (!moment.isLeapSecond()) {
+                        throw new IllegalArgumentException("Parsed leap second is invalid.");
+                    }
+                }
+
+                return moment;
+            } else {
+                PlainTimestamp tsp = PlainTimestamp.axis().createFrom(threeten, attributes);
+
+                if (tsp != null) {
+                    TZID tzid = null;
+
+                    if (attributes.contains(Attributes.TIMEZONE_ID)) {
+                        tzid = attributes.get(Attributes.TIMEZONE_ID); // Ersatzwert
+                    }
+
+                    if (tzid != null) {
+                        if (attributes.contains(Attributes.TRANSITION_STRATEGY)) {
+                            TransitionStrategy strategy = attributes.get(Attributes.TRANSITION_STRATEGY);
+                            return tsp.in(Timezone.of(tzid).with(strategy));
+                        } else {
+                            return tsp.inTimezone(tzid);
+                        }
+                    }
+
+                }
+            }
+
+            return null;
 
         }
 

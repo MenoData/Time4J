@@ -25,6 +25,7 @@ import net.time4j.base.TimeSource;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,10 +54,8 @@ public class Chronology<T extends ChronoEntity<T>>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final List<ChronoReference> CHRONOS =
-        new CopyOnWriteArrayList<ChronoReference>();
-    private static final ReferenceQueue<Chronology<?>> QUEUE =
-        new ReferenceQueue<Chronology<?>>();
+    private static final List<ChronoReference> CHRONOS = new CopyOnWriteArrayList<>();
+    private static final ReferenceQueue<Chronology<?>> QUEUE = new ReferenceQueue<>();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -194,11 +193,17 @@ public class Chronology<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) {
 
-        if (attributes == null) {
-            throw new NullPointerException("Missing attributes.");
-        }
-
         return this.merger.createFrom(clock, attributes);
+
+    }
+
+    @Override
+    public T createFrom(
+        TemporalAccessor threeten,
+        AttributeQuery attributes
+    ) {
+
+        return this.merger.createFrom(threeten, attributes);
 
     }
 
@@ -208,10 +213,6 @@ public class Chronology<T extends ChronoEntity<T>>
         AttributeQuery attributes,
         boolean preparsing
     ) {
-
-        if (attributes == null) {
-            throw new NullPointerException("Missing attributes.");
-        }
 
         return this.merger.createFrom(entity, attributes, preparsing);
 
@@ -504,8 +505,8 @@ public class Chronology<T extends ChronoEntity<T>>
 
             this.chronoType = chronoType;
             this.merger = merger;
-            this.ruleMap = new HashMap<ChronoElement<?>, ElementRule<T, ?>>();
-            this.extensions = new ArrayList<ChronoExtension>();
+            this.ruleMap = new HashMap<>();
+            this.extensions = new ArrayList<>();
 
         }
 
@@ -545,7 +546,7 @@ public class Chronology<T extends ChronoEntity<T>>
                     + "with a time axis, use TimeAxis.Builder instead.");
             }
 
-            return new Builder<T>(chronoType, chronoMerger);
+            return new Builder<>(chronoType, chronoMerger);
 
         }
 
@@ -635,7 +636,7 @@ public class Chronology<T extends ChronoEntity<T>>
         public Chronology<T> build() {
 
             final Chronology<T> chronology =
-                new Chronology<T>(
+                new Chronology<>(
                     this.chronoType,
                     this.merger,
                     this.ruleMap,

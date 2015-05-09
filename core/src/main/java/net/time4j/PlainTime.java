@@ -54,6 +54,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.time.LocalTime;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -3260,6 +3264,30 @@ public final class PlainTime
 
             final UnixTime ut = clock.currentTime();
             return PlainTime.from(ut, zone.getOffset(ut));
+
+        }
+
+        @Override
+        public PlainTime createFrom(
+            TemporalAccessor threeten,
+            AttributeQuery attributes
+        ) {
+
+            // lax mode not supported, we only look for existing complete types like OffsetTime etc.
+            LocalTime localTime = threeten.query(TemporalQueries.localTime());
+
+            if (localTime != null) {
+                if (
+                    localTime.equals(LocalTime.MIDNIGHT)
+                    && threeten.query(DateTimeFormatter.parsedExcessDays()).equals(Period.ofDays(1))
+                ) {
+                    return PlainTime.midnightAtEndOfDay();
+                } else {
+                    return TemporalType.LOCAL_TIME.translate(localTime);
+                }
+            }
+
+            return null;
 
         }
 

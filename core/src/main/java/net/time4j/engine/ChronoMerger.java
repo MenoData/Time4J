@@ -23,6 +23,10 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
+
 
 /**
  * <p>Merges any set of chronological informations to a new chronological
@@ -192,5 +196,41 @@ public interface ChronoMerger<T> {
      * @return  preparsing chronology or {@code null}
      */
     Chronology<?> preparser();
+
+    /**
+     * <p>Creates a new entity of type T based on given chronological
+     * data. </p>
+     *
+     * <p>The default implementation always returns {@code null} so subclasses
+     * with better knowledge about their own state and needs should override it. </p>
+     *
+     * @param   threeten        object of type {@code TemporalAccessor}
+     * @param   attributes      configuration attributes given by parser
+     * @return  new time context or {@code null} if given data are insufficient
+     * @throws  IllegalArgumentException in any case of inconsistent data
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Konstruiert eine neue Entit&auml;t basierend auf den angegebenen
+     * chronologischen Daten. </p>
+     *
+     * <p>Die Standardimplementierung liefert immer {@code null}, so da&szlig;
+     * Subklassen mit besserer Kenntnis ihres Zustands und ihrer Anforderungen
+     * diese Methode &uuml;berschreiben sollten. </p>
+     *
+     * @param   threeten        object of type {@code TemporalAccessor}
+     * @param   attributes      configuration attributes given by parser
+     * @return  new time context or {@code null} if given data are insufficient
+     * @throws  IllegalArgumentException in any case of inconsistent data
+     * @since   4.0
+     */
+    default T createFrom(
+        TemporalAccessor threeten,
+        AttributeQuery attributes
+    ) {
+
+        return null;
+
+    }
 
 }
