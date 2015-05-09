@@ -548,6 +548,52 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Short cut for {@code TemporalType.THREETEN_DURATION.translate(threetenDuration)}. </p>
+     *
+     * @param   threetenDuration    Threeten-equivalent of a clock duration
+     * @return  Duration
+     * @since   4.0
+     * @see     TemporalType#THREETEN_DURATION
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.THREETEN_DURATION.translate(threetenDuration)}. </p>
+     *
+     * @param   threetenDuration    Threeten-equivalent of a clock duration
+     * @return  Duration
+     * @since   4.0
+     * @see     TemporalType#THREETEN_DURATION
+     */
+    public static Duration<ClockUnit> from(java.time.Duration threetenDuration) {
+
+        return TemporalType.THREETEN_DURATION.translate(threetenDuration);
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.THREETEN_PERIOD.translate(threetenPeriod)}. </p>
+     *
+     * @param   threetenPeriod    Threeten-equivalent of a calendar duration
+     * @return  Duration
+     * @throws  ChronoException if conversion fails due to mixed signs
+     * @since   4.0
+     * @see     TemporalType#THREETEN_PERIOD
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.THREETEN_PERIOD.translate(threetenPeriod)}. </p>
+     *
+     * @param   threetenPeriod    Threeten-equivalent of a calendar duration
+     * @return  Duration
+     * @throws  ChronoException if conversion fails due to mixed signs
+     * @since   4.0
+     * @see     TemporalType#THREETEN_PERIOD
+     */
+    public static Duration<CalendarUnit> from(java.time.Period threetenPeriod) {
+
+        return TemporalType.THREETEN_PERIOD.translate(threetenPeriod);
+
+    }
+
+    /**
      * <p>Constructs a metric for any kind of standard units in
      * normalized form. </p>
      *
