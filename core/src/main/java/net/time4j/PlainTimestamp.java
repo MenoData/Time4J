@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -195,8 +196,7 @@ public final class PlainTimestamp
     private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
 
     static {
-        Map<Object, ChronoElement<?>> children =
-            new HashMap<Object, ChronoElement<?>>();
+        Map<Object, ChronoElement<?>> children = new HashMap<>();
         children.put(CALENDAR_DATE, WALL_TIME);
         children.put(YEAR, MONTH_AS_NUMBER);
         children.put(YEAR_OF_WEEKDATE, Weekmodel.ISO.weekOfYear());
@@ -505,6 +505,28 @@ public final class PlainTimestamp
             PlainDate.of(year, month, dayOfMonth),
             PlainTime.of(hour, minute, second)
         );
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.LOCAL_DATE_TIME.translate(ldt)}. </p>
+     *
+     * @param   ldt    Threeten-equivalent of this instance
+     * @return  PlainTimestamp
+     * @since   4.0
+     * @see     TemporalType#LOCAL_DATE_TIME
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.LOCAL_DATE_TIME.translate(ldt)}. </p>
+     *
+     * @param   ldt    Threeten-equivalent of this instance
+     * @return  PlainTimestamp
+     * @since   4.0
+     * @see     TemporalType#LOCAL_DATE_TIME
+     */
+    public static PlainTimestamp from(LocalDateTime ldt) {
+
+        return TemporalType.LOCAL_DATE_TIME.translate(ldt);
 
     }
 
@@ -1403,7 +1425,7 @@ public final class PlainTimestamp
 
         static <V> FieldRule<V> of(ChronoElement<V> element) {
 
-            return new FieldRule<V>(element);
+            return new FieldRule<>(element);
 
         }
 

@@ -53,6 +53,7 @@ import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.time.LocalTime;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -895,7 +896,7 @@ public final class PlainTime
     private static final Map<String, Object> ELEMENTS;
 
     static {
-        Map<String, Object> constants = new HashMap<String, Object>();
+        Map<String, Object> constants = new HashMap<>();
         fill(constants, WALL_TIME);
         fill(constants, AM_PM_OF_DAY);
         fill(constants, CLOCK_HOUR_OF_AMPM);
@@ -1302,6 +1303,28 @@ public final class PlainTime
                 time.getSecond(),
                 time.getNanosecond());
         }
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.LOCAL_TIME.translate(time)}. </p>
+     *
+     * @param   time    Threeten-equivalent of this instance
+     * @return  PlainTime
+     * @since   4.0
+     * @see     TemporalType#LOCAL_TIME
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.LOCAL_TIME.translate(time)}. </p>
+     *
+     * @param   time    Threeten-equivalent of this instance
+     * @return  PlainTime
+     * @since   4.0
+     * @see     TemporalType#LOCAL_TIME
+     */
+    public static PlainTime from(LocalTime time) {
+
+        return TemporalType.LOCAL_TIME.translate(time);
 
     }
 

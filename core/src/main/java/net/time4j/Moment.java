@@ -63,6 +63,7 @@ import java.io.ObjectOutput;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -202,7 +203,7 @@ public final class Moment
     private static final Map<TimeUnit, Double> UNIT_LENGTHS;
 
     static {
-        Set<ChronoElement<?>> high = new HashSet<ChronoElement<?>>();
+        Set<ChronoElement<?>> high = new HashSet<>();
         high.add(ISO_HOUR);
         high.add(DIGITAL_HOUR_OF_DAY);
         high.add(DIGITAL_HOUR_OF_AMPM);
@@ -213,8 +214,7 @@ public final class Moment
         high.add(MINUTE_OF_DAY);
         HIGH_TIME_ELEMENTS = Collections.unmodifiableSet(high);
 
-        Map<ChronoElement<?>, Integer> low =
-            new HashMap<ChronoElement<?>, Integer>();
+        Map<ChronoElement<?>, Integer> low = new HashMap<>();
         low.put(SECOND_OF_MINUTE, Integer.valueOf(1));
         low.put(SECOND_OF_DAY, Integer.valueOf(1));
         low.put(MILLI_OF_SECOND, Integer.valueOf(1000));
@@ -225,8 +225,7 @@ public final class Moment
         low.put(NANO_OF_DAY, Integer.valueOf(MRD));
         LOW_TIME_ELEMENTS = Collections.unmodifiableMap(low);
 
-        Map<TimeUnit, Double> unitLengths =
-            new EnumMap<TimeUnit, Double>(TimeUnit.class);
+        Map<TimeUnit, Double> unitLengths = new EnumMap<>(TimeUnit.class);
         unitLengths.put(TimeUnit.DAYS, 86400.0);
         unitLengths.put(TimeUnit.HOURS, 3600.0);
         unitLengths.put(TimeUnit.MINUTES, 60.0);
@@ -514,6 +513,28 @@ public final class Moment
                 ut.getNanosecond(),
                 POSIX);
         }
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.INSTANT.translate(instant)}. </p>
+     *
+     * @param   instant    Threeten-equivalent of this instance
+     * @return  Moment
+     * @since   4.0
+     * @see     TemporalType#INSTANT
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.INSTANT.translate(instant)}. </p>
+     *
+     * @param   instant    Threeten-equivalent of this instance
+     * @return  Moment
+     * @since   4.0
+     * @see     TemporalType#INSTANT
+     */
+    public static Moment from(Instant instant) {
+
+        return TemporalType.INSTANT.translate(instant);
 
     }
 

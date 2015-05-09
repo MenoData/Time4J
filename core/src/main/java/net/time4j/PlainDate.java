@@ -60,6 +60,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -363,7 +364,7 @@ public final class PlainDate
      */
     @FormattableElement(format = "Q", standalone="q")
     public static final NavigableElement<Quarter> QUARTER_OF_YEAR =
-        new EnumElement<Quarter>(
+        new EnumElement<>(
             "QUARTER_OF_YEAR",
             Quarter.class,
             Quarter.Q1,
@@ -437,7 +438,7 @@ public final class PlainDate
      */
     @FormattableElement(format = "M", standalone="L")
     public static final NavigableElement<Month> MONTH_OF_YEAR =
-        new EnumElement<Month>(
+        new EnumElement<>(
             "MONTH_OF_YEAR",
             Month.class,
             Month.JANUARY,
@@ -531,7 +532,7 @@ public final class PlainDate
      */
     @FormattableElement(format = "E")
     public static final NavigableElement<Weekday> DAY_OF_WEEK =
-        new EnumElement<Weekday>(
+        new EnumElement<>(
             "DAY_OF_WEEK",
             Weekday.class,
             Weekday.MONDAY,
@@ -613,7 +614,7 @@ public final class PlainDate
     private static final TimeAxis<IsoDateUnit, PlainDate> ENGINE;
 
     static {
-        Map<String, Object> constants = new HashMap<String, Object>();
+        Map<String, Object> constants = new HashMap<>();
         fill(constants, CALENDAR_DATE);
         fill(constants, YEAR);
         fill(constants, YEAR_OF_WEEKDATE);
@@ -893,6 +894,28 @@ public final class PlainDate
             return PlainDate.of(
                 date.getYear(), date.getMonth(), date.getDayOfMonth());
         }
+
+    }
+
+    /**
+     * <p>Short cut for {@code TemporalType.LOCAL_DATE.translate(date)}. </p>
+     *
+     * @param   date    Threeten-equivalent of this instance
+     * @return  PlainDate
+     * @since   4.0
+     * @see     TemporalType#LOCAL_DATE
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.LOCAL_DATE.translate(date)}. </p>
+     *
+     * @param   date    Threeten-equivalent of this instance
+     * @return  PlainDate
+     * @since   4.0
+     * @see     TemporalType#LOCAL_DATE
+     */
+    public static PlainDate from(LocalDate date) {
+
+        return TemporalType.LOCAL_DATE.translate(date);
 
     }
 
@@ -1933,7 +1956,7 @@ public final class PlainDate
         for (CalendarUnit unit : CalendarUnit.values()) {
             builder.appendUnit(
                 unit,
-                new CalendarUnit.Rule<PlainDate>(unit),
+                new CalendarUnit.Rule<>(unit),
                 unit.getLength(),
                 (unit.compareTo(CalendarUnit.WEEKS) < 0) ? monthly : daily
             );
@@ -2829,7 +2852,7 @@ public final class PlainDate
 
         static <V extends Enum<V>> EnumElementRule<V> of(ChronoElement<V> element) {
 
-            return new EnumElementRule<V>(
+            return new EnumElementRule<>(
                 element.name(),
                 element.getType(),
                 element.getDefaultMinimum(),

@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -283,7 +285,16 @@ public class DateCreationTest {
                 new Attributes.Builder()
                     .set(Attributes.LENIENCY, Leniency.LAX).build(),
                 false),
-        is(PlainDate.of(1970, 1, 1)));
+            is(PlainDate.of(1970, 1, 1)));
+    }
+
+    @Test
+    public void fromLocalDate() {
+        LocalDate input = LocalDate.of(2015, 5, 9);
+        assertThat(
+            PlainDate.from(input),
+            is(PlainDate.of(2015, 5, 9))
+        );
     }
 
 }
