@@ -164,13 +164,13 @@ public final class ChronoHistory
         EARLIEST_CUTOVER = PlainDate.of(1582, 10, 15).get(EpochDays.MODIFIED_JULIAN_DATE);
         INTRODUCTION_BY_POPE_GREGOR = ChronoHistory.ofGregorianReform(EARLIEST_CUTOVER);
 
-        List<CutOverEvent> events = new ArrayList<CutOverEvent>();
+        List<CutOverEvent> events = new ArrayList<>();
         events.add(new CutOverEvent(-57959, CalendarAlgorithm.JULIAN, CalendarAlgorithm.SWEDISH)); // 1700-03-01
         events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
         events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
         SWEDEN = new ChronoHistory(VARIANT_SWEDEN, Collections.unmodifiableList(events));
 
-        Map<String, ChronoHistory> tmp = new HashMap<String, ChronoHistory>();
+        Map<String, ChronoHistory> tmp = new HashMap<>();
         tmp.put("GB", ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14)));
         tmp.put("RU", ChronoHistory.ofGregorianReform(PlainDate.of(1918, 2, 14)));
         tmp.put("SE", SWEDEN);
@@ -211,7 +211,7 @@ public final class ChronoHistory
         this.monthElement = HistoricalIntegerElement.forMonth(this);
         this.dayOfMonthElement = HistoricalIntegerElement.forDayOfMonth(this);
 
-        Set<ChronoElement<?>> tmp = new HashSet<ChronoElement<?>>();
+        Set<ChronoElement<?>> tmp = new HashSet<>();
         tmp.add(this.eraElement);
         tmp.add(this.yearOfEraElement);
         tmp.add(this.monthElement);
@@ -811,7 +811,7 @@ public final class ChronoHistory
             Class<T> type
         ) {
 
-            return new Key<T>(name, type);
+            return new Key<>(name, type);
 
         }
 
