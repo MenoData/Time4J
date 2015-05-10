@@ -819,6 +819,30 @@ public final class ZonalOffset
      * GMT-prefix is NOT canonical and outdated from a scientific
      * point of view. </p>
      *
+     * <p>Examples for supported formats: </p>
+     *
+     * <ul>
+     *     <li>UTC+5</li>
+     *     <li>UTC+05</li>
+     *     <li>UTC+5:30</li>
+     *     <li>UTC+05:30</li>
+     *     <li>UTC+5:30:21</li>
+     *     <li>UTC+05:30:21</li>
+     *     <li>UTC+5:30:21.123456789</li>
+     *     <li>UTC+05:30:21.123456789</li>
+     *     <li>+5</li>
+     *     <li>+05</li>
+     *     <li>+5:30</li>
+     *     <li>+05:30</li>
+     *     <li>+5:30:21</li>
+     *     <li>+05:30:21</li>
+     *     <li>+5:30:21.123456789</li>
+     *     <li>+05:30:21.123456789</li>
+     * </ul>
+     *
+     * <p>Note: All formats containing only the hour or the hour with only one digit
+     * are first supported in version 3.1 or later. </p>
+     *
      * @param   canonical       zonal offset in canonical form to be parsed
      * @return  parsed {@code ZonalOffset}
      * @throws  IllegalArgumentException if given input is not canonical
@@ -835,6 +859,30 @@ public final class ZonalOffset
      * irgendeine benutzerdefinierte Darstellung zu interpretieren. Zu
      * beachten: Die Verwendung des GMT-Pr&auml;fix ist NICHT kanonisch
      * und von einem wissenschaftlichen Standpunkt aus gesehen veraltet. </p>
+     *
+     * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     *
+     * <ul>
+     *     <li>UTC+5</li>
+     *     <li>UTC+05</li>
+     *     <li>UTC+5:30</li>
+     *     <li>UTC+05:30</li>
+     *     <li>UTC+5:30:21</li>
+     *     <li>UTC+05:30:21</li>
+     *     <li>UTC+5:30:21.123456789</li>
+     *     <li>UTC+05:30:21.123456789</li>
+     *     <li>+5</li>
+     *     <li>+05</li>
+     *     <li>+5:30</li>
+     *     <li>+05:30</li>
+     *     <li>+5:30:21</li>
+     *     <li>+05:30:21</li>
+     *     <li>+5:30:21.123456789</li>
+     *     <li>+05:30:21.123456789</li>
+     * </ul>
+     *
+     * <p>Anmerkung: Alle Formate mit einem einstelligen Stundenanteil oder nur mit Stundenanteil
+     * werden erst seit Version 3.1 unterst&uuml;tzt. </p>
      *
      * @param   canonical       zonal offset in canonical form to be parsed
      * @return  parsed {@code ZonalOffset}
@@ -888,7 +936,7 @@ public final class ZonalOffset
             }
         }
 
-        if (n >= 6) {
+        if (n >= 2) {
             OffsetSign sign = null;
 
             if (test.charAt(0) == '-') {
@@ -898,39 +946,51 @@ public final class ZonalOffset
             }
 
             int hours = parse(test, 1, 2);
-            int minutes = parse(test, 4, 2);
 
-            if (
-                (hours >= 0)
-                && (test.charAt(3) == ':')
-                && (minutes >= 0)
-            ) {
-                if (n == 6) {
-                    return ZonalOffset.ofHoursMinutes(sign, hours, minutes);
-                } else if (
-                    (n >= 9)
-                    && (test.charAt(6) == ':')
+            if (hours >= 0) {
+                if (n <= 3){
+                    return ZonalOffset.ofHours(sign, hours);
+                }
+
+                int start = 4;
+
+                if ((test.charAt(2) == ':')) {
+                    start = 3;
+                }
+
+                int minutes = parse(test, start, 2);
+
+                if (
+                    (test.charAt(start - 1) == ':')
+                    && (minutes >= 0)
                 ) {
-                    int seconds = parse(test, 7, 2);
-                    if (seconds >= 0) {
-                        int total = hours * 3600 + minutes * 60 + seconds;
-                        if (sign == OffsetSign.BEHIND_UTC) {
-                            total = -total;
-                        }
-                        if (n == 9) {
-                            return ZonalOffset.ofTotalSeconds(total);
-                        } else if (
-                            (n == 19)
-                            && (test.charAt(9) == '.')
-                        ) {
-                            int fraction = parse(test, 10, 9);
-                            if (fraction >= 0) {
-                                if (sign == OffsetSign.BEHIND_UTC) {
-                                    fraction = -fraction;
+                    if (n == start + 2) {
+                        return ZonalOffset.ofHoursMinutes(sign, hours, minutes);
+                    } else if (
+                        (n >= start + 5)
+                        && (test.charAt(start + 2) == ':')
+                    ) {
+                        int seconds = parse(test, start + 3, 2);
+                        if (seconds >= 0) {
+                            int total = hours * 3600 + minutes * 60 + seconds;
+                            if (sign == OffsetSign.BEHIND_UTC) {
+                                total = -total;
+                            }
+                            if (n == start + 5) {
+                                return ZonalOffset.ofTotalSeconds(total);
+                            } else if (
+                                (n == start + 15)
+                                && (test.charAt(start + 5) == '.')
+                            ) {
+                                int fraction = parse(test, start + 6, 9);
+                                if (fraction >= 0) {
+                                    if (sign == OffsetSign.BEHIND_UTC) {
+                                        fraction = -fraction;
+                                    }
+                                    return ZonalOffset.ofTotalSeconds(
+                                        total,
+                                        fraction);
                                 }
-                                return ZonalOffset.ofTotalSeconds(
-                                    total,
-                                    fraction);
                             }
                         }
                     }
@@ -964,14 +1024,18 @@ public final class ZonalOffset
         int len
     ) {
 
-        int amount = 0;
+        int amount = -1;
 
-        for (int i = 0; i < len; i++) {
+        for (int i = 0, n = Math.min(offset.length() - index, len); i < n; i++) {
             char c = offset.charAt(index + i);
             if ((c >= '0') && (c <= '9')) {
-                amount = amount * 10 + (c - '0');
+                if (amount == -1) {
+                    amount = (c - '0');
+                } else {
+                    amount = amount * 10 + (c - '0');
+                }
             } else {
-                return -1;
+                break;
             }
         }
 
