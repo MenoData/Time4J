@@ -1,12 +1,16 @@
 package net.time4j.format.expert;
 
 import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.Leniency;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.HijrahDate;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -77,6 +81,27 @@ public class ThreetenFormatTest {
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         formatter.format(zdt.toInstant());
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void formatHijrahDate1() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
+                .addPattern("yyyy-MM-dd", PatternType.CLDR).build();
+        HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
+        formatter.with(Leniency.STRICT).format(date);
+    }
+
+    @Test
+    public void formatHijrahDate2() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
+                .addPattern("yyyy-MM-dd", PatternType.CLDR).build();
+        HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
+        assertThat(
+            formatter.format(date),
+            is("2015-08-21"));
+    }
+
 /*
     // for comparison: using Time4J-types is more strict
     // -> printing PlainTimestamp with Moment-formatter is not compilable

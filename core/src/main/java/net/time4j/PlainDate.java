@@ -2158,9 +2158,10 @@ public final class PlainDate
             AttributeQuery attributes
         ) {
 
+            Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
+
             if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
                 if (threeten.isSupported(ChronoField.YEAR)) {
-                    Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
                     int year = threeten.get(ChronoField.YEAR);
 
                     if (
@@ -2186,6 +2187,13 @@ public final class PlainDate
                         }
                     }
                 }
+            } else if (
+                threeten.isSupported(ChronoField.EPOCH_DAY)
+                && !leniency.isStrict()
+            ) {
+                return PlainDate.of(
+                    threeten.getLong(ChronoField.EPOCH_DAY),
+                    EpochDays.UNIX);
             }
 
             return null;
