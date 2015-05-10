@@ -1,11 +1,9 @@
 package net.time4j.format.expert;
 
-import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.TemporalType;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
@@ -598,6 +596,41 @@ public class MiscellaneousTest {
         assertThat(
             ZonalDateTime.parse("2012-07-01T08:59:60+09:00", formatter),
             is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
+    }
+
+    @Test
+    public void formatPlainTimestampWithOffset() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
+        assertThat(
+            formatter.withTimezone("UTC+2").format(PlainTimestamp.of(2015, 3, 29, 2, 30)),
+            is("2015-03-29T02:30+02:00")
+        );
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void formatPlainTimestampWithEuropeBerlin1() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mm[VV]", PatternType.CLDR).build();
+        formatter.withTimezone("Europe/Berlin").format(PlainTimestamp.of(2015, 3, 29, 2, 30));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void formatPlainTimestampWithEuropeBerlin2() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
+        formatter.withTimezone("Europe/Berlin").format(PlainTimestamp.of(2015, 3, 29, 2, 30));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void formatPlainTimestampWithEuropeBerlin3() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mm[z]", PatternType.CLDR).build();
+        formatter.withTimezone("Europe/Berlin").format(PlainTimestamp.of(2015, 3, 29, 2, 30));
     }
 
     @Test
