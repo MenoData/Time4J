@@ -102,18 +102,4 @@ public class ThreetenFormatTest {
             is("2015-08-21"));
     }
 
-/*
-    // for comparison: using Time4J-types is more strict
-    // -> printing PlainTimestamp with Moment-formatter is not compilable
-    @Test
-    public void formatPlainTimestamp() {
-        ChronoFormatter<PlainTimestamp> formatter =
-            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        assertThat(
-            formatter.withTimezone("UTC+02:00").format(PlainTimestamp.of(2015, 3, 29, 2, 30)),
-            is("2015-03-29T02:30+02:00")
-        );
-    }
-*/
 }

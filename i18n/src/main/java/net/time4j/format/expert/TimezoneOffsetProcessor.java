@@ -489,12 +489,20 @@ final class TimezoneOffsetProcessor
 
             if (tzid instanceof ZonalOffset) {
                 return (ZonalOffset) tzid;
+            } else if (tzid != null) {
+                throw new IllegalArgumentException(
+                    "Use a timezone offset instead of ["
+                    + tzid.canonical()
+                    + "] when formatting ["
+                    + formattable
+                    + "].");
             }
         }
 
         throw new IllegalArgumentException(
-            "Cannot extract timezone offset from format attributes for: "
-            + formattable);
+            "Cannot extract timezone offset from format attributes for: ["
+            + formattable
+            + "]");
 
     }
 
