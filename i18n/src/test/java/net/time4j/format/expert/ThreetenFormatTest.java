@@ -29,12 +29,31 @@ public class ThreetenFormatTest {
         );
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class) // no offset
     public void formatLocalDateTime2() {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.ROOT)
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         formatter.format(LocalDateTime.of(2015, 3, 29, 2, 30));
+    }
+
+    @Test
+    public void formatLocalDateTime3() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
+        assertThat(
+            formatter.withTimezone("UTC+2").format(LocalDateTime.of(2015, 3, 29, 2, 30)),
+            is("2015-03-29T02:30+02:00")
+        );
+    }
+
+    @Test(expected=IllegalArgumentException.class) // use offset instead of timezone id
+    public void formatLocalDateTime4() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
+        formatter.withTimezone("Europe/Berlin").format(LocalDateTime.of(2015, 3, 29, 2, 30));
     }
 
     @Test
@@ -73,7 +92,7 @@ public class ThreetenFormatTest {
         );
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class) // no timezone id
     public void formatInstant2() {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.ROOT)
@@ -82,7 +101,7 @@ public class ThreetenFormatTest {
         formatter.format(zdt.toInstant());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=IllegalArgumentException.class) // non-iso in strict mode
     public void formatHijrahDate1() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
