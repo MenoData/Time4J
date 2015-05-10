@@ -1,11 +1,9 @@
 package net.time4j.format.expert;
 
-import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.TemporalType;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
@@ -20,6 +18,9 @@ import net.time4j.scale.TimeScale;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,14 +32,8 @@ import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Locale;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static org.hamcrest.CoreMatchers.is;
@@ -611,58 +606,6 @@ public class MiscellaneousTest {
         Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2012-02-29", plog);
         Object obj = plog.getRawValues();
         roundtrip(obj);
-    }
-
-    @Test
-    public void formatThreeten1() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        assertThat(
-            formatter.withTimezone("Europe/Berlin").format(LocalDateTime.of(2015, 3, 29, 2, 30)),
-            is("2015-03-29T03:30+02:00")
-        );
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void formatThreeten2() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        formatter.format(LocalDateTime.of(2015, 3, 29, 2, 30));
-    }
-
-    @Test
-    public void formatThreeten3() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
-        assertThat(
-            formatter.format(zdt),
-            is("2015-03-29T03:30+02:00")
-        );
-    }
-
-    @Test
-    public void formatThreeten4() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
-        assertThat(
-            formatter.withTimezone("Europe/Berlin").format(zdt.toInstant()),
-            is("2015-03-29T03:30+02:00")
-        );
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void formatThreeten5() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT)
-                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
-        formatter.format(zdt.toInstant());
     }
 
     private static int roundtrip(Object... obj)

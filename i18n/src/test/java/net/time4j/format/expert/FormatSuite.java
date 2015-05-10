@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OffsetPatternTest.class,
         OrdinalTest.class,
         ParsingTextOverflowTest.class,
+        ThreetenFormatTest.class,
         WhitespaceTest.class
     }
 )
