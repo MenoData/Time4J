@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecimalTimeElement.java) is part of project Time4J.
  *
@@ -24,7 +24,6 @@ package net.time4j;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
-import net.time4j.format.NumericalElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -32,7 +31,6 @@ import net.time4j.tz.ZonalOffset;
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 
 /**
@@ -43,7 +41,7 @@ import java.math.RoundingMode;
  */
 final class DecimalTimeElement
     extends BasicElement<BigDecimal>
-    implements ZonalElement<BigDecimal>, NumericalElement<BigDecimal> {
+    implements ZonalElement<BigDecimal> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -77,15 +75,6 @@ final class DecimalTimeElement
     public Class<BigDecimal> getType() {
 
         return BigDecimal.class;
-
-    }
-
-    // TODO: Notwendigkeit prüfen, evtl. verzichtbar wg. direkter Typprüfung,
-    //       oder in ChronoFormatter.Builder eine Methode addDecimal() einbauen!
-    @Override
-    public int numerical(BigDecimal value) {
-
-        return value.setScale(9, RoundingMode.FLOOR).intValue();
 
     }
 
@@ -144,7 +133,7 @@ final class DecimalTimeElement
     @Override
     public ChronoFunction<Moment, BigDecimal> in(Timezone tz) {
 
-        return new ZonalQuery<BigDecimal>(this, tz);
+        return new ZonalQuery<>(this, tz);
 
     }
 
@@ -158,7 +147,7 @@ final class DecimalTimeElement
     @Override
     public ChronoFunction<Moment, BigDecimal> at(ZonalOffset offset) {
 
-        return new ZonalQuery<BigDecimal>(this, offset);
+        return new ZonalQuery<>(this, offset);
 
     }
 
