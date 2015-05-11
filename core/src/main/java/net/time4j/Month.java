@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Month.java) is part of project Time4J.
  *
@@ -48,7 +48,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @author  Meno Hochschild
  */
 public enum Month
-    implements ChronoCondition<GregorianDate> { // TODO: ChronoOperator
+    implements ChronoCondition<GregorianDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

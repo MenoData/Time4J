@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekday.java) is part of project Time4J.
  *
@@ -50,7 +50,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @author  Meno Hochschild
  */
 public enum Weekday
-    implements ChronoCondition<GregorianDate> { // TODO: ChronoOperator
+    implements ChronoCondition<GregorianDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -89,8 +89,7 @@ public enum Weekday
     /**
      * <p>Gets the corresponding numerical ISO-value. </p>
      *
-     * @return  (monday=1, tuesday=2, wednesday=3, thursday=4, friday=5,
-     *          saturday=6, sunday=7)
+     * @return  {@code monday=1, tuesday=2, wednesday=3, thursday=4, friday=5, saturday=6, sunday=7}
      * @see     #valueOf(int)
      * @see     Weekmodel#ISO
      */
@@ -98,8 +97,7 @@ public enum Weekday
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert
      * entsprechend der ISO-8601-Norm. </p>
      *
-     * @return  (monday=1, tuesday=2, wednesday=3, thursday=4, friday=5,
-     *          saturday=6, sunday=7)
+     * @return  {@code monday=1, tuesday=2, wednesday=3, thursday=4, friday=5, saturday=6, sunday=7}
      * @see     #valueOf(int)
      * @see     Weekmodel#ISO
      */
