@@ -36,6 +36,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Temporal;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeLine;
 import net.time4j.engine.TimePoint;
@@ -162,7 +163,7 @@ import static net.time4j.scale.TimeScale.*;
 @CalendarType("iso8601")
 public final class Moment
     extends TimePoint<TimeUnit, Moment>
-    implements UniversalTime, Temporal<UniversalTime> {
+    implements UniversalTime, Temporal<UniversalTime>, ThreetenAdapter {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1451,6 +1452,13 @@ public final class Moment
         }
 
         return sb.toString();
+
+    }
+
+    @Override
+    public Instant toTemporalAccessor() {
+
+        return TemporalType.INSTANT.from(this);
 
     }
 

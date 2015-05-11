@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.TimeScale;
@@ -99,7 +100,7 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  * @see     Moment#inZonalView(String)
  */
 public final class ZonalDateTime
-    implements ChronoDisplay, UniversalTime {
+    implements ChronoDisplay, UniversalTime, ThreetenAdapter {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -500,6 +501,13 @@ public final class ZonalDateTime
         }
 
         return sb.toString();
+
+    }
+
+    @Override
+    public ZonedDateTime toTemporalAccessor() {
+
+        return TemporalType.ZONED_DATE_TIME.from(this);
 
     }
 

@@ -38,6 +38,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
@@ -60,7 +61,6 @@ import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -182,6 +182,7 @@ public final class PlainTimestamp
     implements GregorianDate,
                WallTime,
                Temporal<PlainTimestamp>,
+               ThreetenAdapter,
                Normalizer<IsoUnit> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -837,6 +838,13 @@ public final class PlainTimestamp
     ) {
 
         return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, locale);
+
+    }
+
+    @Override
+    public LocalDateTime toTemporalAccessor() {
+
+        return TemporalType.LOCAL_DATE_TIME.from(this);
 
     }
 

@@ -34,6 +34,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Temporal;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
@@ -145,7 +146,7 @@ import java.util.Set;
 @CalendarType("iso8601")
 public final class PlainTime
     extends TimePoint<IsoTimeUnit, PlainTime>
-    implements WallTime, Temporal<PlainTime> {
+    implements WallTime, Temporal<PlainTime>, ThreetenAdapter {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1687,6 +1688,13 @@ public final class PlainTime
         }
 
         return sb.toString();
+
+    }
+
+    @Override
+    public LocalTime toTemporalAccessor() {
+
+        return TemporalType.LOCAL_TIME.from(this);
 
     }
 

@@ -41,6 +41,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Normalizer;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.ValidationElement;
@@ -144,7 +145,7 @@ import java.util.Set;
 @CalendarType("iso8601")
 public final class PlainDate
     extends Calendrical<IsoDateUnit, PlainDate>
-    implements GregorianDate, Normalizer<CalendarUnit> {
+    implements GregorianDate, Normalizer<CalendarUnit>, ThreetenAdapter {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1371,6 +1372,13 @@ public final class PlainDate
         TimeSpan<? extends CalendarUnit> timespan) {
 
         return this.until(this.plus(timespan), Duration.inYearsMonthsDays());
+
+    }
+
+    @Override
+    public LocalDate toTemporalAccessor() {
+
+        return TemporalType.LOCAL_DATE.from(this);
 
     }
 
