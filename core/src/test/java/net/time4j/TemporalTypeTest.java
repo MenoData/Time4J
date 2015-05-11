@@ -112,9 +112,11 @@ public class TemporalTypeTest {
         );
     }
 
-    @Test(expected=ChronoException.class)
-    public void localTimeFromTime4JOverflow() {
-        TemporalType.LOCAL_TIME.from(PlainTime.axis().getMaximum());
+    @Test
+    public void localTimeFromTime24() {
+        assertThat(
+            TemporalType.LOCAL_TIME.from(PlainTime.axis().getMaximum()),
+            is(LocalTime.MIDNIGHT));
     }
 
     @Test
@@ -167,13 +169,13 @@ public class TemporalTypeTest {
         );
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void instantFromTime4JLS() {
         if (LeapSeconds.getInstance().isEnabled()) {
             Moment ls = PlainDate.of(2012, 7, 1).atStartOfDay().atUTC().minus(1, SI.SECONDS);
-            TemporalType.INSTANT.from(ls);
-        } else {
-            throw new ChronoException("Cannot test disabled leap second.");
+            assertThat(
+                TemporalType.INSTANT.from(ls),
+                is(LocalDateTime.of(2012, 6, 30, 23, 59, 59).atOffset(ZoneOffset.UTC).toInstant()));
         }
     }
 

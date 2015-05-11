@@ -179,15 +179,13 @@ public abstract class TemporalType<S, T> {
      * <p>Bridge between the JSR-310-class {@code java.time.LocalTime} and
      * the class {@code PlainTime}. </p>
      *
-     * <p>The conversion is exact with the exception of midnight at end of day (T24:00). Example: </p>
+     * <p>The conversion is exact with the exception of midnight at end of day (T24:00). The
+     * special time T24:00 will be mapped to 00:00 in class {@code LocalTime}. Example: </p>
      *
      * <pre>
      *  PlainTime time = TemporalType.LOCAL_TIME.translate(LocalTime.of(17, 45));
      *  System.out.println(time);
      *  // output: T17:45
-     *
-     *  // Following line always throws an exception!
-     *  TemporalType.LOCAL_TIME.from(PlainTime.midnightAtEndOfDay());
      * </pre>
      *
      * @since   4.0
@@ -196,15 +194,13 @@ public abstract class TemporalType<S, T> {
      * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.LocalTime} und
      * der Klasse {@code PlainTime}. </p>
      *
-     * <p>Die Konversion ist mit Ausnahme von Mitternacht am Ende des Tages (T24:00) exakt. Beispiel: </p>
+     * <p>Die Konversion ist mit Ausnahme von Mitternacht am Ende des Tages (T24:00) exakt.
+     * Die spezielle Zeit T24:00 wird auf 00:00 in {@code LocalTime} abgebildet. Beispiel: </p>
      *
      * <pre>
      *  PlainTime time = TemporalType.LOCAL_TIME.translate(LocalTime.of(17, 45));
      *  System.out.println(time);
      *  // Ausgabe: T17:45
-     *
-     *  // Folgende Zeile wirft immer eine Ausnahme!
-     *  TemporalType.LOCAL_TIME.from(PlainTime.midnightAtEndOfDay());
      * </pre>
      *
      * @since   4.0
@@ -245,7 +241,7 @@ public abstract class TemporalType<S, T> {
      * <p>Bridge between the JSR-310-class {@code java.time.Instant} and
      * the class {@code Moment}. </p>
      *
-     * <p>The conversion is usually exact. However, leap seconds will throw an exception. The
+     * <p>The conversion is usually exact. However, leap seconds will always be ignored. The
      * outer value range limits of the class {@code Moment} is a little bit smaller. Example: </p>
      *
      * <pre>
@@ -260,7 +256,7 @@ public abstract class TemporalType<S, T> {
      * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Instant} und
      * der Klasse {@code Moment}. </p>
      *
-     * <p>Die Konversion ist normalerweise exakt. Schaltsekunden werfen jedoch eine Ausnahme.
+     * <p>Die Konversion ist normalerweise exakt, aber Schaltsekunden werden immer ignoriert.
      * Die &auml;&szlig;eren Wertgrenzen der Klasse {@code Moment} sind geringf&uuml;gig kleiner.
      * Beispiel: </p>
      *
@@ -278,7 +274,7 @@ public abstract class TemporalType<S, T> {
      * <p>Bridge between the JSR-310-class {@code java.time.ZonedDateTime} and
      * the class {@code ZonalDateTime}. </p>
      *
-     * <p>The conversion is usually exact. However, leap seconds will throw an exception. The
+     * <p>The conversion is usually exact. However, leap seconds will always be ignored. The
      * outer value range limits of the class {@code ZonalDateTime} is a little bit different. Example: </p>
      *
      * <pre>
@@ -293,7 +289,7 @@ public abstract class TemporalType<S, T> {
      * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.ZonedDateTime} und
      * der Klasse {@code ZonalDateTime}. </p>
      *
-     * <p>Die Konversion ist normalerweise exakt. Schaltsekunden werfen jedoch eine Ausnahme.
+     * <p>Die Konversion ist normalerweise exakt, ignoriert aber Schaltsekunden.
      * Die &auml;&szlig;eren Wertgrenzen der Klasse {@code ZonalDateTime} sind geringf&uuml;gig anders.
      * Beispiel: </p>
      *
@@ -552,7 +548,7 @@ public abstract class TemporalType<S, T> {
         public LocalTime from(PlainTime time) {
 
             if (time.getHour() == 24) {
-                throw new ChronoException("T24:00 cannot be mapped to 'java.time.LocalTime'.");
+                return LocalTime.MIDNIGHT;
             }
 
             return LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), time.getNanosecond());
@@ -608,10 +604,6 @@ public abstract class TemporalType<S, T> {
         @Override
         public Instant from(Moment moment) {
 
-            if (moment.isLeapSecond()) {
-                throw new ChronoException("Leap second cannot be mapped to 'java.time.Instant'.");
-            }
-
             return Instant.ofEpochSecond(moment.getPosixTime(), moment.getNanosecond());
 
         }
@@ -634,7 +626,7 @@ public abstract class TemporalType<S, T> {
         @Override
         public ZonedDateTime from(ZonalDateTime zdt) {
 
-            Instant instant = TemporalType.INSTANT.from(zdt.toMoment()); // fails for leap seconds
+            Instant instant = TemporalType.INSTANT.from(zdt.toMoment());
             ZoneId zone;
 
             try {
@@ -846,13 +838,7 @@ public abstract class TemporalType<S, T> {
         @Override
         public Instant instant() {
 
-            Moment moment = Moment.from(this.source.currentTime());
-
-            if (moment.isLeapSecond()) {
-                moment = moment.minus(1, SI.SECONDS); // repeat leap second as second 59
-            }
-
-            return TemporalType.INSTANT.from(moment);
+            return TemporalType.INSTANT.from(Moment.from(this.source.currentTime()));
 
         }
 
