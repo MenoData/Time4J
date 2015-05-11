@@ -479,21 +479,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public String format(TemporalAccessor formattable) {
 
-        T entity = this.chronology.createFrom(formattable, this.globalAttributes);
-
-        if (entity == null) {
-            throw new IllegalArgumentException("Insufficient data to convert temporal accessor: " + formattable);
-        }
-
-        if (!this.getAttributes().contains(Attributes.TIMEZONE_ID)) {
-            ZoneId zoneId = formattable.query(TemporalQueries.zone());
-
-            if (zoneId != null) {
-                return this.withTimezone(zoneId.getId()).format(entity);
-            }
-        }
-
-        return this.format(entity);
+        T entity = this.toEntity(formattable);
+        return this.toZonedFormatter(formattable).format(entity);
 
     }
 
@@ -512,8 +499,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Prints given chronological entity as formatted text and writes
      * the text into given buffer. </p>
      *
-     * <p>Equiovalent to
-     * {@code print(formattable, buffer, getDefaultAttributes(), true)}. </p>
+     * <p>Equivalent to {@code print(formattable, buffer, getAttributes())}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -524,8 +510,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
      * den Puffer. </p>
      *
-     * <p>Entspricht
-     * {@code print(formattable, buffer, getDefaultAttributes(), true)}. </p>
+     * <p>Entspricht {@code print(formattable, buffer, getAttributes())}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -549,6 +534,42 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Prints given Threeten-object as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>Similar to {@code print(formattable, buffer, getAttributes())}. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @throws  IOException if writing to buffer fails
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Threeten-Objekt als Text und schreibt ihn in
+     * den Puffer. </p>
+     *
+     * <p>&Auml;hnlich zu {@code print(formattable, buffer, getAttributes())}. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @return  unmodifiable set of element positions in formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @throws  IOException if writing to buffer fails
+     * @since   4.0
+     */
+    public Set<ElementPosition> print(
+        TemporalAccessor formattable,
+        Appendable buffer
+    ) throws IOException {
+
+        T entity = this.toEntity(formattable);
+        return this.toZonedFormatter(formattable).print(entity, buffer, this.globalAttributes);
+
+    }
+
+    /**
      * <p>Prints given chronological entity as formatted text and writes
      * the text into given buffer. </p>
      *
@@ -556,9 +577,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * (for example not change a localized weekmodel), but can override some
      * format properties like language or certain text attributes for this
      * run only. </p>
-     *
-     * <p>Equivalent to
-     * {@code print(formattable, buffer, attributes, true)}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -575,8 +593,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * Wochenmodell wechseln), aber bestimmte Formateigenschaften wie
      * die Sprachausgabe oder Textattribute individuell nur f&uuml;r diesen
      * Lauf setzen. </p>
-     *
-     * <p>Entspricht {@code print(formattable, buffer, attributes, true)}. </p>
      *
      * @param   formattable     object to be formatted
      * @param   buffer          text output buffer
@@ -609,6 +625,32 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             this.chronology.preformat(formattable, attributes);
         this.print(display, buffer, attributes, false);
         return query.apply(display);
+
+    }
+
+    private T toEntity(TemporalAccessor formattable) {
+
+        T entity = this.chronology.createFrom(formattable, this.globalAttributes);
+
+        if (entity == null) {
+            throw new IllegalArgumentException("Insufficient data to convert temporal accessor: " + formattable);
+        }
+
+        return entity;
+
+    }
+
+    private ChronoFormatter<T> toZonedFormatter(TemporalAccessor formattable) {
+
+        if (!this.getAttributes().contains(Attributes.TIMEZONE_ID)) {
+            ZoneId zoneId = formattable.query(TemporalQueries.zone());
+
+            if (zoneId != null) {
+                return this.withTimezone(zoneId.getId());
+            }
+        }
+
+        return this;
 
     }
 
@@ -712,7 +754,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Interpretes given text as chronological entity starting
      * at the specified position in parse log. </p>
      *
-     * <p>Equivalent to {@code parse(text, status, getDefaultAttributes())}. </p>
+     * <p>Equivalent to {@code parse(text, status, getAttributes())}. </p>
      *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
@@ -724,7 +766,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
      * Log. </p>
      *
-     * <p>Entspricht {@code parse(text, status, getDefaultAttributes())}. </p>
+     * <p>Entspricht {@code parse(text, status, getAttributes())}. </p>
      *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
