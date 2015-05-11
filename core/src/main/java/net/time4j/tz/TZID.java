@@ -51,6 +51,9 @@ package net.time4j.tz;
  * the timezone data associated with the enum constants are not necessarily
  * correct. </p>
  *
+ * <p>This interface can be used as functional interface since version 4.0 using
+ * a lambda expression: {@code ()->"Europe/London"} </p>
+ *
  * @author  Meno Hochschild
  * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
@@ -84,9 +87,13 @@ package net.time4j.tz;
  * vor den Enum-Konstanten zu geben, weil die mit den Enums verkn&uuml;pften
  * historischen Zeitzonendaten nicht notwendig korrekt sein m&uuml;ssen. </p>
  *
+ * <p>Dieses Interface kann seit Version 4.0 als <i>functional interface</i> verwendet
+ * werden, indem ein Lambda-Ausdruck benutzt wird: {@code ()->"Europe/London"} </p>
+ *
  * @author  Meno Hochschild
  * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
+@FunctionalInterface
 public interface TZID {
 
     //~ Methoden ----------------------------------------------------------
