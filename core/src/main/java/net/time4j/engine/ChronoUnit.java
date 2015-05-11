@@ -85,7 +85,6 @@ public interface ChronoUnit {
      * @return  {@code true} if at least as long as a day else {@code false}
      */
     /*[deutsch]
-    /**
      * <p>Ist diese Zeiteinheit kalendarisch beziehungsweise mindestens
      * so lange wie ein Kalendertag? </p>
      *
@@ -96,6 +95,10 @@ public interface ChronoUnit {
      *
      * @return  {@code true} if at least as long as a day else {@code false}
      */
-    boolean isCalendrical(); // TODO: Ab Java 8 (Time4J-2.0) default-Methode
+    default boolean isCalendrical() {
+
+        return (Double.compare(this.getLength(), 86400.0) >= 0);
+
+    }
 
 }

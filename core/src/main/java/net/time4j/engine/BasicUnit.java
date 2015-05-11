@@ -56,13 +56,6 @@ public abstract class BasicUnit
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    public boolean isCalendrical() {
-
-        return (Double.compare(this.getLength(), 86400.0) >= 0);
-        
-    }
-
     /**
      * <p>Derives an optional unit rule for given chronology. </p>
      *
