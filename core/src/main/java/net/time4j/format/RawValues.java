@@ -26,6 +26,9 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoException;
 import net.time4j.tz.TZID;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 
 /**
  * <p>Stores any kind of raw values as {@code ChronoDisplay}. </p>
@@ -41,8 +44,8 @@ import net.time4j.tz.TZID;
  * @since   3.0
  * @doctags.concurrency <mutable>
  */
-// TODO: Ab Java 8 aktiv => implements Consumer<ChronoDisplay>, Supplier<ChronoDisplay>
-public class RawValues {
+public class RawValues
+    implements Consumer<ChronoDisplay>, Supplier<ChronoDisplay> {
 
     //~ Instanzvariablen --------------------------------------------------
 
