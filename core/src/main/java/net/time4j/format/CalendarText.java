@@ -26,6 +26,15 @@ import net.time4j.engine.Chronology;
 
 import java.text.DateFormatSymbols;
 import java.text.Normalizer;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.chrono.IsoEra;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoField;
+import java.time.temporal.IsoFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -156,8 +165,7 @@ public final class CalendarText {
      */
     public static final String ISO_CALENDAR_TYPE = "iso8601";
 
-    private static final ConcurrentMap<String, CalendarText> CACHE =
-        new ConcurrentHashMap<String, CalendarText>();
+    private static final ConcurrentMap<String, CalendarText> CACHE = new ConcurrentHashMap<>();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -202,11 +210,10 @@ public final class CalendarText {
         }
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> qt =
-            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
-                (TextWidth.class);
+            new EnumMap<>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             Map<OutputContext, TextAccessor> qo =
-                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
+                new EnumMap<>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 qo.put(
                     oc,
@@ -220,11 +227,10 @@ public final class CalendarText {
         this.quarters = Collections.unmodifiableMap(qt);
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> wt =
-            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
-                (TextWidth.class);
+            new EnumMap<>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             Map<OutputContext, TextAccessor> wo =
-                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
+                new EnumMap<>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 wo.put(
                     oc,
@@ -238,7 +244,7 @@ public final class CalendarText {
         this.weekdays = Collections.unmodifiableMap(wt);
 
         Map<TextWidth, TextAccessor> et =
-            new EnumMap<TextWidth, TextAccessor>(TextWidth.class);
+            new EnumMap<>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             et.put(
                 tw,
@@ -248,7 +254,7 @@ public final class CalendarText {
         this.eras = Collections.unmodifiableMap(et);
 
         Map<TextWidth, TextAccessor> mt =
-            new EnumMap<TextWidth, TextAccessor>(TextWidth.class);
+            new EnumMap<>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             mt.put(
                 tw,
@@ -364,7 +370,6 @@ public final class CalendarText {
 
             // Java-Ressourcen
             if (p == null) {
-                // TODO: Für Java 8 neuen Provider definieren (mit Quartalen)?
                 TextProvider tmp = new JDKTextProvider();
 
                 if (
@@ -850,14 +855,12 @@ public final class CalendarText {
         boolean leapForm
     ) {
 
-        Map<TextWidth, Map<OutputContext, TextAccessor>> mt =
-            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
-                (TextWidth.class);
+        Map<TextWidth, Map<OutputContext, TextAccessor>> mt = new EnumMap<>(TextWidth.class);
         boolean usesDifferentLeapForm = false;
 
         for (TextWidth tw : TextWidth.values()) {
             Map<OutputContext, TextAccessor> mo =
-                new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
+                new EnumMap<>(OutputContext.class);
             for (OutputContext oc : OutputContext.values()) {
                 String[] ls =
                     p.months(calendarType, locale, tw, oc, leapForm);
@@ -965,19 +968,16 @@ public final class CalendarText {
             boolean leapForm
         ) {
 
-            DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
+            TextStyle style = getStyle(tw, oc);
+            String[] months = new String[12];
+            int i = 0;
 
-            switch (tw) {
-                case WIDE:
-                    return dfs.getMonths();
-                case ABBREVIATED:
-                case SHORT:
-                    return dfs.getShortMonths();
-                case NARROW:
-                    return narrow(dfs.getShortMonths(), 12);
-                default:
-                    throw new UnsupportedOperationException(tw.name());
+            for (Month month : Month.values()) {
+                months[i] = month.getDisplayName(style, locale);
+                i++;
             }
+
+            return months;
 
         }
 
@@ -989,7 +989,19 @@ public final class CalendarText {
             OutputContext oc
         ) {
 
-            return new String[] {"Q1", "Q2", "Q3", "Q4"}; // fallback
+            TextStyle style = getStyle(tw, oc);
+            String[] quarters = new String[4];
+
+            for (int i = 0; i < 4; i++) {
+                LocalDate date = LocalDate.of(1970, i * 3 + 1, 1);
+                quarters[i] =
+                    new DateTimeFormatterBuilder()
+                        .appendText(IsoFields.QUARTER_OF_YEAR, style)
+                        .toFormatter(locale)
+                        .format(date);
+            }
+
+            return quarters;
 
         }
 
@@ -1001,40 +1013,16 @@ public final class CalendarText {
             OutputContext oc
         ) {
 
-            DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
-            String[] result;
+            TextStyle style = getStyle(tw, oc);
+            String[] weekdays = new String[7];
+            int i = 0;
 
-            switch (tw) {
-                case WIDE:
-                    result = dfs.getWeekdays(); // 8 Elemente
-                    break;
-                case ABBREVIATED:
-                case SHORT:
-                    result = dfs.getShortWeekdays(); // 8 Elemente
-                    break;
-                case NARROW:
-                    String[] names = // 7 Elemente
-                        weekdays("", locale, TextWidth.SHORT, oc);
-                    result = narrow(names, 7);
-                    break;
-                default:
-                    throw new UnsupportedOperationException(
-                        "Unknown text width: " + tw);
+            for (DayOfWeek dow : DayOfWeek.values()) {
+                weekdays[i] = dow.getDisplayName(style, locale);
+                i++;
             }
 
-            if (result.length > 7) { // ISO-Reihenfolge erzwingen
-                String sunday = result[1];
-                String[] arr = new String[7];
-
-                for (int i = 2; i < 8; i++) {
-                    arr[i - 2] = result[i];
-                }
-
-                arr[6] = sunday;
-                result = arr;
-            }
-
-            return result;
+            return weekdays;
 
         }
 
@@ -1045,26 +1033,16 @@ public final class CalendarText {
             TextWidth textWidth
         ) {
 
-            DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
+            TextStyle style = getStyle(textWidth, OutputContext.FORMAT);
+            String[] eras = new String[2];
+            int i = 0;
 
-            if (textWidth == TextWidth.NARROW) {
-                String[] eras = dfs.getEras();
-                String[] ret = new String[eras.length];
-                for (int i = 0, n = eras.length; i < n; i++) {
-                    if (!eras[i].isEmpty()) {
-                        ret[i] = toSingleLetter(eras[i]);
-                    } else if ((i == 0) && (eras.length == 2)) {
-                        ret[i] = "B";
-                    } else if ((i == 1) && (eras.length == 2)) {
-                        ret[i] = "A";
-                    } else {
-                        ret[i] = String.valueOf(i);
-                    }
-                }
-                return ret;
-            } else {
-                return dfs.getEras();
+            for (IsoEra era : IsoEra.values()) {
+                eras[i] = era.getDisplayName(style, locale);
+                i++;
             }
+
+            return eras;
 
         }
 
@@ -1075,12 +1053,19 @@ public final class CalendarText {
             TextWidth textWidth
         ) {
 
-        	if (textWidth == TextWidth.NARROW) {
-                return new String[] {"A", "P"};
-        	}
+            TextStyle style = getStyle(textWidth, OutputContext.FORMAT);
+            String[] meridiems = new String[2];
 
-            // JDK-Quelle
-            return DateFormatSymbols.getInstance(locale).getAmPmStrings();
+            for (int i = 0; i < 2; i++) {
+                LocalTime time = LocalTime.of(i * 12, 0);
+                meridiems[i] =
+                    new DateTimeFormatterBuilder()
+                        .appendText(ChronoField.AMPM_OF_DAY, style)
+                        .toFormatter(locale)
+                        .format(time);
+            }
+
+            return meridiems;
 
         }
 
@@ -1099,42 +1084,23 @@ public final class CalendarText {
 
         }
 
-        private static String[] narrow(
-            String[] names,
-            int len
+        private static TextStyle getStyle(
+            TextWidth tw,
+            OutputContext oc
         ) {
 
-            String[] ret = new String[len];
+            boolean standalone = (oc == OutputContext.STANDALONE);
 
-            for (int i = 0; i < len; i++) {
-                if (!names[i].isEmpty()) {
-                    ret[i] = toSingleLetter(names[i]);
-                } else {
-                    ret[i] = String.valueOf(i + 1);
-                }
-            }
-
-            return ret;
-
-        }
-
-        private static String toSingleLetter(String input) {
-
-            // diakritische Zeichen entfernen
-            char c = Normalizer.normalize(input, Normalizer.Form.NFD).charAt(0);
-
-            if ((c >= 'A') && (c <= 'Z')) {
-                return String.valueOf(c);
-            } else if ((c >= 'a') && (c <= 'z')) {
-                c += ('A' - 'a');
-                return String.valueOf(c);
-            } else if ((c >= '\u0410') && (c <= '\u042F')) { // kyrillisch (ru)
-                return String.valueOf(c);
-            } else if ((c >= '\u0430') && (c <= '\u044F')) { // kyrillisch (ru)
-                c += ('\u0410' - '\u0430');
-                return String.valueOf(c);
-            } else {
-                return input; // NARROW-Form nicht möglich => nichts ändern!
+            switch (tw) {
+                case WIDE:
+                    return (standalone ? TextStyle.FULL_STANDALONE : TextStyle.FULL);
+                case ABBREVIATED:
+                case SHORT:
+                    return (standalone ? TextStyle.SHORT_STANDALONE : TextStyle.SHORT);
+                case NARROW:
+                    return (standalone ? TextStyle.NARROW_STANDALONE : TextStyle.NARROW);
+                default:
+                    throw new UnsupportedOperationException(tw.name());
             }
 
         }
