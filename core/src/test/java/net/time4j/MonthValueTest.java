@@ -1,9 +1,13 @@
 package net.time4j;
 
 
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -95,6 +99,22 @@ public class MonthValueTest {
         assertThat(Month.atEndOfQuarterYear(Quarter.Q2), is(Month.JUNE));
         assertThat(Month.atEndOfQuarterYear(Quarter.Q3), is(Month.SEPTEMBER));
         assertThat(Month.atEndOfQuarterYear(Quarter.Q4), is(Month.DECEMBER));
+    }
+
+    @Test
+    public void czechMonthInFormatContext() {
+        assertThat(
+            Month.JANUARY.getDisplayName(new Locale("cs"), TextWidth.WIDE, OutputContext.FORMAT),
+            is("ledna")
+        );
+    }
+
+    @Test
+    public void czechMonthInStandaloneContext() {
+        assertThat(
+            Month.JANUARY.getDisplayName(new Locale("cs"), TextWidth.WIDE, OutputContext.STANDALONE),
+            is("leden")
+        );
     }
 
 }
