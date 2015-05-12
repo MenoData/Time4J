@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PrettyTime.java) is part of project Time4J.
  *
@@ -35,6 +35,7 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.MessageFormat;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -117,21 +118,17 @@ public final class PrettyTime {
 
     private static final int MIO = 1000000;
 
-    private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP =
-        new ConcurrentHashMap<Locale, PrettyTime>();
+    private static final ConcurrentMap<Locale, PrettyTime> LANGUAGE_MAP = new ConcurrentHashMap<>();
     private static final IsoUnit[] STD_UNITS;
     private static final IsoUnit[] TSP_UNITS;
     private static final Set<IsoUnit> SUPPORTED_UNITS;
 
     static {
-        IsoUnit[] stdUnits =
-            {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
+        IsoUnit[] stdUnits = {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
         STD_UNITS = stdUnits;
-        IsoUnit[] tspUnits =
-            {YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS};
-        TSP_UNITS = tspUnits;
+        TSP_UNITS = new IsoUnit[]{YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS};
 
-        Set<IsoUnit> tmp = new HashSet<IsoUnit>();
+        Set<IsoUnit> tmp = new HashSet<>();
         Collections.addAll(tmp, stdUnits);
         tmp.add(NANOS);
         SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
@@ -655,6 +652,35 @@ public final class PrettyTime {
     }
 
     /**
+     * <p>Short-cut for {@code print(Duration.from(threeten), width)}. </p>
+     *
+     * @param   threeten    object representing a duration which might contain several units and quantities
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @return  formatted list output in normalized form
+     * @throws  IllegalArgumentException in case of conversion failures
+     * @since   4.0
+     * @see     #print(Duration, TextWidth)
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code print(Duration.from(threeten), width)}. </p>
+     *
+     * @param   threeten    object representing a duration which might contain several units and quantities
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @return  formatted list output in normalized form
+     * @throws  IllegalArgumentException in case of conversion failures
+     * @since   4.0
+     * @see     #print(Duration, TextWidth)
+     */
+    public String print(
+        TemporalAmount threeten,
+        TextWidth width
+    ) {
+
+        return this.print(Duration.from(threeten), width);
+
+    }
+
+    /**
      * <p>Formats given duration. </p>
      *
      * <p>Like {@link #print(Duration, TextWidth)}, but offers the
@@ -733,7 +759,7 @@ public final class PrettyTime {
         pushDuration(values, duration, this.refClock, this.weekToDays);
 
         // format duration items
-        List<Object> parts = new ArrayList<Object>();
+        List<Object> parts = new ArrayList<>();
         int count = 0;
 
         for (int i = 0; i < values.length; i++) {
@@ -760,6 +786,41 @@ public final class PrettyTime {
         return MessageFormat.format(
             UnitPatterns.of(this.locale).getListPattern(width, count),
             parts.toArray(new Object[count]));
+
+    }
+
+    /**
+     * <p>Short-cut for {@code print(Duration.from(threeten), width, printZero, maxLength)}. </p>
+     *
+     * @param   threeten    object representing a duration which might contain several units and quantities
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   printZero   determines if zero amounts shall be printed, too
+     * @param   maxLength   maximum count of displayed items
+     * @return  formatted list output in normalized form
+     * @throws  IllegalArgumentException if maxLength is smaller than {@code 1} or in case of conversion failures
+     * @since   4.0
+     * @see     #print(Duration, TextWidth, boolean, int)
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung f&uuml;r {@code print(Duration.from(threeten), width, printZero, maxLength)}. </p>
+     *
+     * @param   threeten    object representing a duration which might contain several units and quantities
+     * @param   width       text width (ABBREVIATED as synonym for SHORT)
+     * @param   printZero   determines if zero amounts shall be printed, too
+     * @param   maxLength   maximum count of displayed items
+     * @return  formatted list output in normalized form
+     * @throws  IllegalArgumentException if maxLength is smaller than {@code 1} or in case of conversion failures
+     * @since   4.0
+     * @see     #print(Duration, TextWidth, boolean, int)
+     */
+    public String print(
+        TemporalAmount threeten,
+        TextWidth width,
+        boolean printZero,
+        int maxLength
+    ) {
+
+        return this.print(Duration.from(threeten), width, printZero, maxLength);
 
     }
 
