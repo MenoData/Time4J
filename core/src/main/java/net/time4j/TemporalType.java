@@ -340,12 +340,21 @@ public abstract class TemporalType<S, T> {
      * the class {@code net.time4j.Duration}. </p>
      *
      * <p>Note that mixed signs in original period like &quot;P1M-30D&quot; will be rejected by Time4J.
-     * Example for a correct input: </p>
+     * This is a normalizing conversion. Example for a correct input: </p>
      *
      * <pre>
-     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45));
+     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 13, 45));
      *  System.out.println(duration);
-     *  // output: P3Y8M45D
+     *  // output: P4Y1M45D
+     * </pre>
+     *
+     * <p>Note: The algorithm to apply a negative duration is slightly different. Example: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *       LocalDate.of(2015, 7, 1).minus(Period.of(0, 1, 1))); // 2015-05-31
+     *     System.out.println(
+     *       PlainDate.of(2015, 7, 1).minus(Duration.ofCalendarUnits(0, 1, 1))); // 2015-05-30
      * </pre>
      *
      * @since   4.0
@@ -355,12 +364,21 @@ public abstract class TemporalType<S, T> {
      * der Klasse {@code net.time4j.Duration}. </p>
      *
      * <p>Man beachte, da&szlig; gemischte Vorzeichen in der Original-Periode wie &quot;P1M-30D&quot;
-     * von Time4J verworfen werden. Beispiel f&uuml;r eine korrekte Eingabe: </p>
+     * von Time4J verworfen werden. Die Konversion normalisiert immer. Beispiel f&uuml;r eine korrekte Eingabe: </p>
      *
      * <pre>
-     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45));
+     *  Duration&lt;CalendarUnit&gt; duration = TemporalType.THREETEN_PERIOD.translate(Period.of(3, 13, 45));
      *  System.out.println(duration);
-     *  // Ausgabe: P3Y8M45D
+     *  // output: P4Y1M45D
+     * </pre>
+     *
+     * <p>Zu beachten: Der Algorithmus zur Anwendung einer negativen Dauer ist etwas verschieden. Beispiel: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *       LocalDate.of(2015, 7, 1).minus(Period.of(0, 1, 1))); // 2015-05-31
+     *     System.out.println(
+     *       PlainDate.of(2015, 7, 1).minus(Duration.ofCalendarUnits(0, 1, 1))); // 2015-05-30
      * </pre>
      *
      * @since   4.0
@@ -711,7 +729,9 @@ public abstract class TemporalType<S, T> {
         public Duration<CalendarUnit> translate(Period source) {
 
             try {
-                return Duration.ofCalendarUnits(source.getYears(), source.getMonths(), source.getDays());
+                Duration<CalendarUnit> duration =
+                    Duration.ofCalendarUnits(source.getYears(), source.getMonths(), source.getDays());
+                return duration.with(Duration.STD_CALENDAR_PERIOD);
             } catch (RuntimeException ex) {
                 throw new ChronoException("Cannot convert period: " + source, ex);
             }

@@ -10,6 +10,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -228,8 +234,8 @@ public class TemporalTypeTest {
     @Test
     public void periodToTime4J1() {
         assertThat(
-            TemporalType.THREETEN_PERIOD.translate(Period.of(3, 8, 45)),
-            is(Duration.ofCalendarUnits(3, 8, 45))
+            TemporalType.THREETEN_PERIOD.translate(Period.of(3, 13, 45)),
+            is(Duration.ofCalendarUnits(4, 1, 45))
         );
     }
 
@@ -284,6 +290,87 @@ public class TemporalTypeTest {
                     ZoneId.systemDefault()
                 ).instant())
         );
+    }
+
+    @Test
+    public void durationFromTemporalAmount1() {
+        Period period = Period.of(0, 1, 1);
+        Duration<CalendarUnit> duration = Duration.ofCalendarUnits(0, 1, 1);
+        assertThat(Duration.from(period), is(duration));
+        LocalDate threeten = LocalDate.of(2015, 7, 1).minus(period);
+        assertThat(threeten, is(LocalDate.of(2015, 5, 31)));
+        PlainDate time4j = PlainDate.of(2015, 7, 1).minus(duration);
+        assertThat(time4j, is(PlainDate.of(2015, 5, 30)));
+    }
+
+    @Test
+    public void durationFromTemporalAmount2() {
+        TemporalAmount ta = new CustomTemporalAmount();
+        Duration<IsoUnit> duration = Duration.from(ta);
+        LocalDateTime ldt = LocalDateTime.of(2015, 5, 12, 17, 45);
+        PlainTimestamp tsp = PlainTimestamp.from(ldt);
+        assertThat(
+            duration,
+            is(Duration.compose(
+                Duration.of(1, CalendarUnit.DAYS),
+                Duration.of(12, ClockUnit.HOURS)))
+        );
+        assertThat(tsp.plus(duration).toTemporalAccessor(), is(ldt.plus(ta)));
+    }
+
+    @Test
+    public void displayTemporalAmount1() {
+        assertThat(
+            Duration.formatter("[DD:]hh:mm").format(java.time.Duration.ofMinutes(1565)),
+            is("01:02:05")
+        );
+    }
+
+    @Test
+    public void displayTemporalAmount2() {
+        assertThat(
+            Duration.formatter("'P'YYYY'-'MM'-'DD").format(java.time.Period.of(4, 13, 35)),
+            is("P0005-01-35")
+        );
+    }
+
+    @Test
+    public void displayTemporalAmount3() {
+        assertThat(
+            Duration.formatter("[DD:]hh").format(new CustomTemporalAmount()),
+            is("01:12")
+        );
+    }
+
+    private static class CustomTemporalAmount
+        implements TemporalAmount {
+
+        @Override
+        public long get(TemporalUnit unit) {
+            if (unit.equals(ChronoUnit.DAYS)) {
+                return 1;
+            } else if (unit.equals(ChronoUnit.HALF_DAYS)) {
+                return 1;
+            }
+            return 0;
+        }
+
+        @Override
+        public List<TemporalUnit> getUnits() {
+            return Arrays.asList(ChronoUnit.DAYS, ChronoUnit.HALF_DAYS);
+        }
+
+        @Override
+        public Temporal addTo(Temporal temporal) {
+            LocalDateTime ldt = (LocalDateTime) temporal;
+            return ldt.plus(1, ChronoUnit.DAYS).plus(1, ChronoUnit.HALF_DAYS);
+        }
+
+        @Override
+        public Temporal subtractFrom(Temporal temporal) {
+            LocalDateTime ldt = (LocalDateTime) temporal;
+            return ldt.minus(1, ChronoUnit.DAYS).minus(1, ChronoUnit.HALF_DAYS);
+        }
     }
 
 }

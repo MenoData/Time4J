@@ -41,6 +41,9 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -548,20 +551,130 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Tries to convert given temporal amount to a duration. </p>
+     *
+     * <p>Note that the arithmetic of given amount is probably different from that of the result. Every unit
+     * compatible with {@code java.time.temporal.ChronoUnit} with exception of {@code ERAS} and {@code FOREVER}
+     * can be processed. Also the units {@code IsoFields.QUARTER_YEARS} and {@code IsoFields.WEEK_BASED_YEARS}
+     * are accepted. </p>
+     *
+     * @param   threeten    temporal amount
+     * @return  normalized duration
+     * @throws  IllegalArgumentException if the argument contains a non-mappable temporal unit or has mixed signs
+     * @see     #from(java.time.Duration)
+     * @see     #from(java.time.Period)
+     * @see     #STD_PERIOD
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Versucht, den angegebenen temporalen Betrag zu einer Dauer zu konvertieren. </p>
+     *
+     * <p>Zu beachten: Der Algorithmus des Arguments ist wahrscheinlich anders als der der erzeugten
+     * Dauer. Jede Zeiteinheit kompatibel zu {@code java.time.temporal.ChronoUnit} mit Ausnahme von
+     * {@code ERAS} und {@code FOREVER} kann verarbeitet werden. Auch die Einheiten {@code IsoFields.QUARTER_YEARS}
+     * und {@code IsoFields.WEEK_BASED_YEARS} werden erkannt. </p>
+     *
+     * @param   threeten    temporal amount
+     * @return  normalized duration
+     * @throws  IllegalArgumentException if the argument contains a non-mappable temporal unit or has mixed signs
+     * @see     #from(java.time.Duration)
+     * @see     #from(java.time.Period)
+     * @see     #STD_PERIOD
+     * @since   4.0
+     */
+    public static Duration<IsoUnit> from(TemporalAmount threeten) {
+
+        Duration<IsoUnit> result = Duration.ofZero();
+
+        for (TemporalUnit tu : threeten.getUnits()) {
+            long amount = threeten.get(tu);
+
+            if (amount == 0) {
+                continue;
+            }
+
+            IsoUnit unit;
+
+            if (tu instanceof java.time.temporal.ChronoUnit) {
+                switch (java.time.temporal.ChronoUnit.class.cast(tu)) {
+                    case NANOS:
+                        unit = ClockUnit.NANOS;
+                        break;
+                    case MICROS:
+                        unit = ClockUnit.MICROS;
+                        break;
+                    case MILLIS:
+                        unit = ClockUnit.MILLIS;
+                        break;
+                    case SECONDS:
+                        unit = ClockUnit.SECONDS;
+                        break;
+                    case MINUTES:
+                        unit = ClockUnit.MINUTES;
+                        break;
+                    case HOURS:
+                        unit = ClockUnit.HOURS;
+                        break;
+                    case HALF_DAYS:
+                        unit = ClockUnit.HOURS;
+                        amount = Math.multiplyExact(amount, 12);
+                        break;
+                    case DAYS:
+                        unit = CalendarUnit.DAYS;
+                        break;
+                    case WEEKS:
+                        unit = CalendarUnit.WEEKS;
+                        break;
+                    case MONTHS:
+                        unit = CalendarUnit.MONTHS;
+                        break;
+                    case YEARS:
+                        unit = CalendarUnit.YEARS;
+                        break;
+                    case DECADES:
+                        unit = CalendarUnit.DECADES;
+                        break;
+                    case CENTURIES:
+                        unit = CalendarUnit.CENTURIES;
+                        break;
+                    case MILLENNIA:
+                        unit = CalendarUnit.MILLENNIA;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Not supported: " + tu);
+                }
+            } else if (tu.equals(IsoFields.QUARTER_YEARS)) {
+                unit = CalendarUnit.QUARTERS;
+            } else if (tu.equals(IsoFields.WEEK_BASED_YEARS)) {
+                unit = CalendarUnit.weekBasedYears();
+            } else {
+                throw new IllegalArgumentException("Not supported: " + tu);
+            }
+
+            result = result.plus(amount, unit);
+        }
+
+        return result.with(STD_PERIOD);
+
+    }
+
+    /**
      * <p>Short cut for {@code TemporalType.THREETEN_DURATION.translate(threetenDuration)}. </p>
      *
      * @param   threetenDuration    Threeten-equivalent of a clock duration
-     * @return  Duration
+     * @return  normalized clock duration
      * @since   4.0
      * @see     TemporalType#THREETEN_DURATION
+     * @see     #STD_CLOCK_PERIOD
      */
     /*[deutsch]
      * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.THREETEN_DURATION.translate(threetenDuration)}. </p>
      *
      * @param   threetenDuration    Threeten-equivalent of a clock duration
-     * @return  Duration
+     * @return  normalized clock duration
      * @since   4.0
      * @see     TemporalType#THREETEN_DURATION
+     * @see     #STD_CLOCK_PERIOD
      */
     public static Duration<ClockUnit> from(java.time.Duration threetenDuration) {
 
@@ -572,20 +685,42 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Short cut for {@code TemporalType.THREETEN_PERIOD.translate(threetenPeriod)}. </p>
      *
+     * <p>Note that the arithmetic of given period is slightly different from that of the result when
+     * it comes to handling negative durations: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *       LocalDate.of(2015, 7, 1).minus(Period.of(0, 1, 1))); // 2015-05-31
+     *     System.out.println(
+     *       PlainDate.of(2015, 7, 1).minus(Duration.ofCalendarUnits(0, 1, 1))); // 2015-05-30
+     * </pre>
+     *
      * @param   threetenPeriod    Threeten-equivalent of a calendar duration
-     * @return  Duration
+     * @return  normalized calendar duration
      * @throws  ChronoException if conversion fails due to mixed signs
      * @since   4.0
      * @see     TemporalType#THREETEN_PERIOD
+     * @see     #STD_CALENDAR_PERIOD
      */
     /*[deutsch]
      * <p>Abk&uuml;rzung f&uuml;r {@code TemporalType.THREETEN_PERIOD.translate(threetenPeriod)}. </p>
      *
+     * <p>Zu beachten: Der Algorithmus des Arguments ist etwas anders als der der erzeugten
+     * Dauer, wenn es um eine negative Dauer geht. </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *       LocalDate.of(2015, 7, 1).minus(Period.of(0, 1, 1))); // 2015-05-31
+     *     System.out.println(
+     *       PlainDate.of(2015, 7, 1).minus(Duration.ofCalendarUnits(0, 1, 1))); // 2015-05-30
+     * </pre>
+     *
      * @param   threetenPeriod    Threeten-equivalent of a calendar duration
-     * @return  Duration
+     * @return  normalized calendar duration
      * @throws  ChronoException if conversion fails due to mixed signs
      * @since   4.0
      * @see     TemporalType#THREETEN_PERIOD
+     * @see     #STD_CALENDAR_PERIOD
      */
     public static Duration<CalendarUnit> from(java.time.Period threetenPeriod) {
 
@@ -986,8 +1121,7 @@ public final class Duration<U extends IsoUnit>
      * @param   amount      temporal amount to be added (maybe negative)
      * @param   unit        associated time unit
      * @return  new changed duration while this duration remains unaffected
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          adding the partial amounts
+     * @throws  IllegalStateException if the result gets mixed signs by adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #with(long, IsoUnit) with(long, U)
@@ -1016,8 +1150,7 @@ public final class Duration<U extends IsoUnit>
      * @param   amount      temporal amount to be added (maybe negative)
      * @param   unit        associated time unit
      * @return  new changed duration while this duration remains unaffected
-     * @throws  IllegalStateException if the result gets mixed signs by
-     *          adding the partial amounts
+     * @throws  IllegalStateException if the result gets mixed signs by adding the partial amounts
      * @throws  IllegalArgumentException if different units of same length exist
      * @throws  ArithmeticException in case of long overflow
      * @see     #with(long, IsoUnit) with(long, U)
@@ -4252,7 +4385,7 @@ public final class Duration<U extends IsoUnit>
          * <p>Creates a textual output of given duration. </p>
          *
          * @param   duration	duration object
-         * @return  textual represenation of duration
+         * @return  textual representation of duration
          * @throws	IllegalArgumentException if some aspects of duration
          *          prevents printing (for example too many nanoseconds)
          * @since   1.2
@@ -4261,7 +4394,7 @@ public final class Duration<U extends IsoUnit>
          * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer. </p>
          *
          * @param   duration	duration object
-         * @return  textual represenation of duration
+         * @return  textual representation of duration
          * @throws	IllegalArgumentException if some aspects of duration
          *          prevents printing (for example too many nanoseconds)
          * @since   1.2
@@ -4277,6 +4410,32 @@ public final class Duration<U extends IsoUnit>
 			}
 
         	return buffer.toString();
+
+        }
+
+        /**
+         * <p>Creates a textual output of given temporal amount. </p>
+         *
+         * @param   threeten    temporal amount
+         * @return  textual representation of duration
+         * @throws	IllegalArgumentException if some aspects of temporal amount
+         *          prevents printing (for example mixed signs)
+         * @see     Duration#from(TemporalAmount)
+         * @since   4.0
+         */
+        /*[deutsch]
+         * <p>Erzeugt eine textuelle Ausgabe des angegebenen Zeitbetrags. </p>
+         *
+         * @param   threeten    temporal amount
+         * @return  textual representation of duration
+         * @throws	IllegalArgumentException if some aspects of temporal amount
+         *          prevents printing (for example mixed signs)
+         * @see     Duration#from(TemporalAmount)
+         * @since   4.0
+         */
+        public String format(TemporalAmount threeten) {
+
+            return this.format(Duration.from(threeten));
 
         }
 
@@ -4310,6 +4469,39 @@ public final class Duration<U extends IsoUnit>
 			for (FormatItem item : this.items) {
 				item.print(duration, buffer);
 			}
+
+        }
+
+        /**
+         * <p>Creates a textual output of given temporal amount and writes to
+         * the buffer. </p>
+         *
+         * @param   threeten    temporal amount
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of temporal amount
+         *          prevents printing (for example mixed signs)
+         * @throws  IOException if writing into buffer fails
+         * @see     Duration#from(TemporalAmount)
+         * @since   4.0
+         */
+        /*[deutsch]
+         * <p>Erzeugt eine textuelle Ausgabe des angegebenen Zeitbetrags und
+         * schreibt sie in den Puffer. </p>
+         *
+         * @param   threeten    temporal amount
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of temporal amount
+         *          prevents printing (for example mixed signs)
+         * @throws  IOException if writing into buffer fails
+         * @see     Duration#from(TemporalAmount)
+         * @since   4.0
+         */
+        public void print(
+            TemporalAmount threeten,
+            Appendable buffer
+        ) throws IOException {
+
+            this.print(Duration.from(threeten), buffer);
 
         }
 
