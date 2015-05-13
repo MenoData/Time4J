@@ -3666,7 +3666,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             this.checkElement(element);
             this.startSection(Attributes.TRAILING_CHARACTERS, true);
-            this.addProcessor(new CustomizedProcessor<V>(element, printer, parser));
+            this.addProcessor(new CustomizedProcessor<>(element, printer, parser));
             this.endSection();
             return this;
 
