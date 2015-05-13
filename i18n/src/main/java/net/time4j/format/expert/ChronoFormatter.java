@@ -3227,6 +3227,46 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a literal element with exactly one char which can also be an alternative char
+         * during parsing. </p>
+         *
+         * <p>Usually the literal char is a punctuation mark or a
+         * letter symbol. Decimal digits as literal chars are not
+         * recommended, especially not after preceding numerical
+         * elements. </p>
+         *
+         * @param   literal         single literal char (preferred in printing)
+         * @param   alt             alternative literal char for parsing
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char
+         * @since   3.1
+         */
+        /*[deutsch]
+         * <p>Definiert ein Literalelement mit genau einem festen Zeichen, das beim Parsen
+         * auch ein Alternativzeichen sein kann. </p>
+         *
+         * <p>In der Regel handelt es sich um ein Interpunktionszeichen oder
+         * ein Buchstabensymbol. Dezimalziffern als Literal werden nicht
+         * empfohlen, besonders nicht nach vorhergehenden numerischen
+         * Elementen. </p>
+         *
+         * @param   literal         single literal char (preferred in printing)
+         * @param   alt             alternative literal char for parsing
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char
+         * @since   3.1
+         */
+        public Builder<T> addLiteral(
+            char literal,
+            char alt
+        ) {
+
+            this.addProcessor(new LiteralProcessor(literal, alt));
+            return this;
+
+        }
+
+        /**
          * <p>Defines a literal element with any chars. </p>
          *
          * <p>Usually the literal char sequence consists of punctuation
@@ -3625,8 +3665,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            this.addProcessor(
-                new CustomizedProcessor<>(element, printer, parser));
+            this.startSection(Attributes.TRAILING_CHARACTERS, true);
+            this.addProcessor(new CustomizedProcessor<V>(element, printer, parser));
+            this.endSection();
             return this;
 
         }

@@ -46,6 +46,7 @@ final class LiteralProcessor
     //~ Instanzvariablen --------------------------------------------------
 
     private final char single;
+    private final char alt;
     private final String multi;
     private final AttributeKey<Character> attribute;
 
@@ -65,10 +66,37 @@ final class LiteralProcessor
         }
 
         this.single = literal.charAt(0);
+        this.alt = this.single;
         this.attribute = null;
         this.multi = ((literal.length() == 1) ? null : literal);
 
         if (this.single < ' ') {
+            throw new IllegalArgumentException(
+                "Literal must not start with non-printable char.");
+        }
+
+    }
+
+    /**
+     * <p>Konstruktor f&uuml;r ein einzelnes Zeichen mit Alternative. </p>
+     *
+     * @param   literal     preferred literal char
+     * @param   alt         alternative literal char for parsing
+     * @throws  IllegalArgumentException in case of inconsistencies
+     * @since   3.1
+     */
+    LiteralProcessor(
+        char literal,
+        char alt
+    ) {
+        super();
+
+        this.single = literal;
+        this.alt = alt;
+        this.attribute = null;
+        this.multi = null;
+
+        if ((literal < ' ') || (alt < ' ')) {
             throw new IllegalArgumentException(
                 "Literal must not start with non-printable char.");
         }
@@ -89,6 +117,7 @@ final class LiteralProcessor
         }
 
         this.single = '\u0000';
+        this.alt = this.single;
         this.attribute = attribute;
         this.multi = null;
 
@@ -166,7 +195,7 @@ final class LiteralProcessor
             error = true;
         } else {
             c = text.charAt(offset);
-            char alternative = literal;
+            char alternative = this.alt;
 
             if (
                 (this.attribute != null)
@@ -242,15 +271,7 @@ final class LiteralProcessor
                 ).booleanValue();
 
             if (caseInsensitive) {
-                if (
-                    !subSequenceEqualsIgnoreCase(
-                        text,
-                        offset,
-                        this.multi,
-                        0,
-                        len
-                    )
-                ) {
+                if (!subSequenceEqualsIgnoreCase(text, offset, this.multi, 0, len)) {
                     error = true;
                     compare = text.subSequence(offset, offset + len).toString();
                 }
@@ -258,8 +279,7 @@ final class LiteralProcessor
                 for (int i = 0; i < len; i++) {
                     if (this.multi.charAt(i) != text.charAt(i + offset)) {
                         error = true;
-                        compare =
-                            text.subSequence(offset, offset + len).toString();
+                        compare = text.subSequence(offset, offset + len).toString();
                         break;
                     }
                 }
@@ -292,6 +312,7 @@ final class LiteralProcessor
                 return (
                     (that.multi == null)
                     && (this.single == that.single)
+                    && (this.alt == that.alt)
                 );
             } else {
                 return this.multi.equals(that.multi);
@@ -326,6 +347,10 @@ final class LiteralProcessor
             sb.append('}');
         } else if (this.multi == null) {
             sb.append(this.single);
+            if (this.alt != this.single) {
+                sb.append(", alternative=");
+                sb.append(this.alt);
+            }
         } else {
             sb.append(this.multi);
         }

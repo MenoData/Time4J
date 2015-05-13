@@ -643,6 +643,18 @@ public class MiscellaneousTest {
         roundtrip(obj);
     }
 
+    @Test
+    public void testAlternativeLiteral() throws ParseException {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT)
+                .addCustomized(PlainDate.COMPONENT, Iso8601Format.EXTENDED_CALENDAR_DATE)
+                .addLiteral('T', ' ')
+                .addCustomized(PlainTime.COMPONENT, Iso8601Format.EXTENDED_WALL_TIME)
+                .build();
+        assertThat(formatter.parse("2015-05-13T17:45"), is(PlainTimestamp.of(2015, 5, 13, 17, 45)));
+        assertThat(formatter.parse("2015-05-13 17:45"), is(PlainTimestamp.of(2015, 5, 13, 17, 45)));
+    }
+
     private static int roundtrip(Object... obj)
         throws IOException, ClassNotFoundException {
 
