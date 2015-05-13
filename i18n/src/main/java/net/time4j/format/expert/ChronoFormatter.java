@@ -51,7 +51,6 @@ import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import org.w3c.dom.Attr;
 
 import java.io.IOException;
 import java.math.BigDecimal;
