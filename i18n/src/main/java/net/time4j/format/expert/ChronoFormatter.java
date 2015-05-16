@@ -49,6 +49,7 @@ import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
+import net.time4j.history.HistoricVariant;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -438,7 +439,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     @Override
     public AttributeQuery getAttributes() {
 
-        return this.globalAttributes.getAttributes();
+        return this.globalAttributes;
 
     }
 
@@ -984,58 +985,69 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Creates a copy of this formatter with the given date of gregorian calendar reform. </p>
-     *
-     * <p>Note that this configuration will override any gregorian cutover date which might be inferred
-     * from current locale. </p>
-     *
-     * <p>Since version 3.1: The special case if given date is the minimum on the date axis is permitted
-     * and will result in a proleptic gregorian calendar. Note that the proleptic julian calendar is
-     * supported if given date is the maximum on the date axis. </p>
+     * <p>Short-cut for {@code with(ChronoHistory.ofGregorianReform(date))}. </p>
      *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
      * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
      *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
+     * @see     #with(ChronoHistory)
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Erzeugt eine Kopie, die das angegebene Datum der gregorianischen Kalenderreform verwendet. </p>
-     *
-     * <p>Zu beachten: Diese Methode wird jedes gregorianische Umstellungsdatum &uuml;berschreiben, das
-     * von der L&auml;ndereinstellung dieses Formatierers abgeleitet werden mag. </p>
-     *
-     * <p>Seit Version 3.1 gilt: Der Sonderfall der Angabe des Minimums auf der Datumsachse ist zul&auml;ssig
-     * und f&uuml;hrt zu einem rein gregorianischen Kalender ohne Historie. Hinweis: Wenn das angegebene Datum
-     * das Maximum auf der Datumsachse ist, dann f&uuml;hrt diese Einstellung zu einem proleptisch julianischen
-     * Kalender. </p>
+     * <p>Abk&uuml;rzung f&uuml;r {@code with(ChronoHistory.ofGregorianReform(date))}. </p>
      *
      * @param   date        first gregorian date after gregorian calendar reform takes effect
      * @return  changed copy with given date of gregorian calendar reform while this instance remains unaffected
      * @throws  IllegalArgumentException if given date is before first introduction of gregorian calendar
      *          on 1582-10-15 and not the minimum on the date axis
      * @see     ChronoHistory#ofGregorianReform(PlainDate)
+     * @see     #with(ChronoHistory)
      * @since   3.0
      */
     public ChronoFormatter<T> withGregorianCutOver(PlainDate date) {
 
-        ChronoHistory history;
-        PlainDate cutover;
+        return this.with(ChronoHistory.ofGregorianReform(date));
 
-        if (date.equals(PlainDate.axis().getMinimum())) {
-            history = null;
-            cutover = null;
-        } else if (date.isBefore(ChronoHistory.ofFirstGregorianReform().getGregorianCutOverDate())) {
-            throw new IllegalArgumentException("Gregorian calendar did not exist before 1582-10-15");
-        } else {
-            history = ChronoHistory.ofGregorianReform(date);
-            cutover = date;
+    }
+
+    /**
+     * <p>Creates a copy of this formatter with the given chronological history of gregorian calendar reforms. </p>
+     *
+     * <p>Note that this configuration will override any gregorian cutover date which might be inferred
+     * from current locale. </p>
+     *
+     * @param   history             chronological history describing historical calendar reforms
+     * @return  changed copy with given history while this instance remains unaffected
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie, die die angegebene Kalenderreform verwendet. </p>
+     *
+     * <p>Zu beachten: Diese Methode wird jedes gregorianische Umstellungsdatum &uuml;berschreiben, das
+     * von der L&auml;ndereinstellung dieses Formatierers abgeleitet werden mag. </p>
+     *
+     * @param   history             chronological history describing historical calendar reforms
+     * @return  changed copy with given history while this instance remains unaffected
+     * @since   3.1
+     */
+    public ChronoFormatter<T> with(ChronoHistory history) {
+
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .set(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT, history.getVariant())
+                .build();
+        PlainDate cutover = null;
+
+        if (history.getVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
+            cutover = history.getGregorianCutOverDate();
         }
 
         AttributeSet as =
             new AttributeSet(
-                this.globalAttributes.getAttributes(),
+                attrs,
                 this.globalAttributes.getLocale(),
                 this.globalAttributes.getLevel(),
                 this.globalAttributes.getSection(),
