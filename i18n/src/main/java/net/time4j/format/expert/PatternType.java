@@ -80,7 +80,8 @@ public enum PatternType
      *      <td>{@link ChronoHistory#era() ERA}</td>
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
-     *      indicate the long form and five symbols stand for a letter. </td>
+     *      indicate the long form and five symbols stand for a letter. The era
+     *      is based on the chronological history of the current format locale. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
@@ -112,7 +113,8 @@ public enum PatternType
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
      *      <td>Q</td>
      *      <td>One or two symbols for the numerical form, three symbols
-     *      for the abbreviation and four for the full name. </td>
+     *      for the abbreviation, four for the full name and five for
+     *      a letter symbol (NARROW). </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -306,7 +308,8 @@ public enum PatternType
      *      <td>G</td>
      *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
      *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
-     *      Buchstabensymbol. </td>
+     *      Buchstabensymbol. Die &Auml;ra basiert auf dem Ausdruck
+     *      {@code ChronoHistory.of(format-locale)}. </td>
      *  </tr>
      *  <tr>
      *      <td>YEAR_OF_ERA</td>
@@ -339,7 +342,8 @@ public enum PatternType
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
      *      <td>Q</td>
      *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
-     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen. </td>
+     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
+     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW).
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -1207,6 +1211,12 @@ public enum PatternType
             case 4:
                 builder.startSection(
                     Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                builder.addText(PlainDate.QUARTER_OF_YEAR);
+                builder.endSection();
+                break;
+            case 5:
+                builder.startSection(
+                    Attributes.TEXT_WIDTH, TextWidth.NARROW);
                 builder.addText(PlainDate.QUARTER_OF_YEAR);
                 builder.endSection();
                 break;
