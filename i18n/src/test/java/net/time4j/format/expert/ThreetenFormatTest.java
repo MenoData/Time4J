@@ -1,5 +1,6 @@
 package net.time4j.format.expert;
 
+import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -8,6 +9,7 @@ import net.time4j.format.Leniency;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -157,6 +159,61 @@ public class ThreetenFormatTest {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT, () -> "Europe/Berlin");
         assertThat(formatter.format(ta), is("2012-07-01 01:59:60+02:00"));
+    }
+
+    @Test
+    public void formatLocalDateWithThreetenPattern1() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G yyyy-MM-dd (QQQ)", PatternType.THREETEN, Locale.ENGLISH);
+        assertThat(
+            formatter.format(PlainDate.of(1582, 10, 14)),
+            is("AD 1582-10-14 (Q4)")
+        );
+    }
+
+    @Test
+    public void formatLocalDateWithThreetenPattern2() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G yyyy-MM-dd (QQQ)", PatternType.THREETEN, Locale.ENGLISH);
+        assertThat(
+            formatter.format(PlainDate.of(0, 1, 1)),
+            is("BC 0001-01-01 (Q1)")
+        );
+    }
+
+    @Test
+    public void formatTwoDigitYearWithThreetenPattern() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("yy-MM-dd", PatternType.THREETEN, Locale.ENGLISH);
+        assertThat(
+            formatter.parse("70-01-01"),
+            is(PlainDate.of(2070, 1, 1))
+        );
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void formatShortDayOfWeekWithThreetenPattern() throws ParseException {
+        ChronoFormatter.ofDatePattern("EEEEEE", PatternType.THREETEN, Locale.ENGLISH);
+    }
+
+    @Test
+    public void formatLocalTimeWithThreetenPattern() {
+        ChronoFormatter<PlainTime> formatter =
+            ChronoFormatter.ofTimePattern("pph:mm:ss a n", PatternType.THREETEN, Locale.ENGLISH);
+        assertThat(
+            formatter.format(PlainTime.of(14, 10, 14, 123456789)),
+            is(" 2:10:14 PM 123456789")
+        );
+    }
+
+    @Test
+    public void formatLocalDateTimeWithThreetenPattern() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.ofTimestampPattern("EEE, uuuu-MM-dd HH:mm:ss.SSSSSS", PatternType.THREETEN, Locale.ENGLISH);
+        assertThat(
+            formatter.format(PlainTimestamp.of(2015, 5, 16, 17, 45, 30).plus(123456789, ClockUnit.NANOS)),
+            is("Sat, 2015-05-16 17:45:30.123456")
+        );
     }
 
 }

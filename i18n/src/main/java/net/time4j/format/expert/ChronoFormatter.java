@@ -2254,6 +2254,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         private int sectionID;
         private int reservedIndex;
         private int leftPadWidth;
+        private boolean prolepticGregorian;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2282,6 +2283,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             this.sectionID = 0;
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
+            this.prolepticGregorian = false;
 
         }
 
@@ -4608,11 +4610,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public ChronoFormatter<T> build() {
 
-            return new ChronoFormatter<>(
-                this.chronology,
-                this.locale,
-                this.steps
-            );
+            ChronoFormatter<T> formatter =
+                new ChronoFormatter<>(
+                    this.chronology,
+                    this.locale,
+                    this.steps
+                );
+
+            if (this.prolepticGregorian) {
+                formatter = formatter.with(ChronoHistory.PROLEPTIC_GREGORIAN);
+            }
+
+            return formatter;
 
         }
 
@@ -4630,6 +4639,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Builder<T> addProlepticIsoYearWithTwoDigits() {
 
             return this.addNumber(PlainDate.YEAR, true, 2, 2, SignPolicy.SHOW_NEVER, true);
+
+        }
+
+        // Spezialmethode für PatternType.THREETEN
+        void setProlepticGregorian() {
+
+            this.prolepticGregorian = true;
 
         }
 

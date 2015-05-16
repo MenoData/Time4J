@@ -80,7 +80,8 @@ public enum PatternType
      *      <td>{@link ChronoHistory#era() ERA}</td>
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
-     *      indicate the long form and five symbols stand for a letter. </td>
+     *      indicate the long form and five symbols stand for a letter. The era
+     *      is based on the chronological history of the current format locale.  </td>
      *  </tr>
      *  <tr>
      *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
@@ -112,7 +113,8 @@ public enum PatternType
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
      *      <td>Q</td>
      *      <td>One or two symbols for the numerical form, three symbols
-     *      for the abbreviation and four for the full name. </td>
+     *      for the abbreviation, four for the full name and five for
+     *      a letter symbol (NARROW). </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -187,7 +189,7 @@ public enum PatternType
      *      <td>c</td>
      *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
      *      In some languages (not english) the stand-alone-version requires
-     *      a special grammar. </td>
+     *      a special grammar. However, 2 symbols are not allowed. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
@@ -306,7 +308,8 @@ public enum PatternType
      *      <td>G</td>
      *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
      *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
-     *      Buchstabensymbol. </td>
+     *      Buchstabensymbol. Die &Auml;ra basiert auf dem Ausdruck
+     *      {@code ChronoHistory.of(format-locale)}. </td>
      *  </tr>
      *  <tr>
      *      <td>YEAR_OF_ERA</td>
@@ -339,7 +342,8 @@ public enum PatternType
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
      *      <td>Q</td>
      *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
-     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen. </td>
+     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
+     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW).
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -422,7 +426,7 @@ public enum PatternType
      *      <td>Wie e, aber in der {@link OutputContext#STANDALONE
      *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
      *      erfordert die alleinstehende Variante eine besondere
-     *      Deklination. </td>
+     *      Deklination. Zu beachten: 2 Symbole sind nicht erlaubt. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
@@ -704,7 +708,179 @@ public enum PatternType
      * </table>
      * </div>
      */
-    SIMPLE_DATE_FORMAT;
+    SIMPLE_DATE_FORMAT,
+
+    /**
+     * <p>Follows the format pattern description of class
+     * {@link java.time.format.DateTimeFormatter}, which is very near, but not
+     * exactly the same as CLDR and extends it in some details. </p>
+     *
+     * <p>Deviations from {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legend</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoHistory#era() ERA}</td>
+     *      <td>G</td>
+     *      <td>Like in CLDR, but related to the proleptic gregorian calendar. It is NOT the historic era. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
+     *      <td>y</td>
+     *      <td>Like in CLDR, but related to the proleptic gregorian calendar. It is NOT
+     *      the historic year of era. Another important difference: It will use the pivot year 2100
+     *      for the range 2000-2099 if the two-digit-form is choosen. If you want to configure the pivot
+     *      year then use {@code PatternType.CLDR} instead. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
+     *      <td>Y</td>
+     *      <td>Like in CLDR, but the two-digit-form will use the pivot year 2100 for the range 2000-2099.
+     *      If you want to configure the pivot year then use {@code PatternType.CLDR} instead. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR}</td>
+     *      <td>u</td>
+     *      <td>Like in CLDR, but the two-digit-form will use the pivot year 2100 for the range 2000-2099.
+     *      If you want to configure the pivot year then use {@code PatternType.CLDR} instead. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
+     *      <td>g</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#boundedWeekOfMonth()}</td>
+     *      <td>W</td>
+     *      <td>One symbol for the country-dependent week of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#DAY_OF_WEEK}</td>
+     *      <td>E</td>
+     *      <td>Like in CLDR, but no more than five pattern symbols are allowed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>e</td>
+     *      <td>Like in CLDR, but no more than five pattern symbols are allowed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>c</td>
+     *      <td>Like in CLDR, but no more than five pattern symbols are allowed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#NANO_OF_SECOND}</td>
+     *      <td>n</td>
+     *      <td>1-9 symbols allowed, no CLDR-equivalent. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#NANO_OF_DAY}</td>
+     *      <td>N</td>
+     *      <td>1-18 symbols allowed, no CLDR-equivalent. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoFormatter.Builder#padNext(int)}</td>
+     *      <td>p</td>
+     *      <td>No CLDR-equivalent. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
+     * <p>Folgt der Formatmusterbeschreibung der Klasse
+     * {@link java.time.format.DateTimeFormatter}, die sich stark, aber
+     * nicht exakt an CLDR orientiert und letzteres in einigen Details erweitert. </p>
+     *
+     * <p>Unterschiede zu {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legende</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Beschreibung</th>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoHistory#era() ERA}</td>
+     *      <td>G</td>
+     *      <td>Wie in CLDR, aber bezogen auf den proleptisch gregorianischen Kalender. Es handelt sich nicht
+     *      um die historische &Auml;ra. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
+     *      <td>y</td>
+     *      <td>Wie in CLDR, aber bezogen auf den proleptisch gregorianischen Kalender. Es handelt sich nicht
+     *      um das historische Jahr der &Auml;ra. Ein anderer wichtiger Unterschied: Das Kippjahr 2100 f&uuml;r
+     *      den Bereich 2000-2099 wird benutzt wenn eine zweistellige Jahresangabe gew&auml;hlt wird. Wenn das
+     *      Kippjahr konfiguriert werden soll, dann ist {@code PatternType.CLDR} zu verwenden. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
+     *      <td>Y</td>
+     *      <td>Wie in CLDR, aber eine zweistellige Jahresangabe wird das Kippjahr 2100 f&uuml;r
+     *      den Bereich 2000-2099 verwenden. Wenn das Kippjahr konfiguriert werden soll, ist
+     *      {@code PatternType.CLDR} zu verwenden. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#YEAR}</td>
+     *      <td>u</td>
+     *      <td>Wie in CLDR, aber eine zweistellige Jahresangabe wird das Kippjahr 2100 f&uuml;r
+     *      den Bereich 2000-2099 verwenden. Wenn das Kippjahr konfiguriert werden soll, ist
+     *      {@code PatternType.CLDR} zu verwenden. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
+     *      <td>g</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#boundedWeekOfMonth()}</td>
+     *      <td>W</td>
+     *      <td>Ein Symbol f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Monats. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainDate#DAY_OF_WEEK}</td>
+     *      <td>E</td>
+     *      <td>Wie in CLDR, aber nicht mehr als 5 Symbole sind erlaubt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>e</td>
+     *      <td>Wie in CLDR, aber nicht mehr als 5 Symbole sind erlaubt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link Weekmodel#localDayOfWeek()}</td>
+     *      <td>c</td>
+     *      <td>Wie in CLDR, aber nicht mehr als 5 Symbole sind erlaubt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#NANO_OF_SECOND}</td>
+     *      <td>n</td>
+     *      <td>1-9 Symbole erlaubt, kein CLDR-&Auml;quivalent. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#NANO_OF_DAY}</td>
+     *      <td>N</td>
+     *      <td>1-18 Symbole erlaubt, kein CLDR-&Auml;quivalent. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link ChronoFormatter.Builder#padNext(int)}</td>
+     *      <td>p</td>
+     *      <td>Kein CLDR-&Auml;quivalent. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     */
+    THREETEN;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -749,6 +925,8 @@ public enum PatternType
                 return cldr(builder, locale, symbol, count, false);
             case SIMPLE_DATE_FORMAT:
                 return sdf(builder, locale, symbol, count);
+            case THREETEN:
+                return threeten(builder, locale, symbol, count);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -781,8 +959,7 @@ public enum PatternType
                 TextElement<?> eraElement = history.era();
                 builder.addText(eraElement);
                 builder.endSection();
-                Map<ChronoElement<?>, ChronoElement<?>> replacement =
-                    new HashMap<ChronoElement<?>, ChronoElement<?>>();
+                Map<ChronoElement<?>, ChronoElement<?>> replacement = new HashMap<>();
                 replacement.put(PlainDate.YEAR, history.yearOfEra());
                 replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
                 replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
@@ -1089,6 +1266,198 @@ public enum PatternType
 
     }
 
+    private Map<ChronoElement<?>, ChronoElement<?>> threeten(
+        ChronoFormatter.Builder<?> builder,
+        Locale locale,
+        char symbol,
+        int count
+    ) {
+
+        switch (symbol) {
+            case 'G':
+                TextWidth eraWidth;
+                if (count <= 3) {
+                    eraWidth = TextWidth.ABBREVIATED;
+                } else if (count == 4) {
+                    eraWidth = TextWidth.WIDE;
+                } else if (count == 5) {
+                    eraWidth = TextWidth.NARROW;
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
+                ChronoHistory history = ChronoHistory.PROLEPTIC_GREGORIAN;
+                TextElement<?> eraElement = history.era();
+                builder.addText(eraElement);
+                builder.endSection();
+                builder.setProlepticGregorian();
+                Map<ChronoElement<?>, ChronoElement<?>> replacement = new HashMap<>();
+                replacement.put(PlainDate.YEAR, history.yearOfEra());
+                replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
+                replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
+                replacement.put(PlainDate.DAY_OF_MONTH, history.dayOfMonth());
+                return replacement;
+            case 'y':
+                if (count == 2) {
+                    builder.startSection(Attributes.PIVOT_YEAR, 2100);
+                    builder.addTwoDigitYear(PlainDate.YEAR);
+                    builder.endSection();
+                } else if (count < 4) {
+                    builder.addInteger(
+                        PlainDate.YEAR,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_NEGATIVE);
+                } else {
+                    builder.addInteger(
+                        PlainDate.YEAR,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                }
+                break;
+            case 'Y':
+                if (count == 2) {
+                    builder.startSection(Attributes.PIVOT_YEAR, 2100);
+                    builder.addTwoDigitYear(PlainDate.YEAR_OF_WEEKDATE);
+                    builder.endSection();
+                } else if (count < 4) {
+                    builder.addInteger(
+                        PlainDate.YEAR_OF_WEEKDATE,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_NEGATIVE);
+                } else {
+                    builder.addInteger(
+                        PlainDate.YEAR_OF_WEEKDATE,
+                        count,
+                        9,
+                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                }
+                break;
+            case 'u':
+                if (count == 2) {
+                    builder.startSection(Attributes.PIVOT_YEAR, 2100);
+                    builder.addProlepticIsoYearWithTwoDigits();
+                    builder.endSection();
+                } else if (count < 4) {
+                    builder.addProlepticIsoYear(
+                        count,
+                        SignPolicy.SHOW_WHEN_NEGATIVE);
+                } else {
+                    builder.addProlepticIsoYear(
+                        count,
+                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                }
+                break;
+            case 'W':
+                if (count == 1) {
+                    builder.addFixedInteger(
+                        Weekmodel.of(locale).boundedWeekOfMonth(), 1);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
+            case 'E':
+                TextWidth width;
+                if (count <= 3) {
+                    width = TextWidth.ABBREVIATED;
+                } else if (count == 4) {
+                    width = TextWidth.WIDE;
+                } else if (count == 5) {
+                    width = TextWidth.NARROW;
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addText(PlainDate.DAY_OF_WEEK);
+                builder.endSection();
+                break;
+            case 'e':
+                if (count <= 2) {
+                    builder.addFixedNumerical(
+                        Weekmodel.of(locale).localDayOfWeek(), count);
+                } else {
+                    threeten(builder, locale, 'E', count);
+                }
+                break;
+            case 'c':
+                if (count == 2) {
+                    throw new IllegalArgumentException(
+                        "Invalid pattern count of 2 for symbol 'c'.");
+                }
+                builder.startSection(
+                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                try {
+                    threeten(builder, locale, 'e', count);
+                } finally {
+                    builder.endSection();
+                }
+                break;
+            case 'w':
+            case 'Q':
+            case 'q':
+            case 'M':
+            case 'L':
+            case 'd':
+            case 'D':
+            case 'F':
+            case 'a':
+            case 'h':
+            case 'H':
+            case 'K':
+            case 'k':
+            case 'm':
+            case 's':
+            case 'S':
+            case 'A':
+                return cldr(builder, locale, symbol, count, false);
+            case 'n':
+                builder.addInteger(PlainTime.NANO_OF_SECOND, count, 9);
+                break;
+            case 'N':
+                builder.addLongNumber(PlainTime.NANO_OF_DAY, count, 18, SignPolicy.SHOW_NEVER);
+                break;
+            case 'z':
+                return cldr(builder, locale, 'z', count, false);
+            case 'Z':
+                if (count < 4) {
+                    builder.addTimezoneOffset(
+                        DisplayMode.MEDIUM,
+                        false,
+                        Collections.singletonList("+0000"));
+                } else if (count == 4) {
+                    builder.addLongLocalizedOffset();
+                } else if (count == 5) {
+                    builder.addTimezoneOffset(
+                        DisplayMode.LONG,
+                        true,
+                        Collections.singletonList("Z"));
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
+            case 'O':
+            case 'V':
+            case 'X':
+            case 'x':
+                return cldr(builder, locale, symbol, count, false);
+            case 'p':
+                builder.padNext(count);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Unsupported pattern symbol: " + symbol);
+        }
+
+        return Collections.emptyMap();
+
+    }
+
     private static void addOffset(
         ChronoFormatter.Builder<?> builder,
         int count,
@@ -1207,6 +1576,12 @@ public enum PatternType
             case 4:
                 builder.startSection(
                     Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                builder.addText(PlainDate.QUARTER_OF_YEAR);
+                builder.endSection();
+                break;
+            case 5:
+                builder.startSection(
+                    Attributes.TEXT_WIDTH, TextWidth.NARROW);
                 builder.addText(PlainDate.QUARTER_OF_YEAR);
                 builder.endSection();
                 break;
