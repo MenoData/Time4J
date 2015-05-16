@@ -54,7 +54,7 @@ public class WeekdataProviderSPI
 
     // Daten aus CLDR 23
     static {
-        Map<String, Weekday> tmp = new HashMap<String, Weekday>(28);
+        Map<String, Weekday> tmp = new HashMap<>(28);
         tmp.put("AF", Weekday.THURSDAY);
         tmp.put("DZ", Weekday.THURSDAY);
         tmp.put("IR", Weekday.THURSDAY);
@@ -77,7 +77,7 @@ public class WeekdataProviderSPI
         tmp.put("IN", Weekday.SUNDAY);
         START_OF_WEEKEND = Collections.unmodifiableMap(tmp);
 
-        tmp = new HashMap<String, Weekday>(25);
+        tmp = new HashMap<>(25);
         tmp.put("AF", Weekday.FRIDAY);
         tmp.put("DZ", Weekday.FRIDAY);
         tmp.put("IR", Weekday.FRIDAY);
@@ -127,10 +127,8 @@ public class WeekdataProviderSPI
         if (is != null) {
 
             this.source = "@" + cl.getResource(name).toString();
-            Map<String, Weekday> tmpStart =
-                new HashMap<String, Weekday>(START_OF_WEEKEND.size());
-            Map<String, Weekday> tmpEnd =
-                new HashMap<String, Weekday>(END_OF_WEEKEND.size());
+            Map<String, Weekday> tmpStart = new HashMap<>(START_OF_WEEKEND.size());
+            Map<String, Weekday> tmpEnd = new HashMap<>(END_OF_WEEKEND.size());
 
             try {
 
@@ -149,7 +147,7 @@ public class WeekdataProviderSPI
                     int equal = line.indexOf('=');
                     String prefix = line.substring(0, equal).trim();
                     String[] list = line.substring(equal + 1).split(" ");
-                    String wd = "";
+                    String wd;
                     Weekday weekday;
                     Map<String, Weekday> map;
 
@@ -166,20 +164,28 @@ public class WeekdataProviderSPI
                             "Unexpected format: " + this.source);
                     }
 
-                    if (wd.equals("sun")) {
-                        weekday = Weekday.SUNDAY;
-                    } else if (wd.equals("sat")) {
-                        weekday = Weekday.SATURDAY;
-                    } else if (wd.equals("fri")) {
-                        weekday = Weekday.FRIDAY;
-                    } else if (wd.equals("thu")) {
-                        weekday = Weekday.THURSDAY;
-                    } else if (wd.equals("wed")) {
-                        weekday = Weekday.WEDNESDAY;
-                    } else if (wd.equals("tue")) {
-                        weekday = Weekday.TUESDAY;
-                    } else if (wd.equals("mon")) {
-                        weekday = Weekday.MONDAY;
+                    switch (wd) {
+                        case "sun":
+                            weekday = Weekday.SUNDAY;
+                            break;
+                        case "sat":
+                            weekday = Weekday.SATURDAY;
+                            break;
+                        case "fri":
+                            weekday = Weekday.FRIDAY;
+                            break;
+                        case "thu":
+                            weekday = Weekday.THURSDAY;
+                            break;
+                        case "wed":
+                            weekday = Weekday.WEDNESDAY;
+                            break;
+                        case "tue":
+                            weekday = Weekday.TUESDAY;
+                            break;
+                        case "mon":
+                            weekday = Weekday.MONDAY;
+                            break;
                     }
 
                     for (String country : list) {
@@ -223,6 +229,7 @@ public class WeekdataProviderSPI
     @Override
     public int getFirstDayOfWeek(Locale country) {
 
+        // TODO: CLDR-Daten anzapfen?
         GregorianCalendar gc = new GregorianCalendar(country);
         int fd = gc.getFirstDayOfWeek();
         return ((fd == 1) ? 7 : (fd - 1));
@@ -232,6 +239,7 @@ public class WeekdataProviderSPI
     @Override
     public int getMinimalDaysInFirstWeek(Locale country) {
 
+        // TODO: CLDR-Daten anzapfen?
         GregorianCalendar gc = new GregorianCalendar(country);
         return gc.getMinimalDaysInFirstWeek();
 

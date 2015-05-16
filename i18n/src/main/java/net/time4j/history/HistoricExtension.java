@@ -26,7 +26,11 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
+import net.time4j.engine.ValidationElement;
+import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -63,6 +67,10 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
+        if (locale.getCountry().isEmpty()) {
+            return Collections.emptySet();
+        }
+
         return getHistory(locale, attributes).getElements();
 
     }
@@ -75,14 +83,27 @@ public class HistoricExtension
     ) {
 
         ChronoHistory history = getHistory(locale, attributes);
+        HistoricEra era = null;
+
+        if (entity.contains(history.era())) {
+            era = entity.get(history.era());
+        } else {
+            if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
+                era = HistoricEra.AD;
+            } else {
+                String message = "Parsing of historical dates requires the presence of an era.";
+                if (entity.isValid(ValidationElement.ERROR_MESSAGE, message)) {
+                    entity.with(ValidationElement.ERROR_MESSAGE, message);
+                }
+            }
+        }
 
         if (
-            entity.contains(history.era())
+            (era != null)
             && entity.contains(history.yearOfEra())
             && entity.contains(history.month())
             && entity.contains(history.dayOfMonth())
         ) {
-            HistoricEra era = entity.get(history.era());
             int yearOfEra = entity.get(history.yearOfEra());
             int month = entity.get(history.month());
             int dayOfMonth = entity.get(history.dayOfMonth());

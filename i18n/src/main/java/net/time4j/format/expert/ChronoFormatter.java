@@ -167,7 +167,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    // Aufruf durch withAttribute-Methoden
+    // Aufruf durch with(Locale)-Methode
     private ChronoFormatter(
         ChronoFormatter<T> old,
         AttributeSet globalAttributes
@@ -971,10 +971,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * </ul>
      *
      * <p>If necessary all inner format elements which are locale-dependent
-     * will also be adjusted (for example
-     * {@link net.time4j.Weekmodel#weekOfYear()}. But fixed literals will
-     * remain unchanged hence this method might not be suitable for all
-     * languages. </p>
+     * will also be adjusted. Some country-specific extensions like
+     * {@link net.time4j.Weekmodel#weekOfYear()} or {@link ChronoHistory#era()}
+     * will only be adjusted if the country-part of given locale is not empty.
+     * However, fixed literals will remain unchanged hence this method might
+     * not be suitable for all languages. Example: </p>
+     *
+     * <p>{@code new Locale("sv")} will only change the language to swedish
+     * with no side effects, but {@code new Locale("sv", "SE")} will also
+     * set the week model and the historical swedish calendar which can be
+     * relevant for the years 1700-1712. </p>
      *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
@@ -997,9 +1003,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <p>Angepasst werden bei Bedarf auch innere Formatelemente, die
      * Bestandteil landesabh&auml;ngiger chronologischer Erweiterungen wie
-     * zum Beispiel {@link net.time4j.Weekmodel#weekOfYear()} sind (lokales
-     * Wochenmodell). Aber feste Literale bleiben unver&auml;ndert, so da&szlig;
-     * diese Methode nicht f&uuml;r alle Sprachen geeignet sein mag. </p>
+     * zum Beispiel {@link net.time4j.Weekmodel#weekOfYear()} oder
+     * {@link ChronoHistory#era()} sind, aber nur dann, wenn die landesspezifische
+     * Komponente des angegebenen Arguments nicht leer ist. Jedoch bleiben
+     * feste Literale unver&auml;ndert, so da&szlig; diese Methode nicht f&uuml;r
+     * alle Sprachen geeignet sein mag. Beispiel: </p>
+     *
+     * <p>{@code new Locale("sv")} wird nur die Sprache zu Schwedisch ab&auml;ndern,
+     * w&auml;hrend {@code new Locale("sv", "SE")} auch das Wochenmodell und den
+     * schwedischen Kalender setzt, welcher f&uuml;r die Jahre 1700-1712 relevant
+     * sein kann. </p>
      *
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
@@ -4597,14 +4610,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             SignPolicy signPolicy
         ) {
 
-            return this.addNumber(
-                PlainDate.YEAR,
-                false,
-                count,
-                9,
-                signPolicy,
-                true
-            );
+            return this.addNumber( PlainDate.YEAR, false, count, 9, signPolicy, true);
+
+        }
+
+        // Spezialmethode, um das CLDR-Symbol u immer als proleptic-iso-year zu schützen
+        Builder<T> addProlepticIsoYearWithTwoDigits() {
+
+            return this.addNumber(PlainDate.YEAR, true, 2, 2, SignPolicy.SHOW_NEVER, true);
 
         }
 

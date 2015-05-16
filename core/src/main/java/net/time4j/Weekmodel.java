@@ -366,7 +366,8 @@ public final class Weekmodel
      *
      * <p>Note: In order to get a weekend definition deviating from the
      * standard Saturday + Sunday, the i18n-module must be present in
-     * classpath since v2.2. </p>
+     * classpath since v2.2. If the country-part of given locale is missing
+     * then this method will just return {@link #ISO}. </p>
      *
      * @param   locale      country setting
      * @return  localized week model
@@ -377,17 +378,16 @@ public final class Weekmodel
      *
      * <p>Hinweis: Damit eine von Samstag und Sonntag abweichende
      * lokalisierte Wochenenddefinition erzeugt werden kann, mu&szlig;
-     * seit Version v2.2 das i18n-Modul im Klassenpfad vorhanden sein. </p>
+     * seit Version v2.2 das i18n-Modul im Klassenpfad vorhanden sein.
+     * Falls die Landeskomponente des Arguments fehlt, wird diese Methode
+     * lediglich {@link #ISO} liefern. </p>
      *
      * @param   locale      country setting
      * @return  localized week model
      */
     public static Weekmodel of(Locale locale) {
 
-        if (
-            locale.getLanguage().isEmpty()
-            && locale.getCountry().isEmpty()
-        ) {
+        if (locale.getCountry().isEmpty()) {
             return Weekmodel.ISO;
         }
 

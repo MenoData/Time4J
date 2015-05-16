@@ -88,9 +88,8 @@ final class AttributeSet
         : ',' // Empfehlung des ISO-Standards
     );
 
-    private static final
-        ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
-            new ConcurrentHashMap<Locale, NumericalSymbols>();
+    private static final ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
+        new ConcurrentHashMap<>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
         new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
 
@@ -172,9 +171,9 @@ final class AttributeSet
 
         if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
             if (this.cutover == null) {
-                throw new NoSuchElementException(key.name());
-            } else {
                 return defaultValue;
+            } else {
+                return key.type().cast(this.cutover);
             }
         }
 
