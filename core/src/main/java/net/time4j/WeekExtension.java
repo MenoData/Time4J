@@ -26,6 +26,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -52,6 +53,10 @@ class WeekExtension
         Locale locale,
         AttributeQuery attributes
     ) {
+
+        if (locale.getCountry().isEmpty()) {
+            return Collections.emptySet();
+        }
 
         return Weekmodel.of(locale).getElements();
 

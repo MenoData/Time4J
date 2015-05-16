@@ -149,7 +149,7 @@ public class WeekdataProviderSPI
                     int equal = line.indexOf('=');
                     String prefix = line.substring(0, equal).trim();
                     String[] list = line.substring(equal + 1).split(" ");
-                    String wd = "";
+                    String wd;
                     Weekday weekday;
                     Map<String, Weekday> map;
 
@@ -223,6 +223,7 @@ public class WeekdataProviderSPI
     @Override
     public int getFirstDayOfWeek(Locale country) {
 
+        // TODO: CLDR-Daten anzapfen?
         GregorianCalendar gc = new GregorianCalendar(country);
         int fd = gc.getFirstDayOfWeek();
         return ((fd == 1) ? 7 : (fd - 1));
@@ -232,6 +233,7 @@ public class WeekdataProviderSPI
     @Override
     public int getMinimalDaysInFirstWeek(Locale country) {
 
+        // TODO: CLDR-Daten anzapfen?
         GregorianCalendar gc = new GregorianCalendar(country);
         return gc.getMinimalDaysInFirstWeek();
 

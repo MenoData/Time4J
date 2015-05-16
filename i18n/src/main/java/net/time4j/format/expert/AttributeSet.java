@@ -172,9 +172,9 @@ final class AttributeSet
 
         if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
             if (this.cutover == null) {
-                throw new NoSuchElementException(key.name());
-            } else {
                 return defaultValue;
+            } else {
+                return key.type().cast(this.cutover);
             }
         }
 
@@ -240,7 +240,7 @@ final class AttributeSet
         sb.append(this.section);
         sb.append(",print-condition=");
         sb.append(this.printCondition);
-        sb.append(",cutover-date=");
+        sb.append(",gregorian-cutover=");
         sb.append(this.cutover);
         sb.append(']');
         return sb.toString();
