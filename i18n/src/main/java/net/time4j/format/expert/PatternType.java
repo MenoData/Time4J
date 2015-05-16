@@ -189,7 +189,7 @@ public enum PatternType
      *      <td>c</td>
      *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
      *      In some languages (not english) the stand-alone-version requires
-     *      a special grammar. </td>
+     *      a special grammar. Note that 2 symbols are not allowed. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
@@ -426,7 +426,7 @@ public enum PatternType
      *      <td>Wie e, aber in der {@link OutputContext#STANDALONE
      *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
      *      erfordert die alleinstehende Variante eine besondere
-     *      Deklination. </td>
+     *      Deklination. Zu beachten: 2 Symbole sind nicht erlaubt. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
