@@ -162,14 +162,14 @@ final class SPX
         throws IOException {
 
         ChronoHistory history = (ChronoHistory) this.obj;
-        int variant = history.getVariant();
+        int variant = history.getVariant().getSerialValue();
 
         int header = this.type;
         header <<= 4;
         header |= variant;
         out.writeByte(header);
 
-        if (variant == ChronoHistory.VARIANT_OTHER) {
+        if (history.getVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
             out.writeLong(history.getEvents().get(0).start);
         }
 
@@ -181,22 +181,33 @@ final class SPX
     ) throws IOException, ClassNotFoundException {
 
         int variant = header & 0xF;
+        HistoricVariant hv = getEnum(variant);
 
-        switch (variant) {
-            case ChronoHistory.VARIANT_OTHER:
-                long mjd = in.readLong();
-                return ChronoHistory.ofGregorianReform(PlainDate.of(mjd, EpochDays.MODIFIED_JULIAN_DATE));
-            case ChronoHistory.VARIANT_PROLEPTIC_GREGORIAN:
+        switch (hv) {
+            case PROLEPTIC_GREGORIAN:
                 return ChronoHistory.PROLEPTIC_GREGORIAN;
-            case ChronoHistory.VARIANT_PROLEPTIC_JULIAN:
+            case PROLEPTIC_JULIAN:
                 return ChronoHistory.PROLEPTIC_JULIAN;
-            case ChronoHistory.VARIANT_SWEDEN:
+            case SWEDEN:
                 return ChronoHistory.ofSweden();
-            case ChronoHistory.VARIANT_FIRST_GREGORIAN_REFORM:
+            case INTRODUCTION_ON_1582_10_15:
                 return ChronoHistory.ofFirstGregorianReform();
             default:
-                throw new StreamCorruptedException("Unknown variant of chronological history.");
+                long mjd = in.readLong();
+                return ChronoHistory.ofGregorianReform(PlainDate.of(mjd, EpochDays.MODIFIED_JULIAN_DATE));
         }
+
+    }
+
+    private static HistoricVariant getEnum(int variant) throws StreamCorruptedException {
+
+        for (HistoricVariant hv : HistoricVariant.values()) {
+            if (hv.getSerialValue() == variant) {
+                return hv;
+            }
+        }
+
+        throw new StreamCorruptedException("Unknown variant of chronological history.");
 
     }
 

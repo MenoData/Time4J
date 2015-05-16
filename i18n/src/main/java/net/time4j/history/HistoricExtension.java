@@ -125,9 +125,22 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
-        if (attributes.contains(ChronoHistory.ATTRIBUTE_CUTOVER_DATE)) {
-            PlainDate date = attributes.get(ChronoHistory.ATTRIBUTE_CUTOVER_DATE);
-            return ChronoHistory.ofGregorianReform(date);
+        if (attributes.contains(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT)) {
+            switch (attributes.get(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT)) {
+                case INTRODUCTION_ON_1582_10_15:
+                    return ChronoHistory.ofFirstGregorianReform();
+                case PROLEPTIC_JULIAN:
+                    return ChronoHistory.PROLEPTIC_JULIAN;
+                case PROLEPTIC_GREGORIAN:
+                    return ChronoHistory.PROLEPTIC_GREGORIAN;
+                case SWEDEN:
+                    return ChronoHistory.ofSweden();
+                default:
+                    if (attributes.contains(ChronoHistory.ATTRIBUTE_CUTOVER_DATE)) {
+                        PlainDate date = attributes.get(ChronoHistory.ATTRIBUTE_CUTOVER_DATE);
+                        return ChronoHistory.ofGregorianReform(date);
+                    }
+            }
         }
 
         return ChronoHistory.of(locale);

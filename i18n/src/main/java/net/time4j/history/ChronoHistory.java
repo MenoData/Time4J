@@ -62,6 +62,27 @@ public final class ChronoHistory
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * <p>Format attribute which determines the historical calendar variant. </p>
+     *
+     * <p>Users will usually not directly use this attribute but adjust a given {@code ChronoFormatter}
+     * by its method {@code with(ChronoHistory)}. </p>
+     *
+     * @since   3.1
+     * @see     net.time4j.format.expert.ChronoFormatter#with(ChronoHistory)
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das die historische Kalendervariante bestimmt. </p>
+     *
+     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
+     * Methode {@code ChronoFormatter.with(ChronoHistory)} aufrufen. </p>
+     *
+     * @since   3.1
+     * @see     net.time4j.format.expert.ChronoFormatter#with(ChronoHistory)
+     */
+    public static final AttributeKey<HistoricVariant> ATTRIBUTE_HISTORIC_VARIANT =
+        Key.valueOf("HISTORIC_VARIANT", HistoricVariant.class);
+
+    /**
      * <p>Format attribute which can cause the format engine to create a chronological history with
      * given cutover date. </p>
      *
@@ -102,13 +123,6 @@ public final class ChronoHistory
      */
     public static final AttributeKey<Boolean> ATTRIBUTE_COMMON_ERA =
         Key.valueOf("COMMON_ERA", Boolean.class);
-
-    // some variant constants used in serialization
-    static final int VARIANT_PROLEPTIC_GREGORIAN = 1;
-    static final int VARIANT_PROLEPTIC_JULIAN = 2;
-    static final int VARIANT_SWEDEN = 4;
-    static final int VARIANT_FIRST_GREGORIAN_REFORM = 7;
-    static final int VARIANT_OTHER = 0;
 
     /**
      * <p>Describes no real historical event but just the proleptic gregorian calendar which is assumed
@@ -151,13 +165,13 @@ public final class ChronoHistory
     static {
         PROLEPTIC_GREGORIAN =
             new ChronoHistory(
-                VARIANT_PROLEPTIC_GREGORIAN,
+                HistoricVariant.PROLEPTIC_GREGORIAN,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.GREGORIAN, CalendarAlgorithm.GREGORIAN)));
 
         PROLEPTIC_JULIAN =
             new ChronoHistory(
-                VARIANT_PROLEPTIC_JULIAN,
+                HistoricVariant.PROLEPTIC_JULIAN,
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.JULIAN, CalendarAlgorithm.JULIAN)));
 
@@ -168,7 +182,7 @@ public final class ChronoHistory
         events.add(new CutOverEvent(-57959, CalendarAlgorithm.JULIAN, CalendarAlgorithm.SWEDISH)); // 1700-03-01
         events.add(new CutOverEvent(-53575, CalendarAlgorithm.SWEDISH, CalendarAlgorithm.JULIAN)); // 1712-03-01
         events.add(new CutOverEvent(-38611, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)); // 1753-03-01
-        SWEDEN = new ChronoHistory(VARIANT_SWEDEN, Collections.unmodifiableList(events));
+        SWEDEN = new ChronoHistory(HistoricVariant.SWEDEN, Collections.unmodifiableList(events));
 
         Map<String, ChronoHistory> tmp = new HashMap<>();
         tmp.put("GB", ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14)));
@@ -182,7 +196,7 @@ public final class ChronoHistory
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final int variant;
+    private transient final HistoricVariant variant;
     private transient final List<CutOverEvent> events;
     private transient final TextElement<HistoricEra> eraElement;
     private transient final TextElement<Integer> yearOfEraElement;
@@ -193,7 +207,7 @@ public final class ChronoHistory
     //~ Konstruktoren -----------------------------------------------------
 
     private ChronoHistory(
-        int variant,
+        HistoricVariant variant,
         List<CutOverEvent> events
     ) {
         super();
@@ -201,6 +215,8 @@ public final class ChronoHistory
         if (events.isEmpty()) {
             throw new IllegalArgumentException(
                 "At least one cutover event must be present in chronological history.");
+        } else if (variant == null) {
+            throw new NullPointerException("Missing historical variant.");
         }
 
         this.variant = variant;
@@ -377,12 +393,7 @@ public final class ChronoHistory
         }
 
         CalendarAlgorithm algorithm = this.getAlgorithm(date);
-
-        if (algorithm == null) {
-            return false; // gap at cutover
-        }
-
-        return algorithm.isValid(date);
+        return ((algorithm != null) && algorithm.isValid(date));
 
     }
 
@@ -441,6 +452,18 @@ public final class ChronoHistory
         }
 
         return CalendarAlgorithm.JULIAN.fromMJD(mjd);
+
+    }
+
+    /**
+     * <p>Yields the variant. </p>
+     *
+     * @return  HistoricVariant
+     * @since   3.1
+     */
+    public HistoricVariant getVariant() {
+
+        return this.variant;
 
     }
 
@@ -614,10 +637,11 @@ public final class ChronoHistory
             ChronoHistory that = (ChronoHistory) obj;
             if (this.variant != that.variant) {
                 return false;
-            } else if (this.variant == VARIANT_OTHER) {
-                return (this.events.get(0).start == that.events.get(0).start);
             } else {
-                return true;
+                return (
+                    (this.variant != HistoricVariant.SINGLE_CUTOVER_DATE)
+                    || (this.events.get(0).start == that.events.get(0).start)
+                );
             }
         } else {
             return false;
@@ -628,28 +652,29 @@ public final class ChronoHistory
     @Override
     public int hashCode() {
 
-        if (this.variant == VARIANT_OTHER) {
+        if (this.variant == HistoricVariant.SINGLE_CUTOVER_DATE) {
             long h = this.events.get(0).start;
             return (int) (h ^ (h << 32));
         }
 
-        return this.variant;
+        return this.variant.hashCode();
 
     }
 
     public String toString() {
 
         switch (this.variant) {
-            case VARIANT_PROLEPTIC_GREGORIAN:
+            case PROLEPTIC_GREGORIAN:
                 return "ChronoHistory[PROLEPTIC-GREGORIAN]";
-            case VARIANT_PROLEPTIC_JULIAN:
+            case PROLEPTIC_JULIAN:
                 return "ChronoHistory[PROLEPTIC-JULIAN]";
-            case VARIANT_SWEDEN:
+            case SWEDEN:
                 return "ChronoHistory[SWEDEN]";
             default:
                 PlainDate date = this.getGregorianCutOverDate();
                 return "ChronoHistory[" + date + "]";
         }
+
     }
 
     /**
@@ -713,18 +738,6 @@ public final class ChronoHistory
     }
 
     /**
-     * <p>Yields the variant. </p>
-     *
-     * @return  int
-     * @since   3.0
-     */
-    int getVariant() {
-
-        return this.variant;
-
-    }
-
-    /**
      * <p>Yields all associated elements. </p>
      *
      * @return  unmodifiable set
@@ -747,7 +760,9 @@ public final class ChronoHistory
     private static ChronoHistory ofGregorianReform(long mjd) {
 
         return new ChronoHistory(
-            ((mjd == EARLIEST_CUTOVER) ? VARIANT_FIRST_GREGORIAN_REFORM : VARIANT_OTHER),
+            ((mjd == EARLIEST_CUTOVER)
+                ? HistoricVariant.INTRODUCTION_ON_1582_10_15
+                : HistoricVariant.SINGLE_CUTOVER_DATE),
             Collections.singletonList(
                 new CutOverEvent(mjd, CalendarAlgorithm.JULIAN, CalendarAlgorithm.GREGORIAN)));
 

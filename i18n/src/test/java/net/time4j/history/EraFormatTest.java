@@ -109,7 +109,7 @@ public class EraFormatTest {
     }
 
     @Test
-    public void printSweden() {
+    public void printSweden1() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
                 .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR)
@@ -120,13 +120,38 @@ public class EraFormatTest {
     }
 
     @Test
-    public void parseSweden() throws ParseException {
+    public void parseSweden1() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
                 .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR)
                 .build();
         assertThat(
             formatter.parse("30. februari 1712 efter Kristus"),
+            is(PlainDate.of(1712, 3, 11)));
+    }
+
+    @Test
+    public void printSweden2() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv"))
+                .addPattern("d. MMMM yyyy", PatternType.CLDR)
+                .build()
+                .with(ChronoHistory.ofSweden());
+        assertThat(
+            formatter.format(PlainDate.of(1712, 3, 11)),
+            is("30. februari 1712"));
+    }
+
+    @Test
+    public void parseSweden2() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv"))
+                .addPattern("d. MMMM yyyy", PatternType.CLDR)
+                .build()
+                .with(ChronoHistory.ofSweden())
+                .withDefault(ChronoHistory.ofSweden().era(), HistoricEra.AD);
+        assertThat(
+            formatter.parse("30. februari 1712"),
             is(PlainDate.of(1712, 3, 11)));
     }
 
