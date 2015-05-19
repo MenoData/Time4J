@@ -46,7 +46,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class EnumElement<V extends Enum<V>>
     extends AbstractDateElement<V>

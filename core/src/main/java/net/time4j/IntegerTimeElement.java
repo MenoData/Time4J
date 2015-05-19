@@ -35,7 +35,7 @@ import java.math.BigDecimal;
  * <p>Allgemeines verstellbares Uhrzeitelement auf Integer-Basis. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class IntegerTimeElement
     extends AbstractTimeElement<Integer>

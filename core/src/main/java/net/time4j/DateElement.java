@@ -35,7 +35,7 @@ import java.io.ObjectStreamException;
  * <p>Repr&auml;sentiert eine Datumskomponente. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class DateElement
     extends BasicElement<PlainDate>

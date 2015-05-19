@@ -29,7 +29,7 @@ import net.time4j.engine.ChronoDisplay;
  * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class LeapsecondElement
     extends BasicElement<Boolean> {

@@ -37,7 +37,7 @@ import java.math.BigDecimal;
  * <p>Ein dezimales Uhrzeitelement. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class DecimalTimeElement
     extends BasicElement<BigDecimal>

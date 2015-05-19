@@ -36,7 +36,7 @@ import java.math.BigDecimal;
  * <p>Allgemeines verstellbares chronologisches Element auf Integer-Basis. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class IntegerDateElement
     extends AbstractDateElement<Integer>

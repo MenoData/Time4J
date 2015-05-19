@@ -36,7 +36,7 @@ import java.math.BigDecimal;
  * <p>Repr&auml;sentiert ein Uhrzeitelement vom long-Typ. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class LongElement
     extends AbstractTimeElement<Long>
