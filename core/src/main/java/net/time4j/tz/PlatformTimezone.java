@@ -41,14 +41,6 @@ import java.util.Locale;
  * @serial      include
  * @doctags.concurrency {threadsafe}
  */
-/*[deutsch]
- * <p>Eine Zeitzonenimplementierung, die an {@link java.util.TimeZone}
- * delegiert und daher auf allen Plattformen existieren sollte. </p>
- *
- * @author      Meno Hochschild
- * @serial      include
- * @doctags.concurrency {threadsafe}
- */
 final class PlatformTimezone
     extends Timezone {
 
