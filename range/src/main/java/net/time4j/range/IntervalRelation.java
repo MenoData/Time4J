@@ -34,43 +34,43 @@ import net.time4j.engine.Temporal;
  * <table border="1">
  * <caption>Allen-Relations</caption>
  * <tr>
- *  <td>precedes</td><td><img src="doc-files/precedes.jpg" /></td>
+ *  <td>precedes</td><td><img src="doc-files/precedes.jpg"></td>
  * </tr>
  * <tr>
- *  <td>meets</td><td><img src="doc-files/meets.jpg" /></td>
+ *  <td>meets</td><td><img src="doc-files/meets.jpg"></td>
  * </tr>
  * <tr>
- *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg" /></td>
+ *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg"></td>
  * </tr>
  * <tr>
- *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg" /></td>
+ *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>encloses</td><td><img src="doc-files/encloses.jpg" /></td>
+ *  <td>encloses</td><td><img src="doc-files/encloses.jpg"></td>
  * </tr>
  * <tr>
- *  <td>starts</td><td><img src="doc-files/starts.jpg" /></td>
+ *  <td>starts</td><td><img src="doc-files/starts.jpg"></td>
  * </tr>
  * <tr>
- *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg" /></td>
+ *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg"></td>
  * </tr>
  * <tr>
- *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg" /></td>
+ *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg" /></td>
+ *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>finishes</td><td><img src="doc-files/finishes.jpg" /></td>
+ *  <td>finishes</td><td><img src="doc-files/finishes.jpg"></td>
  * </tr>
  * <tr>
- *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg" /></td>
+ *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>metBy</td><td><img src="doc-files/metBy.jpg" /></td>
+ *  <td>metBy</td><td><img src="doc-files/metBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg" /></td>
+ *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg"></td>
  * </tr>
  * </table>
  * </div>
@@ -93,43 +93,43 @@ import net.time4j.engine.Temporal;
  * <table border="1">
  * <caption>Allen-Relationen</caption>
  * <tr>
- *  <td>precedes</td><td><img src="doc-files/precedes.jpg" /></td>
+ *  <td>precedes</td><td><img src="doc-files/precedes.jpg"></td>
  * </tr>
  * <tr>
- *  <td>meets</td><td><img src="doc-files/meets.jpg" /></td>
+ *  <td>meets</td><td><img src="doc-files/meets.jpg"></td>
  * </tr>
  * <tr>
- *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg" /></td>
+ *  <td>overlaps</td><td><img src="doc-files/overlaps.jpg"></td>
  * </tr>
  * <tr>
- *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg" /></td>
+ *  <td>finishedBy</td><td><img src="doc-files/finishedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>encloses</td><td><img src="doc-files/encloses.jpg" /></td>
+ *  <td>encloses</td><td><img src="doc-files/encloses.jpg"></td>
  * </tr>
  * <tr>
- *  <td>starts</td><td><img src="doc-files/starts.jpg" /></td>
+ *  <td>starts</td><td><img src="doc-files/starts.jpg"></td>
  * </tr>
  * <tr>
- *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg" /></td>
+ *  <td>equivalent</td><td><img src="doc-files/equivalent.jpg"></td>
  * </tr>
  * <tr>
- *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg" /></td>
+ *  <td>startedBy</td><td><img src="doc-files/startedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg" /></td>
+ *  <td>enclosedBy</td><td><img src="doc-files/enclosedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>finishes</td><td><img src="doc-files/finishes.jpg" /></td>
+ *  <td>finishes</td><td><img src="doc-files/finishes.jpg"></td>
  * </tr>
  * <tr>
- *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg" /></td>
+ *  <td>overlappedBy</td><td><img src="doc-files/overlappedBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>metBy</td><td><img src="doc-files/metBy.jpg" /></td>
+ *  <td>metBy</td><td><img src="doc-files/metBy.jpg"></td>
  * </tr>
  * <tr>
- *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg" /></td>
+ *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg"></td>
  * </tr>
  * </table>
  * </div>

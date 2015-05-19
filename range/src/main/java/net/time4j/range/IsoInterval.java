@@ -737,7 +737,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/equivalent.jpg" /></p>
+     * <p><img src="doc-files/equivalent.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -752,7 +752,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/equivalent.jpg" /></p>
+     * <p><img src="doc-files/equivalent.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -820,7 +820,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/precedes.jpg" /></p>
+     * <p><img src="doc-files/precedes.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -834,7 +834,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/precedes.jpg" /></p>
+     * <p><img src="doc-files/precedes.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -869,7 +869,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/precededBy.jpg" /></p>
+     * <p><img src="doc-files/precededBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -882,7 +882,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/precededBy.jpg" /></p>
+     * <p><img src="doc-files/precededBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -902,7 +902,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/meets.jpg" /></p>
+     * <p><img src="doc-files/meets.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -916,7 +916,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/meets.jpg" /></p>
+     * <p><img src="doc-files/meets.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -962,7 +962,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/metBy.jpg" /></p>
+     * <p><img src="doc-files/metBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -975,7 +975,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/metBy.jpg" /></p>
+     * <p><img src="doc-files/metBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -996,7 +996,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/overlaps.jpg" /></p>
+     * <p><img src="doc-files/overlaps.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1012,7 +1012,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/overlaps.jpg" /></p>
+     * <p><img src="doc-files/overlaps.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1080,7 +1080,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/overlappedBy.jpg" /></p>
+     * <p><img src="doc-files/overlappedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1094,7 +1094,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/overlappedBy.jpg" /></p>
+     * <p><img src="doc-files/overlappedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1116,7 +1116,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/finishes.jpg" /></p>
+     * <p><img src="doc-files/finishes.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1131,7 +1131,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/finishes.jpg" /></p>
+     * <p><img src="doc-files/finishes.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1209,7 +1209,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/finishedBy.jpg" /></p>
+     * <p><img src="doc-files/finishedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1222,7 +1222,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/finishedBy.jpg" /></p>
+     * <p><img src="doc-files/finishedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1243,7 +1243,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/starts.jpg" /></p>
+     * <p><img src="doc-files/starts.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1258,7 +1258,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/starts.jpg" /></p>
+     * <p><img src="doc-files/starts.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1348,7 +1348,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/startedBy.jpg" /></p>
+     * <p><img src="doc-files/startedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1361,7 +1361,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/startedBy.jpg" /></p>
+     * <p><img src="doc-files/startedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1382,7 +1382,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/encloses.jpg" /></p>
+     * <p><img src="doc-files/encloses.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1397,7 +1397,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/encloses.jpg" /></p>
+     * <p><img src="doc-files/encloses.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1473,7 +1473,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/enclosedBy.jpg" /></p>
+     * <p><img src="doc-files/enclosedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
@@ -1486,7 +1486,7 @@ public abstract class IsoInterval
      *
      * <p>Relation diagram: </p>
      *
-     * <p><img src="doc-files/enclosedBy.jpg" /></p>
+     * <p><img src="doc-files/enclosedBy.jpg"></p>
      *
      * @param   other   another interval whose relation to this interval
      *                  is to be investigated
