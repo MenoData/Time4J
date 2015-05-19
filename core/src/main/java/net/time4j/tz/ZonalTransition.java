@@ -510,7 +510,7 @@ public final class ZonalTransition
      * @serialData  Checks the consistency.
      * @param       in      object input stream
      * @throws      IOException in any case of inconsistencies
-     * @throws      ClassNotFoundException
+     * @throws      ClassNotFoundException if class-loading fails
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {

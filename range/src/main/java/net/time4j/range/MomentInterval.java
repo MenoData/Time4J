@@ -1042,28 +1042,30 @@ public final class MomentInterval
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 35;
-     *  header <<= 2;
-     *  out.writeByte(header);
-     *  writeBoundary(getStart(), out);
-     *  writeBoundary(getEnd(), out);
+       int header = 35;
+       header &lt;&lt;= 2;
+       out.writeByte(header);
+       writeBoundary(getStart(), out);
+       writeBoundary(getEnd(), out);
+
+       private static void writeBoundary(
+           Boundary&lt;?&gt; boundary,
+           ObjectOutput out
+       ) throws IOException {
+           if (boundary.equals(Boundary.infinitePast())) {
+               out.writeByte(1);
+           } else if (boundary.equals(Boundary.infiniteFuture())) {
+               out.writeByte(2);
+           } else {
+               out.writeByte(boundary.isOpen() ? 4 : 0);
+               out.writeObject(boundary.getTemporal());
+           }
+       }
+      </pre>
      *
-     *  private static void writeBoundary(
-     *      Boundary<?> boundary,
-     *      ObjectOutput out
-     *  ) throws IOException {
-     *      if (boundary.equals(Boundary.infinitePast())) {
-     *          out.writeByte(1);
-     *      } else if (boundary.equals(Boundary.infiniteFuture())) {
-     *          out.writeByte(2);
-     *      } else {
-     *          out.writeByte(boundary.isOpen() ? 4 : 0);
-     *          out.writeObject(boundary.getTemporal());
-     *      }
-     *  }
-     * </pre>
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.MOMENT_TYPE);
 
@@ -1071,10 +1073,11 @@ public final class MomentInterval
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

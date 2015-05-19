@@ -128,7 +128,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in case of I/O-problems
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
@@ -140,7 +140,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in case of I/O-problems
      */
     @Override
     public void writeExternal(ObjectOutput out)
@@ -200,15 +200,15 @@ final class SPX
      * <p>Implementation method of interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in case of I/O-problems
+     * @throws  ClassNotFoundException if class-loading fails
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in case of I/O-problems
+     * @throws  ClassNotFoundException if class-loading fails
      */
     @Override
     public void readExternal(ObjectInput in)
@@ -341,8 +341,7 @@ final class SPX
             return DateWindows.EMPTY;
         }
 
-        List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>(size);
+        List<ChronoInterval<PlainDate>> intervals = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             intervals.add(readDateInterval(in));
@@ -363,8 +362,7 @@ final class SPX
             return ClockWindows.EMPTY;
         }
 
-        List<ChronoInterval<PlainTime>> intervals =
-            new ArrayList<ChronoInterval<PlainTime>>(size);
+        List<ChronoInterval<PlainTime>> intervals = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             intervals.add(readClockInterval(in));
@@ -385,8 +383,7 @@ final class SPX
             return TimestampWindows.EMPTY;
         }
 
-        List<ChronoInterval<PlainTimestamp>> intervals =
-            new ArrayList<ChronoInterval<PlainTimestamp>>(size);
+        List<ChronoInterval<PlainTimestamp>> intervals = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             intervals.add(readTimestampInterval(in));
@@ -406,8 +403,7 @@ final class SPX
             return MomentWindows.EMPTY;
         }
 
-        List<ChronoInterval<Moment>> intervals =
-            new ArrayList<ChronoInterval<Moment>>(size);
+        List<ChronoInterval<Moment>> intervals = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             intervals.add(readMomentInterval(in));

@@ -104,32 +104,34 @@ final class ClockWindows
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 41;
-     *  header <<= 2;
-     *  out.writeByte(header);
-     *  out.writeInt(getIntervals().size());
+       int header = 41;
+       header &lt;&lt;= 2;
+       out.writeByte(header);
+       out.writeInt(getIntervals().size());
+
+       for (ChronoInterval&lt;?&gt; part : getIntervals()) {
+           writeBoundary(part.getStart(), out);
+           writeBoundary(part.getEnd(), out);
+       }
+
+       private static void writeBoundary(
+           Boundary&lt;?&gt; boundary,
+           ObjectOutput out
+       ) throws IOException {
+           if (boundary.equals(Boundary.infinitePast())) {
+               out.writeByte(1);
+           } else if (boundary.equals(Boundary.infiniteFuture())) {
+               out.writeByte(2);
+           } else {
+               out.writeByte(boundary.isOpen() ? 4 : 0);
+               out.writeObject(boundary.getTemporal());
+           }
+       }
+      </pre>
      *
-     *  for (ChronoInterval<?> part : getIntervals()) {
-     *      writeBoundary(part.getStart(), out);
-     *      writeBoundary(part.getEnd(), out);
-     *  }
-     *
-     *  private static void writeBoundary(
-     *      Boundary<?> boundary,
-     *      ObjectOutput out
-     *  ) throws IOException {
-     *      if (boundary.equals(Boundary.infinitePast())) {
-     *          out.writeByte(1);
-     *      } else if (boundary.equals(Boundary.infiniteFuture())) {
-     *          out.writeByte(2);
-     *      } else {
-     *          out.writeByte(boundary.isOpen() ? 4 : 0);
-     *          out.writeObject(boundary.getTemporal());
-     *      }
-     *  }
-     * </pre>
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.CLOCK_WINDOW_ID);
 
@@ -137,6 +139,7 @@ final class ClockWindows
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)

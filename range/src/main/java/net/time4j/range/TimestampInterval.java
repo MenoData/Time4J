@@ -779,8 +779,7 @@ public final class TimestampInterval
 
     }
 
-    private static ChronoFormatter<PlainTimestamp>
-    ordinalFormat(boolean extended) {
+    private static ChronoFormatter<PlainTimestamp> ordinalFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
@@ -802,8 +801,7 @@ public final class TimestampInterval
 
     }
 
-    private static ChronoFormatter<PlainTimestamp>
-    weekdateFormat(boolean extended) {
+    private static ChronoFormatter<PlainTimestamp> weekdateFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
@@ -923,28 +921,30 @@ public final class TimestampInterval
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 34;
-     *  header <<= 2;
-     *  out.writeByte(header);
-     *  writeBoundary(getStart(), out);
-     *  writeBoundary(getEnd(), out);
+       int header = 34;
+       header &lt;&lt;= 2;
+       out.writeByte(header);
+       writeBoundary(getStart(), out);
+       writeBoundary(getEnd(), out);
+
+       private static void writeBoundary(
+           Boundary&lt;?&lt; boundary,
+           ObjectOutput out
+       ) throws IOException {
+           if (boundary.equals(Boundary.infinitePast())) {
+               out.writeByte(1);
+           } else if (boundary.equals(Boundary.infiniteFuture())) {
+               out.writeByte(2);
+           } else {
+               out.writeByte(boundary.isOpen() ? 4 : 0);
+               out.writeObject(boundary.getTemporal());
+           }
+       }
+      </pre>
      *
-     *  private static void writeBoundary(
-     *      Boundary<?> boundary,
-     *      ObjectOutput out
-     *  ) throws IOException {
-     *      if (boundary.equals(Boundary.infinitePast())) {
-     *          out.writeByte(1);
-     *      } else if (boundary.equals(Boundary.infiniteFuture())) {
-     *          out.writeByte(2);
-     *      } else {
-     *          out.writeByte(boundary.isOpen() ? 4 : 0);
-     *          out.writeObject(boundary.getTemporal());
-     *      }
-     *  }
-     * </pre>
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.TIMESTAMP_TYPE);
 
@@ -952,10 +952,11 @@ public final class TimestampInterval
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

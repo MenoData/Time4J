@@ -173,7 +173,7 @@ public final class Boundary<T extends Temporal<? super T>>
     public static
     <T extends Temporal<? super T>> Boundary<T> ofOpen(T temporal) {
 
-        return new Boundary<T>(IntervalEdge.OPEN, temporal);
+        return new Boundary<>(IntervalEdge.OPEN, temporal);
 
     }
 
@@ -204,7 +204,7 @@ public final class Boundary<T extends Temporal<? super T>>
     public static
     <T extends Temporal<? super T>> Boundary<T> ofClosed(T temporal) {
 
-        return new Boundary<T>(IntervalEdge.CLOSED, temporal);
+        return new Boundary<>(IntervalEdge.CLOSED, temporal);
 
     }
 
@@ -227,7 +227,7 @@ public final class Boundary<T extends Temporal<? super T>>
         T temporal
     ) {
 
-        return new Boundary<T>(edge, temporal);
+        return new Boundary<>(edge, temporal);
 
     }
 
@@ -475,23 +475,25 @@ public final class Boundary<T extends Temporal<? super T>>
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 57;
-     *  header <<= 2;
+       int header = 57;
+       header &lt;&lt;= 2;
+
+       if (this == Boundary.infinitePast()) {
+           header |= 1;
+           out.writeByte(header);
+       } else if (this == Boundary.infiniteFuture()) {
+           header |= 2;
+           out.writeByte(header);
+       } else {
+           out.writeByte(header);
+           out.writeByte(isOpen() ? 1 : 0);
+           out.writeObject(getTemporal());
+       }
+      </pre>
      *
-     *  if (this == Boundary.infinitePast()) {
-     *      header |= 1;
-     *      out.writeByte(header);
-     *  } else if (this == Boundary.infiniteFuture()) {
-     *      header |= 2;
-     *      out.writeByte(header);
-     *  } else {
-     *      out.writeByte(header);
-     *      out.writeByte(isOpen() ? 1 : 0);
-     *      out.writeObject(getTemporal());
-     *  }
-     * </pre>
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.BOUNDARY_TYPE);
 
@@ -499,6 +501,7 @@ public final class Boundary<T extends Temporal<? super T>>
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
