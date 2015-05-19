@@ -1219,54 +1219,54 @@ public final class PlainTimestamp
      * Schematic algorithm:
      *
      * <pre>
-     *  int range;
-     *
-     *  if (year >= 1850 && year <= 2100) {
-     *      range = 1;
-     *  } else if (Math.abs(year) < 10000) {
-     *      range = 2;
-     *  } else {
-     *      range = 3;
-     *  }
-     *
-     *  int header = 8; // type-id
-     *  header <<= 4;
-     *  header |= month;
-     *  out.writeByte(header);
-     *
-     *  int header2 = range;
-     *  header2 <<= 5;
-     *  header2 |= dayOfMonth;
-     *  out.writeByte(header2);
-     *
-     *  if (range == 1) {
-     *      out.writeByte(year - 1850 - 128);
-     *  } else if (range == 2) {
-     *      out.writeShort(year);
-     *  } else {
-     *      out.writeInt(year);
-     *  }
-     *
-     *  if (time.nano == 0) {
-     *      if (time.second == 0) {
-     *          if (time.minute == 0) {
-     *              out.writeByte(~time.hour);
-     *          } else {
-     *              out.writeByte(time.hour);
-     *              out.writeByte(~time.minute);
-     *          }
-     *      } else {
-     *          out.writeByte(time.hour);
-     *          out.writeByte(time.minute);
-     *          out.writeByte(~time.second);
-     *      }
-     *  } else {
-     *      out.writeByte(time.hour);
-     *      out.writeByte(time.minute);
-     *      out.writeByte(time.second);
-     *      out.writeInt(time.nano);
-     *  }
-     * </pre>
+       int range;
+
+       if (year &gt;= 1850 && year &lt;= 2100) {
+           range = 1;
+       } else if (Math.abs(year) &lt; 10000) {
+           range = 2;
+       } else {
+           range = 3;
+       }
+
+       int header = 8; // type-id
+       header &lt;&lt;= 4;
+       header |= month;
+       out.writeByte(header);
+
+       int header2 = range;
+       header2 &lt;&lt;= 5;
+       header2 |= dayOfMonth;
+       out.writeByte(header2);
+
+       if (range == 1) {
+           out.writeByte(year - 1850 - 128);
+       } else if (range == 2) {
+           out.writeShort(year);
+       } else {
+           out.writeInt(year);
+       }
+
+       if (time.nano == 0) {
+           if (time.second == 0) {
+               if (time.minute == 0) {
+                   out.writeByte(~time.hour);
+               } else {
+                   out.writeByte(time.hour);
+                   out.writeByte(~time.minute);
+               }
+           } else {
+               out.writeByte(time.hour);
+               out.writeByte(time.minute);
+               out.writeByte(~time.second);
+           }
+       } else {
+           out.writeByte(time.hour);
+           out.writeByte(time.minute);
+           out.writeByte(time.second);
+           out.writeInt(time.nano);
+       }
+      </pre>
      *
      * @return  replacement object in serialization graph
      */

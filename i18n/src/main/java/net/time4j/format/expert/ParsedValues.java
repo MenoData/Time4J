@@ -37,7 +37,7 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
+ * @doctags.concurrency {mutable}
  */
 class ParsedValues
     extends ChronoEntity<ParsedValues>

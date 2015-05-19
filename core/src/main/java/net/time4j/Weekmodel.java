@@ -107,8 +107,7 @@ public final class Weekmodel
     private static final int BOUNDED_WEEK_OF_YEAR = 2;
     private static final int BOUNDED_WEEK_OF_MONTH = 3;
 
-    private static final Map<Locale, Weekmodel> CACHE =
-        new ConcurrentHashMap<Locale, Weekmodel>();
+    private static final Map<Locale, Weekmodel> CACHE = new ConcurrentHashMap<>();
 
     /**
      * <p>Standard week rules as defined by ISO-8601. </p>
@@ -224,20 +223,16 @@ public final class Weekmodel
         this.dayOfWeekElement = new DayOfWeekElement();
 
         this.weekendCondition =
-            new ChronoCondition<GregorianDate>() {
-                @Override
-                public boolean test(GregorianDate context) {
-                    int y = context.getYear();
-                    int m = context.getMonth();
-                    int dom = context.getDayOfMonth();
-                    Weekday wd =
-                        Weekday.valueOf(GregorianMath.getDayOfWeek(y, m, dom));
-                    return ((wd == startOfWeekend) || (wd == endOfWeekend));
-                }
+            context -> {
+                int y = context.getYear();
+                int m = context.getMonth();
+                int dom = context.getDayOfMonth();
+                Weekday wd =
+                    Weekday.valueOf(GregorianMath.getDayOfWeek(y, m, dom));
+                return ((wd == startOfWeekend) || (wd == endOfWeekend));
             };
 
-        Set<ChronoElement<?>> set =
-            new HashSet<ChronoElement<?>>();
+        Set<ChronoElement<?>> set = new HashSet<>();
         set.add(this.woyElement);
         set.add(this.womElement);
         set.add(this.dayOfWeekElement);
@@ -919,30 +914,30 @@ public final class Weekmodel
      * Schematic algorithm:
      *
      * <pre>
-     *  boolean isoWeekend = (
-     *      (getStartOfWeekend() == Weekday.SATURDAY)
-     *      && (getEndOfWeekend() == Weekday.SUNDAY)
-     *  );
-     *
-     *  int header = 3;
-     *  header <<= 4;
-     *  if (!isoWeekend) {
-     *      header |= 1;
-     *  }
-     *  out.writeByte(header);
-     *
-     *  int state = getFirstDayOfWeek().getValue();
-     *  state <<= 4;
-     *  state |= getMinimalDaysInFirstWeek();
-     *  out.writeByte(state);
-     *
-     *  if (!isoWeekend) {
-     *      state = getStartOfWeekend().getValue();
-     *      state <<= 4;
-     *      state |= getEndOfWeekend().getValue();
-     *      out.writeByte(state);
-     *  }
-     * </pre>
+       boolean isoWeekend = (
+           (getStartOfWeekend() == Weekday.SATURDAY)
+           && (getEndOfWeekend() == Weekday.SUNDAY)
+       );
+
+       int header = 3;
+       header &lt;&lt;= 4;
+       if (!isoWeekend) {
+           header |= 1;
+       }
+       out.writeByte(header);
+
+       int state = getFirstDayOfWeek().getValue();
+       state &lt;&lt;= 4;
+       state |= getMinimalDaysInFirstWeek();
+       out.writeByte(state);
+
+       if (!isoWeekend) {
+           state = getStartOfWeekend().getValue();
+           state &lt;&lt;= 4;
+           state |= getEndOfWeekend().getValue();
+           out.writeByte(state);
+       }
+      </pre>
      *
      * @return  replacement object in serialization graph
      */
@@ -1049,7 +1044,7 @@ public final class Weekmodel
         @Override
         public ElementOperator<PlainDate> setToNext(Weekday value) {
 
-            return new NavigationOperator<Weekday>(
+            return new NavigationOperator<>(
                 this,
                 ElementOperator.OP_NAV_NEXT,
                 value
@@ -1060,7 +1055,7 @@ public final class Weekmodel
         @Override
         public ElementOperator<PlainDate> setToPrevious(Weekday value) {
 
-            return new NavigationOperator<Weekday>(
+            return new NavigationOperator<>(
                 this,
                 ElementOperator.OP_NAV_PREVIOUS,
                 value
@@ -1071,7 +1066,7 @@ public final class Weekmodel
         @Override
         public ElementOperator<PlainDate> setToNextOrSame(Weekday value) {
 
-            return new NavigationOperator<Weekday>(
+            return new NavigationOperator<>(
                 this,
                 ElementOperator.OP_NAV_NEXT_OR_SAME,
                 value
@@ -1082,7 +1077,7 @@ public final class Weekmodel
         @Override
         public ElementOperator<PlainDate> setToPreviousOrSame(Weekday value) {
 
-            return new NavigationOperator<Weekday>(
+            return new NavigationOperator<>(
                 this,
                 ElementOperator.OP_NAV_PREVIOUS_OR_SAME,
                 value
@@ -1139,7 +1134,7 @@ public final class Weekmodel
         ElementRule<T, Weekday> derive(Chronology<T> chronology) {
 
             if (chronology.isRegistered(CALENDAR_DATE)) {
-                return new DRule<T>(this);
+                return new DRule<>(this);
             } else {
                 return null;
             }
@@ -1405,9 +1400,9 @@ public final class Weekmodel
 
             if (chronology.isRegistered(CALENDAR_DATE)) {
                 if (this.isBounded()) {
-                    return new BWRule<T>(this);
+                    return new BWRule<>(this);
                 } else {
-                    return new CWRule<T>(this);
+                    return new CWRule<>(this);
                 }
             }
 

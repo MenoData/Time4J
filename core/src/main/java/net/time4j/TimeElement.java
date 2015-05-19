@@ -35,7 +35,7 @@ import java.io.ObjectStreamException;
  * <p>Repr&auml;sentiert eine Uhrzeitkomponente. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class TimeElement
     extends BasicElement<PlainTime>

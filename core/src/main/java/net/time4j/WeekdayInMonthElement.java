@@ -42,7 +42,7 @@ import static net.time4j.ElementOperator.OP_WIM;
  * weitere Spezialmethoden zum Setzen des Wochentags im Monat. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class WeekdayInMonthElement
     extends AbstractDateElement<Integer>

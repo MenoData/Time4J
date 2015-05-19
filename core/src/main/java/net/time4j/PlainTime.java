@@ -2034,28 +2034,28 @@ public final class PlainTime
      * Schematic algorithm:
      *
      * <pre>
-     *      out.writeByte(2 << 4);
-     *
-     *      if (time.nano == 0) {
-     *          if (time.second == 0) {
-     *              if (time.minute == 0) {
-     *                  out.writeByte(~time.hour);
-     *              } else {
-     *                  out.writeByte(time.hour);
-     *                  out.writeByte(~time.minute);
-     *              }
-     *          } else {
-     *              out.writeByte(time.hour);
-     *              out.writeByte(time.minute);
-     *              out.writeByte(~time.second);
-     *          }
-     *      } else {
-     *          out.writeByte(time.hour);
-     *          out.writeByte(time.minute);
-     *          out.writeByte(time.second);
-     *          out.writeInt(time.nano);
-     *      }
-     * </pre>
+           out.writeByte(2 &lt;&lt; 4);
+
+           if (time.nano == 0) {
+               if (time.second == 0) {
+                   if (time.minute == 0) {
+                       out.writeByte(~time.hour);
+                   } else {
+                       out.writeByte(time.hour);
+                       out.writeByte(~time.minute);
+                   }
+               } else {
+                   out.writeByte(time.hour);
+                   out.writeByte(time.minute);
+                   out.writeByte(~time.second);
+               }
+           } else {
+               out.writeByte(time.hour);
+               out.writeByte(time.minute);
+               out.writeByte(time.second);
+               out.writeInt(time.nano);
+           }
+      </pre>
      *
      * @return  replacement object in serialization graph
      */

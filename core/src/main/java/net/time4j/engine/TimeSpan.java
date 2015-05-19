@@ -430,7 +430,7 @@ public interface TimeSpan<U> {
          * @serialData  Checks the consistency.
          * @param       in      object input stream
          * @throws      InvalidObjectException if the state is inconsistent
-         * @throws      ClassNotFoundException
+         * @throws      ClassNotFoundException if class-loading fails
          */
         private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {

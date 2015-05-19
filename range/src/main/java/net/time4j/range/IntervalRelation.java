@@ -73,6 +73,7 @@ import net.time4j.engine.Temporal;
  *  <td>precededBy</td><td><img src="doc-files/precededBy.jpg" alt="precededBy"></td>
  * </tr>
  * </table>
+ * </div>
  *
  * <p>Further explanations can be found at the website of
  * <a href="http://www.ics.uci.edu/~alspaugh/cls/shr/allen.html">Allen's

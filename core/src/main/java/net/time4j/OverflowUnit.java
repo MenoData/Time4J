@@ -33,7 +33,7 @@ import java.io.Serializable;
  * <p>Specialized calendar unit for handling day overflow. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class OverflowUnit
     extends BasicUnit
