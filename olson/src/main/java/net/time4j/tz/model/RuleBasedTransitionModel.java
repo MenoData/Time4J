@@ -36,7 +36,6 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +49,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class RuleBasedTransitionModel
     extends TransitionModel {
@@ -73,9 +72,7 @@ final class RuleBasedTransitionModel
     private transient final ZonalTransition initial;
     private transient final List<DaylightSavingRule> rules;
 
-    private transient final
-        ConcurrentMap<Integer, List<ZonalTransition>> tCache =
-            new ConcurrentHashMap<Integer, List<ZonalTransition>>();
+    private transient final ConcurrentMap<Integer, List<ZonalTransition>> tCache = new ConcurrentHashMap<>();
     private transient final List<ZonalTransition> stdTransitions;
     private transient final boolean gregorian;
 
@@ -123,7 +120,7 @@ final class RuleBasedTransitionModel
         }
 
         if (create) {
-            rules = new ArrayList<DaylightSavingRule>(rules);
+            rules = new ArrayList<>(rules);
         }
 
         List<DaylightSavingRule> sortedRules = rules;
@@ -440,19 +437,17 @@ final class RuleBasedTransitionModel
     ) {
 
         long preModel = initial.getPosixTime();
-        long start = startInclusive;
-        long end = endExclusive;
 
-        if (start > end) {
+        if (startInclusive > endExclusive) {
             throw new IllegalArgumentException("Start after end.");
         } else if (
-            (end <= preModel)
-            || (start == end)
+            (endExclusive <= preModel)
+            || (startInclusive == endExclusive)
         ) {
             return Collections.emptyList();
         }
 
-        List<ZonalTransition> transitions = new ArrayList<ZonalTransition>();
+        List<ZonalTransition> transitions = new ArrayList<>();
 
         int year = Integer.MIN_VALUE;
         int n = rules.size();
@@ -465,7 +460,7 @@ final class RuleBasedTransitionModel
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                year = getYear(rule, Math.max(start, preModel) + shift);
+                year = getYear(rule, Math.max(startInclusive, preModel) + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
@@ -473,10 +468,10 @@ final class RuleBasedTransitionModel
             long tt = getTransitionTime(rule, year, shift);
             i++;
 
-            if (tt >= end) {
+            if (tt >= endExclusive) {
                 break;
             } else if (
-                (tt >= start)
+                (tt >= startInclusive)
                 && (tt > preModel)
             ) {
                 transitions.add(
@@ -574,7 +569,7 @@ final class RuleBasedTransitionModel
         List<ZonalTransition> transitions = this.tCache.get(key);
 
         if (transitions == null) {
-            List<ZonalTransition> list = new ArrayList<ZonalTransition>();
+            List<ZonalTransition> list = new ArrayList<>();
             int stdOffset = this.initial.getStandardOffset();
 
             for (int i = 0, n = this.rules.size(); i < n; i++) {
@@ -628,8 +623,10 @@ final class RuleBasedTransitionModel
      *              rules follow. The complex algorithm exploits the fact
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.RULE_BASED_TRANSITION_MODEL_TYPE);
 
@@ -637,10 +634,11 @@ final class RuleBasedTransitionModel
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

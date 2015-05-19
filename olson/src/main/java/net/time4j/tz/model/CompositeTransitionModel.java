@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +43,7 @@ import java.util.List;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class CompositeTransitionModel
     extends TransitionModel {
@@ -157,7 +156,7 @@ final class CompositeTransitionModel
         UnixTime end
     ) {
 
-        List<ZonalTransition> result = new ArrayList<ZonalTransition>();
+        List<ZonalTransition> result = new ArrayList<>();
         result.addAll(this.arrayModel.getTransitions(start, end));
         result.addAll(this.ruleModel.getTransitions(start, end));
         return Collections.unmodifiableList(result);
@@ -249,8 +248,10 @@ final class CompositeTransitionModel
      *              exploits the fact that allmost all transitions happen
      *              at full hours around midnight in local standard time.
      *              Insight in details see source code.
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.COMPOSITE_TRANSITION_MODEL_TYPE);
 
@@ -258,10 +259,11 @@ final class CompositeTransitionModel
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

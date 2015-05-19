@@ -28,7 +28,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.util.List;
 
 
@@ -37,7 +36,7 @@ import java.util.List;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class HistorizedTimezone
     extends Timezone {
@@ -164,7 +163,7 @@ final class HistorizedTimezone
     public boolean isDaylightSaving(UnixTime ut) {
 
         ZonalTransition t = this.history.getStartTransition(ut);
-        return ((t == null) ? false : t.isDaylightSaving());
+        return ((t != null) && t.isDaylightSaving());
 
     }
 
@@ -254,22 +253,21 @@ final class HistorizedTimezone
      * Schematic algorithm:
      *
      * <pre>
-     *  boolean specialStrategy =
-            (getStrategy() != Timezone.DEFAULT_CONFLICT_STRATEGY);
-     *  int header = (14 << 4);
-     *
-     *  if (specialStrategy) {
-     *      header |= 1;
-     *  }
-     *
-     *  out.writeByte(header);
-     *  out.writeObject(tz.getID());
-     *  out.writeObject(tz.getHistory());
-     *
-     *  if (specialStrategy) {
-     *      out.writeObject(tz.getStrategy());
-     *  }
-     * </pre>
+       boolean specialStrategy = (getStrategy() != Timezone.DEFAULT_CONFLICT_STRATEGY);
+       int header = (14 &lt;&lt; 4);
+
+       if (specialStrategy) {
+           header |= 1;
+       }
+
+       out.writeByte(header);
+       out.writeObject(tz.getID());
+       out.writeObject(tz.getHistory());
+
+       if (specialStrategy) {
+           out.writeObject(tz.getStrategy());
+       }
+      </pre>
      *
      * @return  replacement object in serialization graph
      */

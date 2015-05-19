@@ -916,7 +916,7 @@ public final class Weekmodel
      * <pre>
        boolean isoWeekend = (
            (getStartOfWeekend() == Weekday.SATURDAY)
-           && (getEndOfWeekend() == Weekday.SUNDAY)
+           &amp;&amp; (getEndOfWeekend() == Weekday.SUNDAY)
        );
 
        int header = 3;

@@ -27,7 +27,6 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
-import java.io.ObjectStreamException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -40,7 +39,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Eine Zeitzonenimplementierung, die an {@link java.util.TimeZone}
@@ -48,7 +47,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 final class PlatformTimezone
     extends Timezone {

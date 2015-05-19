@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
-import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,7 +45,7 @@ import java.util.List;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class ArrayTransitionModel
     extends TransitionModel {
@@ -426,33 +425,29 @@ final class ArrayTransitionModel
         long endExclusive
     ) {
 
-        long start = startInclusive;
-        long end = endExclusive;
-
-        if (start > end) {
+        if (startInclusive > endExclusive) {
             throw new IllegalArgumentException("Start after end.");
         }
 
-        int i1 = search(start, transitions);
-        int i2 = search(end, transitions);
+        int i1 = search(startInclusive, transitions);
+        int i2 = search(endExclusive, transitions);
 
         if (i2 == 0) {
             return Collections.emptyList();
-        } else if ((i1 > 0) && (transitions[i1 - 1].getPosixTime() == start)) {
+        } else if ((i1 > 0) && (transitions[i1 - 1].getPosixTime() == startInclusive)) {
             i1--;
         }
 
         i2--;
 
-        if (transitions[i2].getPosixTime() == end) {
+        if (transitions[i2].getPosixTime() == endExclusive) {
             i2--;
         }
 
         if (i1 > i2) {
             return Collections.emptyList();
         } else {
-            List<ZonalTransition> result =
-                new ArrayList<ZonalTransition>(i2 - i1 + 1);
+            List<ZonalTransition> result = new ArrayList<>(i2 - i1 + 1);
             for (int i = i1; i <= i2; i++) {
                 result.add(transitions[i]);
             }
@@ -517,8 +512,10 @@ final class ArrayTransitionModel
      *              fact that allmost all transitions happen at full hours
      *              around midnight in local standard time. Insight in details
      *              see source code.
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.ARRAY_TRANSITION_MODEL_TYPE);
 
@@ -526,10 +523,11 @@ final class ArrayTransitionModel
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

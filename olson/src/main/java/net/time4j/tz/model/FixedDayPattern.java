@@ -29,7 +29,6 @@ import net.time4j.base.GregorianMath;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 
 
 /**
@@ -38,7 +37,7 @@ import java.io.ObjectStreamException;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class FixedDayPattern
     extends GregorianTimezoneRule {
@@ -149,8 +148,10 @@ final class FixedDayPattern
      *              state follow. The complex algorithm exploits the fact
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, this.getType());
 
@@ -158,10 +159,11 @@ final class FixedDayPattern
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
-     * @throws InvalidObjectException (always)
+     * @param       in      object input stream
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

@@ -60,8 +60,7 @@ public final class ZonalOffset
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ConcurrentMap<Integer, ZonalOffset> OFFSET_CACHE =
-        new ConcurrentHashMap<Integer, ZonalOffset>();
+    private static final ConcurrentMap<Integer, ZonalOffset> OFFSET_CACHE = new ConcurrentHashMap<>();
 
     private static final BigDecimal DECIMAL_60 = new BigDecimal(60);
     private static final BigDecimal DECIMAL_3600 = new BigDecimal(3600);
@@ -1070,20 +1069,20 @@ public final class ZonalOffset
      * Schematic algorithm:
      *
      * <pre>
-     *  boolean hasFraction = (this.getFractionalAmount() != 0);
-     *  int header = (15 << 4);
-     *
-     *  if (hasFraction) {
-     *      header |= 1;
-     *  }
-     *
-     *  out.writeByte(header);
-     *  out.writeInt(this.getIntegralAmount());
-     *
-     *  if (hasFraction) {
-     *      out.writeInt(this.getFractionalAmount());
-     *  }
-     * </pre>
+       boolean hasFraction = (this.getFractionalAmount() != 0);
+       int header = (15 &lt;&lt; 4);
+
+       if (hasFraction) {
+           header |= 1;
+       }
+
+       out.writeByte(header);
+       out.writeInt(this.getIntegralAmount());
+
+       if (hasFraction) {
+           out.writeInt(this.getFractionalAmount());
+       }
+      </pre>
      *
      * @return  replacement object in serialization graph
      */

@@ -29,7 +29,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -44,24 +43,14 @@ import java.util.Map;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  include
- * @concurrency <immutable>
- */
-/*[deutsch]
- * <p>Repr&auml;sentiert verschiedene &Uuml;bergangsstrategien, die auf
- * der Kenntnis der konkreten &Uuml;bergangshistorie beruhen. </p>
- *
- * @author  Meno Hochschild
- * @since   2.2
- * @serial  include
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class TransitionResolver
     implements TransitionStrategy, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<Integer, TransitionResolver> INSTANCES =
-        new HashMap<Integer, TransitionResolver>();
+    private static final Map<Integer, TransitionResolver> INSTANCES = new HashMap<>();
 
     static {
         for (GapResolver gapR : GapResolver.values()) {
@@ -329,12 +318,12 @@ final class TransitionResolver
      * Schematic algorithm:
      *
      * <pre>
-     *  int key =
-     *      getGapResolver().ordinal() * 2 + getOverlapResolver().ordinal();
-     *  int header = (13 << 4);
-     *  header |= key;
-     *  out.writeByte(header);
-     * </pre>
+       int key =
+           getGapResolver().ordinal() * 2 + getOverlapResolver().ordinal();
+       int header = (13 &lt;&lt; 4);
+       header |= key;
+       out.writeByte(header);
+      </pre>
      *
      * @return  replacement object in serialization graph
      */

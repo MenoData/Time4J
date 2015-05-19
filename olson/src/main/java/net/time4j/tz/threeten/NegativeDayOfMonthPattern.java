@@ -32,7 +32,6 @@ import net.time4j.tz.model.OffsetIndicator;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 
 import static net.time4j.CalendarUnit.DAYS;
 
@@ -46,7 +45,7 @@ import static net.time4j.CalendarUnit.DAYS;
  * @author      Meno Hochschild
  * @since       4.0
  * @serial      include
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class NegativeDayOfMonthPattern
     extends GregorianTimezoneRule {
@@ -175,8 +174,10 @@ final class NegativeDayOfMonthPattern
      *              is bit-compressed. The first byte contains the type id of
      *              the concrete subclass. Then the data bytes for the internal
      *              state follow. Insight in details see source code.
+     *
+     * @return  replacement object in serialization graph
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, SPX.NEGATIVE_DAY_OF_MONTH_PATTERN_TYPE);
 
@@ -184,10 +185,11 @@ final class NegativeDayOfMonthPattern
 
     /**
      * @serialData  Blocks because a serialization proxy is required.
-     * @throws InvalidObjectException (always)
+     * @param       in      object input stream
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

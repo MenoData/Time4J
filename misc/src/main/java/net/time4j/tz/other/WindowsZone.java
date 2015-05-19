@@ -358,16 +358,15 @@ public final class WindowsZone
 
     private static Map<String, Set<String>> prepareSmartMode() {
 
-        Map<String, Set<String>> preferredKeys =
-            new HashMap<String, Set<String>>();
+        Map<String, Set<String>> preferredKeys = new HashMap<>();
 
         for (String country : REPOSITORY.keySet()) {
             Map<String, String> map = idsToNames(country);
             Set<String> keys = map.keySet();
 
             if (keys.size() >= 2) {
-                keys = new HashSet<String>();
-                Set<String> names = new HashSet<String>(map.values());
+                keys = new HashSet<>();
+                Set<String> names = new HashSet<>(map.values());
 
                 for (String name : names) {
                     for (Map.Entry<String, String> e : getFallback()) {
@@ -393,8 +392,7 @@ public final class WindowsZone
 
     private static Map<String, Map<String, Set<TZID>>> prepareResolvers() {
 
-        Map<String, Map<String, Set<TZID>>> nameBasedMap =
-            new HashMap<String, Map<String, Set<TZID>>>();
+        Map<String, Map<String, Set<TZID>>> nameBasedMap = new HashMap<>();
 
         for (String country : REPOSITORY.keySet()) {
             Map<String, String> idsToNames = REPOSITORY.get(country);
@@ -405,13 +403,13 @@ public final class WindowsZone
 
                 Map<String, Set<TZID>> countryToIds = nameBasedMap.get(name);
                 if (countryToIds == null) {
-                    countryToIds = new HashMap<String, Set<TZID>>();
+                    countryToIds = new HashMap<>();
                     nameBasedMap.put(name, countryToIds);
                 }
 
                 Set<TZID> ids = countryToIds.get(country);
                 if (ids == null) {
-                    ids = new HashSet<TZID>();
+                    ids = new HashSet<>();
                     countryToIds.put(country, ids);
                 }
 
@@ -447,14 +445,11 @@ public final class WindowsZone
                 ois = new ObjectInputStream(is);
                 String version = ois.readUTF();
                 Map<String, Map<String, String>> data = cast(ois.readObject());
-                Map<String, Map<String, String>> map =
-                    new HashMap<String, Map<String, String>>(data);
+                Map<String, Map<String, String>> map = new HashMap<>(data);
                 map.put(VKEY, Collections.singletonMap(version, version));
                 return map;
             }
-        } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException(ex);
-        } catch (IOException ex) {
+        } catch (ClassNotFoundException | IOException ex) {
             throw new IllegalStateException(ex);
         } finally {
             if (ois != null) {
@@ -488,7 +483,10 @@ public final class WindowsZone
 
     /**
      * @serialData  Checks the consistency.
-     * @throws      InvalidObjectException in case of inconsistencies
+     * @param       in      object input stream
+     * @throws      ClassNotFoundException if the class of a serialized object could not be found.
+     * @throws      IOException if an I/O error occurs.
+     * @throws      IllegalArgumentException in case of inconsistencies
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {

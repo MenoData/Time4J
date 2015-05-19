@@ -28,7 +28,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 
 
 /**
@@ -197,11 +196,11 @@ final class FallbackTimezone
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = (12 << 4);
-     *  out.writeByte(header);
-     *  out.writeObject(getID());
-     *  out.writeObject(getFallback());
-     * </pre>
+       int header = (12 &lt;&lt; 4);
+       out.writeByte(header);
+       out.writeObject(getID());
+       out.writeObject(getFallback());
+      </pre>
      *
      * @return  replacement object in serialization graph
      */
