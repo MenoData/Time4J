@@ -53,7 +53,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Verbindung zu einem DAYTIME-Server nach der
@@ -67,7 +67,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 public class DaytimeClock
     extends NetTimeConnector<NetTimeConfiguration> {

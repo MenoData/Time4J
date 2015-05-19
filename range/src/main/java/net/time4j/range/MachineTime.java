@@ -65,7 +65,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
  * @see     SI#NANOSECONDS
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Dauer f&uuml;r maschinelle Zeiten in dezimalen
@@ -87,7 +87,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
  * @see     SI#NANOSECONDS
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class MachineTime<U>
     implements TimeSpan<U>, Serializable {
@@ -97,9 +97,9 @@ public final class MachineTime<U>
     private static final int MRD = 1000000000;
 
     private static final MachineTime<TimeUnit> POSIX_ZERO =
-        new MachineTime<TimeUnit>(0, 0, POSIX);
+        new MachineTime<>(0, 0, POSIX);
     private static final MachineTime<SI> UTC_ZERO =
-        new MachineTime<SI>(0, 0, UTC);
+        new MachineTime<>(0, 0, UTC);
 
     /**
      * Metric on the POSIX scale (without leap seconds).
@@ -111,9 +111,7 @@ public final class MachineTime<U>
      *
      * @since   2.0
      */
-    public static final
-    TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE =
-        new Metric<TimeUnit>(POSIX);
+    public static final TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE = new Metric<>(POSIX);
 
     /**
      * <p>Metric on the UTC scale (inclusive leap seconds). </p>
@@ -129,8 +127,7 @@ public final class MachineTime<U>
      *
      * @since   2.0
      */
-    public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE =
-        new Metric<SI>(UTC);
+    public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE = new Metric<>(UTC);
 
     private static final long serialVersionUID = -4150291820807606229L;
 
@@ -293,7 +290,7 @@ public final class MachineTime<U>
             return POSIX_ZERO;
         }
 
-        return new MachineTime<TimeUnit>(seconds, fraction, POSIX);
+        return new MachineTime<>(seconds, fraction, POSIX);
 
     }
 
@@ -332,7 +329,7 @@ public final class MachineTime<U>
             return UTC_ZERO;
         }
 
-        return new MachineTime<SI>(seconds, fraction, UTC);
+        return new MachineTime<>(seconds, fraction, UTC);
 
     }
 
@@ -541,7 +538,7 @@ public final class MachineTime<U>
     @Override
     public List<Item<U>> getTotalLength() {
 
-        List<Item<U>> tmp = new ArrayList<Item<U>>(2);
+        List<Item<U>> tmp = new ArrayList<>(2);
 
         if (this.seconds != 0) {
             Object u = ((this.scale == UTC) ? SI.SECONDS : TimeUnit.SECONDS);
@@ -684,7 +681,7 @@ public final class MachineTime<U>
             }
         }
 
-        return new MachineTime<U>(s, f, this.scale);
+        return new MachineTime<>(s, f, this.scale);
 
     }
 
@@ -714,7 +711,7 @@ public final class MachineTime<U>
 
         long s = MathUtils.safeAdd(this.seconds, duration.seconds);
         int f = this.nanos + duration.nanos;
-        return new MachineTime<U>(s, f, this.scale);
+        return new MachineTime<>(s, f, this.scale);
 
     }
 
@@ -773,7 +770,7 @@ public final class MachineTime<U>
 
         long s = MathUtils.safeSubtract(this.seconds, duration.seconds);
         int f = this.nanos - duration.nanos;
-        return new MachineTime<U>(s, f, this.scale);
+        return new MachineTime<>(s, f, this.scale);
 
     }
 
@@ -794,7 +791,7 @@ public final class MachineTime<U>
     public MachineTime<U> abs() {
 
         if (this.isNegative()) {
-            return new MachineTime<U>(
+            return new MachineTime<>(
                 MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
         } else {
             return this;
@@ -823,7 +820,7 @@ public final class MachineTime<U>
             return this;
         }
 
-        return new MachineTime<U>(
+        return new MachineTime<>(
             MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
 
     }
@@ -1139,7 +1136,7 @@ public final class MachineTime<U>
                     "Machine time requires objects of type 'UnixTime'.");
             }
 
-            return new MachineTime<U>(secs, nanos, this.scale);
+            return new MachineTime<>(secs, nanos, this.scale);
 
         }
 

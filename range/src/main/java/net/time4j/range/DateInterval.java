@@ -59,14 +59,14 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein Datumsintervall. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class DateInterval
     extends IsoInterval<PlainDate, DateInterval>
@@ -77,7 +77,7 @@ public final class DateInterval
     private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
-        new IntervalComparator<PlainDate>(true, PlainDate.axis());
+        new IntervalComparator<>(true, PlainDate.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -431,7 +431,7 @@ public final class DateInterval
      *
      * <pre>
      *  System.out.println(
-     *      &quot;20120101/20140620&quot,
+     *      &quot;20120101/20140620&quot;
      *      Iso8601Format.BASIC_CALENDAR_DATE));
      *  // output: [2012-01-01/2014-06-20]
      * </pre>
@@ -452,7 +452,7 @@ public final class DateInterval
      *
      * <pre>
      *  System.out.println(
-     *      &quot;20120101/20140620&quot,
+     *      &quot;20120101/20140620&quot;
      *      Iso8601Format.BASIC_CALENDAR_DATE));
      *  // Ausgabe: [2012-01-01/2014-06-20]
      * </pre>

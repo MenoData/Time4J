@@ -67,14 +67,14 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein Momentintervall auf dem globalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class MomentInterval
     extends IsoInterval<Moment, MomentInterval>

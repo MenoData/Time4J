@@ -45,7 +45,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Fabrikklasse f&uuml;r die Erzeugung einer {@code TransitionHistory}. </p>
@@ -53,7 +53,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public abstract class TransitionModel
     implements TransitionHistory, Serializable {
@@ -188,8 +188,8 @@ public abstract class TransitionModel
         List<DaylightSavingRule> r;
 
         if (create) {
-            t = new ArrayList<ZonalTransition>(transitions);
-            r = new ArrayList<DaylightSavingRule>(rules);
+            t = new ArrayList<>(transitions);
+            r = new ArrayList<>(rules);
             Collections.sort(t);
             Collections.sort(r, RuleComparator.INSTANCE);
         } else {
@@ -249,7 +249,7 @@ public abstract class TransitionModel
 
         ZonalOffset zo1 = ZonalOffset.ofTotalSeconds(offset1);
         ZonalOffset zo2 = ZonalOffset.ofTotalSeconds(offset2);
-        List<ZonalOffset> offsets = new ArrayList<ZonalOffset>(2);
+        List<ZonalOffset> offsets = new ArrayList<>(2);
         offsets.add(zo1);
         offsets.add(zo2);
         return Collections.unmodifiableList(offsets);

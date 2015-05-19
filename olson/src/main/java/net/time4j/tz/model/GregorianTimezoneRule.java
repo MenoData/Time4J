@@ -43,7 +43,7 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Standardregel f&uuml;r Zeitumstellungen im
@@ -51,7 +51,7 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public class GregorianTimezoneRule

@@ -47,7 +47,7 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()
@@ -65,7 +65,7 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()
@@ -372,8 +372,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      */
     public IntervalCollection<T> plus(ChronoInterval<T> interval) {
 
-        List<ChronoInterval<T>> windows =
-            new ArrayList<ChronoInterval<T>>(this.intervals);
+        List<ChronoInterval<T>> windows = new ArrayList<>(this.intervals);
         windows.add(this.adjust(interval));
         Collections.sort(windows, this.getComparator());
         return this.create(windows);
@@ -411,8 +410,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return this;
         }
 
-        List<ChronoInterval<T>> windows =
-            new ArrayList<ChronoInterval<T>>(this.intervals);
+        List<ChronoInterval<T>> windows = new ArrayList<>(this.intervals);
 
         for (ChronoInterval<T> i : intervals) {
             windows.add(this.adjust(i));
@@ -464,10 +462,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return this;
         }
 
-        List<ChronoInterval<T>> parts =
-            new ArrayList<ChronoInterval<T>>();
-        IntervalCollection<T> subtrahend =
-            this.create(Collections.singletonList(iv));
+        List<ChronoInterval<T>> parts = new ArrayList<>();
+        IntervalCollection<T> subtrahend = this.create(Collections.singletonList(iv));
         IntervalCollection<T> diff = subtrahend.withComplement(minuend);
 
         if (!diff.isEmpty()) {
@@ -533,8 +529,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return this;
         }
 
-        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
-        List<ChronoInterval<T>> list = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> parts = new ArrayList<>();
+        List<ChronoInterval<T>> list = new ArrayList<>();
 
         for (ChronoInterval<T> i : intervals) {
             list.add(this.adjust(i));
@@ -618,7 +614,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         Boundary<T> lower = window.getStart();
         Boundary<T> upper = window.getEnd();
-        List<ChronoInterval<T>> gaps = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> gaps = new ArrayList<>();
 
         // left edge
         T min = coll.getMinimum();
@@ -716,7 +712,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return this.create(zero);
         }
 
-        List<ChronoInterval<T>> gaps = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> gaps = new ArrayList<>();
         T previous = null;
 
         for (int i = 0, n = len - 1; i < n; i++) {
@@ -808,7 +804,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             : IntervalEdge.OPEN);
 
         List<ChronoInterval<T>> gaps = this.withGaps().intervals;
-        List<ChronoInterval<T>> blocks = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> blocks = new ArrayList<>();
         T start = this.getMinimum();
 
         for (int i = 0, n = gaps.size(); i < n; i++) {
@@ -1096,7 +1092,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             return this;
         }
 
-        List<ChronoInterval<T>> parts = new ArrayList<ChronoInterval<T>>();
+        List<ChronoInterval<T>> parts = new ArrayList<>();
 
         for (ChronoInterval<T> interval : this.intervals) {
             if (
@@ -1108,7 +1104,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                 continue;
             }
 
-            List<ChronoInterval<T>> pair = new ArrayList<ChronoInterval<T>>(2);
+            List<ChronoInterval<T>> pair = new ArrayList<>(2);
             pair.add(window);
             pair.add(interval);
             Collections.sort(pair, this.getComparator());

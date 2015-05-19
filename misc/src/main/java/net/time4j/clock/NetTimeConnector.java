@@ -226,7 +226,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
             throw new IOException("Cannot read server reply.", pe);
         }
 
-    };
+    }
 
     /**
      * <p>Queries the configuration parameters to be used for the next

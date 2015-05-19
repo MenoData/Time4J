@@ -64,14 +64,14 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein Zeitstempelintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class TimestampInterval
     extends IsoInterval<PlainTimestamp, TimestampInterval>
@@ -90,7 +90,7 @@ public final class TimestampInterval
     private static final ChronoFormatter<PlainTimestamp> BAS_W =
         weekdateFormat(false);
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
-        new IntervalComparator<PlainTimestamp>(false, PlainTimestamp.axis());
+        new IntervalComparator<>(false, PlainTimestamp.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -361,6 +361,7 @@ public final class TimestampInterval
     /**
      * <p>Yields the length of this interval in given units. </p>
      *
+     * @param   <U> generic unit type
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
@@ -370,12 +371,14 @@ public final class TimestampInterval
      * <p>Liefert die L&auml;nge dieses Intervalls in den angegebenen
      * Zeiteinheiten. </p>
      *
+     * @param   <U> generic unit type
      * @param   units   time units to be used in calculation
      * @return  duration in given units
      * @throws  UnsupportedOperationException if this interval is infinite
      * @since   2.0
      */
-    public <U extends IsoUnit> Duration<U> getDuration(U... units) {
+    @SafeVarargs
+    public final <U extends IsoUnit> Duration<U> getDuration(U... units) {
 
         PlainTimestamp tsp = this.getTemporalOfOpenEnd();
         boolean max = (tsp == null);

@@ -48,14 +48,14 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein endliches Uhrzeitintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class ClockInterval
     extends IsoInterval<PlainTime, ClockInterval>
@@ -66,7 +66,7 @@ public final class ClockInterval
     private static final long serialVersionUID = -6020908050362634577L;
 
     private static final Comparator<ChronoInterval<PlainTime>> COMPARATOR =
-        new IntervalComparator<PlainTime>(false, PlainTime.axis());
+        new IntervalComparator<>(false, PlainTime.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
