@@ -35,14 +35,14 @@ import java.util.function.Supplier;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
+ * @doctags.concurrency {mutable}
  */
 /*[deutsch]
  * <p>Speichert einen beliebigen Satz von chronologischen Rohwerten. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
+ * @doctags.concurrency {mutable}
  */
 public class RawValues
     implements Consumer<ChronoDisplay>, Supplier<ChronoDisplay> {

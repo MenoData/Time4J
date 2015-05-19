@@ -68,7 +68,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Setting one of both properties can improve the performance. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Ermittelt alle seit dem offiziellen Start von UTC 1972 aufgetretenen
@@ -99,7 +99,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Setzen einer der beiden Properties kann die Performance verbessern. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <threadsafe>
+ * @doctags.concurrency {threadsafe}
  */
 public final class LeapSeconds
     implements Iterable<LeapSecondEvent>, Comparator<LeapSecondEvent> {
@@ -229,7 +229,7 @@ public final class LeapSeconds
             this.reverseVolatile = EMPTY_ARRAY;
             this.supportsNegativeLS = false;
         } else {
-            SortedSet<ExtendedLSE> sortedLS = new TreeSet<ExtendedLSE>(this);
+            SortedSet<ExtendedLSE> sortedLS = new TreeSet<>(this);
 
             for (
                 Map.Entry<GregorianDate, Integer> entry
@@ -251,11 +251,9 @@ public final class LeapSeconds
             extend(sortedLS);
 
             if (FINAL_UTC_LEAPSECONDS) {
-                this.list =
-                    Collections.unmodifiableList(
-                        new ArrayList<ExtendedLSE>(sortedLS));
+                this.list = Collections.unmodifiableList(new ArrayList<>(sortedLS));
             } else {
-                this.list = new CopyOnWriteArrayList<ExtendedLSE>(sortedLS);
+                this.list = new CopyOnWriteArrayList<>(sortedLS);
             }
 
             this.reverseFinal = this.initReverse();
@@ -960,7 +958,7 @@ public final class LeapSeconds
 
     private static void extend(SortedSet<ExtendedLSE> sortedColl) {
 
-        List<ExtendedLSE> tmp = new ArrayList<ExtendedLSE>(sortedColl.size());
+        List<ExtendedLSE> tmp = new ArrayList<>(sortedColl.size());
         int diff = 0;
 
         for (ExtendedLSE lse : sortedColl) {
@@ -1008,8 +1006,7 @@ public final class LeapSeconds
 
     private ExtendedLSE[] initReverse() {
 
-        List<ExtendedLSE> tmp =
-            new ArrayList<ExtendedLSE>(this.list.size());
+        List<ExtendedLSE> tmp = new ArrayList<>(this.list.size());
         tmp.addAll(this.list);
         Collections.reverse(tmp);
         return tmp.toArray(new ExtendedLSE[tmp.size()]);

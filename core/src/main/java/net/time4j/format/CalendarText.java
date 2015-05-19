@@ -97,7 +97,7 @@ import java.util.concurrent.ConcurrentMap;
  * <li>AM_PM_OF_DAY</li></ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Quelle f&uuml;r lokalisierte kalendarische Informationen auf Enum-Basis
@@ -151,7 +151,7 @@ import java.util.concurrent.ConcurrentMap;
  * <li>AM_PM_OF_DAY</li></ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class CalendarText {
 

@@ -29,7 +29,7 @@ import java.io.Serializable;
  * is to be taken into account. </p>
  *
  * @author              Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  * @see                 PlainTime#roll(long,ClockUnit)
  */
 /*[deutsch]
@@ -37,7 +37,7 @@ import java.io.Serializable;
  * tageweiser &Uuml;berlauf gez&auml;hlt werden soll. </p>
  *
  * @author              Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  * @see                 PlainTime#roll(long,ClockUnit)
  */
 public final class DayCycles implements Serializable {

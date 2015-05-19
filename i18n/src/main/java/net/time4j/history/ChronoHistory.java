@@ -47,14 +47,14 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Geschichte der Kalenderreformen in einer gegebenen Region. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class ChronoHistory
     implements Serializable {
@@ -314,6 +314,7 @@ public final class ChronoHistory
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166). </p>
      *
+     * @param   locale      contains the country whose calendar reform history is to be queried
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)
@@ -330,6 +331,7 @@ public final class ChronoHistory
      *
      * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166). </p>
      *
+     * @param   locale      contains the country whose calendar reform history is to be queried
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)

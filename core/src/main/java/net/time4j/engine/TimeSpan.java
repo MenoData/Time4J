@@ -260,14 +260,14 @@ public interface TimeSpan<U> {
      * time unit and has a non-negative amount. </p>
      *
      * @param   <U> type of time unit
-     * @doctags.concurrency <immutable>
+     * @doctags.concurrency {immutable}
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert ein atomares Element einer Zeitspanne, das auf nur
      * einer Zeiteinheit beruht und einen nicht-negativen Betrag hat. </p>
      *
      * @param   <U> type of time unit
-     * @doctags.concurrency <immutable>
+     * @doctags.concurrency {immutable}
      */
     public static final class Item<U>
         implements Serializable {

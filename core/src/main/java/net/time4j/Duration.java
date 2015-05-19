@@ -105,7 +105,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>ISO-konforme Zeitspanne zwischen zwei Zeitpunkten. </p>
@@ -145,7 +145,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class Duration<U extends IsoUnit>
     extends AbstractDuration<U>
@@ -3919,7 +3919,7 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @doctags.concurrency <immutable>
+     * @doctags.concurrency {immutable}
      */
     /*[deutsch]
      * <p>Nicht-lokalisiertes benutzerdefiniertes Dauerformat, das auf
@@ -3954,7 +3954,7 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @doctags.concurrency <immutable>
+     * @doctags.concurrency {immutable}
      */
     public static final class Formatter<U extends IsoUnit> {
 

@@ -124,7 +124,7 @@ import static net.time4j.PlainTime.*;
  * day. In element access and manipulations this value is not supported. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Komposition aus Datum und Uhrzeit nach dem ISO-8601-Standard. </p>
@@ -174,7 +174,7 @@ import static net.time4j.PlainTime.*;
  * normalisieren, nicht aber in den Elementen. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class PlainTimestamp

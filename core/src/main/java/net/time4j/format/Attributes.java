@@ -40,13 +40,13 @@ import java.util.NoSuchElementException;
  * and parsing. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Formatattribute zum Steuern des Format- und Interpretierungsvorgangs. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class Attributes
     implements AttributeQuery {
@@ -413,12 +413,6 @@ public final class Attributes
     public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
         PredefinedKey.valueOf("PROTECTED_CHARACTERS", Integer.class);
 
-    private static final char ISO_DECIMAL_SEPARATOR = (
-        Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
-        ? '.'
-        : ',' // Empfehlung des ISO-Standards
-    );
-
     private static final AttributeQuery EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
@@ -430,7 +424,7 @@ public final class Attributes
     private Attributes(Map<String, Object> map) {
         super();
 
-        this.attributes = Collections.unmodifiableMap(new HashMap<String, Object>(map));
+        this.attributes = Collections.unmodifiableMap(new HashMap<>(map));
 
     }
 
@@ -541,18 +535,18 @@ public final class Attributes
     /**
      * <p>Builds a collection of format attributes. </p>
      *
-     * @doctags.concurrency <mutable>
+     * @doctags.concurrency {mutable}
      */
     /*[deutsch]
      * <p>Baut eine Menge von Formatattributen. </p>
      *
-     * @doctags.concurrency <mutable>
+     * @doctags.concurrency {mutable}
      */
     public static final class Builder {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final Map<String, Object> attributes = new HashMap<String, Object>();
+        private final Map<String, Object> attributes = new HashMap<>();
 
         //~ Konstruktoren -------------------------------------------------
 

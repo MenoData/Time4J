@@ -30,7 +30,7 @@ import net.time4j.engine.ChronoElement;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Positionsinformation eines chronologischen
@@ -38,7 +38,7 @@ import net.time4j.engine.ChronoElement;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class ElementPosition {
 

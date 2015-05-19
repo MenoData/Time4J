@@ -94,7 +94,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitformat zur Konversion zwischen einem
@@ -111,7 +111,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 public final class ChronoFormatter<T extends ChronoEntity<T>>
     implements ChronoPrinter<T>, ChronoParser<T>, TemporalFormatter<T> {
@@ -2229,7 +2229,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @doctags.concurrency <mutable>
+     * @doctags.concurrency {mutable}
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Formatobjekt. </p>
@@ -2241,7 +2241,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @doctags.concurrency <mutable>
+     * @doctags.concurrency {mutable}
      */
     public static final class Builder<T extends ChronoEntity<T>> {
 
