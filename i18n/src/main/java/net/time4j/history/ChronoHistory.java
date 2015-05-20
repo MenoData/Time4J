@@ -628,6 +628,24 @@ public final class ChronoHistory
 
     }
 
+    /**
+     * <p>Yields all associated elements. </p>
+     *
+     * @return  unmodifiable set of historical elements
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Liefert alle zugeh&ouml;rigen historischen Elemente. </p>
+     *
+     * @return  unmodifiable set of historical elements
+     * @since   3.1
+     */
+    public Set<ChronoElement<?>> getElements() {
+
+        return this.elements;
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -734,18 +752,6 @@ public final class ChronoHistory
     List<CutOverEvent> getEvents() {
 
         return this.events;
-
-    }
-
-    /**
-     * <p>Yields all associated elements. </p>
-     *
-     * @return  unmodifiable set
-     * @since   3.0
-     */
-    Set<ChronoElement<?>> getElements() {
-
-        return this.elements;
 
     }
 
