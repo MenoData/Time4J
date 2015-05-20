@@ -44,7 +44,6 @@ import static net.time4j.format.PluralCategory.ZERO;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.exclude
  */
 public final class PluralProviderSPI
     implements PluralProvider {

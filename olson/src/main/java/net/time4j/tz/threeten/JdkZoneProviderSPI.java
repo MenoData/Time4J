@@ -35,7 +35,7 @@ import net.time4j.tz.model.DaylightSavingRule;
 import net.time4j.tz.model.GregorianTimezoneRule;
 import net.time4j.tz.model.OffsetIndicator;
 import net.time4j.tz.model.TransitionModel;
-import net.time4j.tz.olson.ZoneNameProviderSPI;
+import net.time4j.tz.spi.ZoneNameProviderSPI;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -59,7 +59,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   4.0
- * @doctags.exclude
  */
 public class JdkZoneProviderSPI
     implements ZoneProvider {

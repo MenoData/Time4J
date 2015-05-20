@@ -104,13 +104,13 @@ public interface StdZoneIdentifier
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Yields the timezone region. </p>
+     * <p>Yields the timezone region - in most cases a continent. </p>
      *
      * @return  the first part of zone identifier (for example
      *          &quot;Europe&quot; in &quot;Europe/Paris&quot;)
      */
     /*[deutsch]
-     * <p>Liefert die Regionskennung. </p>
+     * <p>Liefert die Regionskennung - meistens ein Kontinent. </p>
      *
      * @return  der erste Teil der Zeitzonen-ID (zum Beispiel
      *          &quot;Europe&quot; in &quot;Europe/Paris&quot;)
@@ -130,5 +130,19 @@ public interface StdZoneIdentifier
      *          &quot;Paris&quot; in &quot;Europe/Paris&quot;)
      */
     String getCity();
+
+    /**
+     * <p>Yields the belonging country in ISO-3166-format - related to the exemplar city. </p>
+     *
+     * @return  country code
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Liefert den zugeh&ouml;rigen L&auml;nder-Code im ISO-3166-format - bezogen auf die Beispielstadt. </p>
+     *
+     * @return  L&auml;nder-Code
+     * @since   4.0
+     */
+    String getCountry();
 
 }

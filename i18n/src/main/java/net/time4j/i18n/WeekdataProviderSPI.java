@@ -42,7 +42,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.exclude
  */
 public class WeekdataProviderSPI
     implements WeekdataProvider {

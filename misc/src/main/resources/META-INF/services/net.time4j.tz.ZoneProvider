@@ -1,2 +1,2 @@
-net.time4j.tz.other.WinZoneProviderSPI
-net.time4j.tz.other.MilZoneProviderSPI
+net.time4j.tz.spi.WinZoneProviderSPI
+net.time4j.tz.spi.MilZoneProviderSPI

@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.tz.other;
+package net.time4j.tz.spi;
 
 import net.time4j.tz.TZID;
 
