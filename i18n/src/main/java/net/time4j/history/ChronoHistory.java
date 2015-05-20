@@ -634,13 +634,13 @@ public final class ChronoHistory
      * <p>Yields all associated elements. </p>
      *
      * @return  unmodifiable set of historical elements
-     * @since   4.0
+     * @since   3.1
      */
     /*[deutsch]
      * <p>Liefert alle zugeh&ouml;rigen historischen Elemente. </p>
      *
      * @return  unmodifiable set of historical elements
-     * @since   4.0
+     * @since   3.1
      */
     public Set<ChronoElement<?>> getElements() {
 

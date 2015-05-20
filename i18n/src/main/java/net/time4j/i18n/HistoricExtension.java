@@ -44,12 +44,6 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @since   3.1
  */
-/*[deutsch]
- * <p>Definiert eine historische Erweiterung von {@code PlainDate}. </p>
- *
- * @author  Meno Hochschild
- * @since   3.1
- */
 public class HistoricExtension
     implements ChronoExtension {
 
