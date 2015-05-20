@@ -19,13 +19,22 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.tz.olson;
+package net.time4j.tz.spi;
 
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.olson.AFRICA;
+import net.time4j.tz.olson.AMERICA;
+import net.time4j.tz.olson.ANTARCTICA;
+import net.time4j.tz.olson.ASIA;
+import net.time4j.tz.olson.ATLANTIC;
+import net.time4j.tz.olson.AUSTRALIA;
+import net.time4j.tz.olson.EUROPE;
+import net.time4j.tz.olson.INDIAN;
+import net.time4j.tz.olson.PACIFIC;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,8 +49,7 @@ import java.util.Set;
  * to assist in resolving timezone names to ids. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
- * @doctags.exclude
+ * @since   3.1
  */
 public class ZoneNameProviderSPI
     implements ZoneProvider {

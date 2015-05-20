@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.tz.other;
+package net.time4j.tz.spi;
 
 import net.time4j.tz.TZID;
 
@@ -33,7 +33,7 @@ import java.io.Serializable;
  * <p>The resolved id of a windows zone. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
+ * @since   3.1
  */
 final class WinZoneID
     implements TZID, Serializable {

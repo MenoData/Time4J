@@ -19,8 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j;
+package net.time4j.scale.spi;
 
+import net.time4j.PlainDate;
+import net.time4j.Platform;
 import net.time4j.base.GregorianDate;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondProvider;
@@ -42,7 +44,6 @@ import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
  * &quot;leapseconds.data&quot; in class path. </p>
  *
  * @author  Meno Hochschild
- * @doctags.exclude
  */
 public final class DefaultLeapSecondProviderSPI
     implements LeapSecondProvider {

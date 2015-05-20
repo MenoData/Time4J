@@ -25,7 +25,7 @@ import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZoneProvider;
-import net.time4j.tz.olson.ZoneNameProviderSPI;
+import net.time4j.tz.spi.ZoneNameProviderSPI;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -77,11 +77,7 @@ public class TraditionalZoneProviderSPI
     public Set<String> getAvailableIDs() {
 
         Set<String> zones = new HashSet<String>();
-
-        for (String id : TimeZone.getAvailableIDs()) {
-            zones.add(id);
-        }
-
+        Collections.addAll(zones, TimeZone.getAvailableIDs());
         return Collections.unmodifiableSet(zones);
 
     }

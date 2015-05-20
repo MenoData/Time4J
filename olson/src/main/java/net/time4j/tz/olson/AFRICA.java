@@ -128,17 +128,8 @@ public enum AFRICA
 
     }
 
-    /**
-     * <p>Yields the belonging country in ISO-3166-format. </p>
-     *
-     * @return  country code
-     */
-    /*[deutsch]
-     * <p>Liefert den zugeh&ouml;rigen L&auml;nder-Code im ISO-3166-format. </p>
-     *
-     * @return  L&auml;nder-Code
-     */
-    String getCountry() {
+    @Override
+    public String getCountry() {
 
         return this.country;
 

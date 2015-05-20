@@ -22,17 +22,13 @@
 package net.time4j.tz.other;
 
 import net.time4j.tz.TZID;
+import net.time4j.tz.spi.WinZoneProviderSPI;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -73,29 +69,7 @@ public final class WindowsZone
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    // Map<country, Map<tzid, name>>
-    private static final Map<String, Map<String, String>> REPOSITORY;
-
-    // Map<country, Set<tzid>>
-    private static final Map<String, Set<String>> PREFERRED_KEYS;
-
-    // Map<name, Map<country, Set<tzid>>>
-    private static final Map<String, Map<String, Set<TZID>>> NAME_BASED_MAP;
-
-    // Version of windowsZones.xml
-    private static final String VERSION;
-
-    private static final String VKEY = "VERSION";
     private static final long serialVersionUID = -6071278077083785308L;
-
-    static {
-        Map<String, Map<String, String>> map = loadData();
-        VERSION = map.get(VKEY).keySet().iterator().next();
-        map.remove(VKEY);
-        REPOSITORY = Collections.unmodifiableMap(map);
-        PREFERRED_KEYS = prepareSmartMode();
-        NAME_BASED_MAP = prepareResolvers();
-    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -129,7 +103,7 @@ public final class WindowsZone
      */
     public static Set<String> getAvailableNames() {
 
-        return NAME_BASED_MAP.keySet();
+        return WinZoneProviderSPI.NAME_BASED_MAP.keySet();
 
     }
 
@@ -237,7 +211,7 @@ public final class WindowsZone
      */
     public Set<TZID> resolve(Locale country) {
 
-        Set<TZID> ids = NAME_BASED_MAP.get(this.name).get(country.getCountry());
+        Set<TZID> ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get(country.getCountry());
 
         if (ids == null) {
             return Collections.emptySet();
@@ -285,7 +259,7 @@ public final class WindowsZone
         Set<TZID> ids = this.resolve(country);
 
         if (ids.size() > 1) {
-            ids = NAME_BASED_MAP.get(this.name).get("001");
+            ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get("001");
         }
 
         switch (ids.size()) {
@@ -314,164 +288,7 @@ public final class WindowsZone
      */
     static String getVersion() {
 
-        return VERSION;
-
-    }
-
-    // called by WinZoneProviderSPI
-    static Map<String, String> idsToNames(String country) {
-
-        Map<String, String> map = REPOSITORY.get(country);
-
-        if (map == null) {
-            return Collections.emptyMap();
-        } else {
-            return Collections.unmodifiableMap(map);
-        }
-
-    }
-
-    // called by WinZoneProviderSPI
-    static Set<String> getPreferredIDs(
-        String country,
-        boolean smart
-    ) {
-
-        return (
-            smart
-            ? getPreferences(country)
-            : idsToNames(country).keySet());
-
-    }
-
-    private static Set<String> getPreferences(String country) {
-
-        Set<String> preferences = PREFERRED_KEYS.get(country);
-
-        if (preferences == null) {
-            return Collections.emptySet();
-        } else {
-            return Collections.unmodifiableSet(preferences);
-        }
-
-    }
-
-    private static Map<String, Set<String>> prepareSmartMode() {
-
-        Map<String, Set<String>> preferredKeys =
-            new HashMap<String, Set<String>>();
-
-        for (String country : REPOSITORY.keySet()) {
-            Map<String, String> map = idsToNames(country);
-            Set<String> keys = map.keySet();
-
-            if (keys.size() >= 2) {
-                keys = new HashSet<String>();
-                Set<String> names = new HashSet<String>(map.values());
-
-                for (String name : names) {
-                    for (Map.Entry<String, String> e : getFallback()) {
-                        if (e.getValue().equals(name)) {
-                            keys.add(e.getKey());
-                        }
-                    }
-                }
-            }
-
-            preferredKeys.put(country, keys);
-        }
-
-        return Collections.unmodifiableMap(preferredKeys);
-
-    }
-
-    private static Set<Map.Entry<String, String>> getFallback() {
-
-        return idsToNames("001").entrySet();
-
-    }
-
-    private static Map<String, Map<String, Set<TZID>>> prepareResolvers() {
-
-        Map<String, Map<String, Set<TZID>>> nameBasedMap =
-            new HashMap<String, Map<String, Set<TZID>>>();
-
-        for (String country : REPOSITORY.keySet()) {
-            Map<String, String> idsToNames = REPOSITORY.get(country);
-
-            for (Map.Entry<String, String> e : idsToNames.entrySet()) {
-                String id = e.getKey();
-                String name = e.getValue();
-
-                Map<String, Set<TZID>> countryToIds = nameBasedMap.get(name);
-                if (countryToIds == null) {
-                    countryToIds = new HashMap<String, Set<TZID>>();
-                    nameBasedMap.put(name, countryToIds);
-                }
-
-                Set<TZID> ids = countryToIds.get(country);
-                if (ids == null) {
-                    ids = new HashSet<TZID>();
-                    countryToIds.put(country, ids);
-                }
-
-                ids.add(new WinZoneID(id));
-            }
-        }
-
-        return Collections.unmodifiableMap(nameBasedMap);
-
-    }
-
-    private static Map<String, Map<String, String>> loadData() {
-
-        ObjectInputStream ois = null;
-
-        try {
-            InputStream is = null;
-            String source = "data/winzone.ser";
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-            if (loader != null) {
-                is = loader.getResourceAsStream(source);
-            }
-
-            if (is == null) {
-                loader = WindowsZone.class.getClassLoader();
-                is = loader.getResourceAsStream(source);
-            }
-
-            if (is == null) {
-                throw new FileNotFoundException(source);
-            } else {
-                ois = new ObjectInputStream(is);
-                String version = ois.readUTF();
-                Map<String, Map<String, String>> data = cast(ois.readObject());
-                Map<String, Map<String, String>> map =
-                    new HashMap<String, Map<String, String>>(data);
-                map.put(VKEY, Collections.singletonMap(version, version));
-                return map;
-            }
-        } catch (ClassNotFoundException ex) {
-            throw new IllegalStateException(ex);
-        } catch (IOException ex) {
-            throw new IllegalStateException(ex);
-        } finally {
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException ex) {
-                    // ignore
-                }
-            }
-        }
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> T cast(Object obj) {
-
-        return (T) obj;
+        return WinZoneProviderSPI.WIN_NAME_VERSION;
 
     }
 
@@ -479,7 +296,7 @@ public final class WindowsZone
 
         if (
             name.isEmpty()
-            || !NAME_BASED_MAP.keySet().contains(name)
+            || !WinZoneProviderSPI.NAME_BASED_MAP.keySet().contains(name)
         ) {
             throw new IllegalArgumentException("Unknown windows zone: " + name);
         }
@@ -488,7 +305,10 @@ public final class WindowsZone
 
     /**
      * @serialData  Checks the consistency.
-     * @throws      InvalidObjectException in case of inconsistencies
+     * @param       in      object input stream
+     * @throws      ClassNotFoundException if the class of a serialized object could not be found.
+     * @throws      IOException if an I/O error occurs.
+     * @throws      IllegalArgumentException in case of inconsistencies
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
