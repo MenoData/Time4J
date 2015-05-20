@@ -110,12 +110,6 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.2</version>
                 <configuration>
-                    <doclet>de.menodata.tools.ExcludeDoclet</doclet>
-                    <docletArtifact>
-                        <groupId>de.menodata</groupId>
-                        <artifactId>doctags</artifactId>
-                        <version>1.0</version>
-                    </docletArtifact>
                     <taglets>
                         <taglet>
                             <tagletClass>de.menodata.taglets.ConcurrencyTaglet</tagletClass>
@@ -130,9 +124,10 @@
                     <tagletArtifact>
                         <groupId>de.menodata</groupId>
                         <artifactId>doctags</artifactId>
-                        <version>1.0</version>
+                        <version>2.0</version>
                     </tagletArtifact>
-                    <show>protected</show>
+                    <show>public</show>
+                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.i18n:net.time4j.tz.threeten</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>

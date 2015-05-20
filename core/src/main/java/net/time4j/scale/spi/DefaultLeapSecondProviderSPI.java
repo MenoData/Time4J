@@ -19,8 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j;
+package net.time4j.scale.spi;
 
+import net.time4j.PlainDate;
+import net.time4j.Platform;
 import net.time4j.base.GregorianDate;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondProvider;
@@ -42,7 +44,6 @@ import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
  * &quot;leapseconds.data&quot; in class path. </p>
  *
  * @author  Meno Hochschild
- * @doctags.exclude
  */
 public final class DefaultLeapSecondProviderSPI
     implements LeapSecondProvider {
@@ -59,7 +60,7 @@ public final class DefaultLeapSecondProviderSPI
         super();
 
         PlainDate tmpExpires = PlainDate.axis().getMinimum();
-        this.table = new LinkedHashMap<GregorianDate, Integer>(50);
+        this.table = new LinkedHashMap<>(50);
         InputStream is = null;
         String name = PATH_TO_LEAPSECONDS;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
