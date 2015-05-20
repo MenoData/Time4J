@@ -43,7 +43,7 @@ import java.util.Locale;
  * <p>The expert format engine. </p>
  *
  * @author  Meno Hochschild
- * @since   4.0
+ * @since   3.1
  */
 public final class UltimateFormatEngine
     implements FormatEngine<PatternType> {

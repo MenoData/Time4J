@@ -40,7 +40,7 @@ import java.util.Set;
  * <p>SPI-implementation for support of military timezones. </p>
  *
  * @author  Meno Hochschild
- * @since   4.0
+ * @since   3.1
  */
 public class MilZoneProviderSPI
     implements ZoneProvider {

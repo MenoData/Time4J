@@ -135,13 +135,13 @@ public interface StdZoneIdentifier
      * <p>Yields the belonging country in ISO-3166-format - related to the exemplar city. </p>
      *
      * @return  country code
-     * @since   4.0
+     * @since   3.1
      */
     /*[deutsch]
      * <p>Liefert den zugeh&ouml;rigen L&auml;nder-Code im ISO-3166-format - bezogen auf die Beispielstadt. </p>
      *
      * @return  L&auml;nder-Code
-     * @since   4.0
+     * @since   3.1
      */
     String getCountry();
 

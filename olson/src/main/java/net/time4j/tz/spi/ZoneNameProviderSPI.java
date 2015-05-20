@@ -49,7 +49,7 @@ import java.util.Set;
  * to assist in resolving timezone names to ids. </p>
  *
  * @author  Meno Hochschild
- * @since   4.0
+ * @since   3.1
  */
 public class ZoneNameProviderSPI
     implements ZoneProvider {

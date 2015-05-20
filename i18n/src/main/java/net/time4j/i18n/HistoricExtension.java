@@ -42,13 +42,13 @@ import java.util.Set;
  * <p>Defines a historic extension of {@code PlainDate}. </p>
  *
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   3.1
  */
 /*[deutsch]
  * <p>Definiert eine historische Erweiterung von {@code PlainDate}. </p>
  *
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   3.1
  */
 public class HistoricExtension
     implements ChronoExtension {
