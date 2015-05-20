@@ -1400,9 +1400,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected TimeAxis<IsoDateUnit, PlainDate> getChronology() {
 
@@ -1410,9 +1407,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected PlainDate getContext() {
 
@@ -1420,9 +1414,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected int compareByTime(Calendrical<?, ?> date) {
 

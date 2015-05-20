@@ -1716,9 +1716,6 @@ public final class PlainTime
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected TimeAxis<IsoTimeUnit, PlainTime> getChronology() {
 
@@ -1726,9 +1723,6 @@ public final class PlainTime
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected PlainTime getContext() {
 

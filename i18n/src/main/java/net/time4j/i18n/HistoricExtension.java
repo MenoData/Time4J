@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.history;
+package net.time4j.i18n;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
@@ -29,6 +29,9 @@ import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
+import net.time4j.history.ChronoHistory;
+import net.time4j.history.HistoricDate;
+import net.time4j.history.HistoricEra;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -40,14 +43,12 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.exclude
  */
 /*[deutsch]
  * <p>Definiert eine historische Erweiterung von {@code PlainDate}. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.exclude
  */
 public class HistoricExtension
     implements ChronoExtension {

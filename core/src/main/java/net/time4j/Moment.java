@@ -1480,9 +1480,6 @@ public final class Moment
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected TimeAxis<TimeUnit, Moment> getChronology() {
 
@@ -1490,9 +1487,6 @@ public final class Moment
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected Moment getContext() {
 

@@ -530,7 +530,6 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
      * <p>Liefert den Selbstbezug. </p>
      *
      * @return  time context (usually this instance)
-     * @doctags.exclude
      */
     protected T getContext() {
 

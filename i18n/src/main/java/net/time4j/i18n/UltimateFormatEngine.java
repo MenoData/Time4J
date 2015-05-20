@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.format.expert;
+package net.time4j.i18n;
 
 import net.time4j.Moment;
 import net.time4j.PlainDate;
@@ -30,6 +30,8 @@ import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextWidth;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.scale.UniversalTime;
 import net.time4j.tz.ZonalOffset;
 
@@ -41,15 +43,14 @@ import java.util.Locale;
  * <p>The expert format engine. </p>
  *
  * @author  Meno Hochschild
- * @since   3.0
- * @doctags.exclude
+ * @since   4.0
  */
 public final class UltimateFormatEngine
     implements FormatEngine<PatternType> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    static final FormatEngine<PatternType> INSTANCE = new UltimateFormatEngine();
+    public static final FormatEngine<PatternType> INSTANCE = new UltimateFormatEngine();
 
     //~ Konstruktoren -----------------------------------------------------
 

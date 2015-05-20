@@ -82,10 +82,9 @@ public interface FormatEngine<P extends ChronoPattern<P>> {
     /**
      * <p>Creates a specialized formatter for RFC-1123. </p>
      *
-     * <p>SPECIFICATION: The chronological type must be <code>net.time4j.Moment</code>. </p>
-     *
      * @return  temporal format object
-     * @doctags.exclude
+     * @since   3.0
+     * @doctags.spec The chronological type must be <code>net.time4j.Moment</code>.
      */
     TemporalFormatter<? extends UniversalTime> createRFC1123();
 
