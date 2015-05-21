@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeMetric.java) is part of project Time4J.
  *
@@ -43,20 +43,30 @@ public interface TimeMetric<U, P> {
     /**
      * <p>Computes the temporal distance between two time points. </p>
      *
-     * @param   <T> generic type of time point
-     * @param   start   first time point
-     * @param   end     second time point
-     * @return  calculated time span between given time points, will be
-     *          negative if {@code start} is after {@code end}
-     */
-    /*[deutsch]
-     * <p>Berechnet den zeitlichen Abstand zwischen zwei Zeitpunkten. </p>
+     * <p><strong>Important note:</strong> This method might not work in Java 6 under some circumstances.
+     * In case of any problem users can use the equivalent method {@code until()} defined in the class
+     * {@code TimePoint}. </p>
      *
      * @param   <T> generic type of time point
      * @param   start   first time point
      * @param   end     second time point
      * @return  calculated time span between given time points, will be
      *          negative if {@code start} is after {@code end}
+     * @see     TimePoint#until(TimePoint, TimeMetric)
+     */
+    /*[deutsch]
+     * <p>Berechnet den zeitlichen Abstand zwischen zwei Zeitpunkten. </p>
+     *
+     * <p><strong>Wichtiger Hinweis:</strong> Diese Methode mag in Java 6 unter bestimmten Umst&auml;nden nicht
+     * funktionieren. Ist das der Fall, k&ouml;nnen Anwender auf die &auml;quivalente Methode
+     * {@code until()} definiert in der Klasse {@code TimePoint} ausweichen. </p>
+     *
+     * @param   <T> generic type of time point
+     * @param   start   first time point
+     * @param   end     second time point
+     * @return  calculated time span between given time points, will be
+     *          negative if {@code start} is after {@code end}
+     * @see     TimePoint#until(TimePoint, TimeMetric)
      */
     <T extends TimePoint<? super U, T>> P between(
         T start,
