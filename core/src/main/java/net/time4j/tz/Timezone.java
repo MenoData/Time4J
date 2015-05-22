@@ -119,26 +119,7 @@ public abstract class Timezone
         System.getProperty("net.time4j.tz.repository.version");
 
     private static final Comparator<TZID> ID_COMPARATOR =
-        new Comparator<TZID>() {
-            @Override
-            public int compare(
-                TZID o1,
-                TZID o2
-            ) {
-                String c1 = o1.canonical();
-                int i1 = c1.indexOf('~');
-                String c2 = o2.canonical();
-                int i2 = c2.indexOf('~');
-
-                if (i1 >= 0) {
-                    return ((i2 == -1) ? 1 : c1.compareTo(c2));
-                } else if (i2 >= 0) {
-                    return -1;
-                } else {
-                    return c1.compareTo(c2);
-                }
-            }
-        };
+        (o1, o2) -> o1.canonical().compareTo(o2.canonical());
 
     /**
      * <p>This standard strategy which is also used by the JDK-class
@@ -212,10 +193,10 @@ public abstract class Timezone
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
     static {
-        CACHE = new ConcurrentHashMap<String, NamedReference>();
-        PROVIDERS = new ConcurrentHashMap<String, ZoneProvider>();
-        QUEUE = new ReferenceQueue<Timezone>();
-        LAST_USED = new LinkedList<Timezone>(); // strong references
+        CACHE = new ConcurrentHashMap<>();
+        PROVIDERS = new ConcurrentHashMap<>();
+        QUEUE = new ReferenceQueue<>();
+        LAST_USED = new LinkedList<>(); // strong references
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
@@ -251,7 +232,7 @@ public abstract class Timezone
             areas = Collections.emptyList();
         }
 
-        Map<String, TZID> temp1 = new HashMap<String, TZID>();
+        Map<String, TZID> temp1 = new HashMap<>();
         temp1.put("Z", ZonalOffset.UTC);
         temp1.put("UT", ZonalOffset.UTC);
         temp1.put("UTC", ZonalOffset.UTC);
@@ -394,7 +375,7 @@ public abstract class Timezone
             return Collections.emptyList();
         }
 
-        List<TZID> result = new ArrayList<TZID>();
+        List<TZID> result = new ArrayList<>();
 
         for (String id : zp.getAvailableIDs()) {
             result.add(resolve(id));
@@ -459,7 +440,7 @@ public abstract class Timezone
             return Collections.emptySet();
         }
 
-        Set<TZID> p = new HashSet<TZID>();
+        Set<TZID> p = new HashSet<>();
 
         for (String id : zp.getPreferredIDs(locale, smart)) {
             p.add(resolve(id));
@@ -1237,14 +1218,13 @@ public abstract class Timezone
         if (provider == PLATFORM_PROVIDER) {
             PlatformTimezone test = new PlatformTimezone(resolved, zoneKey);
 
+            // JDK-Fallback verhindern => tz == null
             if (
-                test.isGMT()
-                && !zoneKey.equals("GMT")
-                && !zoneKey.startsWith("UT")
-                && !zoneKey.equals("Z")
+                !test.isGMT()
+                || zoneKey.equals("GMT")
+                || zoneKey.startsWith("UT")
+                || zoneKey.equals("Z")
             ) {
-                // JDK-Fallback verhindern => tz == null
-            } else {
                 tz = test;
             }
         } else { // exakte Suche in Historie
@@ -1261,8 +1241,7 @@ public abstract class Timezone
         // Ungültige ID?
         if (tz == null) {
             if (wantsException) {
-                throw new IllegalArgumentException(
-                    "Unknown timezone: " + zoneID);
+                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
             } else {
                 return null;
             }
@@ -1360,8 +1339,7 @@ public abstract class Timezone
         String... names
     ) throws ClassNotFoundException {
 
-        List<Class<? extends TZID>> classes =
-            new ArrayList<Class<? extends TZID>>();
+        List<Class<? extends TZID>> classes = new ArrayList<>();
 
         for (String name : names) {
             Class<?> clazz =
@@ -1627,7 +1605,7 @@ public abstract class Timezone
         ZonalKeys() {
             super();
 
-            List<TZID> list = new ArrayList<TZID>(1024);
+            List<TZID> list = new ArrayList<>(1024);
             list.add(ZonalOffset.UTC);
 
             for (Map.Entry<String, ZoneProvider> e : PROVIDERS.entrySet()) {
@@ -1665,7 +1643,7 @@ public abstract class Timezone
         @Override
         public Set<String> getAvailableIDs() {
 
-            Set<String> ret = new HashSet<String>();
+            Set<String> ret = new HashSet<>();
             String[] temp = java.util.TimeZone.getAvailableIDs();
             ret.addAll(Arrays.asList(temp));
             return ret;

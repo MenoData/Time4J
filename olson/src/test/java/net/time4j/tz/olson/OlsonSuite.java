@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RulesLikeBerlin1947Test.class,
         RulesLikeDhaka2009Test.class,
         RulesOfEuropeanUnionTest.class,
+        SamoaTest.class,
         SerializationTest.class,
         StartOfDayTest.class,
         TransitionResolverTest.class,
