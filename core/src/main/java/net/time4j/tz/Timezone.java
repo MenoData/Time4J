@@ -125,18 +125,7 @@ public abstract class Timezone
                 TZID o1,
                 TZID o2
             ) {
-                String c1 = o1.canonical();
-                int i1 = c1.indexOf('~');
-                String c2 = o2.canonical();
-                int i2 = c2.indexOf('~');
-
-                if (i1 >= 0) {
-                    return ((i2 == -1) ? 1 : c1.compareTo(c2));
-                } else if (i2 >= 0) {
-                    return -1;
-                } else {
-                    return c1.compareTo(c2);
-                }
+                return o1.canonical().compareTo(o2.canonical());
             }
         };
 
@@ -1237,14 +1226,13 @@ public abstract class Timezone
         if (provider == PLATFORM_PROVIDER) {
             PlatformTimezone test = new PlatformTimezone(resolved, zoneKey);
 
+            // JDK-Fallback verhindern => tz == null
             if (
-                test.isGMT()
-                && !zoneKey.equals("GMT")
-                && !zoneKey.startsWith("UT")
-                && !zoneKey.equals("Z")
+                !test.isGMT()
+                || zoneKey.equals("GMT")
+                || zoneKey.startsWith("UT")
+                || zoneKey.equals("Z")
             ) {
-                // JDK-Fallback verhindern => tz == null
-            } else {
                 tz = test;
             }
         } else { // exakte Suche in Historie
@@ -1261,8 +1249,7 @@ public abstract class Timezone
         // Ungültige ID?
         if (tz == null) {
             if (wantsException) {
-                throw new IllegalArgumentException(
-                    "Unknown timezone: " + zoneID);
+                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
             } else {
                 return null;
             }
