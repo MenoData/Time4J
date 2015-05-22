@@ -32,6 +32,9 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.ZonedDateTime;
@@ -506,6 +509,61 @@ public final class ZonalDateTime
     public ZonedDateTime toTemporalAccessor() {
 
         return TemporalType.ZONED_DATE_TIME.from(this);
+
+    }
+
+    /**
+     * <p>Writes this instance to given output (serialization). </p>
+     *
+     * <p><strong>Warning:</strong> Serializing this instance is a heavy-weight-operation because the
+     * whole relevant timezone data will be written to given stream, not only the timezone-id. </p>
+     *
+     * @param   output      object output
+     * @throws  IOException if writing fails
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Schreibt diese Instanz in den angegebenen Ausgabestrom (Serialisierung). </p>
+     *
+     * <p><strong>Warnung:</strong> Die Serialisierung dieser Instanz ist schwergewichtig, weil alle
+     * relevanten Zeitzonendaten komplett geschrieben werden, nicht nur die Zeitzonen-ID. </p>
+     *
+     * @param   output      object output
+     * @throws  IOException if writing fails
+     * @since   3.1
+     */
+    public void write(ObjectOutput output) throws IOException {
+
+        output.writeObject(this.moment);
+        output.writeObject(this.zone);
+
+    }
+
+    /**
+     * <p>This is the reverse operation of {@link #write(ObjectOutput)}. </p>
+     *
+     * @param   input       object input
+     * @return  reconstructed instance of serialized {@code ZonalDateTime}
+     * @throws  IOException if reading fails
+     * @throws  ClassNotFoundException if class-loading fails
+     * @throws  IllegalArgumentException in case of inconsistent data
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Das ist die Umkehroperation zu {@link #write(ObjectOutput)}. </p>
+     *
+     * @param   input       object input
+     * @return  reconstructed instance of serialized {@code ZonalDateTime}
+     * @throws  IOException if reading fails
+     * @throws  ClassNotFoundException if class-loading fails
+     * @throws  IllegalArgumentException in case of inconsistent data
+     * @since   3.1
+     */
+    public static ZonalDateTime read(ObjectInput input) throws IOException, ClassNotFoundException {
+
+        Moment moment = (Moment) input.readObject();
+        Timezone tz = (Timezone) input.readObject();
+        return new ZonalDateTime(moment, tz);
 
     }
 
