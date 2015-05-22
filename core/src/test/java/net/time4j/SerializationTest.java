@@ -185,6 +185,21 @@ public class SerializationTest {
         assertThat(info.next, is(47));
     }
 
+    @Test
+    public void roundTripOfZonalDateTime() throws IOException, ClassNotFoundException {
+        ZonalDateTime zdt = Moment.UNIX_EPOCH.inZonalView("Europe/Berlin");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        zdt.write(oos);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        ZonalDateTime ser = ZonalDateTime.read(ois);
+        ois.close();
+        assertThat(zdt.equals(ser), is(true));
+    }
+
     private Info analyze(String msg, Object[] sers)
         throws IOException, ClassNotFoundException {
 
