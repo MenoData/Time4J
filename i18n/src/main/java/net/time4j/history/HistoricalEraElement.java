@@ -172,7 +172,7 @@ final class HistoricalEraElement
     protected <T extends ChronoEntity<T>> ElementRule<T, HistoricEra> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
-            return new Rule<T>(this.history);
+            return new Rule<>(this.history);
         }
 
         return null;
@@ -188,6 +188,7 @@ final class HistoricalEraElement
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
 
         if (attributes.get(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE).booleanValue()) {
+            // NARROW and SHORT like ABBREVIATED
             return cnames.getTextForms(this, ((textWidth == TextWidth.WIDE) ? "w" : "a"), "alt");
         }
 
