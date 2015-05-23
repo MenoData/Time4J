@@ -64,15 +64,11 @@ public final class IsoTextProviderSPI
                 UTF8ResourceControl.SINGLETON);
 
         String[] languages = rb.getString("languages").split(" ");
-        Set<String> tmp = new HashSet<String>();
-
-        for (String s : languages) {
-            tmp.add(s);
-        }
-
+        Set<String> tmp = new HashSet<>();
+        Collections.addAll(tmp, languages);
         LANGUAGES = Collections.unmodifiableSet(tmp);
 
-        Set<Locale> locs = new HashSet<Locale>();
+        Set<Locale> locs = new HashSet<>();
 
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
             // Java-pre-8 has no root locale but Java-8 has the root!
@@ -450,6 +446,13 @@ public final class IsoTextProviderSPI
 
             if (names != null) {
                 return names;
+            } else if (tw == TextWidth.NARROW) {
+                return narrow(eras(locale, TextWidth.ABBREVIATED), 2);
+            } else {
+                throw new MissingResourceException(
+                    "Cannot find ISO-8601-resource for era.",
+                    IsoTextProviderSPI.class.getName(),
+                    locale.toString());
             }
         }
 
