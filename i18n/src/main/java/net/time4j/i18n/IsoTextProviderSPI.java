@@ -66,11 +66,7 @@ public final class IsoTextProviderSPI
 
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<String>();
-
-        for (String s : languages) {
-            tmp.add(s);
-        }
-
+        Collections.addAll(tmp, languages);
         LANGUAGES = Collections.unmodifiableSet(tmp);
 
         Set<Locale> locs = new HashSet<Locale>();
@@ -451,6 +447,13 @@ public final class IsoTextProviderSPI
 
             if (names != null) {
                 return names;
+            } else if (tw == TextWidth.NARROW) {
+                return narrow(eras(locale, TextWidth.ABBREVIATED), 2);
+            } else {
+                throw new MissingResourceException(
+                    "Cannot find ISO-8601-resource for era.",
+                    IsoTextProviderSPI.class.getName(),
+                    locale.toString());
             }
         }
 
