@@ -442,6 +442,10 @@ public final class IsoTextProviderSPI
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
+            if (tw == TextWidth.SHORT) {
+                tw = TextWidth.ABBREVIATED;
+            }
+
             String key = getKey(rb, "ERA");
             String[] names = lookupBundle(rb, 2, key, tw);
 
