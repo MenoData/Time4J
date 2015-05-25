@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -130,6 +131,18 @@ public class EraFormatTest {
         assertThat(
             formatter.parse("2. September AD 1752"),
             is(PlainDate.of(1752, 9, 13)));
+    }
+
+    @Test
+    public void printSwedishAnomalyInEnglishUsingThreetenDate() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
+                .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
+                .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
+                .build();
+        assertThat(
+            formatter.format(LocalDate.of(1712, 3, 11)),
+            is("Anno Domini 1712, February 30th"));
     }
 
     @Test
