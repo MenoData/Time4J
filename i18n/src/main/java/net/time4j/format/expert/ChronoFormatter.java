@@ -1060,7 +1060,40 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public ChronoFormatter<T> withAlternativeEraNames() {
 
-        return this.with(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.TRUE);
+        return this.with(
+            ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.TRUE
+        ).with(
+            ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.FALSE
+        );
+
+    }
+
+    /**
+     * <p>Creates a copy of this formatter with latin era names. </p>
+     *
+     * <p>Note: Sectional attributes cannot be overridden. </p>
+     *
+     * @return  changed copy with latin era names while this instance remains unaffected
+     * @see     ChronoHistory#ATTRIBUTE_LATIN_ERA
+     * @since   3.1
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie, die statt der Standard-&Auml;ra-Bezeichnungen
+     * lateinische Namen verwendet. </p>
+     *
+     * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
+     *
+     * @return  changed copy with latin era names while this instance remains unaffected
+     * @see     ChronoHistory#ATTRIBUTE_LATIN_ERA
+     * @since   3.1
+     */
+    public ChronoFormatter<T> withLatinEraNames() {
+
+        return this.with(
+            ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE
+        ).with(
+            ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.TRUE
+        );
 
     }
 

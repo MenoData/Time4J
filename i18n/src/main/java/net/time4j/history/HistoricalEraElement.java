@@ -57,7 +57,8 @@ final class HistoricalEraElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    //private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 5200533417265981438L;
+    private static final Locale LATIN = new Locale("la");
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -181,11 +182,22 @@ final class HistoricalEraElement
 
     private TextAccessor accessor(AttributeQuery attributes) {
 
+        TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+        Locale locale = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
+
+        if (attributes.get(ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.FALSE).booleanValue()) {
+            CalendarText cnames =
+                CalendarText.getInstance(
+                    attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
+                    LATIN);
+            // NARROW and SHORT like ABBREVIATED
+            return cnames.getTextForms(this, ((textWidth == TextWidth.WIDE) ? "w" : "a"));
+        }
+
         CalendarText cnames =
             CalendarText.getInstance(
                 attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
-        TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                locale);
 
         if (attributes.get(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE).booleanValue()) {
             // NARROW and SHORT like ABBREVIATED
