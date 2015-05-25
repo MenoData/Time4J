@@ -13,9 +13,9 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2015-04-30 the version v3.0 of Time4J has been finished and released. The older version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and has reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
+On 2015-05-25 the version v4.0 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The older version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and has reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
 
-- **time4j-olson** which contains some predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java pre 8. 
+- **time4j-olson** which contains some predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
 - **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
 - **time4j-i18n** for enhanced localization, formatting and history support
 - **time4j-range** for handling intervals (needs i18n-module)
@@ -88,6 +88,15 @@ public class Demo {
 	// localized duration format for french
 	String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
+	
+	// following code requires v4.0 and Java-8 using java.time.LocalDate
+        ChronoFormatter&lt;PlainDate&gt; formatter =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
+                .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
+                .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
+                .build();
+        System.out.println(formatter.format(LocalDate.of(1712, 3, 11)));
+        // output: Anno Domini 1712, February 30th
   }
 }
 ```
@@ -104,19 +113,19 @@ d) **Temporal arithmetic**: Another way of manipulation is date/time-arithmetic 
 
 e) **Global versus local**: Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. In a similar way a UTC-moment has both a technical counter (the number of SI-seconds since UTC-epoch) AND a human representation visible in its canonical output produced by `toString()`-method (example: 2014-04-21T19:45:30Z). However, Time4J emphasizes the difference between local and global types. Conversion between these types always require a timezone or an offset.
 
-f) **Internationalization**: Time4J defines its own i18n-resources for many languages (41 in version 3.0) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
+f) **Internationalization**: Time4J defines its own i18n-resources for many languages (41 in version 4.0) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
 
 Plans for next releases:
 ----------------------------------
 
 There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/milestones.
 
-While the main focus of the next releases are standard business use cases, you can expect later more exciting features like other calendar systems, support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project. A smooth integration with JSR-310 is planned in june 2015.
+While the main focus of the next releases are standard business use cases, you can expect later more exciting features like other calendar systems, more support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
 
 Downloads and Requirements:
 ---------------------------
 
-You can find the latest downloads on the release page. Alternatively you can use the maven central repository. Time4J will run at least under Java 6 or later. If you want to build it yourself from sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
+You can find the latest downloads on the release page. Alternatively you can use the maven central repository. If you consider building the version line v3.x yourself from the sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
 
 Feedback:
 ---------
