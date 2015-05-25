@@ -90,13 +90,13 @@ public class Demo {
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 	
 	// following code requires v4.0 and Java-8 using java.time.LocalDate
-        ChronoFormatter&lt;PlainDate&gt; formatter =
-            ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
-                .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
-                .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
-                .build();
-        System.out.println(formatter.format(LocalDate.of(1712, 3, 11)));
-        // output: Anno Domini 1712, February 30th
+	ChronoFormatter&lt;PlainDate&gt; formatter =
+	    ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
+	        .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
+	        .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
+	        .build();
+	System.out.println(formatter.format(LocalDate.of(1712, 3, 11)));
+	// output: Anno Domini 1712, February 30th
   }
 }
 ```
