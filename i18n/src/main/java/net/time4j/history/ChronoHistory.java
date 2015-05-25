@@ -125,6 +125,26 @@ public final class ChronoHistory
         Key.valueOf("COMMON_ERA", Boolean.class);
 
     /**
+     * <p>Format attribute which enforces latin notations of historic eras ignoring the locale. </p>
+     *
+     * <p>Users will usually not directly use this attribute but call the method
+     * {@code ChronoFormatter.withLatinEraNames()} instead. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withLatinEraNames()
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das eine lateinische Schreibweise f&uuml;r die Formatierung
+     * eines Enums des Typs {@link HistoricEra} erzwingt, ohne Ber&uuml;cksichtigung der Spracheinstellung. </p>
+     *
+     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
+     * Methode {@code ChronoFormatter.withLatinEraNames()} aufrufen. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#withLatinEraNames()
+     */
+    public static final AttributeKey<Boolean> ATTRIBUTE_LATIN_ERA =
+        Key.valueOf("LATIN_ERA", Boolean.class);
+
+    /**
      * <p>Describes no real historical event but just the proleptic gregorian calendar which is assumed
      * to be in power all times. </p>
      *
@@ -192,7 +212,7 @@ public final class ChronoHistory
     }
 
     // Dient der Serialisierungsunterstützung.
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4100690610730913643L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -653,17 +673,15 @@ public final class ChronoHistory
             return true;
         } else if (obj instanceof ChronoHistory) {
             ChronoHistory that = (ChronoHistory) obj;
-            if (this.variant != that.variant) {
-                return false;
-            } else {
+            if (this.variant == that.variant) {
                 return (
                     (this.variant != HistoricVariant.SINGLE_CUTOVER_DATE)
                     || (this.events.get(0).start == that.events.get(0).start)
                 );
             }
-        } else {
-            return false;
         }
+
+        return false;
 
     }
 

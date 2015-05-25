@@ -66,7 +66,7 @@ final class HistoricalIntegerElement
     private static final int MONTH_INDEX = 3;
     private static final int DAY_OF_MONTH_INDEX = 4;
 
-    //private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6283098762945747308L;
 
     //~ Instanzvariablen --------------------------------------------------
 

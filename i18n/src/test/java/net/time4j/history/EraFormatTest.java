@@ -63,6 +63,30 @@ public class EraFormatTest {
     }
 
     @Test
+    public void printGermanAndLatinEra() {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.GERMANY)
+                .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR)
+                .build()
+                .withLatinEraNames();
+        assertThat(
+            formatter.format(PlainTimestamp.of(1582, 10, 14, 0, 0)),
+            is("4. Oktober 1582 Anno Domini 00:00"));
+    }
+
+    @Test
+    public void parseGermanAndLatinEra() throws ParseException {
+        ChronoFormatter<PlainTimestamp> formatter =
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.GERMANY)
+                .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR)
+                .build()
+                .withLatinEraNames();
+        assertThat(
+            formatter.parse("4. Oktober 1582 Anno Domini 00:00"),
+            is(PlainTimestamp.of(1582, 10, 14, 0, 0)));
+    }
+
+    @Test
     public void printEngland1() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.GERMANY)
