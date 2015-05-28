@@ -1,7 +1,7 @@
 Time4J
 ======
 
-Advanced date and time library for Java
+Advanced date, time, zone and interval library for Java
 
 Motivation:
 -----------
