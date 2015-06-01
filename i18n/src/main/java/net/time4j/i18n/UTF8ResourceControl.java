@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -45,8 +46,8 @@ class UTF8ResourceControl
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    public static final ResourceBundle.Control SINGLETON =
-    	new UTF8ResourceControl();
+    private static final String FORMAT_ID = "time4j.properties";
+    public static final ResourceBundle.Control SINGLETON = new UTF8ResourceControl();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -74,7 +75,7 @@ class UTF8ResourceControl
     @Override
     public List<String> getFormats(String baseName) {
 
-        return ResourceBundle.Control.FORMAT_PROPERTIES;
+        return Collections.singletonList(FORMAT_ID);
 
     }
 
@@ -87,7 +88,7 @@ class UTF8ResourceControl
         boolean reload
     ) throws IllegalAccessException, InstantiationException, IOException {
 
-        if (format.equals("java.properties")) {
+        if (format.equals(FORMAT_ID)) {
 
             ResourceBundle bundle = null;
             InputStream stream = null;
