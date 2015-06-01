@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.time4j</groupId>
     <artifactId>time4j-parent</artifactId>
-    <version>3.1</version>
+    <version>3.2</version>
     <packaging>pom</packaging>
     <name>Time4J</name>
     <description>Advanced Date and Time library for Java</description>
