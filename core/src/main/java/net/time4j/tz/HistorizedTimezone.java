@@ -129,6 +129,32 @@ final class HistorizedTimezone
     }
 
     @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        ZonalTransition t = this.history.getStartTransition(ut);
+
+        return (
+            (t == null)
+            ? this.history.getInitialOffset()
+            : ZonalOffset.ofTotalSeconds(t.getStandardOffset())
+        );
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        ZonalTransition t = this.history.getStartTransition(ut);
+
+        return (
+            (t == null)
+            ? ZonalOffset.UTC
+            : ZonalOffset.ofTotalSeconds(t.getDaylightSavingOffset())
+        );
+
+    }
+
+    @Override
     public ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime

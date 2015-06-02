@@ -87,6 +87,20 @@ final class FallbackTimezone
     }
 
     @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        return this.fallback.getStandardOffset(ut);
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        return this.fallback.getDaylightSavingOffset(ut);
+
+    }
+
+    @Override
     public ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime

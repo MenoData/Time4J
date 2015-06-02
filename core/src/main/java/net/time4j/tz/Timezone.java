@@ -648,18 +648,20 @@ public abstract class Timezone
     public abstract TZID getID();
 
     /**
-     * <p>Calculates the offset for given global timestamp. </p>
+     * <p>Calculates the total offset for given global timestamp. </p>
      *
      * <p>Note: The returned offset has never any subsecond part, normally
      * not even seconds but full minutes or hours. </p>
      *
      * @param   ut      unix time
-     * @return  shift in seconds which yields local time if added to unix time
+     * @return  total shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
      *          java.util.TimeZone.getOffset(long)
+     * @see     #getStandardOffset(UnixTime)
+     * @see     #getDaylightSavingOffset(UnixTime)
      */
     /*[deutsch]
-     * <p>Ermittelt die Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
+     * <p>Ermittelt die gesamte Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
      * der UT-Weltzeitlinie in Sekunden. </p>
      *
      * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
@@ -667,11 +669,61 @@ public abstract class Timezone
      * nur volle Minuten oder Stunden. </p>
      *
      * @param   ut      unix time
-     * @return  shift in seconds which yields local time if added to unix time
+     * @return  total shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
      *          java.util.TimeZone.getOffset(long)
+     * @see     #getStandardOffset(UnixTime)
+     * @see     #getDaylightSavingOffset(UnixTime)
      */
     public abstract ZonalOffset getOffset(UnixTime ut);
+
+    /**
+     * <p>Calculates the standard offset for given global timestamp. </p>
+     *
+     * <p>Note: The returned offset has never any subsecond part, normally
+     * not even seconds but full minutes or hours. </p>
+     *
+     * @param   ut      unix time
+     * @return  standard shift in seconds which yields standard local time if added to unix time
+     * @since   3.2/4.1
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Standard-Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
+     * der UT-Weltzeitlinie in Sekunden. </p>
+     *
+     * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
+     * Subsekundenteile, normalerweise auch nicht Sekundenteile, sondern
+     * nur volle Minuten oder Stunden. </p>
+     *
+     * @param   ut      unix time
+     * @return  standard shift in seconds which yields standard local time if added to unix time
+     * @since   3.2/4.1
+     */
+    public abstract ZonalOffset getStandardOffset(UnixTime ut);
+
+    /**
+     * <p>Calculates the dst-offset for given global timestamp. </p>
+     *
+     * <p>Note: The returned offset has never any subsecond part, normally
+     * not even seconds but full minutes or hours. </p>
+     *
+     * @param   ut      unix time
+     * @return  dst-shift in seconds which yields local wall time if added to standard local time
+     * @since   3.2/4.1
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Sommerzeitverschiebung zum angegebenen Zeitpunkt auf
+     * der UT-Weltzeitlinie in Sekunden. </p>
+     *
+     * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
+     * Subsekundenteile, normalerweise auch nicht Sekundenteile, sondern
+     * nur volle Minuten oder Stunden. </p>
+     *
+     * @param   ut      unix time
+     * @return  dst-shift in seconds which yields local wall time if added to standard local time
+     * @since   3.2/4.1
+     */
+    public abstract ZonalOffset getDaylightSavingOffset(UnixTime ut);
 
     /**
      * <p>Calculates the offset for given local timestamp. </p>

@@ -140,6 +140,24 @@ final class PlatformTimezone
     }
 
     @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        gcal.setTimeInMillis(ut.getPosixTime() * 1000);
+        return fromOffsetMillis(gcal.get(Calendar.ZONE_OFFSET));
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        gcal.setTimeInMillis(ut.getPosixTime() * 1000);
+        return fromOffsetMillis(gcal.get(Calendar.DST_OFFSET));
+
+    }
+
+    @Override
     public ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime
