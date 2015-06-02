@@ -28,7 +28,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 
 
 /**
@@ -84,6 +83,20 @@ final class FallbackTimezone
     public ZonalOffset getOffset(UnixTime ut) {
 
         return this.fallback.getOffset(ut);
+
+    }
+
+    @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        return this.fallback.getStandardOffset(ut);
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        return this.fallback.getDaylightSavingOffset(ut);
 
     }
 

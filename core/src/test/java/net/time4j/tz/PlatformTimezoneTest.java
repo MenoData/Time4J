@@ -38,6 +38,22 @@ public class PlatformTimezoneTest {
     }
 
     @Test
+    public void getPartialOffsetsOfUnixTimeWinter() {
+        Timezone tz = loadFromPlatform("Europe/Berlin");
+        Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);
+        assertThat(tz.getStandardOffset(utc).canonical(), is("UTC+01:00"));
+        assertThat(tz.getDaylightSavingOffset(utc).canonical(), is("Z"));
+    }
+
+    @Test
+    public void getPartialOffsetsOfUnixTimeSummer() {
+        Timezone tz = loadFromPlatform("Europe/Berlin");
+        Moment utc = Moment.of((40 * 365 + 180) * 86400, TimeScale.POSIX);
+        assertThat(tz.getStandardOffset(utc).canonical(), is("UTC+01:00"));
+        assertThat(tz.getDaylightSavingOffset(utc).canonical(), is("UTC+01:00"));
+    }
+
+    @Test
     public void isDaylightSavingSTD() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);

@@ -92,6 +92,20 @@ final class SingleOffsetTimezone
     }
 
     @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        return this.offset;
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        return ZonalOffset.UTC;
+
+    }
+
+    @Override
     public ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime

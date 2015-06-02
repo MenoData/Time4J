@@ -28,7 +28,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.util.List;
 
 
@@ -37,7 +36,7 @@ import java.util.List;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class HistorizedTimezone
     extends Timezone {
@@ -130,6 +129,32 @@ final class HistorizedTimezone
     }
 
     @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        ZonalTransition t = this.history.getStartTransition(ut);
+
+        return (
+            (t == null)
+            ? this.history.getInitialOffset()
+            : ZonalOffset.ofTotalSeconds(t.getStandardOffset())
+        );
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        ZonalTransition t = this.history.getStartTransition(ut);
+
+        return (
+            (t == null)
+            ? ZonalOffset.UTC
+            : ZonalOffset.ofTotalSeconds(t.getDaylightSavingOffset())
+        );
+
+    }
+
+    @Override
     public ZonalOffset getOffset(
         GregorianDate localDate,
         WallTime localTime
@@ -164,7 +189,7 @@ final class HistorizedTimezone
     public boolean isDaylightSaving(UnixTime ut) {
 
         ZonalTransition t = this.history.getStartTransition(ut);
-        return ((t == null) ? false : t.isDaylightSaving());
+        return ((t != null) && t.isDaylightSaving());
 
     }
 

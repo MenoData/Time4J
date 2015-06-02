@@ -27,7 +27,6 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
-import java.io.ObjectStreamException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -40,15 +39,7 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <threadsafe>
- */
-/*[deutsch]
- * <p>Eine Zeitzonenimplementierung, die an {@link java.util.TimeZone}
- * delegiert und daher auf allen Plattformen existieren sollte. </p>
- *
- * @author      Meno Hochschild
- * @serial      include
- * @concurrency <threadsafe>
+ * @doctags.concurrency <threadsafe>
  */
 final class PlatformTimezone
     extends Timezone {
@@ -145,6 +136,24 @@ final class PlatformTimezone
         }
 
         return fromOffsetMillis(this.tz.getOffset(ut.getPosixTime() * 1000));
+
+    }
+
+    @Override
+    public ZonalOffset getStandardOffset(UnixTime ut) {
+
+        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        gcal.setTimeInMillis(ut.getPosixTime() * 1000);
+        return fromOffsetMillis(gcal.get(Calendar.ZONE_OFFSET));
+
+    }
+
+    @Override
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+
+        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        gcal.setTimeInMillis(ut.getPosixTime() * 1000);
+        return fromOffsetMillis(gcal.get(Calendar.DST_OFFSET));
 
     }
 
