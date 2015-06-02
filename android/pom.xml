@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>net.time4j</groupId>
+        <artifactId>time4j-parent</artifactId>
+        <version>3.2</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <groupId>net.time4j</groupId>
+    <artifactId>time4j-android</artifactId>
+    <packaging>jar</packaging>
+    <name>Time4J-Android</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.1.1.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-core</artifactId>
+            <version>[3.0,4.0)</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
