@@ -1724,23 +1724,27 @@ public final class Duration<U extends IsoUnit>
             }
         }
 
+        if (calItems.isEmpty()) {
+            return Duration.ofZero();
+        }
+
         return new Duration<>(calItems, this.isNegative());
 
     }
 
     /**
-     * <p>Extracts a new duration with all contained calendar units only. </p>
+     * <p>Extracts a new duration with all contained clock units only. </p>
      *
-     * @return  new duration with calendar units only
+     * @return  new duration with clock units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
      * @see     #toCalendarPeriod()
      */
     /*[deutsch]
-     * <p>Extrahiert eine neue Dauer, die nur alle kalendarischen Zeiteinheiten
+     * <p>Extrahiert eine neue Dauer, die nur alle Uhrzeiteinheiten
      * dieser Dauer enth&auml;lt. </p>
      *
-     * @return  new duration with calendar units only
+     * @return  new duration with clock units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
      * @see     #toCalendarPeriod()
@@ -1757,6 +1761,10 @@ public final class Duration<U extends IsoUnit>
             if (item.getUnit() instanceof ClockUnit) {
                 clockItems.add(Item.of(item.getAmount(), ClockUnit.class.cast(item.getUnit())));
             }
+        }
+
+        if (clockItems.isEmpty()) {
+            return Duration.ofZero();
         }
 
         return new Duration<>(clockItems, this.isNegative());
@@ -1800,8 +1808,9 @@ public final class Duration<U extends IsoUnit>
      * <p>Yields an approximate normalizer in steps of hours which
      * finally uses years, months, days and rounded hours. </p>
      *
-     * <p>Example for suppressing hours (and all smaller units) by mean
-     * of an extra big step width of 24 hours (= 1 day): </p>
+     * <p>The rounding algorithm consists of a combination of integer division and
+     * multiplication using the given step width. Example for suppressing hours (and
+     * all smaller units) by mean of an extra big step width of 24 hours (= 1 day): </p>
      *
      * <pre>
      *  Duration&lt;IsoUnit&gt; dur =
@@ -1809,6 +1818,13 @@ public final class Duration<U extends IsoUnit>
      *              .minutes(132).build()
      *              .with(Duration.approximateHours(24));
      *  System.out.println(dur); // output: P3Y2M4D
+     * </pre>
+     *
+     * <p>Another example for rounded hours using static imports: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.&lt;IsoUnit&gt;of(7, HOURS).with(approximateHours(3)));
+     *  // output: PT6H
      * </pre>
      *
      * @param 	steps   rounding step width
@@ -1821,15 +1837,24 @@ public final class Duration<U extends IsoUnit>
      * N&auml;herungsbasis mit Jahren, Monaten, Tagen und gerundeten Stunden
      * erstellt. </p>
      *
-     * <p>Beispiel f&uuml;r das Unterdr&uuml;cken von Stunden mittels einer
-     * extra gro&szlig;en Schrittweite von 24 Stunden (= 1 Tag): </p>
+     * <p>Der Rundungsalgorithmus wendet zuerst die Integerdivision und dann eine
+     * Multiplikation unter Benutzung des angegebenen Schrittfaktors an. Beispiel
+     * f&uuml;r das Unterdr&uuml;cken von Stunden mittels einer extra gro&szlig;en
+     * Schrittweite von 24 Stunden (= 1 Tag): </p>
      *
      * <pre>
      *  Duration&lt;IsoUnit&gt; dur =
      *      Duration.ofPositive().years(2).months(13).days(35)
      *              .minutes(132).build()
      *              .with(Duration.approximateHours(24));
-     *  System.out.println(dur); // output: P3Y2M4D
+     *  System.out.println(dur); // Ausgabe: P3Y2M4D
+     * </pre>
+     *
+     * <p>Ein anderes Beispiel f&uuml;r gerundete Stunden mit Hilfe von <i>static imports</i>: </p>
+     *
+     * <pre>
+     *  System.out.println(Duration.&lt;IsoUnit&gt;of(7, HOURS).with(approximateHours(3)));
+     *  // Ausgabe: PT6H
      * </pre>
      *
      * @param 	steps   rounding step width
@@ -1850,6 +1875,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
+     * @see     #approximateHours(int)
      * @since	2.0
      */
     /*[deutsch]
@@ -1860,6 +1886,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
+     * @see     #approximateHours(int)
      * @since	2.0
      */
     public static Normalizer<IsoUnit> approximateMinutes(int steps) {
@@ -1875,6 +1902,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
+     * @see     #approximateHours(int)
      * @since	2.0
      */
     /*[deutsch]
@@ -1885,6 +1913,7 @@ public final class Duration<U extends IsoUnit>
      * @param 	steps   rounding step width
      * @return	new normalizer for fuzzy and approximate durations
      * @throws	IllegalArgumentException if the argument is not positive
+     * @see     #approximateHours(int)
      * @since	2.0
      */
     public static Normalizer<IsoUnit> approximateSeconds(int steps) {

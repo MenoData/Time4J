@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.Duration.approximateHours;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -120,7 +122,7 @@ public class DurationNormalizerTest {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         assertThat(
-            dur.with(Duration.approximateHours(24)),
+            dur.with(approximateHours(24)),
             is(Duration.ofPositive().years(3).months(2).days(4).build()));
     }
 
@@ -140,6 +142,13 @@ public class DurationNormalizerTest {
 		Duration<IsoUnit> dur =
 			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         dur.with(Duration.approximateMinutes(0));
+    }
+
+    @Test
+    public void withApproximateHours() {
+        assertThat(
+            Duration.<IsoUnit>of(7, HOURS).with(approximateHours(3)),
+            is(Duration.of(6, HOURS)));
     }
 
     @Test
