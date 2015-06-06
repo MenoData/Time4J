@@ -231,14 +231,20 @@ public final class SystemClock
     /**
      * <p>Creates a local clock in system timezone. </p>
      *
-     * @return  local clock in system timezone
+     * <p>Uses the standard clock {@code SystemClock.INSTANCE}. </p>
+     *
+     * @return  cached local clock in system timezone
      * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     #INSTANCE
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der System-Zeitzone. </p>
      *
-     * @return  local clock in system timezone
+     * <p>Verwendet die Standarduhr {@code SystemClock.INSTANCE}. </p>
+     *
+     * @return  cached local clock in system timezone
      * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     #INSTANCE
      */
     public static ZonalClock inLocalView() {
 
@@ -249,16 +255,24 @@ public final class SystemClock
     /**
      * <p>Creates a local clock in given timezone. </p>
      *
-     * @param   tzid        timezone id
-     * @return  local clock in given timezone
-     * @throws  IllegalArgumentException if given timezone cannot be loaded
-     */
-    /*[deutsch]
-     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     * <p>In order to achieve a monotonic zonal clock, users can use the expression
+     * {@code new ZonalClock(SystemClock.MONOTONIC, tzid}. </p>
      *
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #INSTANCE
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     *
+     * <p>Um eine monotone zonale Uhr zu erhalten, k&ouml;nnen Anwender den Ausdruck
+     * {@code new ZonalClock(SystemClock.MONOTONIC, tzid} verwenden. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #INSTANCE
      */
     public static ZonalClock inZonalView(TZID tzid) {
 
@@ -269,16 +283,24 @@ public final class SystemClock
     /**
      * <p>Creates a local clock in given timezone. </p>
      *
-     * @param   tzid        timezone id
-     * @return  local clock in given timezone
-     * @throws  IllegalArgumentException if given timezone cannot be loaded
-     */
-    /*[deutsch]
-     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     * <p>In order to achieve a monotonic zonal clock, users can use the expression
+     * {@code new ZonalClock(SystemClock.MONOTONIC, tzid}. </p>
      *
      * @param   tzid        timezone id
      * @return  local clock in given timezone
      * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #INSTANCE
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der angegebenen Zeitzone. </p>
+     *
+     * <p>Um eine monotone zonale Uhr zu erhalten, k&ouml;nnen Anwender den Ausdruck
+     * {@code new ZonalClock(SystemClock.MONOTONIC, tzid} verwenden. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  local clock in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #INSTANCE
      */
     public static ZonalClock inZonalView(String tzid) {
 
