@@ -23,11 +23,11 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.scale.TickProvider;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.ServiceLoader;
 
 
 /**
@@ -47,39 +47,45 @@ public final class SystemClock
 
     private static final int MIO = 1000000;
     private static final int MRD = MIO * 1000;
-    private static final Class[] EMPTY_PARAMS = new Class[0];
-    private static final Object[] EMPTY_ARGS = new Object[0];
 
-    private static final Method ANDROID;
-    private static final boolean HIGH_PRECISION;
+    private static final TickProvider PROVIDER;
+    private static final boolean MONOTON_MODE;
     private static final long CALIBRATED_OFFSET;
 
     static {
-        Method method;
-        try {
-            Class<?> android = Class.forName("android.os.SystemClock");
-            method = android.getMethod("elapsedRealtimeNanos", EMPTY_PARAMS);
-            method.invoke(null, EMPTY_ARGS); // test
-        } catch (ClassNotFoundException e) {
-            method = null;
-        } catch (NoSuchMethodException e) {
-            method = null;
-        } catch (InvocationTargetException e) {
-            method = null;
-        } catch (IllegalAccessException e) {
-            method = null;
-        } catch (RuntimeException e) {
-            method = null;
-        }
-        ANDROID = method;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        HIGH_PRECISION = Boolean.getBoolean("net.time4j.systemclock.nanoTime");
+        if (cl == null) {
+            cl = TickProvider.class.getClassLoader();
+        }
+
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        ServiceLoader<TickProvider> sl = ServiceLoader.load(TickProvider.class, cl);
+        String platform = System.getProperty("java.vm.name");
+        TickProvider candidate = null;
+
+        for (TickProvider temp : sl) {
+            if (platform.equals(temp.getPlatform())) {
+                candidate = temp;
+                break;
+            }
+        }
+
+        if (candidate == null) {
+            candidate = new StdTickProvider();
+        }
+
+        PROVIDER = candidate;
+        MONOTON_MODE = Boolean.getBoolean("net.time4j.systemclock.nanoTime");
 
         long millis = System.currentTimeMillis();
         long nanos = 0;
 
         for (int i = 0; i < 10; i++) {
-            nanos = getNanos0();
+            nanos = PROVIDER.getNanos();
             long next = System.currentTimeMillis();
             if (millis == next) {
                 break; // nun ist sicher, daß nanos zu millis synchron ist
@@ -100,7 +106,7 @@ public final class SystemClock
      * <p>Standard implementation. </p>
      *
      * <p>The system property &quot;net.time4j.systemclock.nanoTime&quot; controls if this clock is internally
-     * based on the expression {@link System#nanoTime()} (if property is set to &quot;true&quot;) or
+     * based on the expression {@link TickProvider#getNanos()} (if property is set to &quot;true&quot;) or
      * {@link System#currentTimeMillis()} (default). The standard case is a clock which is affected by
      * OS-triggered time jumps and user adjustments so there is no guarantee for a monotonic time. </p>
      */
@@ -108,7 +114,7 @@ public final class SystemClock
      * <p>Standard-Implementierung. </p>
      *
      * <p>Mit der System-Property &quot;net.time4j.systemclock.nanoTime&quot; kann gesteuert werden, ob diese
-     * Uhr intern auf dem Ausdruck {@link System#nanoTime()} (wenn Property auf &quot;true&quot; gesetzt)
+     * Uhr intern auf dem Ausdruck {@link TickProvider#getNanos()} (wenn Property auf &quot;true&quot; gesetzt)
      * oder {@link System#currentTimeMillis()} (Standard) basiert. Der Standardfall ist eine Uhr, die
      * f&uuml;r Zeitspr&uuml;nge und manuelle Verstellungen der Betriebssystem-Uhr empfindlich ist, so
      * da&szlig; keine Garantie f&uuml;r eine monoton ablaufende Zeit gegeben werden kann. </p>
@@ -118,13 +124,25 @@ public final class SystemClock
     /**
      * <p>Monotonic clock based on the best available clock of the underlying operating system. </p>
      *
-     * @see     System#nanoTime()
+     * <p>A side effect of this implementation can be increased nominal precision up to nanoseconds
+     * although no guarantee is made to ensure nanosecond accuracy. The accuracy is often limited to
+     * milliseconds. However, the main focus and motivation is realizing a monotonic behaviour by
+     * delegating to the use of a monotonic clock of the underlying OS. Equivalent to {@code CLOCK_MONOTONIC}
+     * on a Linux-server. </p>
+     *
+     * @see     TickProvider#getNanos()
      * @since   3.2/4.1
      */
     /*[deutsch]
      * <p>Monotone Uhr, die auf der besten verf&uuml;gbaren Uhr des Betriebssystems basiert. </p>
      *
-     * @see     System#nanoTime()
+     * <p>Ein Seiteneffekt dieser Implementierung kann eine erh&ouml;hte nominelle Genauigkeit bis hin
+     * zu Nanosekunden sein. Allerdings ist die reale Genauigkeit oft auf Millisekunden beschr&auml;nkt.
+     * Jedoch liegt der Hauptfokus darauf, ein monotones Verhalten dadurch zu realisieren, da&szlig;
+     * eine monotone Uhr des zugrundeliegenden Betriebssystems verwendet wird. &Auml;quivalent zu
+     * {@code CLOCK_MONOTONIC} auf einem Linux-Server. </p>
+     *
+     * @see     TickProvider#getNanos()
      * @since   3.2/4.1
      */
     public static final SystemClock MONOTONIC = new SystemClock(true);
@@ -147,7 +165,7 @@ public final class SystemClock
     @Override
     public Moment currentTime() {
 
-        if (this.monotonic || HIGH_PRECISION) {
+        if (this.monotonic || MONOTON_MODE) {
             long nanos = getNanos();
             return Moment.of(
                 nanos / MRD,
@@ -177,7 +195,7 @@ public final class SystemClock
      */
     public long currentTimeInMillis() {
 
-        if (this.monotonic || HIGH_PRECISION) {
+        if (this.monotonic || MONOTON_MODE) {
             return getNanos() / MIO;
         } else {
             return System.currentTimeMillis();
@@ -215,7 +233,7 @@ public final class SystemClock
      */
     public long currentTimeInMicros() {
 
-        if (this.monotonic || HIGH_PRECISION) {
+        if (this.monotonic || MONOTON_MODE) {
             return getNanos() / 1000;
         } else {
             return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
@@ -284,13 +302,15 @@ public final class SystemClock
     /**
      * <p>Equivalent to {@code SystemClock.INSTANCE.currentTime()}. </p>
      *
-     * @return  current time
+     * @return  current time using the standard implementation
+     * @see     #INSTANCE
      * @since   2.3
      */
     /*[deutsch]
      * <p>&Auml;quivalent zu {@code SystemClock.INSTANCE.currentTime()}. </p>
      *
-     * @return  current time
+     * @return  current time using the standard implementation
+     * @see     #INSTANCE
      * @since   2.3
      */
     public static Moment currentMoment() {
@@ -301,23 +321,30 @@ public final class SystemClock
 
     private long getNanos() {
         
-        return MathUtils.safeAdd(getNanos0(), CALIBRATED_OFFSET);
+        return MathUtils.safeAdd(PROVIDER.getNanos(), CALIBRATED_OFFSET);
 
     }
 
-    private static long getNanos0() {
+    //~ Innere Klassen ----------------------------------------------------
 
-        if (ANDROID != null) {
-            try {
-                return (Long) ANDROID.invoke(null, EMPTY_ARGS);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace(System.err);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace(System.err);
-            }
+    private static class StdTickProvider
+        implements TickProvider {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getPlatform() {
+
+            return "";
+
         }
 
-        return System.nanoTime();
+        @Override
+        public long getNanos() {
+
+            return System.nanoTime();
+
+        }
 
     }
 
