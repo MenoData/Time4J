@@ -358,7 +358,9 @@ public final class SystemClock
     /**
      * <p>Recalibrates this instance and yields a new copy. </p>
      *
-     * <p>This method is only relevant if this clock is operated in monotonic mode. </p>
+     * <p>This method is only relevant if this clock is operated in monotonic mode. It is strongly advised
+     * not to recalibrate during or near a leap second. Please also note that this method might cause jumps
+     * in time - even backwards. </p>
      *
      * @return  new and recalibrated copy of this instance
      * @see     #MONOTONIC
@@ -367,7 +369,9 @@ public final class SystemClock
     /*[deutsch]
      * <p>Eicht diese Instanz und liefert eine neue Kopie. </p>
      *
-     * <p>Diese Methode ist nur relevant, wenn diese Uhr im monotonen Modus l&auml;uft. </p>
+     * <p>Diese Methode ist nur relevant, wenn diese Uhr im monotonen Modus l&auml;uft. Es wird dringend
+     * angeraten, nicht w&auml;hrend oder nahe einer Schaltsekunde zu eichen. Achtung: Diese Methode kann
+     * Zeitspr&uuml;nge verursachen - eventuell sogar r&uuml;ckw&auml;rts. </p>
      *
      * @return  new and recalibrated copy of this instance
      * @see     #MONOTONIC
