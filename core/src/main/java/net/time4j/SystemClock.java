@@ -152,7 +152,7 @@ public final class SystemClock
     public Moment currentTime() {
 
         if (this.monotonic || MONOTON_MODE) {
-            long nanos = utcNanos();
+            long nanos = this.utcNanos();
             return Moment.of(nanos / MRD, (int) (nanos % MRD), TimeScale.UTC);
         } else {
             long millis = System.currentTimeMillis();
@@ -179,7 +179,7 @@ public final class SystemClock
     public long currentTimeInMillis() {
 
         if (this.monotonic || MONOTON_MODE) {
-            long nanos = utcNanos();
+            long nanos = this.utcNanos();
             long secs = LeapSeconds.getInstance().strip(nanos / MRD);
             return secs * 1000 + nanos % MIO;
         } else {
@@ -219,7 +219,7 @@ public final class SystemClock
     public long currentTimeInMicros() {
 
         if (this.monotonic || MONOTON_MODE) {
-            long nanos = utcNanos();
+            long nanos = this.utcNanos();
             long secs = LeapSeconds.getInstance().strip(nanos / MRD);
             return secs * MIO + nanos % 1000;
         } else {
@@ -247,7 +247,7 @@ public final class SystemClock
     public long realTimeInMicros() {
 
         if (this.monotonic || MONOTON_MODE) {
-            return utcNanos() / 1000;
+            return this.utcNanos() / 1000;
         } else {
             long millis = System.currentTimeMillis();
             long utc = LeapSeconds.getInstance().enhance(millis / 1000);
