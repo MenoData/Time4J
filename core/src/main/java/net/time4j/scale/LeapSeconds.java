@@ -23,7 +23,6 @@ package net.time4j.scale;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
-import net.time4j.base.MathUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -655,8 +654,7 @@ public final class LeapSeconds
      *
      * @param   unixTime    elapsed time in seconds relative to UNIX epoch
      *                      [1970-01-01T00:00:00Z] without leap seconds
-     * @return  elapsed SI-seconds relative to UTC epoch
-     *          [1972-01-01T00:00:00Z] including leap seconds
+     * @return  elapsed SI-seconds relative to UTC epoch [1972-01-01T00:00:00Z] including leap seconds
      * @see     #strip(long)
      */
     public long enhance(long unixTime) {
@@ -664,7 +662,7 @@ public final class LeapSeconds
         long epochTime = unixTime - UNIX_OFFSET;
 
         if (unixTime <= 0) {
-            return unixTime;
+            return epochTime;
         }
 
         // Lineare Suche hier besser als binäre Suche, weil in der
@@ -675,7 +673,7 @@ public final class LeapSeconds
             ExtendedLSE lse = events[i];
 
             if (lse.raw() < epochTime) {
-                return MathUtils.safeAdd(epochTime, lse.utc() - lse.raw());
+                return Math.addExact(epochTime, lse.utc() - lse.raw());
             }
         }
 
@@ -707,8 +705,7 @@ public final class LeapSeconds
      *
      * @param   utc     elapsed SI-seconds relative to UTC epoch
      *                  [1972-01-01T00:00:00Z] including leap seconds
-     * @return  elapsed time in seconds relative to UNIX epoch
-     *          [1970-01-01T00:00:00Z] without leap seconds
+     * @return  elapsed time in seconds relative to UNIX epoch [1970-01-01T00:00:00Z] without leap seconds
      * @see     #enhance(long)
      */
     public long strip(long utc) {
@@ -728,8 +725,8 @@ public final class LeapSeconds
             if (
                 (lse.utc() - lse.getShift() < utc)
                 || (snls && (lse.getShift() < 0) && (lse.utc() < utc))
-            ) {
-                utc = MathUtils.safeAdd(utc, lse.raw() - lse.utc());
+                ) {
+                utc = Math.addExact(utc, lse.raw() - lse.utc());
                 break;
             }
         }
@@ -994,8 +991,8 @@ public final class LeapSeconds
 
     private static long toPosix(GregorianDate date) {
 
-        return MathUtils.safeMultiply(
-            MathUtils.safeSubtract(
+        return Math.multiplyExact(
+            Math.subtractExact(
                 GregorianMath.toMJD(date),
                 MJD_OFFSET
             ),

@@ -214,6 +214,9 @@ public class LeapSecondTest {
     public void enhance() {
         LeapSeconds instance = LeapSeconds.getInstance();
         assertThat(
+            instance.enhance(-1L),
+            is(-1L - 2 * 365 * 86400));
+        assertThat(
             instance.enhance(1341100799L),
             is(UTC_2012_06_30_LS - 1));
         assertThat(
