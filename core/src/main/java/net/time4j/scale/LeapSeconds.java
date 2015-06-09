@@ -666,7 +666,7 @@ public final class LeapSeconds
         long epochTime = unixTime - UNIX_OFFSET;
 
         if (unixTime <= 0) {
-            return unixTime;
+            return epochTime;
         }
 
         // Lineare Suche hier besser als binäre Suche, weil in der
