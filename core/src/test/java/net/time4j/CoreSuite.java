@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MinMaxTest.class,
         ScaleSuite.class,
         SerializationTest.class,
+        SystemClockTest.class,
         TemporalTypeTest.class,
         TimeLineTest.class,
         TimeSuite.class,
