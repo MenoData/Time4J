@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TickProvider;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
@@ -50,7 +51,6 @@ public final class SystemClock
 
     private static final TickProvider PROVIDER;
     private static final boolean MONOTON_MODE;
-    private static final long CALIBRATED_OFFSET;
 
     static {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -80,33 +80,13 @@ public final class SystemClock
 
         PROVIDER = candidate;
         MONOTON_MODE = Boolean.getBoolean("net.time4j.systemclock.nanoTime");
-
-        long millis = System.currentTimeMillis();
-        long nanos = 0;
-
-        for (int i = 0; i < 10; i++) {
-            nanos = PROVIDER.getNanos();
-            long next = System.currentTimeMillis();
-            if (millis == next) {
-                break; // nun ist sicher, daß nanos zu millis synchron ist
-            } else {
-                millis = next;
-            }
-        }
-
-        CALIBRATED_OFFSET = (
-            MathUtils.safeSubtract(
-                MathUtils.safeMultiply(millis, MIO),
-                nanos
-            )
-        );
     }
 
     /**
      * <p>Standard implementation. </p>
      *
      * <p>The system property &quot;net.time4j.systemclock.nanoTime&quot; controls if this clock is internally
-     * based on the expression {@link TickProvider#getNanos()} (if property is set to &quot;true&quot;) or
+     * based on the expression {@link System#nanoTime()} (if property is set to &quot;true&quot;) or
      * {@link System#currentTimeMillis()} (default). The standard case is a clock which is affected by
      * OS-triggered time jumps and user adjustments so there is no guarantee for a monotonic time. </p>
      */
@@ -114,12 +94,12 @@ public final class SystemClock
      * <p>Standard-Implementierung. </p>
      *
      * <p>Mit der System-Property &quot;net.time4j.systemclock.nanoTime&quot; kann gesteuert werden, ob diese
-     * Uhr intern auf dem Ausdruck {@link TickProvider#getNanos()} (wenn Property auf &quot;true&quot; gesetzt)
+     * Uhr intern auf dem Ausdruck {@link System#nanoTime()} (wenn Property auf &quot;true&quot; gesetzt)
      * oder {@link System#currentTimeMillis()} (Standard) basiert. Der Standardfall ist eine Uhr, die
      * f&uuml;r Zeitspr&uuml;nge und manuelle Verstellungen der Betriebssystem-Uhr empfindlich ist, so
      * da&szlig; keine Garantie f&uuml;r eine monoton ablaufende Zeit gegeben werden kann. </p>
      */
-    public static final SystemClock INSTANCE = new SystemClock(false);
+    public static final SystemClock INSTANCE = new SystemClock(false, calibrate());
 
     /**
      * <p>Monotonic clock based on the best available clock of the underlying operating system. </p>
@@ -145,18 +125,23 @@ public final class SystemClock
      * @see     TickProvider#getNanos()
      * @since   3.2/4.1
      */
-    public static final SystemClock MONOTONIC = new SystemClock(true);
+    public static final SystemClock MONOTONIC = new SystemClock(true, calibrate());
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final boolean monotonic;
+    private final long offset;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private SystemClock(boolean monotonic) {
+    private SystemClock(
+        boolean monotonic,
+        long offset
+    ) {
         super();
 
         this.monotonic = monotonic;
+        this.offset = offset;
 
     }
 
@@ -166,11 +151,8 @@ public final class SystemClock
     public Moment currentTime() {
 
         if (this.monotonic || MONOTON_MODE) {
-            long nanos = getNanos();
-            return Moment.of(
-                nanos / MRD,
-                (int) (nanos % MRD),
-                TimeScale.POSIX);
+            long nanos = this.utcNanos();
+            return Moment.of(nanos / MRD, (int) (nanos % MRD), TimeScale.UTC);
         } else {
             long millis = System.currentTimeMillis();
             int nanos = ((int) (millis % 1000)) * MIO;
@@ -196,7 +178,9 @@ public final class SystemClock
     public long currentTimeInMillis() {
 
         if (this.monotonic || MONOTON_MODE) {
-            return getNanos() / MIO;
+            long nanos = this.utcNanos();
+            long secs = LeapSeconds.getInstance().strip(nanos / MRD);
+            return secs * 1000 + nanos % MIO;
         } else {
             return System.currentTimeMillis();
         }
@@ -234,9 +218,39 @@ public final class SystemClock
     public long currentTimeInMicros() {
 
         if (this.monotonic || MONOTON_MODE) {
-            return getNanos() / 1000;
+            long nanos = this.utcNanos();
+            long secs = LeapSeconds.getInstance().strip(nanos / MRD);
+            return secs * MIO + nanos % 1000;
         } else {
             return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
+        }
+
+    }
+
+    /**
+     * <p>Yields the current time in microseconds elapsed since
+     * UTC epoch [1972-01-01T00:00:00,000000Z]. </p>
+     *
+     * @return  count of microseconds since UTC epoch including leap seconds
+     * @see     #currentTimeInMicros()
+     * @since   3.2/4.1
+     */
+    /*[deutsch]
+     * <p>Liefert die aktuelle seit [1972-01-01T00:00:00,000000Z] verstrichene
+     * UTC-Zeit in Mikrosekunden. </p>
+     *
+     * @return  count of microseconds since UTC epoch including leap seconds
+     * @see     #currentTimeInMicros()
+     * @since   3.2/4.1
+     */
+    public long realTimeInMicros() {
+
+        if (this.monotonic || MONOTON_MODE) {
+            return this.utcNanos() / 1000;
+        } else {
+            long millis = System.currentTimeMillis();
+            long utc = LeapSeconds.getInstance().enhance(millis / 1000);
+            return utc * MIO + (millis % 1000) * 1000;
         }
 
     }
@@ -341,9 +355,55 @@ public final class SystemClock
 
     }
 
-    private long getNanos() {
-        
-        return MathUtils.safeAdd(PROVIDER.getNanos(), CALIBRATED_OFFSET);
+    /**
+     * <p>Recalibrates this instance and yields a new copy. </p>
+     *
+     * <p>This method is only relevant if this clock is operated in monotonic mode. </p>
+     *
+     * @return  new and recalibrated copy of this instance
+     * @see     #MONOTONIC
+     * @since   3.2/4.1
+     */
+    /*[deutsch]
+     * <p>Eicht diese Instanz und liefert eine neue Kopie. </p>
+     *
+     * <p>Diese Methode ist nur relevant, wenn diese Uhr im monotonen Modus l&auml;uft. </p>
+     *
+     * @return  new and recalibrated copy of this instance
+     * @see     #MONOTONIC
+     * @since   3.2/4.1
+     */
+    public SystemClock recalibrated() {
+
+        return new SystemClock(this.monotonic, calibrate());
+
+    }
+
+    private static long calibrate() {
+
+        long millis = System.currentTimeMillis();
+        long compare = 0;
+
+        for (int i = 0; i < 10; i++) {
+            compare = (MONOTON_MODE ? System.nanoTime() : PROVIDER.getNanos());
+            long next = System.currentTimeMillis();
+            if (millis == next) {
+                break; // nun ist sicher, daß nanos zu millis synchron ist
+            } else {
+                millis = next;
+            }
+        }
+
+        long utc = LeapSeconds.getInstance().enhance(millis / 1000);
+        long instantNanos = MathUtils.safeMultiply(utc, MRD) + ((int) (millis % 1000)) * MIO;
+        return MathUtils.safeSubtract(instantNanos, compare);
+
+    }
+
+    private long utcNanos() {
+
+        long nanos = (MONOTON_MODE ? System.nanoTime() : PROVIDER.getNanos());
+        return MathUtils.safeAdd(nanos, this.offset);
 
     }
 
