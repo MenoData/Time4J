@@ -36,11 +36,13 @@ import java.util.ServiceLoader;
  * <p>Represents a clock which is based on the clock of the underlying operating system. </p>
  *
  * @author  Meno Hochschild
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Uhr, die auf dem Taktgeber des Betriebssystems basiert. </p>
  *
  * @author  Meno Hochschild
+ * @doctags.concurrency {immutable}
  */
 public final class SystemClock
     implements TimeSource<Moment> {
@@ -381,6 +383,41 @@ public final class SystemClock
     public SystemClock recalibrated() {
 
         return new SystemClock(this.monotonic, calibrate());
+
+    }
+
+    /**
+     * <p>Synchronizes this instance with given time source and yields a new copy. </p>
+     *
+     * <p>This method is only relevant if this clock is operated in monotonic mode. It is strongly advised
+     * not to recalibrate during or near a leap second. Please also note that this method might cause jumps
+     * in time - even backwards. </p>
+     *
+     * @param   clock       another clock which this instance should be synchronized with
+     * @return  synchronized copy of this instance
+     * @since   3.2/4.1
+     */
+    /*[deutsch]
+     * <p>Synchronisiert diese Instanz mit der angegebenen Zeitquelle und liefert eine neue Kopie. </p>
+     *
+     * <p>Diese Methode ist nur relevant, wenn diese Uhr im monotonen Modus l&auml;uft. Es wird dringend
+     * angeraten, nicht w&auml;hrend oder nahe einer Schaltsekunde zu eichen. Achtung: Diese Methode kann
+     * Zeitspr&uuml;nge verursachen - eventuell sogar r&uuml;ckw&auml;rts. </p>
+     *
+     * @param   clock       another clock which this instance should be synchronized with
+     * @return  synchronized copy of this instance
+     * @since   3.2/4.1
+     */
+    public SystemClock synchronizedWith(TimeSource<?> clock) {
+
+        Moment time = Moment.from(clock.currentTime());
+        long compare = (MONOTON_MODE ? System.nanoTime() : PROVIDER.getNanos());
+
+        long utc = time.getElapsedTime(TimeScale.UTC);
+        long instantNanos = Math.multiplyExact(utc, MRD) + time.getNanosecond(TimeScale.UTC);
+        long newOffset = Math.subtractExact(instantNanos, compare);
+
+        return new SystemClock(this.monotonic, newOffset);
 
     }
 
