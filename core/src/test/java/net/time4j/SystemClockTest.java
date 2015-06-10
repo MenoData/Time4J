@@ -1,5 +1,7 @@
 package net.time4j;
 
+import net.time4j.base.TimeSource;
+import net.time4j.base.UnixTime;
 import net.time4j.scale.LeapSeconds;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,6 +64,22 @@ public class SystemClockTest {
         assertThat(
             r1 != r2,
             is(true));
+    }
+
+    @Test
+    public void synchronizedWith() {
+        final Moment start = Moment.UNIX_EPOCH.plus(2 * 365, TimeUnit.DAYS);
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
+            @Override
+            public UnixTime currentTime() {
+                return start;
+            }
+        };
+        Moment end = SystemClock.MONOTONIC.synchronizedWith(clock).currentTime();
+        assertThat(
+            start.until(end, TimeUnit.SECONDS) < 1L,
+            is(true)
+        );
     }
 
 }
