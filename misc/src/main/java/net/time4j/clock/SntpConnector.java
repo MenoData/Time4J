@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SntpConnector.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j.clock;
 
 import net.time4j.Moment;
 import net.time4j.SystemClock;
-import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 
 import java.io.IOException;
@@ -38,10 +37,9 @@ import java.util.ServiceLoader;
  *
  * <p>This class needs a socket connection via the port 123. The exact
  * configuration can be set in the constructors but can also be changed
- * at runtime. For safer protection against arbitrary local clock adjustments
- * which might affect this clock, applications should also consider setting
- * the system property &quot;net.time4j.systemclock.nanoTime&quot; to
- * the value &quot;true&quot;. </p>
+ * at runtime. It is recommended not to connect to the NTP-server during
+ * or near a leap second because the NTP-protocol only repeats such a
+ * timestamp causing ambivalences. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
@@ -54,10 +52,9 @@ import java.util.ServiceLoader;
  * <p>Diese Klasse ben&ouml;tigt einen Internet-Zugang &uuml;ber
  * Port 123 (NTP). Die genaue Konfiguration wird zun&auml;chst im
  * Konstruktor festgelegt, kann aber zur Laufzeit ge&auml;ndert werden.
- * Als Schutz gegen willk&uuml;rliche Verstellungen der lokalen Systemuhr,
- * die diese Uhr negativ beeinflussen k&ouml;nnen, kann das Setzen der
- * <i>system-property</i> &quot;net.time4j.systemclock.nanoTime&quot;
- * auf den Wert &quot;true&quot; sinnvoll sein. </p>
+ * Es wird empfohlen, nicht w&auml;hrend oder nahe einer Schaltsekunde
+ * zum NTP-Server zu verbinden, weil das NTP-Protokoll solch einen
+ * Zeitstempel nur wiederholt und sich somit hier ambivalent zeigt. </p>
  *
  * <p>Die Physikalisch-Technische Bundesanstalt in Braunschweig (PTB),
  * die dort eine Atomuhr betreibt, ben&ouml;tigt als Adresse den Wert
@@ -180,7 +177,7 @@ public class SntpConnector
             );
         }
 
-        long millis = SystemClock.INSTANCE.currentTimeInMillis();
+        long millis = SystemClock.MONOTONIC.currentTimeInMillis();
         return (millis + (this.getLastOffset(millis) / 1000));
 
     }
@@ -214,7 +211,7 @@ public class SntpConnector
             );
         }
 
-        long micros = SystemClock.INSTANCE.currentTimeInMicros();
+        long micros = SystemClock.MONOTONIC.currentTimeInMicros();
         return (micros + this.getLastOffset(micros / 1000));
 
     }
@@ -248,7 +245,7 @@ public class SntpConnector
         short requestCount = config.getRequestCount();
 
         if (requestCount <= 0) {
-            return SystemClock.INSTANCE.currentTime();
+            return SystemClock.MONOTONIC.currentTime();
         }
 
         String address = config.getTimeServerAddress();
@@ -302,6 +299,7 @@ public class SntpConnector
 
                 // Annahme gleicher Netzlaufzeiten für Anfrage und Antwort
                 // round-trip-delay: (D - O) - (T - R) = 2 * Netzlaufzeit
+                // REAL-LOCAL-TIME = T + Netzlaufzeit = D + localClockOffset
                 double localClockOffset = (
                     replyMessage.getReceiveTimestamp()
                     - replyMessage.getOriginateTimestamp()
@@ -309,9 +307,6 @@ public class SntpConnector
                     - destinationTimestamp
                 ) / 2.0;
 
-                // Lokale Netzzeit berechnen (= transmit + Netzlaufzeit)
-                // => Genauigkeit basiert auf System.nanoTime(), weil sich die
-                // Deltas in destinationTimestamp und localClockOffset wegheben!
                 sum += (localClockOffset * MIO);
                 averageOffset = (sum / i);
 
@@ -342,36 +337,19 @@ public class SntpConnector
             }
         }
 
-        long micros =
-            SystemClock.INSTANCE.currentTimeInMicros() + averageOffset;
+        long micros = SystemClock.MONOTONIC.currentTimeInMicros() + averageOffset;
         long seconds = micros / MIO;
         int nanosecond = (int) ((micros % MIO) * 1000);
         byte leapIndicator = this.lastReply.getLeapIndicator();
 
-        if (
-            (leapIndicator == 1)
-            && this.isLastConnectionAtSameDay(seconds)
-            && this.isOffsetSteppedBackByOneSecond(seconds, nanosecond)
-        ) {
-            LeapSeconds ls = LeapSeconds.getInstance();
-
-            if (ls.isEnabled()) {
-                // NTP-Server wiederholt alten Sekundenwert vor dem LS-Ereignis
-                // und meldet separat eine positive Schaltsekunde, daher +1
-                Moment candidate =
-                    Moment.of(
-                        ls.enhance(seconds) + 1,
-                        nanosecond,
-                        TimeScale.UTC);
-                if (candidate.isLeapSecond()) {
-                    this.log(null, "NTP-Server signals positive leap second.");
-                    return candidate;
-                }
-            }
-        } else if (leapIndicator == 3) {
+        if (leapIndicator == 3) {
             throw new IOException(
                 "Alarm condition: "
                 + "NTP-Server is not synchronized with any clock source.");
+        } else if (leapIndicator == 1) {
+            this.log(null, "Positive leap second announced.");
+        } else if (leapIndicator == 2) {
+            this.log(null, "Negative leap second announced.");
         }
 
         return Moment.of(seconds, nanosecond, TimeScale.POSIX);
@@ -414,30 +392,6 @@ public class SntpConnector
         }
 
         throw new IllegalStateException("SNTP-configuration not found.");
-
-    }
-
-    private boolean isLastConnectionAtSameDay(long seconds) {
-
-        // 2-Tage-Frist
-        Moment lc = this.getLastConnectionTime();
-        return ((lc != null) && (seconds - lc.getPosixTime() < 2 * 86400));
-
-    }
-
-    private boolean isOffsetSteppedBackByOneSecond(
-        long seconds,
-        int nanosecond
-    ) {
-
-        // Näherung für Windows-Rechner, deren Uhr nicht automatisch
-        // nachgestellt wird, in anderen OS wird die Methode false liefern
-        long newMillis = SystemClock.INSTANCE.currentTimeInMillis();
-        double mio = MIO * 1D;
-        double previousOffset = this.getLastOffset(newMillis) / mio;
-        double time = seconds + nanosecond / (mio * 1000);
-        double diff = (previousOffset - time + (newMillis / 1000D));
-        return (diff > 0.85 && diff < 1.15); // Toleranzkorridor
 
     }
 

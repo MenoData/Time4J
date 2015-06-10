@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AdjustableClock.java) is part of project Time4J.
  *
@@ -86,20 +86,22 @@ public final class AdjustableClock
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Yields an adjustable clock around the system clock. </p>
+     * <p>Yields an adjustable clock around the standard system clock. </p>
      *
      * <p>The clock can be adjusted using the {@code with()}-methods. </p>
      *
      * @return  adjustable clock wrapper
+     * @see     SystemClock#INSTANCE
      * @since   2.1
      */
     /*[deutsch]
-     * <p>Liefert eine verstellbare Uhr, die auf der Systemuhr basiert. </p>
+     * <p>Liefert eine verstellbare Uhr, die auf der Standard-Systemuhr basiert. </p>
      *
      * <p>Die Uhr kann mit Hilfe der {@code with()}-Methoden verstellt
      * werden. </p>
      *
      * @return  adjustable clock wrapper
+     * @see     SystemClock#INSTANCE
      * @since   2.1
      */
     public static AdjustableClock ofSystem() {

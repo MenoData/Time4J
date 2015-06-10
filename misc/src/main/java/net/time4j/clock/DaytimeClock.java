@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DaytimeClock.java) is part of project Time4J.
  *
@@ -24,7 +24,6 @@ package net.time4j.clock;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.engine.AttributeQuery;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -80,34 +79,27 @@ public class DaytimeClock
         ChronoFormatter.setUp(PlainTime.class, Locale.ROOT).addPattern("HH:mm:ss", PatternType.CLDR).build();
 
     private static final ChronoParser<Moment> NIST_PARSER =
-        new ChronoParser<Moment>() {
-            @Override
-            public Moment parse(
-                CharSequence text,
-                ParseLog status,
-                AttributeQuery attrs
-            ) {
-                int pos = 0;
-                while (!Character.isDigit(text.charAt(pos))) {
-                    pos++;
-                }
-                PlainDate date =
-                    MJD_PARSER.parse(
-                        text.subSequence(pos, 5 + pos), status, attrs);
-                if (date != null) {
-                    status.setPosition(0);
-                    PlainTime time =
-                        TIME_PARSER.parse(
-                            text.subSequence(15 + pos, 23 + pos),
-                            status,
-                            attrs);
-                    if (time != null) {
-                        // leapsecond will be set to 59 in smart mode
-                        return date.at(time).atUTC();
-                    }
-                }
-                return null;
+        (text, status, attrs) -> {
+            int pos = 0;
+            while (!Character.isDigit(text.charAt(pos))) {
+                pos++;
             }
+            PlainDate date =
+                MJD_PARSER.parse(
+                    text.subSequence(pos, 5 + pos), status, attrs);
+            if (date != null) {
+                status.setPosition(0);
+                PlainTime time =
+                    TIME_PARSER.parse(
+                        text.subSequence(15 + pos, 23 + pos),
+                        status,
+                        attrs);
+                if (time != null) {
+                    // leapsecond will be set to 59 in smart mode
+                    return date.at(time).atUTC();
+                }
+            }
+            return null;
         };
 
     /**
