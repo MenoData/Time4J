@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SntpMessage.java) is part of project Time4J.
  *
@@ -762,7 +762,7 @@ public final class SntpMessage {
      */
     static double getLocalTimestamp() {
 
-        long ut1 = SystemClock.INSTANCE.currentTimeInMicros();
+        long ut1 = SystemClock.MONOTONIC.currentTimeInMicros();
         return ((ut1 + OFFSET_1900) / MIO_AS_DOUBLE);
 
     }

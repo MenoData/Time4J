@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NetTimeConnector.java) is part of project Time4J.
  *
@@ -22,37 +22,39 @@
 package net.time4j.clock;
 
 import net.time4j.Moment;
+import net.time4j.SI;
 import net.time4j.SystemClock;
+import net.time4j.scale.TimeScale;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ServiceLoader;
-import java.util.concurrent.TimeUnit;
 
 
 /**
  * <p>Represents an abstract connection object to an internet time server. </p>
  *
- * <p>A socket connection can be established by {@code connect()}
- * and then the difference between the local computer clock and the net time
+ * <p>A socket connection can be established by {@code connect()} and then the difference
+ * between the local computer clock using {@code SystemClock.MONOTONIC} and the net time
  * can be queried. Next time queries of this clock are based on this difference
  * and the local clock - until the next CONNECT. </p>
  *
  * @param   <C> generic configuration type
  * @author  Meno Hochschild
+ * @see     SystemClock#MONOTONIC
  */
 /*[deutsch]
  * <p>Stellt ein abstraktes Verbindungsobjekt zu einem Uhrzeit-Server dar. </p>
  *
- * <p>Mit Hilfe von {@code connect()} wird eine Socket-Verbindung aufgebaut,
- * der Uhrzeit-Server abgefragt und dann die Differenz zwischen lokaler
- * Rechneruhr und Netzzeit notiert. Weitere normale Zeitanfragen an diese
- * Klasse basieren bis zum n&auml;chsten CONNECT auf dieser Zeitdifferenz
- * und der lokalen Rechneruhr. </p>
+ * <p>Mit Hilfe von {@code connect()} wird eine Socket-Verbindung aufgebaut, der Uhrzeit-Server
+ * abgefragt und dann die Differenz zwischen lokaler Rechneruhr ({@code SystemClock.MONOTONIC})
+ * und Netzzeit notiert. Weitere normale Zeitanfragen an diese Klasse basieren bis zum n&auml;chsten
+ * CONNECT auf dieser Zeitdifferenz und der lokalen Rechneruhr. </p>
  *
  * @param   <C> generischer Konfigurationstyp
  * @author  Meno Hochschild
+ * @see     SystemClock#MONOTONIC
  */
 public abstract class NetTimeConnector<C extends NetTimeConfiguration>
     extends AbstractClock {
@@ -88,7 +90,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
             throw new NullPointerException("Missing configuration parameters.");
         }
 
-        this.startMoment = SystemClock.INSTANCE.currentTime();
+        this.startMoment = SystemClock.MONOTONIC.currentTime();
         this.defaultNTC = ntc;
         this.result = null;
         this.writer = null;
@@ -147,12 +149,12 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
             return this.startMoment;
         }
 
-        long localMicros = SystemClock.INSTANCE.currentTimeInMicros();
+        long localMicros = SystemClock.MONOTONIC.realTimeInMicros();
         long amount =
             localMicros
             + cr.getActualOffset(localMicros)
             - extractMicros(cr.lastMoment);
-        return cr.lastMoment.plus(amount, TimeUnit.MICROSECONDS);
+        return cr.lastMoment.plus(amount * 1000, SI.NANOSECONDS);
 
     }
 
@@ -209,7 +211,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
 
         try {
             Moment moment = this.doConnect();
-            long localMicros = SystemClock.INSTANCE.currentTimeInMicros();
+            long localMicros = SystemClock.MONOTONIC.realTimeInMicros();
             final ConnectionResult cr = this.result;
             long currentOffset = (
                 (cr == null)
@@ -226,7 +228,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
             throw new IOException("Cannot read server reply.", pe);
         }
 
-    };
+    }
 
     /**
      * <p>Queries the configuration parameters to be used for the next
@@ -361,7 +363,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
      */
     public long getLastOffsetInMicros() {
 
-        return this.getLastOffset(SystemClock.INSTANCE.currentTimeInMillis());
+        return this.getLastOffset(SystemClock.MONOTONIC.realTimeInMicros() / 1000);
 
     }
 
@@ -501,7 +503,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
 
     private static long extractMicros(Moment time) {
 
-        return time.getPosixTime() * MIO + time.getNanosecond() / 1000;
+        return time.getElapsedTime(TimeScale.UTC) * MIO + time.getNanosecond(TimeScale.UTC) / 1000;
 
     }
 
@@ -527,10 +529,10 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
         ) {
             super();
 
+            this.lastMoment = time;
             this.startTime = localMicros;
             this.startOffset = startOffset;
             this.endOffset = (extractMicros(time) - localMicros);
-            this.lastMoment = time;
             this.window = window * MIO;
 
         }
