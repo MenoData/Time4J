@@ -178,7 +178,7 @@ public class SntpConnector
         }
 
         long millis = SystemClock.MONOTONIC.currentTimeInMillis();
-        return (millis + (this.getLastOffset(millis) / 1000));
+        return (millis + (this.getLastOffset(millis * 1000) / 1000));
 
     }
 
@@ -212,7 +212,7 @@ public class SntpConnector
         }
 
         long micros = SystemClock.MONOTONIC.currentTimeInMicros();
-        return (micros + this.getLastOffset(micros / 1000));
+        return (micros + this.getLastOffset(micros));
 
     }
 
