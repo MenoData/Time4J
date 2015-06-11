@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OrdinalWeekdayElement.java) is part of project Time4J.
  *
@@ -126,5 +126,49 @@ public interface OrdinalWeekdayElement
      * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<PlainDate> setToLast(Weekday dayOfWeek);
+
+    /**
+     * <p>Defines an operator which moves a date to the given ordinal weekday
+     * in month. </p>
+     *
+     * <p>If given ordinal number is {@code Integer.MAX_VALUE} then the last weekday in month
+     * will be determined. </p>
+     *
+     * @param   ordinal     ordinal number
+     * @param   dayOfWeek   last day of week in month
+     * @return  operator directly applicable also on {@code PlainTimestamp}
+     * @since   4.1
+     */
+    /*[deutsch]
+     * <p>Definiert einen Versteller, der ein Datum auf den x-ten angegebenen
+     * Wochentag eines Monats setzt. </p>
+     *
+     * <p>Wenn die angegebene Ordnungsnummer {@code Integer.MAX_VALUE} ist, wird der letzte
+     * Wochentag des Monats bestimmt. </p>
+     *
+     * @param   ordinal     ordinal number
+     * @param   dayOfWeek   last day of week in month
+     * @return  operator directly applicable also on {@code PlainTimestamp}
+     * @since   4.1
+     */
+    default ElementOperator<PlainDate> setTo(
+        int ordinal,
+        Weekday dayOfWeek
+    ) {
+        switch (ordinal) {
+            case 1:
+                return this.setToFirst(dayOfWeek);
+            case 2:
+                return this.setToSecond(dayOfWeek);
+            case 3:
+                return this.setToThird(dayOfWeek);
+            case 4:
+                return this.setToFourth(dayOfWeek);
+            case Integer.MAX_VALUE:
+                return this.setToLast(dayOfWeek);
+            default:
+                throw new UnsupportedOperationException("Out of range: " + ordinal);
+        }
+    }
 
 }

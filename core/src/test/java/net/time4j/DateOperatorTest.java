@@ -520,4 +520,14 @@ public class DateOperatorTest {
                 .with(PlainTime.NANO_OF_SECOND, 999999999)));
     }
 
+    @Test
+    public void genericOrdinalWeekdayInMonth() {
+        assertThat(
+            PlainDate.of(2015, 6, 11).with(PlainDate.WEEKDAY_IN_MONTH.setTo(0, Weekday.MONDAY)),
+            is(PlainDate.of(2015, 5, 25)));
+        assertThat(
+            PlainDate.of(2015, 6, 11).with(PlainDate.WEEKDAY_IN_MONTH.setTo(Integer.MAX_VALUE, Weekday.MONDAY)),
+            is(PlainDate.of(2015, 6, 29)));
+    }
+
 }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -30,8 +30,6 @@ import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
 
-import static net.time4j.ElementOperator.OP_WIM;
-
 
 /**
  * <p>Das Element f&uuml;r den x-ten Wochentag im Monat. </p>
@@ -56,7 +54,7 @@ final class WeekdayInMonthElement
     static final WeekdayInMonthElement INSTANCE =
         new WeekdayInMonthElement();
 
-    private static final int LAST = 5;
+    private static final int LAST = Integer.MAX_VALUE;
     private static final long serialVersionUID = -2378018589067147278L;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -109,7 +107,7 @@ final class WeekdayInMonthElement
     @Override
     public Integer getDefaultMaximum() {
 
-        return Integer.valueOf(LAST);
+        return Integer.valueOf(5);
 
     }
 
@@ -162,9 +160,10 @@ final class WeekdayInMonthElement
 
     }
 
-    private ElementOperator<PlainDate> setTo(
-        final int ordinal,
-        final Weekday dayOfWeek
+    @Override
+    public ElementOperator<PlainDate> setTo(
+        int ordinal,
+        Weekday dayOfWeek
     ) {
 
         return new SpecialOperator(ordinal, dayOfWeek);
@@ -202,14 +201,7 @@ final class WeekdayInMonthElement
 
             this.ordinal = ordinal;
             this.dayOfWeek = dayOfWeek;
-
-            this.specialTS =
-                new ChronoOperator<PlainTimestamp>() {
-                    @Override
-                    public PlainTimestamp apply(PlainTimestamp entity) {
-                        return doApply(entity);
-                    }
-                };
+            this.specialTS = this::doApply;
 
         }
 
@@ -236,10 +228,9 @@ final class WeekdayInMonthElement
                 Weekday current = date.get(PlainDate.DAY_OF_WEEK);
                 int delta = this.dayOfWeek.getValue() - current.getValue();
                 int dom = date.getDayOfMonth() + delta;
-                int days =
-                    (this.ordinal - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7
-                    + delta;
+                int days;
                 if (this.ordinal == LAST) {
+                    days = (5 - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
                     int max =
                         GregorianMath.getLengthOfMonth(
                             date.getYear(),
@@ -247,6 +238,8 @@ final class WeekdayInMonthElement
                     if (date.getDayOfMonth() + days > max) {
                         days -= 7;
                     }
+                } else {
+                    days = (this.ordinal - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
                 }
                 date = date.plus(days, CalendarUnit.DAYS);
                 return entity.with(PlainDate.CALENDAR_DATE, date);
