@@ -363,7 +363,7 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
      */
     public long getLastOffsetInMicros() {
 
-        return this.getLastOffset(SystemClock.MONOTONIC.realTimeInMicros() / 1000);
+        return this.getLastOffset(SystemClock.MONOTONIC.realTimeInMicros());
 
     }
 
@@ -487,17 +487,15 @@ public abstract class NetTimeConnector<C extends NetTimeConfiguration>
     protected abstract Class<C> getConfigurationType();
 
     /**
-     * <p>Liefert die aktuelle Differenz zwischen Netz-Zeit und
-     * lokaler Zeit in Mikrosekunden. </p>
+     * <p>Liefert die aktuelle Differenz zwischen Netz-Zeit und lokaler Zeit in Mikrosekunden. </p>
      *
-     * @param   millis  aktuelle lokale Zeit in Millisekunden
-     * @return  Mikrosekunden-Offset ({@code 0}, wenn noch keine Verbindung
-     *          hergestellt wurde)
+     * @param   micros  aktuelle lokale Zeit in Mikrosekunden
+     * @return  Mikrosekunden-Offset ({@code 0}, wenn noch keine Verbindung hergestellt wurde)
      */
-    long getLastOffset(long millis) {
+    long getLastOffset(long micros) {
 
         final ConnectionResult cr = this.result;
-        return ((cr == null) ? 0 : cr.getActualOffset(millis * 1000));
+        return ((cr == null) ? 0 : cr.getActualOffset(micros));
 
     }
 
