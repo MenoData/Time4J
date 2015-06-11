@@ -154,11 +154,16 @@ public final class SystemClock
 
         if (this.monotonic || MONOTON_MODE) {
             long nanos = this.utcNanos();
-            return Moment.of(nanos / MRD, (int) (nanos % MRD), TimeScale.UTC);
+            return Moment.of(
+                MathUtils.floorDivide(nanos, MRD),
+                MathUtils.floorModulo(nanos, MRD),
+                TimeScale.UTC);
         } else {
             long millis = System.currentTimeMillis();
-            int nanos = ((int) (millis % 1000)) * MIO;
-            return Moment.of(millis / 1000, nanos, TimeScale.POSIX);
+            return Moment.of(
+                MathUtils.floorDivide(millis, 1000),
+                MathUtils.floorModulo(millis, 1000) * MIO,
+                TimeScale.POSIX);
         }
 
     }
@@ -181,8 +186,8 @@ public final class SystemClock
 
         if (this.monotonic || MONOTON_MODE) {
             long nanos = this.utcNanos();
-            long secs = LeapSeconds.getInstance().strip(nanos / MRD);
-            return secs * 1000 + nanos % MIO;
+            long secs = LeapSeconds.getInstance().strip(MathUtils.floorDivide(nanos, MRD));
+            return MathUtils.safeMultiply(secs, 1000) + MathUtils.floorModulo(nanos, MIO);
         } else {
             return System.currentTimeMillis();
         }
@@ -221,8 +226,8 @@ public final class SystemClock
 
         if (this.monotonic || MONOTON_MODE) {
             long nanos = this.utcNanos();
-            long secs = LeapSeconds.getInstance().strip(nanos / MRD);
-            return secs * MIO + nanos % 1000;
+            long secs = LeapSeconds.getInstance().strip(MathUtils.floorDivide(nanos, MRD));
+            return MathUtils.safeMultiply(secs, MIO) + MathUtils.floorModulo(nanos, 1000);
         } else {
             return MathUtils.safeMultiply(System.currentTimeMillis(), 1000);
         }
@@ -248,11 +253,11 @@ public final class SystemClock
     public long realTimeInMicros() {
 
         if (this.monotonic || MONOTON_MODE) {
-            return this.utcNanos() / 1000;
+            return MathUtils.floorDivide(this.utcNanos(), 1000);
         } else {
             long millis = System.currentTimeMillis();
-            long utc = LeapSeconds.getInstance().enhance(millis / 1000);
-            return utc * MIO + (millis % 1000) * 1000;
+            long utc = LeapSeconds.getInstance().enhance(MathUtils.floorDivide(millis, 1000));
+            return MathUtils.safeMultiply(utc, MIO) + MathUtils.floorModulo(millis, 1000) * 1000;
         }
 
     }
@@ -394,6 +399,7 @@ public final class SystemClock
      *
      * @param   clock       another clock which this instance should be synchronized with
      * @return  synchronized copy of this instance
+     * @see     #MONOTONIC
      * @since   3.2/4.1
      */
     /*[deutsch]
@@ -405,6 +411,7 @@ public final class SystemClock
      *
      * @param   clock       another clock which this instance should be synchronized with
      * @return  synchronized copy of this instance
+     * @see     #MONOTONIC
      * @since   3.2/4.1
      */
     public SystemClock synchronizedWith(TimeSource<?> clock) {
@@ -435,8 +442,8 @@ public final class SystemClock
             }
         }
 
-        long utc = LeapSeconds.getInstance().enhance(millis / 1000);
-        long instantNanos = MathUtils.safeMultiply(utc, MRD) + ((int) (millis % 1000)) * MIO;
+        long utc = LeapSeconds.getInstance().enhance(MathUtils.floorDivide(millis, 1000));
+        long instantNanos = MathUtils.safeMultiply(utc, MRD) + MathUtils.floorModulo(millis, 1000) * MIO;
         return MathUtils.safeSubtract(instantNanos, compare);
 
     }
