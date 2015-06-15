@@ -21,11 +21,11 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.tz.ExtZoneProvider;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
-import net.time4j.tz.ZoneProvider;
 import net.time4j.tz.other.WindowsZone;
 
 import java.io.FileNotFoundException;
@@ -47,7 +47,7 @@ import java.util.Set;
  * @since   3.1
  */
 public class WinZoneProviderSPI
-    implements ZoneProvider {
+    implements ExtZoneProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
