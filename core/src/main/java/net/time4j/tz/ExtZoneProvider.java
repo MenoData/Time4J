@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (TimeApplication.java) is part of project Time4J.
+ * This file (ExtZoneProvider.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,34 +18,28 @@
  * along with Time4J. If not, see <http://www.gnu.org/licenses/>.
  * -----------------------------------------------------------------------
  */
-package net.time4j.android;
 
-import android.app.Application;
+package net.time4j.tz;
 
 
 /**
- * <p>Serves as super class for any time-based android application using Time4J. </p>
+ * <p>SPI interface which is identical to {@code ZoneProvider} but enables a different name
+ * of the associated service loader file intended for the Android platform. </p>
  *
- * @author      Meno Hochschild
- * @since       3.2
+ * @author  Meno Hochschild
+ * @since   3.2/4.2
+ * @see     java.util.ServiceLoader
  */
 /*[deutsch]
- * <p>Dient als Superklasse f&uuml;r eine beliebige zeitbasierte Android-App, die Time4J nutzt. </p>
+ * <p>SPI-Interface, das zu seinem Super-Interface {@code ZoneProvider} nichts hinzuf&uuml;gt,
+ * aber eine {@code ServiceLoader}-Datei mit einem anderen Namen speziell f&uuml;r die
+ * Android-Plattform erm&ouml;glicht. </p>
  *
- * @author      Meno Hochschild
- * @since       3.2
+ * @author  Meno Hochschild
+ * @since   3.2/4.2
+ * @see     java.util.ServiceLoader
  */
-public abstract class TimeApplication
-    extends Application {
-
-    //~ Methoden ----------------------------------------------------------
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        ApplicationStarter.registerReceiver(this);
-
-    }
+public interface ExtZoneProvider
+    extends ZoneProvider {
 
 }

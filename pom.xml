@@ -16,9 +16,7 @@
         <module>range</module>
         <module>misc</module>
         <module>olson</module>
-        <!--
         <module>android</module>
-        -->
     </modules>
     
     <licenses>
@@ -73,7 +71,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.2</version>
                 <configuration>
                     <verbose>true</verbose>
                     <fork>true</fork>
