@@ -129,6 +129,9 @@ public abstract class XMLAdapter<S, T>
      *  // output: T21:45:30
      * </pre>
      *
+     * <p>Note: The special value T24:00 (midnight at end of day) is mapped to
+     * T00:00 in the value space of {@code XMLGregorianCalendar}. </p>
+     *
      * @since   3.0
      */
     /*[deutsch]
@@ -145,6 +148,9 @@ public abstract class XMLAdapter<S, T>
      *  System.out.println(time);
      *  // Ausgabe: T21:45:30
      * </pre>
+     *
+     * <p>Hinweis: Der Spezialwert T24:00 (Mitternacht am Ende des Tages) wird auf T00:00
+     * im Wertraum von {@code XMLGregorianCalendar} abgebildet. </p>
      *
      * @since   3.0
      */
