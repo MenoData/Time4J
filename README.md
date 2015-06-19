@@ -15,11 +15,11 @@ Current state and introduction:
 
 On 2015-06-11 the version v4.1 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The older version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and has reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
 
-- **time4j-olson** which contains some predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
+- **time4j-olson** contains some predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
 - **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
 - **time4j-i18n** for enhanced localization, formatting and history support
 - **time4j-range** for handling intervals (needs i18n-module)
-- **time4j-misc** containing other features like sql-support, xml-support, alternative clocks or military timezones
+- **time4j-misc** miscellaneous features like sql- and xml-support, alternative clocks or military timezones
 - **time4j-android** for Android-support (only relevant for version line 3.x - minimum version is 3.2)
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
