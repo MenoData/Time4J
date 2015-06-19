@@ -2,10 +2,12 @@ package net.time4j.xml;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
+import net.time4j.PlainTime;
 import net.time4j.ZonalDateTime;
 import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
@@ -41,6 +43,63 @@ public class XMLAdapterTest {
             ZonalDateTime.parse(xml, Iso8601Format.EXTENDED_DATE_TIME_OFFSET);
         assertThat(
             XMLAdapter.XML_DATE_TIME_OFFSET.from(zm),
+            is(expected));
+    }
+
+    @Test
+    public void xmlTimeToTime4J() throws Exception {
+        String xml = "23:59:36.123";
+        XMLGregorianCalendar cal =
+            DatatypeFactory.newInstance().newXMLGregorianCalendar(xml);
+        PlainTime expected = Iso8601Format.EXTENDED_WALL_TIME.parse(xml);
+        assertThat(
+            XMLAdapter.XML_TIME.translate(cal),
+            is(expected));
+    }
+
+    @Test
+    public void xmlTimeFromTime4J() throws Exception {
+        XMLGregorianCalendar expected =
+            DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar(
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED, 23, 59, 36, 123, DatatypeConstants.FIELD_UNDEFINED);
+        String xml = "23:59:36.123";
+        PlainTime time = Iso8601Format.EXTENDED_WALL_TIME.parse(xml);
+        assertThat(
+            XMLAdapter.XML_TIME.from(time),
+            is(expected));
+    }
+
+    @Test
+    public void xmlTimeToTime4J_24() throws Exception {
+        XMLGregorianCalendar cal =
+            DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar(
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED, 24, 0, 0, 0, DatatypeConstants.FIELD_UNDEFINED);
+        PlainTime expected = PlainTime.midnightAtStartOfDay();
+        assertThat(
+            XMLAdapter.XML_TIME.translate(cal),
+            is(expected));
+        assertThat(
+            cal.getHour(),
+            is(0));
+    }
+
+    @Test
+    public void xmlTimeFromTime4J_24() throws Exception {
+        XMLGregorianCalendar expected =
+            DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar(
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED,
+                    DatatypeConstants.FIELD_UNDEFINED, 24, 0, 0, 0, DatatypeConstants.FIELD_UNDEFINED);
+        PlainTime time = PlainTime.midnightAtEndOfDay();
+        assertThat(
+            XMLAdapter.XML_TIME.from(time),
             is(expected));
     }
 
