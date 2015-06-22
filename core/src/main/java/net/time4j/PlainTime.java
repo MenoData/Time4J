@@ -3231,8 +3231,10 @@ public final class PlainTime
 
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 zone = Timezone.of(attributes.get(Attributes.TIMEZONE_ID));
-            } else {
+            } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
                 zone = Timezone.ofSystem();
+            } else {
+                return null;
             }
 
             final UnixTime ut = clock.currentTime();
