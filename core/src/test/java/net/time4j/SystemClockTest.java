@@ -82,4 +82,9 @@ public class SystemClockTest {
         );
     }
 
+    @Test
+    public void platformView() {
+        System.out.println(SystemClock.inPlatformView().now());
+    }
+
 }
