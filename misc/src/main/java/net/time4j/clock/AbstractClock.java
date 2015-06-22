@@ -48,16 +48,39 @@ public abstract class AbstractClock
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates a local clock in platform timezone. </p>
+     *
+     * @return  local clock in system timezone (using the platform timezone data)
+     * @since   3.3/4.2
+     * @see     java.util.TimeZone
+     * @see     Timezone#ofSystem()
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der Plattform-Zeitzone. </p>
+     *
+     * @return  local clock in system timezone (using the platform timezone data)
+     * @since   3.3/4.2
+     * @see     java.util.TimeZone
+     * @see     Timezone#ofSystem()
+     */
+    public ZonalClock inPlatformView() {
+
+        String tzid = "java.util.TimeZone~" + Timezone.ofSystem().getID().canonical();
+        return new ZonalClock(this, tzid);
+
+    }
+
+    /**
      * <p>Creates a local clock in system timezone. </p>
      *
-     * @return  local clock in system timezone
+     * @return  local clock in system timezone (using the best available timezone data)
      * @since   2.1
      * @see     Timezone#ofSystem()
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der System-Zeitzone. </p>
      *
-     * @return  local clock in system timezone
+     * @return  local clock in system timezone (using the best available timezone data)
      * @since   2.1
      * @see     Timezone#ofSystem()
      */

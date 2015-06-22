@@ -26,6 +26,7 @@ import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TickProvider;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -259,11 +260,40 @@ public final class SystemClock
     }
 
     /**
+     * <p>Creates a local clock in platform timezone. </p>
+     *
+     * <p>Uses the standard clock {@code SystemClock.INSTANCE} and the platform timezone data. </p>
+     *
+     * @return  local clock in system timezone using the platform timezone data
+     * @since   3.3/4.2
+     * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     #INSTANCE
+     * @see     java.util.TimeZone
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine lokale Uhr in der Plattform-Zeitzone. </p>
+     *
+     * <p>Verwendet die Standarduhr {@code SystemClock.INSTANCE} und die Zeitzonendaten der Plattform. </p>
+     *
+     * @return  local clock in system timezone using the platform timezone data
+     * @since   3.3/4.2
+     * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     #INSTANCE
+     * @see     java.util.TimeZone
+     */
+    public static ZonalClock inPlatformView() {
+
+        String tzid = "java.util.TimeZone~" + Timezone.ofSystem().getID().canonical();
+        return new ZonalClock(INSTANCE, tzid);
+
+    }
+
+    /**
      * <p>Creates a local clock in system timezone. </p>
      *
      * <p>Uses the standard clock {@code SystemClock.INSTANCE}. </p>
      *
-     * @return  cached local clock in system timezone
+     * @return  cached local clock in system timezone using the best available timezone data
      * @see     net.time4j.tz.Timezone#ofSystem()
      * @see     #INSTANCE
      */
@@ -272,7 +302,7 @@ public final class SystemClock
      *
      * <p>Verwendet die Standarduhr {@code SystemClock.INSTANCE}. </p>
      *
-     * @return  cached local clock in system timezone
+     * @return  cached local clock in system timezone using the best available timezone data
      * @see     net.time4j.tz.Timezone#ofSystem()
      * @see     #INSTANCE
      */
