@@ -114,6 +114,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#DECIMAL_HOUR}</li>
  *  <li>{@link PlainTime#DECIMAL_MINUTE}</li>
  *  <li>{@link PlainTime#DECIMAL_SECOND}</li>
+ *  <li>{@link PlainTime#PRECISION}</li>
  * </ul>
  *
  * <p>Furthermore, all elements of class {@link Weekmodel} are supported. As
@@ -163,6 +164,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#DECIMAL_HOUR}</li>
  *  <li>{@link PlainTime#DECIMAL_MINUTE}</li>
  *  <li>{@link PlainTime#DECIMAL_SECOND}</li>
+ *  <li>{@link PlainTime#PRECISION}</li>
  * </ul>
  *
  * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}
@@ -349,7 +351,10 @@ public final class PlainTimestamp
                     new DecimalRule(DECIMAL_MINUTE))
                 .appendElement(
                     DECIMAL_SECOND,
-                    new DecimalRule(DECIMAL_SECOND));
+                    new DecimalRule(DECIMAL_SECOND))
+                .appendElement(
+                    PRECISION,
+                    FieldRule.of(PRECISION));
         registerCalendarUnits(builder);
         registerClockUnits(builder);
         registerExtensions(builder);
