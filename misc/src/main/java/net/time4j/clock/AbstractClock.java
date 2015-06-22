@@ -45,18 +45,6 @@ import net.time4j.tz.Timezone;
 public abstract class AbstractClock
     implements TimeSource<Moment> {
 
-    //~ Instanzvariablen --------------------------------------------------
-
-    private final ZonalClock local;
-
-    //~ Konstruktoren -----------------------------------------------------
-
-    AbstractClock() {
-        super();
-
-        this.local = new ZonalClock(this, Timezone.ofSystem().getID());
-    }
-
     //~ Methoden ----------------------------------------------------------
 
     /**
@@ -75,7 +63,7 @@ public abstract class AbstractClock
      */
     public ZonalClock inLocalView() {
 
-        return this.local;
+        return new ZonalClock(this, Timezone.ofSystem().getID());
 
     }
 

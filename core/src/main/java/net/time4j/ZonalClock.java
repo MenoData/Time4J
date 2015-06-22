@@ -155,7 +155,7 @@ public final class ZonalClock {
         super();
 
         this.timeSource = SystemClock.INSTANCE;
-        this.timezone = Timezone.ofSystem();
+        this.timezone = null;
 
     }
 
@@ -174,7 +174,8 @@ public final class ZonalClock {
     public PlainTimestamp now() {
 
         final UnixTime ut = this.timeSource.currentTime();
-        return PlainTimestamp.from(ut, this.timezone.getOffset(ut));
+        Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
+        return PlainTimestamp.from(ut, tz.getOffset(ut));
 
     }
 
@@ -191,7 +192,8 @@ public final class ZonalClock {
     public PlainDate today() {
 
         final UnixTime ut = this.timeSource.currentTime();
-        return PlainDate.from(ut, this.timezone.getOffset(ut));
+        Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
+        return PlainDate.from(ut, tz.getOffset(ut));
 
     }
 
@@ -223,7 +225,8 @@ public final class ZonalClock {
      */
     public TZID getTimezone() {
 
-        return this.timezone.getID();
+        Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
+        return tz.getID();
 
     }
 
