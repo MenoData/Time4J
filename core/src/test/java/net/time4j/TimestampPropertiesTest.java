@@ -1336,22 +1336,28 @@ public class TimestampPropertiesTest {
     @Test
     public void containsPrecision() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.contains(PRECISION), is(false));
+        assertThat(anyTS.contains(PRECISION), is(true));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getPrecision() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).get(PRECISION);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).get(PRECISION),
+            is(ClockUnit.MINUTES));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMinimumPrecision() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(PRECISION);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMinimum(PRECISION),
+            is(ClockUnit.HOURS));
     }
 
-    @Test(expected=ChronoException.class)
+    @Test
     public void getMaximumPrecision() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(PRECISION);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45).getMaximum(PRECISION),
+            is(ClockUnit.NANOS));
     }
 
     @Test
@@ -1359,12 +1365,33 @@ public class TimestampPropertiesTest {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 1, 45)
                 .isValid(PRECISION, ClockUnit.HOURS),
+            is(true));
+    }
+
+    @Test
+    public void isValidPrecisionNull() {
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 1, 45)
+                .isValid(PRECISION, null),
             is(false));
     }
 
     @Test(expected=ChronoException.class)
+    public void getBaseUnitPrecision() {
+        PlainTimestamp.axis().getBaseUnit(PRECISION);
+    }
+
+    @Test
     public void withPrecision() {
-        PlainTimestamp.of(2014, 4, 21, 1, 45).with(PRECISION, ClockUnit.HOURS);
+        assertThat(
+            PlainTimestamp.of(2014, 4, 21, 9, 15, 43)
+                .with(PRECISION, ClockUnit.MINUTES),
+            is(PlainTimestamp.of(2014, 4, 21, 9, 15, 0)));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void withPrecisionNull() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(PRECISION, null);
     }
 
     @Test
