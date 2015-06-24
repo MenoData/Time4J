@@ -220,4 +220,22 @@ public class AdjacentDigitParsingTest {
             is(PlainTime.of(7, 8, 30)));
     }
 
+    @Test
+    public void adjacentMonthDayYear_yyyy()
+        throws ParseException {
+
+        assertThat(
+            ChronoFormatter.ofDatePattern("Mddyyyy", PatternType.CLDR, Locale.ROOT).parse("8302011"),
+            is(PlainDate.of(2011, 8, 30)));
+    }
+
+    @Test
+    public void adjacentMonthDayYear_uuuu()
+        throws ParseException {
+
+        assertThat(
+            ChronoFormatter.ofDatePattern("Mdduuuu", PatternType.CLDR, Locale.ROOT).parse("8302011"),
+            is(PlainDate.of(2011, 8, 30)));
+    }
+
 }
