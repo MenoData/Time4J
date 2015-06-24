@@ -62,20 +62,26 @@ final class TwoDigitYearProcessor
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoElement<Integer> element;
+    private final boolean protectedMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Konstruiert eine neue benutzerdefinierte Formatverarbeitung. </p>
      *
-     * @param   element     year element to be formatted
+     * @param   element         year element to be formatted
+     * @param   protectedMode   allow replacement?
      * @throws  IllegalArgumentException if no year element is given
      */
-    TwoDigitYearProcessor(ChronoElement<Integer> element) {
+    TwoDigitYearProcessor(
+        ChronoElement<Integer> element,
+        boolean protectedMode
+    ) {
         super();
 
         if (element.name().startsWith("YEAR")) {
             this.element = element;
+            this.protectedMode = protectedMode;
         } else {
             throw new IllegalArgumentException(
                 "Year element required: " + element);
@@ -269,7 +275,10 @@ final class TwoDigitYearProcessor
             return true;
         } else if (obj instanceof TwoDigitYearProcessor) {
             TwoDigitYearProcessor that = (TwoDigitYearProcessor) obj;
-            return this.element.equals(that.element);
+            return (
+                this.element.equals(that.element)
+                && (this.protectedMode == that.protectedMode)
+            );
         } else {
             return false;
         }
@@ -290,6 +299,8 @@ final class TwoDigitYearProcessor
         sb.append(this.getClass().getName());
         sb.append("[element=");
         sb.append(this.element.name());
+        sb.append(", protected-mode=");
+        sb.append(this.protectedMode);
         sb.append(']');
         return sb.toString();
 
@@ -305,11 +316,14 @@ final class TwoDigitYearProcessor
     @Override
     public FormatProcessor<Integer> withElement(ChronoElement<Integer> e) {
 
-        if (this.element == e) {
+        if (
+            this.protectedMode
+            || (this.element == e)
+        ) {
             return this;
         }
 
-        return new TwoDigitYearProcessor(e);
+        return new TwoDigitYearProcessor(e, false);
 
     }
 

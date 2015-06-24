@@ -3782,28 +3782,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addTwoDigitYear(ChronoElement<Integer> element) {
 
-            this.checkElement(element);
-            this.checkAfterDecimalDigits(element);
-            FormatProcessor<?> processor = new TwoDigitYearProcessor(element);
-
-            if (this.reservedIndex == -1) {
-                this.addProcessor(processor);
-                this.reservedIndex = this.steps.size() - 1;
-            } else {
-                int ri = this.reservedIndex;
-                FormatStep numStep = this.steps.get(ri);
-                this.startSection(Attributes.LENIENCY, Leniency.STRICT);
-                this.addProcessor(processor);
-                this.endSection();
-                FormatStep lastStep = this.steps.get(this.steps.size() - 1);
-
-                if (numStep.getSection() == lastStep.getSection()) {
-                    this.reservedIndex = ri;
-                    this.steps.set(ri, numStep.reserve(2));
-                }
-            }
-
-            return this;
+            return this.addTwoDigitYear(element, false);
 
         }
 
@@ -4658,20 +4637,31 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        // Spezialmethode, um das CLDR-Symbol u immer als proleptic-iso-year zu schützen
-        Builder<T> addProlepticIsoYear(
+        // Spezialmethode für Jahreselemente, siehe auch issue #307
+        Builder<T> addYear(
+            ChronoElement<Integer> element,
             int count,
-            SignPolicy signPolicy
+            boolean protectedMode
         ) {
 
-            return this.addNumber( PlainDate.YEAR, false, count, 9, signPolicy, true);
+            if (
+                this.steps.isEmpty()
+                || !this.steps.get(this.steps.size() - 1).isNumerical()
+                || (count != 4)
+            ) {
+                SignPolicy signPolicy = ((count < 4) ? SignPolicy.SHOW_WHEN_NEGATIVE : SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                return this.addNumber(element, false, count, 9, signPolicy, protectedMode);
+            }
+
+            assert (count == 4);
+            return this.addNumber(element, true, 4, 4, SignPolicy.SHOW_NEVER, protectedMode);
 
         }
 
         // Spezialmethode, um das CLDR-Symbol u immer als proleptic-iso-year zu schützen
         Builder<T> addProlepticIsoYearWithTwoDigits() {
 
-            return this.addNumber(PlainDate.YEAR, true, 2, 2, SignPolicy.SHOW_NEVER, true);
+            return this.addTwoDigitYear(PlainDate.YEAR, true);
 
         }
 
@@ -4741,6 +4731,36 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             } else {
                 this.addProcessor(np);
                 this.reservedIndex = this.steps.size() - 1;
+            }
+
+            return this;
+
+        }
+
+        private Builder<T> addTwoDigitYear(
+            ChronoElement<Integer> element,
+            boolean protectedMode
+        ) {
+
+            this.checkElement(element);
+            this.checkAfterDecimalDigits(element);
+            FormatProcessor<?> processor = new TwoDigitYearProcessor(element, protectedMode);
+
+            if (this.reservedIndex == -1) {
+                this.addProcessor(processor);
+                this.reservedIndex = this.steps.size() - 1;
+            } else {
+                int ri = this.reservedIndex;
+                FormatStep numStep = this.steps.get(ri);
+                this.startSection(Attributes.LENIENCY, Leniency.STRICT);
+                this.addProcessor(processor);
+                this.endSection();
+                FormatStep lastStep = this.steps.get(this.steps.size() - 1);
+
+                if (numStep.getSection() == lastStep.getSection()) {
+                    this.reservedIndex = ri;
+                    this.steps.set(ri, numStep.reserve(2));
+                }
             }
 
             return this;

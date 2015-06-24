@@ -749,7 +749,7 @@ public enum PatternType
      *      <td>{@link PlainDate#YEAR}</td>
      *      <td>u</td>
      *      <td>Like in CLDR, but the two-digit-form will use the pivot year 2100 for the range 2000-2099.
-     *      If you want to configure the pivot year then use {@code PatternType.CLDR} instead. </td>
+     *      If you want to configure the pivot year then use {@code PatternType.CLDR} and the symbol yy instead. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
@@ -835,7 +835,7 @@ public enum PatternType
      *      <td>u</td>
      *      <td>Wie in CLDR, aber eine zweistellige Jahresangabe wird das Kippjahr 2100 f&uuml;r
      *      den Bereich 2000-2099 verwenden. Wenn das Kippjahr konfiguriert werden soll, ist
-     *      {@code PatternType.CLDR} zu verwenden. </td>
+     *      {@code PatternType.CLDR} nebst dem Symbol yy zu verwenden. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
@@ -969,47 +969,19 @@ public enum PatternType
             case 'y':
                 if (count == 2) {
                     builder.addTwoDigitYear(PlainDate.YEAR);
-                } else if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addYear(PlainDate.YEAR, count, false);
                 }
                 break;
             case 'Y':
                 if (count == 2) {
                     builder.addTwoDigitYear(PlainDate.YEAR_OF_WEEKDATE);
-                } else if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR_OF_WEEKDATE,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR_OF_WEEKDATE,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false);
                 }
                 break;
             case 'u':
-                if (count < 4) {
-                    builder.addProlepticIsoYear(
-                        count,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
-                } else {
-                    builder.addProlepticIsoYear(
-                        count,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
-                }
+                builder.addYear(PlainDate.YEAR, count, true);
                 break;
             case 'Q':
                 addQuarterOfYear(builder, count);
@@ -1304,18 +1276,8 @@ public enum PatternType
                     builder.startSection(Attributes.PIVOT_YEAR, 2100);
                     builder.addTwoDigitYear(PlainDate.YEAR);
                     builder.endSection();
-                } else if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addYear(PlainDate.YEAR, count, false);
                 }
                 break;
             case 'Y':
@@ -1323,18 +1285,8 @@ public enum PatternType
                     builder.startSection(Attributes.PIVOT_YEAR, 2100);
                     builder.addTwoDigitYear(PlainDate.YEAR_OF_WEEKDATE);
                     builder.endSection();
-                } else if (count < 4) {
-                    builder.addInteger(
-                        PlainDate.YEAR_OF_WEEKDATE,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addInteger(
-                        PlainDate.YEAR_OF_WEEKDATE,
-                        count,
-                        9,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false);
                 }
                 break;
             case 'u':
@@ -1342,14 +1294,8 @@ public enum PatternType
                     builder.startSection(Attributes.PIVOT_YEAR, 2100);
                     builder.addProlepticIsoYearWithTwoDigits();
                     builder.endSection();
-                } else if (count < 4) {
-                    builder.addProlepticIsoYear(
-                        count,
-                        SignPolicy.SHOW_WHEN_NEGATIVE);
                 } else {
-                    builder.addProlepticIsoYear(
-                        count,
-                        SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                    builder.addYear(PlainDate.YEAR, count, true);
                 }
                 break;
             case 'W':

@@ -523,6 +523,8 @@ final class NumberProcessor<V>
         sb.append(this.maxDigits);
         sb.append(", sign-policy=");
         sb.append(this.signPolicy);
+        sb.append(", protected-mode=");
+        sb.append(this.protectedMode);
         sb.append(']');
         return sb.toString();
 
@@ -545,7 +547,7 @@ final class NumberProcessor<V>
             return this;
         }
 
-        return new NumberProcessor<V>(
+        return new NumberProcessor<>(
             element,
             this.fixedWidth,
             this.minDigits,

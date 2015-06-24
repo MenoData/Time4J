@@ -103,7 +103,7 @@ public class AdjacentDigitParsingTest {
         assertThat(
             formatter.parse("20000229174521123456"),
             is(PlainTimestamp.of(2000, 2, 29, 17, 45, 21)
-                             .plus(123456, ClockUnit.MICROS)));
+                .plus(123456, ClockUnit.MICROS)));
     }
 
     @Test
@@ -218,6 +218,33 @@ public class AdjacentDigitParsingTest {
         assertThat(
             formatter.parse("708,5"),
             is(PlainTime.of(7, 8, 30)));
+    }
+
+    @Test
+    public void adjacentMonthDayYear_yyyy()
+        throws ParseException {
+
+        assertThat(
+            ChronoFormatter.ofDatePattern("Mddyyyy", PatternType.CLDR, Locale.ROOT).parse("8302011"),
+            is(PlainDate.of(2011, 8, 30)));
+    }
+
+    @Test
+    public void adjacentMonthDayYear_uuuu()
+        throws ParseException {
+
+        assertThat(
+            ChronoFormatter.ofDatePattern("Mdduuuu", PatternType.CLDR, Locale.ROOT).parse("8302011"),
+            is(PlainDate.of(2011, 8, 30)));
+    }
+
+    @Test
+    public void adjacentMonthDayYear_uu_threeten()
+        throws ParseException {
+
+        assertThat(
+            ChronoFormatter.ofDatePattern("Mdduu", PatternType.THREETEN, Locale.ROOT).parse("83011"),
+            is(PlainDate.of(2011, 8, 30)));
     }
 
 }
