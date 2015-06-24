@@ -523,6 +523,8 @@ final class NumberProcessor<V>
         sb.append(this.maxDigits);
         sb.append(", sign-policy=");
         sb.append(this.signPolicy);
+        sb.append(", protected-mode=");
+        sb.append(this.protectedMode);
         sb.append(']');
         return sb.toString();
 
