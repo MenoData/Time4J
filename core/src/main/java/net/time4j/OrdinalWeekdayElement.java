@@ -132,7 +132,8 @@ public interface OrdinalWeekdayElement
      * in month. </p>
      *
      * <p>If given ordinal number is {@code Integer.MAX_VALUE} then the last weekday in month
-     * will be determined. </p>
+     * will be determined. Note that only the values 1-4 can give the guarantee that the current
+     * month will not be changed. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month
@@ -144,7 +145,8 @@ public interface OrdinalWeekdayElement
      * Wochentag eines Monats setzt. </p>
      *
      * <p>Wenn die angegebene Ordnungsnummer {@code Integer.MAX_VALUE} ist, wird der letzte
-     * Wochentag des Monats bestimmt. </p>
+     * Wochentag des Monats bestimmt. Zu beachten, nur die Werte 1-4 k&ouml;nnen garantieren,
+     * da&szlig; der aktuelle Monat gleich bleibt. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month
