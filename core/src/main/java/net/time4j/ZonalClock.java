@@ -23,6 +23,9 @@ package net.time4j;
 
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.Chronology;
+import net.time4j.format.Attributes;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -162,12 +165,42 @@ public final class ZonalClock {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Gets the current date in the associated timezone. </p>
+     *
+     * <p>The result dynamically depends on the associated timezone meaning if and only if the underlying
+     * timezone is the system timezone. </p>
+     *
+     * @return  calendar date representing today
+     */
+    /**
+     * <p>Ermittelt das aktuelle Datum in der assoziierten Zeitzone. </p>
+     *
+     * <p>Das Ergebnis h&auml;ngt genau dann dynamisch von der assoziierten Zeitzone ab, wenn die
+     * System-Zeitzone vorliegt. </p>
+     *
+     * @return  calendar date representing today
+     */
+    public PlainDate today() {
+
+        final UnixTime ut = this.timeSource.currentTime();
+        Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
+        return PlainDate.from(ut, tz.getOffset(ut));
+
+    }
+
+    /**
      * <p>Gets the current timestamp in the associated timezone. </p>
+     *
+     * <p>The result dynamically depends on the associated timezone meaning if and only if the underlying
+     * timezone is the system timezone. </p>
      *
      * @return  current local timestamp
      */
     /*[deutsch]
      * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone. </p>
+     *
+     * <p>Das Ergebnis h&auml;ngt genau dann dynamisch von der assoziierten Zeitzone ab, wenn die
+     * System-Zeitzone vorliegt. </p>
      *
      * @return  current local timestamp
      */
@@ -180,20 +213,42 @@ public final class ZonalClock {
     }
 
     /**
-     * <p>Gets the current date in the associated timezone. </p>
+     * <p>Gets the current timestamp in the associated timezone and given chronology. </p>
      *
-     * @return  calendar date representing today
-     */
-    /**
-     * <p>Ermittelt das aktuelle Datum in der assoziierten Zeitzone. </p>
+     * <p>The result always dynamically depends on the associated timezone meaning if the underlying
+     * timezone data change then the result will also change by next call. </p>
      *
-     * @return  calendar date representing today
+     * <p>Code example: </p>
+     *
+     * <pre>
+     *     System.out.println(SystemClock.inLocalView().now(PlainTime.axis())); // local wall time
+     * </pre>
+     *
+     * @param   chronology  chronology to be used
+     * @return  current local timestamp in given chronology
+     * @since   3.3/4.2
      */
-    public PlainDate today() {
+    /*[deutsch]
+     * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone und angegebenen Chronologie. </p>
+     *
+     * <p>Das Ergebnis h&auml;ngt immer dynamisch von der assoziierten Zeitzone ab. Wenn deren Daten sich
+     * &auml;ndern, dann wird diese Methode beim n&auml;chsten Aufruf ein angepasstes Ergebnis liefern. </p>
+     *
+     * <p>Code-Beispiel: </p>
+     *
+     * <pre>
+     *     System.out.println(SystemClock.inLocalView().now(PlainTime.axis())); // lokale Uhrzeit
+     * </pre>
+     *
+     * @param   chronology  chronology to be used
+     * @return  current local timestamp in given chronology
+     * @since   3.3/4.2
+     */
+    public <T extends ChronoEntity<T>> T now(Chronology<T> chronology) {
 
-        final UnixTime ut = this.timeSource.currentTime();
         Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
-        return PlainDate.from(ut, tz.getOffset(ut));
+        Attributes attrs = new Attributes.Builder().setTimezone(tz.getID()).build();
+        return chronology.createFrom(this.timeSource, attrs);
 
     }
 
