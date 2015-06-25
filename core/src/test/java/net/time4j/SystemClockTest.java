@@ -87,4 +87,9 @@ public class SystemClockTest {
         System.out.println(SystemClock.inPlatformView().now());
     }
 
+    @Test
+    public void localTime() {
+        System.out.println(SystemClock.inLocalView().now(PlainTime.axis()));
+    }
+
 }
