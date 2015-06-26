@@ -224,6 +224,7 @@ public final class ZonalClock {
      *     System.out.println(SystemClock.inLocalView().now(PlainTime.axis())); // local wall time
      * </pre>
      *
+     * @param   <T> generic type of chronology
      * @param   chronology  chronology to be used
      * @return  current local timestamp in given chronology
      * @since   3.3/4.2
@@ -240,6 +241,7 @@ public final class ZonalClock {
      *     System.out.println(SystemClock.inLocalView().now(PlainTime.axis())); // lokale Uhrzeit
      * </pre>
      *
+     * @param   <T> generic type of chronology
      * @param   chronology  chronology to be used
      * @return  current local timestamp in given chronology
      * @since   3.3/4.2
