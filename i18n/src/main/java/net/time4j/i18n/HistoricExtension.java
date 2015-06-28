@@ -82,15 +82,8 @@ public class HistoricExtension
 
         if (entity.contains(history.era())) {
             era = entity.get(history.era());
-        } else {
-            if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
-                era = HistoricEra.AD;
-            } else {
-                String message = "Parsing of historical dates requires the presence of an era.";
-                if (entity.isValid(ValidationElement.ERROR_MESSAGE, message)) {
-                    entity.with(ValidationElement.ERROR_MESSAGE, message);
-                }
-            }
+        } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
+            era = HistoricEra.AD;
         }
 
         if (
