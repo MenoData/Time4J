@@ -827,6 +827,30 @@ public final class PrettyTime {
     /**
      * <p>Formats given time point relative to the current time of
      * {@link #getReferenceClock()} as duration in at most second
+     * precision or less - using the system timezone. </p>
+     *
+     * @param   moment      relative time point
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in maximal
+     * Sekundengenauigkeit - bez&uuml;glich der Systemzeitzone. </p>
+     *
+     * @param   moment      relative time point
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.4/4.3
+     */
+    public String printRelativeInStdTimezone(UnixTime moment) {
+
+        return this.printRelative(moment, Timezone.ofSystem());
+
+    }
+
+    /**
+     * <p>Formats given time point relative to the current time of
+     * {@link #getReferenceClock()} as duration in at most second
      * precision or less. </p>
      *
      * @param   moment      relative time point
@@ -849,7 +873,7 @@ public final class PrettyTime {
         TZID tzid
     ) {
 
-        return this.print(moment, Timezone.of(tzid));
+        return this.printRelative(moment, Timezone.of(tzid));
 
     }
 
@@ -878,11 +902,11 @@ public final class PrettyTime {
         String tzid
     ) {
 
-        return this.print(moment, Timezone.of(tzid));
+        return this.printRelative(moment, Timezone.of(tzid));
 
     }
 
-    private String print(
+    private String printRelative(
         UnixTime ut,
         Timezone tz
     ) {

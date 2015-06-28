@@ -182,6 +182,24 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printRelativeInStdTimezone() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelativeInStdTimezone(PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC()),
+            is(PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(), Timezone.ofSystem().getID())));
+    }
+
+    @Test
     public void print3DaysLaterGerman() {
         TimeSource<?> clock = new TimeSource<Moment>() {
             @Override
