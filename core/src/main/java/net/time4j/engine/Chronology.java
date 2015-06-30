@@ -260,15 +260,13 @@ public class Chronology<T extends ChronoEntity<T>>
     /**
      * <p>Queries if this chronology has a calendar system. </p>
      *
-     * @return  {@code true} if this chronology has a calendar system
-     *          else {@code false}
+     * @return  {@code true} if this chronology has a calendar system else {@code false}
      * @see     #getCalendarSystem()
      */
     /*[deutsch]
      * <p>Ermittelt, ob diese Chronologie ein Kalendersystem hat. </p>
      *
-     * @return  {@code true} if this chronology has a calendar system
-     *          else {@code false}
+     * @return  {@code true} if this chronology has a calendar system else {@code false}
      * @see     #getCalendarSystem()
      */
     public boolean hasCalendarSystem() {
@@ -281,19 +279,41 @@ public class Chronology<T extends ChronoEntity<T>>
      * <p>Returns the associated calendar system if available. </p>
      *
      * @return  calendar system, not {@code null}
-     * @throws  ChronoException if the calendar system is unavailable
+     * @throws  ChronoException if the calendar system is unavailable or if there is more than one variant
      * @see     #hasCalendarSystem()
      */
     /*[deutsch]
      * <p>Liefert das assoziierte Kalendersystem, wenn verf&uuml;gbar. </p>
      *
      * @return  calendar system, not {@code null}
-     * @throws  ChronoException if the calendar system is unavailable
+     * @throws  ChronoException if the calendar system is unavailable or if there is more than one variant
      * @see     #hasCalendarSystem()
      */
     public CalendarSystem<T> getCalendarSystem() {
 
         throw new ChronoException("Calendar system is not available.");
+
+    }
+
+    /**
+     * <p>Returns the calendar system for given calendar variant if available. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  calendar system, not {@code null}
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant)
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Liefert das Kalendersystem zur angegebenen Kalendervariante, wenn verf&uuml;gbar. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  calendar system, not {@code null}
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant)
+     * @since   3.4/4.3
+     */
+    public CalendarSystem<T> getCalendarSystem(String variant) {
+
+        throw new ChronoException("Calendar variant is not available: " + variant);
 
     }
 
