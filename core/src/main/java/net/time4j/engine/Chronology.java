@@ -300,16 +300,18 @@ public class Chronology<T extends ChronoEntity<T>>
      *
      * @param   variant     name of calendar variant
      * @return  calendar system, not {@code null}
-     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant)
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant name)
      * @since   3.4/4.3
+     * @see     CalendarVariant#getVariant()
      */
     /*[deutsch]
      * <p>Liefert das Kalendersystem zur angegebenen Kalendervariante, wenn verf&uuml;gbar. </p>
      *
      * @param   variant     name of calendar variant
      * @return  calendar system, not {@code null}
-     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant)
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant name)
      * @since   3.4/4.3
+     * @see     CalendarVariant#getVariant()
      */
     public CalendarSystem<T> getCalendarSystem(String variant) {
 
