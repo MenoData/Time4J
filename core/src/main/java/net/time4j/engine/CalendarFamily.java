@@ -28,18 +28,18 @@ import java.util.Map;
 /**
  * <p>Represents a set of various calendar systems as members of a family. </p>
  *
- * @param   <T> generic type compatible to {@link ChronoEntity}
+ * @param   <T> generic type compatible to {@link CalendarVariant}
  * @author  Meno Hochschild
  * @since   3.4/4.3
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Familie von miteinander verwandten Kalendersystemen. </p>
  *
- * @param   <T> generic type compatible to {@link ChronoEntity}
+ * @param   <T> generic type compatible to {@link CalendarVariant}
  * @author  Meno Hochschild
  * @since   3.4/4.3
  */
-public final class CalendarFamily<T extends ChronoEntity<T>>
+public final class CalendarFamily<T extends CalendarVariant<T>>
     extends Chronology<T> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -121,7 +121,7 @@ public final class CalendarFamily<T extends ChronoEntity<T>>
      * @since       3.4/4.3
      * @doctags.concurrency {mutable}
      */
-    public static final class Builder<T extends ChronoEntity<T>>
+    public static final class Builder<T extends CalendarVariant<T>>
         extends Chronology.Builder<T> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -169,7 +169,7 @@ public final class CalendarFamily<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if no calendar system is specified
          * @since   3.4/4.3
          */
-        public static <T extends ChronoEntity<T>> Builder<T> setUp(
+        public static <T extends CalendarVariant<T>> Builder<T> setUp(
             Class<T> chronoType,
             ChronoMerger<T> merger,
             Map<String, CalendarSystem<T>> calendars
