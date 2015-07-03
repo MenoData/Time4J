@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import net.time4j.base.MathUtils;
+
 import java.io.Serializable;
 
 
@@ -201,6 +203,41 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
         long t1 = utcDays(this);
         long t2 = utcDays(other);
         return (t1 == t2);
+
+    }
+
+    /**
+     * <p>Adds given calendar days to this instance. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebenen Kalendertage zu dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    public T plus(CalendarDays days) {
+
+        long sum = MathUtils.safeAdd(utcDays(this), days.getAmount());
+        return this.getCalendarSystem().transform(sum);
+
+    }
+
+    /**
+     * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @since   3.4/4.3
+     */
+    public T minus(CalendarDays days) {
+
+        long result = MathUtils.safeSubtract(utcDays(this), days.getAmount());
+        return this.getCalendarSystem().transform(result);
 
     }
 

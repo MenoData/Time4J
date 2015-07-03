@@ -1,7 +1,6 @@
 package net.time4j;
 
 import net.time4j.engine.CalendarDays;
-import net.time4j.engine.EpochDays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -110,6 +109,24 @@ public class CalendarDaysTest {
         assertThat(
             CalendarDays.between(d1, d2).getAmount(),
             is(63L));
+    }
+
+    @Test
+    public void addition() {
+        PlainDate d1 = PlainDate.of(2011, 12, 29);
+        PlainDate d2 = PlainDate.of(2012, 3, 1);
+        assertThat(
+            d1.plus(CalendarDays.of(63)),
+            is(d2));
+    }
+
+    @Test
+    public void subtraction() {
+        PlainDate d1 = PlainDate.of(2011, 12, 29);
+        PlainDate d2 = PlainDate.of(2012, 3, 1);
+        assertThat(
+            d2.minus(CalendarDays.of(63)),
+            is(d1));
     }
 
 }
