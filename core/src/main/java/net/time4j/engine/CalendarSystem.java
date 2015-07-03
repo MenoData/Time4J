@@ -56,6 +56,7 @@ public interface CalendarSystem<D> {
      *
      * @param   utcDays     count of days since UTC epoch [1972-01-01]
      * @return  new calendar date
+     * @throws  IllegalArgumentException if the argument is out of range
      */
     /*[deutsch]
      * <p>Transformiert die angegebene Tagesnummer zu einem Datum auf dem
@@ -63,6 +64,7 @@ public interface CalendarSystem<D> {
      *
      * @param   utcDays     count of days since UTC epoch [1972-01-01]
      * @return  new calendar date
+     * @throws  IllegalArgumentException if the argument is out of range
      */
     D transform(long utcDays);
 
@@ -72,6 +74,7 @@ public interface CalendarSystem<D> {
      *
      * @param   date        calendar date to be transformed
      * @return  count of days since UTC epoch [1972-01-01]
+     * @throws  IllegalArgumentException if the argument is not consistent with this calendar system
      */
     /*[deutsch]
      * <p>Transformiert das angegebene Datum zu einer Tagesnummer auf dem
@@ -79,6 +82,7 @@ public interface CalendarSystem<D> {
      *
      * @param   date        calendar date to be transformed
      * @return  count of days since UTC epoch [1972-01-01]
+     * @throws  IllegalArgumentException if the argument is not consistent with this calendar system
      */
     long transform(D date);
 
