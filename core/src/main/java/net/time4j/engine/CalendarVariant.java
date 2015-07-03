@@ -205,6 +205,41 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
     }
 
     /**
+     * <p>Adds given calendar days to this instance. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebenen Kalendertage zu dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    public T plus(CalendarDays days) {
+
+        long sum = Math.addExact(utcDays(this), days.getAmount());
+        return this.getCalendarSystem().transform(sum);
+
+    }
+
+    /**
+     * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @since   3.4/4.3
+     */
+    public T minus(CalendarDays days) {
+
+        long result = Math.subtractExact(utcDays(this), days.getAmount());
+        return this.getCalendarSystem().transform(result);
+
+    }
+
+    /**
      * <p>Compares the whole state of this instance with given object. </p>
      *
      * <p>Implementations will usually define their state based on the temporal position

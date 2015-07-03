@@ -239,6 +239,41 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     }
 
     /**
+     * <p>Adds given calendar days to this instance. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebenen Kalendertage zu dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    public D plus(CalendarDays days) {
+
+        long sum = Math.addExact(this.getEpochDays(), days.getAmount());
+        return this.getCalendarSystem().transform(sum);
+
+    }
+
+    /**
+     * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @since   3.4/4.3
+     */
+    public D minus(CalendarDays days) {
+
+        long result = Math.subtractExact(this.getEpochDays(), days.getAmount());
+        return this.getCalendarSystem().transform(result);
+
+    }
+
+    /**
      * <p>Definiert eine rein zeitliche Ordnung. </p>
      *
      * <p>Diese Implementierung wertet die zeitliche Position auf dem
