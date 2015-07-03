@@ -22,6 +22,8 @@
 package net.time4j.engine;
 
 
+import net.time4j.base.MathUtils;
+
 /**
  * <p>Abstract base class of all plain calendar date types which are
  * convertible via their day epoch numbers. </p>
@@ -235,6 +237,41 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
 
         long days = this.getEpochDays();
         return (int) (days ^ (days >>> 32));
+
+    }
+
+    /**
+     * <p>Adds given calendar days to this instance. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebenen Kalendertage zu dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be added
+     * @return  result of addition
+     * @since   3.4/4.3
+     */
+    public D plus(CalendarDays days) {
+
+        long sum = MathUtils.safeAdd(this.getEpochDays(), days.getAmount());
+        return this.getCalendarSystem().transform(sum);
+
+    }
+
+    /**
+     * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @since   3.4/4.3
+     */
+    public D minus(CalendarDays days) {
+
+        long result = MathUtils.safeSubtract(this.getEpochDays(), days.getAmount());
+        return this.getCalendarSystem().transform(result);
 
     }
 
