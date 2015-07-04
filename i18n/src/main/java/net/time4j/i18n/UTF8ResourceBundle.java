@@ -23,6 +23,7 @@ package net.time4j.i18n;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.Set;
 
@@ -36,19 +37,36 @@ import java.util.Set;
 class UTF8ResourceBundle
     extends PropertyResourceBundle {
 
+    //~ Instanzvariablen --------------------------------------------------
+
+    private final Locale bundleLocale;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Standard-Konstruktor zum Auslesen von UTF-8-Dateien. </p>
      *
-     * @param   reader  character stream from the property file
+     * @param   reader          character stream from the property file
+     * @param   bundleLocale    associated locale
      */
-    UTF8ResourceBundle(Reader reader) throws IOException {
+    UTF8ResourceBundle(
+        Reader reader,
+        Locale bundleLocale
+    ) throws IOException {
         super(reader);
+
+        this.bundleLocale = bundleLocale;
 
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    @Override
+    public Locale getLocale() {
+
+        return this.bundleLocale; // super.getLocale() can yield null on Android - see issue #316
+
+    }
 
     /**
      * <p>Liefert die internen Schl&uuml;ssel. </p>
