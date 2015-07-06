@@ -117,7 +117,7 @@ class UTF8ResourceControl
                     reader =
                         new BufferedReader(
                             new InputStreamReader(stream, "UTF-8"));
-                    bundle = new UTF8ResourceBundle(reader);
+                    bundle = new UTF8ResourceBundle(reader, locale);
                 } finally {
                     if (reader != null) {
                         reader.close();

@@ -375,7 +375,7 @@ public final class UnitPatternProviderSPI
 				: ResourceBundle.getBundle(baseName, locale, loader, control));
 
 			if (init) {
-				if (rb.getLocale().equals(locale)) {
+				if (locale.equals(rb.getLocale())) {
 					init = false;
 				} else {
 					first = rb;
