@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         CalendricalNamesTest.class,
+        CLDR24Test.class,
         DatePatternTest.class,
         DateTimePatternTest.class,
         EnumDisplayTest.class,

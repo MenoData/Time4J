@@ -793,6 +793,8 @@ public enum PatternType
      *  </tr>
      * </table>
      * </div>
+     *
+     * @since   4.0
      */
     /*[deutsch]
      * <p>Folgt der Formatmusterbeschreibung der Klasse
@@ -880,8 +882,60 @@ public enum PatternType
      *  </tr>
      * </table>
      * </div>
+     *
+     * @since   4.0
      */
-    THREETEN;
+    THREETEN,
+
+    /**
+     * <p>CLDR-variant with the only difference how the symbol &quot;H&quot; will be interpreted. </p>
+     *
+     * <p>Deviations from {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legend</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#ISO_HOUR}</td>
+     *      <td>H</td>
+     *      <td>Stunde des ISO-8601-Formats im Bereich 0-24 (der Wert 24 ist nur dann erlaubt,
+     *      wenn alle anderen Uhrzeitanteile {@code 0} sind). </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
+     * <p>CLDR-Variante, die das Symbol &quot;H&quot; als ISO-8601-Stunde im Bereich 0-24 interpretiert. </p>
+     *
+     * <p>Unterschiede zu {@link #CLDR}: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legende</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Beschreibung</th>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#ISO_HOUR}</td>
+     *      <td>H</td>
+     *      <td>Stunde des ISO-8601-Formats im Bereich 0-24 (der Wert 24 ist nur dann erlaubt,
+     *      wenn alle anderen Uhrzeitanteile {@code 0} sind). </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * @since   3.4/4.3
+     */
+    CLDR_24;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -928,6 +982,8 @@ public enum PatternType
                 return sdf(builder, locale, symbol, count);
             case THREETEN:
                 return threeten(builder, locale, symbol, count);
+            case CLDR_24:
+                return cldr24(builder, locale, symbol, count, false);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -1402,6 +1458,23 @@ public enum PatternType
         }
 
         return Collections.emptyMap();
+
+    }
+
+    private Map<ChronoElement<?>, ChronoElement<?>> cldr24(
+        ChronoFormatter.Builder<?> builder,
+        Locale locale,
+        char symbol,
+        int count,
+        boolean sdf
+    ) {
+
+        if (symbol == 'H') {
+            addNumber(PlainTime.ISO_HOUR, builder, count, sdf);
+            return Collections.emptyMap();
+        }
+
+        return cldr(builder, locale, symbol, count, sdf);
 
     }
 
