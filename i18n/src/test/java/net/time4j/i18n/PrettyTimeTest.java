@@ -688,6 +688,15 @@ public class PrettyTimeTest {
             is("4 weeks and 10 days"));
     }
 
+    @Test
+    public void printFrenchDemoExample() {
+        Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
+        String formattedDuration = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
+        assertThat(
+            formattedDuration,
+            is("93 heures, 45 minutes et 40 secondes"));
+    }
+
     private static class FortnightPlusOneDay
         extends BasicUnit
         implements IsoUnit {

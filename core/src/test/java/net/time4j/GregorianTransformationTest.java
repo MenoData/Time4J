@@ -1,6 +1,5 @@
 package net.time4j;
 
-
 import net.time4j.engine.EpochDays;
 
 import java.util.Arrays;
