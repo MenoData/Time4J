@@ -82,7 +82,7 @@ public enum PatternType
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
      *      indicate the long form and five symbols stand for a letter. The era
-     *      is based on the chronological history of the current format locale.  </td>
+     *      is based on the chronological history of the current format locale. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
@@ -838,7 +838,8 @@ public enum PatternType
                 TextElement<?> eraElement = history.era();
                 builder.addText(eraElement);
                 builder.endSection();
-                Map<ChronoElement<?>, ChronoElement<?>> replacement = new HashMap<ChronoElement<?>, ChronoElement<?>>();
+                Map<ChronoElement<?>, ChronoElement<?>> replacement =
+                    new HashMap<ChronoElement<?>, ChronoElement<?>>();
                 replacement.put(PlainDate.YEAR, history.yearOfEra());
                 replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
                 replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
@@ -1101,8 +1102,8 @@ public enum PatternType
             case 'x':
                 throw new IllegalArgumentException(
                     "CLDR pattern symbol not supported"
-                        + " in SimpleDateFormat-style: "
-                        + symbol);
+                    + " in SimpleDateFormat-style: "
+                    + symbol);
             case 'X':
                 if (count >= 4) {
                     throw new IllegalArgumentException(
