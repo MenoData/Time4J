@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarSystem.java) is part of project Time4J.
  *
@@ -29,9 +29,10 @@ import java.util.List;
  * day number corresponding to the count of days elapsed since UTC epoch
  * [1972-01-01]. </p>
  *
- * @param   <D> generic type of calendar date (subtype of {@code Calendrical})
+ * @param   <D> generic type of calendar date (subtype of {@code Calendrical} or {@code CalendarVariant})
  * @author  Meno Hochschild
  * @see     Calendrical
+ * @see     CalendarVariant
  * @see     net.time4j.engine.EpochDays
  * @doctags.spec    All implementations must be immutable.
  */
@@ -40,9 +41,10 @@ import java.util.List;
  * eine Tagesnummer entsprechend der Anzahl der Tage seit der UTC-Epoche
  * [1972-01-01] abbilden kann. </p>
  *
- * @param   <D> generic type of calendar date (subtype of {@code Calendrical})
+ * @param   <D> generic type of calendar date (subtype of {@code Calendrical} or {@code CalendarVariant})
  * @author  Meno Hochschild
  * @see     Calendrical
+ * @see     CalendarVariant
  * @see     net.time4j.engine.EpochDays
  * @doctags.spec    All implementations must be immutable.
  */
