@@ -13,9 +13,7 @@
     <modules>
         <module>core</module>
         <module>i18n</module>
-        <!--
         <module>calendar</module>
-        -->
         <module>range</module>
         <module>misc</module>
         <module>olson</module>
