@@ -362,6 +362,19 @@ public final class CalendarText {
                 }
             }
 
+            if (p == null) {
+                // ServiceLoader-Mechanismus (Suche nach alternativen Providern)
+                for (TextProvider tmp : ServiceLoader.load(AltTextProvider.class, c)) {
+                    if (
+                        isCalendarTypeSupported(tmp, calendarType)
+                        && isLocaleSupported(tmp, locale)
+                    ) {
+                        p = tmp;
+                        break;
+                    }
+                }
+            }
+
             // Java-Ressourcen
             if (p == null) {
                 // TODO: Für Java 8 neuen Provider definieren (mit Quartalen)?
