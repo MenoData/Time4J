@@ -41,7 +41,7 @@ import java.util.ResourceBundle;
  * @author  Meno Hochschild
  * @since   1.2
  */
-class UTF8ResourceControl
+public class UTF8ResourceControl
     extends ResourceBundle.Control {
 
     //~ Statische Felder/Initialisierungen --------------------------------
