@@ -275,7 +275,7 @@ public final class HijriCalendar
      * @return  int
      * @since   3.5/4.3
      */
-    public int getYearOfEra() {
+    public int getYear() {
 
         return this.hyear;
 
@@ -293,7 +293,7 @@ public final class HijriCalendar
      * @return  enum
      * @since   3.5/4.3
      */
-    public HijriMonth getMonthOfYear() {
+    public HijriMonth getMonth() {
 
         return HijriMonth.valueOf(this.hmonth);
 
