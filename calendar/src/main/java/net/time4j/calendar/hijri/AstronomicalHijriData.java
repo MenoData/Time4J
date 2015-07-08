@@ -137,10 +137,8 @@ final class AstronomicalHijriData
                 this.lengthOfMonth = mlen;
                 this.firstOfMonth = mutc;
 
-            } catch (ParseException pe) {
-                throw new IOException("Wrong file format: " + name, pe);
-            } catch (NumberFormatException nfe) {
-                throw new IOException("Wrong file format: " + name, nfe);
+            } catch (ParseException | NumberFormatException ex) {
+                throw new IOException("Wrong file format: " + name, ex);
             } finally {
                 try {
                     is.close();
@@ -187,7 +185,7 @@ final class AstronomicalHijriData
                 + " (calendar variants are different).");
         }
 
-        int index = (date.getYearOfEra() - this.minYear) * 12 + date.getMonthOfYear().getValue() - 1;
+        int index = (date.getYear() - this.minYear) * 12 + date.getMonth().getValue() - 1;
         return this.firstOfMonth[index] + date.getDayOfMonth() - 1;
 
     }

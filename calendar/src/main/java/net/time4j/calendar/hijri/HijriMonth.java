@@ -190,7 +190,7 @@ public enum HijriMonth
     @Override
     public boolean test(HijriCalendar context) {
 
-        return (context.getMonthOfYear() == this);
+        return (context.getMonth() == this);
 
     }
 
