@@ -135,7 +135,7 @@
                         <version>1.0</version>
                     </tagletArtifact>
                     <show>public</show>
-                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.i18n:net.time4j.tz.javazi</excludePackageNames>
+                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.i18n:net.time4j.tz.javazi:net.time4j.calendar.spi</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>

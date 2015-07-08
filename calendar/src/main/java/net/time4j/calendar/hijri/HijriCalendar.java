@@ -25,6 +25,7 @@ import net.time4j.calendar.MonthBasedCalendarSystem;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoException;
+import net.time4j.format.CalendarType;
 
 import java.io.IOException;
 import java.util.Map;
@@ -66,6 +67,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since   3.5/4.3
  * @doctags.concurrency <immutable>
  */
+@CalendarType("islamic")
 public final class HijriCalendar
     extends CalendarVariant<HijriCalendar> {
 
@@ -127,6 +129,41 @@ public final class HijriCalendar
     public static HijriCalendar of(
         String variant,
         int hyear,
+        HijriMonth hmonth,
+        int hdom
+    ) {
+
+        return HijriCalendar.of(variant, hyear, hmonth.getValue(), hdom);
+
+    }
+
+    /**
+     * <p>Creates a new instance of a Hijri calendar date in given variant. </p>
+     *
+     * @param   variant calendar variant
+     * @param   hyear   islamic year
+     * @param   hmonth  islamic month
+     * @param   hdom    islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Hijri-Kalenderdatum in der angegebenen Variante. </p>
+     *
+     * @param   variant calendar variant
+     * @param   hyear   islamic year
+     * @param   hmonth  islamic month
+     * @param   hdom    islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.5/4.3
+     */
+    public static HijriCalendar of(
+        String variant,
+        int hyear,
         int hmonth,
         int hdom
     ) {
@@ -139,6 +176,39 @@ public final class HijriCalendar
         }
 
         return new HijriCalendar(hyear, hmonth, hdom, variant);
+
+    }
+
+    /**
+     * <p>Creates a new instance of a Hijri calendar date in the variant &quot;islamic-umalqura&quot;
+     * used in Saudi-Arabia. </p>
+     *
+     * @param   hyear   islamic year
+     * @param   hmonth  islamic month
+     * @param   hdom    islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Hijri-Kalenderdatum in der Variante &quot;islamic-umalqura&quot;, die in
+     * Saudi-Arabien benutzt wird. </p>
+     *
+     * @param   hyear   islamic year
+     * @param   hmonth  islamic month
+     * @param   hdom    islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.5/4.3
+     */
+    public static HijriCalendar ofUmalqura(
+        int hyear,
+        HijriMonth hmonth,
+        int hdom
+    ) {
+
+        return HijriCalendar.of(UMALQURA, hyear, hmonth.getValue(), hdom);
 
     }
 
@@ -214,18 +284,18 @@ public final class HijriCalendar
     /**
      * <p>Yields the islamic month. </p>
      *
-     * @return  int
+     * @return  enum
      * @since   3.5/4.3
      */
     /*[deutsch]
      * <p>Liefert den islamischen Monat. </p>
      *
-     * @return  int
+     * @return  enum
      * @since   3.5/4.3
      */
-    public int getMonthOfYear() {
+    public HijriMonth getMonthOfYear() {
 
-        return this.hmonth;
+        return HijriMonth.valueOf(this.hmonth);
 
     }
 

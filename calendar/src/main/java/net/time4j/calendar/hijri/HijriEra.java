@@ -22,6 +22,11 @@
 package net.time4j.calendar.hijri;
 
 import net.time4j.engine.CalendarEra;
+import net.time4j.format.CalendarText;
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
+
+import java.util.Locale;
 
 
 /**
@@ -57,6 +62,63 @@ public enum HijriEra
     public int getValue() {
 
         return 1;
+
+    }
+
+    /**
+     * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
+     *
+     * @param   locale      language setting
+     * @return  descriptive text (long form, never {@code null})
+     * @see     #getDisplayName(Locale, TextWidth)
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Entspricht dem Ausdruck {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
+     *
+     * @param   locale      language setting
+     * @return  descriptive text (long form, never {@code null})
+     * @see     #getDisplayName(Locale, TextWidth)
+     * @since   3.5/4.3
+     */
+    public String getDisplayName(Locale locale) {
+
+        return this.getDisplayName(locale, TextWidth.WIDE);
+
+    }
+
+    /**
+     * <p>Gets the description text dependent on the locale and style
+     * parameters. </p>
+     *
+     * <p>The second argument controls the width of description. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  descriptive text for given locale and style (never {@code null})
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
+     *
+     * <p>&Uuml;ber das zweite Argument kann gesteuert werden, ob eine kurze
+     * oder eine lange Form des Beschreibungstexts ausgegeben werden soll. Das
+     * ist besonders sinnvoll in Benutzeroberfl&auml;chen, wo zwischen der
+     * Beschriftung und der detaillierten Erl&auml;uterung einer graphischen
+     * Komponente unterschieden wird. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @return  descriptive text for given locale and style (never {@code null})
+     * @since   3.5/4.3
+     */
+    public String getDisplayName(
+        Locale locale,
+        TextWidth width
+    ) {
+
+        CalendarText names = CalendarText.getInstance("islamic", locale);
+        return names.getEras(width).print(this);
 
     }
 
