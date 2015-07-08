@@ -727,8 +727,8 @@ public enum PatternType
      *  <tr>
      *      <td>{@link PlainTime#ISO_HOUR}</td>
      *      <td>H</td>
-     *      <td>Stunde des ISO-8601-Formats im Bereich 0-24 (der Wert 24 ist nur dann erlaubt,
-     *      wenn alle anderen Uhrzeitanteile {@code 0} sind). </td>
+     *      <td>Hour of day as defined in ISO-8601 - in range 0-24 (the value 24 is only permitted if
+     *      all other time parts are zero). </td>
      *  </tr>
      * </table>
      * </div>
