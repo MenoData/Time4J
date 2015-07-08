@@ -58,7 +58,7 @@ import java.io.Serializable;
  *  <li>The natural order should be consistent with {@code equals()}. </li>
  * </ul>
  *
- * @param   <T> generic type of self reference
+ * @param   <D> generic type of self reference
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   3.4/4.3
@@ -104,16 +104,16 @@ import java.io.Serializable;
  *  sein. </li>
  * </ul>
  *
- * @param   <T> generic type of self reference
+ * @param   <D> generic type of self reference
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   3.4/4.3
  * @see     Chronology
  * @see     CalendarFamily
  */
-public abstract class CalendarVariant<T extends CalendarVariant<T>>
-    extends ChronoEntity<T>
-    implements Comparable<T>, Temporal<CalendarVariant<?>>, Serializable {
+public abstract class CalendarVariant<D extends CalendarVariant<D>>
+    extends ChronoEntity<D>
+    implements Comparable<D>, Temporal<CalendarVariant<?>>, Serializable {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -132,6 +132,105 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
      * @see     CalendarFamily#getCalendarSystem(String)
      */
     public abstract String getVariant();
+
+    /**
+     * <p>Converts this calendar date to the given target type based on
+     * the count of days relative to UTC epoch [1972-01-01]. </p>
+     *
+     * <p>The conversion occurs on the local timeline at noon. This
+     * reference time ensures that all date types remain convertible
+     * even if a calendar system defines dates not starting at midnight. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target  chronological type this date shall be converted to
+     * @return  converted date of target type t
+     * @throws  IllegalArgumentException if the target class does not
+     *          have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Konvertiert dieses Datum zum angegebenen Zieltyp auf Basis der
+     * Anzahl der Tage relativ zur UTC-Epoche [1972-01-01]. </p>
+     *
+     * <p>Die Konversion findet auf dem lokalen Zeitstrahl um 12 Uhr mittags
+     * als angenommener Referenzzeit statt. Diese Referenzzeit stellt sicher,
+     * da&szlig; alle Datumstypen konvertierbar bleiben, auch wenn in einem
+     * Kalendersystem ein Tag nicht um Mitternacht startet. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target  chronological type this date shall be converted to
+     * @return  converted date of target type t
+     * @throws  IllegalArgumentException if the target class does not
+     *          have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.5/4.3
+     */
+    public <T extends Calendrical<?, T>> T transform(Class<T> target) {
+
+        String ref = target.getName();
+        Chronology<T> chronology = Chronology.lookup(target);
+
+        if (chronology == null) {
+            // kommt normal nie vor, weil sich jede Chrono selbst registriert
+            throw new IllegalArgumentException(
+                "Cannot find any chronology for given target type: " + ref);
+        }
+
+        return this.transform(chronology.getCalendarSystem(), ref);
+
+    }
+
+    /**
+     * <p>Converts this calendar date to the given target type based on
+     * the count of days relative to UTC epoch [1972-01-01]. </p>
+     *
+     * <p>The conversion occurs on the local timeline at noon. This
+     * reference time ensures that all date types remain convertible
+     * even if a calendar system defines dates not starting at midnight. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target      chronological type this date shall be converted to
+     * @param   variant     desired calendar variant
+     * @return  converted date of target type t
+     * @throws  IllegalArgumentException if the target class does not have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Konvertiert dieses Datum zum angegebenen Zieltyp auf Basis der
+     * Anzahl der Tage relativ zur UTC-Epoche [1972-01-01]. </p>
+     *
+     * <p>Die Konversion findet auf dem lokalen Zeitstrahl um 12 Uhr mittags
+     * als angenommener Referenzzeit statt. Diese Referenzzeit stellt sicher,
+     * da&szlig; alle Datumstypen konvertierbar bleiben, auch wenn in einem
+     * Kalendersystem ein Tag nicht um Mitternacht startet. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target      chronological type this date shall be converted to
+     * @param   variant     desired calendar variant
+     * @return  converted date of target type t
+     * @throws  IllegalArgumentException if the target class does not have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.5/4.3
+     */
+    public <T extends CalendarVariant<T>> T transform(
+        Class<T> target,
+        String variant
+    ) {
+
+        String ref = target.getName();
+        Chronology<T> chronology = Chronology.lookup(target);
+
+        if (chronology == null) {
+            // kommt normal nie vor, weil sich jede Chrono selbst registriert
+            throw new IllegalArgumentException(
+                "Cannot find any chronology for given target type: " + ref);
+        }
+
+        return this.transform(chronology.getCalendarSystem(variant), ref);
+
+    }
 
     /**
      * <p>Compares two calendar variants preferably by their temporal positions
@@ -162,7 +261,7 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
      * @see     #equals(Object)
      */
     @Override
-    public int compareTo(T calendarVariant) {
+    public int compareTo(D calendarVariant) {
 
         long t1 = utcDays(this);
         long t2 = utcDays(calendarVariant);
@@ -218,7 +317,7 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
      * @return  result of addition
      * @since   3.4/4.3
      */
-    public T plus(CalendarDays days) {
+    public D plus(CalendarDays days) {
 
         long sum = Math.addExact(utcDays(this), days.getAmount());
         return this.getCalendarSystem().transform(sum);
@@ -232,7 +331,7 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
      * @return  result of subtraction
      * @since   3.4/4.3
      */
-    public T minus(CalendarDays days) {
+    public D minus(CalendarDays days) {
 
         long result = Math.subtractExact(utcDays(this), days.getAmount());
         return this.getCalendarSystem().transform(result);
@@ -307,7 +406,7 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
      * @see     CalendarFamily.Builder
      */
     @Override
-    protected abstract CalendarFamily<T> getChronology();
+    protected abstract CalendarFamily<D> getChronology();
 
     // wildcard capture
     static <T extends CalendarVariant<T>> long utcDays(CalendarVariant<T> cv) {
@@ -316,9 +415,27 @@ public abstract class CalendarVariant<T extends CalendarVariant<T>>
 
     }
 
-    private CalendarSystem<T> getCalendarSystem() {
+    private CalendarSystem<D> getCalendarSystem() {
 
         return this.getChronology().getCalendarSystem(this.getVariant());
+
+    }
+
+    private <T> T transform(
+        CalendarSystem<T> calsys,
+        String ref
+    ) {
+
+        long utcDays = utcDays(this);
+
+        if (
+            (calsys.getMinimumSinceUTC() > utcDays)
+            || (calsys.getMaximumSinceUTC() < utcDays)
+        ) {
+            throw new ArithmeticException("Cannot transform <" + utcDays + "> to: " + ref);
+        } else {
+            return calsys.transform(utcDays);
+        }
 
     }
 
