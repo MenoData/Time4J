@@ -177,9 +177,10 @@ public abstract class Timezone
     public static final TransitionStrategy STRICT_MODE =
         GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET);
 
+    private static final boolean ANDROID = "Dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
+
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
-        Boolean.getBoolean("net.time4j.allow.system.tz.override")
-        || "Dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
+        ANDROID || Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
     private static volatile ZonalKeys zonalKeys = null;
     private static volatile Timezone currentSystemTZ = null;
@@ -258,23 +259,26 @@ public abstract class Timezone
 
         PREDEFINED = Collections.unmodifiableMap(temp1);
 
-        ServiceLoader<ZoneProvider> sl =
-            ServiceLoader.load(ZoneProvider.class, cl);
         ZoneProvider zp = null;
         ZoneProvider np = null;
 
-        for (ZoneProvider provider : sl) {
-            String name = provider.getName();
+        if (!ANDROID) {
+            ServiceLoader<ZoneProvider> sl =
+                ServiceLoader.load(ZoneProvider.class, cl);
 
-            if (name.equals(NAME_TZDB)) {
-                zp = compareTZDB(provider, zp);
-            } else if (name.equals(NAME_ZONENAMES)) {
-                np = provider;
-            } else if (
-                !name.isEmpty()
-                && !name.equals(NAME_DEFAULT)
-            ) {
-                PROVIDERS.put(name, provider);
+            for (ZoneProvider provider : sl) {
+                String name = provider.getName();
+
+                if (name.equals(NAME_TZDB)) {
+                    zp = compareTZDB(provider, zp);
+                } else if (name.equals(NAME_ZONENAMES)) {
+                    np = provider;
+                } else if (
+                    !name.isEmpty()
+                    && !name.equals(NAME_DEFAULT)
+                ) {
+                    PROVIDERS.put(name, provider);
+                }
             }
         }
 
