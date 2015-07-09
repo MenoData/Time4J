@@ -40,7 +40,7 @@ import java.io.Serializable;
  * @param   <V> generic type of element values
  * @author  Meno Hochschild
  */
-public abstract class BasicElement<V>
+public abstract class BasicElement<V extends Comparable<V>>
     implements ChronoElement<V>, Serializable {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -92,6 +92,31 @@ public abstract class BasicElement<V>
     public final String name() {
 
         return this.name;
+
+    }
+
+    /**
+     * <p>Compares the values of this element based on their natural order. </p>
+     *
+     * @throws  ChronoException if this element is not registered in any entity
+     *          and/or if no element rule exists to extract the element value
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Vergleicht die Werte dieses Elements auf Basis ihrer
+     * nat&uuml;rlichen Ordnung. </p>
+     *
+     * @throws  ChronoException if this element is not registered in any entity
+     *          and/or if no element rule exists to extract the element value
+     * @since   3.5/4.3
+     */
+    @Override
+    public int compare(
+        ChronoDisplay o1,
+        ChronoDisplay o2
+    ) {
+
+        return o1.get(this).compareTo(o2.get(this));
 
     }
 
@@ -262,9 +287,7 @@ public abstract class BasicElement<V>
      * @param   chronology  chronology an element rule is searched for
      * @return  element rule or {@code null} if given chronology is unsupported
      */
-    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(
-        Chronology<T> chronology
-    ) {
+    protected <T extends ChronoEntity<T>> ElementRule<T, V> derive(Chronology<T> chronology) {
 
         return null;
 

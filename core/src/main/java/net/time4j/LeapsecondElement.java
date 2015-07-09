@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapsecondElement.java) is part of project Time4J.
  *
@@ -29,7 +29,7 @@ import net.time4j.engine.ChronoDisplay;
  * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class LeapsecondElement
     extends BasicElement<Boolean> {
@@ -70,16 +70,6 @@ final class LeapsecondElement
     public Boolean getDefaultMaximum() {
 
         return Boolean.TRUE;
-
-    }
-
-    @Override
-    public int compare(
-        ChronoDisplay o1,
-        ChronoDisplay o2
-    ) {
-
-        return o1.get(this).compareTo(o2.get(this));
 
     }
 

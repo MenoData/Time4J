@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateOperator.java) is part of project Time4J.
  *
@@ -30,7 +30,7 @@ import net.time4j.engine.ChronoOperator;
  * dem Strategy-Entwurfsmuster. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class DateOperator
     extends ElementOperator<PlainDate> {
@@ -77,28 +77,28 @@ final class DateOperator
                 this.tsCache = newValueTS(element, value);
                 break;
             case OP_MINIMIZE:
-                this.opCache = element.minimized(PlainDate.class);
-                this.tsCache = element.minimized(PlainTimestamp.class);
+                this.opCache = minimum(element);
+                this.tsCache = minimumTS(element);
                 break;
             case OP_MAXIMIZE:
-                this.opCache = element.maximized(PlainDate.class);
-                this.tsCache = element.maximized(PlainTimestamp.class);
+                this.opCache = maximum(element);
+                this.tsCache = maximumTS(element);
                 break;
             case OP_DECREMENT:
-                this.opCache = element.decremented(PlainDate.class);
-                this.tsCache = element.decremented(PlainTimestamp.class);
+                this.opCache = decrement(element);
+                this.tsCache = decrementTS(element);
                 break;
             case OP_INCREMENT:
-                this.opCache = element.incremented(PlainDate.class);
-                this.tsCache = element.incremented(PlainTimestamp.class);
+                this.opCache = increment(element);
+                this.tsCache = incrementTS(element);
                 break;
             case OP_FLOOR:
-                this.opCache = element.atFloor(PlainDate.class);
-                this.tsCache = element.atFloor(PlainTimestamp.class);
+                this.opCache = floor(element);
+                this.tsCache = floorTS(element);
                 break;
             case OP_CEILING:
-                this.opCache = element.atCeiling(PlainDate.class);
-                this.tsCache = element.atCeiling(PlainTimestamp.class);
+                this.opCache = ceiling(element);
+                this.tsCache = ceilingTS(element);
                 break;
             case OP_LENIENT:
                 this.opCache = lenient(element, value);
@@ -135,8 +135,7 @@ final class DateOperator
 
     }
 
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainDate> newValue(
+    private static <V extends Comparable<V>> ChronoOperator<PlainDate> newValue(
         AdvancedElement<V> element,
         Object value
     ) {
@@ -147,8 +146,7 @@ final class DateOperator
 
     }
 
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTimestamp> newValueTS(
+    private static <V extends Comparable<V>> ChronoOperator<PlainTimestamp> newValueTS(
         AdvancedElement<V> element,
         Object value
     ) {
@@ -162,8 +160,7 @@ final class DateOperator
 
     }
 
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainDate> lenient(
+    private static <V extends Comparable<V>> ChronoOperator<PlainDate> lenient(
         AdvancedElement<V> element,
         Object value
     ) {
@@ -174,8 +171,7 @@ final class DateOperator
 
     }
 
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTimestamp> lenientTS(
+    private static <V extends Comparable<V>> ChronoOperator<PlainTimestamp> lenientTS(
         AdvancedElement<V> element,
         Object value
     ) {
@@ -186,6 +182,78 @@ final class DateOperator
                 PlainTimestamp.class),
             value
         );
+
+    }
+
+    private static ChronoOperator<PlainDate> minimum(AdvancedElement<?> element) {
+
+        return element.minimized(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> minimumTS(AdvancedElement<?> element) {
+
+        return element.minimized(PlainTimestamp.class);
+
+    }
+
+    private static ChronoOperator<PlainDate> maximum(AdvancedElement<?> element) {
+
+        return element.maximized(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> maximumTS(AdvancedElement<?> element) {
+
+        return element.maximized(PlainTimestamp.class);
+
+    }
+
+    private static ChronoOperator<PlainDate> floor(AdvancedElement<?> element) {
+
+        return element.atFloor(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> floorTS(AdvancedElement<?> element) {
+
+        return element.atFloor(PlainTimestamp.class);
+
+    }
+
+    private static ChronoOperator<PlainDate> ceiling(AdvancedElement<?> element) {
+
+        return element.atCeiling(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> ceilingTS(AdvancedElement<?> element) {
+
+        return element.atCeiling(PlainTimestamp.class);
+
+    }
+
+    private static ChronoOperator<PlainDate> increment(AdvancedElement<?> element) {
+
+        return element.incremented(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> incrementTS(AdvancedElement<?> element) {
+
+        return element.incremented(PlainTimestamp.class);
+
+    }
+
+    private static ChronoOperator<PlainDate> decrement(AdvancedElement<?> element) {
+
+        return element.decremented(PlainDate.class);
+
+    }
+
+    private static ChronoOperator<PlainTimestamp> decrementTS(AdvancedElement<?> element) {
+
+        return element.decremented(PlainTimestamp.class);
 
     }
 

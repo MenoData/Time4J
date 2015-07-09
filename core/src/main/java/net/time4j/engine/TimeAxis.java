@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -1068,18 +1068,6 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         public Class<T> getType() {
 
             return this.type;
-
-        }
-
-        @Override
-        public int compare(
-            ChronoDisplay o1,
-            ChronoDisplay o2
-        ) {
-
-            T t1 = o1.get(this);
-            T t2 = o2.get(this);
-            return t1.compareTo(t2);
 
         }
 
