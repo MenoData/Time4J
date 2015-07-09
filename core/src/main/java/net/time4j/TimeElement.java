@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeElement.java) is part of project Time4J.
  *
@@ -77,16 +77,6 @@ final class TimeElement
     public PlainTime getDefaultMaximum() {
 
         return PlainTime.of(23, 59, 59, 999999999);
-
-    }
-
-    @Override
-    public int compare(
-        ChronoDisplay o1,
-        ChronoDisplay o2
-    ) {
-
-        return o1.get(this).compareTo(o2.get(this));
 
     }
 

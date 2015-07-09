@@ -430,13 +430,13 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     // optional
-    private <V> ElementRule<T, V> getDerivedRule(
-        ChronoElement<V> element,
+    private ElementRule<T, ?> getDerivedRule(
+        ChronoElement<?> element,
         boolean wantsVeto
     ) {
 
         if (element instanceof BasicElement) {
-            BasicElement<V> e = (BasicElement<V>) element;
+            BasicElement<?> e = BasicElement.class.cast(element);
 
             String veto = (wantsVeto ? e.getVeto(this) : null);
 

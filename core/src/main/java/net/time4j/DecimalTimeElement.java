@@ -107,16 +107,6 @@ final class DecimalTimeElement
     }
 
     @Override
-    public int compare(
-        ChronoDisplay o1,
-        ChronoDisplay o2
-    ) {
-
-        return o1.get(this).compareTo(o2.get(this));
-
-    }
-
-    @Override
     public ChronoFunction<Moment, BigDecimal> inStdTimezone() {
 
         return this.in(Timezone.ofSystem());
