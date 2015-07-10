@@ -21,7 +21,7 @@
 
 package net.time4j;
 
-import net.time4j.engine.AdvancedElement;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
@@ -53,7 +53,7 @@ final class NavigationOperator<V extends Enum<V>>
      * @param   value       target value of navigation
      */
     NavigationOperator(
-        AdvancedElement<V> element,
+        ChronoElement<V> element,
         int mode,
         V value
     ) {
