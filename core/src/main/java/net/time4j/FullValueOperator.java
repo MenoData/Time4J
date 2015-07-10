@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FullValueOperator.java) is part of project Time4J.
  *
@@ -49,7 +49,6 @@ final class FullValueOperator
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoOperator<PlainTimestamp> tsop;
-    private final ChronoOperator<Moment> moop;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -57,22 +56,17 @@ final class FullValueOperator
         super(PlainTime.COMPONENT, type);
 
         this.tsop =
-            new ChronoOperator<PlainTimestamp>() {
-                @Override
-                public PlainTimestamp apply(PlainTimestamp entity) {
-                    PlainTime time = doApply(entity.getWallTime());
+            entity -> {
+                PlainTime time = doApply(entity.getWallTime());
 
-                    if (time.getHour() == 24) {
-                        return PlainTimestamp.of(
-                            entity.getCalendarDate().plus(1, DAYS),
-                            PlainTime.midnightAtStartOfDay());
-                    } else {
-                        return entity.with(time);
-                    }
+                if (time.getHour() == 24) {
+                    return PlainTimestamp.of(
+                        entity.getCalendarDate().plus(1, DAYS),
+                        PlainTime.midnightAtStartOfDay());
+                } else {
+                    return entity.with(time);
                 }
             };
-        this.moop =
-            new Moment.Operator(this.tsop, PlainTime.COMPONENT, type);
 
     }
 
@@ -82,13 +76,6 @@ final class FullValueOperator
     public PlainTime apply(PlainTime entity) {
 
         return this.doApply(entity);
-
-    }
-
-    @Override
-    public ChronoOperator<Moment> inStdTimezone() {
-
-        return this.moop;
 
     }
 

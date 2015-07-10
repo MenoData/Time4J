@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NavigationOperator.java) is part of project Time4J.
  *
@@ -65,14 +65,7 @@ final class NavigationOperator<V extends Enum<V>>
 
         this.value = value;
         this.len = element.getType().getEnumConstants().length;
-
-        this.navTS =
-            new ChronoOperator<PlainTimestamp>() {
-                @Override
-                public PlainTimestamp apply(PlainTimestamp entity) {
-                    return doApply(entity);
-                }
-            };
+        this.navTS = this::doApply;
 
     }
 

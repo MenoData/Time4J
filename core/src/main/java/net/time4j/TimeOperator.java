@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeOperator.java) is part of project Time4J.
  *
@@ -21,9 +21,10 @@
 
 package net.time4j;
 
-import net.time4j.engine.AdvancedElement;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
+import net.time4j.engine.StdOperator;
 
 
 /**
@@ -31,16 +32,14 @@ import net.time4j.engine.ChronoOperator;
  * dem Strategy-Entwurfsmuster. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class TimeOperator
     extends ElementOperator<PlainTime> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoOperator<PlainTime> opCache;
-    private final ChronoOperator<PlainTimestamp> tsCache;
-    private final ChronoOperator<Moment> moCache;
+    private final Object opDelegate;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -51,7 +50,7 @@ final class TimeOperator
      * @param   type            type of operator
      */
     TimeOperator(
-        AdvancedElement<?> element,
+        ChronoElement<?> element,
         int type
     ) {
         this(element, type, null);
@@ -63,10 +62,10 @@ final class TimeOperator
      *
      * @param   element         element an operator will be applied on
      * @param   type            operator type
-     * @param   value           lenient value of element
+     * @param   value           lenient or new value of element
      */
     TimeOperator(
-        final AdvancedElement<?> element,
+        final ChronoElement<?> element,
         final int type,
         final Object value // optional
     ) {
@@ -74,153 +73,100 @@ final class TimeOperator
 
         switch (type) {
             case OP_NEW_VALUE:
-                this.opCache = newValue(element, value);
-                this.tsCache = newValueTS(element, value);
+                this.opDelegate = newValue(element, value);
                 break;
             case OP_MINIMIZE:
-                this.opCache = element.minimized(PlainTime.class);
-                this.tsCache = element.minimized(PlainTimestamp.class);
+                this.opDelegate = StdOperator.minimized(element);
                 break;
             case OP_MAXIMIZE:
-                this.opCache = element.maximized(PlainTime.class);
-                this.tsCache = element.maximized(PlainTimestamp.class);
+                this.opDelegate = StdOperator.maximized(element);
                 break;
             case OP_DECREMENT:
-                this.opCache = element.decremented(PlainTime.class);
-                this.tsCache = element.decremented(PlainTimestamp.class);
+                this.opDelegate = StdOperator.decremented(element);
                 break;
             case OP_INCREMENT:
-                this.opCache = element.incremented(PlainTime.class);
-                this.tsCache = element.incremented(PlainTimestamp.class);
+                this.opDelegate = StdOperator.incremented(element);
                 break;
             case OP_FLOOR:
-                this.opCache = child(element, false, PlainTime.class);
-                this.tsCache = child(element, false, PlainTimestamp.class);
+                this.opDelegate = child(element, false);
                 break;
             case OP_CEILING:
-                this.opCache = child(element, true, PlainTime.class);
-                this.tsCache = child(element, true, PlainTimestamp.class);
+                this.opDelegate = child(element, true);
                 break;
             case OP_LENIENT:
-                this.opCache = lenient(element, value);
-                this.tsCache = lenientTS(element, value);
+                this.opDelegate = lenient(element, value);
                 break;
             default:
                 throw new AssertionError("Unknown: " + this.getType());
         }
-
-        this.moCache = new Moment.Operator(this.tsCache, element, type);
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
+    @SuppressWarnings("unchecked")
     public PlainTime apply(PlainTime entity) {
 
-        return this.opCache.apply(entity);
+        ChronoOperator<PlainTime> operator = (ChronoOperator<PlainTime>) this.opDelegate;
+        return operator.apply(entity);
 
     }
 
     @Override
-    public ChronoOperator<Moment> inStdTimezone() {
-
-        return this.moCache;
-
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     ChronoOperator<PlainTimestamp> onTimestamp() {
 
-        return this.tsCache;
+        return (ChronoOperator<PlainTimestamp>) this.opDelegate;
 
     }
 
-    private static <V extends Comparable<V>, T extends ChronoEntity<T>>
-    ChronoOperator<T> child(
-        AdvancedElement<V> element,
-        boolean up,
-        Class<T> context
+    private static <V, T extends ChronoEntity<T>> Object newValue(
+        ChronoElement<V> element,
+        Object value
+    ) {
+
+        V v = element.getType().cast(value);
+        ChronoOperator<T> operator = StdOperator.newValue(v, element);
+        return ValueOperator.of(operator, value);
+
+    }
+
+    private static <V, T extends ChronoEntity<T>> Object lenient(
+        ChronoElement<V> element,
+        Object value
+    ) {
+
+        V v = element.getType().cast(value);
+        ChronoOperator<T> operator = StdOperator.setLenient(v, element);
+        return ValueOperator.of(operator, value);
+
+    }
+
+    private static <V, T extends ChronoEntity<T>> ChronoOperator<T> child(
+        ChronoElement<V> element,
+        boolean up
     ) {
 
         String compare = element.name();
 
-        if (
-            compare.equals("MILLI_OF_SECOND")
-            || compare.equals("MILLI_OF_DAY")
-        ) {
-            return new FractionOperator<T>('3', up);
-        } else if (
-            compare.equals("MICRO_OF_SECOND")
-            || compare.equals("MICRO_OF_DAY")
-        ) {
-            return new FractionOperator<T>('6', up);
-        } else if (
-            compare.equals("NANO_OF_SECOND")
-            || compare.equals("NANO_OF_DAY")
-        ) {
-            return new FractionOperator<T>('9', up);
+        switch (compare) {
+            case "MILLI_OF_SECOND":
+            case "MILLI_OF_DAY":
+                return new FractionOperator<>('3', up);
+            case "MICRO_OF_SECOND":
+            case "MICRO_OF_DAY":
+                return new FractionOperator<>('6', up);
+            case "NANO_OF_SECOND":
+            case "NANO_OF_DAY":
+                return new FractionOperator<>('9', up);
+            default:
+                if (up) {
+                    return StdOperator.atCeiling(element);
+                } else {
+                    return StdOperator.atFloor(element);
+                }
         }
-
-        if (up) {
-            return element.atCeiling(context);
-        } else {
-            return element.atFloor(context);
-        }
-
-    }
-
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTime> newValue(
-        AdvancedElement<V> element,
-        Object value
-    ) {
-
-        return element.newValue(
-            element.getType().cast(value),
-            PlainTime.class);
-
-    }
-
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTimestamp> newValueTS(
-        AdvancedElement<V> element,
-        Object value
-    ) {
-
-        return new ValueOperator(
-            element.newValue(
-                element.getType().cast(value),
-                PlainTimestamp.class),
-            value
-        );
-
-    }
-
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTime> lenient(
-        AdvancedElement<V> element,
-        Object value
-    ) {
-
-        return element.setLenient(
-            element.getType().cast(value),
-            PlainTime.class);
-
-    }
-
-    private static <V extends Comparable<V>>
-    ChronoOperator<PlainTimestamp> lenientTS(
-        AdvancedElement<V> element,
-        Object value
-    ) {
-
-        return new ValueOperator(
-            element.setLenient(
-                element.getType().cast(value),
-                PlainTimestamp.class),
-            Number.class.cast(value)
-        );
 
     }
 

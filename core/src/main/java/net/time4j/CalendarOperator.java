@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarOperator.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j;
 
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.ChronoOperator;
-
 
 
 /**
@@ -54,7 +53,6 @@ final class CalendarOperator
     //~ Instanzvariablen --------------------------------------------------
 
     private final ChronoOperator<PlainTimestamp> tsop;
-    private final ChronoOperator<Moment> moop;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -62,15 +60,10 @@ final class CalendarOperator
         super(PlainDate.COMPONENT, type);
 
         this.tsop =
-            new ChronoOperator<PlainTimestamp>() {
-                @Override
-                public PlainTimestamp apply(PlainTimestamp entity) {
-                    PlainDate date = doApply(entity.getCalendarDate());
-                    return entity.with(date);
-                }
+            entity -> {
+                PlainDate date = doApply(entity.getCalendarDate());
+                return entity.with(date);
             };
-        this.moop =
-            new Moment.Operator(this.tsop, PlainDate.COMPONENT, type);
 
     }
 
@@ -80,13 +73,6 @@ final class CalendarOperator
     public PlainDate apply(PlainDate entity) {
 
         return this.doApply(entity);
-
-    }
-
-    @Override
-    public ChronoOperator<Moment> inStdTimezone() {
-
-        return this.moop;
 
     }
 

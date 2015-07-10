@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (YOWElement.java) is part of project Time4J.
  *
@@ -153,7 +153,7 @@ final class YOWElement
         Class<T> type
     ) {
 
-        return new ERule<T>();
+        return new ERule<>();
 
     }
 
@@ -328,14 +328,11 @@ final class YOWElement
             this.amount = amount;
 
             this.yowTS =
-                new ChronoOperator<PlainTimestamp>() {
-                    @Override
-                    public PlainTimestamp apply(PlainTimestamp entity) {
-                        UnitRule<PlainTimestamp> rule = YOWElement.unitRule();
-                        return rule.addTo(
-                            entity,
-                            YOWRollingAdjuster.this.amount);
-                    }
+                entity -> {
+                    UnitRule<PlainTimestamp> rule = YOWElement.unitRule();
+                    return rule.addTo(
+                        entity,
+                        YOWRollingAdjuster.this.amount);
                 };
 
         }
