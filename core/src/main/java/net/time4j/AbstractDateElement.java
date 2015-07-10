@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractDateElement.java) is part of project Time4J.
  *
@@ -21,15 +21,11 @@
 
 package net.time4j;
 
-import net.time4j.engine.AdvancedElement;
+import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -40,39 +36,21 @@ import java.util.Map;
  * @author  Meno Hochschild
  */
 abstract class AbstractDateElement<V extends Comparable<V>>
-    extends AdvancedElement<V>
+    extends BasicElement<V>
     implements AdjustableElement<V, PlainDate> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final Map<Integer, ElementOperator<PlainDate>> cache;
+    private transient final ElementOperator<PlainDate> minimizer;
+    private transient final ElementOperator<PlainDate> maximizer;
 
     //~ Konstruktoren -----------------------------------------------------
 
     AbstractDateElement(String name) {
         super(name);
 
-        Map<Integer, ElementOperator<PlainDate>> ops =
-            new HashMap<Integer, ElementOperator<PlainDate>>();
-        ops.put(
-            ElementOperator.OP_MINIMIZE,
-            new DateOperator(this, ElementOperator.OP_MINIMIZE));
-        ops.put(
-            ElementOperator.OP_MAXIMIZE,
-            new DateOperator(this, ElementOperator.OP_MAXIMIZE));
-        ops.put(
-            ElementOperator.OP_DECREMENT,
-            new DateOperator(this, ElementOperator.OP_DECREMENT));
-        ops.put(
-            ElementOperator.OP_INCREMENT,
-            new DateOperator(this, ElementOperator.OP_INCREMENT));
-        ops.put(
-            ElementOperator.OP_FLOOR,
-            new DateOperator(this, ElementOperator.OP_FLOOR));
-        ops.put(
-            ElementOperator.OP_CEILING,
-            new DateOperator(this, ElementOperator.OP_CEILING));
-        this.cache = Collections.unmodifiableMap(ops);
+        this.minimizer = new DateOperator(this, ElementOperator.OP_MINIMIZE);
+        this.maximizer = new DateOperator(this, ElementOperator.OP_MAXIMIZE);
 
     }
 
@@ -88,42 +66,42 @@ abstract class AbstractDateElement<V extends Comparable<V>>
     @Override
     public ElementOperator<PlainDate> minimized() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));
+        return this.minimizer;
 
     }
 
     @Override
     public ElementOperator<PlainDate> maximized() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_MAXIMIZE));
+        return this.maximizer;
 
     }
 
     @Override
     public ElementOperator<PlainDate> decremented() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_DECREMENT));
+        return new DateOperator(this, ElementOperator.OP_DECREMENT);
 
     }
 
     @Override
     public ElementOperator<PlainDate> incremented() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_INCREMENT));
+        return new DateOperator(this, ElementOperator.OP_INCREMENT);
 
     }
 
     @Override
     public ElementOperator<PlainDate> atFloor() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_FLOOR));
+        return new DateOperator(this, ElementOperator.OP_FLOOR);
 
     }
 
     @Override
     public ElementOperator<PlainDate> atCeiling() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_CEILING));
+        return new DateOperator(this, ElementOperator.OP_CEILING);
 
     }
 

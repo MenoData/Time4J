@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractTimeElement.java) is part of project Time4J.
  *
@@ -21,15 +21,11 @@
 
 package net.time4j;
 
-import net.time4j.engine.AdvancedElement;
+import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -40,39 +36,21 @@ import java.util.Map;
  * @author  Meno Hochschild
  */
 abstract class AbstractTimeElement<V extends Comparable<V>>
-    extends AdvancedElement<V>
+    extends BasicElement<V>
     implements AdjustableElement<V, PlainTime> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final Map<Integer, ElementOperator<PlainTime>> cache;
+    private transient final ElementOperator<PlainTime> minimizer;
+    private transient final ElementOperator<PlainTime> maximizer;
 
     //~ Konstruktoren -----------------------------------------------------
 
     AbstractTimeElement(String name) {
         super(name);
 
-        Map<Integer, ElementOperator<PlainTime>> ops =
-            new HashMap<Integer, ElementOperator<PlainTime>>();
-        ops.put(
-            ElementOperator.OP_MINIMIZE,
-            new TimeOperator(this, ElementOperator.OP_MINIMIZE));
-        ops.put(
-            ElementOperator.OP_MAXIMIZE,
-            new TimeOperator(this, ElementOperator.OP_MAXIMIZE));
-        ops.put(
-            ElementOperator.OP_DECREMENT,
-            new TimeOperator(this, ElementOperator.OP_DECREMENT));
-        ops.put(
-            ElementOperator.OP_INCREMENT,
-            new TimeOperator(this, ElementOperator.OP_INCREMENT));
-        ops.put(
-            ElementOperator.OP_FLOOR,
-            new TimeOperator(this, ElementOperator.OP_FLOOR));
-        ops.put(
-            ElementOperator.OP_CEILING,
-            new TimeOperator(this, ElementOperator.OP_CEILING));
-        this.cache = Collections.unmodifiableMap(ops);
+        this.minimizer = new TimeOperator(this, ElementOperator.OP_MINIMIZE);
+        this.maximizer = new TimeOperator(this, ElementOperator.OP_MAXIMIZE);
 
     }
 
@@ -88,42 +66,42 @@ abstract class AbstractTimeElement<V extends Comparable<V>>
     @Override
     public ElementOperator<PlainTime> minimized() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_MINIMIZE));
+        return this.minimizer;
 
     }
 
     @Override
     public ElementOperator<PlainTime> maximized() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_MAXIMIZE));
+        return this.maximizer;
 
     }
 
     @Override
     public ElementOperator<PlainTime> decremented() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_DECREMENT));
+        return new TimeOperator(this, ElementOperator.OP_DECREMENT);
 
     }
 
     @Override
     public ElementOperator<PlainTime> incremented() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_INCREMENT));
+        return new TimeOperator(this, ElementOperator.OP_INCREMENT);
 
     }
 
     @Override
     public ElementOperator<PlainTime> atFloor() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_FLOOR));
+        return new TimeOperator(this, ElementOperator.OP_FLOOR);
 
     }
 
     @Override
     public ElementOperator<PlainTime> atCeiling() {
 
-        return this.cache.get(Integer.valueOf(ElementOperator.OP_CEILING));
+        return new TimeOperator(this, ElementOperator.OP_CEILING);
 
     }
 
