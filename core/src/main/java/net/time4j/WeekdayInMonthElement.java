@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -42,7 +42,7 @@ import static net.time4j.ElementOperator.OP_WIM;
  * weitere Spezialmethoden zum Setzen des Wochentags im Monat. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class WeekdayInMonthElement
     extends AbstractDateElement<Integer>

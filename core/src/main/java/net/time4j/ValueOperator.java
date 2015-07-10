@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ValueOperator.java) is part of project Time4J.
  *
@@ -25,23 +25,23 @@ import net.time4j.engine.ChronoOperator;
 
 
 /**
- * <p>Spezial-Operator f&uuml;r das Setzen von Werten auf einem
- * {@code PlainTimestamp}. </p>
+ * <p>Spezial-Operator f&uuml;r das Setzen von Werten. </p>
  *
  * @author  Meno Hochschild
+ * @param   <T> generic target type (usually {@code PlainTimestamp})
  */
-final class ValueOperator
-    implements ChronoOperator<PlainTimestamp> {
+final class ValueOperator<T>
+    implements ChronoOperator<T> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final ChronoOperator<PlainTimestamp> delegate;
+    private final ChronoOperator<T> delegate;
     private final Object value;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    ValueOperator(
-        ChronoOperator<PlainTimestamp> delegate,
+    private ValueOperator(
+        ChronoOperator<T> delegate,
         Object value
     ) {
         super();
@@ -53,8 +53,17 @@ final class ValueOperator
 
     //~ Methoden ----------------------------------------------------------
 
+    static <T> ValueOperator of(
+        ChronoOperator<T> delegate,
+        Object value
+    ) {
+
+        return new ValueOperator<T>(delegate, value);
+
+    }
+
     @Override
-    public PlainTimestamp apply(PlainTimestamp entity) {
+    public T apply(T entity) {
 
         return this.delegate.apply(entity);
 
