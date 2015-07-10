@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ElementRule.java) is part of project Time4J.
  *
@@ -222,7 +222,7 @@ public interface ElementRule<T, V> {
      * an integer type. The lenient mode causes the tolerant interpretation
      * of invalid values like 31st of April as 1st of May. This mode is only
      * active if an element is either explicitly declared as lenient or if
-     * the method {@code AdvancedElement.setLenient()} is used. </p>
+     * the method {@code StdOperator.setLenient()} is used. </p>
      *
      * @param   context     time context to be evaluated
      * @param   value       new element value (optional)
@@ -232,8 +232,7 @@ public interface ElementRule<T, V> {
      *          not valid dependent on the given time context
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #isValid(Object, Object) isValid(T, V)
-     * @see     AdvancedElement#setLenient(Comparable, Class)
-     *          AdvancedElement.setLenient(Comparable, Class)
+     * @see     StdOperator#setLenient(Object, ChronoElement)
      * @see     ChronoElement#isLenient()
      * @see     net.time4j.ProportionalElement#setLenient(Number)
      */
@@ -248,7 +247,7 @@ public interface ElementRule<T, V> {
      * f&uuml;hrt dazu, da&szlig; eigentlich ung&uuml;ltige Werte
      * wie der 31. April als 1. Mai interpretiert werden. Aktiv ist
      * dieser Modus nur bei Verwendung der einen Operator liefernden
-     * Methode {@code AdvancedElement.setLenient()} oder wenn das
+     * Methode {@code StdOperator.setLenient()} oder wenn das
      * Element ausdr&uuml;cklich als nachsichtig deklariert wird. </p>
      *
      * @param   context     time context to be evaluated
@@ -259,8 +258,7 @@ public interface ElementRule<T, V> {
      *          not valid dependent on the given time context
      * @throws  ArithmeticException in case of numerical overflow
      * @see     #isValid(Object, Object) isValid(T, V)
-     * @see     AdvancedElement#setLenient(Comparable, Class)
-     *          AdvancedElement.setLenient(Comparable, Class)
+     * @see     StdOperator#setLenient(Object, ChronoElement)
      * @see     ChronoElement#isLenient()
      * @see     net.time4j.ProportionalElement#setLenient(Number)
      */
@@ -275,22 +273,21 @@ public interface ElementRule<T, V> {
      * value. </p>
      *
      * <p>The access to this method only happens indirectly in the class
-     * {@code AdvancedElement}. </p>
+     * {@code StdOperator}. </p>
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#atFloor(Class)
+     * @see     StdOperator#atFloor(ChronoElement)
      */
     /*[deutsch]
      * <p>Ermittelt das Kindselement, dessen Wert auf seinen unteren Randwert
      * gesetzt wird. </p>
      *
-     * <p>Der Zugriff erfolgt nur &uuml;ber die Klasse
-     * {@code AdvancedElement}. </p>
+     * <p>Der Zugriff erfolgt nur &uuml;ber die Klasse {@code StdOperator}. </p>
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#atFloor(Class)
+     * @see     StdOperator#atFloor(ChronoElement)
      */
     ChronoElement<?> getChildAtFloor(T context);
 
@@ -299,22 +296,21 @@ public interface ElementRule<T, V> {
      * value. </p>
      *
      * <p>The access to this method only happens indirectly in the class
-     * {@code AdvancedElement}. </p>
+     * {@code StdOperator}. </p>
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#atCeiling(Class)
+     * @see     StdOperator#atCeiling(ChronoElement)
      */
     /*[deutsch]
      * <p>Ermittelt das Kindselement, dessen Wert auf seinen oberen Randwert
      * gesetzt wird. </p>
      *
-     * <p>Der Zugriff erfolgt nur &uuml;ber die Klasse
-     * {@code AdvancedElement}. </p>
+     * <p>Der Zugriff erfolgt nur &uuml;ber die Klasse {@code StdOperator}. </p>
      *
      * @param   context     time context to be evaluated
      * @return  child element or {@code null} if not available
-     * @see     AdvancedElement#atCeiling(Class)
+     * @see     StdOperator#atCeiling(ChronoElement)
      */
     ChronoElement<?> getChildAtCeiling(T context);
 
