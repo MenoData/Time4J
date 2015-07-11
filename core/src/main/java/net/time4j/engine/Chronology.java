@@ -483,6 +483,7 @@ public class Chronology<T extends ChronoEntity<T>>
         //~ Instanzvariablen ----------------------------------------------
 
         final Class<T> chronoType;
+        final boolean time4j;
         final ChronoMerger<T> merger;
         final Map<ChronoElement<?>, ElementRule<T, ?>> ruleMap;
         final List<ChronoExtension> extensions;
@@ -502,13 +503,12 @@ public class Chronology<T extends ChronoEntity<T>>
         ) {
             super();
 
-            if (chronoType == null) {
-                throw new NullPointerException("Missing chronological type.");
-            } else if (merger == null) {
+            if (merger == null) {
                 throw new NullPointerException("Missing chronological merger.");
             }
 
             this.chronoType = chronoType;
+            this.time4j = chronoType.getName().startsWith("net.time4j.");
             this.merger = merger;
             this.ruleMap = new HashMap<ChronoElement<?>, ElementRule<T, ?>>();
             this.extensions = new ArrayList<ChronoExtension>();
@@ -655,7 +655,9 @@ public class Chronology<T extends ChronoEntity<T>>
 
         private void checkElementDuplicates(ChronoElement<?> element) {
 
-            if (element == null) {
+            if (this.time4j) {
+                return;
+            } else if (element == null) {
                 throw new NullPointerException(
                     "Static initialization problem: "
                     + "Check if given element statically refer "

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarUnit.java) is part of project Time4J.
  *
@@ -176,15 +176,15 @@ public enum CalendarUnit
     //~ Instanzvariablen --------------------------------------------------
 
     private final IsoDateUnit eof =
-        new OverflowUnit(this, OverflowPolicy.END_OF_MONTH);
+        new OverflowUnit(this, OverflowUnit.POLICY_END_OF_MONTH);
     private final IsoDateUnit kld =
-        new OverflowUnit(this, OverflowPolicy.KEEPING_LAST_DATE);
+        new OverflowUnit(this, OverflowUnit.POLICY_KEEPING_LAST_DATE);
     private final IsoDateUnit ui =
-        new OverflowUnit(this, OverflowPolicy.UNLESS_INVALID);
+        new OverflowUnit(this, OverflowUnit.POLICY_UNLESS_INVALID);
     private final IsoDateUnit nvd =
-        new OverflowUnit(this, OverflowPolicy.NEXT_VALID_DATE);
+        new OverflowUnit(this, OverflowUnit.POLICY_NEXT_VALID_DATE);
     private final IsoDateUnit co =
-        new OverflowUnit(this, OverflowPolicy.CARRY_OVER);
+        new OverflowUnit(this, OverflowUnit.POLICY_CARRY_OVER);
 
     //~ Methoden ----------------------------------------------------------
 
@@ -544,18 +544,18 @@ public enum CalendarUnit
         //~ Instanzvariablen ----------------------------------------------
 
         private final CalendarUnit unit;
-        private final OverflowPolicy policy;
+        private final int policy;
 
         //~ Konstruktoren -------------------------------------------------
 
         /**
          * <p>Constructs a new rule for a calendar unit using the policy
-         * {@code OverflowPolicy.PREVIOUS_VALID_DATE}. </p>
+         * {@code OverflowUnit.POLICY_PREVIOUS_VALID_DATE}. </p>
          *
          * @param   unit    calendar unit
          */
         Rule(CalendarUnit unit) {
-            this(unit, OverflowPolicy.PREVIOUS_VALID_DATE);
+            this(unit, OverflowUnit.POLICY_PREVIOUS_VALID_DATE);
 
         }
 
@@ -568,7 +568,7 @@ public enum CalendarUnit
          */
         Rule(
             CalendarUnit unit,
-            OverflowPolicy policy
+            int policy
         ) {
             super();
 

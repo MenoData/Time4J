@@ -629,7 +629,6 @@ public final class PlainDate
 
         TRANSFORMER = new Transformer();
 
-
         TimeAxis.Builder<IsoDateUnit, PlainDate> builder =
             TimeAxis.Builder.setUp(
                 IsoDateUnit.class,
@@ -1494,7 +1493,7 @@ public final class PlainDate
         CalendarUnit unit,
         PlainDate context,
         long amount,
-        OverflowPolicy policy
+        int policy
     ) {
 
         switch (unit) {
@@ -1544,7 +1543,7 @@ public final class PlainDate
                     policy);
             case DAYS:
                 PlainDate date = addDays(context, amount);
-                if (policy == OverflowPolicy.END_OF_MONTH) {
+                if (policy == OverflowUnit.POLICY_END_OF_MONTH) {
                     return PlainDate.of(
                         date.year,
                         date.month,
@@ -1761,14 +1760,14 @@ public final class PlainDate
         PlainDate context,
         long emonths,
         int dayOfMonth,
-        OverflowPolicy policy
+        int policy
     ) {
 
         if (
-            (policy == OverflowPolicy.KEEPING_LAST_DATE)
+            (policy == OverflowUnit.POLICY_KEEPING_LAST_DATE)
             && (context.dayOfMonth == context.lengthOfMonth())
         ) {
-            policy = OverflowPolicy.END_OF_MONTH;
+            policy = OverflowUnit.POLICY_END_OF_MONTH;
         }
 
         int year =
@@ -1784,24 +1783,24 @@ public final class PlainDate
 
         if (dayOfMonth > max) {
             switch (policy) {
-                case PREVIOUS_VALID_DATE:
-                case END_OF_MONTH:
-                case KEEPING_LAST_DATE:
+                case OverflowUnit.POLICY_PREVIOUS_VALID_DATE:
+                case OverflowUnit.POLICY_END_OF_MONTH:
+                case OverflowUnit.POLICY_KEEPING_LAST_DATE:
                     dom = max;
                     break;
-                case NEXT_VALID_DATE:
+                case OverflowUnit.POLICY_NEXT_VALID_DATE:
                     return PlainDate.fromEpochMonths(
                         context,
                         MathUtils.safeAdd(emonths, 1),
                         1,
                         policy);
-                case CARRY_OVER:
+                case OverflowUnit.POLICY_CARRY_OVER:
                     return PlainDate.fromEpochMonths(
                         context,
                         MathUtils.safeAdd(emonths, 1),
                         dayOfMonth - max,
                         policy);
-                case UNLESS_INVALID:
+                case OverflowUnit.POLICY_UNLESS_INVALID:
                     StringBuilder sb = new StringBuilder(32);
                     sb.append("Day of month out of range: ");
                     formatYear(sb, year);
@@ -1810,11 +1809,11 @@ public final class PlainDate
                     throw new ChronoException(sb.toString());
                 default:
                     throw new UnsupportedOperationException(
-                        "Not implemented: " + policy.toString());
+                        "Overflow policy not implemented: " + policy);
             }
         } else if(
             (dayOfMonth < max)
-            && (policy == OverflowPolicy.END_OF_MONTH)
+            && (policy == OverflowUnit.POLICY_END_OF_MONTH)
         ) {
             dom = max;
         }
@@ -2440,13 +2439,8 @@ public final class PlainDate
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        private static final long MIN_LONG;
-        private static final long MAX_LONG;
-
-        static {
-            MIN_LONG = doTransform(PlainDate.MIN);
-            MAX_LONG = doTransform(PlainDate.MAX);
-        }
+        private static final long MIN_LONG = -365243219892L; // transform(PlainDate.MIN)
+        private static final long MAX_LONG = 365241779741L; // transform(PlainDate.MAX)
 
         //~ Methoden ------------------------------------------------------
 
@@ -2475,12 +2469,6 @@ public final class PlainDate
 
         @Override
         public long transform(PlainDate date) {
-
-            return doTransform(date);
-
-        }
-
-        private static long doTransform(PlainDate date) {
 
             return EpochDays.UTC.transform(
                 GregorianMath.toMJD(date),
