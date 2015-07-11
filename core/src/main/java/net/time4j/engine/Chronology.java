@@ -370,31 +370,15 @@ public class Chronology<T extends ChronoEntity<T>>
     /**
      * <p>Registriert die angegebene Chronologie. </p>
      *
-     * <p>Die Registrierung ist zur Unterst&uuml;tzung der Methode
-     * {@link #lookup(Class)} gedacht und wird einmalig nach Konstruktion
-     * einer Chronologie aufgerufen. </p>
+     * <p>Die Registrierung ist zur Unterst&uuml;tzung der Methode {@link #lookup(Class)} gedacht und wird
+     * einmalig nach Konstruktion einer Chronologie w&auml;hrend des Ladens der assoziierten Entit&auml;tsklasse
+     * aufgerufen. </p>
      *
      * @param   chronology  new instance to be registered
-     * @throws  IllegalStateException if already registered
      */
     static void register(Chronology<?> chronology) {
 
-        synchronized (CHRONOS) {
-            Class<?> chronoType = chronology.getChronoType();
-
-            for (ChronoReference cref : CHRONOS) {
-                Chronology<?> test = cref.get();
-                if (
-                    (test != null)
-                    && (test.getChronoType() == chronoType)
-                ) {
-                    throw new IllegalStateException(
-                        chronoType.getName() + " is already installed.");
-                }
-            }
-
-            CHRONOS.add(new ChronoReference(chronology, QUEUE));
-        }
+        CHRONOS.add(new ChronoReference(chronology, QUEUE));
 
     }
 

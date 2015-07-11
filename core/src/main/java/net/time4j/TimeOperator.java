@@ -62,7 +62,7 @@ final class TimeOperator
      *
      * @param   element         element an operator will be applied on
      * @param   type            operator type
-     * @param   value           lenient value of element
+     * @param   value           lenient or new value of element
      */
     TimeOperator(
         final ChronoElement<?> element,
