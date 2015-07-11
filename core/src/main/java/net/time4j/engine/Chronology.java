@@ -371,31 +371,15 @@ public class Chronology<T extends ChronoEntity<T>>
     /**
      * <p>Registriert die angegebene Chronologie. </p>
      *
-     * <p>Die Registrierung ist zur Unterst&uuml;tzung der Methode
-     * {@link #lookup(Class)} gedacht und wird einmalig nach Konstruktion
-     * einer Chronologie aufgerufen. </p>
+     * <p>Die Registrierung ist zur Unterst&uuml;tzung der Methode {@link #lookup(Class)} gedacht und wird
+     * einmalig nach Konstruktion einer Chronologie w&auml;hrend des Ladens der assoziierten Entit&auml;tsklasse
+     * aufgerufen. </p>
      *
      * @param   chronology  new instance to be registered
-     * @throws  IllegalStateException if already registered
      */
     static void register(Chronology<?> chronology) {
 
-        synchronized (CHRONOS) {
-            Class<?> chronoType = chronology.getChronoType();
-
-            for (ChronoReference cref : CHRONOS) {
-                Chronology<?> test = cref.get();
-                if (
-                    (test != null)
-                    && (test.getChronoType() == chronoType)
-                ) {
-                    throw new IllegalStateException(
-                        chronoType.getName() + " is already installed.");
-                }
-            }
-
-            CHRONOS.add(new ChronoReference(chronology, QUEUE));
-        }
+        CHRONOS.add(new ChronoReference(chronology, QUEUE));
 
     }
 
@@ -500,6 +484,7 @@ public class Chronology<T extends ChronoEntity<T>>
         //~ Instanzvariablen ----------------------------------------------
 
         final Class<T> chronoType;
+        final boolean time4j;
         final ChronoMerger<T> merger;
         final Map<ChronoElement<?>, ElementRule<T, ?>> ruleMap;
         final List<ChronoExtension> extensions;
@@ -519,16 +504,15 @@ public class Chronology<T extends ChronoEntity<T>>
         ) {
             super();
 
-            if (chronoType == null) {
-                throw new NullPointerException("Missing chronological type.");
-            } else if (merger == null) {
+            if (merger == null) {
                 throw new NullPointerException("Missing chronological merger.");
             }
 
             this.chronoType = chronoType;
+            this.time4j = chronoType.getName().startsWith("net.time4j.");
             this.merger = merger;
-            this.ruleMap = new HashMap<>();
-            this.extensions = new ArrayList<>();
+            this.ruleMap = new HashMap<ChronoElement<?>, ElementRule<T, ?>>();
+            this.extensions = new ArrayList<ChronoExtension>();
 
         }
 
@@ -672,7 +656,9 @@ public class Chronology<T extends ChronoEntity<T>>
 
         private void checkElementDuplicates(ChronoElement<?> element) {
 
-            if (element == null) {
+            if (this.time4j) {
+                return;
+            } else if (element == null) {
                 throw new NullPointerException(
                     "Static initialization problem: "
                     + "Check if given element statically refer "

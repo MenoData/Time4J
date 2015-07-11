@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OverflowUnit.java) is part of project Time4J.
  *
@@ -41,7 +41,41 @@ final class OverflowUnit
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long serialVersionUID = 1988843503875912053L;
+    /**
+     * Standard policy which resets the invalid day of month to the previous
+     * valid one.
+     */
+    static final int POLICY_PREVIOUS_VALID_DATE = 0;
+
+    /**
+     * Resolves the invalid day of month to the next valid one.
+     */
+    static final int POLICY_NEXT_VALID_DATE = 1;
+
+    /**
+     * Always moves the day of month to the last day of month even if valid.
+     */
+    static final int POLICY_END_OF_MONTH = 2;
+
+    /**
+     * Any carry-over will be transferred to the next month.
+     */
+    static final int POLICY_CARRY_OVER = 3;
+
+    /**
+     * This policy causes an exception in case of day overflow.
+     */
+    static final int POLICY_UNLESS_INVALID = 4;
+
+    /**
+     * Moves the day of month to the last day of month if the original date
+     * is the last day of month.
+     *
+     * @since   2.3
+     */
+    static final int POLICY_KEEPING_LAST_DATE = 5;
+
+    private static final long serialVersionUID = 1988843503875912054L;
 
     //~ Instanzvariablen ----------------------------------------------
 
@@ -53,7 +87,7 @@ final class OverflowUnit
     /**
      * @serial  day overflow policy
      */
-    private final OverflowPolicy policy;
+    private final int policy;
 
     //~ Konstruktoren -------------------------------------------------
 
@@ -65,7 +99,7 @@ final class OverflowUnit
      */
     OverflowUnit(
         CalendarUnit unit,
-        OverflowPolicy policy
+        int policy
     ) {
         super();
 
@@ -118,7 +152,7 @@ final class OverflowUnit
     ) {
 
         if (chronology.isRegistered(PlainDate.CALENDAR_DATE)) {
-            return new CalendarUnit.Rule<T>(this.unit, this.policy);
+            return new CalendarUnit.Rule<>(this.unit, this.policy);
         }
 
         return null;
@@ -145,7 +179,7 @@ final class OverflowUnit
     @Override
     public int hashCode() {
 
-        return 23 * this.unit.hashCode() + 37 * this.policy.hashCode();
+        return 23 * this.unit.hashCode() + 37 * this.policy;
 
     }
 
@@ -161,7 +195,25 @@ final class OverflowUnit
         StringBuilder sb = new StringBuilder();
         sb.append(this.unit.getSymbol());
         sb.append('-');
-        sb.append(this.policy.name());
+        switch (this.policy) {
+            case POLICY_NEXT_VALID_DATE:
+                sb.append("NEXT_VALID_DATE");
+                break;
+            case POLICY_END_OF_MONTH:
+                sb.append("END_OF_MONTH");
+                break;
+            case POLICY_CARRY_OVER:
+                sb.append("CARRY_OVER");
+                break;
+            case POLICY_UNLESS_INVALID:
+                sb.append("UNLESS_INVALID");
+                break;
+            case POLICY_KEEPING_LAST_DATE:
+                sb.append("KEEPING_LAST_DATE");
+                break;
+            default:
+                sb.append("PREVIOUS_VALID_DATE");
+        }
         return sb.toString();
 
     }

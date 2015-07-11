@@ -1006,6 +1006,10 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         private void checkUnitDuplicates(U unit) {
 
+            if (this.time4j) {
+                return;
+            }
+
             // Instanzprüfung
             for (U key : this.unitRules.keySet()) {
                 if (key.equals(unit)) {
