@@ -1,5 +1,6 @@
 package net.time4j.calendar.hijri;
 
+import net.time4j.PlainDate;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.expert.Iso8601Format;
@@ -105,6 +106,13 @@ public class UmalquraDataTest {
         assertThat(
             CALSYS.transform(this.epoch),
             is(this.umalqura));
+    }
+
+    @Test
+    public void weekday() {
+        assertThat(
+            this.umalqura.getDayOfWeek(),
+            is(PlainDate.of(this.epoch, EpochDays.UTC).get(PlainDate.DAY_OF_WEEK)));
     }
 
 }

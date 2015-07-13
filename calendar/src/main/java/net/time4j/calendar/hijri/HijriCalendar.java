@@ -21,6 +21,8 @@
 
 package net.time4j.calendar.hijri;
 
+import net.time4j.Weekday;
+import net.time4j.base.MathUtils;
 import net.time4j.calendar.MonthBasedCalendarSystem;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
@@ -47,6 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
+ * @doctags.experimental
  * @doctags.concurrency <immutable>
  */
 /*[deutsch]
@@ -65,6 +68,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
+ * @doctags.experimental
  * @doctags.concurrency <immutable>
  */
 @CalendarType("islamic")
@@ -314,6 +318,29 @@ public final class HijriCalendar
     public int getDayOfMonth() {
 
         return this.hdom;
+
+    }
+
+    /**
+     * <p>Determines the day of week. </p>
+     *
+     * <p>The Hijri calendar also uses a 7-day-week. </p>
+     *
+     * @return  Weekday
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Ermittelt den Wochentag. </p>
+     *
+     * <p>Der Hijri-Kalendar verwendet ebenfalls eine 7-Tage-Woche. </p>
+     *
+     * @return  Weekday
+     * @since   3.5/4.3
+     */
+    public Weekday getDayOfWeek() {
+
+        long utcDays = getCalendarSystem(variant).transform(this);
+        return Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1);
 
     }
 
