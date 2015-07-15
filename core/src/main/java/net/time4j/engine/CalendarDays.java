@@ -21,8 +21,6 @@
 
 package net.time4j.engine;
 
-import net.time4j.base.MathUtils;
-
 import java.io.Serializable;
 
 
@@ -179,7 +177,7 @@ public final class CalendarDays
 
         long t1 = CalendarVariant.utcDays(start);
         long t2 = CalendarVariant.utcDays(end);
-        return CalendarDays.of(MathUtils.safeSubtract(t2, t1));
+        return CalendarDays.of(Math.subtractExact(t2, t1));
 
     }
 
@@ -206,7 +204,7 @@ public final class CalendarDays
 
         long t1 = start.getEpochDays();
         long t2 = end.getEpochDays();
-        return CalendarDays.of(MathUtils.safeSubtract(t2, t1));
+        return CalendarDays.of(Math.subtractExact(t2, t1));
 
     }
 
@@ -224,43 +222,47 @@ public final class CalendarDays
      */
     public CalendarDays abs() {
 
-        return ((this.days < 0) ? CalendarDays.of(MathUtils.safeNegate(this.days)) : this);
+        return ((this.days < 0) ? CalendarDays.of(Math.negateExact(this.days)) : this);
 
     }
 
     /**
      * <p>Yields the sum of the represented calendar days of this instance and given argument. </p>
      *
+     * @param   other   calendar days to be added
      * @return  sum of calendar days
      * @since   3.4/4.3
      */
     /*[deutsch]
      * <p>Liefert die Summe der Kalendertage dieser Instanz und des angegebenen Arguments. </p>
      *
+     * @param   other   calendar days to be added
      * @return  sum of calendar days
      * @since   3.4/4.3
      */
     public CalendarDays plus(CalendarDays other) {
 
-        return CalendarDays.of(MathUtils.safeAdd(this.days, other.days));
+        return CalendarDays.of(Math.addExact(this.days, other.days));
 
     }
 
     /**
      * <p>Yields the delta of the represented calendar days of this instance and given argument. </p>
      *
+     * @param   other   calendar days to be subtracted
      * @return  delta of calendar days
      * @since   3.4/4.3
      */
     /*[deutsch]
      * <p>Liefert die Differenz der Kalendertage dieser Instanz und des angegebenen Arguments. </p>
      *
+     * @param   other   calendar days to be subtracted
      * @return  delta of calendar days
      * @since   3.4/4.3
      */
     public CalendarDays minus(CalendarDays other) {
 
-        return CalendarDays.of(MathUtils.safeSubtract(this.days, other.days));
+        return CalendarDays.of(Math.subtractExact(this.days, other.days));
 
     }
 
