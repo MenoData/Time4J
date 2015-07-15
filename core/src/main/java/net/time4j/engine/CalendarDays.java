@@ -231,12 +231,14 @@ public final class CalendarDays
     /**
      * <p>Yields the sum of the represented calendar days of this instance and given argument. </p>
      *
+     * @param   other   calendar days to be added
      * @return  sum of calendar days
      * @since   3.4/4.3
      */
     /*[deutsch]
      * <p>Liefert die Summe der Kalendertage dieser Instanz und des angegebenen Arguments. </p>
      *
+     * @param   other   calendar days to be added
      * @return  sum of calendar days
      * @since   3.4/4.3
      */
@@ -249,12 +251,14 @@ public final class CalendarDays
     /**
      * <p>Yields the delta of the represented calendar days of this instance and given argument. </p>
      *
+     * @param   other   calendar days to be subtracted
      * @return  delta of calendar days
      * @since   3.4/4.3
      */
     /*[deutsch]
      * <p>Liefert die Differenz der Kalendertage dieser Instanz und des angegebenen Arguments. </p>
      *
+     * @param   other   calendar days to be subtracted
      * @return  delta of calendar days
      * @since   3.4/4.3
      */
