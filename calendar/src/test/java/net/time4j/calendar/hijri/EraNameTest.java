@@ -19,7 +19,7 @@ public class EraNameTest {
     public void getDisplayNameWide() {
         assertThat(
             HijriEra.ANNO_HEGIRAE.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
-            is("Anno Hegirae"));
+            is("AH"));
     }
 
     @Test

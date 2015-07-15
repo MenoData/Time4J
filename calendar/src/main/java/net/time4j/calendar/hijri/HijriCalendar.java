@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental
+ * @doctags.experimental The serialization format will change in future. Format support is not yet fully available.
  * @doctags.concurrency <immutable>
  */
 /*[deutsch]
@@ -68,7 +68,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental
+ * @doctags.experimental The serialization format will change in future. Format support is not yet fully available.
  * @doctags.concurrency <immutable>
  */
 @CalendarType("islamic")
@@ -407,7 +407,8 @@ public final class HijriCalendar
     @Override
     protected CalendarFamily<HijriCalendar> getChronology() {
 
-        return null;
+        throw new UnsupportedOperationException(
+            "This version is still experimental. Will be supported in a future release.");
 
     }
 
