@@ -19,10 +19,9 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar.hijri;
+package net.time4j.calendar;
 
 import net.time4j.PlainDate;
-import net.time4j.calendar.MonthBasedCalendarSystem;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.expert.Iso8601Format;
@@ -110,7 +109,7 @@ final class AstronomicalHijriData
                 int max = Integer.parseInt(properties.getProperty("max", "0"));
                 this.maxYear = max;
                 int count = (max - min + 1) * 12;
-                this.maxUTC = this.minUTC + count - 1;
+                long maxCounter = this.minUTC - 1;
 
                 int[] mlen = new int[count];
                 long[] mutc = new long[count];
@@ -128,12 +127,14 @@ final class AstronomicalHijriData
                     }
                     for (int m = 0; m < 12; m++) {
                         mlen[i] = Integer.parseInt(monthLengths[m]);
+                        maxCounter += mlen[i];
                         mutc[i] = v;
                         v += mlen[i];
                         i++;
                     }
                 }
 
+                this.maxUTC = maxCounter;
                 this.lengthOfMonth = mlen;
                 this.firstOfMonth = mutc;
 

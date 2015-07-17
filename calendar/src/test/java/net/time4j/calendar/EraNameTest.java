@@ -1,7 +1,6 @@
-package net.time4j.calendar.hijri;
+package net.time4j.calendar;
 
 import net.time4j.format.TextWidth;
-import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

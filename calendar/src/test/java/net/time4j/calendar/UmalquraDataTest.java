@@ -1,4 +1,4 @@
-package net.time4j.calendar.hijri;
+package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.CalendarSystem;

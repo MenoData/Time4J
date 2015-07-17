@@ -19,10 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar.spi;
+package net.time4j.calendar.service;
 
-import net.time4j.format.AltTextProvider;
 import net.time4j.format.OutputContext;
+import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.i18n.UTF8ResourceControl;
 
@@ -47,7 +47,7 @@ import java.util.Set;
  * @doctags.exclude
  */
 public final class GenericTextProviderSPI
-    implements AltTextProvider {
+    implements TextProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -63,12 +63,12 @@ public final class GenericTextProviderSPI
                 UTF8ResourceControl.SINGLETON);
 
         String[] languages = rb.getString("languages").split(" ");
-        Set<String> tmp = new HashSet<String>();
+        Set<String> tmp = new HashSet<>();
         Collections.addAll(tmp, languages);
         tmp.add("");
         LANGUAGES = Collections.unmodifiableSet(tmp);
 
-        Set<Locale> locs = new HashSet<Locale>();
+        Set<Locale> locs = new HashSet<>();
 
         for (String lang : LANGUAGES) {
             if (lang.isEmpty()) {
