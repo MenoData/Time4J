@@ -762,8 +762,8 @@ public enum PatternType
     CLDR_24,
 
     /**
-     * <p>A small subset of CLDR applicable on any chronology which has registered the
-     * associated elements with same symbols - also if not ISO-compatible. </p>
+     * <p>A small subset of CLDR applicable on any non-ISO-chronology which has registered the
+     * associated elements with same symbols. </p>
      *
      * <p>If not explicitly stated otherwise the count of symbols always
      * controls the minimum count of digits in case of a numerical element.
@@ -826,9 +826,8 @@ public enum PatternType
      * @since   3.5/4.3
      */
     /*[deutsch]
-     * <p>Eine kleine Untermenge von CLDR, die auf jede Chronologie anwendbar ist, die die
-     * assoziierten Elemente mit gleichen Symbolen registriert hat - auch wenn sie nicht
-     * kompatibel zu ISO-8601 ist. </p>
+     * <p>Eine kleine Untermenge von CLDR, die auf jede Nicht-ISO-Chronologie anwendbar ist, die die
+     * assoziierten Elemente mit gleichen Symbolen registriert hat. </p>
      *
      * <p>Wenn nicht explizit anders angegeben, steuert die Anzahl der Symbole
      * immer die minimale Anzahl der zu formatierenden Stellen, ein numerisches
@@ -894,7 +893,7 @@ public enum PatternType
      *
      * @since   3.5/4.3
      */
-    GENERIC;
+    NON_ISO_DATE;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -941,7 +940,7 @@ public enum PatternType
                 return sdf(builder, locale, symbol, count);
             case CLDR_24:
                 return cldr24(builder, locale, symbol, count, false);
-            case GENERIC:
+            case NON_ISO_DATE:
                 return general(builder, symbol, count);
             default:
                 throw new UnsupportedOperationException(this.name());
