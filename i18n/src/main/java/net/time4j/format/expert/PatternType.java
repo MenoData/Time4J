@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -61,9 +62,8 @@ public enum PatternType
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>Follows the standard
-     * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a>
-     * of unicode-consortium. </p>
+     * <p>This standard pattern is applicable on all ISO-chronologies and follows the standard
+     * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a> of unicode-consortium. </p>
      *
      * <p>If not explicitly stated otherwise the count of symbols always
      * controls the minimum count of digits in case of a numerical element.
@@ -152,7 +152,7 @@ public enum PatternType
      *  <tr>
      *      <td>DAY_OF_MONTH</td>
      *      <td>d</td>
-     *      <td>One or two symbols for the day of month.  Important: If the era is not present
+     *      <td>One or two symbols for the day of month. Important: If the era is not present
      *      then this symbol will simply be mapped to {@link PlainDate#DAY_OF_MONTH}. </td>
      *  </tr>
      *  <tr>
@@ -287,7 +287,7 @@ public enum PatternType
      * </div>
      */
     /*[deutsch]
-     * <p>Folgt der Norm
+     * <p>Dieses Standardmuster ist auf alle ISO-Chronologien anwendbar und folgt der Norm
      * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a>
      * des Unicode-Konsortiums. </p>
      *
@@ -935,7 +935,142 @@ public enum PatternType
      *
      * @since   3.4/4.3
      */
-    CLDR_24;
+    CLDR_24,
+
+    /**
+     * <p>A small subset of CLDR applicable on any chronology which has registered the
+     * associated elements with same symbols - also if not ISO-compatible. </p>
+     *
+     * <p>If not explicitly stated otherwise the count of symbols always
+     * controls the minimum count of digits in case of a numerical element.
+     * Is an element shorter then the zero digit will be used for padding. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legend</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ERA</td>
+     *      <td>G</td>
+     *      <td>One to three symbols indicate an abbreviation, four symbols
+     *      indicate the long form and five symbols stand for a letter. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_ERA</td>
+     *      <td>y</td>
+     *      <td>The count of symbols normally controls the minimum count of
+     *      digits. If it is 2 however then the year will be printed with
+     *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>M</td>
+     *      <td>One or two symbols for the numerical form, three symbols
+     *      for the abbreviation, four for the full name and five for
+     *      a letter symbol (NARROW). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Like M, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_MONTH</td>
+     *      <td>d</td>
+     *      <td>One or two symbols for the day of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_YEAR</td>
+     *      <td>D</td>
+     *      <td>One, two or three symbols for the day of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_WEEK</td>
+     *      <td>E</td>
+     *      <td>One to three symbols for the abbreviation, four for the full
+     *      name, five for a letter symbol or six for the short form. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Eine kleine Untermenge von CLDR, die auf jede Chronologie anwendbar ist, die die
+     * assoziierten Elemente mit gleichen Symbolen registriert hat - auch wenn sie nicht
+     * kompatibel zu ISO-8601 ist. </p>
+     *
+     * <p>Wenn nicht explizit anders angegeben, steuert die Anzahl der Symbole
+     * immer die minimale Anzahl der zu formatierenden Stellen, ein numerisches
+     * Element vorausgesetzt. Ist also ein Element in der Darstellung
+     * k&uuml;rzer, dann wird mit der Null-Ziffer aufgef&uuml;llt. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legende</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Beschreibung</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ERA</td>
+     *      <td>G</td>
+     *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
+     *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
+     *      Buchstabensymbol. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_ERA</td>
+     *      <td>y</td>
+     *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
+     *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
+     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>M</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
+     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
+     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Wie M, aber in der {@link OutputContext#STANDALONE
+     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
+     *      erfordert die alleinstehende Variante eine besondere
+     *      Deklination. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_MONTH</td>
+     *      <td>d</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_YEAR</td>
+     *      <td>D</td>
+     *      <td>Ein, zwei oder drei Symbole f&uuml;r den Tag des Jahres. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_WEEK</td>
+     *      <td>E</td>
+     *      <td>Ein bis drei Symbole f&uuml;r die Abk&uuml;rzung, vier
+     *      f&uuml;r den vollen Namen, f&uuml;nf f&uuml;r ein Buchstabensymbol
+     *      oder sechs f&uuml;r die Kurzform. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * @since   3.5/4.3
+     */
+    GENERIC;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -984,6 +1119,8 @@ public enum PatternType
                 return threeten(builder, locale, symbol, count);
             case CLDR_24:
                 return cldr24(builder, locale, symbol, count, false);
+            case GENERIC:
+                return general(builder, symbol, count);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -1609,6 +1746,183 @@ public enum PatternType
                 throw new IllegalArgumentException(
                     "Too many pattern letters: " + count);
         }
+
+    }
+
+    private Map<ChronoElement<?>, ChronoElement<?>> general(
+        ChronoFormatter.Builder<?> builder,
+        char symbol,
+        int count
+    ) {
+
+        Set<ChronoElement<?>> elements = builder.getChronology().getRegisteredElements();
+        String chronoType = builder.getChronology().getChronoType().getName();
+        ChronoElement<?> element = find(elements, symbol, chronoType);
+        TextElement<?> textElement;
+        ChronoElement<Integer> intElement;
+
+        if (element.getType().isEnum() && (element instanceof TextElement)) {
+            textElement = TextElement.class.cast(element);
+            intElement = null;
+        } else if (Integer.class.isAssignableFrom(element.getType())) {
+            textElement = null;
+            intElement = toIntType(element);
+        } else {
+            throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");
+        }
+
+        switch (symbol) {
+            case 'G':
+                TextWidth eraWidth;
+                if (count <= 3) {
+                    eraWidth = TextWidth.ABBREVIATED;
+                } else if (count == 4) {
+                    eraWidth = TextWidth.WIDE;
+                } else if (count == 5) {
+                    eraWidth = TextWidth.NARROW;
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
+                builder.addText(textElement);
+                builder.endSection();
+                break;
+            case 'y':
+                if (count == 2) {
+                    builder.addTwoDigitYear(intElement);
+                } else {
+                    builder.addYear(intElement, count, false);
+                }
+                break;
+            case 'M':
+                addMonth(builder, Math.min(count, count), textElement);
+                break;
+            case 'L':
+                builder.startSection(
+                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                try {
+                    addMonth(builder, count, textElement);
+                } finally {
+                    builder.endSection();
+                }
+                break;
+            case 'd':
+                addNumber(intElement, builder, count, false);
+                break;
+            case 'D':
+                if (count < 3) {
+                    builder.addInteger(intElement, count, 3);
+                } else if (count == 3) {
+                    builder.addFixedInteger(intElement, count);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
+            case 'E':
+                TextWidth width;
+                if (count <= 3) {
+                    width = TextWidth.ABBREVIATED;
+                } else if (count == 4) {
+                    width = TextWidth.WIDE;
+                } else if (count == 5) {
+                    width = TextWidth.NARROW;
+                } else if (count == 6) {
+                    width = TextWidth.SHORT;
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addText(textElement);
+                builder.endSection();
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Unsupported pattern symbol: " + symbol);
+        }
+
+        return Collections.emptyMap();
+
+    }
+
+    private static ChronoElement<?> find(
+        Set<ChronoElement<?>> elements,
+        char symbol,
+        String chronoType
+    ) {
+
+        for (ChronoElement<?> element : elements) {
+            if (element.getSymbol() == symbol) {
+                return element;
+            }
+        }
+
+        throw new IllegalArgumentException(
+            "Cannot find any registered element for symbol " + symbol + " in \"" + chronoType + "\".");
+
+    }
+
+    private static void addMonth(
+        ChronoFormatter.Builder<?> builder,
+        int count,
+        TextElement<?> element
+    ) {
+
+        switch (count) {
+            case 1:
+                addNumerical(builder, element, false);
+                break;
+            case 2:
+                addNumerical(builder, element, true);
+                break;
+            case 3:
+                builder.startSection(
+                    Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED);
+                builder.addText(element);
+                builder.endSection();
+                break;
+            case 4:
+                builder.startSection(
+                    Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                builder.addText(element);
+                builder.endSection();
+                break;
+            case 5:
+                builder.startSection(
+                    Attributes.TEXT_WIDTH, TextWidth.NARROW);
+                builder.addText(element);
+                builder.endSection();
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Too many pattern letters: " + count);
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <V extends Enum<V>> void addNumerical(
+        ChronoFormatter.Builder<?> builder,
+        ChronoElement<?> element,
+        boolean fixed
+    ) {
+
+        ChronoElement<V> e = (ChronoElement<V>) element;
+
+        if (fixed) {
+            builder.addFixedNumerical(e, 2);
+        } else {
+            builder.addNumerical(e, 1, 2);
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ChronoElement<Integer> toIntType(ChronoElement<?> element) {
+
+        return (ChronoElement<Integer>) element;
 
     }
 
