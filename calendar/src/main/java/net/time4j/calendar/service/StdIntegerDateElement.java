@@ -21,11 +21,7 @@
 
 package net.time4j.calendar.service;
 
-import net.time4j.calendar.StdCalendarElement;
-import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.StdOperator;
 import net.time4j.format.NumericalElement;
 
 

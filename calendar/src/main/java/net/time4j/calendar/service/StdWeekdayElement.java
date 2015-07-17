@@ -51,9 +51,7 @@ public final class StdWeekdayElement<T extends ChronoEntity<T>>
     /**
      * <p>Standard constructor. </p>
      *
-     * @param   name        element name
      * @param   chrono      chronological type which registers this element
-     * @param   type        enum value type
      */
     /*[deutsch]
      * <p>Standard-Konstruktor. </p>
