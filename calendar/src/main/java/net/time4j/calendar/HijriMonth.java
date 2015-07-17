@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar.hijri;
+package net.time4j.calendar;
 
 import net.time4j.engine.ChronoCondition;
 import net.time4j.format.CalendarText;

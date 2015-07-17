@@ -19,11 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar.hijri;
+package net.time4j.calendar;
 
 import net.time4j.engine.CalendarEra;
 import net.time4j.format.CalendarText;
-import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
 import java.util.Locale;
