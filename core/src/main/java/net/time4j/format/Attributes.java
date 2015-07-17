@@ -24,6 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.StartOfDay;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -413,6 +414,37 @@ public final class Attributes
     public static final AttributeKey<Integer> PROTECTED_CHARACTERS =
         PredefinedKey.valueOf("PROTECTED_CHARACTERS", Integer.class);
 
+    /**
+     * <p>Defines an attribute key which can be used in queries for the calendar variant. </p>
+     *
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Definiert ein Formatattribut, das in Abfragen nach der Kalendervariante verwendet werden kann. </p>
+     *
+     * @since   3.5/4.3
+     */
+    public static final AttributeKey<String> CALENDAR_VARIANT =
+        PredefinedKey.valueOf("CALENDAR_VARIANT", String.class);
+
+    /**
+     * <p>Defines an attribute key which can be used in queries for the start of day during formatting or parsing. </p>
+     *
+     * <p>The default value is {@link StartOfDay#MIDNIGHT}. </p>
+     *
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Definiert ein Formatattribut, das in Abfragen nach dem Start eines Kalendertages beim Formatieren
+     * und Parsen verwendet werden kann. </p>
+     *
+     * <p>Der Standardwert ist {@link StartOfDay#MIDNIGHT}. </p>
+     *
+     * @since   3.5/4.3
+     */
+    public static final AttributeKey<StartOfDay> START_OF_DAY =
+        PredefinedKey.valueOf("START_OF_DAY", StartOfDay.class);
+
     private static final AttributeQuery EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
@@ -668,6 +700,54 @@ public final class Attributes
         public Builder setStdTimezone() {
 
             return this.setTimezone(Timezone.ofSystem().getID());
+
+        }
+
+        /**
+         * <p>Sets the calendar variant. </p>
+         *
+         * @param   variant     calendar variant
+         * @return  this instance for method chaining
+         * @see     #CALENDAR_VARIANT
+         * @see     net.time4j.engine.CalendarVariant
+         * @since   3.5/4.3
+         */
+        /*[deutsch]
+         * <p>Setzt die Kalendervariante. </p>
+         *
+         * @param   variant     calendar variant
+         * @return  this instance for method chaining
+         * @see     #CALENDAR_VARIANT
+         * @see     net.time4j.engine.CalendarVariant
+         * @since   3.5/4.3
+         */
+        public Builder setCalendarVariant(String variant) {
+
+            this.setInternal(CALENDAR_VARIANT, variant);
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the start of calendar day. </p>
+         *
+         * @param   startOfDay      start of calendar day
+         * @return  this instance for method chaining
+         * @see     #START_OF_DAY
+         * @since   3.5/4.3
+         */
+        /*[deutsch]
+         * <p>Setzt den Start des Kalendertages. </p>
+         *
+         * @param   startOfDay      start of calendar day
+         * @return  this instance for method chaining
+         * @see     #START_OF_DAY
+         * @since   3.5/4.3
+         */
+        public Builder setStartOfDay(StartOfDay startOfDay) {
+
+            this.setInternal(START_OF_DAY, startOfDay);
+            return this;
 
         }
 
