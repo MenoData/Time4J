@@ -47,19 +47,11 @@ import java.util.Set;
 /**
  * <p>Collection of different format patterns. </p>
  *
- * <p>The concrete pattern type does not matter for non-iso-chronologies like {@code HijriCalendar}. Time4J will
- * only support following CLDR-symbols in that case: G (era), y (year-of-era), M (month), L (standalone-month),
- * d (day-of-month), D (day-of-year), E (day-of-week). </p>
- *
  * @author  Meno Hochschild
  * @since   3.0
  */
 /*[deutsch]
  * <p>Sammlung von verschiedenen Standard-Formatmustern. </p>
- *
- * <p>Der konkrete Mustertyp spielt keine Rolle, wenn eine nicht-ISO-kompatible Chronologie wie
- * {@code HijriCalendar} vorliegt. Time4J wird in diesem Fall nur folgende Formatsymbole unterst&uuml;tzen:
- * G (era), y (year-of-era), M (month), L (standalone-month), d (day-of-month), D (day-of-year), E (day-of-week). </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
