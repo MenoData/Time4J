@@ -36,6 +36,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
@@ -1266,6 +1267,56 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public ChronoFormatter<T> withStdTimezone() {
 
         return this.withTimezone(Timezone.ofSystem().getID());
+
+    }
+
+    /**
+     * <p>Sets the calendar variant. </p>
+     *
+     * @return  changed copy with the calendar variant while this instance remains unaffected
+     * @see     Attributes#CALENDAR_VARIANT
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Setzt die Kalendervariante. </p>
+     *
+     * @return  changed copy with the calendar variant while this instance remains unaffected
+     * @see     Attributes#CALENDAR_VARIANT
+     * @since   3.5/4.3
+     */
+    public ChronoFormatter<T> withCalendarVariant(String variant) {
+
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .setCalendarVariant(variant)
+                .build();
+        return new ChronoFormatter<>(this, attrs);
+
+    }
+
+    /**
+     * <p>Sets the start of calendar day. </p>
+     *
+     * @return  changed copy with the given start of day while this instance remains unaffected
+     * @see     Attributes#START_OF_DAY
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Setzt den Beginn des Kalendertages. </p>
+     *
+     * @return  changed copy with the given start of day while this instance remains unaffected
+     * @see     Attributes#START_OF_DAY
+     * @since   3.5/4.3
+     */
+    public ChronoFormatter<T> withStartOfDay(StartOfDay startOfDay) {
+
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .setStartOfDay(startOfDay)
+                .build();
+        return new ChronoFormatter<>(this, attrs);
 
     }
 
