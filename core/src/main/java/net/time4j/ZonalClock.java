@@ -23,8 +23,11 @@ package net.time4j;
 
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
+import net.time4j.engine.CalendarFamily;
+import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.StartOfDay;
 import net.time4j.format.Attributes;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -226,7 +229,8 @@ public final class ZonalClock {
      *
      * @param   <T> generic type of chronology
      * @param   chronology  chronology to be used
-     * @return  current local timestamp in given chronology
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given chronology requires a calendar variant
      * @since   3.3/4.2
      */
     /*[deutsch]
@@ -243,14 +247,103 @@ public final class ZonalClock {
      *
      * @param   <T> generic type of chronology
      * @param   chronology  chronology to be used
-     * @return  current local timestamp in given chronology
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given chronology requires a calendar variant
      * @since   3.3/4.2
      */
     public <T extends ChronoEntity<T>> T now(Chronology<T> chronology) {
 
         Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
         Attributes attrs = new Attributes.Builder().setTimezone(tz.getID()).build();
-        return chronology.createFrom(this.timeSource, attrs);
+        T result = chronology.createFrom(this.timeSource, attrs);
+
+        if (result == null) {
+            throw new IllegalArgumentException("Calendar variant required: " + chronology.getChronoType().getName());
+        } else {
+            return result;
+        }
+
+    }
+
+    /**
+     * <p>Gets the current timestamp in the associated timezone and given chronology taking into account
+     * given calendar variant and start of day. </p>
+     *
+     * <p>The result always dynamically depends on the associated timezone meaning if the underlying
+     * timezone data change then the result will also change by next call. </p>
+     *
+     * <p>Code example: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijriDate =
+     *      CLOCK.now(
+     *          HijriCalendar.family(),
+     *          HijriCalendar.VARIANT_UMALQURA,
+     *          StartOfDay.EVENING);
+     *     System.out.println(hijriDate); // AH-1436-10-02[islamic-umalqura]
+     * </pre>
+     *
+     * <p>Note that this example is even true if the current timestamp is 2015-07-17T18:00 which would
+     * normally map to AH-1436-10-01 (if the clock time is not considered). Reason is that the islamic
+     * day starts on the evening of the previous day. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology  chronology to be used
+     * @param   variant     calendar variant
+     * @param   startOfDay  start of calendar day
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given variant is not supported
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone und angegebenen Chronologie unter
+     * Ber&uuml;cksichtigung von Kalendervariante und Start des Kalendertages. </p>
+     *
+     * <p>Das Ergebnis h&auml;ngt immer dynamisch von der assoziierten Zeitzone ab. Wenn deren Daten sich
+     * &auml;ndern, dann wird diese Methode beim n&auml;chsten Aufruf ein angepasstes Ergebnis liefern. </p>
+     *
+     * <p>Code-Beispiel: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijriDate =
+     *      CLOCK.now(
+     *          HijriCalendar.family(),
+     *          HijriCalendar.VARIANT_UMALQURA,
+     *          StartOfDay.EVENING);
+     *     System.out.println(hijriDate); // AH-1436-10-02[islamic-umalqura]
+     * </pre>
+     *
+     * <p>Zu beachten: Dieses Beispiel stimmt sogar dann, wenn der aktuelle Zeitstempel 2015-07-17T18:00 ist,
+     * welcher normalerweise auf das islamische Datum AH-1436-10-01 abgebildet wird (wenn die Uhrzeit nicht
+     * betrachtet wird), denn der islamische Tag beginnt am Abend des Vortags. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology  chronology to be used
+     * @param   variant     calendar variant
+     * @param   startOfDay  start of calendar day
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given variant is not supported
+     * @since   3.5/4.3
+     */
+    public <T extends CalendarVariant<T>> T now(
+        CalendarFamily<T> chronology,
+        String variant,
+        StartOfDay startOfDay
+    ) {
+
+        Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
+        Attributes attrs =
+            new Attributes.Builder()
+                .setTimezone(tz.getID())
+                .setCalendarVariant(variant)
+                .setStartOfDay(startOfDay).build();
+        T result = chronology.createFrom(this.timeSource, attrs);
+
+        if (result == null) {
+            throw new IllegalArgumentException("Unknown calendar variant: " + variant);
+        } else {
+            return result;
+        }
 
     }
 

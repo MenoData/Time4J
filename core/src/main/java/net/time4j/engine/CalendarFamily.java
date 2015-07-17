@@ -44,7 +44,7 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final Map<String, CalendarSystem<T>> calendars; // must never be exposed
+    private final Map<String, ? extends CalendarSystem<T>> calendars; // must never be exposed
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -53,7 +53,7 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
         ChronoMerger<T> chronoMerger,
         Map<ChronoElement<?>, ElementRule<T, ?>> ruleMap,
         List<ChronoExtension> extensions,
-        Map<String, CalendarSystem<T>> calendars
+        Map<String, ? extends CalendarSystem<T>> calendars
     ) {
         super(chronoType, chronoMerger, ruleMap, extensions);
 
@@ -126,14 +126,14 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final Map<String, CalendarSystem<T>> calendars;
+        private final Map<String, ? extends CalendarSystem<T>> calendars;
 
         //~ Konstruktoren -------------------------------------------------
 
         private Builder(
             Class<T> chronoType,
             ChronoMerger<T> merger,
-            Map<String, CalendarSystem<T>> calendars
+            Map<String, ? extends CalendarSystem<T>> calendars
         ) {
             super(chronoType, merger);
 
@@ -172,7 +172,7 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
         public static <T extends CalendarVariant<T>> Builder<T> setUp(
             Class<T> chronoType,
             ChronoMerger<T> merger,
-            Map<String, CalendarSystem<T>> calendars
+            Map<String, ? extends CalendarSystem<T>> calendars
         ) {
 
             return new Builder<T>(chronoType, merger, calendars);
