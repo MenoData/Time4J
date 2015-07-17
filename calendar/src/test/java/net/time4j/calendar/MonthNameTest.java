@@ -38,7 +38,7 @@ public class MonthNameTest {
     public void executeCodeDemo() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
             ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("EEE, d. MMMM yy", PatternType.GENERIC).build()
+                .addPattern("EEE, d. MMMM yy", PatternType.NON_ISO_DATE).build()
                 .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
                 .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
         HijriCalendar hijri = formatter.parse("Thu, 29. Ramadan 36");

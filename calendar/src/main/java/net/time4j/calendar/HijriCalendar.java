@@ -83,7 +83,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <pre>
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.GENERIC).build()
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
@@ -127,7 +127,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <pre>
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.GENERIC).build()
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);

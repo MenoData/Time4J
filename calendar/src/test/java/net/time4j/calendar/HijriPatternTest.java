@@ -49,7 +49,7 @@ public class HijriPatternTest {
         this.umalqura = HijriCalendar.ofUmalqura(year, month, dom);
         this.formatter =
             ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern(pattern, PatternType.GENERIC).build()
+                .addPattern(pattern, PatternType.NON_ISO_DATE).build()
                 .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
                 .with(Attributes.PIVOT_YEAR, 1500);
         this.text = text;

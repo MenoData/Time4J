@@ -45,6 +45,13 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class MiscellaneousTest {
 
+    @Test(expected=IllegalArgumentException.class)
+    public void printWithGenericPattern() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("EEEE, yyyy-MM-dd", PatternType.NON_ISO_DATE, Locale.GERMAN);
+        formatter.format(PlainDate.of(2015, 7, 17));
+    }
+
     @Test
     public void printLocalDayOfWeekAsText() throws IOException {
         TextElement<?> te =
