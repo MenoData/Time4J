@@ -47,6 +47,7 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
+import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -160,7 +161,7 @@ public final class HijriCalendar
      * <p>Repr&auml;sentiert die islamische &Auml;ra. </p>
      */
     @FormattableElement(format = "G")
-    public static final StdCalendarElement<HijriEra, HijriCalendar> ERA =
+    public static final TextElement<HijriEra> ERA =
         new StdEnumDateElement<>("ERA", HijriCalendar.class, HijriEra.class, 'G');
 
     /**
