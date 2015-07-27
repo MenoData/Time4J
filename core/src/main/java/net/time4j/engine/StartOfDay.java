@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import net.time4j.tz.TZID;
+
 
 /**
  * <p>Defines the start of a given calendar day relative to midnight in seconds. </p>
@@ -72,27 +74,11 @@ public abstract class StartOfDay {
     //~ Methoden ------------------------------------------------------
 
     /**
-     * <p>Yields the start of given calendar day relative to midnight in seconds. </p>
-     *
-     * @param   calendarDay     calendar day
-     * @return  deviation of start of day relative to midnight in seconds
-     * @since   3.5/4.3
-     */
-    /*[deutsch]
-     * <p>Definiert den Start des angegebenen Kalendertages relativ zu Mitternacht in Sekunden. </p>
-     *
-     * @param   calendarDay     calendar day
-     * @return  deviation of start of day relative to midnight in seconds
-     * @since   3.5/4.3
-     */
-    public abstract int getDeviation(Calendrical<?, ?> calendarDay);
-
-    /**
      * <p>Liefert the start of given calendar day relative to midnight in fixed seconds. </p>
      *
      * <p>A negative deviation is explicitly allowed and refers to the previous calendar day. </p>
      *
-     * @param   deviation   the deviation of start of day relative to midnight in seconds
+     * @param   deviation   the deviation of start of day relative to midnight in seconds on the local timeline
      * @return  start of day
      * @since   3.5/4.3
      */
@@ -101,7 +87,7 @@ public abstract class StartOfDay {
      *
      * <p>Eine negative Abweichung ist ausdr&uuml;cklich erlaubt und bezieht sich auf den Vortag. </p>
      *
-     * @param   deviation   the deviation of start of day relative to midnight in seconds
+     * @param   deviation   the deviation of start of day relative to midnight in seconds on the local timeline
      * @return  start of day
      * @since   3.5/4.3
      */
@@ -116,6 +102,27 @@ public abstract class StartOfDay {
         return new FixedStartOfDay(deviation);
 
     }
+
+    /**
+     * <p>Yields the start of given calendar day relative to midnight in seconds. </p>
+     *
+     * @param   calendarDay     calendar day
+     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sundown to a local time
+     * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Definiert den Start des angegebenen Kalendertages relativ zu Mitternacht in Sekunden. </p>
+     *
+     * @param   calendarDay     calendar day
+     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sundown to a local time
+     * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
+     * @since   3.5/4.3
+     */
+    public abstract int getDeviation(
+        Calendrical<?, ?> calendarDay,
+        TZID tzid
+    );
 
     //~ Innere Klassen ----------------------------------------------------
 
@@ -138,7 +145,10 @@ public abstract class StartOfDay {
         //~ Methoden --------------------------------------------------
 
         @Override
-        public int getDeviation(Calendrical<?, ?> calendarDay) {
+        public int getDeviation(
+            Calendrical<?, ?> calendarDay,
+            TZID timezone
+        ) {
 
             return this.deviation;
 
