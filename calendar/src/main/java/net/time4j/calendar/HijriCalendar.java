@@ -46,6 +46,9 @@ import net.time4j.engine.StartOfDay;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.Leniency;
+import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 import java.io.IOException;
 import java.util.Map;
@@ -1068,8 +1071,18 @@ public final class HijriCalendar
                 return null;
             }
 
+            TZID tzid;
+
+            if (attributes.contains(Attributes.TIMEZONE_ID)) {
+                tzid = attributes.get(Attributes.TIMEZONE_ID);
+            } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
+                tzid = Timezone.ofSystem().getID();
+            } else {
+                return null;
+            }
+
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
-            tsp = tsp.minus(startOfDay.getDeviation(tsp.getCalendarDate()), ClockUnit.SECONDS);
+            tsp = tsp.minus(startOfDay.getDeviation(tsp.getCalendarDate(), tzid), ClockUnit.SECONDS);
             return tsp.getCalendarDate().transform(HijriCalendar.class, variant);
 
         }
