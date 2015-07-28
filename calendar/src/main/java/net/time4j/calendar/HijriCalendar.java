@@ -569,6 +569,60 @@ public final class HijriCalendar
 
     }
 
+    /**
+     * <p>Convenient short form for {@code with(YEAR_OF_ERA.incremented())}. </p>
+     *
+     * @return  copy of this instance at next year
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Kurzform f&uuml;r {@code with(YEAR_OF_ERA.incremented())}. </p>
+     *
+     * @return  copy of this instance at next year
+     * @since   3.5/4.3
+     */
+    public HijriCalendar nextYear() {
+
+        return this.with(YEAR_OF_ERA.incremented());
+
+    }
+
+    /**
+     * <p>Convenient short form for {@code with(MONTH_OF_YEAR.incremented())}. </p>
+     *
+     * @return  copy of this instance at next month
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Kurzform f&uuml;r {@code with(MONTH_OF_YEAR.incremented())}. </p>
+     *
+     * @return  copy of this instance at next month
+     * @since   3.5/4.3
+     */
+    public HijriCalendar nextMonth() {
+
+        return this.with(MONTH_OF_YEAR.incremented());
+
+    }
+
+    /**
+     * <p>Convenient short form for {@code with(DAY_OF_MONTH.incremented())}. </p>
+     *
+     * @return  copy of this instance at next day
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Kurzform f&uuml;r {@code with(DAY_OF_MONTH.incremented())}. </p>
+     *
+     * @return  copy of this instance at next day
+     * @since   3.5/4.3
+     */
+    public HijriCalendar nextDay() {
+
+        return this.with(DAY_OF_MONTH.incremented());
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
