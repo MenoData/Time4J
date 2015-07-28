@@ -178,7 +178,13 @@ public final class HijriCalendar
     @FormattableElement(format = "y")
     public static final StdCalendarElement<Integer, HijriCalendar> YEAR_OF_ERA =
         new StdIntegerDateElement<HijriCalendar>(
-            "YEAR_OF_ERA", HijriCalendar.class, Integer.MIN_VALUE, Integer.MAX_VALUE, 'y');
+            "YEAR_OF_ERA",
+            HijriCalendar.class,
+            Integer.MIN_VALUE,
+            Integer.MAX_VALUE,
+            'y',
+            new HijriMonth.Operator(-12),
+            new HijriMonth.Operator(12));
 
     /**
      * <p>Represents the islamic month. </p>
@@ -189,7 +195,12 @@ public final class HijriCalendar
     @FormattableElement(format = "M", standalone = "L")
     public static final StdCalendarElement<HijriMonth, HijriCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<HijriMonth, HijriCalendar>(
-            "MONTH_OF_YEAR", HijriCalendar.class, HijriMonth.class, 'M');
+            "MONTH_OF_YEAR",
+            HijriCalendar.class,
+            HijriMonth.class,
+            'M',
+            new HijriMonth.Operator(-1),
+            new HijriMonth.Operator(1));
 
     /**
      * <p>Represents the islamic day of month. </p>
@@ -199,8 +210,7 @@ public final class HijriCalendar
      */
     @FormattableElement(format = "d")
     public static final StdCalendarElement<Integer, HijriCalendar> DAY_OF_MONTH =
-        new StdIntegerDateElement<HijriCalendar>(
-            "DAY_OF_MONTH", HijriCalendar.class, 1, 30, 'd');
+        new StdIntegerDateElement<HijriCalendar>("DAY_OF_MONTH", HijriCalendar.class, 1, 30, 'd');
 
     /**
      * <p>Represents the islamic day of year. </p>
@@ -210,8 +220,7 @@ public final class HijriCalendar
      */
     @FormattableElement(format = "D")
     public static final StdCalendarElement<Integer, HijriCalendar> DAY_OF_YEAR =
-        new StdIntegerDateElement<HijriCalendar>(
-            "DAY_OF_YEAR", HijriCalendar.class, 1, 355, 'D');
+        new StdIntegerDateElement<HijriCalendar>("DAY_OF_YEAR", HijriCalendar.class, 1, 355, 'D');
 
     /**
      * <p>Represents the islamic day of week. </p>
@@ -646,7 +655,12 @@ public final class HijriCalendar
 
     }
 
-    private MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
+    /**
+     * <p>Returns the variant-dependent calendar system. </p>
+     *
+     * @return  associated calendar system
+     */
+    MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
 
         return getCalendarSystem(this.variant);
 

@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -191,6 +192,41 @@ public enum HijriMonth
     public boolean test(HijriCalendar context) {
 
         return (context.getMonth() == this);
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    static class Operator
+        implements ChronoOperator<HijriCalendar> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final int steps;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Operator(int steps) {
+            super();
+
+            this.steps = steps;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        public HijriCalendar apply(HijriCalendar entity) {
+
+            int ym = entity.getYear() * 12 + entity.getMonth().getValue() - 1;
+            ym += this.steps;
+            int hyear = ym / 12;
+            int hmonth = ym % 12 + 1;
+            int dmax = entity.getCalendarSystem().getLengthOfMonth(HijriEra.ANNO_HEGIRAE, hyear, hmonth);
+            int hdom = Math.min(entity.getDayOfMonth(), dmax);
+
+            return HijriCalendar.of(entity.getVariant(), hyear, hmonth, hdom);
+
+        }
 
     }
 

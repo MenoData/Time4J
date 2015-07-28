@@ -27,6 +27,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.StdOperator;
 
 import java.io.InvalidObjectException;
@@ -71,6 +72,7 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
     private final Class<T> chrono;
 
     private transient final char symbol;
+    private transient final boolean daywise;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -79,27 +81,8 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
      *
      * @param   name        element name
      * @param   chrono      chronological type which registers this element
-     */
-    /*[deutsch]
-     * <p>F&uuml;r Subklassen. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     */
-    public StdDateElement(
-        String name,
-        Class<T> chrono
-    ) {
-        this(name, chrono, '\u0000');
-
-    }
-
-    /**
-     * <p>For subclasses. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
      * @param   symbol      format pattern symbol
+     * @param   daywise     Is it a day-based element?
      */
     /*[deutsch]
      * <p>F&uuml;r Subklassen. </p>
@@ -107,16 +90,19 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
      * @param   name        element name
      * @param   chrono      chronological type which registers this element
      * @param   symbol      format pattern symbol
+     * @param   daywise     Is it a day-based element?
      */
     public StdDateElement(
         String name,
         Class<T> chrono,
-        char symbol
+        char symbol,
+        boolean daywise
     ) {
         super(name);
 
         this.chrono = chrono;
         this.symbol = symbol;
+        this.daywise = daywise;
 
     }
 
@@ -160,12 +146,20 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
     @Override
     public ChronoOperator<T> decremented() {
 
+        if (this.daywise) {
+            return new DayOperator<T>(true);
+        }
+
         return StdOperator.decremented(this);
 
     }
 
     @Override
     public ChronoOperator<T> incremented() {
+
+        if (this.daywise) {
+            return new DayOperator<T>(false);
+        }
 
         return StdOperator.incremented(this);
 
@@ -201,6 +195,40 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
         }
 
         throw new InvalidObjectException(comp);
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class DayOperator<T extends ChronoEntity<T>>
+        implements ChronoOperator<T> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final boolean backwards;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        DayOperator(boolean backwards) {
+            super();
+
+            this.backwards = backwards;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        public T apply(T entity) {
+
+            long e = entity.get(EpochDays.UTC);
+            if (this.backwards) {
+                e--;
+            } else {
+                e++;
+            }
+            return entity.with(EpochDays.UTC, e);
+
+        }
 
     }
 
