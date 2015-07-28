@@ -115,4 +115,11 @@ public class UmalquraDataTest {
             is(PlainDate.of(this.epoch, EpochDays.UTC).get(PlainDate.DAY_OF_WEEK)));
     }
 
+    @Test
+    public void unixDays() {
+        assertThat(
+            this.umalqura.get(EpochDays.UNIX),
+            is(this.epoch + 2 * 365));
+    }
+
 }
