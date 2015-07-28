@@ -94,6 +94,13 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
 
     }
 
+    @Override
+    public boolean isSupported(ChronoElement<?> element) {
+
+        return super.isSupported(element) || (element instanceof EpochDays);
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     /**
