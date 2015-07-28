@@ -116,6 +116,13 @@ public class UmalquraDataTest {
     }
 
     @Test
+    public void yearday() {
+        assertThat(
+            this.umalqura.getDayOfYear(),
+            is(this.umalqura.get(HijriCalendar.DAY_OF_YEAR).intValue()));
+    }
+
+    @Test
     public void unixDays() {
         assertThat(
             this.umalqura.get(EpochDays.UNIX),

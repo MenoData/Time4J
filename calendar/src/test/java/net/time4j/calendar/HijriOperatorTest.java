@@ -14,6 +14,9 @@ public class HijriOperatorTest {
     @Test
     public void nextMonth1() {
         assertThat(
+            HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_I, 29).nextMonth(),
+            is(HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_II, 29)));
+        assertThat(
             HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_I, 29).with(HijriCalendar.MONTH_OF_YEAR.incremented()),
             is(HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_II, 29)));
     }
@@ -21,12 +24,18 @@ public class HijriOperatorTest {
     @Test
     public void nextMonth2() {
         assertThat(
+            HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_II, 30).nextMonth(),
+            is(HijriCalendar.ofUmalqura(1436, HijriMonth.RAJAB, 29)));
+        assertThat(
             HijriCalendar.ofUmalqura(1436, HijriMonth.JUMADA_II, 30).with(HijriCalendar.MONTH_OF_YEAR.incremented()),
             is(HijriCalendar.ofUmalqura(1436, HijriMonth.RAJAB, 29)));
     }
 
     @Test
     public void nextMonth3() {
+        assertThat(
+            HijriCalendar.ofUmalqura(1436, HijriMonth.DHU_AL_HIJJAH, 12).nextMonth(),
+            is(HijriCalendar.ofUmalqura(1437, HijriMonth.MUHARRAM, 12)));
         assertThat(
             HijriCalendar.ofUmalqura(1436, HijriMonth.DHU_AL_HIJJAH, 12).with(HijriCalendar.MONTH_OF_YEAR.incremented()),
             is(HijriCalendar.ofUmalqura(1437, HijriMonth.MUHARRAM, 12)));
@@ -56,6 +65,9 @@ public class HijriOperatorTest {
     @Test
     public void nextYear() {
         assertThat(
+            HijriCalendar.ofUmalqura(1436, HijriMonth.SAFAR, 25).nextYear(),
+            is(HijriCalendar.ofUmalqura(1437, HijriMonth.SAFAR, 25)));
+        assertThat(
             HijriCalendar.ofUmalqura(1436, HijriMonth.SAFAR, 25).with(HijriCalendar.YEAR_OF_ERA.incremented()),
             is(HijriCalendar.ofUmalqura(1437, HijriMonth.SAFAR, 25)));
     }
@@ -69,6 +81,9 @@ public class HijriOperatorTest {
 
     @Test
     public void nextDay() {
+        assertThat(
+            HijriCalendar.ofUmalqura(1436, HijriMonth.DHU_AL_HIJJAH, 30).nextDay(),
+            is(HijriCalendar.ofUmalqura(1437, HijriMonth.MUHARRAM, 1)));
         assertThat(
             HijriCalendar.ofUmalqura(1436, HijriMonth.DHU_AL_HIJJAH, 30).with(HijriCalendar.DAY_OF_MONTH.incremented()),
             is(HijriCalendar.ofUmalqura(1437, HijriMonth.MUHARRAM, 1)));
