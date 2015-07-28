@@ -195,6 +195,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      * @param   target      chronological type this date shall be converted to
      * @param   variant     desired calendar variant
      * @return  converted date of target type t
+     * @throws  ChronoException if given variant is not recognized
      * @throws  IllegalArgumentException if the target class does not have any chronology
      * @throws  ArithmeticException in case of numerical overflow
      * @since   3.5/4.3
@@ -212,6 +213,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      * @param   target      chronological type this date shall be converted to
      * @param   variant     desired calendar variant
      * @return  converted date of target type t
+     * @throws  ChronoException if given variant is not recognized
      * @throws  IllegalArgumentException if the target class does not have any chronology
      * @throws  ArithmeticException in case of numerical overflow
      * @since   3.5/4.3
@@ -414,6 +416,19 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     static <T extends CalendarVariant<T>> long utcDays(CalendarVariant<T> cv) {
 
         return cv.getCalendarSystem().transform(cv.getContext());
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    <V> ElementRule<D, V> getRule(ChronoElement<V> element) {
+
+        if (element instanceof EpochDays) {
+            EpochDays ed = EpochDays.class.cast(element);
+            return (ElementRule<D, V>) ed.derive(this.getCalendarSystem());
+        } else {
+            return super.getRule(element);
+        }
 
     }
 

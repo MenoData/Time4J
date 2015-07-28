@@ -82,6 +82,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #ERA}</li>
  * </ul>
  *
+ * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ *
  * <p>Example of usage: </p>
  *
  * <pre>
@@ -125,6 +127,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
+ *
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
  *
  * <p>Anwendungsbeispiel: </p>
  *

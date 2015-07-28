@@ -326,8 +326,7 @@ public enum EpochDays
      * @param   calsys      calendar system
      * @return  new element rule for this epoch reference
      */
-    <D extends ChronoEntity<D>>
-    ElementRule<D, Long> derive(CalendarSystem<D> calsys) {
+    <D extends ChronoEntity<D>> ElementRule<D, Long> derive(CalendarSystem<D> calsys) {
 
         return new Rule<D>(this, calsys);
 

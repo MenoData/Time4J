@@ -552,7 +552,15 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
 
     }
 
-    private <V> ElementRule<T, V> getRule(ChronoElement<V> element) {
+    /**
+     * Determines the associated element rule.
+     *
+     * @param   <V> value type of element
+     * @param   element     chronological element to be evaluated
+     * @return  element rule
+     * @throws  RuleNotFoundException if a rule cannot be determined
+     */
+    <V> ElementRule<T, V> getRule(ChronoElement<V> element) {
 
         return this.getChronology().getRule(element);
 
