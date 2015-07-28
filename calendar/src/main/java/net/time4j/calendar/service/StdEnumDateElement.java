@@ -24,6 +24,7 @@ package net.time4j.calendar.service;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
@@ -62,57 +63,38 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final Class<V> type;
+    private transient final ChronoOperator<T> decrementor;
+    private transient final ChronoOperator<T> incrementor;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>For subclasses. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   type        enum value type
-     */
-    /*[deutsch]
-     * <p>F&uuml;r Subklassen. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   type        enum value type
-     */
-    public StdEnumDateElement(
-        String name,
-        Class<T> chrono,
-        Class<V> type
-    ) {
-        this(name, chrono, type, '\u0000');
-
-    }
-
-    /**
-     * <p>For subclasses. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   type        enum value type
-     * @param   symbol      format pattern symbol
-     */
-    /*[deutsch]
-     * <p>F&uuml;r Subklassen. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   type        enum value type
-     * @param   symbol      format pattern symbol
-     */
     public StdEnumDateElement(
         String name,
         Class<T> chrono,
         Class<V> type,
         char symbol
     ) {
-        super(name, chrono, symbol);
+        super(name, chrono, symbol, isWeekdayElement(symbol));
 
         this.type = type;
+        this.decrementor = null;
+        this.incrementor = null;
+
+    }
+
+    public StdEnumDateElement(
+        String name,
+        Class<T> chrono,
+        Class<V> type,
+        char symbol,
+        ChronoOperator<T> decrementor,
+        ChronoOperator<T> incrementor
+    ) {
+        super(name, chrono, symbol, false);
+
+        this.type = type;
+        this.decrementor = decrementor;
+        this.incrementor = incrementor;
 
     }
 
@@ -144,6 +126,28 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     public int numerical(V value) {
 
         return value.ordinal() + 1;
+
+    }
+
+    @Override
+    public ChronoOperator<T> decremented() {
+
+        if (this.decrementor != null) {
+            return this.decrementor;
+        }
+
+        return super.decremented();
+
+    }
+
+    @Override
+    public ChronoOperator<T> incremented() {
+
+        if (this.incrementor != null) {
+            return this.incrementor;
+        }
+
+        return super.incremented();
 
     }
 
@@ -239,7 +243,13 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
      */
     protected boolean isWeekdayElement() {
 
-        return (this.getSymbol() == 'E');
+        return isWeekdayElement(this.getSymbol());
+
+    }
+
+    private static boolean isWeekdayElement(char symbol) {
+
+        return (symbol == 'E');
 
     }
 

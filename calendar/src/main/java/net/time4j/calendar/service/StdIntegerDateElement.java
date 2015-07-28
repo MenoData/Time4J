@@ -22,6 +22,7 @@
 package net.time4j.calendar.service;
 
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.NumericalElement;
 
 
@@ -49,53 +50,11 @@ public class StdIntegerDateElement<T extends ChronoEntity<T>>
 
     private transient final int min;
     private transient final int max;
+    private transient final ChronoOperator<T> decrementor;
+    private transient final ChronoOperator<T> incrementor;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>For subclasses. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   min         default minimum value
-     * @param   max         default maximum value
-     */
-    /*[deutsch]
-     * <p>F&uuml;r Subklassen. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   min         default minimum value
-     * @param   max         default maximum value
-     */
-    public StdIntegerDateElement(
-        String name,
-        Class<T> chrono,
-        int min,
-        int max
-    ) {
-        this(name, chrono, min, max, '\u0000');
-
-    }
-
-    /**
-     * <p>For subclasses. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   min         default minimum value
-     * @param   max         default maximum value
-     * @param   symbol      format pattern symbol
-     */
-    /*[deutsch]
-     * <p>F&uuml;r Subklassen. </p>
-     *
-     * @param   name        element name
-     * @param   chrono      chronological type which registers this element
-     * @param   min         default minimum value
-     * @param   max         default maximum value
-     * @param   symbol      format pattern symbol
-     */
     public StdIntegerDateElement(
         String name,
         Class<T> chrono,
@@ -103,10 +62,30 @@ public class StdIntegerDateElement<T extends ChronoEntity<T>>
         int max,
         char symbol
     ) {
-        super(name, chrono, symbol);
+        super(name, chrono, symbol, true);
 
         this.min = min;
         this.max = max;
+        this.decrementor = null;
+        this.incrementor = null;
+
+    }
+
+    public StdIntegerDateElement(
+        String name,
+        Class<T> chrono,
+        int min,
+        int max,
+        char symbol,
+        ChronoOperator<T> decrementor,
+        ChronoOperator<T> incrementor
+    ) {
+        super(name, chrono, symbol, false);
+
+        this.min = min;
+        this.max = max;
+        this.decrementor = decrementor;
+        this.incrementor = incrementor;
 
     }
 
@@ -137,6 +116,28 @@ public class StdIntegerDateElement<T extends ChronoEntity<T>>
     public int numerical(Integer value) {
 
         return value.intValue();
+
+    }
+
+    @Override
+    public ChronoOperator<T> decremented() {
+
+        if (this.decrementor != null) {
+            return this.decrementor;
+        }
+
+        return super.decremented();
+
+    }
+
+    @Override
+    public ChronoOperator<T> incremented() {
+
+        if (this.incrementor != null) {
+            return this.incrementor;
+        }
+
+        return super.incremented();
 
     }
 

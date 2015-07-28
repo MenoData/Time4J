@@ -176,7 +176,14 @@ public final class HijriCalendar
      */
     @FormattableElement(format = "y")
     public static final StdCalendarElement<Integer, HijriCalendar> YEAR_OF_ERA =
-        new StdIntegerDateElement<>("YEAR_OF_ERA", HijriCalendar.class, Integer.MIN_VALUE, Integer.MAX_VALUE, 'y');
+        new StdIntegerDateElement<>(
+            "YEAR_OF_ERA",
+            HijriCalendar.class,
+            Integer.MIN_VALUE,
+            Integer.MAX_VALUE,
+            'y',
+            new HijriMonth.Operator(-12),
+            new HijriMonth.Operator(12));
 
     /**
      * <p>Represents the islamic month. </p>
@@ -186,7 +193,13 @@ public final class HijriCalendar
      */
     @FormattableElement(format = "M", standalone = "L")
     public static final StdCalendarElement<HijriMonth, HijriCalendar> MONTH_OF_YEAR =
-        new StdEnumDateElement<>("MONTH_OF_YEAR", HijriCalendar.class, HijriMonth.class, 'M');
+        new StdEnumDateElement<>(
+            "MONTH_OF_YEAR",
+            HijriCalendar.class,
+            HijriMonth.class,
+            'M',
+            new HijriMonth.Operator(-1),
+            new HijriMonth.Operator(1));
 
     /**
      * <p>Represents the islamic day of month. </p>
@@ -641,7 +654,12 @@ public final class HijriCalendar
 
     }
 
-    private MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
+    /**
+     * <p>Returns the variant-dependent calendar system. </p>
+     *
+     * @return  associated calendar system
+     */
+    MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
 
         return getCalendarSystem(this.variant);
 
