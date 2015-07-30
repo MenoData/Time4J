@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.expert.Iso8601Format;
@@ -29,6 +30,7 @@ import net.time4j.format.expert.Iso8601Format;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -77,19 +79,10 @@ final class AstronomicalHijriData
     AstronomicalHijriData(String variant) throws IOException {
         super();
 
-        InputStream is = null;
-        String name = "data/" + variant.replace('-', '_') + ".data";
         this.variant = variant;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl != null) {
-            is = cl.getResourceAsStream(name);
-        }
-
-        if (is == null) {
-            cl = AstronomicalHijriData.class.getClassLoader();
-            is = cl.getResourceAsStream(name);
-        }
+        String name = "data/" + variant.replace('-', '_') + ".data";
+        URL url = ResourceLoader.getInstance().find("calendar", AstronomicalHijriData.class, name);
+        InputStream is = ResourceLoader.load(url, true);
 
         if (is != null) {
             try {

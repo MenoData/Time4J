@@ -21,6 +21,7 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.tz.ExtZoneProvider;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
@@ -28,10 +29,10 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.other.WindowsZone;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -199,29 +200,15 @@ public class WinZoneProviderSPI
         ObjectInputStream ois = null;
 
         try {
-            InputStream is = null;
             String source = "data/winzone.ser";
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-
-            if (loader != null) {
-                is = loader.getResourceAsStream(source);
-            }
-
-            if (is == null) {
-                loader = WindowsZone.class.getClassLoader();
-                is = loader.getResourceAsStream(source);
-            }
-
-            if (is == null) {
-                throw new FileNotFoundException(source);
-            } else {
-                ois = new ObjectInputStream(is);
-                String version = ois.readUTF();
-                Map<String, Map<String, String>> data = cast(ois.readObject());
-                Map<String, Map<String, String>> map = new HashMap<>(data);
-                map.put(VKEY, Collections.singletonMap(version, version));
-                return map;
-            }
+            URL url = ResourceLoader.getInstance().find("misc", WindowsZone.class, source);
+            InputStream is = ResourceLoader.load(url, true);
+            ois = new ObjectInputStream(is);
+            String version = ois.readUTF();
+            Map<String, Map<String, String>> data = cast(ois.readObject());
+            Map<String, Map<String, String>> map = new HashMap<>(data);
+            map.put(VKEY, Collections.singletonMap(version, version));
+            return map;
         } catch (ClassNotFoundException | IOException ex) {
             throw new IllegalStateException(ex);
         } finally {

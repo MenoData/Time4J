@@ -157,17 +157,7 @@ public final class SymbolProviderSPI
 
 	private static ClassLoader getLoader() {
 
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-		if (cl == null) {
-			cl = NumberSymbolProvider.class.getClassLoader();
-		}
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-		return cl;
+		return SymbolProviderSPI.class.getClassLoader();
 
 	}
 

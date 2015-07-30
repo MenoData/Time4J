@@ -22,7 +22,7 @@
 package net.time4j.i18n;
 
 import net.time4j.Weekday;
-import net.time4j.Weekmodel;
+import net.time4j.base.ResourceLoader;
 import net.time4j.format.WeekdataProvider;
 
 import java.io.BufferedReader;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   2.2
+ * @doctags.exclude
  */
 public class WeekdataProviderSPI
     implements WeekdataProvider {
@@ -110,31 +112,19 @@ public class WeekdataProviderSPI
     public WeekdataProviderSPI() {
         super();
 
-        InputStream is = null;
         String name = "data/weekend.data";
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl != null) {
-            is = cl.getResourceAsStream(name);
-        }
-
-        if (is == null) {
-            cl = Weekmodel.class.getClassLoader();
-            is = cl.getResourceAsStream(name);
-        }
+        URL url = ResourceLoader.getInstance().find("i18n", WeekdataProviderSPI.class, name);
+        InputStream is = ResourceLoader.load(url, true);
 
         if (is != null) {
-
-            this.source = "@" + cl.getResource(name).toString();
+            this.source = "@" + url;
             Map<String, Weekday> tmpStart = new HashMap<>(START_OF_WEEKEND.size());
             Map<String, Weekday> tmpEnd = new HashMap<>(END_OF_WEEKEND.size());
 
             try {
-
                 BufferedReader br =
                     new BufferedReader(
                         new InputStreamReader(is, "US-ASCII"));
-
                 String line;
 
                 while ((line = br.readLine()) != null) {

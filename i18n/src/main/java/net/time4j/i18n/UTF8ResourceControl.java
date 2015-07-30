@@ -21,13 +21,14 @@
 
 package net.time4j.i18n;
 
+import net.time4j.base.ResourceLoader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +52,13 @@ public class UTF8ResourceControl
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private UTF8ResourceControl() {
+    /**
+     * For subclasses only.
+     */
+    /*[deutsch]
+     * Nur f&uuml;r Subklassen.
+     */
+    protected UTF8ResourceControl() {
         super();
 
     }
@@ -91,24 +98,14 @@ public class UTF8ResourceControl
         if (format.equals(FORMAT_ID)) {
 
             ResourceBundle bundle = null;
-            InputStream stream = null;
 
             String bundleName =
                 this.toBundleName(baseName, locale);
             String resourceName =
                 this.toResourceName(bundleName, "properties");
 
-            if (reload) {
-                URL url = loader.getResource(resourceName);
-
-                if (url != null) {
-                    URLConnection uconn = url.openConnection();
-                    uconn.setUseCaches(false);
-                    stream = uconn.getInputStream();
-                }
-            } else {
-                stream = loader.getResourceAsStream(resourceName);
-            }
+            URL url = ResourceLoader.getInstance().find(getModuleName(), getModuleRef(), resourceName);
+            InputStream stream = ResourceLoader.load(url, reload);
 
             if (stream != null) {
                 Reader reader = null;
@@ -162,6 +159,18 @@ public class UTF8ResourceControl
         }
 
         return sb.toString();
+
+    }
+
+    protected String getModuleName() {
+
+        return "i18n";
+
+    }
+
+    protected Class<?> getModuleRef() {
+
+        return UTF8ResourceControl.class;
 
     }
 

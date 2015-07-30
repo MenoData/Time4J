@@ -780,14 +780,20 @@ public final class LeapSeconds
      *
      * @return  immutable date of expiration
      * @since   2.3
+     * @throws  IllegalStateException if leap seconds are not activated
      */
     /*[deutsch]
      * <p>Bestimmt das Verfallsdatum der zugrundeliegenden Daten. </p>
      *
      * @return  immutable date of expiration
      * @since   2.3
+     * @throws  IllegalStateException if leap seconds are not activated
      */
     public GregorianDate getDateOfExpiration() {
+
+        if (!this.isEnabled()) {
+            throw new IllegalStateException("Leap seconds not activated.");
+        }
 
         return this.provider.getDateOfExpiration();
 
@@ -862,8 +868,10 @@ public final class LeapSeconds
         StringBuilder sb = new StringBuilder(2048);
         sb.append("[PROVIDER=");
         sb.append(this.provider);
-        sb.append(",EXPIRES=");
-        sb.append(format(this.getDateOfExpiration()));
+        if (this.provider != null) {
+            sb.append(",EXPIRES=");
+            sb.append(format(this.getDateOfExpiration()));
+        }
         sb.append(",EVENTS=[");
 
         if (this.isEnabled()) {
