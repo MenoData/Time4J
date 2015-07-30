@@ -22,7 +22,6 @@
 package net.time4j.i18n;
 
 import net.time4j.Weekday;
-import net.time4j.Weekmodel;
 import net.time4j.base.ResourceLoader;
 import net.time4j.format.WeekdataProvider;
 
