@@ -32,6 +32,7 @@
  *      if specified then Time4J will look for a file with name
  *      &quot;tzdata{version}.repository&quot; in given directory path
  *      otherwise the name will not contain the version</li>
+ *  <li>net.time4j.base.ResourceLoader =&gt; class name of external {@code ResourceLoader}-implementation</li>
  * </ul>
  */
 /*[deutsch]
@@ -69,6 +70,7 @@
  *      wenn angegeben wird Time4J im Verzeichnispfad nach einer Datei mit dem
  *      Namen &quot;tzdata{version}.repository&quot; suchen, ansonsten wird
  *      der Name der Datei nicht die Version enthalten</li>
+ *  <li>net.time4j.base.ResourceLoader =&gt; Klassenname einer externen {@code ResourceLoader}-Implementierung</li>
  * </ul>
  */
 package net.time4j;

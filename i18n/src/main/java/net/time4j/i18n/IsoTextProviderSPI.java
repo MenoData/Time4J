@@ -576,7 +576,7 @@ public final class IsoTextProviderSPI
             return ResourceBundle.getBundle(
                 "calendar/" + ISO_CALENDAR_TYPE,
                 desired,
-                getLoader(),
+                getDefaultLoader(),
                 UTF8ResourceControl.SINGLETON);
         }
 
@@ -661,22 +661,6 @@ public final class IsoTextProviderSPI
         return elementName;
 
     }
-
-	private static ClassLoader getLoader() {
-
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-		if (cl == null) {
-			cl = getDefaultLoader();
-		}
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-		return cl;
-
-	}
 
     private static ClassLoader getDefaultLoader() {
 

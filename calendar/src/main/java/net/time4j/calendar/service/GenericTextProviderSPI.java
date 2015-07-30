@@ -53,14 +53,25 @@ public final class GenericTextProviderSPI
 
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
+    private static final ResourceBundle.Control CONTROL;
 
     static {
+        CONTROL =
+            new UTF8ResourceControl() {
+                protected String getModuleName() {
+                    return "calendar";
+                }
+                protected Class<?> getModuleRef() {
+                    return GenericTextProviderSPI.class;
+                }
+            };
+
         ResourceBundle rb =
             ResourceBundle.getBundle(
                 "calendar/" + "islamic",
                 Locale.ROOT,
                 getDefaultLoader(),
-                UTF8ResourceControl.SINGLETON);
+                CONTROL);
 
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<String>();
@@ -246,7 +257,7 @@ public final class GenericTextProviderSPI
     @Override
     public ResourceBundle.Control getControl() {
 
-        return UTF8ResourceControl.SINGLETON;
+        return CONTROL;
 
     }
 
@@ -306,8 +317,8 @@ public final class GenericTextProviderSPI
             return ResourceBundle.getBundle(
                 "calendar/" + calendarType,
                 desired,
-                getLoader(),
-                UTF8ResourceControl.SINGLETON);
+                getDefaultLoader(),
+                CONTROL);
         }
 
         return null;
@@ -397,22 +408,6 @@ public final class GenericTextProviderSPI
         return elementName;
 
     }
-
-	private static ClassLoader getLoader() {
-
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-		if (cl == null) {
-			cl = getDefaultLoader();
-		}
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-		return cl;
-
-	}
 
     private static ClassLoader getDefaultLoader() {
 

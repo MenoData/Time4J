@@ -24,6 +24,7 @@ package net.time4j.scale.spi;
 import net.time4j.PlainDate;
 import net.time4j.Platform;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondProvider;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -61,22 +63,17 @@ public final class DefaultLeapSecondProviderSPI
 
         PlainDate tmpExpires = PlainDate.axis().getMinimum();
         this.table = new LinkedHashMap<GregorianDate, Integer>(50);
-        InputStream is = null;
         String name = PATH_TO_LEAPSECONDS;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl != null) {
-            is = cl.getResourceAsStream(name);
-        }
+        URL url = ResourceLoader.getInstance().find("core", LeapSecondProvider.class, name);
+        InputStream is = ResourceLoader.load(url, true);
 
         if (is == null) {
-            cl = LeapSecondProvider.class.getClassLoader();
-            is = cl.getResourceAsStream(name);
+            is = LeapSecondProvider.class.getClassLoader().getResourceAsStream(name); // test classes in IDE
         }
 
         if (is != null) {
 
-            this.source = cl.getResource(name).toString();
+            this.source = url.toString();
             TemporalFormatter<PlainDate> f = PlainDate.localFormatter("yyyy-MM-dd", Platform.PATTERN);
 
             try {
