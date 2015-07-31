@@ -81,7 +81,7 @@ final class AstronomicalHijriData
 
         this.variant = variant;
         String name = "data/" + variant.replace('-', '_') + ".data";
-        URL url = ResourceLoader.getInstance().find("calendar", AstronomicalHijriData.class, name);
+        URL url = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
         InputStream is = ResourceLoader.load(url, true);
 
         if (is != null) {

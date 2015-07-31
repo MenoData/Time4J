@@ -104,7 +104,7 @@ public class UTF8ResourceControl
             String resourceName =
                 this.toResourceName(bundleName, "properties");
 
-            URL url = ResourceLoader.getInstance().find(getModuleName(), getModuleRef(), resourceName);
+            URL url = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
             InputStream stream = ResourceLoader.load(url, reload);
 
             if (stream != null) {

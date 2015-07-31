@@ -28,6 +28,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.ServiceLoader;
 
 
 /**
@@ -114,28 +115,29 @@ public abstract class ResourceLoader {
     }
 
     /**
-     * <p>Performs a look-up for given module resource. </p>
+     * <p>Constructs an URL for given module resource. </p>
      *
-     * <p>Some implementations might yield an url without verifying if the url really exists. </p>
+     * <p>Some implementations might yield an url without verifying if the url resource really exists. </p>
      *
      * @param   moduleName      name of related time4j-module
      * @param   moduleRef       module-specific class reference
      * @param   path            path to text resource (must be understandable by class loaders)
-     * @return  url of resource or {@code null} if not found
+     * @return  url of resource or {@code null} if unable to locate the resource
      * @since   3.5/4.3
      */
     /*[deutsch]
-     * <p>Versucht, die angegebene Ressource zu finden. </p>
+     * <p>Erstellt einen URL f&uuml;r die angegebene Ressource. </p>
      *
-     * <p>Einige Implementierungen k&ouml;nnen einen URL liefern, ohne die reale Existenz des URL zu pr&uuml;fen. </p>
+     * <p>Einige Implementierungen k&ouml;nnen einen URL liefern, ohne die reale Existenz der URL-Ressource
+     * zu pr&uuml;fen. </p>
      *
      * @param   moduleName      name of related time4j-module
      * @param   moduleRef       module-specific class reference
      * @param   path            path to text resource (must be understandable by class loaders)
-     * @return  url of resource or {@code null} if not found
+     * @return  url of resource or {@code null} if unable to locate the resource
      * @since   3.5/4.3
      */
-    public abstract URL find(
+    public abstract URL locate(
         String moduleName,
         Class<?> moduleRef,
         String path
@@ -146,10 +148,10 @@ public abstract class ResourceLoader {
      *
      * <p>Callers are responsible for closing the result stream. </p>
      *
-     * @param   url         uniform resource locator as result of find-method (optional)
+     * @param   url         uniform resource locator as result of locate-method (optional)
      * @param   noCache     avoid caching?
      * @return  input stream or {@code null} if the resource could not be opened
-     * @see     #find(String, Class, String)
+     * @see     #locate(String, Class, String)
      * @since   3.5/4.3
      */
     /*[deutsch]
@@ -157,10 +159,10 @@ public abstract class ResourceLoader {
      *
      * <p>Aufrufer sind daf&uuml;r verantwortlich, den Eingabestrom zu schlie&szlig;en </p>
      *
-     * @param   url         uniform resource locator as result of find-method (optional)
+     * @param   url         uniform resource locator as result of locate-method (optional)
      * @param   noCache     avoid caching?
      * @return  input stream or {@code null} if the resource could not be opened
-     * @see     #find(String, Class, String)
+     * @see     #locate(String, Class, String)
      * @since   3.5/4.3
      */
     public static InputStream load(
@@ -187,6 +189,25 @@ public abstract class ResourceLoader {
 
     }
 
+    /**
+     * <p>Finds a collection of service providers available for given service provider interface. </p>
+     *
+     * @param   <S> generic service type
+     * @param   serviceInterface    service provider interface
+     * @return  iterable collection of service providers
+     * @since   3.5/4.3
+     */
+    /*[deutsch]
+     * <p>Findet eine Menge von <i>Service Provider</i>-Objekten, die zum angegebenen Interface
+     * verf&uuml;gbar sind. </p>
+     *
+     * @param   <S> generic service type
+     * @param   serviceInterface    service provider interface
+     * @return  iterable collection of service providers
+     * @since   3.5/4.3
+     */
+    public abstract  <S> Iterable<S> services(Class<S> serviceInterface);
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class StdResourceLoader
@@ -195,7 +216,7 @@ public abstract class ResourceLoader {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public URL find(
+        public URL locate(
             String moduleName,
             Class<?> moduleRef,
             String path
@@ -224,6 +245,13 @@ public abstract class ResourceLoader {
 
             // last try - ask the class loader
             return moduleRef.getClassLoader().getResource(path);
+
+        }
+
+        @Override
+        public <S> Iterable<S> services(Class<S> serviceInterface) {
+
+            return ServiceLoader.load(serviceInterface, serviceInterface.getClassLoader());
 
         }
 
