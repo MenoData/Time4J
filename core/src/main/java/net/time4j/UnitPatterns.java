@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
@@ -31,7 +32,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -42,7 +42,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author  Meno Hochschild
  * @since   3.0
  * @see     UnitPatternProvider
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class UnitPatterns {
 
@@ -51,8 +51,8 @@ final class UnitPatterns {
     private static final int MIN_LIST_INDEX = 2;
     private static final int MAX_LIST_INDEX = 7;
 
-    private static final ConcurrentMap<Locale, UnitPatterns> CACHE =
-        new ConcurrentHashMap<Locale, UnitPatterns>();
+    private static final ConcurrentMap<Locale, UnitPatterns> CACHE = new ConcurrentHashMap<>();
+
     private static final IsoUnit[] UNIT_IDS = {
         CalendarUnit.YEARS,
         CalendarUnit.MONTHS,
@@ -71,20 +71,8 @@ final class UnitPatterns {
     static {
         FALLBACK = new FallbackProvider();
         UnitPatternProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = UnitPatternProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            UnitPatternProvider tmp
-            : ServiceLoader.load(UnitPatternProvider.class, cl)
-        ) {
+        for (UnitPatternProvider tmp : ResourceLoader.getInstance().services(UnitPatternProvider.class)) {
             p = tmp;
             break;
         }
@@ -112,22 +100,16 @@ final class UnitPatterns {
 
         this.locale = language;
 
-        Map<IsoUnit, Map<TextWidth, Map<PluralCategory, String>>> map =
-            new HashMap<IsoUnit, Map<TextWidth, Map<PluralCategory, String>>>(10);
-        Map<IsoUnit, Map<PluralCategory, String>> mapPast =
-            new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
-        Map<IsoUnit, Map<PluralCategory, String>> mapFuture =
-            new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
-        Map<Integer, Map<TextWidth, String>> mapList =
-            new HashMap<Integer, Map<TextWidth, String>>(10);
+        Map<IsoUnit, Map<TextWidth, Map<PluralCategory, String>>> map = new HashMap<>(10);
+        Map<IsoUnit, Map<PluralCategory, String>> mapPast = new HashMap<>(10);
+        Map<IsoUnit, Map<PluralCategory, String>> mapFuture = new HashMap<>(10);
+        Map<Integer, Map<TextWidth, String>> mapList = new HashMap<>(10);
 
         for (IsoUnit unit : UNIT_IDS) {
             // Standard-Muster
-            Map<TextWidth, Map<PluralCategory, String>> tmp1 =
-                new EnumMap<TextWidth, Map<PluralCategory, String>>(TextWidth.class);
+            Map<TextWidth, Map<PluralCategory, String>> tmp1 = new EnumMap<>(TextWidth.class);
             for (TextWidth width : TextWidth.values()) {
-                Map<PluralCategory, String> tmp2 =
-                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                Map<PluralCategory, String> tmp2 = new EnumMap<>(PluralCategory.class);
                 for (PluralCategory cat : PluralCategory.values()) {
                     tmp2.put(cat, lookup(language, unit, width, cat));
                 }
@@ -139,8 +121,7 @@ final class UnitPatterns {
 
             if (!Character.isDigit(unit.getSymbol())) { // no subseconds
                 // Vergangenheit
-                Map<PluralCategory, String> tmp3 =
-                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                Map<PluralCategory, String> tmp3 = new EnumMap<>(PluralCategory.class);
                 for (PluralCategory cat : PluralCategory.values()) {
                     tmp3.put(cat, lookup(language, unit, false, cat));
                 }
@@ -149,8 +130,7 @@ final class UnitPatterns {
                     Collections.unmodifiableMap(tmp3));
 
                 // Zukunft
-                Map<PluralCategory, String> tmp4 =
-                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                Map<PluralCategory, String> tmp4 = new EnumMap<>(PluralCategory.class);
                 for (PluralCategory cat : PluralCategory.values()) {
                     tmp4.put(cat, lookup(language, unit, true, cat));
                 }
@@ -163,8 +143,7 @@ final class UnitPatterns {
         // Liste
         for (int i = MIN_LIST_INDEX; i <= MAX_LIST_INDEX; i++) {
             Integer index = Integer.valueOf(i);
-            Map<TextWidth, String> tmp5 =
-                new EnumMap<TextWidth, String>(TextWidth.class);
+            Map<TextWidth, String> tmp5 = new EnumMap<>(TextWidth.class);
             for (TextWidth width : TextWidth.values()) {
                 tmp5.put(width, lookup(language, width, index));
             }

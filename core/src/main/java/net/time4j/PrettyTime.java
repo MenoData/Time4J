@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeSpan;
@@ -41,21 +42,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
-import static net.time4j.ClockUnit.SECONDS;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 
 
 /**
@@ -91,20 +83,8 @@ public final class PrettyTime {
 
     static {
         NumberSymbolProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = NumberSymbolProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            NumberSymbolProvider tmp
-            : ServiceLoader.load(NumberSymbolProvider.class, cl)
-        ) {
+        for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
             p = tmp;
             break;
         }
