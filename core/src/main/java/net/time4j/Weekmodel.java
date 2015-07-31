@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
@@ -52,7 +53,6 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -132,19 +132,8 @@ public final class Weekmodel
 
     static {
         WeekdataProvider tmp = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = WeekdataProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            WeekdataProvider p : ServiceLoader.load(WeekdataProvider.class, cl)
-        ) {
+        for (WeekdataProvider p : ResourceLoader.getInstance().services(WeekdataProvider.class)) {
             tmp = p;
             break;
         }
