@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
@@ -33,7 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -269,7 +269,6 @@ public final class CalendarText {
                 ResourceBundle.getBundle(
                     "calendar/" + calendarType,
                     locale,
-                    getLoader(),
                     p.getControl());
         } catch (MissingResourceException ex) {
             tmpMre = ex;
@@ -349,10 +348,9 @@ public final class CalendarText {
 
         if (instance == null) {
             TextProvider p = null;
-            ClassLoader c = getLoader();
 
             // ServiceLoader-Mechanismus (Suche nach externen Providern)
-            for (TextProvider tmp : ServiceLoader.load(TextProvider.class, c)) {
+            for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
                 if (
                     isCalendarTypeSupported(tmp, calendarType)
                     && isLocaleSupported(tmp, locale)
@@ -364,7 +362,7 @@ public final class CalendarText {
 
             if (p == null) {
                 // ServiceLoader-Mechanismus (Suche nach alternativen Providern)
-                for (TextProvider tmp : ServiceLoader.load(AltTextProvider.class, c)) {
+                for (TextProvider tmp : ResourceLoader.getInstance().services(AltTextProvider.class)) {
                     if (
                         isCalendarTypeSupported(tmp, calendarType)
                         && isLocaleSupported(tmp, locale)
@@ -377,7 +375,6 @@ public final class CalendarText {
 
             // Java-Ressourcen
             if (p == null) {
-                // TODO: Für Java 8 neuen Provider definieren (mit Quartalen)?
                 TextProvider tmp = new JDKTextProvider();
 
                 if (
@@ -931,22 +928,6 @@ public final class CalendarText {
         return keyBuilder.toString();
 
     }
-
-	private static ClassLoader getLoader() {
-
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-		if (cl == null) {
-			cl = CalendarText.class.getClassLoader();
-		}
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-		return cl;
-
-	}
 
     //~ Innere Klassen ----------------------------------------------------
 
