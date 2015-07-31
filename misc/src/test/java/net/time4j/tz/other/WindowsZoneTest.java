@@ -82,10 +82,18 @@ public class WindowsZoneTest {
     }
 
     @Test
-    public void resolveSmartFrance() {
+    public void resolveSmartFrance1() {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
         TZID tzid = wzn.resolveSmart(Locale.FRANCE);
         assertThat(tzid, nullValue());
+    }
+
+    @Test
+    public void resolveSmartFrance2() {
+        WindowsZone wzn = WindowsZone.of("Romance Standard Time");
+        assertThat(
+            wzn.resolveSmart(Locale.FRANCE).canonical(),
+            is("WINDOWS~Europe/Paris"));
     }
 
     @Test
