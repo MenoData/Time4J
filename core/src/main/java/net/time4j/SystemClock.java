@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TickProvider;
@@ -30,7 +31,6 @@ import net.time4j.tz.Timezone;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.ServiceLoader;
 
 
 /**
@@ -57,21 +57,10 @@ public final class SystemClock
     private static final boolean MONOTON_MODE;
 
     static {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = TickProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        ServiceLoader<TickProvider> sl = ServiceLoader.load(TickProvider.class, cl);
         String platform = System.getProperty("java.vm.name");
         TickProvider candidate = null;
 
-        for (TickProvider temp : sl) {
+        for (TickProvider temp : ResourceLoader.getInstance().services(TickProvider.class)) {
             if (platform.equals(temp.getPlatform())) {
                 candidate = temp;
                 break;

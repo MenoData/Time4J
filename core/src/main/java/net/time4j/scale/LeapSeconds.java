@@ -23,6 +23,7 @@ package net.time4j.scale;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.base.ResourceLoader;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -194,21 +194,8 @@ public final class LeapSeconds
         int leapCount = 0;
 
         if (!SUPPRESS_UTC_LEAPSECONDS) {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-            if (cl == null) {
-                cl = LeapSecondProvider.class.getClassLoader();
-            }
-
-            if (cl == null) {
-                cl = ClassLoader.getSystemClassLoader();
-            }
-
-            ServiceLoader<LeapSecondProvider> sl =
-                ServiceLoader.load(LeapSecondProvider.class, cl);
-
             // Provider mit den meisten Schaltsekunden wählen
-            for (LeapSecondProvider temp : sl) {
+            for (LeapSecondProvider temp : ResourceLoader.getInstance().services(LeapSecondProvider.class)) {
                 int currentCount = temp.getLeapSecondTable().size();
 
                 if (currentCount > leapCount) {
