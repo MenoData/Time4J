@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
@@ -31,7 +32,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -71,20 +71,8 @@ final class UnitPatterns {
     static {
         FALLBACK = new FallbackProvider();
         UnitPatternProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = UnitPatternProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            UnitPatternProvider tmp
-            : ServiceLoader.load(UnitPatternProvider.class, cl)
-        ) {
+        for (UnitPatternProvider tmp : ResourceLoader.getInstance().services(UnitPatternProvider.class)) {
             p = tmp;
             break;
         }

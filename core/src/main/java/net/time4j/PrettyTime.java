@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeSpan;
@@ -40,7 +41,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -90,20 +90,8 @@ public final class PrettyTime {
 
     static {
         NumberSymbolProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = NumberSymbolProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            NumberSymbolProvider tmp
-            : ServiceLoader.load(NumberSymbolProvider.class, cl)
-        ) {
+        for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
             p = tmp;
             break;
         }

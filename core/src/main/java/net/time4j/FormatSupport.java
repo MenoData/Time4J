@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
@@ -31,7 +32,6 @@ import net.time4j.tz.TZID;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.ServiceLoader;
 
 
 /**
@@ -49,17 +49,8 @@ class FormatSupport {
     static {
         FormatEngine<?> last = null;
         FormatEngine<?> best = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = FormatEngine.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (FormatEngine<?> tmp : ServiceLoader.load(FormatEngine.class, cl)) {
+        for (FormatEngine<?> tmp : ResourceLoader.getInstance().services(FormatEngine.class)) {
             if (tmp.isSupported(ChronoEntity.class)) {
                 best = tmp;
                 break;
