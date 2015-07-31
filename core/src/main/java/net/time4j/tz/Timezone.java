@@ -22,6 +22,7 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -41,7 +42,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -209,22 +209,12 @@ public abstract class Timezone
         QUEUE = new ReferenceQueue<Timezone>();
         LAST_USED = new LinkedList<Timezone>(); // strong references
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = Timezone.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
         List<Class<? extends TZID>> areas;
 
         try {
             areas =
                 loadPredefined(
-                    cl,
+                    Timezone.class.getClassLoader(),
                     "AFRICA",
                     "AMERICA",
                     "AMERICA$ARGENTINA",
@@ -263,10 +253,7 @@ public abstract class Timezone
         ZoneProvider np = null;
 
         if (!ANDROID) {
-            ServiceLoader<ZoneProvider> sl =
-                ServiceLoader.load(ZoneProvider.class, cl);
-
-            for (ZoneProvider provider : sl) {
+            for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
                 String name = provider.getName();
 
                 if (name.equals(NAME_TZDB)) {
@@ -283,7 +270,7 @@ public abstract class Timezone
         }
 
         Iterator<ExtZoneProvider> slExt =
-            ServiceLoader.load(ExtZoneProvider.class, cl).iterator();
+            ResourceLoader.getInstance().services(ExtZoneProvider.class).iterator();
 
         while (true) {
             boolean more;
