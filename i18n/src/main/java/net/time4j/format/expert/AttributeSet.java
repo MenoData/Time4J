@@ -22,6 +22,7 @@
 package net.time4j.format.expert;
 
 import net.time4j.PlainDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
@@ -36,7 +37,6 @@ import net.time4j.history.ChronoHistory;
 
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -57,20 +57,8 @@ final class AttributeSet
 
     static {
         NumberSymbolProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = NumberSymbolProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            NumberSymbolProvider tmp
-            : ServiceLoader.load(NumberSymbolProvider.class, cl)
-        ) {
+        for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
             p = tmp;
             break;
         }
