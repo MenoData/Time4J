@@ -64,7 +64,7 @@ public final class DefaultLeapSecondProviderSPI
         PlainDate tmpExpires = PlainDate.axis().getMinimum();
         this.table = new LinkedHashMap<GregorianDate, Integer>(50);
         String name = PATH_TO_LEAPSECONDS;
-        URL url = ResourceLoader.getInstance().find("core", LeapSecondProvider.class, name);
+        URL url = ResourceLoader.getInstance().locate("core", LeapSecondProvider.class, name);
         InputStream is = ResourceLoader.load(url, true);
 
         if (is == null) {

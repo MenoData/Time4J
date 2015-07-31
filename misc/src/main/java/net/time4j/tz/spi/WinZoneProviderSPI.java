@@ -201,7 +201,7 @@ public class WinZoneProviderSPI
 
         try {
             String source = "data/winzone.ser";
-            URL url = ResourceLoader.getInstance().find("misc", WindowsZone.class, source);
+            URL url = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
             InputStream is = ResourceLoader.load(url, true);
             ois = new ObjectInputStream(is);
             String version = ois.readUTF();

@@ -113,7 +113,7 @@ public class WeekdataProviderSPI
         super();
 
         String name = "data/weekend.data";
-        URL url = ResourceLoader.getInstance().find("i18n", WeekdataProviderSPI.class, name);
+        URL url = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
         InputStream is = ResourceLoader.load(url, true);
 
         if (is != null) {
