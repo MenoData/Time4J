@@ -22,6 +22,7 @@
 package net.time4j.tz;
 
 import net.time4j.base.GregorianDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 
@@ -39,7 +40,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -167,10 +167,7 @@ public abstract class Timezone
     public static final TransitionStrategy STRICT_MODE =
         GapResolver.ABORT.and(OverlapResolver.LATER_OFFSET);
 
-    private static final boolean ANDROID = "Dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
-
-    private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE =
-        ANDROID || Boolean.getBoolean("net.time4j.allow.system.tz.override");
+    private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE = Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
     private static volatile ZonalKeys zonalKeys = null;
     private static volatile Timezone currentSystemTZ = null;
@@ -199,22 +196,12 @@ public abstract class Timezone
         QUEUE = new ReferenceQueue<>();
         LAST_USED = new LinkedList<>(); // strong references
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = Timezone.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
         List<Class<? extends TZID>> areas;
 
         try {
             areas =
                 loadPredefined(
-                    cl,
+                    Timezone.class.getClassLoader(),
                     "AFRICA",
                     "AMERICA",
                     "AMERICA$ARGENTINA",
@@ -252,20 +239,18 @@ public abstract class Timezone
         ZoneProvider zp = null;
         ZoneProvider np = null;
 
-        if (!ANDROID) {
-            for (ZoneProvider provider : ServiceLoader.load(ZoneProvider.class, cl)) {
-                String name = provider.getName();
+        for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
+            String name = provider.getName();
 
-                if (name.equals(NAME_TZDB)) {
-                    zp = compareTZDB(provider, zp);
-                } else if (name.equals(NAME_ZONENAMES)) {
-                    np = provider;
-                } else if (
-                    !name.isEmpty()
-                    && !name.equals(NAME_DEFAULT)
-                ) {
-                    PROVIDERS.put(name, provider);
-                }
+            if (name.equals(NAME_TZDB)) {
+                zp = compareTZDB(provider, zp);
+            } else if (name.equals(NAME_ZONENAMES)) {
+                np = provider;
+            } else if (
+                !name.isEmpty()
+                && !name.equals(NAME_DEFAULT)
+            ) {
+                PROVIDERS.put(name, provider);
             }
         }
 
