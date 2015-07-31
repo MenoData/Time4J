@@ -6,6 +6,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Quarter;
 import net.time4j.Weekday;
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
@@ -23,7 +24,6 @@ import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ServiceLoader;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -48,17 +48,8 @@ public class CalendricalNamesTest {
         Locale locale = Locale.US;
         CalendarText result = CalendarText.getInstance("iso8601", locale);
         TextProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = CalendarText.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (TextProvider tmp : ServiceLoader.load(TextProvider.class, cl)) {
+        for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
             if (
                 isCalendarTypeSupported(tmp, "iso8601")
                 && isLocaleSupported(tmp, locale)

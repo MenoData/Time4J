@@ -206,7 +206,7 @@ public abstract class ResourceLoader {
      * @return  iterable collection of service providers
      * @since   3.5/4.3
      */
-    public abstract  <S> Iterable<S> services(Class<S> serviceInterface);
+    public abstract <S> Iterable<S> services(Class<S> serviceInterface);
 
     //~ Innere Klassen ----------------------------------------------------
 

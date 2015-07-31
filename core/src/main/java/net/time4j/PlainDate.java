@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
@@ -66,7 +67,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 
@@ -1901,20 +1901,7 @@ public final class PlainDate
 
     private static void registerExtensions(TimeAxis.Builder<IsoDateUnit, PlainDate> builder) {
 
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        if (cl == null) {
-            cl = PlainDate.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        ServiceLoader<ChronoExtension> sl =
-            ServiceLoader.load(ChronoExtension.class, cl);
-
-        for (ChronoExtension extension : sl) {
+        for (ChronoExtension extension : ResourceLoader.getInstance().services(ChronoExtension.class)) {
             if (extension.accept(PlainDate.class)) {
                 builder.appendExtension(extension);
             }
