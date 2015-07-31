@@ -21,9 +21,10 @@
 
 package net.time4j.format;
 
+import net.time4j.base.ResourceLoader;
+
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.time4j.format.PluralCategory.FEW;
@@ -79,20 +80,8 @@ public abstract class PluralRules {
 
     static {
         PluralProvider p = null;
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        if (cl == null) {
-            cl = PluralProvider.class.getClassLoader();
-        }
-
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-
-        for (
-            PluralProvider tmp
-            : ServiceLoader.load(PluralProvider.class, cl)
-        ) {
+        for (PluralProvider tmp : ResourceLoader.getInstance().services(PluralProvider.class)) {
             p = tmp;
             break;
         }
