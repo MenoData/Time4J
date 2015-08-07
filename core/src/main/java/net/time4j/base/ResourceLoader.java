@@ -23,7 +23,8 @@ package net.time4j.base;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.CodeSource;
@@ -115,29 +116,29 @@ public abstract class ResourceLoader {
     }
 
     /**
-     * <p>Constructs an URL for given module resource. </p>
+     * <p>Constructs an URI for given module resource. </p>
      *
-     * <p>Some implementations might yield an url without verifying if the url resource really exists. </p>
+     * <p>Some implementations might yield an uri without verifying if the uri resource really exists. </p>
      *
      * @param   moduleName      name of related time4j-module
      * @param   moduleRef       module-specific class reference
      * @param   path            path to text resource (must be understandable by class loaders)
-     * @return  url of resource or {@code null} if unable to locate the resource
+     * @return  uri of resource or {@code null} if unable to locate the resource
      * @since   3.5/4.3
      */
     /*[deutsch]
-     * <p>Erstellt einen URL f&uuml;r die angegebene Ressource. </p>
+     * <p>Erstellt einen URI f&uuml;r die angegebene Ressource. </p>
      *
-     * <p>Einige Implementierungen k&ouml;nnen einen URL liefern, ohne die reale Existenz der URL-Ressource
+     * <p>Einige Implementierungen k&ouml;nnen einen URI liefern, ohne die reale Existenz der URI-Ressource
      * zu pr&uuml;fen. </p>
      *
      * @param   moduleName      name of related time4j-module
      * @param   moduleRef       module-specific class reference
      * @param   path            path to text resource (must be understandable by class loaders)
-     * @return  url of resource or {@code null} if unable to locate the resource
+     * @return  uri of resource or {@code null} if unable to locate the resource
      * @since   3.5/4.3
      */
-    public abstract URL locate(
+    public abstract URI locate(
         String moduleName,
         Class<?> moduleRef,
         String path
@@ -148,7 +149,7 @@ public abstract class ResourceLoader {
      *
      * <p>Callers are responsible for closing the result stream. </p>
      *
-     * @param   url         uniform resource locator as result of locate-method (optional)
+     * @param   uri         uniform resource identifier as result of locate-method (optional)
      * @param   noCache     avoid caching?
      * @return  input stream or {@code null} if the resource could not be opened
      * @see     #locate(String, Class, String)
@@ -159,22 +160,24 @@ public abstract class ResourceLoader {
      *
      * <p>Aufrufer sind daf&uuml;r verantwortlich, den Eingabestrom zu schlie&szlig;en </p>
      *
-     * @param   url         uniform resource locator as result of locate-method (optional)
+     * @param   uri         uniform resource identifier as result of locate-method (optional)
      * @param   noCache     avoid caching?
      * @return  input stream or {@code null} if the resource could not be opened
      * @see     #locate(String, Class, String)
      * @since   3.5/4.3
      */
     public static InputStream load(
-        URL url,
+        URI uri,
         boolean noCache
     ) {
 
-        if (url == null) {
+        if (uri == null) {
             return null;
         }
 
         try {
+            URL url = uri.toURL();
+
             if (noCache || ANDROID) {
                 URLConnection conn = url.openConnection();
                 conn.setUseCaches(false);
@@ -216,35 +219,44 @@ public abstract class ResourceLoader {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public URL locate(
+        public URI locate(
             String moduleName,
             Class<?> moduleRef,
             String path
         ) {
 
-            // first try url construction whose initialization time is much quicker than querying the class loader
-            String constructedUrl = null;
+            // first try uri construction whose initialization time is much quicker than querying the class loader
+            String constructedUri = null;
 
             try {
                 ProtectionDomain pd = moduleRef.getProtectionDomain(); // null on android platform
                 CodeSource cs = ((pd == null) ? null : pd.getCodeSource());
 
                 if (cs != null) {
-                    constructedUrl = cs.getLocation().toExternalForm();
-                    if (constructedUrl.endsWith(".jar")) {
-                        constructedUrl = "jar:" + constructedUrl + "!/";
+                    constructedUri = cs.getLocation().toExternalForm();
+                    if (constructedUri.endsWith(".jar")) {
+                        constructedUri = "jar:" + constructedUri + "!/";
                     }
-                    constructedUrl += path;
-                    return new URL(constructedUrl);
+                    constructedUri += path;
+                    return new URI(constructedUri);
                 }
             } catch (SecurityException se) {
                 // use fallback via class loader
-            } catch (MalformedURLException e) {
-                System.err.println("Warning: malformed resource path = " + constructedUrl);
+            } catch (URISyntaxException e) {
+                System.err.println("Warning: malformed resource path = " + constructedUri);
             }
 
-            // last try - ask the class loader
-            return moduleRef.getClassLoader().getResource(path);
+            try {
+                // last try - ask the class loader
+                URL url = moduleRef.getClassLoader().getResource(path);
+                if (url != null) {
+                    return url.toURI();
+                }
+            } catch (URISyntaxException e) {
+                // now we give up
+            }
+
+            return null;
 
         }
 

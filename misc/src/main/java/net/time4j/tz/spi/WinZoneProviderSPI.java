@@ -32,7 +32,7 @@ import net.time4j.tz.other.WindowsZone;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -201,8 +201,8 @@ public class WinZoneProviderSPI
 
         try {
             String source = "data/winzone.ser";
-            URL url = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
-            InputStream is = ResourceLoader.load(url, true);
+            URI uri = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
+            InputStream is = ResourceLoader.load(uri, true);
             ois = new ObjectInputStream(is);
             String version = ois.readUTF();
             Map<String, Map<String, String>> data = cast(ois.readObject());

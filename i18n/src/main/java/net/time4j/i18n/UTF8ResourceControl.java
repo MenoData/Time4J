@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -104,8 +104,8 @@ public class UTF8ResourceControl
             String resourceName =
                 this.toResourceName(bundleName, "properties");
 
-            URL url = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
-            InputStream stream = ResourceLoader.load(url, reload);
+            URI uri = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
+            InputStream stream = ResourceLoader.load(uri, reload);
 
             if (stream != null) {
                 Reader reader = null;

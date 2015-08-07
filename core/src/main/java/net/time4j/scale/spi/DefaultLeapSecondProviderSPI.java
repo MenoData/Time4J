@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -64,8 +64,8 @@ public final class DefaultLeapSecondProviderSPI
         PlainDate tmpExpires = PlainDate.axis().getMinimum();
         this.table = new LinkedHashMap<>(50);
         String name = PATH_TO_LEAPSECONDS;
-        URL url = ResourceLoader.getInstance().locate("core", LeapSecondProvider.class, name);
-        InputStream is = ResourceLoader.load(url, true);
+        URI uri = ResourceLoader.getInstance().locate("core", LeapSecondProvider.class, name);
+        InputStream is = ResourceLoader.load(uri, true);
 
         if (is == null) {
             is = LeapSecondProvider.class.getClassLoader().getResourceAsStream(name); // test classes in IDE
@@ -73,7 +73,7 @@ public final class DefaultLeapSecondProviderSPI
 
         if (is != null) {
 
-            this.source = url.toString();
+            this.source = uri.toString();
             TemporalFormatter<PlainDate> f = PlainDate.localFormatter("yyyy-MM-dd", Platform.PATTERN);
 
             try {
