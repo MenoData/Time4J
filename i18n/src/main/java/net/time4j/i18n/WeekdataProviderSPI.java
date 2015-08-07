@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.net.URI;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -113,11 +113,11 @@ public class WeekdataProviderSPI
         super();
 
         String name = "data/weekend.data";
-        URL url = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
-        InputStream is = ResourceLoader.load(url, true);
+        URI uri = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
+        InputStream is = ResourceLoader.load(uri, true);
 
         if (is != null) {
-            this.source = "@" + url;
+            this.source = "@" + uri;
             Map<String, Weekday> tmpStart =
                 new HashMap<String, Weekday>(START_OF_WEEKEND.size());
             Map<String, Weekday> tmpEnd =

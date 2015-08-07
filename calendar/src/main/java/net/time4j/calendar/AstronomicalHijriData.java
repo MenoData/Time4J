@@ -30,7 +30,7 @@ import net.time4j.format.expert.Iso8601Format;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
@@ -81,8 +81,8 @@ final class AstronomicalHijriData
 
         this.variant = variant;
         String name = "data/" + variant.replace('-', '_') + ".data";
-        URL url = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
-        InputStream is = ResourceLoader.load(url, true);
+        URI uri = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
+        InputStream is = ResourceLoader.load(uri, true);
 
         if (is != null) {
             try {
