@@ -114,7 +114,7 @@ public class WeekdataProviderSPI
 
         String name = "data/weekend.data";
         URI uri = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
-        InputStream is = ResourceLoader.load(uri, true);
+        InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is != null) {
             this.source = "@" + uri;
