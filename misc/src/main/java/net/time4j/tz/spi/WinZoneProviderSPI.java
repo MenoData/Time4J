@@ -202,7 +202,7 @@ public class WinZoneProviderSPI
         try {
             String source = "data/winzone.ser";
             URI uri = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
-            InputStream is = ResourceLoader.load(uri, true);
+            InputStream is = ResourceLoader.getInstance().load(uri, true);
             ois = new ObjectInputStream(is);
             String version = ois.readUTF();
             Map<String, Map<String, String>> data = cast(ois.readObject());

@@ -105,7 +105,7 @@ public class UTF8ResourceControl
                 this.toResourceName(bundleName, "properties");
 
             URI uri = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
-            InputStream stream = ResourceLoader.load(uri, reload);
+            InputStream stream = ResourceLoader.getInstance().load(uri, reload);
 
             if (stream != null) {
                 Reader reader = null;

@@ -166,31 +166,10 @@ public abstract class ResourceLoader {
      * @see     #locate(String, Class, String)
      * @since   3.5/4.3
      */
-    public static InputStream load(
+    public abstract InputStream load(
         URI uri,
         boolean noCache
-    ) {
-
-        if (uri == null) {
-            return null;
-        }
-
-        try {
-            URL url = uri.toURL();
-
-            if (noCache || ANDROID) {
-                URLConnection conn = url.openConnection();
-                conn.setUseCaches(false);
-                conn.connect(); // explicit for clarity
-                return conn.getInputStream();
-            } else {
-                return url.openStream();
-            }
-        } catch (IOException ioe) {
-            return null;
-        }
-
-    }
+    );
 
     /**
      * <p>Finds a collection of service providers available for given service provider interface. </p>
@@ -257,6 +236,33 @@ public abstract class ResourceLoader {
             }
 
             return null;
+
+        }
+
+        @Override
+        public InputStream load(
+            URI uri,
+            boolean noCache
+        ) {
+
+            if (uri == null) {
+                return null;
+            }
+
+            try {
+                URL url = uri.toURL();
+
+                if (noCache || ANDROID) {
+                    URLConnection conn = url.openConnection();
+                    conn.setUseCaches(false);
+                    conn.connect(); // explicit for clarity
+                    return conn.getInputStream();
+                } else {
+                    return url.openStream();
+                }
+            } catch (IOException ioe) {
+                return null;
+            }
 
         }
 

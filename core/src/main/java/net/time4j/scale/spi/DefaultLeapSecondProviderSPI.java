@@ -65,7 +65,7 @@ public final class DefaultLeapSecondProviderSPI
         this.table = new LinkedHashMap<GregorianDate, Integer>(50);
         String name = PATH_TO_LEAPSECONDS;
         URI uri = ResourceLoader.getInstance().locate("core", LeapSecondProvider.class, name);
-        InputStream is = ResourceLoader.load(uri, true);
+        InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {
             is = LeapSecondProvider.class.getClassLoader().getResourceAsStream(name); // test classes in IDE
