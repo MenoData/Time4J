@@ -128,7 +128,7 @@
                         <version>2.0</version>
                     </tagletArtifact>
                     <show>public</show>
-                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.i18n:net.time4j.tz.threeten:net.time4j.calendar.spi</excludePackageNames>
+                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.i18n:net.time4j.tz.threeten:net.time4j.calendar.service</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>
