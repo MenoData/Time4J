@@ -44,7 +44,6 @@ import java.util.Set;
  * The basic bundle name corresponds to the choosen calendar type. </p>
  *
  * @author  Meno Hochschild
- * @doctags.exclude
  */
 public final class GenericTextProviderSPI
     implements TextProvider {

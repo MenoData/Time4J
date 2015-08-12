@@ -37,12 +37,14 @@ import java.util.ServiceLoader;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
+ * @doctags.spec    All external subclasses must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Definiert einen allgemeinen Zugriffspunkt zum Laden von Textressourcen und Services. </p>
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
+ * @doctags.spec    All external subclasses must have a public no-arg constructor.
  */
 public abstract class ResourceLoader {
 
@@ -52,15 +54,11 @@ public abstract class ResourceLoader {
      * <p>Name of system property responsible for getting an external instance. </p>
      *
      * <p>Time4J will throw an {@code Error} if the configuration entry is wrong. </p>
-     *
-     * @doctags.spec    All external subclasses must have a public no-arg constructor.
      */
     /**
      * <p>Name der <i>system property</i>, &uuml;ber die eine externe Instanz verwendet wird. </p>
      *
      * <p>Time4J wird einen {@code Error} werfen, wenn der Konfigurationseintrag falsch ist. </p>
-     *
-     * @doctags.spec    All external subclasses must have a public no-arg constructor.
      */
     public static final String EXTERNAL_RESOURCE_LOADER = "net.time4j.base.ResourceLoader";
 
