@@ -36,12 +36,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ServiceConfigurationError;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -252,52 +250,18 @@ public abstract class Timezone
         ZoneProvider zp = null;
         ZoneProvider np = null;
 
-        if (!ANDROID) {
-            for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
-                String name = provider.getName();
+        for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
+            String name = provider.getName();
 
-                if (name.equals(NAME_TZDB)) {
-                    zp = compareTZDB(provider, zp);
-                } else if (name.equals(NAME_ZONENAMES)) {
-                    np = provider;
-                } else if (
-                    !name.isEmpty()
-                    && !name.equals(NAME_DEFAULT)
-                ) {
-                    PROVIDERS.put(name, provider);
-                }
-            }
-        }
-
-        Iterator<ExtZoneProvider> slExt =
-            ResourceLoader.getInstance().services(ExtZoneProvider.class).iterator();
-
-        while (true) {
-            boolean more;
-            try {
-                more = slExt.hasNext();
-                if (!more) {
-                    break;
-                }
-            } catch (ServiceConfigurationError sce) {
-                break;
-            }
-            try {
-                ZoneProvider provider = slExt.next();
-                String name = provider.getName();
-
-                if (name.equals(NAME_TZDB)) {
-                    zp = compareTZDB(provider, zp);
-                } else if (name.equals(NAME_ZONENAMES)) {
-                    np = provider;
-                } else if (
-                    !name.isEmpty()
-                    && !name.equals(NAME_DEFAULT)
-                ) {
-                    PROVIDERS.put(name, provider);
-                }
-            } catch (ServiceConfigurationError sce) {
-                // continue
+            if (name.equals(NAME_TZDB)) {
+                zp = compareTZDB(provider, zp);
+            } else if (name.equals(NAME_ZONENAMES)) {
+                np = provider;
+            } else if (
+                !name.isEmpty()
+                && !name.equals(NAME_DEFAULT)
+            ) {
+                PROVIDERS.put(name, provider);
             }
         }
 

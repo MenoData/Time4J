@@ -21,11 +21,11 @@
 
 package net.time4j.tz.spi;
 
-import net.time4j.tz.ExtZoneProvider;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
+import net.time4j.tz.ZoneProvider;
 import net.time4j.tz.olson.AFRICA;
 import net.time4j.tz.olson.AMERICA;
 import net.time4j.tz.olson.ANTARCTICA;
@@ -52,7 +52,7 @@ import java.util.Set;
  * @since   3.1
  */
 public class ZoneNameProviderSPI
-    implements ExtZoneProvider {
+    implements ZoneProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

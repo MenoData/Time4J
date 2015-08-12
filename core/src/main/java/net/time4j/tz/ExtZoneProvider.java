@@ -23,22 +23,20 @@ package net.time4j.tz;
 
 
 /**
- * <p>SPI interface which is identical to {@code ZoneProvider} but enables a different name
- * of the associated service loader file intended for the Android platform. </p>
+ * <p>No longer used or evaluated. </p>
  *
  * @author  Meno Hochschild
  * @since   3.2/4.2
- * @see     java.util.ServiceLoader
+ * @deprecated  Use the super interface ZoneProvider instead.
  */
 /*[deutsch]
- * <p>SPI-Interface, das zu seinem Super-Interface {@code ZoneProvider} nichts hinzuf&uuml;gt,
- * aber eine {@code ServiceLoader}-Datei mit einem anderen Namen speziell f&uuml;r die
- * Android-Plattform erm&ouml;glicht. </p>
+ * <p>Nicht l&auml;nger in Gebrauch. </p>
  *
  * @author  Meno Hochschild
  * @since   3.2/4.2
- * @see     java.util.ServiceLoader
+ * @deprecated  Use the super interface ZoneProvider instead.
  */
+@Deprecated
 public interface ExtZoneProvider
     extends ZoneProvider {
 
