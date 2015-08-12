@@ -329,6 +329,13 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     }
 
     /**
+     * <p>Subtracts given calendar days from this instance. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
      * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
      *
      * @param   days    calendar days to be subtracted
