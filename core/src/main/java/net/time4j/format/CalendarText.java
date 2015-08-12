@@ -364,19 +364,6 @@ public final class CalendarText {
                 }
             }
 
-            if (p == null) {
-                // ServiceLoader-Mechanismus (Suche nach alternativen Providern)
-                for (TextProvider tmp : ResourceLoader.getInstance().services(AltTextProvider.class)) {
-                    if (
-                        isCalendarTypeSupported(tmp, calendarType)
-                        && isLocaleSupported(tmp, locale)
-                    ) {
-                        p = tmp;
-                        break;
-                    }
-                }
-            }
-
             // Java-Ressourcen
             if (p == null) {
                 TextProvider tmp = new JDKTextProvider();
