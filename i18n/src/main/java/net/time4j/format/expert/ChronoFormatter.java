@@ -1273,6 +1273,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Sets the calendar variant. </p>
      *
+     * @param   variant     name of new calendar variant
      * @return  changed copy with the calendar variant while this instance remains unaffected
      * @see     Attributes#CALENDAR_VARIANT
      * @since   3.5/4.3
@@ -1280,6 +1281,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /*[deutsch]
      * <p>Setzt die Kalendervariante. </p>
      *
+     * @param   variant     name of new calendar variant
      * @return  changed copy with the calendar variant while this instance remains unaffected
      * @see     Attributes#CALENDAR_VARIANT
      * @since   3.5/4.3
@@ -1298,6 +1300,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Sets the start of calendar day. </p>
      *
+     * @param   startOfDay      new start of day
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
@@ -1305,6 +1308,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /*[deutsch]
      * <p>Setzt den Beginn des Kalendertages. </p>
      *
+     * @param   startOfDay      new start of day
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
