@@ -912,20 +912,20 @@ public final class Weekmodel
      *  );
      *
      *  int header = 3;
-     *  header <<= 4;
+     *  header &lt;&lt;= 4;
      *  if (!isoWeekend) {
      *      header |= 1;
      *  }
      *  out.writeByte(header);
      *
      *  int state = getFirstDayOfWeek().getValue();
-     *  state <<= 4;
+     *  state &lt;&lt;= 4;
      *  state |= getMinimalDaysInFirstWeek();
      *  out.writeByte(state);
      *
      *  if (!isoWeekend) {
      *      state = getStartOfWeekend().getValue();
-     *      state <<= 4;
+     *      state &lt;&lt;= 4;
      *      state |= getEndOfWeekend().getValue();
      *      out.writeByte(state);
      *  }

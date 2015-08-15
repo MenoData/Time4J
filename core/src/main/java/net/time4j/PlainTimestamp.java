@@ -1186,21 +1186,21 @@ public final class PlainTimestamp
      * <pre>
      *  int range;
      *
-     *  if (year >= 1850 && year <= 2100) {
+     *  if (year &gt;= 1850 && year &lt;= 2100) {
      *      range = 1;
-     *  } else if (Math.abs(year) < 10000) {
+     *  } else if (Math.abs(year) &lt; 10000) {
      *      range = 2;
      *  } else {
      *      range = 3;
      *  }
      *
      *  int header = 8; // type-id
-     *  header <<= 4;
+     *  header &lt;&lt;= 4;
      *  header |= month;
      *  out.writeByte(header);
      *
      *  int header2 = range;
-     *  header2 <<= 5;
+     *  header2 &lt;&lt;= 5;
      *  header2 |= dayOfMonth;
      *  out.writeByte(header2);
      *

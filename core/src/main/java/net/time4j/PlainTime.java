@@ -1991,7 +1991,7 @@ public final class PlainTime
      * Schematic algorithm:
      *
      * <pre>
-     *      out.writeByte(2 << 4);
+     *      out.writeByte(2 &lt;&lt; 4);
      *
      *      if (time.nano == 0) {
      *          if (time.second == 0) {

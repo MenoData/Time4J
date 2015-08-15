@@ -1663,7 +1663,7 @@ public final class Moment
      *
      * <pre>
      *  int header = 4;
-     *  header <<= 4;
+     *  header &lt;&lt;= 4;
      *
      *  if (isLeapSecond()) {
      *      header |= 1;
@@ -1671,14 +1671,14 @@ public final class Moment
      *
      *  int fraction = getNanosecond();
      *
-     *  if (fraction > 0) {
+     *  if (fraction &gt; 0) {
      *      header |= 2;
      *  }
      *
      *  out.writeByte(header);
      *  out.writeLong(getPosixTime());
      *
-     *  if (fraction > 0) {
+     *  if (fraction &gt; 0) {
      *      out.writeInt(fraction);
      *  }
      * </pre>
