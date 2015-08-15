@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Normalizer.java) is part of project Time4J.
  *
@@ -55,6 +55,6 @@ public interface Normalizer<U> {
      * @return  normalized copy of argument which itself remains unaffected
      * @see     net.time4j.Duration#with(Normalizer)
      */
-    public TimeSpan<U> normalize(TimeSpan<? extends U> timespan);
+    TimeSpan<U> normalize(TimeSpan<? extends U> timespan);
 
 }

@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.BasicElement;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;

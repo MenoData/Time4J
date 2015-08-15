@@ -30,10 +30,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 
