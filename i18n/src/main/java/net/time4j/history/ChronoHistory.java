@@ -332,6 +332,7 @@ public final class ChronoHistory
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166). </p>
      *
+     * @param   locale  country setting
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)
@@ -348,6 +349,7 @@ public final class ChronoHistory
      *
      * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166). </p>
      *
+     * @param   locale  country setting
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)

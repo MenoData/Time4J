@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * <p>Represents an immutable calendar variant. </p>
  *
- * <h4>Display and change chronological element values</h4>
+ * <p><strong>Display and change chronological element values</strong></p>
  *
  * <p>The calendar variant consists of chronological elements. This base class
  * delegates the elment and time arithmetic to the associated calendar family respective to
@@ -40,19 +40,19 @@ import java.io.Serializable;
  * <p>Element values can only be changed by creating a new immutable copy
  * of the original instance. This is done via all {@code with()}-methods. </p>
  *
- * <h4>Calendar system</h4>
+ * <p><strong>Calendar system</strong></p>
  *
  * <p>Every calendar variant is a member of a calendar family. That means referring to
  * a calendar system via a variant name. Hence a limited day arithmetic using the
  * class {@code CalendarDays} is always possible. </p>
  *
- * <h4>Sorting</h4>
+ * <p><strong>Sorting</strong></p>
  *
  * <p>The sorting algorithm prefers the temporal order then the lexicographical comparison
  * based on variant names. In case of doubt the documentation of the subclass is leading.
  * Alternatively, the interface {@code Temporal} can be used to enable a pure temporal order. </p>
  *
- * <h4>Implementation notes</h4>
+ * <p><strong>Implementation notes</strong></p>
  *
  * <ul>
  *  <li>All subclasses must be <i>final</i> und <i>immutable</i>. </li>
@@ -70,7 +70,7 @@ import java.io.Serializable;
 /*[deutsch]
  * <p>Repr&auml;sentiert eine unver&auml;nderlichen Kalendervariante. </p>
  *
- * <h4>Chronologische Elementwerte anzeigen und &auml;ndern</h4>
+ * <p><strong>Chronologische Elementwerte anzeigen und &auml;ndern</strong></p>
  *
  * <p>Der Zeitwert setzt sich aus chronologischen Elementen zusammen. Diese
  * abstrakte Basisklasse delegiert die Zeitrechnung immer an die zugeh&ouml;rige
@@ -83,20 +83,20 @@ import java.io.Serializable;
  * eine neue Instanz mit ge&auml;nderten Elementwerten erzeugt wird. Das wird
  * unter anderem von allen {@code with()}-Methoden geleistet. </p>
  *
- * <h4>Kalendersystem</h4>
+ * <p><strong>Kalendersystem</strong></p>
  *
  * <p>Jede Kalendervariante geh&ouml;rt zu einer Kalenderfamilie. Das schlie&szlig;t den
  * den Bezug zu einem Kalendersystem mit Hilfe eines Variantennamens ein. Daher ist eine
  * begrenzte Zeitarithmetick auf Tageseinheiten basierend immer m&ouml;glich. </p>
  *
- * <h4>Sortierung</h4>
+ * <p><strong>Sortierung</strong></p>
  *
  * <p>Die Sortierung von Kalendervarianten wird die zeitliche Ordnung bevorzugen
  * und dann die lexikalische Ordnung von Variantennamen. Im Zweifelsfall ist die Dokumentation der
  * konkreten Subklasse ma&szlig;geblich. Alternativ kann auch das Interface {@code Temporal}
  * verwendet werden, um eine rein zeitliche Ordnung zu erm&ouml;glichen. </p>
  *
- * <h4>Implementierungshinweise</h4>
+ * <p><strong>Implementierungshinweise</strong></p>
  *
  * <ul>
  *  <li>Alle Subklassen m&uuml;ssen <i>final</i> und <i>immutable</i> sein. </li>
