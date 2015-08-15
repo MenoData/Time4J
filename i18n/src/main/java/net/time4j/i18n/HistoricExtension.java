@@ -26,7 +26,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
-import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.history.ChronoHistory;

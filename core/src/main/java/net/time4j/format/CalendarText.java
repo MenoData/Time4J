@@ -88,7 +88,6 @@ import java.util.concurrent.ConcurrentMap;
  * <li>AM_PM_OF_DAY</li></ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Quelle f&uuml;r lokalisierte kalendarische Informationen auf Enum-Basis
@@ -142,7 +141,6 @@ import java.util.concurrent.ConcurrentMap;
  * <li>AM_PM_OF_DAY</li></ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 public final class CalendarText {
 
@@ -1006,11 +1004,7 @@ public final class CalendarText {
             if (result.length > 7) { // ISO-Reihenfolge erzwingen
                 String sunday = result[1];
                 String[] arr = new String[7];
-
-                for (int i = 2; i < 8; i++) {
-                    arr[i - 2] = result[i];
-                }
-
+                System.arraycopy(result, 2, arr, 0, 6);
                 arr[6] = sunday;
                 result = arr;
             }

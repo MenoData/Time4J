@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentMap;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
  */
 final class RuleBasedTransitionModel
     extends TransitionModel {

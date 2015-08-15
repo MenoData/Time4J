@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PrettyTime.java) is part of project Time4J.
  *
@@ -67,7 +67,6 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Erm&ouml;glicht formatierte Ausgaben einer Dauer f&uuml;r soziale Medien
@@ -80,7 +79,6 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.concurrency <immutable>
  */
 public final class PrettyTime {
 

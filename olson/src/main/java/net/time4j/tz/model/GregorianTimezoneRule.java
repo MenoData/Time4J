@@ -30,10 +30,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 
@@ -43,7 +39,6 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Standardregel f&uuml;r Zeitumstellungen im
@@ -51,7 +46,6 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public class GregorianTimezoneRule

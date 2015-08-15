@@ -68,7 +68,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Setting one of both properties can improve the performance. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <threadsafe>
  */
 /*[deutsch]
  * <p>Ermittelt alle seit dem offiziellen Start von UTC 1972 aufgetretenen
@@ -99,7 +98,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Setzen einer der beiden Properties kann die Performance verbessern. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <threadsafe>
  */
 public final class LeapSeconds
     implements Iterable<LeapSecondEvent>, Comparator<LeapSecondEvent> {

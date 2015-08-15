@@ -36,9 +36,11 @@ import java.util.ResourceBundle;
  * be supplied by help of properties-files in the &quot;data&quot;-folder.
  * </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  */
 /*[deutsch]
@@ -52,9 +54,11 @@ import java.util.ResourceBundle;
  * die gar nicht im JDK vorhanden sind, werden stattdessen mit Hilfe von
  * properties-Dateien im data-Verzeichnis bereitgestellt. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  */
 public interface TextProvider {

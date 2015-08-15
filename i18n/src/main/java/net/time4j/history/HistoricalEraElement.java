@@ -49,7 +49,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class HistoricalEraElement
     extends BasicElement<HistoricEra>

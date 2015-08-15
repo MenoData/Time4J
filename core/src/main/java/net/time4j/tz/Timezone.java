@@ -72,8 +72,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Meno Hochschild
  * @serial      exclude
- * @doctags.concurrency All static methods are thread-safe while this class is
- *                      immutable as long as the underlying timezone data are.
  */
 /*[deutsch]
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
@@ -105,8 +103,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author      Meno Hochschild
  * @serial      exclude
- * @doctags.concurrency All static methods are thread-safe while this class is
- *                      immutable as long as the underlying timezone data are.
  */
 public abstract class Timezone
     implements Serializable {

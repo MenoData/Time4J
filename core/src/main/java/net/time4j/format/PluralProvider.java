@@ -34,10 +34,12 @@ import java.util.Locale;
  * applications need true i18n-support then the i18n-module should be used
  * which has a general implementation of this interface. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @author  Meno Hochschild
  * @since   2.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -51,10 +53,12 @@ import java.util.Locale;
  * brauchen, sollten sie das i18n-Modul von Time4J einbinden, das einen
  * allgemeinen {@code PluralProvider} hat. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @author  Meno Hochschild
  * @since   2.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface PluralProvider {
 

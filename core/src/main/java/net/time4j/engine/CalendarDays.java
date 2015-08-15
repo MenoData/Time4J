@@ -31,14 +31,12 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   3.4/4.3
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Anzahl von Kalendertagen. </p>
  *
  * @author  Meno Hochschild
  * @since   3.4/4.3
- * @doctags.concurrency <immutable>
  */
 public final class CalendarDays
     implements Comparable<CalendarDays>, Serializable {

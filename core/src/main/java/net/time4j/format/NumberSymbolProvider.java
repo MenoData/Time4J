@@ -34,11 +34,13 @@ import java.util.Locale;
  * <p>If there is no external {@code NumberSymbolProvider} then Time4J will
  * just delegate to the JDK. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -48,11 +50,13 @@ import java.util.Locale;
  * <p>Wird kein externer {@code NumberSymbolProvider} gefunden, wird intern
  * eine Instanz erzeugt, die an das JDK delegiert. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface NumberSymbolProvider {
 

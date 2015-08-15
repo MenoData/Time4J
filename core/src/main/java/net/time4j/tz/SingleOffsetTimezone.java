@@ -39,7 +39,6 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @concurrency <immutable>
  */
 final class SingleOffsetTimezone
     extends Timezone

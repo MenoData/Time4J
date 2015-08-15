@@ -30,18 +30,22 @@ import net.time4j.tz.TZID;
 /**
  * <p>Stores any kind of raw values as {@code ChronoDisplay}. </p>
  *
+ * <p><strong>Note:</strong>
+ * This class is mutable and should only be used in a single thread. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
  */
 /*[deutsch]
  * <p>Speichert einen beliebigen Satz von chronologischen Rohwerten. </p>
  *
+ * <p><strong>Hinweis:</strong>
+ * Diese Klasse ist <i>mutable</i> und sollte nur in einem einzigen Thread
+ * verwendet werden. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
  */
-// TODO: Ab Java 8 aktiv => implements Consumer<ChronoDisplay>, Supplier<ChronoDisplay>
 public class RawValues {
 
     //~ Instanzvariablen --------------------------------------------------

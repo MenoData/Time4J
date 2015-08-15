@@ -103,7 +103,7 @@ import static net.time4j.scale.TimeScale.*;
  * are defined by any elements then manipulations of related data are
  * possible in any timezone. </p>
  *
- * <h3>Time arithmetic</h3>
+ * <p><strong>Time arithmetic</strong></p>
  *
  * <p>The main time units are defined by {@link SI} (counting possible
  * UTC-leapseconds) and {@link TimeUnit}. Latter unit type can be used
@@ -113,7 +113,6 @@ import static net.time4j.scale.TimeScale.*;
  * {@code until(Moment, unit)}. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen Zeitpunkt auf der Weltzeitlinie mit Bezug
@@ -142,7 +141,7 @@ import static net.time4j.scale.TimeScale.*;
  * Manipulationen der zugeh&ouml;rigen Daten in einer beliebigen Zeitzone
  * m&ouml;glich. </p>
  *
- * <h3>Zeitarithmetik</h3>
+ * <p><strong>Zeitarithmetik</strong></p>
  *
  * <p>Als Zeiteinheiten kommen {@link SI} (mit Z&auml;hlung von Schaltsekunden)
  * und {@link TimeUnit} in Betracht. Letztere Einheit kann verwendet werden,
@@ -152,7 +151,6 @@ import static net.time4j.scale.TimeScale.*;
  * {@code until(Moment, unit)} verwendet. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class Moment
@@ -1447,9 +1445,6 @@ public final class Moment
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected TimeAxis<TimeUnit, Moment> getChronology() {
 
@@ -1457,9 +1452,6 @@ public final class Moment
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected Moment getContext() {
 
@@ -1822,8 +1814,6 @@ public final class Moment
     /**
      * <p>Delegiert Anpassungen von {@code Moment}-Instanzen an einen
      * {@code ChronoOperator<PlainTimestamp>} mit Hilfe einer Zeitzone. </p>
-     *
-     * @doctags.concurrency <immutable>
      */
     static final class Operator
         implements ChronoOperator<Moment> {

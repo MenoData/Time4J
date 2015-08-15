@@ -32,7 +32,6 @@ import net.time4j.engine.ChronoOperator;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class NavigationOperator<V extends Enum<V>>
     extends ElementOperator<PlainDate> {

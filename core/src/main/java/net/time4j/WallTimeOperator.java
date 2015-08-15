@@ -28,7 +28,6 @@ import net.time4j.engine.ChronoOperator;
  * <p>Spezialoperator zum Navigieren zu bestimmten Uhrzeiten. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class WallTimeOperator
     extends ElementOperator<PlainTimestamp> {

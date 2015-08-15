@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EnumElement.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
-import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
@@ -46,7 +45,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class EnumElement<V extends Enum<V>>
     extends AbstractDateElement<V>
@@ -70,7 +68,6 @@ final class EnumElement<V extends Enum<V>>
     private transient final V dmax;
     private transient final int index;
     private transient final char symbol;
-    private transient final  ElementRule<?, V> rule;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -92,29 +89,6 @@ final class EnumElement<V extends Enum<V>>
         int index,
         char symbol
     ) {
-        this(name, type, defaultMin, defaultMax, index, symbol, null);
-
-    }
-
-    /**
-     * <p>Konstruiert ein neues Element mit den angegebenen Details. </p>
-     *
-     * @param   name        name of element
-     * @param   type        reified type of element values
-     * @param   defaultMin  default minimum
-     * @param   defaultMax  default maximum
-     * @param   index       element index
-     * @param   symbol      CLDR-symbol used in format patterns
-     */
-    EnumElement(
-        String name,
-        Class<V> type,
-        V defaultMin,
-        V defaultMax,
-        int index,
-        char symbol,
-        ElementRule<?, V> rule
-    ) {
         super(name);
 
         this.type = type;
@@ -122,7 +96,6 @@ final class EnumElement<V extends Enum<V>>
         this.dmax = defaultMax;
         this.index = index;
         this.symbol = symbol;
-        this.rule = rule;
 
     }
 

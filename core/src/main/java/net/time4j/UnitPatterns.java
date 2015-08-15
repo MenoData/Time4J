@@ -42,7 +42,6 @@ import java.util.concurrent.ConcurrentMap;
  * @author  Meno Hochschild
  * @since   3.0
  * @see     UnitPatternProvider
- * @doctags.concurrency <immutable>
  */
 final class UnitPatterns {
 

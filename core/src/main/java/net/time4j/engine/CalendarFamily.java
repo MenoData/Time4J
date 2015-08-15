@@ -114,7 +114,6 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,ChronoMerger,Map)
      * @since       3.4/4.3
-     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Erzeugt einen Builder f&uuml;r eine neue Kalenderfamilie und wird ausschlie&szlig;lich beim Laden einer
@@ -126,7 +125,6 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,ChronoMerger,Map)
      * @since       3.4/4.3
-     * @doctags.concurrency <mutable>
      */
     public static final class Builder<T extends CalendarVariant<T>>
         extends Chronology.Builder<T> {

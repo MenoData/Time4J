@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoElement.java) is part of project Time4J.
  *
@@ -40,12 +40,14 @@ import java.util.Comparator;
  * guarantee for such a continuum, for example daylight-saving-jumps or
  * hebrew leap months. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable and serializable. </p>
+ *
  * @param   <V> generic type of element values, usually extending the interface
  *          {@code java.lang.Comparable} (or it can be converted to any other
  *          sortable form)
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoElement)
- * @doctags.spec    All implementations must be immutable and serializable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein chronologisches Element, das einen Teil eines
@@ -64,12 +66,14 @@ import java.util.Comparator;
  * Garantiert ist ein Kontinuum aber nicht, siehe zum Beispiel
  * Sommerzeit-Umstellungen oder hebr&auml;ische Schaltmonate. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable and serializable. </p>
+ *
  * @param   <V> generic type of element values, usually extending the interface
  *          {@code java.lang.Comparable} (or it can be converted to any other
  *          sortable form)
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoElement)
- * @doctags.spec    All implementations must be immutable and serializable.
  */
 public interface ChronoElement<V>
     extends Comparator<ChronoDisplay> {

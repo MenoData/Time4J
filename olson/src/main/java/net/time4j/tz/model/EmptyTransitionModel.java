@@ -42,7 +42,6 @@ import static net.time4j.tz.model.TransitionModel.NEW_LINE;
  * @author      Meno Hochschild
  * @since       2.3
  * @serial      include
- * @concurrency <immutable>
  */
 final class EmptyTransitionModel
     implements TransitionHistory, Serializable {

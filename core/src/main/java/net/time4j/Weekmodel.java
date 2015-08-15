@@ -77,7 +77,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert Regeln f&uuml;r den lokalisierten Umgang mit Wochentagen
@@ -95,7 +94,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @doctags.concurrency <immutable>
  */
 public final class Weekmodel
     implements Serializable {

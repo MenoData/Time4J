@@ -47,7 +47,6 @@ import static net.time4j.tz.OffsetSign.BEHIND_UTC;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class LocalizedGMTProcessor
     implements FormatProcessor<TZID> {

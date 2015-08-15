@@ -29,7 +29,6 @@ import net.time4j.base.WallTime;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -44,16 +43,6 @@ import java.util.Map;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  include
- * @concurrency <immutable>
- */
-/*[deutsch]
- * <p>Repr&auml;sentiert verschiedene &Uuml;bergangsstrategien, die auf
- * der Kenntnis der konkreten &Uuml;bergangshistorie beruhen. </p>
- *
- * @author  Meno Hochschild
- * @since   2.2
- * @serial  include
- * @concurrency <immutable>
  */
 final class TransitionResolver
     implements TransitionStrategy, Serializable {

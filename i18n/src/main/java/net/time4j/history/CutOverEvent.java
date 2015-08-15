@@ -31,7 +31,6 @@ import net.time4j.engine.EpochDays;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class CutOverEvent {
 

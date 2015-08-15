@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntegerTimeElement.java) is part of project Time4J.
  *
@@ -35,7 +35,6 @@ import java.math.BigDecimal;
  * <p>Allgemeines verstellbares Uhrzeitelement auf Integer-Basis. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
  */
 final class IntegerTimeElement
     extends AbstractTimeElement<Integer>
@@ -71,8 +70,6 @@ final class IntegerTimeElement
     /** Element-Index */
     static final int MILLI_OF_DAY = 13;
 
-    private static final int TIME_KIND = 1;
-    private static final int CLOCK_KIND = 2;
     private static final long serialVersionUID = -1337148214680014674L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -80,7 +77,6 @@ final class IntegerTimeElement
     private transient final int index;
     private transient final Integer defaultMin;
     private transient final Integer defaultMax;
-    private transient final int kind;
     private transient final char symbol;
     private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
 
@@ -91,7 +87,6 @@ final class IntegerTimeElement
         int index,
         Integer defaultMin,
         Integer defaultMax,
-        int kind,
         char symbol
     ) {
         super(name);
@@ -99,7 +94,6 @@ final class IntegerTimeElement
         this.index = index;
         this.defaultMin = defaultMin;
         this.defaultMax = defaultMax;
-        this.kind = kind;
         this.symbol = symbol;
 
         boolean extendedRange;
@@ -244,7 +238,6 @@ final class IntegerTimeElement
             index,
             Integer.valueOf(dmin),
             Integer.valueOf(dmax),
-            TIME_KIND,
             symbol
         );
 
@@ -267,7 +260,6 @@ final class IntegerTimeElement
             (has24Hours ? CLOCK_HOUR_OF_DAY : CLOCK_HOUR_OF_AMPM),
             Integer.valueOf(1),
             Integer.valueOf(has24Hours ? 24 : 12),
-            CLOCK_KIND,
             (has24Hours ? 'k' : 'h')
         );
 

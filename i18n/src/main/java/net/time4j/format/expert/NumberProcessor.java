@@ -39,7 +39,6 @@ import java.util.Set;
  * @param   <V> generic type of element values (Integer, Long or Enum)
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class NumberProcessor<V>
     implements FormatProcessor<V> {

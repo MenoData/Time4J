@@ -41,7 +41,6 @@ import java.util.Set;
  * @param   <V> generic type of element values
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class LookupProcessor<V extends Enum<V>>
     implements FormatProcessor<V> {

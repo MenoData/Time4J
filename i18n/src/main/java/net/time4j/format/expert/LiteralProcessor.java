@@ -38,7 +38,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class LiteralProcessor
     implements FormatProcessor<Void> {

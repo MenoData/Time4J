@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoEntity.java) is part of project Time4J.
  *
@@ -40,9 +40,11 @@ import net.time4j.tz.TZID;
  * enables read- and write-access. If no element rule can be found a
  * {@code RuleNotFoundException} will be thrown. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All public implementations must be immutable. </p>
+ *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @doctags.spec    All public implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitwertobjekt, das einzelne Werte mit
@@ -61,9 +63,11 @@ import net.time4j.tz.TZID;
  * Lese- bzw. Schreibzugriff erm&ouml;glicht. Ist die Regel nicht vorhanden,
  * wird eine {@code RuleNotFoundException} geworfen. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All public implementations must be immutable. </p>
+ *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @doctags.spec    All public implementations must be immutable.
  */
 public abstract class ChronoEntity<T extends ChronoEntity<T>>
     implements ChronoDisplay {
@@ -530,7 +534,6 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
      * <p>Liefert den Selbstbezug. </p>
      *
      * @return  time context (usually this instance)
-     * @doctags.exclude
      */
     protected T getContext() {
 

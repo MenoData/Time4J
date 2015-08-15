@@ -35,16 +35,20 @@ import java.util.ServiceLoader;
 /**
  * <p>Defines a general access point of loading any text resources and services. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All external subclasses must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All external subclasses must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Definiert einen allgemeinen Zugriffspunkt zum Laden von Textressourcen und Services. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All external subclasses must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All external subclasses must have a public no-arg constructor.
  */
 public abstract class ResourceLoader {
 
@@ -75,7 +79,8 @@ public abstract class ResourceLoader {
             try {
                 INSTANCE = (ResourceLoader) Class.forName(rl).newInstance();
             } catch (Exception e) {
-                throw new AssertionError("Wrong configuration of external resource loader!", e);
+                throw new AssertionError(
+                    "Wrong configuration of external resource loader: " + e.getMessage());
             }
         }
     }

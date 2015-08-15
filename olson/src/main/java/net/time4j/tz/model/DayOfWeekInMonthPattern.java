@@ -42,7 +42,6 @@ import static net.time4j.CalendarUnit.DAYS;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @doctags.concurrency <immutable>
  */
 final class DayOfWeekInMonthPattern
     extends GregorianTimezoneRule {

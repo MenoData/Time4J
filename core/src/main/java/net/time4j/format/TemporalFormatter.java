@@ -34,19 +34,23 @@ import java.util.Locale;
  * <p>Generic facade for any temporal/chronological format object which can print temporal objects to text
  * or parse texts to temporal objects. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must be immutable. </p>
+ *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Allgemeine Fassade von Zeitformatobjekten, die temporale Objekte zu Text oder umgekehrt Text als
  * temporale Objekte interpretieren. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must be immutable. </p>
+ *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec All implementations must be immutable.
  */
 public interface TemporalFormatter<T> {
 

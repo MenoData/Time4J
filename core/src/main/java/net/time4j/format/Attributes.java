@@ -41,13 +41,11 @@ import java.util.NoSuchElementException;
  * and parsing. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Formatattribute zum Steuern des Format- und Interpretierungsvorgangs. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 public final class Attributes
     implements AttributeQuery {
@@ -572,13 +570,9 @@ public final class Attributes
 
     /**
      * <p>Builds a collection of format attributes. </p>
-     *
-     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Baut eine Menge von Formatattributen. </p>
-     *
-     * @doctags.concurrency <mutable>
      */
     public static final class Builder {
 

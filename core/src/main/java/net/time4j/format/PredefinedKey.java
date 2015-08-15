@@ -29,7 +29,6 @@ import net.time4j.engine.AttributeKey;
  *
  * @param   <A> generic type of associated attribute values
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class PredefinedKey<A>
     implements AttributeKey<A> {

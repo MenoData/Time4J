@@ -43,7 +43,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class OrdinalProcessor
     implements FormatProcessor<Integer> {

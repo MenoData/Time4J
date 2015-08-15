@@ -33,9 +33,11 @@ import java.util.Set;
 /**
  * <p>F&uuml;hrt das elementweise Parsen und Formatieren aus. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must be immutable. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    All implementations must be immutable.
  */
 interface FormatProcessor<V> {
 

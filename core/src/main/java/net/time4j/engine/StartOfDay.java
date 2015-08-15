@@ -27,16 +27,20 @@ import net.time4j.tz.TZID;
 /**
  * <p>Defines the start of a given calendar day relative to midnight in seconds. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All subclasses must be immutable. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All subclasses must be immutable.
  */
 /*[deutsch]
  * <p>Definiert den Start eines Kalendertages relativ zu Mitternacht in Sekunden. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All subclasses must be immutable. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All subclasses must be immutable.
  */
 public abstract class StartOfDay {
 

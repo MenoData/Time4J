@@ -46,7 +46,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * The basic bundle name is &quot;iso8601&quot;. </p>
  *
  * @author  Meno Hochschild
- * @doctags.exclude
  */
 public final class IsoTextProviderSPI
     implements TextProvider {
@@ -421,11 +420,7 @@ public final class IsoTextProviderSPI
         if (result.length > 7) { // ISO-Reihenfolge erzwingen
             String sunday = result[1];
             String[] arr = new String[7];
-
-            for (int i = 2; i < 8; i++) {
-                arr[i - 2] = result[i];
-            }
-
+            System.arraycopy(result, 2, arr, 0, 6);
             arr[6] = sunday;
             result = arr;
         }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdZoneIdentifier.java) is part of project Time4J.
  *
@@ -63,8 +63,10 @@ import net.time4j.tz.TZID;
  * the timezone data associated with the enum constants are not necessarily
  * correct. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>Identifiziert eine Zeitzone per IANA-Standard. </p>
@@ -95,8 +97,10 @@ import net.time4j.tz.TZID;
  * vor den Enum-Konstanten zu geben, weil die mit den Enums verkn&uuml;pften
  * historischen Zeitzonendaten nicht notwendig korrekt sein m&uuml;ssen. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface StdZoneIdentifier
     extends TZID {

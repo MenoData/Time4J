@@ -35,7 +35,6 @@ import java.text.ParsePosition;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
  */
 /*[deutsch]
  * <p>Zeichnet den Status und Fehlermeldungen beim Parsen auf. </p>
@@ -46,7 +45,6 @@ import java.text.ParsePosition;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <mutable>
  */
 public class ParseLog {
 

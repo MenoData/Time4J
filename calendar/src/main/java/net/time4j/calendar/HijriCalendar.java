@@ -97,10 +97,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *     System.out.println(date); // 2015-07-16
  * </pre>
  *
+ * <p><strong>Note:</strong>
+ * This class is still in experimental status. The serialization format will change in future. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental The serialization format will change in future.
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Hijri-Kalender, der in vielen islamischen L&auml;ndern vorwiegend f&uuml;r
@@ -143,10 +144,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *     System.out.println(date); // 2015-07-16
  * </pre>
  *
+ * <p><strong>Note:</strong>
+ * This class is still in experimental status. The serialization format will change in future. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental The serialization format will change in future.
- * @doctags.concurrency <immutable>
  */
 @CalendarType("islamic")
 public final class HijriCalendar

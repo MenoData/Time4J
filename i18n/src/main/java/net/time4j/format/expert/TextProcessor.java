@@ -38,7 +38,6 @@ import java.util.Set;
  * @param   <V> generic type of element values (String or Enum)
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class TextProcessor<V>
     implements FormatProcessor<V> {

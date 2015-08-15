@@ -43,9 +43,11 @@ import static net.time4j.format.PluralCategory.TWO;
  * &quot;common/supplemental/plurals.xml&quot; for cardinal numbers and
  * &quot;common/supplemental/ordinals.xml&quot; for ordinal numbers. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All concrete classes must be immutable. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.spec    All concrete classes must be immutable.
  */
 /*[deutsch]
  * <p>Hilfsklasse zur Bestimmung der Pluralkategorie f&uuml;r eine gegebene
@@ -59,9 +61,11 @@ import static net.time4j.format.PluralCategory.TWO;
  * (f&uuml;r Grundzahlen) gefunden werden. Ordinalzahlregeln sind in der
  * Datei &quot;common/supplemental/ordinals.xml&quot; zu finden. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All concrete classes must be immutable. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.spec    All concrete classes must be immutable.
  */
 public abstract class PluralRules {
 

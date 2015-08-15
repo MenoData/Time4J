@@ -31,7 +31,6 @@ import net.time4j.engine.StdOperator;
  * dem Strategy-Entwurfsmuster. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class DateOperator
     extends ElementOperator<PlainDate> {

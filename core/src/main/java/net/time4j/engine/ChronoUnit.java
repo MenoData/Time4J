@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoUnit.java) is part of project Time4J.
  *
@@ -30,8 +30,10 @@ package net.time4j.engine;
  * <p><strong>Naming convention:</strong> Time units have Java-names in
  * plural form. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    Implementations must be always <i>immutable</i>.
  */
 /*[deutsch]
  * <p>Externe Zeiteinheiten, die nicht in einer Chronologie (Zeitachse)
@@ -42,8 +44,10 @@ package net.time4j.engine;
  * <p><strong>Namenskonvention:</strong> Zeiteinheiten haben Java-Namen in
  * Pluralform. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    Implementations must be always <i>immutable</i>.
  */
 public interface ChronoUnit {
 

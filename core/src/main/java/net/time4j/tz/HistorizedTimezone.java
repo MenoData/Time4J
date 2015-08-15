@@ -36,7 +36,6 @@ import java.util.List;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @doctags.concurrency <immutable>
  */
 final class HistorizedTimezone
     extends Timezone {

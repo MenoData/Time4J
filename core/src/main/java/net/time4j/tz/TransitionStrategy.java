@@ -30,16 +30,20 @@ import net.time4j.base.WallTime;
  * escpecially if there are conflicts due to gaps or overlaps on the local
  * timeline. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>Dient der Aufl&ouml;sung von lokalen Zeitangaben zu einer UTC-Weltzeit,
  * wenn wegen L&uuml;cken oder &Uuml;berlappungen auf dem lokalen Zeitstrahl
  * Konflikte auftreten. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionStrategy {
 

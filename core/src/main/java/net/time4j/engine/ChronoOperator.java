@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoOperator.java) is part of project Time4J.
  *
@@ -48,7 +48,6 @@ package net.time4j.engine;
  * @param   <T> generic type of entities this operator can be applied to
  * @author  Meno Hochschild
  */
-// TODO: Ab Java 8 aktiv => extends UnaryOperator<T>
 public interface ChronoOperator<T> {
 
     //~ Methoden ----------------------------------------------------------

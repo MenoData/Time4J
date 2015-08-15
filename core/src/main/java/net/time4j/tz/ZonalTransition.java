@@ -51,7 +51,6 @@ import java.io.Serializable;
  * gaps and ambivalent in overlapping regions. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Beschreibt einen Wechsel der Verschiebung der lokalen Zeit relativ
@@ -80,7 +79,6 @@ import java.io.Serializable;
  * nicht definiert und auf &Uuml;berlappungen zweideutig. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 public final class ZonalTransition
     implements Comparable<ZonalTransition>, Serializable {

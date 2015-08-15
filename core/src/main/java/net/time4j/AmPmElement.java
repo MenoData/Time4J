@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AmPmElement.java) is part of project Time4J.
  *
@@ -44,7 +44,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * <p>Repr&auml;sentiert das Halbtagselement. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
  */
 enum AmPmElement
     implements ZonalElement<Meridiem>, TextElement<Meridiem> {

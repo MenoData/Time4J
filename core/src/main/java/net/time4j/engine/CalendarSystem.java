@@ -29,24 +29,28 @@ import java.util.List;
  * day number corresponding to the count of days elapsed since UTC epoch
  * [1972-01-01]. </p>
  *
- * @param   <D> generic type of calendar date (subtype of {@code Calendrical} or {@code CalendarVariant})
- * @author  Meno Hochschild
- * @see     Calendrical
- * @see     CalendarVariant
- * @see     net.time4j.engine.EpochDays
- * @doctags.spec    All implementations must be immutable.
- */
-/*[deutsch]
- * <p>Repr&auml;sentiert ein Kalendersystem, das Datumsangaben eindeutig auf
- * eine Tagesnummer entsprechend der Anzahl der Tage seit der UTC-Epoche
- * [1972-01-01] abbilden kann. </p>
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable. </p>
  *
  * @param   <D> generic type of calendar date (subtype of {@code Calendrical} or {@code CalendarVariant})
  * @author  Meno Hochschild
  * @see     Calendrical
  * @see     CalendarVariant
  * @see     net.time4j.engine.EpochDays
- * @doctags.spec    All implementations must be immutable.
+ */
+/*[deutsch]
+ * <p>Repr&auml;sentiert ein Kalendersystem, das Datumsangaben eindeutig auf
+ * eine Tagesnummer entsprechend der Anzahl der Tage seit der UTC-Epoche
+ * [1972-01-01] abbilden kann. </p>
+ *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable. </p>
+ *
+ * @param   <D> generic type of calendar date (subtype of {@code Calendrical} or {@code CalendarVariant})
+ * @author  Meno Hochschild
+ * @see     Calendrical
+ * @see     CalendarVariant
+ * @see     net.time4j.engine.EpochDays
  */
 public interface CalendarSystem<D> {
 

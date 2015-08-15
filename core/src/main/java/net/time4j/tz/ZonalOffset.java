@@ -41,7 +41,6 @@ import java.util.concurrent.ConcurrentMap;
  * <p>{@code [Total Offset] = [Local Wall Time] - [POSIX Time]}</p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Verschiebung der lokalen Zeit relativ zur
@@ -53,7 +52,6 @@ import java.util.concurrent.ConcurrentMap;
  * <p>{@code [Total Offset] = [Local Wall Time] - [POSIX Time]}</p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 public final class ZonalOffset
     implements Comparable<ZonalOffset>, TZID, Serializable {

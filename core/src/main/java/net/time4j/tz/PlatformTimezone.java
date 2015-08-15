@@ -39,7 +39,6 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @doctags.concurrency <threadsafe>
  */
 final class PlatformTimezone
     extends Timezone {

@@ -44,7 +44,6 @@ import static net.time4j.PlainTime.WALL_TIME;
  * <p>Repr&auml;sentiert das Jahr in einem ISO-Wochendatum. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class YOWElement
     extends AbstractDateElement<Integer>

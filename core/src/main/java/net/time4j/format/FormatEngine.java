@@ -30,19 +30,23 @@ import java.util.Locale;
 /**
  * <p>This <strong>SPI-interface</strong> allows the creation of temporal formats via a builder-approach. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erlaubt die Erzeugung von temporalen Formatobjekten
  * via Builder-Entwurfsmuster. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor.</p>
+ *
  * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface FormatEngine<P extends ChronoPattern<P>> {
 
@@ -85,7 +89,6 @@ public interface FormatEngine<P extends ChronoPattern<P>> {
      * <p>SPECIFICATION: The chronological type must be <code>net.time4j.Moment</code>. </p>
      *
      * @return  temporal format object
-     * @doctags.exclude
      */
     TemporalFormatter<? extends UniversalTime> createRFC1123();
 

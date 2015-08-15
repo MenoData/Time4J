@@ -467,7 +467,6 @@ public class Chronology<T extends ChronoEntity<T>>
      *
      * @param       <T> generic type of time context
      * @author      Meno Hochschild
-     * @doctags.concurrency <mutable>
      */
     /*[deutsch]
      * <p>Erzeugt eine neue Chronologie ohne Zeitachse und wird
@@ -476,7 +475,6 @@ public class Chronology<T extends ChronoEntity<T>>
      *
      * @param       <T> generic type of time context
      * @author      Meno Hochschild
-     * @doctags.concurrency <mutable>
      */
     public static class Builder<T extends ChronoEntity<T>> {
 

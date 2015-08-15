@@ -30,7 +30,7 @@ import java.io.Serializable;
  * <p>Represents an immutable time point along a time axis which is directed
  * into the future. </p>
  *
- * <h4>Display and change chronological element values</h4>
+ * <p><strong>Display and change chronological element values</strong></p>
  *
  * <p>The time point consists of chronological elements. This base class
  * delegates the time arithmetic to the associated time axis respective to
@@ -41,7 +41,7 @@ import java.io.Serializable;
  * <p>Element values can only be changed by creating a new immutable copy
  * of the original instance. This is done via all {@code with()}-methods. </p>
  *
- * <h4>Time axis</h4>
+ * <p><strong>Time axis</strong></p>
  *
  * <p>If the referenced time axis is the UTC-timeline (that is a time point
  * is defined relative to the start of UTC epoch - see
@@ -55,7 +55,7 @@ import java.io.Serializable;
  * Applications should therefore take much care if they transform a duration
  * from one time axis to another one. </p>
  *
- * <h4>Sorting</h4>
+ * <p><strong>Sorting</strong></p>
  *
  * <p>Unless explicitly stated otherwise sorting of time points is always
  * in strict temporal order and consistent with {@code equals()}. In case
@@ -63,7 +63,7 @@ import java.io.Serializable;
  * subclasses are free to implement the interface {@code Temporal} to
  * enable a temporal order. </p>
  *
- * <h4>Addition (or subtraction) of a time span to a time point</h4>
+ * <p><strong>Addition (or subtraction) of a time span to a time point</strong></p>
  *
  * <p>These operations are performed by all {@code plus()}- and {@code minus()}-
  * methods. A time span can either be a single time unit, or it consists of
@@ -81,14 +81,14 @@ import java.io.Serializable;
  *  <li>[2011-08-31] + [P2M] = [2011-10-31]</li>
  * </ul>
  *
- * <h4>Difference of time points</h4>
+ * <p><strong>Difference of time points</strong></p>
  *
  * <p>The difference of time points results in a time span. The result can
  * either be expressed in one time unit only, or in multiple units which
  * represent the base unit of associated chronological element. In latter
  * case users have to define a metric, too. </p>
  *
- * <h4>Implementation notes</h4>
+ * <p><strong>Implementation notes</strong></p>
  *
  * <ul>
  *  <li>All subclasses must be <i>final</i> und <i>immutable</i>. </li>
@@ -113,7 +113,7 @@ import java.io.Serializable;
  * <p>Repr&auml;sentiert einen unver&auml;nderlichen Zeitpunkt auf einer in
  * die Zukunft gerichteten Zeitachse. </p>
  *
- * <h4>Chronologische Elementwerte anzeigen und &auml;ndern</h4>
+ * <p><strong>Chronologische Elementwerte anzeigen und &auml;ndern</strong></p>
  *
  * <p>Der Zeitwert setzt sich aus chronologischen Elementen zusammen. Diese
  * abstrakte Basisklasse delegiert die Zeitrechnung immer an die zugeh&ouml;rige
@@ -127,7 +127,7 @@ import java.io.Serializable;
  * eine neue Instanz mit ge&auml;nderten Elementwerten erzeugt wird. Das wird
  * unter anderem von allen {@code with()}-Methoden geleistet. </p>
  *
- * <h4>Zeitstrahl</h4>
+ * <p><strong>Zeitstrahl</strong></p>
  *
  * <p>Ist die referenzierte Zeitachse die UTC-Weltzeitlinie, wenn also
  * ein Zeitpunkt dann relativ zum Beginn der UTC-Epoche liegt (siehe
@@ -141,7 +141,7 @@ import java.io.Serializable;
  * Deshalb sollten Anwendungen besondere Vorsicht walten lassen, wenn eine
  * Dauer von einer Zeitachse auf eine andere Zeitachse &uuml;bertragen wird. </p>
  *
- * <h4>Sortierung</h4>
+ * <p><strong>Sortierung</strong></p>
  *
  * <p>Wenn nicht ausdr&uuml;cklich anders dokumentiert, wird die Sortierung
  * von Zeitpunkten immer rein zeitlich definiert und konsistent mit
@@ -150,7 +150,7 @@ import java.io.Serializable;
  * auch das Interface {@code Temporal} implementieren, um eine rein
  * zeitliche Ordnung zu erm&ouml;glichen. </p>
  *
- * <h4>Addition (oder Subtraktion) einer Zeitspanne zu einem Zeitpunkt</h4>
+ * <p><strong>Addition (oder Subtraktion) einer Zeitspanne zu einem Zeitpunkt</strong></p>
  *
  * <p>Diese Operationen werden von allen {@code plus()}- und {@code minus()}-
  * Methoden geleistet. Eine Zeitspanne kann entweder nur eine einzelne
@@ -171,7 +171,7 @@ import java.io.Serializable;
  *  <li>[2011-08-31] + [P2M] = [2011-10-31]</li>
  * </ul>
  *
- * <h4>Differenz von Zeitpunkten</h4>
+ * <p><strong>Differenz von Zeitpunkten</strong></p>
  *
  * <p>Die Differenz von Zeitpunkten resultiert jeweils in einer Zeitspanne.
  * Das Ergebnis kann entweder in nur einer Zeiteinheit ausgedr&uuml;ckt werden,
@@ -179,7 +179,7 @@ import java.io.Serializable;
  * chronologischen Elements repr&auml;sentieren. In letzterem Fall ist auch
  * eine Metrik anzugeben. </p>
  *
- * <h4>Implementierungshinweise</h4>
+ * <p><strong>Implementierungshinweise</strong></p>
  *
  * <ul>
  *  <li>Alle Subklassen m&uuml;ssen <i>final</i> und <i>immutable</i>

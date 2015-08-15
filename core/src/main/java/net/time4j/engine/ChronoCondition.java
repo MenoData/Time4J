@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoCondition.java) is part of project Time4J.
  *
@@ -44,7 +44,6 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @see     ChronoEntity#matches(ChronoCondition)
  */
-// TODO: Ab Java 8 aktiv => extends Predicate<T>
 public interface ChronoCondition<T> {
 
     //~ Methoden ----------------------------------------------------------

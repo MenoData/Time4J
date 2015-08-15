@@ -56,7 +56,6 @@ import java.util.TimeZone;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class SystemTemporalFormatter<T>
     implements TemporalFormatter<T> {

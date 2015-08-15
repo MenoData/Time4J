@@ -39,7 +39,6 @@ import java.io.ObjectStreamException;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @doctags.concurrency <immutable>
  */
 final class LastWeekdayPattern
     extends GregorianTimezoneRule {

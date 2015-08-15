@@ -45,7 +45,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Fabrikklasse f&uuml;r die Erzeugung einer {@code TransitionHistory}. </p>
@@ -53,7 +52,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.2
  * @serial  exclude
- * @doctags.concurrency <immutable>
  */
 public abstract class TransitionModel
     implements TransitionHistory, Serializable {

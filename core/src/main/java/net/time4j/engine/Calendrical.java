@@ -324,7 +324,6 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * @param   date    another date to be compared with
      * @return  negative, zero or positive integer if this instance is earlier,
      *          simultaneous or later than given date
-     * @doctags.exclude
      */
     protected int compareByTime(Calendrical<?, ?> date) {
 

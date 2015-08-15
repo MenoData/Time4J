@@ -46,7 +46,6 @@ import java.util.List;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @concurrency <immutable>
  */
 final class ArrayTransitionModel
     extends TransitionModel {

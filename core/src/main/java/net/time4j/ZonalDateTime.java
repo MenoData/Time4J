@@ -64,8 +64,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency This class is immutable as long as the underlying timezone
- *                      data are immutable.
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
@@ -94,8 +92,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency This class is immutable as long as the underlying timezone
- *                      data are immutable.
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)

@@ -36,8 +36,10 @@ import java.util.List;
  * Preliminary experimental versions of this interface existed since v1.0
  * but there was originally not any useable implementation. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
@@ -46,8 +48,10 @@ import java.util.List;
  * Davor existierten experimentelle Versionen des Interface schon seit v1.0,
  * aber es gab urspr&uuml;nglich keine nutzbare Implementierung. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must be immutable, thread-safe and serializable. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionHistory {
 

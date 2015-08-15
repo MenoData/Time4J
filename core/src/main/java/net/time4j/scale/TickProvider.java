@@ -29,8 +29,10 @@ package net.time4j.scale;
  * <p>Will be evaluated during loading of the class {@code SystemClock}. The internal standard
  * implementation uses {@code System.nanoTime()}. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   3.2/4.1
  */
 /*[deutsch]
@@ -40,8 +42,10 @@ package net.time4j.scale;
  * <p>Wird beim Laden der Klasse {@code net.time4j.SystemClock} ausgewertet. Die
  * interne Standardimplementierung basiert auf {@code System.nanoTime()}. </p>
  *
+ * <p><strong>Specification:</strong>
+ * All implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   3.2/4.1
  */
 public interface TickProvider {

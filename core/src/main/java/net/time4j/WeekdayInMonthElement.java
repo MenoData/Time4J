@@ -30,8 +30,6 @@ import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
 
-import static net.time4j.ElementOperator.OP_WIM;
-
 
 /**
  * <p>Das Element f&uuml;r den x-ten Wochentag im Monat. </p>
@@ -42,7 +40,6 @@ import static net.time4j.ElementOperator.OP_WIM;
  * weitere Spezialmethoden zum Setzen des Wochentags im Monat. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class WeekdayInMonthElement
     extends AbstractDateElement<Integer>

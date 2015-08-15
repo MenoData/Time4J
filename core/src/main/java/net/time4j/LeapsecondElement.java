@@ -22,14 +22,12 @@
 package net.time4j;
 
 import net.time4j.engine.BasicElement;
-import net.time4j.engine.ChronoDisplay;
 
 
 /**
  * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class LeapsecondElement
     extends BasicElement<Boolean> {

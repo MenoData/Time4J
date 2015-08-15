@@ -102,7 +102,6 @@ import java.util.Set;
  * {@link EpochDays} are supported. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein reines Kalenderdatum im ISO-8601-Standard. </p>
@@ -134,7 +133,6 @@ import java.util.Set;
  * und der Klasse {@link EpochDays} nutzbar. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 @CalendarType("iso8601")
 public final class PlainDate
@@ -1364,9 +1362,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected TimeAxis<IsoDateUnit, PlainDate> getChronology() {
 
@@ -1374,9 +1369,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected PlainDate getContext() {
 
@@ -1384,9 +1376,6 @@ public final class PlainDate
 
     }
 
-    /**
-     * @doctags.exclude
-     */
     @Override
     protected int compareByTime(Calendrical<?, ?> date) {
 

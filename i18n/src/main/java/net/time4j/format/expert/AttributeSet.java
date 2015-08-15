@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class AttributeSet
     implements AttributeQuery {

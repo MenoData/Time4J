@@ -32,10 +32,12 @@ import java.util.Locale;
  * an internal implementation which just offers unit patterns either in
  * english or in scientific notation. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -46,10 +48,12 @@ import java.util.Locale;
  * eine Instanz erzeugt, die lediglich Zeiteinheitsmuster auf Englisch
  * oder in wissenschaftlicher Notation anbietet. </p>
  *
+ * <p><strong>Specification:</strong>
+ * Implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface UnitPatternProvider {
 

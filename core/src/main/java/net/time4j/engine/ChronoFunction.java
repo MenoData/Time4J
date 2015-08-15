@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFunction.java) is part of project Time4J.
  *
@@ -39,7 +39,6 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @see     ChronoEntity#get(ChronoFunction)
  */
-// TODO: Ab Java 8 aktiv => extends Function<T, R>
 public interface ChronoFunction<T, R> {
 
     //~ Methoden ----------------------------------------------------------

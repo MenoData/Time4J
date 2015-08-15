@@ -35,13 +35,11 @@ import net.time4j.tz.Timezone;
  * <p>Represents a clock which is based on the clock of the underlying operating system. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Uhr, die auf dem Taktgeber des Betriebssystems basiert. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 public final class SystemClock
     implements TimeSource<Moment> {

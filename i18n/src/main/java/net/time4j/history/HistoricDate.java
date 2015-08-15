@@ -32,7 +32,6 @@ import net.time4j.base.GregorianMath;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein historisches Datum, das aus &Auml;ra, Jahr der &Auml;ra, Monat
@@ -42,7 +41,6 @@ import net.time4j.base.GregorianMath;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 public final class HistoricDate
     implements Comparable<HistoricDate> {
