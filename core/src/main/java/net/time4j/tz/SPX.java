@@ -101,7 +101,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in any case of IO-failures
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
@@ -113,7 +113,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in any case of IO-failures
      */
     @Override
     public void writeExternal(ObjectOutput out)
@@ -142,15 +142,15 @@ final class SPX
      * <p>Implementation method of interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in any case of IO-failures
+     * @throws  ClassNotFoundException if class loading fails
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in any case of IO-failures
+     * @throws  ClassNotFoundException if class loading fails
      */
     @Override
     public void readExternal(ObjectInput in)
