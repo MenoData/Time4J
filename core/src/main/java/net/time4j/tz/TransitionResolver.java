@@ -320,7 +320,7 @@ final class TransitionResolver
      * <pre>
      *  int key =
      *      getGapResolver().ordinal() * 2 + getOverlapResolver().ordinal();
-     *  int header = (13 << 4);
+     *  int header = (13 &lt;&lt; 4);
      *  header |= key;
      *  out.writeByte(header);
      * </pre>
@@ -339,7 +339,7 @@ final class TransitionResolver
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException {
+        throws InvalidObjectException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

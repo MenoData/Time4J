@@ -209,7 +209,7 @@ final class DayOfWeekInMonthPattern
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
      */
-    private Object writeReplace() throws ObjectStreamException {
+    private Object writeReplace() {
 
         return new SPX(this, this.getType());
 
@@ -220,7 +220,7 @@ final class DayOfWeekInMonthPattern
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+        throws InvalidObjectException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 
