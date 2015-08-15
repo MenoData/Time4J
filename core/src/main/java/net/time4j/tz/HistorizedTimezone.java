@@ -280,7 +280,7 @@ final class HistorizedTimezone
      * <pre>
      *  boolean specialStrategy =
             (getStrategy() != Timezone.DEFAULT_CONFLICT_STRATEGY);
-     *  int header = (14 << 4);
+     *  int header = (14 &lt;&lt; 4);
      *
      *  if (specialStrategy) {
      *      header |= 1;

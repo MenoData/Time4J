@@ -210,7 +210,7 @@ final class FallbackTimezone
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = (12 << 4);
+     *  int header = (12 &lt;&lt; 4);
      *  out.writeByte(header);
      *  out.writeObject(getID());
      *  out.writeObject(getFallback());
@@ -230,7 +230,7 @@ final class FallbackTimezone
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException {
+        throws InvalidObjectException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

@@ -1069,7 +1069,7 @@ public final class ZonalOffset
      *
      * <pre>
      *  boolean hasFraction = (this.getFractionalAmount() != 0);
-     *  int header = (15 << 4);
+     *  int header = (15 &lt;&lt; 4);
      *
      *  if (hasFraction) {
      *      header |= 1;
@@ -1097,7 +1097,7 @@ public final class ZonalOffset
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws IOException {
+        throws InvalidObjectException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 
