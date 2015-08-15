@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntegerDateElement.java) is part of project Time4J.
  *
@@ -24,7 +24,6 @@ package net.time4j;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.ElementRule;
 import net.time4j.format.NumericalElement;
 
 import java.io.InvalidObjectException;
@@ -64,17 +63,15 @@ final class IntegerDateElement
     private transient final Integer defaultMax;
     private transient final char symbol;
     private transient final ChronoFunction<ChronoEntity<?>, BigDecimal> rf;
-    private transient final ElementRule<?, Integer> rule;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    IntegerDateElement(
+    private IntegerDateElement(
         String name,
         int index,
         Integer defaultMin,
         Integer defaultMax,
-        char symbol,
-        ElementRule<?, Integer> rule
+        char symbol
     ) {
         super(name);
 
@@ -82,8 +79,6 @@ final class IntegerDateElement
         this.defaultMin = defaultMin;
         this.defaultMax = defaultMax;
         this.symbol = symbol;
-        this.rule = rule;
-
         this.rf = new ProportionalFunction(this, false);
 
     }
@@ -149,7 +144,7 @@ final class IntegerDateElement
     @Override
     public ChronoOperator<PlainDate> roundedUp(int stepwidth) {
 
-        return new RoundingOperator<PlainDate>(
+        return new RoundingOperator<>(
             this,
             Boolean.TRUE,
             stepwidth
@@ -160,7 +155,7 @@ final class IntegerDateElement
     @Override
     public ChronoOperator<PlainDate> roundedHalf(int stepwidth) {
 
-        return new RoundingOperator<PlainDate>(
+        return new RoundingOperator<>(
             this,
             null,
             stepwidth
@@ -171,7 +166,7 @@ final class IntegerDateElement
     @Override
     public ChronoOperator<PlainDate> roundedDown(int stepwidth) {
 
-        return new RoundingOperator<PlainDate>(
+        return new RoundingOperator<>(
             this,
             Boolean.FALSE,
             stepwidth
@@ -213,8 +208,7 @@ final class IntegerDateElement
             index,
             Integer.valueOf(dmin),
             Integer.valueOf(dmax),
-            symbol,
-            null
+            symbol
         );
 
     }
