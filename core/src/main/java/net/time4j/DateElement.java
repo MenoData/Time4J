@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.engine.BasicElement;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -153,7 +152,7 @@ final class DateElement
     @Override
     public ChronoFunction<Moment, PlainDate> in(Timezone tz) {
 
-        return new ZonalQuery<PlainDate>(this, tz);
+        return new ZonalQuery<>(this, tz);
 
     }
 
@@ -167,7 +166,7 @@ final class DateElement
     @Override
     public ChronoFunction<Moment, PlainDate> at(ZonalOffset offset) {
 
-        return new ZonalQuery<PlainDate>(this, offset);
+        return new ZonalQuery<>(this, offset);
 
     }
 
