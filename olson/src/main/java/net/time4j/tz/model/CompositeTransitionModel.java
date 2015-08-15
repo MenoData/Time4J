@@ -248,6 +248,8 @@ final class CompositeTransitionModel
      *              exploits the fact that allmost all transitions happen
      *              at full hours around midnight in local standard time.
      *              Insight in details see source code.
+     *
+     * @return  replacement object
      */
     private Object writeReplace() {
 
@@ -256,6 +258,7 @@ final class CompositeTransitionModel
     }
 
     /**
+     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
      * @throws      InvalidObjectException (always)
      */

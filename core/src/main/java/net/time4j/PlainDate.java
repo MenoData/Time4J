@@ -2027,7 +2027,7 @@ public final class PlainDate
      * <pre>
      *  int range;
      *
-     *  if (year &gt;= 1850 && year &lt;= 2100) {
+     *  if (year &gt;= 1850 &amp;&amp; year &lt;= 2100) {
      *      range = 1;
      *  } else if (Math.abs(year) &lt; 10000) {
      *      range = 2;

@@ -157,6 +157,8 @@ final class LastWeekdayPattern
      *              state follow. The complex algorithm exploits the fact
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
+     *
+     * @return  replacement object
      */
     private Object writeReplace() {
 
@@ -165,8 +167,9 @@ final class LastWeekdayPattern
     }
 
     /**
+     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
-     * @throws InvalidObjectException (always)
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
         throws InvalidObjectException {
