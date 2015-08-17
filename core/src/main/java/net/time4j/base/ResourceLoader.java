@@ -198,6 +198,17 @@ public abstract class ResourceLoader {
     private static class StdResourceLoader
         extends ResourceLoader {
 
+        //~ Konstruktoren -------------------------------------------------
+
+        protected StdResourceLoader() {
+            super();
+
+            if (ANDROID) {
+                throw new IllegalStateException("The module time4j-android is not active. Check your configuration.");
+            }
+
+        }
+
         //~ Methoden ------------------------------------------------------
 
         @Override
@@ -255,7 +266,7 @@ public abstract class ResourceLoader {
             try {
                 URL url = uri.toURL();
 
-                if (noCache || ANDROID) {
+                if (noCache) {
                     URLConnection conn = url.openConnection();
                     conn.setUseCaches(false);
                     conn.connect(); // explicit for clarity
