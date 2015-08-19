@@ -21,7 +21,8 @@ On 2015-08-12 the version v4.3 of Time4J has been finished and released. It requ
 - **time4j-calendar** for handling alternative non-iso calendars (needs i18n-module)
 - **time4j-range** for handling intervals (needs i18n-module)
 - **time4j-misc** miscellaneous features like sql/xml-support, alternative clocks or military timezones
-- **time4j-android** for Android-support (only relevant for version line 3.x - minimum version is 3.2)
+ 
+For **Android support** please refer to the sister project [Time4A](https://github.com/MenoData/Time4A).
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
 
