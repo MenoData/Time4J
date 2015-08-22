@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.*;
@@ -870,7 +871,7 @@ public final class PrettyTime {
      */
     public String printRelativeInStdTimezone(UnixTime moment) {
 
-        return this.printRelative(moment, Timezone.ofSystem());
+        return this.printRelative(moment, Timezone.ofSystem(), TimeUnit.SECONDS);
 
     }
 
@@ -899,7 +900,7 @@ public final class PrettyTime {
         TZID tzid
     ) {
 
-        return this.printRelative(moment, Timezone.of(tzid));
+        return this.printRelative(moment, Timezone.of(tzid), TimeUnit.SECONDS);
 
     }
 
@@ -928,13 +929,35 @@ public final class PrettyTime {
         String tzid
     ) {
 
-        return this.printRelative(moment, Timezone.of(tzid));
+        return this.printRelative(moment, Timezone.of(tzid), TimeUnit.SECONDS);
 
     }
 
-    private String printRelative(
-        UnixTime ut,
-        Timezone tz
+    /**
+     * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
+     * as duration in given precision or less. </p>
+     *
+     * @param   moment      relative time point
+     * @param   tz          time zone for translating to a local duration
+     * @param   precision   maximum precision of relative time (not more than seconds)
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
+     * maximalen Genauigkeit. </p>
+     *
+     * @param   moment      relative time point
+     * @param   tz          time zone for translating to a local duration
+     * @param   precision   maximum precision of relative time (not more than seconds)
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    public String printRelative(
+        UnixTime moment,
+        Timezone tz,
+        TimeUnit precision
     ) {
 
         UnixTime ref = this.getReferenceClock().currentTime();
@@ -945,20 +968,40 @@ public final class PrettyTime {
                 tz.getOffset(ref));
         PlainTimestamp end =
             PlainTimestamp.from(
-                ut,
-                tz.getOffset(ut));
+                moment,
+                tz.getOffset(moment));
 
         IsoUnit[] units = (this.weekToDays ? TSP_UNITS : STD_UNITS);
-        Duration<IsoUnit> duration =
-            Duration.in(tz, units).between(start, end);
+        Duration<IsoUnit> duration = Duration.in(tz, units).between(start, end);
 
         if (duration.isEmpty()) {
-            return UnitPatterns.of(this.locale).getNowWord();
+            return this.getEmptyRelativeString(precision);
         }
 
         TimeSpan.Item<IsoUnit> item = duration.getTotalLength().get(0);
         long amount = item.getAmount();
         IsoUnit unit = item.getUnit();
+
+        if (unit instanceof ClockUnit) {
+            ClockUnit cu = (ClockUnit) unit;
+
+            if (5 - cu.ordinal() < precision.ordinal()) {
+                return this.getEmptyRelativeString(precision);
+            }
+        }
+
+        if (
+            (amount == 1L)
+            && unit.equals(CalendarUnit.DAYS)
+        ) {
+            UnitPatterns patterns = UnitPatterns.of(this.locale);
+            String replacement = (duration.isNegative() ? patterns.getYesterdayWord() : patterns.getTomorrowWord());
+
+            if (!replacement.isEmpty()) {
+                return replacement;
+            }
+        }
+
         String pattern;
 
         if (duration.isNegative()) {
@@ -976,6 +1019,22 @@ public final class PrettyTime {
         }
 
         return this.format(pattern, amount);
+
+    }
+
+    private String getEmptyRelativeString(TimeUnit precision) {
+
+        UnitPatterns patterns = UnitPatterns.of(this.locale);
+
+        if (precision.equals(TimeUnit.DAYS)) {
+            String replacement = patterns.getTodayWord();
+
+            if (!replacement.isEmpty()) {
+                return replacement;
+            }
+        }
+
+        return patterns.getNowWord();
 
     }
 
