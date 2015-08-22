@@ -256,6 +256,27 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print4HoursEarlierGermanShort() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 3, 30, 5, 0)
+                    .in(Timezone.of("Europe/Berlin"));
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .withShortStyle()
+                .printRelative(
+                    PlainTimestamp.of(2014, 3, 30, 0, 0)
+                        .in(Timezone.of("Europe/Berlin")),
+                    "Europe/Berlin"),
+            is("vor 4 Std."));
+    }
+
+    @Test
     public void print3DaysRussian() {
         assertThat(
             PrettyTime.of(new Locale("ru")).print(3, DAYS, TextWidth.WIDE),
