@@ -22,8 +22,8 @@
 package net.time4j.i18n;
 
 import net.time4j.format.PluralCategory;
+import net.time4j.format.RelativeTimeProvider;
 import net.time4j.format.TextWidth;
-import net.time4j.format.UnitPatternProvider;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -48,7 +48,7 @@ import java.util.ResourceBundle;
  * @since   1.2
  */
 public final class UnitPatternProviderSPI
-    implements UnitPatternProvider {
+    implements RelativeTimeProvider {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -250,6 +250,119 @@ public final class UnitPatternProviderSPI
             PluralCategory.OTHER);
 
 	}
+
+    @Override
+    public String getShortYearPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'y', future, category);
+
+    }
+
+    @Override
+    public String getShortMonthPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'm', future, category);
+
+    }
+
+    @Override
+    public String getShortWeekPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'w', future, category);
+
+    }
+
+    @Override
+    public String getShortDayPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'd', future, category);
+
+    }
+
+    @Override
+    public String getShortHourPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'h', future, category);
+
+    }
+
+    @Override
+    public String getShortMinutePattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 'n', future, category);
+
+    }
+
+    @Override
+    public String getShortSecondPattern(
+        Locale language,
+        boolean future,
+        PluralCategory category
+    ) {
+
+        return this.getRelativePattern(language, 's', future, category);
+
+    }
+
+    @Override
+    public String getYesterdayWord(Locale lang) {
+
+        return this.getPattern(
+            lang,
+            "reltime/pattern",
+            "yesterday",
+            null,
+            PluralCategory.OTHER);
+
+    }
+
+    @Override
+    public String getTodayWord(Locale lang) {
+
+        return this.getPattern(
+            lang,
+            "reltime/pattern",
+            "today",
+            null,
+            PluralCategory.OTHER);
+
+    }
+
+    @Override
+    public String getTomorrowWord(Locale lang) {
+
+        return this.getPattern(
+            lang,
+            "reltime/pattern",
+            "tomorrow",
+            null,
+            PluralCategory.OTHER);
+
+    }
 
     @Override
     public String getListPattern(

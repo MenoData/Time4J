@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.ResourceLoader;
 import net.time4j.format.PluralCategory;
+import net.time4j.format.RelativeTimeProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.format.UnitPatternProvider;
 
@@ -89,8 +90,13 @@ final class UnitPatterns {
     private final Map<IsoUnit, Map<TextWidth, Map<PluralCategory, String>>> patterns;
     private final Map<IsoUnit, Map<PluralCategory, String>> past;
     private final Map<IsoUnit, Map<PluralCategory, String>> future;
+    private final Map<IsoUnit, Map<PluralCategory, String>> shortPast;
+    private final Map<IsoUnit, Map<PluralCategory, String>> shortFuture;
     private final Map<Integer, Map<TextWidth, String>> list;
     private final String now;
+    private final String yesterday;
+    private final String today;
+    private final String tomorrow;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -104,6 +110,10 @@ final class UnitPatterns {
         Map<IsoUnit, Map<PluralCategory, String>> mapPast =
             new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
         Map<IsoUnit, Map<PluralCategory, String>> mapFuture =
+            new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
+        Map<IsoUnit, Map<PluralCategory, String>> mapShortPast =
+            new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
+        Map<IsoUnit, Map<PluralCategory, String>> mapShortFuture =
             new HashMap<IsoUnit, Map<PluralCategory, String>>(10);
         Map<Integer, Map<TextWidth, String>> mapList =
             new HashMap<Integer, Map<TextWidth, String>>(10);
@@ -129,21 +139,37 @@ final class UnitPatterns {
                 Map<PluralCategory, String> tmp3 =
                     new EnumMap<PluralCategory, String>(PluralCategory.class);
                 for (PluralCategory cat : PluralCategory.values()) {
-                    tmp3.put(cat, lookup(language, unit, false, cat));
+                    tmp3.put(cat, lookup(language, unit, false, false, cat));
                 }
                 mapPast.put(
                     unit,
                     Collections.unmodifiableMap(tmp3));
+                Map<PluralCategory, String> tmp3a =
+                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                for (PluralCategory cat : PluralCategory.values()) {
+                    tmp3a.put(cat, lookup(language, unit, false, true, cat));
+                }
+                mapShortPast.put(
+                    unit,
+                    Collections.unmodifiableMap(tmp3a));
 
                 // Zukunft
                 Map<PluralCategory, String> tmp4 =
                     new EnumMap<PluralCategory, String>(PluralCategory.class);
                 for (PluralCategory cat : PluralCategory.values()) {
-                    tmp4.put(cat, lookup(language, unit, true, cat));
+                    tmp4.put(cat, lookup(language, unit, true, false, cat));
                 }
                 mapFuture.put(
                     unit,
                     Collections.unmodifiableMap(tmp4));
+                Map<PluralCategory, String> tmp4a =
+                    new EnumMap<PluralCategory, String>(PluralCategory.class);
+                for (PluralCategory cat : PluralCategory.values()) {
+                    tmp4a.put(cat, lookup(language, unit, true, true, cat));
+                }
+                mapShortFuture.put(
+                    unit,
+                    Collections.unmodifiableMap(tmp4a));
             }
         }
 
@@ -163,17 +189,33 @@ final class UnitPatterns {
         this.patterns = Collections.unmodifiableMap(map);
         this.past = Collections.unmodifiableMap(mapPast);
         this.future = Collections.unmodifiableMap(mapFuture);
+        this.shortPast = Collections.unmodifiableMap(mapShortPast);
+        this.shortFuture = Collections.unmodifiableMap(mapShortFuture);
         this.list = Collections.unmodifiableMap(mapList);
 
         String n;
 
+        String y = "";
+        String t1 = "";
+        String t2 = "";
+
         try {
             n = PROVIDER.getNowWord(language);
+
+            if (PROVIDER instanceof RelativeTimeProvider) {
+                RelativeTimeProvider rp = RelativeTimeProvider.class.cast(PROVIDER);
+                y = rp.getYesterdayWord(language);
+                t1 = rp.getTodayWord(language);
+                t2 = rp.getTomorrowWord(language);
+            }
         } catch (MissingResourceException mre) {
             n = FALLBACK.getNowWord(language); // should not happen
         }
 
         this.now = n;
+        this.yesterday = y;
+        this.today = t1;
+        this.tomorrow = t2;
 
     }
 
@@ -230,17 +272,25 @@ final class UnitPatterns {
      * of the form &quot;{0}&quot; standing for the count of units in the
      * past. </p>
      *
-     * @param   category    plural category
-     * @param   unit        associated iso unit
+     * @param   category        plural category
+     * @param   abbreviated     using short form or not
+     * @param   unit            associated iso unit
      * @return  unit pattern in the past
+     * @since   3.6/4.4
      */
     String getPatternInPast(
         PluralCategory category,
+        boolean abbreviated,
         IsoUnit unit
     ) {
 
         checkNull(category);
-        return this.past.get(unit).get(category);
+
+        if (abbreviated) {
+            return this.shortPast.get(unit).get(category);
+        } else {
+            return this.past.get(unit).get(category);
+        }
 
     }
 
@@ -249,28 +299,72 @@ final class UnitPatterns {
      * of the form &quot;{0}&quot; standing for the count of units in the
      * future. </p>
      *
-     * @param   category    plural category
-     * @param   unit        associated iso unit
+     * @param   category        plural category
+     * @param   abbreviated     using short form or not
+     * @param   unit            associated iso unit
      * @return  unit pattern in the future
+     * @since   3.6/4.4
      */
     String getPatternInFuture(
         PluralCategory category,
+        boolean abbreviated,
         IsoUnit unit
     ) {
 
         checkNull(category);
-        return this.future.get(unit).get(category);
+
+        if (abbreviated) {
+            return this.shortFuture.get(unit).get(category);
+        } else {
+            return this.future.get(unit).get(category);
+        }
 
     }
 
     /**
-     * <p>Yields the localized word for the current time (now). </p>
+     * <p>Yields the localized word for the current time (&quot;now&quot;). </p>
      *
      * @return  String
      */
     String getNowWord() {
 
         return this.now;
+
+    }
+
+    /**
+     * <p>Yields the localized word for &quot;yesterday&quot;. </p>
+     *
+     * @return  String (maybe empty)
+     * @since   3.6/4.4
+     */
+    String getYesterdayWord() {
+
+        return this.yesterday;
+
+    }
+
+    /**
+     * <p>Yields the localized word for &quot;today&quot;. </p>
+     *
+     * @return  String (maybe empty)
+     * @since   3.6/4.4
+     */
+    String getTodayWord() {
+
+        return this.today;
+
+    }
+
+    /**
+     * <p>Yields the localized word for &quot;tomorrow&quot;. </p>
+     *
+     * @return  String (maybe empty)
+     * @since   3.6/4.4
+     */
+    String getTomorrowWord() {
+
+        return this.tomorrow;
 
     }
 
@@ -390,13 +484,14 @@ final class UnitPatterns {
         Locale language,
         IsoUnit unit,
         boolean future,
+        boolean abbreviated,
         PluralCategory category
     ) {
 
         try {
-            return lookup(PROVIDER, language, getID(unit), future, category);
+            return lookup(PROVIDER, language, getID(unit), future, abbreviated, category);
         } catch (MissingResourceException mre) { // should not happen
-            return lookup(FALLBACK, language, getID(unit), future, category);
+            return lookup(FALLBACK, language, getID(unit), future, abbreviated, category);
         }
 
     }
@@ -406,8 +501,31 @@ final class UnitPatterns {
         Locale language,
         char unitID,
         boolean future,
+        boolean abbreviated,
         PluralCategory category
     ) {
+
+        if (abbreviated && (p instanceof RelativeTimeProvider)) {
+            RelativeTimeProvider rp = RelativeTimeProvider.class.cast(p);
+            switch (unitID) {
+                case 'Y':
+                    return rp.getShortYearPattern(language, future, category);
+                case 'M':
+                    return rp.getShortMonthPattern(language, future, category);
+                case 'W':
+                    return rp.getShortWeekPattern(language, future, category);
+                case 'D':
+                    return rp.getShortDayPattern(language, future, category);
+                case 'H':
+                    return rp.getShortHourPattern(language, future, category);
+                case 'N':
+                    return rp.getShortMinutePattern(language, future, category);
+                case 'S':
+                    return rp.getShortSecondPattern(language, future, category);
+                default:
+                    throw new UnsupportedOperationException("Unit-ID: " + unitID);
+            }
+        }
 
         switch (unitID) {
             case 'Y':

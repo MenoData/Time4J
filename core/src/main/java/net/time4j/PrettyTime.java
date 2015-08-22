@@ -127,9 +127,10 @@ public final class PrettyTime {
     private final Locale locale;
     private final TimeSource<?> refClock;
     private final char zeroDigit;
-    private final IsoUnit emptyUnit;
     private final String minusSign;
+    private final IsoUnit emptyUnit;
     private final boolean weekToDays;
+    private final boolean shortStyle;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -139,7 +140,8 @@ public final class PrettyTime {
         char zeroDigit,
         String minusSign,
         IsoUnit emptyUnit,
-        boolean weekToDays
+        boolean weekToDays,
+        boolean shortStyle
     ) {
         super();
 
@@ -157,6 +159,7 @@ public final class PrettyTime {
         this.emptyUnit = emptyUnit;
         this.minusSign = minusSign;
         this.weekToDays = weekToDays;
+        this.shortStyle = shortStyle;
 
     }
 
@@ -190,6 +193,7 @@ public final class PrettyTime {
                     NUMBER_SYMBOLS.getZeroDigit(locale),
                     NUMBER_SYMBOLS.getMinusSign(locale),
                     SECONDS,
+                    false,
                     false);
             PrettyTime old = LANGUAGE_MAP.putIfAbsent(locale, ptime);
 
@@ -274,7 +278,8 @@ public final class PrettyTime {
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
-            this.weekToDays);
+            this.weekToDays,
+            this.shortStyle);
 
     }
 
@@ -320,7 +325,8 @@ public final class PrettyTime {
             zeroDigit,
             this.minusSign,
             this.emptyUnit,
-            this.weekToDays);
+            this.weekToDays,
+            this.shortStyle);
 
     }
 
@@ -371,7 +377,8 @@ public final class PrettyTime {
             this.zeroDigit,
             minusSign,
             this.emptyUnit,
-            this.weekToDays);
+            this.weekToDays,
+            this.shortStyle);
 
     }
 
@@ -410,7 +417,8 @@ public final class PrettyTime {
             this.zeroDigit,
             this.minusSign,
             emptyUnit,
-            this.weekToDays);
+            this.weekToDays,
+            this.shortStyle);
 
     }
 
@@ -449,7 +457,8 @@ public final class PrettyTime {
             this.zeroDigit,
             this.minusSign,
             emptyUnit,
-            this.weekToDays);
+            this.weekToDays,
+            this.shortStyle);
 
     }
 
@@ -477,6 +486,43 @@ public final class PrettyTime {
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
+            true,
+            this.shortStyle);
+
+    }
+
+    /**
+     * <p>Mandates the use of abbreviations as default style. </p>
+     *
+     * <p>All {@code print()}-methods with explicit {@code TextWidth}-parameters will ignore this
+     * setting however. This method is mainly relevant for printing relative times. </p>
+     *
+     * @return  changed copy of this instance
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Legt die Verwendung von Abk&uuml;rzungen als Vorgabestil fest. </p>
+     *
+     * <p>Alle {@code print()}-Methoden mit einem expliziten {@code TextWidth}-Parameter ignorieren diese
+     * Einstellung. Diese Methode ist haupts&auml;chlich f&uuml;r die Formatierung von relativen Zeitangaben
+     * von Bedeutung. </p>
+     *
+     * @return  changed copy of this instance
+     * @since   3.6/4.4
+     */
+    public PrettyTime withShortStyle() {
+
+        if (this.shortStyle) {
+            return this;
+        }
+
+        return new PrettyTime(
+            this.locale,
+            this.refClock,
+            this.zeroDigit,
+            this.minusSign,
+            this.emptyUnit,
+            this.weekToDays,
             true);
 
     }
@@ -883,7 +929,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-        return patterns.getPatternInPast(category, unit);
+        return patterns.getPatternInPast(category, this.shortStyle, unit);
 
     }
 
@@ -894,7 +940,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-        return patterns.getPatternInFuture(category, unit);
+        return patterns.getPatternInFuture(category, this.shortStyle, unit);
 
     }
 
@@ -905,7 +951,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-        return patterns.getPatternInPast(category, unit);
+        return patterns.getPatternInPast(category, this.shortStyle, unit);
 
     }
 
@@ -916,7 +962,7 @@ public final class PrettyTime {
 
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
-        return patterns.getPatternInFuture(category, unit);
+        return patterns.getPatternInFuture(category, this.shortStyle, unit);
 
     }
 
