@@ -18,6 +18,8 @@ import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -197,6 +199,99 @@ public class PrettyTimeTest {
             is(PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(), Timezone.ofSystem().getID())));
+    }
+
+    @Test
+    public void printYesterdayGerman() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC(),
+                    ZonalOffset.UTC),
+            is("gestern"));
+    }
+
+    @Test
+    public void printTodayGerman1() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.DAYS),
+            is("heute"));
+    }
+
+    @Test
+    public void printTodayGerman2() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.HOURS),
+            is("jetzt"));
+    }
+
+    @Test
+    public void printTodayGerman3() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.MINUTES),
+            is("vor 30 Minuten"));
+    }
+
+    @Test
+    public void printTomorrowGerman() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 2, 14, 45).atUTC(),
+                    ZonalOffset.UTC),
+            is("morgen"));
     }
 
     @Test
