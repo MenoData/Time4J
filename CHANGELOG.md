@@ -1,4 +1,6 @@
 ## [Unreleased] published on ?
+### Added
+- Print relative times with abbreviations [#327]
 
 ## [v4.3] published on 2015-08-12
 ### Added
