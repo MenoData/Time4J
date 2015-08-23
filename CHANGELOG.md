@@ -2,6 +2,7 @@
 ## [Unreleased] published on ?
 ### Added
 - Print relative times with abbreviations [#327]
+- I18n-support for "yesterday", "today", "tomorrow" [#310]
 
 ## [v3.5] published on 2015-08-18
 ### Added
