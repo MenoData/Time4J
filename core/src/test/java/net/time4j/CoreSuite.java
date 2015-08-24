@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         TestInitialization.class,
+        AxisElementTest.class,
         ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,

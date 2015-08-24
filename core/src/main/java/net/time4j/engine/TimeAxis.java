@@ -1177,6 +1177,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         }
 
+        @Override
+        protected String getVeto(Chronology<?> chronology) {
+
+            return null;
+
+        }
+
     }
 
     private static class DefaultTimeLine<U, T extends TimePoint<U, T>>
