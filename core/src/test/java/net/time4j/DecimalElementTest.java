@@ -106,6 +106,6 @@ public class DecimalElementTest {
         protected Chronology<RawEntity> getChronology() {
             throw new UnsupportedOperationException();
         }
-    };
+    }
 
 }
