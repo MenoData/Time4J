@@ -1,6 +1,7 @@
 package net.time4j.format.expert;
 
 import net.time4j.Moment;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
@@ -39,6 +40,21 @@ public class OffsetPatternTest {
                         ZonalOffset.UTC,
                         "2012-06-30T23:59:60,123456789Z",
                         "2012-06-30T23:59:60.123456789+00:00"},
+                {"uuuuMMdd'T'HHmmx",
+                    "",
+                    ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30),
+                    "2012-06-30T12:00Z",
+                    "20120630T1730+0530"},
+                {"uuuuMMdd'T'HHmmxx",
+                    "",
+                    ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30),
+                    "2012-06-30T12:00Z",
+                    "20120630T1730+0530"},
+                {"uuuu-MM-dd'T'HH:mmxxx",
+                    "",
+                    ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30),
+                    "2012-06-30T12:00Z",
+                    "2012-06-30T17:30+05:30"},
                 {"uuuuMMdd'T'HHmmssSSSSSSSSSXX",
                         "",
                         ZonalOffset.UTC,

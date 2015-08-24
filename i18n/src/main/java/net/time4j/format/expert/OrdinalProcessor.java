@@ -53,8 +53,7 @@ final class OrdinalProcessor
     private static final Map<PluralCategory, String> ENGLISH_ORDINALS;
 
     static {
-        Map<PluralCategory, String> map =
-            new EnumMap<PluralCategory, String>(PluralCategory.class);
+        Map<PluralCategory, String> map = new EnumMap<>(PluralCategory.class);
         map.put(PluralCategory.ONE, "st");
         map.put(PluralCategory.TWO, "nd");
         map.put(PluralCategory.FEW, "rd");
@@ -90,13 +89,13 @@ final class OrdinalProcessor
 
         if (indicators == null) {
             this.indicators = null;
-        } else if (!indicators.containsKey(PluralCategory.OTHER)) {
-            throw new IllegalArgumentException(
-                "Missing plural category OTHER: " + indicators);
         } else {
             this.indicators =
-                Collections.unmodifiableMap(
-                    new EnumMap<PluralCategory, String>(indicators));
+                Collections.unmodifiableMap(new EnumMap<>(indicators));
+            if (!this.indicators.containsKey(PluralCategory.OTHER)) {
+                throw new IllegalArgumentException(
+                    "Missing plural category OTHER: " + indicators);
+            }
         }
 
     }
