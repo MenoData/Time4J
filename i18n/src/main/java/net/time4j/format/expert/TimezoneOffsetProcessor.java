@@ -34,6 +34,7 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -92,18 +93,20 @@ final class TimezoneOffsetProcessor
             throw new NullPointerException("Missing display mode.");
         } else if (zeroOffsets.isEmpty()) {
             throw new IllegalArgumentException("Missing zero offsets.");
-        } else {
-            for (String zo : zeroOffsets) {
-                if (zo.trim().isEmpty()) {
-                    throw new IllegalArgumentException(
-                        "Zero offset must not be white-space-only.");
-                }
+        }
+
+        List<String> offsets = new ArrayList<String>(zeroOffsets);
+
+        for (String zo : offsets) {
+            if (zo.trim().isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Zero offset must not be white-space-only.");
             }
         }
 
         this.precision = precision;
         this.extended = extended;
-        this.zeroOffsets = Collections.unmodifiableList(zeroOffsets);
+        this.zeroOffsets = Collections.unmodifiableList(offsets);
 
     }
 
@@ -196,7 +199,10 @@ final class TimezoneOffsetProcessor
                 buffer.append(minutes);
                 printed += minutes.length();
 
-                if (this.precision != MEDIUM) {
+                if (
+                    (this.precision != SHORT)
+                    && (this.precision != MEDIUM)
+                ) {
                     if (
                         (this.precision == FULL)
                         || ((s | fraction) != 0)
@@ -338,59 +344,64 @@ final class TimezoneOffsetProcessor
             return;
         }
 
+        int colon = 0;
+
         if (this.extended) {
             if (text.charAt(pos) == ':') {
-                pos++;
+                colon = 1;
             } else if (this.precision == SHORT) {
                 parsedResult.put(
                     TimezoneElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
                 return;
-            } else if (leniency.isStrict()) {
+            } else {
                 status.setError(pos, "Colon expected in timezone offset.");
                 return;
             }
         }
 
-        int minutes = parseNum(text, pos, Leniency.STRICT);
+        int minutes = parseNum(text, pos + colon, Leniency.STRICT);
         int seconds = 0;
         int fraction = 0;
 
         if (minutes == -1000) {
-            if (
-                (this.precision == SHORT)
-                && !this.extended
-            ) {
+            if (this.precision == SHORT) {
                 parsedResult.put(
                     TimezoneElement.TIMEZONE_ID,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
                 status.setError(
-                    pos,
+                    pos + colon,
                     "Minute part in timezone offset "
                     + "does not match expected pattern mm.");
             }
             return;
         }
 
+        pos += colon;
         pos += 2;
 
         if (
             (pos < len)
             && ((this.precision == LONG) || (this.precision == FULL))
         ) {
+            colon = 0;
+
             if (this.extended) {
                 if (text.charAt(pos) == ':') {
-                    pos++;
-                } else if (leniency.isStrict()) {
+                    colon = 1;
+                    seconds = parseNum(text, pos + colon, Leniency.STRICT);
+                } else if (this.precision == FULL) {
                     status.setError(pos, "Colon expected in timezone offset.");
                     return;
+                } else {
+                    seconds = -1000;
                 }
+            } else {
+                seconds = parseNum(text, pos, Leniency.STRICT);
             }
-
-            seconds = parseNum(text, pos, Leniency.STRICT);
 
             if (seconds == -1000) {
                 if (this.precision == FULL) {
@@ -403,6 +414,7 @@ final class TimezoneOffsetProcessor
                     seconds = 0;
                 }
             } else {
+                pos += colon;
                 pos += 2;
 
                 if (pos + 10 <= len) {

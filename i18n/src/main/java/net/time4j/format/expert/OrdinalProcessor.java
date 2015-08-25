@@ -89,13 +89,14 @@ final class OrdinalProcessor
 
         if (indicators == null) {
             this.indicators = null;
-        } else if (!indicators.containsKey(PluralCategory.OTHER)) {
-            throw new IllegalArgumentException(
-                "Missing plural category OTHER: " + indicators);
         } else {
             this.indicators =
                 Collections.unmodifiableMap(
                     new EnumMap<PluralCategory, String>(indicators));
+            if (!this.indicators.containsKey(PluralCategory.OTHER)) {
+                throw new IllegalArgumentException(
+                    "Missing plural category OTHER: " + indicators);
+            }
         }
 
     }

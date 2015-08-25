@@ -2452,6 +2452,8 @@ public final class Moment
 
             if (entity instanceof UnixTime) {
                 return Moment.from(UnixTime.class.cast(entity));
+            } else if (entity.contains(Moment.axis().element())) {
+                return entity.get(Moment.axis().element());
             } else if (entity.contains(LongElement.POSIX_TIME)) {
                 long posixTime = entity.get(LongElement.POSIX_TIME).longValue();
                 int fraction = 0;

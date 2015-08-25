@@ -749,12 +749,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (preparser == null) {
             return parse(this, this.chronology, text, status, attributes, false);
         } else {
-            Object obj = parse(this, preparser, text, status, attributes, true);
+            parse(this, preparser, text, status, attributes, true);
 
-            if (
-                (obj == null)
-                || status.isError()
-            ) {
+            if (status.isError()) {
                 return null;
             }
 
@@ -1944,9 +1941,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 5: Konsistenzprüfung
         if (result == null) {
-            status.setError(
-                text.length(),
-                getReason(parsed) + getDescription(data.peek()));
+            if (!preparsing) {
+                status.setError(
+                    text.length(),
+                    getReason(parsed) + getDescription(data.peek()));
+            }
             return null;
         } else {
             return checkConsistency(parsed, result, text, status, attributes);
@@ -4021,11 +4020,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * </div>
          *
          * <p>Notes: All components given in square brackets are optional.
-         * They will only appear if they are different from {@code 0}.
-         * A fractional second part with 9 digits is always optional
+         * During printing, they will only appear if they are different from {@code 0}.
+         * During parsing, they can be left out of the text to be parsed. A fractional
+         * second part with 9 digits is always optional (unless a dot exists)
          * and is only possible in case of a longitudinal offset. The modes
          * SHORT and MEDIUM correspond to ISO-8601 where an offset should
-         * only have hours and minutes. </p>
+         * only have hours and minutes. The hour part might consist of one digit
+         * only if the parsing mode is not strict. </p>
          *
          * <p>The third argument determines what kind of text should be
          * interpreted as zero offset. The formatted output always uses
@@ -4077,12 +4078,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * </div>
          *
          * <p>Hinweise: Die in eckigen Klammern angegebenen Komponenten
-         * sind optional, erscheinen also nur, wenn sie von {@code 0}
-         * verschieden sind. Ein fraktionaler stets 9-stelliger Sekundenteil
-         * ist immer optional und nur dann m&ouml;glich, wenn ein longitudinaler
-         * Offset verwendet wird. Die Genauigkeitsangaben SHORT und MEDIUM
-         * entsprechen der ISO-8601-Notation, in der nur Stunden und Minuten
-         * formatiert werden. </p>
+         * sind optional, erscheinen also beim Formatieren nur, wenn sie von {@code 0}
+         * verschieden sind. Der Interpretierer duldet auch Fehler in diesen Teilen.
+         * Ein fraktionaler stets 9-stelliger Sekundenteil ist immer optional (wenn nicht
+         * anfangs ein Punkt existiert) und nur dann m&ouml;glich, wenn ein longitudinaler
+         * Offset verwendet wird. Die Genauigkeitsangaben SHORT und MEDIUM entsprechen der
+         * ISO-8601-Notation, in der nur Stunden und Minuten formatiert werden. Der Stundenteil
+         * mag aus nur einer Ziffer bestehen, wenn der Interpretierer nicht strikt ist. </p>
          *
          * <p>Das dritte Argument legt fest, was als Null-Offset interpretiert
          * werden soll. Die formatierte Ausgabe benutzt immer den ersten

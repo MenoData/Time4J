@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.DisplayMode;
+import net.time4j.format.Leniency;
 import net.time4j.tz.ZonalOffset;
 
 import java.util.Collections;
@@ -51,10 +52,14 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
 /**
  * <p>Collection of predefined format objects for ISO-8601. </p>
  *
+ * <p>All formatters are strict by default. </p>
+ *
  * @author  Meno Hochschild
  */
 /*[deutsch]
  * <p>Sammlung von vordefinierten Format-Objekten f&uuml;r ISO-8601. </p>
+ *
+ * <p>Alle Formatierer sind per Vorgabe strikt. </p>
  *
  * @author  Meno Hochschild
  */
@@ -208,11 +213,12 @@ public class Iso8601Format {
     /**
      * <p>Defines the <i>basic</i> ISO-8601-format for a composition of
      * calendar date, wall time and timezone offset using the pattern
-     * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]X&quot;. </p>
+     * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]{offset}&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
      * the count of decimal digits is flexible (0-9). The minute part is
-     * optional during parsing, but will always be printed. </p>
+     * optional during parsing, but will always be printed. The offset
+     * part is for printing equivalent to XX, for parsing equivalent to X. </p>
      *
      * <p>By default, the timezone offset used for printing is UTC+00:00.
      * Users can override this offset by calling the method
@@ -221,11 +227,13 @@ public class Iso8601Format {
     /*[deutsch]
      * <p>Definiert das <i>basic</i> ISO-8601-Format f&uuml;r eine Kombination
      * aus Kalenderdatum, Uhrzeit mit Stunde und Minute und Offset im Muster
-     * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]X&quot;. </p>
+     * &quot;uuuuMMdd'T'HH[mm[ss[SSSSSSSSS]]]{offset}&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
      * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
-     * optional, wird aber beim Formatieren immer ausgegeben. </p>
+     * optional, wird aber beim Formatieren immer ausgegeben. Der Offset-Teil
+     * ist f&uuml;r die formatierte Ausgabe &auml;quivalent zu XX, beim
+     * Interpretieren &auml;quivalent zu X. </p>
      *
      * <p>Standardm&auml;&szlig;ig wird f&uuml;r die formatierte Ausgabe der
      * Zeitzonen-Offset UTC+00:00 verwendet. Diese Vorgabe kann mit Hilfe von
@@ -237,11 +245,13 @@ public class Iso8601Format {
     /**
      * <p>Defines the <i>extended</i> ISO-8601-format for a composition of
      * calendar date, wall time and timezone offset using the pattern
-     * &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]XXX&quot;. </p>
+     * &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]{offset}&quot;. </p>
      *
      * <p>Second and nanosecond elements are optional. Furthermore,
      * the count of decimal digits is flexible (0-9). The minute part is
-     * optional during parsing, but will always be printed. </p>
+     * optional during parsing, but will always be printed. The offset
+     * part is for printing equivalent to XXX, for parsing equivalent
+     * to X (but with colon!).  </p>
      *
      * <p>By default, the timezone offset used for printing is UTC+00:00.
      * Users can override this offset by calling the method
@@ -250,11 +260,13 @@ public class Iso8601Format {
     /*[deutsch]
      * <p>Definiert das <i>extended</i> ISO-8601-Format f&uuml;r eine
      * Kombination aus Kalenderdatum, Uhrzeit mit Stunde und Minute und Offset
-     * im Muster &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]XXX&quot;. </p>
+     * im Muster &quot;uuuu-MM-dd'T'HH[:mm[:ss[,SSSSSSSSS]]]{offset}&quot;. </p>
      *
      * <p>Sekunde und Nanosekunde sind optional. Auch die Anzahl der
      * Dezimalstellen ist variabel (0-9). Der Minutenteil ist beim Parsen
-     * optional, wird aber beim Formatieren immer ausgegeben. </p>
+     * optional, wird aber beim Formatieren immer ausgegeben.  Der Offset-Teil
+     * ist f&uuml;r die formatierte Ausgabe &auml;quivalent zu XXX, beim
+     * Interpretieren &auml;quivalent zu X (aber mit Doppelpunkt!). </p>
      *
      * <p>Standardm&auml;&szlig;ig wird f&uuml;r die formatierte Ausgabe der
      * Zeitzonen-Offset UTC+00:00 verwendet. Diese Vorgabe kann mit Hilfe von
@@ -292,10 +304,9 @@ public class Iso8601Format {
     private static ChronoFormatter<PlainDate> calendarFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainDate> builder =
-            ChronoFormatter
-            .setUp(PlainDate.class, Locale.ROOT);
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
         addCalendarDate(builder, extended);
-        return builder.build();
+        return builder.build().with(Leniency.STRICT);
 
     }
 
@@ -303,14 +314,14 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
-            .setUp(PlainDate.class, Locale.ROOT)
-            .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                .setUp(PlainDate.class, Locale.ROOT)
+                .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
         if (extended) {
             builder.addLiteral('-');
         }
 
-        return builder.addFixedInteger(DAY_OF_YEAR, 3).build();
+        return builder.addFixedInteger(DAY_OF_YEAR, 3).build().with(Leniency.STRICT);
 
     }
 
@@ -318,12 +329,12 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
-            .setUp(PlainDate.class, Locale.ROOT)
-            .addInteger(
-                YEAR_OF_WEEKDATE,
-                4,
-                9,
-                SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                .setUp(PlainDate.class, Locale.ROOT)
+                .addInteger(
+                    YEAR_OF_WEEKDATE,
+                    4,
+                    9,
+                    SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
         if (extended) {
             builder.addLiteral('-');
@@ -336,17 +347,16 @@ public class Iso8601Format {
             builder.addLiteral('-');
         }
 
-        return builder.addFixedNumerical(DAY_OF_WEEK, 1).build();
+        return builder.addFixedNumerical(DAY_OF_WEEK, 1).build().with(Leniency.STRICT);
 
     }
 
     private static ChronoFormatter<PlainTime> timeFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainTime> builder =
-            ChronoFormatter
-            .setUp(PlainTime.class, Locale.ROOT);
+            ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
         addWallTime(builder, extended);
-        return builder.build();
+        return builder.build().with(Leniency.STRICT);
 
     }
 
@@ -355,27 +365,43 @@ public class Iso8601Format {
     ) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
-            ChronoFormatter
-            .setUp(PlainTimestamp.class, Locale.ROOT);
+            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
         addCalendarDate(builder, extended);
         builder.addLiteral('T');
         addWallTime(builder, extended);
-        return builder.build();
+        return builder.build().with(Leniency.STRICT);
 
     }
 
     private static ChronoFormatter<Moment> momentFormat(boolean extended) {
 
         ChronoFormatter.Builder<Moment> builder =
-            ChronoFormatter
-            .setUp(Moment.class, Locale.ROOT);
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+
+        builder.addCustomized(
+            Moment.axis().element(),
+            momentFormat(DisplayMode.MEDIUM, extended),
+            momentFormat(DisplayMode.SHORT, extended)
+        );
+
+        return builder.build().withTimezone(ZonalOffset.UTC).with(Leniency.STRICT);
+
+    }
+
+    private static ChronoFormatter<Moment> momentFormat(
+        DisplayMode mode,
+        boolean extended
+    ) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
 
         addCalendarDate(builder, extended);
         builder.addLiteral('T');
         addWallTime(builder, extended);
 
         builder.addTimezoneOffset(
-            (extended ? DisplayMode.MEDIUM : DisplayMode.SHORT),
+            mode,
             extended,
             Collections.singletonList("Z"));
 
@@ -456,8 +482,8 @@ public class Iso8601Format {
         public boolean test(ChronoDisplay context) {
 
             return (
-                !context.contains(this.element)
-                || (context.get(this.element).intValue() != 0)
+                context.contains(this.element)
+                && (context.get(this.element).intValue() != 0)
             );
 
         }

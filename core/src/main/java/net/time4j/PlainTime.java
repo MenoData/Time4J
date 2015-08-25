@@ -3243,13 +3243,11 @@ public final class PlainTime
         ) {
 
             if (entity instanceof UnixTime) {
-                return PlainTimestamp.axis()
-                    .createFrom(entity, attributes, preparsing).getWallTime();
-            }
-
-            // Uhrzeit bereits vorhanden? -------------------------------------
-            if (entity.contains(WALL_TIME)) {
+                return PlainTimestamp.axis().createFrom(entity, attributes, preparsing).getWallTime();
+            } else if (entity.contains(WALL_TIME)) {
                 return entity.get(WALL_TIME);
+            } else if (entity.contains(PlainTime.axis().element())) {
+                return entity.get(PlainTime.axis().element());
             }
 
             // Stundenteil ----------------------------------------------------

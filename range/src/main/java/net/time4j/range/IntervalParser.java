@@ -36,7 +36,6 @@ import net.time4j.tz.TZID;
 
 import java.text.ParseException;
 
-import static net.time4j.format.Leniency.SMART;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
@@ -122,6 +121,7 @@ final class IntervalParser
      * @param   startFormat     formatter for lower interval boundary
      * @param   endFormat       formatter for upper interval boundary
      * @param   policy          bracket policy
+     * @param   merger          ISO-merger
      * @return  new interval parser
      * @since   2.0
      */
@@ -337,7 +337,6 @@ final class IntervalParser
                 if (
                     (t1 != null)
                     && (this.merger != null)
-                    && !attrs.get(Attributes.LENIENCY, SMART).isStrict()
                 ) {
                     IntervalFactory<T, I> iif = this.factory;
                     ChronoParser<T> parser = this.endFormat;
