@@ -103,6 +103,7 @@ public final class PrettyTime {
     private static final IsoUnit[] STD_UNITS;
     private static final IsoUnit[] TSP_UNITS;
     private static final Set<IsoUnit> SUPPORTED_UNITS;
+    private static final long START_1972;
 
     static {
         IsoUnit[] stdUnits = {YEARS, MONTHS, WEEKS, DAYS, HOURS, MINUTES, SECONDS};
@@ -113,6 +114,7 @@ public final class PrettyTime {
         Collections.addAll(tmp, stdUnits);
         tmp.add(NANOS);
         SUPPORTED_UNITS = Collections.unmodifiableSet(tmp);
+        START_1972 = 2 * 365 * 86400L;
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -858,6 +860,7 @@ public final class PrettyTime {
      *
      * @param   moment      relative time point
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   3.4/4.3
      */
     /*[deutsch]
@@ -867,6 +870,7 @@ public final class PrettyTime {
      *
      * @param   moment      relative time point
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   3.4/4.3
      */
     public String printRelativeInStdTimezone(UnixTime moment) {
@@ -880,9 +884,21 @@ public final class PrettyTime {
      * {@link #getReferenceClock()} as duration in at most second
      * precision or less. </p>
      *
+     * <p>Example how to query for a coming leap second: </p>
+     *
+     * <pre>
+     *      TimeSource&lt;?&gt; clock = () -&gt; PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+     *      String remainingDurationInRealSeconds =
+     *          PrettyTime.of(Locale.ENGLISH).withReferenceClock(clock).printRelative(
+     *              PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+     *              ZonalOffset.UTC);
+     *      System.out.println(remainingDurationInRealSeconds); // in 7 seconds
+     * </pre>
+     *
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   1.2
      */
     /*[deutsch]
@@ -890,9 +906,21 @@ public final class PrettyTime {
      * der Referenzuhr {@link #getReferenceClock()} als Dauer in maximal
      * Sekundengenauigkeit. </p>
      *
+     * <p>Beispiel, das zeigt, wie eine bevorstehende Schaltsekunde abgefragt werden kann: </p>
+     *
+     * <pre>
+     *      TimeSource&lt;?&gt; clock = () -&gt; PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+     *      String remainingDurationInRealSeconds =
+     *          PrettyTime.of(Locale.ENGLISH).withReferenceClock(clock).printRelative(
+     *              PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+     *              ZonalOffset.UTC);
+     *      System.out.println(remainingDurationInRealSeconds); // in 7 seconds
+     * </pre>
+     *
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   1.2
      */
     public String printRelative(
@@ -912,6 +940,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   1.2
      */
     /*[deutsch]
@@ -922,6 +951,7 @@ public final class PrettyTime {
      * @param   moment      relative time point
      * @param   tzid        time zone id for translating to a local duration
      * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
      * @since   1.2
      */
     public String printRelative(
@@ -937,6 +967,18 @@ public final class PrettyTime {
      * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
      * as duration in given precision or less. </p>
      *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *      TimeSource&lt;?&gt; clock = () -> PlainTimestamp.of(2015, 8, 1, 10, 24, 5).atUTC();
+     *      String durationInDays =
+     *          PrettyTime.of(Locale.GERMAN).withReferenceClock(clock).printRelative(
+     *              PlainTimestamp.of(2015, 8, 1, 17, 0).atUTC(),
+     *              Timezone.of(EUROPE.BERLIN),
+     *              TimeUnit.DAYS);
+     *      System.out.println(durationInDays); // heute (german word for today)
+     * </pre>
+     *
      * @param   moment      relative time point
      * @param   tz          time zone for translating to a local duration
      * @param   precision   maximum precision of relative time (not more than seconds)
@@ -947,6 +989,18 @@ public final class PrettyTime {
      * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
      * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
      * maximalen Genauigkeit. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *      TimeSource&lt;?&gt; clock = () -> PlainTimestamp.of(2015, 8, 1, 10, 24, 5).atUTC();
+     *      String durationInDays =
+     *          PrettyTime.of(Locale.GERMAN).withReferenceClock(clock).printRelative(
+     *              PlainTimestamp.of(2015, 8, 1, 17, 0).atUTC(),
+     *              Timezone.of(EUROPE.BERLIN),
+     *              TimeUnit.DAYS);
+     *      System.out.println(durationInDays); // heute
+     * </pre>
      *
      * @param   moment      relative time point
      * @param   tz          time zone for translating to a local duration
@@ -961,6 +1015,27 @@ public final class PrettyTime {
     ) {
 
         UnixTime ref = this.getReferenceClock().currentTime();
+
+        if (precision.compareTo(TimeUnit.SECONDS) <= 0) {
+            Moment t1 = Moment.from(ref);
+            Moment t2 = Moment.from(moment);
+            long delta = t1.until(t2, TimeUnit.SECONDS);
+
+            if (Math.abs(delta) < 60L) {
+                if (t1.getPosixTime() >= START_1972 && t2.getPosixTime() >= START_1972) {
+                    delta = SI.SECONDS.between(t1, t2); // leap second correction
+                }
+                if (delta == 0) {
+                    return UnitPatterns.of(this.locale).getNowWord();
+                }
+                long amount = Math.abs(delta);
+                String pattern = (
+                    (delta < 0)
+                    ? this.getPastPattern(amount, ClockUnit.SECONDS)
+                    : this.getFuturePattern(amount, ClockUnit.SECONDS));
+                return this.format(pattern, amount);
+            }
+        }
 
         PlainTimestamp start =
             PlainTimestamp.from(

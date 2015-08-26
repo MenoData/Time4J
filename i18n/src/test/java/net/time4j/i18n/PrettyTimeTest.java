@@ -15,26 +15,16 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import static net.time4j.CalendarUnit.CENTURIES;
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.QUARTERS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -167,12 +157,7 @@ public class PrettyTimeTest {
 
     @Test
     public void printNowGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -185,12 +170,7 @@ public class PrettyTimeTest {
 
     @Test
     public void printRelativeInStdTimezone() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -202,13 +182,34 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printLastLeapsecondGerman() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2015, 7, 1, 0, 0, 5).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2015, 6, 30, 23, 59, 59).atUTC(),
+                    ZonalOffset.UTC),
+            is("vor 7 Sekunden"));
+    }
+
+    @Test
+    public void printNextLeapsecondEnglish() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.ENGLISH)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("in 7 seconds"));
+    }
+
+    @Test
     public void printYesterdayGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -221,18 +222,13 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman1() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    PlainTimestamp.of(2014, 9, 3, 1, 0).atUTC(),
                     Timezone.of(ZonalOffset.UTC),
                     TimeUnit.DAYS),
             is("heute"));
@@ -240,12 +236,7 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman2() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -259,12 +250,7 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman3() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -277,13 +263,22 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printTodayGerman4() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 3, 15, 30).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.HOURS),
+            is("vor 1 Stunde"));
+    }
+
+    @Test
     public void printTomorrowGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -296,12 +291,7 @@ public class PrettyTimeTest {
 
     @Test
     public void print3DaysLaterGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -314,12 +304,7 @@ public class PrettyTimeTest {
 
     @Test
     public void print4MonthsEarlierGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -332,13 +317,8 @@ public class PrettyTimeTest {
 
     @Test
     public void print4HoursEarlierGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 3, 30, 5, 0)
-                    .in(Timezone.of("Europe/Berlin"));
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 3, 30, 5, 0)
+            .in(Timezone.of("Europe/Berlin"));
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -352,13 +332,8 @@ public class PrettyTimeTest {
 
     @Test
     public void print4HoursEarlierGermanShort() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 3, 30, 5, 0)
-                    .in(Timezone.of("Europe/Berlin"));
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 3, 30, 5, 0)
+            .in(Timezone.of("Europe/Berlin"));
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -710,12 +685,7 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -728,12 +698,7 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterGermanAndWeeksToDays() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
@@ -747,12 +712,7 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterNorsk() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
         assertThat(
             PrettyTime.of(new Locale("no")) // language match no => nb
@@ -796,12 +756,7 @@ public class PrettyTimeTest {
 
     @Test
     public void printSpecialUnitsEnglish() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
-            @Override
-            public Moment currentTime() {
-                return PlainTimestamp.of(2014, 10, 1, 14, 30).atUTC();
-            }
-        };
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 10, 1, 14, 30).atUTC();
         Duration<?> dur =
             Duration.ofZero()
                 .plus(8, DAYS)
