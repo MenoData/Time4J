@@ -557,7 +557,7 @@ public class PrettyTimeTest {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
-            PrettyTime.of(Locale.US).print(duration, TextWidth.WIDE),
+            PrettyTime.of(Locale.US).print(duration),
             is("15 years, 3 months, 1 week, and 2 days"));
     }
 

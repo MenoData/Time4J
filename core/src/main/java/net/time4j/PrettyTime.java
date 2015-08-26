@@ -649,9 +649,45 @@ public final class PrettyTime {
      * all {@link ClockUnit}-units. This method performs an internal
      * normalization if any other unit is involved. </p>
      *
-     * <p>Note: If the local script variant is from right to left
-     * then a unicode-RLM-marker will automatically be inserted
-     * before each number. </p>
+     * <p>Note: This method uses full words by default. If
+     * {@link #withShortStyle()} is called then abbreviations will be used. </p>
+     *
+     * @param   duration    object representing a duration which might contain several units and quantities
+     * @return  formatted list output
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Formatiert die gesamte angegebene Dauer. </p>
+     *
+     * <p>Eine lokalisierte Ausgabe ist nur f&uuml;r die Zeiteinheiten
+     * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
+     * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} und
+     * alle {@link ClockUnit}-Instanzen vorhanden. Bei Bedarf werden
+     * andere Einheiten zu diesen normalisiert. </p>
+     *
+     * <p>Hinweis: Diese Methode verwendet standardm&auml;&szlig; volle
+     * W&ouml;rter. Falls {@link #withShortStyle()} aufgerufen wurde, werden
+     * Abk&uuml;rzungen verwendet. </p>
+     *
+     * @param   duration    object representing a duration which might contain several units and quantities
+     * @return  formatted list output
+     * @since   3.6/4.4
+     */
+    public String print(Duration<?> duration) {
+
+        TextWidth width = (this.shortStyle ? TextWidth.ABBREVIATED : TextWidth.WIDE);
+        return this.print(duration, width, false, Integer.MAX_VALUE);
+
+    }
+
+    /**
+     * <p>Formats the total given duration. </p>
+     *
+     * <p>A localized output is only supported for the units
+     * {@link CalendarUnit#YEARS}, {@link CalendarUnit#MONTHS},
+     * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} and
+     * all {@link ClockUnit}-units. This method performs an internal
+     * normalization if any other unit is involved. </p>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities
@@ -667,10 +703,6 @@ public final class PrettyTime {
      * {@link CalendarUnit#WEEKS}, {@link CalendarUnit#DAYS} und
      * alle {@link ClockUnit}-Instanzen vorhanden. Bei Bedarf werden
      * andere Einheiten zu diesen normalisiert. </p>
-     *
-     * <p>Hinweis: Wenn die lokale Skript-Variante von rechts nach links
-     * geht, wird automatisch ein Unicode-RLM-Marker vor jeder Nummer
-     * eingef&uuml;gt. </p>
      *
      * @param   duration    object representing a duration which might contain
      *                      several units and quantities
