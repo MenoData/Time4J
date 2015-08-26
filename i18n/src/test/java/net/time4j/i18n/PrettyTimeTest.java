@@ -4,7 +4,6 @@ import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
-import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
@@ -477,7 +476,7 @@ public class PrettyTimeTest {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
         assertThat(
-            PrettyTime.of(Locale.US).print(duration, TextWidth.WIDE),
+            PrettyTime.of(Locale.US).print(duration),
             is("15 years, 3 months, 1 week, and 2 days"));
     }
 
