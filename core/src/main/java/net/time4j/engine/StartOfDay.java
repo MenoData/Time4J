@@ -107,7 +107,7 @@ public abstract class StartOfDay {
      * <p>Yields the start of given calendar day relative to midnight in seconds. </p>
      *
      * @param   calendarDay     calendar day
-     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sundown to a local time
+     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sunset to a local time
      * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
      * @since   3.5/4.3
      */
@@ -115,7 +115,7 @@ public abstract class StartOfDay {
      * <p>Definiert den Start des angegebenen Kalendertages relativ zu Mitternacht in Sekunden. </p>
      *
      * @param   calendarDay     calendar day
-     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sundown to a local time
+     * @param   tzid            timezone identifier, helps to resolve an UTC-event like sunset to a local time
      * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
      * @since   3.5/4.3
      */
