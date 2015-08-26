@@ -12,6 +12,8 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.TextWidth;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -30,6 +32,75 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PrettyTimeTest {
+
+    @Test
+    public void printRelativeTimeOrDateTime() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 40).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .printRelativeOrDateTime(
+                    PlainTimestamp.of(2014, 10, 3, 14, 30).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.MINUTES,
+                    86400L * 30, // 30 days
+                    ChronoFormatter.ofMomentPattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN,
+                        Timezone.of("Europe/Berlin").getID())
+                ),
+            is("3. Oktober 2014"));
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDateTime(
+                    PlainTimestamp.of(2014, 9, 30, 14, 40).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.MINUTES,
+                    86400L * 29, // 29 days
+                    ChronoFormatter.ofMomentPattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN,
+                        Timezone.of("Europe/Berlin").getID())
+                ),
+            is("in 29 Tagen"));
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDateTime(
+                    PlainTimestamp.of(2014, 9, 30, 14, 40).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.MINUTES,
+                    CalendarUnit.DAYS,
+                    ChronoFormatter.ofMomentPattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN,
+                        Timezone.of("Europe/Berlin").getID())
+                ),
+            is("in 29 Tagen"));
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDateTime(
+                    PlainTimestamp.of(2014, 10, 1, 14, 40).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.MINUTES,
+                    CalendarUnit.DAYS,
+                    ChronoFormatter.ofMomentPattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN,
+                        Timezone.of("Europe/Berlin").getID())
+                ),
+            is("1. Oktober 2014"));
+    }
 
     @Test
     public void getLocale() {
