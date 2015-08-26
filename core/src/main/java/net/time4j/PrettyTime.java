@@ -30,6 +30,7 @@ import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -948,7 +949,8 @@ public final class PrettyTime {
      * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
      * as duration in given precision or less. </p>
      *
-     * <p>Example: </p>
+     * <p>If day precision is given then output like &quot;today&quot;, &quot;yesterday&quot; or
+     * &quot;tomorrow&quot; is possible. Example: </p>
      *
      * <pre>
      *      TimeSource&lt;?&gt; clock = new TimeSource&lt;Moment&gt;() {
@@ -974,7 +976,8 @@ public final class PrettyTime {
      * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
      * maximalen Genauigkeit. </p>
      *
-     * <p>Beispiel: </p>
+     * <p>Wenn Tagesgenauigkeit angegeben ist, sind auch Ausgaben wie &quot;heute&quot;, &quot;gestern&quot;
+     * oder &quot;morgen&quot; m&ouml;glich. Beispiel: </p>
      *
      * <pre>
      *      TimeSource&lt;?&gt; clock = new TimeSource&lt;Moment&gt;() {
@@ -1002,27 +1005,154 @@ public final class PrettyTime {
     ) {
 
         UnixTime ref = this.getReferenceClock().currentTime();
+        Moment t1 = Moment.from(ref);
+        Moment t2 = Moment.from(moment);
 
         if (precision.compareTo(TimeUnit.SECONDS) <= 0) {
-            Moment t1 = Moment.from(ref);
-            Moment t2 = Moment.from(moment);
             long delta = t1.until(t2, TimeUnit.SECONDS);
 
             if (Math.abs(delta) < 60L) {
-                if (t1.getPosixTime() >= START_1972 && t2.getPosixTime() >= START_1972) {
-                    delta = SI.SECONDS.between(t1, t2); // leap second correction
-                }
-                if (delta == 0) {
-                    return UnitPatterns.of(this.locale).getNowWord();
-                }
-                long amount = Math.abs(delta);
-                String pattern = (
-                    (delta < 0)
-                        ? this.getPastPattern(amount, ClockUnit.SECONDS)
-                        : this.getFuturePattern(amount, ClockUnit.SECONDS));
-                return this.format(pattern, amount);
+                return this.printRelativeSeconds(t1, t2, delta);
             }
         }
+
+        return this.printRelativeTime(t1, t2, tz, precision, null, null);
+
+    }
+
+    /**
+     * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
+     * as duration in given precision or as absolute date-time. </p>
+     *
+     * @param   moment      relative time point
+     * @param   tz          time zone for translating to a local duration
+     * @param   precision   maximum precision of relative time (not more than seconds)
+     * @param   maxdelta    maximum deviation of given moment from clock in posix seconds for relative printing
+     * @param   formatter   used for printing absolute time if the deviation is bigger than maxdelta
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
+     * maximalen Genauigkeit oder als absolute Datumszeit. </p>
+     *
+     * @param   moment      relative time point
+     * @param   tz          time zone for translating to a local duration
+     * @param   precision   maximum precision of relative time (not more than seconds)
+     * @param   maxdelta    maximum deviation of given moment from clock in posix seconds for relative printing
+     * @param   formatter   used for printing absolute time if the deviation is bigger than maxdelta
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    public String printRelativeOrDateTime(
+        UnixTime moment,
+        Timezone tz,
+        TimeUnit precision,
+        long maxdelta,
+        TemporalFormatter<Moment> formatter
+    ) {
+
+        UnixTime ref = this.getReferenceClock().currentTime();
+        Moment t1 = Moment.from(ref);
+        Moment t2 = Moment.from(moment);
+        long delta = t1.until(t2, TimeUnit.SECONDS);
+
+        if (Math.abs(delta) > maxdelta) {
+            return formatter.format(t2);
+        } else if (
+            (precision.compareTo(TimeUnit.SECONDS) <= 0)
+            && (Math.abs(delta) < 60L)
+        ) {
+            return this.printRelativeSeconds(t1, t2, delta);
+        }
+
+        return this.printRelativeTime(t1, t2, tz, precision, null, null);
+
+    }
+
+    /**
+     * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
+     * as duration in given precision or as absolute date-time. </p>
+     *
+     * @param   moment          time point whose deviation from clock is to be printed
+     * @param   tz              time zone for translating to a local duration
+     * @param   precision       maximum precision of relative time (not more than seconds)
+     * @param   maxRelativeUnit maximum time unit which will still be printed in a relative way
+     * @param   formatter       used for printing absolute time if the leading unit is bigger than maxRelativeUnit
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
+     * maximalen Genauigkeit oder als absolute Datumszeit. </p>
+     *
+     * @param   moment          time point whose deviation from clock is to be printed
+     * @param   tz              time zone for translating to a local duration
+     * @param   precision       maximum precision of relative time (not more than seconds)
+     * @param   maxRelativeUnit maximum time unit which will still be printed in a relative way
+     * @param   formatter       used for printing absolute time if the leading unit is bigger than maxRelativeUnit
+     * @return  formatted output of relative time, either in past or in future
+     * @since   3.6/4.4
+     */
+    public String printRelativeOrDateTime(
+        UnixTime moment,
+        Timezone tz,
+        TimeUnit precision,
+        CalendarUnit maxRelativeUnit,
+        TemporalFormatter<Moment> formatter
+    ) {
+
+        if (maxRelativeUnit == null) {
+            throw new NullPointerException("Missing max relative unit.");
+        }
+
+        UnixTime ref = this.getReferenceClock().currentTime();
+        Moment t1 = Moment.from(ref);
+        Moment t2 = Moment.from(moment);
+        long delta = t1.until(t2, TimeUnit.SECONDS);
+
+        if (
+            (precision.compareTo(TimeUnit.SECONDS) <= 0)
+            && (Math.abs(delta) < 60L)
+        ) {
+            return this.printRelativeSeconds(t1, t2, delta);
+        }
+
+        return this.printRelativeTime(t1, t2, tz, precision, maxRelativeUnit, formatter);
+
+    }
+
+    private String printRelativeSeconds(
+        Moment t1,
+        Moment t2,
+        long delta
+    ) {
+
+        if (t1.getPosixTime() >= START_1972 && t2.getPosixTime() >= START_1972) {
+            delta = SI.SECONDS.between(t1, t2); // leap second correction
+        }
+        if (delta == 0) {
+            return UnitPatterns.of(this.locale).getNowWord();
+        }
+        long amount = Math.abs(delta);
+        String pattern = (
+            (delta < 0)
+            ? this.getPastPattern(amount, ClockUnit.SECONDS)
+            : this.getFuturePattern(amount, ClockUnit.SECONDS));
+        return this.format(pattern, amount);
+
+    }
+
+    private String printRelativeTime(
+        Moment ref,
+        Moment moment,
+        Timezone tz,
+        TimeUnit precision,
+        CalendarUnit maxRelativeUnit,
+        TemporalFormatter<Moment> formatter
+    ) {
 
         PlainTimestamp start =
             PlainTimestamp.from(
@@ -1045,14 +1175,15 @@ public final class PrettyTime {
         IsoUnit unit = item.getUnit();
 
         if (unit instanceof ClockUnit) {
-            ClockUnit cu = (ClockUnit) unit;
-
-            if (5 - cu.ordinal() < precision.ordinal()) {
+            if (5 - ((ClockUnit) unit).ordinal() < precision.ordinal()) {
                 return this.getEmptyRelativeString(precision);
             }
-        }
-
-        if (
+        } else if (
+            (maxRelativeUnit != null)
+            && (Double.compare(unit.getLength(), maxRelativeUnit.getLength()) > 0)
+        ) {
+            return formatter.format(moment);
+        } else if (
             (amount == 1L)
             && unit.equals(CalendarUnit.DAYS)
         ) {
