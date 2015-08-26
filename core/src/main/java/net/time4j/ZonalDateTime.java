@@ -64,6 +64,9 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *  Moment globalTSP = zdt.toMoment().plus(30, SI.SECONDS);
  * </pre>
  *
+ * <p>This class supports all elements which are supported by {@link Moment}
+ * and {@link PlainTimestamp}, too. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.0
  * @doctags.concurrency {immutable}
@@ -92,6 +95,9 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *  // manipulation on global timeline
  *  Moment globalTSP = zdt.toMoment().plus(30, SI.SECONDS);
  * </pre>
+ *
+ * <p>Diese Klasse unterst&uuml;tzt alle Elemente, die auch von {@link Moment}
+ * und {@link PlainTimestamp} unterst&uuml;tzt werden. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
