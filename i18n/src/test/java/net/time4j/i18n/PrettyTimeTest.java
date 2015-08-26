@@ -202,6 +202,42 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printLastLeapsecondGerman() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2015, 7, 1, 0, 0, 5).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2015, 6, 30, 23, 59, 59).atUTC(),
+                    ZonalOffset.UTC),
+            is("vor 7 Sekunden"));
+    }
+
+    @Test
+    public void printNextLeapsecondEnglish() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.ENGLISH)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("in 7 seconds"));
+    }
+
+    @Test
     public void printYesterdayGerman() {
         TimeSource<?> clock = new TimeSource<Moment>() {
             @Override
@@ -232,7 +268,7 @@ public class PrettyTimeTest {
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    PlainTimestamp.of(2014, 9, 3, 1, 0).atUTC(),
                     Timezone.of(ZonalOffset.UTC),
                     TimeUnit.DAYS),
             is("heute"));
@@ -274,6 +310,25 @@ public class PrettyTimeTest {
                     Timezone.of(ZonalOffset.UTC),
                     TimeUnit.MINUTES),
             is("vor 30 Minuten"));
+    }
+
+    @Test
+    public void printTodayGerman4() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 3, 15, 30).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 3, 14, 0).atUTC(),
+                    Timezone.of(ZonalOffset.UTC),
+                    TimeUnit.HOURS),
+            is("vor 1 Stunde"));
     }
 
     @Test
