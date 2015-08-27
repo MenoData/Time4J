@@ -80,6 +80,7 @@ public abstract class StartOfDay {
      *
      * @param   deviation   the deviation of start of day relative to midnight in seconds on the local timeline
      * @return  start of day
+     * @throws  IllegalArgumentException if the absolute amount of deviation is bigger than or equal to 43200
      * @since   3.5/4.3
      */
     /*[deutsch]
@@ -89,6 +90,7 @@ public abstract class StartOfDay {
      *
      * @param   deviation   the deviation of start of day relative to midnight in seconds on the local timeline
      * @return  start of day
+     * @throws  IllegalArgumentException if the absolute amount of deviation is bigger than or equal to 43200
      * @since   3.5/4.3
      */
     public static StartOfDay ofFixedDeviation(int deviation) {
@@ -97,6 +99,8 @@ public abstract class StartOfDay {
             return MIDNIGHT;
         } else if (deviation == -21600) {
             return EVENING;
+        } else if (Math.abs(deviation) >= 43200) {
+            throw new IllegalArgumentException("Start of day out of range: " + deviation);
         }
 
         return new FixedStartOfDay(deviation);
