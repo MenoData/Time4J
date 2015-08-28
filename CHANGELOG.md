@@ -1,7 +1,17 @@
 ## [Unreleased] published on ?
 ### Added
+- New method(s) for printing durations with 1 parameter only [#333]
+- Create option to either print relative time or normal date-time [#328]
 - Print relative times with abbreviations [#327]
 - I18n-support for "yesterday", "today", "tomorrow" [#310]
+
+### Fixed
+- Printing relative time near a leap second incorrect [#332]
+- Behaviour of timezone-offset-parser inconsistent with spec [#330]
+- Time-axis-element not fully supported [#329]
+
+### Changed
+- ISO-formatters need to be strict by default [#331]
 
 ## [v4.3] published on 2015-08-12
 ### Added
