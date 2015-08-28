@@ -1,4 +1,4 @@
-## [Unreleased] published on ?
+## [v4.4] published on [Unreleased]
 ### Added
 - New method(s) for printing durations with 1 parameter only [#333]
 - Create option to either print relative time or normal date-time [#328]
