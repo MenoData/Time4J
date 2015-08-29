@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         ClockTest.class,
         EraNameTest.class,
+        HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
         MonthNameTest.class,

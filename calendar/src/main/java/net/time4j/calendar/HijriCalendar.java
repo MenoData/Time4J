@@ -21,12 +21,17 @@
 
 package net.time4j.calendar;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
+import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.base.UnixTime;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
@@ -44,6 +49,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.ValidationElement;
+import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
@@ -254,6 +260,9 @@ public final class HijriCalendar
     static {
         Map<String, MonthBasedCalendarSystem<HijriCalendar>> calsys = new VariantMap();
         calsys.put(VARIANT_UMALQURA, AstronomicalHijriData.UMALQURA);
+        for (HijriAlgorithm algo : HijriAlgorithm.values()) {
+            calsys.put(algo.getVariant(), algo.getCalendarSystem());
+        }
         CALSYS = calsys;
 
         CalendarFamily.Builder<HijriCalendar> builder =
@@ -383,6 +392,76 @@ public final class HijriCalendar
         }
 
         return new HijriCalendar(hyear, hmonth, hdom, variant);
+
+    }
+
+    /**
+     * <p>Creates a new instance of a Hijri calendar date in given variant. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   hyear           islamic year
+     * @param   hmonth          islamic month
+     * @param   hdom            islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Hijri-Kalenderdatum in der angegebenen Variante. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   hyear           islamic year
+     * @param   hmonth          islamic month
+     * @param   hdom            islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.6/4.4
+     */
+    public static HijriCalendar of(
+        VariantSource variantSource,
+        int hyear,
+        HijriMonth hmonth,
+        int hdom
+    ) {
+
+        return HijriCalendar.of(variantSource.getVariant(), hyear, hmonth.getValue(), hdom);
+
+    }
+
+    /**
+     * <p>Creates a new instance of a Hijri calendar date in given variant. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   hyear           islamic year
+     * @param   hmonth          islamic month
+     * @param   hdom            islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Hijri-Kalenderdatum in der angegebenen Variante. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   hyear           islamic year
+     * @param   hmonth          islamic month
+     * @param   hdom            islamic day of month
+     * @return  new instance of {@code HijriCalendar}
+     * @throws  ChronoException if given variant is not supported
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.6/4.4
+     */
+    public static HijriCalendar of(
+        VariantSource variantSource,
+        int hyear,
+        int hmonth,
+        int hdom
+    ) {
+
+        return HijriCalendar.of(variantSource.getVariant(), hyear, hmonth, hdom);
 
     }
 
@@ -1139,12 +1218,6 @@ public final class HijriCalendar
             AttributeQuery attributes
         ) {
 
-            PlainTimestamp tsp = PlainTimestamp.axis().createFrom(clock, attributes);
-
-            if (tsp == null) {
-                return null;
-            }
-
             String variant = attributes.get(Attributes.CALENDAR_VARIANT, "");
 
             if (variant.isEmpty()) {
@@ -1162,7 +1235,9 @@ public final class HijriCalendar
             }
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
-            tsp = tsp.minus(startOfDay.getDeviation(tsp.getCalendarDate(), tzid), ClockUnit.SECONDS);
+            PlainTimestamp tsp = Moment.from(clock.currentTime()).toZonalTimestamp(tzid);
+            int deviation = startOfDay.getDeviation(tsp.getCalendarDate(), tzid);
+            tsp = tsp.minus(deviation, ClockUnit.SECONDS);
             return tsp.getCalendarDate().transform(HijriCalendar.class, variant);
 
         }

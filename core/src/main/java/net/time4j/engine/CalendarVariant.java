@@ -145,7 +145,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   <T> generic target date type
      * @param   target  chronological type this date shall be converted to
-     * @return  converted date of target type t
+     * @return  converted date of target type T
      * @throws  IllegalArgumentException if the target class does not
      *          have any chronology
      * @throws  ArithmeticException in case of numerical overflow
@@ -162,7 +162,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   <T> generic target date type
      * @param   target  chronological type this date shall be converted to
-     * @return  converted date of target type t
+     * @return  converted date of target type T
      * @throws  IllegalArgumentException if the target class does not
      *          have any chronology
      * @throws  ArithmeticException in case of numerical overflow
@@ -194,7 +194,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      * @param   <T> generic target date type
      * @param   target      chronological type this date shall be converted to
      * @param   variant     desired calendar variant
-     * @return  converted date of target type t
+     * @return  converted date of target type T
      * @throws  ChronoException if given variant is not recognized
      * @throws  IllegalArgumentException if the target class does not have any chronology
      * @throws  ArithmeticException in case of numerical overflow
@@ -212,7 +212,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      * @param   <T> generic target date type
      * @param   target      chronological type this date shall be converted to
      * @param   variant     desired calendar variant
-     * @return  converted date of target type t
+     * @return  converted date of target type T
      * @throws  ChronoException if given variant is not recognized
      * @throws  IllegalArgumentException if the target class does not have any chronology
      * @throws  ArithmeticException in case of numerical overflow
@@ -233,6 +233,50 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
         }
 
         return this.transform(chronology.getCalendarSystem(variant), ref);
+
+    }
+
+    /**
+     * <p>Converts this calendar date to the given target type based on
+     * the count of days relative to UTC epoch [1972-01-01]. </p>
+     *
+     * <p>The conversion occurs on the local timeline at noon. This
+     * reference time ensures that all date types remain convertible
+     * even if a calendar system defines dates not starting at midnight. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target          chronological type this date shall be converted to
+     * @param   variantSource   source of desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if given variant is not recognized
+     * @throws  IllegalArgumentException if the target class does not have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Konvertiert dieses Datum zum angegebenen Zieltyp auf Basis der
+     * Anzahl der Tage relativ zur UTC-Epoche [1972-01-01]. </p>
+     *
+     * <p>Die Konversion findet auf dem lokalen Zeitstrahl um 12 Uhr mittags
+     * als angenommener Referenzzeit statt. Diese Referenzzeit stellt sicher,
+     * da&szlig; alle Datumstypen konvertierbar bleiben, auch wenn in einem
+     * Kalendersystem ein Tag nicht um Mitternacht startet. </p>
+     *
+     * @param   <T> generic target date type
+     * @param   target          chronological type this date shall be converted to
+     * @param   variantSource   source of desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if given variant is not recognized
+     * @throws  IllegalArgumentException if the target class does not have any chronology
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.6/4.4
+     */
+    public <T extends CalendarVariant<T>> T transform(
+        Class<T> target,
+        VariantSource variantSource
+    ) {
+
+        return this.transform(target, variantSource.getVariant());
 
     }
 
