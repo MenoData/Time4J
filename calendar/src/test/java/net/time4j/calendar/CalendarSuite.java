@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriOperatorTest.class,
         HijriPatternTest.class,
         MonthNameTest.class,
+        HijriAlgoTest.class,
         UmalquraDataTest.class
     }
 )

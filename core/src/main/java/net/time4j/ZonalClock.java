@@ -28,6 +28,7 @@ import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.StartOfDay;
+import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -331,6 +332,12 @@ public final class ZonalClock {
         StartOfDay startOfDay
     ) {
 
+        if (variant == null) {
+            throw new NullPointerException("Missing calendar variant.");
+        } else if (startOfDay == null) {
+            throw new NullPointerException("Missing start of day.");
+        }
+
         Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
         Attributes attrs =
             new Attributes.Builder()
@@ -344,6 +351,40 @@ public final class ZonalClock {
         } else {
             return result;
         }
+
+    }
+
+    /**
+     * <p>Equivalent to {@code now(chronology, variantSource.getVariant(), startOfDay)}. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology      chronology to be used
+     * @param   variantSource   source of calendar variant
+     * @param   startOfDay      start of calendar day
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given variant is not supported
+     * @see     #now(CalendarFamily, String, StartOfDay)
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent to {@code now(chronology, variantSource.getVariant(), startOfDay)}. </p>
+     *
+     * @param   <T> generic type of chronology
+     * @param   chronology      chronology to be used
+     * @param   variantSource   source of calendar variant
+     * @param   startOfDay      start of calendar day
+     * @return  current local timestamp or date in given chronology
+     * @throws  IllegalArgumentException if given variant is not supported
+     * @see     #now(CalendarFamily, String, StartOfDay)
+     * @since   3.6/4.4
+     */
+    public <T extends CalendarVariant<T>> T now(
+        CalendarFamily<T> chronology,
+        VariantSource variantSource,
+        StartOfDay startOfDay
+    ) {
+
+        return this.now(chronology, variantSource.getVariant(), startOfDay);
 
     }
 
