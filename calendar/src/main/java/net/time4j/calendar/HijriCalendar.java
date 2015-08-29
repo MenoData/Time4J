@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.ClockUnit;
+import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
@@ -1210,12 +1211,6 @@ public final class HijriCalendar
             AttributeQuery attributes
         ) {
 
-            PlainTimestamp tsp = PlainTimestamp.axis().createFrom(clock, attributes);
-
-            if (tsp == null) {
-                return null;
-            }
-
             String variant = attributes.get(Attributes.CALENDAR_VARIANT, "");
 
             if (variant.isEmpty()) {
@@ -1233,7 +1228,9 @@ public final class HijriCalendar
             }
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
-            tsp = tsp.minus(startOfDay.getDeviation(tsp.getCalendarDate(), tzid), ClockUnit.SECONDS);
+            PlainTimestamp tsp = Moment.from(clock.currentTime()).toZonalTimestamp(tzid);
+            int deviation = startOfDay.getDeviation(tsp.getCalendarDate(), tzid);
+            tsp = tsp.minus(deviation, ClockUnit.SECONDS);
             return tsp.getCalendarDate().transform(HijriCalendar.class, variant);
 
         }
