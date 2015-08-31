@@ -22,6 +22,12 @@ public class HijriAlgoTest {
         assertThat(
             hijri.transform(PlainDate.class),
             is(PlainDate.of(2174, 11, 23)));
+        assertThat(
+            hijri.lengthOfMonth(),
+            is(30));
+        assertThat(
+            hijri.lengthOfYear(),
+            is(355));
     }
 
     @Test
@@ -70,6 +76,12 @@ public class HijriAlgoTest {
         assertThat(
             hijri.transform(PlainDate.class),
             is(PlainDate.of(2174, 11, 23)));
+        assertThat(
+            hijri.lengthOfMonth(),
+            is(30));
+        assertThat(
+            hijri.lengthOfYear(),
+            is(355));
     }
 
     @Test
@@ -118,6 +130,12 @@ public class HijriAlgoTest {
         assertThat(
             hijri.transform(PlainDate.class),
             is(PlainDate.of(2174, 11, 23)));
+        assertThat(
+            hijri.lengthOfMonth(),
+            is(30));
+        assertThat(
+            hijri.lengthOfYear(),
+            is(355));
     }
 
     @Test
@@ -166,6 +184,12 @@ public class HijriAlgoTest {
         assertThat(
             hijri.transform(PlainDate.class),
             is(PlainDate.of(2174, 11, 23)));
+        assertThat(
+            hijri.lengthOfMonth(),
+            is(29));
+        assertThat(
+            hijri.lengthOfYear(),
+            is(354));
     }
 
     @Test

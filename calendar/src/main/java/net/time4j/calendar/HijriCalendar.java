@@ -67,10 +67,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * religious authorities in most countries often publish dates which deviate from such official calendars
  * by one or two days. </p>
  *
- * <p>The calendar year is divided into 12 islamic months. Every month has either 29 or 30 days. The length
+ * <p>The calendar year is divided into 12 islamic months. Every month usually has either 29 or 30 days. The length
  * of the month in days shall reflect the date when the new moon appears. However, for every variant there
  * are different data or rules how to determine if a month has 29 or 30 days. The Hijri calendar day starts
- * in the evening. </p>
+ * in the evening. New variants can be configured by a file named &quot;{variant-name}.data&quot; in the
+ * data-subdirectory of resource class path (where hyphens are replaced by underscores). Format details see
+ * the file &quot;islamic_umalqura.data&quot;. </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -114,10 +116,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * Die religi&ouml;sen Autorit&auml;ten in den meisten L&auml;ndern folgen nicht streng den offiziellen
  * Kalendervarianten, sondern ver&ouml;ffentlichen oft ein Datum, das 1 oder 2 Tage abweichen kann. </p>
  *
- * <p>Das Kalendarjahr wird in 12 islamische Monate geteilt. Jeder Monat hat entweder 29 oder 30 Tage. Die
- * L&auml;nge des Monats in Tagen soll den Zeitpunkt reflektieren, wann der Neumond gesichtet wird. Aber
- * jede Variante kennt verschiedenen Daten oder Regeln, um zu bestimmen, ob ein Monat 29 oder 30 Tage hat.
- * Der islamische Kalendertag startet am Abend. </p>
+ * <p>Das Kalendarjahr wird in 12 islamische Monate geteilt. Jeder Monat hat gew&ouml;hnlich entweder 29 oder
+ * 30 Tage. Die L&auml;nge des Monats in Tagen soll den Zeitpunkt reflektieren, wann der Neumond gesichtet wird.
+ * Aber jede Variante kennt verschiedenen Daten oder Regeln, um zu bestimmen, ob ein Monat 29 oder 30 Tage hat.
+ * Der islamische Kalendertag startet am Abend. Neue Varianten k&ouml;nnen mit Hilfe einer Datei konfiguriert
+ * werden, die den Namen &quot;{variant-name}.data&quot; hat und im data-Unterordner des Ressourcen-Klassenpfads
+ * liegt (wobei Bindestriche durch Unterstriche ersetzt werden). Formatdetails siehe die vorhandene Datei
+ * &quot;islamic_umalqura.data&quot;. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
@@ -645,6 +650,42 @@ public final class HijriCalendar
     }
 
     /**
+     * <p>Yields the length of current islamic month. </p>
+     *
+     * @return  int
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge des aktuellen islamischen Monats. </p>
+     *
+     * @return  int
+     * @since   3.6/4.4
+     */
+    public int lengthOfMonth() {
+
+        return this.getCalendarSystem().getLengthOfMonth(HijriEra.ANNO_HEGIRAE, this.hyear, this.hmonth);
+
+    }
+
+    /**
+     * <p>Yields the length of current islamic year. </p>
+     *
+     * @return  int
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge des aktuellen islamischen Jahres. </p>
+     *
+     * @return  int
+     * @since   3.6/4.4
+     */
+    public int lengthOfYear() {
+
+        return this.getCalendarSystem().getLengthOfYear(HijriEra.ANNO_HEGIRAE, this.hyear);
+
+    }
+
+    /**
      * <p>Convenient short form for {@code with(YEAR_OF_ERA.incremented())}. </p>
      *
      * @return  copy of this instance at next year
@@ -910,11 +951,7 @@ public final class HijriCalendar
                 case DAY_OF_MONTH_INDEX:
                     return calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, context.hyear, context.hmonth);
                 case DAY_OF_YEAR_INDEX:
-                    int max = 0;
-                    for (int m = 1; m <= 12; m++) {
-                        max += calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, context.hyear, m);
-                    }
-                    return Integer.valueOf(max);
+                    return calsys.getLengthOfYear(HijriEra.ANNO_HEGIRAE, context.hyear);
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }

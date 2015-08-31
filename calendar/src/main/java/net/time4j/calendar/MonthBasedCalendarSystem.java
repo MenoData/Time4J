@@ -39,7 +39,7 @@ import net.time4j.engine.CalendarSystem;
  * @author  Meno Hochschild
  * @since   3.5/4.3
  */
-public interface MonthBasedCalendarSystem<D>
+interface MonthBasedCalendarSystem<D>
     extends CalendarSystem<D> {
 
     //~ Methoden ----------------------------------------------------------
@@ -95,6 +95,29 @@ public interface MonthBasedCalendarSystem<D>
         CalendarEra era,
         int yearOfEra,
         int monthOfYear
+    );
+
+    /**
+     * <p>Yields the length of given  year. </p>
+     *
+     * @param   era         calendar era
+     * @param   yearOfEra   calendar year
+     * @return  length of year in days
+     * @throws  IllegalArgumentException if any parameter is wrong or out of bounds
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Bestimmt die L&auml;nge des angegebenen Jahres. </p>
+     *
+     * @param   era         calendar era
+     * @param   yearOfEra   calendar year
+     * @return  length of year in days
+     * @throws  IllegalArgumentException if any parameter is wrong or out of bounds
+     * @since   3.6/4.4
+     */
+    int getLengthOfYear(
+        CalendarEra era,
+        int yearOfEra
     );
 
 }
