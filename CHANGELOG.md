@@ -1,4 +1,6 @@
-## [v3.6] not yet released
+## [v3.7] not yet released
+
+## [v3.6] published on 2015-08-31
 ### Added
 - Support for algorithmic variants of islamic calendar [#334]
 - Create direct option to determine length of Hijri month or year [#337]
