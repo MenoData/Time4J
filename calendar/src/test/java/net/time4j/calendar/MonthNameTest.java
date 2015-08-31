@@ -46,4 +46,15 @@ public class MonthNameTest {
         System.out.println(date); // 2015-07-16
     }
 
+    @Test
+    public void executeICU() throws ParseException {
+        ChronoFormatter<HijriCalendar> formatter =
+            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
+                .addPattern("y-MM-dd", PatternType.NON_ISO_DATE).build()
+                .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
+        HijriCalendar hijri = formatter.parse("1-01-01");
+        PlainDate date = hijri.transform(PlainDate.class);
+        System.out.println(date); // 622-07-18
+    }
+
 }
