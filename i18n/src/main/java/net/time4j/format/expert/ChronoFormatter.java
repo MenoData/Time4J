@@ -39,6 +39,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
+import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
@@ -1209,6 +1210,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 .setCalendarVariant(variant)
                 .build();
         return new ChronoFormatter<T>(this, attrs);
+
+    }
+
+    /**
+     * <p>Sets the calendar variant. </p>
+     *
+     * @param   variantSource   source of new calendar variant
+     * @return  changed copy with the given calendar variant while this instance remains unaffected
+     * @see     Attributes#CALENDAR_VARIANT
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Setzt die Kalendervariante. </p>
+     *
+     * @param   variantSource   source of new calendar variant
+     * @return  changed copy with the given calendar variant while this instance remains unaffected
+     * @see     Attributes#CALENDAR_VARIANT
+     * @since   3.6/4.4
+     */
+    public ChronoFormatter<T> withCalendarVariant(VariantSource variantSource) {
+
+        return this.withCalendarVariant(variantSource.getVariant());
 
     }
 
