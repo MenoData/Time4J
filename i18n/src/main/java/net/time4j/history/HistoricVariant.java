@@ -55,7 +55,7 @@ public enum HistoricVariant {
     PROLEPTIC_GREGORIAN,
 
     /**
-     * <p>Marks the Swedisch calendar anomaly. </p>
+     * <p>Marks the Swedish calendar anomaly. </p>
      */
     /*[deutsch]
      * <p>Kennzeichnet die schwedische Kalenderanomalie. </p>
