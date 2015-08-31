@@ -670,13 +670,13 @@ public final class HijriCalendar
     }
 
     /**
-     * <p>Yields the length of current islamic month. </p>
+     * <p>Yields the length of current islamic month in days. </p>
      *
      * @return  int
      * @since   3.6/4.4
      */
     /*[deutsch]
-     * <p>Liefert die L&auml;nge des aktuellen islamischen Monats. </p>
+     * <p>Liefert die L&auml;nge des aktuellen islamischen Monats in Tagen. </p>
      *
      * @return  int
      * @since   3.6/4.4
@@ -688,13 +688,13 @@ public final class HijriCalendar
     }
 
     /**
-     * <p>Yields the length of current islamic year. </p>
+     * <p>Yields the length of current islamic year in days. </p>
      *
      * @return  int
      * @since   3.6/4.4
      */
     /*[deutsch]
-     * <p>Liefert die L&auml;nge des aktuellen islamischen Jahres. </p>
+     * <p>Liefert die L&auml;nge des aktuellen islamischen Jahres in Tagen. </p>
      *
      * @return  int
      * @since   3.6/4.4
