@@ -1,5 +1,6 @@
 ## [v3.6] not yet released
 ### Added
+- Support for algorithmic variants of islamic calendar [#334]
 - Create direct option to determine length of Hijri month or year [#337]
 - Add toDate() and toTime() in PlainTimestamp [#336]
 - New method(s) for printing durations with 1 parameter only [#333]
