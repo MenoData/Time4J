@@ -62,6 +62,24 @@ public class TimestampPropertiesTest {
     }
 
     @Test
+    public void getCalendarDateDirect2() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(19, 45, 30, 123456789);
+        assertThat(
+            PlainTimestamp.of(date, time).toDate(),
+            is(date));
+    }
+
+    @Test
+    public void getWallTimeDirect2() {
+        PlainDate date = PlainDate.of(2014, 4, 21);
+        PlainTime time = PlainTime.of(19, 45, 30, 123456789);
+        assertThat(
+            PlainTimestamp.of(date, time).toTime(),
+            is(time));
+    }
+
+    @Test
     public void getYearDirect() {
         PlainDate date = PlainDate.of(2014, 4, 21);
         PlainTime time = PlainTime.of(19, 45, 30, 123456789);
