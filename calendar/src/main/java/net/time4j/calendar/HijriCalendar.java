@@ -246,11 +246,31 @@ public final class HijriCalendar
 
     /**
      * The name of Umm-al-qura-variant.
+     *
+     * <p>The supported range of islamic years is 1300-1500. </p>
      */
     /*[deutsch]
      * Der Name der Umm-al-qura-Variante.
+     *
+     * <p>Der unterst&uuml;tze Wertebereich der islamischen Jahre ist 1300-1500. </p>
      */
     public static final String VARIANT_UMALQURA = "islamic-umalqura";
+
+    /**
+     * The name of the astronomical ICU4J-variant.
+     *
+     * <p>The supported range of islamic years is 1-1600. </p>
+     *
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * Der Name der astronomischen ICU4J-Variante.
+     *
+     * <p>Der unterst&uuml;tze Wertebereich der islamischen Jahre ist 1-1600. </p>
+     *
+     * @since   3.6/4.4
+     */
+    public static final String VARIANT_ICU4J = "islamic-icu4j";
 
     private static final Map<String, MonthBasedCalendarSystem<HijriCalendar>> CALSYS;
     private static final CalendarFamily<HijriCalendar> ENGINE;
