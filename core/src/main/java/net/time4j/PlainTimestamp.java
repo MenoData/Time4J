@@ -751,6 +751,45 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Synonym for {@code getCalendarDate()}. </p>
+     *
+     * @return  calendar date component
+     * @see     #getCalendarDate()
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Synonym f&uuml;r {@code getCalendarDate()}. </p>
+     *
+     * @return  calendar date component
+     * @since   3.6/4.4
+     */
+    public PlainDate toDate() {
+
+        return this.date;
+
+    }
+
+    /**
+     * <p>Synonym for {@code getWallTime()}. </p>
+     *
+     * @return  wall time component
+     * @see     #getWallTime()
+     * @since   3.6/4.4
+     */
+    /*[deutsch]
+     * <p>Synonym f&uuml;r {@code getWallTime()}. </p>
+     *
+     * @return  wall time component
+     * @see     #getWallTime()
+     * @since   3.6/4.4
+     */
+    public PlainTime toTime() {
+
+        return this.time;
+
+    }
+
+    /**
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing plain timestamps. </p>
      *

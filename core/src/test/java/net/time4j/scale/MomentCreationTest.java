@@ -6,6 +6,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import org.junit.Test;
@@ -18,6 +19,16 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class MomentCreationTest {
+
+    @Test
+    public void inStdTimezone() {
+        PlainTimestamp tsp = PlainTimestamp.of(
+            PlainDate.of(2015, 8, 31),
+            PlainTime.of(23, 59, 59, 123456789));
+        assertThat(
+            tsp.inStdTimezone(),
+            is(tsp.in(Timezone.ofSystem())));
+    }
 
     @Test
     public void leapsecond_2012_06_30() {
