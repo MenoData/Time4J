@@ -249,6 +249,31 @@ final class AstronomicalHijriData
 
     }
 
+    @Override
+    public int getLengthOfYear(
+        CalendarEra era,
+        int hyear
+    ) {
+
+        if (era != HijriEra.ANNO_HEGIRAE) {
+            throw new IllegalArgumentException("Wrong era: " + era);
+        }
+
+        if ((hyear < this.minYear) || (hyear > this.maxYear)) {
+            throw new IllegalArgumentException("Out of bounds: yearOfEra=" + hyear);
+        }
+
+        int max = 0;
+
+        for (int m = 1; m <= 12; m++) {
+            int index = (hyear - this.minYear) * 12 + m - 1;
+            max += this.lengthOfMonth[index];
+        }
+
+        return max;
+
+    }
+
     // returns index of month-start associated with utcDays
     private static int search(
         long utcDays,

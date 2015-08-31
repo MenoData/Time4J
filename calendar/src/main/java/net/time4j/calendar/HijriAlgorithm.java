@@ -286,6 +286,25 @@ public enum HijriAlgorithm
 		}
 
 		@Override
+		public int getLengthOfYear(
+			CalendarEra era,
+			int hyear
+		) {
+
+			if (era != HijriEra.ANNO_HEGIRAE) {
+				throw new IllegalArgumentException("Wrong era: " + era);
+			}
+
+			if ((hyear < 1) || (hyear > MAX_YEAR)) {
+				throw new IllegalArgumentException("Out of bounds: yearOfEra=" + hyear);
+			}
+
+			int y = ((hyear - 1) % 30) + 1;
+			return ((Arrays.binarySearch(this.intercalaries, y) >= 0) ? 355 : 354);
+
+		}
+
+		@Override
 		public HijriCalendar transform(long utcDays) {
 
 			long start = this.getMinimumSinceUTC();
