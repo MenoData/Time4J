@@ -31,32 +31,36 @@ import java.util.List;
 
 
 /**
- * <p>Describes islamic calendar variants based on deterministic algorithms. </p>
+ * <p>Describes islamic calendar variants based on simplistic deterministic algorithms. </p>
  *
  * <p>Most algorithms uses a leap year pattern within a 30-year-cycle. All years have 12 months where
  * the month lengths are alternately 30 or 29 with the exception of last month which has 30 days in
- * leap years else 29 days. </p>
+ * leap years else 29 days. The supported range in islamic years is 1-1600. </p>
  *
  * <p>Note that all these algorithms have <strong>approximated</strong> nature only. There are deviations
  * from sighting-based variants especially in short term. However, main advantage of algorithm-based variants
  * is the fact that they can be applied into far past or future. Keep in mind that sighting-based calendars
- * have a much more constrained valid range. </p>
+ * have a much more constrained valid range. For more background see
+ * <a href="http://www.staff.science.uu.nl/~gent0113/islam/islam_tabcal_variants.htm">The Arithmetical
+ * or Tabular Islamic Calendar</a>. </p>
  *
  * @author 	Meno Hochschild
  * @since 	3.6/4.4
  */
 /*[deutsch]
- * <p>Beschreibt islamische Kalendervarianten basierend auf deterministischen Algorithmen. </p>
+ * <p>Beschreibt islamische Kalendervarianten basierend auf vereinfachenden deterministischen Algorithmen. </p>
  *
  * <p>Die meisten Algorithmen verwenden ein Schaltjahresmuster innerhalb eines 30-Jahres-Zyklus. Jedes Jahr hat
  * 12 Monate, die abwechselnd 30 oder 29 Tage lang sind. Als Ausnahme hat der letzte Monat in Schaltjahren
- * 30 Tage. </p>
+ * 30 Tage. Der unterst&uuml;tzte Wertbereich ist in islamischen Jahren 1-1600. </p>
  *
  * <p>Zu beachten: All diese Algorithmen haben nur <strong>N&auml;herungscharakter</strong>. Abweichungen von
  * sichtbasierten Varianten sind besonders kurzfristig m&ouml;glich. Allerdings besteht der Hauptvorteil der
  * Algorithmen darin, da&szlig; sie auf Zeiten weit in der Vergangenheit oder Zukunft angewandt werden
  * k&ouml;nnen, w&auml;hrend sichtbasierte Varianten stark in ihrem G&uuml;ltigkeitsbereich eingeschr&auml;nkt
- * sind. </p>
+ * sind. Mehr Hintergrundinformationen siehe
+ * <a href="http://www.staff.science.uu.nl/~gent0113/islam/islam_tabcal_variants.htm">The Arithmetical
+ * or Tabular Islamic Calendar</a>. </p>
  *
  * @author 	Meno Hochschild
  * @since 	3.6/4.4
