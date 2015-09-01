@@ -5,6 +5,7 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
 import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
@@ -43,6 +44,61 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PrettyTimeTest {
+
+    @Test
+    public void printRelativeOrDate() {
+        TimeSource<?> clock = new TimeSource<Moment>() {
+            @Override
+            public Moment currentTime() {
+                return PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
+            }
+        };
+
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDate(
+                    PlainDate.of(2014, 10, 3),
+                    ZonalOffset.UTC,
+                    CalendarUnit.DAYS,
+                    ChronoFormatter.ofDatePattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN)
+                ),
+            is("in 29 Tagen"));
+
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDate(
+                    PlainDate.of(2014, 10, 4),
+                    ZonalOffset.UTC,
+                    CalendarUnit.DAYS,
+                    ChronoFormatter.ofDatePattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN)
+                ),
+            is("4. Oktober 2014"));
+
+        assertThat(
+            PrettyTime.of(Locale.GERMAN)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelativeOrDate(
+                    PlainDate.of(2014, 9, 3),
+                    ZonalOffset.UTC,
+                    CalendarUnit.DAYS,
+                    ChronoFormatter.ofDatePattern(
+                        "d. MMMM uuuu",
+                        PatternType.CLDR,
+                        Locale.GERMAN)
+                ),
+            is("gestern"));
+    }
 
     @Test
     public void printRelativeOrDateTime() {

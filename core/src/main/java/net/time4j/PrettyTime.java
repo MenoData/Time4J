@@ -1124,6 +1124,80 @@ public final class PrettyTime {
 
     }
 
+    /**
+     * <p>Formats given date relative to the current date of {@link #getReferenceClock()}
+     * as duration or as absolute date. </p>
+     *
+     * @param   date            calendar date whose deviation from clock is to be printed
+     * @param   tzid            time zone identifier for getting current reference date
+     * @param   maxRelativeUnit maximum calendar unit which will still be printed in a relative way
+     * @param   formatter       used for printing absolute date if the leading unit is bigger than maxRelativeUnit
+     * @return  formatted output of relative date, either in past or in future
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Datum relativ zum aktuellen Datum der Referenzuhr {@link #getReferenceClock()}
+     * als Dauer oder als absolute Datumszeit. </p>
+     *
+     * @param   date            calendar date whose deviation from clock is to be printed
+     * @param   tzid            time zone identifier for getting current reference date
+     * @param   maxRelativeUnit maximum calendar unit which will still be printed in a relative way
+     * @param   formatter       used for printing absolute date if the leading unit is bigger than maxRelativeUnit
+     * @return  formatted output of relative date, either in past or in future
+     * @since   3.7/4.5
+     */
+    public String printRelativeOrDate(
+        PlainDate date,
+        TZID tzid,
+        CalendarUnit maxRelativeUnit,
+        TemporalFormatter<PlainDate> formatter
+    ) {
+
+        if (maxRelativeUnit == null) {
+            throw new NullPointerException("Missing max relative unit.");
+        }
+
+        Moment refTime = Moment.from(this.getReferenceClock().currentTime());
+        PlainDate refDate = refTime.toZonalTimestamp(tzid).toDate();
+        Duration<CalendarUnit> duration;
+
+        if (this.weekToDays) {
+            duration = Duration.inYearsMonthsDays().between(refDate, date);
+        } else {
+            CalendarUnit[] stdUnits = {YEARS, MONTHS, WEEKS, DAYS};
+            duration = Duration.in(stdUnits).between(refDate, date);
+        }
+
+        if (duration.isEmpty()) {
+            return this.getEmptyRelativeString(TimeUnit.DAYS);
+        }
+
+        TimeSpan.Item<CalendarUnit> item = duration.getTotalLength().get(0);
+        long amount = item.getAmount();
+        CalendarUnit unit = item.getUnit();
+
+        if (Double.compare(unit.getLength(), maxRelativeUnit.getLength()) > 0) {
+            return formatter.format(date);
+        } else if (
+            (amount == 1L)
+            && unit.equals(CalendarUnit.DAYS)
+        ) {
+            UnitPatterns patterns = UnitPatterns.of(this.locale);
+            String replacement = (duration.isNegative() ? patterns.getYesterdayWord() : patterns.getTomorrowWord());
+
+            if (!replacement.isEmpty()) {
+                return replacement;
+            }
+        }
+
+        String pattern = (
+            duration.isNegative()
+            ? this.getPastPattern(amount, unit)
+            : this.getFuturePattern(amount, unit));
+        return this.format(pattern, amount);
+
+    }
+
     private String printRelativeSeconds(
         Moment t1,
         Moment t2,
