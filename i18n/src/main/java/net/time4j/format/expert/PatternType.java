@@ -1415,14 +1415,17 @@ public enum PatternType
         String chronoType = builder.getChronology().getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
         TextElement<?> textElement;
+        ChronoElement<? extends Enum> enumElement;
         ChronoElement<Integer> intElement;
 
         if (element.getType().isEnum() && (element instanceof TextElement)) {
-            textElement = TextElement.class.cast(element);
+            textElement = cast(element);
+            enumElement = cast(element);
             intElement = null;
         } else if (Integer.class.isAssignableFrom(element.getType())) {
             textElement = null;
-            intElement = toIntType(element);
+            enumElement = null;
+            intElement = cast(element);
         } else {
             throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");
         }
@@ -1452,13 +1455,13 @@ public enum PatternType
                 }
                 break;
             case 'M':
-                addMonth(builder, Math.min(count, count), textElement);
+                addMonth(builder, Math.min(count, count), textElement, enumElement);
                 break;
             case 'L':
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
                 try {
-                    addMonth(builder, count, textElement);
+                    addMonth(builder, count, textElement, enumElement);
                 } finally {
                     builder.endSection();
                 }
@@ -1523,32 +1526,33 @@ public enum PatternType
     private static void addMonth(
         ChronoFormatter.Builder<?> builder,
         int count,
-        TextElement<?> element
+        TextElement<?> textElement,
+        ChronoElement<? extends Enum> enumElement
     ) {
 
         switch (count) {
             case 1:
-                builder.addNumerical(toEnumType(element), 1, 2);
+                builder.addNumerical(enumElement, 1, 2);
                 break;
             case 2:
-                builder.addFixedNumerical(toEnumType(element), 2);
+                builder.addFixedNumerical(enumElement, 2);
                 break;
             case 3:
                 builder.startSection(
                     Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED);
-                builder.addText(element);
+                builder.addText(textElement);
                 builder.endSection();
                 break;
             case 4:
                 builder.startSection(
                     Attributes.TEXT_WIDTH, TextWidth.WIDE);
-                builder.addText(element);
+                builder.addText(textElement);
                 builder.endSection();
                 break;
             case 5:
                 builder.startSection(
                     Attributes.TEXT_WIDTH, TextWidth.NARROW);
-                builder.addText(element);
+                builder.addText(textElement);
                 builder.endSection();
                 break;
             default:
@@ -1559,16 +1563,9 @@ public enum PatternType
     }
 
     @SuppressWarnings("unchecked")
-    private static <V extends Enum<V>> ChronoElement<V> toEnumType(ChronoElement<?> element) {
+    private static <T> T cast(Object obj) {
 
-        return (ChronoElement<V>) element;
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static ChronoElement<Integer> toIntType(ChronoElement<?> element) {
-
-        return (ChronoElement<Integer>) element;
+        return (T) obj;
 
     }
 
