@@ -403,8 +403,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *          with closed start
      * @since   2.0
      */
-    public IntervalCollection<T> plus(
-        List<? extends ChronoInterval<T>> intervals) {
+    public IntervalCollection<T> plus(List<? extends ChronoInterval<T>> intervals) {
 
         if (intervals.isEmpty()) {
             return this;
@@ -418,6 +417,30 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         Collections.sort(windows, this.getComparator());
         return this.create(windows);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code plus(other.getIntervals())}. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be added to this instance
+     * @return  new interval collection containing the intervals of this instance and the argument
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code plus(other.getIntervals())}. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be added to this instance
+     * @return  new interval collection containing the intervals of this instance and the argument
+     * @since   3.7/4.5
+     */
+    public IntervalCollection<T> plus(IntervalCollection<T> other) {
+
+        if (this == other) {
+            return this;
+        }
+
+        return this.plus(other.getIntervals());
 
     }
 
@@ -519,8 +542,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *          with closed start
      * @since   2.2
      */
-    public IntervalCollection<T> minus(
-        List<? extends ChronoInterval<T>> intervals) {
+    public IntervalCollection<T> minus(List<? extends ChronoInterval<T>> intervals) {
 
         if (
             this.isEmpty()
@@ -550,6 +572,31 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         Collections.sort(parts, this.getComparator());
         return this.create(parts);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code minus(other.getIntervals())}. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be subtracted from this instance
+     * @return  new interval collection containing all timepoints of this instance excluding those of argument
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code minus(other.getIntervals())}. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be subtracted from this instance
+     * @return  new interval collection containing all timepoints of this instance excluding those of argument
+     * @since   3.7/4.5
+     */
+    public IntervalCollection<T> minus(IntervalCollection<T> other) {
+
+        if (this == other) {
+            List<ChronoInterval<T>> zero = Collections.emptyList();
+            return this.create(zero);
+        }
+
+        return this.minus(other.getIntervals());
 
     }
 
@@ -925,28 +972,27 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     }
 
     /**
-     * <p>Equivalent to {@code plus(other.getIntervals())}. </p>
+     * <p>Equivalent to {@code plus(other).withBlocks()}. </p>
      *
-     * @param   other       another interval collection whose intervals
-     *                      are to be added to this instance
-     * @return  new merged interval collection
+     * <p>Note: Before version 3.7/4.5 the behaviour was just giving an unmerged collection. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be added to this instance
+     * @return  new merged interval collection with disjunct blocks
      * @since   2.0
      */
     /*[deutsch]
-     * <p>&Auml;quivalent zu {@code plus(other.getIntervals())}. </p>
+     * <p>&Auml;quivalent zu {@code plus(other).withBlocks()}. </p>
      *
-     * @param   other       another interval collection whose intervals
-     *                      are to be added to this instance
-     * @return  new merged interval collection
+     * <p>Hinweis: Vor der Version 3.7/4.5 war das Verhalten so, da&szlig; nur eine Intervallmenge ohne
+     * notwendig disjunkte Bl&ouml;cke geliefert wurde. </p>
+     *
+     * @param   other       another interval collection whose intervals are to be added to this instance
+     * @return  new merged interval collection with disjunct blocks
      * @since   2.0
      */
     public IntervalCollection<T> union(IntervalCollection<T> other) {
 
-        if (this == other) {
-            return this;
-        }
-
-        return this.plus(other.getIntervals());
+        return this.plus(other).withBlocks();
 
     }
 

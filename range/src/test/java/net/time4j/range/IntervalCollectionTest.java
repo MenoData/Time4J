@@ -5,6 +5,7 @@ import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.Test;
@@ -829,6 +830,65 @@ public class IntervalCollectionTest {
         assertThat(
             minuend.minus(windows.getIntervals()),
             is(delta));
+    }
+
+    @Test
+    public void plus() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
+        IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2);
+        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(Arrays.asList(i1, i2));
+
+        assertThat(a.plus(b).getIntervals(), is(c.getIntervals())); // unmerged
+    }
+
+    @Test
+    public void minus() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval j =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 4, 29));
+        IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
+        IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2);
+        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(j);
+
+        assertThat(a.minus(b).getIntervals(), is(c.getIntervals()));
+    }
+
+    @Test
+    public void union() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval merged =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
+        IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2);
+        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(merged);
+
+        assertThat(a.union(b).getIntervals(), is(c.getIntervals()));
     }
 
 }
