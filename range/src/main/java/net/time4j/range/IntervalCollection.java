@@ -404,8 +404,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *          with closed start
      * @since   2.0
      */
-    public IntervalCollection<T> plus(
-        List<? extends ChronoInterval<T>> intervals) {
+    public IntervalCollection<T> plus(List<? extends ChronoInterval<T>> intervals) {
 
         if (intervals.isEmpty()) {
             return this;
@@ -547,8 +546,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *          with closed start
      * @since   2.2
      */
-    public IntervalCollection<T> minus(
-        List<? extends ChronoInterval<T>> intervals) {
+    public IntervalCollection<T> minus(List<? extends ChronoInterval<T>> intervals) {
 
         if (
             this.isEmpty()
