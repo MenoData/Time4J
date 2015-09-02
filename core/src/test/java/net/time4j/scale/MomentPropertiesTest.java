@@ -17,6 +17,8 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -182,8 +184,8 @@ public class MomentPropertiesTest {
             this.utc.with(MILLI_OF_DAY.newValue(86399999).atUTC()),
             is(
                 this.utc
-                .plus((999 - 123) * MIO, SI.NANOSECONDS)
-                .minus(1, SI.SECONDS)));
+                    .plus((999 - 123) * MIO, SI.NANOSECONDS)
+                    .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -214,8 +216,8 @@ public class MomentPropertiesTest {
             this.utc.with(MICRO_OF_DAY.newValue(86399999999L).atUTC()),
             is(
                 this.utc
-                .plus((999999 - 123456) * 1000L, SI.NANOSECONDS)
-                .minus(1, SI.SECONDS)));
+                    .plus((999999 - 123456) * 1000L, SI.NANOSECONDS)
+                    .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -246,8 +248,8 @@ public class MomentPropertiesTest {
             this.utc.with(NANO_OF_DAY.newValue(86399999999999L).atUTC()),
             is(
                 this.utc
-                .plus((999999999 - 123456789), SI.NANOSECONDS)
-                .minus(1, SI.SECONDS)));
+                    .plus((999999999 - 123456789), SI.NANOSECONDS)
+                    .minus(1, SI.SECONDS)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -451,8 +453,8 @@ public class MomentPropertiesTest {
             this.utc.with(CLOCK_HOUR_OF_AMPM.newValue(12).atUTC()),
             is(
                 PlainDate.of(2012, 6, 30)
-                .at(PlainTime.of(12, 59, 59, 123456789))
-                .inTimezone(ZonalOffset.UTC)));
+                    .at(PlainTime.of(12, 59, 59, 123456789))
+                    .inTimezone(ZonalOffset.UTC)));
     }
 
     @Test(expected=NullPointerException.class)
@@ -923,6 +925,45 @@ public class MomentPropertiesTest {
         assertThat(
             this.utc.with(Moment.FRACTION, 0),
             is(this.utc.minus(123456789, SI.NANOSECONDS)));
+    }
+
+    @Test
+    public void containsPrecisionInTimeUnits() {
+        assertThat(
+            this.utc.contains(Moment.PRECISION),
+            is(true));
+    }
+
+    @Test
+    public void getPrecisionInTimeUnits() {
+        assertThat(
+            this.utc.get(Moment.PRECISION),
+            is(TimeUnit.NANOSECONDS));
+    }
+
+    @Test
+    public void withPrecisionInTimeUnits() {
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.DAYS),
+            is(PlainTimestamp.of(2012, 6, 30, 0, 0).atUTC()));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.HOURS),
+            is(PlainTimestamp.of(2012, 6, 30, 23, 0).atUTC()));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.MINUTES),
+            is(PlainTimestamp.of(2012, 6, 30, 23, 59).atUTC()));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.SECONDS),
+            is(this.utc.minus(123456789, SI.NANOSECONDS)));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.MILLISECONDS),
+            is(this.utc.minus(456789, SI.NANOSECONDS)));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.MICROSECONDS),
+            is(this.utc.minus(789, SI.NANOSECONDS)));
+        assertThat(
+            this.utc.with(Moment.PRECISION, TimeUnit.NANOSECONDS),
+            is(this.utc));
     }
 
 }

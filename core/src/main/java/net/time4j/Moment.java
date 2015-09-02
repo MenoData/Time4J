@@ -258,6 +258,9 @@ public final class Moment
             IntElement.FRACTION,
             IntElement.FRACTION,
             TimeUnit.NANOSECONDS);
+        builder.appendElement(
+            PrecisionElement.TIME_PRECISION,
+            new PrecisionRule());
 
         ENGINE = builder.withTimeLine(new GlobalTimeLine()).build();
 
@@ -297,6 +300,18 @@ public final class Moment
      * @since   2.0
      */
     public static final ChronoElement<Integer> FRACTION = IntElement.FRACTION;
+
+    /**
+     * <p>Represents the precision. </p>
+     *
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Genauigkeit. </p>
+     *
+     * @since   3.7/4.5
+     */
+    public static final ChronoElement<TimeUnit> PRECISION = PrecisionElement.TIME_PRECISION;
 
     private static final ChronoOperator<Moment> NEXT_LS = new NextLS();
     private static final long serialVersionUID = -3192884724477742274L;
@@ -2642,6 +2657,124 @@ public final class Moment
                     return tsp.atUTC().plus(event.getShift(), SECONDS);
                 }
             }
+
+            return null;
+
+        }
+
+    }
+
+    private static class PrecisionRule
+        implements ElementRule<Moment, TimeUnit> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public TimeUnit getValue(Moment context) {
+
+            int f = context.getNanosecond();
+
+            if (f != 0) {
+                if ((f % MIO) == 0) {
+                    return TimeUnit.MILLISECONDS;
+                } else if ((f % 1000) == 0) {
+                    return TimeUnit.MICROSECONDS;
+                } else {
+                    return TimeUnit.NANOSECONDS;
+                }
+            }
+
+            long secs = context.posixTime;
+
+            if (MathUtils.floorModulo(secs, 86400) == 0) {
+                return TimeUnit.DAYS;
+            } else if (MathUtils.floorModulo(secs, 3600) == 0) {
+                return TimeUnit.HOURS;
+            } else if (MathUtils.floorModulo(secs, 60) == 0) {
+                return TimeUnit.MINUTES;
+            } else {
+                return TimeUnit.SECONDS;
+            }
+
+        }
+
+        @Override
+        public Moment withValue(
+            Moment context,
+            TimeUnit value,
+            boolean lenient
+        ) {
+
+            Moment result;
+
+            switch (value) {
+                case DAYS:
+                    long secsD = MathUtils.floorDivide(context.posixTime, 86400) * 86400;
+                    return Moment.of(secsD, TimeScale.POSIX);
+                case HOURS:
+                    long secsH = MathUtils.floorDivide(context.posixTime, 3600) * 3600;
+                    return Moment.of(secsH, TimeScale.POSIX);
+                case MINUTES:
+                    long secsM = MathUtils.floorDivide(context.posixTime, 60) * 60;
+                    return Moment.of(secsM, TimeScale.POSIX);
+                case SECONDS:
+                    result = Moment.of(context.posixTime, 0, TimeScale.POSIX);
+                    break;
+                case MILLISECONDS:
+                    int f3 = (context.getNanosecond() / MIO) * MIO;
+                    result = Moment.of(context.posixTime, f3, TimeScale.POSIX);
+                    break;
+                case MICROSECONDS:
+                    int f6 = (context.getNanosecond() / 1000) * 1000;
+                    result = Moment.of(context.posixTime, f6, TimeScale.POSIX);
+                    break;
+                case NANOSECONDS:
+                    return context;
+                default:
+                    throw new UnsupportedOperationException(value.name());
+            }
+
+            if (context.isLeapSecond() && LeapSeconds.getInstance().isEnabled()) {
+                return result.plus(1, SI.SECONDS);
+            } else {
+                return result;
+            }
+
+        }
+
+        @Override
+        public boolean isValid(
+            Moment context,
+            TimeUnit value
+        ) {
+
+            return (value != null);
+
+        }
+
+        @Override
+        public TimeUnit getMinimum(Moment context) {
+
+            return TimeUnit.DAYS;
+
+        }
+
+        @Override
+        public TimeUnit getMaximum(Moment context) {
+
+            return TimeUnit.NANOSECONDS;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(Moment context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(Moment context) {
 
             return null;
 

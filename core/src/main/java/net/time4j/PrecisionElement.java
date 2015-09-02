@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PrecisionElement.java) is part of project Time4J.
  *
@@ -24,39 +24,72 @@ package net.time4j;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * <p>Das Element f&uuml;r die Genauigkeit einer Uhrzeitangabe. </p>
  *
  * @author  Meno Hochschild
  */
-enum PrecisionElement
-    implements ChronoElement<ClockUnit> {
+class PrecisionElement<U extends Comparable<U>>
+    implements ChronoElement<U> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    PRECISION;
+    static final ChronoElement<ClockUnit> CLOCK_PRECISION =
+        new PrecisionElement<ClockUnit>(ClockUnit.class, ClockUnit.HOURS, ClockUnit.NANOS);
+    static final ChronoElement<TimeUnit> TIME_PRECISION =
+        new PrecisionElement<TimeUnit>(TimeUnit.class, TimeUnit.DAYS, TimeUnit.NANOSECONDS);
+
+    //~ Instanzvariablen --------------------------------------------------
+
+    private final Class<U> type;
+    private transient final U min;
+    private transient final U max;
+
+    //~ Konstruktoren -----------------------------------------------------
+
+    private PrecisionElement(
+        Class<U> type,
+        U min,
+        U max
+    ) {
+        super();
+
+        this.type = type;
+        this.min = min;
+        this.max = max;
+
+    }
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public Class<ClockUnit> getType() {
+    public String name() {
 
-        return ClockUnit.class;
-
-    }
-
-    @Override
-    public ClockUnit getDefaultMinimum() {
-
-        return ClockUnit.HOURS;
+        return "PRECISION";
 
     }
 
     @Override
-    public ClockUnit getDefaultMaximum() {
+    public Class<U> getType() {
 
-        return ClockUnit.NANOS;
+        return this.type;
+
+    }
+
+    @Override
+    public U getDefaultMinimum() {
+
+        return this.min;
+
+    }
+
+    @Override
+    public U getDefaultMaximum() {
+
+        return this.max;
 
     }
 
@@ -80,7 +113,14 @@ enum PrecisionElement
         ChronoDisplay o2
     ) {
 
-        return o1.get(this).compareTo(o2.get(this));
+        U u1 = o1.get(this);
+        U u2 = o2.get(this);
+
+        if (this.type == ClockUnit.class) {
+            return u1.compareTo(u2);
+        } else {
+            return u2.compareTo(u1);
+        }
 
     }
 
@@ -95,6 +135,16 @@ enum PrecisionElement
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    /**
+     * @serialData  serves for singleton semantic
+     * @return      replacement object
+     */
+    private Object readResolve() {
+
+        return ((this.type == ClockUnit.class) ? CLOCK_PRECISION : TIME_PRECISION);
 
     }
 

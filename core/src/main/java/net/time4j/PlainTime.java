@@ -886,8 +886,7 @@ public final class PlainTime
      *
      * <p>Dieses Element definiert keine Basiseinheit. </p>
      */
-    public static final ChronoElement<ClockUnit> PRECISION =
-        PrecisionElement.PRECISION;
+    public static final ChronoElement<ClockUnit> PRECISION = PrecisionElement.CLOCK_PRECISION;
 
     // Dient der Serialisierungsunterstützung.
     private static final Map<String, Object> ELEMENTS;
@@ -914,7 +913,6 @@ public final class PlainTime
         fill(constants, DECIMAL_HOUR);
         fill(constants, DECIMAL_MINUTE);
         fill(constants, DECIMAL_SECOND);
-        fill(constants, PRECISION);
         ELEMENTS = Collections.unmodifiableMap(constants);
     }
 
