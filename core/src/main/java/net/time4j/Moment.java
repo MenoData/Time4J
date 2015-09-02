@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.base.GregorianMath;
-import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
@@ -68,7 +67,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -264,6 +262,9 @@ public final class Moment
             IntElement.FRACTION,
             IntElement.FRACTION,
             TimeUnit.NANOSECONDS);
+        builder.appendElement(
+            PrecisionElement.TIME_PRECISION,
+            new PrecisionRule());
 
         ENGINE = builder.withTimeLine(new GlobalTimeLine()).build();
 
@@ -304,6 +305,18 @@ public final class Moment
      */
     public static final ChronoElement<Integer> FRACTION = IntElement.FRACTION;
 
+    /**
+     * <p>Represents the precision. </p>
+     *
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Genauigkeit. </p>
+     *
+     * @since   3.7/4.5
+     */
+    public static final ChronoElement<TimeUnit> PRECISION = PrecisionElement.TIME_PRECISION;
+
     private static final ChronoOperator<Moment> NEXT_LS = new NextLS();
     private static final long serialVersionUID = -3192884724477742274L;
 
@@ -333,14 +346,14 @@ public final class Moment
                 if (scale == UTC) {
                     utcTime = elapsedTime;
                 } else if (scale == TAI) {
-                    utcTime = MathUtils.safeSubtract(elapsedTime, 10);
+                    utcTime = Math.subtractExact(elapsedTime, 10);
 
                     if (utcTime < 0) {
                         throw new IllegalArgumentException(
                             "TAI not supported before 1972-01-01: " + elapsedTime);
                     }
                 } else if (scale == GPS) {
-                    utcTime = MathUtils.safeAdd(elapsedTime, UTC_GPS_DELTA);
+                    utcTime = Math.addExact(elapsedTime, UTC_GPS_DELTA);
 
                     if (utcTime < UTC_GPS_DELTA) {
                         throw new IllegalArgumentException(
@@ -917,32 +930,31 @@ public final class Moment
                 case SECONDS:
                     if (LeapSeconds.getInstance().isEnabled()) {
                         result = new Moment(
-                            MathUtils.safeAdd(this.getEpochTime(), amount),
+                            Math.addExact(this.getEpochTime(), amount),
                             this.getNanosecond(),
                             UTC);
                     } else {
                         result = Moment.of(
-                            MathUtils.safeAdd(this.posixTime, amount),
+                            Math.addExact(this.posixTime, amount),
                             this.getNanosecond(),
                             POSIX
                         );
                     }
                     break;
                 case NANOSECONDS:
-                    long sum =
-                        MathUtils.safeAdd(this.getNanosecond(), amount);
-                    int nano = MathUtils.floorModulo(sum, MRD);
-                    long second = MathUtils.floorDivide(sum, MRD);
+                    long sum = Math.addExact(this.getNanosecond(), amount);
+                    int nano = (int) Math.floorMod(sum, MRD);
+                    long second = Math.floorDiv(sum, MRD);
 
                     if (LeapSeconds.getInstance().isEnabled()) {
                         result = new Moment(
-                            MathUtils.safeAdd(this.getEpochTime(), second),
+                            Math.addExact(this.getEpochTime(), second),
                             nano,
                             UTC
                         );
                     } else {
                         result = Moment.of(
-                            MathUtils.safeAdd(this.posixTime, second),
+                            Math.addExact(this.posixTime, second),
                             nano,
                             POSIX
                         );
@@ -994,7 +1006,7 @@ public final class Moment
         SI unit
     ) {
 
-        return this.plus(MathUtils.safeNegate(amount), unit);
+        return this.plus(Math.negateExact(amount), unit);
 
     }
 
@@ -1429,7 +1441,7 @@ public final class Moment
                 Moment tai =
                     new Moment(
                         this.getNanosecond(),
-                        MathUtils.safeAdd(
+                        Math.addExact(
                             this.getElapsedTime(TAI),
                             POSIX_UTC_DELTA)
                         );
@@ -1440,7 +1452,7 @@ public final class Moment
                 Moment gps =
                     new Moment(
                         this.getNanosecond(),
-                        MathUtils.safeAdd(
+                        Math.addExact(
                             this.getElapsedTime(GPS),
                             POSIX_GPS_DELTA)
                         );
@@ -1549,7 +1561,7 @@ public final class Moment
     private PlainDate getDateUTC() {
 
         return PlainDate.of(
-            MathUtils.floorDivide(this.posixTime, 86400),
+            Math.floorDiv(this.posixTime, 86400),
             EpochDays.UNIX);
 
     }
@@ -1632,7 +1644,7 @@ public final class Moment
     // Anzahl der POSIX-Sekunden des Tages
     private static int getTimeOfDay(Moment context) {
 
-        return MathUtils.floorModulo(context.posixTime, 86400);
+        return (int) Math.floorMod(context.posixTime, 86400);
 
     }
 
@@ -1946,7 +1958,7 @@ public final class Moment
                             + timezone.getOffset(moment));
                     } else if (getMaxSecondOfMinute(moment) == 60) {
                         return moment.plus(
-                            MathUtils.safeSubtract(60, this.extractOld(moment)),
+                            Math.subtractExact(60, this.extractOld(moment)),
                             SECONDS);
                     } else {
                         throw new IllegalArgumentException(
@@ -1966,7 +1978,7 @@ public final class Moment
                     } else if (this.type == ElementOperator.OP_LENIENT) {
                         long oldValue = this.extractOld(moment);
                         long newValue = this.extractValue();
-                        amount = MathUtils.safeSubtract(newValue, oldValue);
+                        amount = Math.subtractExact(newValue, oldValue);
                     }
 
                     switch (step) {
@@ -1974,11 +1986,11 @@ public final class Moment
                             return moment.plus(amount, SECONDS);
                         case 1000:
                             return moment.plus(
-                                MathUtils.safeMultiply(MIO, amount),
+                                Math.multiplyExact(MIO, amount),
                                 NANOSECONDS);
                         case MIO:
                             return moment.plus(
-                                MathUtils.safeMultiply(1000, amount),
+                                Math.multiplyExact(1000, amount),
                                 NANOSECONDS);
                         case MRD:
                             return moment.plus(amount, NANOSECONDS);
@@ -2105,21 +2117,21 @@ public final class Moment
 
             if (this.unit.compareTo(TimeUnit.SECONDS) >= 0) {
                 long secs =
-                    MathUtils.safeMultiply(amount, this.unit.toSeconds(1));
+                    Math.multiplyExact(amount, this.unit.toSeconds(1));
                 return Moment.of(
-                    MathUtils.safeAdd(context.getPosixTime(), secs),
+                    Math.addExact(context.getPosixTime(), secs),
                     context.getNanosecond(),
                     POSIX
                 );
             } else { // MILLIS, MICROS, NANOS
                 long nanos =
-                    MathUtils.safeMultiply(amount, this.unit.toNanos(1));
-                long sum = MathUtils.safeAdd(context.getNanosecond(), nanos);
-                int nano = MathUtils.floorModulo(sum, MRD);
-                long second = MathUtils.floorDivide(sum, MRD);
+                    Math.multiplyExact(amount, this.unit.toNanos(1));
+                long sum = Math.addExact(context.getNanosecond(), nanos);
+                int nano = (int) Math.floorMod(sum, MRD);
+                long second = Math.floorDiv(sum, MRD);
 
                 return Moment.of(
-                    MathUtils.safeAdd(context.getPosixTime(), second),
+                    Math.addExact(context.getPosixTime(), second),
                     nano,
                     POSIX
                 );
@@ -2148,16 +2160,16 @@ public final class Moment
                 }
             } else { // MILLIS, MICROS, NANOS
                 delta =
-                    MathUtils.safeAdd(
-                        MathUtils.safeMultiply(
-                            MathUtils.safeSubtract(
+                    Math.addExact(
+                        Math.multiplyExact(
+                            Math.subtractExact(
                                 end.getPosixTime(),
                                 start.getPosixTime()
                             ),
                             MRD
                         ),
                         end.getNanosecond() - start.getNanosecond()
-                     );
+                    );
             }
 
             switch (this.unit) {
@@ -2729,6 +2741,124 @@ public final class Moment
                     return tsp.atUTC().plus(event.getShift(), SECONDS);
                 }
             }
+
+            return null;
+
+        }
+
+    }
+
+    private static class PrecisionRule
+        implements ElementRule<Moment, TimeUnit> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public TimeUnit getValue(Moment context) {
+
+            int f = context.getNanosecond();
+
+            if (f != 0) {
+                if ((f % MIO) == 0) {
+                    return TimeUnit.MILLISECONDS;
+                } else if ((f % 1000) == 0) {
+                    return TimeUnit.MICROSECONDS;
+                } else {
+                    return TimeUnit.NANOSECONDS;
+                }
+            }
+
+            long secs = context.posixTime;
+
+            if (Math.floorMod(secs, 86400) == 0) {
+                return TimeUnit.DAYS;
+            } else if (Math.floorMod(secs, 3600) == 0) {
+                return TimeUnit.HOURS;
+            } else if (Math.floorMod(secs, 60) == 0) {
+                return TimeUnit.MINUTES;
+            } else {
+                return TimeUnit.SECONDS;
+            }
+
+        }
+
+        @Override
+        public Moment withValue(
+            Moment context,
+            TimeUnit value,
+            boolean lenient
+        ) {
+
+            Moment result;
+
+            switch (value) {
+                case DAYS:
+                    long secsD = Math.floorDiv(context.posixTime, 86400) * 86400;
+                    return Moment.of(secsD, TimeScale.POSIX);
+                case HOURS:
+                    long secsH = Math.floorDiv(context.posixTime, 3600) * 3600;
+                    return Moment.of(secsH, TimeScale.POSIX);
+                case MINUTES:
+                    long secsM = Math.floorDiv(context.posixTime, 60) * 60;
+                    return Moment.of(secsM, TimeScale.POSIX);
+                case SECONDS:
+                    result = Moment.of(context.posixTime, 0, TimeScale.POSIX);
+                    break;
+                case MILLISECONDS:
+                    int f3 = (context.getNanosecond() / MIO) * MIO;
+                    result = Moment.of(context.posixTime, f3, TimeScale.POSIX);
+                    break;
+                case MICROSECONDS:
+                    int f6 = (context.getNanosecond() / 1000) * 1000;
+                    result = Moment.of(context.posixTime, f6, TimeScale.POSIX);
+                    break;
+                case NANOSECONDS:
+                    return context;
+                default:
+                    throw new UnsupportedOperationException(value.name());
+            }
+
+            if (context.isLeapSecond() && LeapSeconds.getInstance().isEnabled()) {
+                return result.plus(1, SI.SECONDS);
+            } else {
+                return result;
+            }
+
+        }
+
+        @Override
+        public boolean isValid(
+            Moment context,
+            TimeUnit value
+        ) {
+
+            return (value != null);
+
+        }
+
+        @Override
+        public TimeUnit getMinimum(Moment context) {
+
+            return TimeUnit.DAYS;
+
+        }
+
+        @Override
+        public TimeUnit getMaximum(Moment context) {
+
+            return TimeUnit.NANOSECONDS;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(Moment context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(Moment context) {
 
             return null;
 
