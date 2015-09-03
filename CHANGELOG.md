@@ -1,4 +1,17 @@
-## [v3.7] not yet released
+## [v3.8] not yet released
+
+## [v3.7] published on 2015-09-03
+### Added
+- New method IntervalCollection.getRange() [#344]
+- PrettyTime.printRelativeOrDate() using PlainDate [#343]
+- Moment-class with a new precision element [#342]
+- Add plus/minus-operators for IntervalCollection [#339]
+
+### Fixed
+- Fix for generics-related problem in PatternType [#346]
+
+### Changed
+- IntervalCollection.union() should create a merged collection [#338]
 
 ## [v3.6] published on 2015-08-31
 ### Added
