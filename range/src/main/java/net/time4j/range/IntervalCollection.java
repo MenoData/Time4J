@@ -349,6 +349,47 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     }
 
     /**
+     * <p>Yields the full min-max-range of this instance. </p>
+     *
+     * @return  minimum range interval spanning over all enclosed intervals
+     * @since   3.7/4.5
+     */
+    /*[deutsch]
+     * <p>Liefert den vollen min-max-Bereich dieser Instanz. </p>
+     *
+     * @return  minimum range interval spanning over all enclosed intervals
+     * @since   3.7/4.5
+     */
+    public ChronoInterval<T> getRange() {
+
+        Boundary<T> start = Boundary.infinitePast();
+        Boundary<T> end = Boundary.infiniteFuture();
+
+        T min = this.getMinimum();
+        T max = this.getMaximum();
+
+        if (min != null) {
+            start = Boundary.ofClosed(min);
+        }
+
+        if (max != null) {
+            if (this.isCalendrical()) {
+                end = Boundary.ofClosed(max);
+            } else {
+                T max2 = this.getTimeLine().stepForward(max);
+                if (max2 != null) {
+                    end = Boundary.ofOpen(max2);
+                } else {
+                    end = Boundary.ofClosed(max);
+                }
+            }
+        }
+
+        return this.newInterval(start, end);
+
+    }
+
+    /**
      * <p>Adds the given interval to this interval collection. </p>
      *
      * @param   interval    the new interval to be added

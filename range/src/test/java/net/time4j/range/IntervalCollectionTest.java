@@ -891,4 +891,64 @@ public class IntervalCollectionTest {
         assertThat(a.union(b).getIntervals(), is(c.getIntervals()));
     }
 
+    @Test
+    public void getRange1() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval range =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis().plus(i1).plus(i2);
+
+        assertThat(coll.getRange(), is(range));
+    }
+
+    @Test
+    public void getRange2() {
+        DateInterval i1 = DateInterval.until(PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval range =
+            DateInterval.until(PlainDate.of(2014, 6, 1));
+        IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis().plus(i1).plus(i2);
+
+        assertThat(coll.getRange(), is(range));
+    }
+
+    @Test
+    public void getRange3() {
+        DateInterval i1 = DateInterval.until(PlainDate.of(2014, 5, 31));
+        DateInterval i2 = DateInterval.since(PlainDate.of(2014, 4, 30));
+        IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis().plus(i1).plus(i2);
+        ChronoInterval<PlainDate> range = coll.getRange();
+
+        assertThat(range.isFinite(), is(false));
+        assertThat(range.getStart().isInfinite(), is(true));
+        assertThat(range.getEnd().isInfinite(), is(true));
+    }
+
+    @Test
+    public void getRange4() {
+        TimestampInterval i1 = TimestampInterval.until(PlainTimestamp.of(2014, 5, 31, 17, 45));
+        TimestampInterval i2 =
+            TimestampInterval.between(
+                PlainTimestamp.of(2014, 4, 30, 0, 0),
+                PlainTimestamp.of(2014, 6, 1, 2, 30));
+        TimestampInterval range =
+            TimestampInterval.until(PlainTimestamp.of(2014, 6, 1, 2, 30));
+        IntervalCollection<PlainTimestamp> coll = IntervalCollection.onTimestampAxis().plus(i1).plus(i2);
+
+        assertThat(coll.getRange(), is(range));
+        assertThat(coll.getRange().getEnd().isOpen(), is(true));
+    }
+
 }
