@@ -1,4 +1,6 @@
 ## [v3.8] not yet released
+### Added
+- New intersect-operator for interval collections [#345]
 
 ## [v3.7] published on 2015-09-03
 ### Added
