@@ -951,4 +951,31 @@ public class IntervalCollectionTest {
         assertThat(coll.getRange().getEnd().isOpen(), is(true));
     }
 
+    @Test
+    public void intersect() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 3, 1),
+                PlainDate.of(2014, 3, 31));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 15),
+                PlainDate.of(2014, 6, 1));
+        DateInterval intersection1 = i2;
+        DateInterval intersection2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 15),
+                PlainDate.of(2014, 5, 31));
+        IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
+        IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2).plus(i3);
+        Object ic1 = a.intersect(b);
+        Object ic2 = IntervalCollection.onDateAxis().plus(intersection1).plus(intersection2);
+
+        assertThat(ic1, is(ic2));
+    }
+
 }
