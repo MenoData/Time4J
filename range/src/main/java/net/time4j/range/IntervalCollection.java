@@ -958,57 +958,9 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         if (len < 2) {
             return this;
+        } else {
+            return this.create(this.intersect(this.intervals));
         }
-
-        T latestStart = this.intervals.get(len - 1).getStart().getTemporal();
-        T earliestEnd = null;
-
-        for (int i = 0; i < len; i++) {
-            Boundary<T> b = this.intervals.get(i).getEnd();
-            T candidate = b.getTemporal();
-
-            if (b.isInfinite()) {
-                continue;
-            } else if (this.isCalendrical()) {
-                if (b.isOpen()) {
-                    candidate = this.getTimeLine().stepBackwards(candidate);
-                }
-            } else if (b.isClosed()) {
-                candidate = this.getTimeLine().stepForward(candidate);
-                if (candidate == null) {
-                    continue;
-                }
-            }
-
-            if (
-                (earliestEnd == null)
-                || candidate.isBefore(earliestEnd)
-            ) {
-                earliestEnd = candidate;
-            }
-        }
-
-        if (earliestEnd == null) {
-            Boundary<T> s = this.createStartBoundary(latestStart);
-            Boundary<T> e = Boundary.infiniteFuture();
-            ChronoInterval<T> interval = this.newInterval(s, e);
-            return this.create(Collections.singletonList(interval));
-        } else if (this.isCalendrical()) {
-            if (!earliestEnd.isBefore(latestStart)) {
-                Boundary<T> s = this.createStartBoundary(latestStart);
-                Boundary<T> e = Boundary.ofClosed(earliestEnd);
-                ChronoInterval<T> interval = this.newInterval(s, e);
-                return this.create(Collections.singletonList(interval));
-            }
-        } else if (earliestEnd.isAfter(latestStart)) {
-            Boundary<T> s = this.createStartBoundary(latestStart);
-            Boundary<T> e = Boundary.ofOpen(earliestEnd);
-            ChronoInterval<T> interval = this.newInterval(s, e);
-            return this.create(Collections.singletonList(interval));
-        }
-
-        List<ChronoInterval<T>> zero = Collections.emptyList();
-        return this.create(zero);
 
     }
 
@@ -1034,6 +986,47 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     public IntervalCollection<T> union(IntervalCollection<T> other) {
 
         return this.plus(other).withBlocks();
+
+    }
+
+    /**
+     * <p>Determines the intersection. </p>
+     *
+     * @param   other       another interval collection
+     * @return  new interval collection with disjunct blocks containing all time points in both interval collections
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Ermittelt die gemeinsame Schnittmenge. </p>
+     *
+     * @param   other       another interval collection
+     * @return  new interval collection with disjunct blocks containing all time points in both interval collections
+     * @since   3.8/4.5
+     */
+    public IntervalCollection intersect(IntervalCollection<T> other) {
+
+        if (this.isEmpty() || other.isEmpty()) {
+            List<ChronoInterval<T>> zero = Collections.emptyList();
+            return this.create(zero);
+        }
+
+        List<ChronoInterval<T>> list = new ArrayList<>();
+
+        for (ChronoInterval<T> a : this.intervals) {
+            for (ChronoInterval<T> b : other.intervals) {
+                List<ChronoInterval<T>> candidates = new ArrayList<ChronoInterval<T>>(2);
+                candidates.add(a);
+                candidates.add(b);
+                Collections.sort(candidates, this.getComparator());
+                candidates = this.intersect(candidates);
+                if (!candidates.isEmpty()) {
+                    list.addAll(candidates);
+                }
+            }
+        }
+
+        Collections.sort(list, this.getComparator());
+        return this.create(list).withBlocks();
 
     }
 
@@ -1255,6 +1248,67 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
             Boundary<T> bs = Boundary.ofClosed(start);
             gaps.add(this.newInterval(bs, be));
+        }
+
+    }
+
+    private List<ChronoInterval<T>> intersect(List<ChronoInterval<T>> components) {
+
+        int len = components.size();
+
+        if (len < 2) {
+            return components;
+        }
+
+        T latestStart = components.get(len - 1).getStart().getTemporal();
+        T earliestEnd = null;
+
+        for (int i = 0; i < len; i++) {
+            Boundary<T> b = components.get(i).getEnd();
+            T candidate = b.getTemporal();
+
+            if (b.isInfinite()) {
+                continue;
+            } else if (this.isCalendrical()) {
+                if (b.isOpen()) {
+                    candidate = this.getTimeLine().stepBackwards(candidate);
+                }
+            } else if (b.isClosed()) {
+                candidate = this.getTimeLine().stepForward(candidate);
+                if (candidate == null) {
+                    continue;
+                }
+            }
+
+            if (
+                (earliestEnd == null)
+                || candidate.isBefore(earliestEnd)
+            ) {
+                earliestEnd = candidate;
+            }
+        }
+
+        Boundary<T> s = null;
+        Boundary<T> e = null;
+
+        if (earliestEnd == null) {
+            s = this.createStartBoundary(latestStart);
+            e = Boundary.infiniteFuture();
+        } else if (this.isCalendrical()) {
+            if (!earliestEnd.isBefore(latestStart)) {
+                s = this.createStartBoundary(latestStart);
+                e = Boundary.ofClosed(earliestEnd);
+            }
+        } else if (earliestEnd.isAfter(latestStart)) {
+            s = this.createStartBoundary(latestStart);
+            e = Boundary.ofOpen(earliestEnd);
+        }
+
+        if ((s == null) || (e == null)) {
+            return Collections.emptyList();
+        } else {
+            ChronoInterval<T> interval = this.newInterval(s, e);
+            return Collections.singletonList(interval);
         }
 
     }
