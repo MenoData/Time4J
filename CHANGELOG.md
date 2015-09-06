@@ -1,5 +1,6 @@
 ## [v4.5] not yet released
 ### Added
+- New intersect-operator for interval collections [#345]
 - New method IntervalCollection.getRange() [#344]
 - PrettyTime.printRelativeOrDate() using PlainDate [#343]
 - Moment-class with a new precision element [#342]
