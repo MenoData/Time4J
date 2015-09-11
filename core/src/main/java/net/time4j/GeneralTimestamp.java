@@ -33,6 +33,9 @@ import net.time4j.tz.ZonalOffset;
 /**
  * <p>Represents a general timestamp consisting of a general date and a 24-hour-clock time. </p>
  *
+ * <p>Note: This class is only relevant for non-gregorian use-cases. Most users will use {@link PlainTimestamp}
+ * instead. </p>
+ *
  * @param   <C> generic type of date component
  * @author  Meno Hochschild
  * @since   3.8/4.5
@@ -40,6 +43,9 @@ import net.time4j.tz.ZonalOffset;
 /*[deutsch]
  * <p>Repr&auml;sentiert einen allgemeinen Zeitstempel, der aus einem allgemeinen Datum und einer 24-Stunden-Uhrzeit
  * zusammengesetzt ist. </p>
+ *
+ * <p>Hinweis: Diese Klasse ist nur f&uuml;r nicht-gregorianische Anwendungsf&auuml;lle von Belang. Die meisten
+ * Anwender werden stattdessen {@link PlainTimestamp} nutzen. </p>
  *
  * @param   <C> generic type of date component
  * @author  Meno Hochschild
