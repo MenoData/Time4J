@@ -1,5 +1,6 @@
 ## [v4.5] not yet released
 ### Added
+- New calendar-related class GeneralTimestamp [#340]
 - New intersect-operator for interval collections [#345]
 - New method IntervalCollection.getRange() [#344]
 - PrettyTime.printRelativeOrDate() using PlainDate [#343]
@@ -7,6 +8,7 @@
 - Add plus/minus-operators for IntervalCollection [#339]
 
 ### Changed
+- Two specialized now()-methods in ZonalClock changed the return type [#340]
 - IntervalCollection.union() should create a merged collection [#338]
 
 ## [v4.4] published on 2015-08-31
