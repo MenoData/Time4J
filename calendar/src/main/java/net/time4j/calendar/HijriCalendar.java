@@ -21,9 +21,9 @@
 
 package net.time4j.calendar;
 
-import net.time4j.ClockUnit;
+import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
-import net.time4j.PlainTimestamp;
+import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
@@ -762,6 +762,61 @@ public final class HijriCalendar
 
     }
 
+    /**
+     * <p>Creates a new local timestamp with this date and given wall time. </p>
+     *
+     * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
+     * then the resulting timestamp will automatically be normalized such
+     * that the timestamp will contain the following day instead. </p>
+     *
+     * @param   time    wall time
+     * @return  general timestamp as composition of this date and given time
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen allgemeinen Zeitstempel mit diesem Datum und der angegebenen Uhrzeit. </p>
+     *
+     * <p>Wenn {@link PlainTime#midnightAtEndOfDay() T24:00} angegeben wird,
+     * dann wird der Zeitstempel automatisch so normalisiert, da&szlig; er auf
+     * den n&auml;chsten Tag verweist. </p>
+     *
+     * @param   time    wall time
+     * @return  general timestamp as composition of this date and given time
+     * @since   3.8/4.5
+     */
+    public GeneralTimestamp<HijriCalendar> at(PlainTime time) {
+
+        return GeneralTimestamp.of(this, time);
+
+    }
+
+    /**
+     * <p>Is equivalent to {@code at(PlainTime.of(hour, minute))}. </p>
+     *
+     * @param   hour        hour of day in range (0-24)
+     * @param   minute      minute of hour in range (0-59)
+     * @return  general timestamp as composition of this date and given time
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Entspricht {@code at(PlainTime.of(hour, minute))}. </p>
+     *
+     * @param   hour        hour of day in range (0-24)
+     * @param   minute      minute of hour in range (0-59)
+     * @return  general timestamp as composition of this date and given time
+     * @throws  IllegalArgumentException if any argument is out of range
+     * @since   3.8/4.5
+     */
+    public GeneralTimestamp<HijriCalendar> atTime(
+        int hour,
+        int minute
+    ) {
+
+        return this.at(PlainTime.of(hour, minute));
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -1288,10 +1343,7 @@ public final class HijriCalendar
             }
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
-            PlainTimestamp tsp = Moment.from(clock.currentTime()).toZonalTimestamp(tzid);
-            int deviation = startOfDay.getDeviation(tsp.getCalendarDate(), tzid);
-            tsp = tsp.minus(deviation, ClockUnit.SECONDS);
-            return tsp.getCalendarDate().transform(HijriCalendar.class, variant);
+            return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, variant, tzid, startOfDay).toDate();
 
         }
 

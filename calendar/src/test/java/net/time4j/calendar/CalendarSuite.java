@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriOperatorTest.class,
         HijriPatternTest.class,
         MonthNameTest.class,
+        StartOfDayTest.class,
         UmalquraDataTest.class
     }
 )

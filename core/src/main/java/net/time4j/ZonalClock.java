@@ -259,7 +259,12 @@ public final class ZonalClock {
         T result = chronology.createFrom(this.timeSource, attrs);
 
         if (result == null) {
-            throw new IllegalArgumentException("Calendar variant required: " + chronology.getChronoType().getName());
+            Class<?> type = chronology.getChronoType();
+            if (CalendarVariant.class.isAssignableFrom(type)) {
+                throw new IllegalArgumentException("Calendar variant required: " + type.getName());
+            } else {
+                throw new IllegalArgumentException("Insufficient data: " + type.getName());
+            }
         } else {
             return result;
         }
@@ -280,7 +285,8 @@ public final class ZonalClock {
      *      CLOCK.now(
      *          HijriCalendar.family(),
      *          HijriCalendar.VARIANT_UMALQURA,
-     *          StartOfDay.EVENING);
+     *          StartOfDay.EVENING)
+     *      .toDate();
      *     System.out.println(hijriDate); // AH-1436-10-02[islamic-umalqura]
      * </pre>
      *
@@ -288,13 +294,13 @@ public final class ZonalClock {
      * normally map to AH-1436-10-01 (if the clock time is not considered). Reason is that the islamic
      * day starts on the evening of the previous day. </p>
      *
-     * @param   <T> generic type of chronology
-     * @param   chronology  chronology to be used
+     * @param   <C> generic type of chronology
+     * @param   family      calendar family to be used
      * @param   variant     calendar variant
      * @param   startOfDay  start of calendar day
-     * @return  current local timestamp or date in given chronology
+     * @return  current general timestamp in given chronology
      * @throws  IllegalArgumentException if given variant is not supported
-     * @since   3.5/4.3
+     * @since   3.8/4.5
      */
     /*[deutsch]
      * <p>Ermittelt die aktuelle Zeit in der assoziierten Zeitzone und angegebenen Chronologie unter
@@ -310,7 +316,8 @@ public final class ZonalClock {
      *      CLOCK.now(
      *          HijriCalendar.family(),
      *          HijriCalendar.VARIANT_UMALQURA,
-     *          StartOfDay.EVENING);
+     *          StartOfDay.EVENING)
+     *      .toDate();
      *     System.out.println(hijriDate); // AH-1436-10-02[islamic-umalqura]
      * </pre>
      *
@@ -318,73 +325,57 @@ public final class ZonalClock {
      * welcher normalerweise auf das islamische Datum AH-1436-10-01 abgebildet wird (wenn die Uhrzeit nicht
      * betrachtet wird), denn der islamische Tag beginnt am Abend des Vortags. </p>
      *
-     * @param   <T> generic type of chronology
-     * @param   chronology  chronology to be used
+     * @param   <C> generic type of chronology
+     * @param   family      calendar family to be used
      * @param   variant     calendar variant
      * @param   startOfDay  start of calendar day
-     * @return  current local timestamp or date in given chronology
+     * @return  current general timestamp in given chronology
      * @throws  IllegalArgumentException if given variant is not supported
-     * @since   3.5/4.3
+     * @since   3.8/4.5
      */
-    public <T extends CalendarVariant<T>> T now(
-        CalendarFamily<T> chronology,
+    public <C extends CalendarVariant<C>> GeneralTimestamp<C> now(
+        CalendarFamily<C> family,
         String variant,
         StartOfDay startOfDay
     ) {
 
-        if (variant == null) {
-            throw new NullPointerException("Missing calendar variant.");
-        } else if (startOfDay == null) {
-            throw new NullPointerException("Missing start of day.");
-        }
-
         Timezone tz = (this.timezone == null) ? Timezone.ofSystem() : this.timezone;
-        Attributes attrs =
-            new Attributes.Builder()
-                .setTimezone(tz.getID())
-                .setCalendarVariant(variant)
-                .setStartOfDay(startOfDay).build();
-        T result = chronology.createFrom(this.timeSource, attrs);
-
-        if (result == null) {
-            throw new IllegalArgumentException("Unknown calendar variant: " + variant);
-        } else {
-            return result;
-        }
+        Moment moment = Moment.from(this.timeSource.currentTime());
+        return moment.toGeneralTimestamp(family, variant, tz.getID(), startOfDay);
 
     }
 
     /**
      * <p>Equivalent to {@code now(chronology, variantSource.getVariant(), startOfDay)}. </p>
      *
-     * @param   <T> generic type of chronology
-     * @param   chronology      chronology to be used
+     * @param   <C> generic type of chronology
+     * @param   family          calendar family to be used
      * @param   variantSource   source of calendar variant
      * @param   startOfDay      start of calendar day
      * @return  current local timestamp or date in given chronology
      * @throws  IllegalArgumentException if given variant is not supported
      * @see     #now(CalendarFamily, String, StartOfDay)
-     * @since   3.6/4.4
+     * @since   3.8/4.5
      */
     /*[deutsch]
      * <p>&Auml;quivalent to {@code now(chronology, variantSource.getVariant(), startOfDay)}. </p>
      *
-     * @param   <T> generic type of chronology
-     * @param   chronology      chronology to be used
+     * @param   <C> generic type of chronology
+     * @param   family          calendar family to be used
      * @param   variantSource   source of calendar variant
      * @param   startOfDay      start of calendar day
      * @return  current local timestamp or date in given chronology
      * @throws  IllegalArgumentException if given variant is not supported
      * @see     #now(CalendarFamily, String, StartOfDay)
-     * @since   3.6/4.4
+     * @since   3.8/4.5
      */
-    public <T extends CalendarVariant<T>> T now(
-        CalendarFamily<T> chronology,
+    public <C extends CalendarVariant<C>> GeneralTimestamp<C> now(
+        CalendarFamily<C> family,
         VariantSource variantSource,
         StartOfDay startOfDay
     ) {
 
-        return this.now(chronology, variantSource.getVariant(), startOfDay);
+        return this.now(family, variantSource.getVariant(), startOfDay);
 
     }
 

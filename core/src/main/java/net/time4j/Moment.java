@@ -26,6 +26,9 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarFamily;
+import net.time4j.engine.CalendarVariant;
+import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -35,6 +38,7 @@ import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeLine;
@@ -766,6 +770,81 @@ public final class Moment
     public PlainTimestamp toZonalTimestamp(String tzid) {
 
         return this.in(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Converts this instance to a general timestamp in given timezone. </p>
+     *
+     * @param   chronology      chronology of date component
+     * @param   tzid            timezone id
+     * @param   startOfDay      start of day
+     * @return  general timestamp in given timezone (leap seconds will always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Wandelt diese Instanz in einen allgemeinen Zeitstempel um. </p>
+     *
+     * @param   chronology      chronology of date component
+     * @param   tzid            timezone id
+     * @param   startOfDay      start of day
+     * @return  general timestamp in given timezone (leap seconds will always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   3.8/4.5
+     */
+    public <C extends Calendrical<?, C>> GeneralTimestamp<C> toGeneralTimestamp(
+        Chronology<C> chronology,
+        TZID tzid,
+        StartOfDay startOfDay
+    ) {
+
+        PlainTimestamp tsp = this.toZonalTimestamp(tzid);
+        PlainTime time = tsp.getWallTime();
+        int deviation = startOfDay.getDeviation(tsp.getCalendarDate(), tzid);
+        tsp = tsp.minus(deviation, ClockUnit.SECONDS);
+        C date = tsp.getCalendarDate().transform(chronology.getChronoType());
+        return GeneralTimestamp.of(date, time);
+
+    }
+
+    /**
+     * <p>Converts this instance to a general timestamp in given timezone. </p>
+     *
+     * @param   family          calendar family for date component
+     * @param   variant         variant of date component
+     * @param   tzid            timezone id
+     * @param   startOfDay      start of day
+     * @return  general timestamp in given timezone (leap seconds will always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  ChronoException if given variant is not recognized
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Wandelt diese Instanz in einen allgemeinen Zeitstempel um. </p>
+     *
+     * @param   family          calendar family for date component
+     * @param   variant         variant of date component
+     * @param   tzid            timezone id
+     * @param   startOfDay      start of day
+     * @return  general timestamp in given timezone (leap seconds will always be lost)
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  ChronoException if given variant is not recognized
+     * @since   3.8/4.5
+     */
+    public <C extends CalendarVariant<C>> GeneralTimestamp<C> toGeneralTimestamp(
+        CalendarFamily<C> family,
+        String variant,
+        TZID tzid,
+        StartOfDay startOfDay
+    ) {
+
+        PlainTimestamp tsp = this.toZonalTimestamp(tzid);
+        PlainTime time = tsp.getWallTime();
+        int deviation = startOfDay.getDeviation(tsp.getCalendarDate(), tzid);
+        tsp = tsp.minus(deviation, ClockUnit.SECONDS);
+        C date = tsp.getCalendarDate().transform(family.getChronoType(), variant);
+        return GeneralTimestamp.of(date, time);
 
     }
 
