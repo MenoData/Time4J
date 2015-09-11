@@ -42,7 +42,7 @@ public class ClockTest {
     public void startAtMidnight() {
         assertThat(
             CLOCK.now(HijriCalendar.family(), HijriCalendar.VARIANT_UMALQURA, StartOfDay.MIDNIGHT).toString(),
-            is("AH-1436-10-01[islamic-umalqura]"));
+            is("AH-1436-10-01[islamic-umalqura]T18:01"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ClockTest {
                 HijriCalendar.VARIANT_UMALQURA,
                 StartOfDay.ofFixedDeviation(-21600 + 60)
             ).toString(),
-            is("AH-1436-10-02[islamic-umalqura]"));
+            is("AH-1436-10-02[islamic-umalqura]T18:01"));
     }
 
 }
