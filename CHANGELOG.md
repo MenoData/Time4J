@@ -1,5 +1,6 @@
 ## [v4.5] not yet released
 ### Added
+- Make PatternType.CLDR useable for non-iso-dates [#348]
 - New calendar-related class GeneralTimestamp [#340]
 - New intersect-operator for interval collections [#345]
 - New method IntervalCollection.getRange() [#344]
