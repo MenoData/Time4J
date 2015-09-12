@@ -35,6 +35,7 @@ public class HijriPatternTest {
 
     private HijriCalendar umalqura;
     private ChronoFormatter<HijriCalendar> formatter;
+    private ChronoFormatter<HijriCalendar> cldrFormatter;
     private String text;
 
     public HijriPatternTest(
@@ -52,6 +53,11 @@ public class HijriPatternTest {
                 .addPattern(pattern, PatternType.NON_ISO_DATE).build()
                 .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
                 .with(Attributes.PIVOT_YEAR, 1500);
+        this.cldrFormatter =
+            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
+                .addPattern(pattern, PatternType.CLDR).build()
+                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
+                .with(Attributes.PIVOT_YEAR, 1500);
         this.text = text;
     }
 
@@ -60,12 +66,18 @@ public class HijriPatternTest {
         assertThat(
             this.formatter.format(this.umalqura),
             is(this.text));
+        assertThat(
+            this.cldrFormatter.format(this.umalqura),
+            is(this.text));
     }
 
     @Test
     public void parse() throws ParseException {
         assertThat(
             this.formatter.parse(this.text),
+            is(this.umalqura));
+        assertThat(
+            this.cldrFormatter.parse(this.text),
             is(this.umalqura));
     }
 
