@@ -26,8 +26,11 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
+import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
@@ -62,12 +65,14 @@ public enum PatternType
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>This standard pattern is applicable on all ISO-chronologies and follows the standard
+     * <p>This standard pattern is applicable on many chronologies and follows the standard
      * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a> of unicode-consortium. </p>
      *
      * <p>If not explicitly stated otherwise the count of symbols always
      * controls the minimum count of digits in case of a numerical element.
      * Is an element shorter then the zero digit will be used for padding. </p>
+     *
+     * <p>Non-ISO-chronologies are also supported if their elements define CLDR-symbols. </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -287,7 +292,7 @@ public enum PatternType
      * </div>
      */
     /*[deutsch]
-     * <p>Dieses Standardmuster ist auf alle ISO-Chronologien anwendbar und folgt der Norm
+     * <p>Dieses Standardmuster ist auf viele Chronologien anwendbar und folgt der Norm
      * <a href="http://www.unicode.org/reports/tr35/tr35-dates.html">LDML</a>
      * des Unicode-Konsortiums. </p>
      *
@@ -295,6 +300,8 @@ public enum PatternType
      * immer die minimale Anzahl der zu formatierenden Stellen, ein numerisches
      * Element vorausgesetzt. Ist also ein Element in der Darstellung
      * k&uuml;rzer, dann wird mit der Null-Ziffer aufgef&uuml;llt. </p>
+     *
+     * <p>Nicht-ISO-Chronologien werden auch unterst&uuml;tzt, wenn ihre Elemente CLDR-Symbole definieren. </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -530,8 +537,8 @@ public enum PatternType
      * {@link java.text.SimpleDateFormat}, which is very near, but not
      * exactly the same as CLDR. </p>
      *
-     * <p>The permitted count of digits is usually unlimited. Deviations
-     * from {@link #CLDR}: </p>
+     * <p>The permitted count of digits is usually unlimited. This pattern style is only applicable on
+     * ISO-compatible chronologies. Other deviations from {@link #CLDR}: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -621,8 +628,8 @@ public enum PatternType
      * {@link java.text.SimpleDateFormat}, die sich stark, aber
      * nicht exakt an CLDR orientiert. </p>
      *
-     * <p>Die erlaubte Anzahl der Symbole ist in der Regel nach oben offen.
-     * Unterschiede zu {@link #CLDR}: </p>
+     * <p>Die erlaubte Anzahl der Symbole ist in der Regel nach oben offen. Dieser Musterstil ist nur auf
+     * ISO-Chronologien anwendbar. Andere Unterschiede zu {@link #CLDR}: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -935,12 +942,15 @@ public enum PatternType
 
         switch (this) {
             case CLDR:
-                return cldr(builder, locale, symbol, count, false);
+                return cldr(builder, locale, symbol, count);
             case SIMPLE_DATE_FORMAT:
                 return sdf(builder, locale, symbol, count);
             case CLDR_24:
-                return cldr24(builder, locale, symbol, count, false);
+                return cldr24(builder, locale, symbol, count);
             case NON_ISO_DATE:
+                if (isISO(builder.getChronology())) {
+                    throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
+                }
                 return general(builder, symbol, count);
             default:
                 throw new UnsupportedOperationException(this.name());
@@ -948,7 +958,49 @@ public enum PatternType
 
     }
 
+    private static boolean isGeneralSymbol(char symbol) {
+
+        switch (symbol) {
+            case 'D':
+            case 'E':
+            case 'G':
+            case 'L':
+            case 'M':
+            case 'd':
+            case 'y':
+                return true;
+            default:
+                return false;
+        }
+
+    }
+
+    private static boolean isISO(Chronology<?> chronology) {
+
+        CalendarType ctype = chronology.getChronoType().getAnnotation(CalendarType.class);
+        return ((ctype == null) || ctype.value().equals(CalendarText.ISO_CALENDAR_TYPE));
+
+    }
+
     private Map<ChronoElement<?>, ChronoElement<?>> cldr(
+        ChronoFormatter.Builder<?> builder,
+        Locale locale,
+        char symbol,
+        int count
+    ) {
+
+        if (
+            isGeneralSymbol(symbol)
+            && !isISO(builder.getChronology())
+        ) {
+            return this.general(builder, symbol, count);
+        } else {
+            return this.cldrISO(builder, locale, symbol, count, false);
+        }
+
+    }
+
+    private Map<ChronoElement<?>, ChronoElement<?>> cldrISO(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
@@ -1086,7 +1138,7 @@ public enum PatternType
                     builder.addFixedNumerical(
                         Weekmodel.of(locale).localDayOfWeek(), count);
                 } else {
-                    cldr(builder, locale, 'E', count, sdf);
+                    cldrISO(builder, locale, 'E', count, sdf);
                 }
                 break;
             case 'c':
@@ -1101,7 +1153,7 @@ public enum PatternType
                         builder.addFixedNumerical(
                             Weekmodel.of(locale).localDayOfWeek(), 1);
                     } else {
-                        cldr(builder, locale, 'E', count, sdf);
+                        cldrISO(builder, locale, 'E', count, sdf);
                     }
                 } finally {
                     builder.endSection();
@@ -1245,9 +1297,9 @@ public enum PatternType
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
                 }
-                return cldr(builder, locale, 'X', count, true);
+                return cldrISO(builder, locale, 'X', count, true);
             default:
-                return cldr(builder, locale, symbol, count, true);
+                return cldrISO(builder, locale, symbol, count, true);
         }
 
         return Collections.emptyMap();
@@ -1258,16 +1310,15 @@ public enum PatternType
         ChronoFormatter.Builder<?> builder,
         Locale locale,
         char symbol,
-        int count,
-        boolean sdf
+        int count
     ) {
 
         if (symbol == 'H') {
-            addNumber(PlainTime.ISO_HOUR, builder, count, sdf);
+            addNumber(PlainTime.ISO_HOUR, builder, count, false);
             return Collections.emptyMap();
         }
 
-        return cldr(builder, locale, symbol, count, sdf);
+        return cldr(builder, locale, symbol, count);
 
     }
 
