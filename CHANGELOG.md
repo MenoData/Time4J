@@ -1,5 +1,6 @@
 ## [v4.5] not yet released
 ### Added
+- New XOR-operator for interval collections [#347]
 - Make PatternType.CLDR useable for non-iso-dates [#348]
 - New calendar-related class GeneralTimestamp [#340]
 - New intersect-operator for interval collections [#345]
