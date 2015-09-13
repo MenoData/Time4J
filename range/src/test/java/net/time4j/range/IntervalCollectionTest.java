@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import net.time4j.scale.TimeScale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -975,6 +978,35 @@ public class IntervalCollectionTest {
         IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(intersection1).plus(intersection2);
 
         assertThat(a.intersect(b), is(c));
+    }
+
+    @Test
+    public void xor() {
+        Moment d0 = Moment.of(0, TimeScale.POSIX);
+        Moment d1 = Moment.of(1, TimeScale.POSIX);
+        Moment d2 = Moment.of(2, TimeScale.POSIX);
+        Moment d3 = Moment.of(3, TimeScale.POSIX);
+        Moment d4 = Moment.of(4, TimeScale.POSIX);
+        Moment d5 = Moment.of(5, TimeScale.POSIX);
+        Moment d6 = Moment.of(6, TimeScale.POSIX);
+        Moment d7 = Moment.of(7, TimeScale.POSIX);
+
+        MomentInterval i1 = MomentInterval.between(d0, d2);
+        MomentInterval i2 = MomentInterval.between(d3, d6);
+        IntervalCollection<Moment> a = IntervalCollection.onMomentAxis().plus(i1).plus(i2);
+
+        MomentInterval i3 = MomentInterval.between(d1, d4);
+        MomentInterval i4 = MomentInterval.between(d5, d7);
+        IntervalCollection<Moment> b = IntervalCollection.onMomentAxis().plus(i3).plus(i4);
+
+        IntervalCollection<Moment> result = a.xor(b);
+        IntervalCollection<Moment> expected =
+            IntervalCollection.onMomentAxis()
+                .plus(MomentInterval.between(d0, d1))
+                .plus(MomentInterval.between(d2, d3))
+                .plus(MomentInterval.between(d4, d5))
+                .plus(MomentInterval.between(d6, d7));
+        assertThat(result, is(expected));
     }
 
 }
