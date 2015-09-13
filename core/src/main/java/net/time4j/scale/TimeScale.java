@@ -76,7 +76,7 @@ public enum TimeScale {
      * explicitly states however that the relation between the current day
      * time and the current POSIX-value is not specified and dependent on
      * the implementation. Time4J maps the leap second to the current day
-     * as the last second. This corresponds to an UNXI-variation where a
+     * as the last second. This corresponds to an UNIX-variation where a
      * clock is reset at the begin of a leap second instead of at the end
      * of a leap second. </p>
      */
