@@ -888,11 +888,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
         Boundary<T> e;
 
         boolean calendrical = this.isCalendrical();
-        IntervalEdge edge = (
-            calendrical
-            ? IntervalEdge.CLOSED
-            : IntervalEdge.OPEN);
-
+        IntervalEdge edge = (calendrical ? IntervalEdge.CLOSED : IntervalEdge.OPEN);
         List<ChronoInterval<T>> gaps = this.withGaps().intervals;
         List<ChronoInterval<T>> blocks = new ArrayList<ChronoInterval<T>>();
         T start = this.getMinimum();
@@ -1005,7 +1001,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @return  new interval collection with disjunct blocks containing all time points in both interval collections
      * @since   3.8/4.5
      */
-    public IntervalCollection intersect(IntervalCollection<T> other) {
+    public IntervalCollection<T> intersect(IntervalCollection<T> other) {
 
         if (this.isEmpty() || other.isEmpty()) {
             List<ChronoInterval<T>> zero = Collections.emptyList();
@@ -1027,6 +1023,77 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             }
         }
 
+        Collections.sort(list, this.getComparator());
+        return this.create(list).withBlocks();
+
+    }
+
+    /**
+     * <p>Determines the difference which holds all time points either in this <i>xor</i> the other collection. </p>
+     *
+     * @param   other       another interval collection
+     * @return  new interval collection with disjunct blocks containing all time points which are in only one
+     *          of both interval collections
+     * @since   3.8/4.5
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Differenz, die alle Zeitpunkte entweder in dieser oder in der anderen enth&auml;lt. </p>
+     *
+     * @param   other       another interval collection
+     * @return  new interval collection with disjunct blocks containing all time points which are in only one
+     *          of both interval collections
+     * @since   3.8/4.5
+     */
+    public IntervalCollection<T> xor(IntervalCollection<T> other) {
+
+        if (this.isEmpty()) {
+            return other;
+        } else if (other.isEmpty()) {
+            return this;
+        }
+
+        T min1 = this.getMinimum();
+        T max1 = this.getMaximum();
+        T min2 = other.getMinimum();
+        T max2 = other.getMaximum();
+
+        T min;
+        T max;
+
+        if ((min1 == null) || (min2 == null)) {
+            min = null;
+        } else {
+            min = (min1.isAfter(min2) ? min2 : min1);
+        }
+
+        if ((max1 == null) || (max2 == null)) {
+            max = null;
+        } else {
+            max = (max1.isBefore(max2) ? max2 : max1);
+        }
+
+        Boundary<T> start = this.createStartBoundary(min);
+        Boundary<T> end;
+
+        if (max == null) {
+            end = Boundary.infiniteFuture();
+        } else if (this.isCalendrical()) {
+            end = Boundary.ofClosed(max);
+        } else {
+            max = this.getTimeLine().stepForward(max);
+            if (max == null) {
+                end = Boundary.infiniteFuture();
+            } else {
+                end = Boundary.ofOpen(max);
+            }
+        }
+
+        ChronoInterval<T> window = this.newInterval(start, end);
+        List<ChronoInterval<T>> list = new ArrayList<ChronoInterval<T>>();
+        IntervalCollection<T> ic1 = this.withComplement(window).intersect(other);
+        IntervalCollection<T> ic2 = other.withComplement(window).intersect(this);
+        list.addAll(ic1.getIntervals());
+        list.addAll(ic2.getIntervals());
         Collections.sort(list, this.getComparator());
         return this.create(list).withBlocks();
 
