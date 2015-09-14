@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -186,8 +187,26 @@ public class CalendricalNamesTest {
         status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.NARROW, outputContext)
-            .parse("m", status, Month.class, toAttributes(true, true));
-        assertThat(value, is(Month.MARCH));
+            .parse("m", status, Month.class, toAttributes(true, false));
+        assertThat(value, nullValue()); // ambivalent - March or May
+
+        status.setIndex(0);
+        value =
+            instance.getStdMonths(TextWidth.NARROW, outputContext)
+            .parse("d", status, Month.class, toAttributes(true, false));
+        assertThat(value, is(Month.DECEMBER));
+
+        status.setIndex(0);
+        value =
+            instance.getStdMonths(TextWidth.WIDE, outputContext)
+            .parse("ju", status, Month.class, toAttributes(true, true));
+        assertThat(value, nullValue()); // ambivalent - June or July
+
+        status.setIndex(0);
+        value =
+            instance.getStdMonths(TextWidth.WIDE, outputContext)
+            .parse("jul", status, Month.class, toAttributes(true, true));
+        assertThat(value, is(Month.JULY));
 
         Locale locale = Locale.JAPAN;
         DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);

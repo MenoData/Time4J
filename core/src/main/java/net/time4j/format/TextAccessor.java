@@ -234,10 +234,7 @@ public final class TextAccessor {
         V candidate = null;
 
         for (int i = 0; i < enums.length; i++) {
-            String s = (
-                (i >= len)
-                ? enums[i].name()
-                : this.textForms.get(i));
+            String s = ((i >= len) ? enums[i].name() : this.textForms.get(i));
             int pos = start;
             int n = s.length();
             boolean eq = true;
@@ -261,16 +258,17 @@ public final class TextAccessor {
                 }
             }
 
-            if (eq) {
+            if (partialCompare || (n == 1)) {
+                if (maxEq < pos - start) {
+                    maxEq = pos - start;
+                    candidate = enums[i];
+                } else if (maxEq == pos - start) {
+                    candidate = null;
+                }
+            } else if (eq) {
                 assert pos == start + n;
                 status.setIndex(pos);
                 return enums[i];
-            } else if (
-                partialCompare
-                && (maxEq < pos - start)
-            ) {
-                maxEq = pos - start;
-                candidate = enums[i];
             }
         }
 
