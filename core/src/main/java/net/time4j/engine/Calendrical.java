@@ -44,7 +44,7 @@ import net.time4j.base.MathUtils;
  */
 public abstract class Calendrical<U, D extends Calendrical<U, D>>
     extends TimePoint<U, D>
-    implements Temporal<Calendrical<?, ?>> {
+    implements CalendarDate {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -190,21 +190,21 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     }
 
     @Override
-    public boolean isBefore(Calendrical<?, ?> date) {
+    public boolean isBefore(CalendarDate date) {
 
         return (this.compareByTime(date) < 0);
 
     }
 
     @Override
-    public boolean isAfter(Calendrical<?, ?> date) {
+    public boolean isAfter(CalendarDate date) {
 
         return (this.compareByTime(date) > 0);
 
     }
 
     @Override
-    public boolean isSimultaneous(Calendrical<?, ?> date) {
+    public boolean isSimultaneous(CalendarDate date) {
 
         return ((this == date) || (this.compareByTime(date) == 0));
 
@@ -225,8 +225,8 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      *
      * @throws  ClassCastException if there are different date types
      * @see     EpochDays#compare(ChronoDisplay, ChronoDisplay)
-     * @see     #isBefore(Calendrical)
-     * @see     #isAfter(Calendrical)
+     * @see     #isBefore(CalendarDate)
+     * @see     #isAfter(CalendarDate)
      */
     /*[deutsch]
      * <p>Definiert eine totale respektive eine nat&uuml;rliche Ordnung. </p>
@@ -243,8 +243,8 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      *
      * @throws  ClassCastException if there are different date types
      * @see     EpochDays#compare(ChronoDisplay, ChronoDisplay)
-     * @see     #isBefore(Calendrical)
-     * @see     #isAfter(Calendrical)
+     * @see     #isBefore(CalendarDate)
+     * @see     #isAfter(CalendarDate)
      */
     @Override
     public int compareTo(D date) {
@@ -271,7 +271,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * must override this method. </p>
      *
      * <p>If an only temporal comparison is required then the method
-     * {@link #isSimultaneous(Calendrical)} is to be used. </p>
+     * {@link #isSimultaneous(CalendarDate)} is to be used. </p>
      *
      * @see     Chronology#getChronoType()
      */
@@ -284,7 +284,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * geeignet &uuml;berschreiben. </p>
      *
      * <p>Soll ein rein zeitlicher Vergleich sichergestellt sein, dann
-     * ist stattdessen die Methode {@link #isSimultaneous(Calendrical)}
+     * ist stattdessen die Methode {@link #isSimultaneous(CalendarDate)}
      * zu verwenden. </p>
      *
      * @see     Chronology#getChronoType()
@@ -302,7 +302,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
             Class<?> t2 = that.getChronology().getChronoType();
             return (
                 (t1 == t2)
-                && (this.getEpochDays() == that.getEpochDays())
+                && (this.getDaysSinceEpochUTC() == that.getDaysSinceEpochUTC())
             );
         } else {
             return false;
@@ -319,7 +319,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
     @Override
     public int hashCode() {
 
-        long days = this.getEpochDays();
+        long days = this.getDaysSinceEpochUTC();
         return (int) (days ^ (days >>> 32));
 
     }
@@ -340,7 +340,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      */
     public D plus(CalendarDays days) {
 
-        long sum = MathUtils.safeAdd(this.getEpochDays(), days.getAmount());
+        long sum = MathUtils.safeAdd(this.getDaysSinceEpochUTC(), days.getAmount());
         return this.getCalendarSystem().transform(sum);
 
     }
@@ -354,8 +354,15 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      */
     public D minus(CalendarDays days) {
 
-        long result = MathUtils.safeSubtract(this.getEpochDays(), days.getAmount());
+        long result = MathUtils.safeSubtract(this.getDaysSinceEpochUTC(), days.getAmount());
         return this.getCalendarSystem().transform(result);
+
+    }
+
+    @Override
+    public long getDaysSinceEpochUTC() {
+
+        return this.getCalendarSystem().transform(this.getContext());
 
     }
 
@@ -369,24 +376,12 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      * @return  negative, zero or positive integer if this instance is earlier,
      *          simultaneous or later than given date
      */
-    protected int compareByTime(Calendrical<?, ?> date) {
+    protected int compareByTime(CalendarDate date) {
 
-        long d1 = this.getEpochDays();
-        long d2 = date.getEpochDays();
+        long d1 = this.getDaysSinceEpochUTC();
+        long d2 = date.getDaysSinceEpochUTC();
 
         return ((d1 < d2) ? -1 : ((d1 == d2) ? 0 : 1));
-
-    }
-
-    /**
-     * <p>Ermittelt die Anzahl von Tagen seit dem Beginn der
-     * UTC-Epoche [1972-01-01]. </p>
-     *
-     * @return  count of days relative to UTC epoch [1972-01-01]
-     */
-    long getEpochDays() {
-
-        return this.getCalendarSystem().transform(this.getContext());
 
     }
 
@@ -401,7 +396,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
         String ref
     ) {
 
-        long utcDays = this.getEpochDays();
+        long utcDays = this.getDaysSinceEpochUTC();
 
         if (
             (calsys.getMinimumSinceUTC() > utcDays)

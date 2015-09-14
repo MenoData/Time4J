@@ -155,55 +155,28 @@ public final class CalendarDays
     }
 
     /**
-     * <p>Calculates the delta of calendar days between given calendar variants. </p>
+     * <p>Calculates the delta of calendar days between given calendar dates. </p>
      *
-     * @param   start   first calendar variant (inclusive)
-     * @param   end     second calendar variant (exclusive)
+     * @param   start   first calendar date (inclusive)
+     * @param   end     second calendar date (exclusive)
      * @return  count of calendar days between start and end
-     * @since   3.4/4.3
+     * @since   3.8/4.5
      */
     /*[deutsch]
-     * <p>Berechnet die Tagesdifferenz zwischen den angegebenen Kalendervarianten. </p>
+     * <p>Berechnet die Tagesdifferenz zwischen den angegebenen Datumsobjekten. </p>
      *
-     * @param   start   first calendar variant (inclusive)
-     * @param   end     second calendar variant (exclusive)
+     * @param   start   first calendar date (inclusive)
+     * @param   end     second calendar date (exclusive)
      * @return  count of calendar days between start and end
-     * @since   3.4/4.3
+     * @since   3.8/4.5
      */
     public static CalendarDays between(
-        CalendarVariant<?> start,
-        CalendarVariant<?> end
+        CalendarDate start,
+        CalendarDate end
     ){
 
-        long t1 = CalendarVariant.utcDays(start);
-        long t2 = CalendarVariant.utcDays(end);
-        return CalendarDays.of(MathUtils.safeSubtract(t2, t1));
-
-    }
-
-    /**
-     * <p>Calculates the delta of calendar days between given calendrical time points. </p>
-     *
-     * @param   start   first calendrical time point (inclusive)
-     * @param   end     second calendrical time point (exclusive)
-     * @return  count of calendar days between start and end
-     * @since   3.4/4.3
-     */
-    /*[deutsch]
-     * <p>Berechnet die Tagesdifferenz zwischen den angegebenen Kalenderzeitpunkten. </p>
-     *
-     * @param   start   first calendrical time point (inclusive)
-     * @param   end     second calendrical time point (exclusive)
-     * @return  count of calendar days between start and end
-     * @since   3.4/4.3
-     */
-    public static CalendarDays between(
-        Calendrical<?, ?> start,
-        Calendrical<?, ?> end
-    ){
-
-        long t1 = start.getEpochDays();
-        long t2 = end.getEpochDays();
+        long t1 = start.getDaysSinceEpochUTC();
+        long t2 = end.getDaysSinceEpochUTC();
         return CalendarDays.of(MathUtils.safeSubtract(t2, t1));
 
     }

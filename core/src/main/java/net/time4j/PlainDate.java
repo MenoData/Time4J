@@ -28,6 +28,7 @@ import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
@@ -1377,7 +1378,7 @@ public final class PlainDate
     }
 
     @Override
-    protected int compareByTime(Calendrical<?, ?> date) {
+    protected int compareByTime(CalendarDate date) {
 
         if (date instanceof PlainDate) { // Optimierung
             PlainDate d1 = this;
