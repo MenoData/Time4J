@@ -1,11 +1,13 @@
 ## [v3.8] not yet released
 ### Added
+- Unify CalendarVariant and Calendrical [#350]
 - New XOR-operator for interval collections [#347]
 - Make PatternType.CLDR useable for non-iso-dates [#348]
 - New calendar-related class GeneralTimestamp [#340]
 - New intersect-operator for interval collections [#345]
 
 ### Changed
+- CalendarVariant and Calendrical changed Temporal signature [#350]
 - Two specialized now()-methods in ZonalClock changed the return type [#340]
 
 ## [v3.7] published on 2015-09-03
