@@ -113,7 +113,7 @@ import java.io.Serializable;
  */
 public abstract class CalendarVariant<D extends CalendarVariant<D>>
     extends ChronoEntity<D>
-    implements Comparable<D>, Temporal<CalendarVariant<?>>, Serializable {
+    implements CalendarDate, Comparable<D>,Serializable {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -309,8 +309,8 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     @Override
     public int compareTo(D calendarVariant) {
 
-        long t1 = utcDays(this);
-        long t2 = utcDays(calendarVariant);
+        long t1 = this.getDaysSinceEpochUTC();
+        long t2 = calendarVariant.getDaysSinceEpochUTC();
 
         if (t1 < t2) {
             return - 1;
@@ -323,28 +323,28 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     }
 
     @Override
-    public boolean isAfter(CalendarVariant<?> other) {
+    public boolean isAfter(CalendarDate other) {
 
-        long t1 = utcDays(this);
-        long t2 = utcDays(other);
+        long t1 = this.getDaysSinceEpochUTC();
+        long t2 = other.getDaysSinceEpochUTC();
         return (t1 > t2);
 
     }
 
     @Override
-    public boolean isBefore(CalendarVariant<?> other) {
+    public boolean isBefore(CalendarDate other) {
 
-        long t1 = utcDays(this);
-        long t2 = utcDays(other);
+        long t1 = this.getDaysSinceEpochUTC();
+        long t2 = other.getDaysSinceEpochUTC();
         return (t1 < t2);
 
     }
 
     @Override
-    public boolean isSimultaneous(CalendarVariant<?> other) {
+    public boolean isSimultaneous(CalendarDate other) {
 
-        long t1 = utcDays(this);
-        long t2 = utcDays(other);
+        long t1 = this.getDaysSinceEpochUTC();
+        long t2 = other.getDaysSinceEpochUTC();
         return (t1 == t2);
 
     }
@@ -365,7 +365,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      */
     public D plus(CalendarDays days) {
 
-        long sum = Math.addExact(utcDays(this), days.getAmount());
+        long sum = Math.addExact(this.getDaysSinceEpochUTC(), days.getAmount());
         return this.getCalendarSystem().transform(sum);
 
     }
@@ -386,7 +386,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      */
     public D minus(CalendarDays days) {
 
-        long result = Math.subtractExact(utcDays(this), days.getAmount());
+        long result = Math.subtractExact(this.getDaysSinceEpochUTC(), days.getAmount());
         return this.getCalendarSystem().transform(result);
 
     }
@@ -431,6 +431,13 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     @Override
     public abstract String toString();
 
+    @Override
+    public long getDaysSinceEpochUTC() {
+
+        return this.getCalendarSystem().transform(this.getContext());
+
+    }
+
     /**
      * <p>Returns the assigned calendar family which contains all necessary
      * chronological rules. </p>
@@ -461,13 +468,6 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     @Override
     protected abstract CalendarFamily<D> getChronology();
 
-    // wildcard capture
-    static <T extends CalendarVariant<T>> long utcDays(CalendarVariant<T> cv) {
-
-        return cv.getCalendarSystem().transform(cv.getContext());
-
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     <V> ElementRule<D, V> getRule(ChronoElement<V> element) {
@@ -492,7 +492,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
         String ref
     ) {
 
-        long utcDays = utcDays(this);
+        long utcDays = this.getDaysSinceEpochUTC();
 
         if (
             (calsys.getMinimumSinceUTC() > utcDays)
