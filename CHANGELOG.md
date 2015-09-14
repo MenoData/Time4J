@@ -1,5 +1,6 @@
 ## [v4.5] not yet released
 ### Added
+- Unify CalendarVariant and Calendrical [#350]
 - New XOR-operator for interval collections [#347]
 - Make PatternType.CLDR useable for non-iso-dates [#348]
 - New calendar-related class GeneralTimestamp [#340]
@@ -10,6 +11,7 @@
 - Add plus/minus-operators for IntervalCollection [#339]
 
 ### Changed
+- CalendarVariant and Calendrical changed Temporal-signature [#350]
 - Two specialized now()-methods in ZonalClock changed the return type [#340]
 - IntervalCollection.union() should create a merged collection [#338]
 
