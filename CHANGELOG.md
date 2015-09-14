@@ -6,6 +6,9 @@
 - New calendar-related class GeneralTimestamp [#340]
 - New intersect-operator for interval collections [#345]
 
+### Fixed
+- Disable parsing of ambivalent text forms [#351]
+
 ### Changed
 - CalendarVariant and Calendrical changed Temporal signature [#350]
 - Two specialized now()-methods in ZonalClock changed the return type [#340]
