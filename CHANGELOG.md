@@ -10,6 +10,9 @@
 - Moment-class with a new precision element [#342]
 - Add plus/minus-operators for IntervalCollection [#339]
 
+### Fixed
+- Disable parsing of ambivalent text forms [#351]
+
 ### Changed
 - CalendarVariant and Calendrical changed Temporal-signature [#350]
 - Two specialized now()-methods in ZonalClock changed the return type [#340]
