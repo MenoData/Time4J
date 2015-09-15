@@ -36,13 +36,14 @@ import java.util.ResourceBundle;
  *
  * <p>The underlying properties files are located in the folder
  * &quot;units&quot; relative to class path and are encoded in UTF-8. The basic
- * bundle name is &quot;pattern&quot;. This class uses a modified fallback
+ * bundle name is &quot;upattern&quot;. This class uses a modified fallback
  * algorithm for searching the right properties file as documented in
  * <a href="http://www.unicode.org/reports/tr35/#Multiple_Inheritance"
  * target="_blank">CLDR</a> published by unicode consortium. </p>
  *
  * <p>The case is similar for past and future patterns - with the difference
- * that the folder &quot;reltime&quot; is used instead. </p>
+ * that the folder &quot;reltime&quot; and the basic bundle name &quot;relpattern&quot;
+ * are used instead. </p>
  *
  * @author  Meno Hochschild
  * @since   1.2
@@ -244,7 +245,7 @@ public final class UnitPatternProviderSPI
 
 		return this.getPattern(
             lang,
-            "reltime/pattern",
+            "reltime/relpattern",
             "now",
             null,
             PluralCategory.OTHER);
@@ -333,7 +334,7 @@ public final class UnitPatternProviderSPI
 
         return this.getPattern(
             lang,
-            "reltime/pattern",
+            "reltime/relpattern",
             "yesterday",
             null,
             PluralCategory.OTHER);
@@ -345,7 +346,7 @@ public final class UnitPatternProviderSPI
 
         return this.getPattern(
             lang,
-            "reltime/pattern",
+            "reltime/relpattern",
             "today",
             null,
             PluralCategory.OTHER);
@@ -357,7 +358,7 @@ public final class UnitPatternProviderSPI
 
         return this.getPattern(
             lang,
-            "reltime/pattern",
+            "reltime/relpattern",
             "tomorrow",
             null,
             PluralCategory.OTHER);
@@ -378,7 +379,7 @@ public final class UnitPatternProviderSPI
 		ClassLoader loader = this.getClass().getClassLoader();
 		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		ResourceBundle rb =
-            ResourceBundle.getBundle("units/pattern", desired, loader, control);
+            ResourceBundle.getBundle("units/upattern", desired, loader, control);
         String exact = buildListKey(width, String.valueOf(size));
 
         if (rb.containsKey(exact)) {
@@ -443,7 +444,7 @@ public final class UnitPatternProviderSPI
 
 		return this.getPattern(
 			lang,
-			"units/pattern",
+			"units/upattern",
 			buildKey(unitID, width, category),
 			buildKey(unitID, width, PluralCategory.OTHER),
 			category
@@ -460,7 +461,7 @@ public final class UnitPatternProviderSPI
 
 		return this.getPattern(
 			lang,
-			"reltime/pattern",
+			"reltime/relpattern",
 			buildKey(unitID, future, category),
 			buildKey(unitID, future, PluralCategory.OTHER),
 			category
