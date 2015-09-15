@@ -14,6 +14,7 @@
 - Disable parsing of ambivalent text forms [#351]
 
 ### Changed
+- Rename unit pattern resource file names [#352]
 - CalendarVariant and Calendrical changed Temporal-signature [#350]
 - Two specialized now()-methods in ZonalClock changed the return type [#340]
 - IntervalCollection.union() should create a merged collection [#338]
