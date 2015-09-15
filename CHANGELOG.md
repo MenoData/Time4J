@@ -1,4 +1,6 @@
-## [v4.5] not yet released
+## [v4.6] not yet released
+
+## [v4.5] published on 2015-09-15
 ### Added
 - Support for Malay language [#353]
 - Unify CalendarVariant and Calendrical by new interface CalendarDate [#350]
