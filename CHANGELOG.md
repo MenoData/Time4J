@@ -1,5 +1,6 @@
 ## [v3.8] not yet released
 ### Added
+- Support for Malay language [#353]
 - Unify CalendarVariant and Calendrical by new interface CalendarDate [#350]
 - New XOR-operator for interval collections [#347]
 - Make PatternType.CLDR useable for non-iso-dates [#348]
