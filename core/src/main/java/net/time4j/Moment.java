@@ -776,6 +776,7 @@ public final class Moment
     /**
      * <p>Converts this instance to a general timestamp in given timezone. </p>
      *
+     * @param   <C> generic type of date component
      * @param   chronology      chronology of date component
      * @param   tzid            timezone id
      * @param   startOfDay      start of day
@@ -786,6 +787,7 @@ public final class Moment
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen allgemeinen Zeitstempel um. </p>
      *
+     * @param   <C> generic type of date component
      * @param   chronology      chronology of date component
      * @param   tzid            timezone id
      * @param   startOfDay      start of day
@@ -811,6 +813,7 @@ public final class Moment
     /**
      * <p>Converts this instance to a general timestamp in given timezone. </p>
      *
+     * @param   <C> generic type of date component
      * @param   family          calendar family for date component
      * @param   variant         variant of date component
      * @param   tzid            timezone id
@@ -823,6 +826,7 @@ public final class Moment
     /*[deutsch]
      * <p>Wandelt diese Instanz in einen allgemeinen Zeitstempel um. </p>
      *
+     * @param   <C> generic type of date component
      * @param   family          calendar family for date component
      * @param   variant         variant of date component
      * @param   tzid            timezone id
