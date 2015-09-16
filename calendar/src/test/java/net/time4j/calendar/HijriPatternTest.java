@@ -25,6 +25,7 @@ public class HijriPatternTest {
                 {1300, 1, 1, "yyyy-MM-dd", "1300-01-01"},
                 {1355, 12, 29, "MM/dd/yyyy", "12/29/1355"},
                 {1436, 9, 29, "d. MMMM yyyy", "29. Ramadan 1436"},
+                {1436, 9, 29, "d. LLLL yyyy", "29. Ramadan 1436"},
                 {1436, 10, 1, "EEE, d. MMM yyyy", "Fri, 1. Shaw. 1436"},
                 {1436, 10, 2, "G yyyy, MM/dd", "AH 1436, 10/02"},
                 {1437, 1, 1, "yyyy (D)", "1437 (1)"},
