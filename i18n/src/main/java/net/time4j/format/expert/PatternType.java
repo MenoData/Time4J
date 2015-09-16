@@ -1563,8 +1563,10 @@ public enum PatternType
         String chronoType
     ) {
 
+        char c = ((symbol == 'L') ? 'M' : symbol);
+
         for (ChronoElement<?> element : elements) {
-            if (element.getSymbol() == symbol) {
+            if (element.getSymbol() == c) {
                 return element;
             }
         }
