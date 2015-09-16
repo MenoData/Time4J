@@ -275,6 +275,22 @@ public final class HijriCalendar
      */
     public static final String VARIANT_ICU4J = "islamic-icu4j";
 
+    /**
+     * The name of the Turkish Diyanet-variant.
+     *
+     * <p>The supported range is 1318-01/1444-05. </p>
+     *
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * Der Name der t&uuml;rischen Diyanet-Variante.
+     *
+     * <p>Der unterst&uuml;tze Wertebereich ist 1318-01/1444-05. </p>
+     *
+     * @since   3.9/4.6
+     */
+    public static final String VARIANT_DIYANET = "islamic-diyanet";
+
     private static final Map<String, MonthBasedCalendarSystem<HijriCalendar>> CALSYS;
     private static final CalendarFamily<HijriCalendar> ENGINE;
 

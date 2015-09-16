@@ -115,15 +115,21 @@ final class AstronomicalHijriData
                         throw new IOException("Wrong file format: " + name + " (missing year=" + year + ")");
                     }
                     String[] monthLengths = row.split(" ");
-                    if (monthLengths.length != 12) {
-                        throw new IOException("Wrong file format: " + name + " (incomplete year=" + year + ")");
-                    }
-                    for (int m = 0; m < 12; m++) {
+                    for (int m = 0; m < Math.min(monthLengths.length, 12); m++) {
                         mlen[i] = Integer.parseInt(monthLengths[m]);
                         maxCounter += mlen[i];
                         mutc[i] = v;
                         v += mlen[i];
                         i++;
+                    }
+                    if (monthLengths.length < 12) {
+                        int[] buf1 = new int[i];
+                        long[] buf2 = new long[i];
+                        System.arraycopy(mlen, 0, buf1, 0, i);
+                        System.arraycopy(mutc, 0, buf2, 0, i);
+                        mlen = buf1;
+                        mutc = buf2;
+                        break;
                     }
                 }
 
@@ -216,15 +222,22 @@ final class AstronomicalHijriData
         int hdom
     ) {
 
-        return (
-            (era == HijriEra.ANNO_HEGIRAE)
-            && (hyear >= this.minYear)
-            && (hyear <= this.maxYear)
-            && (hmonth >= 1)
-            && (hmonth <= 12)
-            && (hdom >= 1)
-            && (hdom <= this.getLengthOfMonth(era, hyear, hmonth))
-        );
+        if (
+            (era != HijriEra.ANNO_HEGIRAE)
+            || (hyear < this.minYear)
+            || (hyear > this.maxYear)
+            || (hmonth < 1)
+            || (hmonth > 12)
+            || (hdom < 1)
+        ) {
+            return false;
+        }
+
+        if ((hyear - this.minYear) * 12 + hmonth - 1 >= this.lengthOfMonth.length) {
+            return false;
+        }
+
+        return (hdom <= this.getLengthOfMonth(era, hyear, hmonth));
 
     }
 
@@ -267,6 +280,9 @@ final class AstronomicalHijriData
 
         for (int m = 1; m <= 12; m++) {
             int index = (hyear - this.minYear) * 12 + m - 1;
+            if (index >= this.lengthOfMonth.length) {
+                throw new IllegalArgumentException("Year range is partially out of range: " + hyear);
+            }
             max += this.lengthOfMonth[index];
         }
 
