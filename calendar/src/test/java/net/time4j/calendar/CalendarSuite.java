@@ -9,11 +9,13 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         ClockTest.class,
+        DiyanetDataTest.class,
+        DiyanetRangeTest.class,
         EraNameTest.class,
+        HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
         MonthNameTest.class,
-        HijriAlgoTest.class,
         StartOfDayTest.class,
         UmalquraDataTest.class
     }
