@@ -281,7 +281,7 @@ final class AstronomicalHijriData
         for (int m = 1; m <= 12; m++) {
             int index = (hyear - this.minYear) * 12 + m - 1;
             if (index >= this.lengthOfMonth.length) {
-                throw new IllegalArgumentException("Year range is partially out of range: " + hyear);
+                throw new IllegalArgumentException("Year range is not fully covered by underlying data: " + hyear);
             }
             max += this.lengthOfMonth[index];
         }

@@ -1,6 +1,7 @@
 package net.time4j.calendar;
 
 import net.time4j.engine.CalendarDays;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +35,11 @@ public class DiyanetRangeTest {
     @Test(expected=IllegalArgumentException.class)
     public void beyondMaximum() {
         HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29).plus(CalendarDays.ONE);
+    }
+
+    @Test(expected=ChronoException.class)
+    public void incompleteLengthOfYear() {
+        HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29).lengthOfYear();
     }
 
 }

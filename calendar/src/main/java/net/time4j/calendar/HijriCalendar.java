@@ -278,14 +278,14 @@ public final class HijriCalendar
     /**
      * The name of the Turkish Diyanet-variant.
      *
-     * <p>The supported range is 1318-01/1444-05. </p>
+     * <p>The supported range is 1318-01-01/1444-05-29 (ISO: 1900-05-01/2022-12-23). </p>
      *
      * @since   3.9/4.6
      */
     /*[deutsch]
-     * Der Name der t&uuml;rischen Diyanet-Variante.
+     * Der Name der t&uuml;rkischen Diyanet-Variante.
      *
-     * <p>Der unterst&uuml;tze Wertebereich ist 1318-01/1444-05. </p>
+     * <p>Der unterst&uuml;tze Wertebereich ist 1318-01-01/1444-05-29 (ISO: 1900-05-01/2022-12-23). </p>
      *
      * @since   3.9/4.6
      */
@@ -711,16 +711,22 @@ public final class HijriCalendar
      *
      * @return  int
      * @since   3.6/4.4
+     * @throws  ChronoException if data are not available for the whole year (edge case)
      */
     /*[deutsch]
      * <p>Liefert die L&auml;nge des aktuellen islamischen Jahres in Tagen. </p>
      *
      * @return  int
      * @since   3.6/4.4
+     * @throws  ChronoException if data are not available for the whole year (edge case)
      */
     public int lengthOfYear() {
 
-        return this.getCalendarSystem().getLengthOfYear(HijriEra.ANNO_HEGIRAE, this.hyear);
+        try {
+            return this.getCalendarSystem().getLengthOfYear(HijriEra.ANNO_HEGIRAE, this.hyear);
+        } catch (IllegalArgumentException iae) {
+            throw new ChronoException(iae.getMessage(), iae);
+        }
 
     }
 
