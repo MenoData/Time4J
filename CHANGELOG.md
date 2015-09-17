@@ -1,4 +1,7 @@
 ## [v4.6] not yet released
+### Added
+- Support for Turkish islamic calendar (Diyanet) [#355]
+
 ### Fixed
 - Pattern letter "L" causes exception for non-iso-dates [#354]
 
