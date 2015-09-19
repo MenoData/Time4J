@@ -67,7 +67,7 @@ public final class GenericTextProviderSPI
 
         ResourceBundle rb =
             ResourceBundle.getBundle(
-                "calendar/" + "islamic",
+                "calendar/generic",
                 Locale.ROOT,
                 getDefaultLoader(),
                 CONTROL);
@@ -104,7 +104,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "islamic" };
+        return new String[] { "islamic", "persian" };
 
     }
 
@@ -125,63 +125,50 @@ public final class GenericTextProviderSPI
     ) {
 
         ResourceBundle rb = getBundle(calendarType, locale);
+        String[] names;
+        String key = getKey(rb, "MONTH_OF_YEAR");
+        boolean standalone = (
+            (oc == OutputContext.STANDALONE)
+            && "true".equals(rb.getObject("enableStandalone")));
 
-        if (rb != null) {
-            String[] names;
-            String key = getKey(rb, "MONTH_OF_YEAR");
-            boolean standalone = (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone")));
-
-            if (tw == TextWidth.SHORT) {
-                tw = TextWidth.ABBREVIATED;
-            }
-
-            if (standalone) {
-                names = lookupBundle(rb, 12, key, tw, oc, leapForm);
-            } else {
-                names = lookupBundle(rb, 12, key, tw, leapForm);
-            }
-
-            if (names == null) {
-                if (tw == TextWidth.NARROW) {
-                    names = months(calendarType, locale, TextWidth.ABBREVIATED, oc, leapForm);
-                    if (names == null) {
-                        if (standalone) {
-                            names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
-                        }
-                        if (names == null) {
-                            throw new MissingResourceException(
-                                "Cannot find calendar month.",
-                                GenericTextProviderSPI.class.getName(),
-                                locale.toString());
-                        }
-                    }
-                    return narrow(names, 12);
-                }
-                if (standalone) {
-                    names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
-                }
-                if (names == null) {
-                    throw new MissingResourceException(
-                        "Cannot find calendar month.",
-                        GenericTextProviderSPI.class.getName(),
-                        locale.toString());
-                }
-            }
-
-            return names;
+        if (tw == TextWidth.SHORT) {
+            tw = TextWidth.ABBREVIATED;
         }
 
-        if (tw == TextWidth.WIDE) {
-            return new String[] {
-                "01", "02", "03", "04", "05", "06",
-                "07", "08", "09", "10", "11", "12"};
+        if (standalone) {
+            names = lookupBundle(rb, 12, key, tw, oc, leapForm);
         } else {
-            return new String[] {
-                "1", "2", "3", "4", "5", "6",
-                "7", "8", "9", "10", "11", "12"};
+            names = lookupBundle(rb, 12, key, tw, leapForm);
         }
+
+        if (names == null) {
+            if (tw == TextWidth.NARROW) {
+                names = months(calendarType, locale, TextWidth.ABBREVIATED, oc, leapForm);
+                if (names == null) {
+                    if (standalone) {
+                        names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
+                    }
+                    if (names == null) {
+                        throw new MissingResourceException(
+                            "Cannot find calendar month.",
+                            GenericTextProviderSPI.class.getName(),
+                            locale.toString());
+                    }
+                }
+                return narrow(names, 12);
+            }
+            if (standalone) {
+                names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
+            }
+            if (names == null) {
+                throw new MissingResourceException(
+                    "Cannot find calendar month.",
+                    GenericTextProviderSPI.class.getName(),
+                    locale.toString());
+            }
+        }
+
+        return names;
 
     }
 
@@ -218,27 +205,23 @@ public final class GenericTextProviderSPI
 
         ResourceBundle rb = getBundle(calendarType, locale);
 
-        if (rb != null) {
-            if (tw == TextWidth.SHORT) {
-                tw = TextWidth.ABBREVIATED;
-            }
-
-            String key = getKey(rb, "ERA");
-            String[] names = lookupBundle(rb, 1, key, tw, false);
-
-            if (names != null) {
-                return names;
-            } else if (tw == TextWidth.NARROW) {
-                return narrow(eras(calendarType, locale, TextWidth.ABBREVIATED), 1);
-            } else {
-                throw new MissingResourceException(
-                    "Cannot find calendar resource for era.",
-                    GenericTextProviderSPI.class.getName(),
-                    locale.toString());
-            }
+        if (tw == TextWidth.SHORT) {
+            tw = TextWidth.ABBREVIATED;
         }
 
-        return ((tw == TextWidth.WIDE) ? new String[] {"Anno Hegirae"} : new String[] {"AH"});
+        String key = getKey(rb, "ERA");
+        String[] names = lookupBundle(rb, 1, key, tw, false);
+
+        if (names != null) {
+            return names;
+        } else if (tw == TextWidth.NARROW) {
+            return narrow(eras(calendarType, locale, TextWidth.ABBREVIATED), 1);
+        } else {
+            throw new MissingResourceException(
+                "Cannot find calendar resource for era.",
+                GenericTextProviderSPI.class.getName(),
+                locale.toString());
+        }
 
     }
 
@@ -312,15 +295,11 @@ public final class GenericTextProviderSPI
         Locale desired
     ) throws MissingResourceException {
 
-        if (LANGUAGES.contains(desired.getLanguage())) {
-            return ResourceBundle.getBundle(
-                "calendar/" + calendarType,
-                desired,
-                getDefaultLoader(),
-                CONTROL);
-        }
-
-        return null;
+        return ResourceBundle.getBundle(
+            "calendar/" + calendarType,
+            LANGUAGES.contains(desired.getLanguage()) ? desired : Locale.ROOT,
+            getDefaultLoader(),
+            CONTROL);
 
     }
 
