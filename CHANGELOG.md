@@ -1,5 +1,6 @@
 ## [v4.6] not yet released
 ### Added
+- Support for Pashto language [#358]
 - Support for Turkish islamic calendar (Diyanet) [#355]
 
 ### Fixed
