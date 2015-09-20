@@ -31,14 +31,14 @@ public class EraNameTest {
     @Test
     public void getDisplayNameWidePersian() {
         assertThat(
-            PersianEra.ANNO_HEGIRAE.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            PersianEra.ANNO_PERSICO.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
             is("AP"));
     }
 
     @Test
     public void getDisplayNameShortPersian() {
         assertThat(
-            PersianEra.ANNO_HEGIRAE.getDisplayName(Locale.GERMAN, TextWidth.SHORT),
+            PersianEra.ANNO_PERSICO.getDisplayName(Locale.GERMAN, TextWidth.SHORT),
             is("AP"));
     }
 

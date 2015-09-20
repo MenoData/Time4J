@@ -29,14 +29,14 @@ import java.util.Locale;
 
 
 /**
- * <p>The Persian calendar only supports one single era called &quot;Anno Hegirae&quot; with the
+ * <p>The Persian calendar only supports one single era called &quot;Anno Persico&quot; with the
  * numerical value {@code 1}. </p>
  *
  * @author  Meno Hochschild
  * @since   3.9/4.6
  */
 /*[deutsch]
- * <p>Der persische Kalender unterst&uuml;tzt nur eine einzige &Auml;ra, die &quot;Anno Hegirae&quot;
+ * <p>Der persische Kalender unterst&uuml;tzt nur eine einzige &Auml;ra, die &quot;Anno Persico&quot;
  * genannt wird und den numerischen Wert {@code 1} hat. </p>
  *
  * @author  Meno Hochschild
@@ -53,7 +53,7 @@ public enum PersianEra
     /*[deutsch]
      * Singleton-Instanz (oft als &quot;AP&quot; abgek&uuml;rzt).
      */
-    ANNO_HEGIRAE;
+    ANNO_PERSICO;
 
     //~ Methoden ----------------------------------------------------------
 
