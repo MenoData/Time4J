@@ -46,28 +46,101 @@ public enum PersianMonth {
     //implements ChronoCondition<PersianCalendar> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * The 1st month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der erste Monat des persischen Kalenders mit 31 Tagen.
+     */
     FARVARDIN,
 
+    /**
+     * The 2nd month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der zweite Monat des persischen Kalenders mit 31 Tagen.
+     */
     ORDIBEHESHT,
 
+    /**
+     * The 3rd month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der dritte Monat des persischen Kalenders mit 31 Tagen.
+     */
     KHORDAD,
 
+    /**
+     * The 4th month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der vierte Monat des persischen Kalenders mit 31 Tagen.
+     */
     TIR,
 
+    /**
+     * The 5th month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der f&uuml;nfte Monat des persischen Kalenders mit 31 Tagen.
+     */
     MORDAD,
 
+    /**
+     * The 6th month of Persian Calendar with 31 days.
+     */
+    /*[deutsch]
+     * Der sechste Monat des persischen Kalenders mit 31 Tagen.
+     */
     SHAHRIVAR,
 
+    /**
+     * The 7th month of Persian Calendar with 30 days.
+     */
+    /*[deutsch]
+     * Der siebente Monat des persischen Kalenders mit 30 Tagen.
+     */
     MEHR,
 
+    /**
+     * The 8th month of Persian Calendar with 30 days.
+     */
+    /*[deutsch]
+     * Der achte Monat des persischen Kalenders mit 30 Tagen.
+     */
     ABAN,
 
+    /**
+     * The 9th month of Persian Calendar with 30 days.
+     */
+    /*[deutsch]
+     * Der neunte Monat des persischen Kalenders mit 30 Tagen.
+     */
     AZAR,
 
+    /**
+     * The 10th month of Persian Calendar with 30 days.
+     */
+    /*[deutsch]
+     * Der zehnte Monat des persischen Kalenders mit 30 Tagen.
+     */
     DEY,
 
+    /**
+     * The 11th month of Persian Calendar with 30 days.
+     */
+    /*[deutsch]
+     * Der elfte Monat des persischen Kalenders mit 30 Tagen.
+     */
     BAHMAN,
 
+    /**
+     * The 12th month of Persian Calendar with 29 or 30 days (if in leap year).
+     */
+    /*[deutsch]
+     * Der zw&ouml;lfte Monat des persischen Kalenders mit 29 oder 30 Tagen (wenn im Schaltjahr).
+     */
     ESFAND;
 
     private static final PersianMonth[] ENUMS = PersianMonth.values(); // Cache
