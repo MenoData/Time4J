@@ -4,6 +4,7 @@
 - Support for Turkish islamic calendar (Diyanet) [#355]
 
 ### Fixed
+- Wrong between-calculation with overflow units [#360]
 - Pattern letter "L" causes exception for non-iso-dates [#354]
 
 ## [v4.5] published on 2015-09-15
