@@ -15,7 +15,9 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
+        MiscellaneousTest.class,
         MonthNameTest.class,
+        PersianCalendarTest.class,
         StartOfDayTest.class,
         UmalquraDataTest.class
     }

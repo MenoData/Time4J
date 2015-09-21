@@ -21,40 +21,24 @@ import static org.junit.Assert.assertThat;
 public class MonthNameTest {
 
     @Test
-    public void getDisplayNameWide() {
+    public void getDisplayNameWideHijri() {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT),
             is("Dhuʻl-Hijjah"));
     }
 
     @Test
-    public void getDisplayNameShort() {
+    public void getDisplayNameWidePersian() {
+        assertThat(
+            PersianMonth.ORDIBEHESHT.getDisplayName(Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT),
+            is("Ordibehesht"));
+    }
+
+    @Test
+    public void getDisplayNameShortHijri() {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.SHORT, OutputContext.FORMAT),
             is("Dhuʻl-H."));
-    }
-
-    @Test
-    public void executeCodeDemo() throws ParseException {
-        ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("EEE, d. MMMM yy", PatternType.NON_ISO_DATE).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
-                .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
-        HijriCalendar hijri = formatter.parse("Thu, 29. Ramadan 36");
-        PlainDate date = hijri.transform(PlainDate.class);
-        System.out.println(date); // 2015-07-16
-    }
-
-    @Test
-    public void executeICU() throws ParseException {
-        ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("y-MM-dd", PatternType.NON_ISO_DATE).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
-        HijriCalendar hijri = formatter.parse("1-01-01");
-        PlainDate date = hijri.transform(PlainDate.class);
-        System.out.println(date); // 622-07-18
     }
 
 }
