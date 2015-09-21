@@ -48,6 +48,17 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void khayam() {
+        for (int pyear = 1178; pyear <= 1633; pyear++) {
+            int m = pyear % 33;
+            boolean leapKhayam = (m == 1 || m == 5 || m == 9 || m == 13 || m == 17 || m == 22 || m == 26 || m == 30);
+            assertThat(
+                PersianCalendar.of(pyear, 1, 1).isLeapYear(),
+                is(leapKhayam));
+        }
+    }
+
+    @Test
     public void executeCodeDemo() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
             ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
