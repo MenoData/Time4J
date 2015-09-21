@@ -1732,10 +1732,8 @@ public final class PlainTimestamp
                 d = timepoint.date.plus(amount, this.calendarUnit);
                 t = timepoint.time;
             } else {
-                DayCycles cycles =
-                    timepoint.time.roll(amount, this.clockUnit);
-                d =
-                    timepoint.date.plus(cycles.getDayOverflow(), DAYS);
+                DayCycles cycles = timepoint.time.roll(amount, this.clockUnit);
+                d = timepoint.date.plus(cycles.getDayOverflow(), DAYS);
                 t = cycles.getWallTime();
             }
 
@@ -1825,8 +1823,7 @@ public final class PlainTimestamp
                     case NANOS:
                         break;
                     default:
-                        throw new UnsupportedOperationException(
-                            this.clockUnit.name());
+                        throw new UnsupportedOperationException(this.clockUnit.name());
                 }
             }
 

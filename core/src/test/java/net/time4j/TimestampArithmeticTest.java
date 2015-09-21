@@ -130,6 +130,12 @@ public class TimestampArithmeticTest {
                 PlainTimestamp.of(2012, 2, 29, 12, 44, 59)
             ),
             is(0L));
+        assertThat(
+            PlainTimestamp.of(2012, 1, 29, 12, 45).until(
+                PlainTimestamp.of(2012, 3, 28, 12, 44, 59),
+                MONTHS.withCarryOver()
+            ),
+            is(1L));
     }
 
     @Test
