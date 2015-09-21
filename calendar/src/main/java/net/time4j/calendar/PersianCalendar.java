@@ -74,7 +74,9 @@ import java.util.List;
  * months are 30 days long with the exception of the last month whose length is 29 days in normal years and
  * 30 days in leap years. The algorithm is based on the excellent work of Borkowski who describes the details at
  * <a href="http://www.astro.uni.torun.pl/~kb/Papers/EMP/PersianC-EMP.htm">The Persian calendar for 3000 years</a>.
- * </p>
+ * It is in agreement with the well known cycle proposed by Omar Khayam for the years 1178-1633 (ISO: 1799-2254).
+ * However, dates calculated in far future beyond 2123 can still be wrong due to the uncertainty of astronomical
+ * term delta-T and should be considered as approximation. </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -117,7 +119,9 @@ import java.util.List;
  * nur 30 Tage mit Ausnahme des letzten Monats, dessen L&auml;nge 29 oder 30 Tage betr&auml;gt je nachdem ob ein
  * Schaltjahr vorliegt. Der Algorithmus basiert auf der ausgezeichneten Arbeit von Borkowski, der die Details auf
  * <a href="http://www.astro.uni.torun.pl/~kb/Papers/EMP/PersianC-EMP.htm">The Persian calendar for 3000 years</a>.
- * beschreibt. </p>
+ * beschreibt.  Allerdings k&ouml;nnen Datumswerte nach dem gregorianischen Jahr 2123 falsch sein, weil der
+ * astronomische Term delta-T sich nicht beliebig genau in die Zukunft prognostizieren l&auml;sst. Solche Datumswerte
+ * weit in der Zukunft sind daher als N&auml;herung anzusehen.</p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
