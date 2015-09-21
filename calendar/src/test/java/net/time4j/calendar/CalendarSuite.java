@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MiscellaneousTest.class,
         MonthNameTest.class,
         PersianCalendarTest.class,
+        PersianOperatorTest.class,
         StartOfDayTest.class,
         UmalquraDataTest.class
     }
