@@ -632,16 +632,25 @@ public enum CalendarUnit
                 && start.contains(PlainTime.WALL_TIME)
                 && end.contains(PlainTime.WALL_TIME)
             ) {
+                boolean needsTimeCorrection;
 
-                PlainTime t1 = start.get(PlainTime.WALL_TIME);
-                PlainTime t2 = end.get(PlainTime.WALL_TIME);
-
-                if ((amount > 0) && t1.isAfter(t2)) {
-                    amount--;
-                } else if ((amount < 0) && t1.isBefore(t2)) {
-                    amount++;
+                if (this.unit == DAYS) {
+                    needsTimeCorrection = true;
+                } else {
+                    PlainDate d = d1.plus(amount, this.unit);
+                    needsTimeCorrection = (d.compareByTime(d2) == 0);
                 }
 
+                if (needsTimeCorrection) {
+                    PlainTime t1 = start.get(PlainTime.WALL_TIME);
+                    PlainTime t2 = end.get(PlainTime.WALL_TIME);
+
+                    if ((amount > 0) && t1.isAfter(t2)) {
+                        amount--;
+                    } else if ((amount < 0) && t1.isBefore(t2)) {
+                        amount++;
+                    }
+                }
             }
 
             return amount;
