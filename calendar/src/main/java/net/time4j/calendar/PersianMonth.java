@@ -41,8 +41,8 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   3.9/4.6
  */
-public enum PersianMonth {
-    //implements ChronoCondition<PersianCalendar> {
+public enum PersianMonth
+    implements ChronoCondition<PersianCalendar> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -256,12 +256,12 @@ public enum PersianMonth {
         return names.getStdMonths(width, context).print(this);
 
     }
-/*
+
     @Override
     public boolean test(PersianCalendar context) {
 
         return (context.getMonth() == this);
 
     }
-*/
+
 }
