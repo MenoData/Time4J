@@ -4,6 +4,7 @@
 - Support for Turkish islamic calendar (Diyanet) [#355]
 
 ### Fixed
+- 2015-10-25T02:00+01:00[Europe/Berlin] cannot be parsed [#361]
 - Wrong between-calculation with overflow units [#360]
 - Pattern letter "L" causes exception for non-iso-dates [#354]
 
