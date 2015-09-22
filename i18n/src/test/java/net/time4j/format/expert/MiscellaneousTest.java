@@ -326,7 +326,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => Time component out of range."),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -339,7 +339,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => MONTH_OF_YEAR out of range: 13"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -355,7 +355,7 @@ public class MiscellaneousTest {
         assertThat(
             plog.getErrorMessage().startsWith(
                 "Validation failed => DAY_OF_MONTH out of range: 29"),
-                is(true));
+            is(true));
     }
 
     @Test
@@ -603,6 +603,18 @@ public class MiscellaneousTest {
         assertThat(
             ZonalDateTime.parse("2012-07-01T08:59:60+09:00", formatter),
             is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
+    }
+
+    @Test(expected = ParseException.class)
+    public void parseAmbivalentOffset() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.ofMomentPattern(
+                "uuuu-MM-dd'T'HH:mm:ssXXX'['VV']'",
+                PatternType.CLDR,
+                Locale.ROOT,
+                ZonalOffset.UTC
+            ).with(Leniency.STRICT);
+        formatter.parse("2012-07-01T08:59:60+01:00[Asia/Tokyo]");
     }
 
     @Test

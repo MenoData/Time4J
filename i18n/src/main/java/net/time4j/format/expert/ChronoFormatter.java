@@ -2016,12 +2016,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (leniency.isStrict()) {
             // Zeitzonenkonversion ergibt immer Unterschied zwischen
-            // lokaler und globaler Zeit => nicht prüfen!
+            // lokaler und globaler Zeit => lokale Elemente nicht prüfen!
             if (result instanceof UnixTime) {
+                UnixTime ut = UnixTime.class.cast(result);
+
+                // check offset+tzid
+                if (
+                    parsed.contains(TimezoneElement.TIMEZONE_ID)
+                    && parsed.contains(TimezoneElement.TIMEZONE_OFFSET)
+                ) {
+                    TZID tzid = parsed.get(TimezoneElement.TIMEZONE_ID);
+                    TZID offset = parsed.get(TimezoneElement.TIMEZONE_OFFSET);
+                    if (!Timezone.of(tzid).getOffset(ut).equals(offset)) {
+                        status.setError(text.length(), "Ambivalent offset information: " + tzid + " versus " + offset);
+                        return null;
+                    }
+                }
+
+                // check tz-naming
                 if (status.getDSTInfo() != null) {
                     TZID tzid = parsed.getTimezone();
-                    UnixTime ut = UnixTime.class.cast(result);
-
                     try {
                         boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
                         if (dst != status.getDSTInfo().booleanValue()) {
