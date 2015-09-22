@@ -39,20 +39,14 @@ import java.util.Set;
  * @param   <V> generic type of element values
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class CustomizedProcessor<V>
     implements FormatProcessor<V> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
-        new ChronoFunction<ChronoDisplay, Void>() {
-            @Override
-            public Void apply(ChronoDisplay context) {
-                return null;
-            }
-        };
+    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT = (context -> null);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -115,7 +109,7 @@ final class CustomizedProcessor<V>
                     ChronoFormatter.class.cast(this.printer);
                 Set<ElementPosition> result =
                     print(cf, value, collector, attributes);
-                Set<ElementPosition> set = new LinkedHashSet<ElementPosition>();
+                Set<ElementPosition> set = new LinkedHashSet<>();
                 for (ElementPosition ep : result) {
                     set.add(
                         new ElementPosition(
@@ -164,6 +158,11 @@ final class CustomizedProcessor<V>
                     parsedResult.put(
                         TimezoneElement.TIMEZONE_ID,
                         status.getRawValues().get(TimezoneElement.TIMEZONE_ID));
+                }
+                if (status.getRawValues().contains(TimezoneElement.TIMEZONE_OFFSET)) {
+                    parsedResult.put(
+                        TimezoneElement.TIMEZONE_OFFSET,
+                        status.getRawValues().get(TimezoneElement.TIMEZONE_OFFSET));
                 }
             }
         } catch (IndexOutOfBoundsException ex) {
@@ -232,7 +231,7 @@ final class CustomizedProcessor<V>
             return this;
         }
 
-        return new CustomizedProcessor<V>(element, this.printer, this.parser);
+        return new CustomizedProcessor<>(element, this.printer, this.parser);
 
     }
 

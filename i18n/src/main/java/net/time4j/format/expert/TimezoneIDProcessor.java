@@ -65,7 +65,7 @@ enum TimezoneIDProcessor
         }
 
         int start = -1;
-        int printed = 0;
+        int printed;
 
         if (buffer instanceof CharSequence) {
             start = ((CharSequence) buffer).length();
@@ -145,7 +145,7 @@ enum TimezoneIDProcessor
                 + "use UTC-Offsets instead.");
             return;
         } else if (key.equals("Z")) {
-            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         } else if (
@@ -162,7 +162,7 @@ enum TimezoneIDProcessor
                     return;
                 }
             }
-            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         }

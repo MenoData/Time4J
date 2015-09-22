@@ -50,17 +50,15 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
+ * @doctags.concurrency {immutable}
  */
 final class TimezoneNameProcessor
     implements FormatProcessor<TZID> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ConcurrentMap<Locale, TZNames> CACHE_ABBREVIATIONS =
-        new ConcurrentHashMap<Locale, TZNames>();
-    private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES =
-        new ConcurrentHashMap<Locale, TZNames>();
+    private static final ConcurrentMap<Locale, TZNames> CACHE_ABBREVIATIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Locale, TZNames> CACHE_ZONENAMES = new ConcurrentHashMap<>();
     private static final int MAX = 25; // maximum size of cache
     private static final String DEFAULT_PROVIDER = "DEFAULT";
 
@@ -100,7 +98,7 @@ final class TimezoneNameProcessor
 
         this.abbreviated = abbreviated;
         this.fallback = new LocalizedGMTProcessor(abbreviated);
-        this.preferredZones = Collections.unmodifiableSet(new LinkedHashSet<TZID>(preferredZones));
+        this.preferredZones = Collections.unmodifiableSet(new LinkedHashSet<>(preferredZones));
 
     }
 
@@ -295,7 +293,7 @@ final class TimezoneNameProcessor
                 dstZones.remove(0);
                 sum--;
             } else if (!dstZones.isEmpty()) {
-                zones = new ArrayList<TZID>(zones);
+                zones = new ArrayList<>(zones);
                 zones.addAll(dstZones); // for better error message if not unique
             }
         } else {
@@ -309,7 +307,7 @@ final class TimezoneNameProcessor
             for (TZID id : zones) {
                 if (id.canonical().indexOf('~') == -1) {
                     if (filtered == null) {
-                        filtered = new ArrayList<TZID>();
+                        filtered = new ArrayList<>();
                     }
                     filtered.add(id);
                 }
@@ -366,7 +364,7 @@ final class TimezoneNameProcessor
     ) {
 
         List<TZID> zones;
-        Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
+        Map<String, List<TZID>> map = new HashMap<>();
 
         for (TZID tzid : Timezone.getAvailableIDs()) {
             Timezone zone = Timezone.of(tzid);
@@ -383,7 +381,7 @@ final class TimezoneNameProcessor
             zones = map.get(tzName);
 
             if (zones == null) {
-                zones = new ArrayList<TZID>();
+                zones = new ArrayList<>();
                 map.put(tzName, zones);
             }
 
@@ -424,8 +422,8 @@ final class TimezoneNameProcessor
         Leniency leniency
     ) {
 
-        Map<String, List<TZID>> matched = new HashMap<String, List<TZID>>();
-        matched.put(DEFAULT_PROVIDER, new ArrayList<TZID>());
+        Map<String, List<TZID>> matched = new HashMap<>();
+        matched.put(DEFAULT_PROVIDER, new ArrayList<>());
 
         for (TZID tz : zones) {
             String id = tz.canonical();
@@ -449,7 +447,7 @@ final class TimezoneNameProcessor
                 if (p.canonical().equals(id)) {
                     List<TZID> candidates = matched.get(provider);
                     if (candidates == null) {
-                        candidates = new ArrayList<TZID>();
+                        candidates = new ArrayList<>();
                         matched.put(provider, candidates);
                     }
                     candidates.add(p);

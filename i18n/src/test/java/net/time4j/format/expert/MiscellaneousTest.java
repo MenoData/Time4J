@@ -605,6 +605,18 @@ public class MiscellaneousTest {
             is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
     }
 
+    @Test(expected = ParseException.class)
+    public void parseAmbivalentOffset() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.ofMomentPattern(
+                "uuuu-MM-dd'T'HH:mm:ssXXX'['VV']'",
+                PatternType.CLDR,
+                Locale.ROOT,
+                ZonalOffset.UTC
+            ).with(Leniency.STRICT);
+        formatter.parse("2012-07-01T08:59:60+01:00[Asia/Tokyo]");
+    }
+
     @Test
     public void formatPlainTimestampWithOffset() {
         ChronoFormatter<PlainTimestamp> formatter =

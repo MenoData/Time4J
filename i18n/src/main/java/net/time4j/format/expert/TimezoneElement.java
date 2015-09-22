@@ -39,7 +39,9 @@ enum TimezoneElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    TIMEZONE_ID;
+    TIMEZONE_ID,
+
+    TIMEZONE_OFFSET;
 
     //~ Methoden ----------------------------------------------------------
 
