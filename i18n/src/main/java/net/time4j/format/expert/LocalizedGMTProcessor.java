@@ -85,7 +85,7 @@ final class LocalizedGMTProcessor
     ) throws IOException {
 
         int start = -1;
-        int printed = 0;
+        int printed;
 
         if (buffer instanceof CharSequence) {
             start = ((CharSequence) buffer).length();
@@ -230,7 +230,7 @@ final class LocalizedGMTProcessor
                 "Missing prefix in localized offset: " + gmtPrefix);
             return;
         } else if (pos >= len) {
-            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         }
@@ -243,7 +243,7 @@ final class LocalizedGMTProcessor
             && "ar".equals(locale.getLanguage())
         ) {
             if (pos + 1 >= len) {
-                parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+                parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
                 status.setPosition(pos);
                 return;
             }
@@ -261,7 +261,7 @@ final class LocalizedGMTProcessor
             sign = BEHIND_UTC;
             pos++;
         } else {
-            parsedResult.put(TimezoneElement.TIMEZONE_ID, ZonalOffset.UTC);
+            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
             status.setPosition(pos);
             return;
         }
@@ -285,7 +285,7 @@ final class LocalizedGMTProcessor
         if (pos >= len) {
             if (this.abbreviated) {
                 parsedResult.put(
-                    TimezoneElement.TIMEZONE_ID,
+                    TimezoneElement.TIMEZONE_OFFSET,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
             } else {
@@ -307,7 +307,7 @@ final class LocalizedGMTProcessor
             pos++;
         } else if (this.abbreviated) {
             parsedResult.put(
-                TimezoneElement.TIMEZONE_ID,
+                TimezoneElement.TIMEZONE_OFFSET,
                 ZonalOffset.ofHours(sign, hours));
             status.setPosition(pos);
             return;
@@ -328,7 +328,7 @@ final class LocalizedGMTProcessor
 
         pos += 2;
         ZonalOffset offset = ZonalOffset.ofHoursMinutes(sign, hours, minutes);
-        parsedResult.put(TimezoneElement.TIMEZONE_ID, offset);
+        parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, offset);
         status.setPosition(pos);
 
     }
@@ -336,7 +336,7 @@ final class LocalizedGMTProcessor
     @Override
     public ChronoElement<TZID> getElement() {
 
-        return TimezoneElement.TIMEZONE_ID;
+        return TimezoneElement.TIMEZONE_OFFSET;
 
     }
 

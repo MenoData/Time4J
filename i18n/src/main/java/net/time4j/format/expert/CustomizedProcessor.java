@@ -164,6 +164,11 @@ final class CustomizedProcessor<V>
                         TimezoneElement.TIMEZONE_ID,
                         status.getRawValues().get(TimezoneElement.TIMEZONE_ID));
                 }
+                if (status.getRawValues().contains(TimezoneElement.TIMEZONE_OFFSET)) {
+                    parsedResult.put(
+                        TimezoneElement.TIMEZONE_OFFSET,
+                        status.getRawValues().get(TimezoneElement.TIMEZONE_OFFSET));
+                }
             }
         } catch (IndexOutOfBoundsException ex) {
             status.setError(offset, ex.getMessage());

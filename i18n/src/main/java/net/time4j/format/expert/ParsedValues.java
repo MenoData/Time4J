@@ -208,14 +208,23 @@ class ParsedValues
     @Override
     public boolean hasTimezone() {
 
-        return this.map.containsKey(TimezoneElement.TIMEZONE_ID);
+        return (
+            this.map.containsKey(TimezoneElement.TIMEZONE_ID)
+            || this.map.containsKey(TimezoneElement.TIMEZONE_OFFSET)
+        );
 
     }
 
     @Override
     public TZID getTimezone() {
 
-        Object tz = this.map.get(TimezoneElement.TIMEZONE_ID);
+        Object tz = null;
+
+        if (this.map.containsKey(TimezoneElement.TIMEZONE_ID)) {
+            tz = this.map.get(TimezoneElement.TIMEZONE_ID);
+        } else if (this.map.containsKey(TimezoneElement.TIMEZONE_OFFSET)) {
+            tz = this.map.get(TimezoneElement.TIMEZONE_OFFSET);
+        }
 
         if (tz instanceof TZID) {
             return TZID.class.cast(tz);

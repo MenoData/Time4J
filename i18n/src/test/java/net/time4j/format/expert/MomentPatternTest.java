@@ -167,7 +167,12 @@ public class MomentPatternTest {
                         "",
                         "Europe/Berlin",
                         "2012-06-30T23:59:60,123000000Z",
-                        "2012-07-01T01:59:60.123GMT+2"}
+                        "2012-07-01T01:59:60.123GMT+2"},
+                {"uuuu-MM-dd'T'HH:mmXXX'['VV']'",
+                    "de",
+                    "Europe/Berlin",
+                    "2015-10-25T01:00Z",
+                    "2015-10-25T02:00+01:00[Europe/Berlin]"}
            }
         );
     }
