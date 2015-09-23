@@ -1,5 +1,6 @@
 ## [v3.9] not yet released
 ### Added
+- New Persian calendar [#357]
 - Support for Pashto language [#358]
 - Support for Turkish islamic calendar (Diyanet) [#355]
 
@@ -7,6 +8,9 @@
 - 2015-10-25T02:00+01:00[Europe/Berlin] cannot be parsed [#361]
 - Wrong between-calculation with overflow units [#360]
 - Pattern letter "L" causes exception for non-iso-dates [#354]
+
+### Changed
+- Make serialization of HijriCalendar versionable [#356]
 
 ## [v3.8] published on 2015-09-15
 ### Added
