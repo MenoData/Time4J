@@ -103,9 +103,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *     System.out.println(date); // 2015-07-16
  * </pre>
  *
- * <p><strong>Note:</strong>
- * This class is still in experimental status. The serialization format will change in future. </p>
- *
  * @author  Meno Hochschild
  * @since   3.5/4.3
  */
@@ -152,9 +149,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *     PlainDate date = hijri.transform(PlainDate.class);
  *     System.out.println(date); // 2015-07-16
  * </pre>
- *
- * <p><strong>Note:</strong>
- * This class is still in experimental status. The serialization format will change in future. </p>
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
@@ -331,7 +325,7 @@ public final class HijriCalendar
         ENGINE = builder.build();
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4666707700222367373L;
 
     //~ Instanzvariablen --------------------------------------------------
 
