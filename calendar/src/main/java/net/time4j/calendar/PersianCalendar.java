@@ -57,6 +57,9 @@ import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -296,11 +299,13 @@ public final class PersianCalendar
         ENGINE = builder.build();
     }
 
+    private static final long serialVersionUID = 1L;
+
     //~ Instanzvariablen --------------------------------------------------
 
-    private final int pyear;
-    private final int pmonth;
-    private final int pdom;
+    private transient final int pyear;
+    private transient final int pmonth;
+    private transient final int pdom;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -684,6 +689,32 @@ public final class PersianCalendar
     protected PersianCalendar getContext() {
 
         return this;
+
+    }
+
+    /**
+     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 2}. Then the year is written as int, finally
+     *              month and day-of-month as bytes.
+     *
+     * @return  replacement object in serialization graph
+     */
+    private Object writeReplace() {
+
+        return new SPX(this, SPX.PERSIAN);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws      InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 
