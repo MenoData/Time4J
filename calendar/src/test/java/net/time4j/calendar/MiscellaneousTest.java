@@ -3,14 +3,17 @@ package net.time4j.calendar;
 import net.time4j.PlainDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.Attributes;
-import net.time4j.format.OutputContext;
-import net.time4j.format.TextWidth;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -79,6 +82,31 @@ public class MiscellaneousTest {
         HijriCalendar hijri = formatter.parse("1-01-01");
         PlainDate date = hijri.transform(PlainDate.class);
         System.out.println(date); // 622-07-18
+    }
+
+    @Test
+    public void serializeHijri() throws IOException, ClassNotFoundException {
+        roundtrip(HijriCalendar.ofUmalqura(1437, 3, 17));
+    }
+
+    @Test
+    public void serializePersian() throws IOException, ClassNotFoundException {
+        roundtrip(PersianCalendar.of(1425, 1, 7));
+    }
+
+    private static int roundtrip(Object obj)
+        throws IOException, ClassNotFoundException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        assertThat(ois.readObject(), is(obj));
+        ois.close();
+        return data.length;
     }
 
 }

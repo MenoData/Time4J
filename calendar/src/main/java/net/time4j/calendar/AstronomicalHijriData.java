@@ -290,6 +290,17 @@ final class AstronomicalHijriData
 
     }
 
+    /**
+     * <p>Yields the version attribute of the underlying data. </p>
+     *
+     * @return  String
+     */
+    String getVersion() {
+
+        return this.version;
+
+    }
+
     // returns index of month-start associated with utcDays
     private static int search(
         long utcDays,

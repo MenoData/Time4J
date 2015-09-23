@@ -54,6 +54,8 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -329,12 +331,14 @@ public final class HijriCalendar
         ENGINE = builder.build();
     }
 
+    private static final long serialVersionUID = 1L;
+
     //~ Instanzvariablen --------------------------------------------------
 
-    private final int hyear;
-    private final int hmonth;
-    private final int hdom;
-    private final String variant;
+    private transient final int hyear;
+    private transient final int hmonth;
+    private transient final int hdom;
+    private transient final String variant;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -910,6 +914,38 @@ public final class HijriCalendar
 
     }
 
+    /**
+     * <p>Determines the data version of given variant. </p>
+     *
+     * <p>This method serves for data analysis only. </p>
+     *
+     * @param   variant     name of islamic calendar variant
+     * @return  version info (maybe empty if not relevant)
+     * @throws  ChronoException if the variant is not recognized
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Datenversion der angegebenen Kalendervariante. </p>
+     *
+     * <p>Diese Methode dient nur Analysezwecken. </p>
+     *
+     * @param   variant     name of islamic calendar variant
+     * @return  version info (maybe empty if not relevant)
+     * @throws  ChronoException if the variant is not recognized
+     * @since   3.9/4.6
+     */
+    public static String getVersion(String variant) {
+
+        Object data = getCalendarSystem(variant);
+
+        if (data instanceof AstronomicalHijriData) {
+            return AstronomicalHijriData.class.cast(data).getVersion();
+        }
+
+        return "";
+
+    }
+
     @Override
     protected CalendarFamily<HijriCalendar> getChronology() {
 
@@ -944,6 +980,33 @@ public final class HijriCalendar
         }
 
         return calsys;
+
+    }
+
+    /**
+     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 1}. Then the UTF-coded variant and its data version
+     *              follow. Finally the year is written as int, month and day-of-month as bytes.
+     *              The successful serialization requires equal versions per variant on both sides.
+     *
+     * @return  replacement object in serialization graph
+     */
+    private Object writeReplace() {
+
+        return new SPX(this, SPX.HIJRI);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws      InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
 
     }
 
