@@ -105,7 +105,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental The serialization format will change in future.
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
@@ -154,7 +153,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.experimental The serialization format will change in future.
  * @doctags.concurrency {immutable}
  */
 @CalendarType("islamic")
@@ -328,7 +326,7 @@ public final class HijriCalendar
         ENGINE = builder.build();
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4666707700222367373L;
 
     //~ Instanzvariablen --------------------------------------------------
 

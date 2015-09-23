@@ -299,7 +299,7 @@ public final class PersianCalendar
         ENGINE = builder.build();
     }
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -411339992208638290L;
 
     //~ Instanzvariablen --------------------------------------------------
 
