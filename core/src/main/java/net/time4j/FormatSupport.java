@@ -24,13 +24,11 @@ package net.time4j;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.ChronoPattern;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
+import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.TZID;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 
@@ -45,8 +43,18 @@ class FormatSupport {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final FormatEngine<?> DEFAULT_FORMAT_ENGINE;
+    private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
 
     static {
+        FormatPatternProvider found = null;
+
+        for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
+            found = fpp;
+            break;
+        }
+
+        FORMAT_PATTERN_PROVIDER = ((found == null) ? FormatPatternProvider.DEFAULT : found);
+
         FormatEngine<?> last = null;
         FormatEngine<?> best = null;
 
@@ -171,49 +179,6 @@ class FormatSupport {
     }
 
     /**
-     * <p>Hilfsmethode zum Konvertieren des Anzeigestils in eine
-     * {@code DateFormat}-Konstante. </p>
-     *
-     * @param   mode    Anzeigestil von Time4J
-     * @return  JDK-Anzeigestil
-     * @since   3.0
-     */
-    static int getFormatStyle(DisplayMode mode) {
-
-        switch (mode) {
-            case FULL:
-                return DateFormat.FULL;
-            case LONG:
-                return DateFormat.LONG;
-            case MEDIUM:
-                return DateFormat.MEDIUM;
-            case SHORT:
-                return DateFormat.SHORT;
-            default:
-                throw new UnsupportedOperationException("Unknown: " + mode);
-        }
-
-    }
-
-    /**
-     * <p>Extrahiert ein Formatmuster, wenn m&ouml;glich. </p>
-     *
-     * @param   df      JDK-DateFormat
-     * @return  format pattern
-     * @throws  IllegalStateException if format pattern cannot be determined
-     * @since   3.0
-     */
-    static String getFormatPattern(DateFormat df) {
-
-        if (df instanceof SimpleDateFormat) {
-            return SimpleDateFormat.class.cast(df).toPattern();
-        }
-
-        throw new IllegalStateException("Cannot retrieve format pattern.");
-
-    }
-
-    /**
      * <p>Yields the best available format engine. </p>
      *
      * @return  format engine
@@ -222,6 +187,18 @@ class FormatSupport {
     static FormatEngine<?> getDefaultFormatEngine() {
 
         return DEFAULT_FORMAT_ENGINE;
+
+    }
+
+    /**
+     * <p>Yields the best available format pattern provider. </p>
+     *
+     * @return  format pattern provider
+     * @since   3.9/4.6
+     */
+    static FormatPatternProvider getFormatPatternProvider() {
+
+        return FORMAT_PATTERN_PROVIDER;
 
     }
 

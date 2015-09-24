@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DatePatternTest.class,
         DateTimePatternTest.class,
         EnumDisplayTest.class,
+        FormatPatternTest.class,
         FormatSuite.class,
         HistorySuite.class,
         IsoSanityTest.class,

@@ -61,7 +61,6 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1275,9 +1274,7 @@ public final class PlainDate
         Locale locale
     ) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getDateInstance(style, locale);
-        String formatPattern = FormatSupport.getFormatPattern(df);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getDatePattern(locale, mode);
         return FormatSupport.createFormatter(PlainDate.class, formatPattern, locale);
 
     }

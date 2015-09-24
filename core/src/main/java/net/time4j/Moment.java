@@ -66,7 +66,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -1261,9 +1260,7 @@ public final class Moment
         TZID tzid
     ) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
-        String formatPattern = FormatSupport.getFormatPattern(df);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getDateTimePattern(locale, mode);
         return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }

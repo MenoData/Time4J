@@ -42,6 +42,7 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
+import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.Timezone;
@@ -1454,9 +1455,7 @@ public final class PlainTime
         Locale locale
     ) {
 
-        int style = FormatSupport.getFormatStyle(mode);
-        DateFormat df = DateFormat.getTimeInstance(style, locale);
-        String formatPattern = removeZones(FormatSupport.getFormatPattern(df));
+        String formatPattern = FormatSupport.getFormatPatternProvider().getTimePattern(locale, mode);
         return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
 
     }
@@ -1944,33 +1943,6 @@ public final class PlainTime
         } else {
             return ((value + 1) / divisor) - 1;
         }
-
-    }
-
-    // JDK-Patterns hinten, mittig und vorne von Zeitzonen-Symbolen befreien
-    private static String removeZones(String pattern) {
-
-        String s = pattern.replace(" z", "");
-
-        if (s.charAt(s.length() - 1) == 'z') {
-            for (int i = s.length() - 1; i > 0; i--) {
-                if (s.charAt(i - 1) != 'z') {
-                    s = s.substring(0, i).trim();
-                    break;
-                }
-            }
-        }
-
-        if (s.charAt(0) == 'z') {
-            for (int i = 1; i < s.length(); i++) {
-                if (s.charAt(i) != 'z') {
-                    s = s.substring(i).trim();
-                    break;
-                }
-            }
-        }
-
-        return s;
 
     }
 
