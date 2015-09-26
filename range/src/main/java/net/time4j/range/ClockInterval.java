@@ -376,7 +376,14 @@ public final class ClockInterval
         }
 
         ClockInterval result =
-            parse(text, parser, BracketPolicy.SHOW_NEVER, plog);
+            IntervalParser.of(
+                ClockIntervalFactory.INSTANCE,
+                parser,
+                parser,
+                BracketPolicy.SHOW_NEVER,
+                '/',
+                null // without abbreviation of end component
+            ).parse(text, plog, IsoInterval.extractDefaultAttributes(parser));
 
         if (
             (result == null)
