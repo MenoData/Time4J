@@ -42,7 +42,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.Leniency;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.Timezone;
@@ -53,7 +52,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1455,7 +1453,7 @@ public final class PlainTime
         Locale locale
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getTimePattern(locale, mode);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getTimePattern(mode, locale);
         return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
 
     }

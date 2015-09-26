@@ -1260,7 +1260,7 @@ public final class Moment
         TZID tzid
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getDateTimePattern(locale, mode);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getDateTimePattern(mode, locale);
         return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }

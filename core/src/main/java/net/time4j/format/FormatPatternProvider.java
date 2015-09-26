@@ -72,21 +72,21 @@ public interface FormatPatternProvider {
     FormatPatternProvider DEFAULT =
         new FormatPatternProvider() {
             @Override
-            public String getDatePattern(Locale locale, DisplayMode mode) {
+            public String getDatePattern(DisplayMode mode, Locale locale) {
                 int style = this.getFormatStyle(mode);
                 DateFormat df = DateFormat.getDateInstance(style, locale);
                 return this.getFormatPattern(df);
             }
 
             @Override
-            public String getTimePattern(Locale locale, DisplayMode mode) {
+            public String getTimePattern(DisplayMode mode, Locale locale) {
                 int style = this.getFormatStyle(mode);
                 DateFormat df = DateFormat.getTimeInstance(style, locale);
                 return this.removeZones(this.getFormatPattern(df));
             }
 
             @Override
-            public String getDateTimePattern(Locale locale, DisplayMode mode) {
+            public String getDateTimePattern(DisplayMode mode, Locale locale) {
                 int style = this.getFormatStyle(mode);
                 DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
                 return this.getFormatPattern(df);
@@ -147,20 +147,20 @@ public interface FormatPatternProvider {
     /**
      * <p>Returns the localized date pattern. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized date pattern
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datumsmuster. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized date pattern
      */
     String getDatePattern(
-        Locale locale,
-        DisplayMode mode
+        DisplayMode mode,
+        Locale locale
     );
 
     /**
@@ -168,8 +168,8 @@ public interface FormatPatternProvider {
      *
      * <p>Implementation note: This method must not return a pattern which contains any timezone offset. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized time pattern
      */
     /*[deutsch]
@@ -177,39 +177,40 @@ public interface FormatPatternProvider {
      *
      * <p>Implementierungshinweis: Diese Methode darf keine Zeitzonen-Offsets im Muster enthalten. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized time pattern
      */
     String getTimePattern(
-        Locale locale,
-        DisplayMode mode
+        DisplayMode mode,
+        Locale locale
     );
 
     /**
      * <p>Returns the localized date-time pattern. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized date-time pattern
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster. </p>
      *
-     * @param   locale      language and country setting
      * @param   mode        display mode
+     * @param   locale      language and country setting
      * @return  localized date-time pattern
      */
     String getDateTimePattern(
-        Locale locale,
-        DisplayMode mode
+        DisplayMode mode,
+        Locale locale
     );
 
     /**
      * <p>Returns the localized interval pattern. </p>
      *
      * <p>Expressions of the form &quot;{0}&quot; will be interpreted as the start boundary format
-     * and expressions of the form &quot;{1}&quot; will be interpreted as the end boundary format</p>
+     * and expressions of the form &quot;{1}&quot; will be interpreted as the end boundary format.
+     * All other chars of the pattern will be treated as literals. </p>
      *
      * @param   locale      language and country setting
      * @return  localized interval pattern
@@ -218,7 +219,8 @@ public interface FormatPatternProvider {
      * <p>Liefert das lokalisierte Intervallmuster. </p>
      *
      * <p>Die Ausdr&uuml;cke &quot;{0}&quot; und &quot;{1}&quot; werden als Formathalter f&uuml;r die
-     * Start- und End-Intervallgrenzen interpretiert. </p>
+     * Start- und End-Intervallgrenzen interpretiert. Alle anderen Zeichen des Musters werden wie
+     * Literale behandelt. </p>
      *
      * @param   locale      language and country setting
      * @return  localized interval pattern

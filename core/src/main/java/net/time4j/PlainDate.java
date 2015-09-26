@@ -1274,7 +1274,7 @@ public final class PlainDate
         Locale locale
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getDatePattern(locale, mode);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getDatePattern(mode, locale);
         return FormatSupport.createFormatter(PlainDate.class, formatPattern, locale);
 
     }
