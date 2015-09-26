@@ -284,8 +284,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSSfffffffff() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
-                PlainTime.of(23, 59, 28, 123456789)),
+            Iso8601Format.EXTENDED_WALL_TIME.format(PlainTime.of(23, 59, 28, 123456789)),
             is("23:59:28,123456789"));
     }
 
@@ -308,9 +307,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET.format(
                 PlainDate.of(2012, 6, 30)
-                .at(PlainTime.of(23, 59, 59))
-                .atUTC()
-                .plus(1, SI.SECONDS)),
+                    .at(PlainTime.of(23, 59, 59))
+                    .atUTC()
+                    .plus(1, SI.SECONDS)),
             is("2012-06-30T23:59:60Z"));
     }
 
@@ -331,10 +330,10 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET
                 .withTimezone(ZonalOffset.ofTotalSeconds(7200)).format(
-                PlainDate.of(2012, 6, 30)
-                .at(PlainTime.of(23, 59, 59))
-                .atUTC()
-                .plus(1, SI.SECONDS)),
+                    PlainDate.of(2012, 6, 30)
+                    .at(PlainTime.of(23, 59, 59))
+                    .atUTC()
+                    .plus(1, SI.SECONDS)),
             is("2012-07-01T01:59:60+02:00"));
     }
 
@@ -381,28 +380,24 @@ public class Iso8601FormatTest {
                 .withTimezone(ZonalOffset.ofTotalSeconds(-1))
                 .format(
                     PlainDate.of(2012, 6, 30)
-                    .at(PlainTime.of(23, 59, 59))
-                    .atUTC()
-                    .plus(1, SI.SECONDS));
+                        .at(PlainTime.of(23, 59, 59))
+                        .atUTC()
+                        .plus(1, SI.SECONDS));
     }
 
     @Test
     public void printExtendedDateTime() {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME.format(
-                PlainDate.of(2012, 6, 30)
-                .at(PlainTime.of(23, 59, 59))),
+                PlainDate.of(2012, 6, 30).at(PlainTime.of(23, 59, 59))),
             is("2012-06-30T23:59:59"));
     }
 
     @Test
     public void parseExtendedDateTime() throws ParseException {
         assertThat(
-            Iso8601Format.EXTENDED_DATE_TIME
-                .parse("2012-06-30T23:59:59"),
-            is(
-                PlainDate.of(2012, 6, 30)
-                .at(PlainTime.of(23, 59, 59))));
+            Iso8601Format.EXTENDED_DATE_TIME.parse("2012-06-30T23:59:59"),
+            is(PlainDate.of(2012, 6, 30).at(PlainTime.of(23, 59, 59))));
     }
 
     @Test
@@ -412,6 +407,11 @@ public class Iso8601FormatTest {
                 .with(Attributes.LENIENCY, Leniency.STRICT)
                 .parse("2012-06-30T24:00"),
             is(PlainDate.of(2012, 7, 1).atStartOfDay()));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseExtendedDateTimeStrict2401() throws ParseException {
+        Iso8601Format.EXTENDED_DATE_TIME.parse("2012-06-30T24:01");
     }
 
     @Test
