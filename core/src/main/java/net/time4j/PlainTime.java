@@ -1483,7 +1483,7 @@ public final class PlainTime
         Locale locale
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getTimePattern(locale, mode);
+        String formatPattern = FormatSupport.getFormatPatternProvider().getTimePattern(mode, locale);
         return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
 
     }
