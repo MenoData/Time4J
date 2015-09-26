@@ -41,7 +41,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
 
 
 /**
- * <p>Interpretiert Intervalle basierend auf Zeitformatierern, die auf die
+ * <p>Interpretiert Intervalle basierend auf eher technischen Zeitformatierern, die auf die
  * Start- oder Endkomponenten angewandt werden. </p>
  *
  * @author  Meno Hochschild
@@ -97,8 +97,7 @@ final class IntervalParser
      * @return  new interval parser
      * @since   2.0
      */
-	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
-    IntervalParser<T, I> of(
+	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
 		IntervalFactory<T, I> factory,
 		ChronoParser<T> parser,
 		BracketPolicy policy
@@ -121,12 +120,11 @@ final class IntervalParser
      * @param   startFormat     formatter for lower interval boundary
      * @param   endFormat       formatter for upper interval boundary
      * @param   policy          bracket policy
-     * @param   merger          ISO-merger
+     * @param   merger          ISO-merger (optional)
      * @return  new interval parser
      * @since   2.0
      */
-	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
-    IntervalParser<T, I> of(
+	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
 		IntervalFactory<T, I> factory,
 		ChronoParser<T> startFormat,
 		ChronoParser<T> endFormat,
@@ -186,8 +184,7 @@ final class IntervalParser
 		int pos = start;
 
 		if (pos >= len) {
-            throw new IndexOutOfBoundsException(
-                "[" + pos + "]: " + text.toString());
+            throw new IndexOutOfBoundsException("[" + pos + "]: " + text.toString());
         }
 
         AttributeQuery attrs = attributes;
@@ -335,8 +332,8 @@ final class IntervalParser
 			t2 = this.endFormat.parse(text, upperLog, attrs);
 			if (t2 == null || upperLog.isError()) {
                 if (
-                    (t1 != null)
-                    && (this.merger != null)
+                    (t1 != null) // implies: lowerLog != null
+                    && (this.isoMode())
                 ) {
                     IntervalFactory<T, I> iif = this.factory;
                     ChronoParser<T> parser = this.endFormat;
@@ -449,7 +446,7 @@ final class IntervalParser
                 int index = (rightVisible ? pos : start);
                 status.setError(
                     index,
-                    "Standard boundary not allowed due to sign policy.");
+                    "Standard boundary not allowed due to bracket policy.");
                 return null;
             }
         }
@@ -482,6 +479,12 @@ final class IntervalParser
         ChronoFormatter<?> fmt = ChronoFormatter.class.cast(parser);
         fmt = fmt.withDefault(key, cv.get(key));
         return (ChronoParser<T>) fmt;
+
+    }
+
+    private boolean isoMode() {
+
+        return (this.merger != null);
 
     }
 
