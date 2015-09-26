@@ -26,6 +26,17 @@ public class TimestampIntervalFormatTest {
     }
 
     @Test
+    public void parseAbbreviatedWithoutDateAnd24Hour() throws ParseException {
+        PlainTimestamp start = PlainTimestamp.of(2012, 4, 30, 14, 15);
+        PlainTimestamp end = PlainTimestamp.of(2012, 5, 1, 0, 0);
+        TimestampInterval expected = TimestampInterval.between(start, end);
+
+        assertThat(
+            TimestampInterval.parseISO("2012-04-30T14:15/T24:00"),
+            is(expected));
+    }
+
+    @Test
     public void parseAbbreviatedWithoutDateOrT() throws ParseException {
         PlainTimestamp start = PlainTimestamp.of(2012, 4, 30, 14, 15);
         PlainTimestamp end = PlainTimestamp.of(2012, 4, 30, 16, 0);

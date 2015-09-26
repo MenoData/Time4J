@@ -405,11 +405,13 @@ public class Iso8601FormatTest {
                 .at(PlainTime.of(23, 59, 59))));
     }
 
-    @Test(expected=ParseException.class)
+    @Test
     public void parseExtendedDateTimeStrict24() throws ParseException {
-        Iso8601Format.EXTENDED_DATE_TIME
-            .with(Attributes.LENIENCY, Leniency.STRICT)
-            .parse("2012-06-30T24:00");
+        assertThat(
+            Iso8601Format.EXTENDED_DATE_TIME
+                .with(Attributes.LENIENCY, Leniency.STRICT)
+                .parse("2012-06-30T24:00"),
+            is(PlainDate.of(2012, 7, 1).atStartOfDay()));
     }
 
     @Test

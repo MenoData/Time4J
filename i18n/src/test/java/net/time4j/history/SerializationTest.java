@@ -58,7 +58,7 @@ public class SerializationTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-         oos.writeObject(obj);
+        oos.writeObject(obj);
         byte[] data = baos.toByteArray();
         oos.close();
         ByteArrayInputStream bais = new ByteArrayInputStream(data);

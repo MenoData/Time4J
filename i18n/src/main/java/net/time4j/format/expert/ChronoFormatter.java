@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.CalendarUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -2061,12 +2062,34 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     }
                 }
             } else {
+                ChronoEntity<?> date = null;
+
+                if (
+                    (result instanceof PlainTimestamp)
+                    && (result.get(PlainTime.ISO_HOUR) == 0)
+                    && (
+                        (parsed.contains(PlainTime.ISO_HOUR) && (parsed.get(PlainTime.ISO_HOUR) == 24))
+                        || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
+                    )
+                ) {
+                    date = PlainTimestamp.class.cast(result).toDate().minus(1, CalendarUnit.DAYS);
+                }
+
                 for (ChronoElement<?> e : parsed.toMap().keySet()) {
                     Object value = parsed.get(e);
+                    ChronoEntity<?> test = result;
+
+                    if (date != null) {
+                        if (e.isDateElement()) {
+                            test = date;
+                        } else if (e.isTimeElement()) {
+                            test = PlainTime.midnightAtEndOfDay();
+                        }
+                    }
 
                     if (
-                        result.contains(e)
-                        && !result.get(e).equals(value)
+                        test.contains(e)
+                        && !test.get(e).equals(value)
                     ) {
                         StringBuilder reason = new StringBuilder(256);
                         reason.append("Conflict found: ");
@@ -2078,7 +2101,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         reason.append(value);
                         reason.append("}, but parsed entity ");
                         reason.append("has element value {");
-                        reason.append(result.get(e));
+                        reason.append(test.get(e));
                         reason.append("}.");
                         status.setError(text.length(), reason.toString());
                         return null;
