@@ -129,10 +129,10 @@ final class IntervalParser
      * @since   3.9/4.6
      */
 	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
-		IntervalFactory<T, I> factory,
-		ChronoParser<T> startFormat,
-		ChronoParser<T> endFormat,
-		BracketPolicy policy,
+        IntervalFactory<T, I> factory,
+        ChronoParser<T> startFormat,
+        ChronoParser<T> endFormat,
+        BracketPolicy policy,
         char separator,
         ChronoMerger<T> merger
 	) {
@@ -183,19 +183,19 @@ final class IntervalParser
 
     }
 
-	@Override
-	public I parse(
+    @Override
+    public I parse(
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes
     ) {
 
-		// initialization phase
-		int start = status.getPosition();
-		int len = text.length();
-		int pos = start;
+        // initialization phase
+        int start = status.getPosition();
+        int len = text.length();
+        int pos = start;
 
-		if (pos >= len) {
+        if (pos >= len) {
             throw new IndexOutOfBoundsException("[" + pos + "]: " + text.toString());
         }
 
@@ -210,10 +210,10 @@ final class IntervalParser
             attrs = new Wrapper(attributes);
         }
 
-		IntervalEdge left = CLOSED;
-		IntervalEdge right = this.factory.isCalendrical() ? CLOSED : OPEN;
-		T t1 = null;
-		T t2 = null;
+        IntervalEdge left = CLOSED;
+        IntervalEdge right = this.factory.isCalendrical() ? CLOSED : OPEN;
+        T t1 = null;
+        T t2 = null;
         Boundary<T> lower = null;
         Boundary<T> upper = null;
         int posLower = -1;
@@ -222,98 +222,98 @@ final class IntervalParser
         ParseLog upperLog = null;
         String period = null;
 
-		// starting boundary
-		char c = text.charAt(pos);
-		boolean leftVisible = ((c == '[') || (c == '('));
+        // starting boundary
+        char c = text.charAt(pos);
+        boolean leftVisible = ((c == '[') || (c == '('));
         boolean rightVisible = false;
 
-		if (leftVisible) {
-			if (this.policy == BracketPolicy.SHOW_NEVER) {
-				status.setError(
+        if (leftVisible) {
+            if (this.policy == BracketPolicy.SHOW_NEVER) {
+                status.setError(
                     pos,
                     "Illegal start boundary due to bracket policy: " + c);
-			} else if (c == '(') {
-				left = OPEN;
-			}
+            } else if (c == '(') {
+                left = OPEN;
+            }
             pos++;
-		} else if (this.policy == BracketPolicy.SHOW_ALWAYS) {
-			status.setError(pos, "Missing start boundary bracket.");
-		}
+        } else if (this.policy == BracketPolicy.SHOW_ALWAYS) {
+            status.setError(pos, "Missing start boundary bracket.");
+        }
 
-		if (status.isError()) {
-			return null;
-		} else if (pos >= len) {
-			status.setError(
+        if (status.isError()) {
+            return null;
+        } else if (pos >= len) {
+            status.setError(
                 pos,
                 "Missing interval start component, end of text reached.");
-			return null;
-		}
+            return null;
+        }
 
-		// start component and solidus
-		c = text.charAt(pos);
+        // start component and solidus
+        c = text.charAt(pos);
 
-		if (c == 'P') {
+        if (c == 'P') {
             posLower = pos;
-			int index = pos;
-			int solidus = -1; // here assuming iso mode hence searching for solidus only
-			while (++index < len) {
-				if (text.charAt(index) == '/') {
-					solidus = index;
-					break;
-				}
-			}
-			if (solidus == -1) {
+            int index = pos;
+            int solidus = -1; // here assuming iso mode hence searching for solidus only
+            while (++index < len) {
+                if (text.charAt(index) == '/') {
+                    solidus = index;
+                    break;
+                }
+            }
+            if (solidus == -1) {
                 status.setError(
                     pos,
                     "Solidus char separating start and end boundaries expected.");
                 return null;
-			}
+            }
             period = text.subSequence(pos, solidus).toString();
-			pos = solidus + 1;
-		} else if (
+            pos = solidus + 1;
+        } else if (
             (c == '-')
             && (pos + 1 < len)
             && (text.charAt(pos + 1) == '\u221E')
         ) {
-			if ((left == CLOSED) && leftVisible) {
-				status.setError(pos - 1, "Open boundary expected.");
-				return null;
-			}
-			left = OPEN;
+            if ((left == CLOSED) && leftVisible) {
+                status.setError(pos - 1, "Open boundary expected.");
+                return null;
+            }
+            left = OPEN;
             lower = Boundary.infinitePast();
-			pos += 2;
+            pos += 2;
             this.checkSeparatorChar(text, status, pos, len);
             if (status.isError()) {
                 return null;
             }
-			pos++;
-		} else {
-			lowerLog = new ParseLog(pos);
-			t1 = this.startFormat.parse(text, lowerLog, attrs);
-			if (t1 == null || lowerLog.isError()) {
-				status.setError(pos, lowerLog.getErrorMessage());
-				return null;
-			}
+            pos++;
+        } else {
+            lowerLog = new ParseLog(pos);
+            t1 = this.startFormat.parse(text, lowerLog, attrs);
+            if (t1 == null || lowerLog.isError()) {
+                status.setError(pos, lowerLog.getErrorMessage());
+                return null;
+            }
             lower = Boundary.of(left, t1);
-			pos = lowerLog.getPosition();
+            pos = lowerLog.getPosition();
             this.checkSeparatorChar(text, status, pos, len);
             if (status.isError()) {
                 return null;
             }
-			pos++;
-		}
+            pos++;
+        }
 
-		// end component after solidus
-		if (pos >= len) {
-			status.setError(
+        // end component after separator char
+        if (pos >= len) {
+            status.setError(
                 pos,
                 "Missing interval end component, end of text reached.");
-			return null;
-		}
+            return null;
+        }
 
-		c = text.charAt(pos);
+        c = text.charAt(pos);
 
-		if (c == 'P') {
+        if (c == 'P') {
             if (t1 == null) {
                 status.setError(
                     pos,
@@ -328,7 +328,7 @@ final class IntervalParser
             }
             period = text.subSequence(pos, endIndex).toString();
             pos = endIndex;
-		} else if (
+        } else if (
             (c == '+')
             && (pos + 1 < len)
             && (text.charAt(pos + 1) == '\u221E')
@@ -341,13 +341,13 @@ final class IntervalParser
                 status.setError(pos + 2, "Open boundary expected.");
                 return null;
             }
-			right = OPEN;
+            right = OPEN;
             upper = Boundary.infiniteFuture();
-			pos += 2;
-		} else {
-			upperLog = new ParseLog(pos);
-			t2 = this.endFormat.parse(text, upperLog, attrs);
-			if (t2 == null || upperLog.isError()) {
+            pos += 2;
+        } else {
+            upperLog = new ParseLog(pos);
+            t2 = this.endFormat.parse(text, upperLog, attrs);
+            if (t2 == null || upperLog.isError()) {
                 if (
                     (t1 != null) // implies: lowerLog != null
                     && (this.isoMode())
@@ -367,15 +367,15 @@ final class IntervalParser
                     t2 = parser.parse(text, upperLog, attrs);
                 }
             }
-			if (t2 == null || upperLog.isError()) {
-				status.setError(pos, upperLog.getErrorMessage());
-				return null;
-			}
+            if (t2 == null || upperLog.isError()) {
+                status.setError(pos, upperLog.getErrorMessage());
+                return null;
+            }
             upper = Boundary.of(right, t2);
-			pos = upperLog.getPosition();
-		}
+            pos = upperLog.getPosition();
+        }
 
-		// ending boundary
+        // ending boundary
         if (pos >= len) {
             if (this.policy == BracketPolicy.SHOW_ALWAYS) {
                 status.setError(pos, "Missing end boundary bracket.");
@@ -471,8 +471,7 @@ final class IntervalParser
         status.setPosition(pos);
         return interval;
 
-	}
-
+    }
 
     private void checkSeparatorChar(
         CharSequence text,
