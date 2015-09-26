@@ -73,10 +73,73 @@ public class ClockIntervalFormatTest {
     @Test
     public void parseISOExtended() throws ParseException {
         PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30, 123000000);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("12:20/14:15:30.123"),
+            is(interval));
+        assertThat(
+            ClockInterval.parseISO("12:20/14:15:30,123"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISO24() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.midnightAtEndOfDay();
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("12:20/24:00:00,000"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISOExtendedWithStartPeriod() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
         PlainTime end = PlainTime.of(14, 15, 30);
         ClockInterval interval = ClockInterval.between(start, end);
         assertThat(
-            ClockInterval.parseISO("12:20/14:15:30"),
+            ClockInterval.parseISO("PT1H55M30S/14:15:30"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISOExtendedWithEndPeriod() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("12:20/PT1H55M30S"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISOBasicWithStartPeriod() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("PT1H55M30S/141530"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISOBasicWithEndPeriod() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("1220/PT1H55M30S"),
+            is(interval));
+    }
+
+    @Test
+    public void parseISOBasicWithAlternativePeriod() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parseISO("PT01:55:30/14:15:30"),
             is(interval));
     }
 

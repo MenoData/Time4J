@@ -683,11 +683,12 @@ public final class DateInterval
 
         // create interval
         return IntervalParser.of(
-             DateIntervalFactory.INSTANCE,
-             startFormat,
-             endFormat,
-             BracketPolicy.SHOW_NEVER,
-             PlainDate.axis()
+            DateIntervalFactory.INSTANCE,
+            startFormat,
+            endFormat,
+            BracketPolicy.SHOW_NEVER,
+            '/',
+            PlainDate.axis()
         ).parse(text);
 
     }

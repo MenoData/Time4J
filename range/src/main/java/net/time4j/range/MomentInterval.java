@@ -803,11 +803,12 @@ public final class MomentInterval
 
         // create interval
         return IntervalParser.of(
-             MomentIntervalFactory.INSTANCE,
-             startFormat,
-             endFormat,
-             BracketPolicy.SHOW_NEVER,
-             Moment.axis()
+            MomentIntervalFactory.INSTANCE,
+            startFormat,
+            endFormat,
+            BracketPolicy.SHOW_NEVER,
+            '/',
+            Moment.axis()
         ).parse(text);
 
     }

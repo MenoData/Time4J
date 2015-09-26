@@ -32,7 +32,6 @@ import net.time4j.format.expert.ParseLog;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Comparator;
@@ -79,7 +78,7 @@ public final class ClockInterval
 
         if (start.isInfinite() || end.isInfinite()) {
             throw new IllegalArgumentException(
-                "Time intervals must be finite.");
+                "Clock (time) intervals must be finite.");
         }
 
     }
@@ -290,9 +289,9 @@ public final class ClockInterval
     ) throws ParseException {
 
         return IntervalParser.of(
-             ClockIntervalFactory.INSTANCE,
-             parser,
-             BracketPolicy.SHOW_WHEN_NON_STANDARD
+            ClockIntervalFactory.INSTANCE,
+            parser,
+            BracketPolicy.SHOW_WHEN_NON_STANDARD
         ).parse(text);
 
     }
@@ -339,9 +338,17 @@ public final class ClockInterval
     /**
      * <p>Interpretes given ISO-conforming text as interval. </p>
      *
-     * <p>Equivalent to {@link #parse(String,ChronoParser)
-     * parse(text, Iso8601Format#EXTENDED_WALL_TIME)},
-     * but can also understand the basic ISO-format. </p>
+     * <p>Examples for supported formats: </p>
+     *
+     * <ul>
+     *     <li>09:45/PT5H</li>
+     *     <li>PT5H/14:45</li>
+     *     <li>0945/PT5H</li>
+     *     <li>PT5H/1445</li>
+     *     <li>PT01:55:30/14:15:30</li>
+     *     <li>04:01:30.123/24:00:00.000</li>
+     *     <li>04:01:30,123/24:00:00,000</li>
+     * </ul>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
@@ -353,9 +360,17 @@ public final class ClockInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen ISO-konformen Text als Intervall. </p>
      *
-     * <p>&Auml;quivalent zu {@link #parse(String,ChronoParser)
-     * parse(text, Iso8601Format#EXTENDED_WALL_TIME)},
-     * kann aber auch das <i>basic</i>-ISO-Format verstehen. </p>
+     * <p>Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     *
+     * <ul>
+     *     <li>09:45/PT5H</li>
+     *     <li>PT5H/14:45</li>
+     *     <li>0945/PT5H</li>
+     *     <li>PT5H/1445</li>
+     *     <li>PT01:55:30/14:15:30</li>
+     *     <li>04:01:30.123/24:00:00.000</li>
+     *     <li>04:01:30,123/24:00:00,000</li>
+     * </ul>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
@@ -366,13 +381,16 @@ public final class ClockInterval
      */
     public static ClockInterval parseISO(String text) throws ParseException {
 
-        ChronoParser<PlainTime> parser;
+        ChronoParser<PlainTime> parser = Iso8601Format.BASIC_WALL_TIME;
         ParseLog plog = new ParseLog();
 
         if (text.length() > 3 && text.charAt(2) == ':') {
             parser = Iso8601Format.EXTENDED_WALL_TIME;
-        } else {
-            parser = Iso8601Format.BASIC_WALL_TIME;
+        } else if ((text.charAt(0) == 'P') || (text.charAt(0) == '-')) {
+            int solidus = text.indexOf('/');
+            if (text.length() > solidus + 4 && text.charAt(solidus + 3) == ':') {
+                parser = Iso8601Format.EXTENDED_WALL_TIME;
+            }
         }
 
         ClockInterval result =

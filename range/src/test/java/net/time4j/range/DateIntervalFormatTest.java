@@ -242,6 +242,7 @@ public class DateIntervalFormatTest {
                     .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                     .build(),
                 BracketPolicy.SHOW_ALWAYS,
+                '/',
                 PlainDate.axis()
             ).parse("[20140227/0514]", plog, formatter.getAttributes()),
             is(interval));
