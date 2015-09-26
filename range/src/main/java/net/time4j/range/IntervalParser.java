@@ -60,6 +60,7 @@ final class IntervalParser
 	private final ChronoParser<T> endFormat;
 	private final BracketPolicy policy;
     private final ChronoMerger<T> merger;
+    private final Character separator;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -68,7 +69,8 @@ final class IntervalParser
 		ChronoParser<T> startFormat,
 		ChronoParser<T> endFormat,
 		BracketPolicy policy,
-        ChronoMerger<T> merger // optional
+        ChronoMerger<T> merger, // optional
+        Character separator // optional
 	) {
 		super();
 
@@ -81,13 +83,14 @@ final class IntervalParser
 		this.endFormat = endFormat;
 		this.policy = policy;
         this.merger = merger;
+        this.separator = separator;
 
 	}
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Fabrikmethode f&uuml;r allgemeine Format-Objekte. </p>
+     * <p>Factory method with either solidus or hyphen as separation char. </p>
      *
      * @param   <T> generic temporal type
      * @param   <I> generic interval type
@@ -107,12 +110,12 @@ final class IntervalParser
 			throw new NullPointerException("Missing boundary parser.");
         }
 
-		return new IntervalParser<>(factory, parser, parser, policy, null);
+		return new IntervalParser<>(factory, parser, parser, policy, null, null);
 
 	}
 
     /**
-     * <p>Fabrikmethode im ISO-Modus. </p>
+     * <p>General factory method. </p>
      *
      * @param   <T> generic temporal type
      * @param   <I> generic interval type
@@ -121,23 +124,32 @@ final class IntervalParser
      * @param   endFormat       formatter for upper interval boundary
      * @param   policy          bracket policy
      * @param   merger          ISO-merger (optional)
+     * @param   separator       separation char  between start and end component
      * @return  new interval parser
-     * @since   2.0
+     * @since   3.9/4.6
      */
 	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
 		IntervalFactory<T, I> factory,
 		ChronoParser<T> startFormat,
 		ChronoParser<T> endFormat,
 		BracketPolicy policy,
+        char separator,
         ChronoMerger<T> merger
 	) {
 
-		return new IntervalParser<>(
+        if (startFormat == null) {
+            throw new NullPointerException("Missing start boundary parser.");
+        } else if (endFormat == null) {
+            throw new NullPointerException("Missing end boundary parser.");
+        }
+
+        return new IntervalParser<>(
             factory,
             startFormat,
             endFormat,
             policy,
-            merger);
+            merger,
+            Character.valueOf(separator));
 
 	}
 
@@ -243,7 +255,7 @@ final class IntervalParser
 		if (c == 'P') {
             posLower = pos;
 			int index = pos;
-			int solidus = -1;
+			int solidus = -1; // here assuming iso mode hence searching for solidus only
 			while (++index < len) {
 				if (text.charAt(index) == '/') {
 					solidus = index;
@@ -251,7 +263,10 @@ final class IntervalParser
 				}
 			}
 			if (solidus == -1) {
-                return solidusError(status, pos);
+                status.setError(
+                    pos,
+                    "Solidus char separating start and end boundaries expected.");
+                return null;
 			}
             period = text.subSequence(pos, solidus).toString();
 			pos = solidus + 1;
@@ -267,9 +282,10 @@ final class IntervalParser
 			left = OPEN;
             lower = Boundary.infinitePast();
 			pos += 2;
-			if ((pos >= len) || (text.charAt(pos) != '/')) {
-                return solidusError(status, pos);
-			}
+            this.checkSeparatorChar(text, status, pos, len);
+            if (status.isError()) {
+                return null;
+            }
 			pos++;
 		} else {
 			lowerLog = new ParseLog(pos);
@@ -280,9 +296,10 @@ final class IntervalParser
 			}
             lower = Boundary.of(left, t1);
 			pos = lowerLog.getPosition();
-			if ((pos >= len) || (text.charAt(pos) != '/')) {
-                return solidusError(status, pos);
-			}
+            this.checkSeparatorChar(text, status, pos, len);
+            if (status.isError()) {
+                return null;
+            }
 			pos++;
 		}
 
@@ -457,15 +474,35 @@ final class IntervalParser
 	}
 
 
-    private static <R> R solidusError(
+    private void checkSeparatorChar(
+        CharSequence text,
         ParseLog status,
-        int pos
+        int pos,
+        int len
     ) {
 
-        status.setError(
-            pos,
-            "Solidus char separating start and end boundaries expected.");
-        return null;
+        if (pos >= len) {
+            status.setError(
+                pos,
+                "Reached end of text, but not found any separation char.");
+            return;
+        }
+
+        char test = text.charAt(pos);
+        boolean ok;
+
+        if (this.separator == null) {
+            ok = ((test == '/') || (test == '-'));
+        } else {
+            ok = (test == this.separator.charValue());
+        }
+
+        if (!ok) {
+            status.setError(
+                pos,
+                "Missing separation char between start and end boundaries: "
+                + ((this.separator == null) ? "/ or -" : this.separator.toString()));
+        }
 
     }
 
