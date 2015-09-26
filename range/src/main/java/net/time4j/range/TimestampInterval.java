@@ -746,11 +746,12 @@ public final class TimestampInterval
 
         // create interval
         return IntervalParser.of(
-             TimestampIntervalFactory.INSTANCE,
-             startFormat,
-             endFormat,
-             BracketPolicy.SHOW_NEVER,
-             PlainTimestamp.axis()
+            TimestampIntervalFactory.INSTANCE,
+            startFormat,
+            endFormat,
+            BracketPolicy.SHOW_NEVER,
+            '/',
+            PlainTimestamp.axis()
         ).parse(text);
 
     }
