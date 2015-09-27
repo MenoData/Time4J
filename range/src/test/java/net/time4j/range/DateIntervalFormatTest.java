@@ -9,6 +9,7 @@ import java.util.Locale;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -483,6 +484,23 @@ public class DateIntervalFormatTest {
         DateInterval.parse(
             "(2012-01-01/2012-01-01)",
             Iso8601Format.EXTENDED_CALENDAR_DATE);
+    }
+
+    @Test
+    public void parseCustomUS() throws ParseException {
+        PlainDate start = PlainDate.of(2015, 7, 20);
+        PlainDate end = PlainDate.of(2015, 12, 31);
+        DateInterval interval = DateInterval.between(start, end);
+        ParseLog plog = new ParseLog();
+        assertThat(
+            DateInterval.parse(
+                "July 20 / 2015 - December 31 / 2015",
+                ChronoFormatter.ofDatePattern("MMMM d / uuuu ", PatternType.CLDR, Locale.US),
+                '-',
+                ChronoFormatter.ofDatePattern(" MMMM d / uuuu", PatternType.CLDR, Locale.US),
+                BracketPolicy.SHOW_WHEN_NON_STANDARD,
+                plog),
+            is(interval));
     }
 
 }

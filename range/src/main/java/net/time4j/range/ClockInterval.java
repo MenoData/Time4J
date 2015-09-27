@@ -299,25 +299,31 @@ public final class ClockInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
+     * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
+     * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
+     * between start and end component unless the start component is a period. </p>
+     *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
+     * <p>&Auml;hnlich wie {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
+     * Seit der Version v3.9/4.6 kann diese Methode auch einen Bindestrich als Alternative zum Schr&auml;gstrich
+     * als Trennzeichen zwischen Start- und Endkomponente, es sei denn, die Startkomponente ist eine Periode. </p>
+     *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @param   policy      strategy for parsing interval boundaries
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
      */
     public static ClockInterval parse(
@@ -328,10 +334,62 @@ public final class ClockInterval
     ) {
 
         return IntervalParser.of(
-             ClockIntervalFactory.INSTANCE,
-             parser,
-             policy
+            ClockIntervalFactory.INSTANCE,
+            parser,
+            policy
         ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
+     * <p>This method is mainly intended for parsing technical interval formats similar to ISO-8601
+     * which are not localized. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   startFormat format object for parsing start component
+     * @param   separator   char separating start and end component
+     * @param   endFormat   format object for parsing end component
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * <p>Diese Methode ist vor allem f&uuml;r technische nicht-lokalisierte Intervallformate &auml;hnlich
+     * wie in ISO-8601 definiert gedacht. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   startFormat format object for parsing start component
+     * @param   separator   char separating start and end component
+     * @param   endFormat   format object for parsing end component
+     * @param   policy      strategy for parsing interval boundaries
+     * @param   status      parser information (always as new instance)
+     * @return  result or {@code null} if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   3.9/4.6
+     */
+    public static ClockInterval parse(
+        CharSequence text,
+        ChronoParser<PlainTime> startFormat,
+        char separator,
+        ChronoParser<PlainTime> endFormat,
+        BracketPolicy policy,
+        ParseLog status
+    ) {
+
+        return IntervalParser.of(
+            ClockIntervalFactory.INSTANCE,
+            startFormat,
+            endFormat,
+            policy,
+            separator,
+            null
+        ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
 
     }
 

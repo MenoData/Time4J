@@ -3,9 +3,12 @@ package net.time4j.range;
 import net.time4j.PlainTime;
 
 import java.text.ParseException;
+import java.util.Locale;
 
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -140,6 +143,49 @@ public class ClockIntervalFormatTest {
         ClockInterval interval = ClockInterval.between(start, end);
         assertThat(
             ClockInterval.parseISO("PT01:55:30/14:15:30"),
+            is(interval));
+    }
+
+    @Test
+    public void parseCustom() throws ParseException {
+        PlainTime start = PlainTime.of(12, 20, 0);
+        PlainTime end = PlainTime.of(14, 15, 30);
+        ClockInterval interval = ClockInterval.between(start, end);
+        ParseLog plog = new ParseLog();
+        assertThat(
+            ClockInterval.parse(
+                "[1220/141530)",
+                Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
+            is(interval));
+        plog.reset();
+        assertThat(
+            ClockInterval.parse(
+                "[1220-141530)",
+                Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
+            is(interval));
+        plog.reset();
+        assertThat(
+            ClockInterval.parse(
+                "1220~141530",
+                Iso8601Format.BASIC_WALL_TIME, '~', Iso8601Format.BASIC_WALL_TIME,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD, plog),
+            is(interval));
+    }
+
+    @Test
+    public void parseHHMM() throws ParseException {
+        PlainTime start = PlainTime.of(7, 20);
+        PlainTime end = PlainTime.of(24, 0);
+        ClockInterval interval = ClockInterval.between(start, end);
+        ParseLog plog = new ParseLog();
+        assertThat(
+            ClockInterval.parse(
+                "07:20 - 24:00",
+                ChronoFormatter.ofTimePattern("HH:mm ", PatternType.CLDR_24, Locale.ROOT),
+                '-',
+                ChronoFormatter.ofTimePattern(" HH:mm", PatternType.CLDR_24, Locale.ROOT),
+                BracketPolicy.SHOW_WHEN_NON_STANDARD,
+                plog),
             is(interval));
     }
 
