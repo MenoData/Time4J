@@ -291,4 +291,17 @@ public class BasicClockRangeTest {
             is(expected));
     }
 
+    @Test
+    public void canonicalForm() {
+        assertThat(
+            ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.of(23, 59, 59, 123456789))
+                .withClosedEnd().toCanonical(),
+            is(ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.of(23, 59, 59, 123456790))));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void canonicalError() {
+        ClockInterval.since(PlainTime.midnightAtStartOfDay()).withClosedEnd().toCanonical();
+    }
+
 }

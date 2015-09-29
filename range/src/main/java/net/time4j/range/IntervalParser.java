@@ -500,7 +500,7 @@ final class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<
         while (i < n) {
             char c = pattern.charAt(i);
 
-            if ((c == '{') && (i + 2 < n) && (pattern.charAt(i + 2) == '}')){
+            if ((c == '{') && (i + 2 < n) && (pattern.charAt(i + 2) == '}')) {
                 char next = pattern.charAt(i + 1);
 
                 if (next == '0') {
@@ -544,6 +544,9 @@ final class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<
                     i += 3;
                     continue;
                 }
+            } else if (c == '[' || c == ']' || c == '(' || c == ')') {
+                plog.setError(pos, "Brackets representing interval boundaries cannot be parsed: " + text);
+                return null;
             }
 
             if (pos >= len) {

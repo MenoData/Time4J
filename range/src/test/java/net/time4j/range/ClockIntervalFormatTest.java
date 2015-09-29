@@ -215,4 +215,12 @@ public class ClockIntervalFormatTest {
             ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.ROOT));
     }
 
+    @Test(expected=ParseException.class)
+    public void parseHHMM5() throws ParseException {
+        ClockInterval.parse(
+            "[07:20/24:00)",
+            ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.ROOT),
+            "[{0}/{1})");
+    }
+
 }

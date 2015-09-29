@@ -542,6 +542,69 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
+     * <p>Changes this interval to an interval such that calendrical intervals become closed intervals
+     * and other intervals become half-open. </p>
+     *
+     * <p>The temporal space will not be changed. </p>
+     *
+     * @return  new interval with canonical boundaries
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Wandelt dieses Intervall so um, da&szlig; kalendarische Intervalle geschlossen und andere
+     * Intervalle halb-offen werden. </p>
+     *
+     * <p>Der temporale Zeitraum wird nicht ge&auml;ndert. </p>
+     *
+     * @return  new interval with canonical boundaries
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @since   3.9/4.6
+     */
+    public I toCanonical() {
+
+        Boundary<T> s = this.start;
+        Boundary<T> e = this.end;
+
+        if (!this.start.isInfinite() && this.start.isOpen()) {
+            T t = this.getTimeLine().stepForward(this.start.getTemporal());
+
+            if (t == null) {
+                throw new IllegalStateException("Cannot canonicalize this interval: " + this);
+            }
+
+            s = Boundary.ofClosed(t);
+        }
+
+        if (!this.end.isInfinite()) {
+            if (this.getFactory().isCalendrical()) {
+                if (this.end.isOpen()) {
+                    T t = this.getTimeLine().stepBackwards(this.end.getTemporal());
+
+                    if (t == null) {
+                        throw new IllegalStateException("Cannot canonicalize this interval: " + this);
+                    }
+
+                    e = Boundary.ofClosed(t);
+                }
+            } else {
+                if (this.end.isClosed()) {
+                    T t = this.getTimeLine().stepForward(this.end.getTemporal());
+
+                    if (t == null) {
+                        throw new IllegalStateException("Cannot canonicalize this interval: " + this);
+                    }
+
+                    e = Boundary.ofOpen(t);
+                }
+            }
+        }
+
+        return this.getFactory().between(s, e);
+
+    }
+
+    /**
      * <p>Compares the boundaries (start and end) and also the time axis
      * of this and the other interval. </p>
      *
@@ -627,7 +690,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Prints this interval using a localized interval pattern. </p>
+     * <p>Prints the canonical form of this interval using a localized interval pattern. </p>
      *
      * <p>If given printer does not contain a reference to a locale then the interval pattern
      * &quot;{0}/{1}&quot; will be used. Note: Starting with version v2.0 and before v3.9/4.6,
@@ -636,12 +699,14 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *
      * @param   printer     format object for printing start and end
      * @return  localized formatted string
-     * @since   3.9/4.6
+     * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @see     #toCanonical()
      * @see     #print(ChronoPrinter, String)
      * @see     FormatPatternProvider#getIntervalPattern(Locale)
+     * @since   3.9/4.6
      */
     /*[deutsch]
-     * <p>Formatiert dieses Intervall mit Hilfe eines lokalisierten Intervallmusters. </p>
+     * <p>Formatiert die kanonische Form dieses Intervalls mit Hilfe eines lokalisierten Intervallmusters. </p>
      *
      * <p>Falls der angegebene Formatierer keine Referenz zu einer Sprach- und L&auml;ndereinstellung hat, wird
      * das Intervallmuster &quot;{0}/{1}&quot; verwendet. Hinweis: Beginnend mit Version v2.0 und vor v3.9/4.6
@@ -650,9 +715,11 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *
      * @param   printer     format object for printing start and end
      * @return  localized formatted string
-     * @since   3.9/4.6
+     * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @see     #toCanonical()
      * @see     #print(ChronoPrinter, String)
      * @see     FormatPatternProvider#getIntervalPattern(Locale)
+     * @since   3.9/4.6
      */
     public String print(ChronoPrinter<T> printer) {
 
@@ -661,7 +728,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Prints this interval in a custom format. </p>
+     * <p>Prints the canonical form of this interval in a custom format. </p>
      *
      * <p>Example: </p>
      *
@@ -675,11 +742,13 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *
      * @param   printer             format object for printing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @throws  IllegalStateException if the canonicalization of this interval fails
      * @return  formatted string in given pattern format
+     * @see     #toCanonical()
      * @since   3.9/4.6
      */
     /*[deutsch]
-     * <p>Formatiert dieses Intervall in einem benutzerdefinierten Format. </p>
+     * <p>Formatiert die kanonische Form dieses Intervalls in einem benutzerdefinierten Format. </p>
      *
      * <p>Beispiel: </p>
      *
@@ -694,6 +763,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer             format object for printing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
      * @return  formatted string in given pattern format
+     * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @see     #toCanonical()
      * @since   3.9/4.6
      */
     public String print(
@@ -701,6 +772,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         String intervalPattern
     ) {
 
+        I interval = this.toCanonical();
         AttributeQuery attrs = extractDefaultAttributes(printer);
         StringBuilder sb = new StringBuilder(32);
         int i = 0;
@@ -712,18 +784,18 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
                 if ((c == '{') && (i + 2 < n) && (intervalPattern.charAt(i + 2) == '}')) {
                     char next = intervalPattern.charAt(i + 1);
                     if (next == '0') {
-                        if (this.start.isInfinite()) {
+                        if (interval.getStart().isInfinite()) {
                             sb.append("-\u221E");
                         } else {
-                            printer.print(this.start.getTemporal(), sb, attrs, NO_RESULT);
+                            printer.print(interval.getStart().getTemporal(), sb, attrs, NO_RESULT);
                         }
                         i += 3;
                         continue;
                     } else if (next == '1') {
-                        if (this.end.isInfinite()) {
+                        if (interval.getEnd().isInfinite()) {
                             sb.append("+\u221E");
                         } else {
-                            printer.print(this.end.getTemporal(), sb, attrs, NO_RESULT);
+                            printer.print(interval.getEnd().getTemporal(), sb, attrs, NO_RESULT);
                         }
                         i += 3;
                         continue;
@@ -741,8 +813,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Prints the start and end separated by a slash using given
-     * formatter. </p>
+     * <p>Prints the start and end separated by a slash using given formatter (technical format). </p>
      *
      * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot;
      * or &quot;+&#x221E;&quot;. Example for an ISO-like representation: </p>
@@ -762,8 +833,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Formatiert den Start und das Ende getrennt mit einem
-     * Schr&auml;gstrich unter Benutzung des angegebenen Formatierers. </p>
+     * <p>Formatiert den Start und das Ende getrennt mit einem Schr&auml;gstrich
+     * unter Benutzung des angegebenen Formatierers (technisches Format). </p>
      *
      * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
      * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben.
