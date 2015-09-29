@@ -94,6 +94,11 @@ public interface FormatPatternProvider {
 
             @Override
             public String getIntervalPattern(Locale locale) {
+
+                if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
+                    return "{0}/{1}";
+                }
+
                 return "{0} - {1}";
             }
 
