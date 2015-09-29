@@ -49,8 +49,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @param   <I> generic interval type
  * @since   2.0
  */
-final class IntervalParser
-    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+final class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoParser<I> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -199,17 +198,7 @@ final class IntervalParser
             throw new IndexOutOfBoundsException("[" + pos + "]: " + text.toString());
         }
 
-        AttributeQuery attrs = attributes;
-        boolean allowTrailingChars =
-            attributes.get(
-                Attributes.TRAILING_CHARACTERS,
-                Boolean.FALSE
-            ).booleanValue();
-
-        if (!allowTrailingChars) {
-            attrs = new Wrapper(attributes);
-        }
-
+        AttributeQuery attrs = wrap(attributes);
         IntervalEdge left = CLOSED;
         IntervalEdge right = this.factory.isCalendrical() ? CLOSED : OPEN;
         T t1 = null;
@@ -406,7 +395,7 @@ final class IntervalParser
 
         if (
             (pos < len)
-            && !allowTrailingChars
+            && !attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
         ) {
             String suffix;
 
@@ -450,26 +439,168 @@ final class IntervalParser
         }
 
         // create and return interval
-        I interval = this.factory.between(lower, upper);
+        try {
+            I interval = this.factory.between(lower, upper);
 
-        if (this.policy == BracketPolicy.SHOW_WHEN_NON_STANDARD) {
-            boolean visible = this.policy.display(interval);
+            if (this.policy == BracketPolicy.SHOW_WHEN_NON_STANDARD) {
+                boolean visible = this.policy.display(interval);
 
-            if (visible && (!leftVisible || !rightVisible)) {
-                int index = (!rightVisible ? pos : start);
-                status.setError(index, "Missing boundary.");
+                if (visible && (!leftVisible || !rightVisible)) {
+                    int index = (!rightVisible ? pos : start);
+                    status.setError(index, "Missing boundary.");
+                    return null;
+                } else if (!visible && (leftVisible || rightVisible)) {
+                    int index = (rightVisible ? pos : start);
+                    status.setError(
+                        index,
+                        "Standard boundary not allowed due to bracket policy.");
+                    return null;
+                }
+            }
+
+            status.setPosition(pos);
+            return interval;
+        } catch (IllegalArgumentException iae) {
+            status.setError(pos, iae.getMessage());
+            return null;
+        }
+
+    }
+
+    /**
+     * <p>Custom parsing using any kind of interval pattern. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   factory     interval factory
+     * @param   parser      parser used for parsing either start or end component
+     * @param   pattern     interval pattern containing the placeholders {0} or {1}
+     * @param   plog        collects parser informations and the parsing status
+     * @return  parsed interval or {@code null} if parsing fails
+     * @since   3.9/4.6
+     */
+    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parseCustom(
+        CharSequence text,
+        IntervalFactory<T, I> factory,
+        ChronoParser<T> parser,
+        String pattern,
+        ParseLog plog
+    ){
+
+        int pos = plog.getPosition();
+        int len = text.length();
+        T start = null;
+        T end = null;
+        int i = 0;
+        int n = pattern.length();
+        boolean startWasSet = false;
+        boolean endWasSet = false;
+        AttributeQuery query = IsoInterval.extractDefaultAttributes(parser);
+        AttributeQuery attrs = wrap(query);
+
+        while (i < n) {
+            char c = pattern.charAt(i);
+
+            if ((c == '{') && (i + 2 < n) && (pattern.charAt(i + 2) == '}')){
+                char next = pattern.charAt(i + 1);
+
+                if (next == '0') {
+                    if (startWasSet) {
+                        plog.setError(pos, "Cannot parse start component more than once.");
+                        return null;
+                    }
+                    plog.setPosition(pos);
+                    if ((pos + 1 < len) && (text.charAt(pos) == '-') && (text.charAt(pos + 1) == '\u221E')) {
+                        // start = null;
+                        pos += 2;
+                    } else {
+                        start = parser.parse(text, plog, attrs);
+                        if ((start == null) || plog.isError()) {
+                            return null;
+                        } else {
+                            pos = plog.getPosition();
+                        }
+                    }
+                    startWasSet = true;
+                    i += 3;
+                    continue;
+                } else if (next == '1') {
+                    if (endWasSet) {
+                        plog.setError(pos, "Cannot parse end component more than once.");
+                        return null;
+                    }
+                    plog.setPosition(pos);
+                    if ((pos + 1 < len) && (text.charAt(pos) == '+') && (text.charAt(pos + 1) == '\u221E')) {
+                        // end = null;
+                        pos += 2;
+                    } else {
+                        end = parser.parse(text, plog, attrs);
+                        if ((end == null) || plog.isError()) {
+                            return null;
+                        } else {
+                            pos = plog.getPosition();
+                        }
+                    }
+                    endWasSet = true;
+                    i += 3;
+                    continue;
+                }
+            }
+
+            if (pos >= len) {
+                plog.setError(pos, "End of text reached.");
                 return null;
-            } else if (!visible && (leftVisible || rightVisible)) {
-                int index = (rightVisible ? pos : start);
-                status.setError(
-                    index,
-                    "Standard boundary not allowed due to bracket policy.");
+            } else if (c != text.charAt(pos)) {
+                plog.setError(pos, "Literal mismatched: " + text.toString() + " (expected=" + pattern + ")");
                 return null;
+            }
+
+            i++;
+            pos++;
+        }
+
+        if ((pos < len) && !query.get(Attributes.TRAILING_CHARACTERS, false)) {
+            plog.setError(pos, "Trailing characters found: " + text);
+            return null;
+        }
+
+        Boundary<T> s = Boundary.infinitePast();
+        Boundary<T> e = Boundary.infiniteFuture();
+
+        if (start != null) {
+            s = Boundary.ofClosed(start);
+        }
+
+        if (end != null) {
+            if (factory.isCalendrical()) {
+                e = Boundary.ofClosed(end);
+            } else {
+                e = Boundary.ofOpen(end);
             }
         }
 
-        status.setPosition(pos);
-        return interval;
+        try {
+            return factory.between(s, e);
+        } catch (IllegalArgumentException iae) {
+            plog.setError(pos, iae.getMessage());
+            return null;
+        }
+
+    }
+
+    private static AttributeQuery wrap(AttributeQuery attributes) {
+
+        AttributeQuery attrs = attributes;
+        boolean allowTrailingChars =
+            attributes.get(
+                Attributes.TRAILING_CHARACTERS,
+                Boolean.FALSE
+            ).booleanValue();
+
+        if (!allowTrailingChars) {
+            attrs = new Wrapper(attributes);
+        }
+
+        return attrs;
 
     }
 

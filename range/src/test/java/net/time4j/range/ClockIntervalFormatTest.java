@@ -173,7 +173,7 @@ public class ClockIntervalFormatTest {
     }
 
     @Test
-    public void parseHHMM() throws ParseException {
+    public void parseHHMM1() throws ParseException {
         PlainTime start = PlainTime.of(7, 20);
         PlainTime end = PlainTime.of(24, 0);
         ClockInterval interval = ClockInterval.between(start, end);
@@ -187,6 +187,32 @@ public class ClockIntervalFormatTest {
                 BracketPolicy.SHOW_WHEN_NON_STANDARD,
                 plog),
             is(interval));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseHHMM2() throws ParseException {
+        ClockInterval.parse(
+            "07:20 - 24:00",
+            ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.ROOT));
+    }
+
+    @Test
+    public void parseHHMM3() throws ParseException {
+        PlainTime start = PlainTime.of(7, 20);
+        PlainTime end = PlainTime.of(24, 0);
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(
+            ClockInterval.parse(
+                "07:20 - 24:00",
+                ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.US)),
+            is(interval));
+    }
+
+    @Test(expected=IndexOutOfBoundsException.class)
+    public void parseHHMM4() throws ParseException {
+        ClockInterval.parse(
+            "",
+            ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.ROOT));
     }
 
 }

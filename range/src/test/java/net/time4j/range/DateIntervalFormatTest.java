@@ -506,9 +506,13 @@ public class DateIntervalFormatTest {
     public void parseExtendedOpenCalendardate() throws ParseException {
         PlainDate start = PlainDate.of(2012, 1, 1);
         PlainDate end = PlainDate.of(2014, 2, 14);
+        ParseLog plog = new ParseLog();
+
         DateInterval parsed = DateInterval.parse(
             "(2012-01-01/2014-02-14)",
-            Iso8601Format.EXTENDED_CALENDAR_DATE);
+            Iso8601Format.EXTENDED_CALENDAR_DATE,
+            BracketPolicy.SHOW_ALWAYS,
+            plog);
 
         assertThat(
             parsed.getStart(),
@@ -518,15 +522,19 @@ public class DateIntervalFormatTest {
             is(Boundary.ofOpen(end)));
     }
 
-    @Test(expected=IllegalArgumentException.class) // open start equals open end
+    @Test // open start equals open end
     public void parseInvalidOpenCalendardate() throws ParseException {
+        ParseLog plog = new ParseLog();
         DateInterval.parse(
             "(2012-01-01/2012-01-01)",
-            Iso8601Format.EXTENDED_CALENDAR_DATE);
+            Iso8601Format.EXTENDED_CALENDAR_DATE,
+            BracketPolicy.SHOW_ALWAYS,
+            plog);
+        assertThat(plog.isError(), is(true));
     }
 
     @Test
-    public void parseCustomUS() throws ParseException {
+    public void parseCustomUS1() throws ParseException {
         PlainDate start = PlainDate.of(2015, 7, 20);
         PlainDate end = PlainDate.of(2015, 12, 31);
         DateInterval interval = DateInterval.between(start, end);
@@ -540,6 +548,25 @@ public class DateIntervalFormatTest {
                 BracketPolicy.SHOW_WHEN_NON_STANDARD,
                 plog),
             is(interval));
+    }
+
+    @Test
+    public void parseCustomUS2() throws ParseException {
+        PlainDate start = PlainDate.of(2015, 7, 20);
+        PlainDate end = PlainDate.of(2015, 12, 31);
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            DateInterval.parse(
+                "July 20 / 2015 - December 31 / 2015",
+                ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US)),
+            is(interval));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseCustomStartAfterEnd() throws ParseException {
+        DateInterval.parse(
+            "July 20 / 2016 - December 31 / 2015",
+            ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US));
     }
 
 }

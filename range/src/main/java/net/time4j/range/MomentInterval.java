@@ -43,7 +43,6 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collections;
@@ -92,7 +91,7 @@ public final class MomentInterval
     private static final ChronoFormatter<Moment> BAS_W = weekdateFormat(false);
 
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
-        new IntervalComparator<Moment>(false, Moment.axis());
+        new IntervalComparator<>(false, Moment.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -538,39 +537,85 @@ public final class MomentInterval
     }
 
     /**
-     * <p>Interpretes given text as interval. </p>
+     * <p>Interpretes given text as interval using a localized interval pattern. </p>
+     *
+     * <p>If given printer does not contain a reference to a locale then the interval pattern
+     * &quot;{0}/{1}&quot; will be used. </p>
      *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @since   3.9/4.6
+     * @see     #parse(String, ChronoParser, String)
+     * @see     net.time4j.format.FormatPatternProvider#getIntervalPattern(Locale)
      */
     /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe eines lokalisierten
+     * Intervallmusters. </p>
+     *
+     * <p>Falls der angegebene Formatierer keine Referenz zu einer Sprach- und L&auml;ndereinstellung hat, wird
+     * das Intervallmuster &quot;{0}/{1}&quot; verwendet. </p>
      *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
+     * @since   3.9/4.6
+     * @see     #parse(String, ChronoParser, String)
+     * @see     net.time4j.format.FormatPatternProvider#getIntervalPattern(Locale)
      */
     public static MomentInterval parse(
         String text,
         ChronoParser<Moment> parser
     ) throws ParseException {
 
-        return IntervalParser.of(
-             MomentIntervalFactory.INSTANCE,
-             parser,
-             BracketPolicy.SHOW_WHEN_NON_STANDARD
-        ).parse(text);
+        return parse(text, parser, IsoInterval.getIntervalPattern(parser));
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval using given interval pattern. </p>
+     *
+     * @param   text                text to be parsed
+     * @param   parser              format object for parsing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
+     * Intervallmusters. </p>
+     *
+     * @param   text                text to be parsed
+     * @param   parser              format object for parsing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   3.9/4.6
+     */
+    public static MomentInterval parse(
+        String text,
+        ChronoParser<Moment> parser,
+        String intervalPattern
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        MomentInterval interval =
+            IntervalParser.parseCustom(text, MomentIntervalFactory.INSTANCE, parser, intervalPattern, plog);
+
+        if (plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (interval == null) {
+            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
+        }
+
+        return interval;
 
     }
 

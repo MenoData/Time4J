@@ -6,6 +6,7 @@ import net.time4j.PlainDate;
 import java.text.ParseException;
 
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.ParseLog;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -164,7 +165,9 @@ public class BasicDateRangeTest {
         DateInterval interval =
             DateInterval.parse(
                 "(2012-01-01/2012-01-01]",
-                Iso8601Format.EXTENDED_CALENDAR_DATE);
+                Iso8601Format.EXTENDED_CALENDAR_DATE,
+                BracketPolicy.SHOW_ALWAYS,
+                new ParseLog());
         assertThat(interval.isEmpty(), is(true));
     }
 
