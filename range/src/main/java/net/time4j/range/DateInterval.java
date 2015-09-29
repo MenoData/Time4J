@@ -425,57 +425,90 @@ public final class DateInterval
     }
 
     /**
-     * <p>Interpretes given text as interval. </p>
+     * <p>Interpretes given text as interval using a localized interval pattern. </p>
      *
-     * <p>Example: </p>
-     *
-     * <pre>
-     *  System.out.println(
-     *      &quot;20120101/20140620&quot,
-     *      Iso8601Format.BASIC_CALENDAR_DATE));
-     *  // output: [2012-01-01/2014-06-20]
-     * </pre>
+     * <p>If given printer does not contain a reference to a locale then the interval pattern
+     * &quot;{0}/{1}&quot; will be used. Brackets representing interval boundaries cannot be parsed. </p>
      *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     Iso8601Format
+     * @since   3.9/4.6
+     * @see     #parse(String, ChronoParser, String)
+     * @see     net.time4j.format.FormatPatternProvider#getIntervalPattern(Locale)
      */
     /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe eines lokalisierten
+     * Intervallmusters. </p>
      *
-     * <p>Beispiel: </p>
-     *
-     * <pre>
-     *  System.out.println(
-     *      &quot;20120101/20140620&quot,
-     *      Iso8601Format.BASIC_CALENDAR_DATE));
-     *  // Ausgabe: [2012-01-01/2014-06-20]
-     * </pre>
+     * <p>Falls der angegebene Formatierer keine Referenz zu einer Sprach- und L&auml;ndereinstellung hat, wird
+     * das Intervallmuster &quot;{0}/{1}&quot; verwendet. Klammern, die Intervallgrenzen darstellen, k&ouml;nnen
+     * nicht interpretiert werden. </p>
      *
      * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end boundaries
+     * @param   parser      format object for parsing start and end components
      * @return  parsed interval
-     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  IndexOutOfBoundsException if given text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     Iso8601Format
+     * @since   3.9/4.6
+     * @see     #parse(String, ChronoParser, String)
+     * @see     net.time4j.format.FormatPatternProvider#getIntervalPattern(Locale)
      */
     public static DateInterval parse(
         String text,
         ChronoParser<PlainDate> parser
     ) throws ParseException {
 
-        return IntervalParser.of(
-             DateIntervalFactory.INSTANCE,
-             parser,
-             BracketPolicy.SHOW_WHEN_NON_STANDARD
-        ).parse(text);
+        return parse(text, parser, IsoInterval.getIntervalPattern(parser));
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval using given interval pattern. </p>
+     *
+     * <p>Brackets representing interval boundaries cannot be parsed. </p>
+     *
+     * @param   text                text to be parsed
+     * @param   parser              format object for parsing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
+     * Intervallmusters. </p>
+     *
+     * <p>Klammern, die Intervallgrenzen darstellen, k&ouml;nnen nicht interpretiert werden. </p>
+     *
+     * @param   text                text to be parsed
+     * @param   parser              format object for parsing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  parsed interval
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @since   3.9/4.6
+     */
+    public static DateInterval parse(
+        String text,
+        ChronoParser<PlainDate> parser,
+        String intervalPattern
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        DateInterval interval =
+            IntervalParser.parseCustom(text, DateIntervalFactory.INSTANCE, parser, intervalPattern, plog);
+
+        if (plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (interval == null) {
+            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
+        }
+
+        return interval;
 
     }
 
