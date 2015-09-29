@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 public class DateIntervalFormatTest {
 
     @Test
-    public void printCustom() throws IOException {
+    public void printCustom1() throws IOException {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
         DateInterval interval = DateInterval.between(start, end);
@@ -34,6 +34,30 @@ public class DateIntervalFormatTest {
         assertThat(
             sb.toString(),
             is("[2014-02-27/05-14]"));
+    }
+
+    @Test
+    public void printCustom2() {
+        DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("MMM d, yyyy", PatternType.CLDR, Locale.US);
+        assertThat(
+            interval.print(formatter, "since {0}"),
+            is("since Jan 1, 2015")
+        );
+    }
+
+    @Test
+    public void printCustom3() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("MMM d, yyyy", PatternType.CLDR, Locale.US);
+        assertThat(
+            interval.print(formatter),
+            is("Feb 27, 2014 - May 14, 2014")
+        );
     }
 
     @Test

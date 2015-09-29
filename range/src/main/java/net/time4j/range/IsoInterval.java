@@ -21,16 +21,19 @@
 
 package net.time4j.range;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
+import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
+import java.util.Locale;
 
 
 /**
@@ -69,6 +72,19 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     implements ChronoInterval<T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
+
+    static {
+        FormatPatternProvider found = null;
+
+        for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
+            found = fpp;
+            break;
+        }
+
+        FORMAT_PATTERN_PROVIDER = ((found == null) ? FormatPatternProvider.DEFAULT : found);
+    }
 
     private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
         new ChronoFunction<ChronoDisplay, Void>() {
@@ -617,28 +633,123 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Equivalent to
-     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * <p>Prints this interval using a localized interval pattern. </p>
+     *
+     * <p>If given printer does not contain a reference to a locale then the interval pattern
+     * &quot;{0}/{1}&quot; will be used. Note: Starting with version v2.0 and before v3.9/4.6,
+     * this method had a different behaviour and just delegated to
+     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD)}. </p>
      *
      * @param   printer     format object for printing start and end
-     * @return  formatted string in format {start}/{end}
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoPrinter, BracketPolicy)
+     * @return  localized formatted string
+     * @since   3.9/4.6
+     * @see     #print(ChronoPrinter, String)
+     * @see     FormatPatternProvider#getIntervalPattern(Locale)
      */
     /*[deutsch]
-     * <p>Entspricht
-     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD}. </p>
+     * <p>Formatiert dieses Intervall mit Hilfe eines lokalisierten Intervallmusters. </p>
+     *
+     * <p>Falls der angegebene Formatierer keine Referenz zu einer Sprach- und L&auml;ndereinstellung hat, wird
+     * das Intervallmuster &quot;{0}/{1}&quot; verwendet. Note: Beginnend mit Version v2.0 und vor v3.9/4.6 hatte,
+     * diese Methode ein anderes Verhalten und delegierte einfach an
+     * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD)}. </p>
      *
      * @param   printer     format object for printing start and end
-     * @return  formatted string in format {start}/{end}
-     * @since   2.0
-     * @see     BracketPolicy#SHOW_WHEN_NON_STANDARD
-     * @see     #print(ChronoPrinter, BracketPolicy)
+     * @return  localized formatted string
+     * @since   3.9/4.6
+     * @see     #print(ChronoPrinter, String)
+     * @see     FormatPatternProvider#getIntervalPattern(Locale)
      */
     public String print(ChronoPrinter<T> printer) {
 
-        return this.print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD);
+        String pattern = "{0}/{1}";
+
+        if (printer instanceof ChronoFormatter) {
+            Locale locale = ChronoFormatter.class.cast(printer).getLocale();
+            pattern = FORMAT_PATTERN_PROVIDER.getIntervalPattern(locale);
+        }
+
+        return this.print(printer, pattern);
+
+    }
+
+    /**
+     * <p>Prints this interval in a custom format. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
+     *  ChronoFormatter&lt;PlainDate&gt; formatter =
+     *      ChronoFormatter.ofDatePattern(&quot;MMM d, uuuu&quot;, PatternType.CLDR, Locale.US);
+     *  System.out.println(interval.print(formatter, &quot;since {0}&quot;));
+     *  // output: since Jan 1, 2015
+     * </pre>
+     *
+     * @param   printer             format object for printing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  formatted string in given pattern format
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Formatiert dieses Intervall in einem benutzerdefinierten Format. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
+     *  ChronoFormatter&lt;PlainDate&gt; formatter =
+     *      ChronoFormatter.ofDatePattern(&quot;d. MMMM uuuu&quot;, PatternType.CLDR, Locale.GERMANY);
+     *  System.out.println(interval.print(formatter, &quot;seit {0}&quot;));
+     *  // Ausgabe: seit 1. Januar 2015
+     * </pre>
+     *
+     * @param   printer             format object for printing start and end components
+     * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
+     * @return  formatted string in given pattern format
+     * @since   3.9/4.6
+     */
+    public String print(
+        ChronoPrinter<T> printer,
+        String intervalPattern
+    ) {
+
+        AttributeQuery attrs = extractDefaultAttributes(printer);
+        StringBuilder sb = new StringBuilder(32);
+        int i = 0;
+        int n = intervalPattern.length();
+
+        try {
+            while (i < n) {
+                char c = intervalPattern.charAt(i);
+                if ((c == '{') && (i + 2 < n) && (intervalPattern.charAt(i + 2) == '}')) {
+                    char next = intervalPattern.charAt(i + 1);
+                    if (next == '0') {
+                        if (this.start.isInfinite()) {
+                            sb.append("-\u221E");
+                        } else {
+                            printer.print(this.start.getTemporal(), sb, attrs, NO_RESULT);
+                        }
+                        i += 3;
+                        continue;
+                    } else if (next == '1') {
+                        if (this.end.isInfinite()) {
+                            sb.append("+\u221E");
+                        } else {
+                            printer.print(this.end.getTemporal(), sb, attrs, NO_RESULT);
+                        }
+                        i += 3;
+                        continue;
+                    }
+                }
+                sb.append(c);
+                i++;
+            }
+        } catch (IOException ioe) {
+            throw new AssertionError(ioe);
+        }
+
+        return sb.toString();
 
     }
 
@@ -1609,12 +1720,13 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
     }
 
-    /**
-     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
-     *
-     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
-     *          {@code null} wenn angewandt auf das geschlossene Maximum
-     */
+//    /**
+//     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
+//     *
+//     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
+//     *          {@code null} wenn angewandt auf das geschlossene Maximum
+//     */
+/*
     T getOpenFiniteEnd() {
 
         T temporal = this.end.getTemporal();
@@ -1629,6 +1741,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
     }
+*/
 
     /**
      * <p>Bestimmt die Standard-Attribute, wenn das Argument ein
@@ -1645,6 +1758,18 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         } else {
             return Attributes.empty();
         }
+
+    }
+
+    /**
+     * <p>Yields the best available format pattern provider. </p>
+     *
+     * @return  format pattern provider
+     * @since   3.9/4.6
+     */
+    static FormatPatternProvider getFormatPatternProvider() {
+
+        return FORMAT_PATTERN_PROVIDER;
 
     }
 
