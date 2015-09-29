@@ -644,8 +644,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Formatiert dieses Intervall mit Hilfe eines lokalisierten Intervallmusters. </p>
      *
      * <p>Falls der angegebene Formatierer keine Referenz zu einer Sprach- und L&auml;ndereinstellung hat, wird
-     * das Intervallmuster &quot;{0}/{1}&quot; verwendet. Note: Beginnend mit Version v2.0 und vor v3.9/4.6 hatte,
-     * diese Methode ein anderes Verhalten und delegierte einfach an
+     * das Intervallmuster &quot;{0}/{1}&quot; verwendet. Hinweis: Beginnend mit Version v2.0 und vor v3.9/4.6
+     * hatte diese Methode ein anderes Verhalten und delegierte einfach an
      * {@code print(printer, BracketPolicy.SHOW_WHEN_NON_STANDARD)}. </p>
      *
      * @param   printer     format object for printing start and end
@@ -656,14 +656,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      */
     public String print(ChronoPrinter<T> printer) {
 
-        String pattern = "{0}/{1}";
-
-        if (printer instanceof ChronoFormatter) {
-            Locale locale = ChronoFormatter.class.cast(printer).getLocale();
-            pattern = FORMAT_PATTERN_PROVIDER.getIntervalPattern(locale);
-        }
-
-        return this.print(printer, pattern);
+        return this.print(printer, getIntervalPattern(printer));
 
     }
 
@@ -1756,14 +1749,21 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Yields the best available format pattern provider. </p>
+     * <p>Yields the best available format pattern. </p>
      *
-     * @return  format pattern provider
+     * @return  localized format pattern for intervals
      * @since   3.9/4.6
      */
-    static FormatPatternProvider getFormatPatternProvider() {
+    static String getIntervalPattern(Object formatter) {
 
-        return FORMAT_PATTERN_PROVIDER;
+        String pattern = "{0}/{1}";
+
+        if (formatter instanceof ChronoFormatter) {
+            Locale locale = ChronoFormatter.class.cast(formatter).getLocale();
+            pattern = FORMAT_PATTERN_PROVIDER.getIntervalPattern(locale);
+        }
+
+        return pattern;
 
     }
 
