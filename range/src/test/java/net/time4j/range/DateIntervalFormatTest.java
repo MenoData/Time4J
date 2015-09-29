@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.PlainDate;
 import net.time4j.format.Attributes;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
 
@@ -20,6 +21,20 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class DateIntervalFormatTest {
+
+    @Test
+    public void printCustom() throws IOException {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.between(start, end);
+        ChronoFormatter<PlainDate> startFormat = Iso8601Format.EXTENDED_CALENDAR_DATE;
+        ChronoFormatter<PlainDate> endFormat = ChronoFormatter.ofDatePattern("MM-dd", PatternType.CLDR, Locale.ROOT);
+        StringBuilder sb = new StringBuilder();
+        interval.print(startFormat, '/', endFormat, BracketPolicy.SHOW_ALWAYS, sb);
+        assertThat(
+            sb.toString(),
+            is("[2014-02-27/05-14]"));
+    }
 
     @Test
     public void printSHOW_NEVER() {

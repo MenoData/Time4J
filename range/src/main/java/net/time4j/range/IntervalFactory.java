@@ -53,7 +53,7 @@ interface IntervalFactory
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
-     * @see     net.time4j.engine.Calendrical
+     * @see     net.time4j.engine.CalendarDate
      */
     /*[deutsch]
      * <p>Erzeugt ein Intervall zwischen den angegebenen Intervallgrenzen. </p>
@@ -67,7 +67,7 @@ interface IntervalFactory
      * @return  new interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
-     * @see     net.time4j.engine.Calendrical
+     * @see     net.time4j.engine.CalendarDate
      */
     I between(
         Boundary<T> start,
