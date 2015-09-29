@@ -745,13 +745,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) {
 
+        AttributeQuery attrs = attributes;
+
+        if (attributes != this.globalAttributes) {
+            attrs = new AttributeWrapper(attributes, this.globalAttributes);
+        }
+
         T result;
         Chronology<?> preparser = this.chronology.preparser();
 
         if (preparser == null) {
-            return parse(this, this.chronology, text, status, attributes, false);
+            return parse(this, this.chronology, text, status, attrs, false);
         } else {
-            parse(this, preparser, text, status, attributes, true);
+            parse(this, preparser, text, status, attrs, true);
 
             if (status.isError()) {
                 return null;
@@ -760,7 +766,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ParsedValues parsed = status.getRawValues0();
 
             try {
-                result = this.chronology.createFrom(parsed, attributes, false);
+                result = this.chronology.createFrom(parsed, attrs, false);
             } catch (RuntimeException re) {
                 status.setError(
                     text.length(),
@@ -777,7 +783,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 return null;
             }
 
-            return checkConsistency(parsed, result, text, status, attributes);
+            return checkConsistency(parsed, result, text, status, attrs);
         }
 
     }
@@ -5086,6 +5092,55 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             return FIELD_MAP.get(element.name());
 
+        }
+
+    }
+
+    private static class AttributeWrapper
+        implements AttributeQuery {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final AttributeQuery attributes;
+        private final AttributeSet globals;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        AttributeWrapper(
+            AttributeQuery attributes,
+            AttributeSet globals
+        ) {
+            super();
+
+            this.attributes = attributes;
+            this.globals = globals;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean contains(AttributeKey<?> key) {
+            return this.attributes.contains(key) || this.globals.contains(key);
+        }
+
+        @Override
+        public <A> A get(AttributeKey<A> key) {
+            if (this.attributes.contains(key)) {
+                return this.attributes.get(key);
+            }
+            return this.globals.get(key);
+        }
+
+        @Override
+        public <A> A get(
+            AttributeKey<A> key,
+            A defaultValue
+        ) {
+            if (this.attributes.contains(key)) {
+                return this.attributes.get(key);
+            }
+            return this.globals.get(key, defaultValue);
         }
 
     }

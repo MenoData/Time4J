@@ -130,4 +130,15 @@ public class ParsingTextOverflowTest {
         fmt.parse(this.text);
     }
 
+    @Test
+    public void withNonOverridingCustomAttributes() {
+        ChronoFormatter<PlainDate> fmt = this.formatterAny;
+
+        ParseLog plog = new ParseLog();
+        PlainDate date = fmt.parse(this.text, plog, Attributes.empty());
+        PlainDate expected = PlainDate.of(2013, 9, 1);
+        assertThat(date, is(expected));
+        assertThat(plog.isError(), is(false));
+    }
+
 }
