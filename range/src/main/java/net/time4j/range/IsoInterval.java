@@ -65,19 +65,12 @@ import java.io.IOException;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public abstract class IsoInterval
-    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoInterval<T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
-        new ChronoFunction<ChronoDisplay, Void>() {
-            @Override
-            public Void apply(ChronoDisplay context) {
-                return null;
-            }
-        };
+    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT = (context -> null);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -648,18 +641,15 @@ public abstract class IsoInterval
      * formatter. </p>
      *
      * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot;
-     * or &quot;+&#x221E;&quot;. Example for an ISO-representation: </p>
+     * or &quot;+&#x221E;&quot;. Example for an ISO-like representation: </p>
      *
      * <pre>
-     *  DateInterval interval =
-     *      DateInterval.between(
-     *          PlainDate.of(2014, 1, 31),
-     *          PlainDate.of(2014, 4, 2));
+     *  DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
      *  System.out.println(
      *      interval.print(
      *          Iso8601Format.BASIC_CALENDAR_DATE,
-     *          BracketPolicy.SHOW_NEVER));
-     *  // output: 20140131/20140402
+     *          BracketPolicy.SHOW_ALWAYS));
+     *  // output: [20150101/+&#x221E;)
      * </pre>
      *
      * @param   printer     format object for printing start and end
@@ -673,18 +663,15 @@ public abstract class IsoInterval
      *
      * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
      * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben.
-     * Beispiel f&uuml;r eine ISO-Darstellung: </p>
+     * Beispiel f&uuml;r eine ISO-&auml;hnliche Darstellung: </p>
      *
      * <pre>
-     *  DateInterval interval =
-     *      DateInterval.between(
-     *          PlainDate.of(2014, 1, 31),
-     *          PlainDate.of(2014, 4, 2));
+     *  DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
      *  System.out.println(
      *      interval.print(
      *          Iso8601Format.BASIC_CALENDAR_DATE,
-     *          BracketPolicy.SHOW_NEVER));
-     *  // output: 20140131/20140402
+     *          BracketPolicy.SHOW_ALWAYS));
+     *  // output: [20150101/+&#x221E;)
      * </pre>
      *
      * @param   printer     format object for printing start and end
@@ -697,37 +684,76 @@ public abstract class IsoInterval
         BracketPolicy policy
     ) {
 
-        AttributeQuery attrs = extractDefaultAttributes(printer);
-        boolean showBoundaries = policy.display(this);
-        StringBuilder sb = new StringBuilder(64);
-
-        if (showBoundaries) {
-            sb.append(this.start.isOpen() ? '(' : '[');
-        }
-
         try {
-            if (this.start.isInfinite()) {
-                sb.append("-\u221E");
-            } else {
-                printer.print(this.start.getTemporal(), sb, attrs, NO_RESULT);
-            }
-
-            sb.append('/');
-
-            if (this.end.isInfinite()) {
-                sb.append("+\u221E");
-            } else {
-                printer.print(this.end.getTemporal(), sb, attrs, NO_RESULT);
-            }
+            StringBuilder sb = new StringBuilder(64);
+            this.print(printer, '/', printer, policy, sb);
+            return sb.toString();
         } catch (IOException ioe) {
             throw new AssertionError(ioe);
         }
 
+    }
+
+    /**
+     * <p>Prints this interval in a technical format using given formatters and separator. </p>
+     *
+     * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot; or &quot;+&#x221E;&quot;. </p>
+     *
+     * @param   startFormat format object for printing start component
+     * @param   separator   char separating start and end component
+     * @param   endFormat   format object for printing end component
+     * @param   policy      strategy for printing interval boundaries
+     * @param   buffer      writing buffer
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Formatiert dieses Intervall in einem technischen Format unter Benutzung der angegebenen Formatierer
+     * und des angegebenen Trennzeichens. </p>
+     *
+     * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
+     * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben. </p>
+     *
+     * @param   startFormat format object for printing start component
+     * @param   separator   char separating start and end component
+     * @param   endFormat   format object for printing end component
+     * @param   policy      strategy for printing interval boundaries
+     * @param   buffer      writing buffer
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.9/4.6
+     */
+    public void print(
+        ChronoPrinter<T> startFormat,
+        char separator,
+        ChronoPrinter<T> endFormat,
+        BracketPolicy policy,
+        Appendable buffer
+    ) throws IOException {
+
+        AttributeQuery attrs = extractDefaultAttributes(startFormat);
+        boolean showBoundaries = policy.display(this);
+
         if (showBoundaries) {
-            sb.append(this.end.isOpen() ? ')' : ']');
+            buffer.append(this.start.isOpen() ? '(' : '[');
         }
 
-        return sb.toString();
+        if (this.start.isInfinite()) {
+            buffer.append("-\u221E");
+        } else {
+            startFormat.print(this.start.getTemporal(), buffer, attrs, NO_RESULT);
+        }
+
+        buffer.append(separator);
+
+        if (this.end.isInfinite()) {
+            buffer.append("+\u221E");
+        } else {
+            endFormat.print(this.end.getTemporal(), buffer, attrs, NO_RESULT);
+        }
+
+        if (showBoundaries) {
+            buffer.append(this.end.isOpen() ? ')' : ']');
+        }
 
     }
 

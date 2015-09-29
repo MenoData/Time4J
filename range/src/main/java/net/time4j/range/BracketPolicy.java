@@ -21,7 +21,7 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.Calendrical;
+import net.time4j.engine.CalendarDate;
 
 
 /**
@@ -83,7 +83,7 @@ public enum BracketPolicy {
                 return true;
             } else {
                 Object obj = end.getTemporal();
-                if (obj instanceof Calendrical) {
+                if (obj instanceof CalendarDate) {
                     return end.isOpen();
                 } else {
                     return end.isClosed();

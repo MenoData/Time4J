@@ -18,6 +18,18 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class BasicDateRangeTest {
 
+    @Test
+    public void isAfterOtherInterval() {
+        DateInterval i1 = DateInterval.between(PlainDate.of(2014, 2, 27), PlainDate.of(2014, 5, 14));
+        DateInterval i2 = DateInterval.until(PlainDate.of(2014, 2, 26));
+        assertThat(
+            i1.isAfter(i2),
+            is(true));
+        assertThat(
+            i2.isBefore(i1),
+            is(true));
+    }
+
     @Test(expected=NullPointerException.class)
     public void containsNull() {
         assertThat(
