@@ -232,7 +232,7 @@ public class BasicClockRangeTest {
             ClockInterval.between(start1, end1).hashCode(),
             not(
                 ClockInterval.between(start2, end2)
-                .withClosedEnd().hashCode()));
+                    .withClosedEnd().hashCode()));
         assertThat(
             ClockInterval.between(start1, end1).hashCode(),
             is(ClockInterval.between(start1, end1).hashCode()));
@@ -289,6 +289,19 @@ public class BasicClockRangeTest {
         assertThat(
             interval.move(4, ClockUnit.HOURS),
             is(expected));
+    }
+
+    @Test
+    public void canonicalForm() {
+        assertThat(
+            ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.of(23, 59, 59, 123456789))
+                .withClosedEnd().toCanonical(),
+            is(ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.of(23, 59, 59, 123456790))));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void canonicalError() {
+        ClockInterval.since(PlainTime.midnightAtStartOfDay()).withClosedEnd().toCanonical();
     }
 
 }

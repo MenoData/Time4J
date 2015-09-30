@@ -545,6 +545,9 @@ final class IntervalParser
                     i += 3;
                     continue;
                 }
+            } else if (c == '[' || c == ']' || c == '(' || c == ')') {
+                plog.setError(pos, "Brackets representing interval boundaries cannot be parsed: " + text);
+                return null;
             }
 
             if (pos >= len) {
