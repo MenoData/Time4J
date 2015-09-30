@@ -569,6 +569,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      */
     public I toCanonical() {
 
+        boolean change = false;
         Boundary<T> s = this.start;
         Boundary<T> e = this.end;
 
@@ -580,6 +581,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             }
 
             s = Boundary.ofClosed(t);
+            change = true;
         }
 
         if (!this.end.isInfinite()) {
@@ -592,6 +594,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
                     }
 
                     e = Boundary.ofClosed(t);
+                    change = true;
                 }
             } else {
                 if (this.end.isClosed()) {
@@ -602,11 +605,12 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
                     }
 
                     e = Boundary.ofOpen(t);
+                    change = true;
                 }
             }
         }
 
-        return this.getFactory().between(s, e);
+        return (change ? this.getFactory().between(s, e) : this.getContext());
 
     }
 
@@ -822,7 +826,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Prints the start and end separated by a slash using given formatter (technical format). </p>
      *
      * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot;
-     * or &quot;+&#x221E;&quot;. Example for an ISO-like representation: </p>
+     * or &quot;+&#x221E;&quot;. If given bracket policy is specified as {@code SHOW_NEVER}
+     * then the canonical form of this interval will be printed. Example for an ISO-like representation: </p>
      *
      * <pre>
      *  DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
@@ -836,6 +841,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer     format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
+     * @throws  IllegalStateException if the canonicalization of this interval fails
      * @since   2.0
      */
     /*[deutsch]
@@ -844,6 +850,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *
      * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
      * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben.
+     * Wenn die angegebene {@code BracketPolicy} gleich {@code SHOW_NEVER}
+     * ist, dann wird die kanonische Form dieses Intervalls ausgegeben.
      * Beispiel f&uuml;r eine ISO-&auml;hnliche Darstellung: </p>
      *
      * <pre>
@@ -858,6 +866,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer     format object for printing start and end
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
+     * @throws  IllegalStateException if the canonicalization of this interval fails
      * @since   2.0
      */
     public String print(
@@ -878,13 +887,16 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Prints this interval in a technical format using given formatters and separator. </p>
      *
-     * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot; or &quot;+&#x221E;&quot;. </p>
+     * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot; or &quot;+&#x221E;&quot;.
+     * If given bracket policy is specified as {@code SHOW_NEVER} then the canonical form of this
+     * interval will be printed. </p>
      *
      * @param   startFormat format object for printing start component
      * @param   separator   char separating start and end component
      * @param   endFormat   format object for printing end component
      * @param   policy      strategy for printing interval boundaries
      * @param   buffer      writing buffer
+     * @throws  IllegalStateException if the canonicalization of this interval fails
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
      */
@@ -892,14 +904,16 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Formatiert dieses Intervall in einem technischen Format unter Benutzung der angegebenen Formatierer
      * und des angegebenen Trennzeichens. </p>
      *
-     * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als
-     * &quot;-&#x221E;&quot; oder &quot;+&#x221E;&quot; ausgegeben. </p>
+     * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als &quot;-&#x221E;&quot; oder
+     * &quot;+&#x221E;&quot; ausgegeben. Wenn die angegebene {@code BracketPolicy} gleich {@code SHOW_NEVER}
+     * ist, dann wird die kanonische Form dieses Intervalls ausgegeben. </p>
      *
      * @param   startFormat format object for printing start component
      * @param   separator   char separating start and end component
      * @param   endFormat   format object for printing end component
      * @param   policy      strategy for printing interval boundaries
      * @param   buffer      writing buffer
+     * @throws  IllegalStateException if the canonicalization of this interval fails
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
      */
@@ -911,29 +925,35 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         Appendable buffer
     ) throws IOException {
 
+        I interval = this.getContext();
+
+        if (policy == BracketPolicy.SHOW_NEVER) {
+            interval = this.toCanonical();
+        }
+
         AttributeQuery attrs = extractDefaultAttributes(startFormat);
         boolean showBoundaries = policy.display(this);
 
         if (showBoundaries) {
-            buffer.append(this.start.isOpen() ? '(' : '[');
+            buffer.append(interval.getStart().isOpen() ? '(' : '[');
         }
 
-        if (this.start.isInfinite()) {
+        if (interval.getStart().isInfinite()) {
             buffer.append("-\u221E");
         } else {
-            startFormat.print(this.start.getTemporal(), buffer, attrs, NO_RESULT);
+            startFormat.print(interval.getStart().getTemporal(), buffer, attrs, NO_RESULT);
         }
 
         buffer.append(separator);
 
-        if (this.end.isInfinite()) {
+        if (interval.getEnd().isInfinite()) {
             buffer.append("+\u221E");
         } else {
-            endFormat.print(this.end.getTemporal(), buffer, attrs, NO_RESULT);
+            endFormat.print(interval.getEnd().getTemporal(), buffer, attrs, NO_RESULT);
         }
 
         if (showBoundaries) {
-            buffer.append(this.end.isOpen() ? ')' : ']');
+            buffer.append(interval.getEnd().isOpen() ? ')' : ']');
         }
 
     }

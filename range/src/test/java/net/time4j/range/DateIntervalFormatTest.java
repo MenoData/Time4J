@@ -72,7 +72,7 @@ public class DateIntervalFormatTest {
             is("20140227/20140514"));
         assertThat(
             interval.withOpenEnd().print(formatter, BracketPolicy.SHOW_NEVER),
-            is("20140227/20140514"));
+            is("20140227/20140513"));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class DateIntervalFormatTest {
             interval.withOpenEnd().print(
                 formatter,
                 BracketPolicy.SHOW_NEVER),
-            is("-\u221E/20140514"));
+            is("-\u221E/20140513"));
     }
 
     @Test
