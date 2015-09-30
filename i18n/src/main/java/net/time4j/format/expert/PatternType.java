@@ -1466,16 +1466,13 @@ public enum PatternType
         String chronoType = builder.getChronology().getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
         TextElement<?> textElement;
-        ChronoElement<? extends Enum> enumElement;
         ChronoElement<Integer> intElement;
 
         if (element.getType().isEnum() && (element instanceof TextElement)) {
             textElement = cast(element);
-            enumElement = cast(element);
             intElement = null;
         } else if (Integer.class.isAssignableFrom(element.getType())) {
             textElement = null;
-            enumElement = null;
             intElement = cast(element);
         } else {
             throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");
@@ -1506,13 +1503,13 @@ public enum PatternType
                 }
                 break;
             case 'M':
-                addMonth(builder, Math.min(count, count), textElement, enumElement);
+                addMonth(builder, Math.min(count, count), textElement);
                 break;
             case 'L':
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
                 try {
-                    addMonth(builder, count, textElement, enumElement);
+                    addMonth(builder, count, textElement);
                 } finally {
                     builder.endSection();
                 }
@@ -1576,19 +1573,21 @@ public enum PatternType
 
     }
 
-    private static void addMonth(
+    private static <V extends Enum<V>> void addMonth(
         ChronoFormatter.Builder<?> builder,
         int count,
-        TextElement<?> textElement,
-        ChronoElement<? extends Enum> enumElement
+        TextElement<?> textElement
     ) {
 
         switch (count) {
             case 1:
-                builder.addNumerical(enumElement, 1, 2);
-                break;
             case 2:
-                builder.addFixedNumerical(enumElement, 2);
+                ChronoElement<V> enumElement = cast(textElement);
+                if (count == 1) {
+                    builder.addNumerical(enumElement, 1, 2);
+                } else if (count == 2) {
+                    builder.addFixedNumerical(enumElement, 2);
+                }
                 break;
             case 3:
                 builder.startSection(
