@@ -1,5 +1,6 @@
 ## [v4.6] not yet released
 ### Added
+- Formatting/parsing of intervals based on custom interval patterns [#359]
 - Canonicalization of interval boundaries [#365]
 - New Persian calendar [#357]
 - Support for Pashto language [#358]
@@ -13,7 +14,11 @@
 - Pattern letter "L" causes exception for non-iso-dates [#354]
 
 ### Changed
+- Behaviour of interval formatting/parsing changed [#359]
 - Make serialization of HijriCalendar versionable [#356]
+
+### Removed
+- Interface ExtZoneProvider (no usage) [#371]
 
 ## [v4.5] published on 2015-09-15
 ### Added
