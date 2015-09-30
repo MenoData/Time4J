@@ -1,5 +1,6 @@
 ## [v3.9] not yet released
 ### Added
+- Canonicalization of interval boundaries [#365]
 - New Persian calendar [#357]
 - Support for Pashto language [#358]
 - Support for Turkish islamic calendar (Diyanet) [#355]
