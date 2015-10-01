@@ -1,4 +1,6 @@
-## [v4.6] not yet released
+## [v4.7] not yet released
+
+## [v4.6] published on 2015-10-01
 ### Added
 - Formatting/parsing of intervals based on custom interval patterns [#359]
 - Canonicalization of interval boundaries [#365]
