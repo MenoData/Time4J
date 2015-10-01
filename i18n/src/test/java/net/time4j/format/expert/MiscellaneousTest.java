@@ -268,6 +268,13 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void momentFormatterRFC1123() {
+        assertThat(
+            Moment.formatterRFC1123().format(Moment.UNIX_EPOCH),
+            is("Thu, 1 Jan 1970 00:00:00 GMT"));
+    }
+
+    @Test
     public void momentFormatterPrintingDecimalMinute() {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.US)
