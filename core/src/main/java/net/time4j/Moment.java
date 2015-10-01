@@ -1271,9 +1271,10 @@ public final class Moment
      *
      * <p>Equivalent to the pattern &quot;[EEE, ]d MMM yyyy HH:mm[:ss] XX&quot;
      * where the timezone offset XX is modified such that in case of zero
-     * offset the expression &quot;GMT&quot; is preferred. As zero offset
-     * will also be accepted &quot;UT&quot; or &quot;Z&quot;. The text elements
-     * will always be interpreted in English and are case-insensitive. </p>
+     * offset the expression &quot;GMT&quot; is preferred. &quot;UT&quot; or &quot;Z&quot;
+     * will be accepted as zero offset, too. The text elements will always be interpreted
+     * in English and are case-insensitive. If no extra timezone is specified then this
+     * formatter will use the timezone UTC as default for printing. </p>
      *
      * <p>Note: In contrast to the RFC-1123-standard this method does not
      * support military timezone abbreviations (A-Y) or north-american
@@ -1290,7 +1291,9 @@ public final class Moment
      * Null-Offsets bevorzugt der Ausdruck &quot;GMT&quot; benutzt wird. Als
      * Null-Offset werden auch &quot;UT&quot; oder &quot;Z&quot; akzeptiert.
      * Die Textelemente werden ohne Beachtung der Gro&szlig;- oder
-     * Kleinschreibung in Englisch interpretiert. </p>
+     * Kleinschreibung in Englisch interpretiert. Wird keine extra Zeitzone
+     * angegeben, wird dieser Formatierer die UTC-Zeitzone als Vorgabe zum
+     * Formatieren verwenden. </p>
      *
      * <p>Zu beachten: Im Gegensatz zum RFC-1123-Standard unterst&uuml;tzt die
      * Methode keine milit&auml;rischen Zeitzonen (A-Y) oder nordamerikanischen
