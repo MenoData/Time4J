@@ -338,7 +338,7 @@ public class PrettyTimeTest {
         TimeSource<?> clock = new TimeSource<Moment>() {
             @Override
             public Moment currentTime() {
-                return PlainTimestamp.of(2015, 7, 1, 0, 0, 5).atUTC();
+                return PlainTimestamp.of(2012, 7, 1, 0, 0, 5).atUTC();
             }
         };
 
@@ -346,7 +346,7 @@ public class PrettyTimeTest {
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2015, 6, 30, 23, 59, 59).atUTC(),
+                    PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC(),
                     ZonalOffset.UTC),
             is("vor 7 Sekunden"));
     }
@@ -356,7 +356,7 @@ public class PrettyTimeTest {
         TimeSource<?> clock = new TimeSource<Moment>() {
             @Override
             public Moment currentTime() {
-                return PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+                return PlainTimestamp.of(2012, 6, 30, 23, 59, 54).atUTC();
             }
         };
 
@@ -364,7 +364,7 @@ public class PrettyTimeTest {
             PrettyTime.of(Locale.ENGLISH)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+                    PlainTimestamp.of(2012, 7, 1, 0, 0, 0).atUTC(),
                     ZonalOffset.UTC),
             is("in 7 seconds"));
     }
