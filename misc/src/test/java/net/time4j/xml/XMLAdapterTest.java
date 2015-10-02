@@ -81,7 +81,7 @@ public class XMLAdapterTest {
                     DatatypeConstants.FIELD_UNDEFINED,
                     DatatypeConstants.FIELD_UNDEFINED, 24, 0, 0, 0, DatatypeConstants.FIELD_UNDEFINED);
         PlainTime expected = PlainTime.midnightAtStartOfDay();
-        if (!System.getProperty("java.version").startsWith("1.8")) {
+        if (System.getProperty("java.version").startsWith("1.6")) {
             expected = PlainTime.midnightAtEndOfDay();
         }
         assertThat(
