@@ -81,12 +81,15 @@ public class XMLAdapterTest {
                     DatatypeConstants.FIELD_UNDEFINED,
                     DatatypeConstants.FIELD_UNDEFINED, 24, 0, 0, 0, DatatypeConstants.FIELD_UNDEFINED);
         PlainTime expected = PlainTime.midnightAtStartOfDay();
+        if (!System.getProperty("java.version").startsWith("1.8")) {
+            expected = PlainTime.midnightAtEndOfDay();
+        }
         assertThat(
             XMLAdapter.XML_TIME.translate(cal),
             is(expected));
         assertThat(
             cal.getHour(),
-            is(0));
+            is(expected.getHour()));
     }
 
     @Test
