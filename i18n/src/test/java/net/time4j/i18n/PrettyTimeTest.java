@@ -304,26 +304,26 @@ public class PrettyTimeTest {
 
     @Test
     public void printLastLeapsecondGerman() {
-        TimeSource<?> clock = () -> PlainTimestamp.of(2015, 7, 1, 0, 0, 5).atUTC();
+        TimeSource<?> clock = () -> PlainTimestamp.of(2012, 7, 1, 0, 0, 5).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2015, 6, 30, 23, 59, 59).atUTC(),
+                    PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC(),
                     ZonalOffset.UTC),
             is("vor 7 Sekunden"));
     }
 
     @Test
     public void printNextLeapsecondEnglish() {
-        TimeSource<?> clock = () -> PlainTimestamp.of(2015, 6, 30, 23, 59, 54).atUTC();
+        TimeSource<?> clock = () -> PlainTimestamp.of(2012, 6, 30, 23, 59, 54).atUTC();
 
         assertThat(
             PrettyTime.of(Locale.ENGLISH)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2015, 7, 1, 0, 0, 0).atUTC(),
+                    PlainTimestamp.of(2012, 7, 1, 0, 0, 0).atUTC(),
                     ZonalOffset.UTC),
             is("in 7 seconds"));
     }
