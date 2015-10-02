@@ -103,7 +103,7 @@ import java.util.List;
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
- *     System.out.println(formatter.format(jalali)); // 2015-07-16
+ *     System.out.println(formatter.format(jalali));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -147,7 +147,7 @@ import java.util.List;
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
- *     System.out.println(formatter.format(jalali)); // 2015-07-16
+ *     System.out.println(formatter.format(jalali));
  * </pre>
  *
  * @author  Meno Hochschild
