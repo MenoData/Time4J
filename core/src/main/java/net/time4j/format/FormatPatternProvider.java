@@ -94,9 +94,10 @@ public interface FormatPatternProvider {
 
             @Override
             public String getIntervalPattern(Locale locale) {
-
                 if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
                     return "{0}/{1}";
+                } else if (CalendarText.isTextRTL(locale)) {
+                    return "{1} - {0}";
                 }
 
                 return "{0} - {1}";

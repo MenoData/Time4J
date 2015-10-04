@@ -38,10 +38,12 @@ import java.time.temporal.IsoFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -163,6 +165,23 @@ public final class CalendarText {
      * <p>Standard-Kalendertyp f&uuml;r alle ISO-Systeme. </p>
      */
     public static final String ISO_CALENDAR_TYPE = "iso8601";
+
+    private static final Set<String> RTL;
+
+    static {
+        Set<String> lang = new HashSet<>();
+        lang.add("ar");
+        lang.add("dv");
+        lang.add("fa");
+        lang.add("ha");
+        lang.add("he");
+        lang.add("iw");
+        lang.add("ji");
+        lang.add("ps");
+        lang.add("ur");
+        lang.add("yi");
+        RTL = Collections.unmodifiableSet(lang);
+    }
 
     private static final ConcurrentMap<String, CalendarText> CACHE = new ConcurrentHashMap<>();
 
@@ -827,6 +846,19 @@ public final class CalendarText {
         CalendarType ft =
             chronology.getChronoType().getAnnotation(CalendarType.class);
         return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
+
+    }
+
+    /**
+     * Determines if given language implies right-to-left-directionality. </p>
+     *
+     * @param   locale      language reference
+     * @return  boolean
+     * @since   3.10/4.7
+     */
+    static boolean isTextRTL(Locale locale) {
+
+        return RTL.contains(locale.getLanguage());
 
     }
 
