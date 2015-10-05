@@ -26,7 +26,6 @@ import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.i18n.UTF8ResourceControl;
 
-import java.text.Normalizer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -49,6 +48,8 @@ public final class GenericTextProviderSPI
     implements TextProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final String[] EMPTY_STRINGS = new String[0];
 
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
@@ -125,47 +126,34 @@ public final class GenericTextProviderSPI
     ) {
 
         ResourceBundle rb = getBundle(calendarType, locale);
-        String[] names;
-        String key = getKey(rb, "MONTH_OF_YEAR");
-        boolean standalone = (
-            (oc == OutputContext.STANDALONE)
-            && "true".equals(rb.getObject("enableStandalone")));
 
         if (tw == TextWidth.SHORT) {
             tw = TextWidth.ABBREVIATED;
         }
 
-        if (standalone) {
-            names = lookupBundle(rb, 12, key, tw, oc, leapForm);
-        } else {
-            names = lookupBundle(rb, 12, key, tw, leapForm);
+        String key = getKey(rb, "MONTH_OF_YEAR");
+        String[] names = lookupBundle(rb, 12, key, tw, oc, leapForm, 1);
+
+        // fallback rules as found in CLDR-root-properties via alias paths
+        if (names == null) {
+            if (oc == OutputContext.STANDALONE) {
+                if (tw != TextWidth.NARROW) {
+                    names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
+                }
+            } else {
+                if (tw == TextWidth.ABBREVIATED) {
+                    names = months(calendarType, locale, TextWidth.WIDE, OutputContext.FORMAT, leapForm);
+                } else if (tw == TextWidth.NARROW) {
+                    names = months(calendarType, locale, tw, OutputContext.STANDALONE, leapForm);
+                }
+            }
         }
 
         if (names == null) {
-            if (tw == TextWidth.NARROW) {
-                names = months(calendarType, locale, TextWidth.ABBREVIATED, oc, leapForm);
-                if (names == null) {
-                    if (standalone) {
-                        names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
-                    }
-                    if (names == null) {
-                        throw new MissingResourceException(
-                            "Cannot find calendar month.",
-                            GenericTextProviderSPI.class.getName(),
-                            locale.toString());
-                    }
-                }
-                return narrow(names, 12);
-            }
-            if (standalone) {
-                names = months(calendarType, locale, tw, OutputContext.FORMAT, leapForm);
-            }
-            if (names == null) {
-                throw new MissingResourceException(
-                    "Cannot find calendar month.",
-                    GenericTextProviderSPI.class.getName(),
-                    locale.toString());
-            }
+            throw new MissingResourceException(
+                "Cannot find calendar month.",
+                GenericTextProviderSPI.class.getName(),
+                locale.toString());
         }
 
         return names;
@@ -180,7 +168,7 @@ public final class GenericTextProviderSPI
         OutputContext oc
     ) {
 
-        return new String[] {"1", "2", "3", "4"};
+        return EMPTY_STRINGS;
 
     }
 
@@ -192,7 +180,7 @@ public final class GenericTextProviderSPI
         OutputContext oc
     ) {
 
-        return new String[] {"1", "2", "3", "4", "5", "6", "7"};
+        return EMPTY_STRINGS;
 
     }
 
@@ -210,18 +198,20 @@ public final class GenericTextProviderSPI
         }
 
         String key = getKey(rb, "ERA");
-        String[] names = lookupBundle(rb, 1, key, tw, false);
+        String[] names = lookupBundle(rb, 1, key, tw, OutputContext.FORMAT, false, 0);
 
-        if (names != null) {
-            return names;
-        } else if (tw == TextWidth.NARROW) {
-            return narrow(eras(calendarType, locale, TextWidth.ABBREVIATED), 1);
-        } else {
+        if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
+            names = eras(calendarType, locale, TextWidth.ABBREVIATED);
+        }
+
+        if (names == null) {
             throw new MissingResourceException(
                 "Cannot find calendar resource for era.",
                 GenericTextProviderSPI.class.getName(),
                 locale.toString());
         }
+
+        return names;
 
     }
 
@@ -232,7 +222,7 @@ public final class GenericTextProviderSPI
         TextWidth tw
     ) {
 
-        return new String[] {"AM", "PM"};
+        return EMPTY_STRINGS;
 
     }
 
@@ -247,46 +237,6 @@ public final class GenericTextProviderSPI
     public String toString() {
 
         return "GenericTextProviderSPI";
-
-    }
-
-    private static String[] narrow(
-        String[] names,
-        int len
-    ) {
-
-        String[] ret = new String[len];
-
-        for (int i = 0; i < len; i++) {
-            if (!names[i].isEmpty()) {
-                ret[i] = toSingleLetter(names[i]);
-            } else {
-                ret[i] = String.valueOf(i + 1);
-            }
-        }
-
-        return ret;
-
-    }
-
-    private static String toSingleLetter(String input) {
-
-        // diakritische Zeichen entfernen
-        char c = Normalizer.normalize(input, Normalizer.Form.NFD).charAt(0);
-
-        if ((c >= 'A') && (c <= 'Z')) {
-            return String.valueOf(c);
-        } else if ((c >= 'a') && (c <= 'z')) {
-            c += ('A' - 'a');
-            return String.valueOf(c);
-        } else if ((c >= '\u0410') && (c <= '\u042F')) { // kyrillisch (ru)
-            return String.valueOf(c);
-        } else if ((c >= '\u0430') && (c <= '\u044F')) { // kyrillisch (ru)
-            c += ('\u0410' - '\u0430');
-            return String.valueOf(c);
-        } else {
-            return input; // NARROW-Form nicht möglich => nichts ändern!
-        }
 
     }
 
@@ -308,20 +258,9 @@ public final class GenericTextProviderSPI
         int len,
         String elementName,
         TextWidth tw,
-        boolean leapForm
-    ) {
-
-        return lookupBundle(rb, len, elementName, tw, null, leapForm);
-
-    }
-
-    private static String[] lookupBundle(
-        ResourceBundle rb,
-        int len,
-        String elementName,
-        TextWidth tw,
         OutputContext oc,
-        boolean leapForm
+        boolean leapForm,
+        int baseIndex
     ) {
 
         String[] names = new String[len];
@@ -355,7 +294,7 @@ public final class GenericTextProviderSPI
 
             b.append(')');
             b.append('_');
-            b.append(i + 1);
+            b.append(i + baseIndex);
             String key = b.toString();
 
             if (rb.containsKey(key)) {
