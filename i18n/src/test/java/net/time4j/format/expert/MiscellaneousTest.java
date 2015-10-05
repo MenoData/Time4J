@@ -539,7 +539,7 @@ public class MiscellaneousTest {
         ZonalOffset offset = Timezone.ofSystem().getOffset(moment);
         String displayedOffset = (offset.equals(ZonalOffset.UTC) ? "Z" : offset.toString());
         tsp = moment.toZonalTimestamp(offset);
-        String s = PlainTimestamp.localFormatter("MM/dd/yyyy hh:mm a ", PatternType.CLDR).format(tsp);
+        String s = PlainTimestamp.formatter("MM/dd/yyyy hh:mm a ", PatternType.CLDR, Locale.US).format(tsp);
         assertThat(
             formatter.format(moment),
             is("#" + s.substring(1)
@@ -585,7 +585,7 @@ public class MiscellaneousTest {
         FieldPosition fpos = new FieldPosition(DateFormat.Field.TIME_ZONE); //.TIMEZONE_FIELD);
         assertThat(
             formatter.toFormat().format(moment, new StringBuffer(), fpos).toString(),
-            is("1/02/2015 12:00 AM -05:00")
+            is("1/02/2015 12:00 am -05:00")
         );
         assertThat(fpos.getBeginIndex(), is(19));
         assertThat(fpos.getEndIndex(), is(25));

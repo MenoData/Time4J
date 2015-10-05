@@ -25,7 +25,7 @@ public class EraFormatTest {
                 .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR).build();
         assertThat(
             formatter.format(PlainTimestamp.of(1582, 10, 14, 0, 0)),
-            is("4. Oktober 1582 nach Christi Geburt 00:00"));
+            is("4. Oktober 1582 n. Chr. 00:00"));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class EraFormatTest {
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.GERMANY)
                 .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR).build();
         assertThat(
-            formatter.parse("4. Oktober 1582 nach Christi Geburt 00:00"),
+            formatter.parse("4. Oktober 1582 n. Chr. 00:00"),
             is(PlainTimestamp.of(1582, 10, 14, 0, 0)));
     }
 

@@ -123,7 +123,7 @@ public class CalendricalNamesTest {
         result =
             instance.getStdMonths(textWidth, OutputContext.STANDALONE)
             .print(Month.MARCH);
-        assertThat(result, is("Март"));
+        assertThat(result, is("март"));
     }
 
     @Test
@@ -405,7 +405,7 @@ public class CalendricalNamesTest {
         result =
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.SATURDAY);
-        assertThat(result, is("Sábado"));
+        assertThat(result, is("sábado"));
     }
 
     @Test
@@ -489,7 +489,7 @@ public class CalendricalNamesTest {
         TextWidth textWidth = TextWidth.WIDE;
         CalendarText instance = CalendarText.getInstance("iso8601", Locale.GERMAN);
         String result = instance.getEras(textWidth).print(HistoricEra.AD);
-        assertThat(result, is("nach Christi Geburt"));
+        assertThat(result, is("n. Chr."));
     }
 
     @Test
@@ -499,7 +499,7 @@ public class CalendricalNamesTest {
            CalendarText.getInstance("iso8601", Locale.ENGLISH);
         String result =
             instance.getMeridiems(textWidth).print(Meridiem.PM);
-        assertThat(result, is("PM"));
+        assertThat(result, is("pm"));
     }
 
     @Test
