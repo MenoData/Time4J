@@ -1168,8 +1168,7 @@ public final class CalendarText {
         @Override
         public ResourceBundle.Control getControl() {
 
-            return ResourceBundle.Control.getNoFallbackControl(
-                ResourceBundle.Control.FORMAT_DEFAULT);
+            return ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);
 
         }
 
