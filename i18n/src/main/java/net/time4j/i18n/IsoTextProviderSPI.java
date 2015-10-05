@@ -25,8 +25,6 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 
-import java.text.DateFormatSymbols;
-import java.text.Normalizer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -70,16 +68,13 @@ public final class IsoTextProviderSPI
 
         Set<Locale> locs = new HashSet<Locale>();
 
-        for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
-            // Java-pre-8 has no root locale but Java-8 has the root!
-            // => ensure equal behaviour
-            if (!loc.getLanguage().isEmpty()) {
-                locs.add(loc);
-            }
-        }
-
         for (String lang : LANGUAGES) {
             locs.add(new Locale(lang));
+        }
+
+        // defensive strategy in case JDK should change its behaviour
+        for (LanguageMatch lm : LanguageMatch.values()) {
+            locs.add(new Locale(lm.name())); // in Java 8 or earlier no effect
         }
 
         LOCALES = Collections.unmodifiableSet(locs);
@@ -203,82 +198,41 @@ public final class IsoTextProviderSPI
         OutputContext oc
     ) throws MissingResourceException {
 
+        String[] names = null;
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
-            String[] names;
-            String key = getKey(rb, "MONTH_OF_YEAR");
-            boolean standalone = (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone")));
-
             if (tw == TextWidth.SHORT) {
                 tw = TextWidth.ABBREVIATED;
             }
 
-            if (standalone) {
-                names = lookupBundle(rb, 12, key, tw, oc);
-            } else {
-                names = lookupBundle(rb, 12, key, tw);
-            }
+            String key = getKey(rb, "MONTH_OF_YEAR");
+            names = lookupBundle(rb, 12, key, tw, oc, 1);
 
+            // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
-                if (tw == TextWidth.NARROW) {
-                    names = months(locale, TextWidth.ABBREVIATED, oc);
-                    if (names == null) {
-                        if (standalone) {
-                            names = months(locale, tw, OutputContext.FORMAT);
-                        }
-                        if (names == null) {
-                            throw new MissingResourceException(
-                                "Cannot find ISO-8601-month.",
-                                IsoTextProviderSPI.class.getName(),
-                                locale.toString());
-                        }
+                if (oc == OutputContext.STANDALONE) {
+                    if (tw != TextWidth.NARROW) {
+                        names = months(locale, tw, OutputContext.FORMAT);
                     }
-                    return narrow(names, 12);
-                }
-                if (standalone) {
-                    names = months(locale, tw, OutputContext.FORMAT);
-                }
-                if (names == null) {
-                    throw new MissingResourceException(
-                        "Cannot find ISO-8601-month.",
-                        IsoTextProviderSPI.class.getName(),
-                        locale.toString());
+                } else {
+                    if (tw == TextWidth.ABBREVIATED) {
+                        names = months(locale, TextWidth.WIDE, OutputContext.FORMAT);
+                    } else if (tw == TextWidth.NARROW) {
+                        names = months(locale, tw, OutputContext.STANDALONE);
+                    }
                 }
             }
-
-            return names;
         }
 
-        // Sonderfall: ROOT
-        if (locale.getLanguage().isEmpty()) {
-            if (tw == TextWidth.WIDE) {
-                return new String[] {
-                    "01", "02", "03", "04", "05", "06",
-                    "07", "08", "09", "10", "11", "12"};
-            } else {
-                return new String[] {
-                    "1", "2", "3", "4", "5", "6",
-                    "7", "8", "9", "10", "11", "12"};
-            }
+        if (names == null) {
+            throw new MissingResourceException(
+                "Cannot find ISO-8601-month.",
+                IsoTextProviderSPI.class.getName(),
+                locale.toString());
         }
 
-        // JDK-Quelle
-        DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
-
-        switch (tw) {
-            case WIDE:
-                return dfs.getMonths();
-            case ABBREVIATED:
-            case SHORT:
-                return dfs.getShortMonths();
-            case NARROW:
-                return narrow(dfs.getShortMonths(), 12);
-            default:
-                throw new UnsupportedOperationException(tw.name());
-        }
+        return names;
 
     }
 
@@ -288,61 +242,41 @@ public final class IsoTextProviderSPI
         OutputContext oc
     ) throws MissingResourceException {
 
+        String[] names = null;
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
-            String[] names;
-            String key = getKey(rb, "QUARTER_OF_YEAR");
-            boolean standalone = (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone")));
-
             if (tw == TextWidth.SHORT) {
                 tw = TextWidth.ABBREVIATED;
             }
 
-            if (standalone) {
-                names = lookupBundle(rb, 4, key, tw, oc);
-            } else {
-                names = lookupBundle(rb, 4, key, tw);
-            }
+            String key = getKey(rb, "QUARTER_OF_YEAR");
+            names = lookupBundle(rb, 4, key, tw, oc, 1);
 
+            // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
-                if (tw == TextWidth.NARROW) {
-                    names = quarters(locale, TextWidth.ABBREVIATED, oc);
-                    if (names == null) {
-                        if (standalone) {
-                            names = quarters(locale, tw, OutputContext.FORMAT);
-                        }
-                        if (names == null) {
-                            throw new MissingResourceException(
-                                "Cannot find ISO-8601-quarter-of-year.",
-                                IsoTextProviderSPI.class.getName(),
-                                locale.toString());
-                        }
+                if (oc == OutputContext.STANDALONE) {
+                    if (tw != TextWidth.NARROW) {
+                        names = quarters(locale, tw, OutputContext.FORMAT);
                     }
-                    return narrow(names, 4);
-                }
-                if (standalone) {
-                    names = quarters(locale, tw, OutputContext.FORMAT);
-                }
-                if (names == null) {
-                    throw new MissingResourceException(
-                        "Cannot find ISO-8601-quarter-of-year.",
-                        IsoTextProviderSPI.class.getName(),
-                        locale.toString());
+                } else {
+                    if (tw == TextWidth.ABBREVIATED) {
+                        names = quarters(locale, TextWidth.WIDE, OutputContext.FORMAT);
+                    } else if (tw == TextWidth.NARROW) {
+                        names = quarters(locale, tw, OutputContext.STANDALONE);
+                    }
                 }
             }
-
-            return names;
         }
 
-        // fallback
-        if (tw == TextWidth.NARROW) {
-            return new String[] {"1", "2", "3", "4"};
-        } else {
-            return new String[] {"Q1", "Q2", "Q3", "Q4"};
+        if (names == null) {
+            throw new MissingResourceException(
+                "Cannot find ISO-8601-quarter-of-year.",
+                IsoTextProviderSPI.class.getName(),
+                locale.toString());
         }
+
+        return names;
 
     }
 
@@ -352,80 +286,39 @@ public final class IsoTextProviderSPI
         OutputContext oc
     ) throws MissingResourceException {
 
+        String[] names = null;
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
-            String[] names;
             String key = getKey(rb, "DAY_OF_WEEK");
-            boolean standalone = (
-                (oc == OutputContext.STANDALONE)
-                && "true".equals(rb.getObject("enableStandalone")));
+            names = lookupBundle(rb, 7, key, tw, oc, 1);
 
-            if (standalone) {
-                names = lookupBundle(rb, 7, key, tw, oc);
-            } else {
-                names = lookupBundle(rb, 7, key, tw);
-            }
-
+            // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
-                if (tw == TextWidth.NARROW) {
-                    names = narrow(weekdays(locale, TextWidth.SHORT, oc), 7);
-                } else if (tw == TextWidth.SHORT) {
-                    names = weekdays(locale, TextWidth.ABBREVIATED, oc);
-                    if ((names == null) && standalone) {
+                if (oc == OutputContext.STANDALONE) {
+                    if (tw != TextWidth.NARROW) {
                         names = weekdays(locale, tw, OutputContext.FORMAT);
                     }
-                } else if (standalone) {
-                    names = weekdays(locale, tw, OutputContext.FORMAT);
+                } else {
+                    if (tw == TextWidth.ABBREVIATED) {
+                        names = weekdays(locale, TextWidth.WIDE, OutputContext.FORMAT);
+                    } else if (tw == TextWidth.SHORT) {
+                        names = weekdays(locale, TextWidth.ABBREVIATED, OutputContext.FORMAT);
+                    } else if (tw == TextWidth.NARROW) {
+                        names = weekdays(locale, tw, OutputContext.STANDALONE);
+                    }
                 }
             }
-
-            if (names == null) {
-                throw new MissingResourceException(
-                    "Cannot find ISO-8601-weekday.",
-                    IsoTextProviderSPI.class.getName(),
-                    locale.toString());
-            } else {
-                return names;
-            }
         }
 
-        // Sonderfall: ROOT
-        if (locale.getLanguage().isEmpty()) {
-            return new String[] {"1", "2", "3", "4", "5", "6", "7"};
+        if (names == null) {
+            throw new MissingResourceException(
+                "Cannot find ISO-8601-quarter-of-year.",
+                IsoTextProviderSPI.class.getName(),
+                locale.toString());
         }
 
-        // JDK-Quelle
-        DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
-        String[] result;
-
-        switch (tw) {
-            case WIDE:
-                result = dfs.getWeekdays(); // 8 Elemente
-                break;
-            case ABBREVIATED:
-            case SHORT:
-                result = dfs.getShortWeekdays(); // 8 Elemente
-                break;
-            case NARROW:
-                String[] names = // 7 Elemente
-                    weekdays(locale, TextWidth.SHORT, oc);
-                result = narrow(names, 7);
-                break;
-            default:
-                throw new UnsupportedOperationException(
-                    "Unknown text width: " + tw);
-        }
-
-        if (result.length > 7) { // ISO-Reihenfolge erzwingen
-            String sunday = result[1];
-            String[] arr = new String[7];
-            System.arraycopy(result, 2, arr, 0, 6);
-            arr[6] = sunday;
-            result = arr;
-        }
-
-        return result;
+        return names;
 
     }
 
@@ -434,6 +327,7 @@ public final class IsoTextProviderSPI
         TextWidth tw
     ) throws MissingResourceException {
 
+        String[] names = null;
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
@@ -442,50 +336,22 @@ public final class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "ERA");
-            String[] names = lookupBundle(rb, 2, key, tw);
+            names = lookupBundle(rb, 2, key, tw, OutputContext.FORMAT, 0);
 
-            if (names != null) {
-                return names;
-            } else if (tw == TextWidth.NARROW) {
-                return narrow(eras(locale, TextWidth.ABBREVIATED), 2);
-            } else {
-                throw new MissingResourceException(
-                    "Cannot find ISO-8601-resource for era.",
-                    IsoTextProviderSPI.class.getName(),
-                    locale.toString());
+            // fallback rules as found in CLDR-root-properties via alias paths
+            if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
+                names = eras(locale, TextWidth.ABBREVIATED);
             }
         }
 
-        // Sonderfall: ROOT
-        if (locale.getLanguage().isEmpty()) {
-            if (tw == TextWidth.NARROW) {
-                return new String[] {"B", "A"};
-            } else {
-                return new String[] {"BC", "AD"};
-            }
+        if (names == null) {
+            throw new MissingResourceException(
+                "Cannot find ISO-8601-resource for era.",
+                IsoTextProviderSPI.class.getName(),
+                locale.toString());
         }
 
-        // JDK-Quelle
-        DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
-
-        if (tw == TextWidth.NARROW) {
-            String[] eras = dfs.getEras();
-            String[] ret = new String[eras.length];
-            for (int i = 0, n = eras.length; i < n; i++) {
-                if (!eras[i].isEmpty()) {
-                    ret[i] = toSingleLetter(eras[i]);
-                } else if ((i == 0) && (eras.length == 2)) {
-                    ret[i] = "B";
-                } else if ((i == 1) && (eras.length == 2)) {
-                    ret[i] = "A";
-                } else {
-                    ret[i] = String.valueOf(i);
-                }
-            }
-            return ret;
-        } else {
-            return dfs.getEras();
-        }
+        return names;
 
     }
 
@@ -497,70 +363,33 @@ public final class IsoTextProviderSPI
         ResourceBundle rb = getBundle(locale);
 
         if (rb != null) {
-            String key = getKey(rb, "AM_PM_OF_DAY");
-            String[] names = lookupBundle(rb, 2, key, tw);
+            if (tw == TextWidth.SHORT) {
+                tw = TextWidth.ABBREVIATED;
+            }
 
-            if (names != null) {
-                return names;
+            String[] names = new String[2];
+            String amKey = meridiemKey("am", tw);
+
+            if (rb.containsKey(amKey)) {
+                names[0] = rb.getString(amKey);
+                String pmKey = meridiemKey("pm", tw);
+
+                if (rb.containsKey(pmKey)) {
+                    names[1] = rb.getString(pmKey);
+                    return names;
+                }
+            }
+
+            // fallback
+            if (tw != TextWidth.ABBREVIATED) {
+                return meridiems(locale, TextWidth.ABBREVIATED);
             }
         }
 
-        // Sonderfall: ROOT
-        if (locale.getLanguage().isEmpty()) {
-            if (tw == TextWidth.NARROW) {
-                return new String[] {"A", "P"};
-            } else {
-                return new String[] {"AM", "PM"};
-            }
-        }
-
-        // Im alten JDK-API ist NARROW unbekannt
-        if (tw == TextWidth.NARROW) {
-            return new String[] {"A", "P"};
-        }
-
-        // JDK-Quelle
-        return DateFormatSymbols.getInstance(locale).getAmPmStrings();
-
-    }
-
-    private static String[] narrow(
-        String[] names,
-        int len
-    ) {
-
-        String[] ret = new String[len];
-
-        for (int i = 0; i < len; i++) {
-            if (!names[i].isEmpty()) {
-                ret[i] = toSingleLetter(names[i]);
-            } else {
-                ret[i] = String.valueOf(i + 1);
-            }
-        }
-
-        return ret;
-
-    }
-
-    private static String toSingleLetter(String input) {
-
-        // diakritische Zeichen entfernen
-        char c = Normalizer.normalize(input, Normalizer.Form.NFD).charAt(0);
-
-        if ((c >= 'A') && (c <= 'Z')) {
-            return String.valueOf(c);
-        } else if ((c >= 'a') && (c <= 'z')) {
-            c += ('A' - 'a');
-            return String.valueOf(c);
-        } else if ((c >= '\u0410') && (c <= '\u042F')) { // kyrillisch (ru)
-            return String.valueOf(c);
-        } else if ((c >= '\u0430') && (c <= '\u044F')) { // kyrillisch (ru)
-            c += ('\u0410' - '\u0430');
-            return String.valueOf(c);
-        } else {
-            return input; // NARROW-Form nicht möglich => nichts ändern!
-        }
+        throw new MissingResourceException(
+            "Cannot find ISO-8601-resource for am/pm.",
+            IsoTextProviderSPI.class.getName(),
+            locale.toString());
 
     }
 
@@ -583,19 +412,9 @@ public final class IsoTextProviderSPI
         ResourceBundle rb,
         int len,
         String elementName,
-        TextWidth tw
-    ) {
-
-        return lookupBundle(rb, len, elementName, tw, null);
-
-    }
-
-    private static String[] lookupBundle(
-        ResourceBundle rb,
-        int len,
-        String elementName,
         TextWidth tw,
-        OutputContext oc
+        OutputContext oc,
+        int baseIndex
     ) {
 
         String[] names = new String[len];
@@ -625,7 +444,7 @@ public final class IsoTextProviderSPI
 
             b.append(')');
             b.append('_');
-            b.append(i + 1);
+            b.append(i + baseIndex);
             String key = b.toString();
 
             if (rb.containsKey(key)) {
@@ -660,6 +479,18 @@ public final class IsoTextProviderSPI
     private static ClassLoader getDefaultLoader() {
 
         return IsoTextProviderSPI.class.getClassLoader();
+
+    }
+
+    private static String meridiemKey(
+        String meridiem,
+        TextWidth tw
+    ) {
+
+        char c = tw.name().charAt(0);
+        c = Character.toLowerCase(c);
+
+        return "P(" + String.valueOf(c) + ")_" + meridiem;
 
     }
 
