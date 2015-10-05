@@ -82,12 +82,18 @@ public interface TextProvider {
     /**
      * <p>Yields the supported languages. </p>
      *
+     * <p>Only the language part will be evaluated. </p>
+     *
      * @return  Locale-array
+     * @see     Locale#getLanguage()
      */
     /*[deutsch]
      * <p>Gibt die unterst&uuml;tzten Sprachen an. </p>
      *
+     * <p>Nur der reine Sprachencode wird ausgewertet. </p>
+     *
      * @return  Locale-array
+     * @see     Locale#getLanguage()
      */
     Locale[] getAvailableLocales();
 
