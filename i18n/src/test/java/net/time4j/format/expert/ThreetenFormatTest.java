@@ -32,7 +32,7 @@ public class ThreetenFormatTest {
             ChronoFormatter.ofTimePattern("hh:mm a", PatternType.CLDR, Locale.US);
         assertThat(
             formatter.format(LocalTime.of(17, 45)),
-            is("05:45 PM")
+            is("05:45 pm")
         );
     }
 
@@ -202,7 +202,7 @@ public class ThreetenFormatTest {
             ChronoFormatter.ofTimePattern("pph:mm:ss a n", PatternType.THREETEN, Locale.ENGLISH);
         assertThat(
             formatter.format(PlainTime.of(14, 10, 14, 123456789)),
-            is(" 2:10:14 PM 123456789")
+            is(" 2:10:14 pm 123456789")
         );
     }
 
