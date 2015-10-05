@@ -377,7 +377,7 @@ public final class CalendarText {
         if (instance == null) {
             TextProvider p = null;
 
-            if (locale.getLanguage().isEmpty()) {
+            if (locale.getLanguage().isEmpty() && calendarType.equals(ISO_CALENDAR_TYPE)) {
                 p = ROOT_PROVIDER;
             } else {
                 // ServiceLoader-Mechanismus (Suche nach externen Providern)
