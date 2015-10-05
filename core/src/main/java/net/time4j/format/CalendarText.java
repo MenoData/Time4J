@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
@@ -165,6 +166,9 @@ public final class CalendarText {
      * <p>Standard-Kalendertyp f&uuml;r alle ISO-Systeme. </p>
      */
     public static final String ISO_CALENDAR_TYPE = "iso8601";
+
+    private static final TextProvider JDK_PROVIDER = new JDKTextProvider();
+    private static final TextProvider ROOT_PROVIDER = new FallbackProvider();
 
     private static final Set<String> RTL;
 
@@ -373,29 +377,34 @@ public final class CalendarText {
         if (instance == null) {
             TextProvider p = null;
 
-            for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
-                if (
-                    isCalendarTypeSupported(tmp, calendarType)
-                    && isLocaleSupported(tmp, locale)
-                ) {
-                    p = tmp;
-                    break;
-                }
-            }
-
-            // Java-Ressourcen
-            if (p == null) {
-                TextProvider tmp = new JDKTextProvider();
-
-                if (
-                    isCalendarTypeSupported(tmp, calendarType)
-                    && isLocaleSupported(tmp, locale)
-                ) {
-                    p = tmp;
+            if (locale.getLanguage().isEmpty()) {
+                p = ROOT_PROVIDER;
+            } else {
+                // ServiceLoader-Mechanismus (Suche nach externen Providern)
+                for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
+                    if (
+                        isCalendarTypeSupported(tmp, calendarType)
+                        && isLocaleSupported(tmp, locale)
+                    ) {
+                        p = tmp;
+                        break;
+                    }
                 }
 
+                // Java-Ressourcen
                 if (p == null) {
-                    p = new FallbackProvider(); // keine-ISO-Ressource
+                    TextProvider tmp = JDK_PROVIDER;
+
+                    if (
+                        isCalendarTypeSupported(tmp, calendarType)
+                        && isLocaleSupported(tmp, locale)
+                    ) {
+                        p = tmp;
+                    }
+
+                    if (p == null) {
+                        p = ROOT_PROVIDER; // keine-ISO-Ressource
+                    }
                 }
             }
 
@@ -665,17 +674,26 @@ public final class CalendarText {
      * UTF-8 encoding. The basic name of these resources is the calendar type.
      * The combination of element name and optionally variants in the form
      * &quot;(variant1|variant2|...|variantN)&quot; and the underscore and
-     * finally a numerical suffix with base 1 serves as resource text key.
-     * If there is no entry for given key in the resources then this method
-     * will simply yield the name of enum value associated with given element
-     * value. </p>
+     * finally a numerical suffix with base 1 (for era elements base 0) serves
+     * as resource text key. If there is no entry for given key in the resources
+     * then this method will simply yield the name of enum value associated
+     * with given element value. </p>
+     *
+     * <p>As example, the search for abbreviated historic era {@code HistoricEra.AD} of alternative form
+     * looks up keys in this order (using E if there is an entry &quot;useShortKeys=true&quot;): </p>
+     *
+     * <ol>
+     *     <li>value of &quot;E(a|alt)_1&quot;</li>
+     *     <li>value of &quot;E(a)_1&quot;</li>
+     *     <li>value of &quot;E_1&quot;</li>
+     *     <li><i>fallback=&gt;AD</i></li>
+     * </ol>
      *
      * @param   <V> generic type of element values based on enums
      * @param   element     element text forms are searched for
      * @param   variants    text form variants (optional)
      * @return  accessor for any text forms
-     * @throws  MissingResourceException if for given calendar type there are
-     *          no text resource files
+     * @throws  MissingResourceException if for given calendar type there are no text resource files
      */
     /*[deutsch]
      * <p>Liefert einen {@code Accessor} f&uuml;r alle Textformen des
@@ -696,16 +714,26 @@ public final class CalendarText {
      * Textschluuml;ssel dient die Kombination aus Elementname, optional
      * Varianten in der Form &quot;(variant1|variant2|...|variantN)&quot;,
      * dem Unterstrich und schlie&szlig;lich einem numerischen Suffix mit
-     * Basis 1. Wird in den Ressourcen zum angegebenen Schl&uuml;ssel kein
-     * Eintrag gefunden, liefert diese Methode einfach den Namen des mit dem
-     * Element assoziierten enum-Werts. </p>
+     * Basis 1 (f&uuml;r &Auml;ra-Elemente Basis 0). Wird in den Ressourcen zum
+     * angegebenen Schl&uuml;ssel kein Eintrag gefunden, liefert diese Methode
+     * einfach den Namen des mit dem Element assoziierten enum-Werts. </p>
+     *
+     * <p>Zum Beispiel versucht die Suche nach der abgek&uuml;rzten Form der historischen &Auml;ra
+     * {@code HistoricEra.AD} in der alternativen Form Schl&uuml;ssel in dieser Reihenfolge zu finden
+     * (mit dem Pr&auml;fix E, falls es einen Eintrag &quot;useShortKeys=true&quot; gibt): </p>
+     *
+     * <ol>
+     *     <li>value of &quot;E(a|alt)_1&quot;</li>
+     *     <li>value of &quot;E(a)_1&quot;</li>
+     *     <li>value of &quot;E_1&quot;</li>
+     *     <li><i>fallback=&gt;AD</i></li>
+     * </ol>
      *
      * @param   <V> generic type of element values based on enums
      * @param   element     element text forms are searched for
      * @param   variants    text form variants (optional)
      * @return  accessor for any text forms
-     * @throws  MissingResourceException if for given calendar type there are
-     *          no text resource files
+     * @throws  MissingResourceException if for given calendar type there are no text resource files
      */
     public <V extends Enum<V>> TextAccessor getTextForms(
         ChronoElement<V> element,
@@ -722,40 +750,31 @@ public final class CalendarText {
         V[] enums = element.getType().getEnumConstants();
         int len = enums.length;
         String[] tfs = new String[len];
-        StringBuilder sb = new StringBuilder(element.name());
-
-        if (
-            (variants != null)
-            && (variants.length > 0)
-        ) {
-            boolean first = true;
-            for (int v = 0; v < variants.length; v++) {
-                if (first) {
-                    sb.append('(');
-                    first = false;
-                } else {
-                    sb.append('|');
-                }
-                sb.append(variants[v]);
-            }
-            sb.append(')');
-        }
-
-        String raw = sb.toString();
+        String prefix = getKeyPrefix(this.textForms, element.name());
+        int baseIndex = (CalendarEra.class.isAssignableFrom(element.getType()) ? 0 : 1);
 
         for (int i = 0; i < len; i++) {
-            String vkey = toKey(raw, i);
+            int step = 0;
+            String raw = getKeyStart(prefix, 0, variants);
+            String key = null;
 
-            if (this.textForms.containsKey(vkey)) {
-                tfs[i] = this.textForms.getString(vkey);
-            } else {
-            	String skey = toKey(element.name(), i);
+            // sukzessives Reduzieren der Varianten, wenn nicht gefunden
+            while (raw != null) {
+                String test = toKey(raw, i, baseIndex);
 
-            	if (this.textForms.containsKey(skey)) {
-                	tfs[i] = this.textForms.getString(skey);
-                } else {
-                	tfs[i] = enums[i].name();
+                if (this.textForms.containsKey(test)) {
+                    key = test;
+                    break;
                 }
+
+                step++;
+                raw = getKeyStart(prefix, step, variants);
+            }
+
+            if (key == null) {
+                tfs[i] = enums[i].name(); // fallback
+            } else {
+                tfs[i] = this.textForms.getString(key);
             }
         }
 
@@ -938,14 +957,71 @@ public final class CalendarText {
 
     }
 
+    private static String getKeyPrefix(
+        ResourceBundle bundle,
+        String elementName
+    ) {
+
+        if (
+            bundle.containsKey("useShortKeys")
+                && "true".equals(bundle.getString("useShortKeys"))
+                && (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
+                    || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
+        ) {
+
+            return elementName.substring(0, 1);
+
+        }
+
+        return elementName;
+
+    }
+
+    private static String getKeyStart(
+        String elementName,
+        int step,
+        String... variants
+    ) {
+
+        if ((variants != null) && (variants.length > 0)) {
+            if (variants.length < step) {
+                return null;
+
+            }
+
+            StringBuilder sb = new StringBuilder(elementName);
+            boolean first = true;
+
+            for (int v = 0; v < variants.length - step; v++) {
+                if (first) {
+                    sb.append('(');
+                    first = false;
+                } else {
+                    sb.append('|');
+                }
+                sb.append(variants[v]);
+            }
+
+            if (!first) {
+                sb.append(')');
+            }
+
+            return sb.toString();
+        } else {
+            return (step > 0 ? null : elementName);
+        }
+
+    }
+
     private static String toKey(
-    	String raw,
-    	int counter
+        String raw,
+        int counter,
+        int baseIndex
     ) {
 
         StringBuilder keyBuilder = new StringBuilder(raw);
         keyBuilder.append('_');
-        keyBuilder.append(counter + 1);
+        keyBuilder.append(counter + baseIndex);
         return keyBuilder.toString();
 
     }
@@ -1084,8 +1160,7 @@ public final class CalendarText {
         @Override
         public ResourceBundle.Control getControl() {
 
-            return ResourceBundle.Control.getNoFallbackControl(
-                ResourceBundle.Control.FORMAT_DEFAULT);
+            return ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);
 
         }
 
