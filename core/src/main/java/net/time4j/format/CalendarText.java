@@ -209,8 +209,7 @@ public final class CalendarText {
 
         // Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
-            Collections.unmodifiableMap(
-                getMonths(calendarType, locale, p, false));
+            Collections.unmodifiableMap(getMonths(calendarType, locale, p, false));
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> tmpLeapMonths =
             getMonths(calendarType, locale, p, true);
@@ -222,8 +221,7 @@ public final class CalendarText {
         }
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> qt =
-            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
-                (TextWidth.class);
+            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             Map<OutputContext, TextAccessor> qo =
                 new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
@@ -240,8 +238,7 @@ public final class CalendarText {
         this.quarters = Collections.unmodifiableMap(qt);
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> wt =
-            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>
-                (TextWidth.class);
+            new EnumMap<TextWidth, Map<OutputContext, TextAccessor>>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
             Map<OutputContext, TextAccessor> wo =
                 new EnumMap<OutputContext, TextAccessor>(OutputContext.class);
@@ -369,7 +366,7 @@ public final class CalendarText {
         if (instance == null) {
             TextProvider p = null;
 
-            if (locale.getLanguage().isEmpty()) {
+            if (locale.getLanguage().isEmpty() && calendarType.equals(ISO_CALENDAR_TYPE)) {
                 p = ROOT_PROVIDER;
             } else {
                 // ServiceLoader-Mechanismus (Suche nach externen Providern)
