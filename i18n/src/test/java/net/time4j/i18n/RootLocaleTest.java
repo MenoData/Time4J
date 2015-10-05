@@ -1,9 +1,16 @@
 package net.time4j.i18n;
 
+import net.time4j.Meridiem;
+import net.time4j.Month;
+import net.time4j.Quarter;
+import net.time4j.Weekday;
+import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
 import java.util.Locale;
+
+import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -17,81 +24,65 @@ public class RootLocaleTest {
 
     @Test
     public void monthsWide() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.months(
-                "", Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT, false
-            )[0],
+            ct.getStdMonths(TextWidth.WIDE, OutputContext.FORMAT).print(Month.JANUARY),
             is("01"));
     }
 
     @Test
     public void monthsAbbreviated() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.months(
-                "",
-                Locale.ROOT,
-                TextWidth.ABBREVIATED,
-                OutputContext.FORMAT,
-                false
-            )[0],
+            ct.getStdMonths(TextWidth.ABBREVIATED, OutputContext.FORMAT).print(Month.JANUARY),
             is("1"));
     }
 
     @Test
     public void quartersWide() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.quarters(
-                "", Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT
-            )[0],
+            ct.getQuarters(TextWidth.WIDE, OutputContext.FORMAT).print(Quarter.Q1),
             is("Q1"));
     }
 
     @Test
     public void quartersAbbreviated() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.quarters(
-                "", Locale.ROOT, TextWidth.ABBREVIATED, OutputContext.FORMAT
-            )[0],
+            ct.getQuarters(TextWidth.ABBREVIATED, OutputContext.FORMAT).print(Quarter.Q1),
             is("Q1"));
     }
 
     @Test
     public void quartersNarrow() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.quarters(
-                "", Locale.ROOT, TextWidth.NARROW, OutputContext.FORMAT
-            )[0],
+            ct.getQuarters(TextWidth.NARROW, OutputContext.FORMAT).print(Quarter.Q1),
             is("1"));
     }
 
     @Test
     public void weekdaysWide() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.weekdays(
-                "", Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT
-            )[0],
+            ct.getWeekdays(TextWidth.WIDE, OutputContext.FORMAT).print(Weekday.MONDAY),
             is("1"));
     }
 
     @Test
     public void erasWide() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.eras("", Locale.ROOT, TextWidth.WIDE)[0],
+            ct.getEras(TextWidth.WIDE).print(HistoricEra.BC),
             is("BC"));
     }
 
     @Test
     public void meridiemsWide() {
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            spi.meridiems("", Locale.ROOT, TextWidth.WIDE)[0],
+            ct.getMeridiems(TextWidth.WIDE).print(Meridiem.AM),
             is("AM"));
     }
 

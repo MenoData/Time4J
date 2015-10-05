@@ -74,8 +74,8 @@ public class EnumDisplayTest {
 
     @Test
     public void getMeridiemDisplayName() {
-        assertThat(Meridiem.AM.getDisplayName(Locale.US), is("AM"));
-        assertThat(Meridiem.PM.getDisplayName(Locale.US), is("PM"));
+        assertThat(Meridiem.AM.getDisplayName(Locale.US), is("am"));
+        assertThat(Meridiem.PM.getDisplayName(Locale.US), is("pm"));
     }
 
 }

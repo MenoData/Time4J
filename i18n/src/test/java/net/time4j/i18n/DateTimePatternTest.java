@@ -61,11 +61,11 @@ public class DateTimePatternTest {
                 {"MM/dd/yyyy hh:mm a (e)",
                         "de",
                         "2014-05-30T23:45",
-                        "05/30/2014 11:45 PM (5)"},
+                        "05/30/2014 11:45 nachm. (5)"},
                 {"MM/dd/yyyy hh:mm a (ee)",
                         "us",
                         "2014-05-30T23:45",
-                        "05/30/2014 11:45 PM (06)"},
+                        "05/30/2014 11:45 pm (06)"},
                 {"E, dd.MM.uuuu HH:mm",
                         "de",
                         "2014-05-30T23:45",
@@ -93,19 +93,19 @@ public class DateTimePatternTest {
                 {"EEE, MM/dd/uuuu hh:mm a",
                         "us",
                         "2014-05-30T23:45",
-                        "Fri, 05/30/2014 11:45 PM"},
+                        "Fri, 05/30/2014 11:45 pm"},
                 {"EEEE, MM/dd/uuuu hh:mm a",
                         "us",
                         "2014-05-30T23:45",
-                        "Friday, 05/30/2014 11:45 PM"},
+                        "Friday, 05/30/2014 11:45 pm"},
                 {"EEEEE, MM/dd/uuuu hh:mm a",
                         "us",
                         "2014-05-30T23:45",
-                        "F, 05/30/2014 11:45 PM"},
+                        "F, 05/30/2014 11:45 pm"},
                 {"EEEEEE, MM/dd/uuuu hh:mm a",
                         "us",
                         "2014-05-30T23:45",
-                        "Fr, 05/30/2014 11:45 PM"}
+                        "Fr, 05/30/2014 11:45 pm"}
            }
         );
     }

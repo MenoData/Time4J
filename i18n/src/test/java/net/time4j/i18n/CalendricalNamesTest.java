@@ -123,7 +123,7 @@ public class CalendricalNamesTest {
         result =
             instance.getStdMonths(textWidth, OutputContext.STANDALONE)
             .print(Month.MARCH);
-        assertThat(result, is("Март"));
+        assertThat(result, is("март"));
     }
 
     @Test
@@ -152,7 +152,7 @@ public class CalendricalNamesTest {
     @Test
     public void parseMonths() {
         CalendarText instance =
-            CalendarText.getInstance("iso8601", Locale.GERMAN);
+           CalendarText.getInstance("iso8601", Locale.GERMAN);
         OutputContext outputContext = OutputContext.FORMAT;
         ParsePosition status = new ParsePosition(0);
         Month value =
@@ -211,7 +211,7 @@ public class CalendricalNamesTest {
         Locale locale = Locale.JAPAN;
         DateFormatSymbols dfs = DateFormatSymbols.getInstance(locale);
         instance =
-            CalendarText.getInstance("iso8601", locale);
+           CalendarText.getInstance("iso8601", locale);
         status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.NARROW, outputContext)
@@ -405,7 +405,7 @@ public class CalendricalNamesTest {
         result =
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.SATURDAY);
-        assertThat(result, is("Sábado"));
+        assertThat(result, is("sábado"));
     }
 
     @Test
@@ -489,7 +489,7 @@ public class CalendricalNamesTest {
         TextWidth textWidth = TextWidth.WIDE;
         CalendarText instance = CalendarText.getInstance("iso8601", Locale.GERMAN);
         String result = instance.getEras(textWidth).print(HistoricEra.AD);
-        assertThat(result, is("nach Christi Geburt"));
+        assertThat(result, is("n. Chr."));
     }
 
     @Test
@@ -499,7 +499,7 @@ public class CalendricalNamesTest {
            CalendarText.getInstance("iso8601", Locale.ENGLISH);
         String result =
             instance.getMeridiems(textWidth).print(Meridiem.PM);
-        assertThat(result, is("PM"));
+        assertThat(result, is("pm"));
     }
 
     @Test

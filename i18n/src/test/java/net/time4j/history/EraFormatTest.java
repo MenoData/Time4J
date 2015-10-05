@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -26,7 +25,7 @@ public class EraFormatTest {
                 .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR).build();
         assertThat(
             formatter.format(PlainTimestamp.of(1582, 10, 14, 0, 0)),
-            is("4. Oktober 1582 nach Christi Geburt 00:00"));
+            is("4. Oktober 1582 n. Chr. 00:00"));
     }
 
     @Test
@@ -35,7 +34,7 @@ public class EraFormatTest {
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.GERMANY)
                 .addPattern("d. MMMM yyyy GGGG HH:mm", PatternType.CLDR).build();
         assertThat(
-            formatter.parse("4. Oktober 1582 nach Christi Geburt 00:00"),
+            formatter.parse("4. Oktober 1582 n. Chr. 00:00"),
             is(PlainTimestamp.of(1582, 10, 14, 0, 0)));
     }
 
@@ -131,18 +130,6 @@ public class EraFormatTest {
         assertThat(
             formatter.parse("2. September AD 1752"),
             is(PlainDate.of(1752, 9, 13)));
-    }
-
-    @Test
-    public void printSwedishAnomalyInEnglishUsingThreetenDate() {
-        ChronoFormatter<PlainDate> formatter =
-            ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
-                .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
-                .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
-                .build();
-        assertThat(
-            formatter.format(LocalDate.of(1712, 3, 11)),
-            is("Anno Domini 1712, February 30th"));
     }
 
     @Test
