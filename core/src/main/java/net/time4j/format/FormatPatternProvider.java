@@ -127,24 +127,36 @@ public interface FormatPatternProvider {
 
             // JDK-Patterns hinten, mittig und vorne von Zeitzonen-Symbolen befreien
             private String removeZones(String pattern) {
-                String s = pattern.replace(" z", "");
-                if (s.charAt(s.length() - 1) == 'z') {
-                    for (int i = s.length() - 1; i > 0; i--) {
-                        if (s.charAt(i - 1) != 'z') {
-                            s = s.substring(0, i).trim();
-                            break;
+                boolean literal = false;
+                StringBuilder sb = new StringBuilder();
+
+                for (int i = 0, n = pattern.length(); i < n; i++) {
+                    char c = pattern.charAt(i);
+
+                    if (c == '\'') {
+                        if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                            sb.append(c);
+                            i++;
+                        } else {
+                            literal = !literal;
                         }
+                        sb.append(c);
+                    } else if (literal) {
+                        sb.append(c);
+                    } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V') {
+                        sb.append(c);
                     }
                 }
-                if (s.charAt(0) == 'z') {
-                    for (int i = 1; i < s.length(); i++) {
-                        if (s.charAt(i) != 'z') {
-                            s = s.substring(i).trim();
-                            break;
-                        }
+
+                for (int j = 0; j < sb.length(); j++) {
+                    char c = sb.charAt(j);
+
+                    if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
+                        sb.deleteCharAt(j);
                     }
                 }
-                return s;
+
+                return sb.toString();
             }
         };
 
