@@ -891,14 +891,7 @@ public final class CalendarText {
 
     }
 
-    /**
-     * Determines if given language implies right-to-left-directionality. </p>
-     *
-     * @param   locale      language reference
-     * @return  boolean
-     * @since   3.10/4.7
-     */
-    static boolean isTextRTL(Locale locale) {
+    private static boolean isTextRTL(Locale locale) {
 
         return RTL.contains(locale.getLanguage());
 
@@ -1445,7 +1438,7 @@ public final class CalendarText {
 
             if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
                 return "{0}/{1}";
-            } else if (CalendarText.isTextRTL(locale)) {
+            } else if (isTextRTL(locale)) {
                 return "{1} - {0}";
             }
 
