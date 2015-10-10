@@ -501,7 +501,7 @@ public class CompositeTransitionModelTest {
         long t1 = THIRD.getPosixTime() + 1;
         long t2 = TransitionModel.getFutureMoment(1);
         long factor = (long) (365.2425 * 86400L);
-        long minExpected = (t2 - t1) * 2 / factor + 3;
+        long minExpected = (t2 - t1) * 2 / factor + 2; // estimated
 
         assertThat(
             MODEL.getStdTransitions(),
@@ -569,7 +569,7 @@ public class CompositeTransitionModelTest {
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 0);
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        List<DaylightSavingRule> rules = new ArrayList<>();
         rules.add(autumn);
         rules.add(spring);
 
@@ -599,7 +599,7 @@ public class CompositeTransitionModelTest {
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 3600);
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        List<DaylightSavingRule> rules = new ArrayList<>();
         rules.add(rule);
 
         return new CompositeTransitionModel(
