@@ -61,105 +61,6 @@ import java.util.Locale;
  */
 public interface FormatPatternProvider {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    /**
-     * <p>Default provider which delegates to standard JVM resources. </p>
-     */
-    /*[deutsch]
-     * <p>Standardimplementierung, die an die Ressourcen der JVM delegiert. </p>
-     */
-    FormatPatternProvider DEFAULT =
-        new FormatPatternProvider() {
-            @Override
-            public String getDatePattern(DisplayMode mode, Locale locale) {
-                int style = this.getFormatStyle(mode);
-                DateFormat df = DateFormat.getDateInstance(style, locale);
-                return this.getFormatPattern(df);
-            }
-
-            @Override
-            public String getTimePattern(DisplayMode mode, Locale locale) {
-                int style = this.getFormatStyle(mode);
-                DateFormat df = DateFormat.getTimeInstance(style, locale);
-                return this.removeZones(this.getFormatPattern(df));
-            }
-
-            @Override
-            public String getDateTimePattern(DisplayMode mode, Locale locale) {
-                int style = this.getFormatStyle(mode);
-                DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
-                return this.getFormatPattern(df);
-            }
-
-            @Override
-            public String getIntervalPattern(Locale locale) {
-                if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
-                    return "{0}/{1}";
-                } else if (CalendarText.isTextRTL(locale)) {
-                    return "{1} - {0}";
-                }
-
-                return "{0} - {1}";
-            }
-
-            private int getFormatStyle(DisplayMode mode) {
-                switch (mode) {
-                    case FULL:
-                        return DateFormat.FULL;
-                    case LONG:
-                        return DateFormat.LONG;
-                    case MEDIUM:
-                        return DateFormat.MEDIUM;
-                    case SHORT:
-                        return DateFormat.SHORT;
-                    default:
-                        throw new UnsupportedOperationException("Unknown: " + mode);
-                }
-            }
-
-            private String getFormatPattern(DateFormat df) {
-                if (df instanceof SimpleDateFormat) {
-                    return SimpleDateFormat.class.cast(df).toPattern();
-                }
-                throw new IllegalStateException("Cannot retrieve format pattern: " + df);
-            }
-
-            // JDK-Patterns hinten, mittig und vorne von Zeitzonen-Symbolen befreien
-            private String removeZones(String pattern) {
-                boolean literal = false;
-                StringBuilder sb = new StringBuilder();
-
-                for (int i = 0, n = pattern.length(); i < n; i++) {
-                    char c = pattern.charAt(i);
-
-                    if (c == '\'') {
-                        if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
-                            sb.append(c);
-                            i++;
-                        } else {
-                            literal = !literal;
-                        }
-                        sb.append(c);
-                    } else if (literal) {
-                        sb.append(c);
-                    } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V') {
-                        sb.append(c);
-                    }
-                }
-
-                for (int j = 0; j < sb.length(); j++) {
-                    char c = sb.charAt(j);
-
-                    if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
-                        sb.deleteCharAt(j);
-                    }
-                }
-
-                return sb.toString();
-            }
-        };
-
     //~ Methoden ----------------------------------------------------------
 
     /**
@@ -184,16 +85,12 @@ public interface FormatPatternProvider {
     /**
      * <p>Returns the localized time pattern. </p>
      *
-     * <p>Implementation note: This method must not return a pattern which contains any timezone offset. </p>
-     *
      * @param   mode        display mode
      * @param   locale      language and country setting
      * @return  localized time pattern
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Uhrzeitmuster. </p>
-     *
-     * <p>Implementierungshinweis: Diese Methode darf keine Zeitzonen-Offsets im Muster enthalten. </p>
      *
      * @param   mode        display mode
      * @param   locale      language and country setting

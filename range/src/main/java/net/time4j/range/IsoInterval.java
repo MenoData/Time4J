@@ -21,13 +21,13 @@
 
 package net.time4j.range;
 
-import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoPrinter;
@@ -72,19 +72,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     implements ChronoInterval<T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
-
-    static {
-        FormatPatternProvider found = null;
-
-        for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
-            found = fpp;
-            break;
-        }
-
-        FORMAT_PATTERN_PROVIDER = ((found == null) ? FormatPatternProvider.DEFAULT : found);
-    }
 
     private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT =
         new ChronoFunction<ChronoDisplay, Void>() {
@@ -1857,7 +1844,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         if (formatter instanceof ChronoFormatter) {
             Locale locale = ChronoFormatter.class.cast(formatter).getLocale();
-            pattern = FORMAT_PATTERN_PROVIDER.getIntervalPattern(locale);
+            pattern = CalendarText.getFormatPatterns().getIntervalPattern(locale);
         }
 
         return pattern;

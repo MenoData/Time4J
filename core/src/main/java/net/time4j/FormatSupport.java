@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.format.CalendarText;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.FormatPatternProvider;
@@ -43,18 +44,8 @@ class FormatSupport {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final FormatEngine<?> DEFAULT_FORMAT_ENGINE;
-    private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
 
     static {
-        FormatPatternProvider found = null;
-
-        for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
-            found = fpp;
-            break;
-        }
-
-        FORMAT_PATTERN_PROVIDER = ((found == null) ? FormatPatternProvider.DEFAULT : found);
-
         FormatEngine<?> last = null;
         FormatEngine<?> best = null;
 
@@ -198,7 +189,7 @@ class FormatSupport {
      */
     static FormatPatternProvider getFormatPatternProvider() {
 
-        return FORMAT_PATTERN_PROVIDER;
+        return CalendarText.getFormatPatterns();
 
     }
 
