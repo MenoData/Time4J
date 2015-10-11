@@ -1,4 +1,9 @@
 ## [v4.7] not yet released
+### Added
+- Support for Icelandic and Malta language [#375]
+
+### Changed
+-  Update i18n-data to CLDR-28 [#374]
 
 ## [v4.6] published on 2015-10-01
 ### Added
