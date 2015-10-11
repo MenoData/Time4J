@@ -35,6 +35,49 @@ import static org.junit.Assert.assertThat;
 public class PrettyTimeTest {
 
     @Test
+    public void printRelativePT() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 4, 14, 40, 10).atUTC();
+
+        assertThat(
+            PrettyTime.of(new Locale("pt", "PT"))
+                .withReferenceClock(clock)
+                .withShortStyle()
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 4, 14, 40, 5).atUTC(), ZonalOffset.UTC
+                ),
+            is("há 5 s")); // from pt_PT-resource
+        assertThat(
+            PrettyTime.of(new Locale("pt"))
+                .withReferenceClock(clock)
+                .withShortStyle()
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 4, 14, 40, 5).atUTC(), ZonalOffset.UTC
+                ),
+            is("há 5 seg.")); // Brazilian
+        assertThat(
+            PrettyTime.of(new Locale("pt", "PT"))
+                .withReferenceClock(clock)
+                .withShortStyle()
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 4, 12, 40, 5).atUTC(), ZonalOffset.UTC
+                ),
+            is("há 2 h")); // inherited from Brazilian, does not exist in pt_PT-resource
+    }
+
+    @Test
+    public void printDurationPT() {
+        assertThat(
+            PrettyTime.of(new Locale("pt", "PT")).withShortStyle().print(Duration.of(5, ClockUnit.SECONDS)),
+            is("5 s")); // from pt_PT-resource
+        assertThat(
+            PrettyTime.of(new Locale("pt")).withShortStyle().print(Duration.of(5, ClockUnit.SECONDS)),
+            is("5 seg")); // Brazilian
+        assertThat(
+            PrettyTime.of(new Locale("pt", "PT")).withShortStyle().print(Duration.of(2, ClockUnit.HOURS)),
+            is("2 h")); // inherited from Brazilian, does not exist in pt_PT-resource
+    }
+
+    @Test
     public void printRelativeOrDate() {
         TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
 
@@ -639,7 +682,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar"))
                 .withZeroDigit('0')
                 .print(duration, TextWidth.WIDE),
-            is("15 سنة، 3 أشهر، أسبوع، و يومان"));
+            is("15 سنة، 3 أشهر، أسبوع، ويومان"));
     }
 
     @Test
@@ -649,7 +692,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .print(duration, TextWidth.WIDE),
-            is("١٥ سنة، ٣ أشهر، أسبوع، و يومان"));
+            is("١٥ سنة، ٣ أشهر، أسبوع، ويومان"));
     }
 
     @Test
@@ -660,7 +703,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
                 .print(duration, TextWidth.WIDE),
-            is("‎-15 سنة، ‎-3 أشهر، أسبوع، و يومان"));
+            is("\u200E-15 سنة، \u200E-3 أشهر، أسبوع، ويومان"));
     }
 
     @Test
@@ -671,7 +714,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .print(duration, TextWidth.WIDE),
-            is("‏-١٥ سنة، ‏-٣ أشهر، أسبوع، و يومان"));
+            is("\u200F-١٥ سنة، \u200F-٣ أشهر، أسبوع، ويومان"));
     }
 
     @Test
@@ -867,15 +910,6 @@ public class PrettyTimeTest {
     }
 
     @Test
-    public void printFrenchDemoExample() {
-        Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
-        String formattedDuration = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
-        assertThat(
-            formattedDuration,
-            is("93 heures, 45 minutes et 40 secondes"));
-    }
-
-    @Test
     public void printSpecialUnitsEnglish() {
         TimeSource<?> clock = () -> PlainTimestamp.of(2014, 10, 1, 14, 30).atUTC();
         Duration<?> dur =
@@ -887,6 +921,15 @@ public class PrettyTimeTest {
                 .withReferenceClock(clock)
                 .print(dur, TextWidth.WIDE),
             is("4 weeks and 10 days"));
+    }
+
+    @Test
+    public void printFrenchDemoExample() {
+        Duration<?> dur = Duration.of(337540, ClockUnit.SECONDS).with(Duration.STD_CLOCK_PERIOD);
+        String formattedDuration = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
+        assertThat(
+            formattedDuration,
+            is("93 heures, 45 minutes et 40 secondes"));
     }
 
     private static class FortnightPlusOneDay
