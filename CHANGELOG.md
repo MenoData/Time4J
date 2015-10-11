@@ -4,6 +4,7 @@
 
 ### Changed
 -  Update i18n-data to CLDR-28 [#374]
+-  Change ISO-8601-fallback-mechanism to CLDR standard [#373]
 
 ## [v3.9] published on 2015-10-01
 ### Added
