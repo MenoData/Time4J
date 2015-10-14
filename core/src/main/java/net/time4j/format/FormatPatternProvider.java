@@ -101,7 +101,7 @@ public interface FormatPatternProvider {
                 if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
                     return "{0}/{1}";
                 } else if (TextAccessor.isTextRTL(locale)) {
-                    return "{1} - {0}";
+                    return "{0} - {1}"; // based on analysis of CLDR-data
                 }
                 return "{0} - {1}";
             }
