@@ -26,8 +26,10 @@ import net.time4j.engine.AttributeQuery;
 import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 
 /**
@@ -47,6 +49,25 @@ import java.util.Locale;
  * @see     CalendarText
  */
 public final class TextAccessor {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Set<String> RTL;
+
+    static {
+        Set<String> lang = new HashSet<String>();
+        lang.add("ar");
+        lang.add("dv");
+        lang.add("fa");
+        lang.add("ha");
+        lang.add("he");
+        lang.add("iw");
+        lang.add("ji");
+        lang.add("ps");
+        lang.add("ur");
+        lang.add("yi");
+        RTL = Collections.unmodifiableSet(lang);
+    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -214,6 +235,54 @@ public final class TextAccessor {
         }
         sb.append('}');
         return sb.toString();
+
+    }
+
+    // helper method for text orientation
+    static boolean isTextRTL(Locale locale) {
+
+        return RTL.contains(locale.getLanguage());
+
+    }
+
+    // strip off any timezone symbols in clock time patterns,
+    // used by wrappers of FormatPatternProvider-objects
+    static String removeZones(String pattern) {
+
+        boolean literal = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = pattern.length(); i < n; i++) {
+            char c = pattern.charAt(i);
+
+            if (c == '\'') {
+                if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                    sb.append(c);
+                    i++;
+                } else {
+                    literal = !literal;
+                }
+                sb.append(c);
+            } else if (literal) {
+                sb.append(c);
+            } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V') {
+                sb.append(c);
+            }
+        }
+
+        for (int j = 0; j < sb.length(); j++) {
+            char c = sb.charAt(j);
+
+            if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
+                sb.deleteCharAt(j);
+                j--;
+            } else if (c == '[' || c == ']' || c == '(' || c == ')') { // check locales es, fa, ps
+                sb.deleteCharAt(j);
+                j--;
+            }
+        }
+
+        return sb.toString().trim();
 
     }
 

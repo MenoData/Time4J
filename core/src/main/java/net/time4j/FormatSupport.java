@@ -23,10 +23,8 @@ package net.time4j;
 
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.format.CalendarText;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.FormatEngine;
-import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.TZID;
 
@@ -178,18 +176,6 @@ class FormatSupport {
     static FormatEngine<?> getDefaultFormatEngine() {
 
         return DEFAULT_FORMAT_ENGINE;
-
-    }
-
-    /**
-     * <p>Yields the best available format pattern provider. </p>
-     *
-     * @return  format pattern provider
-     * @since   3.9/4.6
-     */
-    static FormatPatternProvider getFormatPatternProvider() {
-
-        return CalendarText.getFormatPatterns();
 
     }
 

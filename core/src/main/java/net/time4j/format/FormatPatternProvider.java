@@ -27,7 +27,7 @@ import java.util.Locale;
 
 
 /**
- * <p>This <strong>SPI-interface</strong> enables the access to localized
+ * <p>This <strong>SPI-interface</strong> enables the access to localized gregorian
  * date-, time- or interval patterns according to the CLDR-specifiation and is instantiated via a
  * {@code ServiceLoader}-mechanism. </p>
  *
@@ -43,8 +43,8 @@ import java.util.Locale;
  * @see     java.text.SimpleDateFormat#toPattern()
  */
 /*[deutsch]
- * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
- * auf {@code Locale}-abh&auml;ngige Formatmuster f&uuml;r Datum, Uhrzeit oder Intervalle
+ * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff auf gregorianische
+ * {@code Locale}-abh&auml;ngige Formatmuster f&uuml;r Datum, Uhrzeit oder Intervalle
  * entsprechend der CLDR-Spezifikation und wird &uuml;ber einen {@code ServiceLoader}-Mechanismus
  * instanziert. </p>
  *
@@ -60,6 +60,75 @@ import java.util.Locale;
  * @see     java.text.SimpleDateFormat#toPattern()
  */
 public interface FormatPatternProvider {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Default provider which delegates to standard JVM resources. </p>
+     *
+     * @see     CalendarText#getFormatPatterns()
+     */
+    /*[deutsch]
+     * <p>Standardimplementierung, die an die Ressourcen der JVM delegiert. </p>
+     *
+     * @see     CalendarText#getFormatPatterns()
+     */
+    FormatPatternProvider DEFAULT =
+        new FormatPatternProvider() {
+            @Override
+            public String getDatePattern(DisplayMode mode, Locale locale) {
+                int style = this.getFormatStyle(mode);
+                DateFormat df = DateFormat.getDateInstance(style, locale);
+                return this.getFormatPattern(df);
+            }
+
+            @Override
+            public String getTimePattern(DisplayMode mode, Locale locale) {
+                int style = this.getFormatStyle(mode);
+                DateFormat df = DateFormat.getTimeInstance(style, locale);
+                return TextAccessor.removeZones(this.getFormatPattern(df));
+            }
+
+            @Override
+            public String getDateTimePattern(DisplayMode mode, Locale locale) {
+                int style = this.getFormatStyle(mode);
+                DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
+                return this.getFormatPattern(df);
+            }
+
+            @Override
+            public String getIntervalPattern(Locale locale) {
+                if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
+                    return "{0}/{1}";
+                } else if (TextAccessor.isTextRTL(locale)) {
+                    return "{1} - {0}";
+                }
+                return "{0} - {1}";
+            }
+
+            private int getFormatStyle(DisplayMode mode) {
+                switch (mode) {
+                    case FULL:
+                        return DateFormat.FULL;
+                    case LONG:
+                        return DateFormat.LONG;
+                    case MEDIUM:
+                        return DateFormat.MEDIUM;
+                    case SHORT:
+                        return DateFormat.SHORT;
+                    default:
+                        throw new UnsupportedOperationException("Unknown: " + mode);
+                }
+            }
+
+            private String getFormatPattern(DateFormat df) {
+                if (df instanceof SimpleDateFormat) {
+                    return SimpleDateFormat.class.cast(df).toPattern();
+                }
+                throw new IllegalStateException("Cannot retrieve format pattern: " + df);
+
+            }
+        };
 
     //~ Methoden ----------------------------------------------------------
 

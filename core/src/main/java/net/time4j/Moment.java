@@ -45,6 +45,7 @@ import net.time4j.engine.TimeLine;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
@@ -1260,7 +1261,7 @@ public final class Moment
         TZID tzid
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getDateTimePattern(mode, locale);
+        String formatPattern = CalendarText.getFormatPatterns().getDateTimePattern(mode, locale);
         return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }
