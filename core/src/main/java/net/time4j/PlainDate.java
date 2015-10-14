@@ -48,6 +48,7 @@ import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
@@ -1305,7 +1306,7 @@ public final class PlainDate
         Locale locale
     ) {
 
-        String formatPattern = FormatSupport.getFormatPatternProvider().getDatePattern(mode, locale);
+        String formatPattern = CalendarText.getFormatPatterns().getDatePattern(mode, locale);
         return FormatSupport.createFormatter(PlainDate.class, formatPattern, locale);
 
     }
