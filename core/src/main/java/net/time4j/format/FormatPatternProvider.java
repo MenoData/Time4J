@@ -76,23 +76,34 @@ public interface FormatPatternProvider {
     FormatPatternProvider DEFAULT =
         new FormatPatternProvider() {
             @Override
-            public String getDatePattern(DisplayMode mode, Locale locale) {
+            public String getDatePattern(
+                DisplayMode mode,
+                Locale locale
+            ) {
                 int style = this.getFormatStyle(mode);
                 DateFormat df = DateFormat.getDateInstance(style, locale);
                 return this.getFormatPattern(df);
             }
 
             @Override
-            public String getTimePattern(DisplayMode mode, Locale locale) {
+            public String getTimePattern(
+                DisplayMode mode,
+                Locale locale
+            ) {
                 int style = this.getFormatStyle(mode);
                 DateFormat df = DateFormat.getTimeInstance(style, locale);
                 return TextAccessor.removeZones(this.getFormatPattern(df));
             }
 
             @Override
-            public String getDateTimePattern(DisplayMode mode, Locale locale) {
-                int style = this.getFormatStyle(mode);
-                DateFormat df = DateFormat.getDateTimeInstance(style, style, locale);
+            public String getDateTimePattern(
+                DisplayMode dateMode,
+                DisplayMode timeMode,
+                Locale locale
+            ) {
+                int dateStyle = this.getFormatStyle(dateMode);
+                int timeStyle = this.getFormatStyle(timeMode);
+                DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
                 return this.getFormatPattern(df);
             }
 
@@ -173,19 +184,24 @@ public interface FormatPatternProvider {
     /**
      * <p>Returns the localized date-time pattern. </p>
      *
-     * @param   mode        display mode
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
+     * @since   3.10/4.7
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster. </p>
      *
-     * @param   mode        display mode
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
+     * @since   3.10/4.7
      */
     String getDateTimePattern(
-        DisplayMode mode,
+        DisplayMode dateMode,
+        DisplayMode timeMode,
         Locale locale
     );
 

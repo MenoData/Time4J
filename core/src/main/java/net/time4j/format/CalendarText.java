@@ -1348,23 +1348,33 @@ public final class CalendarText {
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public String getDatePattern(DisplayMode mode, Locale locale) {
+        public String getDatePattern(
+            DisplayMode mode,
+            Locale locale
+        ) {
 
             return this.delegate.getDatePattern(mode, locale);
 
         }
 
         @Override
-        public String getTimePattern(DisplayMode mode, Locale locale) {
+        public String getTimePattern(
+            DisplayMode mode,
+            Locale locale
+        ) {
 
             return TextAccessor.removeZones(this.delegate.getTimePattern(mode, locale));
 
         }
 
         @Override
-        public String getDateTimePattern(DisplayMode mode, Locale locale) {
+        public String getDateTimePattern(
+            DisplayMode dateMode,
+            DisplayMode timeMode,
+            Locale locale
+        ) {
 
-            return this.delegate.getDateTimePattern(mode, locale);
+            return this.delegate.getDateTimePattern(dateMode, timeMode, locale);
 
         }
 
