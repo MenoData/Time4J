@@ -1124,14 +1124,12 @@ public final class Moment
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing UTC-timestamps. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales and timezones
-     * however. </p>
+     * <p>Note: The formatter can be adjusted to other locales and timezones however. </p>
      *
      * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code Moment}-objects
-     *          using system locale and system timezone
+     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      */
@@ -1140,14 +1138,12 @@ public final class Moment
      * in der Standard-Sprach- und L&auml;ndereinstellung und in der
      * System-Zeitzone. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
-     * angepasst werden. </p>
+     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen angepasst werden. </p>
      *
      * @param   <P> generic pattern type
      * @param   formatPattern   format definition as pattern
      * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code Moment}-objects
-     *          using system locale and system timezone
+     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      */
@@ -1165,12 +1161,10 @@ public final class Moment
      * <p>Creates a new formatter which uses the given display mode in the
      * default locale for formatting and parsing UTC-timestamps. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales and timezones
-     * however. </p>
+     * <p>Note: The formatter can be adjusted to other locales and timezones however. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code Moment}-objects
-     *          using system locale and system timezone
+     * @param   mode        common formatting style for date part and time part
+     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
      * @throws  IllegalStateException if format pattern cannot be retrieved
      * @since   3.0
      */
@@ -1179,12 +1173,10 @@ public final class Moment
      * in der Standard-Sprach- und L&auml;ndereinstellung und in der
      * System-Zeitzone. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen
-     * angepasst werden. </p>
+     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen angepasst werden. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code Moment}-objects
-     *          using system locale and system timezone
+     * @param   mode        common formatting style for date part and time part
+     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
      * @throws  IllegalStateException if format pattern cannot be retrieved
      * @since   3.0
      */
@@ -1208,8 +1200,7 @@ public final class Moment
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
      * @param   tzid            timezone id
-     * @return  format object for formatting {@code Moment}-objects
-     *          using given locale and timezone
+     * @return  format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
@@ -1228,8 +1219,7 @@ public final class Moment
      * @param   patternType     pattern dialect
      * @param   locale          locale setting
      * @param   tzid            timezone id
-     * @return  format object for formatting {@code Moment}-objects
-     *          using given locale and timezone
+     * @return  format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.0
      * @see     #localFormatter(String,ChronoPattern)
@@ -1254,7 +1244,7 @@ public final class Moment
      * information). The formatter can be adjusted to other locales and
      * timezones however. </p>
      *
-     * @param   mode        formatting style
+     * @param   mode        common formatting style for date part and time part
      * @param   locale      locale setting
      * @param   tzid        timezone id
      * @return  format object for formatting {@code Moment}-objects using given locale
@@ -1272,7 +1262,7 @@ public final class Moment
      * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
      * existiert). </p>
      *
-     * @param   mode        formatting style
+     * @param   mode        common formatting style for date part and time part
      * @param   locale      locale setting
      * @param   tzid        timezone id
      * @return  format object for formatting {@code Moment}-objects using given locale
@@ -1286,7 +1276,7 @@ public final class Moment
         TZID tzid
     ) {
 
-        String formatPattern = CalendarText.getFormatPatterns().getDateTimePattern(mode, locale);
+        String formatPattern = CalendarText.getFormatPatterns().getDateTimePattern(mode, mode, locale);
         return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }

@@ -4,7 +4,6 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.NumberSymbolProvider;
 import net.time4j.tz.Timezone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
