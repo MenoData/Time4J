@@ -56,7 +56,7 @@ public class DateIntervalFormatTest {
             ChronoFormatter.ofDatePattern("MMM d, yyyy", PatternType.CLDR, Locale.US);
         assertThat(
             interval.print(formatter),
-            is("Feb 27, 2014 - May 14, 2014")
+            is("Feb 27, 2014 – May 14, 2014")
         );
     }
 
@@ -557,7 +557,7 @@ public class DateIntervalFormatTest {
         DateInterval interval = DateInterval.between(start, end);
         assertThat(
             DateInterval.parse(
-                "July 20 / 2015 - December 31 / 2015",
+                "July 20 / 2015 – December 31 / 2015",
                 ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US)),
             is(interval));
     }
@@ -565,7 +565,7 @@ public class DateIntervalFormatTest {
     @Test(expected=ParseException.class)
     public void parseCustomStartAfterEnd() throws ParseException {
         DateInterval.parse(
-            "July 20 / 2016 - December 31 / 2015",
+            "July 20 / 2016 – December 31 / 2015",
             ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US));
     }
 
