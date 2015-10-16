@@ -1,10 +1,16 @@
 ## [v4.7] not yet released
 ### Added
+- Repository for localized date-time-patterns [#100]
 - Support for Icelandic and Malta language [#375]
 
 ### Changed
--  Update i18n-data to CLDR-28 [#374]
--  Change ISO-8601-fallback-mechanism to CLDR standard [#373]
+- Review plural rules [#366]
+- Update i18n-data to CLDR-28 [#374]
+- Change ISO-8601-fallback-mechanism to CLDR standard [#373]
+- FormatPatternProvider.getDateTimePattern() with 3 args [#100]
+
+### Removed
+- FormatPatternProvider.DEFAULT [#100]
 
 ## [v4.6] published on 2015-10-01
 ### Added
