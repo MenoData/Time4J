@@ -26,7 +26,9 @@ import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -39,10 +41,12 @@ import java.time.temporal.IsoFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -157,19 +161,36 @@ public final class CalendarText {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final Set<String> RTL;
+
+    static {
+        Set<String> lang = new HashSet<>();
+        lang.add("ar");
+        lang.add("dv");
+        lang.add("fa");
+        lang.add("ha");
+        lang.add("he");
+        lang.add("iw");
+        lang.add("ji");
+        lang.add("ps");
+        lang.add("ur");
+        lang.add("yi");
+        RTL = Collections.unmodifiableSet(lang);
+    }
+
     private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
 
     static {
-        FormatPatternProvider found = null;
+        FormatPatternProvider provider = new FormatPatterns(null);
 
         for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
-            found = new DelegateFormatPatternProvider(fpp);
+            provider = new FormatPatterns(fpp);
             if (!fpp.getClass().getName().startsWith("net.time4j.")) {
                 break;
             }
         }
 
-        FORMAT_PATTERN_PROVIDER = ((found == null) ? FormatPatternProvider.DEFAULT : found);
+        FORMAT_PATTERN_PROVIDER = provider;
     }
 
     /**
@@ -1305,7 +1326,7 @@ public final class CalendarText {
 
     }
 
-    private static class DelegateFormatPatternProvider
+    private static class FormatPatterns
         implements FormatPatternProvider {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -1314,7 +1335,7 @@ public final class CalendarText {
 
         //~ Konstruktoren -------------------------------------------------
 
-        DelegateFormatPatternProvider(FormatPatternProvider delegate) {
+        FormatPatterns(FormatPatternProvider delegate) {
             super();
 
             this.delegate = delegate;
@@ -1329,6 +1350,12 @@ public final class CalendarText {
             Locale locale
         ) {
 
+            if (this.delegate == null) {
+                int style = getFormatStyle(mode);
+                DateFormat df = DateFormat.getDateInstance(style, locale);
+                return getFormatPattern(df);
+            }
+
             return this.delegate.getDatePattern(mode, locale);
 
         }
@@ -1339,7 +1366,17 @@ public final class CalendarText {
             Locale locale
         ) {
 
-            return TextAccessor.removeZones(this.delegate.getTimePattern(mode, locale));
+            String pattern;
+
+            if (this.delegate == null) {
+                int style = getFormatStyle(mode);
+                DateFormat df = DateFormat.getTimeInstance(style, locale);
+                pattern = getFormatPattern(df);
+            } else {
+                pattern = this.delegate.getTimePattern(mode, locale);
+            }
+
+            return removeZones(pattern);
 
         }
 
@@ -1350,6 +1387,13 @@ public final class CalendarText {
             Locale locale
         ) {
 
+            if (this.delegate == null) {
+                int dateStyle = getFormatStyle(dateMode);
+                int timeStyle = getFormatStyle(timeMode);
+                DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+                return getFormatPattern(df);
+            }
+
             return this.delegate.getDateTimePattern(dateMode, timeMode, locale);
 
         }
@@ -1357,7 +1401,92 @@ public final class CalendarText {
         @Override
         public String getIntervalPattern(Locale locale) {
 
+            if (this.delegate == null) {
+                if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
+                    return "{0}/{1}"; // ISO-8601-style
+                } else if (isTextRTL(locale)) {
+                    return "{0} - {1}"; // based on analysis of CLDR-data
+                } else {
+                    return "{0} - {1}"; // default
+                }
+            }
+
             return this.delegate.getIntervalPattern(locale);
+
+        }
+
+        private static int getFormatStyle(DisplayMode mode) {
+
+            switch (mode) {
+                case FULL:
+                    return DateFormat.FULL;
+                case LONG:
+                    return DateFormat.LONG;
+                case MEDIUM:
+                    return DateFormat.MEDIUM;
+                case SHORT:
+                    return DateFormat.SHORT;
+                default:
+                    throw new UnsupportedOperationException("Unknown: " + mode);
+            }
+
+        }
+
+        private static String getFormatPattern(DateFormat df) {
+
+            if (df instanceof SimpleDateFormat) {
+                return SimpleDateFormat.class.cast(df).toPattern();
+            }
+
+            throw new IllegalStateException("Cannot retrieve format pattern: " + df);
+
+        }
+
+        // helper method for text orientation
+        private static boolean isTextRTL(Locale locale) {
+
+            return RTL.contains(locale.getLanguage());
+
+        }
+
+        // strip off any timezone symbols in clock time patterns,
+        // used by wrappers of FormatPatternProvider-objects
+        private static String removeZones(String pattern) {
+
+            boolean literal = false;
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0, n = pattern.length(); i < n; i++) {
+                char c = pattern.charAt(i);
+
+                if (c == '\'') {
+                    if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                        sb.append(c);
+                        i++;
+                    } else {
+                        literal = !literal;
+                    }
+                    sb.append(c);
+                } else if (literal) {
+                    sb.append(c);
+                } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V' && c != 'x' && c != 'X') {
+                    sb.append(c);
+                }
+            }
+
+            for (int j = 0; j < sb.length(); j++) {
+                char c = sb.charAt(j);
+
+                if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
+                    sb.deleteCharAt(j);
+                    j--;
+                } else if (c == '[' || c == ']' || c == '(' || c == ')') { // check locales es, fa, ps
+                    sb.deleteCharAt(j);
+                    j--;
+                }
+            }
+
+            return sb.toString().trim();
 
         }
 
