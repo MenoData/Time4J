@@ -203,7 +203,7 @@ public class ClockIntervalFormatTest {
         ClockInterval interval = ClockInterval.between(start, end);
         assertThat(
             ClockInterval.parse(
-                "07:20 - 24:00",
+                "07:20 – 24:00",
                 ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR_24, Locale.US)),
             is(interval));
     }

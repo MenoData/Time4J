@@ -265,7 +265,7 @@ public final class TextAccessor {
                 sb.append(c);
             } else if (literal) {
                 sb.append(c);
-            } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V') {
+            } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V' && c != 'x' && c != 'X') {
                 sb.append(c);
             }
         }

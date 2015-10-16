@@ -21,6 +21,8 @@
 
 package net.time4j.i18n;
 
+import net.time4j.format.DisplayMode;
+import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
@@ -46,7 +48,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @author  Meno Hochschild
  */
 public final class IsoTextProviderSPI
-    implements TextProvider {
+    implements TextProvider, FormatPatternProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -160,6 +162,81 @@ public final class IsoTextProviderSPI
     ) {
 
         return meridiems(locale, tw);
+
+    }
+
+    @Override
+    public String getDatePattern(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("F(");
+        sb.append(toChar(mode));
+        sb.append(")_d");
+        String key = sb.toString();
+        return getPatterns(locale).getString(key);
+
+    }
+
+    @Override
+    public String getTimePattern(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        String key;
+
+        if (mode == DisplayMode.FULL) {
+            key = "F(alt)";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            sb.append("F(");
+            sb.append(toChar(mode));
+            sb.append(")_t");
+            key = sb.toString();
+        }
+
+        return getPatterns(locale).getString(key);
+
+    }
+
+    @Override
+    public String getDateTimePattern(
+        DisplayMode dateMode,
+        DisplayMode timeMode,
+        Locale locale
+    ) {
+
+        DisplayMode total = dateMode;
+
+        if (dateMode.compareTo(timeMode) < 0) {
+            total = timeMode;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("F(");
+        sb.append(toChar(total));
+        sb.append(")_dt");
+        String key = sb.toString();
+        String result = getPatterns(locale).getString(key);
+        result = result.replace("{1}", getDatePattern(dateMode, locale));
+
+        if (timeMode == DisplayMode.FULL) {
+            result = result.replace("{0}", getPatterns(locale).getString("F(f)_t"));
+        } else {
+            result = result.replace("{0}", getTimePattern(timeMode, locale));
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public String getIntervalPattern(Locale locale) {
+
+        return getPatterns(locale).getString("I");
 
     }
 
@@ -405,6 +482,22 @@ public final class IsoTextProviderSPI
         }
 
         return null;
+
+    }
+
+    private static ResourceBundle getPatterns(Locale desired) {
+
+        return ResourceBundle.getBundle(
+            "calendar/" + ISO_CALENDAR_TYPE,
+            desired,
+            getDefaultLoader(),
+            UTF8ResourceControl.SINGLETON);
+
+    }
+
+    private static char toChar(DisplayMode mode) {
+
+        return Character.toLowerCase(mode.name().charAt(0));
 
     }
 

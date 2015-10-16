@@ -20,26 +20,53 @@ public class FormatPatternTest {
 
     @Test
     public void datePattern() {
-        PlainDate date = PlainDate.of(2015, 9, 10);
+        PlainDate date = PlainDate.of(2015, 9, 8);
+        assertThat(
+            PlainDate.formatter(DisplayMode.FULL, Locale.GERMANY).format(date),
+            is("Dienstag, 8. September 2015"));
         assertThat(
             PlainDate.formatter(DisplayMode.LONG, Locale.GERMANY).format(date),
-            is("10. September 2015"));
+            is("8. September 2015"));
+        assertThat(
+            PlainDate.formatter(DisplayMode.MEDIUM, Locale.GERMANY).format(date),
+            is("08.09.2015"));
+        assertThat(
+            PlainDate.formatter(DisplayMode.SHORT, Locale.GERMANY).format(date),
+            is("08.09.15"));
     }
 
     @Test
     public void timePattern() {
         PlainTime time = PlainTime.of(17, 45, 30);
         assertThat(
+            PlainTime.formatter(DisplayMode.FULL, Locale.GERMANY).format(time),
+            is("17:45 Uhr")); // ohne Offset!!!
+        assertThat(
             PlainTime.formatter(DisplayMode.LONG, Locale.GERMANY).format(time),
             is("17:45:30")); // ohne Offset!!!
+        assertThat(
+            PlainTime.formatter(DisplayMode.MEDIUM, Locale.GERMANY).format(time),
+            is("17:45:30")); // ohne Offset!!!
+        assertThat(
+            PlainTime.formatter(DisplayMode.SHORT, Locale.GERMANY).format(time),
+            is("17:45")); // ohne Offset!!!
     }
 
     @Test
     public void dateTimePattern() {
         Moment m = Moment.UNIX_EPOCH;
         assertThat(
+            Moment.formatter(DisplayMode.FULL, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            is("Donnerstag, 1. Januar 1970 um 01:00:00 Mitteleuropäische Zeit"));
+        assertThat(
             Moment.formatter(DisplayMode.LONG, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
-            is("1. Januar 1970 01:00:00 MEZ"));
+            is("1. Januar 1970 um 01:00:00 MEZ"));
+        assertThat(
+            Moment.formatter(DisplayMode.MEDIUM, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            is("01.01.1970, 01:00:00"));
+        assertThat(
+            Moment.formatter(DisplayMode.SHORT, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            is("01.01.70, 01:00"));
     }
 
 }
