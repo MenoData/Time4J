@@ -50,16 +50,15 @@ public final class PluralProviderSPI
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<String, PluralRules> CARDINAL_MAP =
-        new HashMap<String, PluralRules>(140);
+    private static final Map<String, PluralRules> CARDINAL_MAP = new HashMap<>(140);
     private static final PluralRules STD_CARDINALS = new StdCardinalRules(0);
 
     static {
-        Map<String, PluralRules> cmap = new HashMap<String, PluralRules>();
+        Map<String, PluralRules> cmap = new HashMap<>();
         fillC(cmap, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
         fillC(cmap, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
         fillC(cmap, "pt_PT", 0);
-        fillC(cmap, "am bn fa gu hi kn mr zu", 1);
+        fillC(cmap, "am as bn fa gu hi kn mr zu", 1);
         fillC(cmap, "ff fr hy kab pt", 1);
         fillC(cmap, "si", 1);
         fillC(cmap, "ak bh guw ln mg nso pa ti wa", 1);
@@ -87,17 +86,17 @@ public final class PluralProviderSPI
         fillC(cmap, "gv", 22);
         fillC(cmap, "ar", 23);
         fillC(cmap, "cy", 24);
+        fillC(cmap, "dsb hsb", 25);
         CARDINAL_MAP.putAll(cmap);
     }
 
-    private static final Map<String, PluralRules> ORDINAL_MAP =
-        new HashMap<String, PluralRules>(140);
+    private static final Map<String, PluralRules> ORDINAL_MAP = new HashMap<>(140);
     private static final PluralRules STD_ORDINALS = new StdOrdinalRules(0);
 
     static {
-        Map<String, PluralRules> omap = new HashMap<String, PluralRules>();
+        Map<String, PluralRules> omap = new HashMap<>();
         fillO(omap, "sv", 1);
-        fillO(omap, "fil fr hy lo mo ms ro tl vi", 2);
+        fillO(omap, "fil fr ga hy lo mo ms ro tl vi", 2);
         fillO(omap, "hu", 3);
         fillO(omap, "ne", 4);
         fillO(omap, "kk", 5);
@@ -110,8 +109,10 @@ public final class PluralProviderSPI
         fillO(omap, "mk", 12);
         fillO(omap, "az", 13);
         fillO(omap, "gu hi", 14);
-        fillO(omap, "bn", 15);
+        fillO(omap, "as bn", 15);
         fillO(omap, "cy", 16);
+        fillO(omap, "be", 17);
+        fillO(omap, "uk", 18);
         ORDINAL_MAP.putAll(omap);
     }
 
@@ -215,8 +216,8 @@ public final class PluralProviderSPI
         @Override
         public PluralCategory getCategory(long n) {
 
-            long mod10 = -1;
-            long mod100 = -1;
+            long mod10;
+            long mod100;
 
             switch (this.id) {
                 case 0: // STD_RULES
@@ -474,6 +475,16 @@ public final class PluralProviderSPI
                         return MANY;
                     }
                     return OTHER;
+                case 25: // sorbisch (dsb/hsb)
+                    mod100 = n % 100;
+                    if (mod100 == 1) {
+                        return ONE;
+                    } else if (mod100 == 2) {
+                        return TWO;
+                    } else if (mod100 == 3 || mod100 == 4) {
+                        return FEW;
+                    }
+                    return OTHER;
                 default: // chinesisch (zh)
                     return OTHER;
             }
@@ -510,8 +521,8 @@ public final class PluralProviderSPI
         @Override
         public PluralCategory getCategory(long n) {
 
-            long mod10 = -1;
-            long mod100 = -1;
+            long mod10;
+            long mod100;
 
             switch (this.id) {
                 case 0: // STD_RULES
@@ -691,6 +702,26 @@ public final class PluralProviderSPI
                         return FEW;
                     } else if ((n == 5) || (n == 6)) {
                         return MANY;
+                    }
+                    return OTHER;
+                case 17: // weißrussisch (be)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    if (
+                        ((mod10 == 2) || (mod10 == 3))
+                        && !((mod100 == 12) || (mod100 == 13))
+                    ) {
+                        return FEW;
+                    }
+                    return OTHER;
+                case 18: // ukrainisch (uk)
+                    mod10 = n % 10;
+                    mod100 = n % 100;
+                    if (
+                        (mod10 == 3)
+                        && (mod100 != 13)
+                    ) {
+                        return FEW;
                     }
                     return OTHER;
                 default: // fallback
