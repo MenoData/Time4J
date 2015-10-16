@@ -240,10 +240,18 @@ public final class GenericTextProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(
+    /**
+     * <p>Gets a resource bundle for given calendar type and locale. </p>
+     *
+     * @param   calendarType    calendar type (usually non-gregorian)
+     * @param   desired         locale (language and/or country)
+     * @return  {@code ResourceBundle}
+     * @see     3.10/4.7
+     */
+    static ResourceBundle getBundle(
         String calendarType,
         Locale desired
-    ) throws MissingResourceException {
+    ) {
 
         return ResourceBundle.getBundle(
             "calendar/" + calendarType,

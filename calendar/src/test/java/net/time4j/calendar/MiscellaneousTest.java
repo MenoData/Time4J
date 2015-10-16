@@ -1,8 +1,10 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.Attributes;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -23,6 +25,14 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class MiscellaneousTest {
+
+    @Test
+    public void genericIslamicPattern() {
+        String pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, new Locale("ar"));
+        assertThat(pattern, is("EEEE، d MMMM، y G"));
+        pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, Locale.GERMANY);
+        assertThat(pattern, is("EEEE, d. MMMM y G"));
+    }
 
     @Test
     public void persianCalendarProperties() {

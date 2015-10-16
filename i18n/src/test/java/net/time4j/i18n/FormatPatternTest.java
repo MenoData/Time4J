@@ -3,6 +3,7 @@ package net.time4j.i18n;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayMode;
 import net.time4j.tz.Timezone;
 import org.junit.Test;
@@ -17,6 +18,13 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class FormatPatternTest {
+
+    @Test
+    public void patternForUnsupportedLocale() {
+        String patternXX = CalendarText.getFormatPatterns().getDatePattern(DisplayMode.FULL, new Locale("xx"));
+        String patternRoot = CalendarText.getFormatPatterns().getDatePattern(DisplayMode.FULL, Locale.ROOT);
+        assertThat(patternXX, is(patternRoot));
+    }
 
     @Test
     public void datePattern() {
