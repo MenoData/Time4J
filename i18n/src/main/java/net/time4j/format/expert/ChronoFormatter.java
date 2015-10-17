@@ -42,6 +42,7 @@ import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
 import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumericalElement;
@@ -1776,6 +1777,102 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Builder<Moment> builder = new Builder<Moment>(Moment.class, locale);
         builder.addPattern(pattern, type);
         return builder.build().withTimezone(tzid);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain date objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getDatePattern(DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getDatePattern(DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    public static ChronoFormatter<PlainDate> ofDateStyle(
+        DisplayMode style,
+        Locale locale
+    ) {
+
+        String pattern = CalendarText.getFormatPatterns().getDatePattern(style, locale);
+        return ofDatePattern(pattern, PatternType.CLDR, locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain date objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getTimePattern(DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getTimePattern(DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    public static ChronoFormatter<PlainTime> ofTimeStyle(
+        DisplayMode style,
+        Locale locale
+    ) {
+
+        String pattern = CalendarText.getFormatPatterns().getTimePattern(style, locale);
+        return ofTimePattern(pattern, PatternType.CLDR, locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for moments. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @param   tzid        timezone identifier
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getDateTimePattern(DisplayMode, DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code Moment}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @param   tzid        timezone identifier
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     net.time4j.format.FormatPatternProvider#getDateTimePattern(DisplayMode, DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    public static ChronoFormatter<Moment> ofMomentStyle(
+        DisplayMode dateStyle,
+        DisplayMode timeStyle,
+        Locale locale,
+        TZID tzid
+    ) {
+
+        String pattern = CalendarText.getFormatPatterns().getDateTimePattern(dateStyle, timeStyle, locale);
+        return ofMomentPattern(pattern, PatternType.CLDR, locale, tzid);
 
     }
 
