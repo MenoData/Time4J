@@ -96,6 +96,7 @@ import static net.time4j.scale.TimeScale.*;
  * <ul>
  *  <li>{@link #POSIX_TIME}</li>
  *  <li>{@link #FRACTION}</li>
+ *  <li>{@link #PRECISION}</li>
  * </ul>
  *
  * <p>Furthermore, most local elements like {@code PlainTime.ISO_HOUR} etc.
@@ -132,6 +133,7 @@ import static net.time4j.scale.TimeScale.*;
  * <ul>
  *  <li>{@link #POSIX_TIME}</li>
  *  <li>{@link #FRACTION}</li>
+ *  <li>{@link #PRECISION}</li>
  * </ul>
  *
  * <p>Dar&uuml;berhinaus sind die meisten lokalen Elemente wie
