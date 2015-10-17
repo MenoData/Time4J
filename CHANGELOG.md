@@ -1,5 +1,6 @@
 ## [v3.10] not yet released
 ### Added
+- New style-based factory methods for ChronoFormatter [#376]
 - Repository for localized date-time-patterns [#100]
 - Support for Icelandic and Malta language [#375]
 
