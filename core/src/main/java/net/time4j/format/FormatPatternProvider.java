@@ -62,18 +62,22 @@ public interface FormatPatternProvider {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Returns the localized date pattern. </p>
+     * <p>Returns the localized date pattern suitable for formatting of objects
+     * of type {@code PlainDate}. </p>
      *
      * @param   mode        display mode
      * @param   locale      language and country setting
      * @return  localized date pattern
+     * @see     net.time4j.PlainDate
      */
     /*[deutsch]
-     * <p>Liefert das lokalisierte Datumsmuster. </p>
+     * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
+     * die Formatierung von Instanzen des Typs{@code PlainDate}. </p>
      *
      * @param   mode        display mode
      * @param   locale      language and country setting
      * @return  localized date pattern
+     * @see     net.time4j.PlainDate
      */
     String getDatePattern(
         DisplayMode mode,
@@ -81,18 +85,22 @@ public interface FormatPatternProvider {
     );
 
     /**
-     * <p>Returns the localized time pattern. </p>
+     * <p>Returns the localized time pattern suitable for formatting of objects
+     * of type {@code PlainTime}. </p>
      *
      * @param   mode        display mode
      * @param   locale      language and country setting
      * @return  localized time pattern
+     * @see     net.time4j.PlainTime
      */
     /*[deutsch]
-     * <p>Liefert das lokalisierte Uhrzeitmuster. </p>
+     * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
+     * Formatierung von Instanzen des Typs {@code PlainTime}. </p>
      *
      * @param   mode        display mode
      * @param   locale      language and country setting
      * @return  localized time pattern
+     * @see     net.time4j.PlainTime
      */
     String getTimePattern(
         DisplayMode mode,
@@ -100,20 +108,24 @@ public interface FormatPatternProvider {
     );
 
     /**
-     * <p>Returns the localized date-time pattern. </p>
+     * <p>Returns the localized date-time pattern suitable for formatting of objects
+     * of type {@code Moment}. </p>
      *
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
+     * @see     net.time4j.Moment
      */
     /*[deutsch]
-     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster. </p>
+     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet
+     * f&uuml;r die Formatierung von Instanzen des Typs {@code Moment}. </p>
      *
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
+     * @see     net.time4j.Moment
      */
     String getDateTimePattern(
         DisplayMode dateMode,
