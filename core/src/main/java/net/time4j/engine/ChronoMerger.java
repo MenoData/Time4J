@@ -23,9 +23,8 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
+import java.util.Locale;
 
 
 /**
@@ -232,5 +231,32 @@ public interface ChronoMerger<T> {
         return null;
 
     }
+
+    /**
+     * <p>Defines a CLDR-compatible localized format pattern. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @throws  UnsupportedOperationException if given style is not supported
+     *          or if no localized format pattern support is available
+     * @see     net.time4j.format.LocalizedPatternSupport
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Definiert ein CLDR-kompatibles lokalisiertes Formatmuster. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @throws  UnsupportedOperationException if given style is not supported
+     *          or if no localized format pattern support is available
+     * @see     net.time4j.format.LocalizedPatternSupport
+     * @since   3.10/4.7
+     */
+    String getFormatPattern(
+        DisplayStyle style,
+        Locale locale
+    );
 
 }

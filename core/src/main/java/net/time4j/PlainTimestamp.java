@@ -34,6 +34,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Normalizer;
@@ -45,9 +46,12 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
@@ -181,11 +185,8 @@ import static net.time4j.PlainTime.*;
 @CalendarType("iso8601")
 public final class PlainTimestamp
     extends TimePoint<IsoUnit, PlainTimestamp>
-    implements GregorianDate,
-               WallTime,
-               Temporal<PlainTimestamp>,
-               ThreetenAdapter,
-               Normalizer<IsoUnit> {
+    implements GregorianDate, WallTime,
+               Temporal<PlainTimestamp>, ThreetenAdapter, Normalizer<IsoUnit>, LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1332,6 +1333,17 @@ public final class PlainTimestamp
         implements ChronoMerger<PlainTimestamp> {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
+            return CalendarText.getTimestampPattern(mode, mode, locale);
+
+        }
 
         @Override
         public PlainTimestamp createFrom(
