@@ -1,10 +1,11 @@
 ## [v3.10] not yet released
 ### Added
-- New style-based factory methods for ChronoFormatter [#376]
+- New style-based factory methods for ChronoFormatter [#376], [#377]
 - Repository for localized date-time-patterns [#100]
 - Support for Icelandic and Malta language [#375]
 
 ### Changed
+- Low-level interface ChronoMerger with new method [#377]
 - Review plural rules [#366]
 - Update i18n-data to CLDR-28 [#374]
 - Change ISO-8601-fallback-mechanism to CLDR standard [#373]
