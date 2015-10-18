@@ -789,7 +789,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
                 .print(duration, TextWidth.WIDE),
-            is("\u200E-15 سنة، \u200E-3 أشهر، أسبوع، ويومان"));
+            is("\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان"));
     }
 
     @Test
@@ -800,7 +800,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .print(duration, TextWidth.WIDE),
-            is("\u200F-١٥ سنة، \u200F-٣ أشهر، أسبوع، ويومان"));
+            is("\u200F-١٥ سنة، \u200F-٣ أشهر، \u200F-أسبوع، و\u200F-يومان"));
     }
 
     @Test
