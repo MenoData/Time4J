@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Temporal;
@@ -44,6 +45,7 @@ import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -138,7 +140,7 @@ import java.util.Set;
 @CalendarType("iso8601")
 public final class PlainTime
     extends TimePoint<IsoTimeUnit, PlainTime>
-    implements WallTime, Temporal<PlainTime> {
+    implements WallTime, Temporal<PlainTime>, LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -3181,6 +3183,17 @@ public final class PlainTime
         implements ChronoMerger<PlainTime> {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
+            return CalendarText.getFormatPatterns().getTimePattern(mode, locale);
+
+        }
 
         @Override
         public PlainTime createFrom(

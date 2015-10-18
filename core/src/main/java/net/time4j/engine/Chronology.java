@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -231,6 +232,16 @@ public class Chronology<T extends ChronoEntity<T>>
     public Chronology<?> preparser() {
 
         return this.merger.preparser();
+
+    }
+
+    @Override
+    public String getFormatPattern(
+        DisplayStyle style,
+        Locale locale
+    ) {
+
+        return this.merger.getFormatPattern(style, locale);
 
     }
 

@@ -36,6 +36,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.StartOfDay;
@@ -2523,6 +2524,17 @@ public final class Moment
         implements ChronoMerger<Moment> {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
+            return CalendarText.getFormatPatterns().getDateTimePattern(mode, mode, locale);
+
+        }
 
         @Override
         public Moment createFrom(

@@ -37,6 +37,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
@@ -45,6 +46,7 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.PluralCategory;
@@ -1675,7 +1677,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.class, locale);
+        Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.axis(), locale);
         builder.addPattern(pattern, type);
         return builder.build();
 
@@ -1707,7 +1709,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.class, locale);
+        Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.axis(), locale);
         builder.addPattern(pattern, type);
         return builder.build();
 
@@ -1739,7 +1741,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.class, locale);
+        Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.axis(), locale);
         builder.addPattern(pattern, type);
         return builder.build();
 
@@ -1774,7 +1776,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         TZID tzid
     ) {
 
-        Builder<Moment> builder = new Builder<Moment>(Moment.class, locale);
+        Builder<Moment> builder = new Builder<Moment>(Moment.axis(), locale);
         builder.addPattern(pattern, type);
         return builder.build().withTimezone(tzid);
 
@@ -1841,6 +1843,37 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Constructs a style-based formatter for plain timestamps. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getTimestampPattern(DisplayMode, DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code PlainTimestamp}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getTimestampPattern(DisplayMode, DisplayMode, Locale)
+     * @since   3.10/4.7
+     */
+    public static ChronoFormatter<PlainTimestamp> ofTimestampStyle(
+        DisplayMode dateStyle,
+        DisplayMode timeStyle,
+        Locale locale
+    ) {
+
+        String pattern = CalendarText.getTimestampPattern(dateStyle, timeStyle, locale);
+        return ofTimestampPattern(pattern, PatternType.CLDR, locale);
+
+    }
+
+    /**
      * <p>Constructs a style-based formatter for moments. </p>
      *
      * @param   dateStyle   format style of date part
@@ -1877,6 +1910,47 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Constructs a style-based formatter for general chronologies. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  UnsupportedOperationException if given style is not supported
+     * @see     DisplayMode
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r allgemeine Chronologien. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  UnsupportedOperationException if given style is not supported
+     * @see     DisplayMode
+     * @since   3.10/4.7
+     */
+    public static <T extends ChronoEntity<T> & LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
+        DisplayStyle style,
+        Locale locale,
+        Chronology<T> chronology
+    ) {
+
+        if (LocalizedPatternSupport.class.isAssignableFrom(chronology.getChronoType())) {
+            String pattern = chronology.getFormatPattern(style, locale);
+            Builder<T> builder = new Builder<T>(chronology, locale);
+            builder.addPattern(pattern, PatternType.CLDR);
+            return builder.build();
+        } else if (chronology.equals(Moment.axis())) {
+            throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
+        } else {
+            throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
+        }
+
+    }
+
+    /**
      * <p>Constructs a builder for creating formatters. </p>
      *
      * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
@@ -1903,7 +1977,44 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        return new Builder<T>(type, locale);
+        if (type == null) {
+            throw new NullPointerException("Missing chronological type.");
+        }
+
+        Chronology<T> chronology = Chronology.lookup(type);
+
+        if (chronology == null) {
+            throw new IllegalArgumentException("Not formattable: " + type);
+        }
+
+        return new Builder<T>(chronology, locale);
+
+    }
+
+    /**
+     * <p>Constructs a builder for creating formatters. </p>
+     *
+     * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
+     * @param   chronology  formattable chronology
+     * @param   locale      format locale
+     * @return  new {@code Builder}-instance
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Hilfsobjekt zum Bauen eines Zeitformats. </p>
+     *
+     * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
+     * @param   chronology  formattable chronology
+     * @param   locale      format locale
+     * @return  new {@code Builder}-instance
+     * @since   3.10/4.7
+     */
+    public static <T extends ChronoEntity<T>> ChronoFormatter.Builder<T> setUp(
+        Chronology<T> chronology,
+        Locale locale
+    ) {
+
+        return new Builder<T>(chronology, locale);
 
     }
 
@@ -2422,25 +2533,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         //~ Konstruktoren -------------------------------------------------
 
         private Builder(
-            Class<T> chronoType,
+            Chronology<T> chronology,
             Locale locale
         ) {
             super();
 
-            if (chronoType == null) {
-                throw new NullPointerException("Missing chronological type.");
+            if (chronology == null) {
+                throw new NullPointerException("Missing chronology.");
             } else if (locale == null) {
                 throw new NullPointerException("Missing locale.");
             }
 
-            this.chronology = Chronology.lookup(chronoType);
+            this.chronology = chronology;
             this.locale = locale;
-
-            if (this.chronology == null) {
-                throw new IllegalArgumentException(
-                    "Not formattable: " + chronoType);
-            }
-
             this.steps = new ArrayList<FormatStep>();
             this.stack = new LinkedList<AttributeSet>();
             this.sectionID = 0;

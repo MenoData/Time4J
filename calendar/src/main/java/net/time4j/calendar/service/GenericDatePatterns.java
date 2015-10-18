@@ -22,6 +22,7 @@
 package net.time4j.calendar.service;
 
 
+import net.time4j.engine.DisplayStyle;
 import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayMode;
 
@@ -49,16 +50,19 @@ public final class GenericDatePatterns {
      * <p>Determines a suitable date pattern. </p>
      *
      * @param   calendarType    general calendar type
-     * @param   mode            display mode
+     * @param   style           format style
      * @param   locale          desired language and/or country
      * @return  localized date pattern
+     * @throws  UnsupportedOperationException if given style is not supported
      * @since   3.10/4.7
      */
     public static String get(
         String calendarType,
-        DisplayMode mode,
+        DisplayStyle style,
         Locale locale
     ) {
+
+        DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
 
         if (calendarType.equals(CalendarText.ISO_CALENDAR_TYPE)) {
             return CalendarText.getFormatPatterns().getDatePattern(mode, locale);

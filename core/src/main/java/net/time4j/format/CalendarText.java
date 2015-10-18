@@ -844,6 +844,35 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Yields a format pattern without any timezone symbols for plain timestamps. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @since   3.10/4.7
+     */
+    /*[deutsch]
+     * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @since   3.10/4.7
+     */
+    public static String getTimestampPattern(
+        DisplayMode dateMode,
+        DisplayMode timeMode,
+        Locale locale
+    ) {
+
+        String pattern = FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
+        return removeZones(pattern);
+
+    }
+
+    /**
      * <p>Yields the name of the internal {@link TextProvider}. </p>
      */
     /*[deutsch]
@@ -1036,6 +1065,47 @@ public final class CalendarText {
         keyBuilder.append('_');
         keyBuilder.append(counter + baseIndex);
         return keyBuilder.toString();
+
+    }
+
+    // strip off any timezone symbols in clock time patterns,
+    // used by wrappers of FormatPatternProvider-objects
+    private static String removeZones(String pattern) {
+
+        boolean literal = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = pattern.length(); i < n; i++) {
+            char c = pattern.charAt(i);
+
+            if (c == '\'') {
+                if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                    sb.append(c);
+                    i++;
+                } else {
+                    literal = !literal;
+                }
+                sb.append(c);
+            } else if (literal) {
+                sb.append(c);
+            } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V' && c != 'x' && c != 'X') {
+                sb.append(c);
+            }
+        }
+
+        for (int j = 0; j < sb.length(); j++) {
+            char c = sb.charAt(j);
+
+            if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
+                sb.deleteCharAt(j);
+                j--;
+            } else if (c == '[' || c == ']' || c == '(' || c == ')') { // check locales es, fa, ps
+                sb.deleteCharAt(j);
+                j--;
+            }
+        }
+
+        return sb.toString().trim();
 
     }
 
@@ -1470,47 +1540,6 @@ public final class CalendarText {
         private static boolean isTextRTL(Locale locale) {
 
             return RTL.contains(locale.getLanguage());
-
-        }
-
-        // strip off any timezone symbols in clock time patterns,
-        // used by wrappers of FormatPatternProvider-objects
-        private static String removeZones(String pattern) {
-
-            boolean literal = false;
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0, n = pattern.length(); i < n; i++) {
-                char c = pattern.charAt(i);
-
-                if (c == '\'') {
-                    if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
-                        sb.append(c);
-                        i++;
-                    } else {
-                        literal = !literal;
-                    }
-                    sb.append(c);
-                } else if (literal) {
-                    sb.append(c);
-                } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V' && c != 'x' && c != 'X') {
-                    sb.append(c);
-                }
-            }
-
-            for (int j = 0; j < sb.length(); j++) {
-                char c = sb.charAt(j);
-
-                if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
-                    sb.deleteCharAt(j);
-                    j--;
-                } else if (c == '[' || c == ']' || c == '(' || c == ')') { // check locales es, fa, ps
-                    sb.deleteCharAt(j);
-                    j--;
-                }
-            }
-
-            return sb.toString().trim();
 
         }
 

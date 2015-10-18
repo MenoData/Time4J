@@ -39,6 +39,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
@@ -52,6 +53,7 @@ import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -138,7 +140,7 @@ import java.util.Set;
 @CalendarType("iso8601")
 public final class PlainDate
     extends Calendrical<IsoDateUnit, PlainDate>
-    implements GregorianDate, Normalizer<CalendarUnit> {
+    implements GregorianDate, Normalizer<CalendarUnit>, LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -2079,6 +2081,17 @@ public final class PlainDate
         implements ChronoMerger<PlainDate> {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
+            return CalendarText.getFormatPatterns().getDatePattern(mode, locale);
+
+        }
 
         @Override
         public PlainDate createFrom(

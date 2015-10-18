@@ -30,6 +30,7 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
@@ -43,6 +44,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
@@ -53,6 +55,7 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -62,6 +65,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -155,7 +159,8 @@ import java.util.List;
  */
 @CalendarType("persian")
 public final class PersianCalendar
-    extends Calendrical<PersianCalendar.Unit, PersianCalendar> {
+    extends Calendrical<PersianCalendar.Unit, PersianCalendar>
+    implements LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1339,6 +1344,16 @@ public final class PersianCalendar
         implements ChronoMerger<PersianCalendar> {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            return GenericDatePatterns.get("persian", style, locale);
+
+        }
 
         @Override
         public PersianCalendar createFrom(
