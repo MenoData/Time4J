@@ -4,7 +4,11 @@
 - Repository for localized date-time-patterns [#100]
 - Support for Icelandic and Malta language [#375]
 
+### Fixed
+- ChronoFormatter.format()-methods lack type safety [#378]
+
 ### Changed
+- Two ChronoFormatter.format()-methods renamed [#378]
 - Low-level interface ChronoMerger with new method [#377]
 - Review plural rules [#366]
 - Update i18n-data to CLDR-28 [#374]
