@@ -699,29 +699,29 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysArabicMinus() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-            .inverse();
+                .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
                 .print(duration, TextWidth.WIDE),
-            is("\u200E-15 سنة، \u200E-3 أشهر، أسبوع، ويومان"));
+            is("\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان"));
     }
 
     @Test
     public void print15Years3Months1Week2DaysArabicU0660Minus() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-            .inverse();
+                .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .print(duration, TextWidth.WIDE),
-            is("\u200F-١٥ سنة، \u200F-٣ أشهر، أسبوع، ويومان"));
+            is("\u200F-١٥ سنة، \u200F-٣ أشهر، \u200F-أسبوع، و\u200F-يومان"));
     }
 
     @Test
     public void print15Years3Months1Week2DaysFarsiMinus() throws IOException {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-            .inverse();
+                .inverse();
         String s =
             PrettyTime.of(new Locale("fa")).print(duration, TextWidth.WIDE);
         String expected =

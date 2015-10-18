@@ -1605,6 +1605,10 @@ public final class PrettyTime {
             }
         }
 
+        if (amount < 0) {
+            return this.minusSign + pattern;
+        }
+
         return pattern;
 
     }
