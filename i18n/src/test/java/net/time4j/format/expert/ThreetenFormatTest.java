@@ -31,7 +31,7 @@ public class ThreetenFormatTest {
         ChronoFormatter<PlainTime> formatter =
             ChronoFormatter.ofTimePattern("hh:mm a", PatternType.CLDR, Locale.US);
         assertThat(
-            formatter.format(LocalTime.of(17, 45)),
+            formatter.formatThreeten(LocalTime.of(17, 45)),
             is("05:45 pm")
         );
     }
@@ -42,7 +42,7 @@ public class ThreetenFormatTest {
             ChronoFormatter.setUp(Moment.class, Locale.ROOT)
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         assertThat(
-            formatter.withTimezone("Europe/Berlin").format(LocalDateTime.of(2015, 3, 29, 2, 30)),
+            formatter.withTimezone("Europe/Berlin").formatThreeten(LocalDateTime.of(2015, 3, 29, 2, 30)),
             is("2015-03-29T03:30+02:00")
         );
     }
@@ -52,7 +52,7 @@ public class ThreetenFormatTest {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.ROOT)
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
-        formatter.format(LocalDateTime.of(2015, 3, 29, 2, 30));
+        formatter.formatThreeten(LocalDateTime.of(2015, 3, 29, 2, 30));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ThreetenFormatTest {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter.ofTimestampPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR, Locale.ROOT);
         assertThat(
-            formatter.withTimezone("UTC+2").format(LocalDateTime.of(2015, 3, 29, 2, 30)),
+            formatter.withTimezone("UTC+2").formatThreeten(LocalDateTime.of(2015, 3, 29, 2, 30)),
             is("2015-03-29T02:30+02:00")
         );
     }
@@ -69,7 +69,7 @@ public class ThreetenFormatTest {
     public void formatLocalDateTime4() {
         ChronoFormatter<PlainTimestamp> formatter =
             ChronoFormatter.ofTimestampPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR, Locale.ROOT);
-        formatter.withTimezone("Europe/Berlin").format(LocalDateTime.of(2015, 3, 29, 2, 30));
+        formatter.withTimezone("Europe/Berlin").formatThreeten(LocalDateTime.of(2015, 3, 29, 2, 30));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ThreetenFormatTest {
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         ZonedDateTime zdt = LocalDateTime.of(2015, 6, 1, 12, 0).atZone(ZoneId.of("Europe/London"));
         assertThat(
-            formatter.withTimezone("Europe/Berlin").format(zdt),
+            formatter.withTimezone("Europe/Berlin").formatThreeten(zdt),
             is("2015-06-01T13:00+02:00")
         );
     }
@@ -91,7 +91,7 @@ public class ThreetenFormatTest {
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         assertThat(
-            formatter.format(zdt),
+            formatter.formatThreeten(zdt),
             is("2015-03-29T03:30+02:00")
         );
     }
@@ -103,7 +103,7 @@ public class ThreetenFormatTest {
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         assertThat(
-            formatter.withTimezone("Europe/Berlin").format(zdt.toInstant()),
+            formatter.withTimezone("Europe/Berlin").formatThreeten(zdt.toInstant()),
             is("2015-03-29T03:30+02:00")
         );
     }
@@ -114,7 +114,7 @@ public class ThreetenFormatTest {
             ChronoFormatter.setUp(Moment.class, Locale.ROOT)
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
-        formatter.format(zdt.toInstant());
+        formatter.formatThreeten(zdt.toInstant());
     }
 
     @Test(expected=IllegalArgumentException.class) // non-iso in strict mode
@@ -122,7 +122,7 @@ public class ThreetenFormatTest {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT);
         HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
-        formatter.with(Leniency.STRICT).format(date);
+        formatter.with(Leniency.STRICT).formatThreeten(date);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class ThreetenFormatTest {
             ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT);
         HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
         assertThat(
-            formatter.format(date),
+            formatter.formatThreeten(date),
             is("2015-08-21"));
     }
 
@@ -145,7 +145,7 @@ public class ThreetenFormatTest {
                 .addPattern(":mm", PatternType.CLDR)
                 .build();
         StringBuilder buffer = new StringBuilder();
-        Set<ElementPosition> positions = formatter.print(ta, buffer);
+        Set<ElementPosition> positions = formatter.printThreeten(ta, buffer);
         assertThat(buffer.toString(), is("24:00"));
         assertThat(positions.size(), is(2));
         assertThat(positions.stream().findFirst().get().getElement(), is(PlainTime.ISO_HOUR));
@@ -158,7 +158,7 @@ public class ThreetenFormatTest {
         TemporalAccessor ta = dtf.parse("2012-06-30T23:59:60Z");
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT, () -> "Europe/Berlin");
-        assertThat(formatter.format(ta), is("2012-07-01 01:59:60+02:00"));
+        assertThat(formatter.formatThreeten(ta), is("2012-07-01 01:59:60+02:00"));
     }
 
     @Test

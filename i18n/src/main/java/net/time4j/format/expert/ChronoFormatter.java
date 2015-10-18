@@ -484,7 +484,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @throws  IllegalArgumentException if given argument cannot be formatted
      * @since   4.0
      */
-    public String format(TemporalAccessor formattable) {
+    public String formatThreeten(TemporalAccessor formattable) {
 
         T entity = this.toEntity(formattable);
         return this.toZonedFormatter(formattable).format(entity);
@@ -566,7 +566,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @throws  IOException if writing to buffer fails
      * @since   4.0
      */
-    public Set<ElementPosition> print(
+    public Set<ElementPosition> printThreeten(
         TemporalAccessor formattable,
         Appendable buffer
     ) throws IOException {
