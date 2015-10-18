@@ -4,6 +4,9 @@
 - Repository for localized date-time-patterns [#100]
 - Support for Icelandic and Malta language [#375]
 
+### Fixed
+- Negative duration in Arabic sometimes without minus sign [#379]
+
 ### Changed
 - Low-level interface ChronoMerger with new method [#377]
 - Review plural rules [#366]
