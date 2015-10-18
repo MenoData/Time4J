@@ -5,6 +5,7 @@
 - Support for Icelandic and Malta language [#375]
 
 ### Fixed
+- Negative duration in Arabic sometimes without minus sign [#379]
 - ChronoFormatter.format()-methods lack type safety [#378]
 
 ### Changed
