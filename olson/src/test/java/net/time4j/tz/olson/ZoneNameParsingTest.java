@@ -105,17 +105,17 @@ public class ZoneNameParsingTest {
                         "Europe/London",
                         "2012-03-31T23:59Z",
                         "1. April 2012 00:59 British Summer Time"},
-                 {"uuuu-MM-dd'T'HH:mm:ss.SSS z",
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS z",
                         "in",
                         "Asia/Kolkata",
                         "2012-06-30T23:59:60,123000000Z",
                         "2012-07-01T05:29:60.123 IST"},
-                 {"uuuu-MM-dd'T'HH:mm:ss.SSS zzzz",
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS zzzz",
                         "in",
                         "Asia/Kolkata",
                         "2012-06-30T23:59:60,123000000Z",
                         "2012-07-01T05:29:60.123 India Standard Time"}
-           }
+            }
         );
     }
 

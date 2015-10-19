@@ -256,26 +256,42 @@ final class TimezoneNameProcessor
                 "Unknown timezone name: " + key);
             return;
         }
-        
-        if (
-            (sum > 1)
-            && !leniency.isLax()
-        ) { // tz name not unique
+
+        if ((sum > 1) && !leniency.isStrict()) {
+            stdZones = excludeWinZones(stdZones);
+            dstZones = excludeWinZones(dstZones);
+            sum = stdZones.size() + dstZones.size();
+        }
+
+        List<TZID> stdZonesOriginal = stdZones;
+        List<TZID> dstZonesOriginal = dstZones;
+
+        if ((sum > 1) && !leniency.isLax()) {
             if (stdZones.size() > 0) {
-                stdZones = this.resolve(stdZones, locale, leniency);
+                stdZones = this.resolveUsingPreferred(stdZones, locale, leniency);
             }
             if (dstZones.size() > 0) {
-                dstZones = this.resolve(dstZones, locale, leniency);
+                dstZones = this.resolveUsingPreferred(dstZones, locale, leniency);
             }
         }
 
         sum = stdZones.size() + dstZones.size();
         
         if (sum == 0) {
+            List<String> candidates = new ArrayList<>();
+            for (TZID tzid : stdZonesOriginal) {
+                candidates.add(tzid.canonical());
+            }
+            for (TZID tzid : dstZonesOriginal) {
+                candidates.add(tzid.canonical());
+            }
             status.setError(
                 start,
-                "Time zone id not found among preferred timezones in locale " 
-                + locale);
+                "Time zone name \""
+                    + key
+                    + "\" not found among preferred timezones in locale "
+                    + locale
+                    + ", candidates=" + candidates);
             return;
         }
 
@@ -415,8 +431,30 @@ final class TimezoneNameProcessor
         return zones;
         
     }
-    
-    private List<TZID> resolve(
+
+    private static List<TZID> excludeWinZones(List<TZID> zones) {
+
+        if (zones.size() > 1) {
+            List<TZID> candidates = new ArrayList<>(zones);
+
+            for (int i = 1, n = zones.size(); i < n; i++) {
+                TZID tzid = zones.get(i);
+
+                if (tzid.canonical().startsWith("WINDOWS~")) {
+                    candidates.remove(tzid);
+                }
+            }
+
+            if (!candidates.isEmpty()) {
+                return candidates;
+            }
+        }
+
+        return zones;
+
+    }
+
+    private List<TZID> resolveUsingPreferred(
         List<TZID> zones,
         Locale locale,
         Leniency leniency
@@ -457,6 +495,7 @@ final class TimezoneNameProcessor
         }
 
         List<TZID> candidates = matched.get(DEFAULT_PROVIDER);
+        List<TZID> result = zones;
 
         if (candidates.isEmpty()) {
             matched.remove(DEFAULT_PROVIDER);
@@ -465,21 +504,21 @@ final class TimezoneNameProcessor
                 candidates = matched.get(provider);
                 if (!candidates.isEmpty()) {
                     found = true;
-                    zones = candidates;
+                    result = candidates;
                     break;
                 }
             }
             if (!found) {
-                zones = Collections.emptyList();
+                result = Collections.emptyList();
             }
         } else {
-            zones = candidates;
+            result = candidates;
         }
 
-        return zones;
+        return result;
 
     }
-    
+
     private NameStyle getStyle(boolean daylightSaving) {
 
         if (daylightSaving) {
