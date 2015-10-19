@@ -66,7 +66,7 @@ import java.util.Locale;
  *          (compatible to {@link ChronoEntity})
  * @author  Meno Hochschild
  */
-public interface ChronoMerger<T> {
+public interface ChronoMerger<T extends ChronoEntity<T>> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -177,24 +177,32 @@ public interface ChronoMerger<T> {
      * @return  replacement entity which will finally be used for formatting
      * @throws  IllegalArgumentException in any case of inconsistent data
      */
-    ChronoDisplay preformat(
+    default ChronoDisplay preformat(
         T context,
         AttributeQuery attributes
-    );
+    ) {
+
+        return context;
+
+    }
 
     /**
      * <p>This method defines a child chronology which can preparse
      * a chronological text. </p>
      *
-     * @return  preparsing chronology or {@code null}
+     * @return  preparsing chronology or {@code null} (default)
      */
     /*[deutsch]
      * <p>Diese Methode definiert eine Kindschronologie, wenn eine
      * Vorinterpretierung des chronologischen Texts notwendig ist. </p>
      *
-     * @return  preparsing chronology or {@code null}
+     * @return  preparsing chronology or {@code null} (default)
      */
-    Chronology<?> preparser();
+    default Chronology<?> preparser() {
+
+        return null;
+
+    }
 
     /**
      * <p>Creates a new entity of type T based on given chronological
@@ -254,9 +262,13 @@ public interface ChronoMerger<T> {
      * @see     net.time4j.format.LocalizedPatternSupport
      * @since   3.10/4.7
      */
-    String getFormatPattern(
+    default String getFormatPattern(
         DisplayStyle style,
         Locale locale
-    );
+    ) {
+
+        throw new UnsupportedOperationException("Localized format patterns are not available.");
+
+    }
 
 }

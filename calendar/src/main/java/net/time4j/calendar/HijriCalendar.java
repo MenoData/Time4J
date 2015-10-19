@@ -36,12 +36,10 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -59,6 +57,11 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.time.chrono.Chronology;
+import java.time.chrono.HijrahDate;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1501,15 +1504,20 @@ public final class HijriCalendar
 
         }
 
-        @Override
-        public ChronoDisplay preformat(HijriCalendar context, AttributeQuery attributes) {
+        public HijriCalendar createFrom(
+            TemporalAccessor threeten,
+            AttributeQuery attributes
+        ) {
 
-            return context;
+            Chronology c = threeten.query(TemporalQueries.chronology());
 
-        }
-
-        @Override
-        public Chronology<?> preparser() {
+            if (c != null && c.getId().equals("Hijrah-umalqura")) {
+                HijrahDate hd = HijrahDate.from(threeten);
+                return HijriCalendar.ofUmalqura(
+                    hd.get(ChronoField.YEAR_OF_ERA),
+                    hd.get(ChronoField.MONTH_OF_YEAR),
+                    hd.get(ChronoField.DAY_OF_MONTH));
+            }
 
             return null;
 

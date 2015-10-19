@@ -38,12 +38,10 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -1416,20 +1414,6 @@ public final class PersianCalendar
                 }
                 entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
             }
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(PersianCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
 
             return null;
 

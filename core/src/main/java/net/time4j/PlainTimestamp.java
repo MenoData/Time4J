@@ -27,13 +27,11 @@ import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -1465,23 +1463,6 @@ public final class PlainTimestamp
 
                 return PlainTimestamp.of(date, time);
             }
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(
-            PlainTimestamp context,
-            AttributeQuery attributes
-        ) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
 
         }
 
