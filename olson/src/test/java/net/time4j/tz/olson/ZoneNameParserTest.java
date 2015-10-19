@@ -4,12 +4,9 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
-import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import org.junit.Test;
 
 import java.util.Locale;
-import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
