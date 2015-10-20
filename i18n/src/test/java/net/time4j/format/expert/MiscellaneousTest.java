@@ -45,6 +45,15 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class MiscellaneousTest {
 
+    @Test
+    public void testTagalog() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("MMMM", PatternType.CLDR, new Locale("tl"));
+        assertThat(
+            formatter.format(PlainDate.of(2015, 11, 19)),
+            is("Nobyembre"));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void printWithGenericPattern() {
         ChronoFormatter<PlainDate> formatter =
