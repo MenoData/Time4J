@@ -5,10 +5,12 @@
 - Support for Icelandic and Malta language [#375]
 
 ### Fixed
+- Improved parsing of MSK timezone name [#381]
 - Negative duration in Arabic sometimes without minus sign [#379]
 - ChronoFormatter.format()-methods lack type safety [#378]
 
 ### Changed
+- Simplify interface ChronoMerger by using Java-8 default methods [#382]
 - Two ChronoFormatter.format()-methods renamed [#378]
 - Low-level interface ChronoMerger with new method [#377]
 - Review plural rules [#366]
