@@ -2,6 +2,7 @@
 ### Added
 - New style-based factory methods for ChronoFormatter [#376], [#377]
 - Repository for localized date-time-patterns [#100]
+- Support for Filipino (Tagalog) [#380]
 - Support for Icelandic and Malta language [#375]
 
 ### Fixed
