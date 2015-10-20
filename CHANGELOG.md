@@ -10,6 +10,8 @@
 - ChronoFormatter.format()-methods lack type safety [#378]
 
 ### Changed
+- Better translations for various countries (mainly arabic and french) [#383]
+- Better translations for Spanish locales in Latin America [#368]
 - Simplify interface ChronoMerger by using Java-8 default methods [#382]
 - Two ChronoFormatter.format()-methods renamed [#378]
 - Low-level interface ChronoMerger with new method [#377]
