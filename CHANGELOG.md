@@ -5,6 +5,7 @@
 - Support for Icelandic and Malta language [#375]
 
 ### Fixed
+- Improved parsing of MSK timezone name [#381]
 - Negative duration in Arabic sometimes without minus sign [#379]
 
 ### Changed
