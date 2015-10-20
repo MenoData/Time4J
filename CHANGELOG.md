@@ -9,6 +9,8 @@
 - Negative duration in Arabic sometimes without minus sign [#379]
 
 ### Changed
+- Better translations for various countries (mainly arabic and french) [#383]
+- Better translations for Spanish locales in Latin America [#368]
 - Low-level interface ChronoMerger with new method [#377]
 - Review plural rules [#366]
 - Update i18n-data to CLDR-28 [#374]
