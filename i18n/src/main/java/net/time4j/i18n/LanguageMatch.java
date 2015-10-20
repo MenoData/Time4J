@@ -33,6 +33,7 @@ enum LanguageMatch {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    tl("fil"), // tagalog
     no("nb"), // norsk bokmål
     in("id"), // indonesian (old code)
     iw("he"); // hebrew (old code)
