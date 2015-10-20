@@ -4055,8 +4055,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * &quot;Etc/GMT+12&quot;. </p>
          *
          * @return  this instance for method chaining
-         * @throws  IllegalStateException wenn die zugrundeliegende Chronologie
-         *          nicht dem Typ {@link net.time4j.base.UnixTime} entspricht
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          */
         /*[deutsch]
          * <p>F&uuml;gt eine Zeitzonen-ID hinzu. </p>
@@ -4071,8 +4071,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * veraltete IDs wie &quot;Etc/GMT+12&quot;. </p>
          *
          * @return  this instance for method chaining
-         * @throws  IllegalStateException wenn die zugrundeliegende Chronologie
-         *          nicht dem Typ {@link net.time4j.base.UnixTime} entspricht
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          */
         public Builder<T> addTimezoneID() {
 
