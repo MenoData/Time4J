@@ -1114,7 +1114,13 @@ public final class CalendarText {
             }
         }
 
-        return sb.toString().trim();
+        String result = sb.toString().trim();
+
+        if (result.endsWith(" '")) {
+            result = result.substring(0, result.length() - 2) + "'";
+        }
+
+        return result;
 
     }
 
