@@ -2,6 +2,10 @@
 ### Added
 - New style-based factory methods for ChronoFormatter [#376], [#377]
 - Repository for localized date-time-patterns [#100]
+- Support for Amharic [#387]
+- Support for Swahili [#386]
+- Support for Uzbek (uz), Turkmen (tk) and Kazakh (kk) [#385]
+- Support for Armenian (hy), Azerbaijani (az) and Georgian (ka) [#384]
 - Support for Filipino (Tagalog) [#380]
 - Support for Icelandic and Malta language [#375]
 
