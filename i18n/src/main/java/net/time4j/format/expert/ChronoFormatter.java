@@ -1912,6 +1912,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Constructs a style-based formatter for general chronologies. </p>
      *
+     * @param   <T> generic chronological type
      * @param   style       format style
      * @param   locale      format locale
      * @param   chronology  chronology with format pattern support
@@ -1923,6 +1924,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r allgemeine Chronologien. </p>
      *
+     * @param   <T> generic chronological type
      * @param   style       format style
      * @param   locale      format locale
      * @param   chronology  chronology with format pattern support
