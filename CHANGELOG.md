@@ -1,13 +1,15 @@
-## [v3.10] not yet released
+## [v3.11] not yet released
+
+## [v3.10] published on 2015-10-22
 ### Added
 - New style-based factory methods for ChronoFormatter [#376], [#377]
 - Repository for localized date-time-patterns [#100]
-- Support for Amharic [#387]
-- Support for Swahili [#386]
+- Support for Amharic (am) [#387]
+- Support for Swahili (sw) [#386]
 - Support for Uzbek (uz), Turkmen (tk) and Kazakh (kk) [#385]
 - Support for Armenian (hy), Azerbaijani (az) and Georgian (ka) [#384]
-- Support for Filipino (Tagalog) [#380]
-- Support for Icelandic and Malta language [#375]
+- Support for Filipino (Tagalog - fil or tl) [#380]
+- Support for Icelandic (is) and Malta language (mt) [#375]
 
 ### Fixed
 - Improved parsing of MSK timezone name [#381]
