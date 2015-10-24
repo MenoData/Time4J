@@ -105,8 +105,7 @@ public enum HistoricEra
     /**
      * <p>Gets an alternative description text dependent on the locale and text width. </p>
      *
-     * <p>Actually this method only yields the English notations of
-     * &quot;(Before) Common Era&quot; (BCE/CE). </p>
+     * <p>This method yields for English the notations of <em>&quot;(Before) Common Era&quot; (BCE/CE)</em>. </p>
      *
      * @param   locale      language setting
      * @param   width       text width
@@ -116,8 +115,8 @@ public enum HistoricEra
     /*[deutsch]
      * <p>Liefert einen alternativen sprachabh&auml;ngigen Beschreibungstext. </p>
      *
-     * <p>Aktuell liefert diese Methode nur die englischen Bezeichnungen
-      * &quot;Common Era&quot; bzw. &quot;CE&quot; f&uuml;r {@code AD}. </p>
+     * <p>Diese Methode liefert f&uuml;r Englisch die Bezeichnungen
+     * <em>&quot;(Before) Common Era&quot; (BCE/CE)</em>. </p>
      *
      * @param   locale      language setting
      * @param   width       text width
