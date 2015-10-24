@@ -280,19 +280,37 @@ public class HistoryTest {
     }
 
     @Test
-    public void testProlepticJulianCutOver() {
+    public void testProlepticGregorianCutOver() {
         assertThat(
-            ChronoHistory.ofGregorianReform(PlainDate.axis().getMaximum()),
-            is(ChronoHistory.PROLEPTIC_JULIAN)
+            ChronoHistory.ofGregorianReform(PlainDate.axis().getMinimum()) == ChronoHistory.PROLEPTIC_GREGORIAN,
+            is(true)
+        );
+        assertThat(
+            ChronoHistory.PROLEPTIC_GREGORIAN.hasGregorianCutOverDate(),
+            is(false)
         );
     }
 
+    @Test(expected=UnsupportedOperationException.class)
+    public void testProlepticGregorianCutOverWithoutReform() {
+        ChronoHistory.ofGregorianReform(PlainDate.axis().getMinimum()).getGregorianCutOverDate();
+    }
+
     @Test
-    public void testProlepticGregorianCutOver() {
+    public void testProlepticJulianCutOver() {
         assertThat(
-            ChronoHistory.ofGregorianReform(PlainDate.axis().getMinimum()),
-            is(ChronoHistory.PROLEPTIC_GREGORIAN)
+            ChronoHistory.ofGregorianReform(PlainDate.axis().getMaximum()) == ChronoHistory.PROLEPTIC_JULIAN,
+            is(true)
         );
+        assertThat(
+            ChronoHistory.PROLEPTIC_JULIAN.hasGregorianCutOverDate(),
+            is(false)
+        );
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void testProlepticJulianCutOverWithoutReform() {
+        ChronoHistory.ofGregorianReform(PlainDate.axis().getMaximum()).getGregorianCutOverDate();
     }
 
 }

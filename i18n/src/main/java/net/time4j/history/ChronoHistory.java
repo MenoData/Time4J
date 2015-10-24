@@ -491,17 +491,47 @@ public final class ChronoHistory
      * <p>Yields the date of final introduction of gregorian calendar. </p>
      *
      * @return  ISO-8601-date (gregorian)
+     * @throws  UnsupportedOperationException if this history is proleptic
+     * @see     #hasGregorianCutOverDate()
      * @since   3.0
      */
     /*[deutsch]
      * <p>Liefert das Datum der letztlichen Einf&uuml;hrung des gregorianischen Kalenders. </p>
      *
      * @return  ISO-8601-date (gregorian)
+     * @throws  UnsupportedOperationException if this history is proleptic
+     * @see     #hasGregorianCutOverDate()
      * @since   3.0
      */
     public PlainDate getGregorianCutOverDate() {
 
-        return PlainDate.of(this.events.get(this.events.size() - 1).start, EpochDays.MODIFIED_JULIAN_DATE);
+        long start = this.events.get(this.events.size() - 1).start;
+
+        if (start == Long.MIN_VALUE) {
+            throw new UnsupportedOperationException("Proleptic history without any gregorian reform date.");
+        }
+
+        return PlainDate.of(start, EpochDays.MODIFIED_JULIAN_DATE);
+
+    }
+
+    /**
+     * <p>Determines if this history has at least one gregorian calendar reform date. </p>
+     *
+     * @return  boolean
+     * @since   3.8/4.11
+     * @see     #getGregorianCutOverDate()
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob diese {@code ChronoHistory} wenigstens eine gregorianische Kalenderreform kennt. </p>
+     *
+     * @return  boolean
+     * @since   3.8/4.11
+     * @see     #getGregorianCutOverDate()
+     */
+    public boolean hasGregorianCutOverDate() {
+
+        return (this.events.get(this.events.size() - 1).start > Long.MIN_VALUE);
 
     }
 
