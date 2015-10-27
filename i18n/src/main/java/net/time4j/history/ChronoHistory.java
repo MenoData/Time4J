@@ -25,7 +25,6 @@ import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoException;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.TextElement;
 
