@@ -57,8 +57,8 @@ public interface ChronoDisplay {
      * are also accessible. </p>
      *
      * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} if the method {@code get(ChronoElement)} can
-     *          be called without exception else {@code false}
+     * @return  {@code true} the element is registered or there is an element rule for evaluating the value
+     *          else {@code false}
      * @see     #get(ChronoElement)
      */
     /*[deutsch]
@@ -71,8 +71,8 @@ public interface ChronoDisplay {
      * Regel definieren. </p>
      *
      * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} if the method {@code get(ChronoElement)} can
-     *          be called without exception else {@code false}
+     * @return  {@code true} the element is registered or there is an element rule for evaluating the value
+     *          else {@code false}
      * @see     #get(ChronoElement)
      */
     boolean contains(ChronoElement<?> element);
@@ -84,8 +84,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element which has the value
      * @return  associated element value as object (never {@code null})
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for evaluating the value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     #contains(ChronoElement)
      */
     /*[deutsch]
@@ -94,8 +94,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element which has the value
      * @return  associated element value as object (never {@code null})
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for evaluating the value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     #contains(ChronoElement)
      */
     <V> V get(ChronoElement<V> element);
@@ -115,8 +115,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element whose minimum value is to be evaluated
      * @return  minimum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the minimum value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the minimum value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     ChronoElement#getDefaultMinimum()
      * @see     #getMaximum(ChronoElement)
      */
@@ -135,8 +135,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element whose minimum value is to be evaluated
      * @return  minimum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the minimum value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the minimum value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     ChronoElement#getDefaultMinimum()
      * @see     #getMaximum(ChronoElement)
      */
@@ -161,8 +161,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element whose maximum value is to be evaluated
      * @return  maximum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the maximum value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the maximum value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     ChronoElement#getDefaultMaximum()
      * @see     #getMinimum(ChronoElement)
      */
@@ -185,8 +185,8 @@ public interface ChronoDisplay {
      * @param   <V> generic type of element value
      * @param   element     element whose maximum value is to be evaluated
      * @return  maximum maybe context-dependent element value
-     * @throws  ChronoException if the element is not registered and there
-     *          is no element rule for getting the maximum value
+     * @throws  ChronoException if there is no suitable element rule for evaluating the maximum value
+     *          or if the associated element value is not defined over the complete range of this instance
      * @see     ChronoElement#getDefaultMaximum()
      * @see     #getMinimum(ChronoElement)
      */

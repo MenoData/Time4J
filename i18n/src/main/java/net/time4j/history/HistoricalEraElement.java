@@ -27,6 +27,7 @@ import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
@@ -222,7 +223,11 @@ final class HistoricalEraElement
         @Override
         public HistoricEra getValue(C context) {
 
-            return this.history.convert(context.get(PlainDate.COMPONENT)).getEra();
+            try {
+                return this.history.convert(context.get(PlainDate.COMPONENT)).getEra();
+            } catch (IllegalArgumentException iae) {
+                throw new ChronoException(iae.getMessage(), iae);
+            }
 
         }
 
@@ -250,10 +255,14 @@ final class HistoricalEraElement
                 return false;
             }
 
-            HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
-            HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
-            newHD = this.history.adjustDayOfMonth(newHD);
-            return this.history.isValid(newHD);
+            try {
+                HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
+                HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
+                newHD = this.history.adjustDayOfMonth(newHD);
+                return this.history.isValid(newHD);
+            } catch (IllegalArgumentException iae) {
+                return false;
+            }
 
         }
 

@@ -29,6 +29,7 @@ import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
@@ -322,17 +323,21 @@ final class HistoricalIntegerElement
         @Override
         public Integer getValue(C context) {
 
-            HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
+            try {
+                HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
 
-            switch (this.index) {
-                case YEAR_OF_ERA_INDEX:
-                    return date.getYearOfEra();
-                case MONTH_INDEX:
-                    return date.getMonth();
-                case DAY_OF_MONTH_INDEX:
-                    return date.getDayOfMonth();
-                default:
-                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+                switch (this.index) {
+                    case YEAR_OF_ERA_INDEX:
+                        return date.getYearOfEra();
+                    case MONTH_INDEX:
+                        return date.getMonth();
+                    case DAY_OF_MONTH_INDEX:
+                        return date.getDayOfMonth();
+                    default:
+                        throw new UnsupportedOperationException("Unknown element index: " + this.index);
+                }
+            } catch (IllegalArgumentException iae) {
+                throw new ChronoException(iae.getMessage(), iae);
             }
 
         }
@@ -340,80 +345,89 @@ final class HistoricalIntegerElement
         @Override
         public Integer getMinimum(C context) {
 
-            if (this.index == YEAR_OF_ERA_INDEX) {
-                return Integer.valueOf(1);
-            }
+            try {
+                HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
 
-            HistoricDate hd = this.adjust(context, 1);
-
-            if (this.history.isValid(hd)) {
-                return Integer.valueOf(1);
-            }
-
-
-            HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
-            List<CutOverEvent> events = this.history.getEvents();
-
-            for (int i = events.size() - 1; i >= 0; i--) {
-                CutOverEvent event = events.get(i);
-
-                if (current.compareTo(event.dateAtCutOver) >= 0) {
-                    hd = event.dateAtCutOver;
-                    break;
+                if (this.index == YEAR_OF_ERA_INDEX) {
+                    return Integer.valueOf(1);
                 }
-            }
 
-            int min = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
-            return Integer.valueOf(min);
+                HistoricDate hd = this.adjust(context, 1);
+
+                if (this.history.isValid(hd)) {
+                    return Integer.valueOf(1);
+                }
+
+
+                List<CutOverEvent> events = this.history.getEvents();
+
+                for (int i = events.size() - 1; i >= 0; i--) {
+                    CutOverEvent event = events.get(i);
+
+                    if (current.compareTo(event.dateAtCutOver) >= 0) {
+                        hd = event.dateAtCutOver;
+                        break;
+                    }
+                }
+
+                int min = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
+                return Integer.valueOf(min);
+            } catch (IllegalArgumentException iae) {
+                throw new ChronoException(iae.getMessage(), iae);
+            }
 
         }
 
         @Override
         public Integer getMaximum(C context) {
 
-            HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
-            HistoricDate hd;
-            int max;
+            try {
+                HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
+                HistoricDate hd;
+                int max;
 
-            switch (this.index) {
-                case YEAR_OF_ERA_INDEX:
-                    if (current.getEra() == HistoricEra.BC) {
-                        max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
-                    } else {
-                        max = this.history.convert(PlainDate.axis().getMaximum()).getYearOfEra();
-                    }
-                    return Integer.valueOf(max);
-                case MONTH_INDEX:
-                    max = 12;
-                    hd = this.adjust(context, max);
-                    break;
-                case DAY_OF_MONTH_INDEX:
-                    max = this.history.getAlgorithm(current).getMaximumDayOfMonth(current);
-                    hd = this.adjust(context, max);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
-            }
-
-            if (this.history.isValid(hd)) {
-                return Integer.valueOf(max);
-            }
-
-            List<CutOverEvent> events = this.history.getEvents();
-            CutOverEvent candidate;
-
-            for (int i = events.size() - 1; i >= 0; i--) {
-                CutOverEvent event = events.get(i);
-                candidate = event;
-
-                if (current.compareTo(event.dateAtCutOver) < 0) {
-                    hd = candidate.dateBeforeCutOver;
-                    break;
+                switch (this.index) {
+                    case YEAR_OF_ERA_INDEX:
+                        if (current.getEra() == HistoricEra.BC) {
+                            max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
+                        } else {
+                            max = this.history.convert(PlainDate.axis().getMaximum()).getYearOfEra();
+                        }
+                        return Integer.valueOf(max);
+                    case MONTH_INDEX:
+                        max = 12;
+                        hd = this.adjust(context, max);
+                        break;
+                    case DAY_OF_MONTH_INDEX:
+                        max = this.history.getAlgorithm(current).getMaximumDayOfMonth(current);
+                        hd = this.adjust(context, max);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
-            }
 
-            max = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
-            return Integer.valueOf(max);
+                if (this.history.isValid(hd)) {
+                    return Integer.valueOf(max);
+                }
+
+                List<CutOverEvent> events = this.history.getEvents();
+                CutOverEvent candidate;
+
+                for (int i = events.size() - 1; i >= 0; i--) {
+                    CutOverEvent event = events.get(i);
+                    candidate = event;
+
+                    if (current.compareTo(event.dateAtCutOver) < 0) {
+                        hd = candidate.dateBeforeCutOver;
+                        break;
+                    }
+                }
+
+                max = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
+                return Integer.valueOf(max);
+            } catch (IllegalArgumentException iae) {
+                throw new ChronoException(iae.getMessage(), iae);
+            }
 
         }
 
@@ -427,8 +441,12 @@ final class HistoricalIntegerElement
                 return false;
             }
 
-            HistoricDate newHD = this.adjust(context, value.intValue());
-            return this.history.isValid(newHD);
+            try {
+                HistoricDate newHD = this.adjust(context, value.intValue());
+                return this.history.isValid(newHD);
+            } catch (IllegalArgumentException iae) {
+                return false;
+            }
 
         }
 

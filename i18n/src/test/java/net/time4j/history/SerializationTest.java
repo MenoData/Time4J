@@ -19,10 +19,17 @@ import static org.junit.Assert.assertThat;
 public class SerializationTest {
 
     @Test
-    public void roundTripVar0()
+    public void roundTripSingleCutOver()
         throws IOException, ClassNotFoundException {
 
         roundtrip(ChronoHistory.ofGregorianReform(PlainDate.of(1752, 3, 1)));
+    }
+
+    @Test
+    public void roundTripWithAncientJulianLeapYears()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(ChronoHistory.ofGregorianReform(PlainDate.of(1752, 3, 1)).with(AncientJulianLeapYears.SCALIGER));
     }
 
     @Test
