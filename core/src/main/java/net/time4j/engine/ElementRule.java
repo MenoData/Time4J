@@ -95,6 +95,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  current element value as object (never {@code null})
+     * @throws  ChronoException if the associated element value cannot be evaluated
      */
     /*[deutsch]
      * <p>Ermittelt den aktuellen Wert des assoziierten Elements
@@ -111,6 +112,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  current element value as object (never {@code null})
+     * @throws  ChronoException if the associated element value cannot be evaluated
      */
     V getValue(T context);
 
@@ -127,6 +129,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  minimum legal and sometimes context-dependent value
+     * @throws  ChronoException if the associated minimum value cannot be evaluated
      * @see     #getMaximum(Object) getMaximum(T)
      */
     /*[deutsch]
@@ -144,6 +147,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  minimum legal and sometimes context-dependent value
+     * @throws  ChronoException if the associated minimum value cannot be evaluated
      * @see     #getMaximum(Object) getMaximum(T)
      */
     V getMinimum(T context);
@@ -161,6 +165,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  maximum legal and sometimes context-dependent value
+     * @throws  ChronoException if the associated maximum value cannot be evaluated
      * @see     #getMinimum(Object) getMinimum(T)
      */
     /*[deutsch]
@@ -178,6 +183,7 @@ public interface ElementRule<T, V> {
      *
      * @param   context     time context to be evaluated
      * @return  maximum legal and sometimes context-dependent value
+     * @throws  ChronoException if the associated maximum value cannot be evaluated
      * @see     #getMinimum(Object) getMinimum(T)
      */
     V getMaximum(T context);
