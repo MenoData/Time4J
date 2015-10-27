@@ -47,6 +47,10 @@ final class SPX
     /** Serialisierungstyp. */
     static final int VERSION_1 = 1;
 
+    /** Serialisierungstyp. */
+    static final int VERSION_2 = 2;
+
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -94,7 +98,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException in case of I/O-problems
+     * @throws      IOException in any case of IO-failures
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
@@ -106,7 +110,7 @@ final class SPX
      * @serialData  data layout see {@code writeReplace()}-method of object
      *              to be serialized
      * @param       out     output stream
-     * @throws      IOException in case of I/O-problems
+     * @throws      IOException in any case of IO-failures
      */
     @Override
     public void writeExternal(ObjectOutput out)
@@ -114,6 +118,7 @@ final class SPX
 
         switch (this.type) {
             case VERSION_1:
+            case VERSION_2:
                 this.writeHistory(out);
                 break;
             default:
@@ -126,15 +131,15 @@ final class SPX
      * <p>Implementation method of interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException in case of I/O-problems
-     * @throws  ClassNotFoundException if class-loading fails
+     * @throws  IOException in any case of IO-failures
+     * @throws  ClassNotFoundException if class loading fails
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException in case of I/O-problems
-     * @throws  ClassNotFoundException if class-loading fails
+     * @throws  IOException in any case of IO-failures
+     * @throws  ClassNotFoundException if class loading fails
      */
     @Override
     public void readExternal(ObjectInput in)
@@ -145,6 +150,18 @@ final class SPX
         switch ((header & 0xFF) >> 4) {
             case VERSION_1:
                 this.obj = this.readHistory(in, header);
+                break;
+            case VERSION_2:
+                ChronoHistory history = this.readHistory(in, header);
+                int len = in.readInt();
+                if (len > 0) {
+                    int[] sequence = new int[len];
+                    for (int i = 0; i < len; i++) {
+                        sequence[i] = 1 - in.readInt();
+                    }
+                    history = history.with(AncientJulianLeapYears.of(sequence));
+                }
+                this.obj = history;
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
@@ -171,6 +188,16 @@ final class SPX
 
         if (history.getVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
             out.writeLong(history.getEvents().get(0).start);
+        }
+
+        AncientJulianLeapYears ajly = history.getAncientJulianLeapYears();
+        int[] sequence = (
+            (ajly == null)
+            ? EMPTY_INT_ARRAY
+            : ajly.getPattern());
+        out.writeInt(sequence.length);
+        for (int i = 0; i < sequence.length; i++) {
+            out.writeInt(sequence[i]);
         }
 
     }

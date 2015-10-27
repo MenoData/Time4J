@@ -30,18 +30,19 @@ import net.time4j.base.GregorianMath;
  * @author  Meno Hochschild
  * @since   3.0
  */
-enum CalendarAlgorithm {
+enum CalendarAlgorithm
+    implements Calculus {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     GREGORIAN {
         @Override
-        long toMJD(HistoricDate date) {
+        public long toMJD(HistoricDate date) {
             return GregorianMath.toMJD(getProlepticYear(date), date.getMonth(), date.getDayOfMonth());
         }
 
         @Override
-        HistoricDate fromMJD(long mjd) {
+        public HistoricDate fromMJD(long mjd) {
             long packed = GregorianMath.toPackedDate(mjd);
             int year = GregorianMath.readYear(packed);
             int month = GregorianMath.readMonth(packed);
@@ -55,24 +56,24 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        boolean isValid(HistoricDate date) {
+        public boolean isValid(HistoricDate date) {
             return GregorianMath.isValid(getProlepticYear(date), date.getMonth(), date.getDayOfMonth());
         }
 
         @Override
-        int getMaximumDayOfMonth(HistoricDate date) {
+        public int getMaximumDayOfMonth(HistoricDate date) {
             return GregorianMath.getLengthOfMonth(getProlepticYear(date), date.getMonth());
         }
     },
 
     JULIAN {
         @Override
-        long toMJD(HistoricDate date) {
+        public long toMJD(HistoricDate date) {
             return JulianMath.toMJD(getProlepticYear(date), date.getMonth(), date.getDayOfMonth());
         }
 
         @Override
-        HistoricDate fromMJD(long mjd) {
+        public HistoricDate fromMJD(long mjd) {
             long packed = JulianMath.toPackedDate(mjd);
             int year = JulianMath.readYear(packed);
             int month = JulianMath.readMonth(packed);
@@ -86,7 +87,7 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        boolean isValid(HistoricDate date) {
+        public boolean isValid(HistoricDate date) {
             int year = getProlepticYear(date);
             int month = date.getMonth();
             int dom = date.getDayOfMonth();
@@ -100,7 +101,7 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        int getMaximumDayOfMonth(HistoricDate date) {
+        public int getMaximumDayOfMonth(HistoricDate date) {
             return JulianMath.getLengthOfMonth(getProlepticYear(date), date.getMonth());
         }
     },
@@ -108,7 +109,7 @@ enum CalendarAlgorithm {
     // das betrifft nur den Abschnitt mit der schwedischen Anomalie im Zeitraum 1700-03-01/1712-02-30
     SWEDISH {
         @Override
-        long toMJD(HistoricDate date) {
+        public long toMJD(HistoricDate date) {
             if (
                 (date.getDayOfMonth() == 30)
                 && (date.getMonth() == 2)
@@ -121,7 +122,7 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        HistoricDate fromMJD(long mjd) {
+        public HistoricDate fromMJD(long mjd) {
             if (mjd == -53576L) {
                 return new HistoricDate(HistoricEra.AD, 1712, 2, 30);
             }
@@ -129,7 +130,7 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        boolean isValid(HistoricDate date) {
+        public boolean isValid(HistoricDate date) {
             if (
                 (date.getDayOfMonth() == 30)
                 && (date.getMonth() == 2)
@@ -142,7 +143,7 @@ enum CalendarAlgorithm {
         }
 
         @Override
-        int getMaximumDayOfMonth(HistoricDate date) {
+        public int getMaximumDayOfMonth(HistoricDate date) {
             if (
                 (date.getMonth() == 2)
                 && (date.getYearOfEra() == 1712)
@@ -155,14 +156,6 @@ enum CalendarAlgorithm {
     };
 
     //~ Methoden ----------------------------------------------------------
-
-    abstract long toMJD(HistoricDate date);
-
-    abstract HistoricDate fromMJD(long mjd);
-
-    abstract boolean isValid(HistoricDate date);
-
-    abstract int getMaximumDayOfMonth(HistoricDate date);
 
     private static int getProlepticYear(HistoricDate date) {
 

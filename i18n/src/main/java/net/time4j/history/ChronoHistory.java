@@ -218,6 +218,8 @@ public final class ChronoHistory
 
     private transient final HistoricVariant variant;
     private transient final List<CutOverEvent> events;
+    private transient final AncientJulianLeapYears ajly;
+
     private transient final TextElement<HistoricEra> eraElement;
     private transient final TextElement<Integer> yearOfEraElement;
     private transient final TextElement<Integer> monthElement;
@@ -230,6 +232,15 @@ public final class ChronoHistory
         HistoricVariant variant,
         List<CutOverEvent> events
     ) {
+        this(variant, events, null);
+
+    }
+
+    private ChronoHistory(
+        HistoricVariant variant,
+        List<CutOverEvent> events,
+        AncientJulianLeapYears ajly
+    ) {
         super();
 
         if (events.isEmpty()) {
@@ -241,6 +252,7 @@ public final class ChronoHistory
 
         this.variant = variant;
         this.events = events;
+        this.ajly = ajly;
 
         this.eraElement = new HistoricalEraElement(this);
         this.yearOfEraElement = HistoricalIntegerElement.forYearOfEra(this);
@@ -334,7 +346,7 @@ public final class ChronoHistory
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166). </p>
      *
-     * @param   locale      contains the country whose calendar reform history is to be queried
+     * @param   locale  country setting
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)
@@ -351,7 +363,7 @@ public final class ChronoHistory
      *
      * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166). </p>
      *
-     * @param   locale      contains the country whose calendar reform history is to be queried
+     * @param   locale  country setting
      * @return  localized chronological history
      * @since   3.0
      * @see     #ofGregorianReform(PlainDate)
@@ -414,7 +426,7 @@ public final class ChronoHistory
             return false;
         }
 
-        CalendarAlgorithm algorithm = this.getAlgorithm(date);
+        Calculus algorithm = this.getAlgorithm(date);
         return ((algorithm != null) && algorithm.isValid(date));
 
     }
@@ -425,7 +437,7 @@ public final class ChronoHistory
      * @param   date    historical calendar date
      * @return  ISO-8601-date (gregorian)
      * @since   3.0
-     * @throws  IllegalArgumentException if given date is invalid
+     * @throws  IllegalArgumentException if given date is invalid or out of supported range
      */
     /*[deutsch]
      * <p>Konvertiert das angegebene historische Datum zu einem ISO-8601-Datum. </p>
@@ -433,11 +445,11 @@ public final class ChronoHistory
      * @param   date    historical calendar date
      * @return  ISO-8601-date (gregorian)
      * @since   3.0
-     * @throws  IllegalArgumentException if given date is invalid
+     * @throws  IllegalArgumentException if given date is invalid or out of supported range
      */
     public PlainDate convert(HistoricDate date) {
 
-        CalendarAlgorithm algorithm = this.getAlgorithm(date);
+        Calculus algorithm = this.getAlgorithm(date);
 
         if (algorithm == null) {
             throw new IllegalArgumentException("Invalid historical date: " + date);
@@ -452,6 +464,7 @@ public final class ChronoHistory
      *
      * @param   date    ISO-8601-date (gregorian)
      * @return  historical calendar date
+     * @throws  IllegalArgumentException if given date is out of supported range
      * @since   3.0
      */
     /*[deutsch]
@@ -459,6 +472,7 @@ public final class ChronoHistory
      *
      * @param   date    ISO-8601-date (gregorian)
      * @return  historical calendar date
+     * @throws  IllegalArgumentException if given date is out of supported range
      * @since   3.0
      */
     public HistoricDate convert(PlainDate date) {
@@ -473,7 +487,7 @@ public final class ChronoHistory
             }
         }
 
-        return CalendarAlgorithm.JULIAN.fromMJD(mjd);
+        return this.getJulianAlgorithm().fromMJD(mjd);
 
     }
 
@@ -565,6 +579,38 @@ public final class ChronoHistory
         } catch (RuntimeException re) {
             return -1; // only in very exotic circumstances (for example if given year is out of range)
         }
+
+    }
+
+    /**
+     * <p>Creates a copy of this history with given historic julian leap year sequence. </p>
+     *
+     * <p>This method has no effect if applied on {@code ChronoHistory.PROLEPTIC_GREGORIAN}
+     * or  {@code ChronoHistory.PROLEPTIC_JULIAN}. </p>
+     *
+     * @param   ancientJulianLeapYears      sequence of historic julian leap years
+     * @return  new history which starts at first of January in year BC 45
+     * @since   3.8/4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Instanz mit den angegebenen historischen julianischen Schaltjahren. </p>
+     *
+     * <p>Diese Methode hat keine Auswirkung, wenn angewandt auf {@code ChronoHistory.PROLEPTIC_GREGORIAN}
+     * oder  {@code ChronoHistory.PROLEPTIC_JULIAN}. </p>
+     *
+     * @param   ancientJulianLeapYears      sequence of historic julian leap years
+     * @return  new history which starts at first of January in year BC 45
+     * @since   3.8/4.11
+     */
+    public ChronoHistory with(AncientJulianLeapYears ancientJulianLeapYears) {
+
+        if (ancientJulianLeapYears == null) {
+            throw new NullPointerException("Missing ancient julian leap years.");
+        } else if (!this.hasGregorianCutOverDate()) {
+            return this;
+        }
+
+        return new ChronoHistory(this.variant, this.events, ancientJulianLeapYears);
 
     }
 
@@ -705,11 +751,14 @@ public final class ChronoHistory
             return true;
         } else if (obj instanceof ChronoHistory) {
             ChronoHistory that = (ChronoHistory) obj;
+
             if (this.variant == that.variant) {
-                return (
-                    (this.variant != HistoricVariant.SINGLE_CUTOVER_DATE)
-                    || (this.events.get(0).start == that.events.get(0).start)
-                );
+                if (isEqual(this.ajly, that.ajly)) {
+                    return (
+                        (this.variant != HistoricVariant.SINGLE_CUTOVER_DATE)
+                        || (this.events.get(0).start == that.events.get(0).start)
+                    );
+                }
             }
         }
 
@@ -731,17 +780,28 @@ public final class ChronoHistory
 
     public String toString() {
 
+        String result;
+
         switch (this.variant) {
             case PROLEPTIC_GREGORIAN:
-                return "ChronoHistory[PROLEPTIC-GREGORIAN]";
+                result = "ChronoHistory[PROLEPTIC-GREGORIAN]";
+                break;
             case PROLEPTIC_JULIAN:
-                return "ChronoHistory[PROLEPTIC-JULIAN]";
+                result = "ChronoHistory[PROLEPTIC-JULIAN]";
+                break;
             case SWEDEN:
-                return "ChronoHistory[SWEDEN]";
+                result = "ChronoHistory[SWEDEN]";
+                break;
             default:
                 PlainDate date = this.getGregorianCutOverDate();
-                return "ChronoHistory[" + date + "]";
+                result = "ChronoHistory[" + date + "]";
         }
+
+        if (this.ajly != null) {
+            result = result + " with ancient julian leap years: " + this.ajly;
+        }
+
+        return result;
 
     }
 
@@ -752,7 +812,7 @@ public final class ChronoHistory
      * @return  appropriate calendar algorithm or {@code null} if not found (in case of an invalid date)
      * @since   3.0
      */
-    CalendarAlgorithm getAlgorithm(HistoricDate date) {
+    Calculus getAlgorithm(HistoricDate date) {
 
         for (int i = this.events.size() - 1; i >= 0; i--) {
             CutOverEvent event = this.events.get(i);
@@ -764,7 +824,7 @@ public final class ChronoHistory
             }
         }
 
-        return CalendarAlgorithm.JULIAN;
+        return this.getJulianAlgorithm();
 
     }
 
@@ -773,14 +833,15 @@ public final class ChronoHistory
      *
      * @param   date    historical date
      * @return  adjusted date
+     * @throws  IllegalArgumentException if argument is out of range
      * @since   3.0
      */
     HistoricDate adjustDayOfMonth(HistoricDate date) {
 
-        CalendarAlgorithm algorithm = this.getAlgorithm(date);
+        Calculus algorithm = this.getAlgorithm(date);
 
         if (algorithm == null) {
-            return date; // gap at cutover, let it be unchanged
+            return date; // gap at cutover => let it be unchanged
         }
 
         int max = algorithm.getMaximumDayOfMonth(date);
@@ -802,6 +863,37 @@ public final class ChronoHistory
     List<CutOverEvent> getEvents() {
 
         return this.events;
+
+    }
+
+    /**
+     * <p>Returns the ancient julian leap years if defined. </p>
+     *
+     * @return  historic leap year sequence or {@code null} if not set
+     * @since   3.8/4.11
+     */
+    AncientJulianLeapYears getAncientJulianLeapYears() {
+
+        return this.ajly;
+
+    }
+
+    private Calculus getJulianAlgorithm() {
+
+        if (this.ajly != null) {
+            return this.ajly.getCalculus();
+        }
+
+        return CalendarAlgorithm.JULIAN;
+
+    }
+
+    private static boolean isEqual(
+        Object a1,
+        Object a2
+    ) {
+
+        return ((a1 == null) ? (a2 == null) : a1.equals(a2));
 
     }
 
@@ -828,18 +920,20 @@ public final class ChronoHistory
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The format
      *              is bit-compressed. The first byte contains in the four
-     *              most significant bits the type-ID {@code 1}. The following
+     *              most significant bits the type-ID {@code 2}. The following
      *              bits 4-7 contain the variant of history. The variant is usually
      *              zero, but for PROLEPTIC_GREGORIAN 1, for PROLEPTIC_JULIAN 2,
      *              for SWEDEN 4 and for the first gregorian reform 7. If the
      *              variant is zero then the cutover date in question will be
-     *              written as long (modified julian date) into the stream.
+     *              written as long (modified julian date) into the stream. Finally
+     *              the sequence of eventually set ancient julian leap years will be
+     *              written as int-array (length followed by list of extended years).
      *
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.VERSION_1);
+        return new SPX(this, SPX.VERSION_2);
 
     }
 
