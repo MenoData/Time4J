@@ -55,7 +55,8 @@ import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
-import net.time4j.history.HistoricVariant;
+import net.time4j.history.internal.HistoricVariant;
+import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -970,7 +971,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Note: Sectional attributes cannot be overridden. </p>
      *
      * @return  changed copy with alternative era names while this instance remains unaffected
-     * @see     ChronoHistory#ATTRIBUTE_COMMON_ERA
      * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
      * @since   3.0
      */
@@ -981,17 +981,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
      *
      * @return  changed copy with alternative era names while this instance remains unaffected
-     * @see     ChronoHistory#ATTRIBUTE_COMMON_ERA
      * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
      * @since   3.0
      */
     public ChronoFormatter<T> withAlternativeEraNames() {
 
-        return this.with(
-            ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.TRUE
-        ).with(
-            ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.FALSE
-        );
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .set(HistoricAttribute.COMMON_ERA, true)
+                .set(HistoricAttribute.LATIN_ERA, false)
+                .build();
+        return new ChronoFormatter<T>(this, attrs);
 
     }
 
@@ -1001,7 +1002,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Note: Sectional attributes cannot be overridden. </p>
      *
      * @return  changed copy with latin era names while this instance remains unaffected
-     * @see     ChronoHistory#ATTRIBUTE_LATIN_ERA
      * @since   3.1
      */
     /*[deutsch]
@@ -1011,16 +1011,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
      *
      * @return  changed copy with latin era names while this instance remains unaffected
-     * @see     ChronoHistory#ATTRIBUTE_LATIN_ERA
      * @since   3.1
      */
     public ChronoFormatter<T> withLatinEraNames() {
 
-        return this.with(
-            ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE
-        ).with(
-            ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.TRUE
-        );
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .set(HistoricAttribute.COMMON_ERA, false)
+                .set(HistoricAttribute.LATIN_ERA, true)
+                .build();
+        return new ChronoFormatter<T>(this, attrs);
 
     }
 
@@ -1074,14 +1075,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public ChronoFormatter<T> with(ChronoHistory history) {
 
+        String variant = history.getVariant();
+        HistoricVariant hv = HistoricVariant.valueOf(variant.substring(0, variant.indexOf(':')));
+
         Attributes attrs =
             new Attributes.Builder()
                 .setAll(this.globalAttributes.getAttributes())
-                .set(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT, history.getVariant())
+                .set(HistoricAttribute.HISTORIC_VARIANT, hv)
                 .build();
         PlainDate cutover = null;
 
-        if (history.getVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
+        if (hv == HistoricVariant.SINGLE_CUTOVER_DATE) {
             cutover = history.getGregorianCutOverDate();
         }
 

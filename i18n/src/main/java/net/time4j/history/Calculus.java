@@ -26,7 +26,7 @@ package net.time4j.history;
  * <p>Calculator engine for historic dates. </p>
  *
  * @author  Meno Hochschild
- * @since   3.8/4.11
+ * @since   3.11/4.8
  */
 interface Calculus {
 

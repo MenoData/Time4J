@@ -232,7 +232,7 @@ public final class AncientJulianLeapYears {
      * @param   bcYears     positive numbers for BC-years
      * @return  new instance
      * @throws  IllegalArgumentException if given years are missing or out of range {@code BC 45 <= bcYear < AD 8}
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Erzeugt eine neue historische Sequenz von julianischen Schaltjahren vor dem Jahre AD 8. </p>
@@ -246,7 +246,7 @@ public final class AncientJulianLeapYears {
      * @param   bcYears     positive numbers for BC-years
      * @return  new instance
      * @throws  IllegalArgumentException if given years are missing or out of range {@code BC 45 <= bcYear < AD 8}
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      */
     public static AncientJulianLeapYears of(int... bcYears) {
 

@@ -23,10 +23,10 @@ package net.time4j.history;
 
 import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
-import net.time4j.engine.AttributeKey;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.TextElement;
+import net.time4j.history.internal.HistoricVariant;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -58,89 +58,6 @@ public final class ChronoHistory
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    /**
-     * <p>Format attribute which determines the historical calendar variant. </p>
-     *
-     * <p>Users will usually not directly use this attribute but adjust a given {@code ChronoFormatter}
-     * by its method {@code with(ChronoHistory)}. </p>
-     *
-     * @since   3.1
-     * @see     net.time4j.format.expert.ChronoFormatter#with(ChronoHistory)
-     */
-    /*[deutsch]
-     * <p>Formatattribut, das die historische Kalendervariante bestimmt. </p>
-     *
-     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.with(ChronoHistory)} aufrufen. </p>
-     *
-     * @since   3.1
-     * @see     net.time4j.format.expert.ChronoFormatter#with(ChronoHistory)
-     */
-    public static final AttributeKey<HistoricVariant> ATTRIBUTE_HISTORIC_VARIANT =
-        Key.valueOf("HISTORIC_VARIANT", HistoricVariant.class);
-
-    /**
-     * <p>Format attribute which can cause the format engine to create a chronological history with
-     * given cutover date. </p>
-     *
-     * <p>Users will usually not directly use this attribute but adjust a given {@code ChronoFormatter}
-     * by its method {@code withGregorianCutOver()}. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
-     */
-    /*[deutsch]
-     * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
-     * den angegebenen Attributwert als Umstellungsdatum zu erzeugen. </p>
-     *
-     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.withGregorianCutOver()} aufrufen. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
-     */
-    public static final AttributeKey<PlainDate> ATTRIBUTE_CUTOVER_DATE =
-        Key.valueOf("CUTOVER_DATE", PlainDate.class);
-
-    /**
-     * <p>Format attribute which prefers the notation of &quot;Common Era&quot; in formatting
-     * an enum of type {@link HistoricEra}. </p>
-     *
-     * <p>Users will usually not directly use this attribute but call the method
-     * {@code ChronoFormatter.withAlternativeEraNames()} instead. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withAlternativeEraNames()
-     */
-    /*[deutsch]
-     * <p>Formatattribut, das eine alternative nicht-christliche Schreibweise f&uuml;r die Formatierung
-     * eines Enums des Typs {@link HistoricEra} bevorzugt. </p>
-     *
-     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.withAlternativeEraNames()} aufrufen. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withAlternativeEraNames()
-     */
-    public static final AttributeKey<Boolean> ATTRIBUTE_COMMON_ERA =
-        Key.valueOf("COMMON_ERA", Boolean.class);
-
-    /**
-     * <p>Format attribute which enforces latin notations of historic eras ignoring the locale. </p>
-     *
-     * <p>Users will usually not directly use this attribute but call the method
-     * {@code ChronoFormatter.withLatinEraNames()} instead. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withLatinEraNames()
-     */
-    /*[deutsch]
-     * <p>Formatattribut, das eine lateinische Schreibweise f&uuml;r die Formatierung
-     * eines Enums des Typs {@link HistoricEra} erzwingt, ohne Ber&uuml;cksichtigung der Spracheinstellung. </p>
-     *
-     * <p>Anwender werden normalerweise nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.withLatinEraNames()} aufrufen. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withLatinEraNames()
-     */
-    public static final AttributeKey<Boolean> ATTRIBUTE_LATIN_ERA =
-        Key.valueOf("LATIN_ERA", Boolean.class);
 
     /**
      * <p>Describes no real historical event but just the proleptic gregorian calendar which is assumed
@@ -490,14 +407,49 @@ public final class ChronoHistory
     }
 
     /**
-     * <p>Yields the variant. </p>
+     * <p>Yields the variant of a historic calendar. </p>
      *
-     * @return  HistoricVariant
-     * @since   3.1
+     * @return  text describing the internal state
+     * @since   3.11/4.8
      */
-    public HistoricVariant getVariant() {
+    /*[deutsch]
+     * <p>Liefert die Variante eines historischen Kalenders. </p>
+     *
+     * @return  text describing the internal state
+     * @since   3.11/4.8
+     */
+    public String getVariant() {
 
-        return this.variant;
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(this.variant.name());
+
+        switch (this.variant){
+            case PROLEPTIC_GREGORIAN:
+            case PROLEPTIC_JULIAN:
+                sb.append(":no-cutover");
+                break;
+            case INTRODUCTION_ON_1582_10_15:
+            case SINGLE_CUTOVER_DATE:
+                sb.append(":cutover=");
+                sb.append(this.getGregorianCutOverDate());
+                // fall-through
+            default:
+                sb.append(":ancient-julian-leap-years=");
+                if (this.ajly != null) {
+                    int[] pattern = this.ajly.getPattern();
+                    sb.append('[');
+                    sb.append(pattern[0]);
+                    for (int i = 1; i < pattern.length; i++) {
+                        sb.append(',');
+                        sb.append(pattern[i]);
+                    }
+                    sb.append(']');
+                } else {
+                    sb.append("[]");
+                }
+        }
+
+        return sb.toString();
 
     }
 
@@ -533,14 +485,14 @@ public final class ChronoHistory
      * <p>Determines if this history has at least one gregorian calendar reform date. </p>
      *
      * @return  boolean
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      * @see     #getGregorianCutOverDate()
      */
     /*[deutsch]
      * <p>Ermittelt, ob diese {@code ChronoHistory} wenigstens eine gregorianische Kalenderreform kennt. </p>
      *
      * @return  boolean
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      * @see     #getGregorianCutOverDate()
      */
     public boolean hasGregorianCutOverDate() {
@@ -588,7 +540,7 @@ public final class ChronoHistory
      *
      * @param   ancientJulianLeapYears      sequence of historic julian leap years
      * @return  new history which starts at first of January in year BC 45
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Instanz mit den angegebenen historischen julianischen Schaltjahren. </p>
@@ -598,7 +550,7 @@ public final class ChronoHistory
      *
      * @param   ancientJulianLeapYears      sequence of historic julian leap years
      * @return  new history which starts at first of January in year BC 45
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      */
     public ChronoHistory with(AncientJulianLeapYears ancientJulianLeapYears) {
 
@@ -868,11 +820,22 @@ public final class ChronoHistory
      * <p>Returns the ancient julian leap years if defined. </p>
      *
      * @return  historic leap year sequence or {@code null} if not set
-     * @since   3.8/4.11
+     * @since   3.11/4.8
      */
     AncientJulianLeapYears getAncientJulianLeapYears() {
 
         return this.ajly;
+
+    }
+
+    /**
+     * Used in serialization.
+     *
+     * @return  enum
+     */
+    HistoricVariant getHistoricVariant() {
+
+        return this.variant;
 
     }
 
@@ -944,81 +907,6 @@ public final class ChronoHistory
         throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
-
-    }
-
-    //~ Innere Klassen ----------------------------------------------------
-
-    private static class Key<T>
-        implements AttributeKey<T> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final String name;
-        private final Class<T> type;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private Key(String name, Class<T> type) {
-            super();
-
-            this.name = name;
-            this.type = type;
-
-        }
-
-        //~ Methoden ----------------------------------------------------------
-
-        static <T> Key<T> valueOf(
-            String name,
-            Class<T> type
-        ) {
-
-            return new Key<T>(name, type);
-
-        }
-
-        @Override
-        public String name() {
-
-            return this.name;
-
-        }
-
-        @Override
-        public Class<T> type() {
-
-            return this.type;
-
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (this == obj) {
-                return true;
-            } else if (obj instanceof Key) {
-                Key<?> that = (Key) obj;
-                return (this.name.equals(that.name) && this.type.equals(that.type));
-            } else {
-                return false;
-            }
-
-        }
-
-        @Override
-        public int hashCode() {
-
-            return this.name.hashCode();
-
-        }
-
-        @Override
-        public String toString() {
-
-            return this.type.getName() + "@" + this.name;
-
-        }
 
     }
 

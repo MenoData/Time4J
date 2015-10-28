@@ -36,6 +36,7 @@ import net.time4j.format.NumericalElement;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.history.internal.HistoricAttribute;
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -174,7 +175,7 @@ final class HistoricalEraElement
 
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
 
-        if (attributes.get(ChronoHistory.ATTRIBUTE_LATIN_ERA, Boolean.FALSE).booleanValue()) {
+        if (attributes.get(HistoricAttribute.LATIN_ERA, Boolean.FALSE).booleanValue()) {
             // NARROW and SHORT like ABBREVIATED
             CalendarText cnames = CalendarText.getInstance("historic", LATIN);
             return cnames.getTextForms(this, ((textWidth == TextWidth.WIDE) ? "w" : "a"));
@@ -185,7 +186,7 @@ final class HistoricalEraElement
                 attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
                 attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
-        if (attributes.get(ChronoHistory.ATTRIBUTE_COMMON_ERA, Boolean.FALSE).booleanValue()) {
+        if (attributes.get(HistoricAttribute.COMMON_ERA, Boolean.FALSE).booleanValue()) {
             // NARROW and SHORT like ABBREVIATED
             return cnames.getTextForms(this, ((textWidth == TextWidth.WIDE) ? "w" : "a"), "alt");
         }

@@ -31,6 +31,7 @@ import net.time4j.format.Leniency;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
+import net.time4j.history.internal.HistoricAttribute;
 
 import java.util.Collections;
 import java.util.Locale;
@@ -112,8 +113,8 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
-        if (attributes.contains(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT)) {
-            switch (attributes.get(ChronoHistory.ATTRIBUTE_HISTORIC_VARIANT)) {
+        if (attributes.contains(HistoricAttribute.HISTORIC_VARIANT)) {
+            switch (attributes.get(HistoricAttribute.HISTORIC_VARIANT)) {
                 case INTRODUCTION_ON_1582_10_15:
                     return ChronoHistory.ofFirstGregorianReform();
                 case PROLEPTIC_JULIAN:
@@ -123,8 +124,8 @@ public class HistoricExtension
                 case SWEDEN:
                     return ChronoHistory.ofSweden();
                 default:
-                    if (attributes.contains(ChronoHistory.ATTRIBUTE_CUTOVER_DATE)) {
-                        PlainDate date = attributes.get(ChronoHistory.ATTRIBUTE_CUTOVER_DATE);
+                    if (attributes.contains(HistoricAttribute.CUTOVER_DATE)) {
+                        PlainDate date = attributes.get(HistoricAttribute.CUTOVER_DATE);
                         return ChronoHistory.ofGregorianReform(date);
                     }
             }
