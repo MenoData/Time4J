@@ -33,7 +33,7 @@ import net.time4j.format.Leniency;
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
-import net.time4j.history.ChronoHistory;
+import net.time4j.history.internal.HistoricAttribute;
 
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -128,7 +128,7 @@ final class AttributeSet
     @Override
     public boolean contains(AttributeKey<?> key) {
 
-        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+        if (key == HistoricAttribute.CUTOVER_DATE) {
             return (this.cutover != null);
         }
 
@@ -139,7 +139,7 @@ final class AttributeSet
     @Override
     public <A> A get(AttributeKey<A> key) {
 
-        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+        if (key == HistoricAttribute.CUTOVER_DATE) {
             if (this.cutover == null) {
                 throw new NoSuchElementException(key.name());
             } else {
@@ -157,7 +157,7 @@ final class AttributeSet
         A defaultValue
     ) {
 
-        if (key == ChronoHistory.ATTRIBUTE_CUTOVER_DATE) {
+        if (key == HistoricAttribute.CUTOVER_DATE) {
             if (this.cutover == null) {
                 return defaultValue;
             } else {

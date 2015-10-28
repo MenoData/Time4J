@@ -23,6 +23,7 @@ package net.time4j.history;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.EpochDays;
+import net.time4j.history.internal.HistoricVariant;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -179,14 +180,14 @@ final class SPX
         throws IOException {
 
         ChronoHistory history = (ChronoHistory) this.obj;
-        int variant = history.getVariant().getSerialValue();
+        int variant = history.getHistoricVariant().getSerialValue();
 
         int header = this.type;
         header <<= 4;
         header |= variant;
         out.writeByte(header);
 
-        if (history.getVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
+        if (history.getHistoricVariant() == HistoricVariant.SINGLE_CUTOVER_DATE) {
             out.writeLong(history.getEvents().get(0).start);
         }
 

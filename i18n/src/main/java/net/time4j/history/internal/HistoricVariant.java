@@ -19,20 +19,20 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.history;
+package net.time4j.history.internal;
 
 
 /**
  * <p>Marker for a historical calendar variant. </p>
  *
  * @author  Meno Hochschild
- * @since   3.1
+ * @since   3.11/4.8
  */
 /*[deutsch]
  * <p>Markiert eine historische Kalendervariante. </p>
  *
  * @author  Meno Hochschild
- * @since   3.1
+ * @since   3.11/4.8
  */
 public enum HistoricVariant {
 
@@ -80,8 +80,12 @@ public enum HistoricVariant {
 
     //~ Methoden ----------------------------------------------------------
 
-    // used in serialization
-    int getSerialValue() {
+    /**
+     * <p>Used in serialization. </p>
+     *
+     * @return  int
+     */
+    public int getSerialValue() {
 
         switch (this) {
             case PROLEPTIC_JULIAN:
