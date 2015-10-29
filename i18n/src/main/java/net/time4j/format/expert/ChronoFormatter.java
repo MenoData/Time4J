@@ -1083,27 +1083,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 .setAll(this.globalAttributes.getAttributes())
                 .set(HistoricAttribute.HISTORIC_VARIANT, hv)
                 .build();
-        PlainDate cutover = null;
 
-        if (hv == HistoricVariant.SINGLE_CUTOVER_DATE) {
-            cutover = history.getGregorianCutOverDate();
-        }
-
-        AttributeSet as =
-            new AttributeSet(
-                attrs,
-                this.globalAttributes.getLocale(),
-                this.globalAttributes.getLevel(),
-                this.globalAttributes.getSection(),
-                this.globalAttributes.getCondition(),
-                cutover);
-
+        AttributeSet as = this.globalAttributes.withAttributes(attrs);
+        PlainDate cutover = (
+            (hv == HistoricVariant.SINGLE_CUTOVER_DATE)
+            ? history.getGregorianCutOverDate()
+            : null);
+        as = as.withInternal(HistoricAttribute.CUTOVER_DATE, cutover);
         return new ChronoFormatter<T>(this, as, history);
 
     }
 
     /**
-     * <p>Creates a copy of this formatter with given timezone id which
+     * <p>Creates a copy of this formatter with given timezone which
      * shall be used in formatting or parsing. </p>
      *
      * <p>The timezone is in most cases only relevant for the type
@@ -1112,10 +1104,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * parsing the timezone serves as replacement value if the formatted
      * text does not contain any timezone. </p>
      *
-     * @param   tzid        timezone id
-     * @return  changed copy with the new or changed attribute while
-     *          this instance remains unaffected
+     * @param   tz      timezone
+     * @return  changed copy with the new or changed timezone while this instance remains unaffected
      * @see     Attributes#TIMEZONE_ID
+     * @see     Attributes#TRANSITION_STRATEGY
+     * @since   3.11/4.8
      *
      */
     /*[deutsch]
@@ -1128,75 +1121,84 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * Ersatzwert, wenn im zu interpretierenden Text keine Zeitzone
      * gefunden werden konnte. </p>
      *
-     * @param   tzid        timezone id
-     * @return  changed copy with the new or changed attribute while
-     *          this instance remains unaffected
+     * @param   tz      timezone
+     * @return  changed copy with the new or changed timezone while this instance remains unaffected
      * @see     Attributes#TIMEZONE_ID
+     * @see     Attributes#TRANSITION_STRATEGY
+     * @since   3.11/4.8
      */
-    @Override
-    public ChronoFormatter<T> withTimezone(TZID tzid) {
+    public ChronoFormatter<T> with(Timezone tz) {
 
-        if (tzid == null) {
+        if (tz == null) {
             throw new NullPointerException("Missing timezone id.");
         }
 
         Attributes attrs =
             new Attributes.Builder()
-            .setAll(this.globalAttributes.getAttributes())
-            .setTimezone(tzid)
-            .build();
-        return new ChronoFormatter<T>(this, attrs);
+                .setAll(this.globalAttributes.getAttributes())
+                .setTimezone(tz.getID())
+                .build();
+        AttributeSet as = this.globalAttributes.withAttributes(attrs);
+        as = as.withInternal(Attributes.TRANSITION_STRATEGY, tz.getStrategy());
+        return new ChronoFormatter<T>(this, as);
 
     }
 
     /**
-     * <p>Equivalent to {@link #withTimezone(TZID)
-     * withTimezone(Timezone.of(tzid).getID())}. </p>
+     * <p>Equivalent to {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     */
+    /*[deutsch]
+     * <p>Entspricht {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     */
+    @Override
+    public ChronoFormatter<T> withTimezone(TZID tzid) {
+
+        return this.with(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Equivalent to {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
      *
      * @param   tzid    timezone id
-     * @return  changed copy with the new or changed attribute while
-     *          this instance remains unaffected
+     * @return  changed copy with the new or changed attribute while this instance remains unaffected
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #withTimezone(TZID)
-     * @see     Attributes#TIMEZONE_ID
      * @since   1.1
      */
     /*[deutsch]
-     * <p>Entspricht {@link #withTimezone(TZID)
-     * withTimezone(Timezone.of(tzid).getID())}. </p>
+     * <p>Entspricht {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
      *
      * @param   tzid    timezone id
-     * @return  changed copy with the new or changed attribute while
-     *          this instance remains unaffected
+     * @return  changed copy with the new or changed attribute while this instance remains unaffected
      * @throws  IllegalArgumentException if given timezone cannot be loaded
-     * @see     #withTimezone(TZID)
-     * @see     Attributes#TIMEZONE_ID
      * @since   1.1
      */
     @Override
     public ChronoFormatter<T> withTimezone(String tzid) {
 
-        return this.withTimezone(Timezone.of(tzid).getID());
+        return this.with(Timezone.of(tzid));
 
     }
 
     /**
-     * <p>Equivalent to {@link #withTimezone(TZID)
-     * withTimezone(Timezone.ofSystem().getID())}. </p>
+     * <p>Equivalent to {@link #with(Timezone) with(Timezone.ofSystem())}. </p>
      *
-     * @return  changed copy with the system timezone while
-     *          this instance remains unaffected
+     * @return  changed copy with the system timezone while this instance remains unaffected
      */
     /*[deutsch]
-     * <p>Entspricht {@link #withTimezone(TZID)
-     * withTimezone(Timezone.ofSystem().getID())}. </p>
+     * <p>Entspricht {@link #with(Timezone) with(Timezone.ofSystem())}. </p>
      *
-     * @return  changed copy with the system timezone while
-     *          this instance remains unaffected
+     * @return  changed copy with the system timezone while this instance remains unaffected
      */
     public ChronoFormatter<T> withStdTimezone() {
 
-        return this.withTimezone(Timezone.ofSystem().getID());
+        return this.with(Timezone.ofSystem());
 
     }
 
@@ -1256,6 +1258,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
+     * @deprecated  Use {@link #with(StartOfDay)}
      */
     /*[deutsch]
      * <p>Setzt den Beginn des Kalendertages. </p>
@@ -1264,15 +1267,38 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
+     * @deprecated  Use {@link #with(StartOfDay)}
      */
+    @Deprecated
     public ChronoFormatter<T> withStartOfDay(StartOfDay startOfDay) {
 
-        Attributes attrs =
-            new Attributes.Builder()
-                .setAll(this.globalAttributes.getAttributes())
-                .setStartOfDay(startOfDay)
-                .build();
-        return new ChronoFormatter<T>(this, attrs);
+        return this.with(startOfDay);
+
+    }
+
+    /**
+     * <p>Sets the start of calendar day. </p>
+     *
+     * @param   startOfDay      new start of day
+     * @return  changed copy with the given start of day while this instance remains unaffected
+     * @see     Attributes#START_OF_DAY
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Setzt den Beginn des Kalendertages. </p>
+     *
+     * @param   startOfDay      new start of day
+     * @return  changed copy with the given start of day while this instance remains unaffected
+     * @see     Attributes#START_OF_DAY
+     * @since   3.11/4.8
+     */
+    public ChronoFormatter<T> with(StartOfDay startOfDay) {
+
+        if (startOfDay == null) {
+            throw new NullPointerException("Missing start of day.");
+        }
+
+        return new ChronoFormatter<T>(this, this.globalAttributes.withInternal(Attributes.START_OF_DAY, startOfDay));
 
     }
 
@@ -4637,7 +4663,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 }
             }
 
-            AttributeSet as = new AttributeSet(ab.build(), this.locale, newLevel, newSection, cc, null);
+            AttributeSet as = new AttributeSet(ab.build(), this.locale, newLevel, newSection, cc);
             this.stack.addLast(as);
             return this;
 
