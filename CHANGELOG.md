@@ -3,6 +3,7 @@
 - Arithmetic overflow in ChronoHistory [#391]
 
 ### Changed
+- Refactor handling of two exotic format attributes [#395]
 - Hide internal format attributes of ChronoHistory [#394]
 
 ## [v3.10] published on 2015-10-22
