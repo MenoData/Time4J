@@ -21,7 +21,6 @@
 
 package net.time4j.format.expert;
 
-import net.time4j.PlainDate;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
@@ -33,10 +32,11 @@ import net.time4j.format.Leniency;
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
-import net.time4j.history.internal.HistoricAttribute;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -46,7 +46,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 final class AttributeSet
     implements AttributeQuery {
@@ -72,8 +71,8 @@ final class AttributeSet
 
     private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
-        ? '.'
-        : ',' // Empfehlung des ISO-Standards
+            ? '.'
+            : ',' // Empfehlung des ISO-Standards
     );
 
     private static final ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
@@ -83,12 +82,12 @@ final class AttributeSet
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private final Map<String, Object> internals;
     private final Attributes attributes;
     private final Locale locale;
     private final int level; // Ebene der optionalen Verarbeitungshierarchie
     private final int section; // Identifiziert eine optionale Attributsektion
     private final ChronoCondition<ChronoDisplay> printCondition; // nullable
-    private final PlainDate cutover; // nullable
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -96,7 +95,7 @@ final class AttributeSet
         Attributes attributes,
         Locale locale
     ) {
-        this(attributes, locale, 0, 0, null, null);
+        this(attributes, locale, 0, 0, null);
 
     }
 
@@ -105,8 +104,7 @@ final class AttributeSet
         Locale locale,
         int level,
         int section,
-        ChronoCondition<ChronoDisplay> printCondition,
-        PlainDate cutover
+        ChronoCondition<ChronoDisplay> printCondition
     ) {
         super();
 
@@ -119,7 +117,31 @@ final class AttributeSet
         this.level = level;
         this.section = section;
         this.printCondition = printCondition;
-        this.cutover = cutover;
+
+        this.internals = Collections.emptyMap();
+
+    }
+
+    private AttributeSet(
+        Attributes attributes,
+        Locale locale,
+        int level,
+        int section,
+        ChronoCondition<ChronoDisplay> printCondition,
+        Map<String, Object> internals
+    ) {
+        super();
+
+        if (attributes == null) {
+            throw new NullPointerException("Missing format attributes.");
+        }
+
+        this.attributes = attributes;
+        this.locale = ((locale == null) ? Locale.ROOT : locale);
+        this.level = level;
+        this.section = section;
+        this.printCondition = printCondition;
+        this.internals = Collections.unmodifiableMap(internals);
 
     }
 
@@ -128,8 +150,8 @@ final class AttributeSet
     @Override
     public boolean contains(AttributeKey<?> key) {
 
-        if (key == HistoricAttribute.CUTOVER_DATE) {
-            return (this.cutover != null);
+        if (this.internals.containsKey(key.name())) {
+            return true;
         }
 
         return this.attributes.contains(key);
@@ -139,12 +161,8 @@ final class AttributeSet
     @Override
     public <A> A get(AttributeKey<A> key) {
 
-        if (key == HistoricAttribute.CUTOVER_DATE) {
-            if (this.cutover == null) {
-                throw new NoSuchElementException(key.name());
-            } else {
-                return key.type().cast(this.cutover);
-            }
+        if (this.internals.containsKey(key.name())) {
+            return key.type().cast(this.internals.get(key.name()));
         }
 
         return this.attributes.get(key);
@@ -157,12 +175,8 @@ final class AttributeSet
         A defaultValue
     ) {
 
-        if (key == HistoricAttribute.CUTOVER_DATE) {
-            if (this.cutover == null) {
-                return defaultValue;
-            } else {
-                return key.type().cast(this.cutover);
-            }
+        if (this.internals.containsKey(key.name())) {
+            return key.type().cast(this.internals.get(key.name()));
         }
 
         return this.attributes.get(key, defaultValue);
@@ -184,11 +198,11 @@ final class AttributeSet
             AttributeSet that = (AttributeSet) obj;
             return (
                 this.attributes.equals(that.attributes)
-                && this.locale.equals(that.locale)
-                && (this.level == that.level)
-                && (this.section == that.section)
-                && isEqual(this.printCondition, that.printCondition)
-                && isEqual(this.cutover, that.cutover)
+                    && this.locale.equals(that.locale)
+                    && (this.level == that.level)
+                    && (this.section == that.section)
+                    && isEqual(this.printCondition, that.printCondition)
+                    && this.internals.equals(that.internals)
             );
         } else {
             return false;
@@ -202,7 +216,7 @@ final class AttributeSet
     @Override
     public int hashCode() {
 
-        return this.attributes.hashCode();
+        return 7 * this.attributes.hashCode() + 37 * this.internals.hashCode();
 
     }
 
@@ -217,7 +231,7 @@ final class AttributeSet
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.getClass().getName());
-        sb.append('[');
+        sb.append("[attributes=");
         sb.append(this.attributes);
         sb.append(",locale=");
         sb.append(this.locale);
@@ -227,8 +241,8 @@ final class AttributeSet
         sb.append(this.section);
         sb.append(",print-condition=");
         sb.append(this.printCondition);
-        sb.append(",gregorian-cutover=");
-        sb.append(this.cutover);
+        sb.append(",other=");
+        sb.append(this.internals);
         sb.append(']');
         return sb.toString();
 
@@ -286,7 +300,31 @@ final class AttributeSet
      */
     AttributeSet withAttributes(Attributes attributes) {
 
-        return new AttributeSet(attributes, this.locale, this.level, this.section, this.printCondition, this.cutover);
+        return new AttributeSet(attributes, this.locale, this.level, this.section, this.printCondition, this.internals);
+
+    }
+
+    /**
+     * <p>Setzt das angegebene interne Attribut neu. </p>
+     *
+     * @param   <A> generic type of attribute value
+     * @param   key     attribute key
+     * @param   value   attribute value (if {@code null} then the attribute will be removed else inserted or updated)
+     * @return  changed attribute set
+     * @since   3.11/4.8
+     */
+    <A> AttributeSet withInternal(
+        AttributeKey<A> key,
+        A value
+    ) {
+
+        Map<String, Object> map = new HashMap<>(this.internals);
+        if (value == null) {
+            map.remove(key.name());
+        } else {
+            map.put(key.name(), value);
+        }
+        return new AttributeSet(this.attributes, this.locale, this.level, this.section, this.printCondition, map);
 
     }
 
@@ -306,8 +344,8 @@ final class AttributeSet
 
         if (
             locale.getLanguage().isEmpty()
-            && locale.getCountry().isEmpty()
-        ) {
+                && locale.getCountry().isEmpty()
+            ) {
             locale = Locale.ROOT;
             builder.set(Attributes.ZERO_DIGIT, '0');
             builder.set(Attributes.DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
@@ -340,17 +378,13 @@ final class AttributeSet
         }
 
         builder.setLanguage(locale);
-        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, this.cutover);
+        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, this.internals);
 
     }
 
     private static boolean isEqual(Object o1, Object o2) {
 
-        if (o1 == null) {
-            return (o2 == null);
-        } else {
-            return o1.equals(o2);
-        }
+        return ((o1 == null) ? (o2 == null) : o1.equals(o2));
 
     }
 
