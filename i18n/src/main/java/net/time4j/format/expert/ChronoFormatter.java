@@ -1205,6 +1205,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Sets the calendar variant. </p>
      *
+     * <p>Some calendars like {@code HijriCalendar} require the variant otherwise they cannot be
+     * successfully parsed. </p>
+     *
      * @param   variant     name of new calendar variant
      * @return  changed copy with the calendar variant while this instance remains unaffected
      * @see     Attributes#CALENDAR_VARIANT
@@ -1212,6 +1215,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     /*[deutsch]
      * <p>Setzt die Kalendervariante. </p>
+     *
+     * <p>Einige Kalender wie {@code HijriCalendar} erfordern die Angabe einer Variante, sonst k&ouml;nnen
+     * sie nicht erfolgreich beim Parsen konstruiert werden. </p>
      *
      * @param   variant     name of new calendar variant
      * @return  changed copy with the calendar variant while this instance remains unaffected
@@ -1232,6 +1238,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Sets the calendar variant. </p>
      *
+     * <p>Some calendars like {@code HijriCalendar} require the variant otherwise they cannot be
+     * successfully parsed. </p>
+     *
      * @param   variantSource   source of new calendar variant
      * @return  changed copy with the given calendar variant while this instance remains unaffected
      * @see     Attributes#CALENDAR_VARIANT
@@ -1239,6 +1248,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     /*[deutsch]
      * <p>Setzt die Kalendervariante. </p>
+     *
+     * <p>Einige Kalender wie {@code HijriCalendar} erfordern die Angabe einer Variante, sonst k&ouml;nnen
+     * sie nicht erfolgreich beim Parsen konstruiert werden. </p>
      *
      * @param   variantSource   source of new calendar variant
      * @return  changed copy with the given calendar variant while this instance remains unaffected
@@ -1258,7 +1270,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
-     * @deprecated  Use {@link #with(StartOfDay)}
+     * @deprecated  Will be removed in a future release, use {@link #with(StartOfDay)} instead
      */
     /*[deutsch]
      * <p>Setzt den Beginn des Kalendertages. </p>
@@ -1267,7 +1279,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
      * @since   3.5/4.3
-     * @deprecated  Use {@link #with(StartOfDay)}
+     * @deprecated  Will be removed in a future release, use {@link #with(StartOfDay)} instead
      */
     @Deprecated
     public ChronoFormatter<T> withStartOfDay(StartOfDay startOfDay) {

@@ -1,9 +1,15 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.format.Attributes;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -226,6 +232,17 @@ public class HijriAlgoTest {
         assertThat(
             hijri.transform(PlainDate.class),
             is(PlainDate.of(2016, 2, 24)));
+    }
+
+    @Test
+    public void parseVariantSource() throws ParseException {
+        ChronoFormatter<HijriCalendar> f =
+            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
+                .addPattern("G, yyyy-MM-dd", PatternType.CLDR).build()
+                .withCalendarVariant(HijriAlgorithm.WEST_ISLAMIC_ASTRO);
+        assertThat(
+            f.parse("AH, 1426-11-23"),
+            is(HijriCalendar.of(HijriAlgorithm.WEST_ISLAMIC_ASTRO, 1426, 11, 23)));
     }
 
 }
