@@ -735,7 +735,8 @@ public final class Attributes
          * @return  this instance for method chaining
          * @see     #START_OF_DAY
          * @since   3.5/4.3
-         * @deprecated  Use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
+         * @deprecated  Will be removed in release 3.12/4.9,
+         *              use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
          */
         /*[deutsch]
          * <p>Setzt den Start des Kalendertages. </p>
@@ -744,7 +745,8 @@ public final class Attributes
          * @return  this instance for method chaining
          * @see     #START_OF_DAY
          * @since   3.5/4.3
-         * @deprecated  Use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
+         * @deprecated  Will be removed in release 3.12/4.9,
+         *              use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
          */
         @Deprecated
         public Builder setStartOfDay(StartOfDay startOfDay) {

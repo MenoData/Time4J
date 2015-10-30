@@ -533,6 +533,57 @@ public final class ChronoHistory
     }
 
     /**
+     * <p>Yields the historic julian leap year pattern if available. </p>
+     *
+     * @return  sequence of historic julian leap years
+     * @throws  UnsupportedOperationException if this history has not defined any historic julian leap years
+     * @see     #hasAncientJulianLeapYears()
+     * @see     #with(AncientJulianLeapYears)
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Liefert die Sequenz von historischen julianischen Schaltjahren, wenn verf&uuml;gbar. </p>
+     *
+     * @return  sequence of historic julian leap years
+     * @throws  UnsupportedOperationException if this history has not defined any historic julian leap years
+     * @see     #hasAncientJulianLeapYears()
+     * @see     #with(AncientJulianLeapYears)
+     * @since   3.11/4.8
+     */
+    public AncientJulianLeapYears getAncientJulianLeapYears() {
+
+        if (this.ajly == null){
+            throw new UnsupportedOperationException("No historic julian leap years were defined.");
+        }
+
+        return this.ajly;
+
+    }
+
+    /**
+     * <p>Determines if this history has defined any historic julian leap year sequence. </p>
+     *
+     * @return  boolean
+     * @since   3.11/4.8
+     * @see     #with(AncientJulianLeapYears)
+     * @see     #getAncientJulianLeapYears()
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob diese {@code ChronoHistory} eine spezielle Sequenz von historischen
+     * julianischen Schaltjahren kennt. </p>
+     *
+     * @return  boolean
+     * @since   3.11/4.8
+     * @see     #with(AncientJulianLeapYears)
+     * @see     #getAncientJulianLeapYears()
+     */
+    public boolean hasAncientJulianLeapYears() {
+
+        return (this.ajly != null);
+
+    }
+
+    /**
      * <p>Creates a copy of this history with given historic julian leap year sequence. </p>
      *
      * <p>This method has no effect if applied on {@code ChronoHistory.PROLEPTIC_GREGORIAN}
@@ -813,18 +864,6 @@ public final class ChronoHistory
     List<CutOverEvent> getEvents() {
 
         return this.events;
-
-    }
-
-    /**
-     * <p>Returns the ancient julian leap years if defined. </p>
-     *
-     * @return  historic leap year sequence or {@code null} if not set
-     * @since   3.11/4.8
-     */
-    AncientJulianLeapYears getAncientJulianLeapYears() {
-
-        return this.ajly;
 
     }
 

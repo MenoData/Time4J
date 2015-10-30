@@ -1085,11 +1085,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 .build();
 
         AttributeSet as = this.globalAttributes.withAttributes(attrs);
+
         PlainDate cutover = (
             (hv == HistoricVariant.SINGLE_CUTOVER_DATE)
             ? history.getGregorianCutOverDate()
             : null);
         as = as.withInternal(HistoricAttribute.CUTOVER_DATE, cutover);
+
+        if (history.hasAncientJulianLeapYears()) {
+            as = as.withInternal(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS, history.getAncientJulianLeapYears());
+        }
+
         return new ChronoFormatter<T>(this, as, history);
 
     }
@@ -2189,8 +2195,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
-        for (ChronoExtension ext : chronology.getExtensions()) {
-            parsed = ext.resolve(parsed, cf.getLocale(), attributes);
+        try {
+            for (ChronoExtension ext : chronology.getExtensions()) {
+                parsed = ext.resolve(parsed, cf.getLocale(), attributes);
+            }
+        } catch (RuntimeException re) {
+            status.setError(
+                text.length(),
+                re.getMessage() + getDescription(data.peek()));
+            return null;
         }
 
         // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
