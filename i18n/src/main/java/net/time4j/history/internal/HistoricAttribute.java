@@ -123,6 +123,28 @@ public final class HistoricAttribute<T>
      */
     public static final AttributeKey<Boolean> LATIN_ERA = HistoricAttribute.of("LATIN_ERA", Boolean.class);
 
+    /**
+     * <p>Format attribute which can cause the format engine to create a chronological history with
+     * given triennal julian leap years. </p>
+     *
+     * <p>Users will not directly use this attribute but adjust a given {@code ChronoFormatter}
+     * by its method {@code with(ChronoHistory)}. The value is a comma-separated list of integers. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
+     * die angegebenen julianischen Schaltjahre im 3-Jahres-Rhythmus zu erzeugen. </p>
+     *
+     * <p>Anwender werden nicht direkt dieses Attribut verwenden, sondern stattdessen die
+     * Methode {@code ChronoFormatter.with(ChronoHistory)} aufrufen. Der Wert ist eine komma-getrennte
+     * Auflistung von Integern. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     */
+    public static final AttributeKey<Object> ANCIENT_JULIAN_LEAP_YEARS =
+        HistoricAttribute.of("ANCIENT_JULIAN_LEAP_YEARS", Object.class);
+
     //~ Instanzvariablen --------------------------------------------------
 
     private final String name;

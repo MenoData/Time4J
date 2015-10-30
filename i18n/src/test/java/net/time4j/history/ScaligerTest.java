@@ -1,8 +1,15 @@
 package net.time4j.history;
 
+import net.time4j.PlainDate;
+import net.time4j.engine.EpochDays;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -674,6 +681,27 @@ public class ScaligerTest {
         assertThat(
             matzat.getCalculus().isValid(HistoricDate.of(HistoricEra.BC, 44, 2, 29)),
             is(true));
+    }
+
+    @Test
+    public void parseScaligerBC42() throws ParseException {
+        ChronoHistory history =
+            ChronoHistory.ofFirstGregorianReform().with(AncientJulianLeapYears.SCALIGER);
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDatePattern("G-y-M-d", PatternType.CLDR, Locale.ROOT).with(history);
+        PlainDate date = f.parse("BC-42-2-29");
+        assertThat(
+            date.get(EpochDays.MODIFIED_JULIAN_DATE),
+            is(-676022L - 365 * 48 - 306 - 11));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void parseScaligerBC46() throws ParseException {
+        ChronoHistory history =
+            ChronoHistory.ofFirstGregorianReform().with(AncientJulianLeapYears.SCALIGER);
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDatePattern("G-y-M-d", PatternType.CLDR, Locale.ROOT).with(history);
+        f.parse("BC-46-12-31");
     }
 
 }

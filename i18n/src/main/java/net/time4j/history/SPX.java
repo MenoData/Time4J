@@ -191,11 +191,10 @@ final class SPX
             out.writeLong(history.getEvents().get(0).start);
         }
 
-        AncientJulianLeapYears ajly = history.getAncientJulianLeapYears();
         int[] sequence = (
-            (ajly == null)
-            ? EMPTY_INT_ARRAY
-            : ajly.getPattern());
+            history.hasAncientJulianLeapYears()
+            ? history.getAncientJulianLeapYears().getPattern()
+            : EMPTY_INT_ARRAY);
         out.writeInt(sequence.length);
         for (int i = 0; i < sequence.length; i++) {
             out.writeInt(sequence[i]);

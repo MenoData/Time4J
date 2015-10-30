@@ -28,6 +28,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
+import net.time4j.history.AncientJulianLeapYears;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
@@ -113,25 +114,39 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
+        ChronoHistory result = null;
+
         if (attributes.contains(HistoricAttribute.HISTORIC_VARIANT)) {
             switch (attributes.get(HistoricAttribute.HISTORIC_VARIANT)) {
                 case INTRODUCTION_ON_1582_10_15:
-                    return ChronoHistory.ofFirstGregorianReform();
+                    result = ChronoHistory.ofFirstGregorianReform();
+                    break;
                 case PROLEPTIC_JULIAN:
                     return ChronoHistory.PROLEPTIC_JULIAN;
                 case PROLEPTIC_GREGORIAN:
                     return ChronoHistory.PROLEPTIC_GREGORIAN;
                 case SWEDEN:
-                    return ChronoHistory.ofSweden();
+                    result = ChronoHistory.ofSweden();
+                    break;
                 default:
                     if (attributes.contains(HistoricAttribute.CUTOVER_DATE)) {
                         PlainDate date = attributes.get(HistoricAttribute.CUTOVER_DATE);
-                        return ChronoHistory.ofGregorianReform(date);
+                        result = ChronoHistory.ofGregorianReform(date);
                     }
             }
         }
 
-        return ChronoHistory.of(locale);
+        if (result == null) {
+            result = ChronoHistory.of(locale);
+        }
+
+        if (attributes.contains(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS)) {
+            AncientJulianLeapYears ajly =
+                AncientJulianLeapYears.class.cast(attributes.get(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS));
+            result = result.with(ajly);
+        }
+
+        return result;
 
     }
 
