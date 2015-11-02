@@ -101,8 +101,8 @@ import java.util.Locale;
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(PersianCalendar.class, new Locale(&quot;fa&quot;))
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       ChronoFormatter.setUp(PersianCalendar.axis(), new Locale(&quot;fa&quot;))
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
  *     System.out.println(formatter.format(jalali));
@@ -110,6 +110,7 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.9/4.6
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den persischen Kalender, der offiziell in Iran und Afghanistan benutzt wird. </p>
@@ -146,8 +147,8 @@ import java.util.Locale;
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(PersianCalendar.class, new Locale(&quot;fa&quot;))
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       ChronoFormatter.setUp(PersianCalendar.axis(), new Locale(&quot;fa&quot;))
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
  *     System.out.println(formatter.format(jalali));
@@ -155,6 +156,7 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.9/4.6
+ * @doctags.concurrency {immutable}
  */
 @CalendarType("persian")
 public final class PersianCalendar
