@@ -103,8 +103,8 @@ import java.util.Locale;
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(PersianCalendar.class, new Locale(&quot;fa&quot;))
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       ChronoFormatter.setUp(PersianCalendar.axis(), new Locale(&quot;fa&quot;))
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
  *     System.out.println(formatter.format(jalali));
@@ -147,8 +147,8 @@ import java.util.Locale;
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(PersianCalendar.class, new Locale(&quot;fa&quot;))
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       ChronoFormatter.setUp(PersianCalendar.axis(), new Locale(&quot;fa&quot;))
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
  *     System.out.println(formatter.format(jalali));
