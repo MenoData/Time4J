@@ -1,23 +1,14 @@
 package net.time4j.calendar;
 
-import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.ZonalClock;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.StartOfDay;
-import net.time4j.format.Attributes;
-import net.time4j.format.OutputContext;
-import net.time4j.format.TextWidth;
-import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.text.ParseException;
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -46,7 +37,7 @@ public class ClockTest {
     }
 
     @Test
-    public void startOnEvening() {
+    public void startInEvening() {
         assertThat(
             CLOCK.now(
                 HijriCalendar.family(),

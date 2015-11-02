@@ -105,7 +105,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "islamic", "persian" };
+        return new String[] { "coptic", "ethiopic", "islamic", "persian", "roc" };
 
     }
 
@@ -132,7 +132,7 @@ public final class GenericTextProviderSPI
         }
 
         String key = getKey(rb, "MONTH_OF_YEAR");
-        String[] names = lookupBundle(rb, 12, key, tw, oc, leapForm, 1);
+        String[] names = lookupBundle(rb, countOfMonths(calendarType), key, tw, oc, leapForm, 1);
 
         // fallback rules as found in CLDR-root-properties via alias paths
         if (names == null) {
@@ -198,7 +198,7 @@ public final class GenericTextProviderSPI
         }
 
         String key = getKey(rb, "ERA");
-        String[] names = lookupBundle(rb, 1, key, tw, OutputContext.FORMAT, false, 0);
+        String[] names = lookupBundle(rb, countOfEras(calendarType), key, tw, OutputContext.FORMAT, false, 0);
 
         if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
             names = eras(calendarType, locale, TextWidth.ABBREVIATED);
@@ -337,6 +337,18 @@ public final class GenericTextProviderSPI
     private static ClassLoader getDefaultLoader() {
 
         return GenericTextProviderSPI.class.getClassLoader();
+
+    }
+
+    private static int countOfMonths(String calendarType) {
+
+        return ((calendarType.equals("coptic") || calendarType.equals("ethiopic")) ? 13 : 12);
+
+    }
+
+    private static int countOfEras(String calendarType) {
+
+        return ((calendarType.equals("ethiopic") || calendarType.equals("roc")) ? 2 : 1);
 
     }
 

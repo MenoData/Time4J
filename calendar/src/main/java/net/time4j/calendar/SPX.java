@@ -47,6 +47,9 @@ final class SPX
     /** Serialisierungstyp. */
     static final int PERSIAN = 2;
 
+    /** Serialisierungstyp. */
+    static final int COPTIC = 3;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -119,6 +122,9 @@ final class SPX
             case PERSIAN:
                 this.writePersian(out);
                 break;
+            case COPTIC:
+                this.writeCoptic(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -151,6 +157,9 @@ final class SPX
                 break;
             case PERSIAN:
                 this.obj = this.readPersian(in);
+                break;
+            case COPTIC:
+                this.obj = this.readCoptic(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -211,6 +220,26 @@ final class SPX
         int month = in.readByte();
         int dom = in.readByte();
         return PersianCalendar.of(year, month, dom);
+
+    }
+
+    private void writeCoptic(ObjectOutput out)
+        throws IOException {
+
+        CopticCalendar coptic = (CopticCalendar) this.obj;
+        out.writeInt(coptic.getYear());
+        out.writeByte(coptic.getMonth().getValue());
+        out.writeByte(coptic.getDayOfMonth());
+
+    }
+
+    private CopticCalendar readCoptic(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int year = in.readInt();
+        int month = in.readByte();
+        int dom = in.readByte();
+        return CopticCalendar.of(year, month, dom);
 
     }
 
