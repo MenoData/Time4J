@@ -695,7 +695,7 @@ public class ScaligerTest {
             is(-676022L - 365 * 48 - 306 - 11));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ParseException.class)
     public void parseScaligerBC46() throws ParseException {
         ChronoHistory history =
             ChronoHistory.ofFirstGregorianReform().with(AncientJulianLeapYears.SCALIGER);
