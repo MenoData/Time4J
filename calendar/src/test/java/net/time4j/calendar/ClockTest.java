@@ -37,7 +37,7 @@ public class ClockTest {
     }
 
     @Test
-    public void startOnEvening() {
+    public void startInEvening() {
         assertThat(
             CLOCK.now(
                 HijriCalendar.family(),

@@ -35,6 +35,36 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void copticCalendarProperties() {
+        CopticCalendar date = CopticCalendar.of(1720, CopticMonth.AMSHIR, 9);
+        assertThat(
+            date.getDayOfMonth(),
+            is(9));
+        assertThat(
+            date.getMonth(),
+            is(CopticMonth.AMSHIR));
+        assertThat(
+            date.lengthOfMonth(),
+            is(30));
+        assertThat(
+            date.atTime(12, 0).toDate(),
+            is(date));
+        assertThat(
+            date.lengthOfYear(),
+            is(365)
+        );
+    }
+
+    @Test
+    public void copticCalendarBetween() {
+        CopticCalendar start = CopticCalendar.of(1723, CopticMonth.AMSHIR, 6);
+        CopticCalendar end = CopticCalendar.of(1723, CopticMonth.NASIE, 6);
+        assertThat(CopticCalendar.Unit.MONTHS.between(start, end), is(7));
+        start = start.plus(CalendarDays.ONE);
+        assertThat(CopticCalendar.Unit.MONTHS.between(start, end), is(6));
+    }
+
+    @Test
     public void persianCalendarProperties() {
         PersianCalendar date = PersianCalendar.of(1394, PersianMonth.ABAN, 14);
         assertThat(
@@ -102,6 +132,11 @@ public class MiscellaneousTest {
     @Test
     public void serializePersian() throws IOException, ClassNotFoundException {
         roundtrip(PersianCalendar.of(1425, 1, 7));
+    }
+
+    @Test
+    public void serializeCoptic() throws IOException, ClassNotFoundException {
+        roundtrip(CopticCalendar.of(1723, 13, 6));
     }
 
     private static int roundtrip(Object obj)

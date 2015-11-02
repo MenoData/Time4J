@@ -42,4 +42,18 @@ public class EraNameTest {
             is("AP"));
     }
 
+    @Test
+    public void getDisplayNameWideCoptic() {
+        assertThat(
+            CopticEra.ANNO_MARTYRUM.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("Year of the Martyrs"));
+    }
+
+    @Test
+    public void getDisplayNameShortCoptic() {
+        assertThat(
+            CopticEra.ANNO_MARTYRUM.getDisplayName(Locale.GERMAN, TextWidth.SHORT),
+            is("A.M."));
+    }
+
 }

@@ -32,7 +32,7 @@ public class StartOfDayTest {
     }
 
     @Test
-    public void startOnEvening() {
+    public void startInEvening() {
         Moment moment = PlainTimestamp.of(2015, 7, 17, 18, 1).atUTC();
         HijriCalendar hijri = HijriCalendar.ofUmalqura(1436, 10, 2);
 

@@ -9,6 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         ClockTest.class,
+        CopticCalendarTest.class,
+        CopticOperatorTest.class,
         DiyanetDataTest.class,
         DiyanetRangeTest.class,
         EraNameTest.class,
