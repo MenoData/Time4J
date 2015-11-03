@@ -47,7 +47,7 @@ public enum CopticMonth
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * The 1st month of Coptic Calendar with 30 days.
+     * The 1st month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der erste Monat des koptischen Kalenders mit 30 Tagen.
@@ -55,7 +55,7 @@ public enum CopticMonth
     TOUT,
 
     /**
-     * The 2nd month of Coptic Calendar with 30 days.
+     * The 2nd month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der zweite Monat des koptischen Kalenders mit 30 Tagen.
@@ -63,7 +63,7 @@ public enum CopticMonth
     BABA,
 
     /**
-     * The 3rd month of Coptic Calendar with 30 days.
+     * The 3rd month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der dritte Monat des koptischen Kalenders mit 30 Tagen.
@@ -71,7 +71,7 @@ public enum CopticMonth
     HATOR,
 
     /**
-     * The 4th month of Coptic Calendar with 30 days.
+     * The 4th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der vierte Monat des koptischen Kalenders mit 30 Tagen.
@@ -79,7 +79,7 @@ public enum CopticMonth
     KIAHK,
 
     /**
-     * The 5th month of Coptic Calendar with 30 days.
+     * The 5th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der f&uuml;nfte Monat des koptischen Kalenders mit 30 Tagen.
@@ -87,7 +87,7 @@ public enum CopticMonth
     TOBA,
 
     /**
-     * The 6th month of Coptic Calendar with 30 days.
+     * The 6th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der sechste Monat des koptischen Kalenders mit 30 Tagen.
@@ -95,7 +95,7 @@ public enum CopticMonth
     AMSHIR,
 
     /**
-     * The 7th month of Coptic Calendar with 30 days.
+     * The 7th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der siebente Monat des koptischen Kalenders mit 30 Tagen.
@@ -103,7 +103,7 @@ public enum CopticMonth
     BARAMHAT,
 
     /**
-     * The 8th month of Coptic Calendar with 30 days.
+     * The 8th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der achte Monat des koptischen Kalenders mit 30 Tagen.
@@ -111,7 +111,7 @@ public enum CopticMonth
     BARAMOUDA,
 
     /**
-     * The 9th month of Coptic Calendar with 30 days.
+     * The 9th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der neunte Monat des koptischen Kalenders mit 30 Tagen.
@@ -119,7 +119,7 @@ public enum CopticMonth
     BASHANS,
 
     /**
-     * The 10th month of Coptic Calendar with 30 days.
+     * The 10th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der zehnte Monat des koptischen Kalenders mit 30 Tagen.
@@ -127,7 +127,7 @@ public enum CopticMonth
     PAONA,
 
     /**
-     * The 11th month of Coptic Calendar with 30 days.
+     * The 11th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der elfte Monat des koptischen Kalenders mit 30 Tagen.
@@ -135,7 +135,7 @@ public enum CopticMonth
     EPEP,
 
     /**
-     * The 12th month of Coptic Calendar with 30 days.
+     * The 12th month of Coptic calendar with 30 days.
      */
     /*[deutsch]
      * Der zw&ouml;lfte Monat des koptischen Kalenders mit 30 Tagen.
@@ -143,7 +143,7 @@ public enum CopticMonth
     MESRA,
 
     /**
-     * The 13th month of Coptic Calendar with 5 or 6 days (if in leap year).
+     * The 13th month of Coptic calendar with 5 or 6 days (if in leap year).
      */
     /*[deutsch]
      * Der dreizehnte Monat des koptischen Kalenders mit 5 oder 6 Tagen (wenn im Schaltjahr).
