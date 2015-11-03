@@ -56,4 +56,36 @@ public class EraNameTest {
             is("A.M."));
     }
 
+    @Test
+    public void getDisplayNameWideEthiopic() {
+        assertThat(
+            EthiopianEra.AMETE_ALEM.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("Year of the World"));
+        assertThat(
+            EthiopianEra.AMETE_MIHRET.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("Year of Grace"));
+        assertThat(
+            EthiopianEra.AMETE_ALEM.getDisplayName(Locale.ROOT, TextWidth.WIDE),
+            is("Amete Alem"));
+        assertThat(
+            EthiopianEra.AMETE_MIHRET.getDisplayName(Locale.ROOT, TextWidth.WIDE),
+            is("Amete Mihret"));
+    }
+
+    @Test
+    public void getDisplayNameShortEthiopic() {
+        assertThat(
+            EthiopianEra.AMETE_ALEM.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("Amete Alem"));
+        assertThat(
+            EthiopianEra.AMETE_MIHRET.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("Amete Mihret"));
+        assertThat(
+            EthiopianEra.AMETE_ALEM.getDisplayName(Locale.ROOT, TextWidth.SHORT),
+            is("Amete Alem"));
+        assertThat(
+            EthiopianEra.AMETE_MIHRET.getDisplayName(Locale.ROOT, TextWidth.SHORT),
+            is("Amete Mihret"));
+    }
+
 }
