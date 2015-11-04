@@ -1,7 +1,6 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
-import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
