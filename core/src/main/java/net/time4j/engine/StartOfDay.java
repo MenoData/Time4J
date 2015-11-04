@@ -62,6 +62,14 @@ public abstract class StartOfDay {
      */
     public static final StartOfDay EVENING = new FixedStartOfDay(-21600);
 
+    /**
+     * Start of calendar day at 06:00 in the morning.
+     */
+    /*[deutsch]
+     * Beginn eines Kalendertages zu 6 Uhr morgens.
+     */
+    public static final StartOfDay MORNING = new FixedStartOfDay(21600);
+
     //~ Konstruktoren -------------------------------------------------
 
     /**

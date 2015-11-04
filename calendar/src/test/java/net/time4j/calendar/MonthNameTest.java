@@ -42,6 +42,13 @@ public class MonthNameTest {
     }
 
     @Test
+    public void getDisplayNameWideEthiopian() {
+        assertThat(
+            EthiopianMonth.MESKEREM.getDisplayName(Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT),
+            is("Meskerem"));
+    }
+
+    @Test
     public void getDisplayNameShortHijri() {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.SHORT, OutputContext.FORMAT),

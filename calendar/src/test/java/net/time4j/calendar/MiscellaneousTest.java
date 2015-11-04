@@ -65,6 +65,36 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void ethiopianCalendarProperties() {
+        EthiopianCalendar date = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2008, EthiopianMonth.YEKATIT, 9);
+        assertThat(
+            date.getEra(),
+            is(EthiopianEra.AMETE_MIHRET));
+        assertThat(
+            date.getDayOfMonth(),
+            is(9));
+        assertThat(
+            date.getMonth(),
+            is(EthiopianMonth.YEKATIT));
+        assertThat(
+            date.lengthOfMonth(),
+            is(30));
+        assertThat(
+            date.lengthOfYear(),
+            is(365)
+        );
+    }
+
+    @Test
+    public void ethiopianCalendarBetween() {
+        EthiopianCalendar start = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, EthiopianMonth.YEKATIT, 6);
+        EthiopianCalendar end = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, EthiopianMonth.PAGUMEN, 6);
+        assertThat(EthiopianCalendar.Unit.MONTHS.between(start, end), is(7));
+        start = start.plus(CalendarDays.ONE);
+        assertThat(EthiopianCalendar.Unit.MONTHS.between(start, end), is(6));
+    }
+
+    @Test
     public void persianCalendarProperties() {
         PersianCalendar date = PersianCalendar.of(1394, PersianMonth.ABAN, 14);
         assertThat(
@@ -137,6 +167,11 @@ public class MiscellaneousTest {
     @Test
     public void serializeCoptic() throws IOException, ClassNotFoundException {
         roundtrip(CopticCalendar.of(1723, 13, 6));
+    }
+
+    @Test
+    public void serializeEthiopian() throws IOException, ClassNotFoundException {
+        roundtrip(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 13, 6));
     }
 
     private static int roundtrip(Object obj)

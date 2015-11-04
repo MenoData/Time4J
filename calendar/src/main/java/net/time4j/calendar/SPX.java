@@ -50,6 +50,9 @@ final class SPX
     /** Serialisierungstyp. */
     static final int COPTIC = 3;
 
+    /** Serialisierungstyp. */
+    static final int ETHIOPIAN = 4;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -125,6 +128,9 @@ final class SPX
             case COPTIC:
                 this.writeCoptic(out);
                 break;
+            case ETHIOPIAN:
+                this.writeEthiopian(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -160,6 +166,9 @@ final class SPX
                 break;
             case COPTIC:
                 this.obj = this.readCoptic(in);
+                break;
+            case ETHIOPIAN:
+                this.obj = this.readEthiopian(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -240,6 +249,28 @@ final class SPX
         int month = in.readByte();
         int dom = in.readByte();
         return CopticCalendar.of(year, month, dom);
+
+    }
+
+    private void writeEthiopian(ObjectOutput out)
+        throws IOException {
+
+        EthiopianCalendar coptic = (EthiopianCalendar) this.obj;
+        out.writeByte(coptic.getEra().ordinal());
+        out.writeInt(coptic.getYearOfEra());
+        out.writeByte(coptic.getMonth().getValue());
+        out.writeByte(coptic.getDayOfMonth());
+
+    }
+
+    private EthiopianCalendar readEthiopian(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        EthiopianEra era = EthiopianEra.values()[in.readByte()];
+        int year = in.readInt();
+        int month = in.readByte();
+        int dom = in.readByte();
+        return EthiopianCalendar.of(era, year, month, dom);
 
     }
 

@@ -14,6 +14,8 @@ import org.junit.runners.Suite.SuiteClasses;
         DiyanetDataTest.class,
         DiyanetRangeTest.class,
         EraNameTest.class,
+        EthiopianCalendarTest.class,
+        EthiopianOperatorTest.class,
         HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
