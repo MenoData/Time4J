@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (CopticCalendar.java) is part of project Time4J.
+ * This file (EthiopianCalendar.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,10 +21,8 @@
 
 package net.time4j.calendar;
 
-import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
@@ -65,23 +63,19 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 
 /**
- * <p>Represents the calendar used by the Coptic church in Egypt. </p>
+ * <p>Represents the calendar used in Ethiopia. </p>
  *
- * <p>It is a solar calendar which defines years consisting of 13 months. The first 12 months are always 30 days long.
- * The last month has 5 or 6 days depending if a Coptic year is a leap year or not. The leap year rule is the same
- * as defined in Julian Calendar, namely every fourth year. Years are counted since the era of martyrs where
- * the Julian year AD 284 is counted as Coptic year 1. See also
- * <a href="https://en.wikipedia.org/wiki/Coptic_calendar">Wikipedia</a>. According to the book
- * &quot;Calendrical calculations&quot; of Dershowitz/Reingold, the Coptic day starts at sunset
- * on the previous day. Time4J will also assume that despite of the fact that the ancient Egypt
- * calendar (the historic ancestor of the Coptic calendar) started the day at sunrise. We assume
- * here an adaptation of the Coptic calendar to the habits of Islamic calendar in Egypt. </p>
+ * <p>It is built on the base of the <a href="CopticCalendar.html">Coptic calendar</a>
+ * but uses two different eras. Another difference to Coptic calendar is the day starting
+ * in the morning at 06:00 (usual approximation for sunrise). For more details see
+ * <a href="http://ayannanahmias.com/2011/06/15/ethiopian-calendar/">Intro to the Ethiopic Calendar</a>. </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -100,12 +94,12 @@ import java.util.Locale;
  * <p>Example of usage: </p>
  *
  * <pre>
- *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
- *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
+ *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // conversion at noon
- *     System.out.println(formatter.format(copticDate));
+ *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
+ *     System.out.println(formatter.format(ethiopianDate));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -113,18 +107,12 @@ import java.util.Locale;
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert den Kalender, der von der koptischen Kirche in &Auml;gypten verwendet wird. </p>
+ * <p>Repr&auml;sentiert den Kalender, der in &Auml;thiopien als offizieller Kalender verwendet wird. </p>
  *
- * <p>Es handelt sich um einen Sonnenkalender, dessen Jahre aus 13 Monaten bestehen. Die ersten 12 Monate
- * sind immer 30 Tage lang, w&auml;hrend der letzte Monat 5 oder 6 Tage lang ist, je nachdem ob ein Schaltjahr
- * vorliegt oder nicht. Die Schaltjahrregel ist die gleiche wie im julianischen Kalender, n&auml;mlich
- * alle 4 Jahre. Jahre werden seit der &Auml;ra der M&auml;rtyrer gez&auml;hlt, also seit dem julianischen
- * Jahr AD 284. Siehe auch <a href="https://en.wikipedia.org/wiki/Coptic_calendar">Wikipedia</a>. Nach dem
- * Buch &quot;Calendrical calculations&quot; von Dershowitz/Reingold f&auml;ngt der koptische Tag zum
- * Sonnenuntergang des Vortags an. Time4J wird das auch annehmen, obwohl der alte &auml;gyptische Kalender,
- * von dem der koptische Kalender abgeleitet ist, den Tag zum Sonnenaufgang begann. Es wird hier implizit
- * eine Anpassung des koptischen Kalenders an die Gewohnheiten des islamischen Kalenders in &Auml;gypten
- * angenommen. </p>
+ * <p>Er ist im wesentlichen wie der <a href="CopticCalendar.html">koptische Kalender</a> aufgebaut, verwendet
+ * aber zwei andere &Auml;ras. Eine weitere Differenz zum koptischen Kalender ist, da&szlig; der Kalendertag
+ * am Morgen um 06:00 beginnt (typische N&auml;herung f&uuml;r den Sonnenaufgang). Mehr Details siehe
+ * <a href="http://ayannanahmias.com/2011/06/15/ethiopian-calendar/">Intro to the Ethiopic Calendar</a>. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
@@ -142,30 +130,31 @@ import java.util.Locale;
  * <p>Anwendungsbeispiel: </p>
  *
  * <pre>
- *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
- *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
+ *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // Konversion zu 12 Uhr mittags
- *     System.out.println(formatter.format(copticDate));
+ *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
+ *     System.out.println(formatter.format(ethiopianDate));
  * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  * @doctags.concurrency {immutable}
  */
-@CalendarType("coptic")
-public final class CopticCalendar
-    extends Calendrical<CopticCalendar.Unit, CopticCalendar>
+@CalendarType("ethiopic")
+public final class EthiopianCalendar
+    extends Calendrical<EthiopianCalendar.Unit, EthiopianCalendar>
     implements LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final long DIOCLETIAN;
+    private static final int DELTA_ALEM_MIHRET = 5500;
+    private static final long MIHRET_EPOCH;
 
     static {
-        PlainDate diocletian = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 284, 8, 29));
-        DIOCLETIAN = diocletian.get(EpochDays.UTC);
+        PlainDate mihret = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 8, 8, 29));
+        MIHRET_EPOCH = mihret.get(EpochDays.UTC);
     }
 
     private static final int YEAR_INDEX = 0;
@@ -173,26 +162,30 @@ public final class CopticCalendar
     private static final int DAY_OF_YEAR_INDEX = 3;
 
     /**
-     * <p>Represents the Coptic era. </p>
+     * <p>Represents the Ethiopian era. </p>
+     *
+     * <p>A change of the era has no effect. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die koptische &Auml;ra. </p>
+     * <p>Repr&auml;sentiert die &auml;thiopische &Auml;ra. </p>
+     *
+     * <p>Eine &Auml;nderung der &Auml;ra hat keine Wirkung. </p>
      */
     @FormattableElement(format = "G")
-    public static final TextElement<CopticEra> ERA =
-        new StdEnumDateElement<>("ERA", CopticCalendar.class, CopticEra.class, 'G');
+    public static final TextElement<EthiopianEra> ERA =
+        new StdEnumDateElement<>("ERA", EthiopianCalendar.class, EthiopianEra.class, 'G');
 
     /**
-     * <p>Represents the Coptic year. </p>
+     * <p>Represents the Ethiopian year. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert das koptische Jahr. </p>
+     * <p>Repr&auml;sentiert das &auml;thiopische Jahr. </p>
      */
     @FormattableElement(format = "y")
-    public static final StdCalendarElement<Integer, CopticCalendar> YEAR_OF_ERA =
+    public static final StdCalendarElement<Integer, EthiopianCalendar> YEAR_OF_ERA =
         new StdIntegerDateElement<>(
             "YEAR_OF_ERA",
-            CopticCalendar.class,
+            EthiopianCalendar.class,
             1,
             9999,
             'y',
@@ -200,65 +193,65 @@ public final class CopticCalendar
             null);
 
     /**
-     * <p>Represents the Coptic month. </p>
+     * <p>Represents the Ethiopian month. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den koptischen Monat. </p>
+     * <p>Repr&auml;sentiert den &auml;thiopischen Monat. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
-    public static final StdCalendarElement<CopticMonth, CopticCalendar> MONTH_OF_YEAR =
+    public static final StdCalendarElement<EthiopianMonth, EthiopianCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<>(
             "MONTH_OF_YEAR",
-            CopticCalendar.class,
-            CopticMonth.class,
+            EthiopianCalendar.class,
+            EthiopianMonth.class,
             'M');
 
     /**
-     * <p>Represents the Coptic day of month. </p>
+     * <p>Represents the Ethiopian day of month. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den koptischen Tag des Monats. </p>
+     * <p>Repr&auml;sentiert den &auml;thiopischen Tag des Monats. </p>
      */
     @FormattableElement(format = "d")
-    public static final StdCalendarElement<Integer, CopticCalendar> DAY_OF_MONTH =
-        new StdIntegerDateElement<>("DAY_OF_MONTH", CopticCalendar.class, 1, 30, 'd');
+    public static final StdCalendarElement<Integer, EthiopianCalendar> DAY_OF_MONTH =
+        new StdIntegerDateElement<>("DAY_OF_MONTH", EthiopianCalendar.class, 1, 30, 'd');
 
     /**
-     * <p>Represents the Coptic day of year. </p>
+     * <p>Represents the Ethiopian day of year. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den koptischen Tag des Jahres. </p>
+     * <p>Repr&auml;sentiert den &auml;thiopischen Tag des Jahres. </p>
      */
     @FormattableElement(format = "D")
-    public static final StdCalendarElement<Integer, CopticCalendar> DAY_OF_YEAR =
-        new StdIntegerDateElement<>("DAY_OF_YEAR", CopticCalendar.class, 1, 365, 'D');
+    public static final StdCalendarElement<Integer, EthiopianCalendar> DAY_OF_YEAR =
+        new StdIntegerDateElement<>("DAY_OF_YEAR", EthiopianCalendar.class, 1, 365, 'D');
 
     /**
-     * <p>Represents the Coptic day of week. </p>
+     * <p>Represents the Ethiopian day of week. </p>
      *
-     * <p>If the day-of-week is set to a new value then Time4J handles the Coptic calendar week
-     * as starting on Saturday. </p>
+     * <p>If the day-of-week is set to a new value then Time4J handles the Ethiopian calendar week
+     * as starting on Sunday (deviation from Coptic calendar). </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den koptischen Tag der Woche. </p>
+     * <p>Repr&auml;sentiert den &auml;thiopischen Tag der Woche. </p>
      *
-     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die koptische
-     * Kalenderwoche so, da&szlig; sie am Samstag beginnt. </p>
+     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die &auml;thiopische
+     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt (Abweichung vom koptischen Kalender). </p>
      */
     @FormattableElement(format = "E")
-    public static final StdCalendarElement<Weekday, CopticCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(CopticCalendar.class);
+    public static final StdCalendarElement<Weekday, EthiopianCalendar> DAY_OF_WEEK =
+        new StdWeekdayElement<>(EthiopianCalendar.class);
 
-    private static final MonthBasedCalendarSystem<CopticCalendar> CALSYS;
-    private static final TimeAxis<CopticCalendar.Unit, CopticCalendar> ENGINE;
+    private static final MonthBasedCalendarSystem<EthiopianCalendar> CALSYS;
+    private static final TimeAxis<EthiopianCalendar.Unit, EthiopianCalendar> ENGINE;
 
     static {
         CALSYS = new Transformer();
 
-        TimeAxis.Builder<CopticCalendar.Unit, CopticCalendar> builder =
+        TimeAxis.Builder<EthiopianCalendar.Unit, EthiopianCalendar> builder =
             TimeAxis.Builder.setUp(
-                CopticCalendar.Unit.class,
-                CopticCalendar.class,
+                EthiopianCalendar.Unit.class,
+                EthiopianCalendar.class,
                 new Merger(),
                 CALSYS)
             .appendElement(
@@ -286,193 +279,200 @@ public final class CopticCalendar
                 Unit.DAYS)
             .appendUnit(
                 Unit.YEARS,
-                new CopticUnitRule(Unit.YEARS),
+                new EthiopianUnitRule(Unit.YEARS),
                 Unit.YEARS.getLength(),
                 Collections.singleton(Unit.MONTHS))
             .appendUnit(
                 Unit.MONTHS,
-                new CopticUnitRule(Unit.MONTHS),
+                new EthiopianUnitRule(Unit.MONTHS),
                 Unit.MONTHS.getLength(),
                 Collections.singleton(Unit.YEARS))
             .appendUnit(
                 Unit.WEEKS,
-                new CopticUnitRule(Unit.WEEKS),
+                new EthiopianUnitRule(Unit.WEEKS),
                 Unit.WEEKS.getLength(),
                 Collections.singleton(Unit.DAYS))
             .appendUnit(
                 Unit.DAYS,
-                new CopticUnitRule(Unit.DAYS),
+                new EthiopianUnitRule(Unit.DAYS),
                 Unit.DAYS.getLength(),
                 Collections.singleton(Unit.WEEKS));
         ENGINE = builder.build();
     }
 
-    private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = -1632000525062084751L;
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final int cyear;
-    private transient final int cmonth;
-    private transient final int cdom;
+    private transient final int mihret; // year expressed in era amete mihret
+    private transient final int emonth;
+    private transient final int edom;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private CopticCalendar(
-        int cyear,
-        int cmonth,
-        int cdom
+    private EthiopianCalendar(
+        int mihret,
+        int emonth,
+        int edom
     ) {
         super();
 
-        this.cyear = cyear;
-        this.cmonth = cmonth;
-        this.cdom = cdom;
+        this.mihret = mihret;
+        this.emonth = emonth;
+        this.edom = edom;
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a new instance of a Coptic calendar date. </p>
+     * <p>Creates a new instance of an Ethiopian calendar date. </p>
      *
-     * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
-     * @return  new instance of {@code CopticCalendar}
+     * @param   era         Ethiopian era
+     * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
+     * @param   month       Ethiopian month
+     * @param   dayOfMonth  Ethiopian day of month
+     * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues koptisches Kalenderdatum. </p>
+     * <p>Erzeugt ein neues &auml;thiopisches Kalenderdatum. </p>
      *
-     * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
-     * @return  new instance of {@code CopticCalendar}
+     * @param   era         Ethiopian era
+     * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
+     * @param   month       Ethiopian month
+     * @param   dayOfMonth  Ethiopian day of month
+     * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
      */
-    public static CopticCalendar of(
-        int cyear,
-        CopticMonth cmonth,
-        int cdom
+    public static EthiopianCalendar of(
+        EthiopianEra era,
+        int yearOfEra,
+        EthiopianMonth month,
+        int dayOfMonth
     ) {
 
-        return CopticCalendar.of(cyear, cmonth.getValue(), cdom);
+        return EthiopianCalendar.of(era, yearOfEra, month.getValue(), dayOfMonth);
 
     }
 
     /**
-     * <p>Creates a new instance of a Coptic calendar date. </p>
+     * <p>Creates a new instance of an Ethiopian calendar date. </p>
      *
-     * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
-     * @return  new instance of {@code CopticCalendar}
+     * @param   era         Ethiopian era
+     * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
+     * @param   month       Ethiopian month
+     * @param   dayOfMonth  Ethiopian day of month
+     * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues koptisches Kalenderdatum. </p>
+     * <p>Erzeugt ein neues &auml;thiopisches Kalenderdatum. </p>
      *
-     * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
-     * @return  new instance of {@code CopticCalendar}
+     * @param   era         Ethiopian era
+     * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
+     * @param   month       Ethiopian month
+     * @param   dayOfMonth  Ethiopian day of month
+     * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
      */
-    public static CopticCalendar of(
-        int cyear,
-        int cmonth,
-        int cdom
+    public static EthiopianCalendar of(
+        EthiopianEra era,
+        int yearOfEra,
+        int month,
+        int dayOfMonth
     ) {
 
-        if (!CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
+        if (!CALSYS.isValid(era, yearOfEra, month, dayOfMonth)) {
             throw new IllegalArgumentException(
-                "Invalid Coptic date: year=" + cyear + ", month=" + cmonth + ", day=" + cdom);
+                "Invalid Ethiopian date: era="
+                    + era + ", year=" + yearOfEra + ", month=" + month + ", day=" + dayOfMonth);
         }
 
-        return new CopticCalendar(cyear, cmonth, cdom);
+        return new EthiopianCalendar(mihret(era, yearOfEra), month, dayOfMonth);
 
     }
 
     /**
-     * <p>Yields the Coptic era. </p>
-     *
-     * @return  {@link CopticEra#ANNO_MARTYRUM}
-     * @since   3.11/4.8
-     */
-    /*[deutsch]
-     * <p>Liefert die koptische &Auml;ra. </p>
-     *
-     * @return  {@link CopticEra#ANNO_MARTYRUM}
-     * @since   3.11/4.8
-     */
-    public CopticEra getEra() {
-
-        return CopticEra.ANNO_MARTYRUM;
-
-    }
-
-    /**
-     * <p>Yields the Coptic year. </p>
-     *
-     * @return  int
-     * @since   3.11/4.8
-     */
-    /*[deutsch]
-     * <p>Liefert das koptische Jahr. </p>
-     *
-     * @return  int
-     * @since   3.11/4.8
-     */
-    public int getYear() {
-
-        return this.cyear;
-
-    }
-
-    /**
-     * <p>Yields the Coptic month. </p>
+     * <p>Yields the Ethiopian era. </p>
      *
      * @return  enum
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert den koptischen Monat. </p>
+     * <p>Liefert die &auml;thiopische &Auml;ra. </p>
      *
      * @return  enum
      * @since   3.11/4.8
      */
-    public CopticMonth getMonth() {
+    public EthiopianEra getEra() {
 
-        return CopticMonth.valueOf(this.cmonth);
+        return ((this.mihret < 1) ? EthiopianEra.AMETE_ALEM : EthiopianEra.AMETE_MIHRET);
 
     }
 
     /**
-     * <p>Yields the Coptic day of month. </p>
+     * <p>Yields the Ethiopian year. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert den koptischen Tag des Monats. </p>
+     * <p>Liefert das &auml;thiopische Jahr. </p>
+     *
+     * @return  int
+     * @since   3.11/4.8
+     */
+    public int getYearOfEra() {
+
+        return ((this.mihret < 1) ? this.mihret + DELTA_ALEM_MIHRET : this.mihret);
+
+    }
+
+    /**
+     * <p>Yields the Ethiopian month. </p>
+     *
+     * @return  enum
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Liefert den &auml;thiopischen Monat. </p>
+     *
+     * @return  enum
+     * @since   3.11/4.8
+     */
+    public EthiopianMonth getMonth() {
+
+        return EthiopianMonth.valueOf(this.emonth);
+
+    }
+
+    /**
+     * <p>Yields the Ethiopian day of month. </p>
+     *
+     * @return  int
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Liefert den &auml;thiopischen Tag des Monats. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     public int getDayOfMonth() {
 
-        return this.cdom;
+        return this.edom;
 
     }
 
     /**
      * <p>Determines the day of week. </p>
      *
-     * <p>The Coptic calendar also uses a 7-day-week. </p>
+     * <p>The Ethiopian calendar also uses a 7-day-week. </p>
      *
      * @return  Weekday
      * @since   3.11/4.8
@@ -480,7 +480,7 @@ public final class CopticCalendar
     /*[deutsch]
      * <p>Ermittelt den Wochentag. </p>
      *
-     * <p>Der koptische Kalendar verwendet ebenfalls eine 7-Tage-Woche. </p>
+     * <p>Der &auml;thiopische Kalendar verwendet ebenfalls eine 7-Tage-Woche. </p>
      *
      * @return  Weekday
      * @since   3.11/4.8
@@ -493,13 +493,13 @@ public final class CopticCalendar
     }
 
     /**
-     * <p>Yields the Coptic day of year. </p>
+     * <p>Yields the Ethiopian day of year. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert den koptischen Tag des Jahres. </p>
+     * <p>Liefert den &auml;thiopischen Tag des Jahres. </p>
      *
      * @return  int
      * @since   3.11/4.8
@@ -511,31 +511,31 @@ public final class CopticCalendar
     }
 
     /**
-     * <p>Yields the length of current Coptic month in days. </p>
+     * <p>Yields the length of current Ethiopian month in days. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert die L&auml;nge des aktuellen koptischen Monats in Tagen. </p>
+     * <p>Liefert die L&auml;nge des aktuellen &auml;thiopischen Monats in Tagen. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     public int lengthOfMonth() {
 
-        return CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, this.cyear, this.cmonth);
+        return CALSYS.getLengthOfMonth(this.getEra(), this.getYearOfEra(), this.emonth);
 
     }
 
     /**
-     * <p>Yields the length of current Coptic year in days. </p>
+     * <p>Yields the length of current Ethiopian year in days. </p>
      *
      * @return  int
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert die L&auml;nge des aktuellen koptischen Jahres in Tagen. </p>
+     * <p>Liefert die L&auml;nge des aktuellen &auml;thiopischen Jahres in Tagen. </p>
      *
      * @return  int
      * @since   3.11/4.8
@@ -560,62 +560,7 @@ public final class CopticCalendar
      */
     public boolean isLeapYear() {
 
-        return ((this.cyear % 4) == 3);
-
-    }
-
-    /**
-     * <p>Creates a new local timestamp with this date and given wall time. </p>
-     *
-     * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
-     * then the resulting timestamp will automatically be normalized such
-     * that the timestamp will contain the following day instead. </p>
-     *
-     * @param   time    wall time
-     * @return  general timestamp as composition of this date and given time
-     * @since   3.11/4.8
-     */
-    /*[deutsch]
-     * <p>Erzeugt einen allgemeinen Zeitstempel mit diesem Datum und der angegebenen Uhrzeit. </p>
-     *
-     * <p>Wenn {@link PlainTime#midnightAtEndOfDay() T24:00} angegeben wird,
-     * dann wird der Zeitstempel automatisch so normalisiert, da&szlig; er auf
-     * den n&auml;chsten Tag verweist. </p>
-     *
-     * @param   time    wall time
-     * @return  general timestamp as composition of this date and given time
-     * @since   3.11/4.8
-     */
-    public GeneralTimestamp<CopticCalendar> at(PlainTime time) {
-
-        return GeneralTimestamp.of(this, time);
-
-    }
-
-    /**
-     * <p>Is equivalent to {@code at(PlainTime.of(hour, minute))}. </p>
-     *
-     * @param   hour        hour of day in range (0-24)
-     * @param   minute      minute of hour in range (0-59)
-     * @return  general timestamp as composition of this date and given time
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @since   3.11/4.8
-     */
-    /*[deutsch]
-     * <p>Entspricht {@code at(PlainTime.of(hour, minute))}. </p>
-     *
-     * @param   hour        hour of day in range (0-24)
-     * @param   minute      minute of hour in range (0-59)
-     * @return  general timestamp as composition of this date and given time
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @since   3.11/4.8
-     */
-    public GeneralTimestamp<CopticCalendar> atTime(
-        int hour,
-        int minute
-    ) {
-
-        return this.at(PlainTime.of(hour, minute));
+        return ((this.getYearOfEra() % 4) == 3);
 
     }
 
@@ -624,12 +569,12 @@ public final class CopticCalendar
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof CopticCalendar) {
-            CopticCalendar that = (CopticCalendar) obj;
+        } else if (obj instanceof EthiopianCalendar) {
+            EthiopianCalendar that = (EthiopianCalendar) obj;
             return (
-                (this.cdom == that.cdom)
-                && (this.cmonth == that.cmonth)
-                && (this.cyear == that.cyear)
+                (this.edom == that.edom)
+                && (this.emonth == that.emonth)
+                && (this.mihret == that.mihret)
             );
         } else {
             return false;
@@ -640,7 +585,7 @@ public final class CopticCalendar
     @Override
     public int hashCode() {
 
-        return (17 * this.cdom + 31 * this.cmonth + 37 * this.cyear);
+        return (17 * this.edom + 31 * this.emonth + 37 * this.mihret);
 
     }
 
@@ -648,22 +593,23 @@ public final class CopticCalendar
     public String toString() {
 
         StringBuilder sb = new StringBuilder(32);
-        sb.append("A.M.-");
-        String y = String.valueOf(this.cyear);
+        sb.append(this.getEra());
+        sb.append('-');
+        String y = String.valueOf(this.getYearOfEra());
         for (int i = y.length(); i < 4; i++) {
             sb.append('0');
         }
         sb.append(y);
         sb.append('-');
-        if (this.cmonth < 10) {
+        if (this.emonth < 10) {
             sb.append('0');
         }
-        sb.append(this.cmonth);
+        sb.append(this.emonth);
         sb.append('-');
-        if (this.cdom < 10) {
+        if (this.edom < 10) {
             sb.append('0');
         }
-        sb.append(this.cdom);
+        sb.append(this.edom);
         return sb.toString();
 
     }
@@ -680,37 +626,46 @@ public final class CopticCalendar
      * @return  chronology
      * @since   3.11/4.8
      */
-    public static TimeAxis<Unit, CopticCalendar> axis() {
+    public static TimeAxis<Unit, EthiopianCalendar> axis() {
 
         return ENGINE;
 
     }
 
     @Override
-    protected TimeAxis<Unit, CopticCalendar> getChronology() {
+    protected TimeAxis<Unit, EthiopianCalendar> getChronology() {
 
         return ENGINE;
 
     }
 
     @Override
-    protected CopticCalendar getContext() {
+    protected EthiopianCalendar getContext() {
 
         return this;
+
+    }
+
+    private static int mihret(
+        CalendarEra era,
+        int yearOfEra
+    ) {
+
+        return (EthiopianEra.AMETE_ALEM.equals(era) ? yearOfEra - DELTA_ALEM_MIHRET : yearOfEra);
 
     }
 
     /**
      * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
-     *              the type-ID {@code 3}. Then the year is written as int, finally
-     *              month and day-of-month as bytes.
+     *              the type-ID {@code 4}. Then the era ordinal is written as byte, the year-of-era
+     *              is written as int, finally month and day-of-month written as bytes.
      *
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.COPTIC);
+        return new SPX(this, SPX.ETHIOPIAN);
 
     }
 
@@ -729,12 +684,12 @@ public final class CopticCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Coptic calendar. </p>
+     * <p>Defines come calendar units for the Ethiopian calendar. </p>
      *
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den koptischen Kalender. </p>
+     * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den &auml;thiopischen Kalender. </p>
      *
      * @since   3.11/4.8
      */
@@ -778,7 +733,7 @@ public final class CopticCalendar
         }
 
         /**
-         * <p>Calculates the difference between given Coptic dates in this unit. </p>
+         * <p>Calculates the difference between given Ethiopian dates in this unit. </p>
          *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)
@@ -794,8 +749,8 @@ public final class CopticCalendar
          * @since   3.11/4.8
          */
         public int between(
-            CopticCalendar start,
-            CopticCalendar end
+            EthiopianCalendar start,
+            EthiopianCalendar end
         ) {
 
             return (int) start.until(end, this); // safe
@@ -805,7 +760,7 @@ public final class CopticCalendar
     }
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<CopticCalendar> {
+        implements MonthBasedCalendarSystem<EthiopianCalendar> {
 
         //~ Methoden ------------------------------------------------------
 
@@ -818,9 +773,9 @@ public final class CopticCalendar
         ) {
 
             return (
-                (era == CopticEra.ANNO_MARTYRUM)
+                (era instanceof EthiopianEra)
                 && (yearOfEra >= 1)
-                && (yearOfEra <= 9999)
+                && (yearOfEra <= (EthiopianEra.AMETE_ALEM.equals(era) ? 15499 : 9999))
                 && (monthOfYear >= 1)
                 && (monthOfYear <= 13)
                 && (dayOfMonth >= 1)
@@ -836,13 +791,11 @@ public final class CopticCalendar
             int monthOfYear
         ) {
 
-            if (era != CopticEra.ANNO_MARTYRUM) {
-                throw new IllegalArgumentException("Invalid era: " + era);
-            }
+            checkEra(era);
 
             if (
                 (yearOfEra >= 1)
-                && (yearOfEra <= 9999)
+                && (yearOfEra <= (EthiopianEra.AMETE_ALEM.equals(era) ? 15499 : 9999))
                 && (monthOfYear >= 1)
                 && (monthOfYear <= 13)
             ) {
@@ -853,7 +806,8 @@ public final class CopticCalendar
                 }
             }
 
-            throw new IllegalArgumentException("Out of bounds: year=" + yearOfEra + ", month=" + monthOfYear);
+            throw new IllegalArgumentException(
+                "Out of bounds: era=" + era + ", year=" + yearOfEra + ", month=" + monthOfYear);
 
         }
 
@@ -863,57 +817,61 @@ public final class CopticCalendar
             int yearOfEra
         ) {
 
-            if (era != CopticEra.ANNO_MARTYRUM) {
-                throw new IllegalArgumentException("Invalid era: " + era);
-            }
+            checkEra(era);
 
             if (
                 (yearOfEra >= 1)
-                && (yearOfEra <= 9999)
+                && (yearOfEra <= (EthiopianEra.AMETE_ALEM.equals(era) ? 15499 : 9999))
             ) {
                 return ((yearOfEra % 4) == 3) ? 366 : 365;
             }
 
-            throw new IllegalArgumentException("Out of bounds: year=" + yearOfEra);
+            throw new IllegalArgumentException("Out of bounds: era=" + era + ", year=" + yearOfEra);
 
         }
 
         @Override
-        public CopticCalendar transform(long utcDays) {
+        public EthiopianCalendar transform(long utcDays) {
 
-            int cyear =
+            int mihret =
                 MathUtils.safeCast(
                     MathUtils.floorDivide(
                         MathUtils.safeAdd(
                             MathUtils.safeMultiply(
                                 4,
-                                MathUtils.safeSubtract(utcDays, DIOCLETIAN)),
+                                MathUtils.safeSubtract(utcDays, MIHRET_EPOCH)),
                             1463),
                         1461));
 
-            int startOfYear =  MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
-            int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
-            int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
-            int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
+            int startOfYear = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, 1, 1)));
+            int emonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
+            int startOfMonth = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, emonth, 1)));
+            int edom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
+            EthiopianEra era = EthiopianEra.AMETE_MIHRET;
 
-            return CopticCalendar.of(cyear, cmonth, cdom);
+            if (mihret < 1) {
+                mihret += DELTA_ALEM_MIHRET;
+                era = EthiopianEra.AMETE_ALEM;
+            }
+
+            return EthiopianCalendar.of(era, mihret, emonth, edom);
 
         }
 
         @Override
-        public long transform(CopticCalendar date) {
+        public long transform(EthiopianCalendar date) {
 
             return (
-                DIOCLETIAN - 1
-                + 365 * (date.cyear - 1) + MathUtils.floorDivide(date.cyear, 4)
-                + 30 * (date.cmonth - 1) + date.cdom);
+                MIHRET_EPOCH - 1
+                    + 365 * (date.mihret - 1) + MathUtils.floorDivide(date.mihret, 4)
+                    + 30 * (date.emonth - 1) + date.edom);
 
         }
 
         @Override
         public long getMinimumSinceUTC() {
 
-            CopticCalendar min = new CopticCalendar(1, 1, 1);
+            EthiopianCalendar min = new EthiopianCalendar(1 - DELTA_ALEM_MIHRET, 1, 1);
             return this.transform(min);
 
         }
@@ -921,7 +879,7 @@ public final class CopticCalendar
         @Override
         public long getMaximumSinceUTC() {
 
-            CopticCalendar max = new CopticCalendar(9999, 13, 6);
+            EthiopianCalendar max = new EthiopianCalendar(9999, 13, 6);
             return this.transform(max);
 
         }
@@ -929,15 +887,25 @@ public final class CopticCalendar
         @Override
         public List<CalendarEra> getEras() {
 
-            CalendarEra era = CopticEra.ANNO_MARTYRUM;
-            return Collections.singletonList(era);
+
+            CalendarEra era0 = EthiopianEra.AMETE_ALEM;
+            CalendarEra era1 = EthiopianEra.AMETE_MIHRET;
+            return Arrays.asList(era0, era1);
+
+        }
+
+        private static void checkEra(CalendarEra era) {
+
+            if (!(era instanceof EthiopianEra)) {
+                throw new IllegalArgumentException("Invalid era: " + era);
+            }
 
         }
 
     }
 
     private static class IntegerRule
-        implements ElementRule<CopticCalendar, Integer> {
+        implements ElementRule<EthiopianCalendar, Integer> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -955,19 +923,19 @@ public final class CopticCalendar
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Integer getValue(CopticCalendar context) {
+        public Integer getValue(EthiopianCalendar context) {
 
             switch (this.index) {
                 case YEAR_INDEX:
-                    return context.cyear;
+                    return context.getYearOfEra();
                 case DAY_OF_MONTH_INDEX:
-                    return context.cdom;
+                    return context.edom;
                 case DAY_OF_YEAR_INDEX:
                     int doy = 0;
-                    for (int m = 1; m < context.cmonth; m++) {
-                        doy += CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, context.cyear, m);
+                    for (int m = 1; m < context.emonth; m++) {
+                        doy += CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), m);
                     }
-                    return doy + context.cdom;
+                    return doy + context.edom;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -975,7 +943,7 @@ public final class CopticCalendar
         }
 
         @Override
-        public Integer getMinimum(CopticCalendar context) {
+        public Integer getMinimum(EthiopianCalendar context) {
 
             switch (this.index) {
                 case YEAR_INDEX:
@@ -989,15 +957,15 @@ public final class CopticCalendar
         }
 
         @Override
-        public Integer getMaximum(CopticCalendar context) {
+        public Integer getMaximum(EthiopianCalendar context) {
 
             switch (this.index) {
                 case YEAR_INDEX:
-                    return 9999;
+                    return ((context.getEra() == EthiopianEra.AMETE_ALEM) ? 15499 : 9999);
                 case DAY_OF_MONTH_INDEX:
-                    return CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, context.cyear, context.cmonth);
+                    return CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, context.mihret, context.emonth);
                 case DAY_OF_YEAR_INDEX:
-                    return CALSYS.getLengthOfYear(CopticEra.ANNO_MARTYRUM, context.cyear);
+                    return CALSYS.getLengthOfYear(EthiopianEra.AMETE_MIHRET, context.mihret);
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1006,7 +974,7 @@ public final class CopticCalendar
 
         @Override
         public boolean isValid(
-            CopticCalendar context,
+            EthiopianCalendar context,
             Integer value
         ) {
 
@@ -1021,8 +989,8 @@ public final class CopticCalendar
         }
 
         @Override
-        public CopticCalendar withValue(
-            CopticCalendar context,
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
             Integer value,
             boolean lenient
         ) {
@@ -1043,12 +1011,13 @@ public final class CopticCalendar
 
             switch (this.index) {
                 case YEAR_INDEX:
+                    EthiopianEra era = context.getEra();
                     int y = value.intValue();
-                    int dmax = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, y, context.cmonth);
-                    int d = Math.min(context.cdom, dmax);
-                    return CopticCalendar.of(y, context.cmonth, d);
+                    int dmax = CALSYS.getLengthOfMonth(era, y, context.emonth);
+                    int d = Math.min(context.edom, dmax);
+                    return EthiopianCalendar.of(era, y, context.emonth, d);
                 case DAY_OF_MONTH_INDEX:
-                    return new CopticCalendar(context.cyear, context.cmonth, value.intValue());
+                    return new EthiopianCalendar(context.mihret, context.emonth, value.intValue());
                 case DAY_OF_YEAR_INDEX:
                     int delta = value.intValue() - this.getValue(context).intValue();
                     return context.plus(CalendarDays.of(delta));
@@ -1059,7 +1028,7 @@ public final class CopticCalendar
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CopticCalendar context) {
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
 
             if (this.index == YEAR_INDEX) {
                 return MONTH_OF_YEAR;
@@ -1070,7 +1039,7 @@ public final class CopticCalendar
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
 
             if (this.index == YEAR_INDEX) {
                 return MONTH_OF_YEAR;
@@ -1083,35 +1052,35 @@ public final class CopticCalendar
     }
 
     private static class MonthRule
-        implements ElementRule<CopticCalendar, CopticMonth> {
+        implements ElementRule<EthiopianCalendar, EthiopianMonth> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public CopticMonth getValue(CopticCalendar context) {
+        public EthiopianMonth getValue(EthiopianCalendar context) {
 
             return context.getMonth();
 
         }
 
         @Override
-        public CopticMonth getMinimum(CopticCalendar context) {
+        public EthiopianMonth getMinimum(EthiopianCalendar context) {
 
-            return CopticMonth.TOUT;
+            return EthiopianMonth.MESKEREM;
 
         }
 
         @Override
-        public CopticMonth getMaximum(CopticCalendar context) {
+        public EthiopianMonth getMaximum(EthiopianCalendar context) {
 
-            return CopticMonth.NASIE;
+            return EthiopianMonth.PAGUMEN;
 
         }
 
         @Override
         public boolean isValid(
-            CopticCalendar context,
-            CopticMonth value
+            EthiopianCalendar context,
+            EthiopianMonth value
         ) {
 
             return (value != null);
@@ -1119,28 +1088,28 @@ public final class CopticCalendar
         }
 
         @Override
-        public CopticCalendar withValue(
-            CopticCalendar context,
-            CopticMonth value,
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
+            EthiopianMonth value,
             boolean lenient
         ) {
 
             int m = value.getValue();
-            int dmax = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, context.cyear, m);
-            int d = Math.min(context.cdom, dmax);
-            return new CopticCalendar(context.cyear, m, d);
+            int dmax = CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, context.mihret, m);
+            int d = Math.min(context.edom, dmax);
+            return new EthiopianCalendar(context.mihret, m, d);
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CopticCalendar context) {
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
 
             return DAY_OF_MONTH;
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
 
             return DAY_OF_MONTH;
 
@@ -1149,35 +1118,35 @@ public final class CopticCalendar
     }
 
     private static class EraRule
-        implements ElementRule<CopticCalendar, CopticEra> {
+        implements ElementRule<EthiopianCalendar, EthiopianEra> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public CopticEra getValue(CopticCalendar context) {
+        public EthiopianEra getValue(EthiopianCalendar context) {
 
-            return CopticEra.ANNO_MARTYRUM;
-
-        }
-
-        @Override
-        public CopticEra getMinimum(CopticCalendar context) {
-
-            return CopticEra.ANNO_MARTYRUM;
+            return context.getEra();
 
         }
 
         @Override
-        public CopticEra getMaximum(CopticCalendar context) {
+        public EthiopianEra getMinimum(EthiopianCalendar context) {
 
-            return CopticEra.ANNO_MARTYRUM;
+            return EthiopianEra.AMETE_ALEM;
+
+        }
+
+        @Override
+        public EthiopianEra getMaximum(EthiopianCalendar context) {
+
+            return EthiopianEra.AMETE_MIHRET;
 
         }
 
         @Override
         public boolean isValid(
-            CopticCalendar context,
-            CopticEra value
+            EthiopianCalendar context,
+            EthiopianEra value
         ) {
 
             return (value != null);
@@ -1185,9 +1154,9 @@ public final class CopticCalendar
         }
 
         @Override
-        public CopticCalendar withValue(
-            CopticCalendar context,
-            CopticEra value,
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
+            EthiopianEra value,
             boolean lenient
         ) {
 
@@ -1200,14 +1169,14 @@ public final class CopticCalendar
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CopticCalendar context) {
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
 
             return YEAR_OF_ERA;
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
 
             return YEAR_OF_ERA;
 
@@ -1216,34 +1185,34 @@ public final class CopticCalendar
     }
 
     private static class WeekdayRule
-        implements ElementRule<CopticCalendar, Weekday> {
+        implements ElementRule<EthiopianCalendar, Weekday> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Weekday getValue(CopticCalendar context) {
+        public Weekday getValue(EthiopianCalendar context) {
 
             return context.getDayOfWeek();
 
         }
 
         @Override
-        public Weekday getMinimum(CopticCalendar context) {
+        public Weekday getMinimum(EthiopianCalendar context) {
+
+            return Weekday.SUNDAY;
+
+        }
+
+        @Override
+        public Weekday getMaximum(EthiopianCalendar context) {
 
             return Weekday.SATURDAY;
 
         }
 
         @Override
-        public Weekday getMaximum(CopticCalendar context) {
-
-            return Weekday.FRIDAY;
-
-        }
-
-        @Override
         public boolean isValid(
-            CopticCalendar context,
+            EthiopianCalendar context,
             Weekday value
         ) {
 
@@ -1252,13 +1221,13 @@ public final class CopticCalendar
         }
 
         @Override
-        public CopticCalendar withValue(
-            CopticCalendar context,
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
             Weekday value,
             boolean lenient
         ) {
 
-            Weekmodel model = Weekmodel.of(Weekday.SATURDAY, 1);
+            Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);
             int newValue = value.getValue(model);
             return context.plus(CalendarDays.of(newValue - oldValue));
@@ -1266,14 +1235,14 @@ public final class CopticCalendar
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CopticCalendar context) {
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
 
             return null;
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
 
             return null;
 
@@ -1282,7 +1251,7 @@ public final class CopticCalendar
     }
 
     private static class Merger
-        implements ChronoMerger<CopticCalendar> {
+        implements ChronoMerger<EthiopianCalendar> {
 
         //~ Methoden ------------------------------------------------------
 
@@ -1292,12 +1261,12 @@ public final class CopticCalendar
             Locale locale
         ) {
 
-            return GenericDatePatterns.get("coptic", style, locale);
+            return GenericDatePatterns.get("ethiopic", style, locale);
 
         }
 
         @Override
-        public CopticCalendar createFrom(
+        public EthiopianCalendar createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
         ) {
@@ -1312,49 +1281,52 @@ public final class CopticCalendar
                 return null;
             }
 
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.MORNING);
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
 
         }
 
         @Override
-        public CopticCalendar createFrom(
+        public EthiopianCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
             if (!entity.contains(YEAR_OF_ERA)) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Ethiopian year.");
                 return null;
+            } else if (!entity.contains(ERA)) {
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Ethiopian era.");
             }
 
-            int cyear = entity.get(YEAR_OF_ERA).intValue();
+            int year = entity.get(YEAR_OF_ERA).intValue();
+            EthiopianEra era = entity.get(ERA);
 
             if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
-                int cmonth = entity.get(MONTH_OF_YEAR).getValue();
-                int cdom = entity.get(DAY_OF_MONTH).intValue();
-                if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
-                    return CopticCalendar.of(cyear, cmonth, cdom);
+                int month = entity.get(MONTH_OF_YEAR).getValue();
+                int dom = entity.get(DAY_OF_MONTH).intValue();
+                if (CALSYS.isValid(era, year, month, dom)) {
+                    return EthiopianCalendar.of(era, year, month, dom);
                 } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
                 }
             } else if (entity.contains(DAY_OF_YEAR)) {
-                int cdoy = entity.get(DAY_OF_YEAR).intValue();
-                if (cdoy > 0) {
-                    int cmonth = 1;
+                int doy = entity.get(DAY_OF_YEAR).intValue();
+                if (doy > 0) {
+                    int month = 1;
                     int daycount = 0;
-                    while (cmonth <= 13) {
-                        int len = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-                        if (cdoy > daycount + len) {
-                            cmonth++;
+                    while (month <= 13) {
+                        int len = CALSYS.getLengthOfMonth(era, year, month);
+                        if (doy > daycount + len) {
+                            month++;
                             daycount += len;
                         } else {
-                            return CopticCalendar.of(cyear, cmonth, cdoy - daycount);
+                            return EthiopianCalendar.of(era, year, month, doy - daycount);
                         }
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
             }
 
             return null;
@@ -1362,7 +1334,7 @@ public final class CopticCalendar
         }
 
         @Override
-        public ChronoDisplay preformat(CopticCalendar context, AttributeQuery attributes) {
+        public ChronoDisplay preformat(EthiopianCalendar context, AttributeQuery attributes) {
 
             return context;
 
@@ -1377,8 +1349,8 @@ public final class CopticCalendar
 
     }
 
-    private static class CopticUnitRule
-        implements UnitRule<CopticCalendar> {
+    private static class EthiopianUnitRule
+        implements UnitRule<EthiopianCalendar> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -1386,7 +1358,7 @@ public final class CopticCalendar
 
         //~ Konstruktoren -------------------------------------------------
 
-        CopticUnitRule(Unit unit) {
+        EthiopianUnitRule(Unit unit) {
             super();
 
             this.unit = unit;
@@ -1396,7 +1368,7 @@ public final class CopticCalendar
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public CopticCalendar addTo(CopticCalendar date, long amount) {
+        public EthiopianCalendar addTo(EthiopianCalendar date, long amount) {
 
             switch (this.unit) {
                 case YEARS:
@@ -1408,9 +1380,9 @@ public final class CopticCalendar
                     int month = MathUtils.floorModulo(ym, 13) + 1;
                     int dom =
                         Math.min(
-                            date.cdom,
-                            CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, year, month));
-                    return CopticCalendar.of(year, month, dom);
+                            date.edom,
+                            CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, year, month));
+                    return EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, year, month, dom);
                 case WEEKS:
                     amount = MathUtils.safeMultiply(amount, 7);
                     // fall-through
@@ -1424,7 +1396,7 @@ public final class CopticCalendar
         }
 
         @Override
-        public long between(CopticCalendar start, CopticCalendar end) {
+        public long between(EthiopianCalendar start, EthiopianCalendar end) {
 
             int factor = 1;
 
@@ -1437,9 +1409,9 @@ public final class CopticCalendar
                     if (factor > 1) {
                         delta = delta / factor;
                     }
-                    if ((delta > 0) && (end.cdom < start.cdom)) {
+                    if ((delta > 0) && (end.edom < start.edom)) {
                         delta--;
-                    } else if ((delta < 0) && (end.cdom > start.cdom)) {
+                    } else if ((delta < 0) && (end.edom > start.edom)) {
                         delta++;
                     }
                     return delta;
@@ -1458,9 +1430,9 @@ public final class CopticCalendar
 
         }
 
-        private static int ymValue(CopticCalendar date) {
+        private static int ymValue(EthiopianCalendar date) {
 
-            return date.cyear * 13 + date.cmonth - 1;
+            return date.mihret * 13 + date.emonth - 1;
 
         }
 
