@@ -840,8 +840,7 @@ public final class CopticCalendar
             }
 
             if (
-                (era == CopticEra.ANNO_MARTYRUM)
-                && (yearOfEra >= 1)
+                (yearOfEra >= 1)
                 && (yearOfEra <= 9999)
                 && (monthOfYear >= 1)
                 && (monthOfYear <= 13)
@@ -891,9 +890,9 @@ public final class CopticCalendar
                             1463),
                         1461));
 
-            int startOfYear =  MathUtils.safeCast(this.transform(CopticCalendar.of(cyear, 1, 1)));
+            int startOfYear =  MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
             int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
-            int startOfMonth = MathUtils.safeCast(this.transform(CopticCalendar.of(cyear, cmonth, 1)));
+            int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
             int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
 
             return CopticCalendar.of(cyear, cmonth, cdom);
@@ -1325,7 +1324,7 @@ public final class CopticCalendar
         ) {
 
             if (!entity.contains(YEAR_OF_ERA)) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing coptic year.");
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
                 return null;
             }
 
