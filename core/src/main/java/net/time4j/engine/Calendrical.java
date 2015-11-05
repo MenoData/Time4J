@@ -329,6 +329,7 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      *
      * @param   days    calendar days to be added
      * @return  result of addition
+     * @throws  ArithmeticException in case of numerical overflow
      * @since   3.4/4.3
      */
     /*[deutsch]
@@ -336,26 +337,42 @@ public abstract class Calendrical<U, D extends Calendrical<U, D>>
      *
      * @param   days    calendar days to be added
      * @return  result of addition
+     * @throws  ArithmeticException in case of numerical overflow
      * @since   3.4/4.3
      */
     public D plus(CalendarDays days) {
 
-        long sum = MathUtils.safeAdd(this.getDaysSinceEpochUTC(), days.getAmount());
-        return this.getCalendarSystem().transform(sum);
+        long result = MathUtils.safeAdd(this.getDaysSinceEpochUTC(), days.getAmount());
+
+        try {
+            return this.getCalendarSystem().transform(result);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException("Out of range: " + result);
+            ex.initCause(iae);
+            throw ex;
+        }
 
     }
 
     /**
+     * <p>Subtracts given calendar days from this instance. </p>
+     *
+     * @param   days    calendar days to be subtracted
+     * @return  result of subtraction
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.4/4.3
+     */
+    /*[deutsch]
      * <p>Subtrahiert die angegebenen Kalendertage von dieser Instanz. </p>
      *
      * @param   days    calendar days to be subtracted
      * @return  result of subtraction
+     * @throws  ArithmeticException in case of numerical overflow
      * @since   3.4/4.3
      */
     public D minus(CalendarDays days) {
 
-        long result = MathUtils.safeSubtract(this.getDaysSinceEpochUTC(), days.getAmount());
-        return this.getCalendarSystem().transform(result);
+        return this.plus(CalendarDays.of(MathUtils.safeNegate(days.getAmount())));
 
     }
 

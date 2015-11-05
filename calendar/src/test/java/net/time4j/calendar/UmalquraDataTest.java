@@ -21,7 +21,7 @@ public class UmalquraDataTest {
     @Parameterized.Parameters(name= "{index}: umalqura({0}-{1}-{2})={3}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-            new Object[][]{
+            new Object[][] {
                 {1300, 1, 1, "1882-11-12"},
                 {1355, 12, 29, "1937-03-13"},
                 {1356, 1, 1, "1937-03-14"}, // first date supported by v.Gent

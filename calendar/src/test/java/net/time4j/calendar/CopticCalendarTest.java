@@ -21,7 +21,7 @@ public class CopticCalendarTest {
     @Parameterized.Parameters(name= "{index}: coptic({0}-{1}-{2})={3} (leap:{4})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-            new Object[][]{
+            new Object[][] {
                 {1, 1, 1, "0284-08-29", false},
                 {1720, 10, 2, "2004-06-09", false},
                 {1721, 10, 2, "2005-06-09", false},

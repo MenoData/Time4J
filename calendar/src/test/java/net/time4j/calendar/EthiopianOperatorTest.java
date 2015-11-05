@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.engine.CalendarDays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -176,6 +177,28 @@ public class EthiopianOperatorTest {
             EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1736, EthiopianMonth.PAGUMEN, 2)
                 .with(EthiopianCalendar.YEAR_OF_ERA.atCeiling()),
             is(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1736, EthiopianMonth.PAGUMEN, 5)));
+    }
+
+    @Test(expected=ArithmeticException.class)
+    public void beforeCreationOfWorld() {
+        EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 1, 1, 1).minus(CalendarDays.of(1));
+    }
+
+    @Test(expected=ArithmeticException.class)
+    public void afterYear9999() {
+        EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 9999, 13, 6).plus(CalendarDays.of(1));
+    }
+
+    @Test
+    public void sameMaxInTwoEpochs() {
+        assertThat(
+            EthiopianCalendar.axis().getMaximum(),
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 9999, 13, 6))
+        );
+        assertThat(
+            EthiopianCalendar.axis().getMaximum(),
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 15499, 13, 6))
+        );
     }
 
 }
