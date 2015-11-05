@@ -24,10 +24,11 @@ public class EthiopianCalendarTest {
     @Parameterized.Parameters(name= "{index}: ethiopian({0}-{1}-{2})={3} (leap:{4})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-            new Object[][]{
+            new Object[][] {
+                {-5499, 1, 1, "-5492-07-17", false}, // BC-5493-08-29
                 {-1, 13, 5, "0007-08-26", true},
                 {0, 13, 5, "0008-08-26", false},
-                {1, 1, 1, "0008-08-27", false}, // AD-8-08-29
+                {1, 1, 1, "0008-08-27", false}, // AD-0008-08-29
                 {71, 1, 1, "0078-08-27", true},
                 {76, 1, 1, "0083-08-28", false},
                 {276, 13, 5, "0284-08-28", false},

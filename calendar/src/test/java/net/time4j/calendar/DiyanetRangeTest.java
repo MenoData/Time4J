@@ -2,12 +2,9 @@ package net.time4j.calendar;
 
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.ChronoException;
-import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -32,7 +29,7 @@ public class DiyanetRangeTest {
             is(hijri.getDaysSinceEpochUTC()));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=ArithmeticException.class)
     public void beyondMaximum() {
         HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29).plus(CalendarDays.ONE);
     }
