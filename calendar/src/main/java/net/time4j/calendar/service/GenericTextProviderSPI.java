@@ -105,7 +105,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "coptic", "ethiopic", "islamic", "persian", "roc" };
+        return new String[] { "coptic", "ethiopic", "generic", "islamic", "persian", "roc" };
 
     }
 
@@ -340,15 +340,15 @@ public final class GenericTextProviderSPI
 
     }
 
-    private static int countOfMonths(String calendarType) {
+    private static int countOfMonths(String ct) {
 
-        return ((calendarType.equals("coptic") || calendarType.equals("ethiopic")) ? 13 : 12);
+        return ((ct.equals("coptic") || ct.equals("ethiopic") || ct.equals("generic")) ? 13 : 12);
 
     }
 
-    private static int countOfEras(String calendarType) {
+    private static int countOfEras(String ct) {
 
-        return ((calendarType.equals("ethiopic") || calendarType.equals("roc")) ? 2 : 1);
+        return ((ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc")) ? 2 : 1);
 
     }
 

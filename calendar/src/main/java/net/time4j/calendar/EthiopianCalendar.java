@@ -241,6 +241,21 @@ public final class EthiopianCalendar
     public static final StdCalendarElement<Weekday, EthiopianCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<EthiopianCalendar>(EthiopianCalendar.class);
 
+    /**
+     * <p>Represents the evangelist associated with a year of the Ethiopian leap year cycle. </p>
+     *
+     * <p>The fourth evangelist (John) is always associated with a leap year. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert einen Apostel, der mit einem Jahr des &auml;thiopischen Schaltjahrzyklus
+     * assoziiert ist. </p>
+     *
+     * <p>Der vierte Apostel Johannes ist immer mit einem Schaltjahr assoziiert. </p>
+     */
+    public static final TextElement<Evangelist> EVANGELIST =
+        new StdEnumDateElement<Evangelist, EthiopianCalendar>(
+            "EVANGELIST", EthiopianCalendar.class, Evangelist.class, '\u0000', "generic");
+
     private static final MonthBasedCalendarSystem<EthiopianCalendar> CALSYS;
     private static final TimeAxis<EthiopianCalendar.Unit, EthiopianCalendar> ENGINE;
 
@@ -276,6 +291,9 @@ public final class EthiopianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                EVANGELIST,
+                new EvangelistRule())
             .appendUnit(
                 Unit.YEARS,
                 new EthiopianUnitRule(Unit.YEARS),
@@ -1183,6 +1201,74 @@ public final class EthiopianCalendar
 
     }
 
+    private static class EvangelistRule
+        implements ElementRule<EthiopianCalendar, Evangelist> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Evangelist getValue(EthiopianCalendar context) {
+
+            return Evangelist.values()[context.getYearOfEra() % 4];
+
+        }
+
+        @Override
+        public Evangelist getMinimum(EthiopianCalendar context) {
+
+            return ((context.mihret <= -5497) ? Evangelist.MARK : Evangelist.MATTHEW);
+
+        }
+
+        @Override
+        public Evangelist getMaximum(EthiopianCalendar context) {
+
+            return Evangelist.JOHN;
+
+        }
+
+        @Override
+        public boolean isValid(
+            EthiopianCalendar context,
+            Evangelist value
+        ) {
+
+            return ((value != null) && value.compareTo(this.getMinimum(context)) >= 0);
+
+        }
+
+        @Override
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
+            Evangelist value,
+            boolean lenient
+        ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing evangelist.");
+            }
+
+            int years = value.ordinal() - this.getValue(context).ordinal();
+            return context.plus(years, Unit.YEARS);
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
+
+            return null;
+
+        }
+
+    }
+
     private static class WeekdayRule
         implements ElementRule<EthiopianCalendar, Weekday> {
 
@@ -1374,14 +1460,19 @@ public final class EthiopianCalendar
                     amount = MathUtils.safeMultiply(amount, 13);
                     // fall-through
                 case MONTHS:
+                    EthiopianEra era = EthiopianEra.AMETE_MIHRET;
                     long ym = MathUtils.safeAdd(ymValue(date), amount);
                     int year = MathUtils.safeCast(MathUtils.floorDivide(ym, 13));
                     int month = MathUtils.floorModulo(ym, 13) + 1;
+                    if (year < 1) {
+                        era = EthiopianEra.AMETE_ALEM;
+                        year += DELTA_ALEM_MIHRET;
+                    }
                     int dom =
                         Math.min(
                             date.edom,
-                            CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, year, month));
-                    return EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, year, month, dom);
+                            CALSYS.getLengthOfMonth(era, year, month));
+                    return EthiopianCalendar.of(era, year, month, dom);
                 case WEEKS:
                     amount = MathUtils.safeMultiply(amount, 7);
                     // fall-through

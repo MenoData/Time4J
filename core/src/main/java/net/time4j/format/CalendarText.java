@@ -673,7 +673,7 @@ public final class CalendarText {
      * used. </p>
      *
      * <p>While the methods {@code getStdMonths()}, {@code getWeekdays()}
-     * etc.are mainly based on JDK-defaults, this method is escpecially
+     * etc. are mainly based on JDK-defaults, this method is escpecially
      * designed for querying chronological texts which are not contained in
      * JDK. Text forms will be stored internally in the resource folder
      * &quot;calendar&quot; relative to class path in properties-files using
@@ -746,6 +746,38 @@ public final class CalendarText {
         String... variants
     ) {
 
+        return this.getTextForms(element.name(), element.getType(), variants);
+
+    }
+
+    /**
+     * <p>See {@link #getTextForms(ChronoElement, String...)}. </p>
+     *
+     * @param   <V> generic type of element values based on enums
+     * @param   name        name of text entries in resource file
+     * @param   type        type of enum values
+     * @param   variants    text form variants (optional)
+     * @return  accessor for any text forms
+     * @throws  MissingResourceException if for given calendar type there are no text resource files
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Siehe {@link #getTextForms(ChronoElement, String...)}. </p>
+     *
+     * @param   <V> generic type of element values based on enums
+     * @param   name        name of text entries in resource file
+     * @param   type        type of enum values
+     * @param   variants    text form variants (optional)
+     * @return  accessor for any text forms
+     * @throws  MissingResourceException if for given calendar type there are no text resource files
+     * @since   3.11/4.8
+     */
+    public <V extends Enum<V>> TextAccessor getTextForms(
+        String name,
+        Class<V> type,
+        String... variants
+    ) {
+
         if (this.textForms == null) {
             throw new MissingResourceException(
                 this.mre.getMessage(),
@@ -753,11 +785,11 @@ public final class CalendarText {
                 this.mre.getKey());
         }
 
-        V[] enums = element.getType().getEnumConstants();
+        V[] enums = type.getEnumConstants();
         int len = enums.length;
         String[] tfs = new String[len];
-        String prefix = getKeyPrefix(this.textForms, element.name());
-        int baseIndex = (CalendarEra.class.isAssignableFrom(element.getType()) ? 0 : 1);
+        String prefix = getKeyPrefix(this.textForms, name);
+        int baseIndex = (CalendarEra.class.isAssignableFrom(type) ? 0 : 1);
 
         for (int i = 0; i < len; i++) {
             int step = 0;
@@ -1006,13 +1038,11 @@ public final class CalendarText {
 
         if (
             bundle.containsKey("useShortKeys")
-                && "true".equals(bundle.getString("useShortKeys"))
-                && (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
-                    || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
+            && "true".equals(bundle.getString("useShortKeys"))
+            && (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
+                || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
         ) {
-
             return elementName.substring(0, 1);
-
         }
 
         return elementName;
