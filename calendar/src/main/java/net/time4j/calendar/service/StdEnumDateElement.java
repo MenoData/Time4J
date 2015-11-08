@@ -27,6 +27,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.CalendarType;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
@@ -63,6 +64,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final Class<V> type;
+    private transient final String defaultCalendarType;
     private transient final ChronoOperator<T> decrementor;
     private transient final ChronoOperator<T> incrementor;
 
@@ -77,6 +79,23 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
         super(name, chrono, symbol, isWeekdayElement(symbol));
 
         this.type = type;
+        this.defaultCalendarType = extractCalendarType(chrono);
+        this.decrementor = null;
+        this.incrementor = null;
+
+    }
+
+    public StdEnumDateElement(
+        String name,
+        Class<T> chrono,
+        Class<V> type,
+        char symbol,
+        String defaultCalendarType
+    ) {
+        super(name, chrono, symbol, isWeekdayElement(symbol));
+
+        this.type = type;
+        this.defaultCalendarType = defaultCalendarType;
         this.decrementor = null;
         this.incrementor = null;
 
@@ -93,6 +112,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
         super(name, chrono, symbol, false);
 
         this.type = type;
+        this.defaultCalendarType = extractCalendarType(chrono);
         this.decrementor = decrementor;
         this.incrementor = incrementor;
 
@@ -253,6 +273,13 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
 
     }
 
+    private static String extractCalendarType(Class<?> type) {
+
+        CalendarType ft = type.getAnnotation(CalendarType.class);
+        return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
+
+    }
+
     private TextAccessor accessor(
         AttributeQuery attributes,
         boolean leap
@@ -267,7 +294,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
         if (this.isMonthElement()) {
             cnames =
                 CalendarText.getInstance(
-                    attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
+                    attributes.get(Attributes.CALENDAR_TYPE, this.defaultCalendarType),
                     lang);
             if (leap) {
                 return cnames.getLeapMonths(textWidth, outputContext);
@@ -280,11 +307,11 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
         } else if (this.isEraElement()) {
             cnames =
                 CalendarText.getInstance(
-                    attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
+                    attributes.get(Attributes.CALENDAR_TYPE, this.defaultCalendarType),
                     lang);
             return cnames.getEras(textWidth);
         } else {
-            throw new UnsupportedOperationException(this.name());
+            return CalendarText.getInstance(this.defaultCalendarType, lang).getTextForms(this.name(), this.type);
         }
 
     }
