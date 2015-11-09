@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         PersianCalendarTest.class,
         PersianOperatorTest.class,
         StartOfDayTest.class,
+        TabotTest.class,
         UmalquraDataTest.class
     }
 )
