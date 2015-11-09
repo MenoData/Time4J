@@ -53,14 +53,14 @@ public enum Evangelist {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Determines a translation of this instance with fallback to English. </p>
+     * <p>Determines a translation of this instance with fallback to Roman numerals. </p>
      *
      * @param   locale      language setting
      * @return  descriptive text (never {@code null})
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert eine &Uuml;bersetzung oder Englisch, wenn nicht vorhanden. </p>
+     * <p>Liefert eine &Uuml;bersetzung oder r&ouml;mische Numerale, wenn nicht vorhanden. </p>
      *
      * @param   locale      language setting
      * @return  descriptive text (never {@code null})

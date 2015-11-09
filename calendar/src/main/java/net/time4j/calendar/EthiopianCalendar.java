@@ -256,6 +256,40 @@ public final class EthiopianCalendar
         new StdEnumDateElement<Evangelist, EthiopianCalendar>(
             "EVANGELIST", EthiopianCalendar.class, Evangelist.class, '\u0000', "generic");
 
+    /**
+     * <p>Represents the tabot name of the associated day-of-month. </p>
+     *
+     * <p>Example of usage in formatting: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;EthiopianCalendar&gt; f =
+     *      ChronoFormatter.setUp(EthiopianCalendar.axis(), new Locale(&quot;am&quot;))
+     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.NON_ISO_DATE)
+     *      .addLiteral(&quot; (&quot;)
+     *      .addText(EthiopianCalendar.TABOT)
+     *      .addLiteral(&#39;)&#39;)
+     *      .build();
+     *  String s = f.format(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 6, 25));
+     * </pre>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert einen mit dem Monatstag verkn&uuml;pften Namen (<i>tabot</i>). </p>
+     *
+     * <p>Verwendungsbeispiel beim Formatieren: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;EthiopianCalendar&gt; f =
+     *      ChronoFormatter.setUp(EthiopianCalendar.axis(), new Locale(&quot;am&quot;))
+     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.NON_ISO_DATE)
+     *      .addLiteral(&quot; (&quot;)
+     *      .addText(EthiopianCalendar.TABOT)
+     *      .addLiteral(&#39;)&#39;)
+     *      .build();
+     *  String s = f.format(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 6, 25));
+     * </pre>
+     */
+    public static final TextElement<Tabot> TABOT = Tabot.Element.TABOT;
+
     private static final MonthBasedCalendarSystem<EthiopianCalendar> CALSYS;
     private static final TimeAxis<EthiopianCalendar.Unit, EthiopianCalendar> ENGINE;
 
@@ -294,6 +328,9 @@ public final class EthiopianCalendar
             .appendElement(
                 EVANGELIST,
                 new EvangelistRule())
+            .appendElement(
+                TABOT,
+                new TabotRule())
             .appendUnit(
                 Unit.YEARS,
                 new EthiopianUnitRule(Unit.YEARS),
@@ -980,9 +1017,9 @@ public final class EthiopianCalendar
                 case YEAR_INDEX:
                     return ((context.getEra() == EthiopianEra.AMETE_ALEM) ? 15499 : 9999);
                 case DAY_OF_MONTH_INDEX:
-                    return CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, context.mihret, context.emonth);
+                    return CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), context.emonth);
                 case DAY_OF_YEAR_INDEX:
-                    return CALSYS.getLengthOfYear(EthiopianEra.AMETE_MIHRET, context.mihret);
+                    return CALSYS.getLengthOfYear(context.getEra(), context.getYearOfEra());
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1112,7 +1149,7 @@ public final class EthiopianCalendar
         ) {
 
             int m = value.getValue();
-            int dmax = CALSYS.getLengthOfMonth(EthiopianEra.AMETE_MIHRET, context.mihret, m);
+            int dmax = CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), m);
             int d = Math.min(context.edom, dmax);
             return new EthiopianCalendar(context.mihret, m, d);
 
@@ -1250,6 +1287,73 @@ public final class EthiopianCalendar
 
             int years = value.ordinal() - this.getValue(context).ordinal();
             return context.plus(years, Unit.YEARS);
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
+
+            return null;
+
+        }
+
+    }
+
+    private static class TabotRule
+        implements ElementRule<EthiopianCalendar, Tabot> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Tabot getValue(EthiopianCalendar context) {
+
+            return Tabot.of(context.getDayOfMonth());
+
+        }
+
+        @Override
+        public Tabot getMinimum(EthiopianCalendar context) {
+
+            return Tabot.of(1);
+
+        }
+
+        @Override
+        public Tabot getMaximum(EthiopianCalendar context) {
+
+            return Tabot.of(context.getMaximum(DAY_OF_MONTH));
+
+        }
+
+        @Override
+        public boolean isValid(
+            EthiopianCalendar context,
+            Tabot value
+        ) {
+
+            return ((value != null) && value.compareTo(this.getMaximum(context)) <= 0);
+
+        }
+
+        @Override
+        public EthiopianCalendar withValue(
+            EthiopianCalendar context,
+            Tabot value,
+            boolean lenient
+        ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing tabot.");
+            }
+
+            return context.with(DAY_OF_MONTH, value.getDayOfMonth());
 
         }
 
