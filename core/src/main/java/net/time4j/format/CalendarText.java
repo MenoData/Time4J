@@ -1039,10 +1039,15 @@ public final class CalendarText {
         if (
             bundle.containsKey("useShortKeys")
             && "true".equals(bundle.getString("useShortKeys"))
-            && (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
-                || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
         ) {
-            return elementName.substring(0, 1);
+            if (
+                (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
+                || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
+            ) {
+                return elementName.substring(0, 1);
+            } else if (elementName.equals("EVANGELIST")) { // special case
+                return "EV";
+            }
         }
 
         return elementName;

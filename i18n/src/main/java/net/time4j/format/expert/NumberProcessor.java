@@ -26,6 +26,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ final class NumberProcessor<V>
                 "Sign policy must be SHOW_NEVER in fixed-width-mode.");
         }
 
-        int scale = this.getScale();
+        int scale = this.getScale(NumberSystem.ARABIC);
 
         if (minDigits > scale) {
             throw new IllegalArgumentException(
@@ -135,14 +136,16 @@ final class NumberProcessor<V>
         boolean negative = false;
         String digits;
 
+        NumberSystem numsys =
+            step.getAttribute(
+                Attributes.NUMBER_SYSTEM,
+                attributes,
+                NumberSystem.ARABIC);
+
         if (type == Integer.class) {
             int v = Integer.class.cast(value).intValue();
             negative = (v < 0);
-            digits = (
-                (v == Integer.MIN_VALUE)
-                ? "2147483648"
-                : Integer.toString(Math.abs(v))
-            );
+            digits = toNumeral(numsys, v);
         } else if (type == Long.class) {
             long v = Long.class.cast(value).longValue();
             negative = (v < 0);
@@ -168,14 +171,9 @@ final class NumberProcessor<V>
                         "Enum broken: " + value + " / " + type.getName());
                 }
             }
-            digits = (
-                (v == Integer.MIN_VALUE)
-                ? "2147483648"
-                : Integer.toString(Math.abs(v))
-            );
+            digits = toNumeral(numsys, v);
         } else {
-            throw new IllegalArgumentException(
-                "Not formattable: " + this.element);
+            throw new IllegalArgumentException("Not formattable: " + this.element);
         }
 
         if (digits.length() > this.maxDigits) {
@@ -185,22 +183,26 @@ final class NumberProcessor<V>
                 + " exceeds the maximum width of " + this.maxDigits + ".");
         }
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0'))
-            .charValue();
+        char zeroDigit = '\u0000';
 
-        if (zeroDigit != '0') {
-            int diff = zeroDigit - '0';
-            char[] characters = digits.toCharArray();
+        if (numsys == NumberSystem.ARABIC) {
+            zeroDigit =
+                step.getAttribute(
+                    Attributes.ZERO_DIGIT,
+                    attributes,
+                    Character.valueOf('0'))
+                    .charValue();
 
-            for (int i = 0; i < characters.length; i++) {
-                characters[i] = (char) (characters[i] + diff);
+            if (zeroDigit != '0') {
+                int diff = zeroDigit - '0';
+                char[] characters = digits.toCharArray();
+
+                for (int i = 0; i < characters.length; i++) {
+                    characters[i] = (char) (characters[i] + diff);
+                }
+
+                digits = new String(characters);
             }
-
-            digits = new String(characters);
         }
 
         int start = -1;
@@ -235,9 +237,11 @@ final class NumberProcessor<V>
             }
         }
 
-        for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
-            buffer.append(zeroDigit);
-            printed++;
+        if (numsys == NumberSystem.ARABIC) {
+            for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
+                buffer.append(zeroDigit);
+                printed++;
+            }
         }
 
         buffer.append(digits);
@@ -248,8 +252,7 @@ final class NumberProcessor<V>
             && (printed > 0)
             && (positions != null)
         ) {
-            positions.add(
-                new ElementPosition(this.element, start, start + printed));
+            positions.add(new ElementPosition(this.element, start, start + printed));
         }
 
     }
@@ -263,11 +266,14 @@ final class NumberProcessor<V>
         FormatStep step
     ) {
 
+        NumberSystem numsys =
+            step.getAttribute(Attributes.NUMBER_SYSTEM, attributes, NumberSystem.ARABIC);
+
         Leniency leniency =
             step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
         int effectiveMin = 1;
-        int effectiveMax = this.getScale();
+        int effectiveMax = this.getScale(numsys);
 
         if (
             this.fixedWidth
@@ -358,13 +364,23 @@ final class NumberProcessor<V>
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
-            for (int i = pos; i < len; i++) {
-                int digit = text.charAt(i) - zeroDigit;
+            if (numsys == NumberSystem.ARABIC) {
+                for (int i = pos; i < len; i++) {
+                    int digit = text.charAt(i) - zeroDigit;
 
-                if ((digit >= 0) && (digit <= 9)) {
-                    digitCount++;
-                } else {
-                    break;
+                    if ((digit >= 0) && (digit <= 9)) {
+                        digitCount++;
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                for (int i = pos; i < len; i++) {
+                    if (numsys.contains(text.charAt(i))) {
+                        digitCount++;
+                    } else {
+                        break;
+                    }
                 }
             }
 
@@ -376,19 +392,38 @@ final class NumberProcessor<V>
         long total = 0;
         boolean first = true;
 
-        while (pos < maxPos) {
-            int digit = text.charAt(pos) - zeroDigit;
+        if (numsys == NumberSystem.ARABIC) {
+            while (pos < maxPos) {
+                int digit = text.charAt(pos) - zeroDigit;
 
-            if ((digit >= 0) && (digit <= 9)) {
-                total = total * 10 + digit;
-                pos++;
-                first = false;
-            } else if (first) {
-                status.setError(start, "Digit expected.");
-                return;
-            } else {
-                break;
+                if ((digit >= 0) && (digit <= 9)) {
+                    total = total * 10 + digit;
+                    pos++;
+                    first = false;
+                } else if (first) {
+                    status.setError(start, "Digit expected.");
+                    return;
+                } else {
+                    break;
+                }
             }
+        } else {
+            int digitCount = 0;
+
+            while (pos < maxPos) {
+                if (numsys.contains(text.charAt(pos))) {
+                    digitCount++;
+                    pos++;
+                    first = false;
+                } else if (first) {
+                    status.setError(start, "Digit expected.");
+                    return;
+                } else {
+                    break;
+                }
+            }
+
+            total = numsys.toInteger(text.subSequence(pos - digitCount, pos).toString());
         }
 
         if (
@@ -564,9 +599,29 @@ final class NumberProcessor<V>
 
     }
 
-    private int getScale() {
+    private int getScale(NumberSystem numsys) {
 
-        return ((this.element.getType() == Long.class) ? 18 : 9);
+        if (numsys == NumberSystem.ARABIC) {
+            return ((this.element.getType() == Long.class) ? 18 : 9);
+        } else {
+            return Integer.MAX_VALUE;
+        }
+
+    }
+
+    private static String toNumeral(
+        NumberSystem numsys,
+        int v
+    ) {
+
+        if (numsys == NumberSystem.ARABIC) {
+            return (
+                (v == Integer.MIN_VALUE)
+                ? "2147483648"
+                : Integer.toString(Math.abs(v)));
+        } else {
+            return numsys.toNumeral(Math.abs(v));
+        }
 
     }
 

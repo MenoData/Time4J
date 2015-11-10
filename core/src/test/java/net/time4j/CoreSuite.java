@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.format.NumberSuite;
 import net.time4j.scale.ScaleSuite;
 import net.time4j.tz.ZoneSuite;
 
@@ -16,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,
+        NumberSuite.class,
         OperatorSuite.class,
         MinMaxTest.class,
         ScaleSuite.class,

@@ -5,6 +5,7 @@ import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -25,6 +26,25 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class MiscellaneousTest {
+
+    @Test
+    public void ethiopicNumeralFormat() throws ParseException {
+        ChronoFormatter<EthiopianCalendar> formatter =
+            ChronoFormatter.setUp(EthiopianCalendar.class, new Locale("am"))
+                .addPattern("MMMM d ", PatternType.NON_ISO_DATE)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
+                .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
+                .endSection()
+                .addLiteral(" (")
+                .addText(EthiopianCalendar.EVANGELIST)
+                .addPattern(") G", PatternType.NON_ISO_DATE)
+                .build();
+        String input = "ጥቅምት 11 ፲፱፻፺፯ (ማቴዎስ) ዓ/ም";
+        EthiopianCalendar ethio = formatter.parse(input);
+        assertThat(
+            ethio,
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1997, 2, 11)));
+    }
 
     @Test
     public void genericIslamicPattern() {

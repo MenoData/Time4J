@@ -251,7 +251,24 @@ public final class Attributes
         PredefinedKey.valueOf("PARSE_PARTIAL_COMPARE", Boolean.class);
 
     /**
-     * <p>Determines the unicode char for the zero digit.. </p>
+     * <p>Determines the number system. </p>
+     *
+     * <p>If defined as non-arabic then the attribute for zero digit will be ignored. </p>
+     *
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Zahlsystem. </p>
+     *
+     * <p>Wenn als nicht-arabisch definiert, dann wird das Attribut f&uuml;r die Nullziffer ignoriert. </p>
+     *
+     * @since   3.11/4.8
+     */
+    public static final AttributeKey<NumberSystem> NUMBER_SYSTEM =
+        PredefinedKey.valueOf("NUMBER_SYSTEM", NumberSystem.class);
+
+    /**
+     * <p>Determines the unicode char for the zero digit. </p>
      *
      * <p>In case of changing the language setting this attribute will
      * automatically be adjusted. Default value is the arab digit
