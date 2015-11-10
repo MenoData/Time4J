@@ -4,6 +4,7 @@
 - Support for triennal julian leap years [#393]
 
 ### Fixed
+- Compile problem with text elements in ChronoFormatter.Builder [#398]
 - plus/minus(CalendarDays) does not document any exception [#397]
 - Arithmetic overflow in ChronoHistory [#391]
 
