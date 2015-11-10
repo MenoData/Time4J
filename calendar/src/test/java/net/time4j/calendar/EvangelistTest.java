@@ -65,34 +65,34 @@ public class EvangelistTest {
     public void getEvangelist() {
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 1, 1, 1).get(EthiopianCalendar.EVANGELIST),
-            is(Evangelist.MARK));
+            is(Evangelist.MATTHEW));
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1, 1, 1).get(EthiopianCalendar.EVANGELIST),
-            is(Evangelist.MARK));
+            is(Evangelist.MATTHEW));
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 15499, 1, 1).get(EthiopianCalendar.EVANGELIST),
-            is(Evangelist.JOHN));
+            is(Evangelist.LUKE));
     }
 
     @Test
     public void isValid() {
         assertThat(
-            EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 3, 1, 1).isValid(
+            EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 15497, 1, 1).isValid(
                 EthiopianCalendar.EVANGELIST,
-                Evangelist.MATTHEW),
+                Evangelist.JOHN),
             is(false));
         assertThat(
-            EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 3, 1, 1).isValid(
+            EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 15497, 1, 1).isValid(
                 EthiopianCalendar.EVANGELIST,
-                Evangelist.MARK),
+                Evangelist.LUKE),
             is(true));
     }
 
     @Test(expected=ArithmeticException.class)
     public void withEvangelistEx() {
-        EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 3, 1, 1).with(
+        EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 15499, 1, 1).with(
             EthiopianCalendar.EVANGELIST,
-            Evangelist.MATTHEW);
+            Evangelist.JOHN);
     }
 
     @Test
@@ -101,16 +101,21 @@ public class EvangelistTest {
             EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 1, 1, 1).with(
                 EthiopianCalendar.EVANGELIST,
                 Evangelist.JOHN),
-            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 3, 1, 1)));
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 4, 1, 1)));
+        assertThat(
+            EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 5499, 1, 1).with(
+                EthiopianCalendar.EVANGELIST,
+                Evangelist.LUKE),
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 5499, 1, 1)));
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 5499, 1, 1).with(
                 EthiopianCalendar.EVANGELIST,
                 Evangelist.JOHN),
-            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 5499, 1, 1)));
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_ALEM, 5500, 1, 1)));
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1, 1, 1).with(
                 EthiopianCalendar.EVANGELIST,
-                Evangelist.JOHN),
+                Evangelist.LUKE),
             is(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 3, 1, 1)));
     }
 

@@ -1282,21 +1282,21 @@ public final class EthiopianCalendar
         @Override
         public Evangelist getValue(EthiopianCalendar context) {
 
-            return Evangelist.values()[context.getYearOfEra() % 4];
+            return Evangelist.values()[(context.getYearOfEra() + 3) % 4];
 
         }
 
         @Override
         public Evangelist getMinimum(EthiopianCalendar context) {
 
-            return ((context.mihret <= -5497) ? Evangelist.MARK : Evangelist.MATTHEW);
+            return Evangelist.MATTHEW;
 
         }
 
         @Override
         public Evangelist getMaximum(EthiopianCalendar context) {
 
-            return Evangelist.JOHN;
+            return ((context.mihret >= 9997) ? Evangelist.LUKE : Evangelist.JOHN);
 
         }
 
@@ -1306,7 +1306,7 @@ public final class EthiopianCalendar
             Evangelist value
         ) {
 
-            return ((value != null) && value.compareTo(this.getMinimum(context)) >= 0);
+            return ((value != null) && value.compareTo(this.getMaximum(context)) <= 0);
 
         }
 
