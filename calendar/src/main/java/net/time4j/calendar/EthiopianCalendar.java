@@ -87,6 +87,8 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #EVANGELIST}</li>
+ *  <li>{@link #TABOT}</li>
  * </ul>
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
@@ -94,12 +96,28 @@ import java.util.Locale;
  * <p>Example of usage: </p>
  *
  * <pre>
+ *     // printing to English
  *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
  *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
  *     System.out.println(formatter.format(ethiopianDate));
+ *
+ *     // parsing text in Amharic (requires Ethiopic unicode font for proper view in browser)
+ *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(EthiopianCalendar.class, new Locale(&quot;am&quot;))
+ *       .addPattern(&quot;MMMM d &quot;, PatternType.NON_ISO_DATE)
+ *       .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
+ *       .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
+ *       .endSection()
+ *       .addLiteral(&quot; (&quot;)
+ *       .addText(EthiopianCalendar.EVANGELIST)
+ *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
+ *       .build();
+ *     EthiopianCalendar ethio =
+ *       formatter.parse(&quot;&#4901;&#4677;&#4637;&#4725; 11 &#4978;&#4977;&#4987;&#4986;&#4975; (&#4635;&#4724;&#4814;&#4661;) &#4819;/&#4637;&quot;);
+ *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
  * @author  Meno Hochschild
@@ -122,19 +140,37 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #EVANGELIST}</li>
+ *  <li>{@link #TABOT}</li>
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <p>Anwendungsbeispiele: </p>
  *
  * <pre>
+ *     // printing to English
  *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
  *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
  *     System.out.println(formatter.format(ethiopianDate));
+ *
+ *     // parsing text in Amharic (requires Ethiopic unicode font for proper view in browser)
+ *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(EthiopianCalendar.class, new Locale(&quot;am&quot;))
+ *       .addPattern(&quot;MMMM d &quot;, PatternType.NON_ISO_DATE)
+ *       .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
+ *       .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
+ *       .endSection()
+ *       .addLiteral(&quot; (&quot;)
+ *       .addText(EthiopianCalendar.EVANGELIST)
+ *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
+ *       .build();
+ *     EthiopianCalendar ethio =
+ *       formatter.parse(&quot;&#4901;&#4677;&#4637;&#4725; 11 &#4978;&#4977;&#4987;&#4986;&#4975; (&#4635;&#4724;&#4814;&#4661;) &#4819;/&#4637;&quot;);
+ *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
  * @author  Meno Hochschild
@@ -170,7 +206,7 @@ public final class EthiopianCalendar
      * <p>Eine &Auml;nderung der &Auml;ra hat keine Wirkung. </p>
      */
     @FormattableElement(format = "G")
-    public static final TextElement<EthiopianEra> ERA =
+    public static final ChronoElement<EthiopianEra> ERA =
         new StdEnumDateElement<EthiopianEra, EthiopianCalendar>(
             "ERA", EthiopianCalendar.class, EthiopianEra.class, 'G');
 
@@ -252,7 +288,7 @@ public final class EthiopianCalendar
      *
      * <p>Der vierte Apostel Johannes ist immer mit einem Schaltjahr assoziiert. </p>
      */
-    public static final TextElement<Evangelist> EVANGELIST =
+    public static final ChronoElement<Evangelist> EVANGELIST =
         new StdEnumDateElement<Evangelist, EthiopianCalendar>(
             "EVANGELIST", EthiopianCalendar.class, Evangelist.class, '\u0000', "generic");
 

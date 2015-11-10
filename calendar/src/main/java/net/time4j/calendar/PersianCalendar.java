@@ -56,7 +56,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
-import net.time4j.format.TextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -175,7 +174,7 @@ public final class PersianCalendar
      * <p>Repr&auml;sentiert die persische &Auml;ra. </p>
      */
     @FormattableElement(format = "G")
-    public static final TextElement<PersianEra> ERA =
+    public static final ChronoElement<PersianEra> ERA =
         new StdEnumDateElement<PersianEra, PersianCalendar>(
             "ERA", PersianCalendar.class, PersianEra.class, 'G');
 
