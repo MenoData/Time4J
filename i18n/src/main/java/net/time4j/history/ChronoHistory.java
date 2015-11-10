@@ -137,7 +137,7 @@ public final class ChronoHistory
     private transient final List<CutOverEvent> events;
     private transient final AncientJulianLeapYears ajly;
 
-    private transient final TextElement<HistoricEra> eraElement;
+    private transient final ChronoElement<HistoricEra> eraElement;
     private transient final TextElement<Integer> yearOfEraElement;
     private transient final TextElement<Integer> monthElement;
     private transient final TextElement<Integer> dayOfMonthElement;
@@ -639,7 +639,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    public TextElement<HistoricEra> era() {
+    public ChronoElement<HistoricEra> era() {
 
         return this.eraElement;
 

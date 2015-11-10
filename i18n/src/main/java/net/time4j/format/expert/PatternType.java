@@ -1201,7 +1201,7 @@ public enum PatternType
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
                 ChronoHistory history = ChronoHistory.of(locale);
-                TextElement<?> eraElement = history.era();
+                TextElement<?> eraElement = TextElement.class.cast(history.era());
                 builder.addText(eraElement);
                 builder.endSection();
                 Map<ChronoElement<?>, ChronoElement<?>> replacement = new HashMap<>();
@@ -1505,7 +1505,7 @@ public enum PatternType
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
                 ChronoHistory history = ChronoHistory.PROLEPTIC_GREGORIAN;
-                TextElement<?> eraElement = history.era();
+                TextElement<?> eraElement = TextElement.class.cast(history.era());
                 builder.addText(eraElement);
                 builder.endSection();
                 builder.setProlepticGregorian();

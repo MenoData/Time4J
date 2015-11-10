@@ -55,7 +55,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
-import net.time4j.format.TextElement;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
@@ -179,7 +178,7 @@ public final class CopticCalendar
      * <p>Repr&auml;sentiert die koptische &Auml;ra. </p>
      */
     @FormattableElement(format = "G")
-    public static final TextElement<CopticEra> ERA =
+    public static final ChronoElement<CopticEra> ERA =
         new StdEnumDateElement<>("ERA", CopticCalendar.class, CopticEra.class, 'G');
 
     /**
