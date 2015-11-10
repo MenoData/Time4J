@@ -1,6 +1,7 @@
 package net.time4j.calendar;
 
 import net.time4j.format.Attributes;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -117,7 +118,8 @@ public class TabotTest {
                 .addLiteral(" (")
                 .addText(EthiopianCalendar.TABOT)
                 .addLiteral(')')
-                .build();
+                .build()
+                .with(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         assertThat(
             f.format(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 6, 25)),
             is("25 የካቲት 2007 ዓ/ም (መርቆርዮስ)"));

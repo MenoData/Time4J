@@ -25,11 +25,13 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +54,7 @@ final class NumberProcessor<V>
     private final int maxDigits;
     private final SignPolicy signPolicy;
     private final boolean protectedMode;
+    private final boolean yearOfEra;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -118,6 +121,8 @@ final class NumberProcessor<V>
                 "Max digits out of range: " + maxDigits);
         }
 
+        this.yearOfEra = (this.element.name().equals("YEAR_OF_ERA"));
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -134,13 +139,8 @@ final class NumberProcessor<V>
         Class<V> type = this.element.getType();
         V value = formattable.get(this.element);
         boolean negative = false;
+        NumberSystem numsys = this.getNumberSystem(attributes, step);
         String digits;
-
-        NumberSystem numsys =
-            step.getAttribute(
-                Attributes.NUMBER_SYSTEM,
-                attributes,
-                NumberSystem.ARABIC);
 
         if (type == Integer.class) {
             int v = Integer.class.cast(value).intValue();
@@ -266,11 +266,8 @@ final class NumberProcessor<V>
         FormatStep step
     ) {
 
-        NumberSystem numsys =
-            step.getAttribute(Attributes.NUMBER_SYSTEM, attributes, NumberSystem.ARABIC);
-
-        Leniency leniency =
-            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
+        NumberSystem numsys = this.getNumberSystem(attributes, step);
+        Leniency leniency = step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
         int effectiveMin = 1;
         int effectiveMax = this.getScale(numsys);
@@ -622,6 +619,25 @@ final class NumberProcessor<V>
         } else {
             return numsys.toNumeral(Math.abs(v));
         }
+
+    }
+
+    private NumberSystem getNumberSystem(
+        AttributeQuery attrs,
+        FormatStep step
+    ) {
+
+        NumberSystem defaultNumberSystem = NumberSystem.ARABIC;
+
+        if (
+            this.yearOfEra
+            && step.getAttribute(Attributes.LANGUAGE, attrs, Locale.ROOT).getLanguage().equals("am")
+            && step.getAttribute(Attributes.CALENDAR_TYPE, attrs, CalendarText.ISO_CALENDAR_TYPE).equals("ethiopic")
+        ) {
+            defaultNumberSystem = NumberSystem.ETHIOPIC;
+        }
+
+        return step.getAttribute(Attributes.NUMBER_SYSTEM, attrs, defaultNumberSystem);
 
     }
 
