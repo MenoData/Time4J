@@ -212,9 +212,19 @@ public final class EthiopianCalendar
 
     /**
      * <p>Represents the Ethiopian year. </p>
+     *
+     * <p>Note: The format engine of Time4J uses the Ethiopic numeral system for calendar years by default
+     * if the language is Amharic. </p>
+     *
+     * @see     net.time4j.format.NumberSystem#ETHIOPIC
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das &auml;thiopische Jahr. </p>
+     *
+     * <p>Hinweis: Die Formatmaschine von Time4J verwendet standardm&auml;&szlig;ig &auml;thiopische
+     * Numerale f&uuml;r Kalenderjahre in der Sprache Amharic. </p>
+     *
+     * @see     net.time4j.format.NumberSystem#ETHIOPIC
      */
     @FormattableElement(format = "y")
     public static final StdCalendarElement<Integer, EthiopianCalendar> YEAR_OF_ERA =
