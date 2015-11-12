@@ -2125,8 +2125,6 @@ public final class PlainDate
                 return PlainTimestamp.axis().createFrom(entity, attributes, preparsing).getCalendarDate();
             } else if (entity.contains(CALENDAR_DATE)) {
                 return entity.get(CALENDAR_DATE);
-            } else if (entity.contains(PlainDate.axis().element())) {
-                return entity.get(PlainDate.axis().element());
             }
 
             if (entity.contains(EpochDays.MODIFIED_JULIAN_DATE)) {

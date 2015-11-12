@@ -1309,8 +1309,6 @@ public final class EthiopianTime
 
             if (time != null) {
                 return EthiopianTime.from(time);
-            } else if (entity.contains(EthiopianTime.axis().element())) {
-                return entity.get(EthiopianTime.axis().element());
             } else if (entity.contains(AM_PM_OF_DAY) && entity.contains(ETHIOPIAN_HOUR)) {
                 Meridiem meridiem = entity.get(AM_PM_OF_DAY);
                 int hour = entity.get(ETHIOPIAN_HOUR);

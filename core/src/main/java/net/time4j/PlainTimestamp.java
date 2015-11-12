@@ -1339,10 +1339,6 @@ public final class PlainTimestamp
             boolean preparsing
         ) {
 
-            if (entity.contains(PlainTimestamp.axis().element())) {
-                return entity.get(PlainTimestamp.axis().element());
-            }
-
             Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
 
             if (entity instanceof UnixTime) {

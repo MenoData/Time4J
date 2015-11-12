@@ -3228,8 +3228,6 @@ public final class PlainTime
                 return PlainTimestamp.axis().createFrom(entity, attributes, preparsing).getWallTime();
             } else if (entity.contains(WALL_TIME)) {
                 return entity.get(WALL_TIME);
-            } else if (entity.contains(PlainTime.axis().element())) {
-                return entity.get(PlainTime.axis().element());
             }
 
             // Stundenteil ----------------------------------------------------
