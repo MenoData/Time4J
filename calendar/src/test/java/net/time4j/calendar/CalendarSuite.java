@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EvangelistTest.class,
         EthiopianCalendarTest.class,
         EthiopianOperatorTest.class,
+        EthiopianTimeTest.class,
         HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,

@@ -21,6 +21,8 @@
 
 package net.time4j.calendar;
 
+import net.time4j.PlainTime;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -51,7 +53,10 @@ final class SPX
     static final int COPTIC = 3;
 
     /** Serialisierungstyp. */
-    static final int ETHIOPIAN = 4;
+    static final int ETHIOPIAN_DATE = 4;
+
+    /** Serialisierungstyp. */
+    static final int ETHIOPIAN_TIME = 5;
 
     private static final long serialVersionUID = 1L;
 
@@ -128,8 +133,11 @@ final class SPX
             case COPTIC:
                 this.writeCoptic(out);
                 break;
-            case ETHIOPIAN:
-                this.writeEthiopian(out);
+            case ETHIOPIAN_DATE:
+                this.writeEthiopianDate(out);
+                break;
+            case ETHIOPIAN_TIME:
+                this.writeEthiopianTime(out);
                 break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
@@ -167,8 +175,11 @@ final class SPX
             case COPTIC:
                 this.obj = this.readCoptic(in);
                 break;
-            case ETHIOPIAN:
-                this.obj = this.readEthiopian(in);
+            case ETHIOPIAN_DATE:
+                this.obj = this.readEthiopianDate(in);
+                break;
+            case ETHIOPIAN_TIME:
+                this.obj = this.readEthiopianTime(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -252,18 +263,18 @@ final class SPX
 
     }
 
-    private void writeEthiopian(ObjectOutput out)
+    private void writeEthiopianDate(ObjectOutput out)
         throws IOException {
 
-        EthiopianCalendar coptic = (EthiopianCalendar) this.obj;
-        out.writeByte(coptic.getEra().ordinal());
-        out.writeInt(coptic.getYearOfEra());
-        out.writeByte(coptic.getMonth().getValue());
-        out.writeByte(coptic.getDayOfMonth());
+        EthiopianCalendar ethio = (EthiopianCalendar) this.obj;
+        out.writeByte(ethio.getEra().ordinal());
+        out.writeInt(ethio.getYearOfEra());
+        out.writeByte(ethio.getMonth().getValue());
+        out.writeByte(ethio.getDayOfMonth());
 
     }
 
-    private EthiopianCalendar readEthiopian(ObjectInput in)
+    private EthiopianCalendar readEthiopianDate(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
         EthiopianEra era = EthiopianEra.values()[in.readByte()];
@@ -271,6 +282,31 @@ final class SPX
         int month = in.readByte();
         int dom = in.readByte();
         return EthiopianCalendar.of(era, year, month, dom);
+
+    }
+
+    private void writeEthiopianTime(ObjectOutput out)
+        throws IOException {
+
+        EthiopianTime ethio = (EthiopianTime) this.obj;
+        int tod =
+            ethio.get(EthiopianTime.DIGITAL_HOUR_OF_DAY).intValue() * 3600
+            + ethio.getMinute() * 60
+            + ethio.getSecond();
+        out.writeInt(tod);
+
+    }
+
+    private EthiopianTime readEthiopianTime(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int tod = in.readInt();
+        int second = tod % 60;
+        int minutes = tod / 60;
+        int minute = minutes % 60;
+        int hour24 = minutes / 60;
+        PlainTime time = PlainTime.of(hour24, minute, second);
+        return EthiopianTime.from(time);
 
     }
 
