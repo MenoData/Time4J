@@ -761,7 +761,7 @@ public final class EthiopianCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.ETHIOPIAN);
+        return new SPX(this, SPX.ETHIOPIAN_DATE);
 
     }
 

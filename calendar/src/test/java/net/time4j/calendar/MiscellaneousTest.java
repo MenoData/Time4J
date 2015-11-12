@@ -203,8 +203,13 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void serializeEthiopian() throws IOException, ClassNotFoundException {
+    public void serializeEthiopianDate() throws IOException, ClassNotFoundException {
         roundtrip(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 13, 6));
+    }
+
+    @Test
+    public void serializeEthiopianTime() throws IOException, ClassNotFoundException {
+        roundtrip(EthiopianTime.ofDay(4, 45, 23));
     }
 
     private static int roundtrip(Object obj)
