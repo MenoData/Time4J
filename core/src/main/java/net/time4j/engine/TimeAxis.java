@@ -447,6 +447,21 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
     }
 
+    @Override
+    public T createFrom(
+        ChronoEntity<?> entity,
+        AttributeQuery attributes,
+        boolean preparsing
+    ) {
+
+        if (entity.contains(this.self)) {
+            return entity.get(this.self);
+        }
+
+        return super.createFrom(entity, attributes, preparsing);
+
+    }
+
     /**
      * <p>Yields this time axis as chronological self-referencing
      * element. </p>
