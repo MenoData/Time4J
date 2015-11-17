@@ -1512,7 +1512,7 @@ public final class EthiopianCalendar
                 return null;
             }
 
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.MORNING);
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
 
         }
@@ -1575,6 +1575,13 @@ public final class EthiopianCalendar
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MORNING;
 
         }
 

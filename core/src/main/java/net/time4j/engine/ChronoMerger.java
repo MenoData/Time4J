@@ -271,4 +271,22 @@ public interface ChronoMerger<T extends ChronoEntity<T>> {
 
     }
 
+    /**
+     * <p>Determines the default start of day. </p>
+     *
+     * @return  start of day
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Bestimmt den &uuml;blichen Tagesbeginn. </p>
+     *
+     * @return  start of day
+     * @since   3.11/4.8
+     */
+    default StartOfDay getDefaultStartOfDay() {
+
+        return StartOfDay.MIDNIGHT;
+
+    }
+
 }

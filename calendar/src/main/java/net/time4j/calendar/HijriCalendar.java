@@ -1439,7 +1439,7 @@ public final class HijriCalendar
                 return null;
             }
 
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, variant, tzid, startOfDay).toDate();
 
         }
@@ -1503,6 +1503,7 @@ public final class HijriCalendar
 
         }
 
+        @Override
         public HijriCalendar createFrom(
             TemporalAccessor threeten,
             AttributeQuery attributes
@@ -1519,6 +1520,13 @@ public final class HijriCalendar
             }
 
             return null;
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.EVENING;
 
         }
 

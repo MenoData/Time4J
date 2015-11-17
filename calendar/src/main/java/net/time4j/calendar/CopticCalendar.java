@@ -1311,7 +1311,7 @@ public final class CopticCalendar
                 return null;
             }
 
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.EVENING);
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
 
         }
@@ -1371,6 +1371,13 @@ public final class CopticCalendar
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.EVENING;
 
         }
 
