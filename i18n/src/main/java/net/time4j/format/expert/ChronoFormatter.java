@@ -36,6 +36,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.StartOfDay;
@@ -759,15 +760,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Chronology<?> preparser = this.chronology.preparser();
 
         if (preparser == null) {
-            return parse(this, this.chronology, text, status, attrs, false);
+            return parse(this, this.chronology, this.chronology.getExtensions(), text, status, attrs, false);
         } else {
-            parse(this, preparser, text, status, attrs, true);
+            Object intermediate = parse(this, preparser, preparser.getExtensions(), text, status, attrs, true);
+            ParsedValues parsed = status.getRawValues0();
 
             if (status.isError()) {
                 return null;
             }
 
-            ParsedValues parsed = status.getRawValues0();
+            if (preparser instanceof TimeAxis) {
+                ChronoElement<?> self = TimeAxis.class.cast(preparser).element();
+                updateSelf(parsed, self, intermediate);
+            }
 
             try {
                 result = this.chronology.createFrom(parsed, attrs, false);
@@ -2142,7 +2147,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     private static <T extends ChronoEntity<T>> T parse(
         ChronoFormatter<?> cf,
-        Chronology<T> chronology,
+        ChronoMerger<T> merger,
+        List<ChronoExtension> extensions,
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
@@ -2196,7 +2202,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
         try {
-            for (ChronoExtension ext : chronology.getExtensions()) {
+            for (ChronoExtension ext : extensions) {
                 parsed = ext.resolve(parsed, cf.getLocale(), attributes);
             }
         } catch (RuntimeException re) {
@@ -2210,7 +2216,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         T result;
 
         try {
-            result = chronology.createFrom(parsed, attributes, preparsing);
+            result = merger.createFrom(parsed, attributes, preparsing);
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
@@ -2223,15 +2229,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             && (result != null)
         ) { // Sonderfall Bruchzahlelement
             result = cf.fracproc.update(result, parsed);
-        }
-
-        if (
-            preparsing
-            && (result != null)
-            && (chronology instanceof TimeAxis)
-        ) {
-            ChronoElement<?> self = TimeAxis.class.cast(chronology).element();
-            updateSelf(parsed, self, result);
         }
 
         // Phase 5: Konsistenzprüfung

@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.base.MathUtils;
+import net.time4j.base.ResourceLoader;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
@@ -29,11 +30,13 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimePoint;
@@ -1013,6 +1016,7 @@ public final class PlainTime
             .appendElement(
                 PRECISION,
                 new PrecisionRule());
+        registerExtensions(builder);
         registerUnits(builder);
         ENGINE = builder.build();
     }
@@ -1904,6 +1908,16 @@ public final class PlainTime
     private boolean isFullMinute() {
 
         return ((this.second | this.nano) == 0);
+
+    }
+
+    private static void registerExtensions(TimeAxis.Builder<IsoTimeUnit, PlainTime> builder) {
+
+        for (ChronoExtension extension : ResourceLoader.getInstance().services(ChronoExtension.class)) {
+            if (extension.accept(PlainTime.class)) {
+                builder.appendExtension(extension);
+            }
+        }
 
     }
 
@@ -3492,6 +3506,13 @@ public final class PlainTime
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MIDNIGHT;
 
         }
 

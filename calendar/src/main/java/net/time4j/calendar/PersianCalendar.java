@@ -1355,6 +1355,13 @@ public final class PersianCalendar
         }
 
         @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
         public PersianCalendar createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
@@ -1370,7 +1377,7 @@ public final class PersianCalendar
                 return null;
             }
 
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.MIDNIGHT);
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
 
         }

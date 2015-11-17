@@ -245,6 +245,13 @@ public class Chronology<T extends ChronoEntity<T>>
 
     }
 
+    @Override
+    public StartOfDay getDefaultStartOfDay() {
+
+        return this.merger.getDefaultStartOfDay();
+
+    }
+
     /**
      * <p>Returns all registered chronological extensions. </p>
      *

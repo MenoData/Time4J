@@ -35,6 +35,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimePoint;
@@ -1346,6 +1347,13 @@ public final class EthiopianTime
         @Override
         public Chronology<?> preparser() {
             return null;
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MORNING;
+
         }
 
     }

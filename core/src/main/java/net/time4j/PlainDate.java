@@ -44,6 +44,7 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.Normalizer;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.ValidationElement;
@@ -2289,6 +2290,13 @@ public final class PlainDate
         public Chronology<?> preparser() {
 
             return null;
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MIDNIGHT;
 
         }
 

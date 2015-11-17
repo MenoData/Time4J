@@ -38,6 +38,7 @@ import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.Normalizer;
+import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeMetric;
@@ -1308,6 +1309,13 @@ public final class PlainTimestamp
 
             DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
             return CalendarText.getTimestampPattern(mode, mode, locale);
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MIDNIGHT;
 
         }
 

@@ -2537,6 +2537,13 @@ public final class Moment
         }
 
         @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
         public Moment createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
