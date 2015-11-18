@@ -14,6 +14,8 @@ import net.time4j.format.Leniency;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.history.ChronoHistory;
+import net.time4j.history.HistoricEra;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
@@ -237,6 +239,18 @@ public class MiscellaneousTest {
         e1.with(PlainTimestamp.axis().element(), null);
         ChronoEntity<?> e2 = cf.parseRaw(text);
         assertThat(e1.equals(e2), is(true));
+    }
+
+    @Test
+    public void parseRawDataHistoric() {
+        ChronoFormatter<?> cf = ChronoFormatter.ofDatePattern("G yyyy, MMM/d", PatternType.CLDR, Locale.ENGLISH);
+        ChronoHistory history = ChronoHistory.ofFirstGregorianReform();
+        ChronoEntity<?> e = cf.parseRaw("AD 1492, Jan/1");
+        assertThat(e.get(history.era()), is(HistoricEra.AD));
+        assertThat(e.get(history.yearOfEra()), is(1492));
+        assertThat(e.get(history.month()), is(1));
+        assertThat(e.get(history.dayOfMonth()), is(1));
+        assertThat(e.contains(PlainDate.DAY_OF_MONTH), is(false));
     }
 
     @Test
