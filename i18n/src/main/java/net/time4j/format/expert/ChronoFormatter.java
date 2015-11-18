@@ -29,6 +29,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -126,6 +127,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     //~ Instanzvariablen --------------------------------------------------
 
     private final Chronology<T> chronology;
+    private final Chronology<?> override;
     private final AttributeSet globalAttributes;
     private final List<FormatStep> steps;
     private final Map<ChronoElement<?>, Object> defaults;
@@ -136,6 +138,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     // Aufruf durch Builder
     private ChronoFormatter(
         Chronology<T> chronology,
+        Chronology<?> override,
         Locale locale,
         List<FormatStep> steps
     ) {
@@ -149,6 +152,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         this.chronology = chronology;
+        this.override = override;
         this.globalAttributes = AttributeSet.createDefaults(chronology, locale);
         this.steps = Collections.unmodifiableList(steps);
         this.defaults = Collections.emptyMap();
@@ -197,6 +201,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         this.chronology = old.chronology;
+        this.override = old.override;
         this.globalAttributes = globalAttributes;
         this.defaults =
             Collections.unmodifiableMap(
@@ -271,9 +276,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             throw new NullPointerException("Missing element.");
         }
 
-        checkElement(formatter.chronology, element);
+        checkElement(formatter.chronology, formatter.override, element);
 
         this.chronology = formatter.chronology;
+        this.override = formatter.override;
         this.globalAttributes = formatter.globalAttributes;
         this.fracproc = formatter.fracproc;
 
@@ -929,11 +935,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         ParseLog status = new ParseLog(offset);
         AttributeQuery attributes = this.globalAttributes;
-        Chronology<?> c = this.chronology.preparser();
-
-        if (c == null) {
-            c = this.chronology;
-        }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         Deque<NonAmbivalentMap> data = new LinkedList<>();
@@ -960,11 +961,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (!parsed.contains(e)) {
                 fill(parsed, e, this.defaults.get(e));
             }
-        }
-
-        // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
-        for (ChronoExtension ext : c.getExtensions()) {
-            parsed = ext.resolve(parsed, this.getLocale(), attributes);
         }
 
         return parsed;
@@ -2155,6 +2151,38 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Constructs a builder for creating global formatters with usage of given calendar type. </p>
+     *
+     * @param   <C> generic calendrical type
+     * @param   locale              format locale
+     * @param   overrideCalendar    formattable calendar chronology
+     * @return  new {@code Builder}-instance applicable on {@code Moment}
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Hilfsobjekt zum Bauen eines globalen Zeitformats mit Verwendung
+     * des angegebenen Kalendertyps. </p>
+     *
+     * @param   <C> generic calendrical type
+     * @param   locale              format locale
+     * @param   overrideCalendar    formattable calendar chronology
+     * @return  new {@code Builder}-instance applicable on {@code Moment}
+     * @since   3.11/4.8
+     */
+    public static <C extends ChronoEntity<C> & CalendarDate> ChronoFormatter.Builder<Moment> setUpWithOverride(
+        Locale locale,
+        Chronology<C> overrideCalendar
+    ) {
+
+        if (overrideCalendar == null) {
+            throw new NullPointerException("Missing override calendar.");
+        }
+
+        return new Builder<>(Moment.axis(), locale, overrideCalendar);
+
+    }
+
+    /**
      * <p>Compares the chronologies, default attributes, default values and
      * the internal format structures. </p>
      */
@@ -2171,6 +2199,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ChronoFormatter<?> that = (ChronoFormatter<?>) obj;
             return (
                 this.chronology.equals(that.chronology)
+                && isEqual(this.override, that.override)
                 && this.globalAttributes.equals(that.globalAttributes)
                 && this.defaults.equals(that.defaults)
                 && this.steps.equals(that.steps)
@@ -2350,6 +2379,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
 
         parsed.with(element, element.getType().cast(result));
+
+    }
+
+    private static boolean isEqual(
+        Object obj1,
+        Object obj2
+    ) {
+
+        return ((obj1 == null) ? (obj2 == null) : obj1.equals(obj2));
 
     }
 
@@ -2614,18 +2652,25 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     private static void checkElement(
         Chronology<?> chronology,
+        Chronology<?> override,
         ChronoElement<?> element
     ) {
 
-        if (!chronology.isSupported(element)) {
-            Chronology<?> child = chronology.preparser();
+        boolean support = chronology.isSupported(element);
 
-            if (
-                (child == null)
-                || !child.isSupported(element)
-            ) {
-                throw new IllegalArgumentException(
-                    "Unsupported element: " + element.name());
+        if (!support) {
+            if (override == null) {
+                Chronology<?> child = chronology.preparser();
+                support = ((child != null) && child.isSupported(element));
+            } else {
+                support = (
+                    (element.isDateElement() && override.isSupported(element))
+                    || (element.isTimeElement() && PlainTime.axis().isSupported(element))
+                );
+            }
+
+            if (!support) {
+                throw new IllegalArgumentException("Unsupported element: " + element.name());
             }
         }
 
@@ -2662,6 +2707,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         //~ Instanzvariablen ----------------------------------------------
 
         private final Chronology<T> chronology;
+        private final Chronology<?> override;
         private final Locale locale;
         private List<FormatStep> steps;
         private LinkedList<AttributeSet> stack;
@@ -2676,6 +2722,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Chronology<T> chronology,
             Locale locale
         ) {
+            this(chronology, locale, null);
+
+        }
+
+        private Builder(
+            Chronology<T> chronology,
+            Locale locale,
+            Chronology<?> override
+        ) {
             super();
 
             if (chronology == null) {
@@ -2685,6 +2740,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             this.chronology = chronology;
+            this.override = override;
             this.locale = locale;
             this.steps = new ArrayList<>();
             this.stack = new LinkedList<>();
@@ -3980,9 +4036,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *          supported by chronology
          * @see     Chronology#isSupported(ChronoElement)
          */
-        public <V extends Enum<V>> Builder<T> addText(
-            ChronoElement<V> element
-        ) {
+        public <V extends Enum<V>> Builder<T> addText(ChronoElement<V> element) {
 
             this.checkElement(element);
 
@@ -4624,8 +4678,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> padNext(int width) {
 
             if (width < 0) {
-                throw new IllegalArgumentException(
-                    "Negative pad width: " + width);
+                throw new IllegalArgumentException("Negative pad width: " + width);
             } else if (width > 0) {
                 this.leftPadWidth = width;
             }
@@ -4659,8 +4712,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> padPrevious(int width) {
 
             if (width < 0) {
-                throw new IllegalArgumentException(
-                    "Negative pad width: " + width);
+                throw new IllegalArgumentException("Negative pad width: " + width);
             } else if (
                 !this.steps.isEmpty()
                 && (width > 0)
@@ -5003,6 +5055,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ChronoFormatter<T> formatter =
                 new ChronoFormatter<>(
                     this.chronology,
+                    this.override,
                     this.locale,
                     this.steps
                 );
@@ -5206,8 +5259,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         private static void checkAttribute(AttributeKey<?> key) {
 
             if (key.name().charAt(0) == '_') {
-                throw new IllegalArgumentException(
-                    "Internal attribute not allowed: " + key.name());
+                throw new IllegalArgumentException("Internal attribute not allowed: " + key.name());
             }
 
         }
@@ -5229,7 +5281,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         private void checkElement(ChronoElement<?> element) {
 
-            ChronoFormatter.checkElement(this.chronology, element);
+            ChronoFormatter.checkElement(this.chronology, this.override, element);
 
         }
 
