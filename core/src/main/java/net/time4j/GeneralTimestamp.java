@@ -24,8 +24,12 @@ package net.time4j;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
+import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.StartOfDay;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -51,7 +55,8 @@ import net.time4j.tz.ZonalOffset;
  * @author  Meno Hochschild
  * @since   3.8/4.5
  */
-public final class GeneralTimestamp<C extends ChronoEntity<C>> {
+public final class GeneralTimestamp<C extends ChronoEntity<C>>
+    implements ChronoDisplay {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -309,6 +314,48 @@ public final class GeneralTimestamp<C extends ChronoEntity<C>> {
         }
 
         return tsp.in(tz);
+
+    }
+
+    @Override
+    public boolean contains(ChronoElement<?> element) {
+
+        return (element.isDateElement() ? this.toDate().contains(element) : this.time.contains(element));
+
+    }
+
+    @Override
+    public <V> V get(ChronoElement<V> element) {
+
+        return (element.isDateElement() ? this.toDate().get(element) : this.time.get(element));
+
+    }
+
+    @Override
+    public <V> V getMinimum(ChronoElement<V> element) {
+
+        return (element.isDateElement() ? this.toDate().getMinimum(element) : this.time.getMinimum(element));
+
+    }
+
+    @Override
+    public <V> V getMaximum(ChronoElement<V> element) {
+
+        return (element.isDateElement() ? this.toDate().getMaximum(element) : this.time.getMaximum(element));
+
+    }
+
+    @Override
+    public boolean hasTimezone() {
+
+        return false;
+
+    }
+
+    @Override
+    public TZID getTimezone() {
+
+        throw new ChronoException("Timezone not available: " + this);
 
     }
 
