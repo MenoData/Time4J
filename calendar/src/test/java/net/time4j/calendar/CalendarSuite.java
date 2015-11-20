@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        CalendarOverrideTest.class,
         ClockTest.class,
         CopticCalendarTest.class,
         CopticOperatorTest.class,

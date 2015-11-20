@@ -21,6 +21,7 @@
 
 package net.time4j.calendar;
 
+import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
@@ -661,6 +662,30 @@ public final class EthiopianCalendar
     public boolean isLeapYear() {
 
         return ((this.getYearOfEra() % 4) == 3);
+
+    }
+
+    /**
+     * <p>Creates a new local timestamp with this date and given Ethiopian time. </p>
+     *
+     * <p>Note: The Ethiopian time will be automatically converted to ISO. </p>
+     *
+     * @param   time    ethiopian time starting in the morning
+     * @return  general timestamp as composition of this date and given time
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen allgemeinen Zeitstempel mit diesem Datum und der angegebenen &auml;thiopischen Uhrzeit. </p>
+     *
+     * <p>Hinweis: Die &auml;thiopische Uhrzeit wird automatisch zur ISO-Uhrzeit konvertiert. </p>
+     *
+     * @param   time    ethiopian time starting in the morning
+     * @return  general timestamp as composition of this date and given time
+     * @since   3.11/4.8
+     */
+    public GeneralTimestamp<EthiopianCalendar> at(EthiopianTime time) {
+
+        return GeneralTimestamp.of(this, time.toISO());
 
     }
 

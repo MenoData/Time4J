@@ -26,6 +26,7 @@ import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -46,7 +47,6 @@ import net.time4j.format.LocalizedPatternSupport;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -348,8 +348,8 @@ public final class EthiopianTime
                 EthiopianTime.class,
                 new Merger(),
                 EthiopianTime.MIN,
-                EthiopianTime.MAX
-            ).appendElement(
+                EthiopianTime.MAX)
+            .appendElement(
                 AM_PM_OF_DAY,
                 new MeridiemRule())
             .appendElement(
@@ -567,7 +567,7 @@ public final class EthiopianTime
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Liefert die &auml;thiopische Uhrzeit im Bereich 1-12. </p>
+     * <p>Liefert die &auml;thiopische Stunde im Bereich 1-12. </p>
      *
      * @return  hour in range 1-12
      * @see     #isDay()
@@ -799,8 +799,8 @@ public final class EthiopianTime
 
         return (
             this.second
-            + this.minute * 60
-            + ((this.hour24 < 6) ? this.hour24 + 24 : this.hour24) * 3600
+                + this.minute * 60
+                + ((this.hour24 < 6) ? this.hour24 + 24 : this.hour24) * 3600
         );
 
     }
@@ -1020,7 +1020,7 @@ public final class EthiopianTime
     }
 
     private static class EthiopianHour
-        implements ChronoElement<Integer>, Serializable {
+        extends BasicElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -1030,16 +1030,11 @@ public final class EthiopianTime
         //~ Konstruktoren -------------------------------------------------
 
         private EthiopianHour() {
-            super();
+            super("ETHIOPIAN_HOUR");
 
         }
 
         //~ Methoden ------------------------------------------------------
-
-        @Override
-        public String name() {
-            return "ETHIOPIAN_HOUR";
-        }
 
         @Override
         public Class<Integer> getType() {
@@ -1049,14 +1044,6 @@ public final class EthiopianTime
         @Override
         public char getSymbol() {
             return 'h';
-        }
-
-        @Override
-        public int compare(
-            ChronoDisplay o1,
-            ChronoDisplay o2
-        ) {
-            return o1.get(this).compareTo(o2.get(this));
         }
 
         @Override
@@ -1080,8 +1067,16 @@ public final class EthiopianTime
         }
 
         @Override
-        public boolean isLenient() {
-            return false;
+        protected ChronoElement<?> getParent() {
+            return PlainTime.CLOCK_HOUR_OF_AMPM;
+        }
+
+        @Override
+        protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(Chronology<T> chronology) {
+            if (PlainTime.axis().equals(chronology)) {
+                return new GeneralHourRule<T>();
+            }
+            return null;
         }
 
         private Object readResolve() {
@@ -1097,9 +1092,7 @@ public final class EthiopianTime
 
         @Override
         public Meridiem getValue(EthiopianTime context) {
-
             return ((context.hour24 < 12) ? Meridiem.AM : Meridiem.PM);
-
         }
 
         @Override
@@ -1108,7 +1101,6 @@ public final class EthiopianTime
             Meridiem value,
             boolean lenient
         ) {
-
             int h = context.hour24;
 
             if (value == null) {
@@ -1124,7 +1116,6 @@ public final class EthiopianTime
             }
 
             return new EthiopianTime(h, context.minute, context.second);
-
         }
 
         @Override
@@ -1132,40 +1123,83 @@ public final class EthiopianTime
             EthiopianTime context,
             Meridiem value
         ) {
-
             return (value != null);
-
         }
 
         @Override
         public Meridiem getMinimum(EthiopianTime context) {
-
             return Meridiem.AM;
-
         }
 
         @Override
         public Meridiem getMaximum(EthiopianTime context) {
-
             return Meridiem.PM;
-
         }
 
         @Override
         public ChronoElement<?> getChildAtFloor(EthiopianTime context) {
-
             return null;
-
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(EthiopianTime context) {
-
             return null;
-
         }
 
     }
+
+    private static class GeneralHourRule<T extends ChronoEntity<T>>
+        implements ElementRule<T, Integer> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Integer getValue(T context) {
+            PlainTime time = context.get(PlainTime.COMPONENT);
+            return EthiopianTime.from(time).getHour();
+        }
+
+        @Override
+        public Integer getMinimum(T context) {
+            return Integer.valueOf(1);
+        }
+
+        @Override
+        public Integer getMaximum(T context) {
+            return Integer.valueOf(12);
+        }
+
+        @Override
+        public boolean isValid(
+            T context,
+            Integer value
+        ) {
+            PlainTime time = context.get(PlainTime.COMPONENT);
+            return EthiopianTime.from(time).isValid(ETHIOPIAN_HOUR, value);
+        }
+
+        @Override
+        public T withValue(
+            T context,
+            Integer value,
+            boolean lenient
+        ) {
+            PlainTime time = context.get(PlainTime.COMPONENT);
+            EthiopianTime ethio = EthiopianTime.from(time).with(ETHIOPIAN_HOUR, value);
+            return context.with(PlainTime.COMPONENT, ethio.toISO());
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(T context) {
+            return null;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(T context) {
+            return null;
+        }
+    }
+
 
     private static class IntegerElementRule
         implements ElementRule<EthiopianTime, Integer> {
@@ -1351,9 +1385,7 @@ public final class EthiopianTime
 
         @Override
         public StartOfDay getDefaultStartOfDay() {
-
             return StartOfDay.MORNING;
-
         }
 
     }
