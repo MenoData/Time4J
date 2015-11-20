@@ -71,14 +71,16 @@ public class Demo {
 		PlainDate.of(2012, Month.JUNE, 30)
 		.at(PlainTime.midnightAtEndOfDay()) // 2012-06-30T24 => 2012-07-01T00
 		.atUTC().minus(1, SI.SECONDS);
-	System.out.println(leapsecondUTC); // 2012-06-30T23:59:60,000000000Z
+	System.out.println(leapsecondUTC); // 2012-06-30T23:59:60Z
 
-        // Attention: Following line needs the i18n-module
 	System.out.println(
 		"Japan-Time: "
-		+ Moment.localFormatter("uuuu-MM-dd'T'HH:mm:ssXX", PatternType.CLDR)
-			.withTimezone(ASIA.TOKYO)
-			.format(leapsecondUTC)
+		+ ChronoFormatter.ofMomentPattern(
+		     "uuuu-MM-dd'T'HH:mm:ssXX", 
+		     PatternType.CLDR, 
+		     Locale.ROOT, 
+		     ASIA.TOKYO
+		  ).format(leapsecondUTC)
 	); // Japan-Time: 2012-07-01T08:59:60+0900
 
 	// duration in seconds normalized to hours, minutes and seconds
@@ -93,12 +95,12 @@ public class Demo {
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 	
 	// following code requires v4.0 and Java-8 using java.time.LocalDate
-	ChronoFormatter&lt;PlainDate&gt; formatter =
+	ChronoFormatter<PlainDate> formatter =
 	    ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
 	        .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
 	        .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
 	        .build();
-	System.out.println(formatter.format(LocalDate.of(1712, 3, 11)));
+	System.out.println(formatter.formatThreeten(LocalDate.of(1712, 3, 11)));
 	// output: Anno Domini 1712, February 30th
   }
 }
