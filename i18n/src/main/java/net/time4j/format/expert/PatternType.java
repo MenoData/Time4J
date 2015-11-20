@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
@@ -977,8 +978,14 @@ public enum PatternType
 
     private static boolean isISO(Chronology<?> chronology) {
 
+        return getCalendarType(chronology).equals(CalendarText.ISO_CALENDAR_TYPE);
+
+    }
+
+    private static String getCalendarType(Chronology<?> chronology) {
+
         CalendarType ctype = chronology.getChronoType().getAnnotation(CalendarType.class);
-        return ((ctype == null) || ctype.value().equals(CalendarText.ISO_CALENDAR_TYPE));
+        return ((ctype == null) ? CalendarText.ISO_CALENDAR_TYPE : ctype.value());
 
     }
 
@@ -989,11 +996,21 @@ public enum PatternType
         int count
     ) {
 
-        if (
-            isGeneralSymbol(symbol)
-            && !isISO(builder.getChronology())
-        ) {
+        Chronology<?> chronology = builder.getChronology();
+
+        if (isGeneralSymbol(symbol) && !isISO(chronology)) {
             return this.general(builder, symbol, count);
+        } else if ((symbol == 'h') && getCalendarType(chronology).equals("ethiopic")) {
+            for (ChronoExtension ext : PlainTime.axis().getExtensions()) {
+                for (ChronoElement<?> e : ext.getElements(locale, Attributes.empty())) {
+                    if (e.name().equals("ETHIOPIAN_HOUR")) {
+                        ChronoElement<Integer> ethiopianHour = cast(e);
+                        addNumber(ethiopianHour, builder, count, false);
+                        return Collections.emptyMap();
+                    }
+                }
+            }
+            throw new IllegalArgumentException("Ethiopian time not available.");
         } else {
             return this.cldrISO(builder, locale, symbol, count, false);
         }

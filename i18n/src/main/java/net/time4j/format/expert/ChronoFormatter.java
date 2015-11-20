@@ -22,14 +22,18 @@
 package net.time4j.format.expert;
 
 import net.time4j.CalendarUnit;
+import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarFamily;
+import net.time4j.engine.CalendarVariant;
+import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -57,10 +61,11 @@ import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
-import net.time4j.history.internal.HistoricVariant;
 import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.history.internal.HistoricVariant;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.TransitionStrategy;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -80,6 +85,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
@@ -123,7 +129,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     //~ Instanzvariablen --------------------------------------------------
 
     private final Chronology<T> chronology;
-    private final Chronology<?> override;
+    private final OverrideHandler<?> overrideHandler;
     private final AttributeSet globalAttributes;
     private final List<FormatStep> steps;
     private final Map<ChronoElement<?>, Object> defaults;
@@ -148,8 +154,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         this.chronology = chronology;
-        this.override = override;
-        this.globalAttributes = AttributeSet.createDefaults(chronology, locale);
+        this.overrideHandler = OverrideHandler.of(override);
+        this.globalAttributes = AttributeSet.createDefaults((override == null) ? chronology : override, locale);
         this.steps = Collections.unmodifiableList(steps);
         this.defaults = Collections.emptyMap();
 
@@ -197,11 +203,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         this.chronology = old.chronology;
-        this.override = old.override;
+        this.overrideHandler = old.overrideHandler;
         this.globalAttributes = globalAttributes;
-        this.defaults =
-            Collections.unmodifiableMap(
-                new NonAmbivalentMap(old.defaults));
+        this.defaults = Collections.unmodifiableMap(new NonAmbivalentMap(old.defaults));
         this.fracproc = old.fracproc;
 
         // update extension elements and historizable elements
@@ -272,10 +276,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             throw new NullPointerException("Missing element.");
         }
 
-        checkElement(formatter.chronology, formatter.override, element);
+        Chronology<?> overrideCalendar = (
+            (formatter.overrideHandler == null)
+            ? null
+            : formatter.overrideHandler.getCalendarOverride());
+        checkElement(formatter.chronology, overrideCalendar, element);
 
         this.chronology = formatter.chronology;
-        this.override = formatter.override;
+        this.overrideHandler = formatter.overrideHandler;
         this.globalAttributes = formatter.globalAttributes;
         this.fracproc = formatter.fracproc;
 
@@ -346,7 +354,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  <caption>Legend</caption>
      *  <tr>
      *      <td>{@link Attributes#CALENDAR_TYPE}</td>
-     *      <td>dependent on associated chronology</td>
+     *      <td>read-only, dependent on associated chronology</td>
      *  </tr>
      *  <tr>
      *      <td>{@link Attributes#LANGUAGE}</td>
@@ -403,19 +411,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *  <caption>Legende</caption>
      *  <tr>
      *      <td>{@link Attributes#CALENDAR_TYPE}</td>
-     *      <td>dependent on associated chronology</td>
+     *      <td>schreibgesch&uuml;tzt, abh&auml;ngig von der Chronologie</td>
      *  </tr>
      *  <tr>
      *      <td>{@link Attributes#LANGUAGE}</td>
-     *      <td>dependent on associated locale</td>
+     *      <td>abh&auml;ngig von der Sprache</td>
      *  </tr>
      *  <tr>
      *      <td>{@link Attributes#DECIMAL_SEPARATOR}</td>
-     *      <td>dependent on associated locale</td>
+     *      <td>abh&auml;ngig von der Sprache</td>
      *  </tr>
      *  <tr>
      *      <td>{@link Attributes#ZERO_DIGIT}</td>
-     *      <td>dependent on associated locale</td>
+     *      <td>abh&auml;ngig von der Sprache</td>
      *  </tr>
      *  <tr>
      *      <td>{@link Attributes#LENIENCY}</td>
@@ -458,8 +466,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     @Override
     public String format(T formattable) {
 
-        ChronoDisplay display =
-            this.chronology.preformat(formattable, this.globalAttributes);
+        ChronoDisplay display = this.display(formattable, this.globalAttributes);
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
 
         try {
@@ -512,8 +519,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         StringBuilder buffer
     ) {
 
-        ChronoDisplay display =
-            this.chronology.preformat(formattable, this.globalAttributes);
+        ChronoDisplay display = this.display(formattable, this.globalAttributes);
 
         try {
             return this.print(display, buffer, this.globalAttributes, true);
@@ -566,8 +572,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) throws IOException {
 
-        ChronoDisplay display =
-            this.chronology.preformat(formattable, attributes);
+        ChronoDisplay display = this.display(formattable, attributes);
         return this.print(display, buffer, attributes, true);
 
     }
@@ -580,8 +585,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ChronoFunction<ChronoDisplay, R> query
     ) throws IOException {
 
-        ChronoDisplay display =
-            this.chronology.preformat(formattable, attributes);
+        ChronoDisplay display = this.display(formattable, attributes);
         this.print(display, buffer, attributes, false);
         return query.apply(display);
 
@@ -729,8 +733,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   status      parser information (always as new instance)
      * @param   attributes  attributes for limited parsing control
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab der angegebenen Position
@@ -746,8 +749,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   status      parser information (always as new instance)
      * @param   attributes  attributes for limited parsing control
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      */
     @Override
     public T parse(
@@ -763,43 +765,81 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         T result;
-        Chronology<?> preparser = this.chronology.preparser();
+        ParsedValues parsed;
 
-        if (preparser == null) {
-            return parse(this, this.chronology, this.chronology.getExtensions(), text, status, attrs, false);
-        } else {
-            Object intermediate = parse(this, preparser, preparser.getExtensions(), text, status, attrs, true);
-            ParsedValues parsed = status.getRawValues0();
+        if (this.overrideHandler != null) {
+            List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
+            ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
+            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, true);
+            parsed = status.getRawValues0();
 
             if (status.isError()) {
                 return null;
             }
 
-            if (preparser instanceof TimeAxis) {
-                ChronoElement<?> self = TimeAxis.class.cast(preparser).element();
-                updateSelf(parsed, self, intermediate);
+            TZID tzid = null;
+            Moment moment = null;
+
+            if (parsed.hasTimezone()) {
+                tzid = parsed.getTimezone();
+            } else if (attrs.contains(Attributes.TIMEZONE_ID)) {
+                tzid = attrs.get(Attributes.TIMEZONE_ID); // Ersatzwert
             }
 
-            try {
-                result = this.chronology.createFrom(parsed, attrs, false);
-            } catch (RuntimeException re) {
+            if (tzid != null) {
+                StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, merger.getDefaultStartOfDay());
+
+                if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                    TransitionStrategy strategy = attrs.get(Attributes.TRANSITION_STRATEGY);
+                    moment = tsp.in(Timezone.of(tzid).with(strategy), startOfDay);
+                } else {
+                    moment = tsp.in(Timezone.of(tzid), startOfDay);
+                }
+            }
+
+            if (moment == null) {
+                status.setError(text.length(), "Missing timezone or offset.");
+                return null;
+            } else {
+                updateSelf(parsed, Moment.axis().element(), moment);
+            }
+        } else {
+            Chronology<?> preparser = this.chronology.preparser();
+
+            if (preparser != null) {
+                Object intermediate = parse(this, preparser, preparser.getExtensions(), text, status, attrs, true);
+                parsed = status.getRawValues0();
+
+                if (status.isError()) {
+                    return null;
+                } else if (preparser instanceof TimeAxis) {
+                    ChronoElement<?> self = TimeAxis.class.cast(preparser).element();
+                    updateSelf(parsed, self, intermediate);
+                }
+            } else {
+                return parse(this, this.chronology, this.chronology.getExtensions(), text, status, attrs, false);
+            }
+        }
+
+        try {
+            result = this.chronology.createFrom(parsed, attrs, false);
+        } catch (RuntimeException re) {
+            status.setError(
+                text.length(),
+                re.getMessage() + getDescription(parsed.toMap()));
+            return null;
+        }
+
+        if (result == null) {
+            if (!status.isError()) {
                 status.setError(
                     text.length(),
-                    re.getMessage() + getDescription(parsed.toMap()));
-                return null;
+                    getReason(parsed) + getDescription(parsed.toMap()));
             }
-
-            if (result == null) {
-                if (!status.isError()) {
-                    status.setError(
-                        text.length(),
-                        getReason(parsed) + getDescription(parsed.toMap()));
-                }
-                return null;
-            }
-
-            return checkConsistency(parsed, result, text, status, attrs);
+            return null;
         }
+
+        return checkConsistency(parsed, result, text, status, attrs);
 
     }
 
@@ -1802,7 +1842,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used
      * @param   locale      format locale
-     * @param   tzid            timezone id
+     * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.1
@@ -1813,7 +1853,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used
      * @param   locale      format locale
-     * @param   tzid            timezone id
+     * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @since   3.1
@@ -2072,6 +2112,46 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Constructs a builder for creating global formatters with usage of given calendar type. </p>
      *
+     * <p>For formatting, it is necessary to set the timezone on the built formatter. For parsing,
+     * the calendar variant is necessary. </p>
+     *
+     * @param   <C> generic calendrical type with variant
+     * @param   locale              format locale
+     * @param   overrideCalendar    formattable calendar chronology
+     * @return  new {@code Builder}-instance applicable on {@code Moment}
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Hilfsobjekt zum Bauen eines globalen Zeitformats mit Verwendung
+     * des angegebenen Kalendertyps. </p>
+     *
+     * <p>Zum Formatieren ist es notwendig, die Zeitzone am fertiggestellten Formatierer zu setzen.
+     * Beim Parsen ist die Kalendervariante notwendig. </p>
+     *
+     * @param   <C> generic calendrical type with variant
+     * @param   locale              format locale
+     * @param   overrideCalendar    formattable calendar chronology
+     * @return  new {@code Builder}-instance applicable on {@code Moment}
+     * @since   3.11/4.8
+     */
+    public static <C extends CalendarVariant<C>> ChronoFormatter.Builder<Moment> setUpWithOverride(
+        Locale locale,
+        CalendarFamily<C> overrideCalendar
+    ) {
+
+        if (overrideCalendar == null) {
+            throw new NullPointerException("Missing override calendar.");
+        }
+
+        return new Builder<Moment>(Moment.axis(), locale, overrideCalendar);
+
+    }
+
+    /**
+     * <p>Constructs a builder for creating global formatters with usage of given calendar type. </p>
+     *
+     * <p>For formatting, it is necessary to set the timezone on the built formatter. </p>
+     *
      * @param   <C> generic calendrical type
      * @param   locale              format locale
      * @param   overrideCalendar    formattable calendar chronology
@@ -2082,13 +2162,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Konstruiert ein Hilfsobjekt zum Bauen eines globalen Zeitformats mit Verwendung
      * des angegebenen Kalendertyps. </p>
      *
+     * <p>Zum Formatieren ist es notwendig, die Zeitzone am fertiggestellten Formatierer zu setzen. </p>
+     *
      * @param   <C> generic calendrical type
      * @param   locale              format locale
      * @param   overrideCalendar    formattable calendar chronology
      * @return  new {@code Builder}-instance applicable on {@code Moment}
      * @since   3.11/4.8
      */
-    public static <C extends ChronoEntity<C> & CalendarDate> ChronoFormatter.Builder<Moment> setUpWithOverride(
+    public static <C extends Calendrical<?, C>> ChronoFormatter.Builder<Moment> setUpWithOverride(
         Locale locale,
         Chronology<C> overrideCalendar
     ) {
@@ -2118,7 +2200,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ChronoFormatter<?> that = (ChronoFormatter<?>) obj;
             return (
                 this.chronology.equals(that.chronology)
-                && isEqual(this.override, that.override)
+                && isEqual(this.overrideHandler, that.overrideHandler)
                 && this.globalAttributes.equals(that.globalAttributes)
                 && this.defaults.equals(that.defaults)
                 && this.steps.equals(that.steps)
@@ -2154,6 +2236,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         StringBuilder sb = new StringBuilder(256);
         sb.append("net.time4j.format.ChronoFormatter[chronology=");
         sb.append(this.chronology.getChronoType().getName());
+        if (this.overrideHandler != null) {
+            sb.append(", override=");
+            sb.append(this.overrideHandler);
+        }
         sb.append(", default-attributes=");
         sb.append(this.globalAttributes);
         sb.append(", default-values=");
@@ -2174,7 +2260,43 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static <T extends ChronoEntity<T>> T parse(
+    private ChronoDisplay display(
+        T formattable,
+        AttributeQuery query
+    ) {
+
+        if (this.overrideHandler == null) {
+            return this.chronology.preformat(formattable, query);
+        }
+
+        try {
+            Class<?> otype = this.overrideHandler.getCalendarOverride().getChronoType();
+            StartOfDay startOfDay = query.get(Attributes.START_OF_DAY, this.overrideHandler.getDefaultStartOfDay());
+            Moment m = Moment.class.cast(formattable);
+            TZID tzid = query.get(Attributes.TIMEZONE_ID);
+            GeneralTimestamp<?> tsp;
+
+            if (CalendarVariant.class.isAssignableFrom(otype)) {
+                CalendarFamily<?> family = cast(this.overrideHandler.getCalendarOverride());
+                String variant = query.get(Attributes.CALENDAR_VARIANT);
+                tsp = m.toGeneralTimestamp(family, variant, tzid, startOfDay);
+            } else if (Calendrical.class.isAssignableFrom(otype)) {
+                Chronology<? extends Calendrical> axis = cast(this.overrideHandler.getCalendarOverride());
+                tsp = m.toGeneralTimestamp(axis, tzid, startOfDay);
+            } else {
+                throw new IllegalStateException("Unexpected calendar override: " + otype);
+            }
+
+            return new ZonalDisplay(tsp, tzid);
+        } catch (ClassCastException ex) {
+            throw new IllegalArgumentException("Not formattable: " + formattable, ex);
+        } catch (NoSuchElementException ex) { // missing timezone or calendar variant
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+
+    }
+
+    private static <T extends ChronoDisplay> T parse(
         ChronoFormatter<?> cf,
         ChronoMerger<T> merger,
         List<ChronoExtension> extensions,
@@ -2255,9 +2377,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (
             (cf.fracproc != null)
-            && (result != null)
+            && (result instanceof ChronoEntity)
         ) { // Sonderfall Bruchzahlelement
-            result = cf.fracproc.update(result, parsed);
+            ChronoEntity<?> entity = ChronoEntity.class.cast(result);
+            result = cast(cf.fracproc.update(entity, parsed));
         }
 
         // Phase 5: Konsistenzprüfung
@@ -2271,6 +2394,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         } else {
             return checkConsistency(parsed, result, text, status, attributes);
         }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object obj) {
+
+        return (T) obj;
 
     }
 
@@ -2310,7 +2440,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static <T extends ChronoEntity<T>> T checkConsistency(
+    private static <T extends ChronoDisplay> T checkConsistency(
         ParsedValues parsed,
         T result,
         CharSequence text,
@@ -2383,7 +2513,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                 for (ChronoElement<?> e : parsed.toMap().keySet()) {
                     Object value = parsed.get(e);
-                    ChronoEntity<?> test = result;
+                    ChronoDisplay test = result;
 
                     if (date != null) {
                         if (e.isDateElement()) {
@@ -2667,18 +2797,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         //~ Methoden ------------------------------------------------------
 
         /**
-         * <p>Returns the associated chronology. </p>
+         * <p>Returns the calendar override if set else the associated chronology. </p>
          *
          * @return  Chronology
+         * @since   3.11/4.8
          */
         /*[deutsch]
-         * <p>Liefert die zugeh&ouml;rige Chronologie. </p>
+         * <p>Liefert die separate Kalenderchronologie, wenn gesetzt, sonst die zugeh&ouml;rige Chronologie. </p>
          *
          * @return  Chronology
+         * @since   3.11/4.8
          */
-        public Chronology<T> getChronology() {
+        public Chronology<?> getChronology() {
 
-            return this.chronology;
+            return ((this.override == null) ? this.chronology : this.override);
 
         }
 
@@ -4184,7 +4316,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public Builder<T> addTimezoneID() {
 
-            Class<?> chronoType = this.getChronology().getChronoType();
+            Class<?> chronoType = this.chronology.getChronoType();
 
             if (UnixTime.class.isAssignableFrom(chronoType)) {
                 this.addProcessor(TimezoneIDProcessor.INSTANCE);
@@ -4706,7 +4838,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> startOptionalSection(final ChronoCondition<ChronoDisplay> printCondition) {
 
             this.resetPadding();
-            Attributes.Builder ab = new Attributes.Builder(this.chronology);
+            Attributes.Builder ab = new Attributes.Builder();
             AttributeSet previous = null;
             ChronoCondition<ChronoDisplay> cc = null;
 
@@ -4779,7 +4911,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Attributes.Builder ab;
 
             if (this.stack.isEmpty()) {
-                ab = new Attributes.Builder(this.chronology);
+                ab = new Attributes.Builder();
                 as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
@@ -4830,7 +4962,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Attributes.Builder ab;
 
             if (this.stack.isEmpty()) {
-                ab = new Attributes.Builder(this.chronology);
+                ab = new Attributes.Builder();
                 as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
@@ -4881,7 +5013,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Attributes.Builder ab;
 
             if (this.stack.isEmpty()) {
-                ab = new Attributes.Builder(this.chronology);
+                ab = new Attributes.Builder();
                 as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
@@ -4934,7 +5066,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Attributes.Builder ab;
 
             if (this.stack.isEmpty()) {
-                ab = new Attributes.Builder(this.chronology);
+                ab = new Attributes.Builder();
                 as = new AttributeSet(ab.set(key, value).build(), this.locale);
             } else {
                 AttributeSet old = this.stack.getLast();
@@ -5450,6 +5582,208 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 return this.attributes.get(key);
             }
             return this.globals.get(key, defaultValue);
+        }
+
+    }
+
+    private static class OverrideHandler<C extends ChronoEntity<C>>
+        implements ChronoMerger<GeneralTimestamp<C>> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final Chronology<C> override;
+        private final List<ChronoExtension> extensions;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private OverrideHandler(Chronology<C> override) {
+            super();
+
+            this.override = override;
+
+            List<ChronoExtension> list = new ArrayList<ChronoExtension>();
+            list.addAll(this.override.getExtensions());
+            list.addAll(PlainTime.axis().getExtensions());
+            this.extensions = Collections.unmodifiableList(list);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        static <C extends ChronoEntity<C>> OverrideHandler<C> of(Chronology<C> override) {
+
+            if (override == null) {
+                return null;
+            }
+
+            return new OverrideHandler<C>(override);
+
+        }
+
+        @Override
+        public GeneralTimestamp<C> createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean preparsing
+        ) {
+
+            C date = this.override.createFrom(entity, attributes, preparsing);
+            PlainTime time = PlainTime.axis().createFrom(entity, attributes, preparsing);
+            Object tsp;
+
+            if (date instanceof CalendarVariant) {
+                tsp = GeneralTimestamp.of(CalendarVariant.class.cast(date), time);
+            } else if (date instanceof Calendrical) {
+                tsp = GeneralTimestamp.of(Calendrical.class.cast(date), time);
+            } else {
+                throw new IllegalStateException("Cannot determine calendar type: " + date);
+            }
+
+            return cast(tsp);
+
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+
+            return this.override.getDefaultStartOfDay();
+
+        }
+
+        public List<ChronoExtension> getExtensions() {
+
+            return this.extensions;
+
+        }
+
+        public Chronology<?> getCalendarOverride() {
+
+            return this.override;
+
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) {
+                return true;
+            } else  if (obj instanceof OverrideHandler) {
+                OverrideHandler that = (OverrideHandler) obj;
+                return this.override.equals(that.override);
+            } else {
+                return false;
+            }
+
+        }
+
+        @Override
+        public int hashCode() {
+
+            return this.override.hashCode();
+
+        }
+
+        @Override
+        public String toString() {
+
+            return this.override.getChronoType().getName();
+
+        }
+
+        @Override
+        public ChronoDisplay preformat(
+            GeneralTimestamp<C> context,
+            AttributeQuery attributes
+        ) {
+            throw new UnsupportedOperationException("Not used.");
+        }
+
+        @Override
+        public Chronology<?> preparser() {
+            throw new UnsupportedOperationException("Not used.");
+        }
+
+        @Override
+        public GeneralTimestamp<C> createFrom(
+            TimeSource<?> clock,
+            AttributeQuery attributes
+        ) {
+            throw new UnsupportedOperationException("Not used.");
+        }
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+            throw new UnsupportedOperationException("Not used.");
+        }
+
+    }
+
+    private static class ZonalDisplay
+        implements ChronoDisplay {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final GeneralTimestamp<?> tsp;
+        private final TZID tzid;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private ZonalDisplay(
+            GeneralTimestamp<?> tsp,
+            TZID tzid
+        ) {
+            super();
+
+            this.tsp = tsp;
+            this.tzid = tzid;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean contains(ChronoElement<?> element) {
+
+            return this.tsp.contains(element);
+
+        }
+
+        @Override
+        public <V> V get(ChronoElement<V> element) {
+
+            return this.tsp.get(element);
+
+        }
+
+        @Override
+        public <V> V getMinimum(ChronoElement<V> element) {
+
+            return this.tsp.getMinimum(element);
+
+        }
+
+        @Override
+        public <V> V getMaximum(ChronoElement<V> element) {
+
+            return this.tsp.getMaximum(element);
+
+        }
+
+        @Override
+        public boolean hasTimezone() {
+
+            return true;
+
+        }
+
+        @Override
+        public TZID getTimezone() {
+
+            return this.tzid;
+
         }
 
     }

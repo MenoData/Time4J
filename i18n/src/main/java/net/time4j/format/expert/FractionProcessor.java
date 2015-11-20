@@ -403,8 +403,8 @@ final class FractionProcessor
      * @param   parsed  intermediate buffer for parsed values
      * @return  updated result object
      */
-    <T extends ChronoEntity<T>> T update(
-        T entity,
+    ChronoEntity<?> update(
+        ChronoEntity<?> entity,
         ParsedValues parsed
     ) {
 
