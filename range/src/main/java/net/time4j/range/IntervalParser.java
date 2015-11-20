@@ -59,7 +59,7 @@ final class IntervalParser
     private final ChronoParser<T> startFormat;
     private final ChronoParser<T> endFormat;
     private final BracketPolicy policy;
-    private final ChronoMerger<T> merger;
+    private final ChronoMerger<?> merger;
     private final Character separator;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -69,7 +69,7 @@ final class IntervalParser
         ChronoParser<T> startFormat,
         ChronoParser<T> endFormat,
         BracketPolicy policy,
-        ChronoMerger<T> merger, // optional
+        ChronoMerger<?> merger, // optional
         Character separator // optional
     ) {
         super();
@@ -134,7 +134,7 @@ final class IntervalParser
         ChronoParser<T> endFormat,
         BracketPolicy policy,
         char separator,
-        ChronoMerger<T> merger
+        ChronoMerger<?> merger
     ) {
 
         if (startFormat == null) {
@@ -348,7 +348,7 @@ final class IntervalParser
                     if (lowerRaw.hasTimezone()) {
                         attrs = new Wrapper(attrs, lowerRaw.getTimezone());
                     }
-                    ChronoDisplay cv = this.merger.preformat(t1, attrs);
+                    ChronoDisplay cv = preformat(t1, this.merger, attrs);
                     for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
                         parser = setDefault(parser, cv, key);
                     }
@@ -656,6 +656,17 @@ final class IntervalParser
     private boolean isoMode() {
 
         return (this.merger != null);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> ChronoDisplay preformat(
+        Object time,
+        ChronoMerger<T> merger,
+        AttributeQuery attrs
+    ) {
+
+        return merger.preformat((T) time, attrs);
 
     }
 
