@@ -66,7 +66,7 @@ import java.util.Locale;
  *          (compatible to {@link ChronoEntity})
  * @author  Meno Hochschild
  */
-public interface ChronoMerger<T extends ChronoEntity<T>> {
+public interface ChronoMerger<T> {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -182,7 +182,11 @@ public interface ChronoMerger<T extends ChronoEntity<T>> {
         AttributeQuery attributes
     ) {
 
-        return context;
+        try {
+            return (ChronoDisplay) context;
+        } catch (ClassCastException cce) {
+            throw new IllegalArgumentException(cce.getMessage());
+        }
 
     }
 

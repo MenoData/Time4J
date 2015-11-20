@@ -659,7 +659,7 @@ final class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<
     }
 
     @SuppressWarnings("unchecked")
-    private static <T extends ChronoEntity<T>> ChronoDisplay preformat(
+    private static <T> ChronoDisplay preformat(
         Object time,
         ChronoMerger<T> merger,
         AttributeQuery attrs
