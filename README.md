@@ -94,7 +94,7 @@ public class Demo {
 	String s2 = PrettyTime.of(Locale.FRANCE).print(dur, TextWidth.WIDE);
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 	
-	// following code requires v4.0 and Java-8 using java.time.LocalDate
+	// following code requires v4.x and Java-8 using java.time.LocalDate
 	ChronoFormatter<PlainDate> formatter =
 	    ChronoFormatter.setUp(PlainDate.class, new Locale("en", "SE"))
 	        .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
