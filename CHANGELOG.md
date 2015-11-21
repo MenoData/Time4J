@@ -1,5 +1,7 @@
 ## [v3.11] not yet released
 ### Added
+- Add Ethiopian calendar and time [#389]
+- Enable formatting/parsing moments using another calendar [#399]
 - GeneralTimestamp should implement ChronoDisplay [#401]
 - Add Coptic calendar [#388]
 - Support for triennal julian leap years [#393]
