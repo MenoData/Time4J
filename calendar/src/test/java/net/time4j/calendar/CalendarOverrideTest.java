@@ -24,6 +24,23 @@ import static org.junit.Assert.assertThat;
 public class CalendarOverrideTest {
 
     @Test
+    public void formatGeneralTimestamp() {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUpWithOverride(Locale.ENGLISH, HijriCalendar.family())
+                .addPattern("G-yyyy-MM-dd HH:mm", PatternType.CLDR)
+                .build()
+                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA);
+        Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
+        GeneralTimestamp<HijriCalendar> tsp =
+            m.toGeneralTimestamp(HijriCalendar.family(), HijriCalendar.VARIANT_UMALQURA, offset, StartOfDay.EVENING);
+        assertThat(
+            f.format(tsp),
+            is("AH-1437-02-08 21:45")
+        );
+    }
+
+    @Test
     public void printHijri() {
         ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
         ChronoFormatter<Moment> f =

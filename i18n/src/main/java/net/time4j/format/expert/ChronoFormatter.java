@@ -467,15 +467,29 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     public String format(T formattable) {
 
         ChronoDisplay display = this.display(formattable, this.globalAttributes);
-        StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
+        return this.format0(display);
 
-        try {
-            this.print(display, buffer, this.globalAttributes, false);
-        } catch (IOException ioe) {
-            throw new IllegalStateException(ioe); // cannot happen
-        }
+    }
 
-        return buffer.toString();
+    /**
+     * <p>Prints given general timestamp. </p>
+     *
+     * @param   tsp     general timestamp as combination of a date and a time
+     * @return  formatted string
+     * @throws  IllegalArgumentException if the timestamp is not formattable with this formatter
+     * @since   3.11/4.8
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen allgemeinen Zeitstempel. </p>
+     *
+     * @param   tsp     general timestamp as combination of a date and a time
+     * @return  formatted string
+     * @throws  IllegalArgumentException if the timestamp is not formattable with this formatter
+     * @since   3.11/4.8
+     */
+    public String format(GeneralTimestamp<?> tsp) {
+
+        return this.format0(tsp);
 
     }
 
@@ -2257,6 +2271,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
         sb.append("}]");
         return sb.toString();
+
+    }
+
+    private String format0(ChronoDisplay display) {
+
+        StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
+
+        try {
+            this.print(display, buffer, this.globalAttributes, false);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(ioe); // cannot happen
+        }
+
+        return buffer.toString();
 
     }
 
