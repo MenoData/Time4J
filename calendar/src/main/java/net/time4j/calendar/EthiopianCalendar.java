@@ -116,8 +116,8 @@ import java.util.Locale;
  *       .addText(EthiopianCalendar.EVANGELIST)
  *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
  *       .build();
- *     EthiopianCalendar ethio =
- *       formatter.parse(&quot;&#4901;&#4677;&#4637;&#4725; 11 &#4978;&#4977;&#4987;&#4986;&#4975; (&#4635;&#4724;&#4814;&#4661;) &#4819;/&#4637;&quot;);
+ *     String input = &quot;&amp;#4901;&amp;#4677;&amp;#4637;&amp;#4725; 11 &amp;#4978;&amp;#4977;&amp;#4987;&amp;#4986;&amp;#4975; (&amp;#4635;&amp;#4724;&amp;#4814;&amp;#4661;) &amp;#4819;/&amp;#4637;&quot;;
+ *     EthiopianCalendar ethio = formatter.parse(input);
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
@@ -169,8 +169,8 @@ import java.util.Locale;
  *       .addText(EthiopianCalendar.EVANGELIST)
  *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
  *       .build();
- *     EthiopianCalendar ethio =
- *       formatter.parse(&quot;&#4901;&#4677;&#4637;&#4725; 11 &#4978;&#4977;&#4987;&#4986;&#4975; (&#4635;&#4724;&#4814;&#4661;) &#4819;/&#4637;&quot;);
+ *     String input = &quot;&amp;#4901;&amp;#4677;&amp;#4637;&amp;#4725; 11 &amp;#4978;&amp;#4977;&amp;#4987;&amp;#4986;&amp;#4975; (&amp;#4635;&amp;#4724;&amp;#4814;&amp;#4661;) &amp;#4819;/&amp;#4637;&quot;;
+ *     EthiopianCalendar ethio = formatter.parse(input);
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *

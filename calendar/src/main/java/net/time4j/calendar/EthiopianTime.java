@@ -57,9 +57,8 @@ import java.util.Set;
  * <p>Represents the 12-hour-time in second precision used in Ethiopia
  * starting in the morning at 6 AM as zero point. </p>
  *
- * <p>Mapping table: </p>
- *
  * <table border="1">
+ *     <caption>Mapping table</caption>
  *     <tr>
  *         <th>ISO-8601</th>
  *         <th>Ethiopic</th>
@@ -169,9 +168,8 @@ import java.util.Set;
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr in Sekundengenauigkeit, die in &Auml;thiopien verwendet wird
  * und morgens um 6 Uhr startet. </p>
  *
- * <p>Konversionstabelle: </p>
- *
  * <table border="1">
+ *     <caption>Konversionstabelle</caption>
  *     <tr>
  *         <th>ISO-8601</th>
  *         <th>&Auml;thiopisch</th>
