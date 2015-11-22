@@ -37,6 +37,9 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1017,6 +1020,63 @@ public final class PrettyTime {
     ) {
 
         return this.printRelative(moment, Timezone.of(tzid), TimeUnit.SECONDS);
+
+    }
+
+    /**
+     * <p>Formats given threeten object relative to the current time of
+     * {@link #getReferenceClock()} as duration in at most second
+     * precision or less. </p>
+     *
+     * @param   zdt     relative time
+     * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(Instant, ZoneId)
+     * @since   4.8
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt in JSR-310-Schreibweise relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in maximal
+     * Sekundengenauigkeit. </p>
+     *
+     * @param   zdt     relative time
+     * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(Instant, ZoneId)
+     * @since   4.8
+     */
+    public String printRelative(ZonedDateTime zdt) {
+
+        return this.printRelative(zdt.toInstant(), zdt.getZone());
+
+    }
+
+    /**
+     * <p>Formats given time point relative to the current time of
+     * {@link #getReferenceClock()} as duration in at most second
+     * precision or less. </p>
+     *
+     * @param   instant     relative time point
+     * @param   zoneId      time zone id for translating to a local duration
+     * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
+     * @since   4.8
+     */
+    /*[deutsch]
+     * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
+     * der Referenzuhr {@link #getReferenceClock()} als Dauer in maximal
+     * Sekundengenauigkeit. </p>
+     *
+     * @param   instant     relative time point
+     * @param   zoneId      time zone id for translating to a local duration
+     * @return  formatted output of relative time, either in past or in future
+     * @see     #printRelative(UnixTime, Timezone, TimeUnit)
+     * @since   4.8
+     */
+    public String printRelative(
+        Instant instant,
+        ZoneId zoneId
+    ) {
+
+        return this.printRelative(Moment.from(instant), Timezone.of(zoneId.getId()), TimeUnit.SECONDS);
 
     }
 

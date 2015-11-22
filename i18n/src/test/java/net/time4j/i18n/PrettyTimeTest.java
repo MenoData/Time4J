@@ -22,6 +22,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +37,19 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PrettyTimeTest {
+
+    @Test
+    public void printRelativeThreeten() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 4, 14, 40, 10).atUTC();
+        ZonedDateTime zdt = ZonedDateTime.of(2014, 9, 28, 15, 0, 0, 0, ZoneOffset.ofHours(1));
+
+        assertThat(
+            PrettyTime.of(Locale.ENGLISH)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelative(zdt),
+            is("in 23 days"));
+    }
 
     @Test
     public void printRelativePT() {
