@@ -1,5 +1,6 @@
 ## [v4.8] not yet released
 ### Added
+- Support for Sinhalese [#402]
 - Print relative times for java.time.Instant [#392]
 - Add Ethiopian calendar and time [#389]
 - Enable formatting/parsing moments using another calendar [#399]
