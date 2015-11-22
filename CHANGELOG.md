@@ -1,5 +1,6 @@
 ## [v3.11] not yet released
 ### Added
+- Support for Sinhalese [#402]
 - Add Ethiopian calendar and time [#389]
 - Enable formatting/parsing moments using another calendar [#399]
 - GeneralTimestamp should implement ChronoDisplay [#401]
