@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.time4j</groupId>
         <artifactId>time4j-parent</artifactId>
-        <version>3.11</version>
+        <version>3.12</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
@@ -19,13 +19,13 @@
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-core</artifactId>
-            <version>[3.10,4.0)</version>
+            <version>[3.12,4.0)</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-i18n</artifactId>
-            <version>[3.10,4.0)</version>
+            <version>[3.12,4.0)</version>
             <scope>test</scope>
         </dependency>
         <dependency>
