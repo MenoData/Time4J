@@ -42,16 +42,6 @@ import java.util.Set;
 public class EthiopianExtension
     implements ChronoExtension {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final Set<ChronoElement<?>> ELEMENTS;
-
-    static {
-        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
-        set.add(EthiopianTime.ETHIOPIAN_HOUR);
-        ELEMENTS = Collections.unmodifiableSet(set);
-    }
-
     //~ Methoden ----------------------------------------------------------
 
     @Override
@@ -67,7 +57,9 @@ public class EthiopianExtension
         AttributeQuery attributes
     ) {
 
-        return ELEMENTS;
+        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+        set.add(EthiopianTime.ETHIOPIAN_HOUR);
+        return Collections.unmodifiableSet(set);
 
     }
 
