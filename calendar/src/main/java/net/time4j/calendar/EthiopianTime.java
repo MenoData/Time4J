@@ -887,13 +887,6 @@ public final class EthiopianTime
 
         }
 
-        @Override
-        public boolean isCalendrical() {
-
-            return false;
-
-        }
-
         /**
          * <p>Calculates the difference between given Ethiopian times in this unit. </p>
          *
