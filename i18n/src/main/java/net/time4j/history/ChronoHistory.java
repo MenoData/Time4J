@@ -917,7 +917,7 @@ public final class ChronoHistory
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.history.SPX">
      *              a dedicated serialization form</a> as proxy. The format
      *              is bit-compressed. The first byte contains in the four
      *              most significant bits the type-ID {@code 2}. The following

@@ -982,7 +982,7 @@ public final class HijriCalendar
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
      *              the type-ID {@code 1}. Then the UTF-coded variant and its data version
      *              follow. Finally the year is written as int, month and day-of-month as bytes.

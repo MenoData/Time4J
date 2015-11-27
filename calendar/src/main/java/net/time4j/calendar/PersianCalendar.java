@@ -697,7 +697,7 @@ public final class PersianCalendar
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
      *              the type-ID {@code 2}. Then the year is written as int, finally
      *              month and day-of-month as bytes.

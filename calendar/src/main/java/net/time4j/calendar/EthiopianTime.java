@@ -818,7 +818,7 @@ public final class EthiopianTime
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
      *              the type-ID {@code 5}. Then the time of day in seconds using western
      *              format is written as integer.

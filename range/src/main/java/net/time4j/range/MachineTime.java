@@ -1042,7 +1042,7 @@ public final class MachineTime<U>
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
      *              six most significant bits the type id {@code 7} and as

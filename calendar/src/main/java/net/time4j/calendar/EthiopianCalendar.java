@@ -781,7 +781,7 @@ public final class EthiopianCalendar
     }
 
     /**
-     * @serialData  Uses <a href="../../serialized-form.html#net.time4j.SPX">
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
      *              the type-ID {@code 4}. Then the era ordinal is written as byte, the year-of-era
      *              is written as int, finally month and day-of-month written as bytes.
