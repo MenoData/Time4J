@@ -746,34 +746,6 @@ public final class Attributes
         }
 
         /**
-         * <p>Sets the start of calendar day. </p>
-         *
-         * @param   startOfDay      start of calendar day
-         * @return  this instance for method chaining
-         * @see     #START_OF_DAY
-         * @since   3.5/4.3
-         * @deprecated  Will be removed in release 3.12/4.9,
-         *              use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
-         */
-        /*[deutsch]
-         * <p>Setzt den Start des Kalendertages. </p>
-         *
-         * @param   startOfDay      start of calendar day
-         * @return  this instance for method chaining
-         * @see     #START_OF_DAY
-         * @since   3.5/4.3
-         * @deprecated  Will be removed in release 3.12/4.9,
-         *              use {@code net.time4j.format.expert.ChronoFormatter.with(StartOfDay)} instead
-         */
-        @Deprecated
-        public Builder setStartOfDay(StartOfDay startOfDay) {
-
-            this.setInternal(START_OF_DAY, startOfDay);
-            return this;
-
-        }
-
-        /**
          * <p>Sets an attribute of {@code boolean}-type. </p>
          *
          * @param   key     attribute key
