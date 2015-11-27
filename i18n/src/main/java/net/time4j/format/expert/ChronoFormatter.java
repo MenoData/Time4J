@@ -1330,31 +1330,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   startOfDay      new start of day
      * @return  changed copy with the given start of day while this instance remains unaffected
      * @see     Attributes#START_OF_DAY
-     * @since   3.5/4.3
-     * @deprecated  Will be removed in a future release, use {@link #with(StartOfDay)} instead
-     */
-    /*[deutsch]
-     * <p>Setzt den Beginn des Kalendertages. </p>
-     *
-     * @param   startOfDay      new start of day
-     * @return  changed copy with the given start of day while this instance remains unaffected
-     * @see     Attributes#START_OF_DAY
-     * @since   3.5/4.3
-     * @deprecated  Will be removed in a future release, use {@link #with(StartOfDay)} instead
-     */
-    @Deprecated
-    public ChronoFormatter<T> withStartOfDay(StartOfDay startOfDay) {
-
-        return this.with(startOfDay);
-
-    }
-
-    /**
-     * <p>Sets the start of calendar day. </p>
-     *
-     * @param   startOfDay      new start of day
-     * @return  changed copy with the given start of day while this instance remains unaffected
-     * @see     Attributes#START_OF_DAY
      * @since   3.11/4.8
      */
     /*[deutsch]
