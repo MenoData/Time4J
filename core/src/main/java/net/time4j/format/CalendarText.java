@@ -41,6 +41,7 @@ import java.time.temporal.IsoFields;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -219,8 +220,9 @@ public final class CalendarText {
     private final Map<TextWidth, TextAccessor> eras;
     private final Map<TextWidth, TextAccessor> meridiems;
 
-    // Textformen spezifisch für eine Chronologie
-    private final ResourceBundle textForms;
+    // Allgemeine Textformen spezifisch für eine Chronologie
+    private final Map<String, String> textForms;
+    private final Locale locale;
     private final MissingResourceException mre;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -306,20 +308,24 @@ public final class CalendarText {
 
         // Allgemeine Textformen als optionales Bundle vorbereiten
         // Wichtig: Letzter Schritt im Konstruktor wg. Bundle-Cache
-        ResourceBundle rb = null;
+        Map<String, String> map = new HashMap<>();
         MissingResourceException tmpMre = null;
 
         try {
-            rb =
+            ResourceBundle rb =
                 ResourceBundle.getBundle(
                     "calendar/" + calendarType,
                     locale,
                     p.getControl());
+            for (String key : rb.keySet()) {
+                map.put(key, rb.getString(key));
+            }
         } catch (MissingResourceException ex) {
             tmpMre = ex;
         }
 
-        this.textForms = rb;
+        this.textForms = Collections.unmodifiableMap(map);
+        this.locale = locale;
         this.mre = tmpMre;
 
     }
@@ -674,6 +680,24 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Yields all text forms in raw format. </p>
+     *
+     * @return  unmodifiable map of all text forms
+     * @since   3.12/4.9
+     */
+    /*[deutsch]
+     * <p>Liefert alle Textformen im Rohformat. </p>
+     *
+     * @return  unmodifiable map of all text forms
+     * @since   3.12/4.9
+     */
+    public Map<String, String> getTextForms() {
+
+        return this.textForms;
+
+    }
+
+    /**
      * <p>Yields an {@code Accessor} for all text forms of given
      * chronological element. </p>
      *
@@ -789,7 +813,7 @@ public final class CalendarText {
         String... variants
     ) {
 
-        if (this.textForms == null) {
+        if (this.mre != null) {
             throw new MissingResourceException(
                 this.mre.getMessage(),
                 this.mre.getClassName(),
@@ -799,7 +823,7 @@ public final class CalendarText {
         V[] enums = type.getEnumConstants();
         int len = enums.length;
         String[] tfs = new String[len];
-        String prefix = getKeyPrefix(this.textForms, name);
+        String prefix = this.getKeyPrefix(name);
         int baseIndex = (CalendarEra.class.isAssignableFrom(type) ? 0 : 1);
 
         for (int i = 0; i < len; i++) {
@@ -823,11 +847,11 @@ public final class CalendarText {
             if (key == null) {
                 tfs[i] = enums[i].name(); // fallback
             } else {
-                tfs[i] = this.textForms.getString(key);
+                tfs[i] = this.textForms.get(key);
             }
         }
 
-        return new TextAccessor(tfs, this.textForms.getLocale());
+        return new TextAccessor(tfs, this.locale);
 
     }
 
@@ -860,11 +884,11 @@ public final class CalendarText {
 
         CalendarText ct = CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
 
-        if (ct.textForms == null) {
+        if (ct.textForms.isEmpty()) {
             return "GMT";
         }
 
-        return ct.textForms.getString("prefixGMTOffset");
+        return ct.textForms.get("prefixGMTOffset");
 
     }
 
@@ -1040,14 +1064,11 @@ public final class CalendarText {
 
     }
 
-    private static String getKeyPrefix(
-        ResourceBundle bundle,
-        String elementName
-    ) {
+    private String getKeyPrefix(String elementName) {
 
         if (
-            bundle.containsKey("useShortKeys")
-            && "true".equals(bundle.getString("useShortKeys"))
+            this.textForms.containsKey("useShortKeys")
+            && "true".equals(this.textForms.get("useShortKeys"))
         ) {
             if (
                 (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
