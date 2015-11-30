@@ -349,6 +349,24 @@ public enum HijriAlgorithm
 			}
 
 			hdom += delta;
+			int test;
+
+			if (hmonth == 12) {
+				int y = ((hyear - 1) % 30) + 1;
+				test = ((Arrays.binarySearch(this.intercalaries, y) >= 0) ? 30 : 29);
+			} else {
+				test = ((hmonth % 2 == 1) ? 30 : 29);
+			}
+
+			if (hdom > test) {
+				hdom = 1;
+				hmonth++;
+
+				if (hmonth > 12) {
+					hmonth = 1;
+					hyear++;
+				}
+			}
 
 			return HijriCalendar.of(this.variant, hyear, hmonth, hdom);
 
@@ -387,7 +405,7 @@ public enum HijriAlgorithm
 			if (hdom == 30) {
 				if (
 					(hmonth == 12 && Arrays.binarySearch(this.intercalaries, y) < 0)
-					|| ((hmonth % 2) == 0)
+					|| ((hmonth != 12) && (hmonth % 2) == 0)
 				) {
 					throw new IllegalArgumentException("Invalid day-of-month: " + date);
 				}
