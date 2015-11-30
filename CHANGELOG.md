@@ -1,4 +1,19 @@
-## [v3.11] not yet released
+## [v3.13] not yet released
+
+## [v3.12] published on 2015-11-30
+### Added
+- Support for Bengali [#409]
+- Ethiopian time should support element PlainTime.COMPONENT [#408]
+
+### Fixed
+- HijriAlgorithm calendar variant broken [#407]
+- Broken javadoc links to some serial forms [#406]
+- British date format should be in order DMY [#403]
+
+### Removed
+- Tidy deprecated elements [#404]
+
+## [v3.11] published on 2015-11-22
 ### Added
 - Support for Sinhalese [#402]
 - Add Ethiopian calendar and time [#389]
