@@ -1,6 +1,8 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.engine.EpochDays;
+import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -242,6 +244,24 @@ public class HijriAlgoTest {
         assertThat(
             f.parse("AH, 1426-11-23"),
             is(HijriCalendar.of(HijriAlgorithm.WEST_ISLAMIC_ASTRO, 1426, 11, 23)));
+    }
+
+    @Test
+    public void formatExample() { // see issue #407
+        ChronoFormatter<HijriCalendar> formatter2 =
+            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
+                .addPattern("EEE, d. MMMM yy", PatternType.NON_ISO_DATE).build()
+                .with(Attributes.PIVOT_YEAR, 1500);
+        PlainDate today2 = PlainDate.of(735914, EpochDays.RATA_DIE);
+        HijriCalendar h = today2.transform(HijriCalendar.class, "islamic-fatimida");
+        assertThat(h, is(today2.transform(HijriCalendar.class, HijriAlgorithm.FATIMID_ASTRO)));
+        String s = formatter2.format(h);
+        assertThat(s, is("Thu, 1. Safar 37"));
+
+        h = today2.transform(HijriCalendar.class, "islamic-habashalhasiba");
+        assertThat(h, is(today2.transform(HijriCalendar.class, HijriAlgorithm.HABASH_AL_HASIB_ASTRO)));
+        s = formatter2.format(h);
+        assertThat(s, is("Thu, 1. Safar 37"));
     }
 
 }
