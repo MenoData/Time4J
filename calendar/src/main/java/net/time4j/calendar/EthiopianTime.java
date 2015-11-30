@@ -161,6 +161,17 @@ import java.util.Set;
  *     </tr>
  * </table>
  *
+ * <p>Following elements which are declared as constants are registered by this class: </p>
+ *
+ * <ul>
+ *  <li>{@link #ISO_TIME}</li>
+ *  <li>{@link #AM_PM_OF_DAY}</li>
+ *  <li>{@link #ETHIOPIAN_HOUR}</li>
+ *  <li>{@link #DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link #MINUTE_OF_HOUR}</li>
+ *  <li>{@link #SECOND_OF_MINUTE}</li>
+ * </ul>
+ *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
@@ -272,6 +283,17 @@ import java.util.Set;
  *     </tr>
  * </table>
  *
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ *
+ * <ul>
+ *  <li>{@link #ISO_TIME}</li>
+ *  <li>{@link #AM_PM_OF_DAY}</li>
+ *  <li>{@link #ETHIOPIAN_HOUR}</li>
+ *  <li>{@link #DIGITAL_HOUR_OF_DAY}</li>
+ *  <li>{@link #MINUTE_OF_HOUR}</li>
+ *  <li>{@link #SECOND_OF_MINUTE}</li>
+ * </ul>
+ *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
@@ -286,6 +308,18 @@ public final class EthiopianTime
     private static final int DIGITAL_HOUR_INDEX = 1;
     private static final int MINUTE_INDEX = 2;
     private static final int SECOND_INDEX = 3;
+
+    /**
+     * Behaves like {@link PlainTime#COMPONENT} and serves for conversion.
+     *
+     * @since   3.12/4.9
+     */
+    /*[deutsch]
+     * Verh&auml;lt sich wie {@link PlainTime#COMPONENT} und dient der Konversion.
+     *
+     * @since   3.12/4.9
+     */
+    public static final ChronoElement<PlainTime> ISO_TIME = PlainTime.COMPONENT;
 
     /**
      * Behaves like {@link PlainTime#AM_PM_OF_DAY}.
@@ -350,6 +384,9 @@ public final class EthiopianTime
             .appendElement(
                 AM_PM_OF_DAY,
                 new MeridiemRule())
+            .appendElement(
+                ISO_TIME,
+                new TimeRule())
             .appendElement(
                 ETHIOPIAN_HOUR,
                 new IntegerElementRule(ETHIOPIAN_HOUR_INDEX),
@@ -1079,6 +1116,55 @@ public final class EthiopianTime
 
         private Object readResolve() {
             return ELEMENT;
+        }
+
+    }
+
+    private static class TimeRule
+        implements ElementRule<EthiopianTime, PlainTime> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public PlainTime getValue(EthiopianTime context) {
+            return context.toISO();
+        }
+
+        @Override
+        public PlainTime getMinimum(EthiopianTime context) {
+            return PlainTime.midnightAtStartOfDay();
+        }
+
+        @Override
+        public PlainTime getMaximum(EthiopianTime context) {
+            return PlainTime.of(23, 59, 59);
+        }
+
+        @Override
+        public boolean isValid(
+            EthiopianTime context,
+            PlainTime value
+        ) {
+            return (value != null);
+        }
+
+        @Override
+        public EthiopianTime withValue(
+            EthiopianTime context,
+            PlainTime value,
+            boolean lenient
+        ) {
+            return EthiopianTime.from(value);
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(EthiopianTime context) {
+            return null;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(EthiopianTime context) {
+            return null;
         }
 
     }
