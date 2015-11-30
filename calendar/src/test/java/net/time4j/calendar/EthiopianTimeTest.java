@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.Meridiem;
 import net.time4j.PlainTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -350,6 +351,17 @@ public class EthiopianTimeTest {
         assertThat(
             EthiopianTime.Unit.HOURS.between(e1, e2),
             is(0));
+    }
+
+    @Test
+    public void elements() {
+        EthiopianTime ethio = EthiopianTime.ofDay(12, 15, 30);
+        assertThat(ethio.get(EthiopianTime.ISO_TIME), is(PlainTime.of(6, 15, 30)));
+        assertThat(ethio.get(EthiopianTime.AM_PM_OF_DAY), is(Meridiem.AM));
+        assertThat(ethio.get(EthiopianTime.DIGITAL_HOUR_OF_DAY), is(6));
+        assertThat(ethio.get(EthiopianTime.ETHIOPIAN_HOUR), is(12));
+        assertThat(ethio.get(EthiopianTime.MINUTE_OF_HOUR), is(15));
+        assertThat(ethio.get(EthiopianTime.SECOND_OF_MINUTE), is(30));
     }
 
 }
