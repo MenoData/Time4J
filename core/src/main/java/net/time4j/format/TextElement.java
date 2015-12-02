@@ -24,6 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoException;
 
 import java.io.IOException;
 import java.text.ParsePosition;
@@ -59,6 +60,7 @@ public interface TextElement<V>
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  query for control attributes
      * @throws  IOException if writing to buffer fails
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
      */
     /*[deutsch]
      * <p>Wandelt dieses im angegebenen Zeitwertkontext enthaltene Element zu
@@ -72,12 +74,13 @@ public interface TextElement<V>
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  query for control attributes
      * @throws  IOException if writing to buffer fails
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
      */
     void print(
         ChronoDisplay context,
         Appendable buffer,
         AttributeQuery attributes
-    ) throws IOException;
+    ) throws IOException, ChronoException;
 
     /**
      * <p>Interpretes the given text as element value. </p>
