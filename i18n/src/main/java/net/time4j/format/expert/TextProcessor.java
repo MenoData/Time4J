@@ -24,6 +24,7 @@ package net.time4j.format.expert;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
 
@@ -82,17 +83,21 @@ final class TextProcessor<V>
         FormatStep step
     ) throws IOException {
 
-        if (buffer instanceof CharSequence) {
-            CharSequence cs = (CharSequence) buffer;
-            int offset = cs.length();
-            this.element.print(formattable, buffer, step.getQuery(attributes));
+        try {
+            if (buffer instanceof CharSequence) {
+                CharSequence cs = (CharSequence) buffer;
+                int offset = cs.length();
+                this.element.print(formattable, buffer, step.getQuery(attributes));
 
-            if (positions != null) {
-                positions.add(
-                    new ElementPosition(this.element, offset, cs.length()));
+                if (positions != null) {
+                    positions.add(
+                        new ElementPosition(this.element, offset, cs.length()));
+                }
+            } else {
+                this.element.print(formattable, buffer, step.getQuery(attributes));
             }
-        } else {
-            this.element.print(formattable, buffer, step.getQuery(attributes));
+        } catch (ChronoException ce) {
+            throw new IllegalArgumentException(ce);
         }
 
     }
