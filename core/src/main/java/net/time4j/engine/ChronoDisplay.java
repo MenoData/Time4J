@@ -57,7 +57,7 @@ public interface ChronoDisplay {
      * are also accessible. </p>
      *
      * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} the element is registered or there is an element rule for evaluating the value
+     * @return  {@code true} if the element is registered or there is an element rule for evaluating the value
      *          else {@code false}
      * @see     #get(ChronoElement)
      */
@@ -71,7 +71,7 @@ public interface ChronoDisplay {
      * Regel definieren. </p>
      *
      * @param   element     chronological element to be asked (optional)
-     * @return  {@code true} the element is registered or there is an element rule for evaluating the value
+     * @return  {@code true} if the element is registered or there is an element rule for evaluating the value
      *          else {@code false}
      * @see     #get(ChronoElement)
      */
