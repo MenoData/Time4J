@@ -336,13 +336,13 @@ final class SPX
     private PlainTime readTime(ObjectInput in)
         throws IOException {
 
-        int minute = 0, second = 0, nano = 0;
         int hour = in.readByte();
 
         if (hour < 0) {
             return PlainTime.of(~hour);
         } else {
-            minute = in.readByte();
+            int second = 0, nano = 0;
+            int minute = in.readByte();
 
             if (minute < 0) {
                 minute = ~minute;
