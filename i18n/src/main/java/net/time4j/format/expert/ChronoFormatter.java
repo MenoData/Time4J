@@ -1948,8 +1948,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   style       format style
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getDatePattern(DisplayMode, Locale)
+     * @see     CalendarText#patternForDate(DisplayMode, Locale)
      * @since   3.10/4.7
      */
     /*[deutsch]
@@ -1959,7 +1958,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getDatePattern(DisplayMode, Locale)
+     * @see     CalendarText#patternForDate(DisplayMode, Locale)
      * @since   3.10/4.7
      */
     public static ChronoFormatter<PlainDate> ofDateStyle(
@@ -1967,7 +1966,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        String pattern = CalendarText.getFormatPatterns().getDatePattern(style, locale);
+        String pattern = CalendarText.patternForDate(style, locale);
         return ofDatePattern(pattern, PatternType.CLDR, locale);
 
     }
@@ -1978,8 +1977,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   style       format style
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getTimePattern(DisplayMode, Locale)
+     * @see     CalendarText#patternForTime(DisplayMode, Locale)
      * @since   3.10/4.7
      */
     /*[deutsch]
@@ -1988,8 +1986,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   style       format style
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getTimePattern(DisplayMode, Locale)
+     * @see     CalendarText#patternForTime(DisplayMode, Locale)
      * @since   3.10/4.7
      */
     public static ChronoFormatter<PlainTime> ofTimeStyle(
@@ -1997,7 +1994,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        String pattern = CalendarText.getFormatPatterns().getTimePattern(style, locale);
+        String pattern = CalendarText.patternForTime(style, locale);
         return ofTimePattern(pattern, PatternType.CLDR, locale);
 
     }
@@ -2009,7 +2006,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   timeStyle   format style of time part
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getTimestampPattern(DisplayMode, DisplayMode, Locale)
+     * @see     CalendarText#patternForTimestamp(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
     /*[deutsch]
@@ -2019,7 +2016,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   timeStyle   format style of time part
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getTimestampPattern(DisplayMode, DisplayMode, Locale)
+     * @see     CalendarText#patternForTimestamp(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
     public static ChronoFormatter<PlainTimestamp> ofTimestampStyle(
@@ -2028,7 +2025,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        String pattern = CalendarText.getTimestampPattern(dateStyle, timeStyle, locale);
+        String pattern = CalendarText.patternForTimestamp(dateStyle, timeStyle, locale);
         return ofTimestampPattern(pattern, PatternType.CLDR, locale);
 
     }
@@ -2041,8 +2038,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getDateTimePattern(DisplayMode, DisplayMode, Locale)
+     * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
     /*[deutsch]
@@ -2053,8 +2049,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
-     * @see     CalendarText#getFormatPatterns()
-     * @see     net.time4j.format.FormatPatternProvider#getDateTimePattern(DisplayMode, DisplayMode, Locale)
+     * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
     public static ChronoFormatter<Moment> ofMomentStyle(
@@ -2064,7 +2059,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         TZID tzid
     ) {
 
-        String pattern = CalendarText.getFormatPatterns().getDateTimePattern(dateStyle, timeStyle, locale);
+        String pattern = CalendarText.patternForMoment(dateStyle, timeStyle, locale);
         return ofMomentPattern(pattern, PatternType.CLDR, locale, tzid);
 
     }

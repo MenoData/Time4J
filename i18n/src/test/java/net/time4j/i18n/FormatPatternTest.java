@@ -25,8 +25,8 @@ public class FormatPatternTest {
 
     @Test
     public void patternForUnsupportedLocale() {
-        String patternXX = CalendarText.getFormatPatterns().getDatePattern(DisplayMode.FULL, new Locale("xx"));
-        String patternRoot = CalendarText.getFormatPatterns().getDatePattern(DisplayMode.FULL, Locale.ROOT);
+        String patternXX = CalendarText.patternForDate(DisplayMode.FULL, new Locale("xx"));
+        String patternRoot = CalendarText.patternForDate(DisplayMode.FULL, Locale.ROOT);
         assertThat(patternXX, is(patternRoot));
     }
 

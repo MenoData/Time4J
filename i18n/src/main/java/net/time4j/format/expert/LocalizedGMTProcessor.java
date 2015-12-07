@@ -112,8 +112,7 @@ final class LocalizedGMTProcessor
 
         Locale locale =
             step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
-        String gmtPrefix = CalendarText.getGMTPrefix(locale);
-
+        String gmtPrefix = getGMTPrefix(locale);
         buffer.append(gmtPrefix);
         printed = gmtPrefix.length();
 
@@ -196,9 +195,8 @@ final class LocalizedGMTProcessor
             return;
         }
 
-        Locale locale =
-            step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
-        String gmtPrefix = CalendarText.getGMTPrefix(locale);
+        Locale locale = step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
+        String gmtPrefix = getGMTPrefix(locale);
         String[] zeroOffsets = { "GMT", gmtPrefix, "UTC", "UT" };
         boolean found = false;
         boolean caseInsensitive =
@@ -352,6 +350,18 @@ final class LocalizedGMTProcessor
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    private static String getGMTPrefix(Locale locale) {
+
+        CalendarText ct = CalendarText.getIsoInstance(locale);
+
+        if (ct.getTextForms().isEmpty()) {
+            return "GMT";
+        }
+
+        return ct.getTextForms().get("prefixGMTOffset");
 
     }
 
