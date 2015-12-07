@@ -1,4 +1,12 @@
 ## [v3.13] not yet released
+### Added
+- New method CalendarText.getIsoInstance(Locale) [#410]
+- New methods CalendarText.patternForXYZ(...) [#410]
+
+### Deprecated
+- CalendarText.getGMTPrefix [#410]
+- CalendarText.getFormatPatterns() [#410]
+- CalendarText.getTimestampPattern [#410]
 
 ## [v3.12] published on 2015-11-30
 ### Added
