@@ -1460,7 +1460,7 @@ public final class PlainTime
         Locale locale
     ) {
 
-        String formatPattern = CalendarText.getFormatPatterns().getTimePattern(mode, locale);
+        String formatPattern = CalendarText.patternForTime(mode, locale);
         return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
 
     }
@@ -3205,7 +3205,7 @@ public final class PlainTime
         ) {
 
             DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.getFormatPatterns().getTimePattern(mode, locale);
+            return CalendarText.patternForTime(mode, locale);
 
         }
 

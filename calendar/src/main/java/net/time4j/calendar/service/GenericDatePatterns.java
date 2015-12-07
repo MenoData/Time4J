@@ -65,7 +65,7 @@ public final class GenericDatePatterns {
         DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
 
         if (calendarType.equals(CalendarText.ISO_CALENDAR_TYPE)) {
-            return CalendarText.getFormatPatterns().getDatePattern(mode, locale);
+            return CalendarText.patternForDate(mode, locale);
         }
 
         StringBuilder sb = new StringBuilder();

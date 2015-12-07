@@ -1308,7 +1308,7 @@ public final class PlainTimestamp
         ) {
 
             DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.getTimestampPattern(mode, mode, locale);
+            return CalendarText.patternForTimestamp(mode, mode, locale);
 
         }
 

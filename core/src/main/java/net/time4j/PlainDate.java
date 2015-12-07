@@ -1278,7 +1278,7 @@ public final class PlainDate
         Locale locale
     ) {
 
-        String formatPattern = CalendarText.getFormatPatterns().getDatePattern(mode, locale);
+        String formatPattern = CalendarText.patternForDate(mode, locale);
         return FormatSupport.createFormatter(PlainDate.class, formatPattern, locale);
 
     }
@@ -2090,7 +2090,7 @@ public final class PlainDate
         ) {
 
             DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.getFormatPatterns().getDatePattern(mode, locale);
+            return CalendarText.patternForDate(mode, locale);
 
         }
 

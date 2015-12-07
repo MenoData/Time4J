@@ -1254,7 +1254,7 @@ public final class Moment
         TZID tzid
     ) {
 
-        String formatPattern = CalendarText.getFormatPatterns().getDateTimePattern(mode, mode, locale);
+        String formatPattern = CalendarText.patternForMoment(mode, mode, locale);
         return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
 
     }
@@ -2532,7 +2532,7 @@ public final class Moment
         ) {
 
             DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.getFormatPatterns().getDateTimePattern(mode, mode, locale);
+            return CalendarText.patternForMoment(mode, mode, locale);
 
         }
 

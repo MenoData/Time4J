@@ -1844,7 +1844,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         if (formatter instanceof ChronoFormatter) {
             Locale locale = ChronoFormatter.class.cast(formatter).getLocale();
-            pattern = CalendarText.getFormatPatterns().getIntervalPattern(locale);
+            pattern = CalendarText.patternForInterval(locale);
         }
 
         return pattern;

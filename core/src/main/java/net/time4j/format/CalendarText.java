@@ -322,6 +322,27 @@ public final class CalendarText {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Returns an instance of {@code CalendarText} for ISO calendar systems and given language. </p>
+     *
+     * @param   locale      language
+     * @return  {@code CalendarText} object maybe cached
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Gibt eine Instanz dieser Klasse f&uuml;r ISO-Kalendersysteme und die angegebene
+     * Sprache zur&uuml;ck. </p>
+     *
+     * @param   locale      language
+     * @return  {@code CalendarText} object maybe cached
+     * @since   3.13/4.10
+     */
+    public static CalendarText getIsoInstance(Locale locale) {
+
+        return getInstance(CalendarText.ISO_CALENDAR_TYPE, locale);
+
+    }
+
+    /**
      * <p>Returns an instance of {@code CalendarText} for given chronology
      * and language. </p>
      *
@@ -853,25 +874,15 @@ public final class CalendarText {
      * &quot;UTC&quot;-literal and an ISO-8601-timezone-offset. This
      * method is mainly a fit to the CLDR data. </p>
      *
-     * @param 	locale 	language and country configuration
-     * @return  localized GMT-String defaults to &quot;GMT&quot;
+     * @param 	    locale 	language and country configuration
+     * @return      localized GMT-String defaults to &quot;GMT&quot;
+     * @deprecated  Please avoid use of GMT-notation else you can use the expression
+     *              {@code CalendarText.getIsoInstance(locale).getTextForms().get("prefixGMTOffset")}
      */
-    /*[deutsch]
-     * <p>Liefert das lokalisierte GMT-Pr&auml;fix, das im
-     * <i>localized GMT format</i> von CLDR benutzt wird. </p>
-     *
-     * <p>Hinweis: Die GMT-Schreibweise ist mindestens veraltet. Anwender
-     * sollten die UTC-Schreibweise als Kombination des Literals
-     * &quot;UTC&quot; mit einem ISO-8601-Zeitzonen-Offset bevorzugen.
-     * Diese Methode ist in erster Linie eine Anpassung an die
-     * CLDR-Daten. </p>
-     *
-     * @param 	locale 	language and country configuration
-     * @return  localized GMT-String defaults to &quot;GMT&quot;
-     */
+    @Deprecated
     public static String getGMTPrefix(Locale locale) {
 
-        CalendarText ct = CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
+        CalendarText ct = CalendarText.getIsoInstance(locale);
 
         if (ct.textForms.isEmpty()) {
             return "GMT";
@@ -886,13 +897,16 @@ public final class CalendarText {
      *
      * @return  format pattern provider
      * @since   3.10/4.7
+     * @deprecated  Use one of methods {@code patternForXYZ} instead
      */
     /*[deutsch]
      * <p>Liefert die am besten verf&uuml;gbaren Formatmuster. </p>
      *
      * @return  format pattern provider
      * @since   3.10/4.7
+     * @deprecated  Use one of methods {@code patternForXYZ} instead
      */
+    @Deprecated
     public static FormatPatternProvider getFormatPatterns() {
 
         return FORMAT_PATTERN_PROVIDER;
@@ -907,6 +921,7 @@ public final class CalendarText {
      * @param   locale      language and country setting
      * @return  format pattern for plain timestamps without timezone symbols
      * @since   3.10/4.7
+     * @deprecated  Use {@code patternForTimestamp} instead
      */
     /*[deutsch]
      * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
@@ -916,7 +931,9 @@ public final class CalendarText {
      * @param   locale      language and country setting
      * @return  format pattern for plain timestamps without timezone symbols
      * @since   3.10/4.7
+     * @deprecated  Use {@code patternForTimestamp} instead
      */
+    @Deprecated
     public static String getTimestampPattern(
         DisplayMode dateMode,
         DisplayMode timeMode,
@@ -925,6 +942,155 @@ public final class CalendarText {
 
         String pattern = FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
         return removeZones(pattern);
+
+    }
+
+    /**
+     * <p>Returns the localized date pattern suitable for formatting of objects
+     * of type {@code PlainDate}. </p>
+     *
+     * @param   mode        display mode
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
+     * die Formatierung von Instanzen des Typs{@code PlainDate}. </p>
+     *
+     * @param   mode        display mode
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   3.13/4.10
+     */
+    public static String patternForDate(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getDatePattern(mode, locale);
+
+    }
+
+    /**
+     * <p>Returns the localized time pattern suitable for formatting of objects
+     * of type {@code PlainTime}. </p>
+     *
+     * @param   mode        display mode
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
+     * Formatierung von Instanzen des Typs {@code PlainTime}. </p>
+     *
+     * @param   mode        display mode
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   3.13/4.10
+     */
+    public static String patternForTime(
+        DisplayMode mode,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getTimePattern(mode, locale);
+
+    }
+
+    /**
+     * <p>Yields a format pattern without any timezone symbols for plain timestamps. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @see     net.time4j.PlainTimestamp
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @see     net.time4j.PlainTimestamp
+     * @since   3.13/4.10
+     */
+    public static String patternForTimestamp(
+        DisplayMode dateMode,
+        DisplayMode timeMode,
+        Locale locale
+    ) {
+
+        String pattern = FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
+        return removeZones(pattern);
+
+    }
+
+    /**
+     * <p>Returns the localized date-time pattern suitable for formatting of objects
+     * of type {@code Moment}. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern
+     * @see     net.time4j.Moment
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet
+     * f&uuml;r die Formatierung von Instanzen des Typs {@code Moment}. </p>
+     *
+     * @param   dateMode    display mode of date part
+     * @param   timeMode    display mode of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern
+     * @see     net.time4j.Moment
+     * @since   3.13/4.10
+     */
+    public static String patternForMoment(
+        DisplayMode dateMode,
+        DisplayMode timeMode,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
+
+    }
+
+    /**
+     * <p>Returns the localized interval pattern. </p>
+     *
+     * <p>Expressions of the form &quot;{0}&quot; will be interpreted as the start boundary format
+     * and expressions of the form &quot;{1}&quot; will be interpreted as the end boundary format.
+     * All other chars of the pattern will be treated as literals. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  localized interval pattern
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Intervallmuster. </p>
+     *
+     * <p>Die Ausdr&uuml;cke &quot;{0}&quot; und &quot;{1}&quot; werden als Formathalter f&uuml;r die
+     * Start- und End-Intervallgrenzen interpretiert. Alle anderen Zeichen des Musters werden wie
+     * Literale behandelt. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  localized interval pattern
+     * @since   3.13/4.10
+     */
+    public static String patternForInterval(Locale locale) {
+
+        return FORMAT_PATTERN_PROVIDER.getIntervalPattern(locale);
 
     }
 
