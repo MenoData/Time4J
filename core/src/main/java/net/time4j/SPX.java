@@ -23,6 +23,8 @@ package net.time4j;
 
 import net.time4j.engine.TimeSpan;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -215,7 +217,7 @@ final class SPX
 
     }
 
-    private void writeDate(ObjectOutput out)
+    private void writeDate(DataOutput out)
         throws IOException {
 
         PlainDate date = (PlainDate) this.obj;
@@ -226,7 +228,7 @@ final class SPX
     private static void writeDate(
         PlainDate date,
         int type,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         int year = date.getYear();
@@ -269,7 +271,7 @@ final class SPX
     }
 
     private PlainDate readDate(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -297,7 +299,7 @@ final class SPX
 
     }
 
-    private void writeTime(ObjectOutput out)
+    private void writeTime(DataOutput out)
         throws IOException {
 
         PlainTime time = (PlainTime) this.obj;
@@ -308,7 +310,7 @@ final class SPX
 
     private static void writeTime(
         PlainTime time,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         if (time.getNanosecond() == 0) {
@@ -333,7 +335,7 @@ final class SPX
 
     }
 
-    private PlainTime readTime(ObjectInput in)
+    private PlainTime readTime(DataInput in)
         throws IOException {
 
         int hour = in.readByte();
@@ -361,7 +363,7 @@ final class SPX
 
     }
 
-    private void writeWeekmodel(ObjectOutput out)
+    private void writeWeekmodel(DataOutput out)
         throws IOException {
 
         Weekmodel wm = (Weekmodel) this.obj;
@@ -393,7 +395,7 @@ final class SPX
     }
 
     private Object readWeekmodel(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -419,7 +421,7 @@ final class SPX
 
     }
 
-    private void writeMoment(ObjectOutput out)
+    private void writeMoment(DataOutput out)
         throws IOException {
 
         Moment ut = (Moment) this.obj;
@@ -428,7 +430,7 @@ final class SPX
     }
 
     private Object readMoment(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -442,7 +444,7 @@ final class SPX
 
     }
 
-    private void writeTimestamp(ObjectOutput out)
+    private void writeTimestamp(DataOutput out)
         throws IOException {
 
         PlainTimestamp ts = (PlainTimestamp) this.obj;
@@ -452,7 +454,7 @@ final class SPX
     }
 
     private Object readTimestamp(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException, ClassNotFoundException {
 
@@ -512,8 +514,7 @@ final class SPX
             return Duration.ofZero();
         }
 
-        List<TimeSpan.Item<IsoUnit>> items =
-            new ArrayList<TimeSpan.Item<IsoUnit>>(size);
+        List<TimeSpan.Item<IsoUnit>> items = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             long amount = (useLong ? in.readLong() : in.readInt());
@@ -522,7 +523,7 @@ final class SPX
         }
 
         boolean negative = in.readBoolean();
-        return new Duration<IsoUnit>(items, negative);
+        return new Duration<>(items, negative);
     }
 
 }
