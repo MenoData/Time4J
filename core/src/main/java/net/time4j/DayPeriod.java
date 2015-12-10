@@ -21,15 +21,34 @@
 
 package net.time4j;
 
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.Chronology;
+import net.time4j.engine.ElementRule;
+import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
+import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.text.ParsePosition;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -103,8 +122,13 @@ public final class DayPeriod {
      */
     public static DayPeriod of(Locale locale) {
 
-        Map<String, String> resourceMap =
-            CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, locale).getTextForms();
+        String lang = locale.getLanguage(); // NPE-check
+
+        if (lang.equals("nn")) {
+            locale = new Locale("nb"); // CLDR 28 contains no data for language nn
+        }
+
+        Map<String, String> resourceMap = CalendarText.getIsoInstance(locale).getTextForms();
         SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
 
         for (String key : resourceMap.keySet()) {
@@ -119,8 +143,21 @@ public final class DayPeriod {
             }
         }
 
-        if (codeMap.isEmpty() || locale.getLanguage().isEmpty()) {
+        if (codeMap.isEmpty() || lang.isEmpty()) {
             return FALLBACK;
+        }
+
+        Iterator<PlainTime> iter = codeMap.keySet().iterator();
+        String oldCode = "";
+
+        while (iter.hasNext()) {
+            PlainTime time = iter.next();
+            String code = codeMap.get(time);
+            if (code.equals(oldCode)) {
+                iter.remove(); // lex colombia
+            } else {
+                oldCode = code;
+            }
         }
 
         return new DayPeriod(locale, codeMap);
@@ -133,7 +170,7 @@ public final class DayPeriod {
      * @param   timeToLabels    map containing the day-periods where the keys represent starting points
      *                          and the values represent the associated labels intended for representation
      * @return  user-specific instance
-     * @throws  IllegalArgumentException if given map contains empty values
+     * @throws  IllegalArgumentException if given map is empty or contains empty values
      * @since   3.13/4.10
      */
     /*[deutsch]
@@ -142,10 +179,14 @@ public final class DayPeriod {
      * @param   timeToLabels    map containing the day-periods where the keys represent starting points
      *                          and the values represent the associated labels intended for representation
      * @return  user-specific instance
-     * @throws  IllegalArgumentException if given map contains empty values
+     * @throws  IllegalArgumentException if given map is empty or contains empty values
      * @since   3.13/4.10
      */
     public static DayPeriod of(Map<PlainTime, String> timeToLabels) {
+
+        if (timeToLabels.isEmpty()) {
+            throw new IllegalArgumentException("Label map is empty.");
+        }
 
         SortedMap<PlainTime, String> map = new TreeMap<PlainTime, String>(timeToLabels);
 
@@ -408,7 +449,491 @@ public final class DayPeriod {
 
     }
 
+    private static String getFixedCode(PlainTime time) {
+
+        int minuteOfDay = time.get(PlainTime.MINUTE_OF_DAY).intValue();
+
+        if ((minuteOfDay == 0) || (minuteOfDay == 1440)) {
+            return "midnight";
+        } else if (minuteOfDay < 720) {
+            return "am";
+        } else if (minuteOfDay == 720) {
+            return "noon";
+        } else {
+            return "pm";
+        }
+
+    }
+
+    private static String createKey(
+        Map<String, String> textForms,
+        TextWidth tw,
+        OutputContext oc,
+        String code
+    ) {
+
+        String key = toPrefix(tw, oc) + code;
+
+        if (!textForms.containsKey(key)) {
+            if (tw == TextWidth.ABBREVIATED) {
+                if (oc == OutputContext.STANDALONE) {
+                    key = toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
+                }
+            } else {
+                key = toPrefix(TextWidth.ABBREVIATED, oc) + code;
+                if (!textForms.containsKey(key) && (oc == OutputContext.STANDALONE)) {
+                    key = toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
+                }
+            }
+        }
+
+        return key;
+
+    }
+
+    private static String toPrefix(
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        char c;
+
+        switch (tw) {
+            case WIDE:
+                c = 'w';
+                break;
+            case NARROW:
+                c = 'n';
+                break;
+            default:
+                c = 'a';
+        }
+
+        if (oc == OutputContext.STANDALONE) {
+            c = Character.toUpperCase(c);
+        }
+
+        return "P(" + c + ")_";
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
+
+    static class Extension
+        implements ChronoExtension {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean accept(Class<?> chronoType) {
+            return PlainTime.class.isAssignableFrom(chronoType);
+        }
+
+        @Override
+        public Set<ChronoElement<?>> getElements(
+            Locale locale,
+            AttributeQuery attributes
+        ) {
+            DayPeriod dp = DayPeriod.of(locale);
+            Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+            set.add(new Element(false, dp));
+            set.add(new Element(true, dp));
+            return Collections.unmodifiableSet(set);
+        }
+
+        @Override
+        public <T extends ChronoEntity<T>> T resolve(
+            T entity,
+            Locale locale,
+            AttributeQuery attributes
+        ) {
+            if (
+                entity.contains(PlainTime.COMPONENT)
+                || entity.contains(PlainTime.ISO_HOUR)
+                || entity.contains(PlainTime.DIGITAL_HOUR_OF_DAY)
+                || entity.contains(PlainTime.CLOCK_HOUR_OF_DAY)
+            ) {
+                return entity; // optimization
+            }
+
+            DayPeriod dp = DayPeriod.of(locale);
+            Element approximate = new Element(false, dp);
+
+            if (entity.contains(approximate)) {
+                String code = entity.get(approximate);
+                Meridiem meridiem = null;
+                for (PlainTime time : dp.codeMap.keySet()) {
+                    if (dp.codeMap.get(time).equals(code)) {
+                        Meridiem m = null;
+                        if (time.getHour() >= 12) {
+                            m = Meridiem.PM;
+                        } else if (!dp.getEnd(time).isAfter(PlainTime.of(12))) {
+                            m = Meridiem.AM;
+                        }
+                        if (m != null) {
+                            if ((meridiem != null) && (meridiem != m)) { // ambivalent day period
+                                int hour12 = getHour12(entity);
+                                if (hour12 == -1) {
+                                    meridiem = null; // no clock hour available for distinction
+                                } else if (code.startsWith("night")) { // night1 or night2 (ja)
+                                    meridiem = ((hour12 < 6) ? Meridiem.AM : Meridiem.PM);
+                                } else if (code.startsWith("afternoon")) { // languages id or uz
+                                    meridiem = ((hour12 < 6) ? Meridiem.PM : Meridiem.AM);
+                                } else { // cannot resolve other day period code to am/pm
+                                    meridiem = null;
+                                }
+                            } else {
+                                meridiem = m;
+                            }
+                        }
+                    }
+                }
+                if (meridiem != null) {
+                    entity = entity.with(PlainTime.AM_PM_OF_DAY, meridiem);
+                    entity = entity.with(approximate, null);
+                }
+            } else {
+                Element fixed = new Element(true, dp);
+
+                if (entity.contains(fixed)) {
+                    String code = entity.get(fixed);
+                    if (code.equals("am") || code.equals("midnight")) {
+                        entity = entity.with(PlainTime.AM_PM_OF_DAY, Meridiem.AM);
+                    } else {
+                        entity = entity.with(PlainTime.AM_PM_OF_DAY, Meridiem.PM);
+                    }
+                    entity = entity.with(fixed, null);
+                }
+            }
+
+            return entity;
+        }
+
+        private static int getHour12(ChronoEntity<?> entity) {
+            int hour12 = -1;
+            if (entity.contains(PlainTime.CLOCK_HOUR_OF_AMPM)) {
+                hour12 = entity.get(PlainTime.CLOCK_HOUR_OF_AMPM).intValue();
+                if (hour12 == 12) {
+                    hour12 = 0;
+                }
+            } else if (entity.contains(PlainTime.DIGITAL_HOUR_OF_AMPM)) {
+                hour12 = entity.get(PlainTime.DIGITAL_HOUR_OF_AMPM).intValue();
+            }
+            return hour12;
+        }
+    }
+
+    static class Element
+        extends BasicElement<String>
+        implements TextElement<String>, ElementRule<ChronoEntity<?>, String> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = 5589976208326940032L;
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private transient final boolean fixed;
+        private transient final DayPeriod dayPeriod;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Element(
+            boolean fixed,
+            Locale locale
+        ) {
+            this(fixed, DayPeriod.of(locale));
+
+        }
+
+        private Element(
+            boolean fixed,
+            DayPeriod dayPeriod
+        ) {
+            super(fixed ? "FIXED_DAY_PERIOD" : "APPROXIMATE_DAY_PERIOD");
+
+            this.fixed = fixed;
+            this.dayPeriod = dayPeriod;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Class<String> getType() {
+            return String.class;
+        }
+
+        @Override
+        public char getSymbol() {
+            return (this.fixed ? 'b' : 'B');
+        }
+
+        @Override
+        public String getDefaultMinimum() {
+            if (this.fixed) {
+                return "am";
+            }
+            PlainTime key = this.dayPeriod.codeMap.firstKey();
+            return this.dayPeriod.codeMap.get(key);
+        }
+
+        @Override
+        public String getDefaultMaximum() {
+            if (this.fixed) {
+                return "pm";
+            }
+            PlainTime key = this.dayPeriod.codeMap.lastKey();
+            return this.dayPeriod.codeMap.get(key);
+        }
+
+        @Override
+        public boolean isDateElement() {
+            return false;
+        }
+
+        @Override
+        public boolean isTimeElement() {
+            return true;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof Element) {
+                Element that = (Element) obj;
+                return (
+                    this.dayPeriod.equals(that.dayPeriod)
+                    && (this.fixed == that.fixed));
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return this.dayPeriod.hashCode() + (this.fixed ? 1 : 0);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder(32);
+            sb.append(this.name());
+            sb.append('@');
+            sb.append(this.dayPeriod.getLocale());
+            return sb.toString();
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected <T extends ChronoEntity<T>> ElementRule<T, String> derive(Chronology<T> chronology) {
+
+            if (chronology.isRegistered(PlainTime.COMPONENT)) {
+                return (ElementRule<T, String>) this;
+            }
+
+            return null;
+
+        }
+
+        @Override
+        public String getValue(ChronoEntity<?> context) {
+            PlainTime time = context.get(PlainTime.COMPONENT);
+            if (this.fixed) {
+                return getFixedCode(time);
+            } else {
+                PlainTime key = this.dayPeriod.getStart(time);
+                return this.dayPeriod.codeMap.get(key);
+            }
+        }
+
+        @Override
+        public String getMinimum(ChronoEntity<?> context) {
+            return this.getDefaultMinimum();
+        }
+
+        @Override
+        public String getMaximum(ChronoEntity<?> context) {
+            return this.getDefaultMaximum();
+        }
+
+        @Override
+        public boolean isValid(
+            ChronoEntity<?> context,
+            String value
+        ) {
+            return false;
+        }
+
+        @Override
+        public ChronoEntity<?> withValue(
+            ChronoEntity<?> context,
+            String value,
+            boolean lenient
+        ) {
+            throw new IllegalArgumentException("Day period element cannot be set.");
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(ChronoEntity<?> context) {
+            return null;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(ChronoEntity<?> context) {
+            return null;
+        }
+
+        boolean isFixed() {
+            return this.fixed;
+        }
+
+        Locale getLocale() {
+            return this.dayPeriod.getLocale();
+        }
+
+        private Object writeReplace() {
+            return new SPX(this, SPX.DAY_PERIOD_TYPE);
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException {
+            throw new InvalidObjectException("Serialization proxy required.");
+        }
+
+        @Override
+        public void print(
+            ChronoDisplay context,
+            Appendable buffer,
+            AttributeQuery attributes
+        ) throws IOException, ChronoException {
+            TextWidth width = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            String s;
+            if (this.fixed) {
+                s = this.dayPeriod.fixed(width, oc).apply(context);
+            } else {
+                s = this.dayPeriod.approximate(width, oc).apply(context);
+            }
+            buffer.append(s);
+        }
+
+        @Override
+        public String parse(
+            CharSequence text,
+            ParsePosition status,
+            AttributeQuery attributes
+        ) {
+            Map<String, String> textForms = CalendarText.getIsoInstance(this.getLocale()).getTextForms();
+            List<String> codes = new ArrayList<String>();
+
+            if (this.fixed) {
+                codes.add("am");
+                codes.add("pm");
+                codes.add("midnight");
+                codes.add("noon");
+            } else {
+                for (String key : textForms.keySet()) {
+                    if ((key.charAt(0) == 'T') && (key.length() == 5)) {
+                        codes.add(textForms.get(key));
+                    }
+                }
+            }
+
+            TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            boolean caseInsensitive =
+                attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue();
+            boolean partialCompare =
+                attributes.get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE).booleanValue();
+            String candidate = null;
+            int start = status.getIndex();
+            int end = text.length();
+            int maxEq = 0;
+
+            for (String code : codes) {
+                String key;
+                if (this.fixed) {
+                    key = createKey(textForms, tw, oc, code);
+                    if (!textForms.containsKey(key)) {
+                        if (code.equals("midnight")) {
+                            key = createKey(textForms, tw, oc, "am");
+                        } else if (code.equals("noon")) {
+                            key = createKey(textForms, tw, oc, "pm");
+                        }
+                    }
+                } else {
+                    key = createKey(textForms, tw, oc, code);
+                }
+                if (textForms.containsKey(key)) {
+                    String test = textForms.get(key);
+                    int pos = start;
+                    int n = test.length();
+                    boolean eq = true;
+
+                    for (int j = 0; eq && (j < n); j++) {
+                        if (start + j >= end) {
+                            eq = false;
+                        } else {
+                            char c = text.charAt(start + j);
+                            char t = test.charAt(j);
+
+                            if (caseInsensitive) {
+                                eq = this.compareIgnoreCase(c, t);
+                            } else {
+                                eq = (c == t);
+                            }
+
+                            if (eq) {
+                                pos++;
+                            }
+                        }
+                    }
+
+                    if (partialCompare || (n == 1)) {
+                        if (maxEq < pos - start) {
+                            maxEq = pos - start;
+                            candidate = code;
+                        } else if (maxEq == pos - start) {
+                            candidate = null;
+                        }
+                    } else if (eq) {
+                        assert pos == start + n;
+                        status.setIndex(pos);
+                        return code;
+                    }
+                }
+            }
+
+            if (candidate == null) {
+                status.setErrorIndex(start);
+            } else {
+                status.setIndex(start + maxEq);
+            }
+
+            return candidate;
+        }
+
+        private boolean compareIgnoreCase(char c1, char c2) {
+            if (c1 >= 'a' && c1 <= 'z') {
+                c1 = (char) (c1 - 'a' + 'A');
+            }
+
+            if (c2 >= 'a' && c2 <= 'z') {
+                c2 = (char) (c2 - 'a' + 'A');
+            }
+
+            if (c1 >= 'A' && c1 <= 'Z') {
+                return (c1 == c2);
+            }
+
+            Locale locale = this.getLocale();
+            String s1 = String.valueOf(c1).toUpperCase(locale);
+            String s2 = String.valueOf(c2).toUpperCase(locale);
+            return s1.equals(s2);
+        }
+
+    }
 
     private class PeriodName
         implements ChronoFunction<ChronoDisplay, String> {
@@ -449,21 +974,17 @@ public final class DayPeriod {
             DayPeriod dp = DayPeriod.this;
             Locale locale = dp.getLocale();
 
-            if (locale.getLanguage().equals("nn")) {
-                locale = new Locale("nb"); // CLDR 28 contains no data for language nn
-            }
-
             if (this.fixed) {
-                String code = this.getFixedCode(time);
+                String code = getFixedCode(time);
+
                 if (dp.isPredefined()) {
-                    Map<String, String> textForms =
-                        CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, locale).getTextForms();
-                    String key = this.createKey(textForms, code);
+                    Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+                    String key = createKey(textForms, this.width, this.outputContext, code);
                     if (!textForms.containsKey(key)) {
                         if (code.equals("midnight")) {
-                            key = this.createKey(textForms, "am");
+                            key = createKey(textForms, this.width, this.outputContext, "am");
                         } else if (code.equals("noon")) {
-                            key = this.createKey(textForms, "pm");
+                            key = createKey(textForms, this.width, this.outputContext, "pm");
                         }
                     }
                     if (textForms.containsKey(key)) {
@@ -475,87 +996,18 @@ public final class DayPeriod {
             } else {
                 String code = dp.codeMap.get(dp.getStart(time));
 
-                if (code != null) {
-                    if (dp.isPredefined()) {
-                        Map<String, String> textForms =
-                            CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, locale).getTextForms();
-                        String key = this.createKey(textForms, code);
-                        if (textForms.containsKey(key)) {
-                            return textForms.get(key);
-                        }
-                    } else {
-                        return code;
-                    }
-                }
-            }
-
-            return time.get(PlainTime.AM_PM_OF_DAY).getDisplayName(locale); // fallback
-
-        }
-
-        private String toPrefix(
-            TextWidth w,
-            OutputContext o
-        ) {
-
-            char c;
-
-            switch (w) {
-                case WIDE:
-                    c = 'w';
-                    break;
-                case NARROW:
-                    c = 'n';
-                    break;
-                default:
-                    c = 'a';
-            }
-
-            if (o == OutputContext.STANDALONE) {
-                c = Character.toUpperCase(c);
-            }
-
-            return "P(" + c + ")_";
-
-        }
-
-        private String createKey(
-            Map<String, String> textForms,
-            String code
-        ) {
-
-            String key = this.toPrefix(this.width, this.outputContext) + code;
-
-            if (!textForms.containsKey(key)) {
-                if (this.width == TextWidth.ABBREVIATED) {
-                    if (this.outputContext == OutputContext.STANDALONE) {
-                        key = this.toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
+                if (dp.isPredefined()) {
+                    Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+                    String key = createKey(textForms, this.width, this.outputContext, code);
+                    if (textForms.containsKey(key)) {
+                        return textForms.get(key);
                     }
                 } else {
-                    key = this.toPrefix(TextWidth.ABBREVIATED, this.outputContext) + code;
-                    if (!textForms.containsKey(key) && (this.outputContext == OutputContext.STANDALONE)) {
-                        key = this.toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
-                    }
+                    return code;
                 }
             }
 
-            return key;
-
-        }
-
-        private String getFixedCode(PlainTime time) {
-
-            int minuteOfDay = time.get(PlainTime.MINUTE_OF_DAY).intValue();
-
-            if ((minuteOfDay == 0) || (minuteOfDay == 1440)) {
-                return "midnight";
-            } else if (minuteOfDay < 720) {
-                return "am";
-            } else if (minuteOfDay == 720) {
-                return "noon";
-            } else {
-                return "pm";
-            }
+            return time.get(PlainTime.AM_PM_OF_DAY).getDisplayName((locale == null) ? Locale.ROOT : locale); // fallback
 
         }
 

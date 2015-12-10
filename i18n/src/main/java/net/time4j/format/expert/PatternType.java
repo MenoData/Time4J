@@ -88,7 +88,7 @@ public enum PatternType
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
      *      indicate the long form and five symbols stand for a letter. The era
-     *      is based on the chronological history of the current format locale.  </td>
+     *      is based on the chronological history of the current format locale. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
@@ -201,9 +201,20 @@ public enum PatternType
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
      *      <td>a</td>
-     *      <td>One symbol for the text form. The attribute
-     *      {@link Attributes#TEXT_WIDTH} can have impact on the length
-     *      of the text form however. </td>
+     *      <td>1-3 symbols for the short form, 4 symbols for the full text form
+     *      and 5 symbols for the narrow form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>1-3 symbols for the short form, 4 symbols for the full text form
+     *      and 5 symbols for the narrow form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
+     *      <td>1-3 symbols for the short form, 4 symbols for the full text form
+     *      and 5 symbols for the narrow form. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</td>
@@ -440,9 +451,20 @@ public enum PatternType
      *  <tr>
      *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
      *      <td>a</td>
-     *      <td>Ein Symbol f&uuml;r die Textform. Das Attribut
-     *      {@link Attributes#TEXT_WIDTH} kann die L&auml;nge der
-     *      Textform beeinflussen. </td>
+     *      <td>Ein- bis drei Symbole f&uuml;r die Kurzform, 4 Symbole f&uuml;r
+     *      die volle Textform und f&uuml;nf f&uuml;r die Symbolform. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>Ein- bis drei Symbole f&uuml;r die Kurzform, 4 Symbole f&uuml;r
+     *      die volle Textform und f&uuml;nf f&uuml;r die Symbolform. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
+     *      <td>Ein- bis drei Symbole f&uuml;r die Kurzform, 4 Symbole f&uuml;r
+     *      die volle Textform und f&uuml;nf f&uuml;r die Symbolform. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#CLOCK_HOUR_OF_AMPM}</td>
@@ -597,6 +619,21 @@ public enum PatternType
      *      <td>Not supported (as work-around: use CLDR). </td>
      *  </tr>
      *  <tr>
+     *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
+     *      <td>a</td>
+     *      <td>Only the short form is supported. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
      *      <td>RFC_822_TIMEZONE_OFFSET</td>
      *      <td>Z</td>
      *      <td>Equivalent to CLDR-xx.</td>
@@ -687,6 +724,21 @@ public enum PatternType
      *  <tr>
      *      <td>{local-day-of-week-number}</td>
      *      <td>c</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link PlainTime#AM_PM_OF_DAY}</td>
+     *      <td>a</td>
+     *      <td>Nur die Kurzform wird unterst&uuml;tzt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
      *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
      *  </tr>
      *  <tr>
@@ -785,6 +837,16 @@ public enum PatternType
      *      <td>Like in CLDR, but no more than five pattern symbols are allowed. </td>
      *  </tr>
      *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
      *      <td>{@link PlainTime#NANO_OF_SECOND}</td>
      *      <td>n</td>
      *      <td>1-9 symbols allowed, no CLDR-equivalent. </td>
@@ -872,6 +934,16 @@ public enum PatternType
      *      <td>{@link Weekmodel#localDayOfWeek()}</td>
      *      <td>c</td>
      *      <td>Wie in CLDR, aber nicht mehr als 5 Symbole sind erlaubt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#fixed()}</td>
+     *      <td>b</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link net.time4j.DayPeriod#approximate()}</td>
+     *      <td>B</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainTime#NANO_OF_SECOND}</td>
@@ -1203,20 +1275,21 @@ public enum PatternType
         boolean sdf
     ) {
 
+        TextWidth width;
+
         switch (symbol) {
             case 'G':
-                TextWidth eraWidth;
                 if (count <= 3) {
-                    eraWidth = TextWidth.ABBREVIATED;
+                    width = TextWidth.ABBREVIATED;
                 } else if ((count == 4) || sdf) {
-                    eraWidth = TextWidth.WIDE;
+                    width = TextWidth.WIDE;
                 } else if (count == 5) {
-                    eraWidth = TextWidth.NARROW;
+                    width = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters: " + count);
                 }
-                builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
+                builder.startSection(Attributes.TEXT_WIDTH, width);
                 ChronoHistory history = ChronoHistory.of(locale);
                 TextElement<?> eraElement = TextElement.class.cast(history.era());
                 builder.addText(eraElement);
@@ -1310,7 +1383,6 @@ public enum PatternType
                     SignPolicy.SHOW_WHEN_NEGATIVE);
                 break;
             case 'E':
-                TextWidth width;
                 if (count <= 3) {
                     width = TextWidth.ABBREVIATED;
                 } else if ((count == 4) || sdf) {
@@ -1354,12 +1426,22 @@ public enum PatternType
                 }
                 break;
             case 'a':
-                if ((count == 1) || sdf) {
-                    builder.addText(PlainTime.AM_PM_OF_DAY);
-                } else {
-                    throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
-                }
+                width = (sdf ? TextWidth.ABBREVIATED : getPeriodWidth(count));
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addText(PlainTime.AM_PM_OF_DAY);
+                builder.endSection();
+                break;
+            case 'b':
+                width = getPeriodWidth(count);
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addFixedDayPeriod();
+                builder.endSection();
+                break;
+            case 'B':
+                width = getPeriodWidth(count);
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addApproximateDayPeriod();
+                builder.endSection();
                 break;
             case 'h':
                 addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, builder, count, sdf);
@@ -1451,6 +1533,21 @@ public enum PatternType
 
     }
 
+    private static TextWidth getPeriodWidth(int count) {
+
+        if (count <= 3) {
+            return TextWidth.ABBREVIATED;
+        } else if (count == 4) {
+            return TextWidth.WIDE;
+        } else if (count == 5) {
+            return TextWidth.NARROW;
+        } else {
+            throw new IllegalArgumentException(
+                "Too many pattern letters: " + count);
+        }
+
+    }
+
     private Map<ChronoElement<?>, ChronoElement<?>> sdf(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
@@ -1473,6 +1570,8 @@ public enum PatternType
             case 'Z':
                 addOffset(builder, 2, false);
                 break;
+            case 'b':
+            case 'B':
             case 'Q':
             case 'q':
             case 'L':

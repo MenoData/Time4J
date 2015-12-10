@@ -1953,6 +1953,8 @@ public final class PlainTime
             }
         }
 
+        builder.appendExtension(new DayPeriod.Extension());
+
     }
 
     private static void registerUnits(TimeAxis.Builder<IsoTimeUnit, PlainTime> builder) {

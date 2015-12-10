@@ -34,6 +34,7 @@ import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -72,6 +73,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code Duration}. */
     static final int DURATION_TYPE = 6;
+
+    /** Serialisierungstyp von {@code DayPeriod.Element}. */
+    static final int DAY_PERIOD_TYPE = 7;
 
     /** Serialisierungstyp von {@code PlainTimestamp}. */
     static final int TIMESTAMP_TYPE = 8;
@@ -157,6 +161,9 @@ final class SPX
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
+            case DAY_PERIOD_TYPE:
+                this.writeDayPeriod(out);
+                break;
             case TIMESTAMP_TYPE:
                 this.writeTimestamp(out);
                 break;
@@ -201,6 +208,9 @@ final class SPX
                 break;
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
+                break;
+            case DAY_PERIOD_TYPE:
+                this.obj = this.readDayPeriod(in, header);
                 break;
             case TIMESTAMP_TYPE:
                 this.obj = this.readTimestamp(in, header);
@@ -524,6 +534,48 @@ final class SPX
 
         boolean negative = in.readBoolean();
         return new Duration<>(items, negative);
+    }
+
+    private void writeDayPeriod(DataOutput out)
+        throws IOException {
+
+        DayPeriod.Element element = DayPeriod.Element.class.cast(this.obj);
+
+        int header = DAY_PERIOD_TYPE;
+        header <<= 4;
+        if (element.isFixed()) {
+            header |= 1;
+        }
+        out.writeByte(header);
+
+        Locale locale = element.getLocale();
+        String lang = locale.getLanguage();
+        if (!locale.getCountry().isEmpty()) {
+            lang = lang + "-" + locale.getCountry();
+        }
+        out.writeUTF(lang);
+
+    }
+
+    private Object readDayPeriod(
+        DataInput in,
+        byte header
+    ) throws IOException {
+
+        boolean fixed = ((header & 0xF) == 1);
+
+        String langCode = in.readUTF();
+        int index = langCode.indexOf("-");
+        Locale locale;
+
+        if (index == -1) {
+            locale = new Locale(langCode);
+        } else {
+            locale = new Locale(langCode.substring(0, index), langCode.substring(index + 1));
+        }
+
+        return new DayPeriod.Element(fixed, locale);
+
     }
 
 }
