@@ -4133,6 +4133,60 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a text format for a fixed day period (am/pm/midnight/noon). </p>
+         *
+         * @return  this instance for method chaining
+         * @see     net.time4j.DayPeriod#fixed()
+         * @since   3.13/4.10
+         */
+        /*[deutsch]
+         * <p>Definiert ein Textformat f&uuml;r einen festen Tagesabschnitt (am/pm/midnight/noon). </p>
+         *
+         * @return  this instance for method chaining
+         * @see     net.time4j.DayPeriod#fixed()
+         * @since   3.13/4.10
+         */
+        public Builder<T> addFixedDayPeriod() {
+
+            ChronoElement<?> e = this.findDayPeriodElement(true);
+
+            if (e instanceof TextElement) {
+                TextElement<?> te = TextElement.class.cast(e);
+                return this.addText(te);
+            } else {
+                throw new AssertionError("Cannot find day period extension.");
+            }
+
+        }
+
+        /**
+         * <p>Defines a text format for a flexible day period (morning/afternoon etc). </p>
+         *
+         * @return  this instance for method chaining
+         * @see     net.time4j.DayPeriod#approximate()
+         * @since   3.13/4.10
+         */
+        /*[deutsch]
+         * <p>Definiert ein Textformat f&uuml;r einen flexiblen Tagesabschnitt (morgens/nachmittags usw.). </p>
+         *
+         * @return  this instance for method chaining
+         * @see     net.time4j.DayPeriod#approximate()
+         * @since   3.13/4.10
+         */
+        public Builder<T> addApproximateDayPeriod() {
+
+            ChronoElement<?> e = this.findDayPeriodElement(false);
+
+            if (e instanceof TextElement) {
+                TextElement<?> te = TextElement.class.cast(e);
+                return this.addText(te);
+            } else {
+                throw new AssertionError("Cannot find day period extension.");
+            }
+
+        }
+
+        /**
          * <p>Defines a customized format element for given chronological
          * element. </p>
          *
@@ -5262,6 +5316,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             this.steps.add(step);
+
+        }
+
+        private ChronoElement<?> findDayPeriodElement(boolean fixed) {
+
+            for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
+                for (ChronoElement<?> element : extension.getElements(this.locale, Attributes.empty())) {
+                    if (fixed && (element.getSymbol() == 'b') && element.name().endsWith("_DAY_PERIOD")) {
+                        return element;
+                    } else if (!fixed && (element.getSymbol() == 'B') && element.name().endsWith("_DAY_PERIOD")) {
+                        return element;
+                    }
+                }
+            }
+
+            return null;
 
         }
 

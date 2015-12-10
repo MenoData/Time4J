@@ -61,11 +61,11 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 import net.time4j.tz.ZonalOffset;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
@@ -1801,7 +1801,7 @@ public final class Moment
      * @param   out         output stream
      * @throws  IOException
      */
-    void writeTimestamp(ObjectOutput out)
+    void writeTimestamp(DataOutput out)
         throws IOException {
 
         int header = SPX.MOMENT_TYPE;
@@ -1835,7 +1835,7 @@ public final class Moment
      * @throws  IOException
      */
     static Moment readTimestamp(
-        ObjectInput in,
+        DataInput in,
         boolean positiveLS,
         boolean hasNanos
     ) throws IOException {

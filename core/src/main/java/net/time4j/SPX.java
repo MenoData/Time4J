@@ -23,6 +23,8 @@ package net.time4j;
 
 import net.time4j.engine.TimeSpan;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -32,6 +34,7 @@ import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -70,6 +73,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code Duration}. */
     static final int DURATION_TYPE = 6;
+
+    /** Serialisierungstyp von {@code DayPeriod.Element}. */
+    static final int DAY_PERIOD_TYPE = 7;
 
     /** Serialisierungstyp von {@code PlainTimestamp}. */
     static final int TIMESTAMP_TYPE = 8;
@@ -155,6 +161,9 @@ final class SPX
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
+            case DAY_PERIOD_TYPE:
+                this.writeDayPeriod(out);
+                break;
             case TIMESTAMP_TYPE:
                 this.writeTimestamp(out);
                 break;
@@ -200,6 +209,9 @@ final class SPX
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
                 break;
+            case DAY_PERIOD_TYPE:
+                this.obj = this.readDayPeriod(in, header);
+                break;
             case TIMESTAMP_TYPE:
                 this.obj = this.readTimestamp(in, header);
                 break;
@@ -215,7 +227,7 @@ final class SPX
 
     }
 
-    private void writeDate(ObjectOutput out)
+    private void writeDate(DataOutput out)
         throws IOException {
 
         PlainDate date = (PlainDate) this.obj;
@@ -226,7 +238,7 @@ final class SPX
     private static void writeDate(
         PlainDate date,
         int type,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         int year = date.getYear();
@@ -269,7 +281,7 @@ final class SPX
     }
 
     private PlainDate readDate(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -297,7 +309,7 @@ final class SPX
 
     }
 
-    private void writeTime(ObjectOutput out)
+    private void writeTime(DataOutput out)
         throws IOException {
 
         PlainTime time = (PlainTime) this.obj;
@@ -308,7 +320,7 @@ final class SPX
 
     private static void writeTime(
         PlainTime time,
-        ObjectOutput out
+        DataOutput out
     ) throws IOException {
 
         if (time.getNanosecond() == 0) {
@@ -333,7 +345,7 @@ final class SPX
 
     }
 
-    private PlainTime readTime(ObjectInput in)
+    private PlainTime readTime(DataInput in)
         throws IOException {
 
         int hour = in.readByte();
@@ -361,7 +373,7 @@ final class SPX
 
     }
 
-    private void writeWeekmodel(ObjectOutput out)
+    private void writeWeekmodel(DataOutput out)
         throws IOException {
 
         Weekmodel wm = (Weekmodel) this.obj;
@@ -393,7 +405,7 @@ final class SPX
     }
 
     private Object readWeekmodel(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -419,7 +431,7 @@ final class SPX
 
     }
 
-    private void writeMoment(ObjectOutput out)
+    private void writeMoment(DataOutput out)
         throws IOException {
 
         Moment ut = (Moment) this.obj;
@@ -428,7 +440,7 @@ final class SPX
     }
 
     private Object readMoment(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException {
 
@@ -442,7 +454,7 @@ final class SPX
 
     }
 
-    private void writeTimestamp(ObjectOutput out)
+    private void writeTimestamp(DataOutput out)
         throws IOException {
 
         PlainTimestamp ts = (PlainTimestamp) this.obj;
@@ -452,7 +464,7 @@ final class SPX
     }
 
     private Object readTimestamp(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException, ClassNotFoundException {
 
@@ -523,6 +535,48 @@ final class SPX
 
         boolean negative = in.readBoolean();
         return new Duration<IsoUnit>(items, negative);
+    }
+
+    private void writeDayPeriod(DataOutput out)
+        throws IOException {
+
+        DayPeriod.Element element = DayPeriod.Element.class.cast(this.obj);
+
+        int header = DAY_PERIOD_TYPE;
+        header <<= 4;
+        if (element.isFixed()) {
+            header |= 1;
+        }
+        out.writeByte(header);
+
+        Locale locale = element.getLocale();
+        String lang = locale.getLanguage();
+        if (!locale.getCountry().isEmpty()) {
+            lang = lang + "-" + locale.getCountry();
+        }
+        out.writeUTF(lang);
+
+    }
+
+    private Object readDayPeriod(
+        DataInput in,
+        byte header
+    ) throws IOException {
+
+        boolean fixed = ((header & 0xF) == 1);
+
+        String langCode = in.readUTF();
+        int index = langCode.indexOf("-");
+        Locale locale;
+
+        if (index == -1) {
+            locale = new Locale(langCode);
+        } else {
+            locale = new Locale(langCode.substring(0, index), langCode.substring(index + 1));
+        }
+
+        return new DayPeriod.Element(fixed, locale);
+
     }
 
 }
