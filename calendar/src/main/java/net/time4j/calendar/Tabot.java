@@ -327,6 +327,7 @@ public final class Tabot
                     offset + len <= text.length()
                     && test.equals(text.subSequence(offset, offset + len))
                 ) {
+                    status.setIndex(offset + len);
                     return Tabot.of(i);
                 }
             }
