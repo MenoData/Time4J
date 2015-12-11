@@ -6,6 +6,7 @@ import net.time4j.scale.TimeScale;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
@@ -121,6 +122,7 @@ public class SerializationTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void roundtripOfWeekmodelElement()
         throws IOException, ClassNotFoundException {
 
@@ -198,6 +200,18 @@ public class SerializationTest {
         ZonalDateTime ser = ZonalDateTime.read(ois);
         ois.close();
         assertThat(zdt.equals(ser), is(true));
+    }
+
+    @Test
+    public void roundTripOfDayPeriodElements() throws IOException, ClassNotFoundException {
+        Object o1 = new DayPeriod.Element(true, Locale.ENGLISH);
+        Object o2 = new DayPeriod.Element(false, Locale.GERMAN);
+        roundtrip(o1, o2);
+    }
+
+    @Test(expected=NotSerializableException.class)
+    public void dayPeriodNotSerializable() throws IOException, ClassNotFoundException {
+        roundtrip(DayPeriod.of(Locale.ENGLISH));
     }
 
     private Info analyze(String msg, Object[] sers)
