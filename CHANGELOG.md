@@ -3,6 +3,9 @@
 - New method CalendarText.getIsoInstance(Locale) [#410]
 - New methods CalendarText.patternForXYZ(...) [#410]
 
+### Fixed
+- Parsing of Ethiopic tabot names broken if not at end of text [#412]
+
 ### Deprecated
 - CalendarText.getGMTPrefix [#410]
 - CalendarText.getFormatPatterns() [#410]
