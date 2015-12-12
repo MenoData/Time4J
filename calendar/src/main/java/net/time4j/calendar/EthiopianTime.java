@@ -25,11 +25,13 @@ import net.time4j.Meridiem;
 import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.calendar.service.EthiopianExtension;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -41,6 +43,7 @@ import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
+import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.LocalizedPatternSupport;
 
@@ -404,6 +407,7 @@ public final class EthiopianTime
                 new IntegerElementRule(SECOND_INDEX),
                 Unit.SECONDS);
         registerUnits(builder);
+        registerExtensions(builder);
         ENGINE = builder.build();
     }
 
@@ -850,6 +854,25 @@ public final class EthiopianTime
                 new ClockUnitRule(unit),
                 unit.getLength(),
                 convertibles);
+        }
+
+    }
+
+    private static void registerExtensions(TimeAxis.Builder<Unit, EthiopianTime> builder) {
+
+        builder.appendExtension(new EthiopianExtension());
+
+        for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
+            Set<ChronoElement<?>> elements = extension.getElements(Locale.ROOT, Attributes.empty());
+
+            if (elements.size() == 2) {
+                for (ChronoElement<?> element : elements) {
+                    if (element.name().endsWith("_DAY_PERIOD")) {
+                        builder.appendExtension(extension);
+                        return;
+                    }
+                }
+            }
         }
 
     }
@@ -1428,27 +1451,6 @@ public final class EthiopianTime
 
             if (time != null) {
                 return EthiopianTime.from(time);
-            } else if (entity.contains(AM_PM_OF_DAY) && entity.contains(ETHIOPIAN_HOUR)) {
-                Meridiem meridiem = entity.get(AM_PM_OF_DAY);
-                int hour = entity.get(ETHIOPIAN_HOUR);
-                if (hour == 12) {
-                    hour = 0;
-                }
-                hour += 6;
-                if (hour >= 12) {
-                    hour -= 12;
-                }
-                if (meridiem == Meridiem.PM) {
-                    hour += 12;
-                }
-                int minute = 0, second = 0;
-                if (entity.contains(MINUTE_OF_HOUR)) {
-                    minute = entity.get(MINUTE_OF_HOUR);
-                }
-                if (entity.contains(SECOND_OF_MINUTE)) {
-                    second = entity.get(SECOND_OF_MINUTE);
-                }
-                return new EthiopianTime(hour, minute, second);
             }
 
             return null;

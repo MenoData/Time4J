@@ -5,15 +5,18 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.StartOfDay;
+import net.time4j.format.Leniency;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -96,7 +99,7 @@ public class CalendarOverrideTest {
     }
 
     @Test
-    public void parseEthiopian() throws ParseException {
+    public void parseEthiopian1() throws ParseException {
         ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
         ChronoFormatter<Moment> f =
             ChronoFormatter.setUpWithOverride(Locale.ENGLISH, EthiopianCalendar.axis())
@@ -107,6 +110,33 @@ public class CalendarOverrideTest {
             f.parse("Amete Mihret, 2008-03-09 03:45 PM +03:00"),
             is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset))
         );
+    }
+
+    @Test
+    public void parseEthiopian2() throws ParseException {
+        String input = "ሐሙስ፣ ጥቅምት 11 ቀን (ሐና፡ማርያም) 10:15:44 ንጋት EAT ፲፱፻፺፯ (ማቴዎስ) ዓ/ም";
+        String preferredZone = "Africa/Addis_Ababa";
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUpWithOverride(new Locale("am", "ET", "ethiopic"), EthiopianCalendar.axis())
+                .addPattern("EEEE'፣' MMMM d 'ቀን' (", PatternType.CLDR)
+                .addText(EthiopianCalendar.TABOT)
+                .addPattern(") h:mm:ss B ", PatternType.CLDR)
+                .addShortTimezoneName(Collections.singleton(Timezone.of(preferredZone).getID()))
+                .addPattern(" yyyy (", PatternType.CLDR)
+                .addText(EthiopianCalendar.EVANGELIST)
+                .addPattern(") G", PatternType.CLDR)
+                .build()
+                .withTimezone(offset)
+                .with(Leniency.STRICT);
+        assertThat(
+            f.parse(input), // 2004-10-22T01:15:44Z
+            is(PlainTimestamp.of(2004, 10, 22, 4, 15, 44).at(offset))
+        );
+        assertThat(
+            EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1997, EthiopianMonth.TEKEMT, 11),
+            is(PlainDate.of(2004, 10, 21).transform(EthiopianCalendar.class)));
     }
 
 }

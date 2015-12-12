@@ -71,12 +71,15 @@ public class EthiopianExtension
     ) {
 
         if (entity.contains(EthiopianTime.ETHIOPIAN_HOUR)) {
-            EthiopianTime time = EthiopianTime.axis().createFrom(entity, attributes, false);
-
-            if (time != null) {
-                entity.with(EthiopianTime.ETHIOPIAN_HOUR, null);
-                return entity.with(PlainTime.axis().element(), time.toISO());
+            int h = entity.get(EthiopianTime.ETHIOPIAN_HOUR).intValue();
+            if (h == 12) {
+                h = 0;
             }
+            h += 6;
+            if (h >= 12) {
+                h -= 12;
+            }
+            entity = entity.with(PlainTime.DIGITAL_HOUR_OF_AMPM, h);
         }
 
         return entity;

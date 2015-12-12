@@ -446,6 +446,7 @@ final class NumberProcessor<V>
         } else if (
             (this.signPolicy == SignPolicy.SHOW_WHEN_BIG_NUMBER)
             && leniency.isStrict()
+            && (numsys == NumberSystem.ARABIC)
         ) {
             if (
                 (sign == '+')

@@ -128,14 +128,23 @@ public final class DayPeriod {
             locale = new Locale("nb"); // CLDR 28 contains no data for language nn
         }
 
-        Map<String, String> resourceMap = CalendarText.getIsoInstance(locale).getTextForms();
+        Map<String, String> resourceMap = loadTextForms(locale);
         SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
 
         for (String key : resourceMap.keySet()) {
-            if ((key.charAt(0) == 'T') && (key.length() == 5)) {
+            if (accept(key)) {
                 int hour = Integer.parseInt(key.substring(1, 3));
                 int minute = Integer.parseInt(key.substring(3, 5));
-                PlainTime time = PlainTime.midnightAtStartOfDay().plus(hour * 60 + minute, ClockUnit.MINUTES);
+                PlainTime time = PlainTime.midnightAtStartOfDay();
+                if (hour == 24) {
+                    if (minute != 0) {
+                        throw new IllegalStateException("Invalid time key: " + key);
+                    }
+                } else if ((hour >= 0) && (hour < 24) && (minute >= 0) && (minute < 60)) {
+                    time = time.plus(hour * 60 + minute, ClockUnit.MINUTES);
+                } else {
+                    throw new IllegalStateException("Invalid time key: " + key);
+                }
                 if (codeMap.isEmpty()) {
                     codeMap = new TreeMap<PlainTime, String>();
                 }
@@ -517,6 +526,25 @@ public final class DayPeriod {
 
     }
 
+    private static Map<String, String> loadTextForms(Locale locale) {
+
+        if (locale.getVariant().isEmpty()) {
+            return CalendarText.getIsoInstance(locale).getTextForms();
+        }
+
+        return CalendarText.getInstance(
+            locale.getVariant(),
+            new Locale(locale.getLanguage(), locale.getCountry())
+        ).getTextForms();
+
+    }
+
+    private static boolean accept(String key) {
+
+        return ((key.charAt(0) == 'T') && (key.length() == 5) && Character.isDigit(key.charAt(1)));
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     static class Extension
@@ -565,21 +593,31 @@ public final class DayPeriod {
                 for (PlainTime time : dp.codeMap.keySet()) {
                     if (dp.codeMap.get(time).equals(code)) {
                         Meridiem m = null;
+                        int hour12 = getHour12(entity);
+                        PlainTime next = dp.getEnd(time);
+
+                        // Optimistic assumption that hour12 is always within time range described by code.
+                        // However, the strict parser will detect any inconsistencies with day periods later.
                         if (time.getHour() >= 12) {
-                            m = Meridiem.PM;
-                        } else if (!dp.getEnd(time).isAfter(PlainTime.of(12))) {
+                            if (next.isAfter(time) || next.isSimultaneous(PlainTime.midnightAtStartOfDay())) {
+                                m = Meridiem.PM;
+                            } else if (hour12 != -1) {
+                                m = ((hour12 + 12 >= time.getHour()) ? Meridiem.PM : Meridiem.AM);
+                            }
+                        } else if (!next.isAfter(PlainTime.of(12))) {
                             m = Meridiem.AM;
+                        } else if (hour12 != -1) {
+                            m = ((hour12 >= time.getHour()) ? Meridiem.AM : Meridiem.PM);
                         }
                         if (m != null) {
                             if ((meridiem != null) && (meridiem != m)) { // ambivalent day period
-                                int hour12 = getHour12(entity);
                                 if (hour12 == -1) {
                                     meridiem = null; // no clock hour available for distinction
                                 } else if (code.startsWith("night")) { // night1 or night2 (ja)
                                     meridiem = ((hour12 < 6) ? Meridiem.AM : Meridiem.PM);
                                 } else if (code.startsWith("afternoon")) { // languages id or uz
                                     meridiem = ((hour12 < 6) ? Meridiem.PM : Meridiem.AM);
-                                } else { // cannot resolve other day period code to am/pm
+                                } else { // cannot resolve other day period code duplicate to am/pm
                                     meridiem = null;
                                 }
                             } else {
@@ -824,7 +862,7 @@ public final class DayPeriod {
             ParsePosition status,
             AttributeQuery attributes
         ) {
-            Map<String, String> textForms = CalendarText.getIsoInstance(this.getLocale()).getTextForms();
+            Map<String, String> textForms = loadTextForms(this.getLocale());
             List<String> codes = new ArrayList<String>();
 
             if (this.fixed) {
@@ -834,7 +872,7 @@ public final class DayPeriod {
                 codes.add("noon");
             } else {
                 for (String key : textForms.keySet()) {
-                    if ((key.charAt(0) == 'T') && (key.length() == 5)) {
+                    if (accept(key)) {
                         codes.add(textForms.get(key));
                     }
                 }
@@ -978,7 +1016,7 @@ public final class DayPeriod {
                 String code = getFixedCode(time);
 
                 if (dp.isPredefined()) {
-                    Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+                    Map<String, String> textForms = loadTextForms(locale);
                     String key = createKey(textForms, this.width, this.outputContext, code);
                     if (!textForms.containsKey(key)) {
                         if (code.equals("midnight")) {
@@ -997,7 +1035,7 @@ public final class DayPeriod {
                 String code = dp.codeMap.get(dp.getStart(time));
 
                 if (dp.isPredefined()) {
-                    Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+                    Map<String, String> textForms = loadTextForms(locale);
                     String key = createKey(textForms, this.width, this.outputContext, code);
                     if (textForms.containsKey(key)) {
                         return textForms.get(key);
