@@ -2,9 +2,15 @@ package net.time4j.calendar;
 
 import net.time4j.Meridiem;
 import net.time4j.PlainTime;
+import net.time4j.format.Leniency;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -362,6 +368,42 @@ public class EthiopianTimeTest {
         assertThat(ethio.get(EthiopianTime.ETHIOPIAN_HOUR), is(12));
         assertThat(ethio.get(EthiopianTime.MINUTE_OF_HOUR), is(15));
         assertThat(ethio.get(EthiopianTime.SECOND_OF_MINUTE), is(30));
+    }
+
+    @Test
+    public void parseAmPm() throws ParseException {
+        ChronoFormatter<EthiopianTime> f =
+            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am", "ET", "ethiopic"))
+                .addPattern("h:mm a", PatternType.CLDR)
+                .build()
+                .with(Leniency.STRICT);
+        assertThat(
+            f.parse("11:30 PM").toISO(),
+            is(PlainTime.of(23, 30)));
+        assertThat(
+            f.parse("0:00 AM").toISO(),
+            is(PlainTime.midnightAtStartOfDay()));
+        assertThat(
+            f.parse("0:30 AM").toISO(),
+            is(PlainTime.of(0, 30)));
+    }
+
+    @Test
+    public void parseEkulLeilit() throws ParseException {
+        ChronoFormatter<EthiopianTime> f =
+            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am", "ET", "ethiopic"))
+                .addPattern("h:mm B", PatternType.CLDR)
+                .build()
+                .with(Leniency.STRICT);
+        assertThat(
+            f.parse("5:30 እኩለ ሌሊት").toISO(),
+            is(PlainTime.of(23, 30)));
+        assertThat(
+            f.parse("6:00 እኩለ ሌሊት").toISO(),
+            is(PlainTime.midnightAtStartOfDay()));
+        assertThat(
+            f.parse("6:30 እኩለ ሌሊት").toISO(),
+            is(PlainTime.of(0, 30)));
     }
 
 }
