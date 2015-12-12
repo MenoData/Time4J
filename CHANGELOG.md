@@ -4,6 +4,7 @@
 - New methods CalendarText.patternForXYZ(...) [#410]
 
 ### Fixed
+- Formatting Ethiopian time with AM/PM-marker is not in western style [#413]
 - Parsing of Ethiopic tabot names broken if not at end of text [#412]
 
 ### Deprecated
