@@ -443,7 +443,7 @@ public final class DayPeriod {
         }
 
         Map<String, String> resourceMap = loadTextForms(locale, calendarType);
-        SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
+        SortedMap<PlainTime, String> codeMap = new TreeMap<PlainTime, String>();
 
         for (String key : resourceMap.keySet()) {
             if (accept(key)) {
@@ -458,9 +458,6 @@ public final class DayPeriod {
                     time = time.plus(hour * 60 + minute, ClockUnit.MINUTES);
                 } else {
                     throw new IllegalStateException("Invalid time key: " + key);
-                }
-                if (codeMap.isEmpty()) {
-                    codeMap = new TreeMap<PlainTime, String>();
                 }
                 codeMap.put(time, resourceMap.get(key));
             }
