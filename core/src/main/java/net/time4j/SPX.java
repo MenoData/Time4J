@@ -35,6 +35,7 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -537,35 +538,50 @@ final class SPX
         return new Duration<IsoUnit>(items, negative);
     }
 
-    private void writeDayPeriod(DataOutput out)
+    private void writeDayPeriod(ObjectOutput out)
         throws IOException {
 
         DayPeriod.Element element = DayPeriod.Element.class.cast(this.obj);
-
+        Locale locale = element.getLocale();
         int header = DAY_PERIOD_TYPE;
         header <<= 4;
         if (element.isFixed()) {
             header |= 1;
         }
+        if (locale == null) {
+            header |= 2;
+        }
         out.writeByte(header);
 
-        Locale locale = element.getLocale();
-        String lang = locale.getLanguage();
-        if (!locale.getCountry().isEmpty()) {
-            lang = lang + "-" + locale.getCountry();
+        if (locale == null) {
+            out.writeObject(element.getCodeMap());
+        } else {
+            String lang = locale.getLanguage();
+            if (!locale.getCountry().isEmpty()) {
+                lang = lang + "-" + locale.getCountry();
+            }
+            out.writeUTF(lang);
+            out.writeUTF(element.getCalendarType());
         }
-        out.writeUTF(lang);
 
     }
 
+    @SuppressWarnings("unchecked")
     private Object readDayPeriod(
-        DataInput in,
+        ObjectInput in,
         byte header
-    ) throws IOException {
+    ) throws IOException, ClassNotFoundException {
 
-        boolean fixed = ((header & 0xF) == 1);
+        boolean fixed = ((header & 1) == 1);
+        boolean custom = ((header & 2) == 2);
+
+        if (custom) {
+            Map<PlainTime, String> timeToLabels = (Map<PlainTime, String>) in.readObject();
+            return new DayPeriod.Element(fixed, DayPeriod.of(timeToLabels));
+        }
 
         String langCode = in.readUTF();
+        String calendarType = in.readUTF();
         int index = langCode.indexOf("-");
         Locale locale;
 
@@ -575,7 +591,7 @@ final class SPX
             locale = new Locale(langCode.substring(0, index), langCode.substring(index + 1));
         }
 
-        return new DayPeriod.Element(fixed, locale);
+        return new DayPeriod.Element(fixed, locale, calendarType);
 
     }
 
