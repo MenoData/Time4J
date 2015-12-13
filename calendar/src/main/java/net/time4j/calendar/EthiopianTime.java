@@ -164,6 +164,56 @@ import java.util.Set;
  *     </tr>
  * </table>
  *
+ * <p>This class applies following calendar specific day period scheme by default: </p>
+ *
+ * <table border="1">
+ *     <caption>Standard scheme of day periods</caption>
+ *     <tr>
+ *         <th>Interval (ISO-8601)</th>
+ *         <th>Day period (transscription)</th>
+ *     </tr>
+ *     <tr>
+ *         <td>23:00-00:59</td>
+ *         <td>Ekul Leilit</td>
+ *     </tr>
+ *     <tr>
+ *         <td>01:00-03:59</td>
+ *         <td>Wedek&#39;et</td>
+ *     </tr>
+ *     <tr>
+ *         <td>04:00-05:59</td>
+ *         <td>Nigat</td>
+ *     </tr>
+ *     <tr>
+ *         <td>06:00-08:59</td>
+ *         <td>T&#39;uwat</td>
+ *     </tr>
+ *     <tr>
+ *         <td>09:00-11:59</td>
+ *         <td>Refad</td>
+ *     </tr>
+ *     <tr>
+ *         <td>12:00-12:59</td>
+ *         <td>Ekul K&#39;en</td>
+ *     </tr>
+ *     <tr>
+ *         <td>13:00-15:59</td>
+ *         <td>Kese&#39;at Behwala</td>
+ *     </tr>
+ *     <tr>
+ *         <td>16:00-17:59</td>
+ *         <td>Wedemata</td>
+ *     </tr>
+ *     <tr>
+ *         <td>18:00-19:59</td>
+ *         <td>Sidenegiz</td>
+ *     </tr>
+ *     <tr>
+ *         <td>20:00-22:59</td>
+ *         <td>Mishet</td>
+ *     </tr>
+ * </table>
+ *
  * <p>Following elements which are declared as constants are registered by this class: </p>
  *
  * <ul>
@@ -283,6 +333,56 @@ import java.util.Set;
  *     <tr>
  *         <td>23:00</td>
  *         <td>5 (night)</td>
+ *     </tr>
+ * </table>
+ *
+ * <p>Diese Klasse wendet folgendes Tagesabschnittsschema per Vorgabe an: </p>
+ *
+ * <table border="1">
+ *     <caption>Standard-Schema von Tagesabschnitten</caption>
+ *     <tr>
+ *         <th>Intervall (ISO-8601)</th>
+ *         <th>Tagesabschnitt (Transskript)</th>
+ *     </tr>
+ *     <tr>
+ *         <td>23:00-00:59</td>
+ *         <td>Ekul Leilit</td>
+ *     </tr>
+ *     <tr>
+ *         <td>01:00-03:59</td>
+ *         <td>Wedek&#39;et</td>
+ *     </tr>
+ *     <tr>
+ *         <td>04:00-05:59</td>
+ *         <td>Nigat</td>
+ *     </tr>
+ *     <tr>
+ *         <td>06:00-08:59</td>
+ *         <td>T&#39;uwat</td>
+ *     </tr>
+ *     <tr>
+ *         <td>09:00-11:59</td>
+ *         <td>Refad</td>
+ *     </tr>
+ *     <tr>
+ *         <td>12:00-12:59</td>
+ *         <td>Ekul K&#39;en</td>
+ *     </tr>
+ *     <tr>
+ *         <td>13:00-15:59</td>
+ *         <td>Kese&#39;at Behwala</td>
+ *     </tr>
+ *     <tr>
+ *         <td>16:00-17:59</td>
+ *         <td>Wedemata</td>
+ *     </tr>
+ *     <tr>
+ *         <td>18:00-19:59</td>
+ *         <td>Sidenegiz</td>
+ *     </tr>
+ *     <tr>
+ *         <td>20:00-22:59</td>
+ *         <td>Mishet</td>
  *     </tr>
  * </table>
  *

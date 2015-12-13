@@ -119,7 +119,7 @@ public class CalendarOverrideTest {
         ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
 
         ChronoFormatter<Moment> f =
-            ChronoFormatter.setUpWithOverride(new Locale("am", "ET", "ethiopic"), EthiopianCalendar.axis())
+            ChronoFormatter.setUpWithOverride(new Locale("am"), EthiopianCalendar.axis())
                 .addPattern("EEEE'፣' MMMM d 'ቀን' (", PatternType.CLDR)
                 .addText(EthiopianCalendar.TABOT)
                 .addPattern(") h:mm:ss B ", PatternType.CLDR)

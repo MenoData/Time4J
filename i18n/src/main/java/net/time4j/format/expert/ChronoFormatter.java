@@ -5321,8 +5321,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         private ChronoElement<?> findDayPeriodElement(boolean fixed) {
 
+            Attributes attrs = new Attributes.Builder(this.getChronology()).build();
+
             for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
-                for (ChronoElement<?> element : extension.getElements(this.locale, Attributes.empty())) {
+                for (ChronoElement<?> element : extension.getElements(this.locale, attrs)) {
                     if (fixed && (element.getSymbol() == 'b') && element.name().endsWith("_DAY_PERIOD")) {
                         return element;
                     } else if (!fixed && (element.getSymbol() == 'B') && element.name().endsWith("_DAY_PERIOD")) {

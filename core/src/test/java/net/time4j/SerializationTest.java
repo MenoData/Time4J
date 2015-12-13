@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoElement;
+import net.time4j.format.CalendarText;
 import net.time4j.scale.TimeScale;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +10,10 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -121,6 +125,7 @@ public class SerializationTest {
             is(true)); // erstes, zweites und drittes Datenpaket
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void roundtripOfWeekmodelElement()
         throws IOException, ClassNotFoundException {
@@ -203,9 +208,17 @@ public class SerializationTest {
 
     @Test
     public void roundTripOfDayPeriodElements() throws IOException, ClassNotFoundException {
-        Object o1 = new DayPeriod.Element(true, Locale.ENGLISH);
-        Object o2 = new DayPeriod.Element(false, Locale.GERMAN);
-        roundtrip(o1, o2);
+        Object o1 = new DayPeriod.Element(true, Locale.ENGLISH, CalendarText.ISO_CALENDAR_TYPE);
+        Object o2 = new DayPeriod.Element(false, Locale.GERMAN, CalendarText.ISO_CALENDAR_TYPE);
+        Map<PlainTime, String> custom = new HashMap<PlainTime, String>();
+        custom.put(PlainTime.midnightAtStartOfDay(), "midnight");
+        custom.put(PlainTime.of(0, 1), "night");
+        custom.put(PlainTime.of(6, 30), "morning");
+        custom.put(PlainTime.of(12), "noon");
+        custom.put(PlainTime.of(12, 1), "afternoon");
+        custom.put(PlainTime.of(18, 30), "evening");
+        Object o3 = new DayPeriod.Element(false, DayPeriod.of(custom));
+        roundtrip(o1, o2, o3);
     }
 
     @Test(expected=NotSerializableException.class)

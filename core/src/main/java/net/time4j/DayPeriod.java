@@ -80,22 +80,25 @@ public final class DayPeriod {
         STD_RULES = Collections.unmodifiableSortedMap(rules);
     }
 
-    private static DayPeriod FALLBACK = new DayPeriod(Locale.ROOT, STD_RULES);
+    private static DayPeriod FALLBACK = new DayPeriod(Locale.ROOT, CalendarText.ISO_CALENDAR_TYPE, STD_RULES);
 
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final Locale locale;
+    private transient final String calendarType;
     private transient final SortedMap<PlainTime, String> codeMap;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private DayPeriod(
         Locale locale, // optional
+        String calendarType,
         SortedMap<PlainTime, String> codeMap
     ) {
         super();
 
         this.locale = locale;
+        this.calendarType = calendarType;
         this.codeMap = Collections.unmodifiableSortedMap(codeMap);
 
     }
@@ -122,54 +125,7 @@ public final class DayPeriod {
      */
     public static DayPeriod of(Locale locale) {
 
-        String lang = locale.getLanguage(); // NPE-check
-
-        if (lang.equals("nn")) {
-            locale = new Locale("nb"); // CLDR 28 contains no data for language nn
-        }
-
-        Map<String, String> resourceMap = loadTextForms(locale);
-        SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
-
-        for (String key : resourceMap.keySet()) {
-            if (accept(key)) {
-                int hour = Integer.parseInt(key.substring(1, 3));
-                int minute = Integer.parseInt(key.substring(3, 5));
-                PlainTime time = PlainTime.midnightAtStartOfDay();
-                if (hour == 24) {
-                    if (minute != 0) {
-                        throw new IllegalStateException("Invalid time key: " + key);
-                    }
-                } else if ((hour >= 0) && (hour < 24) && (minute >= 0) && (minute < 60)) {
-                    time = time.plus(hour * 60 + minute, ClockUnit.MINUTES);
-                } else {
-                    throw new IllegalStateException("Invalid time key: " + key);
-                }
-                if (codeMap.isEmpty()) {
-                    codeMap = new TreeMap<PlainTime, String>();
-                }
-                codeMap.put(time, resourceMap.get(key));
-            }
-        }
-
-        if (codeMap.isEmpty() || lang.isEmpty()) {
-            return FALLBACK;
-        }
-
-        Iterator<PlainTime> iter = codeMap.keySet().iterator();
-        String oldCode = "";
-
-        while (iter.hasNext()) {
-            PlainTime time = iter.next();
-            String code = codeMap.get(time);
-            if (code.equals(oldCode)) {
-                iter.remove(); // lex colombia
-            } else {
-                oldCode = code;
-            }
-        }
-
-        return new DayPeriod(locale, codeMap);
+        return DayPeriod.of(locale, CalendarText.ISO_CALENDAR_TYPE);
 
     }
 
@@ -208,7 +164,7 @@ public final class DayPeriod {
             }
         }
 
-        return new DayPeriod(null, map);
+        return new DayPeriod(null, "", map);
 
     }
 
@@ -392,6 +348,29 @@ public final class DayPeriod {
 
     }
 
+    /**
+     * <p>Yields an unmodifiable sorted map from start times to day period names. </p>
+     *
+     * <p>The names (codes) do not represent translations if this instance was constructed via a locale. </p>
+     *
+     * @return  unmodifiable sorted map from start times to day period codes
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert eine {@code SortedMap} von Startzeiten zu Tagesabschnittsnamen. </p>
+     *
+     * <p>Die Namen stellen keine &Uuml;bersetzungen dar, wenn diese Instanz mit Hilfe einer
+     * {@code Locale} erzeugt wurde. </p>
+     *
+     * @return  unmodifiable sorted map from start times to day period codes
+     * @since   3.13/4.10
+     */
+    public SortedMap<PlainTime, String> getCodeMap() {
+
+        return this.codeMap;
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -406,7 +385,7 @@ public final class DayPeriod {
             } else if (!this.locale.equals(that.locale)) {
                 return false;
             }
-            return this.codeMap.equals(that.codeMap);
+            return (this.codeMap.equals(that.codeMap) && this.calendarType.equals(that.calendarType));
         }
 
         return false;
@@ -439,6 +418,11 @@ public final class DayPeriod {
             sb.append("locale=");
             sb.append(this.locale);
             sb.append(',');
+            if (!this.calendarType.equals(CalendarText.ISO_CALENDAR_TYPE)) {
+                sb.append(",calendar-type=");
+                sb.append(this.calendarType);
+                sb.append(',');
+            }
         }
         sb.append(this.codeMap);
         sb.append(']');
@@ -446,9 +430,60 @@ public final class DayPeriod {
 
     }
 
-    private Locale getLocale() {
+    // package-private because used in deserialization
+    static DayPeriod of(
+        Locale locale,
+        String calendarType
+    ) {
 
-        return this.locale;
+        String lang = locale.getLanguage(); // NPE-check
+
+        if (lang.equals("nn")) {
+            locale = new Locale("nb"); // CLDR 28 contains no data for language nn
+        }
+
+        Map<String, String> resourceMap = loadTextForms(locale, calendarType);
+        SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
+
+        for (String key : resourceMap.keySet()) {
+            if (accept(key)) {
+                int hour = Integer.parseInt(key.substring(1, 3));
+                int minute = Integer.parseInt(key.substring(3, 5));
+                PlainTime time = PlainTime.midnightAtStartOfDay();
+                if (hour == 24) {
+                    if (minute != 0) {
+                        throw new IllegalStateException("Invalid time key: " + key);
+                    }
+                } else if ((hour >= 0) && (hour < 24) && (minute >= 0) && (minute < 60)) {
+                    time = time.plus(hour * 60 + minute, ClockUnit.MINUTES);
+                } else {
+                    throw new IllegalStateException("Invalid time key: " + key);
+                }
+                if (codeMap.isEmpty()) {
+                    codeMap = new TreeMap<PlainTime, String>();
+                }
+                codeMap.put(time, resourceMap.get(key));
+            }
+        }
+
+        if (codeMap.isEmpty() || lang.isEmpty()) {
+            return FALLBACK;
+        }
+
+        Iterator<PlainTime> iter = codeMap.keySet().iterator();
+        String oldCode = "";
+
+        while (iter.hasNext()) {
+            PlainTime time = iter.next();
+            String code = codeMap.get(time);
+            if (code.equals(oldCode)) {
+                iter.remove(); // lex colombia
+            } else {
+                oldCode = code;
+            }
+        }
+
+        return new DayPeriod(locale, calendarType, codeMap);
 
     }
 
@@ -526,16 +561,21 @@ public final class DayPeriod {
 
     }
 
-    private static Map<String, String> loadTextForms(Locale locale) {
+    private static Map<String, String> loadTextForms(
+        Locale locale,
+        String calendarType
+    ) {
 
-        if (locale.getVariant().isEmpty()) {
-            return CalendarText.getIsoInstance(locale).getTextForms();
+        Map<String, String> map = CalendarText.getInstance(calendarType, locale).getTextForms();
+
+        if (
+            !calendarType.equals(CalendarText.ISO_CALENDAR_TYPE)
+            && !"true".equals(map.get("hasDayPeriods"))
+        ) {
+            map = CalendarText.getIsoInstance(locale).getTextForms(); // fallback
         }
 
-        return CalendarText.getInstance(
-            locale.getVariant(),
-            new Locale(locale.getLanguage(), locale.getCountry())
-        ).getTextForms();
+        return map;
 
     }
 
@@ -554,7 +594,7 @@ public final class DayPeriod {
 
         @Override
         public boolean accept(Class<?> chronoType) {
-            return PlainTime.class.isAssignableFrom(chronoType);
+            return PlainTime.class.isAssignableFrom(chronoType); // not used
         }
 
         @Override
@@ -562,7 +602,8 @@ public final class DayPeriod {
             Locale locale,
             AttributeQuery attributes
         ) {
-            DayPeriod dp = DayPeriod.of(locale);
+            DayPeriod dp =
+                DayPeriod.of(locale, attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE));
             Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
             set.add(new Element(false, dp));
             set.add(new Element(true, dp));
@@ -584,7 +625,8 @@ public final class DayPeriod {
                 return entity; // optimization
             }
 
-            DayPeriod dp = DayPeriod.of(locale);
+            DayPeriod dp =
+                DayPeriod.of(locale, attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE));
             Element approximate = new Element(false, dp);
 
             if (entity.contains(approximate)) {
@@ -628,7 +670,7 @@ public final class DayPeriod {
                 }
                 if (meridiem != null) {
                     entity = entity.with(PlainTime.AM_PM_OF_DAY, meridiem);
-                    entity = entity.with(approximate, null);
+                    // don't remove day period element here in order to help the strict parser to detect errors later
                 }
             } else {
                 Element fixed = new Element(true, dp);
@@ -678,13 +720,14 @@ public final class DayPeriod {
 
         Element(
             boolean fixed,
-            Locale locale
+            Locale locale,
+            String calendarType
         ) {
-            this(fixed, DayPeriod.of(locale));
+            this(fixed, DayPeriod.of(locale, calendarType));
 
         }
 
-        private Element(
+        Element(
             boolean fixed,
             DayPeriod dayPeriod
         ) {
@@ -759,20 +802,17 @@ public final class DayPeriod {
             StringBuilder sb = new StringBuilder(32);
             sb.append(this.name());
             sb.append('@');
-            sb.append(this.dayPeriod.getLocale());
+            sb.append(this.dayPeriod);
             return sb.toString();
         }
 
         @Override
         @SuppressWarnings("unchecked")
         protected <T extends ChronoEntity<T>> ElementRule<T, String> derive(Chronology<T> chronology) {
-
             if (chronology.isRegistered(PlainTime.COMPONENT)) {
                 return (ElementRule<T, String>) this;
             }
-
             return null;
-
         }
 
         @Override
@@ -828,7 +868,15 @@ public final class DayPeriod {
         }
 
         Locale getLocale() {
-            return this.dayPeriod.getLocale();
+            return this.dayPeriod.locale;
+        }
+
+        String getCalendarType() {
+            return this.dayPeriod.calendarType;
+        }
+
+        Object getCodeMap() {
+            return this.dayPeriod.getCodeMap();
         }
 
         private Object writeReplace() {
@@ -862,8 +910,8 @@ public final class DayPeriod {
             ParsePosition status,
             AttributeQuery attributes
         ) {
-            Map<String, String> textForms = loadTextForms(this.getLocale());
             List<String> codes = new ArrayList<String>();
+            Map<String, String> textForms = null;
 
             if (this.fixed) {
                 codes.add("am");
@@ -871,11 +919,12 @@ public final class DayPeriod {
                 codes.add("midnight");
                 codes.add("noon");
             } else {
-                for (String key : textForms.keySet()) {
-                    if (accept(key)) {
-                        codes.add(textForms.get(key));
-                    }
-                }
+                Set<String> set = new HashSet<String>(this.dayPeriod.codeMap.values());
+                codes.addAll(set); // no duplicates
+            }
+
+            if (this.dayPeriod.isPredefined()) {
+                textForms = loadTextForms(this.getLocale(), this.getCalendarType());
             }
 
             TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
@@ -890,21 +939,30 @@ public final class DayPeriod {
             int maxEq = 0;
 
             for (String code : codes) {
-                String key;
-                if (this.fixed) {
-                    key = createKey(textForms, tw, oc, code);
-                    if (!textForms.containsKey(key)) {
-                        if (code.equals("midnight")) {
-                            key = createKey(textForms, tw, oc, "am");
-                        } else if (code.equals("noon")) {
-                            key = createKey(textForms, tw, oc, "pm");
+                String test = null;
+
+                if (this.dayPeriod.isPredefined()) {
+                    String key;
+                    if (this.fixed) {
+                        key = createKey(textForms, tw, oc, code);
+                        if (!textForms.containsKey(key)) {
+                            if (code.equals("midnight")) {
+                                key = createKey(textForms, tw, oc, "am");
+                            } else if (code.equals("noon")) {
+                                key = createKey(textForms, tw, oc, "pm");
+                            }
                         }
+                    } else {
+                        key = createKey(textForms, tw, oc, code);
+                    }
+                    if (textForms.containsKey(key)) {
+                        test = textForms.get(key);
                     }
                 } else {
-                    key = createKey(textForms, tw, oc, code);
+                    test = code;
                 }
-                if (textForms.containsKey(key)) {
-                    String test = textForms.get(key);
+
+                if (test != null) {
                     int pos = start;
                     int n = test.length();
                     boolean eq = true;
@@ -1010,13 +1068,13 @@ public final class DayPeriod {
 
             PlainTime time = context.get(PlainTime.COMPONENT);
             DayPeriod dp = DayPeriod.this;
-            Locale locale = dp.getLocale();
+            Locale locale = dp.locale;
 
             if (this.fixed) {
                 String code = getFixedCode(time);
 
                 if (dp.isPredefined()) {
-                    Map<String, String> textForms = loadTextForms(locale);
+                    Map<String, String> textForms = loadTextForms(locale, dp.calendarType);
                     String key = createKey(textForms, this.width, this.outputContext, code);
                     if (!textForms.containsKey(key)) {
                         if (code.equals("midnight")) {
@@ -1035,7 +1093,7 @@ public final class DayPeriod {
                 String code = dp.codeMap.get(dp.getStart(time));
 
                 if (dp.isPredefined()) {
-                    Map<String, String> textForms = loadTextForms(locale);
+                    Map<String, String> textForms = loadTextForms(locale, dp.calendarType);
                     String key = createKey(textForms, this.width, this.outputContext, code);
                     if (textForms.containsKey(key)) {
                         return textForms.get(key);

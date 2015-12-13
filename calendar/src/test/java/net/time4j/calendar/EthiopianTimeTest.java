@@ -373,7 +373,7 @@ public class EthiopianTimeTest {
     @Test
     public void parseAmPm() throws ParseException {
         ChronoFormatter<EthiopianTime> f =
-            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am", "ET", "ethiopic"))
+            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am"))
                 .addPattern("h:mm a", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT);
@@ -391,7 +391,7 @@ public class EthiopianTimeTest {
     @Test
     public void parseEkulLeilit() throws ParseException {
         ChronoFormatter<EthiopianTime> f =
-            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am", "ET", "ethiopic"))
+            ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am"))
                 .addPattern("h:mm B", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT);
