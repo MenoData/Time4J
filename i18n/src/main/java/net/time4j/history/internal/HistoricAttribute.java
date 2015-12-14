@@ -23,24 +23,22 @@ package net.time4j.history.internal;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.AttributeKey;
+import net.time4j.format.Attributes;
 
 
 /**
  * <p>Collection of some format attributes for internal purposes only. </p>
  *
- * @param   <T> generic attribute type, must be immutable
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
 /*[deutsch]
  * <p>Eine Menge von einigen Formatattributen nur f&uuml;r interne Zwecke. </p>
  *
- * @param   <T> generic attribute type, must be immutable
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
-public final class HistoricAttribute<T>
-    implements AttributeKey<T> {
+public final class HistoricAttribute {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -61,7 +59,7 @@ public final class HistoricAttribute<T>
      * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
      */
     public static final AttributeKey<HistoricVariant> HISTORIC_VARIANT =
-        HistoricAttribute.of("HISTORIC_VARIANT", HistoricVariant.class);
+        Attributes.createKey("HISTORIC_VARIANT", HistoricVariant.class);
 
     /**
      * <p>Format attribute which can cause the format engine to create a chronological history with
@@ -82,7 +80,7 @@ public final class HistoricAttribute<T>
      * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
      */
     public static final AttributeKey<PlainDate> CUTOVER_DATE =
-        HistoricAttribute.of("CUTOVER_DATE", PlainDate.class);
+        Attributes.createKey("CUTOVER_DATE", PlainDate.class);
 
     /**
      * <p>Format attribute which prefers the notation of &quot;Common Era&quot; in formatting
@@ -102,7 +100,7 @@ public final class HistoricAttribute<T>
      *
      * @see     net.time4j.format.expert.ChronoFormatter#withAlternativeEraNames()
      */
-    public static final AttributeKey<Boolean> COMMON_ERA = HistoricAttribute.of("COMMON_ERA", Boolean.class);
+    public static final AttributeKey<Boolean> COMMON_ERA = Attributes.createKey("COMMON_ERA", Boolean.class);
 
     /**
      * <p>Format attribute which enforces latin notations of historic eras ignoring the locale. </p>
@@ -121,7 +119,7 @@ public final class HistoricAttribute<T>
      *
      * @see     net.time4j.format.expert.ChronoFormatter#withLatinEraNames()
      */
-    public static final AttributeKey<Boolean> LATIN_ERA = HistoricAttribute.of("LATIN_ERA", Boolean.class);
+    public static final AttributeKey<Boolean> LATIN_ERA = Attributes.createKey("LATIN_ERA", Boolean.class);
 
     /**
      * <p>Format attribute which can cause the format engine to create a chronological history with
@@ -143,76 +141,12 @@ public final class HistoricAttribute<T>
      * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
      */
     public static final AttributeKey<Object> ANCIENT_JULIAN_LEAP_YEARS =
-        HistoricAttribute.of("ANCIENT_JULIAN_LEAP_YEARS", Object.class);
-
-    //~ Instanzvariablen --------------------------------------------------
-
-    private final String name;
-    private final Class<T> type;
+        Attributes.createKey("ANCIENT_JULIAN_LEAP_YEARS", Object.class);
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private HistoricAttribute(
-        String name,
-        Class<T> type
-    ) {
-        super();
-
-        this.name = name;
-        this.type = type;
-
-    }
-
-    //~ Methoden ----------------------------------------------------------
-
-    private static <T> HistoricAttribute<T> of(
-        String name,
-        Class<T> type
-    ) {
-
-        return new HistoricAttribute<T>(name, type);
-
-    }
-
-    @Override
-    public String name() {
-
-        return this.name;
-
-    }
-
-    @Override
-    public Class<T> type() {
-
-        return this.type;
-
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        } else if (obj instanceof HistoricAttribute) {
-            HistoricAttribute<?> that = (HistoricAttribute) obj;
-            return (this.name.equals(that.name) && this.type.equals(that.type));
-        } else {
-            return false;
-        }
-
-    }
-
-    @Override
-    public int hashCode() {
-
-        return this.name.hashCode();
-
-    }
-
-    @Override
-    public String toString() {
-
-        return this.type.getName() + "@" + this.name;
+    private HistoricAttribute() {
+        // no instantiation
 
     }
 

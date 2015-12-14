@@ -460,12 +460,6 @@ public final class Attributes
     public static final AttributeKey<StartOfDay> START_OF_DAY =
         PredefinedKey.valueOf("START_OF_DAY", StartOfDay.class);
 
-    private static final char ISO_DECIMAL_SEPARATOR = (
-        Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
-        ? '.'
-        : ',' // Empfehlung des ISO-Standards
-    );
-
     private static final AttributeQuery EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
@@ -496,6 +490,33 @@ public final class Attributes
     public static AttributeQuery empty() {
 
         return EMPTY;
+
+    }
+
+    /**
+     * <p>Creates a new attribute key. </p>
+     *
+     * @param   <A> generic immutable type of attribute value
+     * @param   name    name of attribute
+     * @param   type    type of attribute
+     * @return  new attribute key
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen Attributschl&uuml;ssel. </p>
+     *
+     * @param   <A> generic immutable type of attribute value
+     * @param   name    name of attribute
+     * @param   type    type of attribute
+     * @return  new attribute key
+     * @since   3.13/4.10
+     */
+    public static <A> AttributeKey<A> createKey(
+        String name,
+        Class<A> type
+    ) {
+
+        return PredefinedKey.valueOf(name, type);
 
     }
 
