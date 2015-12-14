@@ -22,6 +22,7 @@
 package net.time4j.format.expert;
 
 import net.time4j.CalendarUnit;
+import net.time4j.DayPeriod;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
@@ -227,9 +228,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ) {
                 // example: week-of-year dependent on LOCALE
                 for (ChronoExtension ext : this.chronology.getExtensions()) {
-                    if (ext.getElements(old.getLocale(), old.globalAttributes).contains(element)) {
+                    if (ext.getElements(old.getLocale(), step.getQuery(old.globalAttributes)).contains(element)) {
                         Set<ChronoElement<?>> elements =
-                            ext.getElements(globalAttributes.getLocale(), globalAttributes);
+                            ext.getElements(globalAttributes.getLocale(), step.getQuery(globalAttributes));
 
                         for (ChronoElement<?> e : elements) {
                             if (e.name().equals(element.name())) {
@@ -2833,6 +2834,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public static final class Builder<T extends ChronoEntity<T>> {
 
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final AttributeKey<DayPeriod> CUSTOM_DAY_PERIOD =
+            Attributes.createKey("DAY_PERIOD", DayPeriod.class);
+
         //~ Instanzvariablen ----------------------------------------------
 
         private final Chronology<T> chronology;
@@ -2844,6 +2850,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         private int reservedIndex;
         private int leftPadWidth;
         private boolean prolepticGregorian;
+        private DayPeriod dayPeriod;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2877,6 +2884,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
             this.prolepticGregorian = false;
+            this.dayPeriod = null;
 
         }
 
@@ -4233,9 +4241,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @see     net.time4j.DayPeriod#fixed()
          * @since   3.13/4.10
          */
-        public Builder<T> addFixedDayPeriod() {
+        public Builder<T> addDayPeriodFixed() {
 
-            ChronoElement<?> e = this.findDayPeriodElement(true);
+            ChronoElement<?> e = this.findDayPeriodElement(true, null);
 
             if (e instanceof TextElement) {
                 TextElement<?> te = TextElement.class.cast(e);
@@ -4260,13 +4268,51 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @see     net.time4j.DayPeriod#approximate()
          * @since   3.13/4.10
          */
-        public Builder<T> addApproximateDayPeriod() {
+        public Builder<T> addDayPeriodApproximate() {
 
-            ChronoElement<?> e = this.findDayPeriodElement(false);
+            ChronoElement<?> e = this.findDayPeriodElement(false, null);
 
             if (e instanceof TextElement) {
                 TextElement<?> te = TextElement.class.cast(e);
                 return this.addText(te);
+            } else {
+                throw new AssertionError("Cannot find day period extension.");
+            }
+
+        }
+
+        /**
+         * <p>Defines a text format for a custom day period. </p>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if already called once
+         * @throws  IllegalArgumentException if given map is empty or contains empty values
+         * @see     DayPeriod#of(Map)
+         * @since   3.13/4.10
+         */
+        /*[deutsch]
+         * <p>Definiert ein Textformat f&uuml;r einen benutzerdefinierten Tagesabschnitt. </p>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if already called once
+         * @throws  IllegalArgumentException if given map is empty or contains empty values
+         * @see     DayPeriod#of(Map)
+         * @since   3.13/4.10
+         */
+        public Builder<T> addDayPeriodCustom(Map<PlainTime, String> timeToLabels) {
+
+            if (this.dayPeriod != null) {
+                throw new IllegalStateException("Cannot add custom day period more than once.");
+            }
+
+            DayPeriod dp = DayPeriod.of(timeToLabels);
+            ChronoElement<?> e = this.findDayPeriodElement(false, dp);
+
+            if (e instanceof TextElement) {
+                TextElement<?> te = TextElement.class.cast(e);
+                this.addText(te);
+                this.dayPeriod = dp;
+                return this.endSection();
             } else {
                 throw new AssertionError("Cannot find day period extension.");
             }
@@ -5245,8 +5291,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     this.steps
                 );
 
-            if (this.prolepticGregorian) {
+            if (this.prolepticGregorian) { // see PatternType.THREETEN
                 formatter = formatter.with(ChronoHistory.PROLEPTIC_GREGORIAN);
+            }
+
+            if (this.dayPeriod != null) {
+                AttributeSet as = formatter.globalAttributes;
+                as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
+                formatter = new ChronoFormatter<T>(formatter, as);
             }
 
             return formatter;
@@ -5431,12 +5483,30 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private ChronoElement<?> findDayPeriodElement(boolean fixed) {
+        private ChronoElement<?> findDayPeriodElement(
+            boolean fixed,
+            DayPeriod dp
+        ) {
 
             Attributes attrs = new Attributes.Builder(this.getChronology()).build();
+            AttributeQuery aq = attrs;
+
+            if (dp != null) {
+                AttributeSet as;
+
+                if (this.stack.isEmpty()) {
+                    as = new AttributeSet(attrs, this.locale);
+                } else {
+                    as = this.stack.getLast();
+                }
+
+                as = as.withInternal(CUSTOM_DAY_PERIOD, dp);
+                this.stack.addLast(as);
+                aq = as;
+            }
 
             for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
-                for (ChronoElement<?> element : extension.getElements(this.locale, attrs)) {
+                for (ChronoElement<?> element : extension.getElements(this.locale, aq)) {
                     if (fixed && (element.getSymbol() == 'b') && element.name().endsWith("_DAY_PERIOD")) {
                         return element;
                     } else if (!fixed && (element.getSymbol() == 'B') && element.name().endsWith("_DAY_PERIOD")) {
