@@ -495,6 +495,33 @@ public final class Attributes
 
     }
 
+    /**
+     * <p>Creates a new attribute key. </p>
+     *
+     * @param   <A> generic immutable type of attribute value
+     * @param   name    name of attribute
+     * @param   type    type of attribute
+     * @return  new attribute key
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen Attributschl&uuml;ssel. </p>
+     *
+     * @param   <A> generic immutable type of attribute value
+     * @param   name    name of attribute
+     * @param   type    type of attribute
+     * @return  new attribute key
+     * @since   3.13/4.10
+     */
+    public static <A> AttributeKey<A> createKey(
+        String name,
+        Class<A> type
+    ) {
+
+        return PredefinedKey.valueOf(name, type);
+
+    }
+
     @Override
     public boolean contains(AttributeKey<?> key) {
 
@@ -857,9 +884,7 @@ public final class Attributes
 
             this.attributes.put(key.name(), value);
 
-            Object compare = key; // stellt JDK-6 zufrieden
-
-            if (compare == Attributes.LENIENCY) {
+            if (key.equals(Attributes.LENIENCY)) {
                 switch (Leniency.class.cast(value)) {
                     case STRICT:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, false);
