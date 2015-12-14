@@ -10,7 +10,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -344,6 +346,27 @@ public class DayPeriodTest {
         assertThat(
             f.parse("11:15 siang"),
             is(PlainTime.of(11, 15)));
+    }
+
+    @Test
+    public void formatCustom() throws ParseException {
+        Map<PlainTime, String> timeToLabels = new HashMap<PlainTime, String>();
+        timeToLabels.put(PlainTime.of(23), "night");
+        timeToLabels.put(PlainTime.of(7), "morning");
+        timeToLabels.put(PlainTime.of(12), "afternoon");
+        timeToLabels.put(PlainTime.of(6, 30), "evening");
+
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
+                .addPattern("h:mm ", PatternType.CLDR)
+                .addDayPeriodCustom(timeToLabels)
+                .build();
+        assertThat(
+            f.format(PlainTime.of(12)),
+            is("12:00 afternoon"));
+        assertThat(
+            f.parse("12:00 afternoon"),
+            is(PlainTime.of(12)));
     }
 
 }

@@ -21,6 +21,7 @@
 
 package net.time4j;
 
+import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
@@ -81,6 +82,7 @@ public final class DayPeriod {
     }
 
     private static DayPeriod FALLBACK = new DayPeriod(Locale.ROOT, CalendarText.ISO_CALENDAR_TYPE, STD_RULES);
+    private static final AttributeKey<DayPeriod> CUSTOM = Attributes.createKey("DAY_PERIOD", DayPeriod.class);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -348,29 +350,6 @@ public final class DayPeriod {
 
     }
 
-    /**
-     * <p>Yields an unmodifiable sorted map from start times to day period names. </p>
-     *
-     * <p>The names (codes) do not represent translations if this instance was constructed via a locale. </p>
-     *
-     * @return  unmodifiable sorted map from start times to day period codes
-     * @since   3.13/4.10
-     */
-    /*[deutsch]
-     * <p>Liefert eine {@code SortedMap} von Startzeiten zu Tagesabschnittsnamen. </p>
-     *
-     * <p>Die Namen stellen keine &Uuml;bersetzungen dar, wenn diese Instanz mit Hilfe einer
-     * {@code Locale} erzeugt wurde. </p>
-     *
-     * @return  unmodifiable sorted map from start times to day period codes
-     * @since   3.13/4.10
-     */
-    public SortedMap<PlainTime, String> getCodeMap() {
-
-        return this.codeMap;
-
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -599,11 +578,12 @@ public final class DayPeriod {
             Locale locale,
             AttributeQuery attributes
         ) {
-            DayPeriod dp =
-                DayPeriod.of(locale, attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE));
+            DayPeriod dp = from(locale, attributes);
             Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
             set.add(new Element(false, dp));
-            set.add(new Element(true, dp));
+            if (!attributes.contains(CUSTOM)) {
+                set.add(new Element(true, dp)); // fixed
+            }
             return Collections.unmodifiableSet(set);
         }
 
@@ -622,8 +602,7 @@ public final class DayPeriod {
                 return entity; // optimization
             }
 
-            DayPeriod dp =
-                DayPeriod.of(locale, attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE));
+            DayPeriod dp = from(locale, attributes);
             Element approximate = new Element(false, dp);
 
             if (entity.contains(approximate)) {
@@ -697,6 +676,17 @@ public final class DayPeriod {
                 hour12 = entity.get(PlainTime.DIGITAL_HOUR_OF_AMPM).intValue();
             }
             return hour12;
+        }
+
+        private static DayPeriod from(
+            Locale locale,
+            AttributeQuery attributes
+        ) {
+            if (attributes.contains(CUSTOM)) {
+                return attributes.get(CUSTOM);
+            }
+
+            return DayPeriod.of(locale, attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE));
         }
     }
 
@@ -873,7 +863,7 @@ public final class DayPeriod {
         }
 
         Object getCodeMap() {
-            return this.dayPeriod.getCodeMap();
+            return this.dayPeriod.codeMap;
         }
 
         private Object writeReplace() {

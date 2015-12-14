@@ -1048,8 +1048,7 @@ public enum PatternType
         for (ChronoExtension ext : PlainTime.axis().getExtensions()) {
             for (ChronoElement<?> e : ext.getElements(Locale.ROOT, Attributes.empty())) {
                 if (e.name().equals("ETHIOPIAN_HOUR")) {
-                    ChronoElement<Integer> ethiopianHour = cast(e);
-                    return ethiopianHour;
+                    return cast(e);
                 }
             }
         }
@@ -1256,13 +1255,13 @@ public enum PatternType
             case 'b':
                 width = getPeriodWidth(count);
                 builder.startSection(Attributes.TEXT_WIDTH, width);
-                builder.addFixedDayPeriod();
+                builder.addDayPeriodFixed();
                 builder.endSection();
                 break;
             case 'B':
                 width = getPeriodWidth(count);
                 builder.startSection(Attributes.TEXT_WIDTH, width);
-                builder.addApproximateDayPeriod();
+                builder.addDayPeriodApproximate();
                 builder.endSection();
                 break;
             case 'h':
