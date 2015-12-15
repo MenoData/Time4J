@@ -24,6 +24,7 @@ package net.time4j.calendar.service;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.i18n.IsoTextProviderSPI;
 import net.time4j.i18n.UTF8ResourceControl;
 
 import java.util.Collections;
@@ -124,6 +125,11 @@ public final class GenericTextProviderSPI
         OutputContext oc,
         boolean leapForm
     ) {
+
+        if (calendarType.equals("roc")) {
+            TextProvider p = new IsoTextProviderSPI();
+            return p.months(calendarType, locale, tw, oc, leapForm);
+        }
 
         ResourceBundle rb = getBundle(calendarType, locale);
 
