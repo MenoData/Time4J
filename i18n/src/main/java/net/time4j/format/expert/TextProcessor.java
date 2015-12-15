@@ -39,7 +39,6 @@ import java.util.Set;
  * @param   <V> generic type of element values (String or Enum)
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class TextProcessor<V>
     implements FormatProcessor<V> {
@@ -47,10 +46,14 @@ final class TextProcessor<V>
     //~ Instanzvariablen ----------------------------------------------
 
     private final TextElement<V> element;
+    private final boolean protectedMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private TextProcessor(TextElement<V> element) {
+    private TextProcessor(
+        TextElement<V> element,
+        boolean protectedMode
+    ) {
         super();
 
         if (element == null) {
@@ -58,6 +61,7 @@ final class TextProcessor<V>
         }
 
         this.element = element;
+        this.protectedMode = protectedMode;
 
     }
 
@@ -71,7 +75,19 @@ final class TextProcessor<V>
      */
     static <V> TextProcessor<V> create(TextElement<V> element) {
 
-        return new TextProcessor<>(element);
+        return new TextProcessor<>(element, false);
+
+    }
+
+    /**
+     * <p>Konstruiert eine neue Instanz. </p>
+     *
+     * @param   element     element to be formatted
+     * @return  new processor instance whose element cannot be changed
+     */
+    static <V> TextProcessor<V> createProtected(TextElement<V> element) {
+
+        return new TextProcessor<>(element, true);
 
     }
 
@@ -91,7 +107,8 @@ final class TextProcessor<V>
                 this.element.print(formattable, buffer, step.getQuery(attributes));
 
                 if (positions != null) {
-                    positions.add(new ElementPosition(this.element, offset, cs.length()));
+                    positions.add(
+                        new ElementPosition(this.element, offset, cs.length()));
                 }
             } else {
                 this.element.print(formattable, buffer, step.getQuery(attributes));
@@ -156,7 +173,9 @@ final class TextProcessor<V>
             return true;
         } else if (obj instanceof TextProcessor) {
             TextProcessor<?> that = (TextProcessor) obj;
-            return this.element.equals(that.element);
+            return (
+                this.element.equals(that.element)
+                && (this.protectedMode == that.protectedMode));
         } else {
             return false;
         }
@@ -177,6 +196,8 @@ final class TextProcessor<V>
         sb.append(this.getClass().getName());
         sb.append("[element=");
         sb.append(this.element.name());
+        sb.append(",protected-mode=");
+        sb.append(this.protectedMode);
         sb.append(']');
         return sb.toString();
 
@@ -192,7 +213,7 @@ final class TextProcessor<V>
     @Override
     public FormatProcessor<V> withElement(ChronoElement<V> element) {
 
-        if (this.element == element) {
+        if (this.protectedMode || (this.element == element)) {
             return this;
         } else if (element instanceof TextElement) {
             return TextProcessor.create((TextElement<V>) element);

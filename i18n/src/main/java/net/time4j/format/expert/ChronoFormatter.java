@@ -228,9 +228,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ) {
                 // example: week-of-year dependent on LOCALE
                 for (ChronoExtension ext : this.chronology.getExtensions()) {
-                    if (ext.getElements(old.getLocale(), step.getQuery(old.globalAttributes)).contains(element)) {
+                    if (ext.getElements(old.getLocale(), old.globalAttributes).contains(element)) {
                         Set<ChronoElement<?>> elements =
-                            ext.getElements(globalAttributes.getLocale(), step.getQuery(globalAttributes));
+                            ext.getElements(globalAttributes.getLocale(), globalAttributes);
 
                         for (ChronoElement<?> e : elements) {
                             if (e.name().equals(element.name())) {
@@ -2837,7 +2837,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         //~ Statische Felder/Initialisierungen ----------------------------
 
         private static final AttributeKey<DayPeriod> CUSTOM_DAY_PERIOD =
-            Attributes.createKey("DAY_PERIOD", DayPeriod.class);
+            Attributes.createKey("CUSTOM_DAY_PERIOD", DayPeriod.class);
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -4231,6 +4231,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a text format for a fixed day period (am/pm/midnight/noon). </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not support day periods
          * @see     net.time4j.DayPeriod#fixed()
          * @since   3.13/4.10
          */
@@ -4238,19 +4239,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Definiert ein Textformat f&uuml;r einen festen Tagesabschnitt (am/pm/midnight/noon). </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not support day periods
          * @see     net.time4j.DayPeriod#fixed()
          * @since   3.13/4.10
          */
         public Builder<T> addDayPeriodFixed() {
 
-            ChronoElement<?> e = this.findDayPeriodElement(true, null);
-
-            if (e instanceof TextElement) {
-                TextElement<?> te = TextElement.class.cast(e);
-                return this.addText(te);
-            } else {
-                throw new AssertionError("Cannot find day period extension.");
-            }
+            TextElement<?> te = this.findDayPeriodElement(true, null);
+            return this.addText(te);
 
         }
 
@@ -4258,6 +4254,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a text format for a flexible day period (morning/afternoon etc). </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not support day periods
          * @see     net.time4j.DayPeriod#approximate()
          * @since   3.13/4.10
          */
@@ -4265,19 +4262,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Definiert ein Textformat f&uuml;r einen flexiblen Tagesabschnitt (morgens/nachmittags usw.). </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not support day periods
          * @see     net.time4j.DayPeriod#approximate()
          * @since   3.13/4.10
          */
         public Builder<T> addDayPeriodApproximate() {
 
-            ChronoElement<?> e = this.findDayPeriodElement(false, null);
-
-            if (e instanceof TextElement) {
-                TextElement<?> te = TextElement.class.cast(e);
-                return this.addText(te);
-            } else {
-                throw new AssertionError("Cannot find day period extension.");
-            }
+            TextElement<?> te = this.findDayPeriodElement(false, null);
+            return this.addText(te);
 
         }
 
@@ -4285,7 +4277,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a text format for a custom day period. </p>
          *
          * @return  this instance for method chaining
-         * @throws  IllegalStateException if already called once
+         * @throws  IllegalStateException if already called once or if the underlying chronology
+         *                                does not support day periods
          * @throws  IllegalArgumentException if given map is empty or contains empty values
          * @see     DayPeriod#of(Map)
          * @since   3.13/4.10
@@ -4294,28 +4287,23 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Definiert ein Textformat f&uuml;r einen benutzerdefinierten Tagesabschnitt. </p>
          *
          * @return  this instance for method chaining
-         * @throws  IllegalStateException if already called once
+         * @throws  IllegalStateException if already called once or if the underlying chronology
+         *                                does not support day periods
          * @throws  IllegalArgumentException if given map is empty or contains empty values
          * @see     DayPeriod#of(Map)
          * @since   3.13/4.10
          */
-        public Builder<T> addDayPeriodCustom(Map<PlainTime, String> timeToLabels) {
+        public Builder<T> addDayPeriod(Map<PlainTime, String> timeToLabels) {
 
             if (this.dayPeriod != null) {
                 throw new IllegalStateException("Cannot add custom day period more than once.");
             }
 
             DayPeriod dp = DayPeriod.of(timeToLabels);
-            ChronoElement<?> e = this.findDayPeriodElement(false, dp);
-
-            if (e instanceof TextElement) {
-                TextElement<?> te = TextElement.class.cast(e);
-                this.addText(te);
-                this.dayPeriod = dp;
-                return this.endSection();
-            } else {
-                throw new AssertionError("Cannot find day period extension.");
-            }
+            TextElement<?> te = this.findDayPeriodElement(false, dp);
+            this.dayPeriod = dp;
+            this.addProcessor(TextProcessor.createProtected(te));
+            return this;
 
         }
 
@@ -5298,7 +5286,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (this.dayPeriod != null) {
                 AttributeSet as = formatter.globalAttributes;
                 as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
-                formatter = new ChronoFormatter<T>(formatter, as);
+                formatter = new ChronoFormatter<>(formatter, as);
             }
 
             return formatter;
@@ -5483,7 +5471,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
-        private ChronoElement<?> findDayPeriodElement(
+        private TextElement<?> findDayPeriodElement(
             boolean fixed,
             DayPeriod dp
         ) {
@@ -5500,22 +5488,35 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     as = this.stack.getLast();
                 }
 
-                as = as.withInternal(CUSTOM_DAY_PERIOD, dp);
-                this.stack.addLast(as);
-                aq = as;
+                aq = as.withInternal(CUSTOM_DAY_PERIOD, dp);
             }
 
             for (ChronoExtension extension : PlainTime.axis().getExtensions()) {
                 for (ChronoElement<?> element : extension.getElements(this.locale, aq)) {
-                    if (fixed && (element.getSymbol() == 'b') && element.name().endsWith("_DAY_PERIOD")) {
-                        return element;
-                    } else if (!fixed && (element.getSymbol() == 'B') && element.name().endsWith("_DAY_PERIOD")) {
-                        return element;
+                    if (fixed && (element.getSymbol() == 'b') && this.isDayPeriodSupported(element)) {
+                        return cast(element);
+                    } else if (!fixed && (element.getSymbol() == 'B') && this.isDayPeriodSupported(element)) {
+                        return cast(element);
                     }
                 }
             }
 
-            return null;
+            throw new IllegalStateException("Day periods are not supported: " + this.getChronology().getChronoType());
+
+        }
+
+        private boolean isDayPeriodSupported(ChronoElement<?> element) {
+
+            if (!element.name().endsWith("_DAY_PERIOD")) {
+                return false;
+            }
+
+            if ((this.override == null) && (!this.chronology.isSupported(element))) {
+                Chronology<?> child = this.chronology.preparser();
+                return ((child != null) && child.isSupported(element));
+            }
+
+            return true;
 
         }
 
