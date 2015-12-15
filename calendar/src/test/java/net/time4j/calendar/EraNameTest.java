@@ -88,4 +88,18 @@ public class EraNameTest {
             is("Amete Mihret"));
     }
 
+    @Test
+    public void getDisplayNameWideMinguo() {
+        assertThat(
+            MinguoEra.ROC.getDisplayName(Locale.GERMAN, TextWidth.WIDE),
+            is("Minguo"));
+    }
+
+    @Test
+    public void getDisplayNameShortMinguo() {
+        assertThat(
+            MinguoEra.ROC.getDisplayName(Locale.GERMAN, TextWidth.SHORT),
+            is("Minguo"));
+    }
+
 }
