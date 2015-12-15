@@ -3,6 +3,7 @@ package net.time4j.format.expert;
 import net.time4j.DayPeriod;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.Leniency;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 import org.junit.Test;
@@ -354,19 +355,55 @@ public class DayPeriodTest {
         timeToLabels.put(PlainTime.of(23), "night");
         timeToLabels.put(PlainTime.of(7), "morning");
         timeToLabels.put(PlainTime.of(12), "afternoon");
-        timeToLabels.put(PlainTime.of(6, 30), "evening");
+        timeToLabels.put(PlainTime.of(18, 30), "evening");
 
         ChronoFormatter<PlainTime> f =
             ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
                 .addPattern("h:mm ", PatternType.CLDR)
-                .addDayPeriodCustom(timeToLabels)
-                .build();
+                .addDayPeriod(timeToLabels)
+                .build()
+                .with(Leniency.STRICT);
+        assertThat(
+            f.format(PlainTime.of(11, 59)),
+            is("11:59 morning"));
+        assertThat(
+            f.parse("11:59 morning"),
+            is(PlainTime.of(11, 59)));
         assertThat(
             f.format(PlainTime.of(12)),
             is("12:00 afternoon"));
         assertThat(
             f.parse("12:00 afternoon"),
             is(PlainTime.of(12)));
+        assertThat(
+            f.format(PlainTime.of(18, 29)),
+            is("6:29 afternoon"));
+        assertThat(
+            f.parse("6:29 afternoon"),
+            is(PlainTime.of(18, 29)));
+        assertThat(
+            f.format(PlainTime.of(18, 30)),
+            is("6:30 evening"));
+        assertThat(
+            f.parse("6:30 evening"),
+            is(PlainTime.of(18, 30)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseCustomWithInconsistency() throws ParseException {
+        Map<PlainTime, String> timeToLabels = new HashMap<PlainTime, String>();
+        timeToLabels.put(PlainTime.of(23), "night");
+        timeToLabels.put(PlainTime.of(7), "morning");
+        timeToLabels.put(PlainTime.of(12), "afternoon");
+        timeToLabels.put(PlainTime.of(6, 30), "evening");
+
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
+                .addPattern("h:mm ", PatternType.CLDR)
+                .addDayPeriod(timeToLabels)
+                .build()
+                .with(Leniency.STRICT);
+        f.parse("12:00 morning");
     }
 
 }

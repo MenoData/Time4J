@@ -27,13 +27,14 @@ import java.util.Set;
 
 /**
  * <p>Defines a configuration-dependent extension of the chronological
- * elements of a {@code Chronology}. </p>
+ * elements of a {@code Chronology} used in formatting and parsing. </p>
  *
  * @author  Meno Hochschild
  */
 /*[deutsch]
  * <p>Definiert eine konfigurationsabh&auml;ngige Erweiterung der
- * chronologischen Elemente einer Chronologie. </p>
+ * chronologischen Elemente einer Chronologie und wird beim Formatieren
+ * und Parsen verwendet. </p>
  *
  * @author  Meno Hochschild
  */
@@ -66,7 +67,7 @@ public interface ChronoExtension {
      * for the given configuration. </p>
      *
      * @param   locale          language and country setting
-     * @param   attributes      configuration attributes
+     * @param   attributes      global configuration attributes of formatter
      * @return  extended element model
      */
     /*[deutsch]
@@ -77,7 +78,7 @@ public interface ChronoExtension {
      * relevant ist. </p>
      *
      * @param   locale          language and country setting
-     * @param   attributes      configuration attributes
+     * @param   attributes      global configuration attributes of formatter
      * @return  extended element model
      */
     Set<ChronoElement<?>> getElements(
@@ -101,7 +102,7 @@ public interface ChronoExtension {
      *                  {@code null} to be set as indication for removing
      *                  associated element)
      * @param   locale          language and country setting
-     * @param   attributes      configuration attributes
+     * @param   attributes      global configuration attributes of parser
      * @return  eventually changed entity
      * @throws  IllegalArgumentException if resolving fails due to inconsistencies
      * @since   3.0
@@ -124,7 +125,7 @@ public interface ChronoExtension {
      *                  {@code null} to be set as indication for removing
      *                  associated element)
      * @param   locale          language and country setting
-     * @param   attributes      configuration attributes
+     * @param   attributes      global configuration attributes of parser
      * @return  eventually changed entity
      * @throws  IllegalArgumentException if resolving fails due to inconsistencies
      * @since   3.0

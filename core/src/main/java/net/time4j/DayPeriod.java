@@ -82,7 +82,7 @@ public final class DayPeriod {
     }
 
     private static DayPeriod FALLBACK = new DayPeriod(Locale.ROOT, CalendarText.ISO_CALENDAR_TYPE, STD_RULES);
-    private static final AttributeKey<DayPeriod> CUSTOM = Attributes.createKey("DAY_PERIOD", DayPeriod.class);
+    private static final AttributeKey<DayPeriod> CUSTOM = Attributes.createKey("CUSTOM_DAY_PERIOD", DayPeriod.class);
 
     //~ Instanzvariablen --------------------------------------------------
 
