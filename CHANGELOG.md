@@ -1,5 +1,6 @@
 ## [v4.10] not yet released
 ### Added
+- Fixed and flexible day periods with appropriate translations [#369]
 - New method CalendarText.getIsoInstance(Locale) [#410]
 - New methods CalendarText.patternForXYZ(...) [#410]
 
