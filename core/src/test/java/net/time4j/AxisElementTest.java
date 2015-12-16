@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -72,6 +75,13 @@ public class AxisElementTest {
             is(Moment.UNIX_EPOCH));
     }
 
+    @Test
+    public void getRegisteredElements() {
+        assertThat(
+            DATA.getRegisteredElements().contains(PlainDate.axis().element()),
+            is(true));
+    }
+
     private static class RawEntity
         extends ChronoEntity<RawEntity> {
 
@@ -116,6 +126,15 @@ public class AxisElementTest {
         @Override
         public <V> V getMaximum(ChronoElement<V> element) {
             throw new UnsupportedOperationException();
+        }
+        @Override
+        public Set<ChronoElement<?>> getRegisteredElements() {
+            Set<ChronoElement<?>> elements = new HashSet<ChronoElement<?>>();
+            elements.add(PlainDate.axis().element());
+            elements.add(PlainTime.axis().element());
+            elements.add(PlainTimestamp.axis().element());
+            elements.add(Moment.axis().element());
+            return Collections.unmodifiableSet(elements);
         }
         @Override
         protected Chronology<RawEntity> getChronology() {

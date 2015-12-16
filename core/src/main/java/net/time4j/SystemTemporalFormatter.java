@@ -48,6 +48,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 
@@ -71,7 +72,7 @@ final class SystemTemporalFormatter<T>
     private static final Map<Class<?>, Chronology<?>> SUPPORTED_TYPES;
 
     static {
-        Map<Class<?>, Chronology<?>> tmp = new HashMap<Class<?>, Chronology<?>>();
+        Map<Class<?>, Chronology<?>> tmp = new HashMap<>();
         tmp.put(PlainDate.class, PlainDate.axis());
         tmp.put(PlainTime.class, PlainTime.axis());
         tmp.put(PlainTimestamp.class, PlainTimestamp.axis());
@@ -168,7 +169,7 @@ final class SystemTemporalFormatter<T>
                 realPattern = RFC_1123_WIDE;
             }
             SystemTemporalFormatter<ZonalDateTime> stf =
-                new SystemTemporalFormatter<ZonalDateTime>(
+                new SystemTemporalFormatter<>(
                     ZonalDateTime.class, realPattern, this.locale, this.leniency, this.tzid);
             text = stf.format(moment.inZonalView(this.tzid));
         } else if (this.type.equals(ZonalDateTime.class)) {
@@ -263,7 +264,7 @@ final class SystemTemporalFormatter<T>
     @Override
     public TemporalFormatter<T> withTimezone(String tzid) {
 
-        return new SystemTemporalFormatter<T>(
+        return new SystemTemporalFormatter<>(
             this.type,
             this.pattern,
             this.locale,
@@ -276,7 +277,7 @@ final class SystemTemporalFormatter<T>
     @Override
     public TemporalFormatter<T> with(Locale locale) {
 
-        return new SystemTemporalFormatter<T>(
+        return new SystemTemporalFormatter<>(
             this.type,
             this.pattern,
             locale,
@@ -289,7 +290,7 @@ final class SystemTemporalFormatter<T>
     @Override
     public TemporalFormatter<T> with(Leniency leniency) {
 
-        return new SystemTemporalFormatter<T>(
+        return new SystemTemporalFormatter<>(
             this.type,
             this.pattern,
             this.locale,
@@ -412,7 +413,7 @@ final class SystemTemporalFormatter<T>
                 }
             }
             SystemTemporalFormatter<ZonalDateTime> stf =
-                new SystemTemporalFormatter<ZonalDateTime>(
+                new SystemTemporalFormatter<>(
                     ZonalDateTime.class, realPattern, this.locale, this.leniency, this.tzid);
             ZonalDateTime zdt = stf.parseInternal(text, position, wantsException, rawValues);
             result = ((zdt == null) ? null : zdt.toMoment());
@@ -490,7 +491,7 @@ final class SystemTemporalFormatter<T>
         Parsed(XCalendar cal) {
             super();
 
-            Map<ChronoElement<?>, Object> map = new HashMap<ChronoElement<?>, Object>();
+            Map<ChronoElement<?>, Object> map = new HashMap<>();
             if (cal.isSet(Calendar.YEAR)) {
                 map.put(PlainDate.YEAR, cal.getRawValue(Calendar.YEAR));
             }
@@ -601,6 +602,13 @@ final class SystemTemporalFormatter<T>
             }
 
             return this.tzid;
+
+        }
+
+        @Override
+        public Set<ChronoElement<?>> getRegisteredElements() {
+
+            return this.values.keySet();
 
         }
 
