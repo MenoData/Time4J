@@ -21,6 +21,7 @@
 
 package net.time4j.calendar;
 
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 
 import java.io.Externalizable;
@@ -57,6 +58,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int ETHIOPIAN_TIME = 5;
+
+    /** Serialisierungstyp. */
+    static final int MINGUO = 6;
 
     private static final long serialVersionUID = 1L;
 
@@ -139,6 +143,9 @@ final class SPX
             case ETHIOPIAN_TIME:
                 this.writeEthiopianTime(out);
                 break;
+            case MINGUO:
+                this.writeMinguo(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -180,6 +187,9 @@ final class SPX
                 break;
             case ETHIOPIAN_TIME:
                 this.obj = this.readEthiopianTime(in);
+                break;
+            case MINGUO:
+                this.obj = this.readMinguo(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -307,6 +317,22 @@ final class SPX
         int hour24 = minutes / 60;
         PlainTime time = PlainTime.of(hour24, minute, second);
         return EthiopianTime.from(time);
+
+    }
+
+    private void writeMinguo(ObjectOutput out)
+        throws IOException {
+
+        MinguoCalendar mc = (MinguoCalendar) this.obj;
+        out.writeObject(mc.toISO());
+
+    }
+
+    private MinguoCalendar readMinguo(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        PlainDate iso = PlainDate.class.cast(in.readObject());
+        return iso.transform(MinguoCalendar.class);
 
     }
 

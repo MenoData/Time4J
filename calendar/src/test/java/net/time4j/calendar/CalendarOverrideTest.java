@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.StartOfDay;
@@ -137,6 +138,31 @@ public class CalendarOverrideTest {
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1997, EthiopianMonth.TEKEMT, 11),
             is(PlainDate.of(2004, 10, 21).transform(EthiopianCalendar.class)));
+    }
+
+    @Test
+    public void printMinguo() {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUpWithOverride(Locale.ENGLISH, MinguoCalendar.axis())
+                .addPattern("G-y-MM-dd HH:mmXXX", PatternType.CLDR)
+                .build()
+                .withTimezone(offset);
+        Moment m = PlainTimestamp.of(2015, 2, 19, 21, 45).at(offset);
+        GeneralTimestamp<MinguoCalendar> tsp =
+            m.toGeneralTimestamp(MinguoCalendar.axis(), offset, StartOfDay.MIDNIGHT);
+        MinguoCalendar date = tsp.toDate();
+
+        assertThat(date.getDayOfMonth(), is(19));
+        assertThat(date.getMonth(), is(Month.FEBRUARY));
+        assertThat(date.getYear(), is(104));
+        assertThat(
+            PlainDate.of(2015, 2, 19).transform(MinguoCalendar.class),
+            is(MinguoCalendar.of(MinguoEra.ROC, 104, 2, 19)));
+
+        assertThat(
+            f.format(m),
+            is("Minguo-104-02-19 21:45+03:00"));
     }
 
 }
