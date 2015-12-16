@@ -1083,6 +1083,58 @@ public final class PlainDate
     }
 
     /**
+     * <p>Determines the day of week. </p>
+     *
+     * @return Weekday
+     * @since 3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Ermittelt den Wochentag. </p>
+     *
+     * @return  Weekday
+     * @since   3.13/4.10
+     */
+    public Weekday getDayOfWeek() {
+
+        return Weekday.valueOf(
+            GregorianMath.getDayOfWeek(
+                this.year,
+                this.month,
+                this.dayOfMonth
+            )
+        );
+
+    }
+
+    /**
+     * <p>Yields the day of year. </p>
+     *
+     * @return int
+     * @since 3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert den Tag des Jahres. </p>
+     *
+     * @return  int
+     * @since   3.13/4.10
+     */
+    public int getDayOfYear() {
+
+        switch (this.month) {
+            case 1:
+                return this.dayOfMonth;
+            case 2:
+                return 31 + this.dayOfMonth;
+            default:
+                return (
+                    DAY_OF_YEAR_PER_MONTH[this.month - 2]
+                    + this.dayOfMonth
+                    + (GregorianMath.isLeapYear(this.year) ? 1 : 0));
+        }
+
+    }
+
+    /**
      * <p>Calculates the length of associated month in days. </p>
      *
      * @return  int in value range {@code 28-31}
@@ -1557,44 +1609,6 @@ public final class PlainDate
     long getEpochMonths() {
 
         return ((this.year - 1970) * 12L + this.month - 1);
-
-    }
-
-    /**
-     * <p>Ermittelt den Tag des Jahres. </p>
-     *
-     * @return  int
-     */
-    int getDayOfYear() {
-
-        switch (this.month) {
-            case 1:
-                return this.dayOfMonth;
-            case 2:
-                return 31 + this.dayOfMonth;
-            default:
-                return (
-                    DAY_OF_YEAR_PER_MONTH[this.month - 2]
-                    + this.dayOfMonth
-                    + (GregorianMath.isLeapYear(this.year) ? 1 : 0));
-        }
-
-    }
-
-    /**
-     * <p>Bestimmt den Wochentag. </p>
-     *
-     * @return  day of week as enum
-     */
-    Weekday getDayOfWeek() {
-
-        return Weekday.valueOf(
-            GregorianMath.getDayOfWeek(
-                this.year,
-                this.month,
-                this.dayOfMonth
-            )
-        );
 
     }
 
@@ -2733,18 +2747,18 @@ public final class PlainDate
         @Override
         public ChronoElement<?> getChildAtFloor(PlainDate context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(PlainDate context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
-        private ChronoElement<?> getChild(PlainDate context) {
+        private ChronoElement<?> getChild() {
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
@@ -2893,18 +2907,18 @@ public final class PlainDate
         @Override
         public ChronoElement<?> getChildAtFloor(PlainDate context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(PlainDate context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
-        private ChronoElement<?> getChild(PlainDate context) {
+        private ChronoElement<?> getChild() {
 
             switch (this.index) {
                 case EnumElement.MONTH:
