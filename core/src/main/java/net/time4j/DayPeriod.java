@@ -58,12 +58,37 @@ import java.util.TreeMap;
  * <p>Represents a period or part of a day usually in minute precision
  * as formattable extension to {@code PlainTime}. </p>
  *
+ * <p>The i18n-module is necessary to exploit the full functionality otherwise this class will just
+ * fall back to AM/PM only. Most non-English speaking countries completely ignore the notation of AM/PM
+ * but know day periods with finer granularity such as &quot;in the morning&quot;, &quot;evening&quot; etc.
+ * Users can get extensive format support for day periods via the CLDR-pattern symbols b or B. The combination
+ * of half-day-hours with a day period is especially useful. Example of usage: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;PlainTime&gt; f =
+ *       ChronoFormatter.ofTimePattern(&quot;h:mm BBBB&quot;, PatternType.CLDR, Locale.ENGLISH);
+ *     System.out.println(f.format(PlainTime.of(17, 15))); // output =&gt; 5:15 in the afternoon
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.13/4.10
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen &uuml;blicherweise minutengenauen Tagesabschnitt
  * als formatierbare Erweiterung zu {@code PlainTime}. </p>
+ *
+ * <p>Das i18n-Modul ist notwendig, um die volle Funktionalit&auml;t auszusch&ouml;pfen, sonst wird
+ * diese Klasse nur auf AM/PM zur&uuml;ckfallen. Die meisten nicht Englisch sprechenden L&auml;nder
+ * ignorieren vollst&auml;ndig die AM/PM-Schreibweise, kennen aber Tagesabschnitte mit feinerer
+ * Detaillierung wie zum Beispiel &quot;morgens&quot;, &quot;Abend&quot; usw. Anwender k&ouml;nnen
+ * Formatunterst&uuml;tzung mit Hilfe der CLDR-Formatmustersymbole b oder B erhalten. Die Kombination
+ * von Halbtagsstunden mit Tagesabschnitten ist besonders n&uuml;tzlich. Anwendungsbeispiel: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;PlainTime&gt; f =
+ *       ChronoFormatter.ofTimePattern(&quot;h:mm BBBB&quot;, PatternType.CLDR, Locale.ENGLISH);
+ *     System.out.println(f.format(PlainTime.of(17, 15))); // output =&gt; 5:15 in the afternoon
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
