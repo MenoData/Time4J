@@ -135,7 +135,7 @@ public enum Month
      *
      * @return  number of month in the range [1-12]
      */
-    /**
+    /*[deutsch]
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert. </p>
      *
      * @return  number of month in the range [1-12]
