@@ -223,7 +223,7 @@ public final class MinguoCalendar
         ENGINE = builder.build();
     }
 
-    //private static final long serialVersionUID = -1632000525062084751L;
+    private static final long serialVersionUID = -6628190121085147706L;
 
     //~ Instanzvariablen --------------------------------------------------
 
