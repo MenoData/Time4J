@@ -1025,16 +1025,6 @@ public final class CopticCalendar
             boolean lenient
         ) {
 
-            if (
-                lenient && (
-                    (this.index == DAY_OF_MONTH_INDEX)
-                    || (this.index == DAY_OF_YEAR_INDEX)
-                )
-            ) {
-                long delta = MathUtils.safeSubtract(value.longValue(), this.getValue(context).longValue());
-                return context.plus(CalendarDays.of(delta));
-            }
-
             if (!this.isValid(context, value)) {
                 throw new IllegalArgumentException("Out of range: " + value);
             }
