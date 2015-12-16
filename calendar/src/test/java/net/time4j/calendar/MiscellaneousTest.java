@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.engine.CalendarDays;
@@ -188,6 +189,26 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void minguoCalendarProperties() {
+        MinguoCalendar date = MinguoCalendar.of(MinguoEra.ROC, 89, Month.FEBRUARY, 14);
+        assertThat(
+            date.getDayOfMonth(),
+            is(14));
+        assertThat(
+            date.getMonth(),
+            is(Month.FEBRUARY));
+        assertThat(
+            date.lengthOfMonth(),
+            is(29));
+        assertThat(
+            date.lengthOfYear(),
+            is(366));
+        assertThat(
+            date.atTime(12, 0).toDate(),
+            is(date));
+    }
+
+    @Test
     public void serializeHijri() throws IOException, ClassNotFoundException {
         roundtrip(HijriCalendar.ofUmalqura(1437, 3, 17));
     }
@@ -195,6 +216,11 @@ public class MiscellaneousTest {
     @Test
     public void serializePersian() throws IOException, ClassNotFoundException {
         roundtrip(PersianCalendar.of(1425, 1, 7));
+    }
+
+    @Test
+    public void serializeMinguo() throws IOException, ClassNotFoundException {
+        roundtrip(MinguoCalendar.of(MinguoEra.ROC, 105, 1, 7));
     }
 
     @Test
