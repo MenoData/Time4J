@@ -1146,18 +1146,6 @@ public final class HijriCalendar
             boolean lenient
         ) {
 
-            MonthBasedCalendarSystem<HijriCalendar> calsys = context.getCalendarSystem();
-
-            if (
-                lenient && (
-                    (this.index == DAY_OF_MONTH_INDEX)
-                    || (this.index == DAY_OF_YEAR_INDEX)
-                )
-            ) {
-                long delta = MathUtils.safeSubtract(value.longValue(), this.getValue(context).longValue());
-                return context.plus(CalendarDays.of(delta));
-            }
-
             if (!this.isValid(context, value)) {
                 throw new IllegalArgumentException("Out of range: " + value);
             }
@@ -1165,7 +1153,7 @@ public final class HijriCalendar
             switch (this.index) {
                 case YEAR_INDEX:
                     int y = value.intValue();
-                    int dmax = calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, y, context.hmonth);
+                    int dmax = context.getCalendarSystem().getLengthOfMonth(HijriEra.ANNO_HEGIRAE, y, context.hmonth);
                     int d = Math.min(context.hdom, dmax);
                     return HijriCalendar.of(context.getVariant(), y, context.hmonth, d);
                 case DAY_OF_MONTH_INDEX:
