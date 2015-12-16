@@ -48,6 +48,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 
@@ -606,6 +607,13 @@ final class SystemTemporalFormatter<T>
         void setTimezone(TZID tzid) {
 
             this.tzid = tzid;
+
+        }
+
+        @Override
+        public Set<ChronoElement<?>> getRegisteredElements() {
+
+            return this.values.keySet();
 
         }
 

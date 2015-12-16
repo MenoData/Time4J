@@ -23,6 +23,8 @@ package net.time4j.engine;
 
 import net.time4j.tz.TZID;
 
+import java.util.Set;
+
 
 /**
  * <p>Represents a temporal object which associates partial temporal values
@@ -496,6 +498,29 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     public TZID getTimezone() {
 
         throw new ChronoException("Timezone not available: " + this);
+
+    }
+
+    /**
+     * <p>Yields all registered elements of this instance. </p>
+     *
+     * <p>Note that some (external) elements can be supported but not registered. </p>
+     *
+     * @return  unmodifiable set of internally registered elements
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert alle registrierten Elemente dieser Instanz. </p>
+     *
+     * <p>Hinweis: Einige (externe) Elemente k&ouml;nnen unterst&uuml;tzt werden, sind aber nicht
+     * registriert. </p>
+     *
+     * @return  unmodifiable set of internally registered elements
+     * @since   3.13/4.10
+     */
+    public Set<ChronoElement<?>> getRegisteredElements() {
+
+        return this.getChronology().getRegisteredElements();
 
     }
 

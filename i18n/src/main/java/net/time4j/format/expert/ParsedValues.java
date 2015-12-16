@@ -29,6 +29,7 @@ import net.time4j.tz.TZID;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -194,6 +195,13 @@ class ParsedValues
 
         sb.append('}');
         return sb.toString();
+
+    }
+
+    @Override
+    public Set<ChronoElement<?>> getRegisteredElements() {
+
+        return this.map.keySet();
 
     }
 
