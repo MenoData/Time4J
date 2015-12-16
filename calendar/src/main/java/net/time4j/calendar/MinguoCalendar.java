@@ -79,8 +79,23 @@ import java.util.Set;
  *
  * <p>See also: <a href="https://en.wikipedia.org/wiki/Minguo_calendar">Wikipedia</a>. </p>
  *
+ * <p>Following elements which are declared as constants are registered by
+ * this class: </p>
+ *
+ * <ul>
+ *  <li>{@link #DAY_OF_WEEK}</li>
+ *  <li>{@link #DAY_OF_MONTH}</li>
+ *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #ERA}</li>
+ * </ul>
+ *
+ * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.13/4.10
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Der Minguo-Kalender wird in Taiwan (Republik von China) verwendet und hat als einzige Differenz
@@ -89,8 +104,22 @@ import java.util.Set;
  *
  * <p>Siehe auch: <a href="https://en.wikipedia.org/wiki/Minguo_calendar">Wikipedia</a>. </p>
  *
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ *
+ * <ul>
+ *  <li>{@link #DAY_OF_WEEK}</li>
+ *  <li>{@link #DAY_OF_MONTH}</li>
+ *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #ERA}</li>
+ * </ul>
+ *
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.13/4.10
+ * @doctags.concurrency {immutable}
  */
 @CalendarType("roc")
 public final class MinguoCalendar
