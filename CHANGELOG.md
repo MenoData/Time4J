@@ -12,6 +12,7 @@
 - Parsing of Ethiopic tabot names broken if not at end of text [#412]
 
 ### Deprecated
+- EthiopianCalendar.getYearOfEra() deprecated and renamed to getYear() [#417]
 - CalendarText.getGMTPrefix [#410]
 - CalendarText.getFormatPatterns() [#410]
 - CalendarText.getTimestampPattern [#410]
