@@ -26,7 +26,6 @@ import net.time4j.PlainTime;
 import net.time4j.TemporalType;
 import net.time4j.Weekday;
 import net.time4j.tz.NameStyle;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -213,8 +212,7 @@ public class JdkZoneProviderSPI
         Locale locale
     ) {
 
-        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid);
-        return tz.getDisplayName(style, locale);
+        return NAME_PROVIDER.getDisplayName(tzid, style, locale);
 
     }
 
