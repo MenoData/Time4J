@@ -129,7 +129,7 @@ public class AxisElementTest {
         }
         @Override
         public Set<ChronoElement<?>> getRegisteredElements() {
-            Set<ChronoElement<?>> elements = new HashSet<ChronoElement<?>>();
+            Set<ChronoElement<?>> elements = new HashSet<>();
             elements.add(PlainDate.axis().element());
             elements.add(PlainTime.axis().element());
             elements.add(PlainTimestamp.axis().element());

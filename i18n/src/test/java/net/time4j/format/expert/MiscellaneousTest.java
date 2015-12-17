@@ -7,6 +7,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
+import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
@@ -33,6 +34,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -690,6 +693,27 @@ public class MiscellaneousTest {
         Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2012-02-29", plog);
         Object obj = plog.getRawValues();
         roundtrip(obj);
+    }
+
+    @Test
+    public void iteratorOverParsedValues()
+        throws IOException, ClassNotFoundException {
+
+        ParseLog plog = new ParseLog();
+        ChronoFormatter<PlainTime> formatter = ChronoFormatter.ofTimePattern("h:mm B", PatternType.CLDR, Locale.US);
+        PlainTime time = formatter.parse("9:45 in the evening", plog);
+        assertThat(time, is(PlainTime.of(21, 45)));
+        Set<ChronoElement<?>> elements = plog.getRawValues().getRegisteredElements();
+        assertThat(elements.size(), is(4));
+        for (ChronoElement<?> element : elements) {
+            String n = element.name();
+            assertThat(
+                n.equals("CLOCK_HOUR_OF_AMPM")
+                    || n.equals("MINUTE_OF_HOUR")
+                    || n.equals("APPROXIMATE_DAY_PERIOD")
+                    || n.equals("AM_PM_OF_DAY"),
+                is(true));
+        }
     }
 
     @Test

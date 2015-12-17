@@ -7,6 +7,10 @@ import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -101,6 +105,13 @@ public class DecimalElementTest {
         @Override
         public <V> V getMaximum(ChronoElement<V> element) {
             throw new UnsupportedOperationException();
+        }
+        @Override
+        public Set<ChronoElement<?>> getRegisteredElements() {
+            Set<ChronoElement<?>> elements = new HashSet<>();
+            elements.add(PlainTime.DIGITAL_HOUR_OF_DAY);
+            elements.add(PlainTime.DECIMAL_MINUTE);
+            return Collections.unmodifiableSet(elements);
         }
         @Override
         protected Chronology<RawEntity> getChronology() {
