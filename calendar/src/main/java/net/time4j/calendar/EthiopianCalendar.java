@@ -521,14 +521,35 @@ public final class EthiopianCalendar
      *
      * @return  int
      * @since   3.11/4.8
+     * @deprecated  Use {@link #getYear()} instead
      */
     /*[deutsch]
      * <p>Liefert das &auml;thiopische Jahr. </p>
      *
      * @return  int
      * @since   3.11/4.8
+     * @deprecated  Use {@link #getYear()} instead
      */
+    @Deprecated
     public int getYearOfEra() {
+
+        return this.getYear();
+
+    }
+
+    /**
+     * <p>Yields the Ethiopian year. </p>
+     *
+     * @return  int
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das &auml;thiopische Jahr. </p>
+     *
+     * @return  int
+     * @since   3.13/4.10
+     */
+    public int getYear() {
 
         return ((this.mihret < 1) ? this.mihret + DELTA_ALEM_MIHRET : this.mihret);
 
@@ -625,7 +646,7 @@ public final class EthiopianCalendar
      */
     public int lengthOfMonth() {
 
-        return CALSYS.getLengthOfMonth(this.getEra(), this.getYearOfEra(), this.emonth);
+        return CALSYS.getLengthOfMonth(this.getEra(), this.getYear(), this.emonth);
 
     }
 
@@ -661,7 +682,7 @@ public final class EthiopianCalendar
      */
     public boolean isLeapYear() {
 
-        return ((this.getYearOfEra() % 4) == 3);
+        return ((this.getYear() % 4) == 3);
 
     }
 
@@ -720,7 +741,7 @@ public final class EthiopianCalendar
         StringBuilder sb = new StringBuilder(32);
         sb.append(this.getEra());
         sb.append('-');
-        String y = String.valueOf(this.getYearOfEra());
+        String y = String.valueOf(this.getYear());
         for (int i = y.length(); i < 4; i++) {
             sb.append('0');
         }
@@ -1052,13 +1073,13 @@ public final class EthiopianCalendar
 
             switch (this.index) {
                 case YEAR_INDEX:
-                    return context.getYearOfEra();
+                    return context.getYear();
                 case DAY_OF_MONTH_INDEX:
                     return context.edom;
                 case DAY_OF_YEAR_INDEX:
                     int doy = 0;
                     for (int m = 1; m < context.emonth; m++) {
-                        doy += CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), m);
+                        doy += CALSYS.getLengthOfMonth(context.getEra(), context.getYear(), m);
                     }
                     return doy + context.edom;
                 default:
@@ -1088,9 +1109,9 @@ public final class EthiopianCalendar
                 case YEAR_INDEX:
                     return ((context.getEra() == EthiopianEra.AMETE_ALEM) ? 15499 : 9999);
                 case DAY_OF_MONTH_INDEX:
-                    return CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), context.emonth);
+                    return CALSYS.getLengthOfMonth(context.getEra(), context.getYear(), context.emonth);
                 case DAY_OF_YEAR_INDEX:
-                    return CALSYS.getLengthOfYear(context.getEra(), context.getYearOfEra());
+                    return CALSYS.getLengthOfYear(context.getEra(), context.getYear());
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1210,7 +1231,7 @@ public final class EthiopianCalendar
         ) {
 
             int m = value.getValue();
-            int dmax = CALSYS.getLengthOfMonth(context.getEra(), context.getYearOfEra(), m);
+            int dmax = CALSYS.getLengthOfMonth(context.getEra(), context.getYear(), m);
             int d = Math.min(context.edom, dmax);
             return new EthiopianCalendar(context.mihret, m, d);
 
@@ -1307,7 +1328,7 @@ public final class EthiopianCalendar
         @Override
         public Evangelist getValue(EthiopianCalendar context) {
 
-            return Evangelist.values()[(context.getYearOfEra() + 3) % 4];
+            return Evangelist.values()[(context.getYear() + 3) % 4];
 
         }
 
