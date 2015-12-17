@@ -141,8 +141,7 @@ public class TraditionalZoneProviderSPI
         Locale locale
     ) {
 
-        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid);
-        return tz.getDisplayName(style, locale);
+        return NAME_PROVIDER.getDisplayName(tzid, style, locale);
 
     }
 
