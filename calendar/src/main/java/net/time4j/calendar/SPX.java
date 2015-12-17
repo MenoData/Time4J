@@ -278,7 +278,7 @@ final class SPX
 
         EthiopianCalendar ethio = (EthiopianCalendar) this.obj;
         out.writeByte(ethio.getEra().ordinal());
-        out.writeInt(ethio.getYearOfEra());
+        out.writeInt(ethio.getYear());
         out.writeByte(ethio.getMonth().getValue());
         out.writeByte(ethio.getDayOfMonth());
 
