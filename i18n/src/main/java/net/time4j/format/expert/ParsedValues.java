@@ -28,6 +28,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.tz.TZID;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -201,7 +202,7 @@ class ParsedValues
     @Override
     public Set<ChronoElement<?>> getRegisteredElements() {
 
-        return this.map.keySet();
+        return Collections.unmodifiableSet(this.map.keySet());
 
     }
 

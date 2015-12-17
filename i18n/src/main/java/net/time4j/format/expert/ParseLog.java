@@ -201,13 +201,13 @@ public class ParseLog {
     /**
      * <p>Yields the parsed raw data as chronological entity. </p>
      *
-     * @return  parsed values as mutable serializable map-like entity
+     * @return  parsed values as mutable serializable map-like entity without chronology
      * @since   3.0
      */
     /*[deutsch]
      * <p>Liefert die interpretierten Rohdaten. </p>
      *
-     * @return  parsed values as mutable serializable map-like entity
+     * @return  parsed values as mutable serializable map-like entity without chronology
      * @since   3.0
      */
     public ChronoEntity<?> getRawValues() {

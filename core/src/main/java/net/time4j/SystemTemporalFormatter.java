@@ -613,7 +613,7 @@ final class SystemTemporalFormatter<T>
         @Override
         public Set<ChronoElement<?>> getRegisteredElements() {
 
-            return this.values.keySet();
+            return Collections.unmodifiableSet(this.values.keySet());
 
         }
 
