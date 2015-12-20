@@ -8,6 +8,7 @@
 - New methods CalendarText.patternForXYZ(...) [#410]
 
 ### Fixed
+- Bidi literals (LRM, RLM, ALM) should be ignored in parsing [#418]
 - Formatting Ethiopian time with AM/PM-marker is not in western style [#413]
 - Parsing of Ethiopic tabot names broken if not at end of text [#412]
 
