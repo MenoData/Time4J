@@ -67,7 +67,7 @@ final class LiteralProcessor
         this.single = literal.charAt(0);
         this.alt = this.single;
         this.attribute = null;
-        this.multi = ((literal.length() == 1) ? null : literal);
+        this.multi = literal;
 
         if (this.single < ' ') {
             throw new IllegalArgumentException(
@@ -250,50 +250,26 @@ final class LiteralProcessor
     ) {
 
         int offset = status.getPosition();
-        boolean error = false;
         int len = this.multi.length();
-        String compare = "";
 
-        if (offset >= text.length()) {
-            error = true;
-        } else if (offset + len > text.length()) {
-            error = true;
-            compare = text.subSequence(offset, text.length()).toString();
-        }
+        boolean caseInsensitive =
+            step.getAttribute(
+                Attributes.PARSE_CASE_INSENSITIVE,
+                attributes,
+                Boolean.TRUE
+            ).booleanValue();
 
-        if (!error) {
-            boolean caseInsensitive =
-                step.getAttribute(
-                    Attributes.PARSE_CASE_INSENSITIVE,
-                    attributes,
-                    Boolean.TRUE
-                ).booleanValue();
+        int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive);
 
-            if (caseInsensitive) {
-                if (!subSequenceEqualsIgnoreCase(text, offset, this.multi, 0, len)) {
-                    error = true;
-                    compare = text.subSequence(offset, offset + len).toString();
-                }
-            } else {
-                for (int i = 0; i < len; i++) {
-                    if (this.multi.charAt(i) != text.charAt(i + offset)) {
-                        error = true;
-                        compare = text.subSequence(offset, offset + len).toString();
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (error) {
+        if (parsedLen == -1) {
             StringBuilder msg = new StringBuilder("Expected: [");
             msg.append(this.multi);
             msg.append("], found: [");
-            msg.append(compare);
+            msg.append(text.subSequence(offset, Math.min(offset + len, text.length())));
             msg.append(']');
             status.setError(offset, msg.toString());
         } else {
-            status.setPosition(offset + len);
+            status.setPosition(offset + parsedLen);
         }
 
     }
@@ -380,6 +356,52 @@ final class LiteralProcessor
 
     }
 
+    private static int subSequenceEquals(
+        CharSequence test,
+        int offset,
+        CharSequence expected,
+        boolean caseInsensitive
+    ) {
+
+        int j = 0;
+        int max = test.length();
+        int len = expected.length();
+
+        for (int i = 0; i < len; i++) {
+            char c = '\u0000';
+            char exp = expected.charAt(i);
+
+            if (isBidi(exp)) {
+                continue;
+            }
+
+            while ((j + offset < max) && isBidi(c = test.charAt(j + offset))) {
+                j++;
+            }
+
+            if (j + offset >= max) {
+                return -1;
+            } else {
+                j++;
+            }
+
+            if (caseInsensitive) {
+                if (!charEqualsIgnoreCase(c, exp)) {
+                    return -1;
+                }
+            } else if (c != exp) {
+                return -1;
+            }
+        }
+
+        while ((j + offset < max) && isBidi(test.charAt(j + offset))) {
+            j++;
+        }
+
+        return j;
+
+    }
+
     private static boolean charEqualsIgnoreCase(
         char c1,
         char c2
@@ -393,33 +415,9 @@ final class LiteralProcessor
 
     }
 
-    private static boolean subSequenceEqualsIgnoreCase(
-        CharSequence sequence1,
-        int offset1,
-        CharSequence sequence2,
-        int offset2,
-        int len
-    ) {
+    private static boolean isBidi(char c) {
 
-        int l1 = sequence1.length();
-        int l2 = sequence2.length();
-
-        for (int i = 0; i < len; i++) {
-            if (i + offset1 >= l1) {
-                return (i + offset2 >= l2);
-            } else if (i + offset2 >= l2) {
-                return false;
-            }
-
-            char c1 = sequence1.charAt(i + offset1);
-            char c2 = sequence2.charAt(i + offset2);
-
-            if (!charEqualsIgnoreCase(c1, c2)) {
-                return false;
-            }
-        }
-
-        return true;
+        return ((c == '\u200E') || (c == '\u200F') || (c == '\u061C')); // LRM, RLM, ALM
 
     }
 

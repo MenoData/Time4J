@@ -3953,6 +3953,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Map<ChronoElement<?>, ChronoElement<?>> replacement = Collections.emptyMap();
             int n = formatPattern.length();
             Locale loc = this.locale;
+            StringBuilder literal = new StringBuilder();
 
             if (!this.stack.isEmpty()) {
                 loc = this.stack.getLast().getLocale();
@@ -3962,6 +3963,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 char c = formatPattern.charAt(i);
 
                 if (isSymbol(c)) {
+                    this.addLiteralChars(literal);
                     int start = i++;
 
                     while ((i < n) && formatPattern.charAt(i) == c) {
@@ -3982,6 +3984,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                     i--; // Schleifenzähler nicht doppelt inkrementieren
                 } else if (c == '\'') {
+                    this.addLiteralChars(literal);
                     int start = i++;
 
                     while (i < n) {
@@ -4011,16 +4014,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         this.addLiteral(s.replace("''", "'"));
                     }
                 } else if (c == '[') {
+                    this.addLiteralChars(literal);
                     this.startOptionalSection();
                 } else if (c == ']') {
+                    this.addLiteralChars(literal);
                     this.endSection();
                 } else if ((c == '#') || (c == '{') || (c == '}')) {
                     throw new IllegalArgumentException(
                         "Pattern contains reserved character: '" + c + "'");
                 } else {
-                    this.addLiteral(c);
+                    literal.append(c);
                 }
             }
+
+            this.addLiteralChars(literal);
 
             if (!replacement.isEmpty()) {
                 int len = this.steps.size();
@@ -5502,6 +5509,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             return last;
+
+        }
+
+        private void addLiteralChars(StringBuilder literal) {
+
+            if (literal.length() > 0) {
+                this.addLiteral(literal.toString());
+                literal.setLength(0);
+            }
 
         }
 
