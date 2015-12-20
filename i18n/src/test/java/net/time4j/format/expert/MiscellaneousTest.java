@@ -728,6 +728,28 @@ public class MiscellaneousTest {
         assertThat(formatter.parse("2015-05-13 17:45"), is(PlainTimestamp.of(2015, 5, 13, 17, 45)));
     }
 
+    @Test
+    public void testLiteralWithBidis() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern(
+                "uuuu-MM" + "\u200E\u200F" + "-dd" + "\u061C",
+                PatternType.CLDR,
+                Locale.ENGLISH);
+        PlainDate expected = PlainDate.of(2015, 12, 20);
+        assertThat(
+            formatter.parse("2015\u200E\u200F-12-20\u061C"), // like pattern
+            is(expected));
+        assertThat(
+            formatter.parse("2015-12-20"), // stripped version without bidis
+            is(expected));
+        assertThat(
+            formatter.parse("2015\u200E\u200F-\u061C12-20"), // extra bidi in the midth
+            is(expected));
+        assertThat(
+            formatter.parse("2015-12-20\u061C\u061C"), // extra bidi at the end
+            is(expected));
+    }
+
     private static int roundtrip(Object... obj)
         throws IOException, ClassNotFoundException {
 
