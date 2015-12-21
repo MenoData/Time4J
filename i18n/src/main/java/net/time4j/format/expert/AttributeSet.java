@@ -52,6 +52,9 @@ final class AttributeSet
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    static final AttributeKey<String> PLUS_SIGN = Attributes.createKey("PLUS_SIGN", String.class);
+    static final AttributeKey<String> MINUS_SIGN = Attributes.createKey("MINUS_SIGN", String.class);
+
     private static final NumberSymbolProvider NUMBER_SYMBOLS;
 
     static {
@@ -71,14 +74,13 @@ final class AttributeSet
 
     private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
-            ? '.'
-            : ',' // Empfehlung des ISO-Standards
+        ? '.'
+        : ',' // Empfehlung des ISO-Standards
     );
 
-    private static final ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
-        new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE = new ConcurrentHashMap<>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
-        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
+        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR, "+", "-");
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -198,11 +200,11 @@ final class AttributeSet
             AttributeSet that = (AttributeSet) obj;
             return (
                 this.attributes.equals(that.attributes)
-                    && this.locale.equals(that.locale)
-                    && (this.level == that.level)
-                    && (this.section == that.section)
-                    && isEqual(this.printCondition, that.printCondition)
-                    && this.internals.equals(that.internals)
+                && this.locale.equals(that.locale)
+                && (this.level == that.level)
+                && (this.section == that.section)
+                && isEqual(this.printCondition, that.printCondition)
+                && this.internals.equals(that.internals)
             );
         } else {
             return false;
@@ -341,14 +343,18 @@ final class AttributeSet
 
         Attributes.Builder builder = new Attributes.Builder();
         builder.setAll(this.attributes);
+        String plus;
+        String minus;
 
         if (
             locale.getLanguage().isEmpty()
-                && locale.getCountry().isEmpty()
-            ) {
+            && locale.getCountry().isEmpty()
+        ) {
             locale = Locale.ROOT;
             builder.set(Attributes.ZERO_DIGIT, '0');
             builder.set(Attributes.DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
+            plus = "+";
+            minus = "-";
         } else {
             NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
 
@@ -360,7 +366,9 @@ final class AttributeSet
                         symbols =
                             new NumericalSymbols(
                                 NUMBER_SYMBOLS.getZeroDigit(locale),
-                                NUMBER_SYMBOLS.getDecimalSeparator(locale)
+                                NUMBER_SYMBOLS.getDecimalSeparator(locale),
+                                NUMBER_SYMBOLS.getPlusSign(locale),
+                                NUMBER_SYMBOLS.getMinusSign(locale)
                             );
                         break;
                     }
@@ -375,10 +383,15 @@ final class AttributeSet
 
             builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit);
             builder.set(Attributes.DECIMAL_SEPARATOR, symbols.decimalSeparator);
+            plus = symbols.plus;
+            minus = symbols.minus;
         }
 
         builder.setLanguage(locale);
-        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, this.internals);
+        Map<String, Object> newInternals = new HashMap<>(this.internals);
+        newInternals.put(PLUS_SIGN.name(), plus);
+        newInternals.put(MINUS_SIGN.name(), minus);
+        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, newInternals);
 
     }
 
@@ -396,17 +409,23 @@ final class AttributeSet
 
         private final char zeroDigit;
         private final char decimalSeparator;
+        private final String plus;
+        private final String minus;
 
         //~ Konstruktoren -------------------------------------------------
 
         NumericalSymbols(
             char zeroDigit,
-            char decimalSeparator
+            char decimalSeparator,
+            String plus,
+            String minus
         ) {
             super();
 
             this.zeroDigit = zeroDigit;
             this.decimalSeparator = decimalSeparator;
+            this.plus = plus;
+            this.minus = minus;
 
         }
 

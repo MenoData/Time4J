@@ -356,7 +356,8 @@ final class LiteralProcessor
 
     }
 
-    private static int subSequenceEquals(
+    // also used by LocalizedGMTProcessor
+    static int subSequenceEquals(
         CharSequence test,
         int offset,
         CharSequence expected,
