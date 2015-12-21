@@ -285,6 +285,21 @@ public final class Attributes
         PredefinedKey.valueOf("ZERO_DIGIT", Character.class);
 
     /**
+     * <p>This attribute controls if the formatter will stop using the localized
+     * GMT prefix for representations of localized timezone offsets. </p>
+     *
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Steuert, ob der Formatierer das lokalisierte GMT-Pr&auml;fix in der
+     * Repr&auml;sentation von lokalisierten Zeitzonen-Offsets unterdr&uuml;ckt. </p>
+     *
+     * @since   3.13/4.10
+     */
+    public static final AttributeKey<Boolean> NO_GMT_PREFIX =
+        PredefinedKey.valueOf("NO_GMT_PREFIX", Boolean.class);
+
+    /**
      * <p>Determines the unicode char for the decimal separator. </p>
      *
      * <p>In case of changing the language setting this attribute will automatically

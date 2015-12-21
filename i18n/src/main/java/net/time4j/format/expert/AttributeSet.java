@@ -52,6 +52,9 @@ final class AttributeSet
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    static final AttributeKey<String> PLUS_SIGN = Attributes.createKey("PLUS_SIGN", String.class);
+    static final AttributeKey<String> MINUS_SIGN = Attributes.createKey("MINUS_SIGN", String.class);
+
     private static final NumberSymbolProvider NUMBER_SYMBOLS;
 
     static {
@@ -79,7 +82,7 @@ final class AttributeSet
         ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
             new ConcurrentHashMap<Locale, NumericalSymbols>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
-        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR);
+        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR, "+", "-");
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -342,6 +345,8 @@ final class AttributeSet
 
         Attributes.Builder builder = new Attributes.Builder();
         builder.setAll(this.attributes);
+        String plus;
+        String minus;
 
         if (
             locale.getLanguage().isEmpty()
@@ -350,6 +355,8 @@ final class AttributeSet
             locale = Locale.ROOT;
             builder.set(Attributes.ZERO_DIGIT, '0');
             builder.set(Attributes.DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
+            plus = "+";
+            minus = "-";
         } else {
             NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
 
@@ -361,7 +368,9 @@ final class AttributeSet
                         symbols =
                             new NumericalSymbols(
                                 NUMBER_SYMBOLS.getZeroDigit(locale),
-                                NUMBER_SYMBOLS.getDecimalSeparator(locale)
+                                NUMBER_SYMBOLS.getDecimalSeparator(locale),
+                                NUMBER_SYMBOLS.getPlusSign(locale),
+                                NUMBER_SYMBOLS.getMinusSign(locale)
                             );
                         break;
                     }
@@ -376,10 +385,15 @@ final class AttributeSet
 
             builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit);
             builder.set(Attributes.DECIMAL_SEPARATOR, symbols.decimalSeparator);
+            plus = symbols.plus;
+            minus = symbols.minus;
         }
 
         builder.setLanguage(locale);
-        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, this.internals);
+        Map<String, Object> newInternals = new HashMap<String, Object>(this.internals);
+        newInternals.put(PLUS_SIGN.name(), plus);
+        newInternals.put(MINUS_SIGN.name(), minus);
+        return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, newInternals);
 
     }
 
@@ -397,17 +411,23 @@ final class AttributeSet
 
         private final char zeroDigit;
         private final char decimalSeparator;
+        private final String plus;
+        private final String minus;
 
         //~ Konstruktoren -------------------------------------------------
 
         NumericalSymbols(
             char zeroDigit,
-            char decimalSeparator
+            char decimalSeparator,
+            String plus,
+            String minus
         ) {
             super();
 
             this.zeroDigit = zeroDigit;
             this.decimalSeparator = decimalSeparator;
+            this.plus = plus;
+            this.minus = minus;
 
         }
 

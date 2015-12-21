@@ -25,11 +25,21 @@ public class LocalizedGMTOffsetTest {
  	public static Iterable<Object[]> data() {
  		return Arrays.asList(
             new Object[][] {
-                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
-                        "ar-DZ",
-                        "Asia/Kolkata",
-                        "2012-06-30T23:59:60,123000000Z",
-                        "2012-07-01T05:29:60.123جرينتش\u200E+05:30"}
+                {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
+                    "in",
+                    "Asia/Kolkata",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T05:29:60.123GMT+05:30"},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
+                    "ar",
+                    "Asia/Kolkata",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u200F+٠٥:٣٠"},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
+                    "ar-DZ",
+                    "Asia/Kolkata",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T05:29:60.123جرينتش\u200E+05:30"},
            }
         );
     }
@@ -76,6 +86,8 @@ public class LocalizedGMTOffsetTest {
             return Locale.US;
         } else if (locale.equals("in")) {
             return new Locale("en", "IN");
+        } else if (locale.equals("ar")) {
+            return new Locale("ar");
         } else if (locale.equals("ar-DZ")) {
             return new Locale("ar", "DZ");
         }

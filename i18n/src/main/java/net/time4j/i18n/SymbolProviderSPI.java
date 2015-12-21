@@ -81,6 +81,16 @@ public final class SymbolProviderSPI
     }
 
     @Override
+    public String getPlusSign(Locale locale) {
+
+        return lookup(
+            locale,
+            "plus",
+            String.valueOf('+'));
+
+    }
+
+    @Override
     public String getMinusSign(Locale locale) {
 
         return lookup(

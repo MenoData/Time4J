@@ -90,7 +90,18 @@ public interface NumberSymbolProvider {
             }
 
             @Override
+            public String getPlusSign(Locale locale) {
+                if (locale.getLanguage().equals("ar")) {
+                    return "\u200F+";
+                }
+                return String.valueOf('+');
+            }
+
+            @Override
             public String getMinusSign(Locale locale) {
+                if (locale.getLanguage().equals("ar")) {
+                    return "\u200F\u002D";
+                }
                 return String.valueOf(getSymbols(locale).getMinusSign());
             }
 
@@ -142,13 +153,29 @@ public interface NumberSymbolProvider {
     char getDecimalSeparator(Locale locale);
 
     /**
+     * <p>Returns the localized plus sign. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  localized plus sign, possibly including RLM- or LRM-markers
+     * @since   3.13/4.10
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Plus-Zeichen. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  localized plus sign, possibly including RLM- or LRM-markers
+     * @since   3.13/4.10
+     */
+    String getPlusSign(Locale locale);
+
+    /**
      * <p>Returns the localized minus sign. </p>
      *
      * @param   locale      language and country setting
      * @return  localized minus sign, possibly including RLM- or LRM-markers
      */
     /*[deutsch]
-     * <p>Liefert das lokalisierte Minuszeichen. </p>
+     * <p>Liefert das lokalisierte Minus-Zeichen. </p>
      *
      * @param   locale      language and country setting
      * @return  localized minus sign, possibly including RLM- or LRM-markers
