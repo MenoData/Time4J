@@ -25,9 +25,11 @@ import net.time4j.format.NumberSymbolProvider;
 
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Locale;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 
 /**
@@ -43,6 +45,26 @@ import java.util.ResourceBundle;
 public final class SymbolProviderSPI
     implements NumberSymbolProvider {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    public static final Set<String> SUPPORTED_LOCALES;
+    public static final SymbolProviderSPI INSTANCE;
+
+    static {
+        ResourceBundle rb =
+            ResourceBundle.getBundle(
+                "numbers/symbol",
+                Locale.ROOT,
+                getLoader(),
+                UTF8ResourceControl.SINGLETON);
+
+        String[] languages = rb.getString("languages").split(" ");
+        Set<String> set = new HashSet<String>();
+        Collections.addAll(set, languages);
+        SUPPORTED_LOCALES = Collections.unmodifiableSet(set);
+        INSTANCE = new SymbolProviderSPI();
+    }
+
     //~ Konstruktoren -----------------------------------------------------
 
     /** For {@code java.util.ServiceLoader}. */
@@ -56,7 +78,7 @@ public final class SymbolProviderSPI
     @Override
     public Locale[] getAvailableLocales() {
 
-        return NumberFormat.getAvailableLocales();
+        return NumberFormat.getAvailableLocales(); // not used
 
     }
 
@@ -153,15 +175,15 @@ public final class SymbolProviderSPI
 
     private static ResourceBundle getBundle(Locale desired) {
 
-        try {
+        if (SUPPORTED_LOCALES.contains(LanguageMatch.getAlias(desired))) {
             return ResourceBundle.getBundle(
                 "numbers/symbol",
                 desired,
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
-        } catch (MissingResourceException ex) {
-            return null;
         }
+
+        return null;
 
     }
 

@@ -21,7 +21,6 @@
 
 package net.time4j.format.expert;
 
-import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
@@ -32,6 +31,8 @@ import net.time4j.format.Leniency;
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
+import net.time4j.i18n.LanguageMatch;
+import net.time4j.i18n.SymbolProviderSPI;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,22 +56,7 @@ final class AttributeSet
     static final AttributeKey<String> PLUS_SIGN = Attributes.createKey("PLUS_SIGN", String.class);
     static final AttributeKey<String> MINUS_SIGN = Attributes.createKey("MINUS_SIGN", String.class);
 
-    private static final NumberSymbolProvider NUMBER_SYMBOLS;
-
-    static {
-        NumberSymbolProvider p = null;
-
-        for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
-            p = tmp;
-            break;
-        }
-
-        if (p == null) {
-            p = NumberSymbolProvider.DEFAULT;
-        }
-
-        NUMBER_SYMBOLS = p;
-    }
+    private static final NumberSymbolProvider NUMBER_SYMBOLS = SymbolProviderSPI.INSTANCE;
 
     private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
@@ -78,9 +64,8 @@ final class AttributeSet
         : ',' // Empfehlung des ISO-Standards
     );
 
-    private static final
-        ConcurrentMap<Locale, NumericalSymbols> NUMBER_SYMBOL_CACHE =
-            new ConcurrentHashMap<Locale, NumericalSymbols>();
+    private static final ConcurrentMap<String, NumericalSymbols> NUMBER_SYMBOL_CACHE =
+        new ConcurrentHashMap<String, NumericalSymbols>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
         new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR, "+", "-");
 
@@ -348,9 +333,12 @@ final class AttributeSet
         String plus;
         String minus;
 
+        String lang = LanguageMatch.getAlias(locale);
+        String country = locale.getCountry();
+
         if (
-            locale.getLanguage().isEmpty()
-            && locale.getCountry().isEmpty()
+            lang.isEmpty()
+            && country.isEmpty()
         ) {
             locale = Locale.ROOT;
             builder.set(Attributes.ZERO_DIGIT, '0');
@@ -358,26 +346,32 @@ final class AttributeSet
             plus = "+";
             minus = "-";
         } else {
-            NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(locale);
+            String key = lang;
+
+            if (!country.isEmpty()) {
+                key = key + "_" + country;
+            }
+
+            NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(key);
 
             if (symbols == null) {
                 symbols = DEFAULT_NUMERICAL_SYMBOLS;
 
-                for (Locale test : NUMBER_SYMBOLS.getAvailableLocales()) {
-                    if (locale.equals(test)) {
-                        symbols =
-                            new NumericalSymbols(
-                                NUMBER_SYMBOLS.getZeroDigit(locale),
-                                NUMBER_SYMBOLS.getDecimalSeparator(locale),
-                                NUMBER_SYMBOLS.getPlusSign(locale),
-                                NUMBER_SYMBOLS.getMinusSign(locale)
-                            );
-                        break;
-                    }
+                if (
+                    SymbolProviderSPI.SUPPORTED_LOCALES.contains(key)
+                    || SymbolProviderSPI.SUPPORTED_LOCALES.contains(lang)
+                ) {
+                    symbols =
+                        new NumericalSymbols(
+                            NUMBER_SYMBOLS.getZeroDigit(locale),
+                            NUMBER_SYMBOLS.getDecimalSeparator(locale),
+                            NUMBER_SYMBOLS.getPlusSign(locale),
+                            NUMBER_SYMBOLS.getMinusSign(locale)
+                        );
                 }
 
                 NumericalSymbols old =
-                    NUMBER_SYMBOL_CACHE.putIfAbsent(locale, symbols);
+                    NUMBER_SYMBOL_CACHE.putIfAbsent(key, symbols);
                 if (old != null) {
                     symbols = old;
                 }

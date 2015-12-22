@@ -29,7 +29,7 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  */
-enum LanguageMatch {
+public enum LanguageMatch {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -58,7 +58,7 @@ enum LanguageMatch {
      * @param   desired     gew&uuml;nschte Sprache
      * @return  Ausweichsprache oder {@code desired} wenn nicht gefunden
      */
-    static String getAlias(Locale desired) {
+    public static String getAlias(Locale desired) {
 
         String key = desired.getLanguage();
 
