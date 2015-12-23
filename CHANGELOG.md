@@ -2,6 +2,7 @@
 ### Added
 - Fixed and flexible day periods with appropriate translations [#369]
 - Minguo calendar (Taiwan) [#390]
+- Enable localized digits in timezone offsets [#411]
 - New getters for day-of-week and day-of-year in PlainDate [#416]
 - Query parsed raw data for any registered elements [#415]
 - New method CalendarText.getIsoInstance(Locale) [#410]
