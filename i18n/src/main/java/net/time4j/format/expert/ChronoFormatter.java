@@ -4717,7 +4717,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>This format element is also applicable on chronological
          * entities without timezone reference like {@code PlainTime}
          * provided that a timezone offset is set as format attribute.
-         * The format &quot;GMT&#x00B1;H[:mm]&quot; will be used. </p>
+         * The format &quot;GMT&#x00B1;H[:mm[:ss]]&quot; will be used. </p>
          *
          * <p>Notes: The minute component given in square brackets is
          * optional in short format and appears only if it is different
@@ -4725,11 +4725,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * or &quot;UT&quot; when parsing. A localized GMT-notation is
          * possible provided that the resource files
          * &quot;iso8601.properties&quot; have an entry with the key
-         * &quot;prefixGMTOffset&quot;. </p>
+         * &quot;prefixGMTOffset&quot;. If the format attribute
+         * {@code Attributes.NO_GMT_PREFIX} is set to {@code true}
+         * then the GMT-prefix will be suppressed. The format attribute
+         * {@code Attributes.ZERO_DIGIT} (usually set indirect via the
+         * locale) controls which localized set of digits will be used.
+         * The sign is possibly localized, too. </p>
          *
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
          * @see     #addLongLocalizedOffset()
+         * @see     Attributes#NO_GMT_PREFIX
          */
         /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in kurzer lokalisierter Notation
@@ -4739,7 +4745,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
          * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
          * {@code ChronoFormatter} mitgegeben wird. Als Format wird
-         * &quot;GMT&#x00B1;H[:mm]&quot; verwendet. </p>
+         * &quot;GMT&#x00B1;H[:mm[:ss]]&quot; verwendet. </p>
          *
          * <p>Hinweise: Die in eckigen Klammern angegebene Minutenkomponente
          * ist optional, erscheint also nur, wenn sie von {@code 0} verschieden
@@ -4747,11 +4753,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * oder &quot;UT&quot; vorliegen. Au&szlig;erdem ist eine lokalisierte
          * GMT-Notation m&ouml;glich, indem in den Ressourcendateien
          * &quot;iso8601.properties&quot; ein Eintrag mit dem Schl&uuml;ssel
-         * &quot;prefixGMTOffset&quot; vorhanden ist. </p>
+         * &quot;prefixGMTOffset&quot; vorhanden ist. Wenn das Formatattribut
+         * {@code Attributes.NO_GMT_PREFIX} auf {@code true} gesetzt wird,
+         * dann wird das GMT-Pr&auml;fix unterdr&uuml;ckt. Das Formatattribut
+         * {@code Attributes.ZERO_DIGIT} (normalerweise nur implizit &uuml;ber die
+         * Sprache gesetzt) steuert, welcher lokalisierter Satz von Ziffernzeichen
+         * verwendet wird. Das Vorzeichen ist eventuell auch lokalisiert. </p>
          *
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
          * @see     #addLongLocalizedOffset()
+         * @see     Attributes#NO_GMT_PREFIX
          */
         public Builder<T> addShortLocalizedOffset() {
 
@@ -4766,17 +4778,23 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>This format element is also applicable on chronological
          * entities without timezone reference like {@code PlainTime}
          * provided that a timezone offset is set as format attribute.
-         * The format &quot;GMT&#x00B1;HH:mm&quot; will be used. </p>
+         * The format &quot;GMT&#x00B1;HH:mm[:ss]&quot; will be used. </p>
          *
          * <p>Notes: The GMT-prefix can also be like &quot;UTC&quot;
          * or &quot;UT&quot; when parsing. A localized GMT-notation is
          * possible provided that the resource files
          * &quot;iso8601.properties&quot; have an entry with the key
-         * &quot;prefixGMTOffset&quot;. </p>
+         * &quot;prefixGMTOffset&quot;. If the format attribute
+         * {@code Attributes.NO_GMT_PREFIX} is set to {@code true}
+         * then the GMT-prefix will be suppressed. The format attribute
+         * {@code Attributes.ZERO_DIGIT} (usually set indirect via the
+         * locale) controls which localized set of digits will be used.
+         * The sign is possibly localized, too. </p>
          *
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
          * @see     #addShortLocalizedOffset()
+         * @see     Attributes#NO_GMT_PREFIX
          */
         /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in langer lokalisierter Notation
@@ -4786,17 +4804,24 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Typen ohne Zeitzonenbezug wie z.B. {@code PlainTime}, setzt dann
          * aber voraus, da&szlig; ein Zeitzonen-Offset als Attribut des
          * {@code ChronoFormatter} mitgegeben wird. Als Format wird
-         * &quot;GMT&#x00B1;HH:mm&quot; verwendet. </p>
+         * &quot;GMT&#x00B1;HH:mm[:ss]&quot; verwendet. </p>
          *
          * <p>Hinweise: Das GMT-Pr&auml;fix darf beim Parsen auch als
          * &quot;UTC&quot; oder &quot;UT&quot; vorliegen. Au&szlig;erdem
          * ist eine lokalisierte GMT-Notation m&ouml;glich, indem in den
          * Ressourcendateien &quot;iso8601.properties&quot; ein Eintrag mit
-         * dem Schl&uuml;ssel &quot;prefixGMTOffset&quot; vorhanden ist. </p>
+         * dem Schl&uuml;ssel &quot;prefixGMTOffset&quot; vorhanden ist. Wenn
+         * das Formatattribut {@code Attributes.NO_GMT_PREFIX} auf {@code true}
+         * gesetzt wird, dann wird das GMT-Pr&auml;fix unterdr&uuml;ckt. Das
+         * Formatattribut {@code Attributes.ZERO_DIGIT} (normalerweise nur
+         * implizit &uuml;ber die Sprache gesetzt) steuert, welcher lokalisierter
+         * Satz von Ziffernzeichen verwendet wird. Das Vorzeichen ist eventuell
+         * auch lokalisiert. </p>
          *
          * @return  this instance for method chaining
          * @see     ChronoEntity#getTimezone()
          * @see     #addShortLocalizedOffset()
+         * @see     Attributes#NO_GMT_PREFIX
          */
         public Builder<T> addLongLocalizedOffset() {
 

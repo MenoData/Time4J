@@ -288,11 +288,15 @@ public final class Attributes
      * <p>This attribute controls if the formatter will stop using the localized
      * GMT prefix for representations of localized timezone offsets. </p>
      *
+     * <p>Only relevant if the CLDR format pattern symbol O (or OOOO) is used. </p>
+     *
      * @since   3.13/4.10
      */
     /*[deutsch]
      * <p>Steuert, ob der Formatierer das lokalisierte GMT-Pr&auml;fix in der
      * Repr&auml;sentation von lokalisierten Zeitzonen-Offsets unterdr&uuml;ckt. </p>
+     *
+     * <p>Nur relevant, wenn das CLDR Formatmustersymbol O (oder OOOO) verwendet wird. </p>
      *
      * @since   3.13/4.10
      */

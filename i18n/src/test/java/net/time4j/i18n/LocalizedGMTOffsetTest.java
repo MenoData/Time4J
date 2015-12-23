@@ -1,6 +1,7 @@
 package net.time4j.i18n;
 
 import net.time4j.Moment;
+import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.PatternType;
@@ -21,7 +22,7 @@ public class LocalizedGMTOffsetTest {
 
  	@Parameterized.Parameters
         (name= "{index}: "
-            + "(pattern={0},locale={1},timezone={2},value={3},text={4})")
+            + "(pattern={0},locale={1},timezone={2},value={3},text={4},noGMTPrefix={5})")
  	public static Iterable<Object[]> data() {
  		return Arrays.asList(
             new Object[][] {
@@ -29,17 +30,32 @@ public class LocalizedGMTOffsetTest {
                     "in",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T05:29:60.123GMT+05:30"},
+                    "2012-07-01T05:29:60.123GMT+05:30",
+                    false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u200F+٠٥:٣٠"},
+                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u200F+٠٥:٣٠", // with RLM-marker
+                    false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar-DZ",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T05:29:60.123جرينتش\u200E+05:30"},
+                    "2012-07-01T05:29:60.123جرينتش\u200E+05:30", // with LRM-marker
+                    false},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
+                    "ar-DZ",
+                    "Asia/Kolkata",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T05:29:60.123\u200E+05:30", // with LRM-marker
+                    true},
+                {"uuuu-MM-dd'T'HH:mm:ssOOOO",
+                    "en-ARABEXT", // language en makes sure not to use bidi chars for sign representation
+                    "UTC",
+                    "2015-11-02T18:44:34Z",
+                    "۲۰۱۵-۱۱-۰۲T۱۸:۴۴:۳۴+۰۰:۰۰",
+                    true},
            }
         );
     }
@@ -53,14 +69,19 @@ public class LocalizedGMTOffsetTest {
         String locale,
         String tzid,
         String value,
-        String text
+        String text,
+        boolean noGMTPrefix
     ) throws ParseException {
         super();
 
         this.formatter =
             ChronoFormatter.setUp(Moment.class, toLocale(locale))
                 .addPattern(pattern, PatternType.CLDR).build()
-                .withTimezone(tzid);
+                .withTimezone(tzid)
+                .with(Attributes.NO_GMT_PREFIX, noGMTPrefix);
+        if (locale.endsWith("-ARABEXT")) {
+            this.formatter = this.formatter.with(Attributes.ZERO_DIGIT, '۰');
+        }
         this.value = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(value);
         this.text = text;
     }
@@ -80,7 +101,7 @@ public class LocalizedGMTOffsetTest {
     }
 
     private static Locale toLocale(String locale) {
-        if (locale.equals("en")) {
+        if (locale.startsWith("en")) {
             return Locale.UK;
         } else if (locale.equals("us")) {
             return Locale.US;
