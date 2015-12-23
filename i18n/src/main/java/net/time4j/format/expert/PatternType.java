@@ -277,7 +277,10 @@ public enum PatternType
      *      <td>One symbol for the abbreviation or 4 symbols for the long
      *      variant. The GMT-prefix can also be available in a localized
      *      version from the resource file &quot;iso8601.properties&quot;,
-     *      given the key &quot;prefixGMTOffset&quot;. </td>
+     *      given the key &quot;prefixGMTOffset&quot;. It can be suppressed by
+     *      help of the format attribute {@link Attributes#NO_GMT_PREFIX}. See also
+     *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()} or its short
+     *      counter part. </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
@@ -527,7 +530,10 @@ public enum PatternType
      *      <td>Ein Symbol f&uuml;r die Kurzform oder 4 Symbole f&uuml;r die
      *      Langform. Das GMT-Pr&auml;fix kann auch lokalisiert aus der
      *      &quot;iso8601.properties&quot;-Ressource stammen, zum Schl&uuml;ssel
-     *      &quot;prefixGMTOffset&quot;. </td>
+     *      &quot;prefixGMTOffset&quot;. Es kann mit Hilfe des Attributs
+     *      {@link Attributes#NO_GMT_PREFIX} unterdr&uuml;ckt werden. Siehe auch
+     *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()} oder
+     *      sein kurzes Gegenst&uuml;ck. </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
