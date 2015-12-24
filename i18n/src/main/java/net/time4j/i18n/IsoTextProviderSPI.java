@@ -220,16 +220,7 @@ public final class IsoTextProviderSPI
         sb.append(toChar(total));
         sb.append(")_dt");
         String key = sb.toString();
-        String result = getPatterns(locale).getString(key);
-        result = result.replace("{1}", getDatePattern(dateMode, locale));
-
-        if (timeMode == DisplayMode.FULL) {
-            result = result.replace("{0}", getPatterns(locale).getString("F(f)_t"));
-        } else {
-            result = result.replace("{0}", getTimePattern(timeMode, locale));
-        }
-
-        return result;
+        return getPatterns(locale).getString(key);
 
     }
 

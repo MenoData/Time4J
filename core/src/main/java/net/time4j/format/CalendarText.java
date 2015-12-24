@@ -1041,7 +1041,7 @@ public final class CalendarText {
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
-     * @return  localized date-time pattern
+     * @return  localized date-time pattern including timezone symbols
      * @see     net.time4j.Moment
      * @since   3.13/4.10
      */
@@ -1052,7 +1052,7 @@ public final class CalendarText {
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
-     * @return  localized date-time pattern
+     * @return  localized date-time pattern including timezone symbols
      * @see     net.time4j.Moment
      * @since   3.13/4.10
      */
@@ -1718,7 +1718,22 @@ public final class CalendarText {
                 return getFormatPattern(df);
             }
 
-            return this.delegate.getDateTimePattern(dateMode, timeMode, locale);
+            String time;
+            String date = this.delegate.getDatePattern(dateMode, locale);
+
+            if (timeMode == DisplayMode.FULL) {
+                time = CalendarText.getIsoInstance(locale).getTextForms().get("F(f)_t");
+                if (time == null) {
+                    int style = getFormatStyle(timeMode);
+                    DateFormat df = DateFormat.getTimeInstance(style, locale);
+                    time = getFormatPattern(df);
+                }
+            } else {
+                time = this.delegate.getTimePattern(timeMode, locale);
+            }
+
+            String pattern =  this.delegate.getDateTimePattern(dateMode, timeMode, locale);
+            return pattern.replace("{1}", date).replace("{0}", time);
 
         }
 
