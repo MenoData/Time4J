@@ -109,23 +109,33 @@ public interface FormatPatternProvider {
 
     /**
      * <p>Returns the localized date-time pattern suitable for formatting of objects
-     * of type {@code Moment}. </p>
+     * of type {@code Moment} or {@code PlainTimestamp}. </p>
+     *
+     * <p>Expressions of the form &quot;{0}&quot; will be interpreted as the time component
+     * and expressions of the form &quot;{1}&quot; will be interpreted as the date component.
+     * All other chars of the pattern will be treated as literals. </p>
      *
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
      * @see     net.time4j.Moment
+     * @see     net.time4j.PlainTimestamp
      */
     /*[deutsch]
-     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet
-     * f&uuml;r die Formatierung von Instanzen des Typs {@code Moment}. </p>
+     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet f&uuml;r die Formatierung
+     * von Instanzen des Typs {@code Moment} oder {@code PlainTimestamp}. </p>
+     *
+     * <p>Die Ausdr&uuml;cke &quot;{0}&quot; und &quot;{1}&quot; werden als Formathalter f&uuml;r die
+     * Uhrzeit- und Datumskomponenten interpretiert. Alle anderen Zeichen des Musters werden wie
+     * Literale behandelt. </p>
      *
      * @param   dateMode    display mode of date part
      * @param   timeMode    display mode of time part
      * @param   locale      language and country setting
      * @return  localized date-time pattern
      * @see     net.time4j.Moment
+     * @see     net.time4j.PlainTimestamp
      */
     String getDateTimePattern(
         DisplayMode dateMode,
