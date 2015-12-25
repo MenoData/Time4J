@@ -155,6 +155,8 @@ final class TextProcessor<V>
             Class<V> valueType = this.element.getType();
             if (valueType.isEnum()) {
                 status.setError(status.getErrorIndex(), "No suitable enum found: " + valueType.getName());
+            } else {
+                status.setError(status.getErrorIndex(), "Unparseable element: " + element.name());
             }
         } else {
             if (value == null) {

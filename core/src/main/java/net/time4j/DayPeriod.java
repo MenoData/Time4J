@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -931,7 +932,7 @@ public final class DayPeriod {
                 codes.add("midnight");
                 codes.add("noon");
             } else {
-                Set<String> set = new HashSet<String>(this.dayPeriod.codeMap.values());
+                Set<String> set = new LinkedHashSet<String>(this.dayPeriod.codeMap.values());
                 codes.addAll(set); // no duplicates
             }
 
