@@ -7,6 +7,10 @@
 - Query parsed raw data for any registered elements [#415]
 - New method CalendarText.getIsoInstance(Locale) [#410]
 - New methods CalendarText.patternForXYZ(...) [#410]
+- Support for Nepali [#422]
+- Support for Mongolian [#421]
+- Support for Afrikaans and Zulu [#420]
+- Support for the languages Khmer and Lao [#419]
 
 ### Fixed
 - Bidi literals (LRM, RLM, ALM) should be ignored in parsing [#418]
