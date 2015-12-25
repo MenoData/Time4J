@@ -406,4 +406,30 @@ public class DayPeriodTest {
         f.parse("12:00 morning");
     }
 
+    @Test
+    public void parseFlexibleZulu() throws ParseException {
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter
+                .ofTimePattern("h:mm BBBB", PatternType.CLDR, new Locale("zu"))
+                .with(Leniency.STRICT);
+        assertThat(
+            f.parse("5:45 entathakusa"),
+            is(PlainTime.of(5, 45)));
+        assertThat(
+            f.parse("9:45 ekuseni"),
+            is(PlainTime.of(9, 45)));
+        assertThat(
+            f.parse("10:45 emini"),
+            is(PlainTime.of(10, 45)));
+        assertThat(
+            f.parse("12:45 emini"),
+            is(PlainTime.of(12, 45)));
+        assertThat(
+            f.parse("6:45 ntambama"),
+            is(PlainTime.of(18, 45)));
+        assertThat(
+            f.parse("7:45 ebusuku"),
+            is(PlainTime.of(19, 45)));
+    }
+
 }
