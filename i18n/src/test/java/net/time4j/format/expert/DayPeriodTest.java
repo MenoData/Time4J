@@ -3,20 +3,30 @@ package net.time4j.format.expert;
 import net.time4j.DayPeriod;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
+import net.time4j.i18n.IsoTextProviderSPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(JUnit4.class)
@@ -391,11 +401,11 @@ public class DayPeriodTest {
 
     @Test(expected=ParseException.class)
     public void parseCustomWithInconsistency() throws ParseException {
-        Map<PlainTime, String> timeToLabels = new HashMap<>();
+        Map<PlainTime, String> timeToLabels = new HashMap<PlainTime, String>();
         timeToLabels.put(PlainTime.of(23), "night");
         timeToLabels.put(PlainTime.of(7), "morning");
         timeToLabels.put(PlainTime.of(12), "afternoon");
-        timeToLabels.put(PlainTime.of(6, 30), "evening");
+        timeToLabels.put(PlainTime.of(18, 30), "evening");
 
         ChronoFormatter<PlainTime> f =
             ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
@@ -430,6 +440,67 @@ public class DayPeriodTest {
         assertThat(
             f.parse("7:45 ebusuku"),
             is(PlainTime.of(19, 45)));
+    }
+
+    @Test
+    public void parseFlexibleFarsi() throws ParseException { // test for ambivalent dayperiods
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter
+                .ofTimePattern("h:mm BBBB", PatternType.CLDR, new Locale("fa"))
+                .with(Leniency.STRICT)
+                .with(Attributes.ZERO_DIGIT, '0');
+        assertThat(
+            f.parse("3:45 عصر"), // afternoon1
+            is(PlainTime.of(15, 45)));
+        assertThat(
+            f.parse("6:45 عصر"), // evening1
+            is(PlainTime.of(18, 45)));
+    }
+
+    @Test
+    public void checkSanity()
+        throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+
+        Method mKey =
+            DayPeriod.class.getDeclaredMethod(
+                "createKey", Map.class, TextWidth.class, OutputContext.class, String.class);
+        mKey.setAccessible(true);
+        Field field = DayPeriod.class.getDeclaredField("codeMap");
+        field.setAccessible(true);
+        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+
+        for (Locale locale : spi.getAvailableLocales()) {
+            Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+            DayPeriod dp = DayPeriod.of(locale);
+            Map<?, ?> m = Map.class.cast(field.get(dp));
+            Set<String> codes = new LinkedHashSet<String>();
+            for (Object code : m.values()) {
+                codes.add(code.toString());
+            }
+
+            for (TextWidth tw : TextWidth.values()) {
+                if (tw == TextWidth.SHORT) {
+                    continue;
+                }
+                for (OutputContext oc : OutputContext.values()) {
+                    Set<String> translations = new HashSet<String>();
+                    for (String code : codes) {
+                        String key = mKey.invoke(null, textForms, tw, oc, code).toString();
+                        String text = textForms.get(key);
+                        if (text == null) {
+                            fail("Fallback problem detected: " + locale + "/" + tw + "/" + oc + "/" + code);
+                        } else if (!translations.add(text) && (tw != TextWidth.NARROW) && isCheckWanted(locale)) {
+                            fail("Ambivalent text forms detected: " + locale + "/" + tw + "/" + oc + "/" + code);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean isCheckWanted(Locale locale) {
+        String lang = locale.getLanguage();
+        return !(lang.equals("fa") || lang.equals("hu")); // require manual check
     }
 
 }
