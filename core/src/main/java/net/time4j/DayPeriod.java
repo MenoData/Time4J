@@ -518,17 +518,22 @@ public final class DayPeriod {
         String code
     ) {
 
+        if (tw == TextWidth.SHORT) {
+            tw = TextWidth.ABBREVIATED;
+        }
+
         String key = toPrefix(tw, oc) + code;
 
         if (!textForms.containsKey(key)) {
-            if (tw == TextWidth.ABBREVIATED) {
-                if (oc == OutputContext.STANDALONE) {
-                    key = toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
+            if (oc == OutputContext.STANDALONE) {
+                if (tw == TextWidth.ABBREVIATED) {
+                    key = createKey(textForms, tw, OutputContext.FORMAT, code);
+                } else {
+                    key = createKey(textForms, TextWidth.ABBREVIATED, oc, code);
                 }
             } else {
-                key = toPrefix(TextWidth.ABBREVIATED, oc) + code;
-                if (!textForms.containsKey(key) && (oc == OutputContext.STANDALONE)) {
-                    key = toPrefix(TextWidth.ABBREVIATED, OutputContext.FORMAT) + code;
+                if (tw != TextWidth.ABBREVIATED) {
+                    key = createKey(textForms, TextWidth.ABBREVIATED, oc, code);
                 }
             }
         }
@@ -632,47 +637,65 @@ public final class DayPeriod {
             Element approximate = new Element(false, dp);
 
             if (entity.contains(approximate)) {
-                String code = entity.get(approximate);
+                String codes = entity.get(approximate);
+                int index = 0;
+                int count = 0;
                 Meridiem meridiem = null;
-                for (PlainTime time : dp.codeMap.keySet()) {
-                    if (dp.codeMap.get(time).equals(code)) {
-                        Meridiem m = null;
-                        int hour12 = getHour12(entity);
-                        PlainTime next = dp.getEnd(time);
 
-                        // Optimistic assumption that hour12 is always within time range described by code.
-                        // However, the strict parser will detect any inconsistencies with day periods later.
-                        if (time.getHour() >= 12) {
-                            if (next.isAfter(time) || next.isSimultaneous(PlainTime.midnightAtStartOfDay())) {
-                                m = Meridiem.PM;
-                            } else if (hour12 != -1) {
-                                m = ((hour12 + 12 >= time.getHour()) ? Meridiem.PM : Meridiem.AM);
-                            }
-                        } else if (!next.isAfter(PlainTime.of(12))) {
-                            m = Meridiem.AM;
-                        } else if (hour12 != -1) {
-                            m = ((hour12 >= time.getHour()) ? Meridiem.AM : Meridiem.PM);
-                        }
-                        if (m != null) {
-                            if ((meridiem != null) && (meridiem != m)) { // ambivalent day period
-                                if (hour12 == -1) {
-                                    meridiem = null; // no clock hour available for distinction
-                                } else if (code.startsWith("night")) { // night1 or night2 (ja)
-                                    meridiem = ((hour12 < 6) ? Meridiem.AM : Meridiem.PM);
-                                } else if (code.startsWith("afternoon")) { // languages id or uz
-                                    meridiem = ((hour12 < 6) ? Meridiem.PM : Meridiem.AM);
-                                } else { // cannot resolve other day period code duplicate to am/pm
-                                    meridiem = null;
+                do {
+                    int nextIndex = codes.indexOf('|', index);
+                    String code;
+                    if (nextIndex == -1) {
+                        code = codes.substring(index);
+                    } else {
+                        code = codes.substring(index, nextIndex);
+                    }
+                    index = nextIndex + 1;
+                    count++;
+
+                    for (PlainTime time : dp.codeMap.keySet()) {
+                        if (dp.codeMap.get(time).equals(code)) {
+                            Meridiem m = null;
+                            int hour12 = getHour12(entity);
+                            PlainTime end = dp.getEnd(time);
+
+                            // Optimistic assumption that hour12 is always within time range described by code.
+                            // However, the strict parser will detect any inconsistencies with day periods later.
+                            if (time.getHour() >= 12) {
+                                if (end.isAfter(time) || end.isSimultaneous(PlainTime.midnightAtStartOfDay())) {
+                                    m = Meridiem.PM;
+                                } else if (hour12 != -1) {
+                                    m = ((hour12 + 12 >= time.getHour()) ? Meridiem.PM : Meridiem.AM);
                                 }
-                            } else {
-                                meridiem = m;
+                            } else if (!end.isAfter(PlainTime.of(12))) {
+                                m = Meridiem.AM;
+                            } else if (hour12 != -1) {
+                                m = ((hour12 >= time.getHour()) ? Meridiem.AM : Meridiem.PM);
+                            }
+                            if (m != null) {
+                                if ((meridiem != null) && (meridiem != m)) { // ambivalent day period
+                                    if (hour12 == -1) {
+                                        meridiem = null; // no clock hour available for distinction
+                                    } else if (code.startsWith("night")) { // night1 or night2 (ja)
+                                        meridiem = ((hour12 < 6) ? Meridiem.AM : Meridiem.PM);
+                                    } else if (code.startsWith("afternoon")) { // languages id or uz
+                                        meridiem = ((hour12 < 6) ? Meridiem.PM : Meridiem.AM);
+                                    } else { // cannot resolve other day period code duplicate to am/pm
+                                        meridiem = null;
+                                    }
+                                } else {
+                                    meridiem = m;
+                                }
                             }
                         }
                     }
-                }
+                } while (index > 0);
+
                 if (meridiem != null) {
                     entity = entity.with(PlainTime.AM_PM_OF_DAY, meridiem);
-                    // don't remove day period element here in order to help the strict parser to detect errors later
+                    if (count > 1) {
+                        entity = entity.with(approximate, null);
+                    } // else don't remove element value here in order to help the strict parser to detect errors later
                 }
             } else {
                 Element fixed = new Element(true, dp);
@@ -1003,13 +1026,22 @@ public final class DayPeriod {
                         if (maxEq < pos - start) {
                             maxEq = pos - start;
                             candidate = code;
-                        } else if (maxEq == pos - start) {
-                            candidate = null;
+                        } else if ((candidate != null) && (maxEq == pos - start)) {
+                            if (this.fixed) {
+                                candidate = null;
+                            } else {
+                                candidate = candidate + "|" + code; // handles NARROW, fa, hu
+                            }
                         }
                     } else if (eq) {
-                        assert pos == start + n;
-                        status.setIndex(pos);
-                        return code;
+                        maxEq = n;
+                        if (candidate == null) {
+                            candidate = code;
+                        } else if (this.fixed) {
+                            candidate = null;
+                        } else {
+                            candidate = candidate + "|" + code; // handles NARROW, fa, hu
+                        }
                     }
                 }
             }
