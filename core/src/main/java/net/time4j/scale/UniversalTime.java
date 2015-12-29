@@ -124,7 +124,7 @@ import net.time4j.base.UnixTime;
  *  </tr>
  *  <tr>
  *      <td>after day X</td>
- *      <td>IT ??? (International Time ??? - without Schaltsekunden)</td>
+ *      <td>IT ??? (International Time ??? - without leapseconds)</td>
  *      <td>SI-second based on atomic clocks</td>
  *      <td>Future leapseconds are no longer defined here. Consequently
  *      the calendar day based on 86400 SI-seconds will increasingly

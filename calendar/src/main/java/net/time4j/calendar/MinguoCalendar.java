@@ -74,7 +74,7 @@ import java.util.Set;
 
 
 /**
- * The Minguo calendar used in Taiwan (Republic Of China) uses as only difference to western gregorian
+ * <p>The Minguo calendar used in Taiwan (Republic Of China) uses as only difference to western gregorian
  * calendar a different year numbering with the Minguo era 1912-01-01. </p>
  *
  * <p>See also: <a href="https://en.wikipedia.org/wiki/Minguo_calendar">Wikipedia</a>. </p>
@@ -190,7 +190,7 @@ public final class MinguoCalendar
 
     /**
      * <p>Represents the day of week. </p>
-     * <p/>
+     *
      * <p>If the day-of-week is set to a new value then Time4J handles the calendar week
      * as starting on Sunday. </p>
      */
@@ -500,7 +500,7 @@ public final class MinguoCalendar
 
     /**
      * <p>Creates a new local timestamp with this date and given wall time. </p>
-     * <p/>
+     *
      * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
      * then the resulting timestamp will automatically be normalized such
      * that the timestamp will contain the following day instead. </p>
