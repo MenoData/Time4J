@@ -25,6 +25,7 @@ import net.time4j.base.ResourceLoader;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
+import net.time4j.format.internal.ExtendedPatterns;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -1696,6 +1697,8 @@ public final class CalendarText {
                 int style = getFormatStyle(mode);
                 DateFormat df = DateFormat.getTimeInstance(style, locale);
                 pattern = getFormatPattern(df);
+            } else if (this.delegate instanceof ExtendedPatterns) {
+                pattern = ExtendedPatterns.class.cast(this.delegate).getTimePattern(mode, locale, true);
             } else {
                 pattern = this.delegate.getTimePattern(mode, locale);
             }
@@ -1718,21 +1721,9 @@ public final class CalendarText {
                 return getFormatPattern(df);
             }
 
-            String time;
+            String time = this.delegate.getTimePattern(timeMode, locale);
             String date = this.delegate.getDatePattern(dateMode, locale);
-
-            if (timeMode == DisplayMode.FULL) {
-                time = CalendarText.getIsoInstance(locale).getTextForms().get("F(f)_t");
-                if (time == null) {
-                    int style = getFormatStyle(timeMode);
-                    DateFormat df = DateFormat.getTimeInstance(style, locale);
-                    time = getFormatPattern(df);
-                }
-            } else {
-                time = this.delegate.getTimePattern(timeMode, locale);
-            }
-
-            String pattern =  this.delegate.getDateTimePattern(dateMode, timeMode, locale);
+            String pattern = this.delegate.getDateTimePattern(dateMode, timeMode, locale);
             return pattern.replace("{1}", date).replace("{0}", time);
 
         }
