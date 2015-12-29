@@ -2259,6 +2259,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
+    @SuppressWarnings("unchecked")
     private ChronoDisplay display(
         T formattable,
         AttributeQuery query
@@ -2280,7 +2281,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 String variant = query.get(Attributes.CALENDAR_VARIANT);
                 tsp = m.toGeneralTimestamp(family, variant, tzid, startOfDay);
             } else if (Calendrical.class.isAssignableFrom(otype)) {
-                Chronology<? extends Calendrical> axis = cast(this.overrideHandler.getCalendarOverride());
+                Chronology<? extends Calendrical> axis =
+                    (Chronology<? extends Calendrical>) this.overrideHandler.getCalendarOverride();
                 tsp = m.toGeneralTimestamp(axis, tzid, startOfDay);
             } else {
                 throw new IllegalStateException("Unexpected calendar override: " + otype);
@@ -4196,6 +4198,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /**
          * <p>Defines a text format for a custom day period. </p>
          *
+         * @param   timeToLabels    mapping from start times to custom dayperiod labels
          * @return  this instance for method chaining
          * @throws  IllegalStateException if already called once or if the underlying chronology
          *                                does not support day periods
@@ -4206,6 +4209,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /*[deutsch]
          * <p>Definiert ein Textformat f&uuml;r einen benutzerdefinierten Tagesabschnitt. </p>
          *
+         * @param   timeToLabels    mapping from start times to custom dayperiod labels
          * @return  this instance for method chaining
          * @throws  IllegalStateException if already called once or if the underlying chronology
          *                                does not support day periods
@@ -5805,6 +5809,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public GeneralTimestamp<C> createFrom(
             ChronoEntity<?> entity,
