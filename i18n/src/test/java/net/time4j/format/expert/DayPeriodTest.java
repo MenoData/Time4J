@@ -401,7 +401,7 @@ public class DayPeriodTest {
 
     @Test(expected=ParseException.class)
     public void parseCustomWithInconsistency() throws ParseException {
-        Map<PlainTime, String> timeToLabels = new HashMap<PlainTime, String>();
+        Map<PlainTime, String> timeToLabels = new HashMap<>();
         timeToLabels.put(PlainTime.of(23), "night");
         timeToLabels.put(PlainTime.of(7), "morning");
         timeToLabels.put(PlainTime.of(12), "afternoon");
@@ -423,7 +423,10 @@ public class DayPeriodTest {
                 .ofTimePattern("h:mm BBBB", PatternType.CLDR, new Locale("zu"))
                 .with(Leniency.STRICT);
         assertThat(
-            f.parse("5:45 entathakusa"),
+            f.with(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE).parse("5:45 entathakusa"),
+            is(PlainTime.of(5, 45)));
+        assertThat(
+            f.parse("5:45 ekuseni"),
             is(PlainTime.of(5, 45)));
         assertThat(
             f.parse("9:45 ekuseni"),
@@ -473,7 +476,7 @@ public class DayPeriodTest {
             Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
             DayPeriod dp = DayPeriod.of(locale);
             Map<?, ?> m = Map.class.cast(field.get(dp));
-            Set<String> codes = new LinkedHashSet<String>();
+            Set<String> codes = new LinkedHashSet<>();
             for (Object code : m.values()) {
                 codes.add(code.toString());
             }
@@ -483,7 +486,7 @@ public class DayPeriodTest {
                     continue;
                 }
                 for (OutputContext oc : OutputContext.values()) {
-                    Set<String> translations = new HashSet<String>();
+                    Set<String> translations = new HashSet<>();
                     for (String code : codes) {
                         String key = mKey.invoke(null, textForms, tw, oc, code).toString();
                         String text = textForms.get(key);
@@ -500,7 +503,7 @@ public class DayPeriodTest {
 
     private static boolean isCheckWanted(Locale locale) {
         String lang = locale.getLanguage();
-        return !(lang.equals("fa") || lang.equals("hu")); // require manual check
+        return !(lang.equals("fa") || lang.equals("hu") || lang.equals("zu")); // require manual check
     }
 
 }
