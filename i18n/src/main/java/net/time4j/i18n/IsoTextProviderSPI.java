@@ -22,10 +22,10 @@
 package net.time4j.i18n;
 
 import net.time4j.format.DisplayMode;
-import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.ExtendedPatterns;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,7 +48,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @author  Meno Hochschild
  */
 public final class IsoTextProviderSPI
-    implements TextProvider, FormatPatternProvider {
+    implements TextProvider, ExtendedPatterns {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -186,9 +186,20 @@ public final class IsoTextProviderSPI
         Locale locale
     ) {
 
+        return this.getTimePattern(mode, locale, false);
+
+    }
+
+    @Override
+    public String getTimePattern(
+        DisplayMode mode,
+        Locale locale,
+        boolean alt
+    ) {
+
         String key;
 
-        if (mode == DisplayMode.FULL) {
+        if (alt && (mode == DisplayMode.FULL)) {
             key = "F(alt)";
         } else {
             StringBuilder sb = new StringBuilder();
