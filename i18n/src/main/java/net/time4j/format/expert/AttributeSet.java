@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
@@ -56,7 +57,28 @@ final class AttributeSet
     static final AttributeKey<String> PLUS_SIGN = Attributes.createKey("PLUS_SIGN", String.class);
     static final AttributeKey<String> MINUS_SIGN = Attributes.createKey("MINUS_SIGN", String.class);
 
-    private static final NumberSymbolProvider NUMBER_SYMBOLS = SymbolProviderSPI.INSTANCE;
+    private static final NumberSymbolProvider NUMBER_SYMBOLS;
+
+    static {
+        NumberSymbolProvider p = null;
+        int count = 0;
+
+        for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
+            if (!tmp.equals(SymbolProviderSPI.INSTANCE)) {
+                int size = tmp.getAvailableLocales().length;
+                if (size > count) {
+                    p = tmp;
+                    count = size;
+                }
+            }
+        }
+
+        if (p == null) {
+            p = SymbolProviderSPI.INSTANCE;
+        }
+
+        NUMBER_SYMBOLS = p;
+    }
 
     private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
@@ -355,12 +377,7 @@ final class AttributeSet
             NumericalSymbols symbols = NUMBER_SYMBOL_CACHE.get(key);
 
             if (symbols == null) {
-                symbols = DEFAULT_NUMERICAL_SYMBOLS;
-
-                if (
-                    SymbolProviderSPI.SUPPORTED_LOCALES.contains(key)
-                    || SymbolProviderSPI.SUPPORTED_LOCALES.contains(lang)
-                ) {
+                try {
                     symbols =
                         new NumericalSymbols(
                             NUMBER_SYMBOLS.getZeroDigit(locale),
@@ -368,6 +385,8 @@ final class AttributeSet
                             NUMBER_SYMBOLS.getPlusSign(locale),
                             NUMBER_SYMBOLS.getMinusSign(locale)
                         );
+                } catch (RuntimeException re) {
+                    symbols = DEFAULT_NUMERICAL_SYMBOLS;
                 }
 
                 NumericalSymbols old =

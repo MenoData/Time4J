@@ -16,7 +16,7 @@ public class NumberSymbolTest {
 
     @Test
     public void getZeroDigitFarsi() {
-        NumberSymbolProvider nsp = new SymbolProviderSPI();
+        NumberSymbolProvider nsp = SymbolProviderSPI.INSTANCE;
         assertThat(
             nsp.getZeroDigit(new Locale("fa")),
             is('\u06F0'));
@@ -24,7 +24,7 @@ public class NumberSymbolTest {
 
     @Test
     public void getMinusSignFarsi() {
-        NumberSymbolProvider nsp = new SymbolProviderSPI();
+        NumberSymbolProvider nsp = SymbolProviderSPI.INSTANCE;
         assertThat(
             nsp.getMinusSign(new Locale("fa")),
             is("\u200E\u2212"));
@@ -32,7 +32,7 @@ public class NumberSymbolTest {
 
     @Test
     public void getDecimalSeparatorGerman() {
-        NumberSymbolProvider nsp = new SymbolProviderSPI();
+        NumberSymbolProvider nsp = SymbolProviderSPI.INSTANCE;
         assertThat(
             nsp.getDecimalSeparator(new Locale("de")),
             is(','));

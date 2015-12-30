@@ -22,7 +22,6 @@
 package net.time4j.format;
 
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 
@@ -32,7 +31,7 @@ import java.util.Locale;
  * {@code ServiceLoader}-mechanism. </p>
  *
  * <p>If there is no external {@code NumberSymbolProvider} then Time4J will
- * just delegate to the JDK. </p>
+ * just delegate to the internal resources or to the JDK. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
@@ -46,7 +45,7 @@ import java.util.Locale;
  * und wird &uuml;ber einen {@code ServiceLoader}-Mechanismus instanziert. </p>
  *
  * <p>Wird kein externer {@code NumberSymbolProvider} gefunden, wird intern
- * eine Instanz erzeugt, die an das JDK delegiert. </p>
+ * eine Instanz erzeugt, die an die internen Ressourcen oder das JDK delegiert. </p>
  *
  * @author  Meno Hochschild
  * @since   2.1
@@ -72,7 +71,7 @@ public interface NumberSymbolProvider {
         new NumberSymbolProvider() {
             @Override
             public Locale[] getAvailableLocales() {
-                return NumberFormat.getAvailableLocales();
+                return DecimalFormatSymbols.getAvailableLocales();
             }
 
             @Override

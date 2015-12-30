@@ -166,6 +166,30 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void formatPersianCalendar() throws ParseException {
+        ChronoFormatter<PersianCalendar> formatter = // pattern => G y MMMM d, EEEE
+            ChronoFormatter.ofStyle(DisplayMode.FULL, new Locale("fa"), PersianCalendar.axis());
+        PersianCalendar jalali = PersianCalendar.of(1393, 2, 10);
+
+        String expected = "ه\u200D.ش."; // era
+        expected += " ";
+        expected += "۱۳۹۳"; // year
+        expected += " ";
+        expected += "اردیبهشت"; // month
+        expected += " ";
+        expected += "۱۰"; // day-of-month
+        expected += ", ";
+        expected += "چهارشنبه"; // day-of-week
+        PersianCalendar parsed = formatter.parse(expected);
+        assertThat(parsed, is(jalali));
+
+        String formatted = formatter.format(jalali); //         ه‍.ش. ۱۳۹۳ اردیبهشت۱۰,چهارشنبه
+        assertThat(formatted, is(expected));
+
+        assertThat(jalali.transform(PlainDate.class), is(PlainDate.of(2014, 4, 30)));
+    }
+
+    @Test
     public void executeCodeDemo() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
             ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
