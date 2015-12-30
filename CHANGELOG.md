@@ -13,6 +13,7 @@
 - Support for the languages Khmer and Lao [#419]
 
 ### Fixed
+- PersianCalendar in Farsi language should be with arabext numbers [#425]
 - Bidi literals (LRM, RLM, ALM) should be ignored in parsing [#418]
 - Formatting Ethiopian time with AM/PM-marker is not in western style [#413]
 - Parsing of Ethiopic tabot names broken if not at end of text [#412]
