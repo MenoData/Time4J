@@ -24,7 +24,6 @@ package net.time4j.i18n;
 import net.time4j.format.NumberSymbolProvider;
 
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -33,12 +32,12 @@ import java.util.Set;
 
 
 /**
- * <p>{@code ServiceProvider}-implementation for accessing localized
- * number symbols. </p>
+ * <p>Internal standard access to localized number symbols. </p>
  *
  * <p>The underlying properties files are located in the folder
  * &quot;numbers&quot; relative to class path and are encoded in UTF-8.
- * The basic bundle name is &quot;symbol&quot;. </p>
+ * The basic bundle name is &quot;symbol&quot;. If a locale is not found
+ * then the JDK serves as fallback. </p>
  *
  * @author  Meno Hochschild
  */
@@ -67,7 +66,9 @@ public final class SymbolProviderSPI
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /** For {@code java.util.ServiceLoader}. */
+    /**
+     * For service loader only.
+     */
     public SymbolProviderSPI() {
         super();
 
@@ -78,7 +79,30 @@ public final class SymbolProviderSPI
     @Override
     public Locale[] getAvailableLocales() {
 
-        return NumberFormat.getAvailableLocales(); // not used
+        Set<String> set = new HashSet<String>(SUPPORTED_LOCALES);
+
+        for (Locale loc : DecimalFormatSymbols.getAvailableLocales()) {
+            if (loc.getCountry().isEmpty()) {
+                set.add(loc.getLanguage());
+            } else {
+                set.add(loc.getLanguage() + "_" + loc.getCountry());
+            }
+        }
+
+        Locale[] result = new Locale[set.size()];
+        int i = 0;
+
+        for (String s : set) {
+            int underscore = s.indexOf('_');
+            if (underscore == -1) {
+                result[i] = new Locale(s);
+            } else {
+                result[i] = new Locale(s.substring(0, underscore), s.substring(underscore + 1));
+            }
+            i++;
+        }
+
+        return result;
 
     }
 
@@ -88,7 +112,7 @@ public final class SymbolProviderSPI
         return lookup(
             locale,
             "zero",
-            getSymbols(locale).getZeroDigit());
+            NumberSymbolProvider.DEFAULT.getZeroDigit(locale));
 
     }
 
@@ -98,7 +122,7 @@ public final class SymbolProviderSPI
         return lookup(
             locale,
             "separator",
-            getSymbols(locale).getDecimalSeparator());
+            NumberSymbolProvider.DEFAULT.getDecimalSeparator(locale));
 
     }
 
@@ -108,7 +132,7 @@ public final class SymbolProviderSPI
         return lookup(
             locale,
             "plus",
-            String.valueOf('+'));
+            NumberSymbolProvider.DEFAULT.getPlusSign(locale));
 
     }
 
@@ -118,7 +142,7 @@ public final class SymbolProviderSPI
         return lookup(
             locale,
             "minus",
-            String.valueOf(getSymbols(locale).getMinusSign()));
+            NumberSymbolProvider.DEFAULT.getMinusSign(locale));
 
     }
 
@@ -126,12 +150,6 @@ public final class SymbolProviderSPI
     public String toString() {
 
         return "SymbolProviderSPI";
-
-    }
-
-    private static DecimalFormatSymbols getSymbols(Locale loc) {
-
-        return DecimalFormatSymbols.getInstance(loc);
 
     }
 
