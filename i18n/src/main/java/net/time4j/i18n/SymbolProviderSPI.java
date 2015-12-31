@@ -23,7 +23,6 @@ package net.time4j.i18n;
 
 import net.time4j.format.NumberSymbolProvider;
 
-import java.text.DecimalFormatSymbols;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -45,6 +44,8 @@ public final class SymbolProviderSPI
     implements NumberSymbolProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final Locale[] EMPTY_ARRAY = new Locale[0];
 
     public static final Set<String> SUPPORTED_LOCALES;
     public static final SymbolProviderSPI INSTANCE;
@@ -79,30 +80,7 @@ public final class SymbolProviderSPI
     @Override
     public Locale[] getAvailableLocales() {
 
-        Set<String> set = new HashSet<String>(SUPPORTED_LOCALES);
-
-        for (Locale loc : DecimalFormatSymbols.getAvailableLocales()) {
-            if (loc.getCountry().isEmpty()) {
-                set.add(loc.getLanguage());
-            } else {
-                set.add(loc.getLanguage() + "_" + loc.getCountry());
-            }
-        }
-
-        Locale[] result = new Locale[set.size()];
-        int i = 0;
-
-        for (String s : set) {
-            int underscore = s.indexOf('_');
-            if (underscore == -1) {
-                result[i] = new Locale(s);
-            } else {
-                result[i] = new Locale(s.substring(0, underscore), s.substring(underscore + 1));
-            }
-            i++;
-        }
-
-        return result;
+        return EMPTY_ARRAY; // ok because this class only serves as fallback in SPI-mechanism
 
     }
 

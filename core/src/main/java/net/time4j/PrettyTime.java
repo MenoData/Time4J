@@ -90,10 +90,14 @@ public final class PrettyTime {
 
     static {
         NumberSymbolProvider p = null;
+        int count = 0;
 
         for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
-            p = tmp;
-            break;
+            int size = tmp.getAvailableLocales().length;
+            if (size >= count) { // includes SymbolProviderSPI if available
+                p = tmp;
+                count = size;
+            }
         }
 
         if (p == null) {
