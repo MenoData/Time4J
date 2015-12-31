@@ -64,12 +64,10 @@ final class AttributeSet
         int count = 0;
 
         for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
-            if (!tmp.equals(SymbolProviderSPI.INSTANCE)) {
-                int size = tmp.getAvailableLocales().length;
-                if (size > count) {
-                    p = tmp;
-                    count = size;
-                }
+            int size = tmp.getAvailableLocales().length;
+            if (size > count) {
+                p = tmp;
+                count = size;
             }
         }
 
