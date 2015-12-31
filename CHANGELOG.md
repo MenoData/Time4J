@@ -1,4 +1,6 @@
-## [v4.10] not yet released
+## [v4.11] not yet released
+
+## [v4.10] published on 2015-12-31
 ### Added
 - Fixed and flexible day periods with appropriate translations [#369]
 - Minguo calendar (Taiwan) [#390]
