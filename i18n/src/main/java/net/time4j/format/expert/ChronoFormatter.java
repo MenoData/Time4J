@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -104,6 +104,8 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * the classes {@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp}
  * and {@code Moment}. </p>
  *
+ * <p>Note: This class is immutable and can be used by multiple threads in parallel. </p>
+ *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
@@ -119,6 +121,9 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * k&ouml;nnen. Ein anderer Weg sind die Methoden {@code formatter(...)}
  * und {@code localFormatter(...)} der Klassen {@code PlainDate},
  * {@code PlainTime}, {@code PlainTimestamp} und {@code Moment}. </p>
+ *
+ * <p>Hinweis: Diese Klasse ist <code>immutable</code> und kann von mehreren
+ * Threads parallel verwendet werden. </p>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild

@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         Iso8601FormatTest.class,
         MiscellaneousTest.class,
         MomentPatternTest.class,
+        MultiFormatTest.class,
         OffsetPatternTest.class,
         OrdinalTest.class,
         ParsingTextOverflowTest.class,

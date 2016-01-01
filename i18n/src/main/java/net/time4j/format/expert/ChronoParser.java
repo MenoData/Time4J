@@ -79,7 +79,7 @@ public interface ChronoParser<T> {
     T parse(
         CharSequence    text,
         ParseLog        status,
-        AttributeQuery attributes
+        AttributeQuery  attributes
     );
 
 }
