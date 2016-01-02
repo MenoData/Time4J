@@ -11,15 +11,19 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.Leniency;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Calendar;
 import java.util.Locale;
@@ -460,6 +464,35 @@ public class CalendricalNamesTest {
             instance.getWeekdays(textWidth, outputContext)
             .print(Weekday.FRIDAY);
         assertThat(result, is("Freitag"));
+    }
+
+    @Test
+    public void parseCzechWithMultipleContextInSmartMode() throws ParseException {
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDatePattern("d. MMMM uuuu", PatternType.CLDR, new Locale("cs"));
+        PlainDate expected = PlainDate.of(2016, 1, 1);
+        assertThat(
+            f.parse("1. leden 2016"),
+            is(expected));
+        assertThat(
+            f.parse("1. ledna 2016"),
+            is(expected));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseCzechWithMultipleContextInStrictMode1() throws ParseException {
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDatePattern("d. MMMM uuuu", PatternType.CLDR, new Locale("cs")).with(Leniency.STRICT);
+        PlainDate expected = PlainDate.of(2016, 1, 1);
+        f.parse("1. leden 2016"); // standalone but parser expects embedded format mode (symbol M)
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseCzechWithMultipleContextInStrictMode2() throws ParseException {
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDatePattern("d. LLLL uuuu", PatternType.CLDR, new Locale("cs")).with(Leniency.STRICT);
+        PlainDate expected = PlainDate.of(2016, 1, 1);
+        f.parse("1. ledna 2016"); // embedded format but parser expects standalone mode (symbol L)
     }
 
     @Test

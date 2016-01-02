@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdEnumDateElement.java) is part of project Time4J.
  *
@@ -179,7 +179,8 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     ) throws IOException {
 
         V value = context.get(this);
-        buffer.append(this.accessor(attributes, isLeapMonth(value)).print(value));
+        OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+        buffer.append(this.accessor(attributes, oc, isLeapMonth(value)).print(value));
 
     }
 
@@ -191,15 +192,27 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     ) {
 
         int index = status.getIndex();
-        V result = this.accessor(attributes, false).parse(text, status, this.getType(), attributes);
+        OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+        V result = this.accessor(attributes, oc, false).parse(text, status, this.getType(), attributes);
 
-        if (
-            this.isMonthElement()
-            && (status.getErrorIndex() != -1)
-        ) {
+        if ((result == null) && this.isMonthElement()) {
             status.setErrorIndex(-1);
             status.setIndex(index);
-            result = this.accessor(attributes, true).parse(text, status, this.getType(), attributes);
+            result = this.accessor(attributes, oc, true).parse(text, status, this.getType(), attributes);
+        }
+
+        if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+            status.setErrorIndex(-1);
+            status.setIndex(index);
+            oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+            result = this.accessor(attributes, oc, false).parse(text, status, this.getType(), attributes);
+
+            if ((result == null) && this.isMonthElement()) {
+                status.setErrorIndex(-1);
+                status.setIndex(index);
+                result = this.accessor(attributes, oc, true).parse(text, status, this.getType(), attributes);
+            }
+
         }
 
         return result;
@@ -282,12 +295,12 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
 
     private TextAccessor accessor(
         AttributeQuery attributes,
+        OutputContext outputContext,
         boolean leap
     ) {
 
         Locale lang = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-        OutputContext outputContext = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
 
         CalendarText cnames;
 
