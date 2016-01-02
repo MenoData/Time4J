@@ -1,5 +1,6 @@
 ## [v3.14] not yet released
 ### Added
+- Dual parsing of embedded or standalone formats [#427]
 - Dedicated MultiFormatParser [#426]
 
 ## [v3.13] published on 2015-12-31
