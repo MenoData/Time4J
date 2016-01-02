@@ -38,6 +38,19 @@ public class MultiFormatTest {
         mfp.parse("31. diciembre 2015"); // spanish was not set up
     }
 
+    @Test(expected=IndexOutOfBoundsException.class)
+    public void parseEmptyString() throws ParseException {
+        MultiFormatParser<PlainDate> mfp = createMultipleFormat();
+        mfp.parse("");
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void parseNull() throws ParseException {
+        MultiFormatParser<PlainDate> mfp = createMultipleFormat();
+        mfp.parse(null);
+    }
+
+    @SuppressWarnings("unchecked")
     private static MultiFormatParser<PlainDate> createMultipleFormat() {
         ChronoFormatter<PlainDate> germanStyle =
             ChronoFormatter.ofDatePattern("dd.MM.uuuu", PatternType.CLDR, Locale.GERMAN);

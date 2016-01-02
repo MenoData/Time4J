@@ -92,7 +92,6 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * @return  new immutable instance of MultiFormatParser
      * @since   3.14/4.11
      */
-    @SafeVarargs
     public static <T extends ChronoEntity<T>> MultiFormatParser<T> of(ChronoFormatter<T>... formats) {
 
         List<ChronoFormatter<T>> parsers = Arrays.asList(formats);
@@ -130,6 +129,7 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * @return  parse result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
+     * @see     #parse(CharSequence, ParseLog)
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -139,6 +139,7 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * @return  parse result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
+     * @see     #parse(CharSequence, ParseLog)
      * @since   3.14/4.11
      */
     public T parse(CharSequence text)
@@ -162,6 +163,42 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * <p>Interpretes given text as chronological entity starting
      * at the specified position in parse log. </p>
      *
+     * <p>Following example demonstrates best coding practice if used in processing bulk data: </p>
+     *
+     * <pre>
+     *     static final MultiFormatParser&lt;PlainDate&gt; MULTI_FORMAT_PARSER;
+     *
+     *     static {
+     *         ChronoFormatter&lt;PlainDate&gt; germanStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;d. MMMM uuuu&quot;, PatternType.CLDR, Locale.GERMAN);
+     *         ChronoFormatter&lt;PlainDate&gt; frenchStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;d. MMMM uuuu&quot;, PatternType.CLDR, Locale.FRENCH);
+     *         ChronoFormatter&lt;PlainDate&gt; usStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;MM/dd/uuuu&quot;, PatternType.CLDR, Locale.US);
+     *         MULTI_FORMAT_PARSER = MultiFormatParser.of(germanStyle, frenchStyle, usStyle);
+     *     }
+     *
+     *     public Collection&lt;PlainDate&gt; parse(Collection&lt;String&gt; data) {
+     *         Collection&lt;PlainDate&gt; parsedDates = new ArrayList&lt;&gt;();
+     *         ParseLog plog = new ParseLog();
+     *         int index = 0;
+     *
+     *         for (String text : data) {
+     *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
+     *             if ((date == null) || plog.isError()) {
+     *                 // users are encouraged to use any good logging framework here
+     *                 System.out.println(&quot;Wrong entry found: &quot; + text + &quot; at position &quot; + index);
+     *             } else {
+     *                 parsedDates.add(date);
+     *             }
+     *             index++;
+     *         }
+     *
+     *         return Collections.unmodifiableCollection(parsedDates);
+     *     }
+     *
+     * </pre>
+     *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
@@ -171,6 +208,42 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
      * Log. </p>
+     *
+     * <p>Folgendes Beispiel demonstriert eine sinnvolle Anwendung, wenn es um die Massenverarbeitung geht: </p>
+     *
+     * <pre>
+     *     static final MultiFormatParser&lt;PlainDate&gt; MULTI_FORMAT_PARSER;
+     *
+     *     static {
+     *         ChronoFormatter&lt;PlainDate&gt; germanStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;d. MMMM uuuu&quot;, PatternType.CLDR, Locale.GERMAN);
+     *         ChronoFormatter&lt;PlainDate&gt; frenchStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;d. MMMM uuuu&quot;, PatternType.CLDR, Locale.FRENCH);
+     *         ChronoFormatter&lt;PlainDate&gt; usStyle =
+     *              ChronoFormatter.ofDatePattern(&quot;MM/dd/uuuu&quot;, PatternType.CLDR, Locale.US);
+     *         MULTI_FORMAT_PARSER = MultiFormatParser.of(germanStyle, frenchStyle, usStyle);
+     *     }
+     *
+     *     public Collection&lt;PlainDate&gt; parse(Collection&lt;String&gt; data) {
+     *         Collection&lt;PlainDate&gt; parsedDates = new ArrayList&lt;&gt;();
+     *         ParseLog plog = new ParseLog();
+     *         int index = 0;
+     *
+     *         for (String text : data) {
+     *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
+     *             if ((date == null) || plog.isError()) {
+     *                 // users are encouraged to use any good logging framework here
+     *                 System.out.println(&quot;Wrong entry found: &quot; + text + &quot; at position &quot; + index);
+     *             } else {
+     *                 parsedDates.add(date);
+     *             }
+     *             index++;
+     *         }
+     *
+     *         return Collections.unmodifiableCollection(parsedDates);
+     *     }
+     *
+     * </pre>
      *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
