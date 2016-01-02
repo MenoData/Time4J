@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EnumElement.java) is part of project Time4J.
  *
@@ -189,7 +189,8 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) throws IOException {
 
-        buffer.append(this.accessor(attributes).print(context.get(this)));
+        OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+        buffer.append(this.accessor(attributes, oc).print(context.get(this)));
 
     }
 
@@ -200,12 +201,18 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) {
 
-        return this.accessor(attributes).parse(
-            text,
-            status,
-            this.getType(),
-            attributes
-        );
+        int index = status.getIndex();
+        OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+        V result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+
+        if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+            status.setErrorIndex(-1);
+            status.setIndex(index);
+            oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+            result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+        }
+
+        return result;
 
     }
 
@@ -220,7 +227,10 @@ final class EnumElement<V extends Enum<V>>
 
     }
 
-    private TextAccessor accessor(AttributeQuery attributes) {
+    private TextAccessor accessor(
+        AttributeQuery attributes,
+        OutputContext oc
+    ) {
 
         CalendarText cnames =
             CalendarText.getInstance(
@@ -232,23 +242,11 @@ final class EnumElement<V extends Enum<V>>
 
         switch (this.index) {
             case MONTH:
-                return cnames.getStdMonths(
-                    textWidth,
-                    attributes.get(
-                        Attributes.OUTPUT_CONTEXT,
-                        OutputContext.FORMAT));
+                return cnames.getStdMonths(textWidth, oc);
             case DAY_OF_WEEK:
-                return cnames.getWeekdays(
-                    textWidth,
-                    attributes.get(
-                        Attributes.OUTPUT_CONTEXT,
-                        OutputContext.FORMAT));
+                return cnames.getWeekdays(textWidth, oc);
             case QUARTER_OF_YEAR:
-                return cnames.getQuarters(
-                    textWidth,
-                    attributes.get(
-                        Attributes.OUTPUT_CONTEXT,
-                        OutputContext.FORMAT));
+                return cnames.getQuarters(textWidth, oc);
             default:
                 throw new UnsupportedOperationException(this.name());
         }

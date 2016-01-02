@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Leniency.java) is part of project Time4J.
  *
@@ -67,7 +67,7 @@ public enum Leniency {
     /**
      * <p>This default mode tries to be a compromise between a pedantic
      * and a lax strategy by paying attention to value range constraints
-     * but neglecting some constraintes like the width of numerical
+     * but neglecting some constraints like the width of numerical
      * elements. </p>
      *
      * <p>There is no consistency check like in strict mode. For example

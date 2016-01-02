@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekmodel.java) is part of project Time4J.
  *
@@ -1084,7 +1084,8 @@ public final class Weekmodel
             AttributeQuery attributes
         ) throws IOException {
 
-            buffer.append(this.accessor(attributes).print(context.get(this)));
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            buffer.append(this.accessor(attributes, oc).print(context.get(this)));
 
         }
 
@@ -1095,12 +1096,18 @@ public final class Weekmodel
             AttributeQuery attributes
         ) {
 
-            return this.accessor(attributes).parse(
-                text,
-                status,
-                this.getType(),
-                attributes
-            );
+            int index = status.getIndex();
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            Weekday result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+
+            if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                status.setErrorIndex(-1);
+                status.setIndex(index);
+                oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+            }
+
+            return result;
 
         }
 
@@ -1122,8 +1129,7 @@ public final class Weekmodel
         }
 
         @Override
-        protected <T extends ChronoEntity<T>>
-        ElementRule<T, Weekday> derive(Chronology<T> chronology) {
+        protected <T extends ChronoEntity<T>> ElementRule<T, Weekday> derive(Chronology<T> chronology) {
 
             if (chronology.isRegistered(CALENDAR_DATE)) {
                 return new DRule<T>(this);
@@ -1140,7 +1146,10 @@ public final class Weekmodel
 
         }
 
-        private TextAccessor accessor(AttributeQuery attributes) {
+        private TextAccessor accessor(
+            AttributeQuery attributes,
+            OutputContext oc
+        ) {
 
             CalendarText cnames =
                 CalendarText.getInstance(
@@ -1148,12 +1157,8 @@ public final class Weekmodel
                     attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
             return cnames.getWeekdays(
-                attributes.get(
-                    Attributes.TEXT_WIDTH,
-                    TextWidth.WIDE),
-                attributes.get(
-                    Attributes.OUTPUT_CONTEXT,
-                    OutputContext.FORMAT));
+                attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE),
+                oc);
 
         }
 
@@ -1478,18 +1483,18 @@ public final class Weekmodel
         @Override
         public ChronoElement<?> getChildAtFloor(T context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(T context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
-        private ChronoElement<?> getChild(T context) {
+        private ChronoElement<?> getChild() {
 
             return this.owner.getModel().localDayOfWeek();
 

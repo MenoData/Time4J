@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Attributes.java) is part of project Time4J.
  *
@@ -158,12 +158,14 @@ public final class Attributes
      *  <caption>Legend</caption>
      *  <tr>
      *      <th>LENIENCY</th>
-     *      <th>PARSE_CASE_INSENSITIVE</th>
-     *      <th>PARSE_PARTIAL_COMPARE</th>
-     *      <th>TRAILING_CHARACTERS</th></tr>
-     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td></tr>
-     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td></tr>
-     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td></tr>
+     *      <th>{@link #PARSE_CASE_INSENSITIVE}</th>
+     *      <th>{@link #PARSE_PARTIAL_COMPARE}</th>
+     *      <th>{@link #TRAILING_CHARACTERS}</th>
+     *      <th>{@link #PARSE_MULTIPLE_CONTEXT}</th>
+     *  </tr>
+     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td><td>false</td></tr>
+     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td><td>true</td></tr>
+     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td><td>true</td></tr>
      * </table>
      *
      * <p>Default value: {@link Leniency#SMART} </p>
@@ -178,12 +180,14 @@ public final class Attributes
      *  <caption>Legende</caption>
      *  <tr>
      *      <th>LENIENCY</th>
-     *      <th>PARSE_CASE_INSENSITIVE</th>
-     *      <th>PARSE_PARTIAL_COMPARE</th>
-     *      <th>TRAILING_CHARACTERS</th></tr>
-     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td></tr>
-     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td></tr>
-     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td></tr>
+     *      <th>{@link #PARSE_CASE_INSENSITIVE}</th>
+     *      <th>{@link #PARSE_PARTIAL_COMPARE}</th>
+     *      <th>{@link #TRAILING_CHARACTERS}</th>
+     *      <th>{@link #PARSE_MULTIPLE_CONTEXT}</th>
+     *  </tr>
+     *  <tr><td>STRICT</td><td>false</td><td>false</td><td>false</td><td>false</td></tr>
+     *  <tr><td>SMART</td><td>true</td><td>false</td><td>false</td><td>true</td></tr>
+     *  <tr><td>LAX</td><td>true</td><td>true</td><td>true</td><td>true</td></tr>
      * </table>
      *
      * <p>Standardwert: {@link Leniency#SMART} </p>
@@ -249,6 +253,31 @@ public final class Attributes
      */
     public static final AttributeKey<Boolean> PARSE_PARTIAL_COMPARE =
         PredefinedKey.valueOf("PARSE_PARTIAL_COMPARE", Boolean.class);
+
+    /**
+     * <p>This attribute controls if the parser will also try alternative
+     * output contexts if parsing with the original one fails. </p>
+     *
+     * <p>Relates to month names, weekday names and quarter names.
+     * Default value: {@code true} </p>
+     *
+     * @see     OutputContext
+     * @see     #OUTPUT_CONTEXT
+     * @since   3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Steuert, ob beim Parsen auch alternative Ausgabekontexte gepr&uuml;ft werden,
+     * wenn der urspr&uuml;nglich angenommene Kontext fehlschl&auml;gt. </p>
+     *
+     * <p>Bezieht sich auf Monatsnamen, Wochentagsnamen und Quartalsnamen.
+     * Standardwert: {@code true} </p>
+     *
+     * @see     OutputContext
+     * @see     #OUTPUT_CONTEXT
+     * @since   3.14/4.11
+     */
+    public static final AttributeKey<Boolean> PARSE_MULTIPLE_CONTEXT =
+        PredefinedKey.valueOf("PARSE_MULTIPLE_CONTEXT", Boolean.class);
 
     /**
      * <p>Determines the number system. </p>
@@ -905,16 +934,19 @@ public final class Attributes
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, false);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, false);
                         this.set(Attributes.TRAILING_CHARACTERS, false);
+                        this.set(Attributes.PARSE_MULTIPLE_CONTEXT, false);
                         break;
                     case SMART:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, true);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, false);
                         this.set(Attributes.TRAILING_CHARACTERS, false);
+                        this.set(Attributes.PARSE_MULTIPLE_CONTEXT, true);
                         break;
                     case LAX:
                         this.set(Attributes.PARSE_CASE_INSENSITIVE, true);
                         this.set(Attributes.PARSE_PARTIAL_COMPARE, true);
                         this.set(Attributes.TRAILING_CHARACTERS, true);
+                        this.set(Attributes.PARSE_MULTIPLE_CONTEXT, true);
                         break;
                     default:
                         throw new UnsupportedOperationException(value.name());

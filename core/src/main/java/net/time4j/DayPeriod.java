@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPeriod.java) is part of project Time4J.
  *
@@ -946,6 +946,28 @@ public final class DayPeriod {
             ParsePosition status,
             AttributeQuery attributes
         ) {
+
+            int index = status.getIndex();
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            String result = this.parse(text, status, attributes, oc);
+
+            if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                status.setErrorIndex(-1);
+                status.setIndex(index);
+                oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                result = this.parse(text, status, attributes, oc);
+            }
+
+            return result;
+
+        }
+
+        private String parse(
+            CharSequence text,
+            ParsePosition status,
+            AttributeQuery attributes,
+            OutputContext oc
+        ) {
             List<String> codes = new ArrayList<String>();
             Map<String, String> textForms = null;
 
@@ -964,7 +986,6 @@ public final class DayPeriod {
             }
 
             TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
             boolean caseInsensitive =
                 attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue();
             boolean partialCompare =

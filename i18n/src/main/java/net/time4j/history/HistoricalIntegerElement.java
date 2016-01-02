@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricalIntegerElement.java) is part of project Time4J.
  *
@@ -204,7 +204,8 @@ final class HistoricalIntegerElement
 
         switch (this.index) {
             case MONTH_INDEX:
-                buffer.append(this.monthAccessor(attributes).print(Month.valueOf(v)));
+                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(v)));
                 break;
             default:
                 // numerical case
@@ -222,14 +223,20 @@ final class HistoricalIntegerElement
 
         switch (this.index) {
             case MONTH_INDEX:
-                Month month =
-                    this.monthAccessor(attributes).parse(
-                        text,
-                        status,
-                        Month.class,
-                        attributes
-                    );
-                return Integer.valueOf(month.getValue());
+                int index = status.getIndex();
+                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                    status.setErrorIndex(-1);
+                    status.setIndex(index);
+                    oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                    month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                }
+                if (month == null) {
+                    return null;
+                } else {
+                    return Integer.valueOf(month.getValue());
+                }
             default:
                 char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
                 int value = 0;
@@ -265,7 +272,10 @@ final class HistoricalIntegerElement
 
     }
 
-    private TextAccessor monthAccessor(AttributeQuery attributes) {
+    private TextAccessor monthAccessor(
+        AttributeQuery attributes,
+        OutputContext outputContext
+    ) {
 
         CalendarText cnames =
             CalendarText.getInstance(
@@ -273,8 +283,6 @@ final class HistoricalIntegerElement
                 attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-        OutputContext outputContext = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-
         return cnames.getStdMonths(textWidth, outputContext);
 
     }
