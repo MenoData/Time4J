@@ -1,16 +1,9 @@
 package net.time4j.calendar;
 
-import net.time4j.PlainDate;
-import net.time4j.engine.EpochDays;
-import net.time4j.format.Attributes;
-import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
+import net.time4j.engine.CalendarDays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.text.ParseException;
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -57,11 +50,57 @@ public class HijriUnitTest {
             HijriCalendar.Unit.MONTHS.between(start, end, HijriCalendar.VARIANT_UMALQURA),
             is(27));
         assertThat(
+            start.plus(27, HijriCalendar.Unit.MONTHS),
+            is(end.withVariant(HijriAlgorithm.EAST_ISLAMIC_ASTRO)));
+        assertThat(
             HijriCalendar.Unit.MONTHS.between(
                 start,
                 end.minus(1, HijriCalendar.Unit.DAYS),
                 HijriCalendar.VARIANT_UMALQURA),
             is(26));
+    }
+
+    @Test
+    public void yearsBetween() {
+        HijriCalendar start = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1436, 12, 30);
+        HijriCalendar end = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_CIVIL, 1438, 12, 29);
+        assertThat(
+            HijriCalendar.Unit.YEARS.between(start, end, HijriCalendar.VARIANT_UMALQURA),
+            is(2));
+        assertThat(
+            start.plus(2, HijriCalendar.Unit.YEARS),
+            is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1438, 12, 29)));
+        assertThat(
+            HijriCalendar.Unit.YEARS.between(
+                start,
+                end.minus(1, HijriCalendar.Unit.DAYS),
+                HijriCalendar.VARIANT_UMALQURA),
+            is(1));
+    }
+
+    @Test
+    public void daysBetween() {
+        HijriCalendar start = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1436, 12, 30);
+        HijriCalendar end = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_CIVIL, 1438, 12, 29);
+        int delta = (int) CalendarDays.between(start, end).getAmount(); // 709
+        assertThat(
+            HijriCalendar.Unit.DAYS.between(start, end, HijriCalendar.VARIANT_UMALQURA),
+            is(delta));
+        assertThat(
+            start.plus(delta, HijriCalendar.Unit.DAYS),
+            is(end.withVariant(HijriAlgorithm.EAST_ISLAMIC_ASTRO)));
+    }
+
+    @Test
+    public void weeksBetween() {
+        HijriCalendar start = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1436, 12, 30);
+        HijriCalendar end = HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_CIVIL, 1438, 12, 29);
+        assertThat(
+            HijriCalendar.Unit.WEEKS.between(start, end, HijriCalendar.VARIANT_UMALQURA),
+            is(101));
+        assertThat(
+            start.plus(101, HijriCalendar.Unit.WEEKS),
+            is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1438, 12, 28)));
     }
 
 }
