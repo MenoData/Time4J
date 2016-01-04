@@ -1,5 +1,6 @@
 ## [v4.11] not yet released
 ### Added
+- Date arithmetic on HijriCalendar [#429]
 - New methods `withVariant(...)` on CalendarVariant [#428]
 - Dual parsing of embedded or standalone formats [#427]
 - Dedicated MultiFormatParser [#426]
