@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
+        HijriUnitTest.class,
         HijriYearTest.class,
         MinguoCalendarTest.class,
         MinguoOperatorTest.class,

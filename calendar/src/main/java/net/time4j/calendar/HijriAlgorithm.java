@@ -175,7 +175,7 @@ public enum HijriAlgorithm
 	private static final long CIVIL_1600_12_29;
 	
 	static {
-		LENGTH_OF_30_YEAR_CYCLE = 30 * 354 + 11; 
+		LENGTH_OF_30_YEAR_CYCLE = 30 * 354 + 11;
 		// HistoricDate date = HistoricDate.of(HistoricEra.AD, 622, 7, 15); // Thursday epoch
 		START_622_07_15 = -492879; // ChronoHistory.PROLEPTIC_JULIAN.convert(date).get(EpochDays.UTC);
 		START_622_07_16 = START_622_07_15 + 1;
