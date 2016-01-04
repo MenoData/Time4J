@@ -41,6 +41,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
@@ -841,6 +842,66 @@ public final class HijriCalendar
 
     }
 
+    /**
+     * <p>Adds given calendrical units to this instance. </p>
+     *
+     * @param   amount      amount to be added (maybe negative)
+     * @param   unit        calendrical unit
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.14/4.10
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebenen Zeiteinheiten zu dieser Instanz. </p>
+     *
+     * @param   amount      amount to be added (maybe negative)
+     * @param   unit        calendrical unit
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.14/4.10
+     */
+    public HijriCalendar plus(
+        int amount,
+        Unit unit
+    ) {
+
+        try {
+            return unit.addTo(this, amount);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException(iae.getMessage());
+            ex.initCause(iae);
+            throw ex;
+        }
+
+    }
+
+    /**
+     * <p>Subtracts given calendrical units from this instance. </p>
+     *
+     * @param   amount      amount to be subtracted (maybe negative)
+     * @param   unit        calendrical unit
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.14/4.10
+     */
+    /*[deutsch]
+     * <p>Subtrahiert die angegebenen Zeiteinheiten von dieser Instanz. </p>
+     *
+     * @param   amount      amount to be subtracted (maybe negative)
+     * @param   unit        calendrical unit
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   3.14/4.10
+     */
+    public HijriCalendar minus(
+        int amount,
+        Unit unit
+    ) {
+
+        return this.plus(MathUtils.safeNegate(amount), unit);
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -1009,6 +1070,160 @@ public final class HijriCalendar
     }
 
     //~ Innere Klassen ----------------------------------------------------
+
+    /**
+     * <p>Defines come calendar units for the Hijri calendar. </p>
+     *
+     * @since   3.14/4.10
+     */
+    /*[deutsch]
+     * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den islamischen Kalender. </p>
+     *
+     * @since   3.14/4.10
+     */
+    public static enum Unit
+        implements ChronoUnit {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        YEARS((354.0 + 11.0 / 30) * 86400.0),
+
+        MONTHS(((354.0 + 11.0 / 30) / 12) * 86400.0), // ~ 29.53 days
+
+        WEEKS(7 * 86400.0),
+
+        DAYS(86400.0);
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private transient final double length;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Unit(double length) {
+            this.length = length;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public double getLength() {
+
+            return this.length;
+
+        }
+
+        @Override
+        public boolean isCalendrical() {
+
+            return true;
+
+        }
+
+        /**
+         * <p>Calculates the difference between given Ethiopian dates in this unit. </p>
+         *
+         * @param   start       start date (inclusive)
+         * @param   end         end date (exclusive)
+         * @param   variant     variant reference to which both dates will be converted first
+         * @return  difference counted in this unit
+         * @since   3.14/4.11
+         */
+        /*[deutsch]
+         * <p>Berechnet die Differenz zwischen den angegebenen Datumsparametern in dieser Zeiteinheit. </p>
+         *
+         * @param   start       start date (inclusive)
+         * @param   end         end date (exclusive)
+         * @param   variant     variant reference to which both dates will be converted first
+         * @return  difference counted in this unit
+         * @since   3.14/4.11
+         */
+        public int between(
+            HijriCalendar start,
+            HijriCalendar end,
+            String variant
+        ) {
+
+            switch (this) {
+                case YEARS:
+                    return MONTHS.between(start, end, variant) / 12;
+                case MONTHS:
+                    HijriCalendar s = start.withVariant(variant);
+                    HijriCalendar e = end.withVariant(variant);
+                    int delta = e.hyear * 12 + (e.hmonth - 1) - s.hyear * 12 - (s.hmonth - 1);
+                    if ((delta > 0) && (e.hdom < s.hdom)) {
+                        delta--;
+                    } else if ((delta < 0) && (e.hdom > s.hdom)) {
+                        delta++;
+                    }
+                    return delta;
+                case WEEKS:
+                    return DAYS.between(start, end, variant) / 7;
+                case DAYS:
+                    return (int) CalendarDays.between(start, end).getAmount();
+                default:
+                    throw new UnsupportedOperationException(this.name());
+            }
+
+        }
+
+        /**
+         * <p>Equivalent to {@link #between(HijriCalendar, HijriCalendar, String)
+         * between(start, end, variantSource.getVariant())}. </p>
+         *
+         * @param   start           start date (inclusive)
+         * @param   end             end date (exclusive)
+         * @param   variantSource   variant reference to which both dates will be converted first
+         * @return  difference counted in this unit
+         * @since   3.14/4.11
+         */
+        /*[deutsch]
+         * <p>&Auml;quivalent zu {@link #between(HijriCalendar, HijriCalendar, String)
+         * between(start, end, variantSource.getVariant())}. </p>
+         *
+         * @param   start           start date (inclusive)
+         * @param   end             end date (exclusive)
+         * @param   variantSource   variant reference to which both dates will be converted first
+         * @return  difference counted in this unit
+         * @since   3.14/4.11
+         */
+        public int between(
+            HijriCalendar start,
+            HijriCalendar end,
+            VariantSource variantSource
+        ) {
+
+            return this.between(start, end, variantSource.getVariant());
+
+        }
+
+        // called by plus/minus-methods
+        HijriCalendar addTo(
+            HijriCalendar hijri,
+            int amount
+        ) {
+
+            switch (this) {
+                case YEARS:
+                    return hijri.with(HijriCalendar.YEAR_OF_ERA, MathUtils.safeAdd(hijri.getYear(), amount));
+                case MONTHS:
+                    int months = MathUtils.safeAdd(hijri.hyear * 12 + (hijri.hmonth - 1), amount);
+                    int y = MathUtils.floorDivide(months, 12);
+                    int m = MathUtils.floorModulo(months, 12) + 1;
+                    int dmax = hijri.getCalendarSystem().getLengthOfMonth(HijriEra.ANNO_HEGIRAE, y, m);
+                    int d = Math.min(hijri.hdom, dmax);
+                    return HijriCalendar.of(hijri.getVariant(), y, m, d);
+                case WEEKS:
+                    return DAYS.addTo(hijri, MathUtils.safeMultiply(amount, 7));
+                case DAYS:
+                    return hijri.plus(CalendarDays.of(amount));
+                default:
+                    throw new UnsupportedOperationException(this.name());
+            }
+
+        }
+
+    }
 
     private static class VariantMap
         extends ConcurrentHashMap<String, MonthBasedCalendarSystem<HijriCalendar>> {

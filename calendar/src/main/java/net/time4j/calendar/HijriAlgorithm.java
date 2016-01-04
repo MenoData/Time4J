@@ -167,7 +167,7 @@ public enum HijriAlgorithm
 	 */
 	HABASH_AL_HASIB_ASTRO("islamic-habashalhasiba", new int[] {2, 5, 8, 11, 13, 16, 19, 21, 24, 27, 30}, false);
 	
-	private static final long LENGTH_OF_30_YEAR_CYCLE; 
+	private static final long LENGTH_OF_30_YEAR_CYCLE;
 	private static final long START_622_07_15;
 	private static final long START_622_07_16;
 	private static final int MAX_YEAR;
