@@ -54,6 +54,9 @@ public class HijriAlgoTest {
         HijriCalendar hijri =
             PlainDate.of(2005, 12, 23).transform(HijriCalendar.class, HijriAlgorithm.EAST_ISLAMIC_ASTRO);
         assertThat(
+            hijri.withVariant(HijriAlgorithm.EAST_ISLAMIC_CIVIL),
+            is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_CIVIL, 1426, 11, 21)));
+        assertThat(
             hijri,
             is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1426, 11, 22)));
         assertThat(
@@ -65,6 +68,9 @@ public class HijriAlgoTest {
     public void EAST_ISLAMIC_CIVIL_2() {
         HijriCalendar hijri =
             PlainDate.of(2005, 12, 23).transform(HijriCalendar.class, HijriAlgorithm.EAST_ISLAMIC_CIVIL);
+        assertThat(
+            hijri.withVariant(HijriAlgorithm.EAST_ISLAMIC_ASTRO),
+            is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_ASTRO, 1426, 11, 22)));
         assertThat(
             hijri,
             is(HijriCalendar.of(HijriAlgorithm.EAST_ISLAMIC_CIVIL, 1426, 11, 21)));

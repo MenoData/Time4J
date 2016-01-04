@@ -136,6 +136,56 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     public abstract String getVariant();
 
     /**
+     * <p>Creates a copy of this instance with given variant. </p>
+     *
+     * <p>If given variant is equal to the variant of this instance
+     * then the method will just return this instance. </p>
+     *
+     * @param   variant     name of new variant
+     * @return  copy of this instance with equal epoch-day-value but different variant
+     * @since   3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Instanz mit der angegebenen Variante. </p>
+     *
+     * <p>Wenn die angegebene Variante der Variante dieser Instanz gleicht, wird die
+     * Methode einfach nur diese Instanz zur&uuml;ckgeben. </p>
+     *
+     * @param   variant     name of new variant
+     * @return  copy of this instance with equal epoch-day-value but different variant
+     * @since   3.14/4.11
+     */
+    public D withVariant(String variant) {
+
+        if (variant.equals(this.getVariant())) { // NPE-check
+            return this.getContext();
+        }
+
+        return this.transform(this.getChronology().getChronoType(), variant);
+
+    }
+
+    /**
+     * <p>Equivalent to {@link #withVariant(String) withVariant(variantSource.getVariant())}. </p>
+     *
+     * @param   variantSource   source of desired calendar variant
+     * @return  copy of this instance with equal epoch-day-value but different variant
+     * @since   3.14/4.11
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@link #withVariant(String) withVariant(variantSource.getVariant())}. </p>
+     *
+     * @param   variantSource   source of desired calendar variant
+     * @return  copy of this instance with equal epoch-day-value but different variant
+     * @since   3.14/4.11
+     */
+    public D withVariant(VariantSource variantSource) {
+
+        return this.withVariant(variantSource.getVariant());
+
+    }
+
+    /**
      * <p>Converts this calendar date to the given target type based on
      * the count of days relative to UTC epoch [1972-01-01]. </p>
      *
