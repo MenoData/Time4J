@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstronomicalHijriData.java) is part of project Time4J.
  *
@@ -39,6 +39,11 @@ import java.util.Properties;
 
 /**
  * <p>Calendar system for astronomical hijri data of any variant. </p>
+ *
+ * <p>Users can easily take care of deviations (usually +/- 3 days) if they manage copies of the underlying data
+ * and make their individual adjustments to lengths of months. The name of the copied change file is the new
+ * variant name. Such a file has the extension &quot;.data&quot; and is located in the data-directory relative
+ * to the class path. </p>
  *
  * @since   3.5/4.3
  */
@@ -102,7 +107,6 @@ final class AstronomicalHijriData
                 int max = Integer.parseInt(properties.getProperty("max", "0"));
                 this.maxYear = max;
                 int count = (max - min + 1) * 12;
-                long maxCounter = this.minUTC - 1;
 
                 int[] mlen = new int[count];
                 long[] mutc = new long[count];
@@ -117,7 +121,6 @@ final class AstronomicalHijriData
                     String[] monthLengths = row.split(" ");
                     for (int m = 0; m < Math.min(monthLengths.length, 12); m++) {
                         mlen[i] = Integer.parseInt(monthLengths[m]);
-                        maxCounter += mlen[i];
                         mutc[i] = v;
                         v += mlen[i];
                         i++;
@@ -133,7 +136,7 @@ final class AstronomicalHijriData
                     }
                 }
 
-                this.maxUTC = maxCounter;
+                this.maxUTC = v - 1;
                 this.lengthOfMonth = mlen;
                 this.firstOfMonth = mutc;
 
