@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoHistory.java) is part of project Time4J.
  *
@@ -329,7 +329,7 @@ public final class ChronoHistory
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Ist das angegebene historische g&uuml;ltig? </p>
+     * <p>Ist das angegebene historische Datum g&uuml;ltig? </p>
      *
      * <p>Wenn das Argument {@code null} ist, liefert die Methode {@code false}. </p>
      *
@@ -618,10 +618,11 @@ public final class ChronoHistory
     }
 
     /**
-     * <p>Defines the element for the historical era. </p>
+     * <p>Defines the element for the historic era. </p>
      *
      * <p>This element is applicable on all chronological types which have registered the element
-     * {@link PlainDate#COMPONENT}. </p>
+     * {@link PlainDate#COMPONENT}. The era value cannot be changed in any way which makes sense
+     * so this element is rather like a display-only element. </p>
      *
      * @return  era-related element
      * @since   3.0
@@ -632,7 +633,9 @@ public final class ChronoHistory
      * <p>Definiert das Element f&uuml;r die historische &Auml;ra. </p>
      *
      * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
-     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     * {@link PlainDate#COMPONENT} registriert haben. Der &Auml;ra-Wert kann nicht auf eine
+     * sinnvolle Weise ge&auml;ndert werden, so da&szlig; sich dieses Element wie ein reines
+     * Anzeigeelement verh&auml;lt. </p>
      *
      * @return  era-related element
      * @since   3.0

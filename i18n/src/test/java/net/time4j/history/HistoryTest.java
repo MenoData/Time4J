@@ -313,4 +313,18 @@ public class HistoryTest {
         ChronoHistory.ofGregorianReform(PlainDate.axis().getMaximum()).getGregorianCutOverDate();
     }
 
+    @Test
+    public void eraNotChanged() {
+        PlainDate date = PlainDate.of(2016, 1, 12);
+        assertThat(
+            date.with(ChronoHistory.PROLEPTIC_JULIAN.era(), HistoricEra.AD),
+            is(date));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void eraChanged() {
+        PlainDate date = PlainDate.of(2016, 1, 12);
+        date.with(ChronoHistory.PROLEPTIC_JULIAN.era(), HistoricEra.BC);
+    }
+
 }
