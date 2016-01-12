@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricalEraElement.java) is part of project Time4J.
  *
@@ -258,9 +258,7 @@ final class HistoricalEraElement
 
             try {
                 HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
-                HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
-                newHD = this.history.adjustDayOfMonth(newHD);
-                return this.history.isValid(newHD);
+                return (hd.getEra() == value);
             } catch (IllegalArgumentException iae) {
                 return false;
             }
@@ -274,10 +272,15 @@ final class HistoricalEraElement
             boolean lenient
         ) {
 
-            HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
-            HistoricDate newHD = HistoricDate.of(value, hd.getYearOfEra(), hd.getMonth(), hd.getDayOfMonth());
-            newHD = this.history.adjustDayOfMonth(newHD);
-            return context.with(PlainDate.COMPONENT, this.history.convert(newHD));
+            if (value != null) {
+                HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
+
+                if (hd.getEra() == value) {
+                    return context;
+                }
+            }
+
+            throw new IllegalArgumentException(value.name());
 
         }
 
