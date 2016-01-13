@@ -8,6 +8,9 @@
 ### Fixed
 - Semantic of changing historic era in ChronoHistory unclear [#430]
 
+### Changed
+- Update leap second expiry date to 2016-12-28 [#431]
+
 ## [v4.10] published on 2015-12-31
 ### Added
 - Fixed and flexible day periods with appropriate translations [#369]
