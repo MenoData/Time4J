@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.ExtendedPatterns;
+import net.time4j.history.HistoricEra;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -415,7 +416,7 @@ public final class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "ERA");
-            names = lookupBundle(rb, 2, key, tw, OutputContext.FORMAT, 0);
+            names = lookupBundle(rb, HistoricEra.values().length, key, tw, OutputContext.FORMAT, 0);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if ((names == null) && (tw != TextWidth.ABBREVIATED)) {

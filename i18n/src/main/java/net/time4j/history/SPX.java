@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -25,6 +25,8 @@ import net.time4j.PlainDate;
 import net.time4j.engine.EpochDays;
 import net.time4j.history.internal.HistoricVariant;
 
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -50,6 +52,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int VERSION_2 = 2;
+
+    /** Serialisierungstyp. */
+    static final int VERSION_3 = 3;
 
     private static final int[] EMPTY_INT_ARRAY = new int[0];
     private static final long serialVersionUID = 1L;
@@ -114,12 +119,12 @@ final class SPX
      * @throws      IOException in any case of IO-failures
      */
     @Override
-    public void writeExternal(ObjectOutput out)
-        throws IOException {
+    public void writeExternal(ObjectOutput out) throws IOException {
 
         switch (this.type) {
             case VERSION_1:
             case VERSION_2:
+            case VERSION_3:
                 this.writeHistory(out);
                 break;
             default:
@@ -146,27 +151,35 @@ final class SPX
     public void readExternal(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
+        ChronoHistory history;
+        AncientJulianLeapYears ajly;
         byte header = in.readByte();
 
         switch ((header & 0xFF) >> 4) {
             case VERSION_1:
-                this.obj = this.readHistory(in, header);
+                history = this.readHistory(in, header);
                 break;
             case VERSION_2:
-                ChronoHistory history = this.readHistory(in, header);
-                int len = in.readInt();
-                if (len > 0) {
-                    int[] sequence = new int[len];
-                    for (int i = 0; i < len; i++) {
-                        sequence[i] = 1 - in.readInt();
-                    }
-                    history = history.with(AncientJulianLeapYears.of(sequence));
+                history = this.readHistory(in, header);
+                ajly = readTriennalState(in);
+                if (ajly != null) {
+                    history = history.with(ajly);
                 }
-                this.obj = history;
+                break;
+            case VERSION_3:
+                history = this.readHistory(in, header);
+                ajly = readTriennalState(in);
+                if (ajly != null) {
+                    history = history.with(ajly);
+                }
+                history = history.with(NewYearStrategy.readFromStream(in));
+                history = history.with(EraPreference.readFromStream(in));
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
         }
+
+        this.obj = history;
 
     }
 
@@ -176,8 +189,7 @@ final class SPX
 
     }
 
-    private void writeHistory(ObjectOutput out)
-        throws IOException {
+    private void writeHistory(DataOutput out) throws IOException {
 
         ChronoHistory history = (ChronoHistory) this.obj;
         int variant = history.getHistoricVariant().getSerialValue();
@@ -200,10 +212,13 @@ final class SPX
             out.writeInt(sequence[i]);
         }
 
+        history.getNewYearStrategy().writeToStream(out);
+        history.getEraPreference().writeToStream(out);
+
     }
 
     private ChronoHistory readHistory(
-        ObjectInput in,
+        DataInput in,
         byte header
     ) throws IOException, ClassNotFoundException {
 
@@ -215,6 +230,8 @@ final class SPX
                 return ChronoHistory.PROLEPTIC_GREGORIAN;
             case PROLEPTIC_JULIAN:
                 return ChronoHistory.PROLEPTIC_JULIAN;
+            case PROLEPTIC_BYZANTINE:
+                return ChronoHistory.PROLEPTIC_BYZANTINE;
             case SWEDEN:
                 return ChronoHistory.ofSweden();
             case INTRODUCTION_ON_1582_10_15:
@@ -235,6 +252,22 @@ final class SPX
         }
 
         throw new StreamCorruptedException("Unknown variant of chronological history.");
+
+    }
+
+    private static AncientJulianLeapYears readTriennalState(DataInput in) throws IOException {
+
+        int len = in.readInt();
+
+        if (len > 0) {
+            int[] sequence = new int[len];
+            for (int i = 0; i < len; i++) {
+                sequence[i] = 1 - in.readInt();
+            }
+            return AncientJulianLeapYears.of(sequence);
+        }
+
+        return null;
 
     }
 

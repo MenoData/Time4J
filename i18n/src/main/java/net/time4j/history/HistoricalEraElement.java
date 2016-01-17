@@ -51,7 +51,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 final class HistoricalEraElement
     extends BasicElement<HistoricEra>
@@ -236,14 +235,26 @@ final class HistoricalEraElement
         @Override
         public HistoricEra getMinimum(C context) {
 
-            return HistoricEra.BC;
+            HistoricEra era = this.getValue(context);
+
+            if (era == HistoricEra.AD) {
+                return HistoricEra.BC;
+            } else {
+                return era;
+            }
 
         }
 
         @Override
         public HistoricEra getMaximum(C context) {
 
-            return HistoricEra.AD;
+            HistoricEra era = this.getValue(context);
+
+            if (era == HistoricEra.BC) {
+                return HistoricEra.AD;
+            } else {
+                return era;
+            }
 
         }
 

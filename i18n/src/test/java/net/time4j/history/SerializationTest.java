@@ -54,6 +54,13 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfProlepticByzantine()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(ChronoHistory.PROLEPTIC_BYZANTINE);
+    }
+
+    @Test
     public void roundTripOfSweden()
         throws IOException, ClassNotFoundException {
 

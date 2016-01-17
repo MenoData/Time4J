@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CutOverEvent.java) is part of project Time4J.
  *
@@ -21,17 +21,16 @@
 
 package net.time4j.history;
 
+
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.EpochDays;
-
 
 /**
  * <p>Represents a cutover event switching the calendar algorithm at a given date. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 final class CutOverEvent {
 

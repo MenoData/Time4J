@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberProcessor.java) is part of project Time4J.
  *
@@ -29,6 +29,8 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
+import net.time4j.format.TextElement;
+import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -136,116 +138,120 @@ final class NumberProcessor<V>
         FormatStep step
     ) throws IOException {
 
-        Class<V> type = this.element.getType();
-        V value = formattable.get(this.element);
-        boolean negative = false;
-        NumberSystem numsys = this.getNumberSystem(attributes, step);
-        String digits;
-
-        if (type == Integer.class) {
-            int v = Integer.class.cast(value).intValue();
-            negative = (v < 0);
-            digits = toNumeral(numsys, v);
-        } else if (type == Long.class) {
-            long v = Long.class.cast(value).longValue();
-            negative = (v < 0);
-            digits = (
-                (v == Long.MIN_VALUE)
-                ? "9223372036854775808"
-                : Long.toString(Math.abs(v))
-            );
-        } else if (Enum.class.isAssignableFrom(type)) {
-            int v = -1;
-            if (this.element instanceof NumericalElement) {
-                v = ((NumericalElement<V>) this.element).numerical(value);
-                negative = (v < 0);
-            } else {
-                for (Object e : type.getEnumConstants()) {
-                    if (e.equals(value)) {
-                        v = Enum.class.cast(e).ordinal();
-                        break;
-                    }
-                }
-                if (v == -1) {
-                    throw new AssertionError(
-                        "Enum broken: " + value + " / " + type.getName());
-                }
-            }
-            digits = toNumeral(numsys, v);
-        } else {
-            throw new IllegalArgumentException("Not formattable: " + this.element);
-        }
-
-        if (digits.length() > this.maxDigits) {
-            throw new IllegalArgumentException(
-                "Element " + this.element.name()
-                + " cannot be printed as the value " + value
-                + " exceeds the maximum width of " + this.maxDigits + ".");
-        }
-
-        char zeroDigit = '\u0000';
-
-        if (numsys == NumberSystem.ARABIC) {
-            zeroDigit =
-                step.getAttribute(
-                    Attributes.ZERO_DIGIT,
-                    attributes,
-                    Character.valueOf('0'))
-                    .charValue();
-
-            if (zeroDigit != '0') {
-                int diff = zeroDigit - '0';
-                char[] characters = digits.toCharArray();
-
-                for (int i = 0; i < characters.length; i++) {
-                    characters[i] = (char) (characters[i] + diff);
-                }
-
-                digits = new String(characters);
-            }
-        }
-
-        int start = -1;
+        int start = ((buffer instanceof CharSequence) ? ((CharSequence) buffer).length() : -1);
         int printed = 0;
 
-        if (buffer instanceof CharSequence) {
-            start = ((CharSequence) buffer).length();
-        }
-
-        if (negative) {
-            if (this.signPolicy == SignPolicy.SHOW_NEVER) {
-                throw new IllegalArgumentException(
-                    "Negative value not allowed according to sign policy.");
-            } else {
-                buffer.append('-');
-                printed++;
-            }
+        if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
+            TextElement<?> te = TextElement.class.cast(this.element);
+            StringBuilder sb = new StringBuilder();
+            te.print(formattable, sb, step.getQuery(attributes, this.minDigits, this.maxDigits));
+            buffer.append(sb.toString());
+            printed = sb.length();
         } else {
-            switch (this.signPolicy) {
-                case SHOW_ALWAYS:
-                    buffer.append('+');
+            Class<V> type = this.element.getType();
+            V value = formattable.get(this.element);
+            boolean negative = false;
+            NumberSystem numsys = this.getNumberSystem(attributes, step);
+            String digits;
+
+            if (type == Integer.class) {
+                int v = Integer.class.cast(value).intValue();
+                negative = (v < 0);
+                digits = toNumeral(numsys, v);
+            } else if (type == Long.class) {
+                long v = Long.class.cast(value).longValue();
+                negative = (v < 0);
+                digits = (
+                    (v == Long.MIN_VALUE)
+                        ? "9223372036854775808"
+                        : Long.toString(Math.abs(v))
+                );
+            } else if (Enum.class.isAssignableFrom(type)) {
+                int v = -1;
+                if (this.element instanceof NumericalElement) {
+                    v = ((NumericalElement<V>) this.element).numerical(value);
+                    negative = (v < 0);
+                } else {
+                    for (Object e : type.getEnumConstants()) {
+                        if (e.equals(value)) {
+                            v = Enum.class.cast(e).ordinal();
+                            break;
+                        }
+                    }
+                    if (v == -1) {
+                        throw new AssertionError(
+                            "Enum broken: " + value + " / " + type.getName());
+                    }
+                }
+                digits = toNumeral(numsys, v);
+            } else {
+                throw new IllegalArgumentException("Not formattable: " + this.element);
+            }
+
+            if (digits.length() > this.maxDigits) {
+                throw new IllegalArgumentException(
+                    "Element " + this.element.name()
+                        + " cannot be printed as the value " + value
+                        + " exceeds the maximum width of " + this.maxDigits + ".");
+            }
+
+            char zeroDigit = '\u0000';
+
+            if (numsys == NumberSystem.ARABIC) {
+                zeroDigit =
+                    step.getAttribute(
+                        Attributes.ZERO_DIGIT,
+                        attributes,
+                        Character.valueOf('0')
+                    ).charValue();
+
+                if (zeroDigit != '0') {
+                    int diff = zeroDigit - '0';
+                    char[] characters = digits.toCharArray();
+
+                    for (int i = 0; i < characters.length; i++) {
+                        characters[i] = (char) (characters[i] + diff);
+                    }
+
+                    digits = new String(characters);
+                }
+            }
+
+            if (negative) {
+                if (this.signPolicy == SignPolicy.SHOW_NEVER) {
+                    throw new IllegalArgumentException(
+                        "Negative value not allowed according to sign policy.");
+                } else {
+                    buffer.append('-');
                     printed++;
-                    break;
-                case SHOW_WHEN_BIG_NUMBER:
-                    if (digits.length() > this.minDigits) {
+                }
+            } else {
+                switch (this.signPolicy) {
+                    case SHOW_ALWAYS:
                         buffer.append('+');
                         printed++;
-                    }
-                    break;
-                default:
-                    // no-op
+                        break;
+                    case SHOW_WHEN_BIG_NUMBER:
+                        if (digits.length() > this.minDigits) {
+                            buffer.append('+');
+                            printed++;
+                        }
+                        break;
+                    default:
+                        // no-op
+                }
             }
-        }
 
-        if (numsys == NumberSystem.ARABIC) {
-            for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
-                buffer.append(zeroDigit);
-                printed++;
+            if (numsys == NumberSystem.ARABIC) {
+                for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
+                    buffer.append(zeroDigit);
+                    printed++;
+                }
             }
-        }
 
-        buffer.append(digits);
-        printed += digits.length();
+            buffer.append(digits);
+            printed += digits.length();
+        }
 
         if (
             (start != -1)
@@ -266,6 +272,39 @@ final class NumberProcessor<V>
         FormatStep step
     ) {
 
+        int len = text.length();
+        int start = status.getPosition();
+
+        int protectedChars =
+            step.getAttribute(
+                Attributes.PROTECTED_CHARACTERS,
+                attributes,
+                0
+            ).intValue();
+
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
+        if (start >= len) {
+            status.setError(start, "Missing digits for: " + this.element.name());
+            status.setWarning();
+            return;
+        }
+
+        if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
+            TextElement<?> te = TextElement.class.cast(this.element);
+            Object value = te.parse(text, status.getPP(), step.getQuery(attributes, this.minDigits, this.maxDigits));
+            if (status.isError()) {
+                status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
+            } else if (value == null) {
+                status.setError(start, "No interpretable value.");
+            } else {
+                parsedResult.put(this.element, value);
+            }
+            return;
+        }
+
         NumberSystem numsys = this.getNumberSystem(attributes, step);
         Leniency leniency = step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
 
@@ -280,27 +319,7 @@ final class NumberProcessor<V>
             effectiveMax = this.maxDigits;
         }
 
-        int len = text.length();
-        int start = status.getPosition();
         int pos = start;
-
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
-
-        if (protectedChars > 0) {
-            len -= protectedChars;
-        }
-
-        if (pos >= len) {
-            status.setError(pos, "Missing digits for: " + this.element.name());
-            status.setWarning();
-            return;
-        }
-
         boolean negative = false;
         char sign = text.charAt(pos);
 
@@ -612,14 +631,11 @@ final class NumberProcessor<V>
         int v
     ) {
 
-        if (numsys == NumberSystem.ARABIC) {
-            return (
-                (v == Integer.MIN_VALUE)
-                ? "2147483648"
-                : Integer.toString(Math.abs(v)));
-        } else {
-            return numsys.toNumeral(Math.abs(v));
+        if ((v == Integer.MIN_VALUE) && (numsys == NumberSystem.ARABIC)) {
+            return "2147483648";
         }
+
+        return numsys.toNumeral(Math.abs(v));
 
     }
 
