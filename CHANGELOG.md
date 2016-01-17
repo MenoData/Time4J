@@ -1,11 +1,14 @@
 ## [v3.14] not yet released
 ### Added
+- Add other historic eras [#436]
+- Support for various historical New Year events [#434]
 - Date arithmetic on HijriCalendar [#429]
 - New methods `withVariant(...)` on CalendarVariant [#428]
 - Dual parsing of embedded or standalone formats [#427]
 - Dedicated MultiFormatParser [#426]
 
 ### Fixed
+- Setting proleptic julian history on formatter is ignored [#435]
 - Semantic of changing historic era in ChronoHistory unclear [#430]
 
 ### Changed
