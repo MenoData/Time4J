@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -78,12 +78,12 @@ import java.util.Set;
  * <p>Represents a plain calendar date in conformance to ISO-8601-standard. </p>
  *
  * <p>The value range also contains negative years down to {@code -999999999}.
- * These years cannot be interpreted in a historical way, as in general no past
+ * These years cannot be interpreted in a historic way, as in general no past
  * year, too. Instead such related dates can and must rather be interpreted
  * as a different way of counting days - like epoch days. The rules of
  * gregorian calendar are applied in a proleptic way that is backwards into
  * the past even before the earliest introduction of gregorian calendar in
- * Rome (a non-historical mathematical abstraction). </p>
+ * Rome (a non-historic mathematical abstraction). </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -255,7 +255,7 @@ public final class PlainDate
      * <p>The term &quot;proleptic&quot; means that the rules of the gregorian
      * calendar and the associated way of year counting is applied backward
      * even before the introduction of gregorian calendar. The year {@code 0}
-     * is permitted - and negative years, too. For historical year numbers,
+     * is permitted - and negative years, too. For historic year numbers,
      * this mathematical extrapolation is not recommended and usually
      * wrong. </p>
      */
