@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricAttribute.java) is part of project Time4J.
  *
@@ -21,9 +21,9 @@
 
 package net.time4j.history.internal;
 
-import net.time4j.PlainDate;
 import net.time4j.engine.AttributeKey;
 import net.time4j.format.Attributes;
+import net.time4j.history.ChronoHistory;
 
 
 /**
@@ -43,44 +43,25 @@ public final class HistoricAttribute {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>Format attribute which determines the historical calendar variant. </p>
+     * <p>Format attribute which determines the calendar history. </p>
      *
      * <p>Users will not directly use this attribute but adjust a given {@code ChronoFormatter}
      * by its method {@code with(ChronoHistory)}. </p>
      *
      * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     * @since   3.14/4.11
      */
     /*[deutsch]
-     * <p>Formatattribut, das die historische Kalendervariante bestimmt. </p>
+     * <p>Formatattribut, das die Kalenderhistorie bestimmt. </p>
      *
      * <p>Anwender werden nicht direkt dieses Attribut verwenden, sondern stattdessen die
      * Methode {@code ChronoFormatter.with(ChronoHistory)} aufrufen. </p>
      *
      * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     * @since   3.14/4.11
      */
-    public static final AttributeKey<HistoricVariant> HISTORIC_VARIANT =
-        Attributes.createKey("HISTORIC_VARIANT", HistoricVariant.class);
-
-    /**
-     * <p>Format attribute which can cause the format engine to create a chronological history with
-     * given cutover date. </p>
-     *
-     * <p>Users will not directly use this attribute but adjust a given {@code ChronoFormatter}
-     * by its method {@code withGregorianCutOver()}. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
-     */
-    /*[deutsch]
-     * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
-     * den angegebenen Attributwert als Umstellungsdatum zu erzeugen. </p>
-     *
-     * <p>Anwender werden nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.withGregorianCutOver()} aufrufen. </p>
-     *
-     * @see     net.time4j.format.expert.ChronoFormatter#withGregorianCutOver(PlainDate)
-     */
-    public static final AttributeKey<PlainDate> CUTOVER_DATE =
-        Attributes.createKey("CUTOVER_DATE", PlainDate.class);
+    public static final AttributeKey<ChronoHistory> CALENDAR_HISTORY =
+        Attributes.createKey("CALENDAR_HISTORY", ChronoHistory.class);
 
     /**
      * <p>Format attribute which prefers the notation of &quot;Common Era&quot; in formatting
@@ -122,26 +103,24 @@ public final class HistoricAttribute {
     public static final AttributeKey<Boolean> LATIN_ERA = Attributes.createKey("LATIN_ERA", Boolean.class);
 
     /**
-     * <p>Format attribute which can cause the format engine to create a chronological history with
-     * given triennal julian leap years. </p>
+     * <p>Format attribute which transmits min width information to year-of-era. </p>
      *
-     * <p>Users will not directly use this attribute but adjust a given {@code ChronoFormatter}
-     * by its method {@code with(ChronoHistory)}. The value is a comma-separated list of integers. </p>
+     * <p>Users will never directly use this attribute but define the min width on the formatter instead. </p>
      *
-     * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     * @since   3.14/4.11
      */
-    /*[deutsch]
-     * <p>Formatattribut, das die Formatmaschine dazu veranlassen kann, eine {@code ChronoHistory} f&uuml;r
-     * die angegebenen julianischen Schaltjahre im 3-Jahres-Rhythmus zu erzeugen. </p>
+    public static final AttributeKey<Integer> MIN_WIDTH_OF_YEAR =
+        Attributes.createKey("MIN_WIDTH_OF_YEAR", Integer.class);
+
+    /**
+     * <p>Format attribute which transmits max width information to year-of-era. </p>
      *
-     * <p>Anwender werden nicht direkt dieses Attribut verwenden, sondern stattdessen die
-     * Methode {@code ChronoFormatter.with(ChronoHistory)} aufrufen. Der Wert ist eine komma-getrennte
-     * Auflistung von Integern. </p>
+     * <p>Users will never directly use this attribute but define the max width on the formatter instead. </p>
      *
-     * @see     net.time4j.format.expert.ChronoFormatter#with(net.time4j.history.ChronoHistory)
+     * @since   3.14/4.11
      */
-    public static final AttributeKey<Object> ANCIENT_JULIAN_LEAP_YEARS =
-        Attributes.createKey("ANCIENT_JULIAN_LEAP_YEARS", Object.class);
+    public static final AttributeKey<Integer> MAX_WIDTH_OF_YEAR =
+        Attributes.createKey("MAX_WIDTH_OF_YEAR", Integer.class);
 
     //~ Konstruktoren -----------------------------------------------------
 

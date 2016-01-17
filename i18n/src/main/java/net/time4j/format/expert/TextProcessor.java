@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextProcessor.java) is part of project Time4J.
  *
@@ -156,7 +156,7 @@ final class TextProcessor<V>
             if (valueType.isEnum()) {
                 status.setError(status.getErrorIndex(), "No suitable enum found: " + valueType.getName());
             } else {
-                status.setError(status.getErrorIndex(), "Unparseable element: " + element.name());
+                status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
             }
         } else {
             if (value == null) {

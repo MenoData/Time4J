@@ -24,6 +24,7 @@ package net.time4j.history;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
@@ -39,6 +40,8 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -58,7 +61,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  */
 final class HistoricalIntegerElement
     extends BasicElement<Integer>
-    implements NumericalElement<Integer>, TextElement<Integer> {
+    implements NumericalElement<Integer>, HistorizedElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -200,16 +203,70 @@ final class HistoricalIntegerElement
         AttributeQuery attributes
     ) throws IOException {
 
-        int v = context.get(this).intValue();
+        HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
 
         switch (this.index) {
+            case YEAR_OF_ERA_INDEX:
+                int min = 1;
+                int max = 9;
+                if (attributes.contains(HistoricAttribute.MIN_WIDTH_OF_YEAR)) {
+                    min = attributes.get(HistoricAttribute.MIN_WIDTH_OF_YEAR);
+                }
+                if (attributes.contains(HistoricAttribute.MAX_WIDTH_OF_YEAR)) {
+                    max = attributes.get(HistoricAttribute.MAX_WIDTH_OF_YEAR);
+                }
+                NewYearStrategy nys = this.history.getNewYearStrategy();
+                HistoricEra era = date.getEra();
+                int yearOfEra = date.getYearOfEra();
+                int annoDomini = era.annoDomini(yearOfEra);
+                char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+                String text = this.format(String.valueOf(yearOfEra), zero, min, max);
+                if (
+                    !NewYearStrategy.DEFAULT.equals(nys)
+                    && ((annoDomini >= 8) || (era.compareTo(HistoricEra.AD) > 0))
+                ) {
+                    int yearOfDisplay = date.getYearOfEra(nys);
+                    if (yearOfDisplay != yearOfEra) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(yearOfDisplay);
+                        sb.append('/');
+                        if (
+                            (yearOfEra >= 100)
+                            && (MathUtils.floorDivide(yearOfDisplay, 100) == MathUtils.floorDivide(yearOfEra, 100))
+                        ) {
+                            int yoe2 = MathUtils.floorModulo(yearOfEra, 100);
+                            if (yoe2 < 10) {
+                                sb.append('0');
+                            }
+                            sb.append(yoe2);
+                        } else {
+                            sb.append(yearOfEra);
+                        }
+                        text = this.format(sb.toString(), zero, min, max);
+                    }
+                }
+                if (zero != '0') {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0, n = text.length(); i < n; i++) {
+                        char c = text.charAt(i);
+                        if (c >= '0' && c <= '9') {
+                            int diff = zero - '0';
+                            sb.append((char) (c + diff));
+                        } else {
+                            sb.append(c); // - (minus) or / (slash)
+                        }
+                    }
+                    text = sb.toString();
+                }
+                buffer.append(text);
+                break;
             case MONTH_INDEX:
                 OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-                buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(v)));
+                buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(date.getMonth())));
                 break;
-            default:
-                // numerical case
-                buffer.append(String.valueOf(v));
+            case DAY_OF_MONTH_INDEX:
+                buffer.append(String.valueOf(date.getDayOfMonth()));
+                break;
         }
 
     }
@@ -221,42 +278,61 @@ final class HistoricalIntegerElement
         AttributeQuery attributes
     ) {
 
-        switch (this.index) {
-            case MONTH_INDEX:
-                int index = status.getIndex();
-                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-                Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-                if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
-                    status.setErrorIndex(-1);
-                    status.setIndex(index);
-                    oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-                    month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-                }
-                if (month == null) {
-                    return null;
-                } else {
-                    return Integer.valueOf(month.getValue());
-                }
-            default:
-                char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
-                int value = 0;
-                int pos = status.getIndex();
-                for (int i = pos, n = text.length(); i < n; i++) {
-                    int digit = text.charAt(i) - zero;
-                    if ((digit >= 0) && (digit <= 9)) {
-                        value = value * 10 + digit;
-                        pos++;
-                    } else {
-                        break;
-                    }
-                }
-                if (pos == status.getIndex()) {
-                    status.setErrorIndex(pos);
-                    return null;
-                } else {
+        if (this.index == MONTH_INDEX) {
+            int index = status.getIndex();
+            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+            Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+            if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                status.setErrorIndex(-1);
+                status.setIndex(index);
+                oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+            }
+            if (month == null) {
+                return null;
+            } else {
+                return Integer.valueOf(month.getValue());
+            }
+        }
+
+        char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+        int start = status.getIndex();
+        int pos = start;
+        int value = parseNum(text, pos, status, zero);
+        pos = status.getIndex();
+
+        if (
+            (this.index == YEAR_OF_ERA_INDEX)
+            && (!NewYearStrategy.DEFAULT.equals(this.history.getNewYearStrategy()))
+            && (pos < text.length())
+            && (text.charAt(pos) == '/')
+        ) {
+            int slash = pos;
+            int yoe = parseNum(text, pos + 1, status, zero);
+            int test = status.getIndex();
+            if (test == pos + 1) { // we will now stop consuming more chars and ignore yoe-part
+                status.setIndex(pos);
+            } else {
+                pos = test;
+                int yod = value;
+                int ancient = this.getAncientYear(yod, yoe);
+                if (ancient != Integer.MAX_VALUE) {
+                    value = ancient;
+                } else if (Math.abs(yoe - yod) <= 1) { // check for plausibility
+                    value = yoe;
+                } else { // now we have something else - let the formatter process the rest
+                    value = yod;
+                    pos = slash;
                     status.setIndex(pos);
-                    return Integer.valueOf(value);
                 }
+            }
+        }
+
+        if (pos == start) {
+            status.setErrorIndex(start);
+            return null;
+        } else {
+            return Integer.valueOf(value);
         }
 
     }
@@ -272,6 +348,59 @@ final class HistoricalIntegerElement
 
     }
 
+    private int getAncientYear(
+        int yearOfDisplay,
+        int yearOfEra
+    ) {
+
+        if ((yearOfEra < 0) || (yearOfEra >= 100) || (yearOfDisplay < 100)) {
+            return Integer.MAX_VALUE;
+        }
+
+        if (
+            (this.history.getEraPreference() != EraPreference.DEFAULT)
+            || (yearOfDisplay < this.history.getGregorianCutOverDate().getYear()) // estimate
+        ) {
+            int factor = ((yearOfEra < 10) ? 10 : 100);
+
+            if (Math.abs(yearOfEra - MathUtils.floorModulo(yearOfDisplay, factor)) <= 1) {
+                return MathUtils.floorDivide(yearOfDisplay, factor) * factor + yearOfEra;
+            }
+        }
+
+        return Integer.MAX_VALUE;
+
+    }
+
+    private String format(
+        String digits,
+        char zero,
+        int min,
+        int max
+    ) {
+
+        int len = digits.length();
+
+        if (len > max) {
+            throw new IllegalArgumentException(
+                "Element " + this.name()
+                    + " cannot be printed as the value " + digits
+                    + " exceeds the maximum width of " + max + ".");
+        } else if (min <= len) {
+            return digits; // optimization
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = min - len; i < n; i++) {
+            sb.append(zero);
+        }
+
+        sb.append(digits);
+        return sb.toString();
+
+    }
+
     private TextAccessor monthAccessor(
         AttributeQuery attributes,
         OutputContext outputContext
@@ -284,6 +413,45 @@ final class HistoricalIntegerElement
 
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         return cnames.getStdMonths(textWidth, outputContext);
+
+    }
+
+    private static int parseNum(
+        CharSequence text,
+        int offset,
+        ParsePosition status,
+        char zero
+    ) {
+
+        int value = 0;
+        int pos = offset;
+        boolean negative = false;
+
+        if (text.charAt(pos) == '-') {
+            negative = true;
+            pos++;
+        }
+
+        for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
+            int digit = text.charAt(i) - zero;
+            if ((digit >= 0) && (digit <= 9)) {
+                value = value * 10 + digit;
+                pos++;
+            } else {
+                break;
+            }
+        }
+
+        if (negative) {
+            if (pos == offset + 1) {
+                pos = offset;
+            } else {
+                value = MathUtils.safeNegate(value);
+            }
+        }
+
+        status.setIndex(pos);
+        return value;
 
     }
 
@@ -357,7 +525,11 @@ final class HistoricalIntegerElement
                 HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
 
                 if (this.index == YEAR_OF_ERA_INDEX) {
-                    return Integer.valueOf(1);
+                    if (current.getEra().compareTo(HistoricEra.AD) <= 0) {
+                        return Integer.valueOf(1);
+                    } else {
+                       return this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
+                    }
                 }
 
                 HistoricDate hd = this.adjust(context, 1);

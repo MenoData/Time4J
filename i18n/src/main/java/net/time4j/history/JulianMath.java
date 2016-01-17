@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JulianMath.java) is part of project Time4J.
  *
@@ -81,7 +81,7 @@ class JulianMath {
      */
     public static boolean isLeapYear(int year) {
 
-        return ((year % 4) == 0);
+        return (MathUtils.floorModulo(year, 4) == 0);
 
     }
 

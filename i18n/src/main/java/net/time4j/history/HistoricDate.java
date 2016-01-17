@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricDate.java) is part of project Time4J.
  *
@@ -25,8 +25,12 @@ import net.time4j.base.GregorianMath;
 
 
 /**
- * <p>Defines a historical date which consists of era, year of era, month
- * and day of month. </p>
+ * <p>Defines a historic date which consists of era, year of era, month and day of month. </p>
+ *
+ * <p>Instances of this class are agnostic of any specific new-year-strategy other than the
+ * {@link NewYearRule#BEGIN_OF_JANUARY default (first of January)} but can use such a strategy
+ * as parameter to determine {@link #getYearOfEra(NewYearStrategy) the real historic year}
+ * for display purposes. </p>
  *
  * <p>The natural order is based on the timeline order. </p>
  *
@@ -34,8 +38,13 @@ import net.time4j.base.GregorianMath;
  * @since   3.0
  */
 /*[deutsch]
- * <p>Definiert ein historisches Datum, das aus &Auml;ra, Jahr der &Auml;ra, Monat
- * und Tag des Monats besteht. </p>
+ * <p>Definiert ein historisches Datum, das aus &Auml;ra, Jahr der &Auml;ra, Monat und Tag
+ * des Monats besteht. </p>
+ *
+ * <p>Instanzen dieser Klasse kennen selber keine andere Neujahrsstrategie als den
+ * {@link NewYearRule#BEGIN_OF_JANUARY Standard (erster Januar)}, k&ouml;nnen aber eine
+ * solche Strategie als Parameter nutzen, um {@link #getYearOfDisplay(NewYearStrategy)
+ * das reale historische Jahr} f&uuml;r Anzeigezwecke zu bestimmen. </p>
  *
  * <p>Die nat&uuml;rliche Ordnung basiert auf der zeitlichen Reihenfolge. </p>
  *
@@ -73,34 +82,43 @@ public final class HistoricDate
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Constructs a new tuple of given historical chronological components. </p>
+     * <p>Constructs a new tuple of given historic chronological components. </p>
      *
      * <p>Note: A detailed validation is not done. Such a validation is the responsibility
-     * of any {@code ChronoHistory}, however. </p>
+     * of any {@code ChronoHistory}, however. Years not related to eras BC or AD might be
+     * smaller than {@code 1} although this does not make much sense. The converted AD-year
+     * must not be beyond the defined range of the class {@code PlainDate}. </p>
      *
-     * @param   era         historical era (AD or BC)
-     * @param   yearOfEra   year of related era ({@code >= 1})
-     * @param   month       historical month (1-12)
-     * @param   dom         historical day of month (1-31)
+     * @param   era         historic era
+     * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
+     * @param   month       historic month (1-12)
+     * @param   dom         historic day of month (1-31)
      * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
+     * @see     GregorianMath#MIN_YEAR
+     * @see     GregorianMath#MAX_YEAR
      */
     /*[deutsch]
      * <p>Konstruiert ein neues Tupel aus den angegebenen historischen Zeitkomponenten. </p>
      *
      * <p>Hinweis: Eine detaillierte Validierung wird nicht gemacht. Das ist stattdessen Aufgabe
-     * der {@code ChronoHistory}. </p>
+     * der {@code ChronoHistory}. Jahre, die sich nicht auf die &Auml;ra BC oder AD beziehen,
+     * k&ouml;nnen kleiner als {@code 1} sein, auch wenn das nicht sehr sinnvoll ist. Ansonsten
+     * darf das umgerechnete AD-Jahr nicht au&szlig;erhalb des Definitionsbereichs der Klasse
+     * {@code PlainDate} liegen. </p>
      *
-     * @param   era         historical era (AD or BC)
-     * @param   yearOfEra   year of related era ({@code >= 1})
-     * @param   month       historical month (1-12)
-     * @param   dom         historical day of month (1-31)
+     * @param   era         historic era
+     * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
+     * @param   month       historic month (1-12)
+     * @param   dom         historic day of month (1-31)
      * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
+     * @see     GregorianMath#MIN_YEAR
+     * @see     GregorianMath#MAX_YEAR
      */
     public static HistoricDate of(
         HistoricEra era,
@@ -112,11 +130,12 @@ public final class HistoricDate
         if (
             (dom < 1 || dom > 31)
             || (month < 1 || month > 12)
-            || (yearOfEra < 1 || yearOfEra > (GregorianMath.MAX_YEAR + (era == HistoricEra.BC ? 1 : 0)))
+            || (Math.abs(era.annoDomini(yearOfEra)) > GregorianMath.MAX_YEAR)
+            || ((era.compareTo(HistoricEra.AD) <= 0) && (yearOfEra < 1))
         ) {
             throw new IllegalArgumentException("Out of range: " + toString(era, yearOfEra, month, dom));
         } else if (era == null) {
-            throw new NullPointerException("Missing historical era.");
+            throw new NullPointerException("Missing historic era.");
         }
 
         return new HistoricDate(era, yearOfEra, month, dom);
@@ -124,7 +143,7 @@ public final class HistoricDate
     }
 
     /**
-     * <p>Yields the historical era. </p>
+     * <p>Yields the historic era. </p>
      *
      * @return  HistoricEra
      * @since   3.0
@@ -142,15 +161,19 @@ public final class HistoricDate
     }
 
     /**
-     * <p>Yields year of the historical era. </p>
+     * <p>Yields the year of the historic era starting on January the first. </p>
      *
      * @return  year of era ({@code >= 1})
+     * @see     #getYearOfEra(NewYearStrategy)
+     * @see     NewYearRule#BEGIN_OF_JANUARY
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Liefert das Jahr der historischen &Auml;ra. </p>
+     * <p>Liefert das Jahr der historischen &Auml;ra beginnend am ersten Tag des Januar. </p>
      *
      * @return  year of era ({@code >= 1})
+     * @see     #getYearOfEra(NewYearStrategy)
+     * @see     NewYearRule#BEGIN_OF_JANUARY
      * @since   3.0
      */
     public int getYearOfEra() {
@@ -160,7 +183,34 @@ public final class HistoricDate
     }
 
     /**
-     * <p>Yields the historical month. </p>
+     * <p>Yields the displayed historic year whose begin is determined by given new-year-strategy. </p>
+     *
+     * @param   newYearStrategy     strategy how to determine New Year
+     * @return  displayed historic year ({@code >= 1})
+     * @throws  IllegalArgumentException if this date is earlier than AD 8 and defined either in era BC or AD
+     * @see     #getYearOfEra()
+     * @see     NewYearRule
+     * @since   3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Liefert das historische Anzeigejahr, dessen Beginn von der angegebenen Neujahrsstrategie
+     * bestimmt wird. </p>
+     *
+     * @param   newYearStrategy     strategy how to determine New Year
+     * @return  displayed historic year ({@code >= 1})
+     * @throws  IllegalArgumentException if this date is earlier than AD 8 and defined either in era BC or AD
+     * @see     #getYearOfEra()
+     * @see     NewYearRule
+     * @since   3.14/4.11
+     */
+    public int getYearOfEra(NewYearStrategy newYearStrategy) {
+
+        return newYearStrategy.displayedYear(this);
+
+    }
+
+    /**
+     * <p>Yields the historic month. </p>
      *
      * @return  month (1-12)
      * @since   3.0
@@ -178,7 +228,7 @@ public final class HistoricDate
     }
 
     /**
-     * <p>Yields the historical day of month. </p>
+     * <p>Yields the historic day of month. </p>
      *
      * @return  day of month (1-31)
      * @since   3.0
@@ -198,34 +248,22 @@ public final class HistoricDate
     @Override
     public int compareTo(HistoricDate other) {
 
-        if (this.getEra() == HistoricEra.BC) {
-            if (other.getEra() == HistoricEra.AD) {
-                return -1;
-            }
-            int delta = this.getYearOfEra() - other.getYearOfEra();
-            if (delta < 0) {
-                return 1; // year-of-era is running backwards in era BC
-            } else if (delta > 0) {
-                return -1;
-            }
-            delta = this.getMonth() - other.getMonth();
-            if (delta == 0) {
-                delta = this.getDayOfMonth() - other.getDayOfMonth();
-            }
-            return ((delta < 0) ? -1 : (delta > 0 ? 1 : 0));
-        } else {
-            if (other.getEra() == HistoricEra.BC) {
-                return 1;
-            }
-            int delta = this.getYearOfEra() - other.getYearOfEra();
-            if (delta == 0) {
-                delta = this.getMonth() - other.getMonth();
-                if (delta == 0) {
-                    delta = this.getDayOfMonth() - other.getDayOfMonth();
-                }
-            }
-            return ((delta < 0) ? -1 : (delta > 0 ? 1 : 0));
+        int ad1 = this.era.annoDomini(this.yearOfEra);
+        int ad2 = other.era.annoDomini(other.yearOfEra);
+
+        if (ad1 < ad2) {
+            return -1;
+        } else if (ad1 > ad2) {
+            return 1;
         }
+
+        int delta = this.getMonth() - other.getMonth();
+
+        if (delta == 0) {
+            delta = this.getDayOfMonth() - other.getDayOfMonth();
+        }
+
+        return ((delta < 0) ? -1 : (delta > 0 ? 1 : 0));
 
     }
 

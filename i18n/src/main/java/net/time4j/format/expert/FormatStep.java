@@ -28,6 +28,8 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
+import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -507,18 +509,46 @@ final class FormatStep {
      */
     AttributeQuery getQuery(final AttributeQuery defaultAttrs) {
 
-        if (this.sectionalAttrs == null) {
+        return this.getQuery(defaultAttrs, 0, 0);
+
+    }
+
+    /**
+     * <p>Erstellt eine Attributabfrage. </p>
+     *
+     * @param   defaultAttrs    default attributes of {@code ChronoFormatter}
+     * @param   min             min width of historic year
+     * @param   max             max width of historic year
+     * @return  query for retrieving attribute values
+     */
+    AttributeQuery getQuery(
+        final AttributeQuery defaultAttrs,
+        final int min,
+        final int max
+    ) {
+
+        if ((this.sectionalAttrs == null) && (min == 0) && (max == 0)) {
             return defaultAttrs; // Optimierung
         }
 
         return new AttributeQuery() {
             @Override
             public boolean contains(AttributeKey<?> key) {
+                if (key.equals(HistoricAttribute.MIN_WIDTH_OF_YEAR)) {
+                    return (min > 0);
+                } else if (key.equals(HistoricAttribute.MAX_WIDTH_OF_YEAR)) {
+                    return (max > 0);
+                }
                 return this.getQuery(key).contains(key);
             }
 
             @Override
             public <A> A get(AttributeKey<A> key) {
+                if (key.equals(HistoricAttribute.MIN_WIDTH_OF_YEAR) && (min > 0)) {
+                    return key.type().cast(Integer.valueOf(min));
+                } else if (key.equals(HistoricAttribute.MAX_WIDTH_OF_YEAR) && (max > 0)) {
+                    return key.type().cast(Integer.valueOf(max));
+                }
                 return this.getQuery(key).get(key);
             }
 
@@ -533,7 +563,7 @@ final class FormatStep {
             private AttributeQuery getQuery(AttributeKey<?> key) {
                 AttributeQuery current = FormatStep.this.sectionalAttrs;
 
-                if (!current.contains(key)) {
+                if ((current == null) || !current.contains(key)) {
                     current = defaultAttrs;
                 }
 
@@ -624,7 +654,7 @@ final class FormatStep {
             return fp;
         } else if (
             (fp.getElement().getType() != element.getType())
-            && !element.name().equals("HISTORIC_MONTH")
+            && !(element instanceof HistorizedElement)
         ) {
             throw new IllegalArgumentException(
                 "Cannot change element value type: " + element.name());

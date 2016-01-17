@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricExtension.java) is part of project Time4J.
  *
@@ -27,8 +27,8 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
-import net.time4j.history.AncientJulianLeapYears;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
@@ -62,10 +62,6 @@ public class HistoricExtension
         Locale locale,
         AttributeQuery attributes
     ) {
-
-        if (locale.getCountry().isEmpty()) {
-            return Collections.emptySet();
-        }
 
         return getHistory(locale, attributes).getElements();
 
@@ -114,39 +110,13 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
-        ChronoHistory result = null;
-
-        if (attributes.contains(HistoricAttribute.HISTORIC_VARIANT)) {
-            switch (attributes.get(HistoricAttribute.HISTORIC_VARIANT)) {
-                case INTRODUCTION_ON_1582_10_15:
-                    result = ChronoHistory.ofFirstGregorianReform();
-                    break;
-                case PROLEPTIC_JULIAN:
-                    return ChronoHistory.PROLEPTIC_JULIAN;
-                case PROLEPTIC_GREGORIAN:
-                    return ChronoHistory.PROLEPTIC_GREGORIAN;
-                case SWEDEN:
-                    result = ChronoHistory.ofSweden();
-                    break;
-                default:
-                    if (attributes.contains(HistoricAttribute.CUTOVER_DATE)) {
-                        PlainDate date = attributes.get(HistoricAttribute.CUTOVER_DATE);
-                        result = ChronoHistory.ofGregorianReform(date);
-                    }
-            }
+        if (attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE).equals("julian")) {
+            return ChronoHistory.PROLEPTIC_JULIAN;
+        } else if (attributes.contains(HistoricAttribute.CALENDAR_HISTORY)) {
+            return attributes.get(HistoricAttribute.CALENDAR_HISTORY);
+        } else {
+            return ChronoHistory.of(locale);
         }
-
-        if (result == null) {
-            result = ChronoHistory.of(locale);
-        }
-
-        if (attributes.contains(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS)) {
-            AncientJulianLeapYears ajly =
-                AncientJulianLeapYears.class.cast(attributes.get(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS));
-            result = result.with(ajly);
-        }
-
-        return result;
 
     }
 

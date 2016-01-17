@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EraNameTest.class,
         JulianTransformationTest.class,
         HistoryTest.class,
+        NewYearTest.class,
         ScaligerTest.class,
         SerializationTest.class
     }

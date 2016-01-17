@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarAlgorithm.java) is part of project Time4J.
  *
@@ -110,15 +110,15 @@ enum CalendarAlgorithm
     SWEDISH {
         @Override
         public long toMJD(HistoricDate date) {
+            int year = getProlepticYear(date);
             if (
                 (date.getDayOfMonth() == 30)
                 && (date.getMonth() == 2)
-                && (date.getYearOfEra() == 1712)
-                && (date.getEra() == HistoricEra.AD)
+                && (year == 1712)
             ) {
                 return -53576L;
             }
-            return JulianMath.toMJD(date.getYearOfEra(), date.getMonth(), date.getDayOfMonth()) - 1;
+            return JulianMath.toMJD(year, date.getMonth(), date.getDayOfMonth()) - 1;
         }
 
         @Override
@@ -131,27 +131,27 @@ enum CalendarAlgorithm
 
         @Override
         public boolean isValid(HistoricDate date) {
+            int year = getProlepticYear(date);
             if (
                 (date.getDayOfMonth() == 30)
                 && (date.getMonth() == 2)
-                && (date.getYearOfEra() == 1712)
-                && (date.getEra() == HistoricEra.AD)
+                && (year == 1712)
             ) {
                 return true;
             }
-            return JulianMath.isValid(date.getYearOfEra(), date.getMonth(), date.getDayOfMonth());
+            return JulianMath.isValid(year, date.getMonth(), date.getDayOfMonth());
         }
 
         @Override
         public int getMaximumDayOfMonth(HistoricDate date) {
+            int year = getProlepticYear(date);
             if (
                 (date.getMonth() == 2)
-                && (date.getYearOfEra() == 1712)
-                && (date.getEra() == HistoricEra.AD)
+                && (year == 1712)
             ) {
                 return 30;
             }
-            return JulianMath.getLengthOfMonth(date.getYearOfEra(), date.getMonth());
+            return JulianMath.getLengthOfMonth(year, date.getMonth());
         }
     };
 
@@ -159,7 +159,7 @@ enum CalendarAlgorithm
 
     private static int getProlepticYear(HistoricDate date) {
 
-        return ((date.getEra() == HistoricEra.AD) ? date.getYearOfEra() : 1 - date.getYearOfEra());
+        return date.getEra().annoDomini(date.getYearOfEra());
 
     }
 

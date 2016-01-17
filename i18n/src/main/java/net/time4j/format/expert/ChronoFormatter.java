@@ -63,7 +63,6 @@ import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
-import net.time4j.history.internal.HistoricVariant;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -1136,27 +1135,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      */
     public ChronoFormatter<T> with(ChronoHistory history) {
 
-        String variant = history.getVariant();
-        HistoricVariant hv = HistoricVariant.valueOf(variant.substring(0, variant.indexOf(':')));
-
-        Attributes attrs =
-            new Attributes.Builder()
-                .setAll(this.globalAttributes.getAttributes())
-                .set(HistoricAttribute.HISTORIC_VARIANT, hv)
-                .build();
-
-        AttributeSet as = this.globalAttributes.withAttributes(attrs);
-
-        PlainDate cutover = (
-            (hv == HistoricVariant.SINGLE_CUTOVER_DATE)
-            ? history.getGregorianCutOverDate()
-            : null);
-        as = as.withInternal(HistoricAttribute.CUTOVER_DATE, cutover);
-
-        if (history.hasAncientJulianLeapYears()) {
-            as = as.withInternal(HistoricAttribute.ANCIENT_JULIAN_LEAP_YEARS, history.getAncientJulianLeapYears());
+        if (history == null) {
+            throw new NullPointerException("Missing calendar history.");
         }
 
+        AttributeSet as = this.globalAttributes.withInternal(HistoricAttribute.CALENDAR_HISTORY, history);
         return new ChronoFormatter<T>(this, as, history);
 
     }
@@ -5285,7 +5268,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 return this.addNumber(element, false, count, 9, signPolicy, protectedMode);
             }
 
-            assert (count == 4);
+            // adjacent digit parsing
             return this.addNumber(element, true, 4, 4, SignPolicy.SHOW_NEVER, protectedMode);
 
         }

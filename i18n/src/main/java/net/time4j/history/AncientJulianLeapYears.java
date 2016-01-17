@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AncientJulianLeapYears.java) is part of project Time4J.
  *
@@ -111,7 +111,7 @@ public final class AncientJulianLeapYears {
                     if (date.compareTo(AD8) >= 0) {
                         return CalendarAlgorithm.JULIAN.toMJD(date);
                     } else if (date.compareTo(BC45) < 0) {
-                        throw new IllegalArgumentException("Not valid before BC 45: " + date);
+                        throw new IllegalArgumentException("Not valid before 45 BC: " + date);
                     }
                     long mjd = MJD_OF_AD8;
                     int target = getProlepticYear(date);
@@ -153,14 +153,14 @@ public final class AncientJulianLeapYears {
                             }
                         }
                     }
-                    throw new IllegalArgumentException("Not valid before BC 45: " + mjd);
+                    throw new IllegalArgumentException("Not valid before 45 BC: " + mjd);
                 }
 
                 @Override
                 public boolean isValid(HistoricDate date) {
                     if (date != null) {
-                        if ((date.getEra() == HistoricEra.AD) || date.getYearOfEra() <= 45) {
-                            int y = getProlepticYear(date);
+                        int y = getProlepticYear(date);
+                        if (y >= -44) { // 45 BC
                             if (y >= 8) {
                                 return CalendarAlgorithm.JULIAN.isValid(date);
                             } else {
@@ -176,7 +176,7 @@ public final class AncientJulianLeapYears {
                     if (date.compareTo(AD8) >= 0) {
                         return CalendarAlgorithm.JULIAN.getMaximumDayOfMonth(date);
                     } else if (date.compareTo(BC45) < 0) {
-                        throw new IllegalArgumentException("Not valid before BC 45: " + date);
+                        throw new IllegalArgumentException("Not valid before 45 BC: " + date);
                     } else {
                         return this.getMaximumDayOfMonth(getProlepticYear(date), date.getMonth());
                     }
@@ -208,7 +208,7 @@ public final class AncientJulianLeapYears {
                 }
 
                 private int getProlepticYear(HistoricDate date) {
-                    return ((date.getEra() == HistoricEra.BC) ? 1 - date.getYearOfEra() : date.getYearOfEra());
+                    return date.getEra().annoDomini(date.getYearOfEra());
                 }
 
                 private boolean isLeapYear(int prolepticYear) {

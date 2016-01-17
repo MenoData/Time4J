@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricVariant.java) is part of project Time4J.
  *
@@ -76,7 +76,15 @@ public enum HistoricVariant {
     /*[deutsch]
      * <p>Kennzeichnet einen historischen Standardkalender mit genau einer gregorianischen Kalenderreform. </p>
      */
-    SINGLE_CUTOVER_DATE;
+    SINGLE_CUTOVER_DATE,
+
+    /**
+     * <p>Byzantine calendar assumed to be valid for all times. </p>
+     */
+    /*[deutsch]
+     * <p>Byzantinischer Kalender, der als f&uuml;r alle Zeiten g&uuml;ltig angesehen wird. </p>
+     */
+    PROLEPTIC_BYZANTINE;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -96,6 +104,8 @@ public enum HistoricVariant {
                 return 4;
             case INTRODUCTION_ON_1582_10_15:
                 return 7;
+            case PROLEPTIC_BYZANTINE:
+                return 3;
             default:
                 return 0;
         }

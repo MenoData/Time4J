@@ -235,14 +235,26 @@ final class HistoricalEraElement
         @Override
         public HistoricEra getMinimum(C context) {
 
-            return HistoricEra.BC;
+            HistoricEra era = this.getValue(context);
+
+            if (era == HistoricEra.AD) {
+                return HistoricEra.BC;
+            } else {
+                return era;
+            }
 
         }
 
         @Override
         public HistoricEra getMaximum(C context) {
 
-            return HistoricEra.AD;
+            HistoricEra era = this.getValue(context);
+
+            if (era == HistoricEra.BC) {
+                return HistoricEra.AD;
+            } else {
+                return era;
+            }
 
         }
 
