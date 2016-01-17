@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSystem.java) is part of project Time4J.
  *
@@ -49,7 +49,7 @@ public enum NumberSystem {
     ARABIC() {
         @Override
         public String toNumeral(int number) {
-            return String.valueOf(number);
+            return Integer.toString(number);
         }
         @Override
         public int toInteger(String numeral) {
