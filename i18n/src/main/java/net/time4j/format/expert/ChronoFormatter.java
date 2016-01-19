@@ -154,8 +154,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (chronology == null) {
             throw new NullPointerException("Missing chronology.");
         } else if (steps.isEmpty()) {
-            throw new IllegalArgumentException(
-                "No format processors defined.");
+            throw new IllegalStateException("No format processors defined.");
         }
 
         this.chronology = chronology;
@@ -628,17 +627,30 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         try {
-            for (FormatStep step : this.steps) {
-                step.print(
-                    formattable,
-                    buffer,
-                    attributes,
-                    positions
-                );
+            int index = 0;
+            int len = this.steps.size();
+
+            while (index < len) {
+                FormatStep step = this.steps.get(index);
+                step.print(formattable, buffer, attributes, positions);
+
+                if (step.isNewOrBlockStarted()) {
+                    // skip the rest of current section
+                    int last = index;
+                    int section = step.getSection();
+                    for (int j = len - 1; j > index; j--) {
+                        if (this.steps.get(j).getSection() == section) {
+                            last = j;
+                            break;
+                        }
+                    }
+                    index = last;
+                }
+
+                index++;
             }
         } catch (ChronoException ex) {
-            throw new IllegalArgumentException(
-                "Not formattable: " + formattable, ex);
+            throw new IllegalArgumentException("Not formattable: " + formattable, ex);
         }
 
         if (withPositions) {
@@ -1746,7 +1758,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.axis(), locale);
         builder.addPattern(pattern, type);
-        return builder.build();
+
+        try {
+            return builder.build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
 
     }
 
@@ -1778,7 +1795,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.axis(), locale);
         builder.addPattern(pattern, type);
-        return builder.build();
+
+        try {
+            return builder.build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
 
     }
 
@@ -1810,7 +1832,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.axis(), locale);
         builder.addPattern(pattern, type);
-        return builder.build();
+
+        try {
+            return builder.build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
 
     }
 
@@ -1845,7 +1872,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         Builder<Moment> builder = new Builder<Moment>(Moment.axis(), locale);
         builder.addPattern(pattern, type);
-        return builder.build().withTimezone(tzid);
+        try {
+            return builder.build().withTimezone(tzid);
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
 
     }
 
@@ -2588,6 +2619,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     && this.defaults.containsKey(element)
                 ) {
                     parsedResult.put(element, this.defaults.get(element));
+                    parsedResult.remove(ValidationElement.ERROR_MESSAGE);
                     status.clearError();
                     status.clearWarning();
                 }
@@ -2595,15 +2627,34 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             // Fehler-Auflösung
             if (status.isError()) {
-                if (current == 0) {
+                // nächsten oder-Block suchen
+                int section = step.getSection();
+                int last = index;
+
+                for (int j = index + 1; j < len; j++) {
+                    FormatStep test = this.steps.get(j);
+                    if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
+                        last = j;
+                        break;
+                    }
+                }
+
+                if (last > index) {
+                    // wenn gefunden, zum nächsten oder-Block springen
+                    values = data.pop();
+                    status.clearError();
+                    status.setPosition(((Integer) values.get(null)).intValue());
+                    values = new NonAmbivalentMap(); // alte Werte verwerfen
+                    values.put(null, Integer.valueOf(status.getPosition()));
+                    data.push(values);
+                    index = last;
+                } else if (current == 0) {
                     // Grundzustand => aussteigen
                     values = data.peek();
                     values.remove(null);
                     return new ParsedValues(values);
                 } else {
                     // Ende des optionalen Abschnitts suchen
-                    int section = step.getSection();
-                    int last = index;
                     for (int j = len - 1; j > index; j--) {
                         if (this.steps.get(j).getSection() == section) {
                             last = j;
@@ -2617,6 +2668,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     status.clearError();
                     status.setPosition(((Integer) values.get(null)).intValue());
                 }
+            } else if (step.isNewOrBlockStarted()) {
+                // Ende des aktuellen Abschnitts suchen
+                int section = step.getSection();
+                int last = index;
+                for (int j = len - 1; j > index; j--) {
+                    if (this.steps.get(j).getSection() == section) {
+                        last = j;
+                        break;
+                    }
+                }
+                index = last;
             }
 
             // Schleifenzähler inkrementieren
@@ -3414,8 +3476,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ) {
 
             this.checkElement(element);
-            boolean fixedWidth =
-                (!decimalSeparator && (minDigits == maxDigits));
+            boolean fixedWidth = (!decimalSeparator && (minDigits == maxDigits));
             this.ensureOnlyOneFractional(fixedWidth, decimalSeparator);
 
             FormatProcessor<?> processor =
@@ -3891,14 +3952,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Processes given format pattern of given pattern type to a
          * sequence of format elements. </p>
          *
-         * <p>The letters a-z and A-Z are treated as format symbols. The
-         * square brackets &quot;[&quot; and &quot;]&quot; define an
-         * optional section which can be nested, too.. The chars
-         * &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved
-         * for the future. All other chars will be interpreted as literals.
-         * If a reserved char shall be treated as literal then it must be
-         * escaped by the apostroph &quot;'&quot;. The apostroph itself
-         * can be treated as literal by double apostroph. </p>
+         * <p>The letters a-z and A-Z are treated as format symbols. The square brackets
+         * &quot;[&quot; and &quot;]&quot; define an optional section which can be nested,
+         * too. The char &quot;|&quot; starts a new {@link #or() or-block}. And the chars
+         * &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved for the future. All other
+         * chars will be interpreted as literals. If a reserved char shall be treated as literal
+         * then it must be escaped by the apostroph &quot;'&quot;. The apostroph itself can be
+         * treated as literal by double apostroph. </p>
          *
          * <p>For exact interpretation and description of format symbols
          * see the implementations of interface {@code ChronoPattern}. </p>
@@ -3912,15 +3972,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /*[deutsch]
          * <p>Verarbeitet ein beliebiges Formatmuster des angegebenen Typs. </p>
          *
-         * <p>Als Formatsymbole werden die Buchstaben a-z und A-Z erkannt. Die
-         * eckigen Klammern &quot;[&quot; und &quot;]&quot; leiten eine
-         * optionale Sektion ein, die auch verschachtelt werden darf. Die
-         * Zeichen &quot;#&quot;, &quot;{&quot; und &quot;}&quot; sind f&uuml;r
-         * die Zukunft reserviert. Alle anderen Zeichen werden als Literale
-         * interpretiert. Falls ein reserviertes Zeichen auch als Literal
-         * gelten soll, mu&szlig; es mittels eines Apostrophs &quot;'&quot;
-         * gekennzeichnet werden (ESCAPE). Das Apostroph selbst wird durch
-         * Verdoppelung als Literal interpretiert. </p>
+         * <p>Als Formatsymbole werden die Buchstaben a-z und A-Z erkannt. Die eckigen Klammern
+         * &quot;[&quot; und &quot;]&quot; leiten eine optionale Sektion ein, die auch verschachtelt
+         * werden darf. Das Zeichen &quot;|&quot; startet einen neuen {@link #or() oder-Block}.
+         * Die Zeichen &quot;#&quot;, &quot;{&quot; und &quot;}&quot; sind f&uuml;r die Zukunft reserviert.
+         * Alle anderen Zeichen werden als Literale interpretiert. Falls ein reserviertes Zeichen auch
+         * als Literal gelten soll, mu&szlig; es mittels eines Apostrophs &quot;'&quot; gekennzeichnet
+          * werden (ESCAPE). Das Apostroph selbst wird durch Verdoppelung als Literal interpretiert. </p>
          *
          * <p>Zur genauen Interpretation der Formatsymbole sei auf die
          * Implementierungen des Interface {@code ChronoPattern} verwiesen. </p>
@@ -4009,6 +4067,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 } else if (c == ']') {
                     this.addLiteralChars(literal);
                     this.endSection();
+                } else if (c == '|') {
+                    try {
+                        this.addLiteralChars(literal);
+                        this.or();
+                    } catch (IllegalStateException ise) {
+                        throw new IllegalArgumentException(ise);
+                    }
                 } else if ((c == '#') || (c == '{') || (c == '}')) {
                     throw new IllegalArgumentException(
                         "Pattern contains reserved character: '" + c + "'");
@@ -4876,7 +4941,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @see     #padNext(int)
          */
         /*[deutsch]
-         * <p>Definiert zum vorherigen Element  der gleichen Sektion soviele
+         * <p>Definiert zum vorherigen Element der gleichen Sektion soviele
          * F&uuml;llzeichen, bis die Elementbreite die angegebene Breite
          * erreicht hat. </p>
          *
@@ -4902,7 +4967,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     currentSection = this.stack.getLast().getSection();
                 }
 
-                if (currentSection == lastStep.getSection()) {
+                if ((currentSection == lastStep.getSection()) && !lastStep.isNewOrBlockStarted()) {
                     this.steps.set(index, lastStep.pad(0, width));
                 }
             }
@@ -5222,17 +5287,104 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Starts a new block inside the current section such that the following parts will only be
+         * taken into account in case of failure according to or-logic. </p>
+         *
+         * <p>Example of usage (here with format pattern char &quot;|&quot;): </p>
+         *
+         * <pre>
+         *   ChronoFormatter&lt;PlainDate&gt; f =
+         *       ChronoFormatter.ofDatePattern(&quot;E, [dd.MM.|MM/dd/]uuuu&quot;, PatternType.CLDR, Locale.ENGLISH);
+         *       PlainDate expected = PlainDate.of(2015, 12, 31);
+         *       assertThat(f.parse("Thu, 31.12.2015"), is(expected));
+         *       assertThat(f.parse("Thu, 12/31/2015"), is(expected));
+         * </pre>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if called twice
+         *          or called after the end of an optional section
+         *          or if there is not yet any defined format step in current section
+         * @since   3.14/4.11
+         */
+        /*[deutsch]
+         * <p>Startet einen neuen Block innerhalb des aktuellen Abschnitts so, da&szlig; alle folgenden
+         * Bl&ouml;cke nur im Fehlerfall verarbeitet werden (entsprechend der oder-Logik). </p>
+         *
+         * <p>Anwendungsbeispiel (hier mit Hilfe des Formatmusterzeichens &quot;|&quot;): </p>
+         *
+         * <pre>
+         *   ChronoFormatter&lt;PlainDate&gt; f =
+         *       ChronoFormatter.ofDatePattern(&quot;E, [dd.MM.|MM/dd/]uuuu&quot;, PatternType.CLDR, Locale.ENGLISH);
+         *       PlainDate expected = PlainDate.of(2015, 12, 31);
+         *       assertThat(f.parse("Thu, 31.12.2015"), is(expected));
+         *       assertThat(f.parse("Thu, 12/31/2015"), is(expected));
+         * </pre>
+         *
+         * @return  this instance for method chaining
+         * @throws  IllegalStateException if called twice
+         *          or called after the end of an optional section
+         *          or if there is not yet any defined format step in current section
+         * @since   3.14/4.11
+         */
+        public Builder<T> or() {
+
+            int index = -1;
+            FormatStep lastStep = null;
+            int lastSection = -1;
+            int currentSection = 0;
+
+            if (!this.stack.isEmpty()) {
+                currentSection = this.stack.getLast().getSection();
+            }
+
+            if (!this.steps.isEmpty()) {
+                index = this.steps.size() - 1;
+                lastStep = this.steps.get(index);
+                lastSection = lastStep.getSection();
+            }
+
+            if (currentSection == lastSection) {
+                this.steps.set(index, lastStep.startNewOrBlock());
+                this.resetPadding();
+                this.reservedIndex = -1; // reset adjacent digit parsing
+            } else {
+                throw new IllegalStateException("Cannot start or-block without any previous step in current section.");
+            }
+
+            return this;
+
+        }
+
+        /**
          * <p>Finishes the build and creates a new {@code ChronoFormatter}. </p>
          *
          * @return  new {@code ChronoFormatter}-instance
+         * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
          */
         /*[deutsch]
-         * <p>Schlie&szlig;t den Build-Vorgang ab und erstellt ein neues
-         * Zeitformat. </p>
+         * <p>Schlie&szlig;t den Build-Vorgang ab und erstellt ein neues Zeitformat. </p>
          *
          * @return  new {@code ChronoFormatter}-instance
+         * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
          */
         public ChronoFormatter<T> build() {
+
+            for (int index = 0, len = this.steps.size(); index < len; index++) {
+                FormatStep step = this.steps.get(index);
+                if (step.isNewOrBlockStarted()) {
+                    int section = step.getSection();
+                    boolean ok = false;
+                    for (int j = len - 1; j > index; j--) {
+                        if (this.steps.get(j).getSection() == section) {
+                            ok = true;
+                            break;
+                        }
+                    }
+                    if (!ok) {
+                        throw new IllegalStateException("Missing format processor after or-operator.");
+                    }
+                }
+            }
 
             ChronoFormatter<T> formatter =
                 new ChronoFormatter<T>(
@@ -5259,9 +5411,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             boolean protectedMode
         ) {
 
+            FormatStep last = (this.steps.isEmpty() ? null : this.steps.get(this.steps.size() - 1));
+
             if (
-                this.steps.isEmpty()
-                || !this.steps.get(this.steps.size() - 1).isNumerical()
+                (last == null)
+                || last.isNewOrBlockStarted()
+                || !last.isNumerical()
                 || (count != 4)
             ) {
                 SignPolicy signPolicy = ((count < 4) ? SignPolicy.SHOW_WHEN_NEGATIVE : SignPolicy.SHOW_WHEN_BIG_NUMBER);
@@ -5321,10 +5476,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         this.steps.set(ri, numStep.reserve(minDigits));
                     }
                 }
-            } else if (
-                (last != null)
-                && last.isNumerical()
-            ) {
+            } else if ((last != null) && last.isNumerical() && !last.isNewOrBlockStarted()) {
                 throw new IllegalStateException(
                     "Numerical element with variable width can't be inserted "
                     + "after another numerical element. "
@@ -5347,10 +5499,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             FormatStep last = this.checkAfterDecimalDigits(element);
             OrdinalProcessor p = new OrdinalProcessor(element, indicators);
 
-            if (
-                (last != null)
-                && last.isNumerical()
-            ) {
+            if ((last != null) && last.isNumerical() && !last.isNewOrBlockStarted()) {
                 throw new IllegalStateException(
                     "Ordinal element with variable width can't be inserted "
                     + "after another numerical element.");
@@ -5518,7 +5667,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 return null;
             }
 
-            if (last.isDecimal()) {
+            if (last.isDecimal() && !last.isNewOrBlockStarted()) {
                 throw new IllegalStateException(
                     element.name()
                     + " can't be inserted after an element"
