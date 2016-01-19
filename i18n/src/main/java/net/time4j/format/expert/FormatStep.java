@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatStep.java) is part of project Time4J.
  *
@@ -54,6 +54,7 @@ final class FormatStep {
     private final int reserved;
     private final int padLeft;
     private final int padRight;
+    private final boolean orMarker;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -72,7 +73,7 @@ final class FormatStep {
         int section,
         AttributeSet sectionalAttrs
     ) {
-        this(processor, level, section, sectionalAttrs, 0, 0, 0);
+        this(processor, level, section, sectionalAttrs, 0, 0, 0, false);
 
     }
 
@@ -83,7 +84,8 @@ final class FormatStep {
         AttributeSet sectionalAttrs,
         int reserved,
         int padLeft,
-        int padRight
+        int padRight,
+        boolean orMarker
     ) {
         super();
 
@@ -94,14 +96,11 @@ final class FormatStep {
         } else if (section < 0) {
             throw new IllegalArgumentException("Invalid section: " + section);
         } else if (reserved < 0) {
-            throw new IllegalArgumentException(
-                "Reserved chars must not be negative: " + reserved);
+            throw new IllegalArgumentException("Reserved chars must not be negative: " + reserved);
         } else if (padLeft < 0) {
-            throw new IllegalArgumentException(
-                "Invalid pad-width: " + padLeft);
+            throw new IllegalArgumentException("Invalid pad-width: " + padLeft);
         } else if (padRight < 0) {
-            throw new IllegalArgumentException(
-                "Invalid pad-width: " + padRight);
+            throw new IllegalArgumentException("Invalid pad-width: " + padRight);
         }
 
         this.processor = processor;
@@ -111,6 +110,7 @@ final class FormatStep {
         this.reserved = reserved;
         this.padLeft = padLeft;
         this.padRight = padRight;
+        this.orMarker = orMarker;
 
     }
 
@@ -415,7 +415,8 @@ final class FormatStep {
             this.sectionalAttrs,
             this.reserved,
             this.padLeft,
-            this.padRight
+            this.padRight,
+            this.orMarker
         );
 
     }
@@ -436,7 +437,8 @@ final class FormatStep {
             this.sectionalAttrs,
             this.reserved + reserved,
             this.padLeft,
-            this.padRight
+            this.padRight,
+            this.orMarker
         );
 
     }
@@ -460,8 +462,47 @@ final class FormatStep {
             this.sectionalAttrs,
             this.reserved,
             this.padLeft + padLeft,
-            this.padRight + padRight
+            this.padRight + padRight,
+            this.orMarker
         );
+
+    }
+
+    /**
+     * <p>Startet einen neuen oder-Block. </p>
+     *
+     * @return  updated format step
+     * @throws  IllegalStateException if a new or-block was already started
+     * @since   3.14/4.11
+     */
+    FormatStep startNewOrBlock() {
+
+        if (this.orMarker) {
+            throw new IllegalStateException("Cannot start or-block twice.");
+        }
+
+        return new FormatStep(
+            this.processor,
+            this.level,
+            this.section,
+            this.sectionalAttrs,
+            this.reserved,
+            this.padLeft,
+            this.padRight,
+            true
+        );
+
+    }
+
+    /**
+     * Wird ein neuer oder-Block gestartet?
+     *
+     * @return  boolean
+     * @since   3.14/4.11
+     */
+    boolean isNewOrBlockStarted() {
+
+        return this.orMarker;
 
     }
 
@@ -520,6 +561,7 @@ final class FormatStep {
      * @param   min             min width of historic year
      * @param   max             max width of historic year
      * @return  query for retrieving attribute values
+     * @since   3.14/4.11
      */
     AttributeQuery getQuery(
         final AttributeQuery defaultAttrs,
@@ -593,6 +635,7 @@ final class FormatStep {
                 && (this.reserved == that.reserved)
                 && (this.padLeft == that.padLeft)
                 && (this.padRight == that.padRight)
+                && (this.orMarker == that.orMarker)
             );
         } else {
             return false;
@@ -639,6 +682,9 @@ final class FormatStep {
         sb.append(this.padLeft);
         sb.append(", pad-right=");
         sb.append(this.padRight);
+        if (this.orMarker) {
+            sb.append(", or-block-started");
+        }
         sb.append(']');
         return sb.toString();
 
