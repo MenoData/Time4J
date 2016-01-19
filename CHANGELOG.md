@@ -1,5 +1,6 @@
 ## [v3.14] not yet released
 ### Added
+- Introduce or-operator in formatting via builder and pattern [#437}
 - Add other historic eras [#436]
 - Support for various historical New Year events [#434]
 - Date arithmetic on HijriCalendar [#429]
