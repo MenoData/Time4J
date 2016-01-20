@@ -45,6 +45,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Locale;
 
@@ -133,7 +134,7 @@ public final class TimestampInterval
      *
      * @param   start   timestamp of lower boundary (inclusive)
      * @param   end     timestamp of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new timestamp interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -143,7 +144,7 @@ public final class TimestampInterval
      *
      * @param   start   timestamp of lower boundary (inclusive)
      * @param   end     timestamp of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new timestamp interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -155,6 +156,36 @@ public final class TimestampInterval
         return new TimestampInterval(
             Boundary.of(CLOSED, start),
             Boundary.of(OPEN, end));
+
+    }
+
+    /**
+     * <p>Creates a finite half-open interval between given time points. </p>
+     *
+     * @param   start   timestamp of lower boundary (inclusive)
+     * @param   end     timestamp of upper boundary (exclusive)
+     * @return  new timestamp interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainTimestamp, PlainTimestamp)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den
+     * angegebenen Zeitpunkten. </p>
+     *
+     * @param   start   timestamp of lower boundary (inclusive)
+     * @param   end     timestamp of upper boundary (exclusive)
+     * @return  new timestamp interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainTimestamp, PlainTimestamp)
+     * @since   4.11
+     */
+    public static TimestampInterval between(
+        LocalDateTime start,
+        LocalDateTime end
+    ) {
+
+        return TimestampInterval.between(PlainTimestamp.from(start), PlainTimestamp.from(end));
 
     }
 
@@ -182,6 +213,30 @@ public final class TimestampInterval
     }
 
     /**
+     * <p>Creates an infinite half-open interval since given start
+     * timestamp. </p>
+     *
+     * @param   start       timestamp of lower boundary (inclusive)
+     * @return  new timestamp interval
+     * @see     #since(PlainTimestamp)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes halb-offenes Intervall ab dem angegebenen
+     * Startzeitpunkt. </p>
+     *
+     * @param   start       timestamp of lower boundary (inclusive)
+     * @return  new timestamp interval
+     * @see     #since(PlainTimestamp)
+     * @since   4.11
+     */
+    public static TimestampInterval since(LocalDateTime start) {
+
+        return TimestampInterval.since(PlainTimestamp.from(start));
+
+    }
+
+    /**
      * <p>Creates an infinite open interval until given end timestamp. </p>
      *
      * @param   end     timestamp of upper boundary (exclusive)
@@ -200,6 +255,111 @@ public final class TimestampInterval
 
         Boundary<PlainTimestamp> past = Boundary.infinitePast();
         return new TimestampInterval(past, Boundary.of(OPEN, end));
+
+    }
+
+    /**
+     * <p>Creates an infinite open interval until given end timestamp. </p>
+     *
+     * @param   end     timestamp of upper boundary (exclusive)
+     * @return  new timestamp interval
+     * @see     #until(PlainTimestamp)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes offenes Intervall bis zum angegebenen
+     * Endzeitpunkt. </p>
+     *
+     * @param   end     timestamp of upper boundary (exclusive)
+     * @return  new timestamp interval
+     * @see     #until(PlainTimestamp)
+     * @since   4.11
+     */
+    public static TimestampInterval until(LocalDateTime end) {
+
+        return TimestampInterval.until(PlainTimestamp.from(end));
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public PlainTimestamp getStartAsTimestamp() {
+
+        return this.getStart().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public LocalDateTime getStartAsLocalDateTime() {
+
+        PlainTimestamp tsp = this.getStartAsTimestamp();
+        return ((tsp == null) ? null : tsp.toTemporalAccessor());
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public PlainTimestamp getEndAsTimestamp() {
+
+        return this.getEnd().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public LocalDateTime getEndAsLocalDateTime() {
+
+        PlainTimestamp tsp = this.getEndAsTimestamp();
+        return ((tsp == null) ? null : tsp.toTemporalAccessor());
 
     }
 

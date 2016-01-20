@@ -41,6 +41,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Locale;
 
@@ -142,6 +143,35 @@ public final class DateInterval
     }
 
     /**
+     * <p>Creates a closed interval between given dates. </p>
+     *
+     * @param   start   date of lower boundary (inclusive)
+     * @param   end     date of upper boundary (inclusive)
+     * @return  new date interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainDate, PlainDate)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein geschlossenes Intervall zwischen den angegebenen Datumswerten. </p>
+     *
+     * @param   start   date of lower boundary (inclusive)
+     * @param   end     date of upper boundary (inclusive)
+     * @return  new date interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainDate, PlainDate)
+     * @since   4.11
+     */
+    public static DateInterval between(
+        LocalDate start,
+        LocalDate end
+    ) {
+
+        return DateInterval.between(PlainDate.from(start), PlainDate.from(end));
+
+    }
+
+    /**
      * <p>Creates an infinite interval since given start date. </p>
      *
      * @param   start   date of lower boundary (inclusive)
@@ -160,6 +190,28 @@ public final class DateInterval
 
         Boundary<PlainDate> future = Boundary.infiniteFuture();
         return new DateInterval(Boundary.of(CLOSED, start), future);
+
+    }
+
+    /**
+     * <p>Creates an infinite interval since given start date. </p>
+     *
+     * @param   start   date of lower boundary (inclusive)
+     * @return  new date interval
+     * @see     #since(PlainDate)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes Intervall ab dem angegebenen Startdatum. </p>
+     *
+     * @param   start   date of lower boundary (inclusive)
+     * @return  new date interval
+     * @see     #since(PlainDate)
+     * @since   4.11
+     */
+    public static DateInterval since(LocalDate start) {
+
+        return DateInterval.since(PlainDate.from(start));
 
     }
 
@@ -186,6 +238,29 @@ public final class DateInterval
     }
 
     /**
+     * <p>Creates an infinite interval until given end date. </p>
+     *
+     * @param   end     date of upper boundary (inclusive)
+     * @return  new date interval
+     * @see     #until(PlainDate)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes Intervall bis zum angegebenen
+     * Endedatum. </p>
+     *
+     * @param   end     date of upper boundary (inclusive)
+     * @return  new date interval
+     * @see     #until(PlainDate)
+     * @since   4.11
+     */
+    public static DateInterval until(LocalDate end) {
+
+        return DateInterval.until(PlainDate.from(end));
+
+    }
+
+    /**
      * <p>Creates a closed interval including only given date. </p>
      *
      * @param   date    single contained date
@@ -203,6 +278,111 @@ public final class DateInterval
     public static DateInterval atomic(PlainDate date) {
 
         return between(date, date);
+
+    }
+
+    /**
+     * <p>Creates a closed interval including only given date. </p>
+     *
+     * @param   date    single contained date
+     * @return  new date interval
+     * @see     #atomic(PlainDate)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein geschlossenes Intervall, das nur das angegebene
+     * Datum enth&auml;lt. </p>
+     *
+     * @param   date    single contained date
+     * @return  new date interval
+     * @see     #atomic(PlainDate)
+     * @since   4.11
+     */
+    public static DateInterval atomic(LocalDate date) {
+
+        return DateInterval.atomic(PlainDate.from(date));
+
+    }
+
+    /**
+     * <p>Yields the start date. </p>
+     *
+     * @return  start date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert das Startdatum. </p>
+     *
+     * @return  start date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public PlainDate getStartAsCalendarDate() {
+
+        return this.getStart().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the start date. </p>
+     *
+     * @return  start date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert das Startdatum. </p>
+     *
+     * @return  start date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public LocalDate getStartAsLocalDate() {
+
+        PlainDate date = this.getStartAsCalendarDate();
+        return ((date == null) ? null : date.toTemporalAccessor());
+
+    }
+
+    /**
+     * <p>Yields the end date. </p>
+     *
+     * @return  end date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert das Endedatum. </p>
+     *
+     * @return  end date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public PlainDate getEndAsCalendarDate() {
+
+        return this.getEnd().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the end date. </p>
+     *
+     * @return  end date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert das Endedatum. </p>
+     *
+     * @return  end date or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public LocalDate getEndAsLocalDate() {
+
+        PlainDate date = this.getEndAsCalendarDate();
+        return ((date == null) ? null : date.toTemporalAccessor());
 
     }
 

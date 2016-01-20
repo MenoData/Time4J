@@ -34,6 +34,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Locale;
 
@@ -111,7 +112,7 @@ public final class ClockInterval
      *
      * @param   start   time of lower boundary (inclusive)
      * @param   end     time of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new time interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -121,7 +122,7 @@ public final class ClockInterval
      *
      * @param   start   time of lower boundary (inclusive)
      * @param   end     time of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new time interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -133,6 +134,42 @@ public final class ClockInterval
         return new ClockInterval(
             Boundary.of(CLOSED, start),
             Boundary.of(OPEN, end));
+
+    }
+
+    /**
+     * <p>Creates a finite half-open interval between given wall times. </p>
+     *
+     * <p>For better handling of time 24:00, it is recommended to directly use the overloaded variant with
+     * arguments of type {@code PlainTime}. </p>
+     *
+     * @param   start   time of lower boundary (inclusive)
+     * @param   end     time of upper boundary (exclusive)
+     * @return  new time interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainTime, PlainTime)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den
+     * angegebenen Uhrzeiten. </p>
+     *
+     * <p>F&uuml;r die spezielle Uhrzeit 24:00 wird empfohlen, die &uuml;berladene Variante mit Argumenten
+     * des Typs {@code PlainTime} zu verwenden. </p>
+     *
+     * @param   start   time of lower boundary (inclusive)
+     * @param   end     time of upper boundary (exclusive)
+     * @return  new time interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(PlainTime, PlainTime)
+     * @since   4.11
+     */
+    public static ClockInterval between(
+        LocalTime start,
+        LocalTime end
+    ) {
+
+        return ClockInterval.between(PlainTime.from(start), PlainTime.from(end));
 
     }
 
@@ -165,6 +202,30 @@ public final class ClockInterval
     }
 
     /**
+     * <p>Creates a finite half-open interval between given start time and
+     * midnight at end of day (exclusive). </p>
+     *
+     * @param   start       time of lower boundary (inclusive)
+     * @return  new time interval
+     * @see     #since(PlainTime)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen der
+     * angegebenen Startzeit und Mitternacht zu Ende des Tages (exklusive). </p>
+     *
+     * @param   start       time of lower boundary (inclusive)
+     * @return  new time interval
+     * @see     #since(PlainTime)
+     * @since   4.11
+     */
+    public static ClockInterval since(LocalTime start) {
+
+        return ClockInterval.since(PlainTime.from(start));
+
+    }
+
+    /**
      * <p>Creates a finite half-open interval between midnight at start of day
      * and given end time. </p>
      *
@@ -183,6 +244,107 @@ public final class ClockInterval
     public static ClockInterval until(PlainTime end) {
 
         return between(PlainTime.midnightAtStartOfDay(), end);
+
+    }
+
+    /**
+     * <p>Creates a finite half-open interval between midnight at start of day
+     * and given end time. </p>
+     *
+     * @param   end     time of upper boundary (exclusive)
+     * @return  new time interval
+     * @see     #until(PlainTime)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen Mitternacht
+     * zu Beginn des Tages und der angegebenen Endzeit. </p>
+     *
+     * @param   end     time of upper boundary (exclusive)
+     * @return  new time interval
+     * @see     #until(PlainTime)
+     * @since   4.11
+     */
+    public static ClockInterval until(LocalTime end) {
+
+        return ClockInterval.until(PlainTime.from(end));
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * @return  start time point
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * @return  start time point
+     * @since   4.11
+     */
+    public PlainTime getStartAsClockTime() {
+
+        return this.getStart().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * @return  start time point
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * @return  start time point
+     * @since   4.11
+     */
+    public LocalTime getStartAsLocalTime() {
+
+        return this.getStartAsClockTime().toTemporalAccessor();
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * @return  end time point
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * @return  end time point
+     * @since   4.11
+     */
+    public PlainTime getEndAsClockTime() {
+
+        return this.getEnd().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * <p>The end time 24:00 (midnight at end of day) will be mapped to midnight at start of next day (00:00). </p>
+     *
+     * @return  end time point
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * <p>Die Zeit 24:00 (Mitternacht am Ende des Tages) wird auf Mitternacht zu Beginn des n&auml;chsten
+     * Tages abgebildet (00:00). </p>
+     *
+     * @return  end time point
+     * @since   4.11
+     */
+    public LocalTime getEndAsLocalTime() {
+
+        return this.getEndAsClockTime().toTemporalAccessor();
 
     }
 

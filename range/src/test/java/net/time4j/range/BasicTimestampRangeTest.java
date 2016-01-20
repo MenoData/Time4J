@@ -7,8 +7,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -187,6 +191,28 @@ public class BasicTimestampRangeTest {
         assertThat(
             TimestampInterval.between(start, end).getEnd(),
             is(Boundary.of(IntervalEdge.OPEN, end)));
+    }
+
+    @Test
+    public void getStartAsLocalDateTime() {
+        LocalDateTime start = LocalDateTime.parse("2014-02-27T10:03:15");
+        assertThat(
+            TimestampInterval.since(start).getStartAsLocalDateTime(),
+            is(start));
+        assertThat(
+            TimestampInterval.since(start).getEndAsLocalDateTime(),
+            nullValue());
+    }
+
+    @Test
+    public void getEndAsLocalDateTime() {
+        LocalDateTime end = LocalDateTime.parse("2014-05-14T17:45:30");
+        assertThat(
+            TimestampInterval.until(end).getEndAsLocalDateTime(),
+            is(end));
+        assertThat(
+            TimestampInterval.until(end).getStartAsLocalDateTime(),
+            nullValue());
     }
 
     @Test

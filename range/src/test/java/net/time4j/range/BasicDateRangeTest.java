@@ -4,6 +4,8 @@ import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
@@ -13,6 +15,7 @@ import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -220,6 +223,36 @@ public class BasicDateRangeTest {
         assertThat(
             DateInterval.between(start, end).getEnd(),
             is(Boundary.of(IntervalEdge.CLOSED, end)));
+    }
+
+    @Test
+    public void getStartAsLocalDate() {
+        LocalDate start = LocalDate.parse("2014-02-27");
+        LocalDate end = LocalDate.parse("2015-05-09");
+        assertThat(
+            DateInterval.between(start, end).getStartAsLocalDate(),
+            is(start));
+        assertThat(
+            DateInterval.atomic(start).getStartAsLocalDate(),
+            is(start));
+        assertThat(
+            DateInterval.until(start).getStartAsLocalDate(),
+            nullValue());
+    }
+
+    @Test
+    public void getEndAsLocalDate() {
+        LocalDate start = LocalDate.parse("2014-02-27");
+        LocalDate end = LocalDate.parse("2015-05-09");
+        assertThat(
+            DateInterval.between(start, end).getEndAsLocalDate(),
+            is(end));
+        assertThat(
+            DateInterval.atomic(end).getEndAsLocalDate(),
+            is(end));
+        assertThat(
+            DateInterval.since(start).getEndAsLocalDate(),
+            nullValue());
     }
 
     @Test

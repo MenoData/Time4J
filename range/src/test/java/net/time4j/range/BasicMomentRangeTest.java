@@ -3,13 +3,17 @@ package net.time4j.range;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
+
+import net.time4j.SI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -193,6 +197,28 @@ public class BasicMomentRangeTest {
     }
 
     @Test
+    public void getStartAsInstant() {
+        Instant start = Instant.parse("2014-02-27T10:03:15Z");
+        assertThat(
+            MomentInterval.since(start).getStartAsInstant(),
+            is(start));
+        assertThat(
+            MomentInterval.since(start).getEndAsInstant(),
+            nullValue());
+    }
+
+    @Test
+    public void getEndAsInstant() {
+        Instant end = Instant.parse("2014-05-14T17:45:30Z");
+        assertThat(
+            MomentInterval.until(end).getEndAsInstant(),
+            is(end));
+        assertThat(
+            MomentInterval.until(end).getStartAsInstant(),
+            nullValue());
+    }
+
+    @Test
     public void testEquals() {
         Moment start1 = PlainTimestamp.of(2014, 2, 27, 0, 0).atUTC();
         Moment end1 = PlainTimestamp.of(2014, 5, 14, 0, 0).atUTC();
@@ -282,6 +308,9 @@ public class BasicMomentRangeTest {
 
         assertThat(
             interval.move(12, TimeUnit.HOURS),
+            is(expected));
+        assertThat(
+            interval.move(12 * 3600, SI.SECONDS),
             is(expected));
     }
 

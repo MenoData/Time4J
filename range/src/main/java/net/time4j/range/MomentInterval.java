@@ -45,6 +45,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
@@ -161,8 +162,36 @@ public final class MomentInterval
     }
 
     /**
-     * <p>Creates an infinite half-open interval since given start
-     * timestamp. </p>
+     * <p>Creates a finite half-open interval between given time points. </p>
+     *
+     * @param   start   moment of lower boundary (inclusive)
+     * @param   end     moment of upper boundary (exclusive)
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(Moment, Moment)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein begrenztes halb-offenes Intervall zwischen den angegebenen Zeitpunkten. </p>
+     *
+     * @param   start   moment of lower boundary (inclusive)
+     * @param   end     moment of upper boundary (exclusive)
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if start is after end
+     * @see     #between(Moment, Moment)
+     * @since   4.11
+     */
+    public static MomentInterval between(
+        Instant start,
+        Instant end
+    ) {
+
+        return MomentInterval.between(Moment.from(start), Moment.from(end));
+
+    }
+
+    /**
+     * <p>Creates an infinite half-open interval since given start. </p>
      *
      * @param   start       moment of lower boundary (inclusive)
      * @return  new moment interval
@@ -184,7 +213,29 @@ public final class MomentInterval
     }
 
     /**
-     * <p>Creates an infinite open interval until given end timestamp. </p>
+     * <p>Creates an infinite half-open interval since given start. </p>
+     *
+     * @param   start       moment of lower boundary (inclusive)
+     * @return  new moment interval
+     * @see     #since(Moment)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes halb-offenes Intervall ab dem angegebenen Startzeitpunkt. </p>
+     *
+     * @param   start       moment of lower boundary (inclusive)
+     * @return  new moment interval
+     * @see     #since(Moment)
+     * @since   4.11
+     */
+    public static MomentInterval since(Instant start) {
+
+        return MomentInterval.since(Moment.from(start));
+
+    }
+
+    /**
+     * <p>Creates an infinite open interval until given end. </p>
      *
      * @param   end     moment of upper boundary (exclusive)
      * @return  new moment interval
@@ -202,6 +253,118 @@ public final class MomentInterval
 
         Boundary<Moment> past = Boundary.infinitePast();
         return new MomentInterval(past, Boundary.of(OPEN, end));
+
+    }
+
+    /**
+     * <p>Creates an infinite open interval until given end. </p>
+     *
+     * @param   end     moment of upper boundary (exclusive)
+     * @return  new moment interval
+     * @see     #until(Moment)
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein unbegrenztes offenes Intervall bis zum angegebenen Endzeitpunkt. </p>
+     *
+     * @param   end     moment of upper boundary (exclusive)
+     * @return  new moment interval
+     * @see     #until(Moment)
+     * @since   4.11
+     */
+    public static MomentInterval until(Instant end) {
+
+        return MomentInterval.until(Moment.from(end));
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public Moment getStartAsMoment() {
+
+        return this.getStart().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the start time point. </p>
+     *
+     * <p>Note: Leap seconds will be lost here. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Startzeitpunkt. </p>
+     *
+     * <p>Hinweis: Schaltsekunden gehen hier verloren. </p>
+     *
+     * @return  start time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public Instant getStartAsInstant() {
+
+        Moment moment = this.getStartAsMoment();
+        return ((moment == null) ? null : moment.toTemporalAccessor());
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public Moment getEndAsMoment() {
+
+        return this.getEnd().getTemporal();
+
+    }
+
+    /**
+     * <p>Yields the end time point. </p>
+     *
+     * <p>Note: Leap seconds will be lost here. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    /*[deutsch]
+     * <p>Liefert den Endzeitpunkt. </p>
+     *
+     * <p>Hinweis: Schaltsekunden gehen hier verloren. </p>
+     *
+     * @return  end time point or {@code null} if infinite
+     * @see     Boundary#isInfinite()
+     * @since   4.11
+     */
+    public Instant getEndAsInstant() {
+
+        Moment moment = this.getEndAsMoment();
+        return ((moment == null) ? null : moment.toTemporalAccessor());
 
     }
 

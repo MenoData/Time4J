@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.time.LocalTime;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
@@ -196,6 +198,29 @@ public class BasicClockRangeTest {
         assertThat(
             ClockInterval.between(start, end).getEnd(),
             is(Boundary.of(IntervalEdge.OPEN, end)));
+    }
+
+    @Test
+    public void getStartAsLocalTime() {
+        LocalTime start = LocalTime.of(14, 45);
+        LocalTime end = LocalTime.of(21, 30);
+        assertThat(
+            ClockInterval.between(start, end).getStartAsLocalTime(),
+            is(start));
+        assertThat(
+            ClockInterval.between(start, end).getEndAsLocalTime(),
+            is(end));
+    }
+
+    @Test
+    public void getEndAsLocalTime() {
+        LocalTime end = LocalTime.of(14, 45);
+        assertThat(
+            ClockInterval.until(end).getEndAsLocalTime(),
+            is(end));
+        assertThat(
+            ClockInterval.since(end).getEndAsLocalTime(),
+            is(LocalTime.of(0, 0)));
     }
 
     @Test
