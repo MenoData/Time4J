@@ -3,6 +3,7 @@
 - Introduce or-operator in formatting via builder and pattern [#437}
 - Add other historic eras [#436]
 - Support for various historical New Year events [#434]
+- Define convenient methods for creating intervals using JSR-310-types [#433]
 - Date arithmetic on HijriCalendar [#429]
 - New methods `withVariant(...)` on CalendarVariant [#428]
 - Dual parsing of embedded or standalone formats [#427]
