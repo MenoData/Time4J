@@ -3953,10 +3953,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * sequence of format elements. </p>
          *
          * <p>The letters a-z and A-Z are treated as format symbols. The square brackets
-         * &quot;[&quot; and &quot;]&quot; define an optional section which can be nested,
-         * too. The char &quot;|&quot; starts a new {@link #or() or-block}. And the chars
-         * &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved for the future. All other
-         * chars will be interpreted as literals. If a reserved char shall be treated as literal
+         * &quot;[&quot; and &quot;]&quot; define an {@link #startOptionalSection() optional section}
+         * which can be nested, too. The char &quot;|&quot; starts a new {@link #or() or-block}. And
+         * the chars &quot;#&quot;, &quot;{&quot; and &quot;}&quot; are reserved for the future. All
+         * other chars will be interpreted as literals. If a reserved char shall be treated as literal
          * then it must be escaped by the apostroph &quot;'&quot;. The apostroph itself can be
          * treated as literal by double apostroph. </p>
          *
@@ -3973,12 +3973,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Verarbeitet ein beliebiges Formatmuster des angegebenen Typs. </p>
          *
          * <p>Als Formatsymbole werden die Buchstaben a-z und A-Z erkannt. Die eckigen Klammern
-         * &quot;[&quot; und &quot;]&quot; leiten eine optionale Sektion ein, die auch verschachtelt
-         * werden darf. Das Zeichen &quot;|&quot; startet einen neuen {@link #or() oder-Block}.
-         * Die Zeichen &quot;#&quot;, &quot;{&quot; und &quot;}&quot; sind f&uuml;r die Zukunft reserviert.
-         * Alle anderen Zeichen werden als Literale interpretiert. Falls ein reserviertes Zeichen auch
-         * als Literal gelten soll, mu&szlig; es mittels eines Apostrophs &quot;'&quot; gekennzeichnet
-          * werden (ESCAPE). Das Apostroph selbst wird durch Verdoppelung als Literal interpretiert. </p>
+         * &quot;[&quot; und &quot;]&quot; leiten eine {@link #startOptionalSection() optionale Sektion}
+         * ein, die auch verschachtelt werden darf. Das Zeichen &quot;|&quot; startet einen neuen
+         * {@link #or() oder-Block}. Die Zeichen &quot;#&quot;, &quot;{&quot; und &quot;}&quot; sind
+         * f&uuml;r die Zukunft reserviert. Alle anderen Zeichen werden als Literale interpretiert.
+         * Falls ein reserviertes Zeichen auch als Literal gelten soll, mu&szlig; es mittels eines
+         * Apostrophs &quot;'&quot; gekennzeichnet werden (ESCAPE). Das Apostroph selbst wird durch
+         * Verdoppelung als Literal interpretiert. </p>
          *
          * <p>Zur genauen Interpretation der Formatsymbole sei auf die
          * Implementierungen des Interface {@code ChronoPattern} verwiesen. </p>
@@ -5300,6 +5301,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *       assertThat(f.parse("Thu, 12/31/2015"), is(expected));
          * </pre>
          *
+         * <p>Note: Or-blocks can also be used outside of an optional section. </p>
+         *
          * @return  this instance for method chaining
          * @throws  IllegalStateException if called twice
          *          or called after the end of an optional section
@@ -5319,6 +5322,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *       assertThat(f.parse("Thu, 31.12.2015"), is(expected));
          *       assertThat(f.parse("Thu, 12/31/2015"), is(expected));
          * </pre>
+         *
+         * <p>Hinweis: Oder-Bl&ouml;cke k&ouml;nnen auch au&szlig;erhalb optionaler Sektionen verwendet werden. </p>
          *
          * @return  this instance for method chaining
          * @throws  IllegalStateException if called twice
