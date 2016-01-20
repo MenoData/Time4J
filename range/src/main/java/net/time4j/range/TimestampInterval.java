@@ -134,7 +134,7 @@ public final class TimestampInterval
      *
      * @param   start   timestamp of lower boundary (inclusive)
      * @param   end     timestamp of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new timestamp interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -144,7 +144,7 @@ public final class TimestampInterval
      *
      * @param   start   timestamp of lower boundary (inclusive)
      * @param   end     timestamp of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new timestamp interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */

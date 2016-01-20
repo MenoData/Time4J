@@ -112,7 +112,7 @@ public final class ClockInterval
      *
      * @param   start   time of lower boundary (inclusive)
      * @param   end     time of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new time interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
@@ -122,7 +122,7 @@ public final class ClockInterval
      *
      * @param   start   time of lower boundary (inclusive)
      * @param   end     time of upper boundary (exclusive)
-     * @return  new moment interval
+     * @return  new time interval
      * @throws  IllegalArgumentException if start is after end
      * @since   2.0
      */
