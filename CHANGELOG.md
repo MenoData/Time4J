@@ -7,6 +7,8 @@
 - New methods `withVariant(...)` on CalendarVariant [#428]
 - Dual parsing of embedded or standalone formats [#427]
 - Dedicated MultiFormatParser [#426]
+- Support for Indian languages gu, kn, mr, pa, ta [#439]
+- Support for Burmese (my - Myanmar) [#438]
 
 ### Fixed
 - Setting proleptic julian history on formatter is ignored [#435]
