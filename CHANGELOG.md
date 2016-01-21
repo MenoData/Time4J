@@ -12,6 +12,7 @@
 - Support for Burmese (my - Myanmar) [#438]
 
 ### Fixed
+- Unable to print java.time.chrono.MinguoDate with Time4J [#440]
 - Setting proleptic julian history on formatter is ignored [#435]
 - Semantic of changing historic era in ChronoHistory unclear [#430]
 
