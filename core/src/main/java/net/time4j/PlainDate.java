@@ -2199,7 +2199,9 @@ public final class PlainDate
                         }
                     }
                 }
-            } else if (
+            }
+
+            if (
                 threeten.isSupported(ChronoField.EPOCH_DAY)
                 && !leniency.isStrict()
             ) {

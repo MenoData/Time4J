@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.MinguoDate;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -187,6 +190,34 @@ public class MiscellaneousTest {
         assertThat(formatted, is(expected));
 
         assertThat(jalali.transform(PlainDate.class), is(PlainDate.of(2014, 4, 30)));
+    }
+
+    @Test
+    public void formatHijrahDate() {
+        ChronoFormatter<HijriCalendar> formatter =
+            ChronoFormatter.setUp(HijriCalendar.class, Locale.ROOT)
+            .addPattern("yyyy-MM-dd", PatternType.CLDR).build();
+        HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
+        assertThat(
+            formatter.formatThreeten(date),
+            is("1436-11-06"));
+        assertThat(
+            PlainDate.of(2015, 8, 21).transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA),
+            is(HijriCalendar.ofUmalqura(1436, 11, 6)));
+    }
+
+    @Test
+    public void formatMinguoDate() {
+        ChronoFormatter<MinguoCalendar> formatter =
+            ChronoFormatter.setUp(MinguoCalendar.axis(), Locale.ROOT)
+                .addPattern("y-MM-dd", PatternType.CLDR).build();
+        MinguoDate date = MinguoDate.from(LocalDate.of(2015, 8, 21));
+        assertThat(
+            formatter.formatThreeten(date),
+            is("104-08-21"));
+        assertThat(
+            PlainDate.of(2015, 8, 21).transform(MinguoCalendar.class),
+            is(MinguoCalendar.of(MinguoEra.ROC, 104, 8, 21)));
     }
 
     @Test

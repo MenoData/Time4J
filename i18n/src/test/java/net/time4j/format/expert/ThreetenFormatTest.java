@@ -16,6 +16,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.HijrahDate;
+import java.time.chrono.MinguoDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
@@ -130,6 +131,24 @@ public class ThreetenFormatTest {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT);
         HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
+        assertThat(
+            formatter.formatThreeten(date),
+            is("2015-08-21"));
+    }
+
+    @Test(expected=IllegalArgumentException.class) // non-iso in strict mode
+    public void formatMinguoDate1() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT);
+        MinguoDate date = MinguoDate.from(LocalDate.of(2015, 8, 21));
+        formatter.with(Leniency.STRICT).formatThreeten(date);
+    }
+
+    @Test
+    public void formatMinguoDate2() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT);
+        MinguoDate date = MinguoDate.from(LocalDate.of(2015, 8, 21));
         assertThat(
             formatter.formatThreeten(date),
             is("2015-08-21"));
