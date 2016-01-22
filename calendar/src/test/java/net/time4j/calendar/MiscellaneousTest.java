@@ -223,24 +223,24 @@ public class MiscellaneousTest {
     @Test
     public void executeCodeDemo() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("EEE, d. MMMM yy", PatternType.NON_ISO_DATE).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
-                .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
+            ChronoFormatter.ofPattern(
+                "EEE, d. MMMM yy", PatternType.NON_ISO_DATE, Locale.ENGLISH, HijriCalendar.family())
+            .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
+            .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
         HijriCalendar hijri = formatter.parse("Thu, 29. Ramadan 36");
         PlainDate date = hijri.transform(PlainDate.class);
-        System.out.println(date); // 2015-07-16
+        assertThat(date, is(PlainDate.of(2015, 7, 16)));
     }
 
     @Test
     public void executeICU() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("y-MM-dd", PatternType.NON_ISO_DATE).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
+            ChronoFormatter.ofPattern(
+                "y-MM-dd", PatternType.NON_ISO_DATE, Locale.ENGLISH, HijriCalendar.family())
+            .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
         HijriCalendar hijri = formatter.parse("1-01-01");
         PlainDate date = hijri.transform(PlainDate.class);
-        System.out.println(date); // 622-07-18
+        assertThat(date, is(PlainDate.of(622, 7, 18)));
     }
 
     @Test
