@@ -1881,6 +1881,54 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Constructs a pattern-based formatter for general chronologies. </p>
+     *
+     * <p>This method is only applicable on chronologies which support CLDR-compatible format patterns. </p>
+     *
+     * @param   <T> generic chronological type
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     ChronoFormatter.Builder#addPattern(String, PatternType)
+     * @since   3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen musterbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
+     *
+     * <p>Diese Methode ist nur auf Chronologien anwendbar, die CLDR-kompatible Formatmuster unterst&uuml;tzen. </p>
+     *
+     * @param   <T> generic chronological type
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     ChronoFormatter.Builder#addPattern(String, PatternType)
+     * @since   3.14/4.11
+     */
+    public static <T extends ChronoEntity<T> & LocalizedPatternSupport> ChronoFormatter<T> ofPattern(
+        String pattern,
+        PatternType type,
+        Locale locale,
+        Chronology<T> chronology
+    ) {
+
+        Builder<T> builder = new Builder<T>(chronology, locale);
+        builder.addPattern(pattern, type);
+
+        try {
+            return builder.build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
+
+    }
+
+    /**
      * <p>Constructs a style-based formatter for plain date objects. </p>
      *
      * @param   style       format style
@@ -2015,7 +2063,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @since   3.10/4.7
      */
     /*[deutsch]
-     * <p>Konstruiert einen Formatierer f&uuml;r allgemeine Chronologien. </p>
+     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
      *
      * @param   <T> generic chronological type
      * @param   style       format style
