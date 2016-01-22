@@ -1741,6 +1741,37 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Creates a normalizer which yields an approximate duration based on the maximum unit
+     * of the original duration (but not smaller than seconds). </p>
+     *
+     * @param   daysToWeeks     if {@code true} then days bigger than {@code 6} will be replaced by weeks
+     * @return	new normalizer for fuzzy and approximate durations of only one unit
+     *          (either years, months, days (weeks), hours, minutes or seconds)
+     * @see     #approximateHours(int)
+     * @see     #approximateMinutes(int)
+     * @see     #approximateSeconds(int)
+     * @since	3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Liefert einen Normalisierer, der eine gen&auml;herte Dauer basierend auf der
+     * gr&ouml;&szlig;ten Zeiteinheit der urspr&uuml;nglichen Dauer (aber nicht kleiner
+     * als Sekunden) erstellt. </p>
+     *
+     * @param   daysToWeeks     if {@code true} then days bigger than {@code 6} will be replaced by weeks
+     * @return	new normalizer for fuzzy and approximate durations of only one unit
+     *          (either years, months, days (weeks), hours, minutes or seconds)
+     * @see     #approximateHours(int)
+     * @see     #approximateMinutes(int)
+     * @see     #approximateSeconds(int)
+     * @since	3.14/4.11
+     */
+    public static Normalizer<IsoUnit> approximateMaxUnit(boolean daysToWeeks) {
+
+        return new ApproximateNormalizer(daysToWeeks);
+
+    }
+
+    /**
      * <p>Based on all stored duration items and the sign. </p>
      *
      * @return  {@code true} if {@code obj} is also a {@code Duration},
@@ -5450,63 +5481,91 @@ public final class Duration<U extends IsoUnit>
     }
 
     private static class ApproximateNormalizer
-    	implements Normalizer<IsoUnit> {
+        implements Normalizer<IsoUnit> {
 
         //~ Instanzvariablen ----------------------------------------------
 
-		private final int steps;
+        private final boolean daysToWeeks;
+        private final int steps;
         private final ClockUnit unit;
 
         //~ Konstruktoren -------------------------------------------------
 
-		ApproximateNormalizer(
+        ApproximateNormalizer(boolean daysToWeeks) {
+            super();
+
+            this.daysToWeeks = daysToWeeks;
+            this.steps = 1;
+            this.unit = null;
+
+        }
+
+        ApproximateNormalizer(
             int steps,
             ClockUnit unit
         ) {
-			super();
+            super();
 
-			if (steps < 1) {
-				throw new IllegalArgumentException(
-					"Step width is not positive: " + steps);
-			} else if (unit.compareTo(SECONDS) > 0) {
+            if (steps < 1) {
+                throw new IllegalArgumentException(
+                    "Step width is not positive: " + steps);
+            } else if (unit.compareTo(SECONDS) > 0) {
                 throw new IllegalArgumentException("Unsupported unit.");
             }
 
-			this.steps = steps;
+            this.daysToWeeks = false;
+            this.steps = steps;
             this.unit = unit;
 
-		}
+        }
 
-	    //~ Methoden ------------------------------------------------------
+        //~ Methoden ------------------------------------------------------
 
-	    @Override
-	    public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> dur) {
+        @Override
+        public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> dur) {
 
-	        double total = 0.0;
+            double total = 0.0;
+            IsoUnit umax = null;
 
-	        for (int i = 0, n = dur.getTotalLength().size(); i < n; i++) {
-	            Item<? extends IsoUnit> item = dur.getTotalLength().get(i);
-	            total += (item.getAmount() * item.getUnit().getLength());
-	        }
+            for (int i = 0, n = dur.getTotalLength().size(); i < n; i++) {
+                Item<? extends IsoUnit> item = dur.getTotalLength().get(i);
+                total += (item.getAmount() * item.getUnit().getLength());
+                if ((umax == null) && (item.getAmount() > 0)) {
+                    umax = item.getUnit();
+                }
+            }
 
-			long value = (long) total;
-			int y, m, d, h, min = 0, s = 0;
+            if (umax == null) {
+                return Duration.ofZero();
+            }
+
+            // rounding applied
+            IsoUnit u = ((this.unit == null) ? umax : this.unit);
+            double len = u.getLength() * this.steps;
+            long value = (long) (total + (len / 2.0)); // half-up
+            int lint = (int) Math.floor(len);
+            value = MathUtils.floorDivide(value, lint) * lint;
+
+            // standard normalization
+            int y, m, w, d, h, min = 0, s = 0;
 
             y = safeCast(value / YEARS.getLength());
-			value -= y * YEARS.getLength();
-			m = safeCast(value / MONTHS.getLength());
-			value -= m * MONTHS.getLength();
-			d = safeCast(value / DAYS.getLength());
-			value -= d * DAYS.getLength();
-			h = safeCast(value / HOURS.getLength());
+            value -= y * YEARS.getLength();
+            m = safeCast(value / MONTHS.getLength());
+            value -= m * MONTHS.getLength();
+            w = safeCast(value / WEEKS.getLength());
+            value -= w * WEEKS.getLength();
+            d = safeCast(value / DAYS.getLength());
+            value -= d * DAYS.getLength();
+            h = safeCast(value / HOURS.getLength());
 
-			if (this.unit == HOURS) {
+            if (HOURS.equals(this.unit)) {
                 h = (h / this.steps);
                 h *= this.steps;
-            } else if (this.unit.compareTo(MINUTES) >= 0) {
+            } else {
                 value -= h * HOURS.getLength();
-				min = safeCast(value / MINUTES.getLength());
-                if (this.unit == MINUTES) {
+                min = safeCast(value / MINUTES.getLength());
+                if (MINUTES.equals(this.unit)) {
                     min = (min / this.steps);
                     min *= this.steps;
                 } else { // seconds
@@ -5515,30 +5574,54 @@ public final class Duration<U extends IsoUnit>
                     s = (s / this.steps);
                     s *= this.steps;
                 }
-			}
+            }
 
-	        Duration<IsoUnit> duration =
-	        	Duration.ofPositive()
-	        	.years(y).months(m).days(d)
-	        	.hours(h).minutes(min).seconds(s).build();
+            // special case of max unit
+            if (this.unit == null) {
+                if ((w > 0) && !this.daysToWeeks) {
+                    d += w * 7;
+                    w = 0;
+                }
+                if (y > 0) {
+                    m = w = d = h = min = s = 0;
+                } else if (m > 0) {
+                    w = d = h = min = s = 0;
+                } else if (w > 0) {
+                    d = h = min = s = 0;
+                } else if (d > 0) {
+                    h = min = s = 0;
+                } else if (h > 0) {
+                    min = s = 0;
+                }
+                if (w > 0) {
+                    IsoUnit weekUnit = CalendarUnit.WEEKS;
+                    return Duration.of(w, weekUnit);
+                }
+            }
 
-	        if (dur.isNegative()) {
-	        	duration = duration.inverse();
-	        }
+            // build
+            Duration<IsoUnit> duration =
+                Duration.ofPositive()
+                .years(y).months(m).days(d + w * 7)
+                .hours(h).minutes(min).seconds(s).build();
 
-	        return duration;
+            if (dur.isNegative()) {
+                duration = duration.inverse();
+            }
 
-	    }
+            return duration;
 
-	    private static int safeCast(double num) {
+        }
 
-	        if (num < Integer.MIN_VALUE || num > Integer.MAX_VALUE) {
-	            throw new ArithmeticException("Out of range: " + num);
-	        } else {
-	            return (int) num;
-	        }
+        private static int safeCast(double num) {
 
-	    }
+            if (num < Integer.MIN_VALUE || num > Integer.MAX_VALUE) {
+                throw new ArithmeticException("Out of range: " + num);
+            } else {
+                return (int) num;
+            }
+
+        }
 
     }
 
