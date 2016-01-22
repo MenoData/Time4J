@@ -1,5 +1,6 @@
 ## [v4.11] not yet released
 ### Added
+- New approximation normalizer based on max unit only [#442]
 - Add pattern-based factory method to ChronoFormatter for any chronology [#441]
 - Introduce or-operator in formatting via builder and pattern [#437}
 - Add other historic eras [#436]
