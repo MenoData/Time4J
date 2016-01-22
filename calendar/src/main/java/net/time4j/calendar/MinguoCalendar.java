@@ -39,12 +39,10 @@ import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -63,6 +61,7 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.time.chrono.Chronology;
 import java.time.chrono.MinguoDate;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
@@ -1046,13 +1045,6 @@ public final class MinguoCalendar
         }
 
         @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
         public MinguoCalendar createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
@@ -1079,7 +1071,7 @@ public final class MinguoCalendar
             AttributeQuery attributes
         ) {
 
-            java.time.chrono.Chronology c = threeten.query(TemporalQueries.chronology());
+            Chronology c = threeten.query(TemporalQueries.chronology());
 
             if (c != null && c.getId().equals("Minguo")) {
                 MinguoDate md = MinguoDate.from(threeten);
@@ -1151,23 +1143,6 @@ public final class MinguoCalendar
                 }
                 entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Minguo date.");
             }
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(
-            MinguoCalendar context,
-            AttributeQuery attributes
-        ) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
 
             return null;
 
