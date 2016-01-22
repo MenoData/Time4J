@@ -173,30 +173,48 @@ public class DurationNormalizerTest {
     }
 
     @Test
-    public void withApproximateMaxUnit() {
-        assertThat(
-            Duration.ofPositive().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnit(true)),
-            is(Duration.of(1, CalendarUnit.WEEKS)));
-
-        Normalizer<IsoUnit> n = Duration.approximateMaxUnit(false);
+    public void withApproximateMaxUnitOnly() {
+        Normalizer<IsoUnit> n = Duration.approximateMaxUnitOnly();
         assertThat(
             Duration.ofPositive().years(2).months(13).days(35).minutes(132).build().with(n),
-            is(Duration.ofPositive().years(3).build()));
+            is(Duration.<IsoUnit>of(3, CalendarUnit.YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(16).days(35).minutes(132).build().with(n),
-            is(Duration.ofPositive().years(3).build()));
+            is(Duration.<IsoUnit>of(3, CalendarUnit.YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(17).days(35).minutes(132).build().with(n),
-            is(Duration.ofPositive().years(4).build()));
+            is(Duration.<IsoUnit>of(4, CalendarUnit.YEARS)));
         assertThat(
             Duration.ofPositive().months(13).days(35).minutes(132).build().with(n),
-            is(Duration.ofPositive().years(1).build()));
+            is(Duration.<IsoUnit>of(1, CalendarUnit.YEARS)));
         assertThat(
             Duration.ofPositive().days(35).minutes(132).build().with(n),
-            is(Duration.ofPositive().months(1).build()));
+            is(Duration.<IsoUnit>of(1, CalendarUnit.MONTHS)));
         assertThat(
-            Duration.ofPositive().days(6).hours(4).minutes(1).build().with(n),
-            is(Duration.ofPositive().days(6).build()));
+            Duration.ofPositive().days(7).hours(4).minutes(1).build().with(n),
+            is(Duration.<IsoUnit>of(7, CalendarUnit.DAYS)));
+        assertThat(
+            Duration.ofNegative().hours(4).minutes(1).build().with(n),
+            is(Duration.<IsoUnit>of(-4, ClockUnit.HOURS)));
+    }
+
+    @Test
+    public void withApproximateMaxUnitOrWeeks() {
+        assertThat(
+            Duration.ofPositive().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
+            is(Duration.<IsoUnit>of(1, CalendarUnit.WEEKS)));
+        assertThat(
+            Duration.ofNegative().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
+            is(Duration.<IsoUnit>of(-1, CalendarUnit.WEEKS)));
+        assertThat(
+            Duration.ofNegative().days(6).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
+            is(Duration.<IsoUnit>of(-6, CalendarUnit.DAYS)));
+        assertThat(
+            Duration.ofPositive().days(10).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
+            is(Duration.<IsoUnit>of(1, CalendarUnit.WEEKS)));
+        assertThat(
+            Duration.ofPositive().days(11).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
+            is(Duration.<IsoUnit>of(2, CalendarUnit.WEEKS)));
     }
 
     @Test
