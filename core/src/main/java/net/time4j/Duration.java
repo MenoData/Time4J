@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -1744,9 +1744,8 @@ public final class Duration<U extends IsoUnit>
      * <p>Creates a normalizer which yields an approximate duration based on the maximum unit
      * of the original duration (but not smaller than seconds). </p>
      *
-     * @param   daysToWeeks     if {@code true} then days bigger than {@code 6} will be replaced by weeks
      * @return	new normalizer for fuzzy and approximate durations of only one unit
-     *          (either years, months, days (weeks), hours, minutes or seconds)
+     *          (either years, months, days, hours, minutes or seconds)
      * @see     #approximateHours(int)
      * @see     #approximateMinutes(int)
      * @see     #approximateSeconds(int)
@@ -1757,17 +1756,40 @@ public final class Duration<U extends IsoUnit>
      * gr&ouml;&szlig;ten Zeiteinheit der urspr&uuml;nglichen Dauer (aber nicht kleiner
      * als Sekunden) erstellt. </p>
      *
-     * @param   daysToWeeks     if {@code true} then days bigger than {@code 6} will be replaced by weeks
      * @return	new normalizer for fuzzy and approximate durations of only one unit
-     *          (either years, months, days (weeks), hours, minutes or seconds)
+     *          (either years, months, days, hours, minutes or seconds)
      * @see     #approximateHours(int)
      * @see     #approximateMinutes(int)
      * @see     #approximateSeconds(int)
      * @since	3.14/4.11
      */
-    public static Normalizer<IsoUnit> approximateMaxUnit(boolean daysToWeeks) {
+    public static Normalizer<IsoUnit> approximateMaxUnitOnly() {
 
-        return new ApproximateNormalizer(daysToWeeks);
+        return new ApproximateNormalizer(false);
+
+    }
+
+    /**
+     * <p>Like {@code approximateMaxUnitOnly()} but can create week-based durations
+     * if the count of days is bigger than {@code 6}.  </p>
+     *
+     * @return	new normalizer for fuzzy and approximate durations of only one unit
+     *          (either years, months, weeks/days, hours, minutes or seconds)
+     * @see     #approximateMaxUnitOnly()
+     * @since	3.14/4.11
+     */
+    /*[deutsch]
+     * <p>Wie {@code approximateMaxUnitOnly()}, kann aber eine wochenbasierte Dauer erzeugen,
+     * wenn die Anzahl der Tage gr&ouml;&szlig;er als {@code 6} Tage ist. </p>
+     *
+     * @return	new normalizer for fuzzy and approximate durations of only one unit
+     *          (either years, months, weeks/days, hours, minutes or seconds)
+     * @see     #approximateMaxUnitOnly()
+     * @since	3.14/4.11
+     */
+    public static Normalizer<IsoUnit> approximateMaxUnitOrWeeks() {
+
+        return new ApproximateNormalizer(true);
 
     }
 
@@ -5576,33 +5598,36 @@ public final class Duration<U extends IsoUnit>
                 }
             }
 
+            d += w * 7;
+            w = 0;
+
             // special case of max unit
             if (this.unit == null) {
-                if ((w > 0) && !this.daysToWeeks) {
-                    d += w * 7;
-                    w = 0;
-                }
                 if (y > 0) {
-                    m = w = d = h = min = s = 0;
+                    m = d = h = min = s = 0;
                 } else if (m > 0) {
-                    w = d = h = min = s = 0;
-                } else if (w > 0) {
                     d = h = min = s = 0;
                 } else if (d > 0) {
+                    if ((d >= 7) && this.daysToWeeks) {
+                        w = (int) ((d + 3.5) / 7);
+                        d = 0;
+                    }
                     h = min = s = 0;
                 } else if (h > 0) {
                     min = s = 0;
+                } else if (min > 0) {
+                    s = 0;
                 }
                 if (w > 0) {
                     IsoUnit weekUnit = CalendarUnit.WEEKS;
-                    return Duration.of(w, weekUnit);
+                    return Duration.of(dur.isNegative() ? -w : w, weekUnit);
                 }
             }
 
             // build
             Duration<IsoUnit> duration =
                 Duration.ofPositive()
-                .years(y).months(m).days(d + w * 7)
+                .years(y).months(m).days(d)
                 .hours(h).minutes(min).seconds(s).build();
 
             if (dur.isNegative()) {
