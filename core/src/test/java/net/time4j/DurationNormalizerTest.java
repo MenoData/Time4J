@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.engine.Normalizer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -118,29 +119,49 @@ public class DurationNormalizerTest {
     }
 
     @Test
-    public void withApproximatePeriod24Hours() {
-		Duration<IsoUnit> dur =
-			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+    public void withApproximatePeriodInRoundedStepsOf24Hours() {
+        Duration<IsoUnit> dur =
+            Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         assertThat(
-            dur.with(approximateHours(24)),
+            dur.with(Duration.approximateHours(24)),
             is(Duration.ofPositive().years(3).months(2).days(4).build()));
     }
 
     @Test
-    public void withApproximatePeriod10Seconds() {
-		Duration<IsoUnit> dur =
-			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+    public void withApproximatePeriodAppliedOnGeneralDuration() {
+        Duration<IsoUnit> dur =
+            Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+        assertThat(
+            dur.with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().years(3).months(2).days(4).hours(15).build()));
         assertThat(
             dur.with(Duration.approximateSeconds(10)),
-            is(
-            	Duration.ofPositive().years(3).months(2).days(4)
-            	.hours(15).minutes(42).seconds(50).build()));
+            is(Duration.ofPositive().years(3).months(2).days(4).hours(15).minutes(42).seconds(50).build()));
+    }
+
+    @Test
+    public void withApproximatePeriodInRoundedStepsOf3Hours() {
+        assertThat(
+            Duration.ofPositive().days(3).minutes(270).build().with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().days(3).hours(6).build()));
+        assertThat(
+            Duration.ofPositive().days(3).minutes(269).build().with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().days(3).hours(3).build()));
+        assertThat(
+            Duration.ofPositive().days(3).minutes(90).build().with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().days(3).hours(3).build()));
+        assertThat(
+            Duration.ofPositive().days(3).minutes(89).build().with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().days(3).hours(0).build()));
+        assertThat(
+            Duration.ofPositive().days(3).minutes(0).build().with(Duration.approximateHours(3)),
+            is(Duration.ofPositive().days(3).hours(0).build()));
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withApproximatePeriod0Minutes() {
-		Duration<IsoUnit> dur =
-			Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
+    public void withApproximatePeriodInNonPositiveRoundedSteps() {
+        Duration<IsoUnit> dur =
+            Duration.ofPositive().years(2).months(13).days(35).minutes(132).build();
         dur.with(Duration.approximateMinutes(0));
     }
 
@@ -149,6 +170,33 @@ public class DurationNormalizerTest {
         assertThat(
             Duration.<IsoUnit>of(7, HOURS).with(approximateHours(3)),
             is(Duration.of(6, HOURS)));
+    }
+
+    @Test
+    public void withApproximateMaxUnit() {
+        assertThat(
+            Duration.ofPositive().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnit(true)),
+            is(Duration.of(1, CalendarUnit.WEEKS)));
+
+        Normalizer<IsoUnit> n = Duration.approximateMaxUnit(false);
+        assertThat(
+            Duration.ofPositive().years(2).months(13).days(35).minutes(132).build().with(n),
+            is(Duration.ofPositive().years(3).build()));
+        assertThat(
+            Duration.ofPositive().years(2).months(16).days(35).minutes(132).build().with(n),
+            is(Duration.ofPositive().years(3).build()));
+        assertThat(
+            Duration.ofPositive().years(2).months(17).days(35).minutes(132).build().with(n),
+            is(Duration.ofPositive().years(4).build()));
+        assertThat(
+            Duration.ofPositive().months(13).days(35).minutes(132).build().with(n),
+            is(Duration.ofPositive().years(1).build()));
+        assertThat(
+            Duration.ofPositive().days(35).minutes(132).build().with(n),
+            is(Duration.ofPositive().months(1).build()));
+        assertThat(
+            Duration.ofPositive().days(6).hours(4).minutes(1).build().with(n),
+            is(Duration.ofPositive().days(6).build()));
     }
 
     @Test
