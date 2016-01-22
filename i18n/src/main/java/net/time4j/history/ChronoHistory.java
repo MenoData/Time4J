@@ -101,7 +101,7 @@ public final class ChronoHistory
      * <p>This constant rather serves for academic purposes because the byzantine calendar was in latest use
      * in Russia before 1700. </p>
      *
-     * @see     3.14/4.11
+     * @since   3.14/4.11
      */
     /*[deutsch]
      * <p>Beschreibt kein wirkliches historisches Ereignis, sondern einfach nur den proleptisch byzantinischen
@@ -110,7 +110,7 @@ public final class ChronoHistory
      * <p>Diese Konstante dient eher akademischen &Uuml;bungen, weil der byzantinische Kalender zuletzt in
      * Ru&szlig;land vor 1700 verwendet wurde. </p>
      *
-     * @see     3.14/4.11
+     * @since   3.14/4.11
      */
     public static final ChronoHistory PROLEPTIC_BYZANTINE;
 
