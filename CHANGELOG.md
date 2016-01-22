@@ -1,5 +1,6 @@
 ## [v4.11] not yet released
 ### Added
+- Add pattern-based factory method to ChronoFormatter for any chronology [#441]
 - Introduce or-operator in formatting via builder and pattern [#437}
 - Add other historic eras [#436]
 - Support for various historical New Year events [#434]
