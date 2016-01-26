@@ -1,4 +1,6 @@
 ## [v3.15] not yet released
+### Fixed
+- Code example in documentation of MultiFormatParser is incomplete [#446]
 
 ## [v3.14] published on 2016-01-22
 ### Added
