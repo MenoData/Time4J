@@ -34,8 +34,11 @@ import java.util.List;
 /**
  * <p>Serves for parsing of text input whose format is not yet known at compile time. </p>
  *
- * <p>Note: This class is immutable and can be used by multiple threads in parallel if all underlying
- * parsers are immutable. </p>
+ * <p>User who only need to parse different formats for one locale only might consider the
+ * simple alternative to concatenate all format pattern strings into one pattern with
+ * the &quot;|&quot;-symbol as separator. </p>
+ *
+ * <p>Note: This class is immutable and can be used by multiple threads in parallel. </p>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
@@ -44,9 +47,12 @@ import java.util.List;
 /*[deutsch]
  * <p>Dient der Interpretation von Texteingaben, deren Format zur Kompilierzeit noch unbekannt ist. </p>
  *
+ * <p>Anwender, die nur f&uuml;r eine Sprache verschiedene Formate interpretieren m&uuml;ssen, k&ouml;nnen
+ * als Alternative auch das Zusammenziehen von Formatmustern in ein einziges Formatmuster in Betracht
+ * ziehen, indem die einzelnen Formatmuster mit dem &quot;|&quot;-Symbol getrennt werden. </p>
+ *
  * <p>Hinweis: Diese Klasse ist <i>immutable</i> (unver&auml;nderlich) und kann von mehreren
- * Threads parallel verwendet werden, wenn alle zugrundeliegenden Interpretierer
- * <i>immutable</i> sind. </p>
+ * Threads parallel verwendet werden. </p>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
@@ -184,6 +190,7 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         int index = 0;
      *
      *         for (String text : data) {
+     *             plog.reset(); // initialization
      *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
      *             if ((date == null) || plog.isError()) {
      *                 // users are encouraged to use any good logging framework here
@@ -230,6 +237,7 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         int index = 0;
      *
      *         for (String text : data) {
+     *             plog.reset(); // initialization
      *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
      *             if ((date == null) || plog.isError()) {
      *                 // users are encouraged to use any good logging framework here
