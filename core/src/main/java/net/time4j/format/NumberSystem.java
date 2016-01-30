@@ -24,6 +24,8 @@ package net.time4j.format;
 
 import net.time4j.base.MathUtils;
 
+import java.util.Locale;
+
 /**
  * <p>Defines the number system. </p>
  *
@@ -52,7 +54,7 @@ public enum NumberSystem {
             return Integer.toString(number);
         }
         @Override
-        public int toInteger(String numeral) {
+        public int toInteger(String numeral, Leniency leniency) {
             return Integer.parseInt(numeral);
         }
         @Override
@@ -133,7 +135,7 @@ public enum NumberSystem {
             return numeral.toString();
         }
         @Override
-        public int toInteger(String numeral) {
+        public int toInteger(String numeral, Leniency leniency) {
             int total = 0;
             int sum = 0;
             int factor = 1;
@@ -176,7 +178,111 @@ public enum NumberSystem {
         }
         @Override
         public boolean contains(char digit) {
-            return ((digit >= ETHIOPIC_ONE) && (digit <= ETHIOPIC_TEN_THOUSAND));
+            return (
+                ((digit >= ETHIOPIC_ONE) && (digit <= ETHIOPIC_TEN))
+                || (digit == ETHIOPIC_HUNDRED)
+                || (digit == ETHIOPIC_TEN_THOUSAND));
+        }
+    },
+
+    /**
+     * Roman numerals in range 1-3999.
+     *
+     * <p>If the leniency is strict then parsing of Roman numerals will only follow modern usage.
+     * The parsing is always case-insensitive. See also
+     * <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>. </p>
+     */
+    /*[deutsch]
+     * R&ouml;mische Numerale im Wertbereich 1-3999.
+     *
+     * <p>Wenn die Nachsichtigkeit strikt ist, wird das Interpretieren von r&ouml;mischen Numeralen
+     * nur dem modernen Gebrauch folgen. Die Gro&szlig;- und Kleinschreibung spielt keine Rolle. Siehe
+     * auch <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>. </p>
+     */
+    ROMAN() {
+        @Override
+        public String toNumeral(int number) {
+            if ((number < 1) || (number > 3999)) {
+                throw new IllegalArgumentException("Out of range (1-3999): " + number);
+            }
+            int n = number;
+            StringBuilder roman = new StringBuilder();
+            for (int i = 0; i < NUMBERS.length; i++) {
+                while (n >= NUMBERS[i]) {
+                    roman.append(LETTERS[i]);
+                    n -= NUMBERS[i];
+                }
+            }
+            return roman.toString();
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            if (numeral.isEmpty()) {
+                throw new NumberFormatException("Empty Roman numeral.");
+            }
+            String ucase = numeral.toUpperCase(Locale.US); // use ASCII-base
+            boolean strict = leniency.isStrict();
+            int len = numeral.length();
+            int i = 0;
+            int total = 0;
+            while (i < len) {
+                char roman = ucase.charAt(i);
+                int value = getValue(roman);
+                int j = i + 1;
+                int count = 1;
+                if (j == len) {
+                    total += value;
+                } else {
+                    while (j < len) {
+                        char test = ucase.charAt(j);
+                        j++;
+                        if (test == roman) {
+                            count++;
+                            if ((count >= 4) && strict) {
+                                throw new NumberFormatException(
+                                    "Roman numeral contains more than 3 equal letters in sequence: " + numeral);
+                            }
+                            if (j == len) {
+                                total += (value * count);
+                            }
+                        } else {
+                            int next = getValue(test);
+                            if (next < value) {
+                                total += (value * count);
+                                j--;
+                            } else { // next > value
+                                if (strict) {
+                                    if ((count > 1) || !isValidCombination(roman, test)) {
+                                        throw new NumberFormatException("Not conform with modern usage: " + numeral);
+                                    }
+                                }
+                                total = total + next - (value * count);
+                            }
+                            break;
+                        }
+                    }
+                }
+                i = j;
+            }
+            if (total > 3999) {
+                throw new NumberFormatException("Roman numbers bigger than 3999 not supported.");
+            } else if (strict) {
+                if (total >= 900 && ucase.contains("DCD")) {
+                    throw new NumberFormatException("Roman number contains invalid sequence DCD.");
+                }
+                if (total >= 90 && ucase.contains("LXL")) {
+                    throw new NumberFormatException("Roman number contains invalid sequence LXL.");
+                }
+                if (total >= 9 && ucase.contains("VIV")) {
+                    throw new NumberFormatException("Roman number contains invalid sequence VIV.");
+                }
+            }
+            return total;
+        }
+        @Override
+        public boolean contains(char digit) {
+            char c = Character.toUpperCase(digit);
+            return ((c == 'I') || (c == 'V') || (c == 'X') || (c == 'L') || (c == 'C') || (c == 'D') || (c == 'M'));
         }
     };
 
@@ -184,6 +290,9 @@ public enum NumberSystem {
     private static final char ETHIOPIC_TEN          = 0x1372;
     private static final char ETHIOPIC_HUNDRED      = 0x137B;
     private static final char ETHIOPIC_TEN_THOUSAND = 0x137C;
+
+    private static final int[] NUMBERS = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
     //~ Methoden ----------------------------------------------------------
 
@@ -210,22 +319,60 @@ public enum NumberSystem {
     }
 
     /**
-     * <p>Converts given text numeral to an integer. </p>
+     * <p>Converts given text numeral to an integer in smart mode. </p>
      *
      * @param   numeral      text numeral to be evaluated as number
      * @return  integer
+     * @throws  NumberFormatException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.11/4.8
      */
     /*[deutsch]
-     * <p>Konvertiert das angegebene Numeral zu einer Ganzzahl. </p>
+     * <p>Konvertiert das angegebene Numeral zu einer Ganzzahl im SMART-Modus. </p>
      *
      * @param   numeral      text numeral to be evaluated as number
      * @return  integer
+     * @throws  NumberFormatException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.11/4.8
      */
-    public int toInteger(String numeral) {
+    public final int toInteger(String numeral) {
+
+        return this.toInteger(numeral, Leniency.SMART);
+
+    }
+
+    /**
+     * <p>Converts given text numeral to an integer. </p>
+     *
+     * <p>In most cases, the leniency will not be taken into account, but parsing of some odd roman numerals
+     * can be enabled in non-strict mode (for example: IIXX instead of XVIII). </p>
+     *
+     * @param   numeral     text numeral to be evaluated as number
+     * @param   leniency    determines how lenient the parsing of given numeral should be
+     * @return  integer
+     * @throws  NumberFormatException if given number has wrong format
+     * @throws  ArithmeticException if int-range overflows
+     * @since   3.15/4.12
+     */
+    /*[deutsch]
+     * <p>Konvertiert das angegebene Numeral zu einer Ganzzahl. </p>
+     *
+     * <p>In den meisten F&auml;llen wird das Nachsichtigkeitsargument nicht in Betracht gezogen. Aber die
+     * Interpretation von nicht dem modernen Gebrauch entsprechenden r&ouml;mischen Numeralen kann im
+     * nicht-strikten Modus erfolgen (zum Beispiel IIXX statt XVIII). </p>
+     *
+     * @param   numeral     text numeral to be evaluated as number
+     * @param   leniency    determines how lenient the parsing of given numeral should be
+     * @return  integer
+     * @throws  NumberFormatException if given number has wrong format
+     * @throws  ArithmeticException if int-range overflows
+     * @since   3.15/4.12
+     */
+    public int toInteger(
+        String numeral,
+        Leniency leniency
+    ) {
 
         throw new AbstractMethodError();
 
@@ -258,6 +405,47 @@ public enum NumberSystem {
     ) {
 
         return MathUtils.safeAdd(total, MathUtils.safeMultiply(sum, factor));
+
+    }
+
+    private static int getValue(char roman) {
+
+        switch (roman) {
+            case 'I':
+                return 1;
+            case 'V':
+                return 5;
+            case 'X':
+                return 10;
+            case 'L':
+                return 50;
+            case 'C':
+                return 100;
+            case 'D':
+                return 500;
+            case 'M':
+                return 1000;
+            default:
+                throw new NumberFormatException("Invalid Roman digit: " + roman);
+        }
+
+    }
+
+    private static boolean isValidCombination(
+        char previous,
+        char next
+    ) {
+
+        switch (previous) {
+            case 'C':
+                return ((next == 'M') || (next == 'D'));
+            case 'X':
+                return ((next == 'C') || (next == 'L'));
+            case 'I':
+                return ((next == 'X') || (next == 'V'));
+            default:
+                return false;
+        }
 
     }
 
