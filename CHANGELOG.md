@@ -1,4 +1,7 @@
 ## [v3.15] not yet released
+### Added
+- Add Roman numerals [#443]
+
 ### Fixed
 - Code example in documentation of MultiFormatParser is incomplete [#446]
 
