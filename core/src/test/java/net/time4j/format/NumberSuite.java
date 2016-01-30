@@ -8,7 +8,9 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        EthiopicNumberTest.class
+        EthiopicNumberTest.class,
+        RomanNumberTestForModernUsage.class,
+        RomanNumberTestForOtherFormats.class
     }
 )
 public class NumberSuite {
