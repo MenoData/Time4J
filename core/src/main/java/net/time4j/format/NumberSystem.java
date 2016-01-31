@@ -178,10 +178,7 @@ public enum NumberSystem {
         }
         @Override
         public boolean contains(char digit) {
-            return (
-                ((digit >= ETHIOPIC_ONE) && (digit <= ETHIOPIC_TEN))
-                || (digit == ETHIOPIC_HUNDRED)
-                || (digit == ETHIOPIC_TEN_THOUSAND));
+            return ((digit >= ETHIOPIC_ONE) && (digit <= ETHIOPIC_TEN_THOUSAND));
         }
     },
 
@@ -286,8 +283,8 @@ public enum NumberSystem {
         }
     };
 
-    private static final char ETHIOPIC_ONE          = 0x1369;
-    private static final char ETHIOPIC_TEN          = 0x1372;
+    private static final char ETHIOPIC_ONE          = 0x1369; // 1, 2, ..., 8, 9
+    private static final char ETHIOPIC_TEN          = 0x1372; // 10, 20, ..., 80, 90
     private static final char ETHIOPIC_HUNDRED      = 0x137B;
     private static final char ETHIOPIC_TEN_THOUSAND = 0x137C;
 
