@@ -683,7 +683,6 @@ public final class PlainDate
                 CalendarUnit.WEEKS);
         registerUnits(builder);
         registerExtensions(builder);
-        builder.appendExtension(new WeekExtension());
         ENGINE = builder.build();
     }
 
@@ -1911,6 +1910,8 @@ public final class PlainDate
                 builder.appendExtension(extension);
             }
         }
+
+        builder.appendExtension(new WeekExtension());
 
     }
 
