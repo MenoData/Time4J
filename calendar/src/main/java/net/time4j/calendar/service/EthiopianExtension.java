@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianExtension.java) is part of project Time4J.
  *
@@ -47,7 +47,7 @@ public class EthiopianExtension
     @Override
     public boolean accept(Class<?> chronoType) {
 
-        return PlainTime.class.isAssignableFrom(chronoType);
+        return false; // never called
 
     }
 

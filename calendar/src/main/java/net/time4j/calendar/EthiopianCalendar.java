@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianCalendar.java) is part of project Time4J.
  *
@@ -28,6 +28,7 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.calendar.service.EthiopianExtension;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
@@ -397,7 +398,8 @@ public final class EthiopianCalendar
                 Unit.DAYS,
                 new EthiopianUnitRule(Unit.DAYS),
                 Unit.DAYS.getLength(),
-                Collections.singleton(Unit.WEEKS));
+                Collections.singleton(Unit.WEEKS))
+            .appendExtension(new EthiopianExtension()); // enable ethiopian hour for timestamps
         ENGINE = builder.build();
     }
 
