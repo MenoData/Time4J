@@ -28,7 +28,6 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
-import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
@@ -41,7 +40,7 @@ import java.util.Set;
  * <p>Formatierschritt als Delegationsobjekt zum Parsen und Formatieren. </p>
  *
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   3.15/4.12
  */
 final class FormatStep {
 
@@ -51,6 +50,7 @@ final class FormatStep {
     private final int level;
     private final int section;
     private final AttributeSet sectionalAttrs;
+    private final AttributeQuery fullAttrs;
     private final int reserved;
     private final int padLeft;
     private final int padRight;
@@ -73,7 +73,7 @@ final class FormatStep {
         int section,
         AttributeSet sectionalAttrs
     ) {
-        this(processor, level, section, sectionalAttrs, 0, 0, 0, false);
+        this(processor, level, section, sectionalAttrs, null, 0, 0, 0, false);
 
     }
 
@@ -82,6 +82,7 @@ final class FormatStep {
         int level,
         int section,
         AttributeSet sectionalAttrs,
+        AttributeQuery fullAttrs,
         int reserved,
         int padLeft,
         int padRight,
@@ -107,6 +108,7 @@ final class FormatStep {
         this.level = level;
         this.section = section;
         this.sectionalAttrs = sectionalAttrs;
+        this.fullAttrs = fullAttrs;
         this.reserved = reserved;
         this.padLeft = padLeft;
         this.padRight = padRight;
@@ -123,19 +125,24 @@ final class FormatStep {
      * @param   buffer          format buffer any text output will be sent to
      * @param   attributes      non-sectional control attributes
      * @param   positions       positions of elements in text (optional)
+     * @param   quickPath       hint for using quick path
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
+     * @since   3.15/4.12
      */
     void print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
-        Set<ElementPosition> positions
+        Set<ElementPosition> positions,
+        boolean quickPath
     ) throws IOException {
 
         if (!this.isPrinting(formattable)) {
             return;
         }
+
+        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(null, attributes));
 
         if (
             (this.padLeft == 0)
@@ -144,9 +151,9 @@ final class FormatStep {
             this.processor.print(
                 formattable,
                 buffer,
-                attributes,
+                aq,
                 positions,
-                this
+                quickPath
             );
 
             return;
@@ -164,15 +171,15 @@ final class FormatStep {
             posBuf = new LinkedHashSet<ElementPosition>();
         }
 
-        boolean strict = this.isStrict(attributes);
-        char padChar = this.getPadChar(attributes);
+        boolean strict = this.isStrict(aq);
+        char padChar = this.getPadChar(aq);
 
         this.processor.print(
             formattable,
             collector,
-            attributes,
+            aq,
             posBuf,
-            this
+            quickPath
         );
 
         int len = collector.length();
@@ -242,25 +249,30 @@ final class FormatStep {
      * @param   status          parser information (always as new instance)
      * @param   attributes      non-sectional control attributes
      * @param   parsedResult    result buffer for parsed values
+     * @param   quickPath       hint for using quick path
+     * @since   3.15/4.12
      */
     void parse(
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult
+        Map<ChronoElement<?>, Object> parsedResult,
+        boolean quickPath
     ) {
+
+        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(null, attributes));
 
         if (
             (this.padLeft == 0)
             && (this.padRight == 0)
         ) {
             // Optimierung
-            this.doParse(text, status, attributes, parsedResult);
+            this.doParse(text, status, aq, parsedResult, quickPath);
             return;
         }
 
-        boolean strict = this.isStrict(attributes);
-        char padChar = this.getPadChar(attributes);
+        boolean strict = this.isStrict(aq);
+        char padChar = this.getPadChar(aq);
         int start = status.getPosition();
         int endPos = text.length();
         int index = start;
@@ -282,7 +294,7 @@ final class FormatStep {
 
         // Eigentliche Parser-Routine
         status.setPosition(index);
-        this.doParse(text, status, attributes, parsedResult);
+        this.doParse(text, status, aq, parsedResult, quickPath);
 
         if (status.isError()) {
             return;
@@ -373,17 +385,6 @@ final class FormatStep {
     }
 
     /**
-     * <p>Ermittelt die Anzahl der zu reservierenden Zeichen beim Parsen. </p>
-     *
-     * @return  n advance reserved chars of following format steps
-     */
-    int getReserved() {
-
-        return this.reserved;
-
-    }
-
-    /**
      * <p>Ermittelt die Delegationsinstanz. </p>
      *
      * @return  delegate object for formatting work
@@ -391,6 +392,31 @@ final class FormatStep {
     FormatProcessor<?> getProcessor() {
 
         return this.processor;
+
+    }
+
+    /**
+     * <p>Finaler Schritt nach dem <i>build</i> des Formatierers oder bei Attribut&auml;nderungen. </p>
+     *
+     * @param   formatter   reference to formattter holding the default global attributes
+     * @return  copy of this instance maybe modified
+     * @since   3.15/4.12
+     */
+    FormatStep quickPath(ChronoFormatter<?> formatter) {
+
+        AttributeQuery attributes = this.getQuery(formatter, null);
+
+        return new FormatStep(
+            this.processor.quickPath(attributes, this.reserved),
+            this.level,
+            this.section,
+            this.sectionalAttrs,
+            attributes,
+            this.reserved,
+            this.padLeft,
+            this.padRight,
+            this.orMarker
+        );
 
     }
 
@@ -413,6 +439,7 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
+            this.fullAttrs,
             this.reserved,
             this.padLeft,
             this.padRight,
@@ -435,6 +462,7 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
+            null, // called before build of formatter
             this.reserved + reserved,
             this.padLeft,
             this.padRight,
@@ -460,6 +488,7 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
+            null, // called before build of formatter
             this.reserved,
             this.padLeft + padLeft,
             this.padRight + padRight,
@@ -486,6 +515,7 @@ final class FormatStep {
             this.level,
             this.section,
             this.sectionalAttrs,
+            null, // called before build of formatter
             this.reserved,
             this.padLeft,
             this.padRight,
@@ -507,115 +537,6 @@ final class FormatStep {
     }
 
     /**
-     * <p>Ermittelt ein Attribut. </p>
-     *
-     * @param   <A> generic type of attribute value
-     * @param   key             attribute key
-     * @param   defaultAttrs    default attributes of {@code ChronoFormatter}
-     * @param   defaultValue    replacement value if attribute is not available
-     * @return  attribute value
-     * @throws  IllegalArgumentException if neither attribute nor replacement
-     *          are defined
-     */
-    <A> A getAttribute(
-        AttributeKey<A> key,
-        AttributeQuery defaultAttrs,
-        A defaultValue
-    ) {
-
-        AttributeQuery current = this.sectionalAttrs;
-
-        if (
-            (this.sectionalAttrs == null)
-            || !this.sectionalAttrs.contains(key)
-        ) {
-            current = defaultAttrs;
-        }
-
-        if (current.contains(key)) {
-            return current.get(key);
-        } else if (defaultValue == null) {
-            throw new IllegalArgumentException(key.name());
-        } else {
-            return defaultValue;
-        }
-
-    }
-
-    /**
-     * <p>Erstellt eine Attributabfrage. </p>
-     *
-     * @param   defaultAttrs    default attributes of {@code ChronoFormatter}
-     * @return  query for retrieving attribute values
-     */
-    AttributeQuery getQuery(final AttributeQuery defaultAttrs) {
-
-        return this.getQuery(defaultAttrs, 0, 0);
-
-    }
-
-    /**
-     * <p>Erstellt eine Attributabfrage. </p>
-     *
-     * @param   defaultAttrs    default attributes of {@code ChronoFormatter}
-     * @param   min             min width of historic year
-     * @param   max             max width of historic year
-     * @return  query for retrieving attribute values
-     * @since   3.14/4.11
-     */
-    AttributeQuery getQuery(
-        final AttributeQuery defaultAttrs,
-        final int min,
-        final int max
-    ) {
-
-        if ((this.sectionalAttrs == null) && (min == 0) && (max == 0)) {
-            return defaultAttrs; // Optimierung
-        }
-
-        return new AttributeQuery() {
-            @Override
-            public boolean contains(AttributeKey<?> key) {
-                if (key.equals(HistoricAttribute.MIN_WIDTH_OF_YEAR)) {
-                    return (min > 0);
-                } else if (key.equals(HistoricAttribute.MAX_WIDTH_OF_YEAR)) {
-                    return (max > 0);
-                }
-                return this.getQuery(key).contains(key);
-            }
-
-            @Override
-            public <A> A get(AttributeKey<A> key) {
-                if (key.equals(HistoricAttribute.MIN_WIDTH_OF_YEAR) && (min > 0)) {
-                    return key.type().cast(Integer.valueOf(min));
-                } else if (key.equals(HistoricAttribute.MAX_WIDTH_OF_YEAR) && (max > 0)) {
-                    return key.type().cast(Integer.valueOf(max));
-                }
-                return this.getQuery(key).get(key);
-            }
-
-            @Override
-            public <A> A get(
-                AttributeKey<A> key,
-                A defaultValue
-            ) {
-                return this.getQuery(key).get(key, defaultValue);
-            }
-
-            private AttributeQuery getQuery(AttributeKey<?> key) {
-                AttributeQuery current = FormatStep.this.sectionalAttrs;
-
-                if ((current == null) || !current.contains(key)) {
-                    current = defaultAttrs;
-                }
-
-                return current;
-            }
-        };
-
-    }
-
-    /**
      * <p>Vergleicht die internen Formatverarbeitungen und die sektionalen
      * Attribute. </p>
      */
@@ -632,6 +553,7 @@ final class FormatStep {
                 && (this.level == that.level)
                 && (this.section == that.section)
                 && isEqual(this.sectionalAttrs, that.sectionalAttrs)
+                && isEqual(this.fullAttrs, that.fullAttrs)
                 && (this.reserved == that.reserved)
                 && (this.padLeft == that.padLeft)
                 && (this.padRight == that.padRight)
@@ -690,6 +612,47 @@ final class FormatStep {
 
     }
 
+    private AttributeQuery getQuery(
+        final ChronoFormatter<?> formatter,
+        final AttributeQuery attributes
+    ) {
+
+        if (this.sectionalAttrs == null) {
+            return ((formatter == null) ? attributes : formatter.getAttributes()); // Optimierung
+        }
+
+        return new AttributeQuery() {
+            @Override
+            public boolean contains(AttributeKey<?> key) {
+                return this.getQuery(key).contains(key);
+            }
+
+            @Override
+            public <A> A get(AttributeKey<A> key) {
+                return this.getQuery(key).get(key);
+            }
+
+            @Override
+            public <A> A get(
+                AttributeKey<A> key,
+                A defaultValue
+            ) {
+                return this.getQuery(key).get(key, defaultValue);
+            }
+
+            private AttributeQuery getQuery(AttributeKey<?> key) {
+                AttributeQuery current = FormatStep.this.sectionalAttrs;
+
+                if ((current == null) || !current.contains(key)) {
+                    current = ((attributes == null) ? formatter.getAttributes() : attributes);
+                }
+
+                return current;
+            }
+        };
+
+    }
+
     @SuppressWarnings("unchecked")
     private static <V> FormatProcessor<V> update(
         FormatProcessor<V> fp,
@@ -723,7 +686,8 @@ final class FormatStep {
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult
+        Map<ChronoElement<?>, Object> parsedResult,
+        boolean quickPath
     ) {
 
         int current = status.getPosition();
@@ -734,7 +698,7 @@ final class FormatStep {
                 status,
                 attributes,
                 parsedResult,
-                this
+                quickPath
             );
         } catch (RuntimeException re) {
             status.setError(current, re.getMessage());
@@ -744,35 +708,25 @@ final class FormatStep {
 
     private boolean isStrict(AttributeQuery attributes) {
 
-        return this.getAttribute(
-            Attributes.LENIENCY,
-            attributes,
-            Leniency.SMART
-        ).isStrict();
+        return attributes.get(Attributes.LENIENCY, Leniency.SMART).isStrict();
 
     }
 
     private char getPadChar(AttributeQuery attributes) {
 
-        return this.getAttribute(
-            Attributes.PAD_CHAR,
-            attributes,
-            Character.valueOf(' ')
-        ).charValue();
+        return attributes.get(Attributes.PAD_CHAR, Character.valueOf(' ')).charValue();
 
     }
 
     private String padExceeded() {
 
-        return "Pad width exceeded: "
-            + this.getProcessor().getElement().name();
+        return "Pad width exceeded: " + this.processor.getElement().name();
 
     }
 
     private String padMismatched() {
 
-        return "Pad width mismatched: "
-            + this.getProcessor().getElement().name();
+        return "Pad width mismatched: " + this.processor.getElement().name();
 
     }
 
@@ -782,12 +736,8 @@ final class FormatStep {
             return true;
         }
 
-        ChronoCondition<ChronoDisplay> printCondition =
-            this.sectionalAttrs.getCondition();
-        return (
-            (printCondition == null)
-            || printCondition.test(formattable)
-        );
+        ChronoCondition<ChronoDisplay> printCondition = this.sectionalAttrs.getCondition();
+        return ((printCondition == null) || printCondition.test(formattable));
 
     }
 

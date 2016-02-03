@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FractionProcessor.java) is part of project Time4J.
  *
@@ -56,6 +56,10 @@ final class FractionProcessor
     private final int maxDigits;
     private final boolean fixedWidth;
 
+    // quick path optimization
+    private final char zeroDigit;
+    private final Leniency lenientMode;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -102,6 +106,32 @@ final class FractionProcessor
                 "Max digits out of range: " + maxDigits);
         }
 
+        this.zeroDigit = '0';
+        this.lenientMode = Leniency.SMART;
+
+    }
+
+    private FractionProcessor(
+        FormatProcessor<Void> decimalSeparator,
+        ChronoElement<Integer> element,
+        int minDigits,
+        int maxDigits,
+        boolean fixedWidth,
+        char zeroDigit,
+        Leniency lenientMode
+    ) {
+        super();
+
+        this.decimalSeparator = decimalSeparator;
+        this.element = element;
+        this.minDigits = minDigits;
+        this.maxDigits = maxDigits;
+        this.fixedWidth = fixedWidth;
+
+        // quick path members
+        this.zeroDigit = zeroDigit;
+        this.lenientMode = lenientMode;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -112,7 +142,7 @@ final class FractionProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         BigDecimal value = toDecimal(formattable.get(this.element));
@@ -135,12 +165,10 @@ final class FractionProcessor
             : fraction.stripTrailingZeros()
         );
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
         int start = -1;
         int printed = 0;
@@ -158,12 +186,12 @@ final class FractionProcessor
                         buffer,
                         attributes,
                         positions,
-                        step);
+                        quickPath);
                     printed++;
                 }
 
                 for (int i = 0; i < this.minDigits; i++) {
-                    buffer.append(zeroDigit);
+                    buffer.append(zeroChar);
                 }
 
                 printed += this.minDigits;
@@ -175,7 +203,7 @@ final class FractionProcessor
                     buffer,
                     attributes,
                     positions,
-                    step);
+                    quickPath);
                 printed++;
             }
 
@@ -185,7 +213,7 @@ final class FractionProcessor
                     this.maxDigits);
             fraction = fraction.setScale(outputScale, RoundingMode.FLOOR);
             String digits = fraction.toPlainString();
-            int diff = zeroDigit - '0';
+            int diff = zeroChar - '0';
 
             for (int i = 2, n = digits.length(); i < n; i++) {
                 char c = (char) (digits.charAt(i) + diff);
@@ -211,22 +239,14 @@ final class FractionProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
-        Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART);
-
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int effectiveMin = 0;
         int effectiveMax = 9;
 
-        if (
-            !leniency.isLax()
-            || this.fixedWidth
-        ) {
+        if (!leniency.isLax() || this.fixedWidth) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }
@@ -249,7 +269,7 @@ final class FractionProcessor
                 status,
                 attributes,
                 null,
-                step);
+                quickPath);
 
             if (status.isError()) {
                 if (effectiveMin == 0) {
@@ -270,17 +290,15 @@ final class FractionProcessor
             return;
         }
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
         long total = 0;
 
         while (current < maxEndPos) {
-            int digit = text.charAt(current) - zeroDigit;
+            int digit = text.charAt(current) - zeroChar;
 
             if ((digit >= 0) && (digit <= 9)) {
                 total = total * 10 + digit;
@@ -387,6 +405,24 @@ final class FractionProcessor
     public boolean isNumerical() {
 
         return true;
+
+    }
+
+    @Override
+    public FormatProcessor<Integer> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new FractionProcessor(
+            this.decimalSeparator,
+            this.element,
+            this.minDigits,
+            this.maxDigits,
+            this.fixedWidth,
+            attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART)
+        );
 
     }
 

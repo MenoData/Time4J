@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LookupProcessor.java) is part of project Time4J.
  *
@@ -50,6 +50,11 @@ final class LookupProcessor<V extends Enum<V>>
     private final ChronoElement<V> element;
     private final Map<V, String> resources;
 
+    // quick path optimization
+    private final int protectedLength;
+    private final boolean caseInsensitive;
+    private final Locale locale;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -70,6 +75,29 @@ final class LookupProcessor<V extends Enum<V>>
         this.element = element;
         this.resources = Collections.unmodifiableMap(tmp);
 
+        this.protectedLength = 0;
+        this.caseInsensitive = true;
+        this.locale = Locale.getDefault();
+
+    }
+
+    private LookupProcessor(
+        ChronoElement<V> element,
+        Map<V, String> resources,
+        int protectedLength,
+        boolean caseInsensitive,
+        Locale locale
+    ) {
+        super();
+
+        this.element = element;
+        this.resources = resources;
+
+        // quick path members
+        this.protectedLength = protectedLength;
+        this.caseInsensitive = caseInsensitive;
+        this.locale = locale;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -80,7 +108,7 @@ final class LookupProcessor<V extends Enum<V>>
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         if (buffer instanceof CharSequence) {
@@ -89,8 +117,7 @@ final class LookupProcessor<V extends Enum<V>>
             this.print(formattable, buffer);
 
             if (positions != null) {
-                positions.add(
-                    new ElementPosition(this.element, offset, cs.length()));
+                positions.add(new ElementPosition(this.element, offset, cs.length()));
             }
         } else {
             this.print(formattable, buffer);
@@ -104,18 +131,12 @@ final class LookupProcessor<V extends Enum<V>>
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int start = status.getPosition();
         int len = text.length();
-
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -127,28 +148,23 @@ final class LookupProcessor<V extends Enum<V>>
             return;
         }
 
-        Class<V> type = this.element.getType();
-        AttributeQuery query = step.getQuery(attributes);
-        boolean caseInsensitive =
-            query.get(
-                Attributes.PARSE_CASE_INSENSITIVE,
-                Boolean.TRUE
-            ).booleanValue();
-        Locale locale = query.get(Attributes.LANGUAGE, Locale.getDefault());
+        boolean ignoreCase = (
+            quickPath
+                ? this.caseInsensitive
+                : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+        Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.getDefault()));
         int maxCount = len - start;
 
-        for (V value : type.getEnumConstants()) {
+        for (V value : this.element.getType().getEnumConstants()) {
             String test = this.getString(value);
 
-            if (caseInsensitive) {
-                String upper = test.toUpperCase(locale);
+            if (ignoreCase) {
+                String upper = test.toUpperCase(loc);
                 int count = test.length();
 
                 if (count <= maxCount) {
-                    String s =
-                        text.subSequence(start, start + count)
-                            .toString()
-                            .toUpperCase(locale);
+                    String s = text.subSequence(start, start + count).toString().toUpperCase(loc);
+
                     if (upper.equals(s)) {
                         parsedResult.put(this.element, value);
                         status.setPosition(start + count);
@@ -159,8 +175,7 @@ final class LookupProcessor<V extends Enum<V>>
                 int count = test.length();
 
                 if (count <= maxCount) {
-                    CharSequence cs =
-                        text.subSequence(start, start + count);
+                    CharSequence cs = text.subSequence(start, start + count);
 
                     if (test.equals(cs.toString())) {
                         parsedResult.put(this.element, value);
@@ -239,6 +254,22 @@ final class LookupProcessor<V extends Enum<V>>
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<V> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new LookupProcessor<V>(
+            this.element,
+            this.resources,
+            attributes.get(Attributes.PROTECTED_CHARACTERS, Integer.valueOf(0)).intValue(),
+            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
+            attributes.get(Attributes.LANGUAGE, Locale.getDefault())
+        );
 
     }
 

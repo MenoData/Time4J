@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecimalProcessor.java) is part of project Time4J.
  *
@@ -51,6 +51,11 @@ final class DecimalProcessor
     private final int precision;
     private final int scale;
 
+    // quick path optimization
+    private final char zeroDigit;
+    private final Leniency lenientMode;
+    private final int protectedLength;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -88,6 +93,31 @@ final class DecimalProcessor
                 "Scale must be bigger than zero.");
         }
 
+        this.zeroDigit = '0';
+        this.lenientMode = Leniency.SMART;
+        this.protectedLength = 0;
+
+    }
+
+    private DecimalProcessor(
+        FormatProcessor<Void> decimalSeparator,
+        ChronoElement<BigDecimal> element,
+        int precision,
+        int scale,
+        char zeroDigit,
+        Leniency lenientMode,
+        int protectedLength
+    ) {
+        super();
+
+        this.decimalSeparator = decimalSeparator;
+        this.element = element;
+        this.precision = precision;
+        this.scale = scale;
+        this.zeroDigit = zeroDigit;
+        this.lenientMode = lenientMode;
+        this.protectedLength = protectedLength;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -98,7 +128,7 @@ final class DecimalProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         BigDecimal value =
@@ -140,8 +170,7 @@ final class DecimalProcessor
             sb.append(digits.charAt(i));
         }
 
-        this.decimalSeparator.print(
-            formattable, sb, attributes, positions, step);
+        this.decimalSeparator.print(formattable, sb, attributes, positions, quickPath);
 
         for (int i = 0; i < s; i++) {
             sb.append(digits.charAt(p + 1 + i));
@@ -153,15 +182,13 @@ final class DecimalProcessor
 
         digits = sb.toString();
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0'))
-            .charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
-        if (zeroDigit != '0') {
-            int diff = zeroDigit - '0';
+        if (zeroChar != '0') {
+            int diff = zeroChar - '0';
             char[] characters = digits.toCharArray();
 
             for (int i = 0; i < characters.length; i++) {
@@ -188,8 +215,7 @@ final class DecimalProcessor
             && (printed > 0)
             && (positions != null)
         ) {
-            positions.add(
-                new ElementPosition(this.element, start, start + printed));
+            positions.add(new ElementPosition(this.element, start, start + printed));
         }
 
     }
@@ -200,19 +226,14 @@ final class DecimalProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
         int start = status.getPosition();
         int pos = start;
 
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -224,12 +245,10 @@ final class DecimalProcessor
             return;
         }
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
         int maxPos = Math.min(len, pos + 18);
         long intpart = 0;
@@ -237,7 +256,7 @@ final class DecimalProcessor
         int p = 0;
 
         while (pos + p < maxPos) {
-            int digit = text.charAt(pos + p) - zeroDigit;
+            int digit = text.charAt(pos + p) - zeroChar;
 
             if ((digit >= 0) && (digit <= 9)) {
                 intpart = intpart * 10 + digit;
@@ -251,8 +270,7 @@ final class DecimalProcessor
             }
         }
 
-        Leniency leniency =
-            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
         if (leniency.isStrict() && (p != (this.precision - this.scale))) {
             status.setError(pos, "Integer part does not match expected width.");
@@ -267,7 +285,7 @@ final class DecimalProcessor
             status,
             attributes,
             null,
-            step);
+            quickPath);
 
         if (status.isError()) {
             return;
@@ -280,7 +298,7 @@ final class DecimalProcessor
         long fraction = 0;
 
         while (pos + s < maxPos) {
-            int digit = text.charAt(pos + s) - zeroDigit;
+            int digit = text.charAt(pos + s) - zeroChar;
 
             if ((digit >= 0) && (digit <= 9)) {
                 fraction = fraction * 10 + digit;
@@ -382,6 +400,24 @@ final class DecimalProcessor
     public boolean isNumerical() {
 
         return true;
+
+    }
+
+    @Override
+    public FormatProcessor<BigDecimal> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new DecimalProcessor(
+            this.decimalSeparator,
+            this.element,
+            this.precision,
+            this.scale,
+            attributes.get(Attributes.ZERO_DIGIT, '0').charValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART),
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0).intValue()
+        );
 
     }
 

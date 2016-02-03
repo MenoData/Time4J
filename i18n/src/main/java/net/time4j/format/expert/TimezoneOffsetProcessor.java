@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneOffsetProcessor.java) is part of project Time4J.
  *
@@ -72,6 +72,10 @@ final class TimezoneOffsetProcessor
     private final boolean extended;
     private final List<String> zeroOffsets;
 
+    // quick path optimization
+    private final boolean caseInsensitive;
+    private final Leniency lenientMode;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -108,6 +112,9 @@ final class TimezoneOffsetProcessor
         this.extended = extended;
         this.zeroOffsets = Collections.unmodifiableList(offsets);
 
+        this.caseInsensitive = true;
+        this.lenientMode = Leniency.SMART;
+
     }
 
     private TimezoneOffsetProcessor() {
@@ -116,6 +123,27 @@ final class TimezoneOffsetProcessor
         this.precision = LONG;
         this.extended = true;
         this.zeroOffsets = Collections.emptyList();
+
+        this.caseInsensitive = true;
+        this.lenientMode = Leniency.SMART;
+
+    }
+
+    private TimezoneOffsetProcessor(
+        DisplayMode precision,
+        boolean extended,
+        List<String> zeroOffsets,
+        boolean caseInsensitive,
+        Leniency lenientMode
+    ) {
+        super();
+
+        this.precision = precision;
+        this.extended = extended;
+        this.zeroOffsets = zeroOffsets;
+
+        this.caseInsensitive = caseInsensitive;
+        this.lenientMode = lenientMode;
 
     }
 
@@ -127,7 +155,7 @@ final class TimezoneOffsetProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         int start = -1;
@@ -145,7 +173,7 @@ final class TimezoneOffsetProcessor
         }
 
         if (tzid == null) {
-            offset = getOffset(formattable, step, attributes);
+            offset = getOffset(formattable, attributes);
         } else if (tzid instanceof ZonalOffset) {
             offset = (ZonalOffset) tzid;
         } else if (formattable instanceof UnixTime) {
@@ -203,10 +231,7 @@ final class TimezoneOffsetProcessor
                     (this.precision != SHORT)
                     && (this.precision != MEDIUM)
                 ) {
-                    if (
-                        (this.precision == FULL)
-                        || ((s | fraction) != 0)
-                    ) {
+                    if ((this.precision == FULL) || ((s | fraction) != 0)) {
                         if (this.extended) {
                             buffer.append(':');
                             printed++;
@@ -257,7 +282,7 @@ final class TimezoneOffsetProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
@@ -275,16 +300,14 @@ final class TimezoneOffsetProcessor
             if (len - pos >= zl) {
                 String compare = text.subSequence(pos, pos + zl).toString();
 
-                boolean caseInsensitive =
-                    step.getAttribute(
-                        Attributes.PARSE_CASE_INSENSITIVE,
-                        attributes,
-                        Boolean.TRUE
-                    ).booleanValue();
+                boolean ignoreCase = (
+                    quickPath
+                        ? this.caseInsensitive
+                        : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
 
                 if (
-                    (caseInsensitive && compare.equalsIgnoreCase(zeroOffset))
-                    || (!caseInsensitive && compare.equals(zeroOffset))
+                    (ignoreCase && compare.equalsIgnoreCase(zeroOffset))
+                    || (!ignoreCase && compare.equals(zeroOffset))
                 ) {
                     parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
                     status.setPosition(pos + zl);
@@ -306,13 +329,7 @@ final class TimezoneOffsetProcessor
             return;
         }
 
-        Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART
-            );
-
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int hours = parseNum(text, pos, leniency);
 
         if (hours == -1000) {
@@ -487,16 +504,29 @@ final class TimezoneOffsetProcessor
 
     }
 
+    @Override
+    public FormatProcessor<TZID> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new TimezoneOffsetProcessor(
+            this.precision,
+            this.extended,
+            this.zeroOffsets,
+            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART)
+        );
+
+    }
+
     private static ZonalOffset getOffset(
         ChronoDisplay formattable,
-        FormatStep step,
         AttributeQuery attributes
     ) {
 
-        AttributeQuery aq = step.getQuery(attributes);
-
-        if (aq.contains(Attributes.TIMEZONE_ID)) {
-            TZID tzid = aq.get(Attributes.TIMEZONE_ID);
+        if (attributes.contains(Attributes.TIMEZONE_ID)) {
+            TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
 
             if (tzid instanceof ZonalOffset) {
                 return (ZonalOffset) tzid;

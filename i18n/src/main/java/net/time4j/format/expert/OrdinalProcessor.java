@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OrdinalProcessor.java) is part of project Time4J.
  *
@@ -66,6 +66,13 @@ final class OrdinalProcessor
     private final ChronoElement<Integer> element;
     private final Map<PluralCategory, String> indicators; // null = english
 
+    // quick path optimization
+    private final int reserved;
+    private final int protectedLength;
+    private final char zeroDigit;
+    private final Leniency lenientMode;
+    private final Locale locale;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -99,6 +106,35 @@ final class OrdinalProcessor
             }
         }
 
+        this.reserved = 0;
+        this.protectedLength = 0;
+        this.zeroDigit = '0';
+        this.lenientMode = Leniency.SMART;
+        this.locale = Locale.ROOT;
+
+    }
+
+    private OrdinalProcessor(
+        ChronoElement<Integer> element,
+        Map<PluralCategory, String> indicators,
+        int reserved,
+        int protectedLength,
+        char zeroDigit,
+        Leniency lenientMode,
+        Locale locale
+    ) {
+        super();
+
+        this.element = element;
+        this.indicators = indicators;
+
+        // quick path members
+        this.reserved = reserved;
+        this.protectedLength = protectedLength;
+        this.zeroDigit = zeroDigit;
+        this.lenientMode = lenientMode;
+        this.locale = locale;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -109,7 +145,7 @@ final class OrdinalProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         int value = formattable.get(this.element).intValue();
@@ -121,15 +157,13 @@ final class OrdinalProcessor
 
         String digits = Integer.toString(value);
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0'))
-            .charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
-        if (zeroDigit != '0') {
-            int diff = zeroDigit - '0';
+        if (zeroChar != '0') {
+            int diff = zeroChar - '0';
             char[] characters = digits.toCharArray();
 
             for (int i = 0; i < characters.length; i++) {
@@ -149,7 +183,7 @@ final class OrdinalProcessor
         buffer.append(digits);
         printed += digits.length();
 
-        String indicator = this.getIndicator(step, attributes, value);
+        String indicator = this.getIndicator(attributes, quickPath, value);
         buffer.append(indicator);
         printed += indicator.length();
 
@@ -170,14 +204,8 @@ final class OrdinalProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
-
-        Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART);
 
         int effectiveMin = 1;
         int effectiveMax = 9;
@@ -186,12 +214,8 @@ final class OrdinalProcessor
         int start = status.getPosition();
         int pos = start;
 
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -203,24 +227,17 @@ final class OrdinalProcessor
             return;
         }
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
-        int reserved = step.getReserved();
-
-        if (
-            (reserved > 0)
-            && (protectedChars <= 0)
-        ) {
+        if ((this.reserved > 0) && (protectedChars <= 0)) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
             for (int i = pos; i < len; i++) {
-                int digit = text.charAt(i) - zeroDigit;
+                int digit = text.charAt(i) - zeroChar;
 
                 if ((digit >= 0) && (digit <= 9)) {
                     digitCount++;
@@ -229,7 +246,7 @@ final class OrdinalProcessor
                 }
             }
 
-            effectiveMax = Math.min(effectiveMax, digitCount - reserved);
+            effectiveMax = Math.min(effectiveMax, digitCount - this.reserved);
         }
 
         int minPos = pos + effectiveMin;
@@ -238,7 +255,7 @@ final class OrdinalProcessor
         boolean first = true;
 
         while (pos < maxPos) {
-            int digit = text.charAt(pos) - zeroDigit;
+            int digit = text.charAt(pos) - zeroChar;
 
             if ((digit >= 0) && (digit <= 9)) {
                 total = total * 10 + digit;
@@ -260,7 +277,7 @@ final class OrdinalProcessor
         }
 
         int value =  (int) total; // safe (see effectiveMax)
-        String indicator = this.getIndicator(step, attributes, value);
+        String indicator = this.getIndicator(attributes, quickPath, value);
         int endPos = pos + indicator.length();
 
         if (endPos >= len) {
@@ -331,8 +348,8 @@ final class OrdinalProcessor
     }
 
     private String getIndicator(
-        FormatStep step,
         AttributeQuery attributes,
+        boolean quickPath,
         int value
     ) {
 
@@ -341,7 +358,7 @@ final class OrdinalProcessor
         if (this.isEnglish()) {
             lang = Locale.ENGLISH;
         } else {
-            lang = step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
+            lang = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         }
 
         PluralCategory category =
@@ -394,6 +411,24 @@ final class OrdinalProcessor
 
         // there is also a string suffix!
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<Integer> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new OrdinalProcessor(
+            this.element,
+            this.indicators,
+            reserved,
+            attributes.get(Attributes.PROTECTED_CHARACTERS, Integer.valueOf(0)).intValue(),
+            attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART),
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT)
+        );
 
     }
 

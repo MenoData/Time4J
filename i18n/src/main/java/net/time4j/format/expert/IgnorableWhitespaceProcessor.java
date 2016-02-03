@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IgnorableWhitespaceProcessor.java) is part of project Time4J.
  *
@@ -51,7 +51,7 @@ enum IgnorableWhitespaceProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         buffer.append(' ');
@@ -64,7 +64,7 @@ enum IgnorableWhitespaceProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int offset = status.getPosition();
@@ -109,6 +109,16 @@ enum IgnorableWhitespaceProcessor
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<Void> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return this;
 
     }
 

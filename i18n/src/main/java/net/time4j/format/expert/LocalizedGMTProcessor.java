@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LocalizedGMTProcessor.java) is part of project Time4J.
  *
@@ -59,6 +59,15 @@ final class LocalizedGMTProcessor
 
     private final boolean abbreviated;
 
+    // quick path optimization
+    private final boolean caseInsensitive;
+    private final boolean noPrefix;
+    private final Locale locale;
+    private final String plusSign;
+    private final String minusSign;
+    private final char zeroDigit;
+    private final Leniency lenientMode;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -67,9 +76,32 @@ final class LocalizedGMTProcessor
      * @param   abbreviated     short form of localized gmt offset?
      */
     LocalizedGMTProcessor(boolean abbreviated) {
+        this(abbreviated, true, false, Locale.ROOT, "+", "-", '0', Leniency.SMART);
+
+    }
+
+    private LocalizedGMTProcessor(
+        boolean abbreviated,
+        boolean caseInsensitive,
+        boolean noPrefix,
+        Locale locale,
+        String plusSign,
+        String minusSign,
+        char zeroDigit,
+        Leniency lenientMode
+    ) {
         super();
 
         this.abbreviated = abbreviated;
+
+        // quick path members
+        this.caseInsensitive = caseInsensitive;
+        this.noPrefix = noPrefix;
+        this.locale = locale;
+        this.plusSign = plusSign;
+        this.minusSign = minusSign;
+        this.zeroDigit = zeroDigit;
+        this.lenientMode = lenientMode;
 
     }
 
@@ -81,7 +113,7 @@ final class LocalizedGMTProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         int start = -1;
@@ -99,7 +131,7 @@ final class LocalizedGMTProcessor
         }
 
         if (tzid == null) {
-            offset = getOffset(formattable, step, attributes);
+            offset = getOffset(formattable, attributes);
         } else if (tzid instanceof ZonalOffset) {
             offset = (ZonalOffset) tzid;
         } else if (formattable instanceof UnixTime) {
@@ -109,25 +141,31 @@ final class LocalizedGMTProcessor
                 "Cannot extract timezone offset from: " + formattable);
         }
 
-        Locale locale = step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
-        char zeroDigit = step.getAttribute(Attributes.ZERO_DIGIT, attributes, Character.valueOf('0')).charValue();
-        String plus = step.getAttribute(AttributeSet.PLUS_SIGN, attributes, "+");
-        String minus = step.getAttribute(AttributeSet.MINUS_SIGN, attributes, "-");
+        Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
+        String plus = (quickPath ? this.plusSign : attributes.get(AttributeSet.PLUS_SIGN, "+"));
+        String minus = (quickPath ? this.minusSign : attributes.get(AttributeSet.MINUS_SIGN, "-"));
 
-        if ("ar".equals(locale.getLanguage()) && (zeroDigit == '0')) {
+        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
             plus = UNICODE_LRM + "+";
             minus = UNICODE_LRM + "\u002D";
         }
 
-        boolean noPrefix = step.getAttribute(Attributes.NO_GMT_PREFIX, attributes, Boolean.FALSE).booleanValue();
-        String gmtPrefix = (noPrefix ? "" : getGMTPrefix(locale));
+        boolean np = (
+            quickPath
+                ? this.noPrefix
+                : attributes.get(Attributes.NO_GMT_PREFIX, Boolean.FALSE).booleanValue());
+        String gmtPrefix = (np ? "" : getGMTPrefix(loc));
         buffer.append(gmtPrefix);
         printed = gmtPrefix.length();
 
         int total = offset.getIntegralAmount();
         int fraction = offset.getFractionalAmount();
 
-        if (noPrefix || (total != 0) || (fraction != 0)) {
+        if (np || (total != 0) || (fraction != 0)) {
             if (offset.getSign() == BEHIND_UTC) {
                 buffer.append(minus);
                 printed += minus.length();
@@ -141,14 +179,14 @@ final class LocalizedGMTProcessor
             int s = offset.getAbsoluteSeconds();
 
             if ((h < 10) && !this.abbreviated) {
-                buffer.append(zeroDigit);
+                buffer.append(zeroChar);
                 printed++;
             }
 
             String hours = String.valueOf(h);
 
             for (int i = 0; i < hours.length(); i++) {
-                char digit = (char) (hours.charAt(i) - '0' + zeroDigit);
+                char digit = (char) (hours.charAt(i) - '0' + zeroChar);
                 buffer.append(digit);
                 printed++;
             }
@@ -158,14 +196,14 @@ final class LocalizedGMTProcessor
                 printed++;
 
                 if (m < 10) {
-                    buffer.append(zeroDigit);
+                    buffer.append(zeroChar);
                     printed++;
                 }
 
                 String minutes = String.valueOf(m);
 
                 for (int i = 0; i < minutes.length(); i++) {
-                    char digit = (char) (minutes.charAt(i) - '0' + zeroDigit);
+                    char digit = (char) (minutes.charAt(i) - '0' + zeroChar);
                     buffer.append(digit);
                     printed++;
                 }
@@ -175,14 +213,14 @@ final class LocalizedGMTProcessor
                     printed++;
 
                     if (s < 10) {
-                        buffer.append(zeroDigit);
+                        buffer.append(zeroChar);
                         printed++;
                     }
 
                     String seconds = String.valueOf(s);
 
                     for (int i = 0; i < seconds.length(); i++) {
-                        char digit = (char) (seconds.charAt(i) - '0' + zeroDigit);
+                        char digit = (char) (seconds.charAt(i) - '0' + zeroChar);
                         buffer.append(digit);
                         printed++;
                     }
@@ -210,7 +248,7 @@ final class LocalizedGMTProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
@@ -222,15 +260,19 @@ final class LocalizedGMTProcessor
             return;
         }
 
-        Locale locale =
-            step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
-        boolean noPrefix =
-            step.getAttribute(Attributes.NO_GMT_PREFIX, attributes, Boolean.FALSE).booleanValue();
-        boolean caseInsensitive =
-            step.getAttribute(Attributes.PARSE_CASE_INSENSITIVE, attributes, Boolean.TRUE).booleanValue();
+        Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
-        if (!noPrefix) {
-            String gmtPrefix = getGMTPrefix(locale);
+        boolean np = (
+            quickPath
+                ? this.noPrefix
+                : attributes.get(Attributes.NO_GMT_PREFIX, Boolean.FALSE).booleanValue());
+        boolean ignoreCase = (
+            quickPath
+                ? this.caseInsensitive
+                : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+
+        if (!np) {
+            String gmtPrefix = getGMTPrefix(loc);
             String[] zeroOffsets = {"GMT", gmtPrefix, "UTC", "UT"};
             boolean found = false;
 
@@ -241,8 +283,8 @@ final class LocalizedGMTProcessor
                     String compare = text.subSequence(pos, pos + zl).toString();
 
                     if (
-                        (caseInsensitive && compare.equalsIgnoreCase(zeroOffset))
-                        || (!caseInsensitive && compare.equals(zeroOffset))
+                        (ignoreCase && compare.equalsIgnoreCase(zeroOffset))
+                        || (!ignoreCase && compare.equals(zeroOffset))
                     ) {
                         found = true;
                         pos += zl;
@@ -263,23 +305,26 @@ final class LocalizedGMTProcessor
             }
         }
 
-        char zeroDigit = step.getAttribute(Attributes.ZERO_DIGIT, attributes, Character.valueOf('0')).charValue();
-        String plus = step.getAttribute(AttributeSet.PLUS_SIGN, attributes, "+");
-        String minus = step.getAttribute(AttributeSet.MINUS_SIGN, attributes, "-");
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
+        String plus = (quickPath ? this.plusSign : attributes.get(AttributeSet.PLUS_SIGN, "+"));
+        String minus = (quickPath ? this.minusSign : attributes.get(AttributeSet.MINUS_SIGN, "-"));
 
-        if ("ar".equals(locale.getLanguage()) && (zeroDigit == '0')) {
+        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
             plus = UNICODE_LRM + "+";
             minus = UNICODE_LRM + "\u002D";
         }
 
         OffsetSign sign;
-        int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, caseInsensitive);
+        int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, ignoreCase);
 
         if (parsedLen == -1) {
-            parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, caseInsensitive);
+            parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, ignoreCase);
 
             if (parsedLen == -1) {
-                if (noPrefix) {
+                if (np) {
                     status.setError(
                         start,
                         "Missing sign in localized time zone offset.");
@@ -297,7 +342,7 @@ final class LocalizedGMTProcessor
         }
 
         pos += parsedLen;
-        int hours = parseHours(text, pos, zeroDigit);
+        int hours = parseHours(text, pos, zeroChar);
 
         if (hours == -1000) {
             status.setError(
@@ -327,12 +372,7 @@ final class LocalizedGMTProcessor
             return;
         }
 
-        Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART
-            );
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
         if (text.charAt(pos) == ':') {
             pos++;
@@ -347,7 +387,7 @@ final class LocalizedGMTProcessor
             return;
         }
 
-        int minutes = parseTwoDigits(text, pos, zeroDigit);
+        int minutes = parseTwoDigits(text, pos, zeroChar);
 
         if (minutes == -1000) {
             status.setError(
@@ -363,7 +403,7 @@ final class LocalizedGMTProcessor
         if (pos < len) {
             if (text.charAt(pos) == ':') {
                 pos++;
-                seconds = parseTwoDigits(text, pos, zeroDigit);
+                seconds = parseTwoDigits(text, pos, zeroChar);
 
                 if (seconds == -1000) {
                     pos--;
@@ -411,6 +451,24 @@ final class LocalizedGMTProcessor
 
     }
 
+    @Override
+    public FormatProcessor<TZID> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new LocalizedGMTProcessor(
+            this.abbreviated,
+            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
+            attributes.get(Attributes.NO_GMT_PREFIX, Boolean.FALSE).booleanValue(),
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT),
+            attributes.get(AttributeSet.PLUS_SIGN, "+"),
+            attributes.get(AttributeSet.MINUS_SIGN, "-"),
+            attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART)
+        );
+    }
+
     private static String getGMTPrefix(Locale locale) {
 
         CalendarText ct = CalendarText.getIsoInstance(locale);
@@ -425,14 +483,11 @@ final class LocalizedGMTProcessor
 
     private static ZonalOffset getOffset(
         ChronoDisplay formattable,
-        FormatStep step,
         AttributeQuery attributes
     ) {
 
-        AttributeQuery aq = step.getQuery(attributes);
-
-        if (aq.contains(Attributes.TIMEZONE_ID)) {
-            TZID tzid = aq.get(Attributes.TIMEZONE_ID);
+        if (attributes.contains(Attributes.TIMEZONE_ID)) {
+            TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
 
             if (tzid instanceof ZonalOffset) {
                 return (ZonalOffset) tzid;

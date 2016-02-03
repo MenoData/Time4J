@@ -63,6 +63,7 @@ import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.history.internal.HistorizedElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -140,6 +141,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final Map<ChronoElement<?>, Object> defaults;
     private final FractionProcessor fracproc;
 
+    // serves for optimization
+    private final boolean hasOptionals;
+    private final boolean needsHistorization;
+    private final boolean needsExtensions;
+
     //~ Konstruktoren -----------------------------------------------------
 
     // Aufruf durch Builder
@@ -160,19 +166,51 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.chronology = chronology;
         this.overrideHandler = OverrideHandler.of(override);
         this.globalAttributes = AttributeSet.createDefaults((override == null) ? chronology : override, locale);
-        this.steps = Collections.unmodifiableList(steps);
         this.defaults = Collections.emptyMap();
 
         FractionProcessor fp = null;
+        boolean ho = false;
+        boolean nh = false;
+        boolean dp = false;
 
-        for (FormatStep step : this.steps) {
-            if (step.getProcessor() instanceof FractionProcessor) {
+        for (FormatStep step : steps) {
+            if ((fp == null) && step.getProcessor() instanceof FractionProcessor) {
                 fp = FractionProcessor.class.cast(step.getProcessor());
-                break;
+            }
+            if (!ho && (step.getLevel() > 0)) {
+                ho = true;
+            }
+            ChronoElement<?> element = step.getProcessor().getElement();
+            if (element != null) {
+                if (element instanceof HistorizedElement) {
+                    nh = true;
+                } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
+                    dp = true;
+                }
             }
         }
 
         this.fracproc = fp;
+        this.hasOptionals = ho;
+        this.needsHistorization = nh;
+
+        Class<?> chronoType = chronology.getChronoType();
+
+        if (PlainDate.class.isAssignableFrom(chronoType)) {
+            this.needsExtensions = (nh || (chronology.getExtensions().size() > 2));
+        } else if (PlainTime.class.isAssignableFrom(chronoType)) {
+            this.needsExtensions = (dp || (chronology.getExtensions().size() > 1));
+        } else if (PlainTimestamp.class.isAssignableFrom(chronoType)) {
+            this.needsExtensions = (dp || nh || (chronology.getExtensions().size() > 3));
+        } else {
+            int count = chronology.getExtensions().size();
+            if (override != null) {
+                count += override.getExtensions().size();
+            }
+            this.needsExtensions = (count > 0);
+        }
+
+        this.steps = this.freeze(steps);
 
     }
 
@@ -211,6 +249,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.globalAttributes = globalAttributes;
         this.defaults = Collections.unmodifiableMap(new NonAmbivalentMap(old.defaults));
         this.fracproc = old.fracproc;
+        this.hasOptionals = old.hasOptionals;
+        this.needsHistorization = (old.needsHistorization || (history != null));
+        this.needsExtensions = (old.needsExtensions || this.needsHistorization);
 
         // update extension elements and historizable elements
         int len = old.steps.size();
@@ -264,7 +305,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
         }
 
-        this.steps = Collections.unmodifiableList(copy);
+        this.steps = this.freeze(copy);
 
     }
 
@@ -290,6 +331,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.overrideHandler = formatter.overrideHandler;
         this.globalAttributes = formatter.globalAttributes;
         this.fracproc = formatter.fracproc;
+        this.hasOptionals = formatter.hasOptionals;
+        this.needsHistorization = formatter.needsHistorization;
+        this.needsExtensions = formatter.needsExtensions;
 
         Map<ChronoElement<?>, Object> map =
             new NonAmbivalentMap(formatter.defaults);
@@ -632,7 +676,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             while (index < len) {
                 FormatStep step = this.steps.get(index);
-                step.print(formattable, buffer, attributes, positions);
+                step.print(formattable, buffer, attributes, positions, (attributes == this.globalAttributes));
 
                 if (step.isNewOrBlockStarted()) {
                     // skip the rest of current section
@@ -927,11 +971,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes = this.globalAttributes;
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
-        ParsedValues parsed = status.getRawValues0();
+        ParsedValues parsed = null;
 
         try {
-            parsed = this.parseElements(text, status, attributes, data);
+            parsed = this.parseElements(text, status, attributes, (attributes == this.globalAttributes));
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -940,11 +983,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
         }
 
-        if (status.isError()) {
+        if ((parsed == null) || status.isError()) {
             return new ParsedValues();
         }
-
-        assert (parsed != null);
 
         // Phase 2: Anreicherung mit Default-Werten
         for (ChronoElement<?> e : this.defaults.keySet()) {
@@ -2380,11 +2421,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        Deque<NonAmbivalentMap> data = new LinkedList<NonAmbivalentMap>();
-        ParsedValues parsed = status.getRawValues0();
+        ParsedValues parsed = null;
 
         try {
-            parsed = cf.parseElements(text, status, attributes, data);
+            parsed = cf.parseElements(text, status, attributes, (attributes == cf.globalAttributes));
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -2393,12 +2433,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
         }
 
-        if (status.isError()) {
+        if ((parsed == null) || status.isError()) {
             return null;
         }
 
         int index = status.getPosition();
-        assert (parsed != null);
 
         if (
             (index < text.length())
@@ -2413,22 +2452,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Phase 2: Anreicherung mit Default-Werten
-        for (ChronoElement<?> e : cf.defaults.keySet()) {
-            if (!parsed.contains(e)) {
-                fill(parsed, e, cf.defaults.get(e));
+        if (!cf.defaults.isEmpty()) {
+            for (ChronoElement<?> e : cf.defaults.keySet()) {
+                if (!parsed.contains(e)) {
+                    fill(parsed, e, cf.defaults.get(e));
+                }
             }
         }
 
         // Phase 3: Auflösung von Elementwerten in chronologischen Erweiterungen
-        try {
-            for (ChronoExtension ext : extensions) {
-                parsed = ext.resolve(parsed, cf.getLocale(), attributes);
+        if (cf.needsExtensions) {
+            try {
+                for (ChronoExtension ext : extensions) {
+                    parsed = ext.resolve(parsed, cf.getLocale(), attributes);
+                }
+            } catch (RuntimeException re) {
+                status.setError(
+                    text.length(),
+                    re.getMessage() + getDescription(parsed.toMap()));
+                return null;
             }
-        } catch (RuntimeException re) {
-            status.setError(
-                text.length(),
-                re.getMessage() + getDescription(data.peek()));
-            return null;
         }
 
         // Phase 4: Transformation der Elementwerte zum Typ T (ChronoMerger)
@@ -2439,7 +2482,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
-                re.getMessage() + getDescription(data.peek()));
+                re.getMessage() + getDescription(parsed.toMap()));
             return null;
         }
 
@@ -2456,7 +2499,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (!preparsing) {
                 status.setError(
                     text.length(),
-                    getReason(parsed) + getDescription(data.peek()));
+                    getReason(parsed) + getDescription(parsed.toMap()));
             }
             return null;
         } else {
@@ -2622,12 +2665,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Deque<NonAmbivalentMap> data
+        boolean quickPath
     ) {
 
         NonAmbivalentMap values = new NonAmbivalentMap();
         values.put(null, Integer.valueOf(status.getPosition()));
-        data.push(values);
+        Deque<NonAmbivalentMap> data = null;
+
+        if (this.hasOptionals) {
+            data = new LinkedList<NonAmbivalentMap>();
+            data.push(values);
+        }
+
         int previous = 0;
         int current = 0;
         int index = 0;
@@ -2635,37 +2684,41 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         while (index < len) {
             FormatStep step = this.steps.get(index);
-            current = step.getLevel();
-            int level = current;
+            Map<ChronoElement<?>, Object> parsedResult;
 
-            // Start einer optionalen Sektion: Stack erweitern
-            while (level > previous) {
-                values = new NonAmbivalentMap();
-                values.put(null, Integer.valueOf(status.getPosition()));
-                data.push(values);
-                level--;
-            }
+            if (data == null) {
+                parsedResult = values;
+            } else {
+                current = step.getLevel();
+                int level = current;
 
-            // Ende einer optionalen Sektion: Werte im Stack sichern
-            while (level < previous) {
-                values = data.pop();
-                values.remove(null);
-                data.peek().putAll(values);
-                level++;
+                // Start einer optionalen Sektion: Stack erweitern
+                while (level > previous) {
+                    values = new NonAmbivalentMap();
+                    values.put(null, Integer.valueOf(status.getPosition()));
+                    data.push(values);
+                    level--;
+                }
+
+                // Ende einer optionalen Sektion: Werte im Stack sichern
+                while (level < previous) {
+                    values = data.pop();
+                    values.remove(null);
+                    data.peek().putAll(values);
+                    level++;
+                }
+
+                parsedResult = data.peek();
             }
 
             // Delegation der Element-Verarbeitung
-            Map<ChronoElement<?>, Object> parsedResult = data.peek();
             status.clearWarning();
-            step.parse(text, status, attributes, parsedResult);
+            step.parse(text, status, attributes, parsedResult, quickPath);
 
             // Im Warnzustand default-value verwenden?
             if (status.isWarning()) {
                 ChronoElement<?> element = step.getProcessor().getElement();
-                if (
-                    (element != null)
-                    && this.defaults.containsKey(element)
-                ) {
+                if ((element != null) && this.defaults.containsKey(element)) {
                     parsedResult.put(element, this.defaults.get(element));
                     parsedResult.remove(ValidationElement.ERROR_MESSAGE);
                     status.clearError();
@@ -2689,16 +2742,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                 if (last > index) {
                     // wenn gefunden, zum nächsten oder-Block springen
-                    values = data.pop();
+                    if (data != null) {
+                        values = data.pop();
+                    }
                     status.clearError();
                     status.setPosition(((Integer) values.get(null)).intValue());
                     values = new NonAmbivalentMap(); // alte Werte verwerfen
                     values.put(null, Integer.valueOf(status.getPosition()));
-                    data.push(values);
+                    if (data != null) {
+                        data.push(values);
+                    }
                     index = last;
                 } else if (current == 0) {
                     // Grundzustand => aussteigen
-                    values = data.peek();
+                    if (data != null) {
+                        values = data.peek();
+                    }
                     values.remove(null);
                     return new ParsedValues(values);
                 } else {
@@ -2712,6 +2771,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     index = last;
                     // Restauration der alten Werte und der Fehlerinformation
                     current--;
+                    assert (data != null);
                     values = data.pop();
                     status.clearError();
                     status.setPosition(((Integer) values.get(null)).intValue());
@@ -2736,6 +2796,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Verbleibende optionale Sektionen auflösen
         while (current > 0) {
+            assert (data != null);
             values = data.pop();
             values.remove(null);
             data.peek().putAll(values);
@@ -2743,7 +2804,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         // Ergebnis
-        values = data.peek();
+        if (data != null) {
+            values = data.peek();
+        }
+
         values.remove(null);
         return new ParsedValues(values);
 
@@ -2821,6 +2885,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 throw new IllegalArgumentException("Unsupported element: " + element.name());
             }
         }
+
+    }
+
+    private List<FormatStep> freeze(List<FormatStep> steps) {
+
+        List<FormatStep> frozen = new ArrayList<FormatStep>();
+
+        for (FormatStep step : steps) {
+            frozen.add(step.quickPath(this));
+        }
+
+        return Collections.unmodifiableList(frozen);
 
     }
 

@@ -58,6 +58,13 @@ final class NumberProcessor<V>
     private final boolean protectedMode;
     private final boolean yearOfEra;
 
+    // quick path optimization
+    private final int reserved;
+    private final char zeroDigit;
+    private final NumberSystem numberSystem;
+    private final Leniency lenientMode;
+    private final int protectedLength;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -79,6 +86,25 @@ final class NumberProcessor<V>
         SignPolicy signPolicy,
         boolean protectedMode
     ) {
+        this(
+            element, fixedWidth, minDigits, maxDigits, signPolicy, protectedMode,
+            0, '0', NumberSystem.ARABIC, Leniency.SMART, 0);
+
+    }
+
+    private NumberProcessor(
+        ChronoElement<V> element,
+        boolean fixedWidth,
+        int minDigits,
+        int maxDigits,
+        SignPolicy signPolicy,
+        boolean protectedMode,
+        int reserved,
+        char zeroDigit,
+        NumberSystem numberSystem,
+        Leniency lenientMode,
+        int protectedLength
+    ) {
         super();
 
         this.element = element;
@@ -98,17 +124,11 @@ final class NumberProcessor<V>
         } else if (minDigits > maxDigits) {
             throw new IllegalArgumentException(
                 "Max smaller than min: " + maxDigits + " < " + minDigits);
-        } else if (
-            fixedWidth
-            && (minDigits != maxDigits)
-        ) {
+        } else if (fixedWidth && (minDigits != maxDigits)) {
             throw new IllegalArgumentException(
                 "Variable width in fixed-width-mode: "
-                + maxDigits + " != " + minDigits);
-        } else if (
-            fixedWidth
-            && (signPolicy != SignPolicy.SHOW_NEVER)
-        ) {
+                    + maxDigits + " != " + minDigits);
+        } else if (fixedWidth && (signPolicy != SignPolicy.SHOW_NEVER)) {
             throw new IllegalArgumentException(
                 "Sign policy must be SHOW_NEVER in fixed-width-mode.");
         }
@@ -125,6 +145,13 @@ final class NumberProcessor<V>
 
         this.yearOfEra = (this.element.name().equals("YEAR_OF_ERA"));
 
+        // quick path members
+        this.reserved = reserved;
+        this.zeroDigit = zeroDigit;
+        this.numberSystem = numberSystem;
+        this.lenientMode = lenientMode;
+        this.protectedLength = protectedLength;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -135,23 +162,23 @@ final class NumberProcessor<V>
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         int start = ((buffer instanceof CharSequence) ? ((CharSequence) buffer).length() : -1);
         int printed = 0;
 
         if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
-            TextElement<?> te = TextElement.class.cast(this.element);
+            HistorizedElement te = HistorizedElement.class.cast(this.element);
             StringBuilder sb = new StringBuilder();
-            te.print(formattable, sb, step.getQuery(attributes, this.minDigits, this.maxDigits));
+            te.print(formattable, sb, attributes, this.minDigits, this.maxDigits);
             buffer.append(sb.toString());
             printed = sb.length();
         } else {
             Class<V> type = this.element.getType();
             V value = formattable.get(this.element);
             boolean negative = false;
-            NumberSystem numsys = this.getNumberSystem(attributes, step);
+            NumberSystem numsys = (quickPath ? this.numberSystem : this.getNumberSystem(attributes));
             String digits;
 
             if (type == Integer.class) {
@@ -195,18 +222,16 @@ final class NumberProcessor<V>
                         + " exceeds the maximum width of " + this.maxDigits + ".");
             }
 
-            char zeroDigit = '\u0000';
+            char zeroChar = '\u0000';
 
             if (numsys == NumberSystem.ARABIC) {
-                zeroDigit =
-                    step.getAttribute(
-                        Attributes.ZERO_DIGIT,
-                        attributes,
-                        Character.valueOf('0')
-                    ).charValue();
+                zeroChar = (
+                    quickPath
+                        ? this.zeroDigit
+                        : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
-                if (zeroDigit != '0') {
-                    int diff = zeroDigit - '0';
+                if (zeroChar != '0') {
+                    int diff = zeroChar - '0';
                     char[] characters = digits.toCharArray();
 
                     for (int i = 0; i < characters.length; i++) {
@@ -244,7 +269,7 @@ final class NumberProcessor<V>
 
             if (numsys == NumberSystem.ARABIC) {
                 for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
-                    buffer.append(zeroDigit);
+                    buffer.append(zeroChar);
                     printed++;
                 }
             }
@@ -269,18 +294,12 @@ final class NumberProcessor<V>
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
         int start = status.getPosition();
-
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -294,7 +313,7 @@ final class NumberProcessor<V>
 
         if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
             TextElement<?> te = TextElement.class.cast(this.element);
-            Object value = te.parse(text, status.getPP(), step.getQuery(attributes, this.minDigits, this.maxDigits));
+            Object value = te.parse(text, status.getPP(), attributes);
             if (status.isError()) {
                 status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
             } else if (value == null) {
@@ -305,16 +324,13 @@ final class NumberProcessor<V>
             return;
         }
 
-        NumberSystem numsys = this.getNumberSystem(attributes, step);
-        Leniency leniency = step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
+        NumberSystem numsys = (quickPath ? this.numberSystem : this.getNumberSystem(attributes));
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
         int effectiveMin = 1;
         int effectiveMax = this.getScale(numsys);
 
-        if (
-            this.fixedWidth
-            || !leniency.isLax()
-        ) {
+        if (this.fixedWidth || !leniency.isLax()) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }
@@ -323,10 +339,7 @@ final class NumberProcessor<V>
         boolean negative = false;
         char sign = text.charAt(pos);
 
-        if (
-            (sign == '-')
-            || (sign == '+')
-        ) {
+        if ((sign == '-') || (sign == '+')) {
             if (
                 (this.signPolicy == SignPolicy.SHOW_NEVER)
                 && (this.fixedWidth || leniency.isStrict())
@@ -363,18 +376,14 @@ final class NumberProcessor<V>
             return;
         }
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
-
-        int reserved = step.getReserved();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
         if (
             !this.fixedWidth
-            && (reserved > 0)
+            && (this.reserved > 0)
             && (protectedChars <= 0)
         ) {
             int digitCount = 0;
@@ -382,7 +391,7 @@ final class NumberProcessor<V>
             // Wieviele Ziffern hat der ganze Ziffernblock?
             if (numsys == NumberSystem.ARABIC) {
                 for (int i = pos; i < len; i++) {
-                    int digit = text.charAt(i) - zeroDigit;
+                    int digit = text.charAt(i) - zeroChar;
 
                     if ((digit >= 0) && (digit <= 9)) {
                         digitCount++;
@@ -400,25 +409,20 @@ final class NumberProcessor<V>
                 }
             }
 
-            effectiveMax = Math.min(effectiveMax, digitCount - reserved);
+            effectiveMax = Math.min(effectiveMax, digitCount - this.reserved);
         }
 
         int minPos = pos + effectiveMin;
         int maxPos = Math.min(len, pos + effectiveMax);
         long total = 0;
-        boolean first = true;
 
         if (numsys == NumberSystem.ARABIC) {
             while (pos < maxPos) {
-                int digit = text.charAt(pos) - zeroDigit;
+                int digit = text.charAt(pos) - zeroChar;
 
                 if ((digit >= 0) && (digit <= 9)) {
                     total = total * 10 + digit;
                     pos++;
-                    first = false;
-                } else if (first) {
-                    status.setError(start, "Digit expected.");
-                    return;
                 } else {
                     break;
                 }
@@ -430,54 +434,49 @@ final class NumberProcessor<V>
                 if (numsys.contains(text.charAt(pos))) {
                     digitCount++;
                     pos++;
-                    first = false;
-                } else if (first) {
-                    status.setError(start, "Digit expected.");
-                    return;
                 } else {
                     break;
                 }
             }
 
-            total = numsys.toInteger(text.subSequence(pos - digitCount, pos).toString());
+            try {
+                if (digitCount > 0) {
+                    total = numsys.toInteger(text.subSequence(pos - digitCount, pos).toString(), leniency);
+                }
+            } catch (NumberFormatException nfe) {
+                status.setError(start, nfe.getMessage());
+                return;
+            }
         }
 
-        if (
-            (pos < minPos)
-            && (first || this.fixedWidth || !leniency.isLax())
-        ) {
-            status.setError(
-                start,
-                "Not enough digits found for: " + this.element.name());
-            return;
+        if (pos < minPos) {
+            if (pos == start) {
+                status.setError(start, "Digit expected.");
+                return;
+            } else if (this.fixedWidth || !leniency.isLax()) {
+                status.setError(
+                    start,
+                    "Not enough digits found for: " + this.element.name());
+                return;
+            }
         }
 
         if (negative) {
-            if (
-                (total == 0)
-                && leniency.isStrict()
-            ) {
+            if ((total == 0) && leniency.isStrict()) {
                 status.setError(start - 1, "Negative zero is not allowed.");
                 return;
             }
-
             total = -total;
         } else if (
             (this.signPolicy == SignPolicy.SHOW_WHEN_BIG_NUMBER)
             && leniency.isStrict()
             && (numsys == NumberSystem.ARABIC)
         ) {
-            if (
-                (sign == '+')
-                && (pos <= minPos)
-            ) {
+            if ((sign == '+') && (pos <= minPos)) {
                 status.setError(
                     start - 1,
                     "Positive sign only allowed for big number.");
-            } else if (
-                (sign != '+')
-                && (pos > minPos)
-            ) {
+            } else if ((sign != '+') && (pos > minPos)) {
                 status.setError(
                     start,
                     "Positive sign must be present for big number.");
@@ -616,6 +615,28 @@ final class NumberProcessor<V>
 
     }
 
+    @Override
+    public FormatProcessor<V> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new NumberProcessor<V>(
+            this.element,
+            this.fixedWidth,
+            this.minDigits,
+            this.maxDigits,
+            this.signPolicy,
+            this.protectedMode,
+            reserved,
+            attributes.get(Attributes.ZERO_DIGIT, '0').charValue(),
+            this.getNumberSystem(attributes),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART),
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0)
+        );
+
+    }
+
     private int getScale(NumberSystem numsys) {
 
         if (numsys == NumberSystem.ARABIC) {
@@ -639,22 +660,19 @@ final class NumberProcessor<V>
 
     }
 
-    private NumberSystem getNumberSystem(
-        AttributeQuery attrs,
-        FormatStep step
-    ) {
+    private NumberSystem getNumberSystem(AttributeQuery attrs) {
 
         NumberSystem defaultNumberSystem = NumberSystem.ARABIC;
 
         if (
             this.yearOfEra
-            && step.getAttribute(Attributes.LANGUAGE, attrs, Locale.ROOT).getLanguage().equals("am")
-            && step.getAttribute(Attributes.CALENDAR_TYPE, attrs, CalendarText.ISO_CALENDAR_TYPE).equals("ethiopic")
+            && attrs.get(Attributes.LANGUAGE, Locale.ROOT).getLanguage().equals("am")
+            && attrs.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE).equals("ethiopic")
         ) {
             defaultNumberSystem = NumberSystem.ETHIOPIC;
         }
 
-        return step.getAttribute(Attributes.NUMBER_SYSTEM, attrs, defaultNumberSystem);
+        return attrs.get(Attributes.NUMBER_SYSTEM, defaultNumberSystem);
 
     }
 
