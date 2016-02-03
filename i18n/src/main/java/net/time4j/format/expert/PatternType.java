@@ -1157,8 +1157,6 @@ public enum PatternType
      */
     NON_ISO_DATE;
 
-    private static final ChronoElement<Integer> ETHIOPIAN_HOUR = findEthiopianHour();
-
     //~ Methoden ----------------------------------------------------------
 
     @Override
@@ -1247,9 +1245,9 @@ public enum PatternType
 
     }
 
-    private static ChronoElement<Integer> findEthiopianHour() {
+    private static ChronoElement<Integer> findEthiopianHour(Chronology<?> chronology) {
 
-        for (ChronoExtension ext : PlainTime.axis().getExtensions()) {
+        for (ChronoExtension ext : chronology.getExtensions()) {
             for (ChronoElement<?> e : ext.getElements(Locale.ROOT, Attributes.empty())) {
                 if (e.name().equals("ETHIOPIAN_HOUR")) {
                     return cast(e);
@@ -1273,10 +1271,11 @@ public enum PatternType
         if (isGeneralSymbol(symbol) && !isISO(chronology)) {
             return this.general(builder, symbol, count);
         } else if ((symbol == 'h') && getCalendarType(chronology).equals("ethiopic")) {
-            if (ETHIOPIAN_HOUR == null) {
+            ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+            if (ethioHour == null) {
                 throw new IllegalArgumentException("Ethiopian time not available.");
             }
-            addNumber(ETHIOPIAN_HOUR, builder, count, false);
+            addNumber(ethioHour, builder, count, false);
             return Collections.emptyMap();
         } else {
             return this.cldrISO(builder, locale, symbol, count, false);
@@ -1447,14 +1446,17 @@ public enum PatternType
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainTime.AM_PM_OF_DAY);
                 builder.endSection();
-                if (ETHIOPIAN_HOUR == null) {
-                    break;
-                } else {
+                if (getCalendarType(builder.getChronology()).equals("ethiopic")) {
                     // AM/PM-marker denotes western reference!
+                    ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+                    if (ethioHour == null) {
+                        throw new IllegalArgumentException("Ethiopian time not available.");
+                    }
                     Map<ChronoElement<?>, ChronoElement<?>> stdHours = new HashMap<>();
-                    stdHours.put(ETHIOPIAN_HOUR, PlainTime.CLOCK_HOUR_OF_AMPM);
+                    stdHours.put(ethioHour, PlainTime.CLOCK_HOUR_OF_AMPM);
                     return stdHours;
                 }
+                break;
             case 'b':
                 width = getPeriodWidth(count);
                 builder.startSection(Attributes.TEXT_WIDTH, width);
@@ -1728,6 +1730,12 @@ public enum PatternType
                     builder.endSection();
                 }
                 break;
+            case 'a':
+                width = getPeriodWidth(count);
+                builder.startSection(Attributes.TEXT_WIDTH, width);
+                builder.addText(PlainTime.AM_PM_OF_DAY);
+                builder.endSection();
+                break;
             case 'w':
             case 'Q':
             case 'q':
@@ -1736,7 +1744,6 @@ public enum PatternType
             case 'd':
             case 'D':
             case 'F':
-            case 'a':
             case 'h':
             case 'H':
             case 'K':
