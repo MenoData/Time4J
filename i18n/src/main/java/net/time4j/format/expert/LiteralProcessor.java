@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LiteralProcessor.java) is part of project Time4J.
  *
@@ -49,6 +49,9 @@ final class LiteralProcessor
     private final String multi;
     private final AttributeKey<Character> attribute;
 
+    // quick path optimization
+    private final boolean caseInsensitive;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -73,6 +76,8 @@ final class LiteralProcessor
             throw new IllegalArgumentException(
                 "Literal must not start with non-printable char.");
         }
+
+        this.caseInsensitive = true;
 
     }
 
@@ -100,6 +105,8 @@ final class LiteralProcessor
                 "Literal must not start with non-printable char.");
         }
 
+        this.caseInsensitive = true;
+
     }
 
     /**
@@ -120,6 +127,25 @@ final class LiteralProcessor
         this.attribute = attribute;
         this.multi = null;
 
+        this.caseInsensitive = true;
+
+    }
+
+    private LiteralProcessor(
+        char single,
+        char alt,
+        String multi,
+        AttributeKey<Character> attribute,
+        boolean caseInsensitive
+    ) {
+        super();
+
+        this.single = single;
+        this.alt = alt;
+        this.multi = multi;
+        this.attribute = attribute;
+        this.caseInsensitive = caseInsensitive;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -130,16 +156,11 @@ final class LiteralProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         if (this.attribute != null) {
-            char literal =
-                step.getAttribute(
-                    this.attribute,
-                    attributes,
-                    null
-                ).charValue();
+            char literal = attributes.get(this.attribute, null).charValue();
             buffer.append(literal);
         } else if (this.multi == null) {
             buffer.append(this.single);
@@ -155,13 +176,13 @@ final class LiteralProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         if (this.multi == null) {
-            this.parseChar(text, status, attributes, step);
+            this.parseChar(text, status, attributes, quickPath);
         } else {
-            this.parseMulti(text, status, attributes, step);
+            this.parseMulti(text, status, attributes, quickPath);
         }
 
     }
@@ -170,7 +191,7 @@ final class LiteralProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int offset = status.getPosition();
@@ -179,18 +200,10 @@ final class LiteralProcessor
         char literal = this.single;
 
         if (this.attribute != null) {
-            literal =
-                step.getAttribute(
-                    this.attribute,
-                    attributes,
-                    Character.valueOf('\u0000')
-                ).charValue();
+            literal = attributes.get(this.attribute, Character.valueOf('\u0000')).charValue();
         }
 
-        if (
-            (offset >= text.length())
-            || (literal == '\u0000')
-        ) {
+        if ((offset >= text.length()) || (literal == '\u0000')) {
             error = true;
         } else {
             c = text.charAt(offset);
@@ -208,12 +221,10 @@ final class LiteralProcessor
                 );
             }
 
-            boolean caseInsensitive =
-                step.getAttribute(
-                    Attributes.PARSE_CASE_INSENSITIVE,
-                    attributes,
-                    Boolean.TRUE
-                ).booleanValue();
+            boolean caseInsensitive = (
+                quickPath
+                    ? this.caseInsensitive
+                    : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
 
             if (caseInsensitive) {
                 if (
@@ -246,18 +257,16 @@ final class LiteralProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int offset = status.getPosition();
         int len = this.multi.length();
 
-        boolean caseInsensitive =
-            step.getAttribute(
-                Attributes.PARSE_CASE_INSENSITIVE,
-                attributes,
-                Boolean.TRUE
-            ).booleanValue();
+        boolean caseInsensitive = (
+            quickPath
+                ? this.caseInsensitive
+                : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
 
         int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive);
 
@@ -353,6 +362,22 @@ final class LiteralProcessor
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<Void> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new LiteralProcessor(
+            this.single,
+            this.alt,
+            this.multi,
+            this.attribute,
+            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue()
+        );
 
     }
 

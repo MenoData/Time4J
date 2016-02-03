@@ -97,21 +97,20 @@ final class TextProcessor<V>
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         try {
             if (buffer instanceof CharSequence) {
                 CharSequence cs = (CharSequence) buffer;
                 int offset = cs.length();
-                this.element.print(formattable, buffer, step.getQuery(attributes));
+                this.element.print(formattable, buffer, attributes);
 
                 if (positions != null) {
-                    positions.add(
-                        new ElementPosition(this.element, offset, cs.length()));
+                    positions.add(new ElementPosition(this.element, offset, cs.length()));
                 }
             } else {
-                this.element.print(formattable, buffer, step.getQuery(attributes));
+                this.element.print(formattable, buffer, attributes);
             }
         } catch (ChronoException ce) {
             throw new IllegalArgumentException(ce);
@@ -125,18 +124,13 @@ final class TextProcessor<V>
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int start = status.getPosition();
         int len = text.length();
 
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        int protectedChars = attributes.get(Attributes.PROTECTED_CHARACTERS, Integer.valueOf(0)).intValue();
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -149,7 +143,7 @@ final class TextProcessor<V>
         }
 
         TextElement<?> te = TextElement.class.cast(this.element);
-        Object value = te.parse(text, status.getPP(), step.getQuery(attributes));
+        Object value = te.parse(text, status.getPP(), attributes);
 
         if (status.isError()) {
             Class<V> valueType = this.element.getType();
@@ -231,6 +225,16 @@ final class TextProcessor<V>
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<V> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return this;
 
     }
 

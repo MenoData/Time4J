@@ -21,7 +21,12 @@
 
 package net.time4j.history.internal;
 
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.TextElement;
+
+import java.io.IOException;
 
 
 /**
@@ -32,5 +37,40 @@ import net.time4j.format.TextElement;
  */
 public interface HistorizedElement
     extends TextElement<Integer> {
+
+    //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Converts the element value in given context to a formatted text. </p>
+     *
+     * @param   context     time context with the value of this element
+     * @param   buffer      format buffer any text output will be sent to
+     * @param   attributes  query for control attributes
+     * @param   minDigits   minimum count of digits
+     * @param   maxDigits   maximum count of digits
+     * @throws  IOException if writing to buffer fails
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
+     * @since   3.15/4.12
+     */
+    /*[deutsch]
+     * <p>Wandelt dieses im angegebenen Zeitwertkontext enthaltene Element zu
+     * einem Text um. </p>
+     *
+     * @param   context     time context with the value of this element
+     * @param   buffer      format buffer any text output will be sent to
+     * @param   attributes  query for control attributes
+     * @param   minDigits   minimum count of digits
+     * @param   maxDigits   maximum count of digits
+     * @throws  IOException if writing to buffer fails
+     * @throws  ChronoException if there is no suitable element rule for evaluating the value
+     * @since   3.15/4.12
+     */
+    void print(
+        ChronoDisplay context,
+        Appendable buffer,
+        AttributeQuery attributes,
+        int minDigits,
+        int maxDigits
+    ) throws IOException, ChronoException;
 
 }

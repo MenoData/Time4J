@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatProcessor.java) is part of project Time4J.
  *
@@ -46,18 +46,18 @@ interface FormatProcessor<V> {
      *
      * @param   formattable     object to be formatted
      * @param   buffer          format buffer any text output will be sent to
-     * @param   attributes      non-sectional control attributes
+     * @param   attributes      control attributes including sectional attributes
      * @param   positions       positions of elements in text (optional)
-     * @param   step            current formatting step
+     * @param   quickPath       hint for using quick path
      * @throws  IllegalArgumentException if the object is not formattable
-     * @throws  IOException if writing into buffer fails
+     * @throws IOException if writing into buffer fails
      */
     void print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException;
 
     /**
@@ -71,16 +71,16 @@ interface FormatProcessor<V> {
      *
      * @param   text            text to be parsed
      * @param   status          parser information (always as new instance)
-     * @param   attributes      non-sectional control attributes
+     * @param   attributes      control attributes including sectional attributes
      * @param   parsedResult    result buffer for parsed values
-     * @param   step            current formatting step
+     * @param   quickPath       hint for using quick path
      */
     void parse(
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     );
 
     /**
@@ -105,5 +105,22 @@ interface FormatProcessor<V> {
      * @return  {@code true} if only digit processing happens else {@code false}
      */
     boolean isNumerical();
+
+    /**
+     * <p>Dient der Internalisierung der angegebenen Attribute, um ihren Zugriff durch den auf
+     * Java-primitives zu ersetzen. </p>
+     *
+     * <p>Prozessoren, die keine Internalisierung vorgesehen haben, sondern die Attribute zur Laufzeit
+     * abfragen, liefern einfach sich selbst zur&uuml;ck (this-pointer). Diese Methode wird nur nach dem
+     * <i>build</i> des Formatierers oder bei Attribut&auml;nderungen als finaler Schritt aufgerufen. </p>
+     *
+     * @param   attributes      control attributes including sectional attributes
+     * @param   reserved        count of reserved characters (only relevant for numerical processors)
+     * @return  copy of this processor maybe modified
+     */
+    FormatProcessor<V> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    );
 
 }

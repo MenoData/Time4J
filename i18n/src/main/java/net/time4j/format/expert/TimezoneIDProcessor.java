@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneIDProcessor.java) is part of project Time4J.
  *
@@ -56,7 +56,7 @@ enum TimezoneIDProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         if (!formattable.hasTimezone()) {
@@ -95,7 +95,7 @@ enum TimezoneIDProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
@@ -158,7 +158,7 @@ enum TimezoneIDProcessor
                 if ((c == '+') || (c == '-')) {
                     status.setPosition(pos);
                     TimezoneOffsetProcessor.EXTENDED_LONG_PARSER.parse(
-                        text, status, attributes, parsedResult, step);
+                        text, status, attributes, parsedResult, quickPath);
                     return;
                 }
             }
@@ -202,7 +202,7 @@ enum TimezoneIDProcessor
     @Override
     public FormatProcessor<TZID> withElement(ChronoElement<TZID> element) {
 
-        return this;
+        return INSTANCE;
 
     }
 
@@ -210,6 +210,16 @@ enum TimezoneIDProcessor
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<TZID> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return INSTANCE;
 
     }
 

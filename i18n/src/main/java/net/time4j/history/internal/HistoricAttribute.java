@@ -102,26 +102,6 @@ public final class HistoricAttribute {
      */
     public static final AttributeKey<Boolean> LATIN_ERA = Attributes.createKey("LATIN_ERA", Boolean.class);
 
-    /**
-     * <p>Format attribute which transmits min width information to year-of-era. </p>
-     *
-     * <p>Users will never directly use this attribute but define the min width on the formatter instead. </p>
-     *
-     * @since   3.14/4.11
-     */
-    public static final AttributeKey<Integer> MIN_WIDTH_OF_YEAR =
-        Attributes.createKey("MIN_WIDTH_OF_YEAR", Integer.class);
-
-    /**
-     * <p>Format attribute which transmits max width information to year-of-era. </p>
-     *
-     * <p>Users will never directly use this attribute but define the max width on the formatter instead. </p>
-     *
-     * @since   3.14/4.11
-     */
-    public static final AttributeKey<Integer> MAX_WIDTH_OF_YEAR =
-        Attributes.createKey("MAX_WIDTH_OF_YEAR", Integer.class);
-
     //~ Konstruktoren -----------------------------------------------------
 
     private HistoricAttribute() {

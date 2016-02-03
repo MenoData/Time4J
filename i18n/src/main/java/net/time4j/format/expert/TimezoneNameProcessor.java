@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneNameProcessor.java) is part of project Time4J.
  *
@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 final class TimezoneNameProcessor
     implements FormatProcessor<TZID> {
@@ -68,6 +67,10 @@ final class TimezoneNameProcessor
     private final FormatProcessor<TZID> fallback;
     private final Set<TZID> preferredZones;
 
+    // quick path optimization
+    private final Leniency lenientMode;
+    private final Locale locale;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -81,6 +84,9 @@ final class TimezoneNameProcessor
         this.abbreviated = abbreviated;
         this.fallback = new LocalizedGMTProcessor(abbreviated);
         this.preferredZones = null;
+
+        this.lenientMode = Leniency.SMART;
+        this.locale = Locale.ROOT;
 
     }
 
@@ -100,6 +106,28 @@ final class TimezoneNameProcessor
         this.fallback = new LocalizedGMTProcessor(abbreviated);
         this.preferredZones = Collections.unmodifiableSet(new LinkedHashSet<>(preferredZones));
 
+        this.lenientMode = Leniency.SMART;
+        this.locale = Locale.ROOT;
+
+    }
+
+    private TimezoneNameProcessor(
+        boolean abbreviated,
+        FormatProcessor<TZID> fallback,
+        Set<TZID> preferredZones,
+        Leniency lenientMode,
+        Locale locale
+    ) {
+        super();
+
+        this.abbreviated = abbreviated;
+        this.fallback = fallback;
+        this.preferredZones = preferredZones;
+
+        // quick path members
+        this.lenientMode = lenientMode;
+        this.locale = locale;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -110,7 +138,7 @@ final class TimezoneNameProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions,
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         if (!formattable.hasTimezone()) {
@@ -121,8 +149,7 @@ final class TimezoneNameProcessor
         TZID tzid = formattable.getTimezone();
 
         if (tzid instanceof ZonalOffset) {
-            this.fallback.print(
-                formattable, buffer, attributes, positions, step);
+            this.fallback.print(formattable, buffer, attributes, positions, quickPath);
             return;
         }
 
@@ -135,7 +162,9 @@ final class TimezoneNameProcessor
             name =
                 zone.getDisplayName(
                     this.getStyle(zone.isDaylightSaving(ut)),
-                    step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT));
+                    quickPath
+                        ? this.locale
+                        : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         } else {
             throw new IllegalArgumentException(
                 "Cannot extract timezone name from: " + formattable);
@@ -171,7 +200,7 @@ final class TimezoneNameProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
@@ -183,10 +212,8 @@ final class TimezoneNameProcessor
             return;
         }
 
-        Locale locale =
-            step.getAttribute(Attributes.LANGUAGE, attributes, Locale.ROOT);
-        Leniency leniency =
-            step.getAttribute(Attributes.LENIENCY, attributes, Leniency.SMART);
+        Locale lang = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
         // evaluation of relevant part of input which might contain the timezone name
         StringBuilder name = new StringBuilder();
@@ -210,11 +237,8 @@ final class TimezoneNameProcessor
         pos = start + key.length();
 
         // fallback-case (fixed offset)
-        if (
-            key.startsWith("GMT")
-            || key.startsWith("UT")
-        ) {
-            this.fallback.parse(text, status, attributes, parsedResult, step);
+        if (key.startsWith("GMT") || key.startsWith("UT")) {
+            this.fallback.parse(text, status, attributes, parsedResult, quickPath);
             return;
         }
 
@@ -224,17 +248,17 @@ final class TimezoneNameProcessor
             ? CACHE_ABBREVIATIONS
             : CACHE_ZONENAMES);
 
-        TZNames tzNames = cache.get(locale);
+        TZNames tzNames = cache.get(lang);
 
         if (tzNames == null) {
             Map<String, List<TZID>> stdNames =
-                this.getTimezoneNameMap(locale, false);
+                this.getTimezoneNameMap(lang, false);
             Map<String, List<TZID>> dstNames =
-                this.getTimezoneNameMap(locale, true);
+                this.getTimezoneNameMap(lang, true);
             tzNames = new TZNames(stdNames, dstNames);
 
             if (cache.size() < MAX) {
-                TZNames tmp = cache.putIfAbsent(locale, tzNames);
+                TZNames tmp = cache.putIfAbsent(lang, tzNames);
 
                 if (tmp != null) {
                     tzNames = tmp;
@@ -268,10 +292,10 @@ final class TimezoneNameProcessor
 
         if ((sum > 1) && !leniency.isLax()) {
             if (stdZones.size() > 0) {
-                stdZones = this.resolveUsingPreferred(stdZones, locale, leniency);
+                stdZones = this.resolveUsingPreferred(stdZones, lang, leniency);
             }
             if (dstZones.size() > 0) {
-                dstZones = this.resolveUsingPreferred(dstZones, locale, leniency);
+                dstZones = this.resolveUsingPreferred(dstZones, lang, leniency);
             }
         }
 
@@ -290,7 +314,7 @@ final class TimezoneNameProcessor
                 "Time zone name \""
                     + key
                     + "\" not found among preferred timezones in locale "
-                    + locale
+                    + lang
                     + ", candidates=" + candidates);
             return;
         }
@@ -374,6 +398,22 @@ final class TimezoneNameProcessor
 
     }
 
+    @Override
+    public FormatProcessor<TZID> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new TimezoneNameProcessor(
+            this.abbreviated,
+            this.fallback,
+            this.preferredZones,
+            attributes.get(Attributes.LENIENCY, Leniency.SMART),
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT)
+        );
+
+    }
+
     private Map<String, List<TZID>> getTimezoneNameMap(
         Locale locale,
         boolean daylightSaving
@@ -453,7 +493,7 @@ final class TimezoneNameProcessor
         return zones;
 
     }
-
+    
     private List<TZID> resolveUsingPreferred(
         List<TZID> zones,
         Locale locale,
@@ -518,7 +558,7 @@ final class TimezoneNameProcessor
         return result;
 
     }
-
+    
     private NameStyle getStyle(boolean daylightSaving) {
 
         if (daylightSaving) {

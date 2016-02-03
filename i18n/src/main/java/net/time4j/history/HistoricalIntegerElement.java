@@ -40,7 +40,6 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
-import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
@@ -203,24 +202,29 @@ final class HistoricalIntegerElement
         AttributeQuery attributes
     ) throws IOException {
 
+        this.print(context, buffer, attributes, 1, 9);
+
+    }
+
+    @Override
+    public void print(
+        ChronoDisplay context,
+        Appendable buffer,
+        AttributeQuery attributes,
+        int minDigits,
+        int maxDigits
+    ) throws IOException {
+
         HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
 
         switch (this.index) {
             case YEAR_OF_ERA_INDEX:
-                int min = 1;
-                int max = 9;
-                if (attributes.contains(HistoricAttribute.MIN_WIDTH_OF_YEAR)) {
-                    min = attributes.get(HistoricAttribute.MIN_WIDTH_OF_YEAR);
-                }
-                if (attributes.contains(HistoricAttribute.MAX_WIDTH_OF_YEAR)) {
-                    max = attributes.get(HistoricAttribute.MAX_WIDTH_OF_YEAR);
-                }
                 NewYearStrategy nys = this.history.getNewYearStrategy();
                 HistoricEra era = date.getEra();
                 int yearOfEra = date.getYearOfEra();
                 int annoDomini = era.annoDomini(yearOfEra);
                 char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
-                String text = this.format(String.valueOf(yearOfEra), zero, min, max);
+                String text = this.format(String.valueOf(yearOfEra), zero, minDigits, maxDigits);
                 if (
                     !NewYearStrategy.DEFAULT.equals(nys)
                     && ((annoDomini >= 8) || (era.compareTo(HistoricEra.AD) > 0))
@@ -242,7 +246,7 @@ final class HistoricalIntegerElement
                         } else {
                             sb.append(yearOfEra);
                         }
-                        text = this.format(sb.toString(), zero, min, max);
+                        text = this.format(sb.toString(), zero, minDigits, maxDigits);
                     }
                 }
                 if (zero != '0') {

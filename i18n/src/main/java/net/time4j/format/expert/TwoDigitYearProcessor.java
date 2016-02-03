@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TwoDigitYearProcessor.java) is part of project Time4J.
  *
@@ -40,7 +40,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency <immutable>
  */
 final class TwoDigitYearProcessor
     implements FormatProcessor<Integer> {
@@ -55,8 +54,7 @@ final class TwoDigitYearProcessor
                 MathUtils.floorDivide(System.currentTimeMillis(), 86400 * 1000),
                 EpochDays.UNIX);
         DEFAULT_PIVOT_YEAR =
-            Integer.valueOf(
-                GregorianMath.readYear(GregorianMath.toPackedDate(mjd)) + 20);
+            Integer.valueOf(GregorianMath.readYear(GregorianMath.toPackedDate(mjd)) + 20);
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -64,13 +62,19 @@ final class TwoDigitYearProcessor
     private final ChronoElement<Integer> element;
     private final boolean protectedMode;
 
+    // quick path optimization
+    private final int reserved;
+    private final char zeroDigit;
+    private final Leniency lenientMode;
+    private final int protectedLength;
+    private final int pivotYear;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
      * <p>Konstruiert eine neue benutzerdefinierte Formatverarbeitung. </p>
      *
-     * @param   element         year element to be formatted
-     * @param   protectedMode   allow replacement?
+     * @param   element     year element to be formatted
      * @throws  IllegalArgumentException if no year element is given
      */
     TwoDigitYearProcessor(
@@ -87,6 +91,35 @@ final class TwoDigitYearProcessor
                 "Year element required: " + element);
         }
 
+        this.reserved = 0;
+        this.zeroDigit = '0';
+        this.lenientMode = Leniency.SMART;
+        this.protectedLength = 0;
+        this.pivotYear = DEFAULT_PIVOT_YEAR;
+
+    }
+
+    private TwoDigitYearProcessor(
+        ChronoElement<Integer> element,
+        boolean protectedMode,
+        int reserved,
+        char zeroDigit,
+        Leniency lenientMode,
+        int protectedLength,
+        int pivotYear
+    ) {
+        super();
+
+        this.element = element;
+        this.protectedMode = protectedMode;
+
+        // quick path members
+        this.reserved = reserved;
+        this.zeroDigit = zeroDigit;
+        this.lenientMode = lenientMode;
+        this.protectedLength = protectedLength;
+        this.pivotYear = pivotYear;
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -97,7 +130,7 @@ final class TwoDigitYearProcessor
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         int year = formattable.get(this.element).intValue();
@@ -110,15 +143,13 @@ final class TwoDigitYearProcessor
         int yy = MathUtils.floorModulo(year, 100);
         String digits = Integer.toString(yy);
 
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0'))
-            .charValue();
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
 
-        if (zeroDigit != '0') {
-            int diff = zeroDigit - '0';
+        if (zeroChar != '0') {
+            int diff = zeroChar - '0';
             char[] characters = digits.toCharArray();
 
             for (int i = 0; i < characters.length; i++) {
@@ -136,7 +167,7 @@ final class TwoDigitYearProcessor
         }
 
         if (yy < 10) {
-            buffer.append(zeroDigit);
+            buffer.append(zeroChar);
             printed++;
         }
 
@@ -148,8 +179,7 @@ final class TwoDigitYearProcessor
             && (printed > 0)
             && (positions != null)
         ) {
-            positions.add(
-                new ElementPosition(this.element, start, start + printed));
+            positions.add(new ElementPosition(this.element, start, start + printed));
         }
 
     }
@@ -160,18 +190,12 @@ final class TwoDigitYearProcessor
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int len = text.length();
         int start = status.getPosition();
-
-        int protectedChars =
-            step.getAttribute(
-                Attributes.PROTECTED_CHARACTERS,
-                attributes,
-                0
-            ).intValue();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -185,31 +209,20 @@ final class TwoDigitYearProcessor
             return;
         }
 
-        Leniency leniency =
-            step.getAttribute(
-                Attributes.LENIENCY,
-                attributes,
-                Leniency.SMART);
-
-        char zeroDigit =
-            step.getAttribute(
-                Attributes.ZERO_DIGIT,
-                attributes,
-                Character.valueOf('0')
-            ).charValue();
-
-        int reserved = step.getReserved();
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int effectiveMax = leniency.isStrict() ? 2 : 9;
 
-        if (
-            (reserved > 0)
-            && (protectedChars <= 0)
-        ) {
+        char zeroChar = (
+            quickPath
+                ? this.zeroDigit
+                : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
+
+        if ((this.reserved > 0) && (protectedChars <= 0)) {
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
             for (int i = start; i < len; i++) {
-                int digit = text.charAt(i) - zeroDigit;
+                int digit = text.charAt(i) - zeroChar;
 
                 if ((digit >= 0) && (digit <= 9)) {
                     digitCount++;
@@ -218,7 +231,7 @@ final class TwoDigitYearProcessor
                 }
             }
 
-            effectiveMax = Math.min(effectiveMax, digitCount - reserved);
+            effectiveMax = Math.min(effectiveMax, digitCount - this.reserved);
         }
 
         int minPos = start + 2;
@@ -228,7 +241,7 @@ final class TwoDigitYearProcessor
         int pos = start;
 
         while (pos < maxPos) {
-            int digit = text.charAt(pos) - zeroDigit;
+            int digit = text.charAt(pos) - zeroChar;
 
             if ((digit >= 0) && (digit <= 9)) {
                 yearOfCentury = yearOfCentury * 10 + digit;
@@ -252,13 +265,9 @@ final class TwoDigitYearProcessor
         int value;
 
         if (pos == start + 2) {
-            int pivotYear =
-                step.getAttribute(
-                    Attributes.PIVOT_YEAR,
-                    attributes,
-                    DEFAULT_PIVOT_YEAR);
+            int py = (quickPath ? this.pivotYear : attributes.get(Attributes.PIVOT_YEAR, DEFAULT_PIVOT_YEAR));
             assert ((yearOfCentury >= 0) && (yearOfCentury <= 99));
-            value = toYear(yearOfCentury, pivotYear);
+            value = toYear(yearOfCentury, py);
         } else {
             value = yearOfCentury; // absolutes Jahr (kein Kippjahr)
         }
@@ -275,10 +284,7 @@ final class TwoDigitYearProcessor
             return true;
         } else if (obj instanceof TwoDigitYearProcessor) {
             TwoDigitYearProcessor that = (TwoDigitYearProcessor) obj;
-            return (
-                this.element.equals(that.element)
-                && (this.protectedMode == that.protectedMode)
-            );
+            return this.element.equals(that.element);
         } else {
             return false;
         }
@@ -299,8 +305,6 @@ final class TwoDigitYearProcessor
         sb.append(this.getClass().getName());
         sb.append("[element=");
         sb.append(this.element.name());
-        sb.append(", protected-mode=");
-        sb.append(this.protectedMode);
         sb.append(']');
         return sb.toString();
 
@@ -316,10 +320,7 @@ final class TwoDigitYearProcessor
     @Override
     public FormatProcessor<Integer> withElement(ChronoElement<Integer> e) {
 
-        if (
-            this.protectedMode
-            || (this.element == e)
-        ) {
+        if (this.protectedMode || (this.element == e)) {
             return this;
         }
 
@@ -331,6 +332,24 @@ final class TwoDigitYearProcessor
     public boolean isNumerical() {
 
         return true;
+
+    }
+
+    @Override
+    public FormatProcessor<Integer> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return new TwoDigitYearProcessor(
+            this.element,
+            this.protectedMode,
+            reserved,
+            attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
+            attributes.get(Attributes.LENIENCY, Leniency.SMART),
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0).intValue(),
+            attributes.get(Attributes.PIVOT_YEAR, DEFAULT_PIVOT_YEAR).intValue()
+        );
 
     }
 

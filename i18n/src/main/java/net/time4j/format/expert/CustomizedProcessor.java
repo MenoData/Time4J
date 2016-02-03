@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CustomizedProcessor.java) is part of project Time4J.
  *
@@ -92,7 +92,7 @@ final class CustomizedProcessor<V>
         Appendable buffer,
         AttributeQuery attributes,
         Set<ElementPosition> positions, // optional
-        FormatStep step
+        boolean quickPath
     ) throws IOException {
 
         V value = formattable.get(this.element);
@@ -105,10 +105,8 @@ final class CustomizedProcessor<V>
             int offset = ((CharSequence) buffer).length();
 
             if (this.printer instanceof ChronoFormatter) {
-                ChronoFormatter<?> cf =
-                    ChronoFormatter.class.cast(this.printer);
-                Set<ElementPosition> result =
-                    print(cf, value, collector, attributes);
+                ChronoFormatter<?> cf = ChronoFormatter.class.cast(this.printer);
+                Set<ElementPosition> result = print(cf, value, collector, attributes);
                 Set<ElementPosition> set = new LinkedHashSet<>();
                 for (ElementPosition ep : result) {
                     set.add(
@@ -141,14 +139,13 @@ final class CustomizedProcessor<V>
         ParseLog status,
         AttributeQuery attributes,
         Map<ChronoElement<?>, Object> parsedResult,
-        FormatStep step
+        boolean quickPath
     ) {
 
         int offset = status.getPosition();
 
         try {
-            AttributeQuery attrs = step.getQuery(attributes);
-            V value = this.parser.parse(text, status, attrs);
+            V value = this.parser.parse(text, status, attributes);
 
             if (value == null) {
                 status.setError(offset, status.getErrorMessage());
@@ -239,6 +236,16 @@ final class CustomizedProcessor<V>
     public boolean isNumerical() {
 
         return false;
+
+    }
+
+    @Override
+    public FormatProcessor<V> quickPath(
+        AttributeQuery attributes,
+        int reserved
+    ) {
+
+        return this;
 
     }
 
