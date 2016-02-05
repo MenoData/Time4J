@@ -3,6 +3,7 @@
 - Add Roman numerals [#443]
 
 ### Fixed
+- Prohibit use of Ethiopian hour with PlainTime [#449]
 - Code example in documentation of MultiFormatParser is incomplete [#446]
 
 ## [v3.14] published on 2016-01-22
