@@ -93,8 +93,17 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     @Override
     public int getInt(ChronoElement<Integer> element) {
 
-        // TODO: replace by use of IntegerElementRule
-        return this.get(element).intValue();
+        IntElementRule<T> intRule = this.getChronology().getIntegerRule(element);
+
+        try {
+            if (intRule == null) {
+                return this.get(element).intValue();
+            } else {
+                return intRule.getInt(this.getContext());
+            }
+        } catch (ChronoException ex) {
+            return Integer.MIN_VALUE;
+        }
 
     }
 
@@ -258,6 +267,12 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
         int value
     ) {
 
+        IntElementRule<T> intRule = this.getChronology().getIntegerRule(element);
+
+        if (intRule != null) {
+            return intRule.isValid(this.getContext(), value);
+        }
+
         return this.isValid(element, Integer.valueOf(value));
 
     }
@@ -374,6 +389,12 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
         ChronoElement<Integer> element,
         int value
     ) {
+
+        IntElementRule<T> intRule = this.getChronology().getIntegerRule(element);
+
+        if (intRule != null) {
+            return intRule.withValue(this.getContext(), value, element.isLenient());
+        }
 
         return this.with(element, Integer.valueOf(value));
 

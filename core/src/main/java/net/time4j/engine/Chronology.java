@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Chronology.java) is part of project Time4J.
  *
@@ -65,6 +65,7 @@ public class Chronology<T extends ChronoEntity<T>>
     private final ChronoMerger<T> merger;
     private final Map<ChronoElement<?>, ElementRule<T, ?>> ruleMap;
     private final List<ChronoExtension> extensions;
+    private final Map<ChronoElement<?>, IntElementRule<T>> intRules;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -81,6 +82,7 @@ public class Chronology<T extends ChronoEntity<T>>
      * @param   ruleMap         registered elements and rules
      * @param   extensions      optional extensions
      */
+    @SuppressWarnings("unchecked")
     Chronology(
         Class<T> chronoType,
         ChronoMerger<T> chronoMerger,
@@ -99,6 +101,20 @@ public class Chronology<T extends ChronoEntity<T>>
         this.merger = chronoMerger;
         this.ruleMap = Collections.unmodifiableMap(ruleMap);
         this.extensions = Collections.unmodifiableList(extensions);
+
+        Map<ChronoElement<?>, IntElementRule<T>> tmpRules =
+            new HashMap<ChronoElement<?>, IntElementRule<T>>();
+
+        for (ChronoElement<?> element : this.ruleMap.keySet()) {
+            if (element.getType() == Integer.class) {
+                Object rule = this.ruleMap.get(element);
+                if (rule instanceof IntElementRule) {
+                    tmpRules.put(element, (IntElementRule<T>) rule);
+                }
+            }
+        }
+
+        this.intRules = Collections.unmodifiableMap(tmpRules);
 
     }
 
@@ -427,6 +443,19 @@ public class Chronology<T extends ChronoEntity<T>>
         }
 
         return cast(rule); // type-safe
+
+    }
+
+    /**
+     * <p>Bestimmt eine chronologische int-basierte Regel zum angegebenen Element. </p>
+     *
+     * @param   element     chronologisches Element
+     * @return  Regelobjekt oder {@code null} wenn nicht vorhanden
+     * @since   3.15/4.12
+     */
+    IntElementRule<T> getIntegerRule(ChronoElement<Integer> element) {
+
+        return this.intRules.get(element);
 
     }
 
