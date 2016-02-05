@@ -145,6 +145,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final boolean hasOptionals;
     private final boolean needsHistorization;
     private final boolean needsExtensions;
+    private final int countOfElements;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -172,6 +173,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         boolean ho = false;
         boolean nh = false;
         boolean dp = false;
+        int co = 0;
 
         for (FormatStep step : steps) {
             if ((fp == null) && step.getProcessor() instanceof FractionProcessor) {
@@ -182,6 +184,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
             ChronoElement<?> element = step.getProcessor().getElement();
             if (element != null) {
+                co++;
                 if (element instanceof HistorizedElement) {
                     nh = true;
                 } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
@@ -193,6 +196,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.fracproc = fp;
         this.hasOptionals = ho;
         this.needsHistorization = nh;
+        this.countOfElements = co;
 
         Class<?> chronoType = chronology.getChronoType();
 
@@ -252,6 +256,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.hasOptionals = old.hasOptionals;
         this.needsHistorization = (old.needsHistorization || (history != null));
         this.needsExtensions = (old.needsExtensions || this.needsHistorization);
+        this.countOfElements = old.countOfElements;
 
         // update extension elements and historizable elements
         int len = old.steps.size();
@@ -334,6 +339,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.hasOptionals = formatter.hasOptionals;
         this.needsHistorization = formatter.needsHistorization;
         this.needsExtensions = formatter.needsExtensions;
+        this.countOfElements = formatter.countOfElements;
 
         Map<ChronoElement<?>, Object> map =
             new NonAmbivalentMap(formatter.defaults);
@@ -980,7 +986,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
-                re.getMessage() + getDescription(parsed.toMap()));
+                re.getMessage() + getDescription(parsed));
             return null;
         }
 
@@ -988,7 +994,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (!status.isError()) {
                 status.setError(
                     text.length(),
-                    getReason(parsed) + getDescription(parsed.toMap()));
+                    getReason(parsed) + getDescription(parsed));
             }
             return null;
         }
@@ -1043,7 +1049,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
 
         if (offset >= text.length()) {
-            return new ParsedValues();
+            return new ParsedValues(0);
         }
 
         ParseLog status = new ParseLog(offset);
@@ -1053,7 +1059,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ParsedValues parsed = null;
 
         try {
-            parsed = this.parseElements(text, status, attributes, (attributes == this.globalAttributes));
+            parsed =
+                this.parseElements(
+                    text, status, attributes, (attributes == this.globalAttributes), this.countOfElements);
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -1063,13 +1071,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         if ((parsed == null) || status.isError()) {
-            return new ParsedValues();
+            return new ParsedValues(0);
         }
 
         // Phase 2: Anreicherung mit Default-Werten
         for (ChronoElement<?> e : this.defaults.keySet()) {
             if (!parsed.contains(e)) {
-                fill(parsed, e, this.defaults.get(e));
+                parsed.put(e, this.defaults.get(e));
             }
         }
 
@@ -2502,7 +2510,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ParsedValues parsed = null;
 
         try {
-            parsed = cf.parseElements(text, status, attributes, (attributes == cf.globalAttributes));
+            parsed =
+                cf.parseElements(
+                    text, status, attributes, (attributes == cf.globalAttributes), cf.countOfElements);
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -2533,7 +2543,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (!cf.defaults.isEmpty()) {
             for (ChronoElement<?> e : cf.defaults.keySet()) {
                 if (!parsed.contains(e)) {
-                    fill(parsed, e, cf.defaults.get(e));
+                    parsed.put(e, cf.defaults.get(e));
                 }
             }
         }
@@ -2547,7 +2557,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             } catch (RuntimeException re) {
                 status.setError(
                     text.length(),
-                    re.getMessage() + getDescription(parsed.toMap()));
+                    re.getMessage() + getDescription(parsed));
                 return null;
             }
         }
@@ -2560,7 +2570,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
-                re.getMessage() + getDescription(parsed.toMap()));
+                re.getMessage() + getDescription(parsed));
             return null;
         }
 
@@ -2577,7 +2587,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (!preparsing) {
                 status.setError(
                     text.length(),
-                    getReason(parsed) + getDescription(parsed.toMap()));
+                    getReason(parsed) + getDescription(parsed));
             }
             return null;
         } else {
@@ -2691,16 +2701,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                 if (
                     (result instanceof PlainTimestamp)
-                    && (result.get(PlainTime.ISO_HOUR) == 0)
+                        && (result.getInt(PlainTime.ISO_HOUR) == 0)
                     && (
-                        (parsed.contains(PlainTime.ISO_HOUR) && (parsed.get(PlainTime.ISO_HOUR) == 24))
+                        (parsed.getInt(PlainTime.ISO_HOUR) == 24)
                         || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
                     )
                 ) {
                     date = PlainTimestamp.class.cast(result).toDate().minus(1, CalendarUnit.DAYS);
                 }
 
-                for (ChronoElement<?> e : parsed.toMap().keySet()) {
+                for (ChronoElement<?> e : parsed.getRegisteredElements()) {
                     Object value = parsed.get(e);
                     ChronoDisplay test = result;
 
@@ -2743,12 +2753,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        boolean quickPath
+        boolean quickPath,
+        int countOfElements
     ) {
 
-        NonAmbivalentMap values = new NonAmbivalentMap();
-        values.put(null, Integer.valueOf(status.getPosition()));
-        Deque<NonAmbivalentMap> data = null;
+        ParsedValues values = new ParsedValues(countOfElements);
+        values.setPosition(status.getPosition());
+        Deque<ParsedValues> data = null;
 
         if (this.hasOptionals) {
             data = new LinkedList<>();
@@ -2762,7 +2773,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         while (index < len) {
             FormatStep step = this.steps.get(index);
-            Map<ChronoElement<?>, Object> parsedResult;
+            ParsedValues parsedResult;
 
             if (data == null) {
                 parsedResult = values;
@@ -2772,8 +2783,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                 // Start einer optionalen Sektion: Stack erweitern
                 while (level > previous) {
-                    values = new NonAmbivalentMap();
-                    values.put(null, Integer.valueOf(status.getPosition()));
+                    values = new ParsedValues(countOfElements >>> 1);
+                    values.setPosition(status.getPosition());
                     data.push(values);
                     level--;
                 }
@@ -2781,7 +2792,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 // Ende einer optionalen Sektion: Werte im Stack sichern
                 while (level < previous) {
                     values = data.pop();
-                    values.remove(null);
                     data.peek().putAll(values);
                     level++;
                 }
@@ -2798,7 +2808,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 ChronoElement<?> element = step.getProcessor().getElement();
                 if ((element != null) && this.defaults.containsKey(element)) {
                     parsedResult.put(element, this.defaults.get(element));
-                    parsedResult.remove(ValidationElement.ERROR_MESSAGE);
+                    parsedResult.with(ValidationElement.ERROR_MESSAGE, null);
                     status.clearError();
                     status.clearWarning();
                 }
@@ -2824,9 +2834,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                         values = data.pop();
                     }
                     status.clearError();
-                    status.setPosition(((Integer) values.get(null)).intValue());
-                    values = new NonAmbivalentMap(); // alte Werte verwerfen
-                    values.put(null, Integer.valueOf(status.getPosition()));
+                    status.setPosition(values.getPosition());
+                    values = new ParsedValues(countOfElements); // alte Werte verwerfen
+                    values.setPosition(status.getPosition());
                     if (data != null) {
                         data.push(values);
                     }
@@ -2836,8 +2846,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     if (data != null) {
                         values = data.peek();
                     }
-                    values.remove(null);
-                    return new ParsedValues(values);
+                    return values;
                 } else {
                     // Ende des optionalen Abschnitts suchen
                     for (int j = len - 1; j > index; j--) {
@@ -2852,7 +2861,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     assert (data != null);
                     values = data.pop();
                     status.clearError();
-                    status.setPosition(((Integer) values.get(null)).intValue());
+                    status.setPosition(values.getPosition());
                 }
             } else if (step.isNewOrBlockStarted()) {
                 // Ende des aktuellen Abschnitts suchen
@@ -2876,7 +2885,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         while (current > 0) {
             assert (data != null);
             values = data.pop();
-            values.remove(null);
             data.peek().putAll(values);
             current--;
         }
@@ -2886,8 +2894,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             values = data.peek();
         }
 
-        values.remove(null);
-        return new ParsedValues(values);
+        return values;
 
     }
 
@@ -2906,13 +2913,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static String getDescription(Map<ChronoElement<?>, Object> map) {
+    private static String getDescription(ParsedValues parsed) {
 
-        StringBuilder sb = new StringBuilder(map.size() * 16);
+        StringBuilder sb = new StringBuilder(parsed.size() * 16);
         sb.append(" [parsed={");
         boolean first = true;
 
-        for (ChronoElement<?> element : map.keySet()) {
+        for (ChronoElement<?> element : parsed.getRegisteredElements()) {
             if (first) {
                 first = false;
             } else {
@@ -2921,22 +2928,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             sb.append(element.name());
             sb.append('=');
-            sb.append(map.get(element));
+            sb.append(parsed.get(element));
         }
 
         sb.append("}]");
         return sb.toString();
-
-    }
-
-    // wildcard capture
-    private static <V> void fill(
-        ChronoEntity<?> entity,
-        ChronoElement<V> element,
-        Object value
-    ) {
-
-        entity.with(element, element.getType().cast(value));
 
     }
 

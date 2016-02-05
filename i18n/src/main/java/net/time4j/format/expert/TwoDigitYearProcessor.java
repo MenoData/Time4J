@@ -31,7 +31,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -133,7 +132,7 @@ final class TwoDigitYearProcessor
         boolean quickPath
     ) throws IOException {
 
-        int year = formattable.get(this.element).intValue();
+        int year = formattable.getInt(this.element);
 
         if (year < 0) {
             throw new IllegalArgumentException(
@@ -189,7 +188,7 @@ final class TwoDigitYearProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
@@ -272,7 +271,7 @@ final class TwoDigitYearProcessor
             value = yearOfCentury; // absolutes Jahr (kein Kippjahr)
         }
 
-        parsedResult.put(this.element, Integer.valueOf(value));
+        parsedResult.put(this.element, value);
         status.setPosition(pos);
 
     }

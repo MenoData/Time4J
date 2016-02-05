@@ -32,7 +32,6 @@ import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -256,7 +255,7 @@ final class FormatStep {
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
@@ -686,7 +685,7 @@ final class FormatStep {
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

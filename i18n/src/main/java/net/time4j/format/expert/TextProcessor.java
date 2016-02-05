@@ -29,7 +29,6 @@ import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -123,7 +122,7 @@ final class TextProcessor<V>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

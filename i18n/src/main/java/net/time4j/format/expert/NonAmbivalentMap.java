@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NonAmbivalentMap.java) is part of project Time4J.
  *
@@ -42,16 +42,7 @@ class NonAmbivalentMap
 
     private static final long serialVersionUID = 1245025551222311435L;
 
-    //~ Instanzvariablen --------------------------------------------------
-
-    private boolean checking = true;
-
     //~ Konstruktoren -----------------------------------------------------
-
-    NonAmbivalentMap() {
-        super();
-
-    }
 
     NonAmbivalentMap(Map<? extends ChronoElement<?>, ?> map) {
         super(map);
@@ -71,22 +62,9 @@ class NonAmbivalentMap
             || obj.equals(value)
         ) {
             return obj;
-        } else if (this.checking) {
-            throw new AmbivalentValueException(key);
         } else {
-            return obj;
+            throw new AmbivalentValueException(key);
         }
-
-    }
-
-    /**
-     * <p>Legt fest, ob zweideutige Werte gepr&uuml;ft werden sollen. </p>
-     *
-     * @param   checking    boolean
-     */
-    void setChecking(boolean checking) {
-
-        this.checking = checking;
 
     }
 
