@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ElementRule.java) is part of project Time4J.
  *
@@ -45,7 +45,6 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
- * @author  Meno Hochschild
  * @doctags.spec    All implementations must be immutable.
  */
 /*[deutsch]
@@ -74,7 +73,6 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
- * @author  Meno Hochschild
  * @doctags.spec    All implementations must be immutable.
  */
 public interface ElementRule<T, V> {
