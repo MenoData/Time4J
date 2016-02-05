@@ -29,7 +29,6 @@ import net.time4j.format.Attributes;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -175,7 +174,7 @@ final class LiteralProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

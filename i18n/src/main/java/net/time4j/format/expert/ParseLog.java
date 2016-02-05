@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ParseLog.java) is part of project Time4J.
  *
@@ -213,7 +213,7 @@ public class ParseLog {
     public ChronoEntity<?> getRawValues() {
 
         if (this.rawValues == null) {
-            this.rawValues = new ParsedValues();
+            this.rawValues = new ParsedValues(0);
         }
 
         return this.rawValues;

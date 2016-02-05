@@ -31,7 +31,6 @@ import net.time4j.format.Leniency;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -46,7 +45,7 @@ final class FractionProcessor
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Integer MRD_MINUS_1 = Integer.valueOf(999999999);
+    private static final int MRD_MINUS_1 = 999999999;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -238,7 +237,7 @@ final class FractionProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
@@ -317,9 +316,7 @@ final class FractionProcessor
         fraction = fraction.movePointLeft(current - status.getPosition());
 
         if (this.element.name().equals("NANO_OF_SECOND")) {
-            Integer min = Integer.valueOf(0);
-            Integer max = MRD_MINUS_1;
-            Integer num = this.getRealValue(fraction, min, max);
+            int num = this.getRealValue(fraction, 0, MRD_MINUS_1);
             parsedResult.put(this.element, num);
         } else {
             // hier nur prototypischer Wert, später fraktionalen Wert bestimmen
@@ -449,9 +446,9 @@ final class FractionProcessor
         }
 
         BigDecimal fraction = parsed.get(FractionalElement.FRACTION);
-        Integer min = entity.getMinimum(this.element);
-        Integer max = entity.getMaximum(this.element);
-        Integer num = this.getRealValue(fraction, min, max);
+        int min = entity.getMinimum(this.element).intValue();
+        int max = entity.getMaximum(this.element).intValue();
+        int num = this.getRealValue(fraction, min, max);
 
         parsed.with(FractionalElement.FRACTION, null); // mutable
         parsed.with(this.element, num); // mutable
@@ -460,16 +457,16 @@ final class FractionProcessor
 
     }
 
-    private Integer getRealValue(
+    private int getRealValue(
         BigDecimal fraction,
-        Integer min,
-        Integer max
+        int min,
+        int max
     ) {
 
-        BigDecimal low = BigDecimal.valueOf(min.intValue());
+        BigDecimal low = BigDecimal.valueOf(min);
 
         BigDecimal range =
-            BigDecimal.valueOf(max.intValue())
+            BigDecimal.valueOf(max)
             .subtract(low)
             .add(BigDecimal.ONE);
 
@@ -478,7 +475,7 @@ final class FractionProcessor
             .setScale(0, RoundingMode.FLOOR)
             .add(low);
 
-        return Integer.valueOf(value.intValueExact());
+        return value.intValueExact();
 
     }
 

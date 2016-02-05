@@ -26,7 +26,6 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -80,7 +79,7 @@ interface FormatProcessor<V> {
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     );
 

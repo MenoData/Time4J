@@ -21,12 +21,11 @@ import net.time4j.scale.TimeScale;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
@@ -35,10 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static org.hamcrest.CoreMatchers.is;
@@ -686,16 +681,6 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void roundTripOfParsedValues()
-        throws IOException, ClassNotFoundException {
-
-        ParseLog plog = new ParseLog();
-        Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2012-02-29", plog);
-        Object obj = plog.getRawValues();
-        roundtrip(obj);
-    }
-
-    @Test
     public void iteratorOverParsedValues()
         throws IOException, ClassNotFoundException {
 
@@ -748,25 +733,6 @@ public class MiscellaneousTest {
         assertThat(
             formatter.parse("2015-12-20\u061C\u061C"), // extra bidi at the end
             is(expected));
-    }
-
-    private static int roundtrip(Object... obj)
-        throws IOException, ClassNotFoundException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        for (int i = 0; i < obj.length; i++) {
-            oos.writeObject(obj[i]);
-        }
-        byte[] data = baos.toByteArray();
-        oos.close();
-        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        for (int i = 0; i < obj.length; i++) {
-            assertThat(ois.readObject(), is(obj[i]));
-        }
-        ois.close();
-        return data.length;
     }
 
     private static ChronoFormatter<PlainDate> getQuarterDateFormatter() {

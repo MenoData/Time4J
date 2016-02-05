@@ -201,7 +201,7 @@ final class TimezoneNameProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

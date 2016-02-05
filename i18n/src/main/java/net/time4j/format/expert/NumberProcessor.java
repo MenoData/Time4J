@@ -34,7 +34,6 @@ import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -156,6 +155,7 @@ final class NumberProcessor<V>
 
     //~ Methoden ----------------------------------------------------------
 
+    @SuppressWarnings("unchecked")
     @Override
     public void print(
         ChronoDisplay formattable,
@@ -176,16 +176,16 @@ final class NumberProcessor<V>
             printed = sb.length();
         } else {
             Class<V> type = this.element.getType();
-            V value = formattable.get(this.element);
             boolean negative = false;
             NumberSystem numsys = (quickPath ? this.numberSystem : this.getNumberSystem(attributes));
             String digits;
 
             if (type == Integer.class) {
-                int v = Integer.class.cast(value).intValue();
+                int v = formattable.getInt((ChronoElement<Integer>) this.element);
                 negative = (v < 0);
                 digits = toNumeral(numsys, v);
             } else if (type == Long.class) {
+                V value = formattable.get(this.element);
                 long v = Long.class.cast(value).longValue();
                 negative = (v < 0);
                 digits = (
@@ -194,6 +194,7 @@ final class NumberProcessor<V>
                         : Long.toString(Math.abs(v))
                 );
             } else if (Enum.class.isAssignableFrom(type)) {
+                V value = formattable.get(this.element);
                 int v = -1;
                 if (this.element instanceof NumericalElement) {
                     v = ((NumericalElement<V>) this.element).numerical(value);
@@ -218,7 +219,7 @@ final class NumberProcessor<V>
             if (digits.length() > this.maxDigits) {
                 throw new IllegalArgumentException(
                     "Element " + this.element.name()
-                        + " cannot be printed as the value " + value
+                        + " cannot be printed as the value " + formattable.get(this.element)
                         + " exceeds the maximum width of " + this.maxDigits + ".");
             }
 
@@ -293,7 +294,7 @@ final class NumberProcessor<V>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
@@ -487,7 +488,9 @@ final class NumberProcessor<V>
         Class<V> type = this.element.getType();
 
         if (type == Integer.class) {
-            value = Integer.valueOf((int) total);
+            parsedResult.put(this.element, (int) total);
+            status.setPosition(pos);
+            return;
         } else if (type == Long.class) {
             value = Long.valueOf(total);
         } else if (Enum.class.isAssignableFrom(type)) {

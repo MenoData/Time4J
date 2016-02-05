@@ -35,7 +35,6 @@ import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
@@ -247,7 +246,7 @@ final class LocalizedGMTProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

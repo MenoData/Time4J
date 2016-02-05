@@ -26,7 +26,6 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -63,7 +62,7 @@ enum IgnorableWhitespaceProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 

@@ -148,7 +148,7 @@ final class OrdinalProcessor
         boolean quickPath
     ) throws IOException {
 
-        int value = formattable.get(this.element).intValue();
+        int value = formattable.getInt(this.element);
 
         if (value < 0) {
             throw new IllegalArgumentException(
@@ -203,7 +203,7 @@ final class OrdinalProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
@@ -301,7 +301,7 @@ final class OrdinalProcessor
             return;
         }
 
-        parsedResult.put(this.element, Integer.valueOf(value));
+        parsedResult.put(this.element, value);
         status.setPosition(pos);
 
     }

@@ -30,7 +30,6 @@ import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -94,7 +93,7 @@ enum TimezoneIDProcessor
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        Map<ChronoElement<?>, Object> parsedResult,
+        ParsedValues parsedResult,
         boolean quickPath
     ) {
 
