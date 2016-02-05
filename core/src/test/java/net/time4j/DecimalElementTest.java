@@ -91,6 +91,14 @@ public class DecimalElementTest {
             return element.getType().cast(ret);
         }
         @Override
+        public int getInt(ChronoElement<Integer> element) {
+            try {
+                return this.get(element).intValue();
+            } catch (ChronoException ex) {
+                return Integer.MIN_VALUE;
+            }
+        }
+        @Override
         public <V> boolean isValid(ChronoElement<V> element, V value) {
             return false;
         }

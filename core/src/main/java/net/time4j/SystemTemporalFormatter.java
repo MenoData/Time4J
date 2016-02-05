@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SystemTemporalFormatter.java) is part of project Time4J.
  *
@@ -539,6 +539,17 @@ final class SystemTemporalFormatter<T>
 
             this.check(element);
             return element.getType().cast(this.values.get(element));
+
+        }
+
+        @Override
+        public int getInt(ChronoElement<Integer> element) {
+
+            try {
+                return this.get(element).intValue();
+            } catch (ChronoException ex) {
+                return Integer.MIN_VALUE;
+            }
 
         }
 

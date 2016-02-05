@@ -6215,6 +6215,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         @Override
+        public int getInt(ChronoElement<Integer> element) {
+
+            return this.tsp.getInt(element);
+
+        }
+
+        @Override
         public <V> V getMinimum(ChronoElement<V> element) {
 
             return this.tsp.getMinimum(element);

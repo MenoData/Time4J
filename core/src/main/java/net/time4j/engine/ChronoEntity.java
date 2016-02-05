@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoEntity.java) is part of project Time4J.
  *
@@ -87,6 +87,14 @@ public abstract class ChronoEntity<T extends ChronoEntity<T>>
     public <V> V get(ChronoElement<V> element) {
 
         return this.getRule(element).getValue(this.getContext());
+
+    }
+
+    @Override
+    public int getInt(ChronoElement<Integer> element) {
+
+        // TODO: replace by use of IntegerElementRule
+        return this.get(element).intValue();
 
     }
 

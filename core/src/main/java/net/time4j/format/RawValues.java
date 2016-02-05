@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RawValues.java) is part of project Time4J.
  *
@@ -122,6 +122,11 @@ public class RawValues {
         @Override
         public <V> V get(ChronoElement<V> element) {
             throw new ChronoException("Not supported:" + element.name());
+        }
+
+        @Override
+        public int getInt(ChronoElement<Integer> element) {
+            return Integer.MIN_VALUE;
         }
 
         @Override

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoDisplay.java) is part of project Time4J.en
  *
@@ -99,6 +99,24 @@ public interface ChronoDisplay {
      * @see     #contains(ChronoElement)
      */
     <V> V get(ChronoElement<V> element);
+
+    /**
+     * <p>Returns the partial value associated with given chronological element. </p>
+     *
+     * @param   element     element which has the value
+     * @return  associated element value as int primitive or {@code Integer.MIN_VALUE} if not available
+     * @see     #get(ChronoElement)
+     * @since   3.15/4.12
+     */
+    /*[deutsch]
+     * <p>Fragt ein chronologisches Element nach seinem Wert als Objekt ab. </p>
+     *
+     * @param   element     element which has the value
+     * @return  associated element value as int primitive or {@code Integer.MIN_VALUE} if not available
+     * @see     #get(ChronoElement)
+     * @since   3.15/4.12
+     */
+    int getInt(ChronoElement<Integer> element);
 
     /**
      * <p>Yields the minimum value of given chronological element in the

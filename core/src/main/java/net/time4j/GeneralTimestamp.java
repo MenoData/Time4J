@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GeneralTimestamp.java) is part of project Time4J.
  *
@@ -328,6 +328,13 @@ public final class GeneralTimestamp<C extends ChronoEntity<C>>
     public <V> V get(ChronoElement<V> element) {
 
         return (element.isDateElement() ? this.toDate().get(element) : this.time.get(element));
+
+    }
+
+    @Override
+    public int getInt(ChronoElement<Integer> element) {
+
+        return (element.isDateElement() ? this.toDate().getInt(element) : this.time.getInt(element));
 
     }
 

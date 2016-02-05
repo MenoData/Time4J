@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalDateTime.java) is part of project Time4J.
  *
@@ -211,6 +211,21 @@ public final class ZonalDateTime
             return this.timestamp.get(element);
         } else {
             return this.moment.get(element);
+        }
+
+    }
+
+    @Override
+    public int getInt(ChronoElement<Integer> element) {
+
+        if (this.moment.isLeapSecond() && (element == SECOND_OF_MINUTE)) {
+            return 60;
+        }
+
+        if (this.timestamp.contains(element)) {
+            return this.timestamp.getInt(element);
+        } else {
+            return this.moment.getInt(element);
         }
 
     }

@@ -112,6 +112,10 @@ public class AxisElementTest {
             return element.getType().cast(ret);
         }
         @Override
+        public int getInt(ChronoElement<Integer> element) {
+            return Integer.MIN_VALUE;
+        }
+        @Override
         public <V> boolean isValid(ChronoElement<V> element, V value) {
             return false;
         }
