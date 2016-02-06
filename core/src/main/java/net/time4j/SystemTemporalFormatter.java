@@ -572,9 +572,9 @@ final class SystemTemporalFormatter<T>
         @Override
         public int getInt(ChronoElement<Integer> element) {
 
-            try {
-                return this.get(element).intValue();
-            } catch (ChronoException ex) {
+            if (this.values.containsKey(element)) {
+                return Integer.class.cast(this.values.get(element)).intValue();
+            } else {
                 return Integer.MIN_VALUE;
             }
 

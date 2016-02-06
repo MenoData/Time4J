@@ -43,6 +43,7 @@ import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
@@ -161,6 +162,8 @@ public final class PlainDate
     static final Integer MAX_YEAR =
         Integer.valueOf(GregorianMath.MAX_YEAR);
 
+    private static final Integer VALUE_1 = Integer.valueOf(1);
+    private static final Integer VALUE_12 = Integer.valueOf(12);
     private static final Integer STD_YEAR_LEN = Integer.valueOf(365);
     private static final Integer LEAP_YEAR_LEN = Integer.valueOf(366);
     private static final int[] DAY_OF_YEAR_PER_MONTH = new int[12];
@@ -2143,82 +2146,63 @@ public final class PlainDate
                 return entity.get(CALENDAR_DATE);
             }
 
-            if (entity.contains(EpochDays.MODIFIED_JULIAN_DATE)) {
-                Long mjd = entity.get(EpochDays.MODIFIED_JULIAN_DATE);
-                long utcDays =
-                    EpochDays.UTC.transform(
-                        mjd.longValue(),
-                        EpochDays.MODIFIED_JULIAN_DATE);
-                return TRANSFORMER.transform(utcDays);
-            }
+            Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
+            int year = entity.getInt(YEAR);
 
-            Leniency leniency =
-                attributes.get(Attributes.LENIENCY, Leniency.SMART);
-            Integer year = null;
+            if (year != Integer.MIN_VALUE) {
+                int month;
 
-            if (entity.contains(YEAR)) {
-                year = entity.get(YEAR);
-            }
-
-            if (year != null) {
-                int y = year.intValue();
-
-                Integer month = null;
                 if (entity.contains(MONTH_OF_YEAR)) {
-                    month =
-                        Integer.valueOf(entity.get(MONTH_OF_YEAR).getValue());
-                } else if (entity.contains(MONTH_AS_NUMBER)) {
-                    month = entity.get(MONTH_AS_NUMBER);
+                    month = entity.get(MONTH_OF_YEAR).getValue();
+                } else {
+                    month = entity.getInt(MONTH_AS_NUMBER);
                 }
 
-                if (
-                    (month != null)
-                    && entity.contains(DAY_OF_MONTH)
-                ) {
-                    Integer dom = entity.get(DAY_OF_MONTH);
-                    int m = month.intValue();
-                    int d = dom.intValue();
+                if (month != Integer.MIN_VALUE) {
+                    int dom = entity.getInt(DAY_OF_MONTH);
 
-                    if (leniency.isLax()) {
-                        PlainDate date = PlainDate.of(y, 1, 1);
-                        date = date.with(MONTH_AS_NUMBER.setLenient(month));
-                        return date.with(DAY_OF_MONTH.setLenient(dom));
-                    } else if ( // Standardszenario
-                        validateYear(entity, y)
-                        && validateMonth(entity, m)
-                        && validateDayOfMonth(entity, y, m, d)
-                    ) {
-                        return PlainDate.of(y, m, d, false);
-                    } else {
-                        return null;
+                    if (dom != Integer.MIN_VALUE) {
+                        if (leniency.isLax()) {
+                            PlainDate date = PlainDate.of(year, 1, 1);
+                            date = date.with(MONTH_AS_NUMBER.setLenient(Integer.valueOf(month)));
+                            return date.with(DAY_OF_MONTH.setLenient(Integer.valueOf(dom)));
+                        } else if ( // Standardszenario
+                            validateYear(entity, year)
+                            && validateMonth(entity, month)
+                            && validateDayOfMonth(entity, year, month, dom)
+                        ) {
+                            return PlainDate.of(year, month, dom, false);
+                        } else {
+                            return null;
+                        }
                     }
                 }
 
-                if (entity.contains(DAY_OF_YEAR)) {
-                    Integer doy = entity.get(DAY_OF_YEAR);
-                    int d = doy.intValue();
+                int doy = entity.getInt(DAY_OF_YEAR);
 
+                if (doy != Integer.MIN_VALUE) {
                     if (leniency.isLax()) {
-                        PlainDate date = PlainDate.of(y, 1);
-                        return date.with(DAY_OF_YEAR.setLenient(doy));
+                        PlainDate date = PlainDate.of(year, 1);
+                        return date.with(DAY_OF_YEAR.setLenient(Integer.valueOf(doy)));
                     } else if ( // Ordinaldatum
-                        validateYear(entity, y)
-                        && validateDayOfYear(entity, y, d)
+                        validateYear(entity, year)
+                        && validateDayOfYear(entity, year, doy)
                     ) {
-                        return PlainDate.of(y, d);
+                        return PlainDate.of(year, doy);
                     } else {
                         return null;
                     }
                 }
 
+                int doq = entity.getInt(DAY_OF_QUARTER);
+
                 if (
-                    entity.contains(QUARTER_OF_YEAR)
-                    && entity.contains(DAY_OF_QUARTER)
+                    (doq != Integer.MIN_VALUE)
+                    && entity.contains(QUARTER_OF_YEAR)
                 ) {
                     Quarter q = entity.get(QUARTER_OF_YEAR);
-                    boolean leapYear = GregorianMath.isLeapYear(y);
-                    int doq = entity.get(DAY_OF_QUARTER).intValue();
-                    int doy = doq + (leapYear ? 91 : 90);
+                    boolean leapYear = GregorianMath.isLeapYear(year);
+                    doy = doq + (leapYear ? 91 : 90);
 
                     if (q == Quarter.Q1) {
                         doy = doq;
@@ -2229,27 +2213,26 @@ public final class PlainDate
                     }
 
                     if (leniency.isLax()) {
-                        PlainDate date = PlainDate.of(y, 1);
-                        return date.with(DAY_OF_YEAR.setLenient(doy));
+                        PlainDate date = PlainDate.of(year, 1);
+                        return date.with(DAY_OF_YEAR.setLenient(Integer.valueOf(doy)));
                     } else if ( // Quartalsdatum
-                        validateYear(entity, y)
+                        validateYear(entity, year)
                         && validateDayOfQuarter(entity, leapYear, q, doq)
                     ) {
-                        return PlainDate.of(y, doy);
+                        return PlainDate.of(year, doy);
                     } else {
                         return null;
                     }
                 }
             }
 
+            int yearOfWeekdate = entity.getInt(YEAR_OF_WEEKDATE);
+
             if (
-                entity.contains(YEAR_OF_WEEKDATE)
+                (yearOfWeekdate != Integer.MIN_VALUE)
                 && entity.contains(Weekmodel.ISO.weekOfYear())
             ) {
-                int yearOfWeekdate =
-                    entity.get(YEAR_OF_WEEKDATE).intValue();
-                int weekOfYear =
-                    entity.get(Weekmodel.ISO.weekOfYear()).intValue();
+                int weekOfYear = entity.get(Weekmodel.ISO.weekOfYear()).intValue();
                 Weekday dayOfWeek;
 
                 if (entity.contains(DAY_OF_WEEK)) {
@@ -2285,6 +2268,15 @@ public final class PlainDate
                 }
 
                 return date;
+            }
+
+            if (entity.contains(EpochDays.MODIFIED_JULIAN_DATE)) {
+                Long mjd = entity.get(EpochDays.MODIFIED_JULIAN_DATE);
+                long utcDays =
+                    EpochDays.UTC.transform(
+                        mjd.longValue(),
+                        EpochDays.MODIFIED_JULIAN_DATE);
+                return TRANSFORMER.transform(utcDays);
             }
 
             return null;
@@ -2575,7 +2567,7 @@ public final class PlainDate
     }
 
     private static class IntegerElementRule
-        implements ElementRule<PlainDate, Integer> {
+        implements IntElementRule<PlainDate> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -2608,17 +2600,24 @@ public final class PlainDate
         @Override
         public Integer getValue(PlainDate context) {
 
+            return Integer.valueOf(this.getInt(context));
+
+        }
+
+        @Override
+        public int getInt(PlainDate context) {
+
             switch (this.index) {
                 case IntegerDateElement.YEAR:
-                    return Integer.valueOf(context.year);
+                    return context.year;
                 case IntegerDateElement.MONTH:
-                    return Integer.valueOf(context.month);
+                    return context.month;
                 case IntegerDateElement.DAY_OF_MONTH:
-                    return Integer.valueOf(context.dayOfMonth);
+                    return context.dayOfMonth;
                 case IntegerDateElement.DAY_OF_YEAR:
-                    return Integer.valueOf(context.getDayOfYear());
+                    return context.getDayOfYear();
                 case IntegerDateElement.DAY_OF_QUARTER:
-                    return Integer.valueOf(context.getDayOfQuarter());
+                    return context.getDayOfQuarter();
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2632,29 +2631,35 @@ public final class PlainDate
             boolean lenient
         ) {
 
-            int v = value.intValue();
+            return this.withValue(context, value.intValue(), lenient);
+
+        }
+
+        @Override
+        public PlainDate withValue(
+            PlainDate context,
+            int value,
+            boolean lenient
+        ) {
 
             if (lenient) { // nur auf numerischen Elementen definiert
                 IsoDateUnit unit = ENGINE.getBaseUnit(this.ref);
-                int old = Number.class.cast(this.getValue(context)).intValue();
-                int amount = MathUtils.safeSubtract(v, old);
+                int amount = MathUtils.safeSubtract(value, this.getInt(context));
                 return context.plus(amount, unit);
             }
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
-                    return context.withYear(v);
+                    return context.withYear(value);
                 case IntegerDateElement.MONTH:
-                    return context.withMonth(v);
+                    return context.withMonth(value);
                 case IntegerDateElement.DAY_OF_MONTH:
-                    return context.withDayOfMonth(v);
+                    return context.withDayOfMonth(value);
                 case IntegerDateElement.DAY_OF_YEAR:
-                    return context.withDayOfYear(v);
+                    return context.withDayOfYear(value);
                 case IntegerDateElement.DAY_OF_QUARTER:
-                    if ((v >= 1) && (v <= getMaximumOfQuarterDay(context))) {
-                        return context.plus(
-                            (v - context.getDayOfQuarter()),
-                            CalendarUnit.DAYS);
+                    if ((value >= 1) && (value <= getMaximumOfQuarterDay(context))) {
+                        return context.plus((value - context.getDayOfQuarter()), CalendarUnit.DAYS);
                     } else {
                         throw new IllegalArgumentException("Out of range: " + value);
                     }
@@ -2670,32 +2675,27 @@ public final class PlainDate
             Integer value
         ) {
 
-            if (value == null) {
-                return false;
-            }
+            return ((value != null) && this.isValid(context, value.intValue()));
 
-            int v = value.intValue();
+        }
+
+        @Override
+        public boolean isValid(
+            PlainDate context,
+            int value
+        ) {
 
             switch (this.index) {
                 case IntegerDateElement.YEAR:
-                    return (
-                        (v >= GregorianMath.MIN_YEAR)
-                        && (v <= GregorianMath.MAX_YEAR)
-                    );
+                    return ((value >= GregorianMath.MIN_YEAR) && (value <= GregorianMath.MAX_YEAR));
                 case IntegerDateElement.MONTH:
-                    return ((v >= 1) && (v <= 12));
+                    return ((value >= 1) && (value <= 12));
                 case IntegerDateElement.DAY_OF_MONTH:
-                    int mlen =
-                        GregorianMath.getLengthOfMonth(
-                            context.year,
-                            context.month);
-                    return ((v >= 1) && (v <= mlen));
+                    return ((value >= 1) && (value <= GregorianMath.getLengthOfMonth(context.year, context.month)));
                 case IntegerDateElement.DAY_OF_YEAR:
-                    boolean leapyear = GregorianMath.isLeapYear(context.year);
-                    return ((v >= 1) && (v <= (leapyear ? 366 : 365)));
+                    return ((value >= 1) && (value <= (GregorianMath.isLeapYear(context.year) ? 366 : 365)));
                 case IntegerDateElement.DAY_OF_QUARTER:
-                    int max = getMaximumOfQuarterDay(context);
-                    return ((v >= 1) && (v <= max));
+                    return ((value >= 1) && (value <= getMaximumOfQuarterDay(context)));
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2712,7 +2712,7 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_MONTH:
                 case IntegerDateElement.DAY_OF_YEAR:
                 case IntegerDateElement.DAY_OF_QUARTER:
-                    return Integer.valueOf(1);
+                    return VALUE_1;
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2726,17 +2726,11 @@ public final class PlainDate
                 case IntegerDateElement.YEAR:
                     return MAX_YEAR;
                 case IntegerDateElement.MONTH:
-                    return Integer.valueOf(12);
+                    return VALUE_12;
                 case IntegerDateElement.DAY_OF_MONTH:
-                    return Integer.valueOf(
-                        GregorianMath.getLengthOfMonth(
-                            context.year,
-                            context.month));
+                    return Integer.valueOf(GregorianMath.getLengthOfMonth(context.year, context.month));
                 case IntegerDateElement.DAY_OF_YEAR:
-                    return (
-                        GregorianMath.isLeapYear(context.year)
-                        ? LEAP_YEAR_LEN
-                        : STD_YEAR_LEN);
+                    return (GregorianMath.isLeapYear(context.year) ? LEAP_YEAR_LEN : STD_YEAR_LEN);
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(getMaximumOfQuarterDay(context));
                 default:
@@ -2937,38 +2931,35 @@ public final class PlainDate
     }
 
     private static class WIMRule
-        implements ElementRule<PlainDate, Integer> {
+        implements IntElementRule<PlainDate> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public Integer getValue(PlainDate context) {
 
-            return Integer.valueOf(((context.dayOfMonth - 1) / 7) + 1);
+            return Integer.valueOf(this.getInt(context));
+
+        }
+
+        @Override
+        public int getInt(PlainDate context) {
+
+            return ((context.dayOfMonth - 1) / 7) + 1;
 
         }
 
         @Override
         public Integer getMinimum(PlainDate context) {
 
-            return Integer.valueOf(1);
+            return VALUE_1;
 
         }
 
         @Override
         public Integer getMaximum(PlainDate context) {
 
-            int y = context.year;
-            int m = context.month;
-            int d = context.dayOfMonth;
-            int maxday = GregorianMath.getLengthOfMonth(y, m);
-            int n = 0;
-
-            while (d + (n + 1) * 7 <= maxday) {
-                n++;
-            }
-
-            return Integer.valueOf(((d + n * 7 - 1) / 7) + 1);
+            return Integer.valueOf(this.getMaximum0(context));
 
         }
 
@@ -2978,13 +2969,17 @@ public final class PlainDate
             Integer value
         ) {
 
-            if (value == null) {
-                return false;
-            }
+            return ((value != null) && this.isValid(context, value.intValue()));
 
-            int wim = value.intValue();
-            int max = this.getMaximum(context).intValue();
-            return ((wim >= 1) && (wim <= max));
+        }
+
+        @Override
+        public boolean isValid(
+            PlainDate context,
+            int value
+        ) {
+
+            return ((value >= 1) && (value <= this.getMaximum0(context)));
 
         }
 
@@ -2995,15 +2990,20 @@ public final class PlainDate
             boolean lenient
         ) {
 
-            int wim = value.intValue();
-            int max = this.getMaximum(context).intValue();
-            int old = ((context.dayOfMonth - 1) / 7) + 1;
+            return this.withValue(context, value.intValue(), lenient);
 
-            if (
-                lenient
-                || ((wim >= 1) && (wim <= max))
-            ) {
-                return context.plus(wim - old, CalendarUnit.WEEKS);
+        }
+
+        @Override
+        public PlainDate withValue(
+            PlainDate context,
+            int value,
+            boolean lenient
+        ) {
+
+            if (lenient || ((value >= 1) && (value <= this.getMaximum0(context)))) {
+                int old = ((context.dayOfMonth - 1) / 7) + 1;
+                return context.plus(value - old, CalendarUnit.WEEKS);
             } else {
                 throw new IllegalArgumentException("Out of range: " + value);
             }
@@ -3021,6 +3021,20 @@ public final class PlainDate
         public ChronoElement<?> getChildAtCeiling(PlainDate context) {
 
             return null;
+
+        }
+
+        private int getMaximum0(PlainDate context) {
+
+            int maxday = GregorianMath.getLengthOfMonth(context.year, context.month);
+            int d = context.dayOfMonth;
+            int n = 0;
+
+            while (d + (n + 1) * 7 <= maxday) {
+                n++;
+            }
+
+            return ((d + n * 7 - 1) / 7) + 1;
 
         }
 
