@@ -571,6 +571,17 @@ final class SystemTemporalFormatter<T>
         }
 
         @Override
+        public int getInt(ChronoElement<Integer> element) {
+
+            if (this.values.containsKey(element)) {
+                return Integer.class.cast(this.values.get(element)).intValue();
+            } else {
+                return Integer.MIN_VALUE;
+            }
+
+        }
+
+        @Override
         public <V> V getMinimum(ChronoElement<V> element) {
 
             this.check(element);
