@@ -316,6 +316,33 @@ final class SystemTemporalFormatter<T>
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof SystemTemporalFormatter) {
+            SystemTemporalFormatter<?> that = (SystemTemporalFormatter<?>) obj;
+            return (
+                this.type.equals(that.type)
+                && this.pattern.equals(that.pattern)
+                && this.locale.equals(that.locale)
+                && (this.leniency == that.leniency)
+                && ((this.tzid == null) ? (that.tzid == null) : this.tzid.equals(that.tzid))
+            );
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return 17 * this.pattern.hashCode() + 31 * this.locale.hashCode() + 37 * this.tzid.hashCode();
+
+    }
+
     private boolean hasTimezoneField() {
 
         boolean literal = false;
