@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -1066,7 +1066,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         //~ Konstruktoren -------------------------------------------------
 
-        SelfElement(
+        private SelfElement(
             Class<T> type,
             T min,
             T max
@@ -1187,6 +1187,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             return null;
+
+        }
+
+        @Override
+        protected boolean isSingleton() {
+
+            return true; // used only once per chronology
 
         }
 

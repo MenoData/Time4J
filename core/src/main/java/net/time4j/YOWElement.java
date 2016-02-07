@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (YOWElement.java) is part of project Time4J.
  *
@@ -141,6 +141,13 @@ final class YOWElement
 
     }
 
+    @Override
+    protected boolean isSingleton() {
+
+        return true; // exists only once in PlainDate
+
+    }
+
     /**
      * <p>Erzeugt eine Elementregel. </p>
      *
@@ -148,9 +155,7 @@ final class YOWElement
      * @param   type    helps to improve type inference
      * @return  new element rule
      */
-    static <T extends ChronoEntity<T>> ElementRule<T, Integer> elementRule(
-        Class<T> type
-    ) {
+    static <T extends ChronoEntity<T>> ElementRule<T, Integer> elementRule(Class<T> type) {
 
         return new ERule<T>();
 

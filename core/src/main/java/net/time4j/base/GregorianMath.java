@@ -78,11 +78,7 @@ public final class GregorianMath {
      */
     public static boolean isLeapYear(int year) {
 
-        if ((year % 4) != 0) {
-            return false;
-        }
-
-        return ((year % 100) != 0) || ((year % 400) == 0);
+        return ((year & 3) == 0) && ((year % 100) != 0) || ((year % 400) == 0);
 
     }
 
@@ -300,7 +296,7 @@ public final class GregorianMath {
      */
     public static int readYear(long packedDate) {
 
-        return (int) ((packedDate >> 32));
+        return (int) (packedDate >> 32);
 
     }
 

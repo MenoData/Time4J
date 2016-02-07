@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapsecondElement.java) is part of project Time4J.
  *
@@ -22,6 +22,8 @@
 package net.time4j;
 
 import net.time4j.engine.BasicElement;
+
+import java.io.ObjectStreamException;
 
 
 /**
@@ -82,6 +84,19 @@ final class LeapsecondElement
     public boolean isTimeElement() {
 
         return false;
+
+    }
+
+    @Override
+    protected boolean isSingleton() {
+
+        return true;
+
+    }
+
+    private Object readResolve() throws ObjectStreamException {
+
+        return INSTANCE;
 
     }
 

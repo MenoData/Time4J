@@ -26,6 +26,7 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -1112,19 +1113,9 @@ public final class Weekmodel
         }
 
         @Override
-        public boolean equals(Object obj) {
+        protected boolean doEquals(BasicElement<?> obj) {
 
-            return (
-                super.equals(obj)
-                && this.getModel().equals(((DayOfWeekElement) obj).getModel())
-            );
-
-        }
-
-        @Override
-        public int hashCode() {
-
-            return 31 * super.hashCode() + 37 * this.getModel().hashCode();
+            return this.getModel().equals(((DayOfWeekElement) obj).getModel());
 
         }
 
@@ -1368,22 +1359,12 @@ public final class Weekmodel
         }
 
         @Override
-        public boolean equals(Object obj) {
+        protected boolean doEquals(BasicElement<?> obj) {
 
-            return (
-                super.equals(obj)
-                && this.getModel().equals(
-                    ((CalendarWeekElement) obj).getModel())
-            );
+            return this.getModel().equals(((CalendarWeekElement) obj).getModel());
 
         }
 
-        @Override
-        public int hashCode() {
-
-            return 31 * super.hashCode() + 37 * this.getModel().hashCode();
-
-        }
         @Override
         protected ChronoElement<?> getParent() {
 

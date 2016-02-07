@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecimalTimeElement.java) is part of project Time4J.
  *
@@ -136,6 +136,13 @@ final class DecimalTimeElement
     public ChronoFunction<Moment, BigDecimal> at(ZonalOffset offset) {
 
         return new ZonalQuery<BigDecimal>(this, offset);
+
+    }
+
+    @Override
+    protected boolean isSingleton() {
+
+        return true;
 
     }
 

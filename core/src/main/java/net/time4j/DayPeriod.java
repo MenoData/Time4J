@@ -815,25 +815,6 @@ public final class DayPeriod {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            } else if (obj instanceof Element) {
-                Element that = (Element) obj;
-                return (
-                    this.dayPeriod.equals(that.dayPeriod)
-                    && (this.fixed == that.fixed));
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return this.dayPeriod.hashCode() + (this.fixed ? 1 : 0);
-        }
-
-        @Override
         public String toString() {
             StringBuilder sb = new StringBuilder(32);
             sb.append(this.name());
@@ -849,6 +830,12 @@ public final class DayPeriod {
                 return (ElementRule<T, String>) this;
             }
             return null;
+        }
+
+        @Override
+        protected boolean doEquals(BasicElement<?> obj) {
+            Element that = (Element) obj;
+            return this.dayPeriod.equals(that.dayPeriod);
         }
 
         @Override

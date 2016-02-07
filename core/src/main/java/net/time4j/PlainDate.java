@@ -2150,12 +2150,10 @@ public final class PlainDate
             int year = entity.getInt(YEAR);
 
             if (year != Integer.MIN_VALUE) {
-                int month;
+                int month = entity.getInt(MONTH_AS_NUMBER);
 
-                if (entity.contains(MONTH_OF_YEAR)) {
+                if ((month == Integer.MIN_VALUE) && entity.contains(MONTH_OF_YEAR)) {
                     month = entity.get(MONTH_OF_YEAR).getValue();
-                } else {
-                    month = entity.getInt(MONTH_AS_NUMBER);
                 }
 
                 if (month != Integer.MIN_VALUE) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -50,8 +50,7 @@ final class WeekdayInMonthElement
     /**
      * <p>Singleton. </p>
      */
-    static final WeekdayInMonthElement INSTANCE =
-        new WeekdayInMonthElement();
+    static final WeekdayInMonthElement INSTANCE = new WeekdayInMonthElement();
 
     private static final int LAST = 5;
     private static final long serialVersionUID = -2378018589067147278L;
@@ -156,6 +155,13 @@ final class WeekdayInMonthElement
     public ElementOperator<PlainDate> setToLast(Weekday dayOfWeek) {
 
         return this.setTo(LAST, dayOfWeek);
+
+    }
+
+    @Override
+    protected boolean isSingleton() {
+
+        return true; // exists only once in PlainDate
 
     }
 
