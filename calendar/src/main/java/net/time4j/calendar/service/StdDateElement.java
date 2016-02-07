@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdDateElement.java) is part of project Time4J.
  *
@@ -176,6 +176,14 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
     public ChronoOperator<T> atCeiling() {
 
         return StdOperator.atCeiling(this);
+
+    }
+
+    @Override
+    protected boolean doEquals(BasicElement<?> obj) {
+
+        StdDateElement<?, ?> that = (StdDateElement<?, ?>) obj;
+        return (this.chrono == that.chrono);
 
     }
 

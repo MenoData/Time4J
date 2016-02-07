@@ -78,11 +78,7 @@ public final class GregorianMath {
      */
     public static boolean isLeapYear(int year) {
 
-        if ((year % 4) != 0) {
-            return false;
-        }
-
-        return ((year % 100) != 0) || ((year % 400) == 0);
+        return ((year & 3) == 0) && ((year % 100) != 0) || ((year % 400) == 0);
 
     }
 
@@ -258,7 +254,7 @@ public final class GregorianMath {
 
         int m = gaussianWeekTerm(month);
         int y = (year % 100);
-        int c = MathUtils.floorDivide(year, 100);
+        int c = Math.floorDiv(year, 100);
 
         if (y < 0) {
             y += 100;
@@ -273,7 +269,7 @@ public final class GregorianMath {
         }
 
         // Gauß'sche Wochentagsformel
-        int k = MathUtils.floorDivide(c, 4);
+        int k = Math.floorDiv(c, 4);
         int w = ((dayOfMonth + m + y + (y / 4) + k - 2 * c) % 7);
 
         if (w <= 0) {
@@ -300,7 +296,7 @@ public final class GregorianMath {
      */
     public static int readYear(long packedDate) {
 
-        return (int) ((packedDate >> 32) & 0xFFFFFFFF);
+        return (int) (packedDate >> 32);
 
     }
 
@@ -383,14 +379,14 @@ public final class GregorianMath {
         int m;
         int d;
 
-        long days = MathUtils.safeAdd(mjd, OFFSET);
+        long days = Math.addExact(mjd, OFFSET);
 
         // TODO: Optimierung der Performance im Jahresbereich 1901-2099
         //       mit vereinfachtem Schaltjahresalgorithmus
         // if (days >= year1901 && days < year2100) { ... }
 
-        long q400 = MathUtils.floorDivide(days, 146097);
-        int r400 = MathUtils.floorModulo(days, 146097);
+        long q400 = Math.floorDiv(days, 146097);
+        int r400 = (int) Math.floorMod(days, 146097);
 
         if (r400 == 146096) {
             y = (q400 + 1) * 400;
@@ -452,8 +448,8 @@ public final class GregorianMath {
      */
     public static long toMJD(GregorianDate date) {
 
-        return GregorianMath.toMJD(
-            date.getYear(), date.getMonth(), date.getDayOfMonth());
+        return GregorianMath.toMJD(date.getYear(), date.getMonth(), date.getDayOfMonth());
+
     }
 
     /**
@@ -493,9 +489,9 @@ public final class GregorianMath {
 
         long days = (
             (y * 365)
-            + MathUtils.floorDivide(y, 4)
-            - MathUtils.floorDivide(y, 100)
-            + MathUtils.floorDivide(y, 400)
+            + Math.floorDiv(y, 4)
+            - Math.floorDiv(y, 100)
+            + Math.floorDiv(y, 400)
             + (((m + 1) * 153) / 5) - 123
             + dayOfMonth
         );

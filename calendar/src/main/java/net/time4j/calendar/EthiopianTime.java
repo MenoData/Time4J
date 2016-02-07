@@ -1232,6 +1232,11 @@ public final class EthiopianTime
             return null;
         }
 
+        @Override
+        protected boolean isSingleton() {
+            return true;
+        }
+
         private Object readResolve() {
             return ELEMENT;
         }

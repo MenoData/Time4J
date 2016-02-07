@@ -1,10 +1,11 @@
 package net.time4j;
 
-import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

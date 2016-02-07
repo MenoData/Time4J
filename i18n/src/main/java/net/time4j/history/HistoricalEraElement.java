@@ -171,6 +171,13 @@ final class HistoricalEraElement
 
     }
 
+    @Override
+    protected boolean doEquals(BasicElement<?> obj) {
+
+        return this.history.equals(((HistoricalEraElement) obj).history);
+
+    }
+
     private TextAccessor accessor(AttributeQuery attributes) {
 
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);

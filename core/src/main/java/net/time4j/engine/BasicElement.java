@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BasicElement.java) is part of project Time4J.
  *
@@ -53,6 +53,22 @@ public abstract class BasicElement<V extends Comparable<V>>
      */
     private final String name;
 
+    /**
+     * @serial  identity code
+     */
+    /*[deutsch]
+     * @serial  Identit&auml;tscode
+     */
+    private final int identity;
+
+    /**
+     * @serial  hash code
+     */
+    /*[deutsch]
+     * @serial  Hash-Code
+     */
+    private final int hash;
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -83,6 +99,8 @@ public abstract class BasicElement<V extends Comparable<V>>
         }
 
         this.name = name;
+        this.hash = name.hashCode();
+        this.identity = (this.isSingleton() ? ((this.hash == -1) ? ~this.hash : this.hash) : -1);
 
     }
 
@@ -202,18 +220,18 @@ public abstract class BasicElement<V extends Comparable<V>>
      *          class and have same names else {@code false}
      */
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
 
         if (this == obj) {
             return true;
         } else if (obj == null) {
             return false;
         } else if (this.getClass() == obj.getClass()) {
-            return this.name.equals(((BasicElement) obj).name);
+            BasicElement<?> that = (BasicElement<?>) obj;
+            int id1 = this.identity;
+            int id2 = that.identity;
+            return ((id1 == id2) && ((id1 != -1) || (this.name().equals(that.name()) && this.doEquals(that))));
         } else {
-            // Verletzung des Liskov-Prinzips, siehe Effective Java, Seite 39.
-            // Aber hier gilt auch: Mit verschiedenen Klassen ist generell ein
-            // anderes Verhalten (z.B. verschiedene Elementregeln) verknüpft!
             return false;
         }
 
@@ -230,9 +248,9 @@ public abstract class BasicElement<V extends Comparable<V>>
      * @return  int
      */
     @Override
-    public int hashCode() {
+    public final int hashCode() {
 
-        return this.name.hashCode();
+        return this.hash;
 
     }
 
@@ -371,6 +389,60 @@ public abstract class BasicElement<V extends Comparable<V>>
         }
 
         return null;
+
+    }
+
+    /**
+     * <p>Determines if this element only exists one time as constant in the JVM. </p>
+     *
+     * <p>Any override of this method MUST NOT refer directly or indirectly to any state of this object
+     * because it is called during construction of this object at a time where this instance might not
+     * yet be finished. </p>
+     *
+     * @return  boolean (default value is {@code false})
+     * @since   3.15/4.12
+     */
+    /*[deutsch]
+     * <p>Bestimmt, ob dieses Element nur einmal als Konstante in der JVM vorhanden ist. </p>
+     *
+     * <p>Jedes &Uuml;berschreiben dieser Methode darf sich NICHT direkt oder indirekt auf den Zustand
+     * dieser Instanz beziehen, weil die Methode zu einem Zeitpunkt aufgerufen wird, zu dem diese
+     * Instanz noch nicht fertig konstruiert ist. </p>
+     *
+     * @return  boolean (default value is {@code false})
+     * @since   3.15/4.12
+     */
+    protected boolean isSingleton() {
+
+        return false;
+
+    }
+
+    /**
+     * <p>Will be called by {@code equals(Object)}. </p>
+     *
+     * <p>Subclasses should override this method if other state attributes than just the element name are to
+     * be taken into account when comparing elements. The parameter can be safely casted to an instance of
+     * this class. </p>
+     *
+     * @param   obj     other element to be compared with
+     * @return  boolean (default value is {@code true})
+     * @since   3.15/4.12
+     */
+    /**
+     * <p>Wird von {@code equals(Object)} aufgerufen. </p>
+     *
+     * <p>Subklassen sollten diese Methode &uuml;berschreiben, wenn anderer Zustandsattribute als nur
+     * der Elementname ber&uuml;cksichtigt werdne m&uuml;ssen. Der Parameter kann sicher zu einem
+     * Typ dieser Klasse umgewandelt werden. </p>
+     *
+     * @param   obj     other element to be compared with
+     * @return  boolean (default value is {@code true})
+     * @since   3.15/4.12
+     */
+    protected boolean doEquals(BasicElement<?> obj) {
+
+        return true;
 
     }
 

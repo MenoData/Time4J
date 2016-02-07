@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -22,7 +22,6 @@
 package net.time4j;
 
 import net.time4j.base.GregorianMath;
-import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
@@ -51,8 +50,7 @@ final class WeekdayInMonthElement
     /**
      * <p>Singleton. </p>
      */
-    static final WeekdayInMonthElement INSTANCE =
-        new WeekdayInMonthElement();
+    static final WeekdayInMonthElement INSTANCE = new WeekdayInMonthElement();
 
     private static final int LAST = Integer.MAX_VALUE;
     private static final long serialVersionUID = -2378018589067147278L;
@@ -170,6 +168,13 @@ final class WeekdayInMonthElement
 
     }
 
+    @Override
+    protected boolean isSingleton() {
+
+        return true; // exists only once in PlainDate
+
+    }
+
     private Object readResolve() throws ObjectStreamException {
 
         return INSTANCE;
@@ -230,16 +235,13 @@ final class WeekdayInMonthElement
                 int dom = date.getDayOfMonth() + delta;
                 int days;
                 if (this.ordinal == LAST) {
-                    days = (5 - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
-                    int max =
-                        GregorianMath.getLengthOfMonth(
-                            date.getYear(),
-                            date.getMonth());
+                    days = (5 - (Math.floorDiv(dom - 1, 7) + 1)) * 7 + delta;
+                    int max = GregorianMath.getLengthOfMonth(date.getYear(), date.getMonth());
                     if (date.getDayOfMonth() + days > max) {
                         days -= 7;
                     }
                 } else {
-                    days = (this.ordinal - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
+                    days = (this.ordinal - (Math.floorDiv(dom - 1, 7) + 1)) * 7 + delta;
                 }
                 date = date.plus(days, CalendarUnit.DAYS);
                 return entity.with(PlainDate.CALENDAR_DATE, date);

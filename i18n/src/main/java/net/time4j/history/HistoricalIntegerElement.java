@@ -352,6 +352,13 @@ final class HistoricalIntegerElement
 
     }
 
+    @Override
+    protected boolean doEquals(BasicElement<?> obj) {
+
+        return this.history.equals(((HistoricalIntegerElement) obj).history);
+
+    }
+
     private int getAncientYear(
         int yearOfDisplay,
         int yearOfEra

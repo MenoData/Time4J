@@ -218,6 +218,13 @@ final class EnumElement<V extends Enum<V>>
 
     }
 
+    @Override
+    protected boolean isSingleton() {
+
+        return true; // exists only once per name in PlainDate
+
+    }
+
     /**
      * <p>Liefert einen Zugriffsindex zur Optimierung der Elementsuche. </p>
      *

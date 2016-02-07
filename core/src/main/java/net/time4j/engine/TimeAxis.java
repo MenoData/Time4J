@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -93,25 +93,17 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         this.min = min;
         this.max = max;
         this.calendarSystem = calendarSystem;
-        this.self = new SelfElement<T>(chronoType, min, max);
+        this.self = new SelfElement<>(chronoType, min, max);
 
         if (timeline == null) {
-            List<U> registeredUnits = new ArrayList<U>(unitRules.keySet());
+            List<U> registeredUnits = new ArrayList<>(unitRules.keySet());
             Collections.sort(
                 registeredUnits,
-                new Comparator<U>() {
-                    @Override
-                    public int compare(
-                        U unit1,
-                        U unit2
-                    ) {
-                        return Double.compare(
-                            getLength(unitLengths, unit1),
-                            getLength(unitLengths, unit2));
-                    }
-                });
+                (unit1, unit2) -> Double.compare(
+                    getLength(unitLengths, unit1),
+                    getLength(unitLengths, unit2)));
             U step = registeredUnits.get(0);
-            this.timeline = new DefaultTimeLine<U, T>(step, min, max);
+            this.timeline = new DefaultTimeLine<>(step, min, max);
         } else {
             this.timeline = timeline;
         }
@@ -613,10 +605,10 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             this.unitType = unitType;
-            this.unitRules = new HashMap<U, UnitRule<T>>();
-            this.unitLengths = new HashMap<U, Double>();
-            this.convertibleUnits = new HashMap<U, Set<U>>();
-            this.baseUnits = new HashMap<ChronoElement<?>, U>();
+            this.unitRules = new HashMap<>();
+            this.unitLengths = new HashMap<>();
+            this.convertibleUnits = new HashMap<>();
+            this.baseUnits = new HashMap<>();
             this.min = min;
             this.max = max;
             this.calendarSystem = calendarSystem;
@@ -662,7 +654,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             T max
         ) {
 
-            return new Builder<U, T>(
+            return new Builder<>(
                 unitType,
                 chronoType,
                 merger,
@@ -709,7 +701,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             final CalendarSystem<D> calsys = calendarSystem;
 
             Builder<U, D> builder =
-                new Builder<U, D>(
+                new Builder<>(
                     unitType,
                     chronoType,
                     merger,
@@ -934,7 +926,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
             this.unitRules.put(unit, rule);
             this.unitLengths.put(unit, length);
-            Set<U> set = new HashSet<U>(convertibleUnits);
+            Set<U> set = new HashSet<>(convertibleUnits);
             set.remove(unit); // Selbstbezug entfernen
             this.convertibleUnits.put(unit, set);
             return this;
@@ -998,7 +990,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             TimeAxis<U, T> engine =
-                new TimeAxis<U, T>(
+                new TimeAxis<>(
                     this.chronoType,
                     this.unitType,
                     this.merger,
@@ -1068,7 +1060,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         //~ Konstruktoren -------------------------------------------------
 
-        SelfElement(
+        private SelfElement(
             Class<T> type,
             T min,
             T max
@@ -1189,6 +1181,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             return null;
+
+        }
+
+        @Override
+        protected boolean isSingleton() {
+
+            return true; // used only once per chronology
 
         }
 

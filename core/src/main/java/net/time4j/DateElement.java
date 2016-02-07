@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateElement.java) is part of project Time4J.
  *
@@ -167,6 +167,13 @@ final class DateElement
     public ChronoFunction<Moment, PlainDate> at(ZonalOffset offset) {
 
         return new ZonalQuery<>(this, offset);
+
+    }
+
+    @Override
+    protected boolean isSingleton() {
+
+        return true;
 
     }
 
