@@ -293,7 +293,7 @@ public class EraFormatTest {
             ChronoFormatter.setUp(PlainDate.class, russia)
                 .addPattern("d. MMMM yyyy", PatternType.CLDR)
                 .build()
-                .withGregorianCutOver(history.getGregorianCutOverDate())
+                .with(history)
                 .withDefault(history.era(), HistoricEra.AD);
         assertThat(
             formatter.parse("25. October 1917"),

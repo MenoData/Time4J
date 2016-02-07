@@ -171,6 +171,10 @@ public final class NewYearStrategy {
         if (this.strategies.isEmpty()) {
             sb.append("[new-year-rule=");
             sb.append(this.lastRule);
+            if (this.lastAnnoDomini != Integer.MAX_VALUE) {
+                sb.append("->");
+                sb.append(this.lastAnnoDomini);
+            }
         } else {
             boolean first = true;
             for (NewYearStrategy nys : this.strategies) {
