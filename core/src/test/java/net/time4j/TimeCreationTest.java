@@ -1,7 +1,6 @@
 package net.time4j;
 
 import net.time4j.format.Attributes;
-import net.time4j.format.Leniency;
 
 import java.math.BigDecimal;
 import org.junit.Test;
@@ -77,7 +76,7 @@ public class TimeCreationTest {
     @Test(expected=IllegalArgumentException.class)
     public void merge() {
         PlainTime.axis().createFrom(
-            Moment.UNIX_EPOCH, Attributes.empty(), false);
+            Moment.UNIX_EPOCH, Attributes.empty(), false, false);
     }
 
     @Test
@@ -85,8 +84,8 @@ public class TimeCreationTest {
         assertThat(
             PlainTime.axis().createFrom(
                 Moment.UNIX_EPOCH,
-                new Attributes.Builder()
-                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                Attributes.empty(),
+                true,
                 false),
         is(PlainTime.midnightAtStartOfDay()));
     }

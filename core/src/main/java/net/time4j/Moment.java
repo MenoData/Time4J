@@ -2631,9 +2631,23 @@ public final class Moment
         }
 
         @Override
+        @Deprecated
+        public Moment createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean preparsing
+        ) {
+
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
         public Moment createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attrs,
+            boolean lenient,
             boolean pp
         ) {
 
@@ -2653,7 +2667,7 @@ public final class Moment
 
             if (entity.contains(LeapsecondElement.INSTANCE)) {
                 leapsecond = true;
-                entity.with(SECOND_OF_MINUTE, Integer.valueOf(60));
+                entity.with(SECOND_OF_MINUTE, 60);
             }
 
             ChronoElement<PlainTimestamp> self = PlainTimestamp.axis().element();
@@ -2662,7 +2676,7 @@ public final class Moment
             if (entity.contains(self)) {
                 ts = entity.get(self);
             } else {
-                ts = PlainTimestamp.axis().createFrom(entity, attrs, pp);
+                ts = PlainTimestamp.axis().createFrom(entity, attrs, lenient, pp);
             }
 
             if (ts == null) {
@@ -2717,10 +2731,7 @@ public final class Moment
                             result.getPosixTime() + 1);
                 }
 
-                Leniency leniency =
-                    attrs.get(Attributes.LENIENCY, Leniency.SMART);
-
-                if (leniency.isLax()) {
+                if (lenient) {
                     result = test;
                 } else if (LeapSeconds.getInstance().isEnabled()) {
                     if (test.isPositiveLS()) {

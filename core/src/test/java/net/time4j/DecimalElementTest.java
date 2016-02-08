@@ -30,6 +30,7 @@ public class DecimalElementTest {
             Chronology.lookup(PlainTime.class).createFrom(
                 vs,
                 Attributes.empty(),
+                false,
                 false);
         assertThat(result, is(PlainTime.of(10, 2, 45, 0)));
     }
@@ -89,6 +90,16 @@ public class DecimalElementTest {
                     "Not registered: " + element.name());
             }
             return element.getType().cast(ret);
+        }
+        @Override
+        public int getInt(ChronoElement<Integer> element) {
+            int ret;
+            if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                ret = 10;
+            } else {
+                ret = Integer.MIN_VALUE;
+            }
+            return ret;
         }
         @Override
         public <V> boolean isValid(ChronoElement<V> element, V value) {

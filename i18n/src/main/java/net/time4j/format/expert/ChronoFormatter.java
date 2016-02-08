@@ -146,6 +146,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final boolean needsHistorization;
     private final boolean needsExtensions;
     private final int countOfElements;
+    private final Leniency leniency;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -167,6 +168,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.chronology = chronology;
         this.overrideHandler = OverrideHandler.of(override);
         this.globalAttributes = AttributeSet.createDefaults((override == null) ? chronology : override, locale);
+        this.leniency = this.globalAttributes.get(Attributes.LENIENCY, Leniency.SMART);
         this.defaults = Collections.emptyMap();
 
         FractionProcessor fp = null;
@@ -251,6 +253,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.chronology = old.chronology;
         this.overrideHandler = old.overrideHandler;
         this.globalAttributes = globalAttributes;
+        this.leniency = this.globalAttributes.get(Attributes.LENIENCY, Leniency.SMART);
         this.defaults = Collections.unmodifiableMap(new NonAmbivalentMap(old.defaults));
         this.fracproc = old.fracproc;
         this.hasOptionals = old.hasOptionals;
@@ -335,6 +338,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.chronology = formatter.chronology;
         this.overrideHandler = formatter.overrideHandler;
         this.globalAttributes = formatter.globalAttributes;
+        this.leniency = formatter.leniency;
         this.fracproc = formatter.fracproc;
         this.hasOptionals = formatter.hasOptionals;
         this.needsHistorization = formatter.needsHistorization;
@@ -919,9 +923,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
 
         AttributeQuery attrs = attributes;
+        Leniency leniency = this.leniency;
 
         if (attributes != this.globalAttributes) {
             attrs = new AttributeWrapper(attributes, this.globalAttributes);
+            leniency = attrs.get(Attributes.LENIENCY, Leniency.SMART);
         }
 
         T result;
@@ -930,7 +936,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (this.overrideHandler != null) {
             List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
             ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
-            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, true);
+            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, leniency, true);
             parsed = status.getRawValues0();
 
             if (status.isError()) {
@@ -967,7 +973,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             Chronology<?> preparser = this.chronology.preparser();
 
             if (preparser != null) {
-                Object intermediate = parse(this, preparser, preparser.getExtensions(), text, status, attrs, true);
+                Object intermediate =
+                    parse(this, preparser, preparser.getExtensions(), text, status, attrs, leniency, true);
                 parsed = status.getRawValues0();
 
                 if (status.isError()) {
@@ -977,12 +984,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     updateSelf(parsed, self, intermediate);
                 }
             } else {
-                return parse(this, this.chronology, this.chronology.getExtensions(), text, status, attrs, false);
+                return parse(
+                    this, this.chronology, this.chronology.getExtensions(), text, status, attrs, leniency, false);
             }
         }
 
         try {
-            result = this.chronology.createFrom(parsed, attrs, false);
+            result = this.chronology.createFrom(parsed, attrs, leniency.isLax(), false);
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
@@ -997,9 +1005,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     getReason(parsed) + getDescription(parsed));
             }
             return null;
+        } else if (leniency.isStrict()) {
+            return checkConsistency(parsed, result, text, status);
+        } else {
+            return result;
         }
-
-        return checkConsistency(parsed, result, text, status, attrs);
 
     }
 
@@ -2498,6 +2508,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
+        Leniency leniency,
         boolean preparsing
     ) {
 
@@ -2508,11 +2519,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         ParsedValues parsed = null;
+        boolean quickPath = (attributes == cf.globalAttributes);
 
         try {
-            parsed =
-                cf.parseElements(
-                    text, status, attributes, (attributes == cf.globalAttributes), cf.countOfElements);
+            parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -2566,7 +2576,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         T result;
 
         try {
-            result = merger.createFrom(parsed, attributes, preparsing);
+            result = merger.createFrom(parsed, attributes, leniency.isLax(), preparsing);
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
@@ -2590,8 +2600,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     getReason(parsed) + getDescription(parsed));
             }
             return null;
+        } else if (leniency.isStrict()) {
+            return checkConsistency(parsed, result, text, status);
         } else {
-            return checkConsistency(parsed, result, text, status, attributes);
+            return result;
         }
 
     }
@@ -2643,104 +2655,98 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ParsedValues parsed,
         T result,
         CharSequence text,
-        ParseLog status,
-        AttributeQuery attributes
+        ParseLog status
     ) {
 
-        Leniency leniency =
-            attributes.get(Attributes.LENIENCY, Leniency.SMART);
+        // Zeitzonenkonversion ergibt immer Unterschied zwischen
+        // lokaler und globaler Zeit => lokale Elemente nicht prüfen!
+        if (result instanceof UnixTime) {
+            UnixTime ut = UnixTime.class.cast(result);
 
-        if (leniency.isStrict()) {
-            // Zeitzonenkonversion ergibt immer Unterschied zwischen
-            // lokaler und globaler Zeit => lokale Elemente nicht prüfen!
-            if (result instanceof UnixTime) {
-                UnixTime ut = UnixTime.class.cast(result);
-
-                // check offset+tzid
-                if (
-                    parsed.contains(TimezoneElement.TIMEZONE_ID)
-                    && parsed.contains(TimezoneElement.TIMEZONE_OFFSET)
-                ) {
-                    TZID tzid = parsed.get(TimezoneElement.TIMEZONE_ID);
-                    TZID offset = parsed.get(TimezoneElement.TIMEZONE_OFFSET);
-                    if (!Timezone.of(tzid).getOffset(ut).equals(offset)) {
-                        status.setError(text.length(), "Ambivalent offset information: " + tzid + " versus " + offset);
-                        return null;
-                    }
+            // check offset+tzid
+            if (
+                parsed.contains(TimezoneElement.TIMEZONE_ID)
+                && parsed.contains(TimezoneElement.TIMEZONE_OFFSET)
+            ) {
+                TZID tzid = parsed.get(TimezoneElement.TIMEZONE_ID);
+                TZID offset = parsed.get(TimezoneElement.TIMEZONE_OFFSET);
+                if (!Timezone.of(tzid).getOffset(ut).equals(offset)) {
+                    status.setError(text.length(), "Ambivalent offset information: " + tzid + " versus " + offset);
+                    return null;
                 }
+            }
 
-                // check tz-naming
-                if (status.getDSTInfo() != null) {
-                    TZID tzid = parsed.getTimezone();
-                    try {
-                        boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
-                        if (dst != status.getDSTInfo().booleanValue()) {
-                            StringBuilder reason = new StringBuilder(256);
-                            reason.append("Conflict found: ");
-                            reason.append("Parsed entity is ");
-                            if (!dst) {
-                                reason.append("not ");
-                            }
-                            reason.append("daylight-saving, but timezone name");
-                            reason.append(" has not the appropriate form in {");
-                            reason.append(text.toString());
-                            reason.append("}.");
-                            status.setError(text.length(), reason.toString());
-                            result = null;
-                        }
-                    } catch (IllegalArgumentException iae) {
-                        StringBuilder reason = new StringBuilder(256);
-                        reason.append("Unable to check timezone name: ");
-                        reason.append(iae.getMessage());
-                        status.setError(text.length(), reason.toString());
-                        return null;
-                    }
-                }
-            } else {
-                ChronoEntity<?> date = null;
-
-                if (
-                    (result instanceof PlainTimestamp)
-                        && (result.getInt(PlainTime.ISO_HOUR) == 0)
-                    && (
-                        (parsed.getInt(PlainTime.ISO_HOUR) == 24)
-                        || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
-                    )
-                ) {
-                    date = PlainTimestamp.class.cast(result).toDate().minus(1, CalendarUnit.DAYS);
-                }
-
-                for (ChronoElement<?> e : parsed.getRegisteredElements()) {
-                    Object value = parsed.get(e);
-                    ChronoDisplay test = result;
-
-                    if (date != null) {
-                        if (e.isDateElement()) {
-                            test = date;
-                        } else if (e.isTimeElement()) {
-                            test = PlainTime.midnightAtEndOfDay();
-                        }
-                    }
-
-                    if (
-                        test.contains(e)
-                        && !test.get(e).equals(value)
-                    ) {
+            // check tz-naming
+            if (status.getDSTInfo() != null) {
+                TZID tzid = parsed.getTimezone();
+                try {
+                    boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
+                    if (dst != status.getDSTInfo().booleanValue()) {
                         StringBuilder reason = new StringBuilder(256);
                         reason.append("Conflict found: ");
-                        reason.append("Text {");
+                        reason.append("Parsed entity is ");
+                        if (!dst) {
+                            reason.append("not ");
+                        }
+                        reason.append("daylight-saving, but timezone name");
+                        reason.append(" has not the appropriate form in {");
                         reason.append(text.toString());
-                        reason.append("} with element ");
-                        reason.append(e.name());
-                        reason.append(" {");
-                        reason.append(value);
-                        reason.append("}, but parsed entity ");
-                        reason.append("has element value {");
-                        reason.append(test.get(e));
                         reason.append("}.");
                         status.setError(text.length(), reason.toString());
-                        return null;
+                        result = null;
                     }
+                } catch (IllegalArgumentException iae) {
+                    StringBuilder reason = new StringBuilder(256);
+                    reason.append("Unable to check timezone name: ");
+                    reason.append(iae.getMessage());
+                    status.setError(text.length(), reason.toString());
+                    return null;
+                }
+            }
+        } else {
+            ChronoEntity<?> date = null;
+
+            if (
+                (result instanceof PlainTimestamp)
+                    && (result.getInt(PlainTime.ISO_HOUR) == 0)
+                && (
+                    (parsed.getInt(PlainTime.ISO_HOUR) == 24)
+                    || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
+                )
+            ) {
+                date = PlainTimestamp.class.cast(result).toDate().minus(1, CalendarUnit.DAYS);
+            }
+
+            for (ChronoElement<?> e : parsed.getRegisteredElements()) {
+                Object value = parsed.get(e);
+                ChronoDisplay test = result;
+
+                if (date != null) {
+                    if (e.isDateElement()) {
+                        test = date;
+                    } else if (e.isTimeElement()) {
+                        test = PlainTime.midnightAtEndOfDay();
+                    }
+                }
+
+                if (
+                    test.contains(e)
+                    && !test.get(e).equals(value)
+                ) {
+                    StringBuilder reason = new StringBuilder(256);
+                    reason.append("Conflict found: ");
+                    reason.append("Text {");
+                    reason.append(text.toString());
+                    reason.append("} with element ");
+                    reason.append(e.name());
+                    reason.append(" {");
+                    reason.append(value);
+                    reason.append("}, but parsed entity ");
+                    reason.append("has element value {");
+                    reason.append(test.get(e));
+                    reason.append("}.");
+                    status.setError(text.length(), reason.toString());
+                    return null;
                 }
             }
         }
@@ -6175,14 +6181,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         @Override
+        @Deprecated
         public GeneralTimestamp<C> createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            C date = this.override.createFrom(entity, attributes, preparsing);
-            PlainTime time = PlainTime.axis().createFrom(entity, attributes, preparsing);
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public GeneralTimestamp<C> createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
+            C date = this.override.createFrom(entity, attributes, lenient, preparsing);
+            PlainTime time = PlainTime.axis().createFrom(entity, attributes, lenient, preparsing);
             Object tsp;
 
             if (date instanceof CalendarVariant) {

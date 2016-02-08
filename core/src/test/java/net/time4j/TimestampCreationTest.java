@@ -1,7 +1,6 @@
 package net.time4j;
 
 import net.time4j.format.Attributes;
-import net.time4j.format.Leniency;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,7 +72,7 @@ public class TimestampCreationTest {
     @Test(expected=IllegalArgumentException.class)
     public void merge() {
         PlainTimestamp.axis().createFrom(
-            Moment.UNIX_EPOCH, Attributes.empty(), false);
+            Moment.UNIX_EPOCH, Attributes.empty(), false, false);
     }
 
     @Test
@@ -81,8 +80,8 @@ public class TimestampCreationTest {
         assertThat(
             PlainTimestamp.axis().createFrom(
                 Moment.UNIX_EPOCH,
-                new Attributes.Builder()
-                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                Attributes.empty(),
+                true,
                 false),
         is(PlainTimestamp.of(1970, 1, 1, 0, 0)));
     }

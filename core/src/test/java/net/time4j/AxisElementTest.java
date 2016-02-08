@@ -32,7 +32,7 @@ public class AxisElementTest {
     @Test
     public void mergeDate() {
         assertThat(
-            PlainDate.axis().createFrom(DATA, Attributes.empty(), false),
+            PlainDate.axis().createFrom(DATA, Attributes.empty(), false, false),
             is(PlainDate.of(2015, 8, 24)));
     }
 
@@ -45,7 +45,7 @@ public class AxisElementTest {
     @Test
     public void mergeTime() {
         assertThat(
-            PlainTime.axis().createFrom(DATA, Attributes.empty(), false),
+            PlainTime.axis().createFrom(DATA, Attributes.empty(), false, false),
             is(PlainTime.midnightAtEndOfDay()));
     }
 
@@ -58,7 +58,7 @@ public class AxisElementTest {
     @Test
     public void mergeTimestamp() {
         assertThat(
-            PlainTimestamp.axis().createFrom(DATA, Attributes.empty(), false),
+            PlainTimestamp.axis().createFrom(DATA, Attributes.empty(), false, false),
             is(PlainTimestamp.of(2015, 8, 24, 17, 45)));
     }
 
@@ -71,7 +71,7 @@ public class AxisElementTest {
     @Test
     public void mergeMoment() {
         assertThat(
-            Moment.axis().createFrom(DATA, Attributes.empty(), false),
+            Moment.axis().createFrom(DATA, Attributes.empty(), false, false),
             is(Moment.UNIX_EPOCH));
     }
 

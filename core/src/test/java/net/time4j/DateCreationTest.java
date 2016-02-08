@@ -3,7 +3,6 @@ package net.time4j;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
-import net.time4j.format.Leniency;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -274,7 +273,7 @@ public class DateCreationTest {
     @Test(expected=IllegalArgumentException.class)
     public void merge() {
         PlainDate.axis().createFrom(
-            Moment.UNIX_EPOCH, Attributes.empty(), false);
+            Moment.UNIX_EPOCH, Attributes.empty(), false, false);
     }
 
     @Test
@@ -282,8 +281,8 @@ public class DateCreationTest {
         assertThat(
             PlainDate.axis().createFrom(
                 Moment.UNIX_EPOCH,
-                new Attributes.Builder()
-                    .set(Attributes.LENIENCY, Leniency.LAX).build(),
+                Attributes.empty(),
+                true,
                 false),
             is(PlainDate.of(1970, 1, 1)));
     }
