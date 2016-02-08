@@ -1560,46 +1560,66 @@ public final class EthiopianCalendar
         }
 
         @Override
+        @Deprecated
         public EthiopianCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            if (!entity.contains(YEAR_OF_ERA)) {
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public EthiopianCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
+            int year = entity.getInt(YEAR_OF_ERA);
+
+            if (year == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Ethiopian year.");
                 return null;
             } else if (!entity.contains(ERA)) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Ethiopian era.");
             }
 
-            int year = entity.get(YEAR_OF_ERA).intValue();
             EthiopianEra era = entity.get(ERA);
 
-            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+            if (entity.contains(MONTH_OF_YEAR)) {
                 int month = entity.get(MONTH_OF_YEAR).getValue();
-                int dom = entity.get(DAY_OF_MONTH).intValue();
-                if (CALSYS.isValid(era, year, month, dom)) {
-                    return EthiopianCalendar.of(era, year, month, dom);
-                } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
-                }
-            } else if (entity.contains(DAY_OF_YEAR)) {
-                int doy = entity.get(DAY_OF_YEAR).intValue();
-                if (doy > 0) {
-                    int month = 1;
-                    int daycount = 0;
-                    while (month <= 13) {
-                        int len = CALSYS.getLengthOfMonth(era, year, month);
-                        if (doy > daycount + len) {
-                            month++;
-                            daycount += len;
-                        } else {
-                            return EthiopianCalendar.of(era, year, month, doy - daycount);
-                        }
+                int dom = entity.getInt(DAY_OF_MONTH);
+
+                if (dom != Integer.MIN_VALUE) {
+                    if (CALSYS.isValid(era, year, month, dom)) {
+                        return EthiopianCalendar.of(era, year, month, dom);
+                    } else {
+                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+                if (doy != Integer.MIN_VALUE) {
+                    if (doy > 0) {
+                        int month = 1;
+                        int daycount = 0;
+                        while (month <= 13) {
+                            int len = CALSYS.getLengthOfMonth(era, year, month);
+                            if (doy > daycount + len) {
+                                month++;
+                                daycount += len;
+                            } else {
+                                return EthiopianCalendar.of(era, year, month, doy - daycount);
+                            }
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
+                }
             }
 
             return null;

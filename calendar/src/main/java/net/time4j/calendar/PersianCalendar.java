@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PersianCalendar.java) is part of project Time4J.
  *
@@ -1373,44 +1373,62 @@ public final class PersianCalendar
         }
 
         @Override
+        @Deprecated
         public PersianCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            if (!entity.contains(YEAR_OF_ERA)) {
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public PersianCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
+            int pyear = entity.getInt(YEAR_OF_ERA);
+
+            if (pyear == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Persian year.");
                 return null;
             }
 
-            int pyear = entity.get(YEAR_OF_ERA).intValue();
-
-            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+            if (entity.contains(MONTH_OF_YEAR)) {
                 int pmonth = entity.get(MONTH_OF_YEAR).getValue();
-                int pdom = entity.get(DAY_OF_MONTH).intValue();
-                if (CALSYS.isValid(PersianEra.ANNO_PERSICO, pyear, pmonth, pdom)) {
-                    return PersianCalendar.of(pyear, pmonth, pdom);
-                } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
-                }
-            } else if (entity.contains(DAY_OF_YEAR)) {
-                int pdoy = entity.get(DAY_OF_YEAR).intValue();
-                if (pdoy > 0) {
-                    int pmonth = 1;
-                    int daycount = 0;
-                    while (pmonth <= 12) {
-                        int len = CALSYS.getLengthOfMonth(PersianEra.ANNO_PERSICO, pyear, pmonth);
-                        if (pdoy > daycount + len) {
-                            pmonth++;
-                            daycount += len;
-                        } else {
-                            int pdom = pdoy - daycount;
-                            return PersianCalendar.of(pyear, pmonth, pdom);
-                        }
+                int pdom = entity.getInt(DAY_OF_MONTH);
+                if (pdom != Integer.MIN_VALUE) {
+                    if (CALSYS.isValid(PersianEra.ANNO_PERSICO, pyear, pmonth, pdom)) {
+                        return PersianCalendar.of(pyear, pmonth, pdom);
+                    } else {
+                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
+            } else {
+                int pdoy = entity.getInt(DAY_OF_YEAR);
+                if (pdoy != Integer.MIN_VALUE) {
+                    if (pdoy > 0) {
+                        int pmonth = 1;
+                        int daycount = 0;
+                        while (pmonth <= 12) {
+                            int len = CALSYS.getLengthOfMonth(PersianEra.ANNO_PERSICO, pyear, pmonth);
+                            if (pdoy > daycount + len) {
+                                pmonth++;
+                                daycount += len;
+                            } else {
+                                int pdom = pdoy - daycount;
+                                return PersianCalendar.of(pyear, pmonth, pdom);
+                            }
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
+                }
             }
 
             return null;

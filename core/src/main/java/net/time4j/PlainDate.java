@@ -2134,19 +2134,30 @@ public final class PlainDate
         }
 
         @Override
+        @Deprecated
         public PlainDate createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            if (entity instanceof UnixTime) {
-                return PlainTimestamp.axis().createFrom(entity, attributes, preparsing).getCalendarDate();
-            } else if (entity.contains(CALENDAR_DATE)) {
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public PlainDate createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
+            if (entity.contains(CALENDAR_DATE)) {
                 return entity.get(CALENDAR_DATE);
             }
 
-            Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
             int year = entity.getInt(YEAR);
 
             if (year != Integer.MIN_VALUE) {
@@ -2160,7 +2171,7 @@ public final class PlainDate
                     int dom = entity.getInt(DAY_OF_MONTH);
 
                     if (dom != Integer.MIN_VALUE) {
-                        if (leniency.isLax()) {
+                        if (lenient) {
                             PlainDate date = PlainDate.of(year, 1, 1);
                             date = date.with(MONTH_AS_NUMBER.setLenient(Integer.valueOf(month)));
                             return date.with(DAY_OF_MONTH.setLenient(Integer.valueOf(dom)));
@@ -2179,7 +2190,7 @@ public final class PlainDate
                 int doy = entity.getInt(DAY_OF_YEAR);
 
                 if (doy != Integer.MIN_VALUE) {
-                    if (leniency.isLax()) {
+                    if (lenient) {
                         PlainDate date = PlainDate.of(year, 1);
                         return date.with(DAY_OF_YEAR.setLenient(Integer.valueOf(doy)));
                     } else if ( // Ordinaldatum
@@ -2210,7 +2221,7 @@ public final class PlainDate
                         doy += (91 + 92);
                     }
 
-                    if (leniency.isLax()) {
+                    if (lenient) {
                         PlainDate date = PlainDate.of(year, 1);
                         return date.with(DAY_OF_YEAR.setLenient(Integer.valueOf(doy)));
                     } else if ( // Quartalsdatum
@@ -2275,6 +2286,8 @@ public final class PlainDate
                         mjd.longValue(),
                         EpochDays.MODIFIED_JULIAN_DATE);
                 return TRANSFORMER.transform(utcDays);
+            } else if (entity instanceof UnixTime) {
+                return PlainTimestamp.axis().createFrom(entity, attributes, lenient, preparsing).getCalendarDate();
             }
 
             return null;
@@ -2310,10 +2323,7 @@ public final class PlainDate
             int year
         ) {
 
-            if (
-                (year < GregorianMath.MIN_YEAR)
-                || (year > GregorianMath.MAX_YEAR)
-            ) {
+            if ((year < GregorianMath.MIN_YEAR) || (year > GregorianMath.MAX_YEAR)) {
                 flagValidationError(
                     entity,
                     "YEAR out of range: " + year);
@@ -2329,10 +2339,7 @@ public final class PlainDate
             int month
         ) {
 
-            if (
-                (month < 1)
-                || (month > 12)
-            ) {
+            if ((month < 1) || (month > 12)) {
                 flagValidationError(
                     entity,
                     "MONTH_OF_YEAR out of range: " + month);
@@ -2350,10 +2357,7 @@ public final class PlainDate
             int dom
         ) {
 
-            if (
-                (dom < 1)
-                || (dom > GregorianMath.getLengthOfMonth(year, month))
-            ) {
+            if ((dom < 1) || ((dom > 28) && (dom > GregorianMath.getLengthOfMonth(year, month)))) {
                 flagValidationError(
                     entity,
                     "DAY_OF_MONTH out of range: " + dom);
@@ -2370,10 +2374,7 @@ public final class PlainDate
             int doy
         ) {
 
-            if (
-                (doy < 1)
-                || (doy > (GregorianMath.isLeapYear(year) ? 366 : 365))
-            ) {
+            if ((doy < 1) || ((doy > 365) && (doy > (GregorianMath.isLeapYear(year) ? 366 : 365)))) {
                 flagValidationError(
                     entity,
                     "DAY_OF_YEAR out of range: " + doy);

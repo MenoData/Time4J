@@ -3232,16 +3232,30 @@ public final class PlainTime
 
         }
 
-        // Löst bevorzugt Elemente auf, die in Format-Patterns vorkommen
         @Override
+        @Deprecated
         public PlainTime createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        // Löst bevorzugt Elemente auf, die in Format-Patterns vorkommen
+        @Override
+        public PlainTime createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
             if (entity instanceof UnixTime) {
-                return PlainTimestamp.axis().createFrom(entity, attributes, preparsing).getWallTime();
+                return PlainTimestamp.axis().createFrom(entity, attributes, lenient, preparsing).getWallTime();
             } else if (entity.contains(WALL_TIME)) {
                 return entity.get(WALL_TIME);
             }
@@ -3251,22 +3265,14 @@ public final class PlainTime
                 return PlainTime.of(entity.get(DECIMAL_HOUR));
             }
 
-            Leniency leniency =
-                attributes.get(Attributes.LENIENCY, Leniency.SMART);
-            int hour;
+            int hour = entity.getInt(ISO_HOUR);
 
-            if (entity.contains(ISO_HOUR)) {
-                hour = entity.get(ISO_HOUR).intValue();
-            } else {
-                Integer h = readHour(entity);
-                if (h == null) {
+            if (hour == Integer.MIN_VALUE) {
+                hour = readHour(entity);
+                if (hour == Integer.MIN_VALUE) {
                     return readSpecialCases(entity);
                 }
-                hour = h.intValue();
-                if (
-                    (hour == 24)
-                    && !leniency.isLax()
-                ) {
+                if ((hour == 24) && !lenient) {
                     flagValidationError(
                         entity,
                         "Time 24:00 not allowed, "
@@ -3284,10 +3290,10 @@ public final class PlainTime
                 );
             }
 
-            int minute = 0;
+            int minute = entity.getInt(MINUTE_OF_HOUR);
 
-            if (entity.contains(MINUTE_OF_HOUR)) {
-                minute = entity.get(MINUTE_OF_HOUR).intValue();
+            if (minute == Integer.MIN_VALUE) {
+                minute = 0; // fallback
             }
 
             // Sekundenteil ---------------------------------------------------
@@ -3299,25 +3305,31 @@ public final class PlainTime
                 );
             }
 
-            int second = 0;
+            int second = entity.getInt(SECOND_OF_MINUTE);
 
-            if (entity.contains(SECOND_OF_MINUTE)) {
-                second = entity.get(SECOND_OF_MINUTE).intValue();
+            if (second == Integer.MIN_VALUE) {
+                second = 0; // fallback
             }
 
             // Nanoteil -------------------------------------------------------
-            int nanosecond = 0;
+            int nanosecond = entity.getInt(NANO_OF_SECOND);
 
-            if (entity.contains(NANO_OF_SECOND)) {
-                nanosecond = entity.get(NANO_OF_SECOND).intValue();
-            } else if (entity.contains(MICRO_OF_SECOND)) {
-                nanosecond = entity.get(MICRO_OF_SECOND).intValue() * KILO;
-            } else if (entity.contains(MILLI_OF_SECOND)) {
-                nanosecond = entity.get(MILLI_OF_SECOND).intValue() * MIO;
+            if (nanosecond == Integer.MIN_VALUE) {
+                nanosecond = entity.getInt(MICRO_OF_SECOND);
+                if (nanosecond == Integer.MIN_VALUE) {
+                    nanosecond = entity.getInt(MILLI_OF_SECOND);
+                    if (nanosecond == Integer.MIN_VALUE) {
+                        nanosecond = 0; // fallback
+                    } else {
+                        nanosecond = MathUtils.safeMultiply(nanosecond, MIO);
+                    }
+                } else {
+                    nanosecond = MathUtils.safeMultiply(nanosecond, KILO);
+                }
             }
 
             // Ergebnis aus Stunde, Minute, Sekunde und Nano ------------------
-            if (leniency.isLax()) {
+            if (lenient) {
                 long total =
                     MathUtils.safeAdd(
                         MathUtils.safeMultiply(
@@ -3365,38 +3377,41 @@ public final class PlainTime
 
         }
 
-        private static Integer readHour(ChronoEntity<?> entity) {
+        private static int readHour(ChronoEntity<?> entity) {
 
-            int hour;
+            int hour = entity.getInt(DIGITAL_HOUR_OF_DAY);
 
-            if (entity.contains(DIGITAL_HOUR_OF_DAY)) {
-                hour = entity.get(DIGITAL_HOUR_OF_DAY).intValue();
-            } else if (entity.contains(CLOCK_HOUR_OF_DAY)) {
-                hour = entity.get(CLOCK_HOUR_OF_DAY).intValue();
-                if (hour == 24) {
-                    hour = 0;
-                }
-            } else if (entity.contains(AM_PM_OF_DAY)) {
+            if (hour != Integer.MIN_VALUE) {
+                return hour;
+            }
+
+            hour = entity.getInt(CLOCK_HOUR_OF_DAY);
+
+            if (hour == 24) {
+                return 0;
+            } else if (hour != Integer.MIN_VALUE) {
+                return hour;
+            }
+
+            if (entity.contains(AM_PM_OF_DAY)) {
                 Meridiem ampm = entity.get(AM_PM_OF_DAY);
-                if (entity.contains(DIGITAL_HOUR_OF_AMPM)) {
-                    int h = entity.get(DIGITAL_HOUR_OF_AMPM).intValue();
-                    hour = ((ampm == Meridiem.AM) ? h : h + 12);
-                } else if (
-                    entity.contains(CLOCK_HOUR_OF_AMPM)
-                ) {
-                    int h = entity.get(CLOCK_HOUR_OF_AMPM).intValue();
+                int h = entity.getInt(CLOCK_HOUR_OF_AMPM);
+
+                if (h != Integer.MIN_VALUE) {
                     if (h == 12) {
                         h = 0;
                     }
-                    hour = ((ampm == Meridiem.AM) ? h : h + 12);
-                } else {
-                    return null;
+                    return ((ampm == Meridiem.AM) ? h : h + 12);
                 }
-            } else {
-                return null;
+
+                h = entity.getInt(DIGITAL_HOUR_OF_AMPM);
+
+                if (h != Integer.MIN_VALUE) {
+                    return ((ampm == Meridiem.AM) ? h : h + 12);
+                }
             }
 
-            return Integer.valueOf(hour);
+            return Integer.MIN_VALUE;
 
         }
 

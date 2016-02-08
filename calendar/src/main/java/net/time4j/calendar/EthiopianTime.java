@@ -45,6 +45,7 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 
 import java.io.IOException;
@@ -1547,12 +1548,26 @@ public final class EthiopianTime
         }
 
         @Override
+        @Deprecated
         public EthiopianTime createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
-            PlainTime time = PlainTime.axis().createFrom(entity, attributes, false);
+
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public EthiopianTime createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+            PlainTime time = PlainTime.axis().createFrom(entity, attributes, lenient, false);
 
             if (time != null) {
                 return EthiopianTime.from(time);

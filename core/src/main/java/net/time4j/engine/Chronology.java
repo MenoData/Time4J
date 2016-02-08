@@ -220,17 +220,26 @@ public class Chronology<T extends ChronoEntity<T>>
     }
 
     @Override
+    @Deprecated
     public T createFrom(
         ChronoEntity<?> entity,
         AttributeQuery attributes,
         boolean preparsing
     ) {
 
-        if (attributes == null) {
-            throw new NullPointerException("Missing attributes.");
-        }
-
         return this.merger.createFrom(entity, attributes, preparsing);
+
+    }
+
+    @Override
+    public T createFrom(
+        ChronoEntity<?> entity,
+        AttributeQuery attributes,
+        boolean lenient,
+        boolean preparsing
+    ) {
+
+        return this.merger.createFrom(entity, attributes, lenient, preparsing);
 
     }
 

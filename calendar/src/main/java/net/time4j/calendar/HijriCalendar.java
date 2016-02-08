@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -1645,9 +1645,23 @@ public final class HijriCalendar
         }
 
         @Override
+        @Deprecated
         public HijriCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
+            boolean preparsing
+        ) {
+
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public HijriCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
             boolean preparsing
         ) {
 
@@ -1665,38 +1679,42 @@ public final class HijriCalendar
                 return null;
             }
 
-            if (!entity.contains(YEAR_OF_ERA)) {
+            int hyear = entity.getInt(YEAR_OF_ERA);
+
+            if (hyear == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing islamic year.");
                 return null;
             }
 
-            int hyear = entity.get(YEAR_OF_ERA).intValue();
-
-            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+            if (entity.contains(MONTH_OF_YEAR)) {
                 int hmonth = entity.get(MONTH_OF_YEAR).getValue();
-                int hdom = entity.get(DAY_OF_MONTH).intValue();
-                if (calsys.isValid(HijriEra.ANNO_HEGIRAE, hyear, hmonth, hdom)) {
-                    return HijriCalendar.of(variant, hyear, hmonth, hdom);
-                } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hijri date.");
-                }
-            } else if (entity.contains(DAY_OF_YEAR)) {
-                int hdoy = entity.get(DAY_OF_YEAR).intValue();
-                if (hdoy > 0) {
-                    int hmonth = 1;
-                    int daycount = 0;
-                    while (hmonth <= 12) {
-                        int len = calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, hyear, hmonth);
-                        if (hdoy > daycount + len) {
-                            hmonth++;
-                            daycount += len;
-                        } else {
-                            int hdom = hdoy - daycount;
-                            return HijriCalendar.of(variant, hyear, hmonth, hdom);
-                        }
+                int hdom = entity.getInt(DAY_OF_MONTH);
+                if (hdom != Integer.MIN_VALUE) {
+                    if (calsys.isValid(HijriEra.ANNO_HEGIRAE, hyear, hmonth, hdom)) {
+                        return HijriCalendar.of(variant, hyear, hmonth, hdom);
+                    } else {
+                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hijri date.");
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hijri date.");
+            } else {
+                int hdoy = entity.getInt(DAY_OF_YEAR);
+                if (hdoy != Integer.MIN_VALUE) {
+                    if (hdoy > 0) {
+                        int hmonth = 1;
+                        int daycount = 0;
+                        while (hmonth <= 12) {
+                            int len = calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, hyear, hmonth);
+                            if (hdoy > daycount + len) {
+                                hmonth++;
+                                daycount += len;
+                            } else {
+                                int hdom = hdoy - daycount;
+                                return HijriCalendar.of(variant, hyear, hmonth, hdom);
+                            }
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hijri date.");
+                }
             }
 
             return null;

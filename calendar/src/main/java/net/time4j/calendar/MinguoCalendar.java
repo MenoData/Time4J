@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MinguoCalendar.java) is part of project Time4J.
  *
@@ -1048,9 +1048,23 @@ public final class MinguoCalendar
         }
 
         @Override
+        @Deprecated
         public MinguoCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
+            boolean preparsing
+        ) {
+
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public MinguoCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
             boolean preparsing
         ) {
 
@@ -1062,46 +1076,51 @@ public final class MinguoCalendar
 
             if (entity.contains(ERA)) {
                 era = entity.get(ERA);
-            } else if (!attributes.get(Attributes.LENIENCY, Leniency.SMART).isStrict()) {
+            } else if (lenient) {
                 era = MinguoEra.ROC;
             } else {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Minguo era.");
                 return null;
             }
 
-            if (!entity.contains(YEAR_OF_ERA)) {
+            int yearOfEra = entity.getInt(YEAR_OF_ERA);
+
+            if (yearOfEra == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Minguo year.");
                 return null;
             }
 
-            int yearOfEra = entity.get(YEAR_OF_ERA).intValue();
             int prolepticYear = toProlepticYear(era, yearOfEra);
 
-            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+            if (entity.contains(MONTH_OF_YEAR)) {
                 int month = entity.get(MONTH_OF_YEAR).getValue();
-                int dom = entity.get(DAY_OF_MONTH).intValue();
-                if (CALSYS.isValid(era, yearOfEra, month, dom)) {
-                    return MinguoCalendar.of(era, yearOfEra, month, dom);
-                } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Minguo date.");
-                }
-            } else if (entity.contains(DAY_OF_YEAR)) {
-                int doy = entity.get(DAY_OF_YEAR).intValue();
-                if (doy > 0) {
-                    int month = 1;
-                    int daycount = 0;
-                    while (month <= 12) {
-                        int len = GregorianMath.getLengthOfMonth(prolepticYear, month);
-                        if (doy > daycount + len) {
-                            month++;
-                            daycount += len;
-                        } else {
-                            int dom = doy - daycount;
-                            return MinguoCalendar.of(era, yearOfEra, month, dom);
-                        }
+                int dom = entity.getInt(DAY_OF_MONTH);
+                if (dom != Integer.MIN_VALUE) {
+                    if (CALSYS.isValid(era, yearOfEra, month, dom)) {
+                        return MinguoCalendar.of(era, yearOfEra, month, dom);
+                    } else {
+                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Minguo date.");
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Minguo date.");
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+                if (doy != Integer.MIN_VALUE) {
+                    if (doy > 0) {
+                        int month = 1;
+                        int daycount = 0;
+                        while (month <= 12) {
+                            int len = GregorianMath.getLengthOfMonth(prolepticYear, month);
+                            if (doy > daycount + len) {
+                                month++;
+                                daycount += len;
+                            } else {
+                                int dom = doy - daycount;
+                                return MinguoCalendar.of(era, yearOfEra, month, dom);
+                            }
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Minguo date.");
+                }
             }
 
             return null;

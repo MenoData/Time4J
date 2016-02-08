@@ -448,6 +448,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     @Override
+    @Deprecated
     public T createFrom(
         ChronoEntity<?> entity,
         AttributeQuery attributes,
@@ -459,6 +460,22 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         return super.createFrom(entity, attributes, preparsing);
+
+    }
+
+    @Override
+    public T createFrom(
+        ChronoEntity<?> entity,
+        AttributeQuery attributes,
+        boolean lenient,
+        boolean preparsing
+    ) {
+
+        if (entity.contains(this.self)) {
+            return entity.get(this.self);
+        }
+
+        return super.createFrom(entity, attributes, lenient, preparsing);
 
     }
 

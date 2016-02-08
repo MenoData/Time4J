@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CopticCalendar.java) is part of project Time4J.
  *
@@ -1306,43 +1306,62 @@ public final class CopticCalendar
         }
 
         @Override
+        @Deprecated
         public CopticCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            if (!entity.contains(YEAR_OF_ERA)) {
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public CopticCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+
+            int cyear = entity.getInt(YEAR_OF_ERA);
+
+            if (cyear == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
                 return null;
             }
 
-            int cyear = entity.get(YEAR_OF_ERA).intValue();
-
-            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+            if (entity.contains(MONTH_OF_YEAR)) {
                 int cmonth = entity.get(MONTH_OF_YEAR).getValue();
-                int cdom = entity.get(DAY_OF_MONTH).intValue();
-                if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
-                    return CopticCalendar.of(cyear, cmonth, cdom);
-                } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
-                }
-            } else if (entity.contains(DAY_OF_YEAR)) {
-                int cdoy = entity.get(DAY_OF_YEAR).intValue();
-                if (cdoy > 0) {
-                    int cmonth = 1;
-                    int daycount = 0;
-                    while (cmonth <= 13) {
-                        int len = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-                        if (cdoy > daycount + len) {
-                            cmonth++;
-                            daycount += len;
-                        } else {
-                            return CopticCalendar.of(cyear, cmonth, cdoy - daycount);
-                        }
+                int cdom = entity.getInt(DAY_OF_MONTH);
+
+                if (cdom != Integer.MIN_VALUE) {
+                    if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
+                        return CopticCalendar.of(cyear, cmonth, cdom);
+                    } else {
+                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
                     }
                 }
-                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+            } else {
+                int cdoy = entity.getInt(DAY_OF_YEAR);
+                if (cdoy != Integer.MIN_VALUE) {
+                    if (cdoy > 0) {
+                        int cmonth = 1;
+                        int daycount = 0;
+                        while (cmonth <= 13) {
+                            int len = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
+                            if (cdoy > daycount + len) {
+                                cmonth++;
+                                daycount += len;
+                            } else {
+                                return CopticCalendar.of(cyear, cmonth, cdoy - daycount);
+                            }
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                }
             }
 
             return null;

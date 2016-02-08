@@ -485,7 +485,8 @@ final class SystemTemporalFormatter<T>
 
             TZID parsedTimezone = Timezone.of(timezone).getID();
             parsed.setTimezone(parsedTimezone);
-            PlainTimestamp tsp = PlainTimestamp.axis().createFrom(parsed, this.getAttributes(), false);
+            PlainTimestamp tsp =
+                PlainTimestamp.axis().createFrom(parsed, this.getAttributes(), this.leniency.isLax(), false);
             if (tsp == null) {
                 result = null;
             } else {

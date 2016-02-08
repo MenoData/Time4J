@@ -1341,20 +1341,32 @@ public final class PlainTimestamp
         }
 
         @Override
+        @Deprecated
         public PlainTimestamp createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
         ) {
 
-            Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
+            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
+            return this.createFrom(entity, attributes, lenient, preparsing);
+
+        }
+
+        @Override
+        public PlainTimestamp createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
 
             if (entity instanceof UnixTime) {
                 TZID tzid;
 
                 if (attributes.contains(Attributes.TIMEZONE_ID)) {
                     tzid = attributes.get(Attributes.TIMEZONE_ID);
-                } else if (leniency.isLax()) {
+                } else if (lenient) {
                     tzid = ZonalOffset.UTC;
                 } else {
                     throw new IllegalArgumentException(
@@ -1365,13 +1377,10 @@ public final class PlainTimestamp
                 return ut.toZonalTimestamp(tzid);
             }
 
-            boolean leapsecond =
-                preparsing
-                && entity.contains(SECOND_OF_MINUTE)
-                && (entity.get(SECOND_OF_MINUTE).intValue() == 60);
+            boolean leapsecond = (preparsing && (entity.getInt(SECOND_OF_MINUTE) == 60));
 
             if (leapsecond) { // temporär, wird später kompensiert
-                entity.with(SECOND_OF_MINUTE, Integer.valueOf(59));
+                entity.with(SECOND_OF_MINUTE, 59);
             }
 
             PlainDate date;
@@ -1380,7 +1389,7 @@ public final class PlainTimestamp
             if (entity.contains(CALENDAR_DATE)) {
                 date = entity.get(CALENDAR_DATE);
             } else {
-                date = PlainDate.axis().createFrom(entity, attributes, false);
+                date = PlainDate.axis().createFrom(entity, attributes, lenient, false);
             }
 
             if (date == null) {
@@ -1388,11 +1397,8 @@ public final class PlainTimestamp
             } else if (entity.contains(WALL_TIME)) {
                 time = entity.get(WALL_TIME);
             } else {
-                time = PlainTime.axis().createFrom(entity, attributes, false);
-                if (
-                    (time == null)
-                    && leniency.isLax()
-                ) {
+                time = PlainTime.axis().createFrom(entity, attributes, lenient, false);
+                if ((time == null) && lenient) {
                     time = PlainTime.MIN;
                 }
             }
