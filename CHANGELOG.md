@@ -3,6 +3,7 @@
 - Add Roman numerals [#443]
 
 ### Fixed
+- Non-ISO-resources for day-of-week, am-pm and quarters are mismatched [#452]
 - Add equals/hashCode-support for platform formatter [#451]
 - Prohibit use of Ethiopian hour with PlainTime [#449]
 - Code example in documentation of MultiFormatParser is incomplete [#446]
