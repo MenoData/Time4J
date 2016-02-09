@@ -96,7 +96,7 @@ public class CalendarOverrideTest {
         Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
         assertThat(
             f.format(m),
-            is("Amete Mihret, 2008-03-09 03:45 PM +03:00"));
+            is("Amete Mihret, 2008-03-09 03:45 pm +03:00"));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class CalendarOverrideTest {
                 .build()
                 .withTimezone(offset);
         assertThat(
-            f.parse("Amete Mihret, 2008-03-09 03:45 PM +03:00"),
+            f.parse("Amete Mihret, 2008-03-09 03:45 pm +03:00"),
             is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset))
         );
     }

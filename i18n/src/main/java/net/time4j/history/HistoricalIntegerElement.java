@@ -49,8 +49,6 @@ import java.text.ParsePosition;
 import java.util.List;
 import java.util.Locale;
 
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
-
 
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf Integer-Basis. </p>
@@ -417,11 +415,7 @@ final class HistoricalIntegerElement
         OutputContext outputContext
     ) {
 
-        CalendarText cnames =
-            CalendarText.getInstance(
-                attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
-
+        CalendarText cnames = CalendarText.getIsoInstance(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         return cnames.getStdMonths(textWidth, outputContext);
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AmPmElement.java) is part of project Time4J.
  *
@@ -23,12 +23,15 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.Leniency;
+import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
-import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.GregorianTextElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -36,8 +39,6 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.text.ParsePosition;
 import java.util.Locale;
-
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -47,7 +48,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @concurrency <immutable>
  */
 enum AmPmElement
-    implements ZonalElement<Meridiem>, TextElement<Meridiem> {
+    implements ZonalElement<Meridiem>, GregorianTextElement<Meridiem> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -131,7 +132,7 @@ enum AmPmElement
     @Override
     public ChronoFunction<Moment, Meridiem> in(Timezone tz) {
 
-        return new ZonalQuery<Meridiem>(this, tz);
+        return new ZonalQuery<>(this, tz);
 
     }
 
@@ -145,7 +146,7 @@ enum AmPmElement
     @Override
     public ChronoFunction<Moment, Meridiem> at(ZonalOffset offset) {
 
-        return new ZonalQuery<Meridiem>(this, offset);
+        return new ZonalQuery<>(this, offset);
 
     }
 
@@ -167,26 +168,51 @@ enum AmPmElement
         AttributeQuery attributes
     ) {
 
-        return this.accessor(attributes).parse(
-            text,
-            status,
-            this.getType(),
-            attributes
-        );
+        return this.accessor(attributes).parse(text, status, this.getType(), attributes);
+
+    }
+
+    @Override
+    public void print(
+        ChronoDisplay context,
+        Appendable buffer,
+        Locale language,
+        TextWidth tw,
+        OutputContext oc
+    ) throws IOException, ChronoException {
+
+        buffer.append(this.accessor(language, tw).print(context.get(this)));
+
+    }
+
+    @Override
+    public Meridiem parse(
+        CharSequence text,
+        ParsePosition status,
+        Locale language,
+        TextWidth tw,
+        OutputContext oc,
+        Leniency leniency
+    ) {
+
+        return this.accessor(language, tw).parse(text, status, this.getType(), leniency);
 
     }
 
     private TextAccessor accessor(AttributeQuery attributes) {
 
-        CalendarText cnames =
-            CalendarText.getInstance(
-                attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
-
-        TextWidth textWidth =
-            attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-
+        CalendarText cnames = CalendarText.getIsoInstance(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+        TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         return cnames.getMeridiems(textWidth);
+
+    }
+
+    private TextAccessor accessor(
+        Locale language,
+        TextWidth textWidth
+    ) {
+
+        return CalendarText.getIsoInstance(language).getMeridiems(textWidth);
 
     }
 

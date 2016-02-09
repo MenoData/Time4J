@@ -315,7 +315,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
                 return cnames.getStdMonths(textWidth, outputContext);
             }
         } else if (this.isWeekdayElement()) {
-            cnames = CalendarText.getInstance(ISO_CALENDAR_TYPE, lang);
+            cnames = CalendarText.getIsoInstance(lang);
             return cnames.getWeekdays(textWidth, outputContext);
         } else if (this.isEraElement()) {
             cnames =

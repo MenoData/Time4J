@@ -43,8 +43,6 @@ import java.io.ObjectStreamException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
-
 
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf enum-Basis. </p>
@@ -189,9 +187,7 @@ final class HistoricalEraElement
         }
 
         CalendarText cnames =
-            CalendarText.getInstance(
-                attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+            CalendarText.getIsoInstance(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
         if (attributes.get(HistoricAttribute.COMMON_ERA, Boolean.FALSE).booleanValue()) {
             // NARROW and SHORT like ABBREVIATED

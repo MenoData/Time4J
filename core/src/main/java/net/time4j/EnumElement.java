@@ -23,13 +23,15 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.Leniency;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
-import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.GregorianTextElement;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -49,7 +51,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  */
 final class EnumElement<V extends Enum<V>>
     extends AbstractDateElement<V>
-    implements NavigableElement<V>, NumericalElement<V>, TextElement<V> {
+    implements NavigableElement<V>, NumericalElement<V>, GregorianTextElement<V> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -190,8 +192,11 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) throws IOException {
 
+        String calendarType = attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
+        Locale language = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
+        TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-        buffer.append(this.accessor(attributes, oc).print(context.get(this)));
+        buffer.append(this.accessor(calendarType, language, tw, oc).print(context.get(this)));
 
     }
 
@@ -202,16 +207,55 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) {
 
-
         int index = status.getIndex();
+        String calendarType = attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
+        Locale language = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
+        TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-        V result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+        V result = this.accessor(calendarType, language, tw, oc).parse(text, status, this.getType(), attributes);
 
         if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
             status.setErrorIndex(-1);
             status.setIndex(index);
             oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-            result = this.accessor(attributes, oc).parse(text, status, this.getType(), attributes);
+            result = this.accessor(calendarType, language, tw, oc).parse(text, status, this.getType(), attributes);
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public void print(
+        ChronoDisplay context,
+        Appendable buffer,
+        Locale language,
+        TextWidth tw,
+        OutputContext oc
+    ) throws IOException, ChronoException {
+
+        buffer.append(this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).print(context.get(this)));
+
+    }
+
+    @Override
+    public V parse(
+        CharSequence text,
+        ParsePosition status,
+        Locale language,
+        TextWidth tw,
+        OutputContext oc,
+        Leniency leniency
+    ) {
+
+        int index = status.getIndex();
+        V result = this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).parse(text, status, this.getType(), leniency);
+
+        if ((result == null) && !leniency.isStrict()) {
+            status.setErrorIndex(-1);
+            status.setIndex(index);
+            oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+            result = this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).parse(text, status, this.getType(), leniency);
         }
 
         return result;
@@ -237,25 +281,19 @@ final class EnumElement<V extends Enum<V>>
     }
 
     private TextAccessor accessor(
-        AttributeQuery attributes,
+        String calendarType,
+        Locale language,
+        TextWidth tw,
         OutputContext oc
     ) {
 
-        CalendarText cnames =
-            CalendarText.getInstance(
-                attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                attributes.get(Attributes.LANGUAGE, Locale.ROOT));
-
-        TextWidth textWidth =
-            attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-
         switch (this.index) {
             case MONTH:
-                return cnames.getStdMonths(textWidth, oc);
+                return CalendarText.getInstance(calendarType, language).getStdMonths(tw, oc);
             case DAY_OF_WEEK:
-                return cnames.getWeekdays(textWidth, oc);
+                return CalendarText.getIsoInstance(language).getWeekdays(tw, oc);
             case QUARTER_OF_YEAR:
-                return cnames.getQuarters(textWidth, oc);
+                return CalendarText.getIsoInstance(language).getQuarters(tw, oc);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
