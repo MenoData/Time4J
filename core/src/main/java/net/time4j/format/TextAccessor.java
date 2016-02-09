@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextAccessor.java) is part of project Time4J.
  *
@@ -138,6 +138,52 @@ public final class TextAccessor {
     ) {
 
         return this.parse(parseable, status, valueType, true, false);
+
+    }
+
+    /**
+     * <p>Interpretes given text form as enum-based element value. </p>
+     *
+     * @param   <V> generic value type of element
+     * @param   parseable       text to be parsed
+     * @param   status          current parsing position
+     * @param   valueType       value class of element
+     * @param   leniency        leniency mode
+     * @return  element value (as enum) or {@code null} if not found
+     * @see     Attributes#LENIENCY
+     * @see     #parse(CharSequence, ParsePosition, Class, AttributeQuery)
+     * @since   3.15/4.12
+     */
+    /*[deutsch]
+     * <p>Interpretiert die angegebene Textform als Enum-Elementwert. </p>
+     *
+     * @param   <V> generic value type of element
+     * @param   parseable       text to be parsed
+     * @param   status          current parsing position
+     * @param   valueType       value class of element
+     * @param   leniency        leniency mode
+     * @return  element value (as enum) or {@code null} if not found
+     * @see     Attributes#LENIENCY
+     * @see     #parse(CharSequence, ParsePosition, Class, AttributeQuery)
+     * @since   3.15/4.12
+     */
+    public <V extends Enum<V>> V parse(
+        CharSequence parseable,
+        ParsePosition status,
+        Class<V> valueType,
+        Leniency leniency
+    ) {
+
+        boolean caseInsensitive = true;
+        boolean partialCompare = false;
+
+        if (leniency == Leniency.STRICT) {
+            caseInsensitive = false;
+        } else if (leniency == Leniency.LAX) {
+            partialCompare = true;
+        }
+
+        return this.parse(parseable, status, valueType, caseInsensitive, partialCompare);
 
     }
 

@@ -59,7 +59,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static net.time4j.PlainDate.CALENDAR_DATE;
 import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -1143,9 +1142,7 @@ public final class Weekmodel
         ) {
 
             CalendarText cnames =
-                CalendarText.getInstance(
-                    attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE),
-                    attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+                CalendarText.getIsoInstance(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
             return cnames.getWeekdays(
                 attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE),

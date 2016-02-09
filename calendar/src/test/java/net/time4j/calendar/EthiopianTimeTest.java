@@ -378,13 +378,13 @@ public class EthiopianTimeTest {
                 .build()
                 .with(Leniency.STRICT);
         assertThat(
-            f.parse("11:30 PM").toISO(),
+            f.parse("11:30 ከሰዓት").toISO(),
             is(PlainTime.of(23, 30)));
         assertThat(
-            f.parse("0:00 AM").toISO(),
+            f.parse("0:00 ጥዋት").toISO(),
             is(PlainTime.midnightAtStartOfDay()));
         assertThat(
-            f.parse("0:30 AM").toISO(),
+            f.parse("0:30 ጥዋት").toISO(),
             is(PlainTime.of(0, 30)));
     }
 

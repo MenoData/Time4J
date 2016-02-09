@@ -26,9 +26,14 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
+import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
+import net.time4j.format.TextWidth;
+import net.time4j.format.internal.GregorianTextElement;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Set;
 
 
@@ -47,11 +52,24 @@ final class TextProcessor<V>
     private final TextElement<V> element;
     private final boolean protectedMode;
 
+    // quick path optimization
+    private final GregorianTextElement<V> gte;
+    private final Locale language;
+    private final TextWidth tw;
+    private final OutputContext oc;
+    private final Leniency lenientMode;
+    private final int protectedLength;
+
     //~ Konstruktoren -----------------------------------------------------
 
     private TextProcessor(
         TextElement<V> element,
-        boolean protectedMode
+        boolean protectedMode,
+        Locale language,
+        TextWidth tw,
+        OutputContext oc,
+        Leniency lenientMode,
+        int protectedLength
     ) {
         super();
 
@@ -61,6 +79,14 @@ final class TextProcessor<V>
 
         this.element = element;
         this.protectedMode = protectedMode;
+
+        // quick path members
+        this.gte = (element instanceof GregorianTextElement) ? (GregorianTextElement<V>) element : null;
+        this.language = language;
+        this.tw = tw;
+        this.oc = oc;
+        this.lenientMode = lenientMode;
+        this.protectedLength = protectedLength;
 
     }
 
@@ -74,7 +100,8 @@ final class TextProcessor<V>
      */
     static <V> TextProcessor<V> create(TextElement<V> element) {
 
-        return new TextProcessor<V>(element, false);
+        return new TextProcessor<V>(
+            element, false, Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT, Leniency.SMART, 0);
 
     }
 
@@ -86,7 +113,8 @@ final class TextProcessor<V>
      */
     static <V> TextProcessor<V> createProtected(TextElement<V> element) {
 
-        return new TextProcessor<V>(element, true);
+        return new TextProcessor<V>(
+            element, true, Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT, Leniency.SMART, 0);
 
     }
 
@@ -103,13 +131,13 @@ final class TextProcessor<V>
             if (buffer instanceof CharSequence) {
                 CharSequence cs = (CharSequence) buffer;
                 int offset = cs.length();
-                this.element.print(formattable, buffer, attributes);
+                this.print(formattable, buffer, attributes, quickPath);
 
                 if (positions != null) {
                     positions.add(new ElementPosition(this.element, offset, cs.length()));
                 }
             } else {
-                this.element.print(formattable, buffer, attributes);
+                this.print(formattable, buffer, attributes, quickPath);
             }
         } catch (ChronoException ce) {
             throw new IllegalArgumentException(ce);
@@ -128,8 +156,7 @@ final class TextProcessor<V>
 
         int start = status.getPosition();
         int len = text.length();
-
-        int protectedChars = attributes.get(Attributes.PROTECTED_CHARACTERS, Integer.valueOf(0)).intValue();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
         if (protectedChars > 0) {
             len -= protectedChars;
@@ -141,8 +168,13 @@ final class TextProcessor<V>
             return;
         }
 
-        TextElement<?> te = TextElement.class.cast(this.element);
-        Object value = te.parse(text, status.getPP(), attributes);
+        Object value;
+
+        if (quickPath && (this.gte != null) && (this.lenientMode != null)) {
+            value = this.gte.parse(text, status.getPP(), this.language, this.tw, this.oc, this.lenientMode);
+        } else {
+            value = this.element.parse(text, status.getPP(), attributes);
+        }
 
         if (status.isError()) {
             Class<V> valueType = this.element.getType();
@@ -151,12 +183,10 @@ final class TextProcessor<V>
             } else {
                 status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
             }
+        } else if (value == null) {
+            status.setError(start, "No interpretable value.");
         } else {
-            if (value == null) {
-                status.setError(start, "No interpretable value.");
-            } else {
-                parsedResult.put(this.element, value);
-            }
+            parsedResult.put(this.element, value);
         }
 
     }
@@ -233,7 +263,43 @@ final class TextProcessor<V>
         int reserved
     ) {
 
-        return this;
+        Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
+        boolean multipleContext = attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE).booleanValue();
+        boolean caseInsensitive = attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue();
+        boolean partialCompare = attributes.get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE).booleanValue();
+
+        if ((leniency == Leniency.STRICT) && (multipleContext || caseInsensitive || partialCompare)) {
+            leniency = null;
+        } else if ((leniency == Leniency.SMART) && (!multipleContext || !caseInsensitive || partialCompare)) {
+            leniency = null;
+        } else if (!multipleContext || !caseInsensitive || !partialCompare) { // lax mode
+            leniency = null;
+        }
+
+        return new TextProcessor<V>(
+            this.element,
+            this.protectedMode,
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT),
+            attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE),
+            attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT),
+            leniency,
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0)
+        );
+
+    }
+
+    private void print(
+        ChronoDisplay formattable,
+        Appendable buffer,
+        AttributeQuery attributes,
+        boolean quickPath
+    ) throws IOException {
+
+        if ((this.gte != null) && quickPath) {
+            this.gte.print(formattable, buffer, this.language, this.tw, this.oc);
+        } else {
+            this.element.print(formattable, buffer, attributes);
+        }
 
     }
 
