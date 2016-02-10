@@ -96,6 +96,16 @@ public class MiscellaneousTest {
         assertThat(CopticCalendar.Unit.MONTHS.between(start, end), is(7));
         start = start.plus(CalendarDays.ONE);
         assertThat(CopticCalendar.Unit.MONTHS.between(start, end), is(6));
+        start = start.minus(3, CopticCalendar.Unit.YEARS);
+        assertThat(CopticCalendar.Unit.YEARS.between(start, end), is(3));
+        start = start.plus(6, CopticCalendar.Unit.YEARS).minus(CalendarDays.of(2)); // A.M.-1726-06-05
+        assertThat(CopticCalendar.Unit.YEARS.between(start, end), is(-2));
+        start = start.with(CopticCalendar.MONTH_OF_YEAR, CopticMonth.NASIE); // A.M.-1726-13-05
+        assertThat(CopticCalendar.Unit.YEARS.between(start, end), is(-2));
+        start = start.plus(1, CopticCalendar.Unit.YEARS); // A.M.-1727-06-05
+        assertThat(CopticCalendar.Unit.YEARS.between(start, end), is(-3));
+        start = start.plus(CalendarDays.ONE); // A.M.-1727-06-06
+        assertThat(CopticCalendar.Unit.YEARS.between(start, end), is(-4));
     }
 
     @Test
@@ -126,6 +136,10 @@ public class MiscellaneousTest {
         assertThat(EthiopianCalendar.Unit.MONTHS.between(start, end), is(7));
         start = start.plus(CalendarDays.ONE);
         assertThat(EthiopianCalendar.Unit.MONTHS.between(start, end), is(6));
+        start = start.minus(3, EthiopianCalendar.Unit.YEARS);
+        assertThat(EthiopianCalendar.Unit.YEARS.between(start, end), is(3));
+        end = end.with(EthiopianCalendar.MONTH_OF_YEAR, EthiopianMonth.YEKATIT);
+        assertThat(EthiopianCalendar.Unit.YEARS.between(start, end), is(2));
     }
 
     @Test
@@ -152,6 +166,27 @@ public class MiscellaneousTest {
         assertThat(PersianCalendar.Unit.MONTHS.between(start, end), is(3));
         end = end.plus(CalendarDays.ONE);
         assertThat(PersianCalendar.Unit.MONTHS.between(start, end), is(4));
+
+        start = PersianCalendar.of(1360, 2, 20);
+        end = PersianCalendar.of(1394, 11, 25);
+
+        for (int i = 0; i < 15; i++) {
+            start = start.plus(1, PersianCalendar.Unit.DAYS);
+            assertThat(
+                PersianCalendar.Unit.YEARS.between(start, end),
+                is(34));
+        }
+
+        start = PersianCalendar.of(1360, 2, 20);
+        end = PersianCalendar.of(1394, 2, 20);
+
+        assertThat(
+            PersianCalendar.Unit.YEARS.between(start, end),
+            is(34));
+        start = PersianCalendar.of(1360, 2, 21);
+        assertThat(
+            PersianCalendar.Unit.YEARS.between(start, end),
+            is(33));
     }
 
     @Test

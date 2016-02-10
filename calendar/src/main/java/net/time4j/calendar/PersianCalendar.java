@@ -1500,17 +1500,11 @@ public final class PersianCalendar
         @Override
         public long between(PersianCalendar start, PersianCalendar end) {
 
-            int factor = 1;
-
             switch (this.unit) {
                 case YEARS:
-                    factor = 12;
-                    // fall-through
+                    return PersianCalendar.Unit.MONTHS.between(start, end) / 12;
                 case MONTHS:
                     long delta = ymValue(end) - ymValue(start);
-                    if (factor > 1) {
-                        delta = delta / factor;
-                    }
                     if ((delta > 0) && (end.pdom < start.pdom)) {
                         delta--;
                     } else if ((delta < 0) && (end.pdom > start.pdom)) {
@@ -1518,14 +1512,9 @@ public final class PersianCalendar
                     }
                     return delta;
                 case WEEKS:
-                    factor = 7;
-                    // fall-through
+                    return PersianCalendar.Unit.DAYS.between(start, end) / 7;
                 case DAYS:
-                    long days = CALSYS.transform(end) - CALSYS.transform(start);
-                    if (factor > 1) {
-                        days = days / factor;
-                    }
-                    return days;
+                    return CALSYS.transform(end) - CALSYS.transform(start);
                 default:
                     throw new UnsupportedOperationException(this.unit.name());
             }

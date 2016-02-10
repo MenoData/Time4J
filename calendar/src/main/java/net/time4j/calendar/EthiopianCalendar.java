@@ -1703,17 +1703,11 @@ public final class EthiopianCalendar
         @Override
         public long between(EthiopianCalendar start, EthiopianCalendar end) {
 
-            int factor = 1;
-
             switch (this.unit) {
                 case YEARS:
-                    factor = 13;
-                    // fall-through
+                    return EthiopianCalendar.Unit.MONTHS.between(start, end) / 13;
                 case MONTHS:
                     long delta = ymValue(end) - ymValue(start);
-                    if (factor > 1) {
-                        delta = delta / factor;
-                    }
                     if ((delta > 0) && (end.edom < start.edom)) {
                         delta--;
                     } else if ((delta < 0) && (end.edom > start.edom)) {
@@ -1721,14 +1715,9 @@ public final class EthiopianCalendar
                     }
                     return delta;
                 case WEEKS:
-                    factor = 7;
-                    // fall-through
+                    return EthiopianCalendar.Unit.DAYS.between(start, end) / 7;
                 case DAYS:
-                    long days = CALSYS.transform(end) - CALSYS.transform(start);
-                    if (factor > 1) {
-                        days = days / factor;
-                    }
-                    return days;
+                    return CALSYS.transform(end) - CALSYS.transform(start);
                 default:
                     throw new UnsupportedOperationException(this.unit.name());
             }
