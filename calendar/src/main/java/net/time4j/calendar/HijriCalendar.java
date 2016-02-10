@@ -1121,7 +1121,7 @@ public final class HijriCalendar
         }
 
         /**
-         * <p>Calculates the difference between given Ethiopian dates in this unit. </p>
+         * <p>Calculates the difference between given islamic dates in this unit. </p>
          *
          * @param   start       start date (inclusive)
          * @param   end         end date (exclusive)
@@ -1130,7 +1130,7 @@ public final class HijriCalendar
          * @since   3.14/4.11
          */
         /*[deutsch]
-         * <p>Berechnet die Differenz zwischen den angegebenen Datumsparametern in dieser Zeiteinheit. </p>
+         * <p>Berechnet die Differenz zwischen den angegebenen islamischen Datumsparametern in dieser Zeiteinheit. </p>
          *
          * @param   start       start date (inclusive)
          * @param   end         end date (exclusive)

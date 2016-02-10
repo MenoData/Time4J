@@ -91,7 +91,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *
  * <p>Note: The definition of an optional negative sign is not part of
  * ISO-8061, but part of the XML-schema-specification and defines the
- * position of two time point relative to each other. A manipulation of
+ * position of two time points relative to each other. A manipulation of
  * the sign is possible with the method {@code inverse()}. </p>
  *
  * <p>The time arithmetic handles the addition of a duration to a time point
