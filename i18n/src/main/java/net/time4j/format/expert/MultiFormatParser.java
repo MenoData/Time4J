@@ -24,10 +24,9 @@ package net.time4j.format.expert;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoEntity;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -63,14 +62,14 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final List<ChronoFormatter<T>> parsers;
+    private final ChronoFormatter<T>[] parsers;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private MultiFormatParser(List<ChronoFormatter<T>> parsers) {
+    private MultiFormatParser(ChronoFormatter<T>[] parsers) {
         super();
 
-        this.parsers = Collections.unmodifiableList(parsers);
+        this.parsers = parsers;
 
         for (ChronoFormatter<T> parser : this.parsers) {
             if (parser == null) {
@@ -98,9 +97,10 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * @return  new immutable instance of MultiFormatParser
      * @since   3.14/4.11
      */
+    @SafeVarargs
     public static <T extends ChronoEntity<T>> MultiFormatParser<T> of(ChronoFormatter<T>... formats) {
 
-        List<ChronoFormatter<T>> parsers = Arrays.asList(formats);
+        ChronoFormatter<T>[] parsers = Arrays.copyOf(formats, formats.length);
         return new MultiFormatParser<T>(parsers);
 
     }
@@ -121,9 +121,11 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      * @return  new immutable instance of MultiFormatParser
      * @since   3.14/4.11
      */
+    @SuppressWarnings("unchecked")
     public static <T extends ChronoEntity<T>> MultiFormatParser<T> of(List<ChronoFormatter<T>> formats) {
 
-        List<ChronoFormatter<T>> parsers = new ArrayList<ChronoFormatter<T>>(formats);
+        ChronoFormatter<T>[] parsers =
+            formats.toArray((ChronoFormatter<T>[]) Array.newInstance(ChronoFormatter.class, formats.size()));
         return new MultiFormatParser<T>(parsers);
 
     }
@@ -203,7 +205,6 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *
      *         return Collections.unmodifiableCollection(parsedDates);
      *     }
-     *
      * </pre>
      *
      * @param   text        text to be parsed
@@ -250,7 +251,6 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *
      *         return Collections.unmodifiableCollection(parsedDates);
      *     }
-     *
      * </pre>
      *
      * @param   text        text to be parsed
@@ -266,12 +266,12 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
 
         int start = status.getPosition();
 
-        for (ChronoFormatter<T> parser : this.parsers) {
+        for (int i = 0; i < this.parsers.length; i++) {
             status.reset(); // initialization
             status.setPosition(start);
 
             // use the default global attributes of every single parser
-            T parsed = parser.parse(text, status);
+            T parsed = this.parsers[i].parse(text, status);
 
             if ((parsed != null) && !status.isError()) {
                 return parsed;
@@ -293,13 +293,13 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
 
         int start = status.getPosition();
 
-        for (ChronoFormatter<T> parser : this.parsers) {
+        for (int i = 0; i < this.parsers.length; i++) {
             status.reset(); // initialization
             status.setPosition(start);
 
             // use the default global attributes of every single parser,
             // possibly overridden by user-defined attributes
-            T parsed = parser.parse(text, status, attributes);
+            T parsed = this.parsers[i].parse(text, status, attributes);
 
             if ((parsed != null) && !status.isError()) {
                 return parsed;

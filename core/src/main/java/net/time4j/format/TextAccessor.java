@@ -51,7 +51,7 @@ public final class TextAccessor {
     //~ Instanzvariablen --------------------------------------------------
 
     private final List<String> textForms;
-    private final Locale locale;
+    // private final Locale locale;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -69,7 +69,7 @@ public final class TextAccessor {
 
         this.textForms =
             Collections.unmodifiableList(Arrays.asList(textForms));
-        this.locale = locale;
+        // this.locale = locale;
 
     }
 
@@ -293,7 +293,7 @@ public final class TextAccessor {
                     char t = s.charAt(j);
 
                     if (caseInsensitive) {
-                        eq = this.compareIgnoreCase(c, t);
+                        eq = (c == t) || this.compareIgnoreCase(c, t);
                     } else {
                         eq = (c == t);
                     }
@@ -331,21 +331,27 @@ public final class TextAccessor {
     private boolean compareIgnoreCase(char c1, char c2) {
 
         if (c1 >= 'a' && c1 <= 'z') {
-            c1 = (char) (c1 - 'a' + 'A');
-        }
-
-        if (c2 >= 'a' && c2 <= 'z') {
-            c2 = (char) (c2 - 'a' + 'A');
-        }
-
-        if (c1 >= 'A' && c1 <= 'Z') {
+            if (c2 >= 'A' && c2 <= 'Z') {
+                c2 = (char) (c2 + 'a' - 'A');
+            }
+            return (c1 == c2);
+        } else if (c1 >= 'A' && c1 <= 'Z') {
+            c1 = (char) (c1 + 'a' - 'A');
+            if (c2 >= 'A' && c2 <= 'Z') {
+                c2 = (char) (c2 + 'a' - 'A');
+            }
             return (c1 == c2);
         }
 
-        String s1 = String.valueOf(c1).toUpperCase(this.locale);
-        String s2 = String.valueOf(c2).toUpperCase(this.locale);
-        return s1.equals(s2);
+        return (
+            Character.toUpperCase(c1) == Character.toUpperCase(c2)
+            || Character.toLowerCase(c1) == Character.toLowerCase(c2)
+        );
 
+// old code
+//        String s1 = String.valueOf(c1).toUpperCase(this.locale);
+//        String s2 = String.valueOf(c2).toUpperCase(this.locale);
+//        return s1.equals(s2);
     }
 
 }

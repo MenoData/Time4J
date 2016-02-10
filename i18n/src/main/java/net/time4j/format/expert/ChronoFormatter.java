@@ -843,7 +843,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes
     ) {
 
-
         AttributeQuery attrs = attributes;
         Leniency leniency = this.leniency;
 
