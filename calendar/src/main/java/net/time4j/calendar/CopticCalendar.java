@@ -1441,17 +1441,11 @@ public final class CopticCalendar
         @Override
         public long between(CopticCalendar start, CopticCalendar end) {
 
-            int factor = 1;
-
             switch (this.unit) {
                 case YEARS:
-                    factor = 13;
-                    // fall-through
+                    return CopticCalendar.Unit.MONTHS.between(start, end) / 13;
                 case MONTHS:
                     long delta = ymValue(end) - ymValue(start);
-                    if (factor > 1) {
-                        delta = delta / factor;
-                    }
                     if ((delta > 0) && (end.cdom < start.cdom)) {
                         delta--;
                     } else if ((delta < 0) && (end.cdom > start.cdom)) {
@@ -1459,14 +1453,9 @@ public final class CopticCalendar
                     }
                     return delta;
                 case WEEKS:
-                    factor = 7;
-                    // fall-through
+                    return CopticCalendar.Unit.DAYS.between(start, end) / 7;
                 case DAYS:
-                    long days = CALSYS.transform(end) - CALSYS.transform(start);
-                    if (factor > 1) {
-                        days = days / factor;
-                    }
-                    return days;
+                    return CALSYS.transform(end) - CALSYS.transform(start);
                 default:
                     throw new UnsupportedOperationException(this.unit.name());
             }
