@@ -39,8 +39,6 @@ import java.io.ObjectStreamException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
-
 
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf enum-Basis. </p>
@@ -191,11 +189,10 @@ final class EnumElement<V extends Enum<V>>
         AttributeQuery attributes
     ) throws IOException {
 
-        String calendarType = attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
         Locale language = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-        buffer.append(this.accessor(calendarType, language, tw, oc).print(context.get(this)));
+        buffer.append(this.accessor(language, tw, oc).print(context.get(this)));
 
     }
 
@@ -207,17 +204,16 @@ final class EnumElement<V extends Enum<V>>
     ) {
 
         int index = status.getIndex();
-        String calendarType = attributes.get(Attributes.CALENDAR_TYPE, ISO_CALENDAR_TYPE);
         Locale language = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-        V result = this.accessor(calendarType, language, tw, oc).parse(text, status, this.getType(), attributes);
+        V result = this.accessor(language, tw, oc).parse(text, status, this.getType(), attributes);
 
         if ((result == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
             status.setErrorIndex(-1);
             status.setIndex(index);
             oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-            result = this.accessor(calendarType, language, tw, oc).parse(text, status, this.getType(), attributes);
+            result = this.accessor(language, tw, oc).parse(text, status, this.getType(), attributes);
         }
 
         return result;
@@ -233,7 +229,7 @@ final class EnumElement<V extends Enum<V>>
         OutputContext oc
     ) throws IOException, ChronoException {
 
-        buffer.append(this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).print(context.get(this)));
+        buffer.append(this.accessor(language, tw, oc).print(context.get(this)));
 
     }
 
@@ -248,13 +244,13 @@ final class EnumElement<V extends Enum<V>>
     ) {
 
         int index = status.getIndex();
-        V result = this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).parse(text, status, this.getType(), leniency);
+        V result = this.accessor(language, tw, oc).parse(text, status, this.getType(), leniency);
 
         if ((result == null) && !leniency.isStrict()) {
             status.setErrorIndex(-1);
             status.setIndex(index);
             oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-            result = this.accessor(ISO_CALENDAR_TYPE, language, tw, oc).parse(text, status, this.getType(), leniency);
+            result = this.accessor(language, tw, oc).parse(text, status, this.getType(), leniency);
         }
 
         return result;
@@ -280,7 +276,6 @@ final class EnumElement<V extends Enum<V>>
     }
 
     private TextAccessor accessor(
-        String calendarType,
         Locale language,
         TextWidth tw,
         OutputContext oc
@@ -288,7 +283,7 @@ final class EnumElement<V extends Enum<V>>
 
         switch (this.index) {
             case MONTH:
-                return CalendarText.getInstance(calendarType, language).getStdMonths(tw, oc);
+                return CalendarText.getIsoInstance(language).getStdMonths(tw, oc);
             case DAY_OF_WEEK:
                 return CalendarText.getIsoInstance(language).getWeekdays(tw, oc);
             case QUARTER_OF_YEAR:

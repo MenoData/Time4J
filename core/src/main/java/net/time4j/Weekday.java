@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekday.java) is part of project Time4J.
  *
@@ -29,8 +29,6 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
 import java.util.Locale;
-
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -421,9 +419,7 @@ public enum Weekday
         OutputContext context
     ) {
 
-        CalendarText names =
-            CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
-        return names.getWeekdays(width, context).print(this);
+        return CalendarText.getIsoInstance(locale).getWeekdays(width, context).print(this);
 
     }
 

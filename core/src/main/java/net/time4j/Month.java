@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Month.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ import static net.time4j.Quarter.Q1;
 import static net.time4j.Quarter.Q2;
 import static net.time4j.Quarter.Q3;
 import static net.time4j.Quarter.Q4;
-import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
 
 /**
@@ -370,9 +369,7 @@ public enum Month
         OutputContext context
     ) {
 
-        CalendarText names =
-            CalendarText.getInstance(ISO_CALENDAR_TYPE, locale);
-        return names.getStdMonths(width, context).print(this);
+        return CalendarText.getIsoInstance(locale).getStdMonths(width, context).print(this);
 
     }
 
