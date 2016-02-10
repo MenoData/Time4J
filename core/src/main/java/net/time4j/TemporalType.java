@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -387,7 +387,7 @@ public abstract class TemporalType<S, T> {
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.Clock} and
-     * the class {@code net.time4j.base.TimeSource}. </p>
+     * the interface {@code net.time4j.base.TimeSource}. </p>
      *
      * <p>The conversion will always ignore leap seconds and initially use {@code ZoneId.systemDefault()}. </p>
      *
@@ -395,7 +395,7 @@ public abstract class TemporalType<S, T> {
      */
     /*[deutsch]
      * <p>Br&uuml;cke zwischen der JSR-310-Klasse {@code java.time.Clock} und
-     * der Klasse {@code net.time4j.base.TimeSource}. </p>
+     * dem Interface {@code net.time4j.base.TimeSource}. </p>
      *
      * <p>Die Konversion wird Schaltsekunden immer ignorieren und initial {@code ZoneId.systemDefault()}
      * verwenden. </p>
