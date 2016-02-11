@@ -242,7 +242,7 @@ public abstract class TemporalType<S, T> {
      * the class {@code Moment}. </p>
      *
      * <p>The conversion is usually exact. However, leap seconds will always be ignored. The
-     * outer value range limits of the class {@code Moment} is a little bit smaller. Example: </p>
+     * outer value range limits of the class {@code Moment} are a tiny bit smaller. Example: </p>
      *
      * <pre>
      *  Moment moment = TemporalType.INSTANT.translate(Instant.ofEpochSecond(86401, 450_000_000));
@@ -275,7 +275,7 @@ public abstract class TemporalType<S, T> {
      * the class {@code ZonalDateTime}. </p>
      *
      * <p>The conversion is usually exact. However, leap seconds will always be ignored. The
-     * outer value range limits of the class {@code ZonalDateTime} is a little bit different. Example: </p>
+     * outer value range limits of the class {@code ZonalDateTime} are a tiny bit different. Example: </p>
      *
      * <pre>
      *  Moment moment = TemporalType.ZONED_DATE_TIME.translate(Instant.ofEpochSecond(86401, 450_000_000));
