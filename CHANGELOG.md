@@ -3,6 +3,8 @@
 - Add Roman numerals [#443]
 
 ### Fixed
+- Unit-between-arithmetic broken for Persian, Coptic and Ethiopian calendar [#453]
+- Improve overall performance [#450]
 - Text resources for am-pm are mismatched (in non-iso-calendars) [#452]
 - Add equals/hashCode-support for platform formatter [#451]
 - Prohibit use of Ethiopian hour with PlainTime [#449]
