@@ -35,6 +35,8 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.Leniency;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
@@ -200,7 +202,9 @@ final class HistoricalIntegerElement
         AttributeQuery attributes
     ) throws IOException {
 
-        this.print(context, buffer, attributes, 1, 9);
+        NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+        char zeroChar = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+        this.print(context, buffer, attributes, numsys, zeroChar, 1, 9);
 
     }
 
@@ -209,6 +213,8 @@ final class HistoricalIntegerElement
         ChronoDisplay context,
         Appendable buffer,
         AttributeQuery attributes,
+        NumberSystem numsys,
+        char zeroChar,
         int minDigits,
         int maxDigits
     ) throws IOException {
@@ -220,45 +226,38 @@ final class HistoricalIntegerElement
                 NewYearStrategy nys = this.history.getNewYearStrategy();
                 HistoricEra era = date.getEra();
                 int yearOfEra = date.getYearOfEra();
-                int annoDomini = era.annoDomini(yearOfEra);
-                char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
-                String text = this.format(String.valueOf(yearOfEra), zero, minDigits, maxDigits);
+                String text = null;
                 if (
                     !NewYearStrategy.DEFAULT.equals(nys)
-                    && ((annoDomini >= 8) || (era.compareTo(HistoricEra.AD) > 0))
+                    && ((era.annoDomini(yearOfEra) >= 8) || (era.compareTo(HistoricEra.AD) > 0))
                 ) {
                     int yearOfDisplay = date.getYearOfEra(nys);
-                    if (yearOfDisplay != yearOfEra) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(yearOfDisplay);
-                        sb.append('/');
-                        if (
-                            (yearOfEra >= 100)
-                            && (MathUtils.floorDivide(yearOfDisplay, 100) == MathUtils.floorDivide(yearOfEra, 100))
-                        ) {
-                            int yoe2 = MathUtils.floorModulo(yearOfEra, 100);
-                            if (yoe2 < 10) {
-                                sb.append('0');
-                            }
-                            sb.append(yoe2);
-                        } else {
-                            sb.append(yearOfEra);
-                        }
-                        text = this.format(sb.toString(), zero, minDigits, maxDigits);
+                    if (yearOfDisplay != yearOfEra) { // dual dating
+                        text = this.dual(numsys, yearOfDisplay, yearOfEra, minDigits);
                     }
                 }
-                if (zero != '0') {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0, n = text.length(); i < n; i++) {
-                        char c = text.charAt(i);
-                        if (c >= '0' && c <= '9') {
-                            int diff = zero - '0';
-                            sb.append((char) (c + diff));
-                        } else {
-                            sb.append(c); // - (minus) or / (slash)
-                        }
+                if (text == null) { // standard case
+                    if (numsys == NumberSystem.ARABIC) {
+                        text = this.format(Integer.toString(yearOfEra), minDigits);
+                    } else {
+                        text = numsys.toNumeral(yearOfEra);
                     }
-                    text = sb.toString();
+                }
+                if (numsys == NumberSystem.ARABIC) {
+                    if (zeroChar != '0') {
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0, n = text.length(); i < n; i++) {
+                            char c = text.charAt(i);
+                            if (c >= '0' && c <= '9') {
+                                int diff = zeroChar - '0';
+                                sb.append((char) (c + diff));
+                            } else {
+                                sb.append(c); // - (minus) or / (slash)
+                            }
+                        }
+                        text = sb.toString();
+                    }
+                    this.checkLength(text, maxDigits);
                 }
                 buffer.append(text);
                 break;
@@ -297,20 +296,26 @@ final class HistoricalIntegerElement
             }
         }
 
+        NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+        Leniency leniency = (
+            (numsys == NumberSystem.ARABIC)
+                ? null // not used
+                : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int start = status.getIndex();
         int pos = start;
-        int value = parseNum(text, pos, status, zero);
+        int value = parseNum(numsys, text, pos, status, zero, leniency);
         pos = status.getIndex();
 
         if (
             (this.index == YEAR_OF_ERA_INDEX)
+            && (pos > start)
             && (!NewYearStrategy.DEFAULT.equals(this.history.getNewYearStrategy()))
             && (pos < text.length())
             && (text.charAt(pos) == '/')
         ) {
             int slash = pos;
-            int yoe = parseNum(text, pos + 1, status, zero);
+            int yoe = parseNum(numsys, text, pos + 1, status, zero, leniency);
             int test = status.getIndex();
             if (test == pos + 1) { // we will now stop consuming more chars and ignore yoe-part
                 status.setIndex(pos);
@@ -318,7 +323,7 @@ final class HistoricalIntegerElement
                 pos = test;
                 int yod = value;
                 int ancient = this.getAncientYear(yod, yoe);
-                if (ancient != Integer.MAX_VALUE) {
+                if ((numsys == NumberSystem.ARABIC) && (ancient != Integer.MAX_VALUE)) {
                     value = ancient;
                 } else if (Math.abs(yoe - yod) <= 1) { // check for plausibility
                     value = yoe;
@@ -381,10 +386,63 @@ final class HistoricalIntegerElement
 
     }
 
+    private String dual(
+        NumberSystem numsys,
+        int yearOfDisplay,
+        int yearOfEra,
+        int minDigits
+    ) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(numsys.toNumeral(yearOfDisplay));
+        sb.append('/');
+
+        if (
+            (numsys == NumberSystem.ARABIC)
+            && (yearOfEra >= 100)
+            && (MathUtils.floorDivide(yearOfDisplay, 100) == MathUtils.floorDivide(yearOfEra, 100))
+        ) {
+            int yoe2 = MathUtils.floorModulo(yearOfEra, 100);
+            if (yoe2 < 10) {
+                sb.append('0');
+            }
+            sb.append(yoe2);
+        } else {
+            sb.append(numsys.toNumeral(yearOfEra));
+        }
+
+        if (numsys == NumberSystem.ARABIC) {
+            return this.format(sb.toString(), minDigits);
+        } else {
+            return sb.toString();
+        }
+
+    }
+
     private String format(
         String digits,
-        char zero,
-        int min,
+        int min
+    ) {
+
+        int len = digits.length();
+
+        if (min <= len) {
+            return digits; // optimization
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = min - len; i < n; i++) {
+            sb.append('0');
+        }
+
+        sb.append(digits);
+        return sb.toString();
+
+    }
+
+    private void checkLength(
+        String digits,
         int max
     ) {
 
@@ -393,20 +451,9 @@ final class HistoricalIntegerElement
         if (len > max) {
             throw new IllegalArgumentException(
                 "Element " + this.name()
-                    + " cannot be printed as the value " + digits
+                    + " cannot be printed as the formatted value " + digits
                     + " exceeds the maximum width of " + max + ".");
-        } else if (min <= len) {
-            return digits; // optimization
         }
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0, n = min - len; i < n; i++) {
-            sb.append(zero);
-        }
-
-        sb.append(digits);
-        return sb.toString();
 
     }
 
@@ -422,36 +469,56 @@ final class HistoricalIntegerElement
     }
 
     private static int parseNum(
+        NumberSystem numsys,
         CharSequence text,
         int offset,
         ParsePosition status,
-        char zero
+        char zero,
+        Leniency leniency
     ) {
 
         int value = 0;
         int pos = offset;
-        boolean negative = false;
 
-        if (text.charAt(pos) == '-') {
-            negative = true;
-            pos++;
-        }
+        if (numsys == NumberSystem.ARABIC) {
+            boolean negative = false;
 
-        for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
-            int digit = text.charAt(i) - zero;
-            if ((digit >= 0) && (digit <= 9)) {
-                value = value * 10 + digit;
+            if (text.charAt(pos) == '-') {
+                negative = true;
                 pos++;
-            } else {
-                break;
             }
-        }
 
-        if (negative) {
-            if (pos == offset + 1) {
-                pos = offset;
-            } else {
-                value = MathUtils.safeNegate(value);
+            for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
+                int digit = text.charAt(i) - zero;
+                if ((digit >= 0) && (digit <= 9)) {
+                    value = value * 10 + digit;
+                    pos++;
+                } else {
+                    break;
+                }
+            }
+
+            if (negative) {
+                if (pos == offset + 1) {
+                    pos = offset;
+                } else {
+                    value = MathUtils.safeNegate(value);
+                }
+            }
+        } else {
+            int len = 0;
+
+            for (int i = pos, n = text.length(); i < n; i++) {
+                if (numsys.contains(text.charAt(i))) {
+                    len++;
+                } else {
+                    break;
+                }
+            }
+
+            if (len > 0) {
+                value = numsys.toInteger(text.subSequence(pos, pos + len).toString(), leniency);
+                pos += len;
             }
         }
 

@@ -167,17 +167,25 @@ final class NumberProcessor<V>
 
         int start = ((buffer instanceof CharSequence) ? ((CharSequence) buffer).length() : -1);
         int printed = 0;
+        NumberSystem numsys = (quickPath ? this.numberSystem : this.getNumberSystem(attributes));
+        char zeroChar = '\u0000';
+
+        if (numsys == NumberSystem.ARABIC) {
+            zeroChar = (
+                quickPath
+                    ? this.zeroDigit
+                    : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
+        }
 
         if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
             HistorizedElement te = HistorizedElement.class.cast(this.element);
             StringBuilder sb = new StringBuilder();
-            te.print(formattable, sb, attributes, this.minDigits, this.maxDigits);
+            te.print(formattable, sb, attributes, numsys, zeroChar, this.minDigits, this.maxDigits);
             buffer.append(sb.toString());
             printed = sb.length();
         } else {
             Class<V> type = this.element.getType();
             boolean negative = false;
-            NumberSystem numsys = (quickPath ? this.numberSystem : this.getNumberSystem(attributes));
             String digits;
 
             if (type == Integer.class) {
@@ -216,21 +224,7 @@ final class NumberProcessor<V>
                 throw new IllegalArgumentException("Not formattable: " + this.element);
             }
 
-            if (digits.length() > this.maxDigits) {
-                throw new IllegalArgumentException(
-                    "Element " + this.element.name()
-                        + " cannot be printed as the value " + formattable.get(this.element)
-                        + " exceeds the maximum width of " + this.maxDigits + ".");
-            }
-
-            char zeroChar = '\u0000';
-
             if (numsys == NumberSystem.ARABIC) {
-                zeroChar = (
-                    quickPath
-                        ? this.zeroDigit
-                        : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
-
                 if (zeroChar != '0') {
                     int diff = zeroChar - '0';
                     char[] characters = digits.toCharArray();
@@ -240,6 +234,12 @@ final class NumberProcessor<V>
                     }
 
                     digits = new String(characters);
+                }
+                if (digits.length() > this.maxDigits) {
+                    throw new IllegalArgumentException(
+                        "Element " + this.element.name()
+                            + " cannot be printed as the formatted value " + digits
+                            + " exceeds the maximum width of " + this.maxDigits + ".");
                 }
             }
 
