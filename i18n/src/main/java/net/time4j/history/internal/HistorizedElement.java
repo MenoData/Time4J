@@ -24,6 +24,7 @@ package net.time4j.history.internal;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.TextElement;
 
 import java.io.IOException;
@@ -46,6 +47,8 @@ public interface HistorizedElement
      * @param   context     time context with the value of this element
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  query for control attributes
+     * @param   numsys      number system
+     * @param   zeroChar    zero digit
      * @param   minDigits   minimum count of digits
      * @param   maxDigits   maximum count of digits
      * @throws  IOException if writing to buffer fails
@@ -59,6 +62,8 @@ public interface HistorizedElement
      * @param   context     time context with the value of this element
      * @param   buffer      format buffer any text output will be sent to
      * @param   attributes  query for control attributes
+     * @param   numsys      number system
+     * @param   zeroChar    zero digit
      * @param   minDigits   minimum count of digits
      * @param   maxDigits   maximum count of digits
      * @throws  IOException if writing to buffer fails
@@ -69,6 +74,8 @@ public interface HistorizedElement
         ChronoDisplay context,
         Appendable buffer,
         AttributeQuery attributes,
+        NumberSystem numsys,
+        char zeroChar,
         int minDigits,
         int maxDigits
     ) throws IOException, ChronoException;

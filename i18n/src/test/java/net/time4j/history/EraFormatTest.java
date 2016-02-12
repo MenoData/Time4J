@@ -3,7 +3,9 @@ package net.time4j.history;
 import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -161,22 +163,32 @@ public class EraFormatTest {
     @Test
     public void printEngland3() {
         ChronoFormatter<PlainDate> formatter =
-            ChronoFormatter.setUp(PlainDate.class, Locale.UK)
-                .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
-                .build()
-                .with(Leniency.STRICT);
+            ChronoFormatter.ofDatePattern("d. MMMM GGGG yyyy", PatternType.CLDR, Locale.UK).with(Leniency.STRICT);
         assertThat(
             formatter.format(PlainDate.of(1603, 4, 3)),
             is("24. March Anno Domini 1602/03")); // death of Queen Elizabeth I.
     }
 
     @Test
+    public void printEngland3Roman() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ENGLISH)
+                .addPattern("d. MMMM GGGG ", PatternType.CLDR)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ROMAN)
+                .addPattern("yyyy", PatternType.CLDR)
+                .endSection()
+                .build()
+                .with(ChronoHistory.of(Locale.UK))
+                .with(Leniency.STRICT);
+        assertThat(
+            formatter.format(PlainDate.of(1603, 4, 3)),
+            is("24. March Anno Domini MDCII/MDCIII")); // death of Queen Elizabeth I.
+    }
+
+    @Test
     public void parseEngland3() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
-            ChronoFormatter.setUp(PlainDate.class, Locale.UK)
-                .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
-                .build()
-                .with(Leniency.STRICT);
+            ChronoFormatter.ofDatePattern("d. MMMM GGGG yyyy", PatternType.CLDR, Locale.UK).with(Leniency.STRICT);
         assertThat(
             formatter.parse("24. March Anno Domini 1602/03"), // death of Queen Elizabeth I. (officially 1602)
             is(PlainDate.of(1603, 4, 3)));
@@ -186,6 +198,22 @@ public class EraFormatTest {
         assertThat(
             formatter.parse("24. March Anno Domini 1751/2"), // test for year-of-era-part < 10
             is(PlainDate.of(1752, 4, 4)));
+    }
+
+    @Test
+    public void parseEngland3Roman() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ENGLISH)
+                .addPattern("d. MMMM GGGG ", PatternType.CLDR)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ROMAN)
+                .addPattern("yyyy", PatternType.CLDR)
+                .endSection()
+                .build()
+                .with(ChronoHistory.of(Locale.UK))
+                .with(Leniency.STRICT);
+        assertThat(
+            formatter.parse("24. March Anno Domini MDCII/MDCIII"), // death of Queen Elizabeth I. (officially 1602)
+            is(PlainDate.of(1603, 4, 3)));
     }
 
     @Test
