@@ -34,7 +34,6 @@ import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
 import net.time4j.history.internal.HistoricAttribute;
 
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 

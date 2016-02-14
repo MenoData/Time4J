@@ -191,6 +191,7 @@ public final class ChronoHistory
     private transient final NewYearStrategy nys;
     private transient final EraPreference eraPreference;
 
+    private transient final ChronoElement<HistoricDate> dateElement;
     private transient final ChronoElement<HistoricEra> eraElement;
     private transient final TextElement<Integer> yearOfEraElement;
     private transient final TextElement<Integer> monthElement;
@@ -231,12 +232,14 @@ public final class ChronoHistory
         this.nys = nys;
         this.eraPreference = eraPreference;
 
+        this.dateElement = new HistoricalDateElement(this);
         this.eraElement = new HistoricalEraElement(this);
         this.yearOfEraElement = HistoricalIntegerElement.forYearOfEra(this);
         this.monthElement = HistoricalIntegerElement.forMonth(this);
         this.dayOfMonthElement = HistoricalIntegerElement.forDayOfMonth(this);
 
         Set<ChronoElement<?>> tmp = new HashSet<ChronoElement<?>>();
+        tmp.add(this.dateElement);
         tmp.add(this.eraElement);
         tmp.add(this.yearOfEraElement);
         tmp.add(this.monthElement);
@@ -895,6 +898,34 @@ public final class ChronoHistory
         }
 
         return new ChronoHistory(this.variant, this.events, this.ajly, this.nys, eraPreference);
+
+    }
+
+    /**
+     * <p>Defines the element for the historic date. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * @return  date-related element
+     * @since   3.15/4.12
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r das historische Datum. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. </p>
+     *
+     * @return  date-related element
+     * @since   3.15/4.12
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<HistoricDate> date() {
+
+        return this.dateElement;
 
     }
 

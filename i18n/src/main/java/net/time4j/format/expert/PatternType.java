@@ -39,6 +39,7 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
+import net.time4j.history.internal.HistorizedElement;
 import net.time4j.i18n.UltimateFormatEngine;
 
 import java.util.Collections;
@@ -1596,6 +1597,9 @@ public enum PatternType
             intElement = null;
         } else if (Integer.class.isAssignableFrom(element.getType())) {
             textElement = null;
+            if (element instanceof HistorizedElement) {
+                textElement = cast(element);
+            }
             intElement = cast(element);
         } else {
             throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -23,6 +23,8 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.base.MathUtils;
+import net.time4j.history.HistoricEra;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -61,6 +63,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int MINGUO = 6;
+
+    /** Serialisierungstyp. */
+    static final int JULIAN = 7;
 
     private static final long serialVersionUID = 1L;
 
@@ -146,6 +151,9 @@ final class SPX
             case MINGUO:
                 this.writeMinguo(out);
                 break;
+            case JULIAN:
+                this.writeJulian(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -190,6 +198,9 @@ final class SPX
                 break;
             case MINGUO:
                 this.obj = this.readMinguo(in);
+                break;
+            case JULIAN:
+                this.obj = this.readJulian(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -333,6 +344,28 @@ final class SPX
 
         PlainDate iso = PlainDate.class.cast(in.readObject());
         return iso.transform(MinguoCalendar.class);
+
+    }
+
+    private void writeJulian(ObjectOutput out)
+        throws IOException {
+
+        JulianCalendar jc = (JulianCalendar) this.obj;
+        out.writeInt(jc.getProlepticYear());
+        out.writeInt(jc.getMonth().getValue());
+        out.writeInt(jc.getDayOfMonth());
+
+    }
+
+    private JulianCalendar readJulian(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int pyear = in.readInt();
+        int month = in.readInt();
+        int dom = in.readInt();
+        HistoricEra era = ((pyear >= 1) ? HistoricEra.AD : HistoricEra.BC);
+        int yearOfEra = ((pyear >= 1) ? pyear : MathUtils.safeSubtract(1, pyear));
+        return JulianCalendar.of(era, yearOfEra, month, dom);
 
     }
 
