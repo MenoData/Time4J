@@ -1,4 +1,6 @@
-## [v3.15] not yet released
+## [v3.16] not yet released
+
+## [v3.15] published on 2016-02-14
 ### Added
 - Proleptic Julian calendar [#444]
 - Add Roman numerals [#443]
