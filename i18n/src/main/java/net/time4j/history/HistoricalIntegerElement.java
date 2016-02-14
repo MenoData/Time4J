@@ -23,6 +23,7 @@ package net.time4j.history;
 
 import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
@@ -219,7 +220,13 @@ final class HistoricalIntegerElement
         int maxDigits
     ) throws IOException {
 
-        HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
+        HistoricDate date;
+
+        if (context instanceof GregorianDate) {
+            date = this.history.convert(PlainDate.from((GregorianDate) context));
+        } else {
+            date = context.get(this.history.date());
+        }
 
         switch (this.index) {
             case YEAR_OF_ERA_INDEX:

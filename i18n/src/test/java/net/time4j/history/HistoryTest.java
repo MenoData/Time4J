@@ -327,4 +327,36 @@ public class HistoryTest {
         date.with(ChronoHistory.PROLEPTIC_JULIAN.era(), HistoricEra.BC);
     }
 
+    @Test
+    public void dateAccess() {
+        assertThat(
+            PlainDate.of(2016, 1, 12).get(ChronoHistory.ofFirstGregorianReform().date()),
+            is(HistoricDate.of(HistoricEra.AD, 2016, 1, 12)));
+        assertThat(
+            PlainDate.of(1582, 10, 14).get(ChronoHistory.ofFirstGregorianReform().date()),
+            is(HistoricDate.of(HistoricEra.AD, 1582, 10, 4)));
+        assertThat(
+            PlainDate.of(2016, 1, 12).with(
+                ChronoHistory.ofFirstGregorianReform().date(),
+                HistoricDate.of(HistoricEra.AD, 1582, 10, 4)),
+            is(PlainDate.of(1582, 10, 14)));
+        assertThat(
+            PlainDate.of(2016, 1, 12).isValid(
+                ChronoHistory.ofFirstGregorianReform().date(),
+                HistoricDate.of(HistoricEra.AD, 1582, 10, 4)),
+            is(true));
+        for (int i = 5; i < 15; i++) {
+            assertThat(
+                PlainDate.of(2016, 1, 12).isValid(
+                    ChronoHistory.ofFirstGregorianReform().date(),
+                    HistoricDate.of(HistoricEra.AD, 1582, 10, i)),
+                is(false));
+        }
+        assertThat(
+            PlainDate.of(2016, 1, 12).isValid(
+                ChronoHistory.ofFirstGregorianReform().date(),
+                HistoricDate.of(HistoricEra.AD, 1582, 10, 15)),
+            is(true));
+    }
+
 }
