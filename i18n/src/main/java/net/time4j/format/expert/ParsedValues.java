@@ -46,7 +46,7 @@ class ParsedValues
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final float LOAD_FACTOR = 0.25f; // we have very small tables
+    private static final float LOAD_FACTOR = 0.75f;
     private static final int INT_PHI = 0x9E3779B9;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -76,9 +76,9 @@ class ParsedValues
         this.len = arraySize(expectedCountOfElements);
         this.mask = this.len - 1;
         this.threshold = maxFill(this.len);
-        this.keys = new Object[this.len + 1];
-        this.values = new Object[this.len + 1];
-        this.ints = new int[this.len + 1];
+        this.keys = new Object[this.len];
+        this.values = null;
+        this.ints = new int[this.len];
         this.count = 0;
 
     }
@@ -134,7 +134,7 @@ class ParsedValues
         Object current;
         int pos;
 
-        if (((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
+        if ((this.values == null) || ((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
             throw new ChronoException("No value found for: " + element.name());
         }
 
@@ -360,7 +360,7 @@ class ParsedValues
     }
 
     // called by format processors
-    int put(ChronoElement<?> element, int v) {
+    void put(ChronoElement<?> element, int v) {
 
         int pos;
         Object current;
@@ -368,20 +368,18 @@ class ParsedValues
 
         if (!((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
             if (current.equals(element)) {
-                int oldValue = this.ints[pos];
-                if (this.duplicateKeysAllowed || (oldValue == v)) {
+                if (this.duplicateKeysAllowed || (this.ints[pos] == v)) {
                     this.ints[pos] = v;
-                    return oldValue;
+                    return;
                 } else {
                     throw new AmbivalentValueException(element);
                 }
             }
             while (!((current = keys[pos = (pos + 1) & this.mask]) == null)) {
                 if (current.equals(element)) {
-                    int oldValue = this.ints[pos];
-                    if (this.duplicateKeysAllowed || (oldValue == v)) {
+                    if (this.duplicateKeysAllowed || (this.ints[pos] == v)) {
                         this.ints[pos] = v;
-                        return oldValue;
+                        return;
                     } else {
                         throw new AmbivalentValueException(element);
                     }
@@ -393,42 +391,44 @@ class ParsedValues
         this.ints[pos] = v;
 
         if (this.count++ >= this.threshold) {
-            rehash(arraySize(this.count + 1));
+            rehash(arraySize(this.count));
         }
-
-        return Integer.MIN_VALUE;
 
     }
 
     // called by format processors
-    Object put(ChronoElement<?> element, Object v) {
+    void put(ChronoElement<?> element, Object v) {
 
         if (v == null) {
-            return this.remove(element);
+            this.remove(element);
+            return;
         } else if (element.getType() == Integer.class) {
-            return this.put(element, Integer.class.cast(v).intValue());
+            this.put(element, Integer.class.cast(v).intValue());
+            return;
         }
 
         int pos;
         Object current;
         Object[] keys = this.keys;
 
+        if (this.values == null) {
+            this.values = new Object[this.len];
+        }
+
         if (!((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
             if (current.equals(element)) {
-                Object oldValue = this.values[pos];
-                if (this.duplicateKeysAllowed || v.equals(oldValue)) {
+                if (this.duplicateKeysAllowed || v.equals(this.values[pos])) {
                     this.values[pos] = v;
-                    return oldValue;
+                    return;
                 } else {
                     throw new AmbivalentValueException(element);
                 }
             }
             while (!((current = keys[pos = (pos + 1) & this.mask]) == null)) {
                 if (current.equals(element)) {
-                    Object oldValue = this.values[pos];
-                    if (this.duplicateKeysAllowed || v.equals(oldValue)) {
+                    if (this.duplicateKeysAllowed || v.equals(this.values[pos])) {
                         this.values[pos] = v;
-                        return oldValue;
+                        return;
                     } else {
                         throw new AmbivalentValueException(element);
                     }
@@ -440,10 +440,16 @@ class ParsedValues
         this.values[pos] = v;
 
         if (this.count++ >= this.threshold) {
-            this.rehash(arraySize(this.count + 1));
+            this.rehash(arraySize(this.count));
         }
 
-        return null;
+    }
+
+    // called in context of erraneous or-block
+    void reset() {
+
+        this.keys = new Object[this.keys.length];
+        this.count = 0;
 
     }
 
@@ -472,38 +478,34 @@ class ParsedValues
 
     }
 
-    private Object remove(Object element) {
+    private void remove(Object element) {
 
         Object[] keys = this.keys;
         Object current;
         int pos;
 
         if (((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
-            return null;
+            return;
         }
 
         if (element.equals(current)) {
-            return this.removeEntry(pos);
+            this.removeEntry(pos);
+            return;
         }
 
         while (true) {
             if (((current = keys[pos = ((pos + 1) & this.mask)]) == null)) {
-                return null;
+                return;
             }
             if (element.equals(current)) {
-                return this.removeEntry(pos);
+                this.removeEntry(pos);
+                return;
             }
         }
 
     }
 
-    private Object removeEntry(int pos) {
-
-        Object oldValue = this.values[pos];
-
-        if (oldValue == null) {
-            oldValue = Integer.valueOf(this.ints[pos]);
-        }
+    private void removeEntry(int pos) {
 
         this.count--;
         int last, slot;
@@ -515,7 +517,7 @@ class ParsedValues
             while (true) {
                 if ((current = keys[pos]) == null) {
                     keys[last] = null;
-                    return oldValue;
+                    return;
                 }
                 slot = mix(current.hashCode()) & this.mask;
                 if (last <= pos ? last >= slot || slot > pos : last >= slot && slot > pos ) {
@@ -524,7 +526,9 @@ class ParsedValues
                 pos = (pos + 1) & this.mask;
             }
             keys[last] = current;
-            this.values[last] = this.values[pos];
+            if (this.values != null) {
+                this.values[last] = this.values[pos];
+            }
             this.ints[last] = this.ints[pos];
         }
 
@@ -570,9 +574,9 @@ class ParsedValues
         Object[] values = this.values;
         int[] ints = this.ints;
         int mask = newLen - 1;
-        Object[] newKeys = new Object[newLen + 1];
-        Object[] newValues = new Object[newLen + 1];
-        int[] newInts = new int[newLen + 1];
+        Object[] newKeys = new Object[newLen];
+        Object[] newValues = ((values == null) ? null : new Object[newLen]);
+        int[] newInts = new int[newLen];
         int i = this.len;
         int pos;
         for (int j = 0, n = this.count; j < n; j++) {
@@ -584,11 +588,11 @@ class ParsedValues
             }
             // transfer data from i to pos
             newKeys[pos] = keys[i];
-            newValues[pos] = values[i];
+            if (values != null) {
+                newValues[pos] = values[i];
+            }
             newInts[pos] = ints[i];
         }
-        newValues[newLen] = values[this.len];
-        newInts[newLen] = ints[this.len];
         this.len = newLen;
         this.mask = mask;
         this.threshold = maxFill(newLen);

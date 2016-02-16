@@ -689,16 +689,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 step.print(formattable, buffer, attributes, positions, (attributes == this.globalAttributes));
 
                 if (step.isNewOrBlockStarted()) {
-                    // skip the rest of current section
-                    int last = index;
-                    int section = step.getSection();
-                    for (int j = len - 1; j > index; j--) {
-                        if (this.steps.get(j).getSection() == section) {
-                            last = j;
-                            break;
-                        }
-                    }
-                    index = last;
+                    index = step.skipTrailingOrBlocks();
                 }
 
                 index++;
@@ -2763,8 +2754,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     }
                     status.clearError();
                     status.setPosition(values.getPosition());
-                    values = new ParsedValues(countOfElements); // alte Werte verwerfen
-                    values.setPosition(status.getPosition());
+                    values.reset(); // alte Werte verwerfen
                     if (data != null) {
                         data.push(values);
                     }
@@ -2792,16 +2782,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     status.setPosition(values.getPosition());
                 }
             } else if (step.isNewOrBlockStarted()) {
-                // Ende des aktuellen Abschnitts suchen
-                int section = step.getSection();
-                int last = index;
-                for (int j = len - 1; j > index; j--) {
-                    if (this.steps.get(j).getSection() == section) {
-                        last = j;
-                        break;
-                    }
-                }
-                index = last;
+                index = step.skipTrailingOrBlocks();
             }
 
             // Schleifenzähler inkrementieren
@@ -5506,6 +5487,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          */
         public ChronoFormatter<T> build() {
 
+            Map<Integer, FormatStep> m = null;
+
             for (int index = 0, len = this.steps.size(); index < len; index++) {
                 FormatStep step = this.steps.get(index);
                 if (step.isNewOrBlockStarted()) {
@@ -5513,6 +5496,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     boolean ok = false;
                     for (int j = len - 1; j > index; j--) {
                         if (this.steps.get(j).getSection() == section) {
+                            if (m == null) {
+                                m = new HashMap<Integer, FormatStep>();
+                            }
+                            m.put(Integer.valueOf(index), step.markLastOrBlock(j));
                             ok = true;
                             break;
                         }
@@ -5520,6 +5507,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     if (!ok) {
                         throw new IllegalStateException("Missing format processor after or-operator.");
                     }
+                }
+            }
+
+            if (m != null) {
+                for (Integer key : m.keySet()) {
+                    this.steps.set(key.intValue(), m.get(key));
                 }
             }
 

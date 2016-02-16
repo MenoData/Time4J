@@ -54,6 +54,7 @@ final class FormatStep {
     private final int padLeft;
     private final int padRight;
     private final boolean orMarker;
+    private final int lastOrBlockIndex;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -72,7 +73,7 @@ final class FormatStep {
         int section,
         AttributeSet sectionalAttrs
     ) {
-        this(processor, level, section, sectionalAttrs, null, 0, 0, 0, false);
+        this(processor, level, section, sectionalAttrs, null, 0, 0, 0, false, -1);
 
     }
 
@@ -85,7 +86,8 @@ final class FormatStep {
         int reserved,
         int padLeft,
         int padRight,
-        boolean orMarker
+        boolean orMarker,
+        int lastOrBlockIndex
     ) {
         super();
 
@@ -112,6 +114,7 @@ final class FormatStep {
         this.padLeft = padLeft;
         this.padRight = padRight;
         this.orMarker = orMarker;
+        this.lastOrBlockIndex = lastOrBlockIndex;
 
     }
 
@@ -414,7 +417,8 @@ final class FormatStep {
             this.reserved,
             this.padLeft,
             this.padRight,
-            this.orMarker
+            this.orMarker,
+            this.lastOrBlockIndex
         );
 
     }
@@ -442,7 +446,8 @@ final class FormatStep {
             this.reserved,
             this.padLeft,
             this.padRight,
-            this.orMarker
+            this.orMarker,
+            this.lastOrBlockIndex
         );
 
     }
@@ -465,7 +470,8 @@ final class FormatStep {
             this.reserved + reserved,
             this.padLeft,
             this.padRight,
-            this.orMarker
+            this.orMarker,
+            this.lastOrBlockIndex
         );
 
     }
@@ -491,7 +497,8 @@ final class FormatStep {
             this.reserved,
             this.padLeft + padLeft,
             this.padRight + padRight,
-            this.orMarker
+            this.orMarker,
+            this.lastOrBlockIndex
         );
 
     }
@@ -518,7 +525,37 @@ final class FormatStep {
             this.reserved,
             this.padLeft,
             this.padRight,
-            true
+            true,
+            -1
+        );
+
+    }
+
+    /**
+     * <p>Markiert den letzten oder-Block des aktuellen Abschnitts. </p>
+     *
+     * @param   lastOrBlockIndex    index of last or-block in current section
+     * @return  updated format step
+     * @throws  IllegalStateException if called for a non-starting or-block
+     * @since   3.16/4.13
+     */
+    FormatStep markLastOrBlock(int lastOrBlockIndex) {
+
+        if (!this.orMarker) {
+            throw new IllegalStateException("This step is not starting an or-block.");
+        }
+
+        return new FormatStep(
+            this.processor,
+            this.level,
+            this.section,
+            this.sectionalAttrs,
+            this.fullAttrs,
+            this.reserved,
+            this.padLeft,
+            this.padRight,
+            true,
+            lastOrBlockIndex
         );
 
     }
@@ -532,6 +569,18 @@ final class FormatStep {
     boolean isNewOrBlockStarted() {
 
         return this.orMarker;
+
+    }
+
+    /**
+     * Ermittelt den Index des letzten Steps zum aktuellen oder-Abschnitt.
+     *
+     * @return  int
+     * @since   3.16/4.13
+     */
+    int skipTrailingOrBlocks() {
+
+        return this.lastOrBlockIndex;
 
     }
 
@@ -557,6 +606,7 @@ final class FormatStep {
                 && (this.padLeft == that.padLeft)
                 && (this.padRight == that.padRight)
                 && (this.orMarker == that.orMarker)
+                && (this.lastOrBlockIndex == that.lastOrBlockIndex)
             );
         } else {
             return false;
