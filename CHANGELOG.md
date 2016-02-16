@@ -1,4 +1,6 @@
 ## [v4.13] not yet released
+### Fixed
+- Reduce array allocation during parsing [#455]
 
 ## [v4.12] published on 2016-02-14
 ### Added
