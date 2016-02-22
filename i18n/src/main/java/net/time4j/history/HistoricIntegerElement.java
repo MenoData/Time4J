@@ -58,7 +58,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   3.0
  */
-final class HistoricalIntegerElement
+final class HistoricIntegerElement
     extends StdHistoricalElement
     implements HistorizedElement {
 
@@ -82,7 +82,7 @@ final class HistoricalIntegerElement
 
     //~ Konstruktoren -----------------------------------------------------
 
-    HistoricalIntegerElement(
+    HistoricIntegerElement(
         String name,
         char symbol,
         int defaultMin,
@@ -295,7 +295,7 @@ final class HistoricalIntegerElement
     @Override
     protected boolean doEquals(BasicElement<?> obj) {
 
-        return this.history.equals(((HistoricalIntegerElement) obj).history);
+        return this.history.equals(((HistoricIntegerElement) obj).history);
 
     }
 

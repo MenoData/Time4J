@@ -38,7 +38,7 @@ import java.io.ObjectStreamException;
  * @author  Meno Hochschild
  * @since   3.15/4.12
  */
-final class HistoricalDateElement
+final class HistoricDateElement
     extends BasicElement<HistoricDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -60,7 +60,7 @@ final class HistoricalDateElement
      *
      * @param   history     associated chronological history
      */
-    HistoricalDateElement(ChronoHistory history) {
+    HistoricDateElement(ChronoHistory history) {
         super("HISTORIC_DATE");
 
         this.history = history;
@@ -118,7 +118,7 @@ final class HistoricalDateElement
     @Override
     protected boolean doEquals(BasicElement<?> obj) {
 
-        return this.history.equals(((HistoricalDateElement) obj).history);
+        return this.history.equals(((HistoricDateElement) obj).history);
 
     }
 

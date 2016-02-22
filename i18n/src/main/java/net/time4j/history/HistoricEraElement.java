@@ -50,7 +50,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   3.0
  */
-final class HistoricalEraElement
+final class HistoricEraElement
     extends BasicElement<HistoricEra>
     implements NumericalElement<HistoricEra>, TextElement<HistoricEra> {
 
@@ -73,7 +73,7 @@ final class HistoricalEraElement
      *
      * @param   history     associated chronological history
      */
-    HistoricalEraElement(ChronoHistory history) {
+    HistoricEraElement(ChronoHistory history) {
         super("ERA");
 
         this.history = history;
@@ -172,7 +172,7 @@ final class HistoricalEraElement
     @Override
     protected boolean doEquals(BasicElement<?> obj) {
 
-        return this.history.equals(((HistoricalEraElement) obj).history);
+        return this.history.equals(((HistoricEraElement) obj).history);
 
     }
 

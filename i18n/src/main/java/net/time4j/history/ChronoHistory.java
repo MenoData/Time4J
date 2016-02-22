@@ -234,40 +234,40 @@ public final class ChronoHistory
         this.nys = nys;
         this.eraPreference = eraPreference;
 
-        this.dateElement = new HistoricalDateElement(this);
-        this.eraElement = new HistoricalEraElement(this);
+        this.dateElement = new HistoricDateElement(this);
+        this.eraElement = new HistoricEraElement(this);
 
-        this.yearOfEraElement = new HistoricalIntegerElement(
+        this.yearOfEraElement = new HistoricIntegerElement(
             "YEAR_OF_ERA",
             'y',
             1,
             GregorianMath.MAX_YEAR,
             this,
-            HistoricalIntegerElement.YEAR_OF_ERA_INDEX
+            HistoricIntegerElement.YEAR_OF_ERA_INDEX
         );
-        this.monthElement = new HistoricalIntegerElement(
+        this.monthElement = new HistoricIntegerElement(
             "HISTORIC_MONTH",
             'M',
             1,
             12,
             this,
-            HistoricalIntegerElement.MONTH_INDEX
+            HistoricIntegerElement.MONTH_INDEX
         );
-        this.dayOfMonthElement = new HistoricalIntegerElement(
+        this.dayOfMonthElement = new HistoricIntegerElement(
             "HISTORIC_DAY_OF_MONTH",
             'd',
             1,
             31,
             this,
-            HistoricalIntegerElement.DAY_OF_MONTH_INDEX
+            HistoricIntegerElement.DAY_OF_MONTH_INDEX
         );
-        this.dayOfYearElement = new HistoricalIntegerElement(
+        this.dayOfYearElement = new HistoricIntegerElement(
             "HISTORIC_DAY_OF_YEAR",
             'D',
             1,
             365,
             this,
-            HistoricalIntegerElement.DAY_OF_YEAR_INDEX
+            HistoricIntegerElement.DAY_OF_YEAR_INDEX
         );
 
         Set<ChronoElement<?>> tmp = new HashSet<ChronoElement<?>>();
