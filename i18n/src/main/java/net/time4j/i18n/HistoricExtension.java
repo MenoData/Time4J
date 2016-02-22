@@ -33,6 +33,7 @@ import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
 import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.history.internal.StdHistoricalElement;
 
 import java.util.Locale;
 import java.util.Set;
@@ -82,22 +83,28 @@ public class HistoricExtension
             era = HistoricEra.AD;
         }
 
-        if (
-            (era != null)
-            && entity.contains(history.yearOfEra())
-            && entity.contains(history.month())
-            && entity.contains(history.dayOfMonth())
-        ) {
+        if ((era != null) && entity.contains(history.yearOfEra())) {
             int yearOfEra = entity.get(history.yearOfEra());
-            int month = entity.get(history.month());
-            int dayOfMonth = entity.get(history.dayOfMonth());
-            HistoricDate hd = HistoricDate.of(era, yearOfEra, month, dayOfMonth);
-            PlainDate date = history.convert(hd);
-            entity.with(history.era(), null);
-            entity.with(history.yearOfEra(), null);
-            entity.with(history.month(), null);
-            entity.with(history.dayOfMonth(), null);
-            return entity.with(PlainDate.COMPONENT, date);
+
+            if (entity.contains(history.month()) && entity.contains(history.dayOfMonth())) {
+                int month = entity.get(history.month());
+                int dayOfMonth = entity.get(history.dayOfMonth());
+                HistoricDate hd = HistoricDate.of(era, yearOfEra, month, dayOfMonth);
+                PlainDate date = history.convert(hd);
+                entity.with(history.era(), null);
+                entity.with(history.yearOfEra(), null);
+                entity.with(history.month(), null);
+                entity.with(history.dayOfMonth(), null);
+                return entity.with(PlainDate.COMPONENT, date);
+            } else if (entity.contains(history.dayOfYear())) {
+                int doy = entity.get(history.dayOfYear());
+                if (entity.contains(StdHistoricalElement.YEAR_OF_DISPLAY)) {
+                    yearOfEra = entity.getInt(StdHistoricalElement.YEAR_OF_DISPLAY);
+                }
+                HistoricDate newYear = history.getBeginOfYear(era, yearOfEra);
+                PlainDate date = history.convert(newYear).with(history.dayOfYear(), doy);
+                return entity.with(PlainDate.COMPONENT, date);
+            }
         }
 
         return entity;

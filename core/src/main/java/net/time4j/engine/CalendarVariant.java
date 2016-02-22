@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarVariant.java) is part of project Time4J.
  *
@@ -32,7 +32,7 @@ import java.io.Serializable;
  * <p><strong>Display and change chronological element values</strong></p>
  *
  * <p>The calendar variant consists of chronological elements. This base class
- * delegates the elment and time arithmetic to the associated calendar family respective to
+ * delegates the element and time arithmetic to the associated calendar family respective to
  * the underlying rules of elements and units. However, any concrete subclass
  * is required to define the state and reflect it in all {@code get()}-methods
  * and also to specify the serialization behaviour. </p>

@@ -23,11 +23,14 @@ package net.time4j.history.internal;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.TextElement;
+import net.time4j.format.expert.ParseLog;
 
 import java.io.IOException;
+import java.text.ParsePosition;
 
 
 /**
@@ -79,5 +82,34 @@ public interface HistorizedElement
         int minDigits,
         int maxDigits
     ) throws IOException, ChronoException;
+
+    /**
+     * <p>Like {@link #parse(CharSequence, ParsePosition, AttributeQuery)} but can create an additional entry
+     * in parsed values. </p>
+     *
+     * @param   text            text to be parsed
+     * @param   status          current parsing position
+     * @param   attributes      query for control attributes
+     * @param   parsedResult    optional container for parsed values
+     * @return  parsed element value or {@code null} if parsing was not successful
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Wie {@link #parse(CharSequence, ParsePosition, AttributeQuery)}, kann aber einen extra Eintrag
+     * in den interpretierten Werten erzeugen. </p>
+     *
+     * @param   text            text to be parsed
+     * @param   status          current parsing position
+     * @param   attributes      query for control attributes
+     * @param   parsedResult    optional container for parsed values
+     * @return  parsed element value or {@code null} if parsing was not successful
+     * @since   3.16/4.13
+     */
+    Integer parse(
+        CharSequence text,
+        ParsePosition status,
+        AttributeQuery attributes,
+        ChronoEntity<?> parsedResult
+    );
 
 }

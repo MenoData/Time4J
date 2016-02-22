@@ -31,6 +31,7 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.GregorianTextElement;
+import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -172,6 +173,8 @@ final class TextProcessor<V>
 
         if (quickPath && (this.gte != null) && (this.lenientMode != null)) {
             value = this.gte.parse(text, status.getPP(), this.language, this.tw, this.oc, this.lenientMode);
+        } else if (this.element instanceof HistorizedElement) {
+            value = ((HistorizedElement) this.element).parse(text, status.getPP(), attributes, parsedResult);
         } else {
             value = this.element.parse(text, status.getPP(), attributes);
         }

@@ -1119,6 +1119,7 @@ public enum PatternType
                 replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
                 replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
                 replacement.put(PlainDate.DAY_OF_MONTH, history.dayOfMonth());
+                replacement.put(PlainDate.DAY_OF_YEAR, history.dayOfYear());
                 return replacement;
             case 'y':
                 if (count == 2) {

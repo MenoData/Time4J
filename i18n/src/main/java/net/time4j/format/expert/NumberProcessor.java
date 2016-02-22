@@ -29,7 +29,6 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
-import net.time4j.format.TextElement;
 import net.time4j.history.internal.HistorizedElement;
 
 import java.io.IOException;
@@ -313,8 +312,8 @@ final class NumberProcessor<V>
         }
 
         if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
-            TextElement<?> te = TextElement.class.cast(this.element);
-            Object value = te.parse(text, status.getPP(), attributes);
+            HistorizedElement te = HistorizedElement.class.cast(this.element);
+            Object value = te.parse(text, status.getPP(), attributes, parsedResult);
             if (status.isError()) {
                 status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
             } else if (value == null) {
