@@ -230,4 +230,23 @@ public class NewYearTest {
             is(366)); // gregorian leap year
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void beforeCouncilOfTours() {
+        NewYearRule.MARIA_ANUNCIATA.until(567);
+    }
+
+    @Test
+    public void atCouncilOfTours() {
+        NewYearStrategy nys = NewYearRule.MARIA_ANUNCIATA.until(568);
+        assertThat(
+            nys.newYear(HistoricEra.AD, 566),
+            is(HistoricDate.of(HistoricEra.AD, 566, 1, 1)));
+        assertThat(
+            nys.newYear(HistoricEra.AD, 567),
+            is(HistoricDate.of(HistoricEra.AD, 567, 3, 25)));
+        assertThat(
+            nys.newYear(HistoricEra.AD, 568),
+            is(HistoricDate.of(HistoricEra.AD, 568, 1, 1)));
+    }
+
 }
