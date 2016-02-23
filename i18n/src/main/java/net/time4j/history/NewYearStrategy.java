@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -34,12 +35,14 @@ import java.util.List;
  * <p>Determines the begin of a given historic year. </p>
  *
  * @author  Meno Hochschild
+ * @see     NewYearRule#until(int)
  * @since   3.14/4.11
  */
 /*[deutsch]
  * <p>Bestimmt den Beginn eines historischen Jahres. </p>
  *
  * @author  Meno Hochschild
+ * @see     NewYearRule#until(int)
  * @since   3.14/4.11
  */
 public final class NewYearStrategy {
@@ -75,11 +78,18 @@ public final class NewYearStrategy {
 
         Collections.sort(strategies, STD_ORDER);
         NewYearStrategy prev = null;
+        Iterator<NewYearStrategy> iter = strategies.iterator();
 
-        for (NewYearStrategy nys : strategies) {
+        while (iter.hasNext()) {
+            NewYearStrategy nys = iter.next();
+
             if ((prev != null) && (nys.lastAnnoDomini == prev.lastAnnoDomini)) {
-                throw new IllegalArgumentException(
-                    "Multiple strategies with overlapping validity range: " + strategies);
+                if (nys.lastRule == prev.lastRule) {
+                    iter.remove();
+                } else {
+                    throw new IllegalArgumentException(
+                        "Multiple strategies with overlapping validity range: " + strategies);
+                }
             } else {
                 prev = nys;
             }

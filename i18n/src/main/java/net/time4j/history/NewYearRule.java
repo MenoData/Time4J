@@ -252,6 +252,8 @@ public enum NewYearRule {
         }
     };
 
+    private static final int COUNCIL_OF_TOURS = 567;
+
     //~ Methoden ----------------------------------------------------------
 
     /**
@@ -259,7 +261,7 @@ public enum NewYearRule {
      *
      * @param   annoDomini  end year of validity range related to era AD (exclusive)
      * @return  NewYearStrategy
-     * @see     HistoricEra#annoDomini(int)
+     * @throws  IllegalArgumentException if given year is not after AD 567 (when the Council of Tours took place)
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -268,12 +270,24 @@ public enum NewYearRule {
      *
      * @param   annoDomini  end year of validity range related to era AD (exclusive)
      * @return  NewYearStrategy
-     * @see     HistoricEra#annoDomini(int)
+     * @throws  IllegalArgumentException if given year is not after AD 567 (when the Council of Tours took place)
      * @since   3.14/4.11
      */
     public NewYearStrategy until(int annoDomini) {
 
-        return new NewYearStrategy(this, annoDomini);
+        if (annoDomini <= COUNCIL_OF_TOURS) {
+            throw new IllegalArgumentException(
+                "Defining New-Year-strategy is not supported before Council of Tours in AD 567.");
+        }
+
+        NewYearStrategy nys = new NewYearStrategy(this, annoDomini);
+
+        if (this != BEGIN_OF_JANUARY){
+            NewYearStrategy first = new NewYearStrategy(BEGIN_OF_JANUARY, COUNCIL_OF_TOURS);
+            nys = first.and(nys);
+        }
+
+        return nys;
 
     }
 
