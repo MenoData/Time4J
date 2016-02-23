@@ -24,10 +24,10 @@ package net.time4j.history;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
-import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -38,12 +38,11 @@ import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
-import net.time4j.format.NumericalElement;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
-import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.internal.HistorizedElement;
+import net.time4j.history.internal.StdHistoricalElement;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -59,15 +58,16 @@ import java.util.Locale;
  * @author  Meno Hochschild
  * @since   3.0
  */
-final class HistoricalIntegerElement
-    extends BasicElement<Integer>
-    implements NumericalElement<Integer>, HistorizedElement {
+final class HistoricIntegerElement
+    extends StdHistoricalElement
+    implements HistorizedElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int YEAR_OF_ERA_INDEX = 2;
-    private static final int MONTH_INDEX = 3;
-    private static final int DAY_OF_MONTH_INDEX = 4;
+    static final int YEAR_OF_ERA_INDEX = 2;
+    static final int MONTH_INDEX = 3;
+    static final int DAY_OF_MONTH_INDEX = 4;
+    static final int DAY_OF_YEAR_INDEX = 5;
 
     private static final long serialVersionUID = -6283098762945747308L;
 
@@ -79,122 +79,25 @@ final class HistoricalIntegerElement
     private final ChronoHistory history;
 
     private transient final int index;
-    private transient final char symbol;
-    private transient final Integer defaultMin;
-    private transient final Integer defaultMax;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private HistoricalIntegerElement(
+    HistoricIntegerElement(
         String name,
         char symbol,
-        Integer defaultMin,
-        Integer defaultMax,
+        int defaultMin,
+        int defaultMax,
         ChronoHistory history,
         int index
     ) {
-        super(name);
+        super(name, symbol, defaultMin, defaultMax);
 
-        this.symbol = symbol;
-        this.defaultMin = defaultMin;
-        this.defaultMax = defaultMax;
         this.history = history;
         this.index = index;
 
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    // factory method
-    static TextElement<Integer> forYearOfEra(ChronoHistory history) {
-
-        return new HistoricalIntegerElement(
-            "YEAR_OF_ERA",
-            'y',
-            Integer.valueOf(1),
-            Integer.valueOf(GregorianMath.MAX_YEAR),
-            history,
-            YEAR_OF_ERA_INDEX
-        );
-
-    }
-
-    // factory method
-    static TextElement<Integer> forMonth(ChronoHistory history) {
-
-        return new HistoricalIntegerElement(
-            "HISTORIC_MONTH",
-            'M',
-            Integer.valueOf(1),
-            Integer.valueOf(12),
-            history,
-            MONTH_INDEX
-        );
-
-    }
-
-    // factory method
-    static TextElement<Integer> forDayOfMonth(ChronoHistory history) {
-
-        return new HistoricalIntegerElement(
-            "HISTORIC_DAY_OF_MONTH",
-            'd',
-            Integer.valueOf(1),
-            Integer.valueOf(31),
-            history,
-            DAY_OF_MONTH_INDEX
-        );
-
-    }
-
-    @Override
-    public Class<Integer> getType() {
-
-        return Integer.class;
-
-    }
-
-    @Override
-    public char getSymbol() {
-
-        return this.symbol;
-
-    }
-
-    @Override
-    public Integer getDefaultMinimum() {
-
-        return this.defaultMin;
-
-    }
-
-    @Override
-    public Integer getDefaultMaximum() {
-
-        return this.defaultMax;
-
-    }
-
-    @Override
-    public boolean isDateElement() {
-
-        return true;
-
-    }
-
-    @Override
-    public boolean isTimeElement() {
-
-        return false;
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
-
-    }
 
     @Override
     public void print(
@@ -219,6 +122,11 @@ final class HistoricalIntegerElement
         int minDigits,
         int maxDigits
     ) throws IOException {
+
+        if (this.index == DAY_OF_YEAR_INDEX) {
+            buffer.append(String.valueOf(context.get(this.history.dayOfYear())));
+            return;
+        }
 
         HistoricDate date;
 
@@ -286,6 +194,18 @@ final class HistoricalIntegerElement
         AttributeQuery attributes
     ) {
 
+        return this.parse(text, status, attributes, null);
+
+    }
+
+    @Override
+    public Integer parse(
+        CharSequence text,
+        ParsePosition status,
+        AttributeQuery attributes,
+        ChronoEntity<?> parsedResult
+    ) {
+
         if (this.index == MONTH_INDEX) {
             int index = status.getIndex();
             OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
@@ -332,6 +252,9 @@ final class HistoricalIntegerElement
                 int ancient = this.getAncientYear(yod, yoe);
                 if ((numsys == NumberSystem.ARABIC) && (ancient != Integer.MAX_VALUE)) {
                     value = ancient;
+                    if (parsedResult != null) {
+                        parsedResult.with(StdHistoricalElement.YEAR_OF_DISPLAY, yod);
+                    }
                 } else if (Math.abs(yoe - yod) <= 1) { // check for plausibility
                     value = yoe;
                 } else { // now we have something else - let the formatter process the rest
@@ -355,7 +278,7 @@ final class HistoricalIntegerElement
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
-            return new Rule<>(this.index, this.history);
+            return new Rule<T>(this.index, this.history);
         }
 
         return null;
@@ -363,9 +286,16 @@ final class HistoricalIntegerElement
     }
 
     @Override
+    protected boolean isSingleton() {
+
+        return false;
+
+    }
+
+    @Override
     protected boolean doEquals(BasicElement<?> obj) {
 
-        return this.history.equals(((HistoricalIntegerElement) obj).history);
+        return this.history.equals(((HistoricIntegerElement) obj).history);
 
     }
 
@@ -544,6 +474,8 @@ final class HistoricalIntegerElement
             return this.history.month();
         } else if (n.equals(this.history.dayOfMonth().name())) {
             return this.history.dayOfMonth();
+        } else if (n.equals(this.history.dayOfYear().name())) {
+            return this.history.dayOfYear();
         } else {
             throw new InvalidObjectException("Unknown element: " + n);
         }
@@ -579,7 +511,8 @@ final class HistoricalIntegerElement
         public Integer getValue(C context) {
 
             try {
-                HistoricDate date = this.history.convert(context.get(PlainDate.COMPONENT));
+                PlainDate iso = context.get(PlainDate.COMPONENT);
+                HistoricDate date = this.history.convert(iso);
 
                 switch (this.index) {
                     case YEAR_OF_ERA_INDEX:
@@ -588,6 +521,11 @@ final class HistoricalIntegerElement
                         return date.getMonth();
                     case DAY_OF_MONTH_INDEX:
                         return date.getDayOfMonth();
+                    case DAY_OF_YEAR_INDEX:
+                        long utc = iso.getDaysSinceEpochUTC();
+                        int yoe = date.getYearOfEra(this.history.getNewYearStrategy());
+                        HistoricDate newYear = this.history.getBeginOfYear(date.getEra(), yoe);
+                        return (int) (utc - this.history.convert(newYear).getDaysSinceEpochUTC() + 1);
                     default:
                         throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
@@ -615,6 +553,8 @@ final class HistoricalIntegerElement
 
                 if (this.history.isValid(hd)) {
                     return Integer.valueOf(1);
+                } else if (this.index == DAY_OF_YEAR_INDEX) {
+                    throw new ChronoException("Historic New Year cannot be determined.");
                 }
 
 
@@ -661,6 +601,13 @@ final class HistoricalIntegerElement
                         max = this.history.getAlgorithm(current).getMaximumDayOfMonth(current);
                         hd = this.adjust(context, max);
                         break;
+                    case DAY_OF_YEAR_INDEX:
+                        int yoe = current.getYearOfEra(this.history.getNewYearStrategy());
+                        max = this.history.getLengthOfYear(current.getEra(), yoe);
+                        if (max == -1) {
+                            throw new ChronoException("Length of historic year undefined.");
+                        }
+                        return Integer.valueOf(max);
                     default:
                         throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
@@ -754,6 +701,20 @@ final class HistoricalIntegerElement
                     break;
                 case DAY_OF_MONTH_INDEX:
                     result = HistoricDate.of(hd.getEra(), hd.getYearOfEra(), hd.getMonth(), value);
+                    break;
+                case DAY_OF_YEAR_INDEX:
+                    int yoe = hd.getYearOfEra(this.history.getNewYearStrategy());
+                    HistoricDate newYear = this.history.getBeginOfYear(hd.getEra(), yoe);
+                    int max = this.history.getLengthOfYear(hd.getEra(), yoe);
+                    if (value == 1) {
+                        result = newYear;
+                    } else if ((value > 1) && (value <= max)) {
+                        PlainDate date = this.history.convert(newYear);
+                        date = date.plus(CalendarDays.of(value - 1));
+                        result = this.history.convert(date);
+                    } else {
+                        throw new IllegalArgumentException("Out of range: " + value);
+                    }
                     break;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);

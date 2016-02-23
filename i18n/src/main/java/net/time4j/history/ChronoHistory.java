@@ -23,6 +23,7 @@ package net.time4j.history;
 
 import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
@@ -198,6 +199,7 @@ public final class ChronoHistory
     private transient final TextElement<Integer> yearOfEraElement;
     private transient final TextElement<Integer> monthElement;
     private transient final TextElement<Integer> dayOfMonthElement;
+    private transient final TextElement<Integer> dayOfYearElement;
     private transient final Set<ChronoElement<?>> elements;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -234,11 +236,41 @@ public final class ChronoHistory
         this.nys = nys;
         this.eraPreference = eraPreference;
 
-        this.dateElement = new HistoricalDateElement(this);
-        this.eraElement = new HistoricalEraElement(this);
-        this.yearOfEraElement = HistoricalIntegerElement.forYearOfEra(this);
-        this.monthElement = HistoricalIntegerElement.forMonth(this);
-        this.dayOfMonthElement = HistoricalIntegerElement.forDayOfMonth(this);
+        this.dateElement = new HistoricDateElement(this);
+        this.eraElement = new HistoricEraElement(this);
+
+        this.yearOfEraElement = new HistoricIntegerElement(
+            "YEAR_OF_ERA",
+            'y',
+            1,
+            GregorianMath.MAX_YEAR,
+            this,
+            HistoricIntegerElement.YEAR_OF_ERA_INDEX
+        );
+        this.monthElement = new HistoricIntegerElement(
+            "HISTORIC_MONTH",
+            'M',
+            1,
+            12,
+            this,
+            HistoricIntegerElement.MONTH_INDEX
+        );
+        this.dayOfMonthElement = new HistoricIntegerElement(
+            "HISTORIC_DAY_OF_MONTH",
+            'd',
+            1,
+            31,
+            this,
+            HistoricIntegerElement.DAY_OF_MONTH_INDEX
+        );
+        this.dayOfYearElement = new HistoricIntegerElement(
+            "HISTORIC_DAY_OF_YEAR",
+            'D',
+            1,
+            365,
+            this,
+            HistoricIntegerElement.DAY_OF_YEAR_INDEX
+        );
 
         Set<ChronoElement<?>> tmp = new HashSet<>();
         tmp.add(this.dateElement);
@@ -246,6 +278,7 @@ public final class ChronoHistory
         tmp.add(this.yearOfEraElement);
         tmp.add(this.monthElement);
         tmp.add(this.dayOfMonthElement);
+        tmp.add(this.dayOfYearElement);
         this.elements = Collections.unmodifiableSet(tmp);
 
     }
@@ -1043,6 +1076,37 @@ public final class ChronoHistory
     public TextElement<Integer> dayOfMonth() {
 
         return this.dayOfMonthElement;
+
+    }
+
+    /**
+     * <p>Defines the element for the historic day of year. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. Note: An eventually deviating new-year-strategy will be taken
+     * into account so this element follows the year cycle which is decoupled from the month cycle. </p>
+     *
+     * @return  day-of-year-related element
+     * @since   3.16/4.13
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r den historischen Tag des Jahres. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
+     * {@link PlainDate#COMPONENT} registriert haben. Hinweis: Eine eventuell abweichende
+     * Neujahrsregel wird ber&uuml;cksichtigt, so da&szlig; dieses Element dem vom Monatszyklus
+     * entkoppelten Jahreszyklus folgt. </p>
+     *
+     * @return  day-of-year-related element
+     * @since   3.16/4.13
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public TextElement<Integer> dayOfYear() {
+
+        return this.dayOfYearElement;
 
     }
 

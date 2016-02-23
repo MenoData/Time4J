@@ -306,6 +306,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     replacement = history.month();
                 } else if (element == PlainDate.DAY_OF_MONTH) {
                     replacement = history.dayOfMonth();
+                } else if (element == PlainDate.DAY_OF_YEAR) {
+                    replacement = history.dayOfYear();
                 }
                 if (replacement != null) {
                     copy.set(i, step.updateElement(replacement));

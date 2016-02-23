@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -1316,6 +1316,7 @@ public enum PatternType
                 replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
                 replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
                 replacement.put(PlainDate.DAY_OF_MONTH, history.dayOfMonth());
+                replacement.put(PlainDate.DAY_OF_YEAR, history.dayOfYear());
                 return replacement;
             case 'y':
                 if (count == 2) {
@@ -1657,6 +1658,7 @@ public enum PatternType
                 replacement.put(PlainDate.MONTH_OF_YEAR, history.month());
                 replacement.put(PlainDate.MONTH_AS_NUMBER, history.month());
                 replacement.put(PlainDate.DAY_OF_MONTH, history.dayOfMonth());
+                replacement.put(PlainDate.DAY_OF_YEAR, history.dayOfYear());
                 return replacement;
             case 'y':
                 if (count == 2) {
