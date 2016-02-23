@@ -163,9 +163,10 @@ public enum PatternType
      *      then this symbol will simply be mapped to {@link PlainDate#DAY_OF_MONTH}. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#DAY_OF_YEAR}</td>
+     *      <td>DAY_OF_YEAR</td>
      *      <td>D</td>
-     *      <td>One, two or three symbols for the day of year. </td>
+     *      <td>One, two or three symbols for the day of year. Important: If the era is not present
+     *      then this symbol will simply be mapped to {@link PlainDate#DAY_OF_YEAR}. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#WEEKDAY_IN_MONTH}</td>
@@ -414,9 +415,11 @@ public enum PatternType
      *      Symbol dem Element {@link PlainDate#DAY_OF_MONTH} zugeordnet.</td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#DAY_OF_YEAR}</td>
+     *      <td>DAY_OF_YEAR</td>
      *      <td>D</td>
-     *      <td>Ein, zwei oder drei Symbole f&uuml;r den Tag des Jahres. </td>
+     *      <td>Ein, zwei oder drei Symbole f&uuml;r den Tag des Jahres.
+     *      Wichtig: Ist die &Auml;ra nicht im Muster vorhanden, wird dieses
+     *      Symbol dem Element {@link PlainDate#DAY_OF_YEAR} zugeordnet. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#WEEKDAY_IN_MONTH}</td>
