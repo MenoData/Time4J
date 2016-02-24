@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         JulianTransformationTest.class,
         HistoryTest.class,
         NewYearTest.class,
+        RangeTest.class,
         ScaligerTest.class,
         SerializationTest.class
     }

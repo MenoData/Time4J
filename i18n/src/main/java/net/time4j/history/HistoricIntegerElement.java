@@ -278,7 +278,7 @@ final class HistoricIntegerElement
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
-            return new Rule<T>(this.index, this.history);
+            return new Rule<>(this.index, this.history);
         }
 
         return null;
