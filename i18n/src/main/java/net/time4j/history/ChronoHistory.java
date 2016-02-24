@@ -138,7 +138,7 @@ public final class ChronoHistory
                 Collections.singletonList(
                     new CutOverEvent(Long.MIN_VALUE, CalendarAlgorithm.JULIAN, CalendarAlgorithm.JULIAN)),
                 null,
-                NewYearRule.BEGIN_OF_SEPTEMBER.until(Integer.MAX_VALUE),
+                new NewYearStrategy(NewYearRule.BEGIN_OF_SEPTEMBER, Integer.MAX_VALUE),
                 EraPreference.byzantineUntil(PlainDate.axis().getMaximum()));
 
         EARLIEST_CUTOVER = PlainDate.of(1582, 10, 15).get(EpochDays.MODIFIED_JULIAN_DATE);

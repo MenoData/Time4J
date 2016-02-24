@@ -249,4 +249,13 @@ public class NewYearTest {
             is(HistoricDate.of(HistoricEra.AD, 568, 1, 1)));
     }
 
+    @Test
+    public void byzantine() {
+        NewYearStrategy ignored = NewYearRule.BEGIN_OF_JANUARY.until(568);
+        assertThat(
+            ChronoHistory.PROLEPTIC_BYZANTINE.with(ignored).getBeginOfYear(HistoricEra.BYZANTINE, 1),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1, 9, 1))
+        );
+    }
+
 }
