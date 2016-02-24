@@ -3,6 +3,7 @@
 - Add element support for historic day-of-year [#456]
  
 ### Fixed
+- Clarify/correct exception behaviour of new year strategies [#457]
 - Reduce array allocation during parsing [#455]
 
 ## [v4.12] published on 2016-02-14
