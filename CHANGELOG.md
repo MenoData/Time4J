@@ -3,6 +3,7 @@
 - Add element support for historic day-of-year [#456]
  
 ### Fixed
+- Don't permit negative years for any historic era [#458]
 - Clarify/correct exception behaviour of new year strategies [#457]
 - Reduce array allocation during parsing [#455]
 
