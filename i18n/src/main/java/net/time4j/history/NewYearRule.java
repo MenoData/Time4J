@@ -250,7 +250,29 @@ public enum NewYearRule {
             }
             return yearOfDisplay;
         }
+    },
+
+    /**
+     * <p>The new year starts on 6th of January. </p>
+     *
+     * <p>This rule was used in some East European countries during early midage. </p>
+     *
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Das neue Jahr f&auml;ngt am sechsten Tag des Januar an (Dreik&ouml;nigstag). </p>
+     *
+     * <p>Diese Regel war vor allem in Osteuropa im fr&uuml;hen Mittelalter gebr&auml;chlich. </p>
+     *
+     * @since   3.16/4.13
+     */
+    EPIPHANY() {
+        @Override
+        HistoricDate newYear(HistoricEra era, int yearOfEra) {
+            return HistoricDate.of(era, yearOfEra, 1, 6);
+        }
     };
+
 
     private static final int COUNCIL_OF_TOURS = 567;
 
@@ -258,6 +280,11 @@ public enum NewYearRule {
 
     /**
      * <p>Creates a new-year-strategy based on this rule which is valid until given year of era. </p>
+     *
+     * <p>Time4J will always use first of January as New Year for all times before the
+     * <a href="http://www.newadvent.org/cathen/03724b.htm">Council of Tours</a> in AD 567 where
+     * a first try of the church is documented to move away from the Roman tradition how to celebrate
+     * New Year. So this method is only relevant for times after the Council of Tours. </p>
      *
      * @param   annoDomini  end year of validity range related to era AD (exclusive)
      * @return  NewYearStrategy
@@ -267,6 +294,12 @@ public enum NewYearRule {
     /*[deutsch]
      * <p>Erzeugt eine Neujahrsstrategie, die auf dieser Regel fu&szlig;t und bis zum angegebenen Jahr
      * der &Auml;ra g&uuml;ltig ist. </p>
+     *
+     * <p>Time4J wird immer den ersten Januar als Neujahr f&uuml;r alle Zeiten vor dem
+     * <a href="http://www.newadvent.org/cathen/03724b.htm">Konzil von Tours</a> AD 567
+     * anwenden, zu dem ein erster Versuch der Kirche dokumentiert ist, von der r&ouml;mischen
+     * Tradition abzuweichen, wann Neujahr gefeiert wird. Somit ist diese Methode nur f&uuml;r
+     * Zeiten nach dem Konzil von Tours von Bedeutung. </p>
      *
      * @param   annoDomini  end year of validity range related to era AD (exclusive)
      * @return  NewYearStrategy
