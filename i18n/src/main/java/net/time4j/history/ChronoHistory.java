@@ -95,20 +95,22 @@ public final class ChronoHistory
 
     /**
      * <p>Describes no real historic event but just the proleptic byzantine calendar which is assumed
-     * to be in power all times. </p>
+     * to be in power all times on or after the creation of the world. </p>
      *
      * <p>This constant rather serves for academic purposes because the byzantine calendar was in latest use
      * in Russia before 1700. </p>
      *
+     * @see     HistoricEra#BYZANTINE
      * @since   3.14/4.11
      */
     /*[deutsch]
      * <p>Beschreibt kein wirkliches historisches Ereignis, sondern einfach nur den proleptisch byzantinischen
-     * Kalender, der als f&uuml;r alle Zeiten g&uuml;ltig angesehen wird. </p>
+     * Kalender, der als f&uuml;r alle Zeiten ab der Erschaffung der Welt g&uuml;ltig angesehen wird. </p>
      *
      * <p>Diese Konstante dient eher akademischen &Uuml;bungen, weil der byzantinische Kalender zuletzt in
      * Ru&szlig;land vor 1700 verwendet wurde. </p>
      *
+     * @see     HistoricEra#BYZANTINE
      * @since   3.14/4.11
      */
     public static final ChronoHistory PROLEPTIC_BYZANTINE;

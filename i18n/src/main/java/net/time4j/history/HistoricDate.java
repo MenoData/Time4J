@@ -85,9 +85,8 @@ public final class HistoricDate
      * <p>Constructs a new tuple of given historic chronological components. </p>
      *
      * <p>Note: A detailed validation is not done. Such a validation is the responsibility
-     * of any {@code ChronoHistory}, however. Years not related to eras BC or AD might be
-     * smaller than {@code 1} although this does not make much sense. The converted AD-year
-     * must not be beyond the defined range of the class {@code PlainDate}. </p>
+     * of any {@code ChronoHistory}, however. The converted AD-year must not be beyond the
+     * defined range of the class {@code PlainDate}. </p>
      *
      * @param   era         historic era
      * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
@@ -104,10 +103,8 @@ public final class HistoricDate
      * <p>Konstruiert ein neues Tupel aus den angegebenen historischen Zeitkomponenten. </p>
      *
      * <p>Hinweis: Eine detaillierte Validierung wird nicht gemacht. Das ist stattdessen Aufgabe
-     * der {@code ChronoHistory}. Jahre, die sich nicht auf die &Auml;ra BC oder AD beziehen,
-     * k&ouml;nnen kleiner als {@code 1} sein, auch wenn das nicht sehr sinnvoll ist. Ansonsten
-     * darf das umgerechnete AD-Jahr nicht au&szlig;erhalb des Definitionsbereichs der Klasse
-     * {@code PlainDate} liegen. </p>
+     * der {@code ChronoHistory}. Das umgerechnete AD-Jahr darf nicht au&szlig;erhalb des
+     * Definitionsbereichs der Klasse {@code PlainDate} liegen. </p>
      *
      * @param   era         historic era
      * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
@@ -131,7 +128,8 @@ public final class HistoricDate
             (dom < 1 || dom > 31)
             || (month < 1 || month > 12)
             || (Math.abs(era.annoDomini(yearOfEra)) > GregorianMath.MAX_YEAR)
-            || ((era.compareTo(HistoricEra.AD) <= 0) && (yearOfEra < 1))
+            || (yearOfEra < 1)
+            || ((era == HistoricEra.BYZANTINE) && (yearOfEra == 1) && (month < 9))
         ) {
             throw new IllegalArgumentException("Out of range: " + toString(era, yearOfEra, month, dom));
         } else if (era == null) {
@@ -186,8 +184,7 @@ public final class HistoricDate
      * <p>Yields the displayed historic year whose begin is determined by given new-year-strategy. </p>
      *
      * @param   newYearStrategy     strategy how to determine New Year
-     * @return  displayed historic year ({@code >= 1})
-     * @throws  IllegalArgumentException if this date is earlier than AD 8 and defined either in era BC or AD
+     * @return  displayed historic year (never negative)
      * @see     #getYearOfEra()
      * @see     NewYearRule
      * @since   3.14/4.11
@@ -197,8 +194,7 @@ public final class HistoricDate
      * bestimmt wird. </p>
      *
      * @param   newYearStrategy     strategy how to determine New Year
-     * @return  displayed historic year ({@code >= 1})
-     * @throws  IllegalArgumentException if this date is earlier than AD 8 and defined either in era BC or AD
+     * @return  displayed historic year (never negative)
      * @see     #getYearOfEra()
      * @see     NewYearRule
      * @since   3.14/4.11

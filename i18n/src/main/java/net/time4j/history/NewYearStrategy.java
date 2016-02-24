@@ -247,7 +247,6 @@ public final class NewYearStrategy {
      *
      * @param   date    historic date as reference for the calculation of the displayed year
      * @return  displayed historic year
-     * @throws  IllegalArgumentException if given date is earlier than AD 8 and defined either in era BC or AD
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -257,7 +256,6 @@ public final class NewYearStrategy {
      *
      * @param   date    historic date as reference for the calculation of the displayed year
      * @return  displayed historic year
-     * @throws  IllegalArgumentException if given date is earlier than AD 8 and defined either in era BC or AD
      * @since   3.14/4.11
      */
     int displayedYear(HistoricDate date) {
@@ -265,11 +263,6 @@ public final class NewYearStrategy {
         HistoricEra era = date.getEra();
         int yearOfEra = date.getYearOfEra();
         int annoDomini = era.annoDomini(yearOfEra);
-
-        if ((annoDomini < 8) && (era.compareTo(HistoricEra.AD) <= 0)) {
-            throw new IllegalArgumentException("Cannot determine displayed year in non-proleptic era: " + date);
-        }
-
         int previous = Integer.MIN_VALUE;
 
         for (int i = 0, n = this.strategies.size(); i < n; i++) {

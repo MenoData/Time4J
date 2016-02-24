@@ -42,18 +42,6 @@ public class NewYearTest {
             is(-1));
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void displayedYearOutOfRangeAD7() {
-        ChronoHistory history = ChronoHistory.of(Locale.UK);
-        history.getBeginOfYear(HistoricEra.AD, 7).getYearOfEra(NewYearStrategy.DEFAULT);
-    }
-
-    @Test(expected=IllegalArgumentException.class)
-    public void displayedYearOutOfRangeBC1() {
-        ChronoHistory history = ChronoHistory.of(Locale.UK);
-        history.getBeginOfYear(HistoricEra.BC, 1).getYearOfEra(NewYearStrategy.DEFAULT);
-    }
-
     @Test
     public void england1066() {
         ChronoHistory history = ChronoHistory.of(Locale.UK);
