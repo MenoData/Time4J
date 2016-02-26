@@ -1,5 +1,6 @@
 ## [v3.16] not yet released
 ### Added
+- Support for Telugu language [#459]
 - Add element support for historic day-of-year [#456]
  
 ### Fixed
