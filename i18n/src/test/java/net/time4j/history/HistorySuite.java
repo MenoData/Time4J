@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        ComputusTest.class,
         DayOfYearTest.class,
         EraFormatTest.class,
         EraNameTest.class,
