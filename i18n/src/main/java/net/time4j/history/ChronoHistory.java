@@ -153,8 +153,8 @@ public final class ChronoHistory
         SWEDEN = new ChronoHistory(HistoricVariant.SWEDEN, Collections.unmodifiableList(events));
 
         Map<String, ChronoHistory> tmp = new HashMap<String, ChronoHistory>();
-        PlainDate ad1383 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1382, 12, 31));
-        PlainDate ad1422 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1421, 12, 31));
+        PlainDate ad1383 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1382, 12, 24));
+        PlainDate ad1422 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1421, 12, 24));
         PlainDate ad1700 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1700, 1, 1));
         tmp.put(
             "ES", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
