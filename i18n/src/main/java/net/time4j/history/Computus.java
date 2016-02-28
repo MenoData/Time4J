@@ -67,45 +67,22 @@ public enum Computus {
     /**
      * <p>Calculates the date of Easter Sunday. </p>
      *
-     * @param   yearOfEra       calendar year
-     * @return  calendar date of Easter Sunday (ISO-8601)
-     * @throws  IllegalArgumentException if {@code yearOfEra < 532} (the first table from Beda Venerabilis)
-     * @since   3.16/4.13
+     * @param annoDomini calendar year related to era AD
+     * @return calendar date of Easter Sunday (ISO-8601)
+     * @throws IllegalArgumentException if given year is before AD 532 (the first table from Beda Venerabilis)
+     * @since 3.16/4.13
      */
     /*[deutsch]
      * <p>Berechnet das Datum des Ostersonntags. </p>
      *
-     * @param   yearOfEra       calendar year
+     * @param   annoDomini      calendar year related to era AD
      * @return  calendar date of Easter Sunday (ISO-8601)
-     * @throws  IllegalArgumentException if {@code yearOfEra < 532} (the first table from Beda Venerabilis)
+     * @throws  IllegalArgumentException if given year is before AD 532 (the first table from Beda Venerabilis)
      * @since   3.16/4.13
      */
-    public PlainDate easterSunday(int yearOfEra) {
+    public PlainDate easterSunday(int annoDomini) {
 
-        if (yearOfEra < 532) {
-            throw new IllegalArgumentException("Out of range: " + yearOfEra);
-        }
-
-        boolean gregorian = ((this == WESTERN) && (yearOfEra > 1582));
-
-        int k = yearOfEra / 100;
-        int m = 15;
-        int s = 0;
-
-        if (gregorian) {
-            m += ((3 * k + 3) / 4);
-            m -= ((8 * k + 13) / 25);
-            s = 2 - ((3 * k + 3) / 4);
-        }
-
-        int a = yearOfEra % 19;
-        int d = (19 * a + m) % 30;
-        int r = (d / 29) + ((d / 28) - (d / 29)) * (a / 11);
-        int og = 21 + d - r;
-        int sz = 7 - ((yearOfEra + (yearOfEra / 4) + s) % 7);
-        int oe = 7 - ((og - sz) % 7);
-
-        int dom = og + oe;
+        int dom = marchDay(annoDomini);
         int month = 3;
 
         if (dom > 31) {
@@ -114,9 +91,37 @@ public enum Computus {
         }
 
         return (
-            gregorian
-                ? PlainDate.of(yearOfEra, month, dom)
-                : PlainDate.of(JulianMath.toMJD(yearOfEra, month, dom), EpochDays.MODIFIED_JULIAN_DATE));
+            ((this == WESTERN) && (annoDomini > 1582))
+            ? PlainDate.of(annoDomini, month, dom)
+            : PlainDate.of(JulianMath.toMJD(annoDomini, month, dom), EpochDays.MODIFIED_JULIAN_DATE));
+
+    }
+
+    // auch benutzt von NewYearRule
+    int marchDay(int annoDomini) {
+
+        if (annoDomini < 532) {
+            throw new IllegalArgumentException("Out of range: " + annoDomini);
+        }
+
+        int k = annoDomini / 100;
+        int m = 15;
+        int s = 0;
+
+        if ((this == WESTERN) && (annoDomini > 1582)) {
+            m += ((3 * k + 3) / 4);
+            m -= ((8 * k + 13) / 25);
+            s = 2 - ((3 * k + 3) / 4);
+        }
+
+        int a = annoDomini % 19;
+        int d = (19 * a + m) % 30;
+        int r = (d / 29) + ((d / 28) - (d / 29)) * (a / 11);
+        int og = 21 + d - r;
+        int sz = 7 - ((annoDomini + (annoDomini / 4) + s) % 7);
+        int oe = 7 - ((og - sz) % 7);
+
+        return og + oe;
 
     }
 
