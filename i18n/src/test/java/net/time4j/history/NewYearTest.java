@@ -208,6 +208,20 @@ public class NewYearTest {
     }
 
     @Test
+    public void france() {
+        ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+        assertThat(
+            history.getBeginOfYear(HistoricEra.AD, 1564),
+            is(HistoricDate.of(HistoricEra.AD, 1564, 4, 1)));
+        assertThat(
+            history.getBeginOfYear(HistoricEra.AD, 1565),
+            is(HistoricDate.of(HistoricEra.AD, 1565, 4, 21)));
+        assertThat(
+            history.getLengthOfYear(HistoricEra.AD, 1564),
+            is(385));
+    }
+
+    @Test
     public void england2000() {
         ChronoHistory history = ChronoHistory.of(Locale.UK);
         assertThat(

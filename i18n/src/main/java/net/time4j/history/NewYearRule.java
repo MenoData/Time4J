@@ -142,13 +142,7 @@ public enum NewYearRule {
     CHRISTMAS_STYLE() {
         @Override
         HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            if (era == HistoricEra.BC) {
-                return HistoricDate.of(era, yearOfEra + 1, 12, 25);
-            } else if (yearOfEra == 1) {
-                return HistoricDate.of(HistoricEra.BC, HistoricEra.BC.yearOfEra(era, 0), 12, 25);
-            } else {
-                return HistoricDate.of(era, yearOfEra - 1, 12, 25);
-            }
+            return HistoricDate.of(era, yearOfEra - 1, 12, 25);
         }
         @Override
         int displayedYear(
@@ -168,30 +162,66 @@ public enum NewYearRule {
     /**
      * <p>The new year starts on Holy Saturday (one day before Easter Sunday). </p>
      *
-     * <p>Mainly used in France. Due to the possibility to have two same dates per year, both dates were
-     * distinguished by the addition &quot;after Easter/before Easter&quot;. </p>
+     * <p>Mainly used in France until AD 1567. Due to the possibility to have two same dates per year,
+     * both dates were distinguished by the addition &quot;after Easter/before Easter&quot;. This rule
+     * always uses the Julian calendar for determining Easter. </p>
+     *
+     * @since   3.16/4.13
      */
     /*[deutsch]
      * <p>Das neue Jahr startet Samstag vor Ostern. </p>
      *
-     * <p>Haupts&auml;chlich in Frankreich verwendet. Wegen der M&ouml;glichkeit, das gleiche Datum zweimal
-     * im Jahr zu haben, wurden die Datumsangaben mit dem Zusatz &quot;nach Ostern/vor Ostern&quot; versehen. </p>
+     * <p>Haupts&auml;chlich in Frankreich bis AD 1567 verwendet. Wegen der M&ouml;glichkeit, das gleiche Datum
+     * zweimal im Jahr zu haben, wurden die Datumsangaben mit dem Zusatz &quot;nach Ostern/vor Ostern&quot;
+     * versehen. Diese Regel verwendet immer den julianischen Kalender zur Bestimmung von Ostern. </p>
+     *
+     * @since   3.16/4.13
      */
-    //EASTER_STYLE,
+    EASTER_STYLE() {
+        @Override
+        HistoricDate newYear(HistoricEra era, int yearOfEra) {
+            int ad = era.annoDomini(yearOfEra);
+            int dom = Computus.EASTERN.marchDay(ad) - 1;
+            int month = 3;
+            if (dom > 31) {
+                month++;
+                dom -= 31;
+            }
+            return HistoricDate.of(era, yearOfEra, month, dom);
+        }
+    },
 
     /**
      * <p>The new year starts on Good Friday (two days before Easter Sunday). </p>
      *
      * <p>Due to the possibility to have two same dates per year, both dates were
-     * distinguished by the addition &quot;after Easter/before Easter&quot;. </p>
+     * distinguished by the addition &quot;after Easter/before Easter&quot;. This rule
+     * always uses the Julian calendar for determining Easter. </p>
+     *
+     * @since   3.16/4.13
      */
     /*[deutsch]
      * <p>Das neue Jahr startet am Karfreitag. </p>
      *
      * <p>Wegen der M&ouml;glichkeit, das gleiche Datum zweimal im Jahr zu haben, wurden die Datumsangaben
-     * mit dem Zusatz &quot;nach Ostern/vor Ostern&quot; versehen. </p>
+     * mit dem Zusatz &quot;nach Ostern/vor Ostern&quot; versehen. Diese Regel verwendet immer den julianischen
+     * Kalender zur Bestimmung von Ostern. </p>
+     *
+     * @since   3.16/4.13
      */
-    //GOOD_FRIDAY,
+    GOOD_FRIDAY() {
+        @Override
+        HistoricDate newYear(HistoricEra era, int yearOfEra) {
+            int ad = era.annoDomini(yearOfEra);
+            int dom = Computus.EASTERN.marchDay(ad) - 2;
+            int month = 3;
+            if (dom > 31) {
+                month++;
+                dom -= 31;
+            }
+            return HistoricDate.of(era, yearOfEra, month, dom);
+        }
+    },
 
     /**
      * <p>The new year starts on 25th of March (yyyy-03-25), also called Lady Day or Calculus Florentinus. </p>
