@@ -153,31 +153,60 @@ public final class ChronoHistory
         SWEDEN = new ChronoHistory(HistoricVariant.SWEDEN, Collections.unmodifiableList(events));
 
         Map<String, ChronoHistory> tmp = new HashMap<String, ChronoHistory>();
-        PlainDate ad1383 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1383, 1, 1));
-        PlainDate ad1422 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1422, 1, 1));
+        PlainDate ad1383 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1382, 12, 31));
+        PlainDate ad1422 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1421, 12, 31));
         PlainDate ad1700 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1700, 1, 1));
         tmp.put(
             "ES", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
-            ChronoHistory.ofFirstGregorianReform().with(EraPreference.hispanicUntil(ad1383)));
+            ChronoHistory.ofFirstGregorianReform()
+                .with(
+                    NewYearRule.BEGIN_OF_JANUARY.until(1383)
+                        .and(NewYearRule.CHRISTMAS_STYLE.until(1556)))
+                .with(EraPreference.hispanicUntil(ad1383)));
         tmp.put(
             "PT", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
-            ChronoHistory.ofFirstGregorianReform().with(EraPreference.hispanicUntil(ad1422)));
+            ChronoHistory.ofFirstGregorianReform()
+                .with(
+                    NewYearRule.BEGIN_OF_JANUARY.until(1422)
+                        .and(NewYearRule.CHRISTMAS_STYLE.until(1556)))
+                .with(EraPreference.hispanicUntil(ad1422)));
+        tmp.put(
+            "FR",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1582, 12, 20))
+                .with(NewYearRule.EASTER_STYLE.until(1567))); // edict of Roussillon in 1564 took effect 3 years later
+        tmp.put(
+            "DE", // Holy Roman Empire
+            ChronoHistory.ofFirstGregorianReform()
+                .with(NewYearRule.CHRISTMAS_STYLE.until(1544)));
+        tmp.put(
+            "DE-PROTESTANT",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1700, 3, 1))
+                .with(NewYearRule.CHRISTMAS_STYLE.until(1559)));
+        tmp.put(
+            "IT",
+            ChronoHistory.ofFirstGregorianReform()
+                .with(NewYearRule.CHRISTMAS_STYLE.until(1583)));
         tmp.put(
             "GB", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
-            ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14)).with(
-                NewYearRule.CHRISTMAS_STYLE.until(1087) // we don't exactly know when it started
-                    .and(NewYearRule.BEGIN_OF_JANUARY.until(1155))
-                    .and(NewYearRule.MARIA_ANUNCIATA.until(1752)))); // http://www.ortelius.de/kalender/jul_en.php
+            ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14))
+                .with(
+                    NewYearRule.CHRISTMAS_STYLE.until(1087) // we don't exactly know when it started
+                        .and(NewYearRule.BEGIN_OF_JANUARY.until(1155))
+                        .and(NewYearRule.MARIA_ANUNCIATA.until(1752)))); // http://www.ortelius.de/kalender/jul_en.php
         tmp.put(
             "GB-SCT", // Scotland (we assume as only difference to England the last new-year-rule)
-            ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14)).with(
-                NewYearRule.CHRISTMAS_STYLE.until(1087)
-                    .and(NewYearRule.BEGIN_OF_JANUARY.until(1155))
-                    .and(NewYearRule.MARIA_ANUNCIATA.until(1600))));
+            ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14))
+                .with(
+                    NewYearRule.CHRISTMAS_STYLE.until(1087)
+                        .and(NewYearRule.BEGIN_OF_JANUARY.until(1155))
+                        .and(NewYearRule.MARIA_ANUNCIATA.until(1600))));
         tmp.put(
             "RU",
             ChronoHistory.ofGregorianReform(PlainDate.of(1918, 2, 14))
-                .with(NewYearRule.BEGIN_OF_SEPTEMBER.until(1700))
+                .with(
+                    NewYearRule.BEGIN_OF_JANUARY.until(988)
+                        .and(NewYearRule.BEGIN_OF_MARCH.until(1492))
+                        .and(NewYearRule.BEGIN_OF_SEPTEMBER.until(1700)))
                 .with(EraPreference.byzantineUntil(ad1700)));
         tmp.put("SE", SWEDEN);
         LOOKUP = Collections.unmodifiableMap(tmp);
@@ -352,16 +381,21 @@ public final class ChronoHistory
     }
 
     /**
-     * <p>Determines the history of gregorian calendar reforms for given locale. </p>
+     * <p>Determines the (usually approximate) history of gregorian calendar reforms for given locale. </p>
      *
      * <p>The actual implementation just falls back to the introduction of gregorian calendar by
      * pope Gregor - with the exception of England (country=GB), Portugal, Russia, Scotland (using variant SCT),
-     * Spain and Sweden. Later releases of Time4J will refine the implementation for most European countries.
-     * For any cutover date not supported by this method, users can call {@code ofGregorianReform(PlainDate)}
-     * instead. </p>
+     * Spain, Germany (using variants CATHOLIC or PROTESTANT), Italy, France and Sweden. Later releases of Time4J
+     * might refine the implementation for most European countries. <strong>In any case, this method does not
+     * reflect the absolute historic truth.</strong> Various regions in many countries used different rules than
+     * the rest. And sometimes historic sources and literature are simply unreliable so this method is just an
+     * approach on base of best efforts. In case of doubt, users should prefer to model the concrete history
+     * themselves as needed. For any cutover date not supported by this method, users can instead call
+     * {@code ofGregorianReform(PlainDate)}. </p>
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166),
-     * in case of Scotland also the variant part (SCT). </p>
+     * in case of Scotland also the variant part (SCT), in case of Germany the variant part (CATHOLIC or
+     * PROTESTANT). </p>
      *
      * @param   locale  country setting
      * @return  localized chronological history
@@ -369,17 +403,22 @@ public final class ChronoHistory
      * @see     #ofGregorianReform(PlainDate)
      */
     /*[deutsch]
-     * <p>Ermittelt die Geschichte der gregorianischen Kalenderreformen f&uuml;r die angegebene Region. </p>
+     * <p>Ermittelt die (meist gen&auml;herte) Geschichte der gregorianischen Kalenderreformen f&uuml;r die
+     * angegebene Region. </p>
      *
      * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r England (country=GB), Portugal,
-     * Ru&szlig;land, Schottland (mit der Variante SCT), Spanien und Schweden auf die erste Einf&uuml;hrung
-     * des gregorianischen Kalenders durch Papst Gregor zur&uuml;ck. Sp&auml;tere Releases von Time4J werden
-     * diesen Ansatz f&uuml;r die meisten europ&auml;ischen L&auml;nder verfeinern. F&uuml;r jedes hier nicht
-     * unterst&uuml;tzte Umstellungsdatum k&ouml;nnen Anwender stattdessen {@code ofGregorianReform(PlainDate)}
-     * nutzen. </p>
+     * Ru&szlig;land, Schottland (mit der Variante SCT), Spanien, Deutschland (mit den Varianten CATHOLIC und
+     * PROTESTANT), Italien, Frankreich und Schweden auf die erste Einf&uuml;hrung des gregorianischen Kalenders
+     * durch Papst Gregor zur&uuml;ck. Sp&auml;tere Releases von Time4J k&ouml;nnen diesen Ansatz f&uuml;r die
+     * meisten europ&auml;ischen L&auml;nder verfeinern. F&uuml;r jedes hier nicht unterst&uuml;tzte Umstellungsdatum
+     * k&ouml;nnen Anwender stattdessen {@code ofGregorianReform(PlainDate)} nutzen. <strong>Wie auch immer, Anwender
+     * sollten in Zweifelsf&auml;llen der spezifischen Modellierung der Kalendergeschichte gegen&uuml;ber dieser
+     * Methode den Vorzug geben.</strong> Verschiedene Regionen in mehreren L&auml;ndern haben oft abweichende
+     * Regeln verwendet. Und manchmal sind historische Quellen einfach unzuverl&auml;ssig. </p>
      *
      * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166),
-     * im Falle Schottlands auch den Variantenteil (SCT). </p>
+     * im Falle Schottlands auch den Variantenteil (SCT), im Falle Deutschlands die Varianten (CATHOLIC oder
+     * PROTESTANT). </p>
      *
      * @param   locale  country setting
      * @return  localized chronological history
@@ -387,8 +426,6 @@ public final class ChronoHistory
      * @see     #ofGregorianReform(PlainDate)
      */
     public static ChronoHistory of(Locale locale) {
-
-        // TODO: support more gregorian cutover dates (for example Germany-various locations etc.)
 
         String key = locale.getCountry();
         ChronoHistory history = null;
