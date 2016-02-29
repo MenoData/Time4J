@@ -1044,6 +1044,51 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Equivalent to {@link #inZonalView(Timezone) inZonalView(Timezone.ofSystem()}. </p>
+     *
+     * @return  ZonalDateTime
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@link #inZonalView(Timezone) inZonalView(Timezone.ofSystem()}. </p>
+     *
+     * @return  ZonalDateTime
+     * @since   3.16/4.13
+     */
+    public ZonalDateTime inLocalView() {
+
+        return this.inZonalView(Timezone.ofSystem());
+
+    }
+
+    /**
+     * <p>Converts this instance to a combination of UTC-moment, given timezone and its zonal timestamp. </p>
+     *
+     * <p><strong>Attention:</strong> Due to winter/summer-time-changes the resulting zonal timestamp
+     * ({@link ZonalDateTime#toTimestamp()}) can deviate from this plain timestamp. </p>
+     *
+     * @param   tz      timezone
+     * @return  ZonalDateTime
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Converts this instance to a combination of UTC-moment, given timezone and its zonal timestamp. </p>
+     *
+     * <p><strong>Achtung:</strong> Wegen Winter-/Sommerzeitumstellungen kann der resultierende zonale
+     * Zeitstempel ({@link ZonalDateTime#toTimestamp()}) von diesem Zeitstempel abweichen. </p>
+     *
+     * @param   tz      timezone
+     * @return  ZonalDateTime
+     * @since   3.16/4.13
+     */
+    public ZonalDateTime inZonalView(Timezone tz) {
+
+        Moment m = this.in(tz);
+        return ZonalDateTime.of(m, tz);
+
+    }
+
+    /**
      * <p>Does this local timestamp exist in given timezone? </p>
      *
      * @param   tzid    timezone id (optional)

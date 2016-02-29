@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         TestInitialization.class,
         AxisElementTest.class,
+        CompareZonalDateTimeTest.class,
         ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,

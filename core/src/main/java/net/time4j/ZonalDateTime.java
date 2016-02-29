@@ -187,6 +187,70 @@ public final class ZonalDateTime
 
     }
 
+    /**
+     * <p>Compares this instance with another instance on the global timeline (UTC). </p>
+     *
+     * <p>If the UTC-times are equal then and only then the local timestamps will be taken into account. </p>
+     *
+     * @param   zdt     other instance to be compared with
+     * @return  negative, zero or positive integer if this instance is earlier, simultaneous or later than given arg
+     * @see     #compareByLocalTimestamp(ZonalDateTime)
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Vergleicht diese Instanz mit der angegebenen Instanz auf der globalen Zeitachse (UTC). </p>
+     *
+     * <p>Die lokalen Zeitstempel werden genau dann in Betracht gezogen, wenn die UTC-Zeitpunkte gleich sind. </p>
+     *
+     * @param   zdt     other instance to be compared with
+     * @return  negative, zero or positive integer if this instance is earlier, simultaneous or later than given arg
+     * @see     #compareByLocalTimestamp(ZonalDateTime)
+     * @since   3.16/4.13
+     */
+    public int compareByMoment(ZonalDateTime zdt) {
+
+        int cmp = this.moment.compareTo(zdt.moment);
+
+        if (cmp == 0) {
+            cmp = this.timestamp.compareTo(zdt.timestamp);
+        }
+
+        return cmp;
+
+    }
+
+    /**
+     * <p>Compares this instance with another instance on the local timeline. </p>
+     *
+     * <p>If the local timestamps are equal then and only then the UTC-times will be taken into account. </p>
+     *
+     * @param   zdt     other instance to be compared with
+     * @return  negative, zero or positive integer if this instance is earlier, simultaneous or later than given arg
+     * @see     #compareByMoment(ZonalDateTime)
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Vergleicht diese Instanz mit der angegebenen Instanz auf der lokalen Zeitachse. </p>
+     *
+     * <p>Die UTC-Zeiten werden genau dann in Betracht gezogen, wenn die lokalen Zeitstempel gleich sind. </p>
+     *
+     * @param   zdt     other instance to be compared with
+     * @return  negative, zero or positive integer if this instance is earlier, simultaneous or later than given arg
+     * @see     #compareByMoment(ZonalDateTime)
+     * @since   3.16/4.13
+     */
+    public int compareByLocalTimestamp(ZonalDateTime zdt) {
+
+        int cmp = this.timestamp.compareTo(zdt.timestamp);
+
+        if (cmp == 0) {
+            cmp = this.moment.compareTo(zdt.moment);
+        }
+
+        return cmp;
+
+    }
+
     @Override
     public boolean contains(ChronoElement<?> element) {
 
@@ -408,7 +472,7 @@ public final class ZonalDateTime
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
-     * @return  parsed zonal moment
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
      * @since   3.0
@@ -418,7 +482,7 @@ public final class ZonalDateTime
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
-     * @return  parsed zonal moment
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
      * @since   3.0
@@ -441,6 +505,53 @@ public final class ZonalDateTime
             tz = toTimezone(parser.getAttributes().get(TIMEZONE_ID), text);
         } else {
             throw new ParseException("Missing timezone: " + text, 0);
+        }
+
+        return ZonalDateTime.of(moment, tz);
+
+    }
+
+    /**
+     * <p>Parses given text to a {@code ZonalDateTime}. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @param   position    parse position (always as new instance)
+     * @return  parsed result or {@code null} if parsing does not work (for example missing timezone information)
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  IllegalArgumentException if timezone data cannot be loaded
+     * @since   3.16/4.13
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als {@code ZonalDateTime}. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @param   position    parse position (always as new instance)
+     * @return  parsed result or {@code null} if parsing does not work (for example missing timezone information)
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  IllegalArgumentException if timezone data cannot be loaded
+     * @since   3.16/4.13
+     */
+    public static ZonalDateTime parse(
+        String text,
+        TemporalFormatter<Moment> parser,
+        ParsePosition position
+    ) {
+
+        RawValues rawValues = new RawValues();
+        Moment moment = parser.parse(text, position, rawValues);
+        Timezone tz;
+
+        if (moment == null) {
+            return null;
+        } else if (rawValues.get().hasTimezone()) {
+            tz = Timezone.of(rawValues.get().getTimezone());
+        } else if (parser.getAttributes().contains(TIMEZONE_ID)) {
+            tz = Timezone.of(parser.getAttributes().get(TIMEZONE_ID));
+        } else {
+            position.setErrorIndex(0);
+            return null;
         }
 
         return ZonalDateTime.of(moment, tz);
