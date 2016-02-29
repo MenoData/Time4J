@@ -448,4 +448,25 @@ public class EraFormatTest {
             is("01/01/01 a.u.c."));
     }
 
+    @Test
+    public void printFrance() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("d. MMMM GGGG yyyy", PatternType.CLDR, Locale.FRANCE).with(Leniency.STRICT);
+        assertThat(
+            formatter.format(PlainDate.of(1565, 4, 3)),
+            is("24. mars après Jésus-Christ 1564/65")); // before Easter
+    }
+
+    @Test
+    public void parseFrance() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("d. MMMM GGGG yyyy", PatternType.CLDR, Locale.FRANCE).with(Leniency.STRICT);
+        assertThat(
+            formatter.parse("24. mars après Jésus-Christ 1564/65"),
+            is(PlainDate.of(1565, 4, 3)));
+        assertThat(
+            formatter.parse("24. mars après Jésus-Christ 1564/5"), // test for year-of-era-part < 10
+            is(PlainDate.of(1565, 4, 3)));
+    }
+
 }

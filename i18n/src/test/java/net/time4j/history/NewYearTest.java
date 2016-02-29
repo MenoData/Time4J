@@ -217,8 +217,20 @@ public class NewYearTest {
             history.getBeginOfYear(HistoricEra.AD, 1565),
             is(HistoricDate.of(HistoricEra.AD, 1565, 4, 21)));
         assertThat(
+            history.getBeginOfYear(HistoricEra.AD, 1566),
+            is(HistoricDate.of(HistoricEra.AD, 1566, 4, 13)));
+        assertThat(
+            history.getBeginOfYear(HistoricEra.AD, 1567),
+            is(HistoricDate.of(HistoricEra.AD, 1567, 1, 1)));
+        assertThat(
             history.getLengthOfYear(HistoricEra.AD, 1564),
             is(385));
+        assertThat(
+            history.getLengthOfYear(HistoricEra.AD, 1565),
+            is(357));
+        assertThat(
+            history.getLengthOfYear(HistoricEra.AD, 1566),
+            is(263));
     }
 
     @Test
