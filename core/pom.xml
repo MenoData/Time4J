@@ -38,6 +38,14 @@
                             <name>net.time4j.scale.leapseconds.path</name>
                             <value>data/leapseconds2012.data</value>
                         </property>
+                        <property>
+                            <name>maven.junit.sysproperties</name>
+                            <value>net.time4j.allow.system.tz.override</value>
+                        </property>
+                        <property>
+                            <name>net.time4j.allow.system.tz.override</name>
+                            <value>true</value>
+                        </property>
                     </systemProperties>
                 </configuration>
             </plugin>

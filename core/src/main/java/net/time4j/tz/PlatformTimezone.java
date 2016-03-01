@@ -71,6 +71,8 @@ final class PlatformTimezone
 
     /**
      * <p>Construtor for the system timezone (very internal use only). </p>
+     *
+     * @param   tzid    resolved id of system timezone
      */
     PlatformTimezone(TZID tzid) {
         this(
