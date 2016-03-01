@@ -286,11 +286,13 @@ public final class ZonalDateTime
             return 60;
         }
 
-        if (this.timestamp.contains(element)) {
-            return this.timestamp.getInt(element);
-        } else {
-            return this.moment.getInt(element);
+        int value = this.timestamp.getInt(element);
+
+        if (value == Integer.MIN_VALUE) {
+            value = this.moment.getInt(element);
         }
+
+        return value;
 
     }
 

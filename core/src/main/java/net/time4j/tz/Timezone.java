@@ -1160,8 +1160,13 @@ public abstract class Timezone
     private static Timezone getDefaultTZ() {
 
         String zoneID = java.util.TimeZone.getDefault().getID();
-        return Timezone.of(zoneID, ZonalOffset.UTC);
+        Timezone ret = Timezone.getTZ(null, zoneID, false);
 
+        if (ret == null) {
+            ret = new PlatformTimezone(new NamedID(zoneID)); // exception case if the tzid cannot be resolved
+        }
+
+        return ret;
     }
 
     private static Timezone getTZ(

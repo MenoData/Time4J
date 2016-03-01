@@ -70,6 +70,17 @@ final class PlatformTimezone
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Construtor for the system timezone (very internal use only). </p>
+     */
+    PlatformTimezone(TZID tzid) {
+        this(
+            tzid, // should originate from default tz
+            java.util.TimeZone.getDefault(),
+            false);
+
+    }
+
+    /**
      * <p>Konstruktor f&uuml;r eine beliebige Zeitzone. </p>
      *
      * @param   resolved    timezone id with preference for enums
