@@ -16,6 +16,9 @@ public class TestInitialization {
         System.setProperty(
             "net.time4j.tz.repository.version",
             "2012c");
+        System.setProperty(
+            "net.time4j.allow.system.tz.override",
+            "true");
     }
 
 }

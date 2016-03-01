@@ -7,13 +7,17 @@ import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
 import net.time4j.scale.TimeScale;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -293,6 +297,29 @@ public class PlatformTimezoneTest {
     @Test(expected=IllegalArgumentException.class)
     public void ofInvalidTZIDAsString() {
         Timezone.of("xyz");
+    }
+
+    @BeforeClass
+    public static void initSystemTzOverride() {
+        System.setProperty(
+            "net.time4j.allow.system.tz.override",
+            "true");
+    }
+
+    @Test
+    public void systemTZ() throws IOException {
+        String zoneID = "!test-id!";
+        java.util.TimeZone oldTZ = java.util.TimeZone.getDefault();
+        java.util.TimeZone platformTZ = java.util.TimeZone.getDefault();
+        platformTZ.setID(zoneID);
+        java.util.TimeZone.setDefault(platformTZ);
+        Timezone.Cache.refresh();
+        assertThat(Timezone.ofSystem().getID().canonical(), is(zoneID));
+        assertThat(Timezone.ofSystem() instanceof PlatformTimezone, is(true));
+        Timezone.ofSystem().dump(System.out);
+        java.util.TimeZone.setDefault(oldTZ);
+        Timezone.Cache.refresh();
+        assertThat(Timezone.ofSystem().getID().canonical(), not(zoneID));
     }
 
     private static Timezone loadFromPlatform(String tzid) {
