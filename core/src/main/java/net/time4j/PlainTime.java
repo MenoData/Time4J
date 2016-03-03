@@ -1648,11 +1648,7 @@ public final class PlainTime
                     for (int i = num.length(); i < 9; i++) {
                         sb.append('0');
                     }
-                    for (
-                        int i = 0, n = Math.min(len, num.length());
-                        i < n;
-                        i++
-                    ) {
+                    for (int i = 0, n = len + num.length() - 9; i < n; i++) {
                         sb.append(num.charAt(i));
                     }
                 }

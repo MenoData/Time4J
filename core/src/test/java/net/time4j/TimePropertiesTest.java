@@ -74,6 +74,24 @@ public class TimePropertiesTest {
         assertThat(
             PlainTime.of(24).toString(),
             is("T24"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 12000000).toString(),
+            is("T12:45:07,012"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 12300000).toString(),
+            is("T12:45:07,012300"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 1234000).toString(),
+            is("T12:45:07,001234"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 12340000).toString(),
+            is("T12:45:07,012340"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 12345000).toString(),
+            is("T12:45:07,012345"));
+        assertThat(
+            PlainTime.of(12, 45, 7, 12345600).toString(),
+            is("T12:45:07,012345600"));
     }
 
     @Test
