@@ -6,6 +6,7 @@
 - Add element support for historic day-of-year [#456]
  
 ### Fixed
+- PlainTime.toString() does not display fraction of second as per spec [#465]
 - Make Timezone.ofSystem() more robust against weird zone ids. [#463]
 - Don't permit negative years for any historic era [#458]
 - Clarify/correct exception behaviour of new year strategies [#457]
