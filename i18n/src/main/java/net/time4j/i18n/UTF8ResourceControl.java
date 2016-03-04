@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UTF8ResourceControl.java) is part of project Time4J.
  *
@@ -106,6 +106,15 @@ public class UTF8ResourceControl
 
             URI uri = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
             InputStream stream = ResourceLoader.getInstance().load(uri, reload);
+
+            if (stream == null) {
+                try {
+                    stream = ResourceLoader.getInstance().load(getModuleRef(), resourceName, reload);
+                } catch (IOException ioe) {
+                    // okay, maybe the resource is simply not there
+                    return null;
+                }
+            }
 
             if (stream != null) {
                 Reader reader = null;

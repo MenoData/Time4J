@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdataProviderSPI.java) is part of project Time4J.
  *
@@ -116,6 +116,14 @@ public class WeekdataProviderSPI
         URI uri = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
+        if (is == null) {
+            try {
+                is = ResourceLoader.getInstance().load(WeekdataProviderSPI.class, name, true);
+            } catch (IOException ioe) {
+                // we print a warning on System.err (see below)
+            }
+        }
+
         if (is != null) {
             this.source = "@" + uri;
             Map<String, Weekday> tmpStart = new HashMap<>(START_OF_WEEKEND.size());
@@ -208,7 +216,7 @@ public class WeekdataProviderSPI
             this.startOfWeekend = START_OF_WEEKEND;
             this.endOfWeekend = END_OF_WEEKEND;
 
-            System.out.println("Warning: File \"" + name + "\" not found.");
+            System.err.println("Warning: File \"" + name + "\" not found.");
         }
 
     }
