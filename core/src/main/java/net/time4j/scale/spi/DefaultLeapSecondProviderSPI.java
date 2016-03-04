@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DefaultLeapSecondProviderSPI.java) is part of project Time4J.
  *
@@ -153,7 +153,7 @@ public final class DefaultLeapSecondProviderSPI
 
         } else {
             this.source = "";
-            System.out.println("Warning: File \"" + name + "\" not found.");
+            System.err.println("Warning: File \"" + name + "\" not found.");
         }
 
         this.expires = tmpExpires;

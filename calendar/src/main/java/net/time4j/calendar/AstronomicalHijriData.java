@@ -27,7 +27,6 @@ import net.time4j.engine.CalendarEra;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.expert.Iso8601Format;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -89,70 +88,70 @@ final class AstronomicalHijriData
         URI uri = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
-        if (is != null) {
-            try {
-                Properties properties = new Properties();
-                properties.load(is);
-                String calendarType = properties.getProperty("type");
-                if (!variant.equals(calendarType)) {
-                    throw new IOException("Wrong hijri variant: expected=" + variant + ", found=" + calendarType);
+        if (is == null) {
+            is = ResourceLoader.getInstance().load(AstronomicalHijriData.class, name, true);
+        }
+
+        try {
+            Properties properties = new Properties();
+            properties.load(is);
+            String calendarType = properties.getProperty("type");
+            if (!variant.equals(calendarType)) {
+                throw new IOException("Wrong hijri variant: expected=" + variant + ", found=" + calendarType);
+            }
+            this.version = properties.getProperty("version", "1.0");
+
+            String isoStart = properties.getProperty("iso-start", "");
+            PlainDate startDate = Iso8601Format.EXTENDED_CALENDAR_DATE.parse(isoStart);
+            this.minUTC = startDate.get(EpochDays.UTC);
+            int min = Integer.parseInt(properties.getProperty("min", "1"));
+            this.minYear = min;
+            int max = Integer.parseInt(properties.getProperty("max", "0"));
+            this.maxYear = max;
+            int count = (max - min + 1) * 12;
+
+            int[] mlen = new int[count];
+            long[] mutc = new long[count];
+            int i = 0;
+            long v = this.minUTC;
+
+            for (int year = min; year <= max; year++) {
+                String row = properties.getProperty(String.valueOf(year));
+                if (row == null) {
+                    throw new IOException("Wrong file format: " + name + " (missing year=" + year + ")");
                 }
-                this.version = properties.getProperty("version", "1.0");
-
-                String isoStart = properties.getProperty("iso-start", "");
-                PlainDate startDate = Iso8601Format.EXTENDED_CALENDAR_DATE.parse(isoStart);
-                this.minUTC = startDate.get(EpochDays.UTC);
-                int min = Integer.parseInt(properties.getProperty("min", "1"));
-                this.minYear = min;
-                int max = Integer.parseInt(properties.getProperty("max", "0"));
-                this.maxYear = max;
-                int count = (max - min + 1) * 12;
-
-                int[] mlen = new int[count];
-                long[] mutc = new long[count];
-                int i = 0;
-                long v = this.minUTC;
-
-                for (int year = min; year <= max; year++) {
-                    String row = properties.getProperty(String.valueOf(year));
-                    if (row == null) {
-                        throw new IOException("Wrong file format: " + name + " (missing year=" + year + ")");
-                    }
-                    String[] monthLengths = row.split(" ");
-                    for (int m = 0; m < Math.min(monthLengths.length, 12); m++) {
-                        mlen[i] = Integer.parseInt(monthLengths[m]);
-                        mutc[i] = v;
-                        v += mlen[i];
-                        i++;
-                    }
-                    if (monthLengths.length < 12) {
-                        int[] buf1 = new int[i];
-                        long[] buf2 = new long[i];
-                        System.arraycopy(mlen, 0, buf1, 0, i);
-                        System.arraycopy(mutc, 0, buf2, 0, i);
-                        mlen = buf1;
-                        mutc = buf2;
-                        break;
-                    }
+                String[] monthLengths = row.split(" ");
+                for (int m = 0; m < Math.min(monthLengths.length, 12); m++) {
+                    mlen[i] = Integer.parseInt(monthLengths[m]);
+                    mutc[i] = v;
+                    v += mlen[i];
+                    i++;
                 }
-
-                this.maxUTC = v - 1;
-                this.lengthOfMonth = mlen;
-                this.firstOfMonth = mutc;
-
-            } catch (ParseException pe) {
-                throw new IOException("Wrong file format: " + name, pe);
-            } catch (NumberFormatException nfe) {
-                throw new IOException("Wrong file format: " + name, nfe);
-            } finally {
-                try {
-                    is.close();
-                } catch (IOException ioe) {
-                    ioe.printStackTrace(System.err);
+                if (monthLengths.length < 12) {
+                    int[] buf1 = new int[i];
+                    long[] buf2 = new long[i];
+                    System.arraycopy(mlen, 0, buf1, 0, i);
+                    System.arraycopy(mutc, 0, buf2, 0, i);
+                    mlen = buf1;
+                    mutc = buf2;
+                    break;
                 }
             }
-        } else {
-            throw new FileNotFoundException(name);
+
+            this.maxUTC = v - 1;
+            this.lengthOfMonth = mlen;
+            this.firstOfMonth = mutc;
+
+        } catch (ParseException pe) {
+            throw new IOException("Wrong file format: " + name, pe);
+        } catch (NumberFormatException nfe) {
+            throw new IOException("Wrong file format: " + name, nfe);
+        } finally {
+            try {
+                is.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace(System.err);
+            }
         }
 
     }

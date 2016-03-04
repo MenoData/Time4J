@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WinZoneProviderSPI.java) is part of project Time4J.
  *
@@ -203,6 +203,9 @@ public class WinZoneProviderSPI
             String source = "data/winzone.ser";
             URI uri = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
             InputStream is = ResourceLoader.getInstance().load(uri, true);
+            if (is == null) {
+                is = ResourceLoader.getInstance().load(WindowsZone.class, source, true);
+            }
             ois = new ObjectInputStream(is);
             String version = ois.readUTF();
             Map<String, Map<String, String>> data = cast(ois.readObject());
