@@ -129,7 +129,21 @@ public enum NewYearRule {
     BEGIN_OF_SEPTEMBER() {
         @Override
         HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra, 9, 1);
+            return HistoricDate.of(era, yearOfEra - 1, 9, 1);
+        }
+        @Override
+        int displayedYear(
+            NewYearStrategy strategy,
+            HistoricDate date
+        ) {
+            HistoricEra era = date.getEra();
+            int yearOfEra = date.getYearOfEra();
+            HistoricDate newYear = strategy.newYear(era, yearOfEra + 1); // use strategy of next year!!!
+            int yearOfDisplay = yearOfEra;
+            if (date.compareTo(newYear) >= 0) {
+                yearOfDisplay++;
+            }
+            return yearOfDisplay;
         }
     },
 

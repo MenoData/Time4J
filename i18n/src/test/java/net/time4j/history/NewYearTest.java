@@ -268,8 +268,150 @@ public class NewYearTest {
         NewYearStrategy ignored = NewYearRule.BEGIN_OF_JANUARY.until(568);
         assertThat(
             ChronoHistory.PROLEPTIC_BYZANTINE.with(ignored).getBeginOfYear(HistoricEra.BYZANTINE, 1),
-            is(HistoricDate.of(HistoricEra.BYZANTINE, 1, 9, 1))
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1))
         );
+        assertThat(
+            ChronoHistory.PROLEPTIC_BYZANTINE.getBeginOfYear(HistoricEra.BYZANTINE, 7208),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7207, 9, 1))
+        );
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void russiaByzantineBeforeCreationOfTheWorld() {
+        ChronoHistory.of(new Locale("ru", "RU")).getBeginOfYear(HistoricEra.BYZANTINE, 0);
+    }
+
+    @Test
+    public void russiaAtOrBeforeCreationOfTheWorld() {
+        assertThat(
+            ChronoHistory.of(new Locale("en", "RU")).getBeginOfYear(HistoricEra.BC, 9999),
+            is(HistoricDate.of(HistoricEra.BC, 9999, 1, 1)));
+        assertThat(
+            ChronoHistory.of(new Locale("en", "RU")).getBeginOfYear(HistoricEra.BC, 5508),
+            is(HistoricDate.of(HistoricEra.BC, 5508, 1, 1)));
+    }
+
+    @Test
+    public void russia988() {
+        Locale russia = new Locale("en", "RU");
+
+        // AD 987
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 987),
+            is(HistoricDate.of(HistoricEra.AD, 987, 1, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 987),
+            is(365 + 31 + 29));
+
+        // AD 988
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 988),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 988 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 988 + 5508),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 988 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 988),
+            is(365));
+    }
+
+    @Test
+    public void russia1492() {
+        Locale russia = new Locale("en", "RU");
+
+        // AD 1491
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1491),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1491 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 1491 + 5508),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1491 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1491),
+            is(366));
+
+        // AD 1492
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1492),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1492 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 1492 + 5508),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1492 + 5508, 3, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1492),
+            is(31 + 30 + 31 + 30 + 31 + 31)); // 184
+
+        // AD 1493
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1493),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1492 + 5508, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 1493 + 5508),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1492 + 5508, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1493),
+            is(365));
+    }
+
+    @Test
+    public void russia1700() {
+        Locale russia = new Locale("en", "RU");
+
+        // AD 1698
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 7206),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7205, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1698),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7205, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.BYZANTINE, 7206),
+            is(365));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1698),
+            is(365));
+
+        // AD 1699
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 7207),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7206, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1699),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7206, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.BYZANTINE, 7207),
+            is(365));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1699),
+            is(365 + 30 + 31 + 30 + 31));
+
+        // AD 1700
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 7208),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 7207, 9, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1700),
+            is(HistoricDate.of(HistoricEra.AD, 1700, 1, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.BYZANTINE, 7208),
+            is(30 + 31 + 30 + 31)); // Sep-Dec
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1700),
+            is(366));
+
+        // AD 1701
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.BYZANTINE, 7209),
+            is(HistoricDate.of(HistoricEra.AD, 1701, 1, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getBeginOfYear(HistoricEra.AD, 1701),
+            is(HistoricDate.of(HistoricEra.AD, 1701, 1, 1)));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.BYZANTINE, 7209),
+            is(365));
+        assertThat(
+            ChronoHistory.of(russia).getLengthOfYear(HistoricEra.AD, 1701),
+            is(365));
     }
 
 }

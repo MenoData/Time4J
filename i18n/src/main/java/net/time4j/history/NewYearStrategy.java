@@ -37,6 +37,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     NewYearRule#until(int)
  * @since   3.14/4.11
+ * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Bestimmt den Beginn eines historischen Jahres. </p>
@@ -44,6 +45,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     NewYearRule#until(int)
  * @since   3.14/4.11
+ * @doctags.concurrency {immutable}
  */
 public final class NewYearStrategy {
 
@@ -225,15 +227,21 @@ public final class NewYearStrategy {
         int yearOfEra
     ) {
 
-        int annoDomini = era.annoDomini(yearOfEra);
+        int ad = era.annoDomini(yearOfEra);
         int previous = Integer.MIN_VALUE;
+        NewYearRule prevRule = null;
 
         for (int i = 0, n = this.strategies.size(); i < n; i++) {
             NewYearStrategy strategy = this.strategies.get(i);
-            if ((annoDomini >= previous) && (annoDomini < strategy.lastAnnoDomini)) {
+            if ((ad >= previous) && (ad < strategy.lastAnnoDomini)) {
                 return strategy.lastRule.newYear(era, yearOfEra);
             }
             previous = strategy.lastAnnoDomini;
+            prevRule = strategy.lastRule;
+        }
+
+        if ((ad == previous) && (era == HistoricEra.BYZANTINE) && (prevRule == NewYearRule.BEGIN_OF_SEPTEMBER)) {
+            return prevRule.newYear(era, yearOfEra); // see Russia in byzantine year 7208
         }
 
         return this.lastRule.newYear(era, yearOfEra);
