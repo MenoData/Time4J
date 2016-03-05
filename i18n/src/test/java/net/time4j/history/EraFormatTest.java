@@ -347,75 +347,86 @@ public class EraFormatTest {
     }
 
     @Test
-    public void printRussiaByzantine1() {
+    public void printRussiaByzantine() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, new Locale("en", "RU"))
                 .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT);
-        PlainDate ad1522 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1522, 8, 31));
+        PlainDate ad1523 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1523, 8, 31));
         assertThat(
-            formatter.format(ad1522),
-            is("31. August Anno Mundi 7030/31"));
+            formatter.format(ad1523),
+            is("31. August Anno Mundi 7031"));
         assertThat(
-            formatter.format(ad1522.plus(1, CalendarUnit.DAYS)),
-            is("1. September Anno Mundi 7031"));
+            formatter.format(ad1523.plus(1, CalendarUnit.DAYS)),
+            is("1. September Anno Mundi 7032/31"));
+        PlainDate ad1699 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1699, 12, 20));
+        assertThat(
+            formatter.format(ad1699),
+            is("20. December Anno Mundi 7208/07")); // decree of Peter I.
     }
 
     @Test
-    public void parseRussiaByzantine1() throws ParseException {
+    public void parseRussiaByzantine() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, new Locale("en", "RU"))
                 .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT);
-        PlainDate ad1522 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1522, 8, 31));
-        assertThat(
-            formatter.parse("31. August Anno Mundi 7030/31"),
-            is(ad1522));
+        PlainDate ad1523 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1523, 8, 31));
         assertThat(
             formatter.parse("31. August Anno Mundi 7031"),
-            is(ad1522));
+            is(ad1523));
         assertThat(
             formatter.parse("1. September Anno Mundi 7031"),
-            is(ad1522.plus(1, CalendarUnit.DAYS)));
+            is(ad1523.plus(1, CalendarUnit.DAYS)));
+        assertThat(
+            formatter.parse("1. September Anno Mundi 7032/31"),
+            is(ad1523.plus(1, CalendarUnit.DAYS)));
+        PlainDate ad1699 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1699, 12, 20));
+        assertThat(
+            formatter.parse("20. December Anno Mundi 7208/07"),
+            is(ad1699));
+        assertThat(
+            formatter.parse("20. December Anno Mundi 7207"),
+            is(ad1699));
     }
 
     @Test
-    public void printRussiaByzantine2() {
+    public void printByzantine() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.ENGLISH)
                 .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT)
                 .with(ChronoHistory.PROLEPTIC_BYZANTINE);
-        PlainDate ad2015 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 2015, 8, 31));
+        PlainDate ad2016 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 2016, 8, 31));
         assertThat(
-            formatter.format(ad2015),
-            is("31. August Anno Mundi 7523/24"));
+            formatter.format(ad2016),
+            is("31. August Anno Mundi 7524"));
         assertThat(
-            formatter.format(ad2015.plus(1, CalendarUnit.DAYS)),
-            is("1. September Anno Mundi 7524"));
+            formatter.format(ad2016.plus(1, CalendarUnit.DAYS)),
+            is("1. September Anno Mundi 7525/24"));
     }
 
     @Test
-    public void parseRussiaByzantine2() throws ParseException {
+    public void parseByzantine() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.ENGLISH)
                 .addPattern("d. MMMM GGGG yyyy", PatternType.CLDR)
                 .build()
                 .with(Leniency.STRICT)
                 .with(ChronoHistory.PROLEPTIC_BYZANTINE);
-        PlainDate ad2015 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 2015, 8, 31));
-        assertThat(
-            formatter.parse("31. August Anno Mundi 7523/24"),
-            is(ad2015));
+        PlainDate ad2016 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 2016, 8, 31));
         assertThat(
             formatter.parse("31. August Anno Mundi 7524"),
-            is(ad2015));
+            is(ad2016));
         assertThat(
             formatter.parse("1. September Anno Mundi 7524"),
-            is(ad2015.plus(1, CalendarUnit.DAYS)));
+            is(ad2016.plus(1, CalendarUnit.DAYS)));
+        assertThat(
+            formatter.parse("1. September Anno Mundi 7525/24"),
+            is(ad2016.plus(1, CalendarUnit.DAYS)));
     }
 
     @Test

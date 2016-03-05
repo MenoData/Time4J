@@ -124,16 +124,23 @@ public final class HistoricDate
         int dom
     ) {
 
-        if (
+        if (era == null) {
+            throw new NullPointerException("Missing historic era.");
+        } else if (
             (dom < 1 || dom > 31)
             || (month < 1 || month > 12)
             || (Math.abs(era.annoDomini(yearOfEra)) > GregorianMath.MAX_YEAR)
-            || (yearOfEra < 1)
-            || ((era == HistoricEra.BYZANTINE) && (yearOfEra == 1) && (month < 9))
         ) {
-            throw new IllegalArgumentException("Out of range: " + toString(era, yearOfEra, month, dom));
-        } else if (era == null) {
-            throw new NullPointerException("Missing historic era.");
+            throw new IllegalArgumentException(
+                "Out of range: " + toString(era, yearOfEra, month, dom));
+        } else if (era == HistoricEra.BYZANTINE) {
+            if ((yearOfEra < 0) || ((yearOfEra == 0) && (month < 9))) {
+                throw new IllegalArgumentException(
+                    "Before creation of the world: " + toString(era, yearOfEra, month, dom));
+            }
+        } else if (yearOfEra < 1) {
+            throw new IllegalArgumentException(
+                "Year of era must be positive: " + toString(era, yearOfEra, month, dom));
         }
 
         return new HistoricDate(era, yearOfEra, month, dom);

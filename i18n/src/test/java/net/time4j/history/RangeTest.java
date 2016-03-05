@@ -13,24 +13,30 @@ public class RangeTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void byzantineBeforeCreationOfWorld() {
-        HistoricDate.of(HistoricEra.BYZANTINE, 1, 8, 31);
+        HistoricDate.of(HistoricEra.BYZANTINE, 0, 8, 31);
     }
 
     @Test
     public void byzantineAtOrAfterCreationOfWorld() {
         NewYearStrategy byzantine = ChronoHistory.PROLEPTIC_BYZANTINE.getNewYearStrategy();
         assertThat(
+            HistoricDate.of(HistoricEra.BYZANTINE, 1, 8, 31).getYearOfEra(),
+            is(1));
+        assertThat(
+            HistoricDate.of(HistoricEra.BYZANTINE, 1, 8, 31).getYearOfEra(byzantine),
+            is(1));
+        assertThat(
+            HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1).getYearOfEra(),
+            is(0));
+        assertThat(
+            HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1).getYearOfEra(byzantine),
+            is(1));
+        assertThat(
             HistoricDate.of(HistoricEra.BYZANTINE, 1, 9, 1).getYearOfEra(),
             is(1));
         assertThat(
             HistoricDate.of(HistoricEra.BYZANTINE, 1, 9, 1).getYearOfEra(byzantine),
-            is(1));
-        assertThat(
-            HistoricDate.of(HistoricEra.BYZANTINE, 2, 1, 1).getYearOfEra(),
             is(2));
-        assertThat(
-            HistoricDate.of(HistoricEra.BYZANTINE, 2, 1, 1).getYearOfEra(byzantine),
-            is(1));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -40,13 +46,9 @@ public class RangeTest {
 
     @Test
     public void aucAtFoundationOfRome() {
-        NewYearStrategy byzantine = ChronoHistory.PROLEPTIC_BYZANTINE.getNewYearStrategy();
         assertThat(
             HistoricDate.of(HistoricEra.AB_URBE_CONDITA, 1, 1, 1).getYearOfEra(NewYearStrategy.DEFAULT),
             is(1));
-        assertThat(
-            HistoricDate.of(HistoricEra.AB_URBE_CONDITA, 1, 1, 1).getYearOfEra(byzantine),
-            is(0)); // exotic edge case
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -56,7 +58,6 @@ public class RangeTest {
 
     @Test
     public void hispanicAtOrAfterEpoch() {
-        NewYearStrategy byzantine = ChronoHistory.PROLEPTIC_BYZANTINE.getNewYearStrategy();
         int ad = 900 - 38;
         assertThat(
             HistoricDate.of(HistoricEra.HISPANIC, 1, 1, 1).getYearOfEra(NewYearStrategy.DEFAULT),
@@ -82,9 +83,6 @@ public class RangeTest {
         assertThat(
             HistoricDate.of(HistoricEra.HISPANIC, 899, 12, 31).getYearOfEra(NewYearRule.CHRISTMAS_STYLE.until(ad)),
             is(899)); // effective rule: BEGIN_OF_JANUARY
-        assertThat(
-            HistoricDate.of(HistoricEra.HISPANIC, 1, 1, 1).getYearOfEra(byzantine),
-            is(0)); // exotic edge case
     }
 
 }

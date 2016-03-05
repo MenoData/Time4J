@@ -153,9 +153,10 @@ public final class ChronoHistory
         SWEDEN = new ChronoHistory(HistoricVariant.SWEDEN, Collections.unmodifiableList(events));
 
         Map<String, ChronoHistory> tmp = new HashMap<String, ChronoHistory>();
+        PlainDate ad988 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 988, 3, 1));
         PlainDate ad1383 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1382, 12, 24));
         PlainDate ad1422 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1421, 12, 24));
-        PlainDate ad1700 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1700, 1, 1));
+        PlainDate ad1700 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.AD, 1699, 12, 31));
         tmp.put(
             "ES", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
             ChronoHistory.ofFirstGregorianReform()
@@ -205,9 +206,9 @@ public final class ChronoHistory
             ChronoHistory.ofGregorianReform(PlainDate.of(1918, 2, 14))
                 .with(
                     NewYearRule.BEGIN_OF_JANUARY.until(988)
-                        .and(NewYearRule.BEGIN_OF_MARCH.until(1492))
+                        .and(NewYearRule.BEGIN_OF_MARCH.until(1493))
                         .and(NewYearRule.BEGIN_OF_SEPTEMBER.until(1700)))
-                .with(EraPreference.byzantineUntil(ad1700)));
+                .with(EraPreference.byzantineBetween(ad988, ad1700)));
         tmp.put("SE", SWEDEN);
         LOOKUP = Collections.unmodifiableMap(tmp);
     }
@@ -713,6 +714,12 @@ public final class ChronoHistory
         HistoricDate newYear = this.getNewYearStrategy().newYear(era, yearOfEra);
 
         if (this.isValid(newYear)) {
+            PlainDate date = this.convert(newYear);
+            HistoricEra preferredEra = this.eraPreference.getPreferredEra(newYear, date);
+            if (preferredEra != era) {
+                int yoe = preferredEra.yearOfEra(newYear.getEra(), newYear.getYearOfEra());
+                newYear = HistoricDate.of(preferredEra, yoe, newYear.getMonth(), newYear.getDayOfMonth());
+            }
             return newYear;
         } else {
             throw new IllegalArgumentException("Cannot determine valid New Year: " + era + "-" + yearOfEra);
@@ -773,6 +780,12 @@ public final class ChronoHistory
                     }
                 } else {
                     max = this.nys.newYear(era, yearOfEra + 1);
+                    if (era == HistoricEra.BYZANTINE) {
+                        HistoricDate hd = this.nys.newYear(HistoricEra.AD, era.annoDomini(yearOfEra));
+                        if (hd.compareTo(min) > 0) {
+                            max = hd;
+                        }
+                    }
                 }
                 extra = 0;
             }

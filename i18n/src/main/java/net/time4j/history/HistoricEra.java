@@ -111,7 +111,7 @@ public enum HistoricEra
     HISPANIC,
 
     /**
-     * <p>Years are reckoned since the assumed year of creation of the world (Anno Mundi) in 5509 BC. </p>
+     * <p>Years are reckoned since the assumed year of creation of the world (Anno Mundi) in 5508 BC. </p>
      *
      * <p>This overlapping alternative to {@link #AD} was mainly used in Russia
      * before 1700 with the rule that years start on first of September.
@@ -120,7 +120,7 @@ public enum HistoricEra
      * @see     NewYearRule#BEGIN_OF_SEPTEMBER
      */
     /*[deutsch]
-     * <p>Jahre werden seit 5509 BC gez&auml;hlt (angenommenes Jahr der Erschaffung der Welt - Anno Mundi). </p>
+     * <p>Jahre werden seit 5508 BC gez&auml;hlt (angenommenes Jahr der Erschaffung der Welt - Anno Mundi). </p>
      *
      * <p>Diese mit {@link #AD} &uuml;berlappende Alternative wurde haupts&auml;chlich in Ru&szlig;land
      * vor 1700 verwendet mit der Regel, da&szlig; Jahre am ersten September beginnen. Siehe auch:
@@ -239,7 +239,7 @@ public enum HistoricEra
                 case HISPANIC:
                     return MathUtils.safeSubtract(yearOfEra, 38);
                 case BYZANTINE:
-                    return MathUtils.safeSubtract(yearOfEra, 5509);
+                    return MathUtils.safeSubtract(yearOfEra, 5508);
                 case AB_URBE_CONDITA:
                     return MathUtils.safeSubtract(yearOfEra, 753);
                 default:
@@ -285,7 +285,7 @@ public enum HistoricEra
                 case HISPANIC:
                     return MathUtils.safeAdd(ad, 38);
                 case BYZANTINE:
-                    return MathUtils.safeAdd(ad, 5509);
+                    return MathUtils.safeAdd(ad, 5508);
                 case AB_URBE_CONDITA:
                     return MathUtils.safeAdd(ad, 753);
                 default:
