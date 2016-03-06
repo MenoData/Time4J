@@ -180,13 +180,53 @@ public final class ChronoHistory
             ChronoHistory.ofFirstGregorianReform()
                 .with(NewYearRule.CHRISTMAS_STYLE.until(1544)));
         tmp.put(
+            "DE-BAYERN",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1583, 10, 16))
+                .with(NewYearRule.CHRISTMAS_STYLE.until(1544)));
+        tmp.put(
+            "DE-PREUSSEN",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1610, 9, 2))
+                .with(NewYearRule.CHRISTMAS_STYLE.until(1559)));
+        tmp.put(
             "DE-PROTESTANT",
             ChronoHistory.ofGregorianReform(PlainDate.of(1700, 3, 1))
                 .with(NewYearRule.CHRISTMAS_STYLE.until(1559)));
         tmp.put(
+            "NL",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1583, 1, 1)));
+        tmp.put(
+            "AT",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1584, 1, 17)));
+        tmp.put(
+            "CH",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1584, 1, 22)));
+        tmp.put(
+            "HU",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1587, 11, 1)));
+        tmp.put(
+            "DK",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1700, 3, 1))
+                .with(NewYearRule.MARIA_ANUNCIATA.until(1623)));
+        tmp.put(
+            "NO",
+            ChronoHistory.ofGregorianReform(PlainDate.of(1700, 3, 1))
+                .with(NewYearRule.MARIA_ANUNCIATA.until(1623)));
+        tmp.put(
             "IT",
             ChronoHistory.ofFirstGregorianReform()
                 .with(NewYearRule.CHRISTMAS_STYLE.until(1583)));
+        tmp.put(
+            "IT-FLORENCE",
+            ChronoHistory.ofFirstGregorianReform()
+                .with(NewYearRule.MARIA_ANUNCIATA.until(1749)));
+        tmp.put(
+            "IT-PISA",
+            ChronoHistory.ofFirstGregorianReform()
+                .with(NewYearRule.CALCULUS_PISANUS.until(1749)));
+        tmp.put(
+            "IT-VENICE",
+            ChronoHistory.ofFirstGregorianReform()
+                .with(NewYearRule.BEGIN_OF_MARCH.until(1798)));
         tmp.put(
             "GB", // source: http://www.newadvent.org/cathen/03738a.htm#beginning
             ChronoHistory.ofGregorianReform(PlainDate.of(1752, 9, 14))
@@ -386,7 +426,7 @@ public final class ChronoHistory
      *
      * <p>The actual implementation just falls back to the introduction of gregorian calendar by
      * pope Gregor - with the exception of England (country=GB), Portugal, Russia, Scotland (using variant SCT),
-     * Spain, Germany (using variants CATHOLIC or PROTESTANT), Italy, France and Sweden. Later releases of Time4J
+     * Spain, Germany (using variants PREUSSEN or PROTESTANT), Italy, France and Sweden. Later releases of Time4J
      * might refine the implementation for most European countries. <strong>In any case, this method does not
      * reflect the absolute historic truth.</strong> Various regions in many countries used different rules than
      * the rest. And sometimes historic sources and literature are simply unreliable so this method is just an
@@ -395,8 +435,88 @@ public final class ChronoHistory
      * {@code ofGregorianReform(PlainDate)}. </p>
      *
      * <p>This method does not use the language part of given locale but the country part (ISO-3166),
-     * in case of Scotland also the variant part (SCT), in case of Germany the variant part (CATHOLIC or
-     * PROTESTANT). </p>
+     * in case of Scotland also the variant part (SCT), in case of Germany the variant part (PREUSSEN or
+     * PROTESTANT). In order to create an appropriate locale, use a constructor like
+     * {@code new Locale(&quot;en&quot;, &quot;GB&quot;, &quot;SCT&quot;)}. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <caption>Summary</caption>
+     * <tr>
+     *  <th>Region</th><th>Locale</th><th>Gregorian cutover</th><th>New Year (using estimates)</th><th>Era preference</th>
+     * </tr>
+     * <tr>
+     *  <td>Italy</td><td>IT</td><td>1582-10-15</td><td>CHRISTMAS_STYLE.until(1583)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Florence</td><td>IT-FLORENCE</td><td>1582-10-15</td><td>MARIA_ANUNCIATA.until(1749)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Pisa</td><td>IT-PISA</td><td>1582-10-15</td><td>CALCULUS_PISANUS.until(1749)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Republic of Venice</td><td>IT-VENICE</td><td>1582-10-15</td><td>BEGIN_OF_MARCH.until(1798)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Spain</td><td>ES</td><td>1582-10-15</td><td>BEGIN_OF_JANUARY.until(1383).and(CHRISTMAS_STYLE.until(1556))</td><td>HISPANIC (until 1383)</td>
+     * </tr>
+     * <tr>
+     *  <td>Portugal</td><td>PT</td><td>1582-10-15</td><td>BEGIN_OF_JANUARY.until(1422).and(CHRISTMAS_STYLE.until(1556))</td><td>HISPANIC (until 1422)</td>
+     * </tr>
+     * <tr>
+     *  <td>Poland</td><td>PL</td><td>1582-10-15</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>France</td><td>FR</td><td>1582-12-20</td><td>EASTER_STYLE.until(1567)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Holland</td><td>NL</td><td>1583-01-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Holy Roman Empire <sup>1)</sup></td><td>DE</td><td>1582-10-15</td><td>CHRISTMAS_STYLE.until(1544)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Bavaria</td><td>DE-BAYERN</td><td>1583-10-16</td><td>CHRISTMAS_STYLE.until(1544)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Prussia</td><td>DE-PREUSSEN</td><td>1610-09-02</td><td>CHRISTMAS_STYLE.until(1559)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Germany (protestant)</td><td>DE-PROTESTANT</td><td>1700-03-01</td><td>CHRISTMAS_STYLE.until(1559)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Austria</td><td>AT</td><td>1584-01-17</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Switzerland</td><td>CH</td><td>1584-01-22</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Hungaria</td><td>HU</td><td>1587-11-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Danmark</td><td>DK</td><td>1700-03-01</td><td>MARIA_ANUNCIATA.until(1623)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Norway</td><td>NO</td><td>1700-03-01</td><td>MARIA_ANUNCIATA.until(1623)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>England</td><td>GB</td><td>1752-09-14</td><td>CHRISTMAS_STYLE.until(1087).and(BEGIN_OF_JANUARY.until(1155)).and(MARIA_ANUNCIATA.until(1752))</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Scotland</td><td>GB-SCT</td><td>1752-09-14</td><td>CHRISTMAS_STYLE.until(1087).and(BEGIN_OF_JANUARY.until(1155)).and(MARIA_ANUNCIATA.until(1600))</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Sweden <sup>2)</sup></td><td>SE</td><td>1753-03-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Russia <sup>3)</sup></td><td>RU</td><td>1918-02-14</td><td>BEGIN_OF_JANUARY.until(988).and(BEGIN_OF_MARCH.until(1493)).and(BEGIN_OF_SEPTEMBER.until(1700))</td><td>BYZANTINE (988-1700)</td>
+     * </tr>
+     * </table>
+     * </div>
+     *
+     * <p><sup>1)</sup> Fallback for catholic regions in German countries, but most regions started Gregorian calendar later.
+     * <br><sup>2)</sup> Sweden used a special calendar shifted by one day between 1700 and 1712 (supported by Time4J).
+     * <br><sup>3)</sup> Special case for Byzantine year 7208: It lasted from AD-1699-09-01 until AD-1699-12-31 (Julian calendar). </p>
      *
      * @param   locale  country setting
      * @return  localized chronological history
@@ -408,7 +528,7 @@ public final class ChronoHistory
      * angegebene Region. </p>
      *
      * <p>Die aktuelle Implementierung f&auml;llt au&szlig;er f&uuml;r England (country=GB), Portugal,
-     * Ru&szlig;land, Schottland (mit der Variante SCT), Spanien, Deutschland (mit den Varianten CATHOLIC und
+     * Ru&szlig;land, Schottland (mit der Variante SCT), Spanien, Deutschland (mit den Varianten PREUSSEN und
      * PROTESTANT), Italien, Frankreich und Schweden auf die erste Einf&uuml;hrung des gregorianischen Kalenders
      * durch Papst Gregor zur&uuml;ck. Sp&auml;tere Releases von Time4J k&ouml;nnen diesen Ansatz f&uuml;r die
      * meisten europ&auml;ischen L&auml;nder verfeinern. F&uuml;r jedes hier nicht unterst&uuml;tzte Umstellungsdatum
@@ -418,8 +538,88 @@ public final class ChronoHistory
      * Regeln verwendet. Und manchmal sind historische Quellen einfach unzuverl&auml;ssig. </p>
      *
      * <p>Diese Methode nutzt nicht den Sprach-, sondern den L&auml;nderteil des Arguments (ISO-3166),
-     * im Falle Schottlands auch den Variantenteil (SCT), im Falle Deutschlands die Varianten (CATHOLIC oder
-     * PROTESTANT). </p>
+     * im Falle Schottlands auch den Variantenteil (SCT), im Falle Deutschlands die Varianten (PREUSSEN
+     * oder PROTESTANT). Um eine passende {@code Locale} zu erzeugen, ist ein Konstruktor wie
+     * {@code new Locale(&quot;en&quot;, &quot;GB&quot;, &quot;SCT&quot;)} zu verwenden. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <caption>Zusammenfassung</caption>
+     * <tr>
+     *  <th>Region</th><th>Locale</th><th>Gregorian cutover</th><th>New Year (using estimates)</th><th>Era preference</th>
+     * </tr>
+     * <tr>
+     *  <td>Italy</td><td>IT</td><td>1582-10-15</td><td>CHRISTMAS_STYLE.until(1583)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Florence</td><td>IT-FLORENCE</td><td>1582-10-15</td><td>MARIA_ANUNCIATA.until(1749)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Pisa</td><td>IT-PISA</td><td>1582-10-15</td><td>CALCULUS_PISANUS.until(1749)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Republic of Venice</td><td>IT-VENICE</td><td>1582-10-15</td><td>BEGIN_OF_MARCH.until(1798)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Spain</td><td>ES</td><td>1582-10-15</td><td>BEGIN_OF_JANUARY.until(1383).and(CHRISTMAS_STYLE.until(1556))</td><td>HISPANIC (until 1383)</td>
+     * </tr>
+     * <tr>
+     *  <td>Portugal</td><td>PT</td><td>1582-10-15</td><td>BEGIN_OF_JANUARY.until(1422).and(CHRISTMAS_STYLE.until(1556))</td><td>HISPANIC (until 1422)</td>
+     * </tr>
+     * <tr>
+     *  <td>Poland</td><td>PL</td><td>1582-10-15</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>France</td><td>FR</td><td>1582-12-20</td><td>EASTER_STYLE.until(1567)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Holland</td><td>NL</td><td>1583-01-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Holy Roman Empire <sup>1)</sup></td><td>DE</td><td>1582-10-15</td><td>CHRISTMAS_STYLE.until(1544)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Bavaria</td><td>DE-BAYERN</td><td>1583-10-16</td><td>CHRISTMAS_STYLE.until(1544)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Prussia</td><td>DE-PREUSSEN</td><td>1610-09-02</td><td>CHRISTMAS_STYLE.until(1559)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Germany (protestant)</td><td>DE-PROTESTANT</td><td>1700-03-01</td><td>CHRISTMAS_STYLE.until(1559)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Austria</td><td>AT</td><td>1584-01-17</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Switzerland</td><td>CH</td><td>1584-01-22</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Hungaria</td><td>HU</td><td>1587-11-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Danmark</td><td>DK</td><td>1700-03-01</td><td>MARIA_ANUNCIATA.until(1623)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Norway</td><td>NO</td><td>1700-03-01</td><td>MARIA_ANUNCIATA.until(1623)</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>England</td><td>GB</td><td>1752-09-14</td><td>CHRISTMAS_STYLE.until(1087).and(BEGIN_OF_JANUARY.until(1155)).and(MARIA_ANUNCIATA.until(1752))</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Scotland</td><td>GB-SCT</td><td>1752-09-14</td><td>CHRISTMAS_STYLE.until(1087).and(BEGIN_OF_JANUARY.until(1155)).and(MARIA_ANUNCIATA.until(1600))</td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Sweden <sup>2)</sup></td><td>SE</td><td>1753-03-01</td><td></td><td></td>
+     * </tr>
+     * <tr>
+     *  <td>Russia <sup>3)</sup></td><td>RU</td><td>1918-02-14</td><td>BEGIN_OF_JANUARY.until(988).and(BEGIN_OF_MARCH.until(1493)).and(BEGIN_OF_SEPTEMBER.until(1700))</td><td>BYZANTINE (988-1700)</td>
+     * </tr>
+     * </table>
+     * </div>
+     *
+     * <p><sup>1)</sup> Fallback for catholic regions in German countries, but most regions started Gregorian calendar later.
+     * <br><sup>2)</sup> Sweden used a special calendar shifted by one day between 1700 and 1712 (supported by Time4J).
+     * <br><sup>3)</sup> Special case for Byzantine year 7208: It lasted from AD-1699-09-01 until AD-1699-12-31 (Julian calendar). </p>
      *
      * @param   locale  country setting
      * @return  localized chronological history
