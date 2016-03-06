@@ -480,4 +480,25 @@ public class EraFormatTest {
             is(PlainDate.of(1565, 4, 3)));
     }
 
+    @Test
+    public void printPisa() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
+        assertThat(
+            formatter.format(PlainDate.of(1700, 1, 30)),
+            is("AD-1698/1700-01-30"));
+    }
+
+    @Test
+    public void parsePisa() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
+        assertThat(
+            formatter.parse("AD-1698/1700-01-30"),
+            is(PlainDate.of(1700, 1, 30)));
+        assertThat(
+            formatter.parse("AD-1700-01-30"),
+            is(PlainDate.of(1700, 1, 30)));
+    }
+
 }
