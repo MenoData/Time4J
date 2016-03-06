@@ -255,7 +255,7 @@ final class HistoricIntegerElement
                     if (parsedResult != null) {
                         parsedResult.with(StdHistoricalElement.YEAR_OF_DISPLAY, yod);
                     }
-                } else if (Math.abs(yoe - yod) <= 1) { // check for plausibility
+                } else if (Math.abs(yoe - yod) <= 2) { // plausibility check (delta 2 necessary for calculus pisanus)
                     value = yoe;
                 } else { // now we have something else - let the formatter process the rest
                     value = yod;
