@@ -139,13 +139,9 @@ final class HistoricIntegerElement
         switch (this.index) {
             case YEAR_OF_ERA_INDEX:
                 NewYearStrategy nys = this.history.getNewYearStrategy();
-                HistoricEra era = date.getEra();
                 int yearOfEra = date.getYearOfEra();
                 String text = null;
-                if (
-                    !NewYearStrategy.DEFAULT.equals(nys)
-                    && ((era.annoDomini(yearOfEra) >= 8) || (era.compareTo(HistoricEra.AD) > 0))
-                ) {
+                if (!NewYearStrategy.DEFAULT.equals(nys)) {
                     int yearOfDisplay = date.getYearOfEra(nys);
                     if (yearOfDisplay != yearOfEra) { // dual dating
                         text = this.dual(numsys, yearOfDisplay, yearOfEra, minDigits);
@@ -249,14 +245,20 @@ final class HistoricIntegerElement
             } else {
                 pos = test;
                 int yod = value;
-                int ancient = this.getAncientYear(yod, yoe);
+                int maxDeviation = (
+                    (this.history.getNewYearStrategy().rule(HistoricEra.AD, yod) == NewYearRule.CALCULUS_PISANUS)
+                    ? 2 : 1);
+                int ancient = this.getAncientYear(yod, yoe, maxDeviation);
                 if ((numsys == NumberSystem.ARABIC) && (ancient != Integer.MAX_VALUE)) {
                     value = ancient;
                     if (parsedResult != null) {
                         parsedResult.with(StdHistoricalElement.YEAR_OF_DISPLAY, yod);
                     }
-                } else if (Math.abs(yoe - yod) <= 2) { // plausibility check (delta 2 necessary for calculus pisanus)
+                } else if (Math.abs(yoe - yod) <= maxDeviation) { // plausibility check
                     value = yoe;
+                    if (parsedResult != null) {
+                        parsedResult.with(StdHistoricalElement.YEAR_OF_DISPLAY, yod);
+                    }
                 } else { // now we have something else - let the formatter process the rest
                     value = yod;
                     pos = slash;
@@ -301,20 +303,14 @@ final class HistoricIntegerElement
 
     private int getAncientYear(
         int yearOfDisplay,
-        int yearOfEra
+        int yearOfEra,
+        int maxDeviation
     ) {
 
-        if ((yearOfEra < 0) || (yearOfEra >= 100) || (yearOfDisplay < 100)) {
-            return Integer.MAX_VALUE;
-        }
-
-        if (
-            (this.history.getEraPreference() != EraPreference.DEFAULT)
-            || (yearOfDisplay < this.history.getGregorianCutOverDate().getYear()) // estimate
-        ) {
+        if ((yearOfEra >= 0) && (yearOfEra < 100) && (yearOfDisplay >= 100)) {
             int factor = ((yearOfEra < 10) ? 10 : 100);
 
-            if (Math.abs(yearOfEra - MathUtils.floorModulo(yearOfDisplay, factor)) <= 1) {
+            if (Math.abs(yearOfEra - MathUtils.floorModulo(yearOfDisplay, factor)) <= maxDeviation) {
                 return MathUtils.floorDivide(yearOfDisplay, factor) * factor + yearOfEra;
             }
         }

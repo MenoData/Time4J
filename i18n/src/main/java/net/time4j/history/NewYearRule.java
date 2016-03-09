@@ -87,8 +87,8 @@ public enum NewYearRule {
      */
     BEGIN_OF_JANUARY() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra, 1, 1);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay, 1, 1);
         }
         @Override
         int displayedYear(
@@ -111,8 +111,8 @@ public enum NewYearRule {
      */
     BEGIN_OF_MARCH() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra, 3, 1);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay, 3, 1);
         }
     },
 
@@ -128,8 +128,8 @@ public enum NewYearRule {
      */
     BEGIN_OF_SEPTEMBER() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra - 1, 9, 1);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay - 1, 9, 1);
         }
         @Override
         int displayedYear(
@@ -155,8 +155,8 @@ public enum NewYearRule {
      */
     CHRISTMAS_STYLE() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra - 1, 12, 25);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay - 1, 12, 25);
         }
         @Override
         int displayedYear(
@@ -193,15 +193,15 @@ public enum NewYearRule {
      */
     EASTER_STYLE() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            int ad = era.annoDomini(yearOfEra);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            int ad = era.annoDomini(yearOfDisplay);
             int dom = Computus.EASTERN.marchDay(ad) - 1;
             int month = 3;
             if (dom > 31) {
                 month++;
                 dom -= 31;
             }
-            return HistoricDate.of(era, yearOfEra, month, dom);
+            return HistoricDate.of(era, yearOfDisplay, month, dom);
         }
     },
 
@@ -225,15 +225,15 @@ public enum NewYearRule {
      */
     GOOD_FRIDAY() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            int ad = era.annoDomini(yearOfEra);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            int ad = era.annoDomini(yearOfDisplay);
             int dom = Computus.EASTERN.marchDay(ad) - 2;
             int month = 3;
             if (dom > 31) {
                 month++;
                 dom -= 31;
             }
-            return HistoricDate.of(era, yearOfEra, month, dom);
+            return HistoricDate.of(era, yearOfDisplay, month, dom);
         }
     },
 
@@ -254,8 +254,8 @@ public enum NewYearRule {
      */
     MARIA_ANUNCIATA() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra, 3, 25);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay, 3, 25);
         }
     },
 
@@ -278,17 +278,17 @@ public enum NewYearRule {
      */
     CALCULUS_PISANUS() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return MARIA_ANUNCIATA.newYear(era, yearOfEra);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return MARIA_ANUNCIATA.newYear(era, yearOfDisplay + 1);
         }
         @Override
         int displayedYear(
             NewYearStrategy strategy,
             HistoricDate date
-        ) { // does not make sense for era BC or yearOfEra <= 2
-            int yearOfEra = date.getYearOfEra();
+        ) {
+            int yearOfEra = date.getYearOfEra() - 1;
             HistoricDate newYear = this.newYear(date.getEra(), yearOfEra);
-            int yearOfDisplay = yearOfEra - 1;
+            int yearOfDisplay = yearOfEra;
             if (date.compareTo(newYear) < 0) {
                 yearOfDisplay--;
             }
@@ -312,8 +312,8 @@ public enum NewYearRule {
      */
     EPIPHANY() {
         @Override
-        HistoricDate newYear(HistoricEra era, int yearOfEra) {
-            return HistoricDate.of(era, yearOfEra, 1, 6);
+        HistoricDate newYear(HistoricEra era, int yearOfDisplay) {
+            return HistoricDate.of(era, yearOfDisplay, 1, 6);
         }
     };
 
@@ -371,14 +371,14 @@ public enum NewYearRule {
     // calculates the new year
     abstract HistoricDate newYear(
         HistoricEra era,
-        int yearOfEra
+        int yearOfDisplay
     );
 
     // also suitable for EASTER_STYLE and GOOD_FRIDAY
     int displayedYear(
         NewYearStrategy strategy,
         HistoricDate date
-    ) { // does not make sense for era BC or yearOfEra <= 1
+    ) {
 
         int yearOfEra = date.getYearOfEra();
         HistoricDate newYear = this.newYear(date.getEra(), yearOfEra);

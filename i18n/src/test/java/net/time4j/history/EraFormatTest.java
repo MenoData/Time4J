@@ -481,7 +481,7 @@ public class EraFormatTest {
     }
 
     @Test
-    public void printPisa() {
+    public void printPisa1700() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
         assertThat(
@@ -490,7 +490,7 @@ public class EraFormatTest {
     }
 
     @Test
-    public void parsePisa() throws ParseException {
+    public void parsePisa1700() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
         assertThat(
@@ -499,6 +499,27 @@ public class EraFormatTest {
         assertThat(
             formatter.parse("AD-1700-01-30"),
             is(PlainDate.of(1700, 1, 30)));
+    }
+
+    @Test
+    public void printPisa1713() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
+        assertThat(
+            formatter.format(PlainDate.of(1713, 1, 30)),
+            is("AD-1711/13-01-30"));
+    }
+
+    @Test
+    public void parsePisa1713() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G-yyyy-MM-dd", PatternType.CLDR, new Locale("en", "IT", "PISA")).with(Leniency.STRICT);
+        assertThat(
+            formatter.parse("AD-1711/13-01-30"),
+            is(PlainDate.of(1713, 1, 30)));
+        assertThat(
+            formatter.parse("AD-1713-01-30"),
+            is(PlainDate.of(1713, 1, 30)));
     }
 
 }

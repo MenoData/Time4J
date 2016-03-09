@@ -185,4 +185,39 @@ public class DayOfYearTest {
             is(PlainDate.of(1712, 3, 11)));
     }
 
+    @Test
+    public void printPisa() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G yyyy (D)", PatternType.CLDR, new Locale("en", "IT", "PISA"))
+                .with(Leniency.STRICT);
+        assertThat(
+            formatter.format(PlainDate.of(1700, 1, 30)),
+            is("AD 1698/1700 (312)"));
+    }
+
+    @Test
+    public void parsePisa() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G yyyy (D)", PatternType.CLDR, new Locale("en", "IT", "PISA"))
+                .with(Leniency.STRICT);
+        assertThat(
+            formatter.parse("AD 1698/1700 (312)"),
+            is(PlainDate.of(1700, 1, 30)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseEnglandNonDualDate() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("(D) GGGG yyyy", PatternType.CLDR, Locale.UK).with(Leniency.STRICT);
+        formatter.parse("(365) Anno Domini 1602"); // conflict: text-year=1602, parsed-year=1603
+    }
+
+    @Test(expected=ParseException.class)
+    public void parsePisaNonDualDate() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("G yyyy (D)", PatternType.CLDR, new Locale("en", "IT", "PISA"))
+                .with(Leniency.STRICT);
+        formatter.parse("AD 1698 (312)"); // conflict: text-year=1698, parsed-year=1700
+    }
+
 }

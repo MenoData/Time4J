@@ -207,42 +207,51 @@ public final class NewYearStrategy {
     /**
      * <p>Determines the date of New Year. </p>
      *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
-     * @return  historic date of New Year
-     * @since   3.14/4.11
-     */
-    /*[deutsch]
-     * <p>Determines the date of New Year. </p>
-     *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
      * @return  historic date of New Year
      * @since   3.14/4.11
      */
     HistoricDate newYear(
         HistoricEra era,
-        int yearOfEra
+        int yearOfDisplay
     ) {
 
-        int ad = era.annoDomini(yearOfEra);
+        return rule(era, yearOfDisplay).newYear(era, yearOfDisplay);
+
+    }
+
+    /**
+     * <p>Determines the appropriate rule for New Year. </p>
+     *
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
+     * @return  NewYearRule
+     * @since   3.17/4.14
+     */
+    NewYearRule rule(
+        HistoricEra era,
+        int yearOfDisplay
+    ) {
+
+        int ad = era.annoDomini(yearOfDisplay);
         int previous = Integer.MIN_VALUE;
         NewYearRule prevRule = null;
 
         for (int i = 0, n = this.strategies.size(); i < n; i++) {
             NewYearStrategy strategy = this.strategies.get(i);
             if ((ad >= previous) && (ad < strategy.lastAnnoDomini)) {
-                return strategy.lastRule.newYear(era, yearOfEra);
+                return strategy.lastRule;
             }
             previous = strategy.lastAnnoDomini;
             prevRule = strategy.lastRule;
         }
 
         if ((ad == previous) && (era == HistoricEra.BYZANTINE) && (prevRule == NewYearRule.BEGIN_OF_SEPTEMBER)) {
-            return prevRule.newYear(era, yearOfEra); // see Russia in byzantine year 7208
+            return prevRule; // see Russia in byzantine year 7208
         }
 
-        return this.lastRule.newYear(era, yearOfEra);
+        return this.lastRule;
 
     }
 
@@ -250,15 +259,6 @@ public final class NewYearStrategy {
      * <p>Determines the displayed year for given historic date. </p>
      *
      * <p>The displayed year can deviate from year of era depending on the concrete new year strategy. </p>
-     *
-     * @param   date    historic date as reference for the calculation of the displayed year
-     * @return  displayed historic year
-     * @since   3.14/4.11
-     */
-    /*[deutsch]
-     * <p>Determines the displayed year for given historic date. </p>
-     *
-     * <p>Das Anzeigejahr kann in Abh&auml;ngigkeit vom Beginn des Jahres vom Jahr der &Auml;ra abweichen. </p>
      *
      * @param   date    historic date as reference for the calculation of the displayed year
      * @return  displayed historic year
