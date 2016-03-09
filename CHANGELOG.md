@@ -1,4 +1,6 @@
 ## [v3.17] not yet released
+### Fixed
+- Calculus Pisanus does not work in parsing [#466]
 
 ## [v3.16] published on 2016-03-06
 ### Added
