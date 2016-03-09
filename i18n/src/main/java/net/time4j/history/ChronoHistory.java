@@ -881,8 +881,8 @@ public final class ChronoHistory
      * <p>Side note: This method should usually yield a valid historic date unless in case of ill
      * configured new-year-strategies which don't play well with configured cutover-dates. </p>
      *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
      * @return  historic date of New Year
      * @throws  IllegalArgumentException if given year is out of range or such that the result becomes invalid
      * @see     NewYearRule
@@ -898,8 +898,8 @@ public final class ChronoHistory
      * es sei denn, die Neujahrsstrategie wurde so konfiguriert, da&szlig; sie nicht mit den
      * gew&auml;hlten Kalenderumstellungsdaten harmoniert. </p>
      *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
      * @return  historic date of New Year
      * @throws  IllegalArgumentException if given year is out of range or such that the result becomes invalid
      * @see     NewYearRule
@@ -910,10 +910,10 @@ public final class ChronoHistory
      */
     public HistoricDate getBeginOfYear(
         HistoricEra era,
-        int yearOfEra
+        int yearOfDisplay
     ) {
 
-        HistoricDate newYear = this.getNewYearStrategy().newYear(era, yearOfEra);
+        HistoricDate newYear = this.getNewYearStrategy().newYear(era, yearOfDisplay);
 
         if (this.isValid(newYear)) {
             PlainDate date = this.convert(newYear);
@@ -924,7 +924,7 @@ public final class ChronoHistory
             }
             return newYear;
         } else {
-            throw new IllegalArgumentException("Cannot determine valid New Year: " + era + "-" + yearOfEra);
+            throw new IllegalArgumentException("Cannot determine valid New Year: " + era + "-" + yearOfDisplay);
         }
 
     }
@@ -934,8 +934,8 @@ public final class ChronoHistory
      *
      * <p>The length of year can be affected by cutover gaps, different leap year rules and new year strategies. </p>
      *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
      * @return  length of historic year in days or {@code -1} if the length cannot be determined
      * @see     #getBeginOfYear(HistoricEra, int)
      * @see     #getGregorianCutOverDate()
@@ -949,8 +949,8 @@ public final class ChronoHistory
      * <p>Die L&auml;nge des Jahres kann durch Kalenderumstellungen, verschiedene Schaltjahresregeln und
      * Neujahrsstrategien beeinflusst werden. </p>
      *
-     * @param   era         historic era
-     * @param   yearOfEra   historic year of era
+     * @param   era             historic era
+     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
      * @return  length of historic year in days or {@code -1} if the length cannot be determined
      * @see     #getBeginOfYear(HistoricEra, int)
      * @see     #getGregorianCutOverDate()
@@ -960,7 +960,7 @@ public final class ChronoHistory
      */
     public int getLengthOfYear(
         HistoricEra era,
-        int yearOfEra
+        int yearOfDisplay
     ) {
 
         try {
@@ -969,21 +969,21 @@ public final class ChronoHistory
             int extra;
 
             if (this.nys == null) {
-                min = HistoricDate.of(era, yearOfEra, 1, 1);
-                max = HistoricDate.of(era, yearOfEra, 12, 31);
+                min = HistoricDate.of(era, yearOfDisplay, 1, 1);
+                max = HistoricDate.of(era, yearOfDisplay, 12, 31);
                 extra = 1;
             } else {
-                min = this.nys.newYear(era, yearOfEra);
+                min = this.nys.newYear(era, yearOfDisplay);
                 if (era == HistoricEra.BC) {
-                    if (yearOfEra == 1) {
+                    if (yearOfDisplay == 1) {
                         max = this.nys.newYear(HistoricEra.AD, 1);
                     } else {
-                        max = this.nys.newYear(era, yearOfEra - 1);
+                        max = this.nys.newYear(era, yearOfDisplay - 1);
                     }
                 } else {
-                    max = this.nys.newYear(era, yearOfEra + 1);
+                    max = this.nys.newYear(era, yearOfDisplay + 1);
                     if (era == HistoricEra.BYZANTINE) {
-                        HistoricDate hd = this.nys.newYear(HistoricEra.AD, era.annoDomini(yearOfEra));
+                        HistoricDate hd = this.nys.newYear(HistoricEra.AD, era.annoDomini(yearOfDisplay));
                         if (hd.compareTo(min) > 0) {
                             max = hd;
                         }
