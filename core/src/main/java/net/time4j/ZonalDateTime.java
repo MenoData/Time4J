@@ -500,6 +500,10 @@ public final class ZonalDateTime
         Timezone tz;
 
         if (moment == null) {
+            moment = parser.parse(text); // will throw an exception with better error message
+        }
+
+        if (moment == null) {
             throw new ParseException("Cannot parse: " + text, pos.getErrorIndex());
         } else if (rawValues.get().hasTimezone()) {
             tz = toTimezone(rawValues.get().getTimezone(), text);

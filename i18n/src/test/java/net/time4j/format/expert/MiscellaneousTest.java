@@ -13,6 +13,7 @@ import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.PluralCategory;
+import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
@@ -733,6 +734,19 @@ public class MiscellaneousTest {
         assertThat(
             formatter.parse("2015-12-20\u061C\u061C"), // extra bidi at the end
             is(expected));
+    }
+
+    @Test
+    public void parseZDTWithException() throws ParseException {
+        Timezone tz = Timezone.of("Asia/Tokyo");
+        TemporalFormatter<Moment> formatter =
+            Moment.formatter("yyyy-MM-dd HH:mmZ", PatternType.CLDR, Locale.ROOT, tz.getID());
+        try {
+            ZonalDateTime zdt = ZonalDateTime.parse("2012-07-01T09:00+0900", formatter);
+            fail("Parsed successfully to: " + zdt + ", but expected exception.");
+        } catch (ParseException pe) {
+            assertThat(pe.getMessage(), is("Cannot parse: \"2012-07-01T09:00+0900\" (expected: [ ], found: [T])"));
+        }
     }
 
     private static ChronoFormatter<PlainDate> getQuarterDateFormatter() {

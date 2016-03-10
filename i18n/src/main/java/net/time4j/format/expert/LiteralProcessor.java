@@ -238,13 +238,15 @@ final class LiteralProcessor
         }
 
         if (error) {
-            StringBuilder msg = new StringBuilder("Expected: [");
+            StringBuilder msg = new StringBuilder("Cannot parse: \"");
+            msg.append(text);
+            msg.append("\" (expected: [");
             msg.append(literal);
             msg.append("], found: [");
             if (c != '\u0000') {
                 msg.append(c);
             }
-            msg.append(']');
+            msg.append("])");
             status.setError(offset, msg.toString());
         } else {
             status.setPosition(offset + 1);
@@ -270,11 +272,13 @@ final class LiteralProcessor
         int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive);
 
         if (parsedLen == -1) {
-            StringBuilder msg = new StringBuilder("Expected: [");
+            StringBuilder msg = new StringBuilder("Cannot parse: \"");
+            msg.append(text);
+            msg.append("\" (expected: [");
             msg.append(this.multi);
             msg.append("], found: [");
             msg.append(text.subSequence(offset, Math.min(offset + len, text.length())));
-            msg.append(']');
+            msg.append("])");
             status.setError(offset, msg.toString());
         } else {
             status.setPosition(offset + parsedLen);
