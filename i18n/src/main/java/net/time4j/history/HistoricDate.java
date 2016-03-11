@@ -43,7 +43,7 @@ import net.time4j.base.GregorianMath;
  *
  * <p>Instanzen dieser Klasse kennen selber keine andere Neujahrsstrategie als den
  * {@link NewYearRule#BEGIN_OF_JANUARY Standard (erster Januar)}, k&ouml;nnen aber eine
- * solche Strategie als Parameter nutzen, um {@link #getYearOfDisplay(NewYearStrategy)
+ * solche Strategie als Parameter nutzen, um {@link #getYearOfEra(NewYearStrategy)
  * das reale historische Jahr} f&uuml;r Anzeigezwecke zu bestimmen. </p>
  *
  * <p>Die nat&uuml;rliche Ordnung basiert auf der zeitlichen Reihenfolge. </p>
