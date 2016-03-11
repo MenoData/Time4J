@@ -74,6 +74,17 @@ public class NewYearTest {
     }
 
     @Test
+    public void england1085() {
+        ChronoHistory history = ChronoHistory.of(Locale.UK);
+        assertThat(
+            history.getBeginOfYear(HistoricEra.AD, 1085),
+            is(HistoricDate.of(HistoricEra.AD, 1084, 12, 25)));
+        assertThat(
+            history.getLengthOfYear(HistoricEra.AD, 1085),
+            is(365));
+    }
+
+    @Test
     public void england1086() {
         ChronoHistory history = ChronoHistory.of(Locale.UK);
         assertThat(
