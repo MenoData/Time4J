@@ -894,13 +894,14 @@ public final class ChronoHistory
      * configured new-year-strategies which don't play well with configured cutover-dates. </p>
      *
      * @param   era             historic era
-     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
+     * @param   yearOfEra       historic year of era as displayed (deviating from standard calendar year)
      * @return  historic date of New Year
      * @throws  IllegalArgumentException if given year is out of range or such that the result becomes invalid
      * @see     NewYearRule
      * @see     #getLengthOfYear(HistoricEra, int)
      * @see     #with(NewYearStrategy)
      * @see     #isValid(HistoricDate)
+     * @see     HistoricDate#getYearOfEra(NewYearStrategy)
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -911,21 +912,22 @@ public final class ChronoHistory
      * gew&auml;hlten Kalenderumstellungsdaten harmoniert. </p>
      *
      * @param   era             historic era
-     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
+     * @param   yearOfEra       historic year of era as displayed (deviating from standard calendar year)
      * @return  historic date of New Year
      * @throws  IllegalArgumentException if given year is out of range or such that the result becomes invalid
      * @see     NewYearRule
      * @see     #getLengthOfYear(HistoricEra, int)
      * @see     #with(NewYearStrategy)
      * @see     #isValid(HistoricDate)
+     * @see     HistoricDate#getYearOfEra(NewYearStrategy)
      * @since   3.14/4.11
      */
     public HistoricDate getBeginOfYear(
         HistoricEra era,
-        int yearOfDisplay
+        int yearOfEra
     ) {
 
-        HistoricDate newYear = this.getNewYearStrategy().newYear(era, yearOfDisplay);
+        HistoricDate newYear = this.getNewYearStrategy().newYear(era, yearOfEra);
 
         if (this.isValid(newYear)) {
             PlainDate date = this.convert(newYear);
@@ -936,7 +938,7 @@ public final class ChronoHistory
             }
             return newYear;
         } else {
-            throw new IllegalArgumentException("Cannot determine valid New Year: " + era + "-" + yearOfDisplay);
+            throw new IllegalArgumentException("Cannot determine valid New Year: " + era + "-" + yearOfEra);
         }
 
     }
@@ -947,12 +949,13 @@ public final class ChronoHistory
      * <p>The length of year can be affected by cutover gaps, different leap year rules and new year strategies. </p>
      *
      * @param   era             historic era
-     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
+     * @param   yearOfEra       historic year of era as displayed (deviating from standard calendar year)
      * @return  length of historic year in days or {@code -1} if the length cannot be determined
      * @see     #getBeginOfYear(HistoricEra, int)
      * @see     #getGregorianCutOverDate()
      * @see     #with(NewYearStrategy)
      * @see     #with(AncientJulianLeapYears)
+     * @see     HistoricDate#getYearOfEra(NewYearStrategy)
      * @since   3.0
      */
     /*[deutsch]
@@ -962,17 +965,18 @@ public final class ChronoHistory
      * Neujahrsstrategien beeinflusst werden. </p>
      *
      * @param   era             historic era
-     * @param   yearOfDisplay   historic year of era as displayed (deviating from standard calendar year)
+     * @param   yearOfEra       historic year of era as displayed (deviating from standard calendar year)
      * @return  length of historic year in days or {@code -1} if the length cannot be determined
      * @see     #getBeginOfYear(HistoricEra, int)
      * @see     #getGregorianCutOverDate()
      * @see     #with(NewYearStrategy)
      * @see     #with(AncientJulianLeapYears)
+     * @see     HistoricDate#getYearOfEra(NewYearStrategy)
      * @since   3.0
      */
     public int getLengthOfYear(
         HistoricEra era,
-        int yearOfDisplay
+        int yearOfEra
     ) {
 
         try {
@@ -981,21 +985,21 @@ public final class ChronoHistory
             int extra;
 
             if (this.nys == null) {
-                min = HistoricDate.of(era, yearOfDisplay, 1, 1);
-                max = HistoricDate.of(era, yearOfDisplay, 12, 31);
+                min = HistoricDate.of(era, yearOfEra, 1, 1);
+                max = HistoricDate.of(era, yearOfEra, 12, 31);
                 extra = 1;
             } else {
-                min = this.nys.newYear(era, yearOfDisplay);
+                min = this.nys.newYear(era, yearOfEra);
                 if (era == HistoricEra.BC) {
-                    if (yearOfDisplay == 1) {
+                    if (yearOfEra == 1) {
                         max = this.nys.newYear(HistoricEra.AD, 1);
                     } else {
-                        max = this.nys.newYear(era, yearOfDisplay - 1);
+                        max = this.nys.newYear(era, yearOfEra - 1);
                     }
                 } else {
-                    max = this.nys.newYear(era, yearOfDisplay + 1);
+                    max = this.nys.newYear(era, yearOfEra + 1);
                     if (era == HistoricEra.BYZANTINE) {
-                        HistoricDate hd = this.nys.newYear(HistoricEra.AD, era.annoDomini(yearOfDisplay));
+                        HistoricDate hd = this.nys.newYear(HistoricEra.AD, era.annoDomini(yearOfEra));
                         if (hd.compareTo(min) > 0) {
                             max = hd;
                         }
