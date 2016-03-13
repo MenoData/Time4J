@@ -21,10 +21,12 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.Moment;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
+import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZoneProvider;
 import net.time4j.tz.olson.AFRICA;
 import net.time4j.tz.olson.AMERICA;
@@ -193,7 +195,12 @@ public class ZoneNameProviderSPI
         Locale locale
     ) {
 
-        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid);
+        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid, ZonalOffset.UTC);
+
+        if (tz.isFixed() && tz.getOffset(Moment.UNIX_EPOCH).equals(ZonalOffset.UTC)) {
+            return "";
+        }
+
         return tz.getDisplayName(style, locale);
 
     }
