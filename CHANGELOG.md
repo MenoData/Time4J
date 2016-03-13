@@ -3,6 +3,7 @@
 - More detailed error message when parsing ZonalDateTime [#467]
 
 ### Fixed
+- Make resolving zone names more robust [#469]
 - Calculus Pisanus does not work in parsing [#466]
 
 ## [v3.16] published on 2016-03-06
