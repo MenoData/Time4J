@@ -1,9 +1,11 @@
 package net.time4j.sql;
 
 import net.time4j.ClockUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.scale.TimeScale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -70,6 +72,26 @@ public class JDBCAdapterTest {
             JDBCAdapter.SQL_TIMESTAMP.from(
                 PlainTimestamp.of(2012, 7, 1, 0, 0, 0)
                 .plus(210, ClockUnit.NANOS)),
+            is(ts));
+    }
+
+    @Test
+    public void sqlTimestampWithZoneToTime4J() {
+        java.sql.Timestamp ts =
+            new java.sql.Timestamp(1341100800L * 1000);
+        ts.setNanos(210);
+        assertThat(
+            JDBCAdapter.SQL_TIMESTAMP_WITH_ZONE.translate(ts),
+            is(Moment.of(1341100800L, 210, TimeScale.POSIX)));
+    }
+
+    @Test
+    public void sqlTimestampWithZoneFromTime4J() {
+        java.sql.Timestamp ts =
+            new java.sql.Timestamp(1341100800L * 1000);
+        ts.setNanos(210);
+        assertThat(
+            JDBCAdapter.SQL_TIMESTAMP_WITH_ZONE.from(Moment.of(1341100800L, 210, TimeScale.POSIX)),
             is(ts));
     }
 

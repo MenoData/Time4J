@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2015-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JDBCAdapter.java) is part of project Time4J.
  *
@@ -68,7 +68,7 @@ public abstract class JDBCAdapter<S, T>
     private static final PlainDate UNIX_DATE = PlainDate.of(0, EpochDays.UNIX);
 
     /**
-     * <p>Bridge between a JDBC-Date and the class {@code PlainDate}.</p>
+     * <p>Bridge between a JDBC-Date and the class {@code PlainDate}. </p>
      *
      * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
      * set to the value &quot;true&quot; then the conversion will not take into
@@ -99,8 +99,7 @@ public abstract class JDBCAdapter<S, T>
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse
-     * {@code PlainDate}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Date und der Klasse {@code PlainDate}. </p>
      *
      * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
      * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt die
@@ -137,7 +136,7 @@ public abstract class JDBCAdapter<S, T>
     // max = new java.sql.Date(253402214400000L + 86399999), // 9999-12-31
 
     /**
-     * <p>Bridge between a JDBC-Time and the class {@code PlainTime}.</p>
+     * <p>Bridge between a JDBC-Time and the class {@code PlainTime}. </p>
      *
      * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot; is
      * set to the value &quot;true&quot; then the conversion will NOT take into
@@ -164,8 +163,7 @@ public abstract class JDBCAdapter<S, T>
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse
-     * {@code PlainTime}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Time und der Klasse {@code PlainTime}. </p>
      *
      * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
      * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt
@@ -196,8 +194,7 @@ public abstract class JDBCAdapter<S, T>
         new SqlTimeRule();
 
     /**
-     * <p>Bridge between a JDBC-Timestamp and the class
-     * {@code PlainTimestamp}.</p>
+     * <p>Bridge between a JDBC-Timestamp and the class {@code PlainTimestamp}. </p>
      *
      * <p>If the system property &quot;net.time4j.sql.utc.conversion&quot;
      * is set to the value &quot;true&quot; then the conversion will NOT take
@@ -219,8 +216,7 @@ public abstract class JDBCAdapter<S, T>
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse
-     * {@code PlainTimestamp}. </p>
+     * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse {@code PlainTimestamp}. </p>
      *
      * <p>Wenn die System-Property &quot;net.time4j.sql.utc.conversion&quot;
      * auf den Wert &quot;true&quot; gesetzt ist, dann ber&uuml;cksichtigt
@@ -243,6 +239,29 @@ public abstract class JDBCAdapter<S, T>
      */
     public static final JDBCAdapter<java.sql.Timestamp, PlainTimestamp> SQL_TIMESTAMP =
         new SqlTimestampRule();
+
+    /**
+     * <p>Bridge between a JDBC-Timestamp and the class {@code Moment}. </p>
+     *
+     * <p>Notes: Leap seconds are not storable. And the maximum available
+     * precision is dependent on the database. Despite of the misleading SQL name,
+     * this conversion does not use a timezone but a timezone offset, finally
+     * {@link ZonalOffset#UTC}. </p>
+     *
+     * @since   3.18/4.14
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einem JDBC-Timestamp und der Klasse {@code Moment}. </p>
+     *
+     * <p>Hinweise: Schaltsekunden sind so nicht speicherf&auml;hig. Und die maximal
+     * erreichbare Genauigkeit h&auml;ngt von der konkreten Datenbank ab. Entgegen dem
+     * SQL-Namen wird nicht eine Zeitzone, sondern ein Zeitzonen-Offset in Betracht
+     * gezogen. Diese Konversion verwendet letztlich {@link ZonalOffset#UTC}. </p>
+     *
+     * @since   3.18/4.14
+     */
+    public static final JDBCAdapter<java.sql.Timestamp, Moment> SQL_TIMESTAMP_WITH_ZONE =
+        new SqlMomentRule();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -401,6 +420,33 @@ public abstract class JDBCAdapter<S, T>
                     MathUtils.safeAdd(dateMillis, timeMillis));
             ret.setNanos(tsp.get(PlainTime.NANO_OF_SECOND));
             return ret;
+
+        }
+
+    }
+
+    private static class SqlMomentRule
+        extends JDBCAdapter<java.sql.Timestamp, Moment> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Moment translate(java.sql.Timestamp source) {
+
+            try {
+                return Moment.of(MathUtils.floorDivide(source.getTime(), 1000), source.getNanos(), TimeScale.POSIX);
+            } catch (IllegalArgumentException iae) {
+                throw new ChronoException(iae.getMessage(), iae);
+            }
+
+        }
+
+        @Override
+        public java.sql.Timestamp from(Moment moment) {
+
+            java.sql.Timestamp sql = new java.sql.Timestamp(MathUtils.safeMultiply(moment.getPosixTime(), 1000));
+            sql.setNanos(moment.getNanosecond());
+            return sql;
 
         }
 
