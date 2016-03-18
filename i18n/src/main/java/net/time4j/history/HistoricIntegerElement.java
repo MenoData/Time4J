@@ -51,6 +51,8 @@ import java.text.ParsePosition;
 import java.util.List;
 import java.util.Locale;
 
+import static net.time4j.history.YearDefinition.DUAL_DATING;
+
 
 /**
  * <p>Allgemeines verstellbares chronologisches Element auf Integer-Basis. </p>
@@ -83,14 +85,13 @@ final class HistoricIntegerElement
     //~ Konstruktoren -----------------------------------------------------
 
     HistoricIntegerElement(
-        String name,
         char symbol,
         int defaultMin,
         int defaultMax,
         ChronoHistory history,
         int index
     ) {
-        super(name, symbol, defaultMin, defaultMax);
+        super(toName(index), symbol, defaultMin, defaultMax);
 
         this.history = history;
         this.index = index;
@@ -143,11 +144,15 @@ final class HistoricIntegerElement
                 String text = null;
                 if (!NewYearStrategy.DEFAULT.equals(nys)) {
                     int yearOfDisplay = date.getYearOfEra(nys);
-                    if (yearOfDisplay != yearOfEra) { // dual dating
-                        text = this.dual(numsys, yearOfDisplay, yearOfEra, minDigits);
+                    if (yearOfDisplay != yearOfEra) {
+                        if (attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING) == DUAL_DATING) {
+                            text = this.dual(numsys, yearOfDisplay, yearOfEra, minDigits);
+                        } else {
+                            yearOfEra = yearOfDisplay;
+                        }
                     }
                 }
-                if (text == null) { // standard case
+                if (text == null) { // no dual format
                     if (numsys == NumberSystem.ARABIC) {
                         text = this.format(Integer.toString(yearOfEra), minDigits);
                     } else {
@@ -230,12 +235,13 @@ final class HistoricIntegerElement
         int value = parseNum(numsys, text, pos, status, zero, leniency);
         pos = status.getIndex();
 
-        if (
+        if ( // dual date check
             (this.index == YEAR_OF_ERA_INDEX)
             && (pos > start)
             && (!NewYearStrategy.DEFAULT.equals(this.history.getNewYearStrategy()))
             && (pos < text.length())
             && (text.charAt(pos) == '/')
+            && (attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING) == DUAL_DATING)
         ) {
             int slash = pos;
             int yoe = parseNum(numsys, text, pos + 1, status, zero, leniency);
@@ -460,17 +466,34 @@ final class HistoricIntegerElement
 
     }
 
+    private static String toName(int index) {
+
+        switch (index) {
+            case YEAR_OF_ERA_INDEX:
+                return "YEAR_OF_ERA";
+            case MONTH_INDEX:
+                return "HISTORIC_MONTH";
+            case DAY_OF_MONTH_INDEX:
+                return "HISTORIC_DAY_OF_MONTH";
+            case DAY_OF_YEAR_INDEX:
+                return "HISTORIC_DAY_OF_YEAR";
+            default:
+                throw new UnsupportedOperationException("Unknown element index: " + index);
+        }
+
+    }
+
     private Object readResolve() throws ObjectStreamException {
 
         String n = this.name();
 
-        if (n.equals(this.history.yearOfEra().name())) {
+        if (n.equals("YEAR_OF_ERA")) {
             return this.history.yearOfEra();
-        } else if (n.equals(this.history.month().name())) {
+        } else if (n.equals("HISTORIC_MONTH")) {
             return this.history.month();
-        } else if (n.equals(this.history.dayOfMonth().name())) {
+        } else if (n.equals("HISTORIC_DAY_OF_YEAR")) {
             return this.history.dayOfMonth();
-        } else if (n.equals(this.history.dayOfYear().name())) {
+        } else if (n.equals("HISTORIC_DAY_OF_YEAR")) {
             return this.history.dayOfYear();
         } else {
             throw new InvalidObjectException("Unknown element: " + n);

@@ -32,11 +32,14 @@ import net.time4j.format.Leniency;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
+import net.time4j.history.YearDefinition;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.StdHistoricalElement;
 
 import java.util.Locale;
 import java.util.Set;
+
+import static net.time4j.history.YearDefinition.DUAL_DATING;
 
 
 /**
@@ -87,9 +90,10 @@ public class HistoricExtension
             int yearOfEra = entity.get(history.yearOfEra());
 
             if (entity.contains(history.month()) && entity.contains(history.dayOfMonth())) {
+                YearDefinition yd = attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING);
                 int month = entity.get(history.month());
                 int dayOfMonth = entity.get(history.dayOfMonth());
-                HistoricDate hd = HistoricDate.of(era, yearOfEra, month, dayOfMonth);
+                HistoricDate hd = HistoricDate.of(era, yearOfEra, month, dayOfMonth, yd, history.getNewYearStrategy());
                 PlainDate date = history.convert(hd);
                 entity.with(history.era(), null);
                 entity.with(history.yearOfEra(), null);

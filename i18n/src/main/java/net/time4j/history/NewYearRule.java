@@ -294,6 +294,17 @@ public enum NewYearRule {
             }
             return yearOfDisplay;
         }
+        @Override
+        int standardYear(
+            boolean earlier,
+            NewYearStrategy strategy,
+            HistoricEra era,
+            int yearOfDisplay,
+            int month,
+            int dom
+        ) {
+            return MARIA_ANUNCIATA.standardYear(earlier, strategy, era, yearOfDisplay + 1, month, dom);
+        }
     },
 
     /**
@@ -389,6 +400,47 @@ public enum NewYearRule {
         }
 
         return yearOfDisplay;
+
+    }
+
+    // apply year-definition
+    int standardYear(
+        boolean earlier,
+        NewYearStrategy strategy,
+        HistoricEra era,
+        int yearOfDisplay,
+        int month,
+        int dom
+    ) {
+
+        if (month >= 5 && (month <= 8)) { // may-aug
+            return yearOfDisplay;
+        }
+
+        HistoricDate currentNY = this.newYear(era, yearOfDisplay);
+        HistoricDate nextNY = strategy.newYear(era, yearOfDisplay + 1);
+        HistoricDate testCurrent = HistoricDate.of(era, yearOfDisplay, month, dom);
+
+        int minYear;
+        int maxYear;
+
+        if (month <= 4) { // jan-apr
+            HistoricDate testNext = HistoricDate.of(era, yearOfDisplay + 1, month, dom);
+            minYear = ((testCurrent.compareTo(currentNY) >= 0) ? yearOfDisplay : yearOfDisplay + 1);
+            maxYear = ((testNext.compareTo(nextNY) >= 0) ? yearOfDisplay : yearOfDisplay + 1);
+        } else { // sep-dec
+            HistoricDate testPrevious = HistoricDate.of(era, yearOfDisplay - 1, month, dom);
+            minYear = ((testPrevious.compareTo(currentNY) >= 0) ? yearOfDisplay - 1 : yearOfDisplay);
+            maxYear = ((testCurrent.compareTo(nextNY) >= 0) ? yearOfDisplay - 1 : yearOfDisplay);
+        }
+
+        if (minYear > maxYear) {
+            throw new IllegalArgumentException(
+                "Invalid date due to changing new year rule (year too short to cover month and day-of-month): "
+                + testCurrent);
+        } else {
+            return (earlier ? minYear : maxYear);
+        }
 
     }
 

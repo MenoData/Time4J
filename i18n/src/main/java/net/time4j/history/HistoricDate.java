@@ -82,11 +82,8 @@ public final class HistoricDate
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Constructs a new tuple of given historic chronological components. </p>
-     *
-     * <p>Note: A detailed validation is not done. Such a validation is the responsibility
-     * of any {@code ChronoHistory}, however. The converted AD-year must not be beyond the
-     * defined range of the class {@code PlainDate}. </p>
+     * <p>Equivalent to {@code HistoricDate.of(era, yearOfEra, month, dom,
+     * YearDefinition.DUAL_DATING, NewYearRule.BEGIN_OF_JANUARY.until(Integer.MAX_VALUE))}. </p>
      *
      * @param   era         historic era
      * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
@@ -100,11 +97,8 @@ public final class HistoricDate
      * @see     GregorianMath#MAX_YEAR
      */
     /*[deutsch]
-     * <p>Konstruiert ein neues Tupel aus den angegebenen historischen Zeitkomponenten. </p>
-     *
-     * <p>Hinweis: Eine detaillierte Validierung wird nicht gemacht. Das ist stattdessen Aufgabe
-     * der {@code ChronoHistory}. Das umgerechnete AD-Jahr darf nicht au&szlig;erhalb des
-     * Definitionsbereichs der Klasse {@code PlainDate} liegen. </p>
+     * <p>&Auml;quivalent zu {@code HistoricDate.of(era, yearOfEra, month, dom,
+     * YearDefinition.DUAL_DATING, NewYearRule.BEGIN_OF_JANUARY.until(Integer.MAX_VALUE))}. </p>
      *
      * @param   era         historic era
      * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
@@ -124,6 +118,59 @@ public final class HistoricDate
         int dom
     ) {
 
+        return HistoricDate.of(era, yearOfEra, month, dom, YearDefinition.DUAL_DATING, NewYearStrategy.DEFAULT);
+
+    }
+
+    /**
+     * <p>Constructs a new tuple of given historic chronological components. </p>
+     *
+     * <p>Note: A detailed validation is not done. Such a validation is the responsibility
+     * of any {@code ChronoHistory}, however. The converted AD-year must not be beyond the
+     * defined range of the class {@code PlainDate}. </p>
+     *
+     * @param   era             historic era
+     * @param   yearOfEra       year of related era ({@code >= 1}) starting on January the first
+     * @param   month           historic month (1-12)
+     * @param   dom             historic day of month (1-31)
+     * @param   yearDefinition  defines a strategy how to interprete year of era
+     * @param   newYearStrategy strategy how to determine New Year
+     * @return  new historic date (not yet validated)
+     * @throws  IllegalArgumentException if any argument is out of required maximum range or inconsistent
+     * @since   3.18/4.14
+     * @see     ChronoHistory#isValid(HistoricDate)
+     * @see     GregorianMath#MIN_YEAR
+     * @see     GregorianMath#MAX_YEAR
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein neues Tupel aus den angegebenen historischen Zeitkomponenten. </p>
+     *
+     * <p>Hinweis: Eine detaillierte Validierung wird nicht gemacht. Das ist stattdessen Aufgabe
+     * der {@code ChronoHistory}. Das umgerechnete AD-Jahr darf nicht au&szlig;erhalb des
+     * Definitionsbereichs der Klasse {@code PlainDate} liegen. </p>
+     *
+     * @param   era             historic era
+     * @param   yearOfEra       year of related era ({@code >= 1}) starting on January the first
+     * @param   month           historic month (1-12)
+     * @param   dom             historic day of month (1-31)
+     * @param   yearDefinition  defines a strategy how to interprete year of era
+     * @param   newYearStrategy strategy how to determine New Year
+     * @return  new historic date (not yet validated)
+     * @throws  IllegalArgumentException if any argument is out of required maximum range or inconsistent
+     * @since   3.18/4.14
+     * @see     ChronoHistory#isValid(HistoricDate)
+     * @see     GregorianMath#MIN_YEAR
+     * @see     GregorianMath#MAX_YEAR
+     */
+    public static HistoricDate of(
+        HistoricEra era,
+        int yearOfEra,
+        int month,
+        int dom,
+        YearDefinition yearDefinition,
+        NewYearStrategy newYearStrategy
+    ) {
+
         if (era == null) {
             throw new NullPointerException("Missing historic era.");
         } else if (
@@ -141,6 +188,14 @@ public final class HistoricDate
         } else if (yearOfEra < 1) {
             throw new IllegalArgumentException(
                 "Year of era must be positive: " + toString(era, yearOfEra, month, dom));
+        }
+
+        if (!yearDefinition.equals(YearDefinition.DUAL_DATING)) {
+            // here we interprete yearOfEra as yearOfDisplay and have to translate it to standard calendar year
+            NewYearRule rule = newYearStrategy.rule(era, yearOfEra);
+            yearOfEra =
+                rule.standardYear(
+                    (yearDefinition == YearDefinition.AFTER_NEW_YEAR), newYearStrategy, era, yearOfEra, month, dom);
         }
 
         return new HistoricDate(era, yearOfEra, month, dom);

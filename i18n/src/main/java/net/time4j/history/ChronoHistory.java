@@ -24,9 +24,11 @@ package net.time4j.history;
 import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.engine.AttributeKey;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
+import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
 import net.time4j.history.internal.HistoricVariant;
 
@@ -60,6 +62,20 @@ public final class ChronoHistory
     implements VariantSource, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * Format attribute controlling the type of historic year used in parsing or formatting.
+     *
+     * @since   3.18/4.14
+     */
+    /*[deutsch]
+     * Formatattribut, das den Typ des beim Formatieren oder Interpretieren zu verwendenden historischen
+     * Jahres festlegt.
+     *
+     * @since   3.18/4.14
+     */
+    public static final AttributeKey<YearDefinition> YEAR_DEFINITION =
+        Attributes.createKey("YEAR_DEFINITION", YearDefinition.class);
 
     /**
      * <p>Describes no real historic event but just the proleptic gregorian calendar which is assumed
@@ -310,7 +326,6 @@ public final class ChronoHistory
         this.eraElement = new HistoricEraElement(this);
 
         this.yearOfEraElement = new HistoricIntegerElement(
-            "YEAR_OF_ERA",
             'y',
             1,
             GregorianMath.MAX_YEAR,
@@ -318,7 +333,6 @@ public final class ChronoHistory
             HistoricIntegerElement.YEAR_OF_ERA_INDEX
         );
         this.monthElement = new HistoricIntegerElement(
-            "HISTORIC_MONTH",
             'M',
             1,
             12,
@@ -326,7 +340,6 @@ public final class ChronoHistory
             HistoricIntegerElement.MONTH_INDEX
         );
         this.dayOfMonthElement = new HistoricIntegerElement(
-            "HISTORIC_DAY_OF_MONTH",
             'd',
             1,
             31,
@@ -334,7 +347,6 @@ public final class ChronoHistory
             HistoricIntegerElement.DAY_OF_MONTH_INDEX
         );
         this.dayOfYearElement = new HistoricIntegerElement(
-            "HISTORIC_DAY_OF_YEAR",
             'D',
             1,
             365,
@@ -342,14 +354,14 @@ public final class ChronoHistory
             HistoricIntegerElement.DAY_OF_YEAR_INDEX
         );
 
-        Set<ChronoElement<?>> tmp = new HashSet<ChronoElement<?>>();
-        tmp.add(this.dateElement);
-        tmp.add(this.eraElement);
-        tmp.add(this.yearOfEraElement);
-        tmp.add(this.monthElement);
-        tmp.add(this.dayOfMonthElement);
-        tmp.add(this.dayOfYearElement);
-        this.elements = Collections.unmodifiableSet(tmp);
+        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+        set.add(this.dateElement);
+        set.add(this.eraElement);
+        set.add(this.yearOfEraElement);
+        set.add(this.monthElement);
+        set.add(this.dayOfMonthElement);
+        set.add(this.dayOfYearElement);
+        this.elements = Collections.unmodifiableSet(set);
 
     }
 
@@ -458,12 +470,12 @@ public final class ChronoHistory
      * </tr>
      * <tr>
      *  <td>Spain</td><td>ES</td><td>1582-10-15</td>
-     *  <td>BEGIN_OF_JANUARY.until(1383)<br />.and(CHRISTMAS_STYLE.until(1556))</td>
+     *  <td>BEGIN_OF_JANUARY.until(1383)<br>.and(CHRISTMAS_STYLE.until(1556))</td>
      *  <td>HISPANIC (until 1383)</td>
      * </tr>
      * <tr>
      *  <td>Portugal</td><td>PT</td><td>1582-10-15</td>
-     *  <td>BEGIN_OF_JANUARY.until(1422)<br />.and(CHRISTMAS_STYLE.until(1556))</td>
+     *  <td>BEGIN_OF_JANUARY.until(1422)<br>.and(CHRISTMAS_STYLE.until(1556))</td>
      *  <td>HISPANIC (until 1422)</td>
      * </tr>
      * <tr>
@@ -504,18 +516,18 @@ public final class ChronoHistory
      * </tr>
      * <tr>
      *  <td>England</td><td>GB</td><td>1752-09-14</td>
-     *  <td>CHRISTMAS_STYLE.until(1087)<br />.and(BEGIN_OF_JANUARY.until(1155))<br />.and(MARIA_ANUNCIATA.until(1752))</td><td></td>
+     *  <td>CHRISTMAS_STYLE.until(1087)<br>.and(BEGIN_OF_JANUARY.until(1155))<br>.and(MARIA_ANUNCIATA.until(1752))</td><td></td>
      * </tr>
      * <tr>
      *  <td>Scotland</td><td>GB-SCT</td><td>1752-09-14</td>
-     *  <td>CHRISTMAS_STYLE.until(1087)<br />.and(BEGIN_OF_JANUARY.until(1155))<br />.and(MARIA_ANUNCIATA.until(1600))</td><td></td>
+     *  <td>CHRISTMAS_STYLE.until(1087)<br>.and(BEGIN_OF_JANUARY.until(1155))<br>.and(MARIA_ANUNCIATA.until(1600))</td><td></td>
      * </tr>
      * <tr>
      *  <td>Sweden <sup>2)</sup></td><td>SE</td><td>1753-03-01</td><td></td><td></td>
      * </tr>
      * <tr>
      *  <td>Russia <sup>3)</sup></td><td>RU</td><td>1918-02-14</td>
-     *  <td>BEGIN_OF_JANUARY.until(988)<br />.and(BEGIN_OF_MARCH.until(1493))<br />.and(BEGIN_OF_SEPTEMBER.until(1700))</td>
+     *  <td>BEGIN_OF_JANUARY.until(988)<br>.and(BEGIN_OF_MARCH.until(1493))<br>.and(BEGIN_OF_SEPTEMBER.until(1700))</td>
      *  <td>BYZANTINE (988-1700)</td>
      * </tr>
      * </table>
@@ -568,12 +580,12 @@ public final class ChronoHistory
      * </tr>
      * <tr>
      *  <td>Spanien</td><td>ES</td><td>1582-10-15</td>
-     *  <td>BEGIN_OF_JANUARY.until(1383)<br />.and(CHRISTMAS_STYLE.until(1556))</td>
+     *  <td>BEGIN_OF_JANUARY.until(1383)<br>.and(CHRISTMAS_STYLE.until(1556))</td>
      *  <td>HISPANIC (until 1383)</td>
      * </tr>
      * <tr>
      *  <td>Portugal</td><td>PT</td><td>1582-10-15</td>
-     *  <td>BEGIN_OF_JANUARY.until(1422)<br />.and(CHRISTMAS_STYLE.until(1556))</td>
+     *  <td>BEGIN_OF_JANUARY.until(1422)<br>.and(CHRISTMAS_STYLE.until(1556))</td>
      *  <td>HISPANIC (until 1422)</td>
      * </tr>
      * <tr>
@@ -614,18 +626,18 @@ public final class ChronoHistory
      * </tr>
      * <tr>
      *  <td>England</td><td>GB</td><td>1752-09-14</td>
-     *  <td>CHRISTMAS_STYLE.until(1087)<br />.and(BEGIN_OF_JANUARY.until(1155))<br />.and(MARIA_ANUNCIATA.until(1752))</td><td></td>
+     *  <td>CHRISTMAS_STYLE.until(1087)<br>.and(BEGIN_OF_JANUARY.until(1155))<br>.and(MARIA_ANUNCIATA.until(1752))</td><td></td>
      * </tr>
      * <tr>
      *  <td>Schottland</td><td>GB-SCT</td><td>1752-09-14</td>
-     *  <td>CHRISTMAS_STYLE.until(1087)<br />.and(BEGIN_OF_JANUARY.until(1155))<br />.and(MARIA_ANUNCIATA.until(1600))</td><td></td>
+     *  <td>CHRISTMAS_STYLE.until(1087)<br>.and(BEGIN_OF_JANUARY.until(1155))<br>.and(MARIA_ANUNCIATA.until(1600))</td><td></td>
      * </tr>
      * <tr>
      *  <td>Schweden <sup>2)</sup></td><td>SE</td><td>1753-03-01</td><td></td><td></td>
      * </tr>
      * <tr>
      *  <td>Ru&szlig;land <sup>3)</sup></td><td>RU</td><td>1918-02-14</td>
-     *  <td>BEGIN_OF_JANUARY.until(988)<br />.and(BEGIN_OF_MARCH.until(1493))<br />.and(BEGIN_OF_SEPTEMBER.until(1700))</td>
+     *  <td>BEGIN_OF_JANUARY.until(988)<br>.and(BEGIN_OF_MARCH.until(1493))<br>.and(BEGIN_OF_SEPTEMBER.until(1700))</td>
      *  <td>BYZANTINE (988-1700)</td>
      * </tr>
      * </table>
@@ -1267,7 +1279,9 @@ public final class ChronoHistory
      * <p>Defines the element for the year of a given historic era. </p>
      *
      * <p>This element is applicable on all chronological types which have registered the element
-     * {@link PlainDate#COMPONENT}. The year starts on first of January. </p>
+     * {@link PlainDate#COMPONENT}. The year starts on first of January. Note: Getting true historic
+     * years which take care of different new-year-rules is possible via the expression
+     * {@code plainDate.get(history.date()).getYearOfEra(history.getNewYearStrategy())}. </p>
      *
      * @return  year-of-era-related element
      * @since   3.0
@@ -1277,8 +1291,10 @@ public final class ChronoHistory
     /*[deutsch]
      * <p>Definiert das Element f&uuml;r das Jahr einer historischen &Auml;ra. </p>
      *
-     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element
-     * {@link PlainDate#COMPONENT} registriert haben. Das Jahr beginnt am ersten Januar. </p>
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element {@link PlainDate#COMPONENT}
+     * registriert haben. Das Jahr beginnt am ersten Januar. Hinweis: Um wahre historische Jahre zu erhalten, die
+     * sich um verschiedene Neujahrsregeln k&uuml;mmern, kann folgender Ausdruck verwendet werden:
+     * {@code plainDate.get(history.date()).getYearOfEra(history.getNewYearStrategy())}. </p>
      *
      * @return  year-of-era-related element
      * @since   3.0
