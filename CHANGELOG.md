@@ -1,5 +1,6 @@
 ## [v3.18] not yet released
 ### Added
+- Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
 
 ## [v3.17] published on 2016-03-13
