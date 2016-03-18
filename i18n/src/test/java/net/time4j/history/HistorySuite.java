@@ -17,7 +17,8 @@ import org.junit.runners.Suite.SuiteClasses;
         NewYearTest.class,
         RangeTest.class,
         ScaligerTest.class,
-        SerializationTest.class
+        SerializationTest.class,
+        YearDefinitionTest.class
     }
 )
 public class HistorySuite {
