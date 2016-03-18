@@ -1,5 +1,6 @@
 ## [v4.14] not yet released
 ### Added
+- Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
 - More detailed error message when parsing ZonalDateTime [#467]
 
