@@ -1,5 +1,6 @@
 ## [v4.14] not yet released
 ### Added
+- Historic year definition (example Easter style in France) [#473]
 - More detailed error message when parsing ZonalDateTime [#467]
 
 ### Fixed
