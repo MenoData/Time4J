@@ -1,5 +1,6 @@
 ## [v3.18] not yet released
 ### Added
+- Move SQL-support to core-module [#471]
 - Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
 
