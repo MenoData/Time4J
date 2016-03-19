@@ -1,5 +1,6 @@
 ## [v4.14] not yet released
 ### Added
+- Add ChronoFormatter.withDefaultSupplier(...) [#470]
 - Move SQL-support to core-module [#471]
 - Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
