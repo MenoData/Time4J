@@ -7,6 +7,8 @@ import net.time4j.PlainTime;
 import java.text.ParseException;
 import java.util.Locale;
 
+import net.time4j.PlainTimestamp;
+import net.time4j.SystemClock;
 import net.time4j.format.Attributes;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,15 @@ public class DefaultValueTest {
                 .withDefault(PlainDate.YEAR, 2012);
         PlainDate date = fmt.parse("05-21");
         assertThat(date, is(PlainDate.of(2012, 5, 21)));
+    }
+
+    @Test
+    public void missingToday() throws ParseException {
+        ChronoFormatter<PlainTimestamp> fmt =
+            ChronoFormatter.ofTimestampPattern("HH:mm", PatternType.CLDR, Locale.ROOT)
+                .withDefaultSupplier(PlainDate.COMPONENT, () -> SystemClock.inLocalView().today());
+        PlainTimestamp tsp = fmt.parse("14:45");
+        assertThat(tsp, is(SystemClock.inLocalView().today().atTime(14, 45)));
     }
 
     @Test(expected=IllegalArgumentException.class)

@@ -91,6 +91,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
 
@@ -1080,7 +1081,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         // Phase 2: Anreicherung mit Default-Werten
         for (ChronoElement<?> e : this.defaults.keySet()) {
             if (!parsed.contains(e)) {
-                parsed.put(e, this.defaults.get(e));
+                parsed.put(e, this.getDefaultValue(e));
             }
         }
 
@@ -1489,8 +1490,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
-     *               .withDefault(PlainDate.YEAR, 2012);
+     *      PlainDate.localFormatter(&quot;MM-dd&quot;, PatternType.CLDR)
+     *          .withDefault(PlainDate.YEAR, 2012);
      *  PlainDate date = fmt.parse("05-21");
      *  System.out.println(date); // 2012-05-21
      * </pre>
@@ -1519,8 +1520,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
-     *               .withDefault(PlainDate.YEAR, 2012);
+     *      PlainDate.localFormatter(&quot;MM-dd&quot;, PatternType.CLDR)
+     *          .withDefault(PlainDate.YEAR, 2012);
      *  PlainDate date = fmt.parse("05-21");
      *  System.out.println(date); // 2012-05-21
      * </pre>
@@ -1547,6 +1548,76 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
 
         return new ChronoFormatter<>(this, element, value);
+
+    }
+
+    /**
+     * <p>Determines a supplier for a default replacement value of given element. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;PlainTimestamp&gt; fmt =
+     *      ChronoFormatter.ofTimestampPattern(&quot;HH:mm&quot;, PatternType.CLDR, Locale.ROOT)
+     *          .withDefaultSupplier(PlainDate.COMPONENT, () -&gt; SystemClock.inLocalView().today());
+     *  PlainTimestamp tsp = fmt.parse("14:45");
+     *  System.out.println(tsp); // 2012-05-21T14:45 (example for parsed time on today)
+     * </pre>
+     *
+     * <p>Default replacement values will be considered by Time4J if either
+     * the formatter does not contain the element in question at all or if
+     * there are no consumable characters for given element. Latter
+     * situation might sometimes require the use of sectional attribute
+     * {@code PROTECTED_CHARACTERS} in order to simulate an end-of-text
+     * situation. </p>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   supplier    supplier for replacement value or {@code null}
+     *                      if the default value shall be deregistered
+     * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if given element is not supported
+     *          by the underlying chronology
+     * @see     Attributes#PROTECTED_CHARACTERS
+     * @since   4.14
+     */
+    /*[deutsch]
+     * <p>Legt einen Lieferanten f&uuml;r einen Standard-Ersatzwert des angegebenen Elements
+     * fest, wenn die Interpretation sonst nicht funktioniert. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;PlainTimestamp&gt; fmt =
+     *      ChronoFormatter.ofTimestampPattern(&quot;HH:mm&quot;, PatternType.CLDR, Locale.ROOT)
+     *          .withDefaultSupplier(PlainDate.COMPONENT, () -&gt; SystemClock.inLocalView().today());
+     *  PlainTimestamp tsp = fmt.parse("14:45");
+     *  System.out.println(tsp); // 2012-05-21T14:45 (example for parsed time on today)
+     * </pre>
+     *
+     * <p>Standard-Ersatzwerte werden von Time4J herangezogen, wenn entweder
+     * der Formatierer das fragliche Element nicht enth&auml;lt oder wenn es
+     * keine konsumierbaren Zeichen f&uuml;r das angegebene Element gibt.
+     * Die letzte Situation erfordert manchmal die Verwendung des sektionalen
+     * Attributs {@code PROTECTED_CHARACTERS}, um eine Situation zu simulieren,
+     * in der der Formatierer quasi am Ende eines Texts angekommen ist. </p>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   supplier    supplier for replacement value or {@code null}
+     *                      if the default value shall be deregistered
+     * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if given element is not supported
+     *          by the underlying chronology
+     * @see     Attributes#PROTECTED_CHARACTERS
+     * @since   4.14
+     */
+    public <V> ChronoFormatter<T> withDefaultSupplier(
+        ChronoElement<V> element,
+        Supplier<V> supplier
+    ) {
+
+        return new ChronoFormatter<>(this, element, supplier);
 
     }
 
@@ -2546,7 +2617,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (!cf.defaults.isEmpty()) {
             for (ChronoElement<?> e : cf.defaults.keySet()) {
                 if (!parsed.contains(e)) {
-                    parsed.put(e, cf.defaults.get(e));
+                    parsed.put(e, cf.getDefaultValue(e));
                 }
             }
         }
@@ -2806,7 +2877,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (status.isWarning()) {
                 ChronoElement<?> element = step.getProcessor().getElement();
                 if ((element != null) && this.defaults.containsKey(element)) {
-                    parsedResult.put(element, this.defaults.get(element));
+                    parsedResult.put(element, this.getDefaultValue(element));
                     parsedResult.with(ValidationElement.ERROR_MESSAGE, null);
                     status.clearError();
                     status.clearWarning();
@@ -2922,6 +2993,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         sb.append("}]");
         return sb.toString();
+
+    }
+
+    private Object getDefaultValue(ChronoElement<?> element) {
+
+        Object obj = this.defaults.get(element);
+
+        if (obj instanceof Supplier) {
+            obj = Supplier.class.cast(obj).get();
+        }
+
+        return obj;
 
     }
 
