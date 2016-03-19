@@ -5,6 +5,7 @@
 - Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
 - More detailed error message when parsing ZonalDateTime [#467]
+- Support for Kirghiz [#474]
 
 ### Fixed
 - Make resolving zone names more robust [#469]
