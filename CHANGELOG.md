@@ -3,6 +3,7 @@
 - Move SQL-support to core-module [#471]
 - Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
 - Historic year definition (example Easter style in France) [#473]
+- Support for Kirghiz [#474]
 
 ## [v3.17] published on 2016-03-13
 ### Added
