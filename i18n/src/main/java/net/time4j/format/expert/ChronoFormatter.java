@@ -4064,6 +4064,81 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Skips all characters from input as unparseable until at least given count of characters is left. </p>
+         *
+         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         *
+         * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code keepRemainingChars < 0}
+         * @see     #skipUnknown(ChronoCondition, int)
+         * @see     Attributes#TRAILING_CHARACTERS
+         * @since   3.18/4.14
+         */
+        /*[deutsch]
+         * <p>Ignoriert alle Zeichen als nicht-interpretierbar, bis wenigstens die angegebene Anzahl von Zeichen
+         * &uuml;brigbleibt. </p>
+         *
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         *
+         * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code keepRemainingChars < 0}
+         * @see     #skipUnknown(ChronoCondition, int)
+         * @see     Attributes#TRAILING_CHARACTERS
+         * @since   3.18/4.14
+         */
+        public Builder<T> skipUnknown(int keepRemainingChars) {
+
+            this.addProcessor(new SkipProcessor(keepRemainingChars));
+            return this;
+
+        }
+
+        /**
+         * <p>Skips all characters accepted by given condition as unparseable. </p>
+         *
+         * <p>Starting with v4.14, the first argument will be replaced by a {@code java.util.function.IntPredicate}
+         * in order to enable easier lambda expressions. If the condition always returns {@code true} then
+         * {@code maxIterations} effectively models a fixed width of characters to be skipped. </p>
+         *
+         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         *
+         * @param   unparseableCondition    condition which marks accepted characters as unparseable
+         * @param   maxIterations           maximum count of invocations on given condition
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code maxIterations < 1}
+         * @see     #skipUnknown(int)
+         * @since   3.18
+         */
+        /*[deutsch]
+         * <p>Ignoriert alle Zeichen als nicht-interpretierbar, die von der angegebenen Bedingung akzeptiert
+         * werden. </p>
+         *
+         * <p>Beginnend mit v4.14 wird das erste Argument durch ein {@code java.util.function.IntPredicate}
+         * ersetzt, um einfachere Lambda-Ausdr&uuml;cke zu erm&ouml;glichen. Wenn die Bedingung immer {@code true}
+         * liefert, dann stellt {@code maxIterations} effektiv eine feste Breite von zu entfernenden Zeichen dar. </p>
+         *
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         *
+         * @param   unparseableCondition    condition which marks accepted characters as unparseable
+         * @param   maxIterations           maximum count of invocations on given condition
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code maxIterations < 1}
+         * @see     #skipUnknown(int)
+         * @since   3.18
+         */
+        public Builder<T> skipUnknown(
+            ChronoCondition<Character> unparseableCondition,
+            int maxIterations
+        ) {
+
+            this.addProcessor(new SkipProcessor(unparseableCondition, maxIterations));
+            return this;
+
+        }
+
+        /**
          * <p>Processes given format pattern of given pattern type to a
          * sequence of format elements. </p>
          *
