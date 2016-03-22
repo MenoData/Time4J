@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OrFormatTest.class,
         OrdinalTest.class,
         ParsingTextOverflowTest.class,
+        SkipUnknownTest.class,
         WhitespaceTest.class
     }
 )

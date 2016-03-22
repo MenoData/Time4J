@@ -91,6 +91,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
@@ -4226,6 +4227,81 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         public Builder<T> addIgnorableWhitespace() {
 
             this.addProcessor(IgnorableWhitespaceProcessor.SINGLETON);
+            return this;
+
+        }
+
+        /**
+         * <p>Skips all characters from input as unparseable until at least given count of characters is left. </p>
+         *
+         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         *
+         * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code keepRemainingChars < 0}
+         * @see     #skipUnknown(IntPredicate, int)
+         * @see     Attributes#TRAILING_CHARACTERS
+         * @since   3.18/4.14
+         */
+        /*[deutsch]
+         * <p>Ignoriert alle Zeichen als nicht-interpretierbar, bis wenigstens die angegebene Anzahl von Zeichen
+         * &uuml;brigbleibt. </p>
+         *
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         *
+         * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code keepRemainingChars < 0}
+         * @see     #skipUnknown(IntPredicate, int)
+         * @see     Attributes#TRAILING_CHARACTERS
+         * @since   3.18/4.14
+         */
+        public Builder<T> skipUnknown(int keepRemainingChars) {
+
+            this.addProcessor(new SkipProcessor(keepRemainingChars));
+            return this;
+
+        }
+
+        /**
+         * <p>Skips all characters accepted by given condition as unparseable. </p>
+         *
+         * <p>Every input character will be handled by given condition as code point. If the condition
+         * always returns {@code true} then {@code maxIterations} effectively models a fixed width of
+         * characters to be skipped. </p>
+         *
+         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         *
+         * @param   unparseableCondition    condition which marks accepted characters as unparseable
+         * @param   maxIterations           maximum count of invocations on given condition
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code maxIterations < 1}
+         * @see     #skipUnknown(int)
+         * @since   4.14
+         */
+        /*[deutsch]
+         * <p>Ignoriert alle Zeichen als nicht-interpretierbar, die von der angegebenen Bedingung akzeptiert
+         * werden. </p>
+         *
+         * <p>Jedes Eingabezeichen wird von der angegebenen Bedingung als Code-Punkt (int) behandelt. Wenn
+         * die Bedingung immer {@code true} liefert, dann stellt {@code maxIterations} effektiv eine feste
+         * Breite von zu entfernenden Zeichen dar. </p>
+         *
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         *
+         * @param   unparseableCondition    condition which marks accepted characters as unparseable
+         * @param   maxIterations           maximum count of invocations on given condition
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if {@code maxIterations < 1}
+         * @see     #skipUnknown(int)
+         * @since   4.14
+         */
+        public Builder<T> skipUnknown(
+            IntPredicate unparseableCondition,
+            int maxIterations
+        ) {
+
+            this.addProcessor(new SkipProcessor(unparseableCondition, maxIterations));
             return this;
 
         }
