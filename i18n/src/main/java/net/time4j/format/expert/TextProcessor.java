@@ -21,6 +21,8 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.Month;
+import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -188,6 +190,8 @@ final class TextProcessor<V>
             }
         } else if (value == null) {
             status.setError(start, "No interpretable value.");
+        } else if (this.element == PlainDate.MONTH_OF_YEAR) { // prevents autoboxing and extra array allocation
+            parsedResult.put(PlainDate.MONTH_AS_NUMBER, Month.class.cast(value).getValue());
         } else {
             parsedResult.put(this.element, value);
         }
