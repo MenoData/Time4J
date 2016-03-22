@@ -1,5 +1,6 @@
 ## [v4.14] not yet released
 ### Added
+- Enable unparseable characters to be skipped when parsing [#476]
 - Add ChronoFormatter.withDefaultSupplier(...) [#470]
 - Move SQL-support to core-module [#471]
 - Add SQL-support for type TIMESTAMP WITH TIMEZONE [#472]
