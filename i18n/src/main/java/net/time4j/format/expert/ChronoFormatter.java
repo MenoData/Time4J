@@ -4278,6 +4278,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if {@code maxIterations < 1}
          * @see     #skipUnknown(int)
          * @since   4.14
+         * @doctags.spec The first condition argument must be immutable or stateless (for example a lambda expression).
          */
         /*[deutsch]
          * <p>Ignoriert alle Zeichen als nicht-interpretierbar, die von der angegebenen Bedingung akzeptiert
@@ -4295,6 +4296,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if {@code maxIterations < 1}
          * @see     #skipUnknown(int)
          * @since   4.14
+         * @doctags.spec The first condition argument must be immutable or stateless (for example a lambda expression).
          */
         public Builder<T> skipUnknown(
             IntPredicate unparseableCondition,
