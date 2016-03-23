@@ -1,4 +1,6 @@
-## [v3.18] not yet released
+## [v3.19] not yet released
+
+## [v3.18] published on 2016-03-23
 ### Added
 - Enable unparseable characters to be skipped when parsing [#476]
 - Move SQL-support to core-module [#471]
