@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralRules.java) is part of project Time4J.
  *
@@ -80,23 +80,6 @@ public abstract class PluralRules {
     private static final PluralRules FALLBACK_ORDINAL_OTHER =
         new FallbackRules(NumberType.ORDINALS, false);
 
-    private static final PluralProvider PROVIDER;
-
-    static {
-        PluralProvider p = null;
-
-        for (PluralProvider tmp : ResourceLoader.getInstance().services(PluralProvider.class)) {
-            p = tmp;
-            break;
-        }
-
-        if (p == null) {
-            p = new FallbackProvider();
-        }
-
-        PROVIDER = p;
-    }
-
     private static final Map<String, PluralRules> CARDINAL_MAP =
         new ConcurrentHashMap<String, PluralRules>();
     private static final Map<String, PluralRules> ORDINAL_MAP =
@@ -149,7 +132,7 @@ public abstract class PluralRules {
         }
 
         if (rules == null) {
-            rules = PROVIDER.load(locale, numType);
+            rules = Holder.PROVIDER.load(locale, numType);
         }
 
         return rules;
@@ -330,6 +313,29 @@ public abstract class PluralRules {
                     throw new UnsupportedOperationException(numType.name());
             }
 
+        }
+
+    }
+
+    private static class Holder { // lazy class loading
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final PluralProvider PROVIDER;
+
+        static {
+            PluralProvider p = null;
+
+            for (PluralProvider tmp : ResourceLoader.getInstance().services(PluralProvider.class)) {
+                p = tmp;
+                break;
+            }
+
+            if (p == null) {
+                p = new FallbackProvider();
+            }
+
+            PROVIDER = p;
         }
 
     }
