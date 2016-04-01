@@ -1,4 +1,7 @@
 ## [v4.15] not yet released
+### Added
+- Fine-tuning of historization [#479]
+- Clarify that PlainDate is historizable [#448]
 
 ## [v4.14] published on 2016-03-23
 ### Added
