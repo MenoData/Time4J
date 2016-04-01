@@ -218,7 +218,7 @@ public enum HistoricEra
      * @param   yearOfEra   historic year reckoned in this era
      * @return  year related to era AD
      * @throws  IllegalArgumentException if given year of era is out of range
-     * @since   3.14/4.11
+     * @since   3.19/4.15
      */
     /*[deutsch]
      * <p>Skaliert das angegebene Jahr der &Auml;ra zu seinem mathematischen AD-Wert. </p>
@@ -226,9 +226,9 @@ public enum HistoricEra
      * @param   yearOfEra   historic year reckoned in this era
      * @return  year related to era AD
      * @throws  IllegalArgumentException if given year of era is out of range
-     * @since   3.14/4.11
+     * @since   3.19/4.15
      */
-    int annoDomini(int yearOfEra) {
+    public int annoDomini(int yearOfEra) {
 
         try {
             switch (this) {

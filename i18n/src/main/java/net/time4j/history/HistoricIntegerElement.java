@@ -70,6 +70,8 @@ final class HistoricIntegerElement
     static final int MONTH_INDEX = 3;
     static final int DAY_OF_MONTH_INDEX = 4;
     static final int DAY_OF_YEAR_INDEX = 5;
+    static final int YEAR_AFTER_INDEX = 6;
+    static final int YEAR_BEFORE_INDEX = 7;
 
     private static final long serialVersionUID = -6283098762945747308L;
 
@@ -184,6 +186,8 @@ final class HistoricIntegerElement
             case DAY_OF_MONTH_INDEX:
                 buffer.append(String.valueOf(date.getDayOfMonth()));
                 break;
+            default:
+                throw new ChronoException("Not printable as text: " + this.name());
         }
 
     }
@@ -222,6 +226,8 @@ final class HistoricIntegerElement
             } else {
                 return Integer.valueOf(month.getValue());
             }
+        } else if ((this.index == YEAR_AFTER_INDEX) || (this.index == YEAR_BEFORE_INDEX)) {
+            throw new ChronoException("Not parseable as text element: " + this.name());
         }
 
         NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
@@ -477,6 +483,10 @@ final class HistoricIntegerElement
                 return "HISTORIC_DAY_OF_MONTH";
             case DAY_OF_YEAR_INDEX:
                 return "HISTORIC_DAY_OF_YEAR";
+            case YEAR_AFTER_INDEX:
+                return "YEAR_AFTER";
+            case YEAR_BEFORE_INDEX:
+                return "YEAR_BEFORE";
             default:
                 throw new UnsupportedOperationException("Unknown element index: " + index);
         }
@@ -496,6 +506,10 @@ final class HistoricIntegerElement
                 return this.history.dayOfMonth();
             case "HISTORIC_DAY_OF_YEAR":
                 return this.history.dayOfYear();
+            case "YEAR_AFTER":
+                return this.history.yearOfEra(YearDefinition.AFTER_NEW_YEAR);
+            case "YEAR_BEFORE":
+                return this.history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR);
             default:
                 throw new InvalidObjectException("Unknown element: " + n);
         }
@@ -546,6 +560,9 @@ final class HistoricIntegerElement
                         int yoe = date.getYearOfEra(this.history.getNewYearStrategy());
                         HistoricDate newYear = this.history.getBeginOfYear(date.getEra(), yoe);
                         return (int) (utc - this.history.convert(newYear).getDaysSinceEpochUTC() + 1);
+                    case YEAR_AFTER_INDEX:
+                    case YEAR_BEFORE_INDEX:
+                        return date.getYearOfEra(this.history.getNewYearStrategy());
                     default:
                         throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
@@ -561,11 +578,15 @@ final class HistoricIntegerElement
             try {
                 HistoricDate current = this.history.convert(context.get(PlainDate.COMPONENT));
 
-                if (this.index == YEAR_OF_ERA_INDEX) {
-                    if (current.getEra().compareTo(HistoricEra.AD) <= 0) {
-                        return Integer.valueOf(1);
+                if (
+                    (this.index == YEAR_OF_ERA_INDEX)
+                    || (this.index == YEAR_AFTER_INDEX)
+                    || (this.index == YEAR_BEFORE_INDEX)
+                ) {
+                    if ((current.getEra() == HistoricEra.BYZANTINE) && (current.getMonth() >= 9)) {
+                        return Integer.valueOf(0);
                     } else {
-                       return this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
+                        return Integer.valueOf(1);
                     }
                 }
 
@@ -607,6 +628,8 @@ final class HistoricIntegerElement
 
                 switch (this.index) {
                     case YEAR_OF_ERA_INDEX:
+                    case YEAR_AFTER_INDEX:
+                    case YEAR_BEFORE_INDEX:
                         if (current.getEra() == HistoricEra.BC) {
                             max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
                         } else {
@@ -708,11 +731,21 @@ final class HistoricIntegerElement
         ) {
 
             HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
+            YearDefinition yd = YearDefinition.DUAL_DATING;
+            NewYearStrategy nys = this.history.getNewYearStrategy();
+
             HistoricDate result;
 
             switch (this.index) {
+                case YEAR_AFTER_INDEX:
+                case YEAR_BEFORE_INDEX:
+                    yd = (
+                        (this.index == YEAR_AFTER_INDEX)
+                            ? YearDefinition.AFTER_NEW_YEAR
+                            : YearDefinition.BEFORE_NEW_YEAR);
+                    // fall-through
                 case YEAR_OF_ERA_INDEX:
-                    result = HistoricDate.of(hd.getEra(), value, hd.getMonth(), hd.getDayOfMonth());
+                    result = HistoricDate.of(hd.getEra(), value, hd.getMonth(), hd.getDayOfMonth(), yd, nys);
                     result = this.history.adjustDayOfMonth(result);
                     break;
                 case MONTH_INDEX:

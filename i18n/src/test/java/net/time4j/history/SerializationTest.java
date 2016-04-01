@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -65,6 +66,13 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         roundtrip(ChronoHistory.ofSweden());
+    }
+
+    @Test
+    public void roundTripElements() throws IOException, ClassNotFoundException {
+        for (Object obj : ChronoHistory.of(Locale.FRANCE).getElements()) {
+            roundtrip(obj);
+        }
     }
 
     private static int roundtrip(Object obj)

@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Locale;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -357,6 +359,36 @@ public class HistoryTest {
                 ChronoHistory.ofFirstGregorianReform().date(),
                 HistoricDate.of(HistoricEra.AD, 1582, 10, 15)),
             is(true));
+    }
+
+    @Test
+    public void withStdYearIfAmbivalent() {
+        ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+        PlainDate date = history.convert(HistoricDate.of(HistoricEra.AD, 1563, 4, 10));
+        assertThat(
+            date.with(history.yearOfEra(), 1564),
+            is(history.convert(HistoricDate.of(HistoricEra.AD, 1564, 4, 10))));
+        assertThat(
+            date.with(history.yearOfEra(YearDefinition.DUAL_DATING), 1564),
+            is(history.convert(HistoricDate.of(HistoricEra.AD, 1564, 4, 10))));
+    }
+
+    @Test
+    public void withEarlierYearIfAmbivalent() {
+        ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+        PlainDate date = history.convert(HistoricDate.of(HistoricEra.AD, 1563, 4, 10));
+        assertThat(
+            date.with(history.yearOfEra(YearDefinition.AFTER_NEW_YEAR), 1564),
+            is(history.convert(HistoricDate.of(HistoricEra.AD, 1564, 4, 10))));
+    }
+
+    @Test
+    public void withLaterYearIfAmbivalent() {
+        ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+        PlainDate date = history.convert(HistoricDate.of(HistoricEra.AD, 1563, 4, 10));
+        assertThat(
+            date.with(history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR), 1564),
+            is(history.convert(HistoricDate.of(HistoricEra.AD, 1565, 4, 10))));
     }
 
 }
