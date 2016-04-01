@@ -76,15 +76,24 @@ import java.util.Set;
 
 
 /**
- * <p>Represents a plain calendar date in conformance to ISO-8601-standard. </p>
+ * <p>Represents a plain calendar date in conformance to ISO-8601-standard using the gregorian calendar rules
+ * for all times. </p>
  *
  * <p>The value range also contains negative years down to {@code -999999999}.
- * These years cannot be interpreted in a historic way, as in general no past
+ * These years cannot be directly interpreted in a historic way, as in general no past
  * year, too. Instead such related dates can and must rather be interpreted
  * as a different way of counting days - like epoch days. The rules of
  * gregorian calendar are applied in a proleptic way that is backwards into
  * the past even before the earliest introduction of gregorian calendar in
  * Rome (a non-historic mathematical abstraction). </p>
+ *
+ * <p>However, this class enables <strong>full historization via a historic extension mechanism</strong>
+ * (i18n-module). When formatting or parsing based on the expert engine of Time4J, it is sufficient to
+ * specify a historic era (pattern symbol G) using the history of calendar reforms in a locale, and Time4J
+ * will automatically apply different rules of calendar history. It is also possible to explicitly model
+ * a suitable history by creating an instance of {@code net.time4j.history.ChronoHistory} and to feed the
+ * format engine with this information. Furthermore, this history object yields specialized elements for
+ * querying and manipulating an ISO-8601 calendar date in a historic context. </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -103,7 +112,7 @@ import java.util.Set;
  *  <li>{@link #YEAR_OF_WEEKDATE}</li>
  * </ul>
  *
- * <p>Furthermore, all elements of class {@link Weekmodel} and class
+ * <p>Furthermore, all elements of classes {@link Weekmodel}, {@code ChronoHistory} and
  * {@link EpochDays} are supported. </p>
  *
  * @author      Meno Hochschild
@@ -117,6 +126,15 @@ import java.util.Set;
  * Epochentagen. Die Schaltjahrregeln des gregorianischen Kalenders werden
  * proleptisch, also r&uuml;ckwirkend auch in die ferne Vergangenheit
  * angewandt (eine ahistorische mathematische Abstraktion). </p>
+ *
+ * <p>Allerdings bietet diese Klasse <strong>volle Historisierung mittels eines historischen
+ * Erweiterungsmechanismus</strong> an (i18n-Modul). Beim Formatieren oder Parsen basierend auf der
+ * Expert-Maschine von Time4J gen&uuml;gt es, eine spezifische historische &Auml;ra (Mustersymbol G) mitsamt
+ * einer Region anzugeben, und Time4J wird automatisch verschiedene Regeln der Kalendergeschichte anwenden.
+ * Es ist auch m&ouml;glich, eine geeignete Kalendergeschichte zu modellieren, indem ein Objekt des Typs
+ * {@code net.time4j.history.ChronoHistory} erzeugt wird, und die Formatmaschine mit dieser Information
+ * zu f&uuml;ttern. Au&szlig;erdem bietet dieses Objekt spezielle Elemente an, die historische Abfragen
+ * und Manipulationen eines ISO-Kalenderdatums erlauben. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
@@ -134,7 +152,7 @@ import java.util.Set;
  *  <li>{@link #YEAR_OF_WEEKDATE}</li>
  * </ul>
  *
- * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}
+ * <p>Dar&uuml;berhinaus sind alle Elemente der Klasse {@link Weekmodel}, {@code ChronoHistory}
  * und der Klasse {@link EpochDays} nutzbar. </p>
  *
  * @author      Meno Hochschild
