@@ -27,6 +27,7 @@ import net.time4j.base.GregorianMath;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.FormattableElement;
 import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
@@ -283,6 +284,8 @@ public final class ChronoHistory
     private transient final ChronoElement<HistoricDate> dateElement;
     private transient final ChronoElement<HistoricEra> eraElement;
     private transient final TextElement<Integer> yearOfEraElement;
+    private transient final ChronoElement<Integer> yearAfterElement;
+    private transient final ChronoElement<Integer> yearBeforeElement;
     private transient final TextElement<Integer> monthElement;
     private transient final TextElement<Integer> dayOfMonthElement;
     private transient final TextElement<Integer> dayOfYearElement;
@@ -332,6 +335,20 @@ public final class ChronoHistory
             this,
             HistoricIntegerElement.YEAR_OF_ERA_INDEX
         );
+        this.yearAfterElement = new HistoricIntegerElement(
+            '\u0000',
+            1,
+            GregorianMath.MAX_YEAR,
+            this,
+            HistoricIntegerElement.YEAR_AFTER_INDEX
+        );
+        this.yearBeforeElement = new HistoricIntegerElement(
+            '\u0000',
+            1,
+            GregorianMath.MAX_YEAR,
+            this,
+            HistoricIntegerElement.YEAR_BEFORE_INDEX
+        );
         this.monthElement = new HistoricIntegerElement(
             'M',
             1,
@@ -358,6 +375,8 @@ public final class ChronoHistory
         set.add(this.dateElement);
         set.add(this.eraElement);
         set.add(this.yearOfEraElement);
+        set.add(this.yearAfterElement);
+        set.add(this.yearBeforeElement);
         set.add(this.monthElement);
         set.add(this.dayOfMonthElement);
         set.add(this.dayOfYearElement);
@@ -1269,6 +1288,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
+    @FormattableElement(format = "G")
     public ChronoElement<HistoricEra> era() {
 
         return this.eraElement;
@@ -1287,6 +1307,7 @@ public final class ChronoHistory
      * @since   3.0
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
+     * @see     #yearOfEra(YearDefinition)
      */
     /*[deutsch]
      * <p>Definiert das Element f&uuml;r das Jahr einer historischen &Auml;ra. </p>
@@ -1300,10 +1321,84 @@ public final class ChronoHistory
      * @since   3.0
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
+     * @see     #yearOfEra(YearDefinition)
      */
+    @FormattableElement(format = "y")
     public TextElement<Integer> yearOfEra() {
 
         return this.yearOfEraElement;
+
+    }
+
+    /**
+     * <p>Defines the element for the year of a given historic era. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. </p>
+     *
+     * <p>Example: Many parts of France used Easter style for New Year so the year 1564 began on 1564-04-01 and
+     * ended on 1565-04-21 causing an ambivalency for April dates. Setting the date to April 10th in historic
+     * year 1564 can be expressed in a non-ambivalent way if a suitable year definition is applied (standard
+     * calendar years 1564 or 1565 possible). </p>
+     *
+     * <pre>
+     *     ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+     *     PlainDate date = history.convert(HistoricDate.of(HistoricEra.AD, 1563, 4, 10));
+     *     assertThat(
+     *          date.with(history.yearOfEra(YearDefinition.AFTER_NEW_YEAR), 1564),
+     *          is(history.convert(HistoricDate.of(HistoricEra.AD, 1564, 4, 10))));
+     *     assertThat(
+     *          date.with(history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR), 1564),
+     *          is(history.convert(HistoricDate.of(HistoricEra.AD, 1565, 4, 10))));
+     * </pre>
+     *
+     * @param   yearDefinition  determines how to display or interprete a historic year
+     * @return  year-of-era-related element
+     * @since   3.19/4.15
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r das Jahr einer historischen &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element {@link PlainDate#COMPONENT}
+     * registriert haben. </p>
+     *
+     * <p>Beispiel: Gro&szlig;e Teile von Frankreich haben den Osterstil als Neujahrsregel verwendet, so da&szlig;
+     * das Jahr 1564 zum Datum 1564-04-01 begann und zum Datum 1565-04-21 endete. Hier gibt es keine eindeutige
+     * Zuordnung von Datumsangaben im April. Wenn das Datum etwa auf den 10. April 1564 gesetzt werden soll,
+     * kann das eindeutig mit Hilfe einer spezifischen Jahresdefinition ausgedr&uuml;ckt werden (Standardkalenderjahre
+     * 1564 oder 1565 m&ouml;glich). </p>
+     *
+     * <pre>
+     *     ChronoHistory history = ChronoHistory.of(Locale.FRANCE);
+     *     PlainDate date = history.convert(HistoricDate.of(HistoricEra.AD, 1563, 4, 10));
+     *     assertThat(
+     *          date.with(history.yearOfEra(YearDefinition.AFTER_NEW_YEAR), 1564),
+     *          is(history.convert(HistoricDate.of(HistoricEra.AD, 1564, 4, 10))));
+     *     assertThat(
+     *          date.with(history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR), 1564),
+     *          is(history.convert(HistoricDate.of(HistoricEra.AD, 1565, 4, 10))));
+     * </pre>
+     *
+     * @param   yearDefinition  determines how to display or interprete a historic year
+     * @return  year-of-era-related element
+     * @since   3.19/4.15
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     */
+    public ChronoElement<Integer> yearOfEra(YearDefinition yearDefinition) {
+
+        switch (yearDefinition) {
+            case DUAL_DATING:
+                return this.yearOfEraElement;
+            case AFTER_NEW_YEAR:
+                return this.yearAfterElement;
+            case BEFORE_NEW_YEAR:
+                return this.yearBeforeElement;
+            default:
+                throw new UnsupportedOperationException(yearDefinition.name());
+        }
 
     }
 
@@ -1329,6 +1424,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
+    @FormattableElement(format = "M")
     public TextElement<Integer> month() {
 
         return this.monthElement;
@@ -1357,6 +1453,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
+    @FormattableElement(format = "d")
     public TextElement<Integer> dayOfMonth() {
 
         return this.dayOfMonthElement;
@@ -1388,6 +1485,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
+    @FormattableElement(format = "D")
     public TextElement<Integer> dayOfYear() {
 
         return this.dayOfYearElement;
