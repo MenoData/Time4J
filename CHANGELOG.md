@@ -1,4 +1,7 @@
 ## [v3.19] not yet released
+### Added
+- Fine-tuning of historization [#479]
+- Document that PlainDate is historizable [#448]
 
 ## [v3.18] published on 2016-03-23
 ### Added
