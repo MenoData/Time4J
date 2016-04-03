@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -106,7 +106,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "coptic", "ethiopic", "generic", "islamic", "persian", "roc" };
+        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "persian", "roc" };
 
     }
 
@@ -126,7 +126,7 @@ public final class GenericTextProviderSPI
         boolean leapForm
     ) {
 
-        if (calendarType.equals("roc")) {
+        if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
             TextProvider p = new IsoTextProviderSPI();
             return p.months(calendarType, locale, tw, oc, leapForm);
         }
@@ -354,7 +354,7 @@ public final class GenericTextProviderSPI
 
     private static int countOfEras(String ct) {
 
-        return ((ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc")) ? 2 : 1);
+        return ((ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc") || ct.equals("buddhist")) ? 2 : 1);
 
     }
 

@@ -102,4 +102,24 @@ public class EraNameTest {
             is("Minguo"));
     }
 
+    @Test
+    public void getDisplayNameWideThaiSolar() {
+        assertThat(
+            ThaiSolarEra.RATTANAKOSIN.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("Rattanakosin Sok"));
+        assertThat(
+            ThaiSolarEra.BUDDHIST.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("Buddhist Era"));
+    }
+
+    @Test
+    public void getDisplayNameShortThaiSolar() {
+        assertThat(
+            ThaiSolarEra.RATTANAKOSIN.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("R.S."));
+        assertThat(
+            ThaiSolarEra.BUDDHIST.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("BE"));
+    }
+
 }
