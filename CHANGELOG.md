@@ -3,6 +3,9 @@
 - Fine-tuning of historization [#479]
 - Clarify that PlainDate is historizable [#448]
 
+### Deprecated
+- Deprecate usage of CalendarEra.getValue() [#480]
+
 ## [v4.14] published on 2016-03-23
 ### Added
 - Enable unparseable characters to be skipped when parsing [#476]
