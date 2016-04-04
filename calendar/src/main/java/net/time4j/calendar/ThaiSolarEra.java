@@ -49,19 +49,28 @@ public enum ThaiSolarEra
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * The era started on 6th of April in 1782 (used until the calendar reform of king Rama VI in year 1912).
+     * The Rattanakosin era started counting of years on 6th of April in 1782 and was introduced by
+     * king Rama V in year 1888 and used until the calendar reform of king Rama VI in year 1912.
+     *
+     * The definition range is hence 1782-04-06/1912-03-31.
      */
     /*[deutsch]
-     * Die &Auml;ra begann am sechsten April 1782 (verwendet bis zur Kalenderreform von K&ouml;nig Rama VI
-     * im Jahre 1912).
+     * Die Rattanakosin-&Auml;ra begann am sechsten April 1782, wurde von K&ouml;nig Rama V eingef&uuml;hrt
+     * und verwendet bis zur Kalenderreform von K&ouml;nig Rama VI im Jahre 1912.
+     *
+     * Der Definitionsbereich erstreckt sich daher von 1782-04-06 bis 1912-03-31.
      */
     RATTANAKOSIN,
 
     /**
      * Users add 543 years to the gregorian AD-year in order to get the buddhist year counting.
+     *
+     * Before year 1941, the buddhist year started on first of April, then on first of January.
      */
     /*[deutsch]
      * Anwender addieren 543 Jahre zum gregorianischen Jahr, um die buddhistische Jahresz&auml;hlung zu erhalten.
+     *
+     * Vor 1941 startete das buddhistische Jahr am ersten April, danach am ersten Januar.
      */
     BUDDHIST;
 
