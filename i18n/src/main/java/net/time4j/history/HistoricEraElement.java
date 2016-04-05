@@ -162,7 +162,7 @@ final class HistoricEraElement
     protected <T extends ChronoEntity<T>> ElementRule<T, HistoricEra> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {
-            return new Rule<T>(this.history);
+            return new Rule<>(this.history);
         }
 
         return null;
