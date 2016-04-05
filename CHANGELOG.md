@@ -3,6 +3,9 @@
 - Fine-tuning of historization [#479]
 - Document that PlainDate is historizable [#448]
 
+### Fixed
+- Fix and improve documentation of era manipulations [#481]
+
 ### Deprecated
 - Deprecate usage of CalendarEra.getValue() [#480]
 
