@@ -110,6 +110,12 @@ public class EraNameTest {
         assertThat(
             ThaiSolarEra.BUDDHIST.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
             is("Buddhist Era"));
+        assertThat(
+            ThaiSolarEra.RATTANAKOSIN.getDisplayName(Locale.FRANCE, TextWidth.WIDE),
+            is("Rattanakosin Sok"));
+        assertThat(
+            ThaiSolarEra.BUDDHIST.getDisplayName(Locale.FRANCE, TextWidth.WIDE),
+            is("ère bouddhiste"));
     }
 
     @Test
