@@ -173,13 +173,15 @@ public final class JulianCalendar
      * <p>Represents the Julian era. </p>
      *
      * <p>This element is identical to {@code ChronoHistory.PROLEPTIC_JULIAN.era()}. Valid values are
-     * either {@code HistoricEra.AD} or {@code HistoricEra.BC}. </p>
+     * either {@code HistoricEra.AD} or {@code HistoricEra.BC}. However, the era cannot be changed
+     * by the expression {@code julianDate.with(ERA, historicEra)}. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die julianische &Auml;ra. </p>
      *
      * <p>Dieses Element entspricht {@code ChronoHistory.PROLEPTIC_JULIAN.era()}. Die g&uuml;ltigen Werte
-     * sind entweder {@code HistoricEra.AD} oder {@code HistoricEra.BC}. </p>
+     * sind entweder {@code HistoricEra.AD} oder {@code HistoricEra.BC}. Allerdings kann die &Auml;ra
+     * nicht durch den Ausdruck {@code julianDate.with(ERA, historicEra)} ge&auml;ndert werden. </p>
      */
     @FormattableElement(format = "G")
     public static final ChronoElement<HistoricEra> ERA = ChronoHistory.PROLEPTIC_JULIAN.era();

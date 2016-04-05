@@ -127,10 +127,10 @@ public final class MinguoCalendar
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>Represents the Minguo era. </p>
+     * <p>Represents the Minguo era which cannot be changed. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die Minguo-&Auml;ra. </p>
+     * <p>Repr&auml;sentiert die Minguo-&Auml;ra, die nicht ge&auml;ndert werden kann. </p>
      */
     @FormattableElement(format = "G")
     public static final ChronoElement<MinguoEra> ERA =
@@ -270,13 +270,13 @@ public final class MinguoCalendar
     /**
      * <p>Creates a new instance of a Minguo calendar date. </p>
      *
-     * @param era        Minguo era
-     * @param yearOfEra  Minguo year of era
-     * @param month      gregorian month
-     * @param dayOfMonth day of month
-     * @return new instance of {@code MinguoCalendar}
-     * @throws IllegalArgumentException in case of any inconsistencies
-     * @since 3.13/4.10
+     * @param   era         Minguo era
+     * @param   yearOfEra   Minguo year of era
+     * @param   month       gregorian month
+     * @param   dayOfMonth  day of month
+     * @return  new instance of {@code MinguoCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.13/4.10
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Minguo-Kalenderdatum. </p>
@@ -303,13 +303,13 @@ public final class MinguoCalendar
     /**
      * <p>Creates a new instance of an Minguo calendar date. </p>
      *
-     * @param era        Minguo era
-     * @param yearOfEra  Minguo year of era
-     * @param month      gregorian month
-     * @param dayOfMonth day of month
-     * @return new instance of {@code MinguoCalendar}
-     * @throws IllegalArgumentException in case of any inconsistencies
-     * @since 3.13/4.10
+     * @param   era         Minguo era
+     * @param   yearOfEra   Minguo year of era
+     * @param   month       gregorian month
+     * @param   dayOfMonth  day of month
+     * @return  new instance of {@code MinguoCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   3.13/4.10
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Minguo-Kalenderdatum. </p>
@@ -807,23 +807,22 @@ public final class MinguoCalendar
         @Override
         public V getValue(MinguoCalendar context) {
 
-            String name = this.element.name();
             Object result;
 
-            if (name.equals("ERA")) {
+            if (this.element == ERA) {
                 result = context.getEra();
-            } else if (name.equals("YEAR_OF_ERA")) {
+            } else if (this.element.equals(YEAR_OF_ERA)) {
                 result = context.getYear();
-            } else if (name.equals("MONTH_OF_YEAR")) {
+            } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = context.getMonth();
-            } else if (name.equals("DAY_OF_MONTH")) {
+            } else if (this.element.equals(DAY_OF_MONTH)) {
                 result = context.getDayOfMonth();
-            } else if (name.equals("DAY_OF_YEAR")) {
+            } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.getDayOfYear();
-            } else if (name.equals("DAY_OF_WEEK")) {
+            } else if (this.element.equals(DAY_OF_WEEK)) {
                 result = context.getDayOfWeek();
             } else {
-                throw new ChronoException("Missing rule for: " + name);
+                throw new ChronoException("Missing rule for: " + this.element.name());
             }
 
             return this.element.getType().cast(result);
@@ -833,19 +832,18 @@ public final class MinguoCalendar
         @Override
         public V getMinimum(MinguoCalendar context) {
 
-            String name = this.element.name();
             Object result;
 
-            if (name.equals("ERA")) {
+            if (this.element == ERA) {
                 result = MinguoEra.BEFORE_ROC;
             } else if (Integer.class.isAssignableFrom(this.element.getType())) {
                 result = Integer.valueOf(1);
-            } else if (name.equals("MONTH_OF_YEAR")) {
+            } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = Month.JANUARY;
-            } else if (name.equals("DAY_OF_WEEK")) {
+            } else if (this.element.equals(DAY_OF_WEEK)) {
                 result = Weekmodel.of(Locale.TAIWAN).localDayOfWeek().getDefaultMinimum();
             } else {
-                throw new ChronoException("Missing rule for: " + name);
+                throw new ChronoException("Missing rule for: " + this.element.name());
             }
 
             return this.element.getType().cast(result);
@@ -855,27 +853,26 @@ public final class MinguoCalendar
         @Override
         public V getMaximum(MinguoCalendar context) {
 
-            String name = this.element.name();
             Object result;
 
-            if (name.equals("ERA")) {
+            if (this.element == ERA) {
                 result = MinguoEra.ROC;
-            } else if (name.equals("YEAR_OF_ERA")) {
+            } else if (this.element.equals(YEAR_OF_ERA)) {
                 MinguoEra era = context.getEra();
                 result = (
                     (era == MinguoEra.ROC)
                         ? Integer.valueOf(GregorianMath.MAX_YEAR - 1911)
                         : Integer.valueOf(1912 - GregorianMath.MIN_YEAR));
-            } else if (name.equals("MONTH_OF_YEAR")) {
+            } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = Month.DECEMBER;
-            } else if (name.equals("DAY_OF_MONTH")) {
+            } else if (this.element.equals(DAY_OF_MONTH)) {
                 result = context.iso.getMaximum(PlainDate.DAY_OF_MONTH);
-            } else if (name.equals("DAY_OF_YEAR")) {
+            } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.iso.getMaximum(PlainDate.DAY_OF_YEAR);
-            } else if (name.equals("DAY_OF_WEEK")) {
+            } else if (this.element.equals(DAY_OF_WEEK)) {
                 result = Weekmodel.of(Locale.TAIWAN).localDayOfWeek().getDefaultMaximum();
             } else {
-                throw new ChronoException("Missing rule for: " + name);
+                throw new ChronoException("Missing rule for: " + this.element.name());
             }
 
             return this.element.getType().cast(result);
@@ -888,10 +885,16 @@ public final class MinguoCalendar
             V value
         ) {
 
+            if (value == null) {
+                return false;
+            } else if (this.element == ERA) {
+                return value.equals(context.getEra());
+            }
+
             V min = this.getMinimum(context);
             V max = this.getMaximum(context);
 
-            return ((value != null) && (min.compareTo(value) <= 0) && (value.compareTo(max) <= 0));
+            return ((min.compareTo(value) <= 0) && (value.compareTo(max) <= 0));
 
         }
 
@@ -906,37 +909,27 @@ public final class MinguoCalendar
                 throw new IllegalArgumentException("Out of range: " + value);
             }
 
-            String name = this.element.name();
-
-            if (name.equals("ERA")) {
-                MinguoEra era = MinguoEra.class.cast(value);
-                int yearOfEra = context.getYear();
-                if (era == MinguoEra.ROC) {
-                    yearOfEra = Math.min(GregorianMath.MAX_YEAR - 1911, yearOfEra);
-                } else {
-                    yearOfEra = Math.min(1912 - GregorianMath.MIN_YEAR, yearOfEra);
-                }
-                MinguoCalendar mc = MinguoCalendar.of(era, yearOfEra, context.getMonth(), 1);
-                return mc.with(DAY_OF_MONTH, Math.min(context.getDayOfMonth(), mc.lengthOfMonth()));
-            } else if (name.equals("YEAR_OF_ERA")) {
+            if (this.element == ERA) {
+                return context;
+            } else if (this.element.equals(YEAR_OF_ERA)) {
                 MinguoCalendar mc = MinguoCalendar.of(context.getEra(), toNumber(value), context.getMonth(), 1);
                 return mc.with(DAY_OF_MONTH, Math.min(context.getDayOfMonth(), mc.lengthOfMonth()));
-            } else if (name.equals("MONTH_OF_YEAR")) {
+            } else if (this.element.equals(MONTH_OF_YEAR)) {
                 PlainDate date = context.iso.with(PlainDate.MONTH_OF_YEAR, Month.class.cast(value));
                 return new MinguoCalendar(date);
-            } else if (name.equals("DAY_OF_MONTH")) {
+            } else if (this.element.equals(DAY_OF_MONTH)) {
                 PlainDate date = context.iso.with(PlainDate.DAY_OF_MONTH, toNumber(value));
                 return new MinguoCalendar(date);
-            } else if (name.equals("DAY_OF_YEAR")) {
+            } else if (this.element.equals(DAY_OF_YEAR)) {
                 PlainDate date = context.iso.with(PlainDate.DAY_OF_YEAR, toNumber(value));
                 return new MinguoCalendar(date);
-            } else if (name.equals("DAY_OF_WEEK")) {
+            } else if (this.element.equals(DAY_OF_WEEK)) {
                 PlainDate date =
                     context.iso.with(Weekmodel.of(Locale.TAIWAN).localDayOfWeek(), Weekday.class.cast(value));
                 return new MinguoCalendar(date);
             }
 
-            throw new ChronoException("Missing rule for: " + name);
+            throw new ChronoException("Missing rule for: " + this.element.name());
 
         }
 
