@@ -4,6 +4,7 @@
 - Document that PlainDate is historizable [#448]
 
 ### Fixed
+- OR-operator logic in ChronoFormatter sometimes broken [#482]
 - Fix and improve documentation of era manipulations [#481]
 
 ### Deprecated
