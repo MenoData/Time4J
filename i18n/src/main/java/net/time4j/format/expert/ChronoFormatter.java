@@ -2891,15 +2891,17 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 int section = step.getSection();
                 int last = index;
 
-                for (int j = index + 1; j < len; j++) {
-                    FormatStep test = this.steps.get(j);
-                    if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
-                        last = j;
-                        break;
+                if (!step.isNewOrBlockStarted()) {
+                    for (int j = index + 1; j < len; j++) {
+                        FormatStep test = this.steps.get(j);
+                        if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
+                            last = j;
+                            break;
+                        }
                     }
                 }
 
-                if (last > index) {
+                if ((last > index) || step.isNewOrBlockStarted()) {
                     // wenn gefunden, zum nächsten oder-Block springen
                     if (data != null) {
                         values = data.pop();
