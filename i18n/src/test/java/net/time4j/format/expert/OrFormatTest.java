@@ -1,6 +1,9 @@
 package net.time4j.format.expert;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.engine.ChronoCondition;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -105,6 +108,56 @@ public class OrFormatTest {
     @Test(expected=IllegalArgumentException.class)
     public void parseLeadingOr2() throws ParseException {
         ChronoFormatter.ofDatePattern("E, [|dd.MM.|MM/dd/]uuuu", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test
+    public void parseWildcards1() throws ParseException {
+        String input = "****-04-01T00:00:00Z/****-04-06T11:55:00Z";
+        int slash = input.indexOf('/');
+        PlainDate d = PlainDate.of(2016, 3, 31);
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.ofMomentPattern(
+                "[uuuu|****]-[MM|**]-[dd|**]'T'HH:mm:ssX", PatternType.CLDR, Locale.ROOT, ZonalOffset.UTC)
+                .withDefault(PlainDate.YEAR, d.getYear())
+                .withDefault(PlainDate.MONTH_AS_NUMBER, d.getMonth())
+                .withDefault(PlainDate.DAY_OF_MONTH, d.getDayOfMonth());
+        Moment start = f.parse(input.substring(0, slash));
+        Moment end = f.parse(input.substring(slash + 1));
+        assertThat(
+            start + "/" + end,
+            is("2016-04-01T00:00:00Z/2016-04-06T11:55:00Z"));
+    }
+
+    @Test
+    public void parseWildcards2() throws ParseException {
+        String input = "****-04-01T00:00:00Z/****-04-06T11:55:00Z";
+        int slash = input.indexOf('/');
+        PlainDate d = PlainDate.of(2016, 3, 31);
+        ChronoCondition<Character> condition =
+            new ChronoCondition<Character>() {
+                @Override
+                public boolean test(Character context) {
+                    return context.charValue() == '*';
+                }
+            };
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ROOT)
+                .addPattern("[uuuu|", PatternType.CLDR)
+                .skipUnknown(condition, 4)
+                .addPattern("]-[MM|", PatternType.CLDR)
+                .skipUnknown(condition, 2)
+                .addPattern("]-[dd|", PatternType.CLDR)
+                .skipUnknown(condition, 2)
+                .addPattern("]'T'HH:mm:ssX", PatternType.CLDR)
+                .build()
+                .withDefault(PlainDate.YEAR, d.getYear())
+                .withDefault(PlainDate.MONTH_AS_NUMBER, d.getMonth())
+                .withDefault(PlainDate.DAY_OF_MONTH, d.getDayOfMonth());
+        Moment start = f.parse(input.substring(0, slash));
+        Moment end = f.parse(input.substring(slash + 1));
+        assertThat(
+            start + "/" + end,
+            is("2016-04-01T00:00:00Z/2016-04-06T11:55:00Z"));
     }
 
 }
