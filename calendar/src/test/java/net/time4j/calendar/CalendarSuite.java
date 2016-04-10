@@ -33,6 +33,8 @@ import org.junit.runners.Suite.SuiteClasses;
         PersianOperatorTest.class,
         StartOfDayTest.class,
         TabotTest.class,
+        ThaiSolarCalendarTest.class,
+        ThaiSolarOperatorTest.class,
         UmalquraDataTest.class
     }
 )
