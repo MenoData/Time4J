@@ -1,7 +1,9 @@
 package net.time4j.calendar;
 
+import net.time4j.CalendarUnit;
 import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.Weekday;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.Attributes;
@@ -21,9 +23,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.chrono.HijrahDate;
-import java.time.chrono.MinguoDate;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -229,34 +228,6 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void formatHijrahDate() {
-        ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.setUp(HijriCalendar.class, Locale.ROOT)
-            .addPattern("yyyy-MM-dd", PatternType.CLDR).build();
-        HijrahDate date = HijrahDate.from(LocalDate.of(2015, 8, 21));
-        assertThat(
-            formatter.formatThreeten(date),
-            is("1436-11-06"));
-        assertThat(
-            PlainDate.of(2015, 8, 21).transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA),
-            is(HijriCalendar.ofUmalqura(1436, 11, 6)));
-    }
-
-    @Test
-    public void formatMinguoDate() {
-        ChronoFormatter<MinguoCalendar> formatter =
-            ChronoFormatter.setUp(MinguoCalendar.axis(), Locale.ROOT)
-                .addPattern("y-MM-dd", PatternType.CLDR).build();
-        MinguoDate date = MinguoDate.from(LocalDate.of(2015, 8, 21));
-        assertThat(
-            formatter.formatThreeten(date),
-            is("104-08-21"));
-        assertThat(
-            PlainDate.of(2015, 8, 21).transform(MinguoCalendar.class),
-            is(MinguoCalendar.of(MinguoEra.ROC, 104, 8, 21)));
-    }
-
-    @Test
     public void julianCalendarProperties() {
         JulianCalendar date = JulianCalendar.of(HistoricEra.AD, 1752, Month.FEBRUARY, 29);
         assertThat(
@@ -341,6 +312,63 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void thaiSolarCalendarProperties() {
+        ThaiSolarCalendar date = ThaiSolarCalendar.of(ThaiSolarEra.RATTANAKOSIN, 106, 2, 10);
+        assertThat(
+            date,
+            is(ThaiSolarCalendar.of(ThaiSolarEra.BUDDHIST, 1888 + 542, 2, 10)));
+        assertThat(
+            date.getEra(),
+            is(ThaiSolarEra.BUDDHIST));
+        assertThat(
+            date.getYear(),
+            is(1888 + 542));
+        assertThat(
+            date.getMonth(),
+            is(Month.FEBRUARY));
+        assertThat(
+            date.getDayOfYear(),
+            is(316));
+        assertThat(
+            date.getDayOfMonth(),
+            is(10));
+        assertThat(
+            date.getDayOfWeek(),
+            is(Weekday.FRIDAY));
+        assertThat(
+            date.lengthOfMonth(),
+            is(29));
+        assertThat(
+            date.lengthOfYear(),
+            is(366));
+        assertThat(
+            date.isLeapYear(),
+            is(true));
+        assertThat(
+            date.atTime(12, 0).toDate(),
+            is(date));
+    }
+
+    @Test
+    public void thaiSolarCalendarBetween() {
+        ThaiSolarCalendar start = ThaiSolarCalendar.ofBuddhist(2482, 2, 10);
+        ThaiSolarCalendar end = ThaiSolarCalendar.ofBuddhist(2485, 2, 10);
+        assertThat(CalendarUnit.YEARS.between(start, end), is(2L));
+        assertThat(CalendarUnit.MONTHS.between(start, end), is(24L));
+        assertThat(CalendarUnit.DAYS.between(start, end), is(731L));
+    }
+
+    @Test
+    public void formatThaiSolarCalendar() {
+        ChronoFormatter<ThaiSolarCalendar> f =
+            ChronoFormatter.ofStyle(DisplayMode.FULL, Locale.GERMAN, ThaiSolarCalendar.axis());
+        assertThat(
+            f.format(ThaiSolarCalendar.ofBuddhist(2482, 2, 10)),
+            is("Samstag, 10. Februar 2482 BE")
+        );
+    }
+
+    @Test
     public void serializeHijri() throws IOException, ClassNotFoundException {
         roundtrip(HijriCalendar.ofUmalqura(1437, 3, 17));
     }
@@ -373,6 +401,11 @@ public class MiscellaneousTest {
     @Test
     public void serializeJulian() throws IOException, ClassNotFoundException {
         roundtrip(JulianCalendar.of(HistoricEra.AD, 1752, 9, 14));
+    }
+
+    @Test
+    public void serializeThaiSolar() throws IOException, ClassNotFoundException {
+        roundtrip(ThaiSolarCalendar.of(ThaiSolarEra.BUDDHIST, 2482, 2, 7));
     }
 
     private static int roundtrip(Object obj)

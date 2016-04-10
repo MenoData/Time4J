@@ -23,6 +23,7 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.base.MathUtils;
 import net.time4j.history.HistoricEra;
 
 import java.io.Externalizable;
@@ -65,6 +66,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int JULIAN = 7;
+
+    /** Serialisierungstyp. */
+    static final int THAI_SOLAR = 8;
 
     private static final long serialVersionUID = 1L;
 
@@ -153,6 +157,9 @@ final class SPX
             case JULIAN:
                 this.writeJulian(out);
                 break;
+            case THAI_SOLAR:
+                this.writeThaiSolar(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -200,6 +207,9 @@ final class SPX
                 break;
             case JULIAN:
                 this.obj = this.readJulian(in);
+                break;
+            case THAI_SOLAR:
+                this.obj = this.readThaiSolar(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -363,8 +373,24 @@ final class SPX
         int month = in.readInt();
         int dom = in.readInt();
         HistoricEra era = ((pyear >= 1) ? HistoricEra.AD : HistoricEra.BC);
-        int yearOfEra = ((pyear >= 1) ? pyear : Math.subtractExact(1, pyear));
+        int yearOfEra = ((pyear >= 1) ? pyear : MathUtils.safeSubtract(1, pyear));
         return JulianCalendar.of(era, yearOfEra, month, dom);
+
+    }
+
+    private void writeThaiSolar(ObjectOutput out)
+        throws IOException {
+
+        ThaiSolarCalendar tsc = (ThaiSolarCalendar) this.obj;
+        out.writeObject(tsc.toISO());
+
+    }
+
+    private ThaiSolarCalendar readThaiSolar(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        PlainDate iso = PlainDate.class.cast(in.readObject());
+        return iso.transform(ThaiSolarCalendar.class);
 
     }
 
