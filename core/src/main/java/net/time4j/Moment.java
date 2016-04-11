@@ -199,7 +199,6 @@ public final class Moment
     private static final Moment MIN = new Moment(MIN_LIMIT, 0, POSIX);
     private static final Moment MAX = new Moment(MAX_LIMIT, MRD - 1, POSIX);
 
-    private static final TemporalFormatter<Moment> FORMATTER_RFC_1123;
     private static final Moment START_LS_CHECK =
         new Moment(86400 + POSIX_UTC_DELTA, 0, POSIX);
     private static final Set<ChronoElement<?>> HIGH_TIME_ELEMENTS;
@@ -270,8 +269,6 @@ public final class Moment
             new PrecisionRule());
 
         ENGINE = builder.withTimeLine(new GlobalTimeLine()).build();
-
-        FORMATTER_RFC_1123 = createRFC1123();
     }
 
     /**
@@ -1297,7 +1294,7 @@ public final class Moment
      */
     public static TemporalFormatter<Moment> formatterRFC1123() {
 
-        return FORMATTER_RFC_1123;
+        return RFC1123.FORMATTER; // lazy initialization
 
     }
 
@@ -1729,14 +1726,6 @@ public final class Moment
         }
 
         return second;
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static TemporalFormatter<Moment> createRFC1123() {
-
-        // Typecast is okay because the type Moment is required per specification.
-        return (TemporalFormatter<Moment>) FormatSupport.getDefaultFormatEngine().createRFC1123();
 
     }
 
@@ -2883,6 +2872,15 @@ public final class Moment
             return null;
 
         }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static class RFC1123 {
+
+        // Typecast is okay because the type Moment is required per specification.
+        static final TemporalFormatter<Moment> FORMATTER =
+            (TemporalFormatter<Moment>) FormatSupport.getDefaultFormatEngine().createRFC1123();
 
     }
 
