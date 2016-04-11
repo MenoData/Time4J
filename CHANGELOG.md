@@ -1,5 +1,6 @@
 ## [v4.15] not yet released
 ### Added
+- Add Thai solar calendar (Suriyakati) [#478]
 - Fine-tuning of historization [#479]
 - Clarify that PlainDate is historizable [#448]
 
