@@ -301,7 +301,7 @@ public final class ThaiSolarCalendar
     /**
      * <p>Creates a new instance of a Thai solar calendar date. </p>
      *
-     * @param   yearOfEra   buddhist year of era (@code >= 1)
+     * @param   yearOfEra   buddhist year of era {@code >= 1}
      * @param   month       gregorian month
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
@@ -311,7 +311,7 @@ public final class ThaiSolarCalendar
     /*[deutsch]
      * <p>Erzeugt ein neues Thai-Solar-Kalenderdatum. </p>
      *
-     * @param   yearOfEra   buddhist year of era (@code >= 1)
+     * @param   yearOfEra   buddhist year of era {@code >= 1}
      * @param   month       gregorian month
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
@@ -331,7 +331,7 @@ public final class ThaiSolarCalendar
     /**
      * <p>Creates a new instance of a Thai solar calendar date. </p>
      *
-     * @param   yearOfEra   buddhist year of era (@code >= 1)
+     * @param   yearOfEra   buddhist year of era {@code >= 1}
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
@@ -341,7 +341,7 @@ public final class ThaiSolarCalendar
     /*[deutsch]
      * <p>Erzeugt ein neues Thai-Solar-Kalenderdatum. </p>
      *
-     * @param   yearOfEra   buddhist year of era (@code >= 1)
+     * @param   yearOfEra   buddhist year of era {@code >= 1}
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
@@ -362,7 +362,7 @@ public final class ThaiSolarCalendar
      * <p>Creates a new instance of a Thai solar calendar date. </p>
      *
      * @param   era         Thai era
-     * @param   yearOfEra   Thai year of era (@code >= 1)
+     * @param   yearOfEra   Thai year of era {@code >= 1}
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
@@ -373,7 +373,7 @@ public final class ThaiSolarCalendar
      * <p>Erzeugt ein neues Thai-Solar-Kalenderdatum. </p>
      *
      * @param   era         Thai era
-     * @param   yearOfEra   Thai year of era (@code >= 1)
+     * @param   yearOfEra   Thai year of era {@code >= 1}
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month
      * @return  new instance of {@code ThaiSolarCalendar}
