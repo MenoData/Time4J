@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
 import net.time4j.tz.ZonalOffset;
@@ -76,8 +75,7 @@ final class SPX
     /** Serialisierungstyp von {@code CompositeTransitionModel}. */
     static final int COMPOSITE_TRANSITION_MODEL_TYPE = 127;
 
-    private static final long POSIX_TIME_1825 =
-        PlainTimestamp.of(1825, 1, 1, 0, 0).atUTC().getPosixTime();
+    private static final long POSIX_TIME_1825 = -4575744000L; // 1825-01-01T00Z
     private static final long DAYS_IN_18_BITS = 86400L * 365 * 718;
     private static final long QUARTERS_IN_24_BITS = 15040511099L;
     private static final int NO_COMPRESSION = 0;
