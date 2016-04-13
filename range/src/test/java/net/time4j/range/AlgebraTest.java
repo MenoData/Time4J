@@ -1082,4 +1082,74 @@ public class AlgebraTest {
         assertThat(a.equivalentTo(b), is(false));
     }
 
+    @Test
+    public void intersectsIfEmpty() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 14);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB).collapse();
+
+        assertThat(a.intersects(b), is(false));
+        assertThat(b.intersects(a), is(false));
+    }
+
+    @Test
+    public void intersectsIfSameStart() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 13);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.intersects(b), is(true));
+        assertThat(b.intersects(a), is(true));
+    }
+
+    @Test
+    public void intersectsIfOverlap() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 14);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.intersects(b), is(true));
+        assertThat(b.intersects(a), is(true));
+    }
+
+    @Test
+    public void intersectsIfSameEnd() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 15);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.intersects(b), is(true));
+        assertThat(b.intersects(a), is(true));
+    }
+
+    @Test
+    public void intersectsIfBefore() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.intersects(b), is(false));
+        assertThat(b.intersects(a), is(false));
+    }
+
 }
