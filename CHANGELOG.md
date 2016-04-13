@@ -1,5 +1,6 @@
 ## [v4.15] not yet released
 ### Added
+- Add boolean query to determine if two intervals intersect [#485]
 - Add Thai solar calendar (Suriyakati) [#478]
 - Fine-tuning of historization [#479]
 - Clarify that PlainDate is historizable [#448]
