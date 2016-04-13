@@ -164,6 +164,9 @@ public final class PlainDate
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    // rule index
+    private static final int WIM_INDEX = 19;
+
     /** Fr&uuml;hestm&ouml;gliches Datum [-999999999-01-01]. */
     static final PlainDate MIN =
         new PlainDate(GregorianMath.MIN_YEAR, 1, 1);
@@ -700,7 +703,7 @@ public final class PlainDate
                 CalendarUnit.DAYS)
             .appendElement(
                 WEEKDAY_IN_MONTH,
-                new WIMRule(),
+                new IntegerElementRule(WIM_INDEX, WEEKDAY_IN_MONTH),
                 CalendarUnit.WEEKS);
         registerUnits(builder);
         registerExtensions(builder);
@@ -2595,19 +2598,18 @@ public final class PlainDate
         //~ Konstruktoren -------------------------------------------------
 
         IntegerElementRule(ChronoElement<Integer> element) {
-            this(element.name(), ((IntegerDateElement) element).getIndex(), element);
+            this(((IntegerDateElement) element).getIndex(), element);
 
         }
 
         IntegerElementRule(
-            String name,
             int index,
             ChronoElement<?> ref
         ) {
             super();
 
             this.ref = ref;
-            this.name = name;
+            this.name = ref.name();
             this.index = index;
 
         }
@@ -2635,6 +2637,8 @@ public final class PlainDate
                     return context.getDayOfYear();
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return context.getDayOfQuarter();
+                case WIM_INDEX:
+                    return ((context.dayOfMonth - 1) / 7) + 1;
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2680,6 +2684,13 @@ public final class PlainDate
                     } else {
                         throw new IllegalArgumentException("Out of range: " + value);
                     }
+                case WIM_INDEX:
+                    if (lenient || ((value >= 1) && (value <= this.getMaximumOfWIM(context)))) {
+                        int old = ((context.dayOfMonth - 1) / 7) + 1;
+                        return context.plus(value - old, CalendarUnit.WEEKS);
+                    } else {
+                        throw new IllegalArgumentException("Out of range: " + value);
+                    }
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2713,6 +2724,8 @@ public final class PlainDate
                     return ((value >= 1) && (value <= (GregorianMath.isLeapYear(context.year) ? 366 : 365)));
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return ((value >= 1) && (value <= getMaximumOfQuarterDay(context)));
+                case WIM_INDEX:
+                    return ((value >= 1) && (value <= this.getMaximumOfWIM(context)));
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2729,6 +2742,7 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_MONTH:
                 case IntegerDateElement.DAY_OF_YEAR:
                 case IntegerDateElement.DAY_OF_QUARTER:
+                case WIM_INDEX:
                     return VALUE_1;
                 default:
                     throw new UnsupportedOperationException(this.name);
@@ -2750,6 +2764,8 @@ public final class PlainDate
                     return (GregorianMath.isLeapYear(context.year) ? LEAP_YEAR_LEN : STD_YEAR_LEN);
                 case IntegerDateElement.DAY_OF_QUARTER:
                     return Integer.valueOf(getMaximumOfQuarterDay(context));
+                case WIM_INDEX:
+                    return Integer.valueOf(this.getMaximumOfWIM(context));
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
@@ -2780,6 +2796,7 @@ public final class PlainDate
                 case IntegerDateElement.DAY_OF_MONTH:
                 case IntegerDateElement.DAY_OF_YEAR:
                 case IntegerDateElement.DAY_OF_QUARTER:
+                case WIM_INDEX:
                     return null;
                 default:
                     throw new UnsupportedOperationException(this.name);
@@ -2798,6 +2815,20 @@ public final class PlainDate
             } else {
                 return 92;
             }
+
+        }
+
+        private int getMaximumOfWIM(PlainDate context) {
+
+            int maxday = GregorianMath.getLengthOfMonth(context.year, context.month);
+            int d = context.dayOfMonth;
+            int n = 0;
+
+            while (d + (n + 1) * 7 <= maxday) {
+                n++;
+            }
+
+            return ((d + n * 7 - 1) / 7) + 1;
 
         }
 
@@ -2942,116 +2973,6 @@ public final class PlainDate
                 default:
                     throw new UnsupportedOperationException(this.name);
             }
-
-        }
-
-    }
-
-    private static class WIMRule
-        implements IntElementRule<PlainDate> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Integer getValue(PlainDate context) {
-
-            return Integer.valueOf(this.getInt(context));
-
-        }
-
-        @Override
-        public int getInt(PlainDate context) {
-
-            return ((context.dayOfMonth - 1) / 7) + 1;
-
-        }
-
-        @Override
-        public Integer getMinimum(PlainDate context) {
-
-            return VALUE_1;
-
-        }
-
-        @Override
-        public Integer getMaximum(PlainDate context) {
-
-            return Integer.valueOf(this.getMaximum0(context));
-
-        }
-
-        @Override
-        public boolean isValid(
-            PlainDate context,
-            Integer value
-        ) {
-
-            return ((value != null) && this.isValid(context, value.intValue()));
-
-        }
-
-        @Override
-        public boolean isValid(
-            PlainDate context,
-            int value
-        ) {
-
-            return ((value >= 1) && (value <= this.getMaximum0(context)));
-
-        }
-
-        @Override
-        public PlainDate withValue(
-            PlainDate context,
-            Integer value,
-            boolean lenient
-        ) {
-
-            return this.withValue(context, value.intValue(), lenient);
-
-        }
-
-        @Override
-        public PlainDate withValue(
-            PlainDate context,
-            int value,
-            boolean lenient
-        ) {
-
-            if (lenient || ((value >= 1) && (value <= this.getMaximum0(context)))) {
-                int old = ((context.dayOfMonth - 1) / 7) + 1;
-                return context.plus(value - old, CalendarUnit.WEEKS);
-            } else {
-                throw new IllegalArgumentException("Out of range: " + value);
-            }
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(PlainDate context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(PlainDate context) {
-
-            return null;
-
-        }
-
-        private int getMaximum0(PlainDate context) {
-
-            int maxday = GregorianMath.getLengthOfMonth(context.year, context.month);
-            int d = context.dayOfMonth;
-            int n = 0;
-
-            while (d + (n + 1) * 7 <= maxday) {
-                n++;
-            }
-
-            return ((d + n * 7 - 1) / 7) + 1;
 
         }
 
