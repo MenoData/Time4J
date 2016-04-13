@@ -1035,6 +1035,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is before the other such
      *          that there is a gap between else {@code false}
      * @since   2.0
+     * @see     #precededBy(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: Liegt dieses Intervall so vor dem anderen, da&szlig;
@@ -1049,6 +1050,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is before the other such
      *          that there is a gap between else {@code false}
      * @since   2.0
+     * @see     #precededBy(IsoInterval)
      */
     public boolean precedes(I other) {
 
@@ -1084,6 +1086,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is after the other such
      *          that there is a gap between else {@code false}
      * @since   2.0
+     * @see     #precedes(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.precedes(this)}. </p>
@@ -1097,6 +1100,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is after the other such
      *          that there is a gap between else {@code false}
      * @since   2.0
+     * @see     #precedes(IsoInterval)
      */
     public boolean precededBy(I other) {
 
@@ -1117,6 +1121,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is before the other such
      *          that there is no gap between else {@code false}
      * @since   2.0
+     * @see     #metBy(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: Liegt dieses Intervall so vor dem anderen, da&szlig;
@@ -1131,6 +1136,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is before the other such
      *          that there is no gap between else {@code false}
      * @since   2.0
+     * @see     #metBy(IsoInterval)
      */
     public boolean meets(I other) {
 
@@ -1177,6 +1183,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is after the other such
      *          that there is no gap between else {@code false}
      * @since   2.0
+     * @see     #meets(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.meets(this)}. </p>
@@ -1190,6 +1197,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval is after the other such
      *          that there is no gap between else {@code false}
      * @since   2.0
+     * @see     #meets(IsoInterval)
      */
     public boolean metBy(I other) {
 
@@ -1212,6 +1220,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          that the start of this interval is still before the start
      *          of the other one else {@code false}
      * @since   2.0
+     * @see     #overlappedBy(IsoInterval)
+     * @see     #intersects(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Uuml;berlappt dieses Intervall so das andere,
@@ -1228,6 +1238,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          that the start of this interval is still before the start
      *          of the other one else {@code false}
      * @since   2.0
+     * @see     #overlappedBy(IsoInterval)
+     * @see     #intersects(IsoInterval)
      */
     public boolean overlaps(I other) {
 
@@ -1296,6 +1308,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          that the start of the other one is still before the start
      *          of this interval else {@code false}
      * @since   2.0
+     * @see     #overlaps(IsoInterval)
+     * @see     #intersects(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.overlaps(this)}. </p>
@@ -1310,6 +1324,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          that the start of the other one is still before the start
      *          of this interval else {@code false}
      * @since   2.0
+     * @see     #overlaps(IsoInterval)
+     * @see     #intersects(IsoInterval)
      */
     public boolean overlappedBy(I other) {
 
@@ -1331,6 +1347,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same end point as
      *          the other one and a later start else {@code false}
      * @since   2.0
+     * @see     #finishedBy(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: Beendet dieses Intervall so das andere, da&szlig; bei
@@ -1346,6 +1363,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same end point as
      *          the other one and a later start else {@code false}
      * @since   2.0
+     * @see     #finishedBy(IsoInterval)
      */
     public boolean finishes(I other) {
 
@@ -1424,6 +1442,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same end point as
      *          the other one and an earlier start else {@code false}
      * @since   2.0
+     * @see     #finishes(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.finishes(this)}. </p>
@@ -1437,6 +1456,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same end point as
      *          the other one and an earlier start else {@code false}
      * @since   2.0
+     * @see     #finishes(IsoInterval)
      */
     public boolean finishedBy(I other) {
 
@@ -1458,6 +1478,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same start point as
      *          the other one and an earlier end else {@code false}
      * @since   2.0
+     * @see     #startedBy(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: Beginnt dieses Intervall so das andere, da&szlig;
@@ -1473,6 +1494,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same start point as
      *          the other one and an earlier end else {@code false}
      * @since   2.0
+     * @see     #startedBy(IsoInterval)
      */
     public boolean starts(I other) {
 
@@ -1563,6 +1585,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same start point as
      *          the other one and a later end else {@code false}
      * @since   2.0
+     * @see     #starts(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.starts(this)}. </p>
@@ -1576,6 +1599,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the same start point as
      *          the other one and a later end else {@code false}
      * @since   2.0
+     * @see     #starts(IsoInterval)
      */
     public boolean startedBy(I other) {
 
@@ -1597,6 +1621,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the earlier start point and
      *          later end compared to the other one else {@code false}
      * @since   2.0
+     * @see     #enclosedBy(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: Umfasst dieses Intervall so das andere, da&szlig;
@@ -1612,6 +1637,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the earlier start point and
      *          later end compared to the other one else {@code false}
      * @since   2.0
+     * @see     #enclosedBy(IsoInterval)
      */
     public boolean encloses(I other) {
 
@@ -1688,6 +1714,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the later start point and
      *          earlier end compared to the other one else {@code false}
      * @since   2.0
+     * @see     #encloses(IsoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.encloses(this)}. </p>
@@ -1701,10 +1728,36 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  {@code true} if this interval has the later start point and
      *          earlier end compared to the other one else {@code false}
      * @since   2.0
+     * @see     #encloses(IsoInterval)
      */
     public boolean enclosedBy(I other) {
 
         return other.encloses(this.getContext());
+
+    }
+
+    /**
+     * <p>Queries if this interval intersects the other one such that there is at least one common time point. </p>
+     *
+     * @param   other   another interval which might have an intersection with this interval
+     * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
+     * @since   3.19/4.15
+     */
+    /*[deutsch]
+     * <p>Bestimmt, ob dieses Intervall sich mit dem angegebenen Intervall so &uuml;berschneidet, da&szlig;
+     * mindestens ein gemeinsamer Zeitpunkt existiert. </p>
+     *
+     * @param   other   another interval which might have an intersection with this interval
+     * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
+     * @since   3.19/4.15
+     */
+    public boolean intersects(I other) {
+
+        if (this.isEmpty() || other.isEmpty()) {
+            return false;
+        }
+
+        return !(this.isBefore(other) || this.isAfter(other));
 
     }
 
