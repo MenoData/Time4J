@@ -1,5 +1,6 @@
 ## [v3.19] not yet released
 ### Added
+- Add convenient abuts-method to IsoInterval [#486]
 - Add boolean query to determine if two intervals intersect [#485]
 - Add Thai solar calendar (Suriyakati) [#478]
 - Fine-tuning of historization [#479]
