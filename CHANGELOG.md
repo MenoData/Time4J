@@ -1,4 +1,6 @@
-## [v3.19] not yet released
+## [v3.20] not yet released
+
+## [v3.19] published on 2016-04-18
 ### Added
 - Add convenient abuts-method to IsoInterval [#486]
 - Add boolean query to determine if two intervals intersect [#485]
