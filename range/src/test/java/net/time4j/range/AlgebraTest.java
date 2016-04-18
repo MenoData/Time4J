@@ -1152,4 +1152,26 @@ public class AlgebraTest {
         assertThat(b.intersects(a), is(false));
     }
 
+    @Test
+    public void abuts() {
+        PlainDate startA = PlainDate.of(2014, 6, 13);
+        PlainDate endA = PlainDate.of(2014, 6, 15);
+
+        PlainDate startB = PlainDate.of(2014, 6, 16);
+
+        DateInterval a = DateInterval.between(startA, endA);
+        DateInterval b = DateInterval.since(startB);
+
+        assertThat(a.abuts(b), is(true));
+        assertThat(b.abuts(a), is(true));
+
+        b = b.move(1, CalendarUnit.DAYS);
+        assertThat(a.abuts(b), is(false));
+        assertThat(b.abuts(a), is(false));
+
+        b = b.move(-2, CalendarUnit.DAYS);
+        assertThat(a.abuts(b), is(false));
+        assertThat(b.abuts(a), is(false));
+    }
+
 }
