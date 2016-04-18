@@ -1748,14 +1748,20 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
+     * @see     #overlaps(IsoInterval)
+     * @see     #isBefore(IsoInterval)
+     * @see     #isAfter(IsoInterval)
      */
     /*[deutsch]
-     * <p>Bestimmt, ob dieses Intervall sich mit dem angegebenen Intervall so &uuml;berschneidet, da&szlig;
+     * <p>Ermittelt, ob dieses Intervall sich mit dem angegebenen Intervall so &uuml;berschneidet, da&szlig;
      * mindestens ein gemeinsamer Zeitpunkt existiert. </p>
      *
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
+     * @see     #overlaps(IsoInterval)
+     * @see     #isBefore(IsoInterval)
+     * @see     #isAfter(IsoInterval)
      */
     public boolean intersects(I other) {
 
@@ -1764,6 +1770,35 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
         return !(this.isBefore(other) || this.isAfter(other));
+
+    }
+
+    /**
+     * <p>Queries if this interval abuts the other one such that there is neither any overlap nor any gap between. </p>
+     *
+     * <p>Equivalent to the expression {@code this.meets(other) || this.metBy(other)}. </p>
+     *
+     * @param   other   another interval which might abut this interval
+     * @return  {@code true} if there is no intersection and no gap between else {@code false}
+     * @since   3.19/4.15
+     * @see     #meets(IsoInterval)
+     * @see     #metBy(IsoInterval)
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob dieses Intervall das angegebene Intervall so ber&uuml;hrt, da&szlig;
+     * weder eine &Uuml;berlappung noch eine L&uuml;cke dazwischen existieren. </p>
+     *
+     * <p>&Auml;quivalent zum Ausdruck {@code this.meets(other) || this.metBy(other)}. </p>
+     *
+     * @param   other   another interval which might abut this interval
+     * @return  {@code true} if there is no intersection and no gap between else {@code false}
+     * @since   3.19/4.15
+     * @see     #meets(IsoInterval)
+     * @see     #metBy(IsoInterval)
+     */
+    public boolean abuts(I other) {
+
+        return (this.meets(other) || this.metBy(other));
 
     }
 
