@@ -444,7 +444,7 @@ public final class DayPeriod {
         String lang = locale.getLanguage(); // NPE-check
 
         if (lang.equals("nn")) {
-            locale = new Locale("nb"); // CLDR 28 contains no data for language nn
+            locale = new Locale("nb"); // CLDR 29 contains no data for language nn
         }
 
         Map<String, String> resourceMap = loadTextForms(locale, calendarType);
@@ -653,6 +653,16 @@ public final class DayPeriod {
                     index = nextIndex + 1;
                     count++;
 
+                    if (dp.isPredefined() && (meridiem == null)) {
+                        if (code.equals("midnight")) {
+                            meridiem = Meridiem.AM;
+                            continue;
+                        } else if (code.equals("noon")) {
+                            meridiem = Meridiem.PM;
+                            continue;
+                        }
+                    }
+
                     for (PlainTime time : dp.codeMap.keySet()) {
                         if (dp.codeMap.get(time).equals(code)) {
                             Meridiem m = null;
@@ -839,11 +849,26 @@ public final class DayPeriod {
         }
 
         @Override
-        public String getValue(ChronoEntity<?> context) {
+        public String getValue(ChronoEntity<?> context) { // used in consistency-check after strict parsing
             PlainTime time = context.get(PlainTime.COMPONENT);
             if (this.fixed) {
                 return getFixedCode(time);
             } else {
+                if (this.dayPeriod.isPredefined()) {
+                    Map<String, String> textForms = loadTextForms(this.getLocale(), this.getCalendarType());
+                    String code = null;
+                    if (time.isMidnight()) {
+                        code = "midnight";
+                    } else if (time.isSimultaneous(PlainTime.of(12))) {
+                        code = "noon";
+                    }
+                    if (code != null) {
+                        String key = createKey(textForms, TextWidth.ABBREVIATED, OutputContext.FORMAT, code);
+                        if (textForms.containsKey(key)) {
+                            return code;
+                        }
+                    }
+                }
                 PlainTime key = this.dayPeriod.getStart(time);
                 return this.dayPeriod.codeMap.get(key);
             }
@@ -966,6 +991,10 @@ public final class DayPeriod {
             } else {
                 Set<String> set = new LinkedHashSet<String>(this.dayPeriod.codeMap.values());
                 codes.addAll(set); // no duplicates
+                if (this.dayPeriod.isPredefined()) {
+                    codes.add("midnight");
+                    codes.add("noon");
+                }
             }
 
             if (this.dayPeriod.isPredefined()) {
@@ -989,7 +1018,7 @@ public final class DayPeriod {
                     String key;
                     if (this.fixed) {
                         key = createKey(textForms, tw, oc, code);
-                        if (!textForms.containsKey(key)) {
+                        if (!textForms.containsKey(key)) { // use fallback am/pm
                             if (code.equals("midnight")) {
                                 key = createKey(textForms, tw, oc, "am");
                             } else if (code.equals("noon")) {
@@ -1143,16 +1172,26 @@ public final class DayPeriod {
                     return code;
                 }
             } else {
-                String code = dp.codeMap.get(dp.getStart(time));
-
                 if (dp.isPredefined()) {
                     Map<String, String> textForms = loadTextForms(locale, dp.calendarType);
+                    if (time.isMidnight()) {
+                        String key = createKey(textForms, this.width, this.outputContext, "midnight");
+                        if (textForms.containsKey(key)) {
+                            return textForms.get(key);
+                        }
+                    } else if (time.isSimultaneous(PlainTime.of(12))) {
+                        String key = createKey(textForms, this.width, this.outputContext, "noon");
+                        if (textForms.containsKey(key)) {
+                            return textForms.get(key);
+                        }
+                    }
+                    String code = dp.codeMap.get(dp.getStart(time));
                     String key = createKey(textForms, this.width, this.outputContext, code);
                     if (textForms.containsKey(key)) {
                         return textForms.get(key);
                     }
                 } else {
-                    return code;
+                    return dp.codeMap.get(dp.getStart(time));
                 }
             }
 
