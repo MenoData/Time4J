@@ -110,17 +110,17 @@ public class DayPeriodTest {
     public void startEndForMidnight() {
         assertThat(
             DayPeriod.of(Locale.US).getStart(PlainTime.of(0)),
-            is(PlainTime.of(0)));
+            is(PlainTime.of(21)));
         assertThat(
             DayPeriod.of(Locale.US).getEnd(PlainTime.of(0)),
-            is(PlainTime.of(0, 1)));
+            is(PlainTime.of(6)));
     }
 
     @Test
     public void startEndForNight1() {
         assertThat(
             DayPeriod.of(Locale.US).getStart(PlainTime.of(4)),
-            is(PlainTime.of(0, 1)));
+            is(PlainTime.of(21)));
         assertThat(
             DayPeriod.of(Locale.US).getEnd(PlainTime.of(4)),
             is(PlainTime.of(6)));
@@ -143,14 +143,14 @@ public class DayPeriodTest {
             is(PlainTime.of(12)));
         assertThat(
             DayPeriod.of(Locale.US).getEnd(PlainTime.of(12)),
-            is(PlainTime.of(12, 1)));
+            is(PlainTime.of(18)));
     }
 
     @Test
     public void startEndForAfternoon() {
         assertThat(
             DayPeriod.of(Locale.US).getStart(PlainTime.of(15)),
-            is(PlainTime.of(12, 1)));
+            is(PlainTime.of(12)));
         assertThat(
             DayPeriod.of(Locale.US).getEnd(PlainTime.of(15)),
             is(PlainTime.of(18)));
@@ -173,7 +173,7 @@ public class DayPeriodTest {
             is(PlainTime.of(21)));
         assertThat(
             DayPeriod.of(Locale.US).getEnd(PlainTime.of(23)),
-            is(PlainTime.of(0)));
+            is(PlainTime.of(6)));
     }
 
     @Test
@@ -256,10 +256,16 @@ public class DayPeriodTest {
             f.parse("12:00 midnight"),
             is(PlainTime.of(0)));
         assertThat(
+            f.parse("12:00 at night"),
+            is(PlainTime.of(0)));
+        assertThat(
             f.format(PlainTime.of(12)),
             is("12:00 noon"));
         assertThat(
             f.parse("12:00 noon"),
+            is(PlainTime.of(12)));
+        assertThat(
+            f.parse("12:00 in the afternoon"),
             is(PlainTime.of(12)));
         assertThat(
             f.format(PlainTime.of(17, 15)),
@@ -267,6 +273,24 @@ public class DayPeriodTest {
         assertThat(
             f.parse("5:15 in the afternoon"),
             is(PlainTime.of(17, 15)));
+    }
+
+    @Test
+    public void consistencyAtMidnight1() throws ParseException {
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.ofTimePattern("h:mm BBBB", PatternType.CLDR, Locale.ENGLISH).with(Leniency.STRICT);
+        assertThat(
+            f.parse("12:00 midnight"),
+            is(PlainTime.of(0)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void consistencyAtMidnight2() throws ParseException {
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.ofTimePattern("h:mm BBBB", PatternType.CLDR, Locale.ENGLISH).with(Leniency.STRICT);
+        assertThat(
+            f.parse("12:00 at night"),
+            is(PlainTime.of(0)));
     }
 
     @Test
@@ -289,13 +313,16 @@ public class DayPeriodTest {
             f.format(PlainTime.of(0)),
             is("12:00 mi"));
         assertThat(
-            f.parse("12:00 mi"),
+            f.parse("12:00 at night"),
             is(PlainTime.of(0)));
         assertThat(
             f.format(PlainTime.of(12)),
             is("12:00 n"));
         assertThat(
             f.parse("12:00 n"),
+            is(PlainTime.of(12)));
+        assertThat(
+            f.parse("12:00 in the afternoon"),
             is(PlainTime.of(12)));
         assertThat(
             f.format(PlainTime.of(17, 15)),
