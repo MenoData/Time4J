@@ -714,7 +714,7 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysArabicMinus() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-                .inverse();
+            .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
                 .print(duration, TextWidth.WIDE),
@@ -725,7 +725,7 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysArabicU0660Minus() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-                .inverse();
+            .inverse();
         assertThat(
             PrettyTime.of(new Locale("ar"))
                 .print(duration, TextWidth.WIDE),
@@ -736,7 +736,7 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysFarsiMinus() throws IOException {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-                .inverse();
+            .inverse();
         String s =
             PrettyTime.of(new Locale("fa")).print(duration, TextWidth.WIDE);
         String expected =
@@ -945,6 +945,15 @@ public class PrettyTimeTest {
         assertThat(
             formattedDuration,
             is("93 heures, 45 minutes et 40 secondes"));
+    }
+
+    @Test
+    public void australia() {
+        Duration<?> dur = Duration.ofCalendarUnits(0, 2, 5);
+        String formattedDuration = PrettyTime.of(new Locale("en", "AU")).print(dur, TextWidth.SHORT);
+        assertThat(
+            formattedDuration,
+            is("2 m., 5 days"));
     }
 
     private static class FortnightPlusOneDay
