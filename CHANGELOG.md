@@ -1,4 +1,6 @@
 ## [v3.20] not yet released
+### Changed
+- Update to CLDR version 29 [#492]
 
 ## [v3.19] published on 2016-04-18
 ### Added
