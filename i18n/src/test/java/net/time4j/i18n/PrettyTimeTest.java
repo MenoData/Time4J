@@ -1038,6 +1038,15 @@ public class PrettyTimeTest {
             is("93 heures, 45 minutes et 40 secondes"));
     }
 
+    @Test
+    public void australia() {
+        Duration<?> dur = Duration.ofCalendarUnits(0, 2, 5);
+        String formattedDuration = PrettyTime.of(new Locale("en", "AU")).print(dur, TextWidth.SHORT);
+        assertThat(
+            formattedDuration,
+            is("2 m., 5 days"));
+    }
+
     private static class FortnightPlusOneDay
         extends BasicUnit
         implements IsoUnit {
