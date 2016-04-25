@@ -1,5 +1,7 @@
 ## [v4.16] not yet released
-
+### Changed
+- Update to CLDR version 29 [#492]
+ 
 ## [v4.15] published on 2016-04-18
 ### Added
 - Add convenient abuts-method to IsoInterval [#486]
