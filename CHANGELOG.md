@@ -1,4 +1,7 @@
 ## [v3.20] not yet released
+### Fixed
+- Clarify format behaviour if zoneless types are combined with zone names [#490]
+
 ### Changed
 - Update to CLDR version 29 [#492]
 
