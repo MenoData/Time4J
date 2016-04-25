@@ -1,4 +1,7 @@
 ## [v3.20] not yet released
+### Added
+- Support for Malayalam [#493]
+
 ### Fixed
 - Clarify format behaviour if zoneless types are combined with zone names [#490]
 
