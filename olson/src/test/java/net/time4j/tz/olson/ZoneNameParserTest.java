@@ -15,7 +15,7 @@ public class ZoneNameParserTest {
 
     @Test
     public void noValidationError() {
-        ChronoFormatter<?> cf = ChronoFormatter.ofDatePattern("z", PatternType.CLDR, Locale.GERMANY);
+        ChronoFormatter<?> cf = ChronoFormatter.ofMomentPattern("z", PatternType.CLDR, Locale.GERMANY, EUROPE.PARIS);
         ChronoEntity<?> raw = cf.parseRaw("MESZ");
         System.out.println("raw-data=" + raw);
         assertThat(raw.contains(ValidationElement.ERROR_MESSAGE), is(false));
