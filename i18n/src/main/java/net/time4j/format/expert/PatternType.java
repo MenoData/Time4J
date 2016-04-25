@@ -265,7 +265,10 @@ public enum PatternType
      *      <td>TIMEZONE_NAME</td>
      *      <td>z</td>
      *      <td>1-3 symbols for the abbreviation, 4 symbols for the full
-     *      timezone name.</td>
+     *      timezone name. The specific non-location format will be used,
+     *      for example &quot;Pacific Daylight Time&quot; (PDT) or
+     *      &quot;Pacific Standard Time&quot; (PST).  This symbol
+     *      can only be applied on the type {@link Moment}.</td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_OFFSET</td>
@@ -520,7 +523,10 @@ public enum PatternType
      *      <td>TIMEZONE_NAME</td>
      *      <td>z</td>
      *      <td>1-3 Symbole f&uuml;r die Kurzform, 4 Symbole f&uuml;r den
-     *      langen Zeitzonennamen.</td>
+     *      langen Zeitzonennamen. Es wird das <i>specific non-location format</i> verwendet,
+     *      zum Beispiel &quot;Pacific Daylight Time&quot; (PDT) oder
+     *      &quot;Pacific Standard Time&quot; (PST). Dieses Symbol kann
+     *      nur auf den Typ {@link Moment} angewandt werden. </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_OFFSET</td>
@@ -1304,13 +1310,17 @@ public enum PatternType
                 builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
                 break;
             case 'z':
-                if (count < 4) {
-                    builder.addShortTimezoneName();
-                } else if ((count == 4) || sdf) {
-                    builder.addLongTimezoneName();
-                } else {
-                    throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                try {
+                    if (count < 4) {
+                        builder.addShortTimezoneName();
+                    } else if ((count == 4) || sdf) {
+                        builder.addLongTimezoneName();
+                    } else {
+                        throw new IllegalArgumentException(
+                            "Too many pattern letters: " + count);
+                    }
+                } catch (IllegalStateException ise) {
+                    throw new IllegalArgumentException(ise.getMessage());
                 }
                 break;
             case 'Z':

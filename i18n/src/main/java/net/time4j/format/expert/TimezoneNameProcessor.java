@@ -145,7 +145,7 @@ final class TimezoneNameProcessor
 
         if (!formattable.hasTimezone()) {
             throw new IllegalArgumentException(
-                "Cannot extract timezone id from: " + formattable);
+                "Cannot extract timezone name from: " + formattable);
         }
 
         TZID tzid = formattable.getTimezone();

@@ -4678,7 +4678,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
-         * <p>Adds a short localized timezone name (an abbreviation). </p>
+         * <p>Adds a short localized timezone name (an abbreviation in specific non-location format). </p>
          *
          * <p>Dependent on the current locale, the preferred timezone IDs
          * in a country will be determined first. The parsing of
@@ -4691,6 +4691,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * name &quot;MST&quot; as Denver. </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
          */
         /*[deutsch]
@@ -4707,17 +4709,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * obwohl es den gleichen Namen &quot;MST&quot; wie Denver hat. </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
          */
         public Builder<T> addShortTimezoneName() {
 
+            this.checkMomentChrono();
             this.addProcessor(new TimezoneNameProcessor(true));
             return this;
 
         }
 
         /**
-         * <p>Adds a long localized timezone name. </p>
+         * <p>Adds a long localized timezone name (in specific non-location format). </p>
          *
          * <p>Dependent on the current locale, the preferred timezone IDs
          * in a country will be determined first. The parsing of
@@ -4730,6 +4735,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * name &quot;Mountain Standard Time&quot; as Denver. </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
          */
         /*[deutsch]
@@ -4747,23 +4754,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * wie Denver hat. </p>
          *
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
          */
         public Builder<T> addLongTimezoneName() {
 
+            this.checkMomentChrono();
             this.addProcessor(new TimezoneNameProcessor(false));
             return this;
 
         }
 
         /**
-         * <p>Adds a short localized timezone name (an abbreviation). </p>
+         * <p>Adds a short localized timezone name (an abbreviation in specific non-location format). </p>
          *
          * <p>Parsing of timezone names is case-sensitive. </p>
          *
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
          */
         /*[deutsch]
@@ -4775,23 +4787,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
          */
         public Builder<T> addShortTimezoneName(Set<TZID> preferredZones) {
 
+            this.checkMomentChrono();
             this.addProcessor(new TimezoneNameProcessor(true, preferredZones));
             return this;
 
         }
 
         /**
-         * <p>Adds a long localized timezone name. </p>
+         * <p>Adds a long localized timezone name (in specific non-location format). </p>
          *
          * <p>Parsing of timezone names is case-sensitive. </p>
          *
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
          */
         /*[deutsch]
@@ -4803,10 +4820,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @param   preferredZones  preferred timezone ids for resolving
          *                          duplicates
          * @return  this instance for method chaining
+         * @throws  IllegalStateException if the underlying chronology does not correspond
+         *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
          */
         public Builder<T> addLongTimezoneName(Set<TZID> preferredZones) {
 
+            this.checkMomentChrono();
             this.addProcessor(new TimezoneNameProcessor(false, preferredZones));
             return this;
 
@@ -5814,6 +5834,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             if (key.name().charAt(0) == '_') {
                 throw new IllegalArgumentException(
                     "Internal attribute not allowed: " + key.name());
+            }
+
+        }
+
+        private void checkMomentChrono() {
+
+            if (!UnixTime.class.isAssignableFrom(this.chronology.getChronoType())) {
+                throw new IllegalStateException(
+                    "Timezone names in specific non-location format can only be reliably combined "
+                    + "with instant-like types, for example \"Moment\".");
             }
 
         }
