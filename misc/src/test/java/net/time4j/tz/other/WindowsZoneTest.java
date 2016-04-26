@@ -31,6 +31,13 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class WindowsZoneTest {
 
+    @Test
+    public void getVersion() {
+        assertThat(
+            WindowsZone.getVersion(),
+            is("$Revision: 12348 $")); // CLDR 29
+    }
+
     @Test(expected=UnsupportedOperationException.class)
     public void getAvailableNamesIsUnmodifiable() {
         Set<String> names = WindowsZone.getAvailableNames();
