@@ -90,7 +90,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @doctags.concurrency <immutable>
  */
 public final class MachineTime<U>
-    implements TimeSpan<U>, Serializable {
+    implements TimeSpan<U>, Comparable<MachineTime<U>>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -943,6 +943,91 @@ public final class MachineTime<U>
 
         throw new UnsupportedOperationException(
             "Use 'Moment.minus(MachineTime<SI>)' instead.");
+
+    }
+
+    /**
+     * <p>Compares the absolute lengths and is equivalent to {@code abs().compareTo(other.abs()) < 0}. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  boolean
+     * @see     #compareTo(MachineTime)
+     * @see     #isLongerThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    /*[deutsch]
+     * <p>Vergleicht die absoluten L&auml;ngen und ist &auml;quivalent zu {@code abs().compareTo(other.abs()) < 0}. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  boolean
+     * @see     #compareTo(MachineTime)
+     * @see     #isLongerThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    public boolean isShorterThan(MachineTime<U> other) {
+
+        return (this.abs().compareTo(other.abs()) < 0);
+
+    }
+
+    /**
+     * <p>Compares the absolute lengths and is equivalent to {@code abs().compareTo(other.abs()) > 0}. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  boolean
+     * @see     #compareTo(MachineTime)
+     * @see     #isShorterThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    /*[deutsch]
+     * <p>Vergleicht die absoluten L&auml;ngen und ist &auml;quivalent zu {@code abs().compareTo(other.abs()) > 0}. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  boolean
+     * @see     #compareTo(MachineTime)
+     * @see     #isShorterThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    public boolean isLongerThan(MachineTime<U> other) {
+
+        return (this.abs().compareTo(other.abs()) > 0);
+
+    }
+
+    /**
+     * <p>Method of the {@code Comparable}-interface. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  negative, zero or positive integer if this instance is shorter, equal or longer than other one
+     * @throws  ClassCastException if this and the other machine time have different time scales
+     * @see     #isShorterThan(MachineTime)
+     * @see     #isLongerThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    /*[deutsch]
+     * <p>Methode des {@code Comparable}-Interface. </p>
+     *
+     * @param   other   another machine time to be compared with
+     * @return  negative, zero or positive integer if this instance is shorter, equal or longer than other one
+     * @throws  ClassCastException if this and the other machine time have different time scales
+     * @see     #isShorterThan(MachineTime)
+     * @see     #isLongerThan(MachineTime)
+     * @since   3.20/4.16
+     */
+    @Override
+    public int compareTo(MachineTime<U> other) {
+
+        if (this.scale == other.scale) {
+            if (this.seconds < other.seconds) {
+                return -1;
+            } else if (this.seconds > other.seconds) {
+                return 1;
+            } else {
+                return (this.nanos - other.nanos);
+            }
+        } else {
+            throw new ClassCastException("Different time scales.");
+        }
 
     }
 
