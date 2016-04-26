@@ -1,6 +1,9 @@
 ## [v3.20] not yet released
 ### Added
+- Modern-coverage of languages defined in CLDR [#367]
 - Support for Malayalam [#493]
+- Support for Basque, Galician and Welsh [#494]
+- Support for Esperanto [#495]
 
 ### Fixed
 - Clarify format behaviour if zoneless types are combined with zone names [#490]
