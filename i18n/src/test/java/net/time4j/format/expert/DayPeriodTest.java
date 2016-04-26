@@ -530,7 +530,8 @@ public class DayPeriodTest {
 
     private static boolean isCheckWanted(Locale locale) {
         String lang = locale.getLanguage();
-        return !(lang.equals("fa") || lang.equals("hu") || lang.equals("zu")); // require manual check
+        // require manual check
+        return !(lang.equals("fa") || lang.equals("gl") || lang.equals("hu") || lang.equals("zu"));
     }
 
 }

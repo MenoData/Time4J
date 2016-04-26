@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -58,7 +58,7 @@ public final class SymbolProviderSPI
                 getLoader(),
                 UTF8ResourceControl.SINGLETON);
 
-        String[] languages = rb.getString("languages").split(" ");
+        String[] languages = rb.getString("locales").split(" ");
         Set<String> set = new HashSet<String>();
         Collections.addAll(set, languages);
         SUPPORTED_LOCALES = Collections.unmodifiableSet(set);
