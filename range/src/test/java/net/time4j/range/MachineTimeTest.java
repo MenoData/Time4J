@@ -20,6 +20,52 @@ public class MachineTimeTest {
     private static final int MRD = 1000000000;
 
     @Test
+    public void isShorterThan() {
+        assertThat(
+            MachineTime.of(23, TimeUnit.HOURS).isShorterThan(MachineTime.of(1, TimeUnit.DAYS)),
+            is(true));
+        assertThat(
+            MachineTime.of(24, TimeUnit.HOURS).isShorterThan(MachineTime.of(1, TimeUnit.DAYS)),
+            is(false));
+        assertThat(
+            MachineTime.of(25, TimeUnit.HOURS).isShorterThan(MachineTime.of(1, TimeUnit.DAYS)),
+            is(false));
+        assertThat(
+            MachineTime.of(-23, TimeUnit.HOURS).isShorterThan(MachineTime.of(-1, TimeUnit.DAYS)),
+            is(true));
+        assertThat(
+            MachineTime.of(-25, TimeUnit.HOURS).isShorterThan(MachineTime.of(-1, TimeUnit.DAYS)),
+            is(false));
+    }
+
+    @Test
+    public void isLongerThan() {
+        assertThat(
+            MachineTime.ofSIUnits(3, 999999999).isLongerThan(MachineTime.ofSIUnits(4, 0)),
+            is(false));
+        assertThat(
+            MachineTime.ofSIUnits(3, 999999999).isLongerThan(MachineTime.ofSIUnits(3, 999999999)),
+            is(false));
+        assertThat(
+            MachineTime.ofSIUnits(3, 999999999).isLongerThan(MachineTime.ofSIUnits(3, 999999998)),
+            is(true));
+        assertThat(
+            MachineTime.ofSIUnits(-3, -999999999).isLongerThan(MachineTime.ofSIUnits(-3, -999999998)),
+            is(true));
+        assertThat(
+            MachineTime.ofSIUnits(-3, 999999999).isLongerThan(MachineTime.ofSIUnits(-3, 999999998)),
+            is(false));
+    }
+
+    @Test(expected=ClassCastException.class)
+    @SuppressWarnings("unchecked")
+    public void comparisonOnDifferentTimescales() {
+        MachineTime m1 = MachineTime.of(23, TimeUnit.HOURS);
+        MachineTime m2 = MachineTime.ofSIUnits(3, 999999999);
+        System.out.println(m1.isLongerThan(m2));
+    }
+
+    @Test
     public void ofDayUnit() {
         assertThat(
             MachineTime.of(1, TimeUnit.DAYS),
