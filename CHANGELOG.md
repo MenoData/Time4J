@@ -1,5 +1,6 @@
 ## [v4.16] not yet released
 ### Added
+- Make MachineTime comparable [#489]
 - Modern-coverage of languages defined in CLDR [#367]
 - Support for Malayalam [#493]
 - Support for Basque, Galician and Welsh [#494]
