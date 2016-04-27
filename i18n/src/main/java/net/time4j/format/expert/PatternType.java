@@ -35,6 +35,7 @@ import net.time4j.format.CalendarType;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
@@ -116,6 +117,16 @@ public enum PatternType
      *      will be used exactly if the year has more digits than given
      *      by count of symbols. In contrast to the symbol y, this year
      *      can never be the historized year-of-era. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>The related gregorian year corresponds to the begin of the calendar year
+     *      in non-gregorian calender systems. In ISO-calendar systems, it is identical
+     *      to the proleptic ISO-8601 calendar year. For formatting or parsing, only the
+     *      ASCII-digits 0-9 will be used, even if other parts of the format use
+     *      alternative digits or other numeral systems. The count of symbols is
+     *      defined within the range 1-9. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -367,6 +378,16 @@ public enum PatternType
      *      &Auml;ra sein. </td>
      *  </tr>
      *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>In nicht-gregorianischen Kalendersystemen entspricht es dem
+     *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. F&uuml;r ISO-Kalender
+     *      ist es identisch mit dem proleptischen ISO-Kalenderjahr. Zur Formatierung
+     *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
+     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
+     *      verwenden. </td>
+     *  </tr>
+     *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
      *      <td>Q</td>
      *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
@@ -576,8 +597,10 @@ public enum PatternType
      * {@link java.text.SimpleDateFormat}, which is very near, but not
      * exactly the same as CLDR. </p>
      *
-     * <p>The permitted count of digits is usually unlimited. This pattern style is only applicable on
-     * ISO-compatible chronologies. Other deviations from {@link #CLDR}: </p>
+     * <p>The permitted count of digits is usually unlimited. Users should treat this setting
+     * only as approximation to any real implementation of {@code SimpleDateFormat}. For example,
+     * this pattern style is only applicable on ISO-compatible chronologies. Android will define
+     * some symbols in a different way. Other deviations from {@link #CLDR}: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -615,8 +638,8 @@ public enum PatternType
      *      <td>Not supported (as work-around: use CLDR). </td>
      *  </tr>
      *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>L</td>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
      *      <td>Not supported (as work-around: use CLDR). </td>
      *  </tr>
      *  <tr>
@@ -682,8 +705,11 @@ public enum PatternType
      * {@link java.text.SimpleDateFormat}, die sich stark, aber
      * nicht exakt an CLDR orientiert. </p>
      *
-     * <p>Die erlaubte Anzahl der Symbole ist in der Regel nach oben offen. Dieser Musterstil ist nur auf
-     * ISO-Chronologien anwendbar. Andere Unterschiede zu {@link #CLDR}: </p>
+     * <p>Die erlaubte Anzahl der Symbole ist in der Regel nach oben offen. Anwender sollten
+     * diese Einstellung nur als N&auml;herung zu einer realen Implementierung der Klasse
+     * {@code SimpleDateFormat} ansehen. Zum Beispiel ist dieser Musterstil nur auf
+     * ISO-Chronologien anwendbar. Android wird einige Symbole anders definieren. Andere
+     * Unterschiede zu {@link #CLDR}: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -723,8 +749,8 @@ public enum PatternType
      *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
      *  </tr>
      *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>L</td>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
      *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
      *  </tr>
      *  <tr>
@@ -896,6 +922,15 @@ public enum PatternType
      *      <td>One to three symbols for the abbreviation, four for the full
      *      name, five for a letter symbol or six for the short form. </td>
      *  </tr>
+     *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>The related gregorian year corresponds to the begin of the calendar year
+     *      in non-gregorian calender systems. For formatting or parsing, only the
+     *      ASCII-digits 0-9 will be used, even if other parts of the format use
+     *      alternative digits or other numeral systems. The count of symbols is
+     *      defined within the range 1-9. </td>
+     *  </tr>
      * </table>
      * </div>
      *
@@ -963,6 +998,15 @@ public enum PatternType
      *      <td>Ein bis drei Symbole f&uuml;r die Abk&uuml;rzung, vier
      *      f&uuml;r den vollen Namen, f&uuml;nf f&uuml;r ein Buchstabensymbol
      *      oder sechs f&uuml;r die Kurzform. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>In nicht-gregorianischen Kalendersystemen entspricht es dem
+     *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. Zur Formatierung
+     *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
+     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
+     *      verwenden. Die Anzahl der Symbole ist im Bereich 1-9 zu w&auml;hlen. </td>
      *  </tr>
      * </table>
      * </div>
@@ -1037,6 +1081,7 @@ public enum PatternType
             case 'M':
             case 'd':
             case 'y':
+            case 'r':
                 return true;
             default:
                 return false;
@@ -1146,6 +1191,13 @@ public enum PatternType
                 break;
             case 'u':
                 builder.addYear(PlainDate.YEAR, count, true);
+                break;
+            case 'r':
+                builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+                builder.startSection(Attributes.ZERO_DIGIT, '0');
+                builder.addYear(PlainDate.YEAR, count, true);
+                builder.endSection();
+                builder.endSection();
                 break;
             case 'Q':
                 addQuarterOfYear(builder, count);
@@ -1419,7 +1471,7 @@ public enum PatternType
             case 'B':
             case 'Q':
             case 'q':
-            case 'L':
+            case 'r':
             case 'g':
             case 'e':
             case 'c':
@@ -1642,6 +1694,13 @@ public enum PatternType
                 } else {
                     builder.addYear(intElement, count, false);
                 }
+                break;
+            case 'r':
+                builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+                builder.startSection(Attributes.ZERO_DIGIT, '0');
+                builder.addInteger(intElement, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                builder.endSection();
+                builder.endSection();
                 break;
             case 'M':
                 addMonth(builder, Math.min(count, count), textElement);

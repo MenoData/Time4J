@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MonthNameTest.class,
         PersianCalendarTest.class,
         PersianOperatorTest.class,
+        RelatedGregorianYearTest.class,
         StartOfDayTest.class,
         TabotTest.class,
         ThaiSolarCalendarTest.class,

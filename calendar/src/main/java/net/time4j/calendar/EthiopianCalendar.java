@@ -89,6 +89,7 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  *  <li>{@link #EVANGELIST}</li>
  *  <li>{@link #TABOT}</li>
  * </ul>
@@ -142,6 +143,7 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  *  <li>{@link #EVANGELIST}</li>
  *  <li>{@link #TABOT}</li>
  * </ul>
@@ -290,6 +292,24 @@ public final class EthiopianCalendar
         new StdWeekdayElement<EthiopianCalendar>(EthiopianCalendar.class);
 
     /**
+     * <p>Represents the related gregorian year which corresponds to the start
+     * of any given ethiopian calendar year. </p>
+     *
+     * <p>The element is read-only. </p>
+     *
+     * @since   3.20/4.16
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das gregorianische Bezugsjahr des Beginns eines &auml;thiopischen Kalendarjahres. </p>
+     *
+     * <p>Dieses Element kann nur gelesen werden. </p>
+     *
+     * @since   3.20/4.16
+     */
+    @FormattableElement(format = "r")
+    public static final ChronoElement<Integer> RELATED_GREGORIAN_YEAR = RelatedGregorianYear.SINGLETON;
+
+    /**
      * <p>Represents the evangelist associated with a year of the Ethiopian leap year cycle. </p>
      *
      * <p>The fourth evangelist (John) is always associated with a leap year. </p>
@@ -373,6 +393,9 @@ public final class EthiopianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                RELATED_GREGORIAN_YEAR,
+                RelatedGregorianYear.SINGLETON)
             .appendElement(
                 EVANGELIST,
                 new EvangelistRule())
@@ -1727,6 +1750,31 @@ public final class EthiopianCalendar
         private static int ymValue(EthiopianCalendar date) {
 
             return date.mihret * 13 + date.emonth - 1;
+
+        }
+
+    }
+
+    private static class RelatedGregorianYear
+        extends RelatedGregorianYearElement<EthiopianCalendar> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final RelatedGregorianYear SINGLETON = new RelatedGregorianYear();
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private RelatedGregorianYear() {
+            super(EthiopianCalendar.class);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        protected EthiopianCalendar firstDayOfYear(EthiopianCalendar context) {
+
+            return EthiopianCalendar.of(context.getEra(), context.getYear(), 1, 1);
 
         }
 
