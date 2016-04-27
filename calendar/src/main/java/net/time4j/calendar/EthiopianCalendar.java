@@ -457,7 +457,7 @@ public final class EthiopianCalendar
      * @param   era         Ethiopian era
      * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
      * @param   month       Ethiopian month
-     * @param   dayOfMonth  Ethiopian day of month
+     * @param   dayOfMonth  Ethiopian day of month in the range 1-30
      * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -468,7 +468,7 @@ public final class EthiopianCalendar
      * @param   era         Ethiopian era
      * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
      * @param   month       Ethiopian month
-     * @param   dayOfMonth  Ethiopian day of month
+     * @param   dayOfMonth  Ethiopian day of month in the range 1-30
      * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -489,8 +489,8 @@ public final class EthiopianCalendar
      *
      * @param   era         Ethiopian era
      * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
-     * @param   month       Ethiopian month
-     * @param   dayOfMonth  Ethiopian day of month
+     * @param   month       Ethiopian month in the range 1-13
+     * @param   dayOfMonth  Ethiopian day of month in the range 1-30
      * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -500,8 +500,8 @@ public final class EthiopianCalendar
      *
      * @param   era         Ethiopian era
      * @param   yearOfEra   Ethiopian year of era in the range 1-9999 (1-15499 if amete alem)
-     * @param   month       Ethiopian month
-     * @param   dayOfMonth  Ethiopian day of month
+     * @param   month       Ethiopian month in the range 1-13
+     * @param   dayOfMonth  Ethiopian day of month in the range 1-30
      * @return  new instance of {@code EthiopianCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
