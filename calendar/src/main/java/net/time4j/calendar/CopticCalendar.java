@@ -92,6 +92,7 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
@@ -134,6 +135,7 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
+ *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
@@ -248,6 +250,23 @@ public final class CopticCalendar
     public static final StdCalendarElement<Weekday, CopticCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<>(CopticCalendar.class);
 
+    /**
+     * <p>Represents the related gregorian year which corresponds to the start of any given coptic calendar year. </p>
+     *
+     * <p>The element is read-only. </p>
+     *
+     * @since   3.20/4.16
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das gregorianische Bezugsjahr des Beginns eines koptischen Kalendarjahres. </p>
+     *
+     * <p>Dieses Element kann nur gelesen werden. </p>
+     *
+     * @since   3.20/4.16
+     */
+    @FormattableElement(format = "r")
+    public static final ChronoElement<Integer> RELATED_GREGORIAN_YEAR = RelatedGregorianYear.SINGLETON;
+
     private static final MonthBasedCalendarSystem<CopticCalendar> CALSYS;
     private static final TimeAxis<CopticCalendar.Unit, CopticCalendar> ENGINE;
 
@@ -283,6 +302,9 @@ public final class CopticCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                RELATED_GREGORIAN_YEAR,
+                RelatedGregorianYear.SINGLETON)
             .appendUnit(
                 Unit.YEARS,
                 new CopticUnitRule(Unit.YEARS),
@@ -336,7 +358,7 @@ public final class CopticCalendar
      *
      * @param   cyear   Coptic year in the range 1-9999
      * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
+     * @param   cdom    Coptic day of month in range 1-30
      * @return  new instance of {@code CopticCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -346,7 +368,7 @@ public final class CopticCalendar
      *
      * @param   cyear   Coptic year in the range 1-9999
      * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
+     * @param   cdom    Coptic day of month in range 1-30
      * @return  new instance of {@code CopticCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -365,8 +387,8 @@ public final class CopticCalendar
      * <p>Creates a new instance of a Coptic calendar date. </p>
      *
      * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
+     * @param   cmonth  Coptic monthin range 1-13
+     * @param   cdom    Coptic day of month in range 1-30
      * @return  new instance of {@code CopticCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -375,8 +397,8 @@ public final class CopticCalendar
      * <p>Erzeugt ein neues koptisches Kalenderdatum. </p>
      *
      * @param   cyear   Coptic year in the range 1-9999
-     * @param   cmonth  Coptic month
-     * @param   cdom    Coptic day of month
+     * @param   cmonth  Coptic month in range 1-13
+     * @param   cdom    Coptic day of month in range 1-30
      * @return  new instance of {@code CopticCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @since   3.11/4.8
@@ -1465,6 +1487,31 @@ public final class CopticCalendar
         private static int ymValue(CopticCalendar date) {
 
             return date.cyear * 13 + date.cmonth - 1;
+
+        }
+
+    }
+
+    private static class RelatedGregorianYear
+        extends RelatedGregorianYearElement<CopticCalendar> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final RelatedGregorianYear SINGLETON = new RelatedGregorianYear();
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private RelatedGregorianYear() {
+            super(CopticCalendar.class);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        protected CopticCalendar firstDayOfYear(CopticCalendar context) {
+
+            return CopticCalendar.of(context.cyear, 1, 1);
 
         }
 
