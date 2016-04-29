@@ -170,7 +170,7 @@ abstract class RelatedGregorianYearElement<T extends ChronoEntity<T>>
         boolean lenient
     ) {
 
-        if (value.equals(this.getValue(context))) {
+        if (this.isValid(context, value)) {
             return context;
         } else {
             throw new IllegalArgumentException("The related gregorian year is read-only.");

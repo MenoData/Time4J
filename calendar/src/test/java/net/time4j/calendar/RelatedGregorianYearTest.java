@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
@@ -116,6 +117,35 @@ public class RelatedGregorianYearTest {
         assertThat(
             f.format(date),
             is("4. Yekatit " + NumberSystem.ETHIOPIC.toNumeral(2009) + " (2016)"));
+    }
+
+    @Test
+    public void thaisolar() {
+        assertThat(
+            ThaiSolarCalendar.ofBuddhist(2482, 5, 10).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 1939-05-10
+            is(1939));
+        assertThat(
+            ThaiSolarCalendar.ofBuddhist(2482, 3, 31).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 1940-03-31
+            is(1939));
+        assertThat(
+            ThaiSolarCalendar.ofBuddhist(2558, 3, 15).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 2015-03-15
+            is(2015));
+    }
+
+    @Test
+    public void thaisolarMinimum() {
+        ThaiSolarCalendar date = ThaiSolarCalendar.ofBuddhist(2482, 3, 31);
+        assertThat(
+            date.getMinimum(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR),
+            is(-542));
+    }
+
+    @Test
+    public void thaisolarMaximum() {
+        ThaiSolarCalendar date = ThaiSolarCalendar.ofBuddhist(2482, 3, 31);
+        assertThat(
+            date.getMaximum(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR),
+            is(GregorianMath.MAX_YEAR));
     }
 
     @Test
