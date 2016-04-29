@@ -1698,7 +1698,7 @@ public enum PatternType
             case 'r':
                 builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                 builder.startSection(Attributes.ZERO_DIGIT, '0');
-                builder.addInteger(intElement, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                builder.addYear(intElement, count, true);
                 builder.endSection();
                 builder.endSection();
                 break;
