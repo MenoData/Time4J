@@ -89,10 +89,9 @@ import java.util.Set;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
- *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
  * <p>The date arithmetic uses the ISO-compatible class {@code CalendarUnit} and always delegate to
  * the ISO-equivalent {@code PlainDate} due to the fact that this calendar has always been a derivate
@@ -126,10 +125,9 @@ import java.util.Set;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
- *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <p>Die Datumsarithmetik benutzt die ISO-kompatible Klasse {@code CalendarUnit} und delegiert immer an
  * das ISO-Gegenst&uuml;ck {@code PlainDate}, weil dieser Kalender nur eine Abwandlung des westlichen
@@ -233,24 +231,6 @@ public final class ThaiSolarCalendar
     public static final StdCalendarElement<Weekday, ThaiSolarCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<>(ThaiSolarCalendar.class);
 
-    /**
-     * <p>Represents the related gregorian year which corresponds to the start
-     * of any given thai calendar year. </p>
-     *
-     * <p>The element is read-only. </p>
-     *
-     * @since   3.20/4.16
-     */
-    /*[deutsch]
-     * <p>Repr&auml;sentiert das gregorianische Bezugsjahr des Beginns eines Siam-Jahres. </p>
-     *
-     * <p>Dieses Element kann nur gelesen werden. </p>
-     *
-     * @since   3.20/4.16
-     */
-    @FormattableElement(format = "r")
-    public static final ChronoElement<Integer> RELATED_GREGORIAN_YEAR = RelatedGregorianYear.SINGLETON;
-
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final MonthBasedCalendarSystem<ThaiSolarCalendar> CALSYS;
     private static final TimeAxis<CalendarUnit, ThaiSolarCalendar> ENGINE;
@@ -282,8 +262,8 @@ public final class ThaiSolarCalendar
                 FieldRule.of(MONTH_OF_YEAR),
                 CalendarUnit.MONTHS)
             .appendElement(
-                RELATED_GREGORIAN_YEAR,
-                RelatedGregorianYear.SINGLETON)
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
             .appendElement(
                 DAY_OF_MONTH,
                 FieldRule.of(DAY_OF_MONTH),
@@ -1250,31 +1230,6 @@ public final class ThaiSolarCalendar
         public Chronology<?> preparser() {
 
             return null;
-
-        }
-
-    }
-
-    private static class RelatedGregorianYear
-        extends RelatedGregorianYearElement<ThaiSolarCalendar> {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final RelatedGregorianYear SINGLETON = new RelatedGregorianYear();
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private RelatedGregorianYear() {
-            super(ThaiSolarCalendar.class);
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        protected ThaiSolarCalendar firstDayOfYear(ThaiSolarCalendar context) {
-
-            return context.with(DAY_OF_YEAR, 1);
 
         }
 

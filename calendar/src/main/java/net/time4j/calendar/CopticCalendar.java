@@ -92,10 +92,9 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
- *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
  * <p>Example of usage: </p>
  *
@@ -135,10 +134,9 @@ import java.util.Locale;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
- *  <li>{@link #RELATED_GREGORIAN_YEAR}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <p>Anwendungsbeispiel: </p>
  *
@@ -250,23 +248,6 @@ public final class CopticCalendar
     public static final StdCalendarElement<Weekday, CopticCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<>(CopticCalendar.class);
 
-    /**
-     * <p>Represents the related gregorian year which corresponds to the start of any given coptic calendar year. </p>
-     *
-     * <p>The element is read-only. </p>
-     *
-     * @since   3.20/4.16
-     */
-    /*[deutsch]
-     * <p>Repr&auml;sentiert das gregorianische Bezugsjahr des Beginns eines koptischen Kalendarjahres. </p>
-     *
-     * <p>Dieses Element kann nur gelesen werden. </p>
-     *
-     * @since   3.20/4.16
-     */
-    @FormattableElement(format = "r")
-    public static final ChronoElement<Integer> RELATED_GREGORIAN_YEAR = RelatedGregorianYear.SINGLETON;
-
     private static final MonthBasedCalendarSystem<CopticCalendar> CALSYS;
     private static final TimeAxis<CopticCalendar.Unit, CopticCalendar> ENGINE;
 
@@ -303,8 +284,8 @@ public final class CopticCalendar
                 new WeekdayRule(),
                 Unit.DAYS)
             .appendElement(
-                RELATED_GREGORIAN_YEAR,
-                RelatedGregorianYear.SINGLETON)
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
             .appendUnit(
                 Unit.YEARS,
                 new CopticUnitRule(Unit.YEARS),
@@ -1487,31 +1468,6 @@ public final class CopticCalendar
         private static int ymValue(CopticCalendar date) {
 
             return date.cyear * 13 + date.cmonth - 1;
-
-        }
-
-    }
-
-    private static class RelatedGregorianYear
-        extends RelatedGregorianYearElement<CopticCalendar> {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final RelatedGregorianYear SINGLETON = new RelatedGregorianYear();
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private RelatedGregorianYear() {
-            super(CopticCalendar.class);
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        protected CopticCalendar firstDayOfYear(CopticCalendar context) {
-
-            return CopticCalendar.of(context.cyear, 1, 1);
 
         }
 
