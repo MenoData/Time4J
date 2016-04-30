@@ -1,5 +1,6 @@
 ## [v3.20] not yet released
 ### Added
+- Related gregorian year for non-gregorian calendars [#370]
 - Make MachineTime comparable [#489]
 - Modern-coverage of languages defined in CLDR [#367]
 - Support for Uyghur [#496]
