@@ -7,6 +7,7 @@ import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
+import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -29,16 +30,16 @@ public class RelatedGregorianYearTest {
     @Test
     public void coptic() {
         assertThat(
-            CopticCalendar.of(1724, 1, 1).get(CopticCalendar.RELATED_GREGORIAN_YEAR), // 2007-09-12
+            CopticCalendar.of(1724, 1, 1).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2007-09-12
             is(2007));
         assertThat(
-            CopticCalendar.of(1724, 6, 1).get(CopticCalendar.RELATED_GREGORIAN_YEAR), // 2008-02-09
+            CopticCalendar.of(1724, 6, 1).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2008-02-09
             is(2007));
         assertThat(
-            CopticCalendar.of(1724, 13, 5).get(CopticCalendar.RELATED_GREGORIAN_YEAR),
+            CopticCalendar.of(1724, 13, 5).get(CommonElements.RELATED_GREGORIAN_YEAR),
             is(2007));
         assertThat(
-            CopticCalendar.of(1724, 13, 5).plus(CalendarDays.ONE).get(CopticCalendar.RELATED_GREGORIAN_YEAR),
+            CopticCalendar.of(1724, 13, 5).plus(CalendarDays.ONE).get(CommonElements.RELATED_GREGORIAN_YEAR),
             is(2008));
     }
 
@@ -46,7 +47,7 @@ public class RelatedGregorianYearTest {
     public void copticMinimum() {
         CopticCalendar date = CopticCalendar.of(1724, 13, 5);
         assertThat(
-            date.getMinimum(CopticCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(284));
     }
 
@@ -54,7 +55,7 @@ public class RelatedGregorianYearTest {
     public void copticMaximum() {
         CopticCalendar date = CopticCalendar.of(1724, 13, 5);
         assertThat(
-            date.getMaximum(CopticCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(10282));
     }
 
@@ -80,10 +81,10 @@ public class RelatedGregorianYearTest {
     @Test
     public void ethiopian() {
         assertThat(
-            EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 1, 2).get(EthiopianCalendar.RELATED_GREGORIAN_YEAR),
+            EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 1, 2).get(CommonElements.RELATED_GREGORIAN_YEAR),
             is(2016));
         assertThat(
-            EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 6, 2).get(EthiopianCalendar.RELATED_GREGORIAN_YEAR),
+            EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 6, 2).get(CommonElements.RELATED_GREGORIAN_YEAR),
             is(2016));
     }
 
@@ -91,7 +92,7 @@ public class RelatedGregorianYearTest {
     public void ethiopianMinimum() {
         EthiopianCalendar date = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 6, 2);
         assertThat(
-            date.getMinimum(EthiopianCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(-5492));
     }
 
@@ -99,7 +100,7 @@ public class RelatedGregorianYearTest {
     public void ethiopianMaximum() {
         EthiopianCalendar date = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2009, 6, 2);
         assertThat(
-            date.getMaximum(EthiopianCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(10006));
     }
 
@@ -122,13 +123,13 @@ public class RelatedGregorianYearTest {
     @Test
     public void thaisolar() {
         assertThat(
-            ThaiSolarCalendar.ofBuddhist(2482, 5, 10).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 1939-05-10
+            ThaiSolarCalendar.ofBuddhist(2482, 5, 10).get(CommonElements.RELATED_GREGORIAN_YEAR), // 1939-05-10
             is(1939));
         assertThat(
-            ThaiSolarCalendar.ofBuddhist(2482, 3, 31).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 1940-03-31
+            ThaiSolarCalendar.ofBuddhist(2482, 3, 31).get(CommonElements.RELATED_GREGORIAN_YEAR), // 1940-03-31
             is(1939));
         assertThat(
-            ThaiSolarCalendar.ofBuddhist(2558, 3, 15).get(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR), // 2015-03-15
+            ThaiSolarCalendar.ofBuddhist(2558, 3, 15).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2015-03-15
             is(2015));
     }
 
@@ -136,7 +137,7 @@ public class RelatedGregorianYearTest {
     public void thaisolarMinimum() {
         ThaiSolarCalendar date = ThaiSolarCalendar.ofBuddhist(2482, 3, 31);
         assertThat(
-            date.getMinimum(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(-542));
     }
 
@@ -144,18 +145,125 @@ public class RelatedGregorianYearTest {
     public void thaisolarMaximum() {
         ThaiSolarCalendar date = ThaiSolarCalendar.ofBuddhist(2482, 3, 31);
         assertThat(
-            date.getMaximum(ThaiSolarCalendar.RELATED_GREGORIAN_YEAR),
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
             is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void hijri() {
+        assertThat(
+            HijriCalendar.ofUmalqura(1411, 4, 30).get(CommonElements.RELATED_GREGORIAN_YEAR), // 1990-11-18
+            is(1990));
+        assertThat(
+            HijriCalendar.ofUmalqura(1411, 11, 30).get(CommonElements.RELATED_GREGORIAN_YEAR), // 1991-06-13
+            is(1990));
+    }
+
+    @Test
+    public void hijriMinimum() {
+        HijriCalendar date = HijriCalendar.ofUmalqura(1436, 4, 25);
+        assertThat(
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(1882));
+        assertThat(
+            date.withVariant(HijriAlgorithm.WEST_ISLAMIC_ASTRO).getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(622));
+    }
+
+    @Test
+    public void hijriMaximum() {
+        HijriCalendar date = HijriCalendar.ofUmalqura(1436, 4, 25);
+        assertThat(
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(2076));
+        assertThat(
+            date.withVariant(HijriAlgorithm.WEST_ISLAMIC_ASTRO).getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(2173));
+    }
+
+    @Test
+    public void persian() {
+        assertThat(
+            PersianCalendar.of(1394, 6, 27).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2015-09-18
+            is(2015));
+        assertThat(
+            PersianCalendar.of(1394, 10, 30).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2016-01-20
+            is(2015));
+    }
+
+    @Test
+    public void persianMinimum() {
+        PersianCalendar date = PersianCalendar.of(1394, 10, 30);
+        assertThat(
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(622));
+    }
+
+    @Test
+    public void persianMaximum() {
+        PersianCalendar date = PersianCalendar.of(1394, 10, 30);
+        assertThat(
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(3621));
+    }
+
+    @Test
+    public void minguo() {
+        assertThat(
+            MinguoCalendar.of(MinguoEra.ROC, 104, 2, 15).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2015-02-15
+            is(2015));
+    }
+
+    @Test
+    public void minguoMinimum() {
+        MinguoCalendar date = MinguoCalendar.of(MinguoEra.ROC, 104, 2, 15);
+        assertThat(
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(GregorianMath.MIN_YEAR));
+    }
+
+    @Test
+    public void minguoMaximum() {
+        MinguoCalendar date = MinguoCalendar.of(MinguoEra.ROC, 104, 2, 15);
+        assertThat(
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(GregorianMath.MAX_YEAR));
+    }
+
+    @Test
+    public void julian() {
+        assertThat(
+            JulianCalendar.of(HistoricEra.AD, 2015, 1, 1).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2016-01-13
+            is(2015));
+        assertThat(
+            JulianCalendar.of(HistoricEra.AD, 2015, 12, 31).get(CommonElements.RELATED_GREGORIAN_YEAR), // 2016-01-13
+            is(2015));
+    }
+
+    @Test
+    public void julianMinimum() {
+        JulianCalendar date = JulianCalendar.of(HistoricEra.AD, 1394, 10, 30);
+        assertThat(
+            date.getMinimum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(-1000020533));
+    }
+
+    @Test
+    public void julianMaximum() {
+        JulianCalendar date = JulianCalendar.of(HistoricEra.AD, 1394, 10, 30);
+        assertThat(
+            date.getMaximum(CommonElements.RELATED_GREGORIAN_YEAR),
+            is(1000020533));
     }
 
     @Test
     public void readOnlyElement1() {
         CopticCalendar date = CopticCalendar.of(1724, 13, 5);
         assertThat(
-            date.isValid(CopticCalendar.RELATED_GREGORIAN_YEAR, 2007),
+            date.isValid(CommonElements.RELATED_GREGORIAN_YEAR, 2007),
             is(true));
         assertThat(
-            date.with(CopticCalendar.RELATED_GREGORIAN_YEAR, 2007),
+            date.with(CommonElements.RELATED_GREGORIAN_YEAR, 2007),
             is(date));
     }
 
@@ -163,41 +271,41 @@ public class RelatedGregorianYearTest {
     public void readOnlyElement2() {
         CopticCalendar date = CopticCalendar.of(1724, 13, 5);
         assertThat(
-            date.isValid(CopticCalendar.RELATED_GREGORIAN_YEAR, 2008),
+            date.isValid(CommonElements.RELATED_GREGORIAN_YEAR, 2008),
             is(false));
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void readOnlyElement3() {
         CopticCalendar date = CopticCalendar.of(1724, 13, 5);
-        date.with(CopticCalendar.RELATED_GREGORIAN_YEAR, 2008);
+        date.with(CommonElements.RELATED_GREGORIAN_YEAR, 2008);
     }
 
     // --- basic element tests ---
 
     @Test
     public void name() {
-        assertThat(CopticCalendar.RELATED_GREGORIAN_YEAR.name(), is("RELATED_GREGORIAN_YEAR"));
+        assertThat(CommonElements.RELATED_GREGORIAN_YEAR.name(), is("RELATED_GREGORIAN_YEAR"));
     }
 
     @Test
     public void isDateElement() {
-        assertThat(CopticCalendar.RELATED_GREGORIAN_YEAR.isDateElement(), is(true));
+        assertThat(CommonElements.RELATED_GREGORIAN_YEAR.isDateElement(), is(true));
     }
 
     @Test
     public void isTimeElement() {
-        assertThat(CopticCalendar.RELATED_GREGORIAN_YEAR.isTimeElement(), is(false));
+        assertThat(CommonElements.RELATED_GREGORIAN_YEAR.isTimeElement(), is(false));
     }
 
     @Test
     public void getSymbol() {
-        assertThat(CopticCalendar.RELATED_GREGORIAN_YEAR.getSymbol(), is('r'));
+        assertThat(CommonElements.RELATED_GREGORIAN_YEAR.getSymbol(), is('r'));
     }
 
     @Test
     public void serialization() throws IOException, ClassNotFoundException {
-        roundtrip(CopticCalendar.RELATED_GREGORIAN_YEAR);
+        roundtrip(CommonElements.RELATED_GREGORIAN_YEAR);
     }
 
     private static void roundtrip(Object obj)

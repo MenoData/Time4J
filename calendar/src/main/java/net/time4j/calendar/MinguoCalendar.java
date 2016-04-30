@@ -91,7 +91,7 @@ import java.util.Set;
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
@@ -114,7 +114,7 @@ import java.util.Set;
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
@@ -234,6 +234,9 @@ public final class MinguoCalendar
                 MONTH_OF_YEAR,
                 FieldRule.of(MONTH_OF_YEAR),
                 CalendarUnit.MONTHS)
+            .appendElement(
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<MinguoCalendar>(CALSYS, DAY_OF_YEAR))
             .appendElement(
                 DAY_OF_MONTH,
                 FieldRule.of(DAY_OF_MONTH),

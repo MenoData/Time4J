@@ -92,7 +92,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
  * <p>Example of usage: </p>
  *
@@ -139,7 +139,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <p>Anwendungsbeispiel: </p>
  *
@@ -317,6 +317,9 @@ public final class HijriCalendar
             .appendElement(
                 MONTH_OF_YEAR,
                 new MonthRule())
+            .appendElement(
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<HijriCalendar>(CALSYS, DAY_OF_YEAR))
             .appendElement(
                 DAY_OF_MONTH,
                 new IntegerRule(DAY_OF_MONTH_INDEX))

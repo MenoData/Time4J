@@ -89,7 +89,7 @@ import java.util.Locale;
  *  <li>{@link #DATE}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
  * <p>Example of usage: </p>
  *
@@ -124,7 +124,7 @@ import java.util.Locale;
  *  <li>{@link #DATE}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <p>Anwendungsbeispiel: </p>
  *
@@ -289,6 +289,9 @@ public final class JulianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<JulianCalendar>(CALSYS, DAY_OF_YEAR))
             .appendUnit(
                 Unit.YEARS,
                 new JulianUnitRule(Unit.YEARS),
