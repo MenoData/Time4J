@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Timezone.java) is part of project Time4J.
  *
@@ -343,7 +343,7 @@ public abstract class Timezone
      * @return  unmodifiable list of available timezone ids in ascending order
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
-     * @see     ZoneProvider#getName()
+     * @see     ZoneModelProvider#getName()
      */
     /*[deutsch]
      * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen zum angegebenen
@@ -358,7 +358,7 @@ public abstract class Timezone
      * @return  unmodifiable list of available timezone ids in ascending order
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
-     * @see     ZoneProvider#getName()
+     * @see     ZoneModelProvider#getName()
      */
     public static List<TZID> getAvailableIDs(String provider) {
 
@@ -397,7 +397,7 @@ public abstract class Timezone
      * @return  unmodifiable set of preferred timezone ids
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
-     * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
+     * @see     ZoneNameProvider#getPreferredIDs(Locale, boolean)
      */
     /*[deutsch]
      * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
@@ -419,7 +419,7 @@ public abstract class Timezone
      * @return  unmodifiable set of preferred timezone ids
      * @throws  IllegalArgumentException if the provider argument is empty
      * @since   2.2
-     * @see     ZoneProvider#getPreferredIDs(Locale, boolean)
+     * @see     ZoneNameProvider#getPreferredIDs(Locale, boolean)
      */
     public static Set<TZID> getPreferredIDs(
         Locale locale,
@@ -934,7 +934,7 @@ public abstract class Timezone
      *
      * @return  unmodifiable list of provider names
      * @since   2.2
-     * @see     ZoneProvider#getName()
+     * @see     ZoneModelProvider#getName()
      */
     /*[deutsch]
      * <p>Liefert die Namen aller registrierten
@@ -942,7 +942,7 @@ public abstract class Timezone
      *
      * @return  unmodifiable list of provider names
      * @since   2.2
-     * @see     ZoneProvider#getName()
+     * @see     ZoneModelProvider#getName()
      */
     public static Set<String> getRegisteredProviders() {
 

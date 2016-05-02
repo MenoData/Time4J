@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TZID.java) is part of project Time4J.
  *
@@ -33,9 +33,9 @@ package net.time4j.tz;
  * already known. </p>
  *
  * <p><strong>Provider-specific keys</strong> have the
- * {@link ZoneProvider#getName() name} of the provider followed by the
+ * {@link ZoneModelProvider#getName() name} of the provider followed by the
  * separator char &quot;~&quot; and the normal canonical identifier. This
- * form can be used if a custom registered {@link ZoneProvider} shall be
+ * form can be used if a custom registered {@link ZoneModelProvider} shall be
  * used instead of the default provider for lookup of the zonal data. For
  * example following key will search the timezone data via the API of
  * {@code java.util.TimeZone} even if there is configured another default
@@ -66,10 +66,10 @@ package net.time4j.tz;
  * zu einem gegebenen Zeitpunkt schon bekannt ist. </p>
  *
  * <p><strong>Provider-spezifische Schl&uuml;ssel</strong> haben den
- * {@link ZoneProvider#getName() Namen} des {@code ZoneProvider} gefolgt
+ * {@link ZoneModelProvider#getName() Namen} des {@code ZoneProvider} gefolgt
  * von der Tilde &quot;~&quot; und der normalen kanonischen ID. Diese
  * Form kann verwendet werden, wenn ein registrierter benutzerdefinierter
- * {@link ZoneProvider} an Stelle des Standard-Provider f&uuml;r die
+ * {@link ZoneModelProvider} an Stelle des Standard-Provider f&uuml;r die
  * Suche nach den Zeitzonendaten herangezogen werden soll. Zum Beispiel
  * wird folgender Schl&uuml;ssel die Zeitzonendaten &uuml;ber das API von
  * {@code java.util.TimeZone} suchen, sogar wenn ein anderer Standard-Provider
