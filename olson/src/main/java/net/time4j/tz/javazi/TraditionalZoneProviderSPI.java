@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TraditionalZoneProviderSPI.java) is part of project Time4J.
  *
@@ -21,15 +21,12 @@
 
 package net.time4j.tz.javazi;
 
-import net.time4j.tz.NameStyle;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
-import net.time4j.tz.ZoneProvider;
-import net.time4j.tz.spi.ZoneNameProviderSPI;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -44,11 +41,7 @@ import java.util.TimeZone;
  * @doctags.exclude
  */
 public class TraditionalZoneProviderSPI
-    implements ZoneProvider {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ZoneProvider NAME_PROVIDER = new ZoneNameProviderSPI();
+    implements ZoneModelProvider {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -118,30 +111,16 @@ public class TraditionalZoneProviderSPI
     }
 
     @Override
+    public ZoneNameProvider getSpecificZoneNameRepository() {
+
+        return null;
+
+    }
+
+    @Override
     public TransitionHistory load(String zoneID) {
 
         return JVMZoneReader.getHistory(zoneID);
-
-    }
-
-    @Override
-    public Set<String> getPreferredIDs(
-        Locale locale,
-        boolean smart
-    ) {
-
-        return NAME_PROVIDER.getPreferredIDs(locale, smart);
-
-    }
-
-    @Override
-    public String getDisplayName(
-        String tzid,
-        NameStyle style,
-        Locale locale
-    ) {
-
-        return NAME_PROVIDER.getDisplayName(tzid, style, locale);
 
     }
 

@@ -5,22 +5,21 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
-import net.time4j.tz.NameStyle;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.ZoneProvider;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -89,19 +88,11 @@ public class StartOfDayTest {
     }
 
     private static class TestProvider
-        implements ZoneProvider {
+        implements ZoneModelProvider {
 
         @Override
         public Set<String> getAvailableIDs() {
             return Collections.singleton("America/Sao_Paulo");
-        }
-
-        @Override
-        public Set<String> getPreferredIDs(
-            Locale locale,
-            boolean smart
-        ) {
-            return Collections.emptySet();
         }
 
         @Override
@@ -137,15 +128,11 @@ public class StartOfDayTest {
             return "";
         }
 
-         @Override
-        public String getDisplayName(
-            String tzid,
-            NameStyle style,
-            Locale locale
-        ) {
-            return "";
+        @Override
+        public ZoneNameProvider getSpecificZoneNameRepository() {
+            return null;
         }
 
-   }
+    }
 
 }

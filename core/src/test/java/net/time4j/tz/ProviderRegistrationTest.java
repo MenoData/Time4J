@@ -1,12 +1,12 @@
 package net.time4j.tz;
 
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -42,7 +42,7 @@ public class ProviderRegistrationTest {
     }
 
     private static class DummyProvider
-        implements ZoneProvider {
+        implements ZoneModelProvider {
 
         private final String name;
 
@@ -52,14 +52,6 @@ public class ProviderRegistrationTest {
 
         @Override
         public Set<String> getAvailableIDs() {
-            return Collections.emptySet();
-        }
-
-        @Override
-        public Set<String> getPreferredIDs(
-            Locale locale,
-            boolean smart
-        ) {
             return Collections.emptySet();
         }
 
@@ -94,12 +86,8 @@ public class ProviderRegistrationTest {
         }
 
         @Override
-        public String getDisplayName(
-            String tzid,
-            NameStyle style,
-            Locale locale
-        ) {
-            return "";
+        public ZoneNameProvider getSpecificZoneNameRepository() {
+            return null;
         }
 
     }

@@ -25,9 +25,8 @@ import net.time4j.Moment;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.olson.AFRICA;
 import net.time4j.tz.olson.AMERICA;
 import net.time4j.tz.olson.ANTARCTICA;
@@ -47,14 +46,14 @@ import java.util.Set;
 
 
 /**
- * <p>Special implementation of {@code ZoneProvider} whose only purpose is
+ * <p>Special implementation of {@code ZoneNameProvider} whose only purpose is
  * to assist in resolving timezone names to ids. </p>
  *
  * @author  Meno Hochschild
  * @since   3.1
  */
 public class ZoneNameProviderSPI
-    implements ZoneProvider {
+    implements ZoneNameProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -110,13 +109,6 @@ public class ZoneNameProviderSPI
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public Set<String> getAvailableIDs() {
-
-        return Collections.emptySet();
-
-    }
-
-    @Override
     public Set<String> getPreferredIDs(
         Locale locale,
         boolean smart
@@ -124,16 +116,22 @@ public class ZoneNameProviderSPI
 
         String country = locale.getCountry();
 
-        if (smart && country.equals("US")) {
-            Set<String> tzids = new LinkedHashSet<String>();
-            tzids.add("America/New_York");
-            tzids.add("America/Chicago");
-            tzids.add("America/Denver");
-            tzids.add("America/Los_Angeles");
-            tzids.add("America/Anchorage");
-            tzids.add("Pacific/Honolulu");
-            tzids.add("America/Adak");
-            return Collections.unmodifiableSet(tzids);
+        if (smart) {
+            if (country.equals("US")) {
+                Set<String> tzids = new LinkedHashSet<String>();
+                tzids.add("America/New_York");
+                tzids.add("America/Chicago");
+                tzids.add("America/Denver");
+                tzids.add("America/Los_Angeles");
+                tzids.add("America/Anchorage");
+                tzids.add("Pacific/Honolulu");
+                tzids.add("America/Adak");
+                return Collections.unmodifiableSet(tzids);
+            } else if (country.equals("CN")) {
+                return Collections.singleton(ASIA.SHANGHAI.canonical());
+            } else if (country.equals("DE")) {
+                return Collections.singleton(EUROPE.BERLIN.canonical());
+            }
         }
 
         Set<String> result = TERRITORIES.get(country);
@@ -143,48 +141,6 @@ public class ZoneNameProviderSPI
         }
 
         return result;
-
-    }
-
-    @Override
-    public Map<String, String> getAliases() {
-
-        return Collections.emptyMap();
-
-    }
-
-    @Override
-    public String getFallback() {
-
-        return "";
-
-    }
-
-    @Override
-    public String getName() {
-
-        return "#STD_ZONE_NAMES";
-
-    }
-
-    @Override
-    public String getLocation() {
-
-        return "";
-
-    }
-
-    @Override
-    public String getVersion() {
-
-        return "";
-
-    }
-
-    @Override
-    public TransitionHistory load(String zoneID) {
-
-        return null;
 
     }
 

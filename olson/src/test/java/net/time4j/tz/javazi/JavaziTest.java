@@ -8,7 +8,7 @@ import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneModelProvider;
 
 import java.io.IOException;
 import org.junit.BeforeClass;
@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 public class JavaziTest {
 
     private static boolean testable = false;
-    private static ZoneProvider zp = null;
+    private static ZoneModelProvider zp = null;
 
     @BeforeClass
     public static void init() {
@@ -220,16 +220,16 @@ public class JavaziTest {
         }
     }
 
-    @Test
+    @Test // expects tzdb-version 2015a or higher
     public void dhakaAtEndOf2009a() throws IOException {
         if (testable) {
             TransitionHistory history = zp.load("Asia/Dhaka");
             PlainDate date = PlainDate.of(2009, 12, 31);
-            PlainTime time = PlainTime.of(23, 59); // dirty hack in JDK for T24
+            PlainTime time = PlainTime.of(24);
             Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
             ZonalTransition conflict = // at first ambivalent time
-                history.getConflictTransition(date, PlainTime.of(22, 59));
+                history.getConflictTransition(date, PlainTime.of(23));
 
             assertThat(
                 conflict.getPosixTime(),
@@ -246,12 +246,12 @@ public class JavaziTest {
         }
     }
 
-    @Test
+    @Test // expects tzdb-version 2015a or higher
     public void dhakaAtEndOf2009b() throws IOException {
         if (testable) {
             TransitionHistory history = zp.load("Asia/Dhaka");
             PlainDate date = PlainDate.of(2009, 12, 31);
-            PlainTime time = PlainTime.of(23, 59); // dirty hack in JDK for T24
+            PlainTime time = PlainTime.of(24);
             Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
             ZonalTransition conflict = // any ambivalent time

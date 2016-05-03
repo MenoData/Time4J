@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MilZoneProviderSPI.java) is part of project Time4J.
  *
@@ -26,7 +26,8 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.other.MilitaryZone;
 
 import java.util.Collections;
@@ -43,7 +44,7 @@ import java.util.Set;
  * @since   3.1
  */
 public class MilZoneProviderSPI
-    implements ZoneProvider {
+    implements ZoneModelProvider, ZoneNameProvider {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -99,6 +100,13 @@ public class MilZoneProviderSPI
     public TransitionHistory load(String zoneID) {
 
         return Timezone.of(ZonalOffset.parse(zoneID)).getHistory();
+
+    }
+
+    @Override
+    public ZoneNameProvider getSpecificZoneNameRepository() {
+
+        return this;
 
     }
 

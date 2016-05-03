@@ -26,7 +26,8 @@ import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.other.WindowsZone;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ import java.util.Set;
  * @since   3.1
  */
 public class WinZoneProviderSPI
-    implements ZoneProvider {
+    implements ZoneModelProvider, ZoneNameProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -129,6 +130,13 @@ public class WinZoneProviderSPI
     public TransitionHistory load(String zoneID) {
 
         return null; // uses fallback
+
+    }
+
+    @Override
+    public ZoneNameProvider getSpecificZoneNameRepository() {
+
+        return this;
 
     }
 

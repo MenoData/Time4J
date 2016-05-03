@@ -36,7 +36,7 @@ import java.util.Set;
  * constructor. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
+ * @since   3.20/4.16
  * @see     java.util.ServiceLoader
  */
 /*[deutsch]
@@ -52,7 +52,7 @@ import java.util.Set;
  * Argumente definieren. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
+ * @since   3.20/4.16
  * @see     java.util.ServiceLoader
  */
 public interface ZoneModelProvider {
@@ -203,5 +203,17 @@ public interface ZoneModelProvider {
      * @return  String (for example &quot;2011n&quot;) or empty if unknown
      */
     String getVersion();
+
+    /**
+     * <p>Queries if specific zone names are to be used. </p>
+     *
+     * @return  specific name repository or {@code null} if not relevant
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob spezifische Zeitzonennamen zu verwenden sind. </p>
+     *
+     * @return  specific name repository or {@code null} if not relevant
+     */
+    ZoneNameProvider getSpecificZoneNameRepository();
 
 }
