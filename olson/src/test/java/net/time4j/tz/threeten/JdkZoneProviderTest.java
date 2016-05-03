@@ -7,7 +7,7 @@ import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneModelProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class JdkZoneProviderTest {
 
-    private static ZoneProvider zp = null;
+    private static ZoneModelProvider zp = null;
 
     @BeforeClass
     public static void init() {

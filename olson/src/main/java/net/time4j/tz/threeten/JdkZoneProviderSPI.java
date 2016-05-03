@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JdkZoneProviderSPI.java) is part of project Time4J.
  *
@@ -25,16 +25,15 @@ import net.time4j.Month;
 import net.time4j.PlainTime;
 import net.time4j.TemporalType;
 import net.time4j.Weekday;
-import net.time4j.tz.NameStyle;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
-import net.time4j.tz.ZoneProvider;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.model.DaylightSavingRule;
 import net.time4j.tz.model.GregorianTimezoneRule;
 import net.time4j.tz.model.OffsetIndicator;
 import net.time4j.tz.model.TransitionModel;
-import net.time4j.tz.spi.ZoneNameProviderSPI;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -47,7 +46,6 @@ import java.time.zone.ZoneRulesProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,11 +58,7 @@ import java.util.Set;
  * @since   4.0
  */
 public class JdkZoneProviderSPI
-    implements ZoneProvider {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ZoneProvider NAME_PROVIDER = new ZoneNameProviderSPI();
+    implements ZoneModelProvider {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -120,6 +114,13 @@ public class JdkZoneProviderSPI
     public String getVersion() {
 
         return this.version;
+
+    }
+
+    @Override
+    public ZoneNameProvider getSpecificZoneNameRepository() {
+
+        return null;
 
     }
 
@@ -192,27 +193,6 @@ public class JdkZoneProviderSPI
         } catch (ZoneRulesException ex) {
             throw new IllegalArgumentException(ex);
         }
-
-    }
-
-    @Override
-    public Set<String> getPreferredIDs(
-        Locale locale,
-        boolean smart
-    ) {
-
-        return NAME_PROVIDER.getPreferredIDs(locale, smart);
-
-    }
-
-    @Override
-    public String getDisplayName(
-        String tzid,
-        NameStyle style,
-        Locale locale
-    ) {
-
-        return NAME_PROVIDER.getDisplayName(tzid, style, locale);
 
     }
 

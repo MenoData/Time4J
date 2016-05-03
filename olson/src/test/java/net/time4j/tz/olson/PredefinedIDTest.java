@@ -54,23 +54,13 @@ public class PredefinedIDTest {
 
     @Test
     public void equalsByObject() {
-        TZID tzid = new TZID() {
-            @Override
-            public String canonical() {
-                return EUROPE.BERLIN.canonical();
-            }
-        };
+        TZID tzid = EUROPE.BERLIN::canonical;
         assertThat(tzid.equals(EUROPE.BERLIN), is(false));
     }
 
     @Test
     public void equalsByCanonical() {
-        TZID tzid = new TZID() {
-            @Override
-            public String canonical() {
-                return EUROPE.BERLIN.canonical();
-            }
-        };
+        TZID tzid = EUROPE.BERLIN::canonical;
         assertThat(
             tzid.canonical().equals(EUROPE.BERLIN.canonical()),
             is(true));
@@ -100,7 +90,6 @@ public class PredefinedIDTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
     public void getPreferredIDsOfBerlin() {
         TZID tzid = EUROPE.BERLIN;
         assertThat(
@@ -111,7 +100,7 @@ public class PredefinedIDTest {
     @Test
     public void getSmartPreferredIDsOfUS() {
         Set<TZID> prefs = Timezone.getPreferredIDs(Locale.US, true, "DEFAULT");
-        Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
+        Map<String, List<TZID>> map = new HashMap<>();
 
         for (TZID tzid : prefs) {
             String name =
@@ -119,7 +108,7 @@ public class PredefinedIDTest {
                     NameStyle.LONG_STANDARD_TIME, Locale.US);
             List<TZID> ids = map.get(name);
             if (ids == null) {
-                ids = new ArrayList<TZID>();
+                ids = new ArrayList<>();
                 map.put(name, ids);
             }
             ids.add(tzid);

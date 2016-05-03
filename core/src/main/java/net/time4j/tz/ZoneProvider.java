@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZoneProvider.java) is part of project Time4J.
  *
@@ -21,14 +21,9 @@
 
 package net.time4j.tz;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 
 /**
- * <p>SPI interface which encapsulates the timezone repository and
- * provides all necessary data for a given timezone id. </p>
+ * <p>SPI interface which encapsulates the timezone transitions and names. </p>
  *
  * <p>Implementations are usually stateless and should normally not
  * try to manage a cache. Instead Time4J uses its own cache. The
@@ -39,11 +34,10 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @since   2.2
  * @see     java.util.ServiceLoader
+ * @deprecated  Use the super interfaces instead
  */
 /*[deutsch]
- * <p>SPI-Interface, das eine Zeitzonendatenbank kapselt und passend zu
- * einer Zeitzonen-ID (hier als String statt als {@code TZID}) die
- * Zeitzonendaten liefert. </p>
+ * <p>SPI-Interface, das eine Zeitzonendatenbank mitsamt Zeitzonennamen kapselt. </p>
  *
  * <p>Implementierungen sind in der Regel zustandslos und halten keinen
  * Cache. Letzterer sollte normalerweise der Klasse {@code Timezone}
@@ -55,219 +49,10 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @since   2.2
  * @see     java.util.ServiceLoader
+ * @deprecated  Use the super interfaces instead
  */
-public interface ZoneProvider {
-
-    //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Gets all available and supported timezone identifiers. </p>
-     *
-     * @return  unmodifiable set of timezone ids
-     * @see     java.util.TimeZone#getAvailableIDs()
-     */
-    /*[deutsch]
-     * <p>Liefert alle verf&uuml;gbaren Zeitzonenkennungen. </p>
-     *
-     * @return  unmodifiable set of timezone ids
-     * @see     java.util.TimeZone#getAvailableIDs()
-     */
-    Set<String> getAvailableIDs();
-
-    /**
-     * <p>Gets a {@code Set} of preferred timezone IDs for given
-     * ISO-3166-country code. </p>
-     *
-     * <p>This information is necessary to enable parsing of
-     * timezone names. </p>
-     *
-     * @param   locale      ISO-3166-alpha-2-country to be evaluated
-     * @param   smart       if {@code true} then try to select zone ids such
-     *                      that there is only one preferred id per zone name
-     * @return  unmodifiable set of preferred timezone ids
-     */
-    /*[deutsch]
-     * <p>Liefert die f&uuml;r einen gegebenen ISO-3166-L&auml;ndercode
-     * bevorzugten Zeitzonenkennungen. </p>
-     *
-     * <p>Diese Information ist f&uuml;r die Interpretation von Zeitzonennamen
-     * notwendig. </p>
-     *
-     * @param   locale      ISO-3166-alpha-2-country to be evaluated
-     * @param   smart       if {@code true} then try to select zone ids such
-     *                      that there is only one preferred id per zone name
-     * @return  unmodifiable set of preferred timezone ids
-     */
-    Set<String> getPreferredIDs(
-        Locale locale,
-        boolean smart
-    );
-
-    /**
-     * <p>Gets an alias table whose keys represent alternative identifiers
-     * mapped to other aliases or finally canonical timezone IDs.. </p>
-     *
-     * <p>Example: &quot;PST&quot; =&gt; &quot;America/Los_Angeles&quot;. </p>
-     *
-     * @return  map from all timezone aliases to canoncial ids
-     */
-    /*[deutsch]
-     * <p>Liefert eine Alias-Tabelle, in der die Schl&uuml;ssel alternative
-     * Zonen-IDs darstellen und in der die zugeordneten Werte wieder
-     * Aliasnamen oder letztlich kanonische Zonen-IDs sind. </p>
-     *
-     * <p>Beispiel: &quot;PST&quot; =&gt; &quot;America/Los_Angeles&quot;. </p>
-     *
-     * @return  map from all timezone aliases to canoncial ids
-     */
-    Map<String, String> getAliases();
-
-    /**
-     * <p>Loads an offset transition history for given timezone id. </p>
-     *
-     * <p>The argument never contains the provider name as prefix. It is
-     * instead the part after the &quot;~&quot;-char (if not absent). </p>
-     *
-     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @return  timezone history or {@code null} if there are no data
-     * @throws  IllegalArgumentException if given id is wrong
-     * @throws  IllegalStateException if timezone database is broken
-     * @see     #getAvailableIDs()
-     * @see     #getAliases()
-     * @see     java.util.TimeZone#getTimeZone(String)
-     */
-    /*[deutsch]
-     * <p>L&auml;dt die Zeitzonendaten zur angegebenen Zonen-ID. </p>
-     *
-     * <p>Das erste Argument enth&auml;lt nie den Provider-Namen als
-     * Pr&auml;fix. Stattdessen ist es der Teil nach dem Zeichen
-     * &quot;~&quot; (falls vorhanden). </p>
-     *
-     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @return  timezone history or {@code null} if there are no data
-     * @throws  IllegalArgumentException if given id is wrong
-     * @throws  IllegalStateException if timezone database is broken
-     * @see     #getAvailableIDs()
-     * @see     #getAliases()
-     * @see     java.util.TimeZone#getTimeZone(String)
-     */
-    TransitionHistory load(String zoneID);
-
-    /**
-     * <p>Determines if in case of a failed search another {@code ZoneProvider}
-     * should be called as alternative with possibly different rules. </p>
-     *
-     * <p>The special name &quot;DEFAULT&quot; can be used to denote the
-     * default zone provider. Note that the fallback provider will only affect
-     * the rules but not the id or display names of a new timezone. </p>
-     *
-     * @return  name of alternative provider or empty if no fallback happens
-     * @see     #load(String)
-     */
-    /*[deutsch]
-     * <p>Legt fest, ob ein alternativer {@code ZoneProvider} mit eventuell
-     * anderen Regeln gerufen werden soll, wenn die Suche nach einer Zeitzone
-     * erfolglos war. </p>
-     *
-     * <p>Der spezielle Name &quot;DEFAULT&quot; kann verwendet werden, um
-     * den Standard-{@code ZoneProvider} anzuzeigen. Zu beachten: Die
-     * Alternative wird nur die Regeln betreffen, nicht aber die ID oder
-     * Anzeigenamen einer neuen Zeitzone. </p>
-     *
-     * @return  name of alternative provider or empty if no fallback happens
-     * @see     #load(String)
-     */
-    String getFallback();
-
-    /**
-     * <p>Gets the name of the underlying repository. </p>
-     *
-     * <p>The Olson/IANA-repository (and any provider which makes use of
-     * these data (direct or indirect)) has the name &quot;TZDB&quot;.
-     * The names &quot;java.util.TimeZone&quot; and &quot;DEFAULT&quot;
-     * are reserved and cannot be used. </p>
-     *
-     * @return  String
-     */
-    /*[deutsch]
-     * <p>Gibt den Namen dieser Zeitzonendatenbank an. </p>
-     *
-     * <p>Die Olson/IANA-Zeitzonendatenbank hat den Namen
-     * &quot;TZDB&quot;. Jeder {@code ZoneProvider}, der sich auf diese
-     * Daten bezieht, mu&szlig; diesen Namen haben. Die Namen
-     * &quot;java.util.TimeZone&quot; and &quot;DEFAULT&quot; sind
-     * reserviert und k&ouml;nnen nicht verwendet werden. </p>
-     *
-     * @return  String
-     */
-    String getName();
-
-    /**
-     * <p>Describes the location or source of the repository. </p>
-     *
-     * @return  String which refers to an URI or empty if unknown
-     */
-    /*[deutsch]
-     * <p>Beschreibt die Quelle der Zeitzonendatenbank. </p>
-     *
-     * @return  String which refers to an URI or empty if unknown
-     */
-    String getLocation();
-
-    /**
-     * <p>Queries the version of the underlying repository. </p>
-     *
-     * <p>In most cases the version has the Olson format starting with
-     * a four-digit year number followed by a small letter in range
-     * a-z. </p>
-     *
-     * @return  String (for example &quot;2011n&quot;) or empty if unknown
-     */
-    /*[deutsch]
-     * <p>Liefert die Version der Zeitzonendatenbank. </p>
-     *
-     * <p>Meist liegt die Version im Olson-Format vor. Dieses Format sieht
-     * als Versionskennung eine 4-stellige Jahreszahl gefolgt von einem
-     * Buchstaben im Bereich a-z vor. </p>
-     *
-     * @return  String (for example &quot;2011n&quot;) or empty if unknown
-     */
-    String getVersion();
-
-    /**
-     * <p>Returns the name of this timezone suitable for presentation to
-     * users in given style and locale. </p>
-     *
-     * <p>The first argument never contains the provider name as prefix. It is
-     * instead the part after the &quot;~&quot;-char (if not absent). </p>
-     *
-     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @param   style       name style
-     * @param   locale      language setting
-     * @return  localized timezone name for display purposes
-     *          or empty if not supported
-     * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
-     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
-     */
-    /*[deutsch]
-     * <p>Liefert den anzuzeigenden Zeitzonennamen. </p>
-     *
-     * <p>Das erste Argument enth&auml;lt nie den Provider-Namen als
-     * Pr&auml;fix. Stattdessen ist es der Teil nach dem Zeichen
-     * &quot;~&quot; (falls vorhanden). </p>
-     *
-     * @param   zoneID      timezone id (i.e. &quot;Europe/London&quot;)
-     * @param   style       name style
-     * @param   locale      language setting
-     * @return  localized timezone name for display purposes
-     *          or empty if not supported
-     * @see     java.util.TimeZone#getDisplayName(boolean,int,Locale)
-     *          java.util.TimeZone.getDisplayName(boolean,int,Locale)
-     */
-    String getDisplayName(
-        String zoneID,
-        NameStyle style,
-        Locale locale
-    );
+@Deprecated
+public interface ZoneProvider
+    extends ZoneModelProvider, ZoneNameProvider {
 
 }
