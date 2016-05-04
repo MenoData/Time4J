@@ -134,13 +134,6 @@ public class WinZoneProviderSPI
     }
 
     @Override
-    public ZoneNameProvider getSpecificZoneNameRepository() {
-
-        return this;
-
-    }
-
-    @Override
     public Set<String> getPreferredIDs(
         Locale locale,
         boolean smart

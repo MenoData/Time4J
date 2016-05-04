@@ -104,13 +104,6 @@ public class MilZoneProviderSPI
     }
 
     @Override
-    public ZoneNameProvider getSpecificZoneNameRepository() {
-
-        return this;
-
-    }
-
-    @Override
     public Set<String> getPreferredIDs(
         Locale locale,
         boolean smart

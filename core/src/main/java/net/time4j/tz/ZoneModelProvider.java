@@ -216,6 +216,10 @@ public interface ZoneModelProvider {
      */
     default ZoneNameProvider getSpecificZoneNameRepository() {
 
+        if (this instanceof ZoneNameProvider) {
+            return ZoneNameProvider.class.cast(this);
+        }
+
         return null;
 
     }
