@@ -21,11 +21,8 @@
 
 package net.time4j.tz.spi;
 
-import net.time4j.Moment;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.olson.AFRICA;
 import net.time4j.tz.olson.AMERICA;
@@ -37,12 +34,17 @@ import net.time4j.tz.olson.EUROPE;
 import net.time4j.tz.olson.INDIAN;
 import net.time4j.tz.olson.PACIFIC;
 
+import java.text.DateFormatSymbols;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -57,9 +59,22 @@ public class ZoneNameProviderSPI
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final ConcurrentMap<Locale, Map<String, Map<NameStyle, String>>> NAMES =
+        new ConcurrentHashMap<Locale, Map<String, Map<NameStyle, String>>>();
+    private static final Set<String> FIXED_ZONES;
     private static final Map<String, Set<String>> TERRITORIES;
 
     static {
+        Set<String> fixedZones = new HashSet<String>();
+        fixedZones.add("GMT");
+        fixedZones.add("GMT0");
+        fixedZones.add("Greenwich");
+        fixedZones.add("UCT");
+        fixedZones.add("UTC");
+        fixedZones.add("Universal");
+        fixedZones.add("Zulu");
+        FIXED_ZONES = Collections.unmodifiableSet(fixedZones);
+
         Map<String, Set<String>> temp = new HashMap<String, Set<String>>();
 
         for (AFRICA tzid : AFRICA.values()) {
@@ -151,13 +166,52 @@ public class ZoneNameProviderSPI
         Locale locale
     ) {
 
-        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid, ZonalOffset.UTC);
-
-        if (tz.isFixed() && tz.getOffset(Moment.UNIX_EPOCH).equals(ZonalOffset.UTC)) {
+        if (FIXED_ZONES.contains(tzid)) {
             return "";
         }
 
-        return tz.getDisplayName(style, locale);
+        Map<String, Map<NameStyle, String>> zonedNames = NAMES.get(locale);
+
+        if (zonedNames == null) {
+            DateFormatSymbols symbols = DateFormatSymbols.getInstance(locale);
+            String[][] zoneNames = symbols.getZoneStrings();
+            zonedNames = new HashMap<String, Map<NameStyle, String>>();
+
+            for (String[] arr : zoneNames) {
+                Map<NameStyle, String> names = new EnumMap<NameStyle, String>(NameStyle.class);
+                names.put(NameStyle.LONG_STANDARD_TIME, arr[1]);
+                names.put(NameStyle.SHORT_STANDARD_TIME, arr[2]);
+                names.put(NameStyle.LONG_DAYLIGHT_TIME, arr[3]);
+                names.put(NameStyle.SHORT_DAYLIGHT_TIME, arr[4]);
+                zonedNames.put(arr[0], names);
+            }
+
+            Map<String, Map<NameStyle, String>> old = NAMES.putIfAbsent(locale, zonedNames);
+
+            if (old != null) {
+                zonedNames = old;
+            }
+        }
+
+        Map<NameStyle, String> styledNames = zonedNames.get(tzid);
+
+        if (styledNames != null) {
+            return styledNames.get(style);
+        }
+
+        return "";
+
+// *************************************************************************************
+// OLD CODE
+// *************************************************************************************
+//        Timezone tz = Timezone.of("java.util.TimeZone~" + tzid, ZonalOffset.UTC);
+//
+//        if (tz.isFixed() && tz.getOffset(Moment.UNIX_EPOCH).equals(ZonalOffset.UTC)) {
+//            return "";
+//        }
+//
+//        return tz.getDisplayName(style, locale);
+// *************************************************************************************
 
     }
 
