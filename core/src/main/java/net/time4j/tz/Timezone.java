@@ -1209,7 +1209,7 @@ public abstract class Timezone
             return tz;
         }
 
-        // ZoneProvider auflösen
+        // ZoneModelProvider auflösen
         String providerName = "";
         String zoneKey = zoneID;
 

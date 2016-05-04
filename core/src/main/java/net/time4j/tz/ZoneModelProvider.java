@@ -124,7 +124,7 @@ public interface ZoneModelProvider {
     TransitionHistory load(String zoneID);
 
     /**
-     * <p>Determines if in case of a failed search another {@code ZoneProvider}
+     * <p>Determines if in case of a failed search another {@code ZoneModelProvider}
      * should be called as alternative with possibly different rules. </p>
      *
      * <p>The special name &quot;DEFAULT&quot; can be used to denote the
@@ -135,12 +135,12 @@ public interface ZoneModelProvider {
      * @see     #load(String)
      */
     /*[deutsch]
-     * <p>Legt fest, ob ein alternativer {@code ZoneProvider} mit eventuell
+     * <p>Legt fest, ob ein alternativer {@code ZoneModelProvider} mit eventuell
      * anderen Regeln gerufen werden soll, wenn die Suche nach einer Zeitzone
      * erfolglos war. </p>
      *
      * <p>Der spezielle Name &quot;DEFAULT&quot; kann verwendet werden, um
-     * den Standard-{@code ZoneProvider} anzuzeigen. Zu beachten: Die
+     * den Standard-{@code ZoneModelProvider} anzuzeigen. Zu beachten: Die
      * Alternative wird nur die Regeln betreffen, nicht aber die ID oder
      * Anzeigenamen einer neuen Zeitzone. </p>
      *
@@ -163,7 +163,7 @@ public interface ZoneModelProvider {
      * <p>Gibt den Namen dieser Zeitzonendatenbank an. </p>
      *
      * <p>Die Olson/IANA-Zeitzonendatenbank hat den Namen
-     * &quot;TZDB&quot;. Jeder {@code ZoneProvider}, der sich auf diese
+     * &quot;TZDB&quot;. Jeder {@code ZoneModelProvider}, der sich auf diese
      * Daten bezieht, mu&szlig; diesen Namen haben. Die Namen
      * &quot;java.util.TimeZone&quot; and &quot;DEFAULT&quot; sind
      * reserviert und k&ouml;nnen nicht verwendet werden. </p>
