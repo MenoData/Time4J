@@ -423,10 +423,9 @@ final class TimezoneNameProcessor
         Map<String, List<TZID>> map = new HashMap<>();
 
         for (TZID tzid : Timezone.getAvailableIDs()) {
-            Timezone zone = Timezone.of(tzid);
-
             String tzName =
-                zone.getDisplayName(
+                Timezone.getDisplayName(
+                    tzid,
                     this.getStyle(daylightSaving),
                     locale);
 
