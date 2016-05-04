@@ -264,6 +264,51 @@ public abstract class Timezone
         PROVIDERS.put(NAME_JUT, PLATFORM_PROVIDER);
 
         if (zp == null) {
+            // for backward compatibility (old version of tzdata-module)
+            // TODO: remove in next major release
+            for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
+                if (provider.getName().equals(NAME_TZDB)) {
+                    final ZoneProvider p = provider;
+                    zp = new ZoneModelProvider() {
+                        @Override
+                        public Set<String> getAvailableIDs() {
+                            return p.getAvailableIDs();
+                        }
+                        @Override
+                        public Map<String, String> getAliases() {
+                            return p.getAliases();
+                        }
+                        @Override
+                        public TransitionHistory load(String zoneID) {
+                            return p.load(zoneID);
+                        }
+                        @Override
+                        public String getFallback() {
+                            return p.getFallback();
+                        }
+                        @Override
+                        public String getName() {
+                            return p.getName();
+                        }
+                        @Override
+                        public String getLocation() {
+                            return p.getLocation();
+                        }
+                        @Override
+                        public String getVersion() {
+                            return p.getVersion();
+                        }
+                        @Override
+                        public ZoneNameProvider getSpecificZoneNameRepository() {
+                            return null;
+                        }
+                    };
+                    break;
+                }
+            }
+        }
+
+        if (zp == null) {
             DEFAULT_PROVIDER = PLATFORM_PROVIDER;
         } else {
             PROVIDERS.put(NAME_TZDB, zp);
@@ -1509,8 +1554,7 @@ public abstract class Timezone
          * make the performance worse especially if the underlying {@code ZoneModelProvider}
          * itself has no cache. </p>
          *
-         * @param   active  {@code true} if chache shall be active
-         *                  else {@code false}
+         * @param   active  {@code true} if cache shall be active else {@code false}
          */
         /*[deutsch]
          * <p>Aktiviert oder deaktiviert den internen Cache. </p>
@@ -1519,8 +1563,7 @@ public abstract class Timezone
          * Cache kann die Performance insbesondere dann verschlechtern, wenn der
          * zugrundeliegende {@code ZoneModelProvider} selbst keinen Cache hat. </p>
          *
-         * @param   active  {@code true} if chache shall be active
-         *                  else {@code false}
+         * @param   active  {@code true} if cache shall be active else {@code false}
          */
         public static void setCacheActive(boolean active) {
 
