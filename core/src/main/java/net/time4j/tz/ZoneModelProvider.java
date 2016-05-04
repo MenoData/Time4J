@@ -214,6 +214,10 @@ public interface ZoneModelProvider {
      *
      * @return  specific name repository or {@code null} if not relevant
      */
-    ZoneNameProvider getSpecificZoneNameRepository();
+    default ZoneNameProvider getSpecificZoneNameRepository() {
+
+        return null;
+
+    }
 
 }

@@ -85,11 +85,6 @@ public class ProviderRegistrationTest {
             return "";
         }
 
-        @Override
-        public ZoneNameProvider getSpecificZoneNameRepository() {
-            return null;
-        }
-
     }
 
 }

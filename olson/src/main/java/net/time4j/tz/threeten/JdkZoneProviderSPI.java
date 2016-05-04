@@ -29,7 +29,6 @@ import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 import net.time4j.tz.ZoneModelProvider;
-import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.model.DaylightSavingRule;
 import net.time4j.tz.model.GregorianTimezoneRule;
 import net.time4j.tz.model.OffsetIndicator;
@@ -114,13 +113,6 @@ public class JdkZoneProviderSPI
     public String getVersion() {
 
         return this.version;
-
-    }
-
-    @Override
-    public ZoneNameProvider getSpecificZoneNameRepository() {
-
-        return null;
 
     }
 

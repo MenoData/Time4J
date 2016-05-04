@@ -9,7 +9,6 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZoneModelProvider;
-import net.time4j.tz.ZoneNameProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -126,11 +125,6 @@ public class StartOfDayTest {
         @Override
         public String getVersion() {
             return "";
-        }
-
-        @Override
-        public ZoneNameProvider getSpecificZoneNameRepository() {
-            return null;
         }
 
     }
