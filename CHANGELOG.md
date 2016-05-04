@@ -12,6 +12,7 @@
 - Clarify format behaviour if zoneless types are combined with zone names [#490]
 
 ### Changed
+- Split `ZoneProvider` into `ZoneModelProvider` and `ZoneNameProvider` [#498]
 - Update to CLDR version 29 [#492]
 
 ## [v3.19] published on 2016-04-18
