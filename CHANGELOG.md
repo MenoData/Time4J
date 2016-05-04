@@ -9,6 +9,7 @@
 - Support for Esperanto [#495]
 
 ### Fixed
+- Improve performance of parsing timezone names [#499]
 - Clarify format behaviour if zoneless types are combined with zone names [#490]
 
 ### Changed
