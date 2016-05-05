@@ -396,6 +396,10 @@ public abstract class Timezone
      */
     public static List<TZID> getAvailableIDs(String provider) {
 
+        if (provider.equals("INCLUDE_ALIAS")) {
+            return zonalKeys.availablesAndAliases;
+        }
+
         ZoneModelProvider zp = getProvider(provider);
 
         if (zp == null) {
@@ -1728,6 +1732,7 @@ public abstract class Timezone
         //~ Instanzvariablen ----------------------------------------------
 
         private final List<TZID> availables;
+        private final List<TZID> availablesAndAliases;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1735,6 +1740,7 @@ public abstract class Timezone
             super();
 
             List<TZID> list = new ArrayList<>(1024);
+            List<TZID> listAndAliases = new ArrayList<>(1024);
             list.add(ZonalOffset.UTC);
 
             for (Map.Entry<String, ZoneModelProvider> e : PROVIDERS.entrySet()) {
@@ -1755,10 +1761,23 @@ public abstract class Timezone
                         list.add(tzid);
                     }
                 }
+
+                listAndAliases.addAll(list);
+
+                for (String alias : zp.getAliases().keySet()) {
+                    TZID tzid = resolve(alias);
+
+                    // wegen resolve() genügt Vergleich per equals()
+                    if (!listAndAliases.contains(tzid)) {
+                        listAndAliases.add(tzid);
+                    }
+                }
             }
 
             Collections.sort(list, ID_COMPARATOR);
+            Collections.sort(listAndAliases, ID_COMPARATOR);
             this.availables = Collections.unmodifiableList(list);
+            this.availablesAndAliases = Collections.unmodifiableList(listAndAliases);
 
         }
 
