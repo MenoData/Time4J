@@ -167,7 +167,7 @@ enum TimezoneIDProcessor
         }
 
         // binäre Suche
-        List<TZID> zones = Timezone.getAvailableIDs();
+        List<TZID> zones = Timezone.getAvailableIDs("INCLUDE_ALIAS");
         int low = 0;
         int high = zones.size() - 1;
 

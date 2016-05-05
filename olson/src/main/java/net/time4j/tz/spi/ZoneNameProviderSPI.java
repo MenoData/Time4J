@@ -61,19 +61,19 @@ public class ZoneNameProviderSPI
 
     private static final ConcurrentMap<Locale, Map<String, Map<NameStyle, String>>> NAMES =
         new ConcurrentHashMap<Locale, Map<String, Map<NameStyle, String>>>();
-    private static final Set<String> FIXED_ZONES;
+    private static final Set<String> GMT_ZONES;
     private static final Map<String, Set<String>> TERRITORIES;
 
     static {
-        Set<String> fixedZones = new HashSet<String>();
-        fixedZones.add("GMT");
-        fixedZones.add("GMT0");
-        fixedZones.add("Greenwich");
-        fixedZones.add("UCT");
-        fixedZones.add("UTC");
-        fixedZones.add("Universal");
-        fixedZones.add("Zulu");
-        FIXED_ZONES = Collections.unmodifiableSet(fixedZones);
+        Set<String> gmtZones = new HashSet<String>();
+        gmtZones.add("GMT");
+        gmtZones.add("GMT0");
+        gmtZones.add("Greenwich");
+        gmtZones.add("UCT");
+        gmtZones.add("UTC");
+        gmtZones.add("Universal");
+        gmtZones.add("Zulu");
+        GMT_ZONES = Collections.unmodifiableSet(gmtZones);
 
         Map<String, Set<String>> temp = new HashMap<String, Set<String>>();
 
@@ -166,7 +166,7 @@ public class ZoneNameProviderSPI
         Locale locale
     ) {
 
-        if (FIXED_ZONES.contains(tzid)) {
+        if (GMT_ZONES.contains(tzid)) {
             return "";
         }
 
