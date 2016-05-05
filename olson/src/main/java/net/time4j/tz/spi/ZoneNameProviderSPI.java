@@ -65,11 +65,13 @@ public class ZoneNameProviderSPI
 
     static {
         Set<String> gmtZones = new HashSet<>();
+        gmtZones.add("Z");
         gmtZones.add("GMT");
         gmtZones.add("GMT0");
         gmtZones.add("Greenwich");
         gmtZones.add("UCT");
         gmtZones.add("UTC");
+        gmtZones.add("UTC0");
         gmtZones.add("Universal");
         gmtZones.add("Zulu");
         GMT_ZONES = Collections.unmodifiableSet(gmtZones);
