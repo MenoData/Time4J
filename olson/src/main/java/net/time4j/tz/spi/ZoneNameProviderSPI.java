@@ -63,6 +63,7 @@ public class ZoneNameProviderSPI
         new ConcurrentHashMap<Locale, Map<String, Map<NameStyle, String>>>();
     private static final Set<String> GMT_ZONES;
     private static final Map<String, Set<String>> TERRITORIES;
+    private static final Map<String, String> PRIMARIES;
 
     static {
         Set<String> gmtZones = new HashSet<String>();
@@ -121,6 +122,21 @@ public class ZoneNameProviderSPI
 
         temp.put("SJ", Collections.singleton("Arctic/Longyearbyen"));
         TERRITORIES = Collections.unmodifiableMap(temp);
+
+        // CLDR29 - supplemental\metaZones.xml - primaryZones
+        Map<String, String> primaries = new HashMap<String, String>();
+        addPrimary(primaries, "CL", AMERICA.SANTIAGO);
+        addPrimary(primaries, "CN", ASIA.SHANGHAI);
+        addPrimary(primaries, "DE", EUROPE.BERLIN);
+        addPrimary(primaries, "EC", AMERICA.GUAYAQUIL);
+        addPrimary(primaries, "ES", EUROPE.MADRID);
+        addPrimary(primaries, "MH", PACIFIC.MAJURO);
+        addPrimary(primaries, "MY", ASIA.KUALA_LUMPUR);
+        addPrimary(primaries, "NZ", PACIFIC.AUCKLAND);
+        addPrimary(primaries, "PT", EUROPE.LISBON);
+        addPrimary(primaries, "UA", EUROPE.KIEV);
+        addPrimary(primaries, "UZ", ASIA.TASHKENT);
+        PRIMARIES = Collections.unmodifiableMap(primaries);
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -144,10 +160,12 @@ public class ZoneNameProviderSPI
                 tzids.add("Pacific/Honolulu");
                 tzids.add("America/Adak");
                 return Collections.unmodifiableSet(tzids);
-            } else if (country.equals("CN")) {
-                return Collections.singleton(ASIA.SHANGHAI.canonical());
-            } else if (country.equals("DE")) {
-                return Collections.singleton(EUROPE.BERLIN.canonical());
+            } else {
+                String primaryZone = PRIMARIES.get(country);
+
+                if (primaryZone != null) {
+                    return Collections.singleton(primaryZone);
+                }
             }
         }
 
@@ -231,6 +249,16 @@ public class ZoneNameProviderSPI
         }
 
         preferred.add(tz.canonical());
+
+    }
+
+    private static void addPrimary(
+        Map<String, String> map,
+        String country,
+        TZID tz
+    ) {
+
+        map.put(country, tz.canonical());
 
     }
 
