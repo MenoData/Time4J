@@ -62,6 +62,7 @@ public class ZoneNameProviderSPI
     private static final ConcurrentMap<Locale, Map<String, Map<NameStyle, String>>> NAMES = new ConcurrentHashMap<>();
     private static final Set<String> GMT_ZONES;
     private static final Map<String, Set<String>> TERRITORIES;
+    private static final Map<String, String> PRIMARIES;
 
     static {
         Set<String> gmtZones = new HashSet<>();
@@ -120,6 +121,21 @@ public class ZoneNameProviderSPI
 
         temp.put("SJ", Collections.singleton("Arctic/Longyearbyen"));
         TERRITORIES = Collections.unmodifiableMap(temp);
+
+        // CLDR29 - supplemental\metaZones.xml - primaryZones
+        Map<String, String> primaries = new HashMap<>();
+        addPrimary(primaries, "CL", AMERICA.SANTIAGO);
+        addPrimary(primaries, "CN", ASIA.SHANGHAI);
+        addPrimary(primaries, "DE", EUROPE.BERLIN);
+        addPrimary(primaries, "EC", AMERICA.GUAYAQUIL);
+        addPrimary(primaries, "ES", EUROPE.MADRID);
+        addPrimary(primaries, "MH", PACIFIC.MAJURO);
+        addPrimary(primaries, "MY", ASIA.KUALA_LUMPUR);
+        addPrimary(primaries, "NZ", PACIFIC.AUCKLAND);
+        addPrimary(primaries, "PT", EUROPE.LISBON);
+        addPrimary(primaries, "UA", EUROPE.KIEV);
+        addPrimary(primaries, "UZ", ASIA.TASHKENT);
+        PRIMARIES = Collections.unmodifiableMap(primaries);
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -133,21 +149,22 @@ public class ZoneNameProviderSPI
         String country = locale.getCountry();
 
         if (smart) {
-            switch (country) {
-                case "US":
-                    Set<String> tzids = new LinkedHashSet<>();
-                    tzids.add("America/New_York");
-                    tzids.add("America/Chicago");
-                    tzids.add("America/Denver");
-                    tzids.add("America/Los_Angeles");
-                    tzids.add("America/Anchorage");
-                    tzids.add("Pacific/Honolulu");
-                    tzids.add("America/Adak");
-                    return Collections.unmodifiableSet(tzids);
-                case "CN":
-                    return Collections.singleton(ASIA.SHANGHAI.canonical());
-                case "DE":
-                    return Collections.singleton(EUROPE.BERLIN.canonical());
+            if (country.equals("US")) {
+                Set<String> tzids = new LinkedHashSet<>();
+                tzids.add("America/New_York");
+                tzids.add("America/Chicago");
+                tzids.add("America/Denver");
+                tzids.add("America/Los_Angeles");
+                tzids.add("America/Anchorage");
+                tzids.add("Pacific/Honolulu");
+                tzids.add("America/Adak");
+                return Collections.unmodifiableSet(tzids);
+            } else {
+                String primaryZone = PRIMARIES.get(country);
+
+                if (primaryZone != null) {
+                    return Collections.singleton(primaryZone);
+                }
             }
         }
 
@@ -231,6 +248,16 @@ public class ZoneNameProviderSPI
         }
 
         preferred.add(tz.canonical());
+
+    }
+
+    private static void addPrimary(
+        Map<String, String> map,
+        String country,
+        TZID tz
+    ) {
+
+        map.put(country, tz.canonical());
 
     }
 
