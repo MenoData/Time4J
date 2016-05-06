@@ -1,4 +1,6 @@
-## [v4.16] not yet released
+## [v4.17] not yet released
+
+## [v4.16] published on 2016-05-07
 ### Added
 - Related gregorian year for non-gregorian calendars [#370]
 - Make MachineTime comparable [#489]
@@ -9,6 +11,7 @@
 - Support for Esperanto [#495]
 
 ### Fixed
+- Make alias zone identifiers always parseable [#500]
 - Improve performance of parsing timezone names [#499]
 - Clarify format behaviour if zoneless types are combined with zone names [#490]
 
