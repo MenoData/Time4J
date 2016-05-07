@@ -9,6 +9,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.chrono.HijrahChronology;
+import java.time.chrono.HijrahDate;
+import java.time.temporal.ChronoField;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -68,6 +72,7 @@ public class UmalquraDataTest {
                 {1440, 2, 1, "2018-10-10"},
                 {1440, 3, 1, "2018-11-09"},
                 {1448, 6, 11, "2026-11-21"},
+                {1462, 12, 10, "2040-12-15"}, // see issue #501
                 {1493, 3, 28, "2070-05-09"},
                 {1493, 4, 29, "2070-06-09"}, // deviation between KACST and v.Gent, we follow KACST
                 {1493, 5, 1, "2070-06-10"},
@@ -127,6 +132,24 @@ public class UmalquraDataTest {
         assertThat(
             this.umalqura.get(EpochDays.UNIX),
             is(this.epoch + 2 * 365));
+    }
+
+    @Test
+    public void threetenComparison() {
+        HijrahDate threeten =
+            HijrahChronology.INSTANCE.dateEpochDay(EpochDays.UNIX.transform(this.epoch, EpochDays.UTC));
+        assertThat(
+            threeten.get(ChronoField.YEAR_OF_ERA),
+            is(this.umalqura.getYear()));
+        assertThat(
+            threeten.get(ChronoField.MONTH_OF_YEAR),
+            is(this.umalqura.getMonth().getValue()));
+        assertThat(
+            threeten.get(ChronoField.DAY_OF_MONTH),
+            is(this.umalqura.getDayOfMonth()));
+        assertThat(
+            PlainDate.from(LocalDate.from(threeten)),
+            is(this.umalqura.transform(PlainDate.class)));
     }
 
 }
