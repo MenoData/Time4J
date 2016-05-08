@@ -1,4 +1,6 @@
 ## [v3.21] not yet released
+### Fixed
+- Zone offset without sign - should be parseable in lax mode [#502]
 
 ## [v3.20] published on 2016-05-07
 ### Added
