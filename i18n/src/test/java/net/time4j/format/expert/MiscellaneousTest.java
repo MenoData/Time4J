@@ -4,6 +4,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.SI;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
@@ -644,6 +645,32 @@ public class MiscellaneousTest {
                 ZonalOffset.UTC
             ).with(Leniency.STRICT);
         formatter.parse("2012-07-01T08:59:60+01:00[Asia/Tokyo]");
+    }
+
+    @Test(expected = ParseException.class)
+    public void parseOffsetWithoutSignInSmartMode() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.ofMomentPattern(
+                "uuuu-MM-dd'T'HH:mm:ss XXX",
+                PatternType.CLDR,
+                Locale.ROOT,
+                ZonalOffset.UTC
+            ).with(Leniency.SMART);
+        formatter.parse("2012-07-01T08:59:60 9:00");
+    }
+
+    @Test
+    public void parseOffsetWithoutSignInLaxMode() throws ParseException {
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.ofMomentPattern(
+                "uuuu-MM-dd'T'HH:mm:ss XXX",
+                PatternType.CLDR,
+                Locale.ROOT,
+                ZonalOffset.UTC
+            ).with(Leniency.LAX);
+        assertThat(
+            formatter.parse("2012-07-01T08:59:60 9:00"),
+            is(PlainTimestamp.of(2012, 7, 1, 0, 0).atUTC().minus(1, SI.SECONDS)));
     }
 
     @Test

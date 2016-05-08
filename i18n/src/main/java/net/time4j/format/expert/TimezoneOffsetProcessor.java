@@ -315,20 +315,23 @@ final class TimezoneOffsetProcessor
             }
         }
 
+        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         char c = text.charAt(pos);
-        pos++;
         OffsetSign sign;
 
         if (c == '+') {
             sign = AHEAD_OF_UTC;
+            pos++;
         } else if (c == '-') {
             sign = BEHIND_UTC;
+            pos++;
+        } else if (Character.isDigit(c) && leniency.isLax()) {
+            sign = AHEAD_OF_UTC;
         } else {
             status.setError(start, "Missing sign of timezone offset.");
             return;
         }
 
-        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int hours = parseNum(text, pos, leniency);
 
         if (hours == -1000) {
