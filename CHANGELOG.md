@@ -1,4 +1,6 @@
 ## [v4.17] not yet released
+### Fixed
+- Zone offset without sign - should it be parseable or not? [#502]
 
 ## [v4.16] published on 2016-05-07
 ### Added
