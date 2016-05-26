@@ -360,8 +360,9 @@ public class ParseLog {
     public void reset() {
 
         this.pp.setIndex(0);
-        this.clearError();
-        this.clearWarning();
+        this.pp.setErrorIndex(-1);
+        this.errorMessage = "";
+        this.warning = false;
         this.rawValues = null;
         this.daylightSaving = null;
 
