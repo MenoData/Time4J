@@ -24,7 +24,8 @@ import org.junit.runners.Suite.SuiteClasses;
         RangeDurationTest.class,
         RelationTest.class,
         SerializationTest.class,
-        TimestampIntervalFormatTest.class
+        TimestampIntervalFormatTest.class,
+        YearsTest.class
     }
 )
 public class RangeSuite {
