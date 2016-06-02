@@ -83,6 +83,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *  <li>{@link #parsePeriod(String)}</li>
  *  <li>{@link #parseCalendarPeriod(String)}</li>
  *  <li>{@link #parseClockPeriod(String)}</li>
+ *  <li>{@link #parseWeekBasedPeriod(String)}</li>
  * </ul>
  *
  * <p>All instances are <i>immutable</i>, but changed copies can be created
@@ -122,6 +123,7 @@ import static net.time4j.ClockUnit.SECONDS;
  *  <li>{@link #parsePeriod(String)}</li>
  *  <li>{@link #parseCalendarPeriod(String)}</li>
  *  <li>{@link #parseClockPeriod(String)}</li>
+ *  <li>{@link #parseWeekBasedPeriod(String)}</li>
  * </ul>
  *
  * <p>Alle Instanzen sind <i>immutable</i>, aber ge&auml;nderte Kopien lassen
@@ -277,6 +279,13 @@ public final class Duration<U extends IsoUnit>
         Duration.in(YEARS, MONTHS, DAYS);
     private static final TimeMetric<ClockUnit, Duration<ClockUnit>> CLOCK_METRIC =
         Duration.in(HOURS, MINUTES, SECONDS, NANOS);
+    private static final TimeMetric<IsoDateUnit, Duration<IsoDateUnit>> WEEK_BASED_METRIC =
+        Duration.in(CalendarUnit.weekBasedYears(), WEEKS, DAYS);
+
+    private static final int SUPER_TYPE = -1;
+    private static final int CALENDAR_TYPE = 0;
+    private static final int CLOCK_TYPE = 1;
+    private static final int WEEK_BASED_TYPE = 2;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -874,6 +883,38 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Constructs a metric in week-based years, weeks and days. </p>
+     *
+     * <p>Finally the resulting duration will be normalized such that
+     * smaller units will be converted to bigger units if possible. </p>
+     *
+     * @return  immutable metric for calculating a duration in week-based years, weeks and days
+     * @see     #in(IsoUnit[]) in(U[])
+     * @see     CalendarUnit#weekBasedYears()
+     * @see     CalendarUnit#WEEKS
+     * @see     CalendarUnit#DAYS
+     * @since   3.21/4.17
+     */
+    /*[deutsch]
+     * <p>Konstruiert eine Metrik in wochen-basierten Jahren, Wochen und Tagen. </p>
+     *
+     * <p>Am Ende wird die Darstellung automatisch normalisiert, also kleine
+     * Zeiteinheiten so weit wie m&ouml;glich in gro&szlig;e Einheiten umgerechnet. </p>
+     *
+     * @return  immutable metric for calculating a duration in week-based years, weeks and days
+     * @see     #in(IsoUnit[]) in(U[])
+     * @see     CalendarUnit#weekBasedYears()
+     * @see     CalendarUnit#WEEKS
+     * @see     CalendarUnit#DAYS
+     * @since   3.21/4.17
+     */
+    public static TimeMetric<IsoDateUnit, Duration<IsoDateUnit>> inWeekBasedUnits() {
+
+        return WEEK_BASED_METRIC;
+
+    }
+
+    /**
      * <p>Helps to evaluate the zonal duration between two timestamps
      * and applies an offset correction if necessary. </p>
      *
@@ -1291,7 +1332,7 @@ public final class Duration<U extends IsoUnit>
     @SuppressWarnings("unchecked")
     public Duration<U> plus(TimeSpan<? extends U> timespan) {
 
-    	Duration<U> result = merge(this, timespan);
+        Duration<U> result = merge(this, timespan);
 
     	if (result == null) {
             long[] sums = new long[4];
@@ -1657,7 +1698,7 @@ public final class Duration<U extends IsoUnit>
 			Duration<U> other = empty.plus(timespan);
 			result.add(other);
 			return Collections.unmodifiableList(result);
-		}
+        }
 
 		return Collections.singletonList(merged);
 
@@ -2401,6 +2442,36 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Parses a canonical representation with only week-based units (Y, W and D) to a
+     * calendrical duration where years are interpreted as week-based years. </p>
+     *
+     * @param   period          duration in canonical or ISO-8601-compatible format (P-string)
+     * @return  parsed calendrical duration
+     * @throws  ParseException if parsing fails
+     * @see     #parsePeriod(String)
+     * @see     CalendarUnit#weekBasedYears()
+     * @since   3.21/4.17
+     */
+    /*[deutsch]
+     * <p>Parst eine kanonische Darstellung nur mit wochen-basierten
+     * Datumskomponenten (Y, W, D) zu einer Dauer, in der Jahr als
+     * wochenbasierte Jahre interpretiert werden. </p>
+     *
+     * @param   period          duration in canonical or ISO-8601-compatible format (P-string)
+     * @return  parsed calendrical duration
+     * @throws  ParseException if parsing fails
+     * @see     #parsePeriod(String)
+     * @see     CalendarUnit#weekBasedYears()
+     * @since   3.21/4.17
+     */
+    public static Duration<IsoDateUnit> parseWeekBasedPeriod(String period)
+        throws ParseException {
+
+        return parsePeriod(period, IsoDateUnit.class);
+
+    }
+
+    /**
      * <p>Equivalent to {@link net.time4j.Duration.Formatter#ofPattern(String)}. </p>
      *
      * @param   pattern format pattern
@@ -2469,15 +2540,12 @@ public final class Duration<U extends IsoUnit>
 
         sb.append('P');
         boolean timeAppended = false;
+        boolean weekBased = false;
         long nanos = 0;
         long seconds = 0;
         long weeksAsDays = 0;
 
-        for (
-            int index = 0, limit = this.getTotalLength().size();
-            index < limit;
-            index++
-        ) {
+        for (int index = 0, limit = this.count(); index < limit; index++) {
             Item<U> item = this.getTotalLength().get(index);
             U unit = item.getUnit();
 
@@ -2489,16 +2557,17 @@ public final class Duration<U extends IsoUnit>
             long amount = item.getAmount();
             char symbol = unit.getSymbol();
 
+            if (unit == Weekcycle.YEARS) {
+                weekBased = true;
+            }
+
             if ((symbol > '0') && (symbol <= '9')) {
                 assert (symbol == '9');
                 nanos = amount;
             } else if (symbol == 'S') {
                 seconds = amount;
             } else {
-                if (
-                    xml
-                    || (style == PRINT_STYLE_ISO)
-                ) {
+                if (xml || (style == PRINT_STYLE_ISO)) {
                     switch (symbol) {
                         case 'D':
                             if (weeksAsDays != 0) {
@@ -2515,8 +2584,7 @@ public final class Duration<U extends IsoUnit>
                         case 'W':
                             if (limit == 1) {
                                 if (xml) {
-                                    sb.append(
-                                        MathUtils.safeMultiply(amount, 7));
+                                    sb.append(MathUtils.safeMultiply(amount, 7));
                                     symbol = 'D';
                                 } else {
                                     sb.append(amount);
@@ -2583,6 +2651,23 @@ public final class Duration<U extends IsoUnit>
         } else if (seconds != 0) {
             sb.append(seconds);
             sb.append('S');
+        }
+
+        if (weekBased) {
+            boolean representable = !timeAppended;
+            if (representable) {
+                for (int index = 0, limit = this.count(); index < limit; index++) {
+                    Object unit = this.getTotalLength().get(index).getUnit();
+                    if ((unit != Weekcycle.YEARS) && (unit != CalendarUnit.WEEKS) && (unit != CalendarUnit.DAYS)) {
+                        representable = false;
+                        break;
+                    }
+                }
+            }
+            if (!representable) {
+                int pos = sb.indexOf("Y");
+                sb.replace(pos, pos + 1, "{WEEK_BASED_YEARS}");
+            }
         }
 
         return sb.toString();
@@ -3051,23 +3136,32 @@ public final class Duration<U extends IsoUnit>
             List<Item<U>> items = new ArrayList<>();
             int sep = period.indexOf('T', index);
             boolean calendrical = (sep == -1);
+            int typeID = SUPER_TYPE;
+
+            if (type == CalendarUnit.class) {
+                typeID = CALENDAR_TYPE;
+            } else if (type == ClockUnit.class) {
+                typeID = CLOCK_TYPE;
+            } else if (type == IsoDateUnit.class) {
+                typeID = WEEK_BASED_TYPE;
+            }
 
             if (calendrical) {
-                if (type == ClockUnit.class) {
+                if (typeID == CLOCK_TYPE) {
                     throw new ParseException(
                         "Format symbol \'T\' expected: " + period, index);
                 } else {
-                    parse(period, index, period.length(), true, items);
+                    parse(period, index, period.length(), ((typeID == SUPER_TYPE) ? CALENDAR_TYPE : typeID), items);
                 }
             } else {
                 boolean alternative = false;
                 if (sep > index) {
-                    if (type == ClockUnit.class) {
+                    if (typeID == CLOCK_TYPE) {
                         throw new ParseException(
                             "Unexpected date component found: " + period,
                             index);
                     } else {
-                        alternative = parse(period, index, sep, true, items);
+                        alternative = parse(period, index, sep, CALENDAR_TYPE, items);
                     }
                 }
                 if (type == CalendarUnit.class) {
@@ -3076,7 +3170,7 @@ public final class Duration<U extends IsoUnit>
                 } else if (alternative) {
                     parseAlt(period, sep + 1, period.length(), false, items);
                 } else {
-                    parse(period, sep + 1, period.length(), false, items);
+                    parse(period, sep + 1, period.length(), CLOCK_TYPE, items);
                 }
             }
 
@@ -3097,15 +3191,15 @@ public final class Duration<U extends IsoUnit>
         String period,
         int from,
         int to,
-        boolean date,
+        int typeID,
         List<Item<U>> items
     ) throws ParseException {
 
         // alternative format?
         char ending = period.charAt(to - 1);
 
-        if ((ending >= '0') && (ending <= '9')) {
-            parseAlt(period, from, to, date, items);
+        if ((ending >= '0') && (ending <= '9') && (typeID != WEEK_BASED_TYPE)) {
+            parseAlt(period, from, to, (typeID == CALENDAR_TYPE), items);
             return true;
         }
 
@@ -3130,7 +3224,7 @@ public final class Duration<U extends IsoUnit>
                 }
                 num.append(c);
             } else if ((c == ',') || (c == '.')) {
-                if ((num == null) || date) {
+                if ((num == null) || (typeID != CLOCK_TYPE)) {
                     throw new ParseException(
                         "Decimal separator misplaced: " + period, i);
                 } else {
@@ -3171,10 +3265,14 @@ public final class Duration<U extends IsoUnit>
                         (num == null) ? String.valueOf(c) : num.toString(),
                         index);
                 num = null;
-                ChronoUnit unit = (
-                    date
-                    ? parseDateSymbol(c, period, i)
-                    : parseTimeSymbol(c, period, i));
+                ChronoUnit unit;
+                if (typeID == CLOCK_TYPE) {
+                    unit = parseTimeSymbol(c, period, i);
+                } else if (typeID == WEEK_BASED_TYPE) {
+                    unit = parseWeekBasedSymbol(c, period, i);
+                } else {
+                    unit = parseDateSymbol(c, period, i);
+                }
                 last = addParsedItem(unit, last, amount, period, i, items);
             }
 
@@ -3383,6 +3481,26 @@ public final class Duration<U extends IsoUnit>
                 return MINUTES;
             case 'S':
                 return SECONDS;
+            default:
+                throw new ParseException(
+                    "Symbol \'" + c + "\' not supported: " + period, index);
+        }
+
+    }
+
+    private static IsoDateUnit parseWeekBasedSymbol(
+        char c,
+        String period,
+        int index
+    ) throws ParseException {
+
+        switch (c) {
+            case 'Y':
+                return CalendarUnit.weekBasedYears();
+            case 'W':
+                return WEEKS;
+            case 'D':
+                return DAYS;
             default:
                 throw new ParseException(
                     "Symbol \'" + c + "\' not supported: " + period, index);

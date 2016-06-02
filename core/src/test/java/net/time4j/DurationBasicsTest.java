@@ -771,6 +771,13 @@ public class DurationBasicsTest {
     }
 
     @Test
+    public void testToStringWithSpecialUnitKeepingEndOfMonth() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.MONTHS.keepingEndOfMonth());
+        assertThat(datePeriod.toString(), is("P4{M-KEEPING_LAST_DATE}"));
+    }
+
+    @Test
     public void testToStringWithSpecialUnitNextValidDate() {
         Duration<IsoDateUnit> datePeriod =
             Duration.of(4, CalendarUnit.MONTHS.nextValidDate());
@@ -792,10 +799,19 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testToStringWithSpecialUnitWeekBasedYears() {
+    public void testToStringWithSpecialUnitWeekBasedYearsAndMonths() {
         Duration<IsoDateUnit> datePeriod =
-            Duration.of(4, CalendarUnit.weekBasedYears());
-        assertThat(datePeriod.toString(), is("P4{WEEK_BASED_YEARS}"));
+            Duration.of(4, CalendarUnit.weekBasedYears()).plus(1, MONTHS);
+        assertThat(datePeriod.toString(), is("P4{WEEK_BASED_YEARS}1M"));
+    }
+
+    @Test
+    public void testToStringWithSpecialUnitWeekBasedYearsAndWeeksAndDays() {
+        Duration<IsoDateUnit> datePeriod =
+            Duration.of(4, CalendarUnit.weekBasedYears()).plus(1, WEEKS).plus(3, DAYS);
+        assertThat(datePeriod.toString(), is("P4Y1W3D"));
+        assertThat(datePeriod.toStringISO(), is("P4Y10D"));
+        assertThat(datePeriod.toStringXML(), is("P4Y10D"));
     }
 
     @Test
@@ -902,6 +918,11 @@ public class DurationBasicsTest {
         datePeriod = Duration.of(3, DAYS).plus(2, WEEKS);
         expResult = Duration.ofZero().plus(datePeriod);
         assertThat(Duration.parsePeriod(period), is(expResult));
+
+        period = "P1Y2W3D";
+        Duration<IsoDateUnit> weekBasedPeriod =
+            Duration.of(1, CalendarUnit.weekBasedYears()).plus(2, WEEKS).plus(3, DAYS);
+        assertThat(Duration.parseWeekBasedPeriod(period), is(weekBasedPeriod));
     }
 
     @Test(expected=ParseException.class)

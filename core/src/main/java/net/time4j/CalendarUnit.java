@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarUnit.java) is part of project Time4J.
  *
@@ -507,6 +507,7 @@ public enum CalendarUnit
      * </pre>
      *
      * @return  calendar unit for week-based years
+     * @see     Weekcycle#YEARS
      */
     /*[deutsch]
      * <p>Definiert eine spezielle Zeiteinheit f&uuml;r wochenbasierte Jahre,
@@ -523,10 +524,11 @@ public enum CalendarUnit
      * </pre>
      *
      * @return  calendar unit for week-based years
+     * @see     Weekcycle#YEARS
      */
     public static IsoDateUnit weekBasedYears() {
 
-        return YOWElement.YOWUnit.WEEK_BASED_YEARS;
+        return Weekcycle.YEARS;
 
     }
 

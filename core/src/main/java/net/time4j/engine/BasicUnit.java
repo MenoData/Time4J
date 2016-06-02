@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BasicUnit.java) is part of project Time4J.
  *
@@ -87,6 +87,28 @@ public abstract class BasicUnit
     ) {
 
         return null;
+
+    }
+
+    /**
+     * <p>Derives an optional unit rule for given entity. </p>
+     *
+     * @param   <T> generic type of time context
+     * @param   entity  the entity referencing a chronology
+     * @return  unit rule or {@code null} if the underlying chronology is not supported
+     * @since   3.21/4.17
+     */
+    /*[deutsch]
+     * <p>Leitet eine optionale Einheitsregel f&uuml;r die angegebene Entit&auml;t ab. </p>
+     *
+     * @param   <T> generic type of time context
+     * @param   entity  the entity referencing a chronology
+     * @return  unit rule or {@code null} if the underlying chronology is not supported
+     * @since   3.21/4.17
+     */
+    protected final <T extends ChronoEntity<T>> UnitRule<T> derive(T entity) {
+
+        return this.derive(entity.getChronology());
 
     }
 
