@@ -23,18 +23,15 @@ package net.time4j;
 
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
-import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 
 import static net.time4j.PlainDate.CALENDAR_DATE;
 import static net.time4j.PlainTime.WALL_TIME;
@@ -161,8 +158,9 @@ final class YOWElement
 
     }
 
+    // used by Weekcycle
     @SuppressWarnings("unchecked")
-    private static <T extends ChronoEntity<T>> UnitRule<T> unitRule() {
+    static <T extends ChronoEntity<T>> UnitRule<T> unitRule() {
 
         return U_RULE;
 
@@ -243,78 +241,6 @@ final class YOWElement
     }
 
     //~ Innere Klassen ----------------------------------------------------
-
-    /**
-     * <p>Spezial-Zeiteinheit f&uuml;r wochenbasierte Jahre. </p>
-     */
-    static class YOWUnit
-        extends BasicUnit
-        implements IsoDateUnit, Serializable {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        /** Singleton. */
-        static final YOWUnit WEEK_BASED_YEARS = new YOWUnit();
-
-        private static final long serialVersionUID = -4981215347844372171L;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private YOWUnit() {
-            // singleton
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public char getSymbol() {
-
-            return '\u0000';
-
-        }
-
-        @Override
-        public double getLength() {
-
-            return CalendarUnit.YEARS.getLength();
-
-        }
-
-        @Override
-        public boolean isCalendrical() {
-
-            return true;
-
-        }
-
-        @Override
-        public String toString() {
-
-            return "WEEK_BASED_YEARS";
-
-        }
-
-        @Override
-        protected <T extends ChronoEntity<T>> UnitRule<T> derive(
-            Chronology<T> chronology
-        ) {
-
-            if (chronology.isRegistered(CALENDAR_DATE)) {
-                return YOWElement.unitRule();
-            }
-
-            return null;
-
-        }
-
-        private Object readResolve() throws ObjectStreamException {
-
-            return WEEK_BASED_YEARS;
-
-        }
-
-    }
 
     private static class YOWRollingAdjuster
         extends ElementOperator<PlainDate> {

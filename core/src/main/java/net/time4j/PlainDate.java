@@ -672,7 +672,7 @@ public final class PlainDate
             .appendElement(
                 YEAR_OF_WEEKDATE,
                 YOWElement.elementRule(PlainDate.class),
-                YOWElement.YOWUnit.WEEK_BASED_YEARS)
+                Weekcycle.YEARS)
             .appendElement(
                 QUARTER_OF_YEAR,
                 EnumElementRule.of(QUARTER_OF_YEAR),

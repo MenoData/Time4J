@@ -125,7 +125,7 @@ public class DurationUntilTest {
             Duration.in(units).between(t1, t2),
             is(
                 Duration.ofPositive().months(1).days(3)
-                .hours(9).minutes(15).build()));
+                    .hours(9).minutes(15).build()));
     }
 
     @Test
@@ -201,6 +201,19 @@ public class DurationUntilTest {
         assertThat(
             Duration.in(units).between(t1, t2),
             is(Duration.ofPositive().hours(27 * 24 + 9).minutes(15).build()));
+    }
+
+    @Test
+    public void betweenWeekBased() {
+        PlainDate d1 = PlainDate.of(2012, 1, 1); // Sunday
+        PlainDate d2 = PlainDate.of(2016, 3, 1); // Tuesday
+        Duration<IsoDateUnit> expected = Duration.of(4, CalendarUnit.weekBasedYears()).plus(9, WEEKS).plus(2, DAYS);
+        assertThat(
+            Duration.inWeekBasedUnits().between(d1, d2),
+            is(expected));
+        assertThat(
+            d1.plus(expected),
+            is(d2));
     }
 
 }

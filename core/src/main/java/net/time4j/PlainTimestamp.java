@@ -241,7 +241,7 @@ public final class PlainTimestamp
                 .appendElement(
                     YEAR_OF_WEEKDATE,
                     FieldRule.of(YEAR_OF_WEEKDATE),
-                    YOWElement.YOWUnit.WEEK_BASED_YEARS)
+                    Weekcycle.YEARS)
                 .appendElement(
                     QUARTER_OF_YEAR,
                     FieldRule.of(QUARTER_OF_YEAR),
