@@ -19,13 +19,13 @@
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-core</artifactId>
-            <version>[4.16,)</version>
+            <version>[4.17,)</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-i18n</artifactId>
-            <version>[4.16,)</version>
+            <version>[4.17,)</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
