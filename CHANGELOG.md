@@ -1,4 +1,7 @@
 ## [v3.21] not yet released
+### Added
+- Better support for week-based durations and units [#509]
+
 ### Fixed
 - Zone offset without sign - should be parseable in lax mode [#502]
 
