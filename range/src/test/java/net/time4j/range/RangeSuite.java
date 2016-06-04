@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
         IntervalCollectionTest.class,
         MachineTimeTest.class,
         MomentIntervalFormatTest.class,
+        MonthsTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class,
         RelationTest.class,

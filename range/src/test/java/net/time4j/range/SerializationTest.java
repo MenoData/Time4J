@@ -217,6 +217,21 @@ public class SerializationTest {
         roundtrip(MachineTime.ofSIUnits(123, 987654321));
     }
 
+    @Test
+    public void roundTripOfYears()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(Years.ofGregorian(12));
+        roundtrip(Years.ofWeekBased(3));
+    }
+
+    @Test
+    public void roundTripOfMonths()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(Months.of(5));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
