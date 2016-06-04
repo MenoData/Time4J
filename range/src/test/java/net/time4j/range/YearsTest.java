@@ -4,6 +4,7 @@ import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.Weekcycle;
 import net.time4j.engine.TimeSpan;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -301,8 +302,8 @@ public class YearsTest {
 
     @Test
     public void toDuration() {
-        assertThat(Years.ofGregorian(15).toDuration(), is(Duration.ofCalendarUnits(15, 0, 0)));
-        assertThat(Years.ofWeekBased(-15).toDuration(), is(Duration.of(-15, CalendarUnit.weekBasedYears())));
+        assertThat(Years.ofGregorian(15).toStdDuration(), is(Duration.ofCalendarUnits(15, 0, 0)));
+        assertThat(Years.ofWeekBased(-15).toStdDuration(), is(Duration.of(-15, Weekcycle.YEARS)));
     }
 
 }
