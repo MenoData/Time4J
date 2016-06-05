@@ -15,7 +15,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class MonthsTest {
+public class SingleUnitTest {
 
     @Test
     public void zeroMonths() {
@@ -110,13 +110,22 @@ public class MonthsTest {
     }
 
     @Test
-    public void betweenPlainDates() {
+    public void betweenPlainDatesOrTimestamps() {
         assertThat(
             Months.between(PlainDate.of(1979, 2, 28), PlainDate.of(1985, 2, 27)),
             is(Months.of(71)));
         assertThat(
             Months.between(PlainTimestamp.of(1979, 2, 28, 9, 15), PlainTimestamp.of(1985, 2, 28, 9, 15)),
             is(Months.of(72)));
+        assertThat(
+            Quarters.between(PlainDate.of(1979, 2, 28), PlainDate.of(1985, 2, 27)),
+            is(Quarters.of(23)));
+        assertThat(
+            Quarters.between(PlainTimestamp.of(1979, 2, 28, 9, 15), PlainTimestamp.of(1985, 2, 28, 9, 15)),
+            is(Quarters.of(24)));
+        assertThat(
+            Weeks.between(PlainDate.of(1985, 2, 28), PlainDate.of(1985, 3, 29)),
+            is(Weeks.of(4)));
     }
 
     @Test
@@ -135,13 +144,37 @@ public class MonthsTest {
     }
 
     @Test
+    public void parseQuarters() throws ParseException {
+        assertThat(
+            Quarters.parsePeriod("-P5Q"),
+            is(Quarters.of(-5)));
+        assertThat(
+            Quarters.parsePeriod("P0Q"),
+            is(Quarters.ZERO));
+    }
+
+    @Test
+    public void parseWeeks() throws ParseException {
+        assertThat(
+            Weeks.parsePeriod("-P7W"),
+            is(Weeks.of(-7)));
+        assertThat(
+            Weeks.parsePeriod("P1W"),
+            is(Weeks.ONE));
+    }
+
+    @Test
     public void getUnit() {
         assertThat(Months.of(15).getUnit(), is(CalendarUnit.MONTHS));
+        assertThat(Quarters.of(5).getUnit(), is(CalendarUnit.QUARTERS));
+        assertThat(Weeks.of(4).getUnit(), is(CalendarUnit.WEEKS));
     }
 
     @Test
     public void toDuration() {
         assertThat(Months.of(-15).toStdDuration(), is(Duration.of(-15, CalendarUnit.MONTHS)));
+        assertThat(Quarters.of(5).toStdDuration(), is(Duration.of(5, CalendarUnit.QUARTERS)));
+        assertThat(Weeks.of(4).toStdDuration(), is(Duration.of(4, CalendarUnit.WEEKS)));
     }
 
 }
