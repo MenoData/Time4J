@@ -232,6 +232,20 @@ public class SerializationTest {
         roundtrip(Months.of(5));
     }
 
+    @Test
+    public void roundTripOfQuarters()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(Quarters.of(6));
+    }
+
+    @Test
+    public void roundTripOfWeeks()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(Weeks.of(3));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

@@ -134,7 +134,7 @@ public class YearsTest {
     }
 
     @Test
-    public void betweenPlainDates() {
+    public void betweenPlainDatesOrTimestamps() {
         assertThat(
             Years.between(PlainDate.of(1979, 2, 28), PlainDate.of(1985, 2, 27)),
             is(Years.ofGregorian(5)));
