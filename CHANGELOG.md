@@ -1,5 +1,6 @@
 ## [v4.17] not yet released
 ### Added
+- Add timespan classes Years, Quarters, Months and Weeks [#506]
 - Better support for week-based durations and units [#509]
 
 ### Fixed
