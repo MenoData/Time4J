@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -67,14 +67,12 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein Momentintervall auf dem globalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 public final class MomentInterval
     extends IsoInterval<Moment, MomentInterval>
@@ -1153,13 +1151,13 @@ public final class MomentInterval
      *
      * <pre>
      *  int header = 35;
-     *  header <<= 2;
+     *  header &lt;&lt;= 2;
      *  out.writeByte(header);
      *  writeBoundary(getStart(), out);
      *  writeBoundary(getEnd(), out);
      *
      *  private static void writeBoundary(
-     *      Boundary<?> boundary,
+     *      Boundary&lt;?&gt; boundary,
      *      ObjectOutput out
      *  ) throws IOException {
      *      if (boundary.equals(Boundary.infinitePast())) {

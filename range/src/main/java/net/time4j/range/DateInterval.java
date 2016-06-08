@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -59,14 +59,12 @@ import static net.time4j.range.IntervalEdge.CLOSED;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein Datumsintervall. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 public final class DateInterval
     extends IsoInterval<PlainDate, DateInterval>
@@ -869,13 +867,13 @@ public final class DateInterval
      *
      * <pre>
      *  int header = 32;
-     *  header <<= 2;
+     *  header &lt;&lt;= 2;
      *  out.writeByte(header);
      *  writeBoundary(getStart(), out);
      *  writeBoundary(getEnd(), out);
      *
      *  private static void writeBoundary(
-     *      Boundary<?> boundary,
+     *      Boundary&lt;?&gt; boundary,
      *      ObjectOutput out
      *  ) throws IOException {
      *      if (boundary.equals(Boundary.infinitePast())) {

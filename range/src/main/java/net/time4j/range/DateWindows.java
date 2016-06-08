@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateWindows.java) is part of project Time4J.
  *
@@ -112,17 +112,17 @@ final class DateWindows
      *
      * <pre>
      *  int header = 40;
-     *  header <<= 2;
+     *  header &lt;&lt;= 2;
      *  out.writeByte(header);
      *  out.writeInt(getIntervals().size());
      *
-     *  for (ChronoInterval<?> part : getIntervals()) {
+     *  for (ChronoInterval&lt;?&gt; part : getIntervals()) {
      *      writeBoundary(part.getStart(), out);
      *      writeBoundary(part.getEnd(), out);
      *  }
      *
      *  private static void writeBoundary(
-     *      Boundary<?> boundary,
+     *      Boundary&lt;?&gt; boundary,
      *      ObjectOutput out
      *  ) throws IOException {
      *      if (boundary.equals(Boundary.infinitePast())) {

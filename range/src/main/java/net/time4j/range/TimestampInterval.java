@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimestampInterval.java) is part of project Time4J.
  *
@@ -64,14 +64,12 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Definiert ein Zeitstempelintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency <immutable>
  */
 public final class TimestampInterval
     extends IsoInterval<PlainTimestamp, TimestampInterval>
@@ -1031,13 +1029,13 @@ public final class TimestampInterval
      *
      * <pre>
      *  int header = 34;
-     *  header <<= 2;
+     *  header &lt;&lt;= 2;
      *  out.writeByte(header);
      *  writeBoundary(getStart(), out);
      *  writeBoundary(getEnd(), out);
      *
      *  private static void writeBoundary(
-     *      Boundary<?> boundary,
+     *      Boundary&lt;?&gt; boundary,
      *      ObjectOutput out
      *  ) throws IOException {
      *      if (boundary.equals(Boundary.infinitePast())) {

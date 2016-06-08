@@ -474,7 +474,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * <pre>
      *  int header = 57;
-     *  header <<= 2;
+     *  header &lt;&lt;= 2;
      *
      *  if (this == Boundary.infinitePast()) {
      *      header |= 1;
