@@ -1,5 +1,6 @@
 ## [v3.21] not yet released
 ### Added
+- Model calendar year as date interval [#505]
 - Add timespan classes Years, Quarters, Months and Weeks [#506]
 - Better support for week-based durations and units [#509]
 
