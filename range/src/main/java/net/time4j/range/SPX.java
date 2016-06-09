@@ -63,6 +63,18 @@ final class SPX
     /** Serialisierungstyp von {@code MomentInterval}. */
     static final int MOMENT_TYPE = 35;
 
+    /** Serialisierungstyp von {@code CalendarYear}. */
+    static final int YEAR_TYPE = 36;
+
+    /** Serialisierungstyp von {@code CalendarQuarter}. */
+    static final int QUARTER_TYPE = 37;
+
+    /** Serialisierungstyp von {@code CalendarMonth}. */
+    static final int MONTH_TYPE = 38;
+
+    /** Serialisierungstyp von {@code CalendarWeek}. */
+    static final int WEEK_TYPE = 39;
+
     /** Serialisierungstyp von {@code DateWindows}. */
     static final int DATE_WINDOW_ID = 40;
 
@@ -174,6 +186,10 @@ final class SPX
                     writeBoundary(interval.getStart(), out);
                     writeBoundary(interval.getEnd(), out);
                     break;
+                case YEAR_TYPE:
+                    CalendarYear cy = (CalendarYear) this.obj;
+                    out.writeInt(cy.getValue());
+                    break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:
                 case TIMESTAMP_WINDOW_ID:
@@ -229,6 +245,9 @@ final class SPX
                 break;
             case MOMENT_TYPE:
                 this.obj = readMomentInterval(in);
+                break;
+            case YEAR_TYPE:
+                this.obj = readCalendarYear(in);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = readDateWindows(in);
@@ -328,6 +347,14 @@ final class SPX
         }
 
         throw new StreamCorruptedException();
+
+    }
+
+    private static CalendarYear readCalendarYear(ObjectInput in)
+        throws IOException {
+
+        int year = in.readInt();
+        return CalendarYear.of(year);
 
     }
 
