@@ -151,6 +151,26 @@ public final class Years<U extends IsoDateUnit>
     }
 
     /**
+     * <p>Determines the difference in years between given calendar years. </p>
+     *
+     * @param   y1  first calendar year
+     * @param   y2  second calendar year
+     * @return  year difference
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Jahresdifferenz zwischen den angegebenen Kalenderjahren. </p>
+     *
+     * @param   y1  first calendar year
+     * @param   y2  second calendar year
+     * @return  year difference
+     */
+    public static Years<CalendarUnit> between(CalendarYear y1, CalendarYear y2) {
+
+        return Years.ofGregorian(y1.getValue() - y2.getValue());
+
+    }
+
+    /**
      * <p>Parses the canonical ISO-8601-format &quot;PnY&quot; with possible preceding minus-char. </p>
      *
      * @param   period      the formatted string to be parsed
