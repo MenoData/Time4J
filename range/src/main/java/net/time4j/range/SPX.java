@@ -216,15 +216,15 @@ final class SPX
      * <p>Implementation method of interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in case of I/O-problems
+     * @throws  ClassNotFoundException if class-loading fails
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
-     * @throws  IOException
-     * @throws  ClassNotFoundException
+     * @throws  IOException in case of I/O-problems
+     * @throws  ClassNotFoundException if class-loading fails
      */
     @Override
     public void readExternal(ObjectInput in)
