@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.Quarter;
 import net.time4j.engine.Temporal;
 import net.time4j.scale.TimeScale;
 
@@ -137,8 +138,7 @@ final class SPX
      * of the object to be serialized. Then the data bytes follow in a
      * bit-compressed representation. </p>
      *
-     * @serialData  data layout see {@code writeReplace()}-method of object
-     *              to be serialized
+     * @serialData  data layout see {@code writeReplace()}-method of object to be serialized
      * @param       out     output stream
      * @throws      IOException in case of I/O-problems
      */
@@ -149,8 +149,7 @@ final class SPX
      * Typ des zu serialisierenden Objekts. Danach folgen die Daten-Bits
      * in einer bit-komprimierten Darstellung. </p>
      *
-     * @serialData  data layout see {@code writeReplace()}-method of object
-     *              to be serialized
+     * @serialData  data layout see {@code writeReplace()}-method of object to be serialized
      * @param       out     output stream
      * @throws      IOException in case of I/O-problems
      */
@@ -189,6 +188,11 @@ final class SPX
                 case YEAR_TYPE:
                     CalendarYear cy = (CalendarYear) this.obj;
                     out.writeInt(cy.getValue());
+                    break;
+                case QUARTER_TYPE:
+                    CalendarQuarter cq = (CalendarQuarter) this.obj;
+                    out.writeInt(cq.getYear());
+                    out.writeInt(cq.getQuarterOfYear().getValue());
                     break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:
@@ -248,6 +252,9 @@ final class SPX
                 break;
             case YEAR_TYPE:
                 this.obj = readCalendarYear(in);
+                break;
+            case QUARTER_TYPE:
+                this.obj = readCalendarQuarter(in);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = readDateWindows(in);
@@ -355,6 +362,15 @@ final class SPX
 
         int year = in.readInt();
         return CalendarYear.of(year);
+
+    }
+
+    private static CalendarQuarter readCalendarQuarter(ObjectInput in)
+        throws IOException {
+
+        int year = in.readInt();
+        int quarter = in.readInt();
+        return CalendarQuarter.of(year, Quarter.valueOf(quarter));
 
     }
 
