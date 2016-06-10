@@ -105,21 +105,6 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
  *     System.out.println(formatter.format(ethiopianDate));
- *
- *     // parsing text in Amharic (requires Ethiopic unicode font for proper view in browser)
- *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(EthiopianCalendar.class, new Locale(&quot;am&quot;))
- *       .addPattern(&quot;MMMM d &quot;, PatternType.NON_ISO_DATE)
- *       .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
- *       .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
- *       .endSection()
- *       .addLiteral(&quot; (&quot;)
- *       .addText(EthiopianCalendar.EVANGELIST)
- *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
- *       .build();
- *     String input = &quot;&amp;#4901;&amp;#4677;&amp;#4637;&amp;#4725; 11 &amp;#4978;&amp;#4977;&amp;#4987;&amp;#4986;&amp;#4975; (&amp;#4635;&amp;#4724;&amp;#4814;&amp;#4661;) &amp;#4819;/&amp;#4637;&quot;;
- *     EthiopianCalendar ethio = formatter.parse(input);
- *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
  * @author  Meno Hochschild
@@ -151,28 +136,13 @@ import java.util.Locale;
  * <p>Anwendungsbeispiele: </p>
  *
  * <pre>
- *     // printing to English
+ *     // Englische Textausgabe
  *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
  *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
+ *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // Umwandlung zur Mittagszeit
  *     System.out.println(formatter.format(ethiopianDate));
- *
- *     // parsing text in Amharic (requires Ethiopic unicode font for proper view in browser)
- *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
- *       ChronoFormatter.setUp(EthiopianCalendar.class, new Locale(&quot;am&quot;))
- *       .addPattern(&quot;MMMM d &quot;, PatternType.NON_ISO_DATE)
- *       .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
- *       .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
- *       .endSection()
- *       .addLiteral(&quot; (&quot;)
- *       .addText(EthiopianCalendar.EVANGELIST)
- *       .addPattern(&quot;) G&quot;, PatternType.NON_ISO_DATE)
- *       .build();
- *     String input = &quot;&amp;#4901;&amp;#4677;&amp;#4637;&amp;#4725; 11 &amp;#4978;&amp;#4977;&amp;#4987;&amp;#4986;&amp;#4975; (&amp;#4635;&amp;#4724;&amp;#4814;&amp;#4661;) &amp;#4819;/&amp;#4637;&quot;;
- *     EthiopianCalendar ethio = formatter.parse(input);
- *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
  * @author  Meno Hochschild

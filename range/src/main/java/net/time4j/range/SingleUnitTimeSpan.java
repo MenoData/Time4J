@@ -56,18 +56,18 @@ public abstract class SingleUnitTimeSpan<U extends IsoDateUnit, D extends Single
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serialField     count of units
+     * @serial      count of units
      */
     /*[deutsch]
-     * @serialField     Anzahl der Zeiteinheiten
+     * @serial      Anzahl der Zeiteinheiten
      */
     private final int amount;
 
     /**
-     * @serialField     unit type
+     * @serial      type of unit
      */
     /*[deutsch]
-     * @serialField     Einheitstyp
+     * @serial      Einheitstyp
      */
     private final U unit;
 

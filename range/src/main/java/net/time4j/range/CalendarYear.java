@@ -94,13 +94,16 @@ public final class CalendarYear
     /**
      * <p>Element with the proleptic iso-year without any era reference and
      * the value range {@code -999999999} until {@code 999999999}. </p>
-     * <p/>
+     *
      * <p>The term &quot;proleptic&quot; means that the rules of the gregorian
      * calendar and the associated way of year counting is applied backward
      * even before the introduction of gregorian calendar. The year {@code 0}
      * is permitted - and negative years, too. For historic year numbers,
      * this mathematical extrapolation is not recommended and usually
      * wrong. </p>
+     *
+     * <p>Format pattern symbol (for CLDR standard) can be either &quot;u&quot;
+     * or &quot;y&quot;. </p>
      */
     /*[deutsch]
      * <p>Element mit dem proleptischen ISO-Jahr ohne &Auml;ra-Bezug mit dem
@@ -112,6 +115,9 @@ public final class CalendarYear
      * werden. Insbesondere ist auch das Jahr {@code 0} zugelassen - nebst
      * negativen Jahreszahlen. F&uuml;r historische Jahreszahlen ist diese
      * mathematische Extrapolation nicht geeignet. </p>
+     *
+     * <p>Formatmustersymbol (f&uuml;r den CLDR-Standard) kann entweder &quot;u&quot;
+     * oder &quot;y&quot; sein. </p>
      */
     @FormattableElement(format = "u")
     public static final ChronoElement<Integer> YEAR = PlainDate.YEAR;
@@ -149,7 +155,7 @@ public final class CalendarYear
     /**
      * <p>Creates a new instance based on given gregorian calendar year. </p>
      *
-     * @param year gregorian year within range {@code -999,999,999 / +999,999,999}
+     * @param   year    gregorian year within range {@code -999,999,999 / +999,999,999}
      * @return new instance
      * @throws IllegalArgumentException if given argument is out of range
      */
