@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.PlainDate;
+import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
 
@@ -106,6 +107,37 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
     public boolean isSimultaneous(T other) {
 
         return (this.compareTo(other) == 0);
+
+    }
+
+    // helper method for toString() in subclasses
+    static void formatYear(
+        StringBuilder sb,
+        int year
+    ) {
+
+        int value = year;
+
+        if (value < 0) {
+            sb.append('-');
+            value = MathUtils.safeNegate(year);
+        }
+
+        if (value >= 10000) {
+            if (year > 0) {
+                sb.append('+');
+            }
+        } else if (value < 1000) {
+            sb.append('0');
+            if (value < 100) {
+                sb.append('0');
+                if (value < 10) {
+                    sb.append('0');
+                }
+            }
+        }
+
+        sb.append(value);
 
     }
 

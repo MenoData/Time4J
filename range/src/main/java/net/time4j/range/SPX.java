@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -138,10 +139,9 @@ final class SPX
      * of the object to be serialized. Then the data bytes follow in a
      * bit-compressed representation. </p>
      *
-     * @serialData  data layout see {@code writeReplace()}-method of object
-     *              to be serialized
+     * @serialData  data layout see {@code writeReplace()}-method of object to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in case of I/O-problems
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
@@ -150,10 +150,9 @@ final class SPX
      * Typ des zu serialisierenden Objekts. Danach folgen die Daten-Bits
      * in einer bit-komprimierten Darstellung. </p>
      *
-     * @serialData  data layout see {@code writeReplace()}-method of object
-     *              to be serialized
+     * @serialData  data layout see {@code writeReplace()}-method of object to be serialized
      * @param       out     output stream
-     * @throws      IOException
+     * @throws      IOException in case of I/O-problems
      */
     @Override
     public void writeExternal(ObjectOutput out)
@@ -195,6 +194,11 @@ final class SPX
                     CalendarQuarter cq = (CalendarQuarter) this.obj;
                     out.writeInt(cq.getYear());
                     out.writeInt(cq.getQuarterOfYear().getValue());
+                    break;
+                case MONTH_TYPE:
+                    CalendarMonth cm = (CalendarMonth) this.obj;
+                    out.writeInt(cm.getYear());
+                    out.writeInt(cm.getMonthOfYear().getValue());
                     break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:
@@ -257,6 +261,9 @@ final class SPX
                 break;
             case QUARTER_TYPE:
                 this.obj = readCalendarQuarter(in);
+                break;
+            case MONTH_TYPE:
+                this.obj = readCalendarMonth(in);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = readDateWindows(in);
@@ -373,6 +380,15 @@ final class SPX
         int year = in.readInt();
         int quarter = in.readInt();
         return CalendarQuarter.of(year, Quarter.valueOf(quarter));
+
+    }
+
+    private static CalendarMonth readCalendarMonth(ObjectInput in)
+        throws IOException {
+
+        int year = in.readInt();
+        int month = in.readInt();
+        return CalendarMonth.of(year, Month.valueOf(month));
 
     }
 

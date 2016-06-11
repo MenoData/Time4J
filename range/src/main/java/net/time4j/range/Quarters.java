@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.PlainDate;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.TimePoint;
 
@@ -116,6 +117,28 @@ public final class Quarters
 
         long delta = CalendarUnit.QUARTERS.between(t1, t2);
         return Quarters.of(MathUtils.safeCast(delta));
+
+    }
+
+    /**
+     * <p>Determines the difference in years between given quarter years. </p>
+     *
+     * @param   q1  first quarter year
+     * @param   q2  second quarter year
+     * @return  difference in quarter years
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Differenz zwischen den angegebenen Quartalen. </p>
+     *
+     * @param   q1  first quarter year
+     * @param   q2  second quarter year
+     * @return  difference in quarter years
+     */
+    public static Quarters between(CalendarQuarter q1, CalendarQuarter q2) {
+
+        PlainDate d1 = q1.atDayOfQuarter(1);
+        PlainDate d2 = q2.atDayOfQuarter(1);
+        return Quarters.between(d1, d2);
 
     }
 

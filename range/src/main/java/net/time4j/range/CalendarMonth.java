@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (CalendarQuarter.java) is part of project Time4J.
+ * This file (CalendarMonth.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -23,8 +23,8 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
-import net.time4j.Quarter;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -58,42 +58,44 @@ import java.util.NoSuchElementException;
 
 
 /**
- * <p>Represents the quarter of a gregorian calendar year as interval
- * (like from 1st of January until end of March). </p>
+ * <p>Represents the month of a gregorian calendar year as interval
+ * (like from 1st of January until end of January). </p>
  *
  * <p>The elements registered by this class are: </p>
  *
  * <ul>
  *  <li>{@link #YEAR}</li>
- *  <li>{@link #QUARTER_OF_YEAR}</li>
+ *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_NUMBER}</li>
  * </ul>
  *
- * <p>Note: The current quarter of calendar year can be determined by an expression like:
- * {@code CalendarQuarter current = SystemClock.inLocalView().now(CalendarQuarter.chronology())}. </p>
+ * <p>Note: The current month of calendar year can be determined by an expression like:
+ * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert das Quartal eines Kalenderjahres als Intervall
- * (zum Beispiel vom ersten Januar bis Ende M&auml;rz). </p>
+ * <p>Repr&auml;sentiert den Monat eines Kalenderjahres als Intervall
+ * (zum Beispiel vom ersten Januar bis Ende Januar). </p>
  *
  * <p>Die von dieser Klasse registrierten Elemente sind: </p>
  *
  * <ul>
  *  <li>{@link #YEAR}</li>
- *  <li>{@link #QUARTER_OF_YEAR}</li>
+ *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_NUMBER}</li>
  * </ul>
  *
- * <p>Hinweis: Das aktuelle Quartal kann mit einem Ausdruck wie folgt bestimmt werden:
- * {@code CalendarQuarter current = SystemClock.inLocalView().now(CalendarQuarter.chronology())}. </p>
+ * <p>Hinweis: Der aktuelle Monat kann mit einem Ausdruck wie folgt bestimmt werden:
+ * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
  */
 @CalendarType("iso8601")
-public final class CalendarQuarter
-    extends FixedCalendarInterval<CalendarQuarter>
+public final class CalendarMonth
+    extends FixedCalendarInterval<CalendarMonth>
     implements LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -124,100 +126,133 @@ public final class CalendarQuarter
     public static final ChronoElement<Integer> YEAR = PlainDate.YEAR;
 
     /**
-     * <p>Element with the quarter of year in the value range
-     * {@code Q1-Q4}. </p>
+     * <p>Element with the month of year in the value range
+     * {@code January - December}. </p>
      */
     /*[deutsch]
-     * <p>Element mit dem Quartal des Jahres (Wertebereich {@code Q1-Q4}). </p>
+     * <p>Element mit dem Monat des Jahres (Wertebereich {@code Januar - Dezember}). </p>
      */
-    @FormattableElement(format = "Q", standalone="q")
-    public static final ChronoElement<Quarter> QUARTER_OF_YEAR = PlainDate.QUARTER_OF_YEAR;
+    @FormattableElement(format = "M", standalone="L")
+    public static final ChronoElement<Month> MONTH_OF_YEAR = PlainDate.MONTH_OF_YEAR;
 
-    private static final Chronology<CalendarQuarter> ENGINE =
+    /**
+     * <p>Element with the month as number in the value range {@code 1 - 12}. </p>
+     */
+    /*[deutsch]
+     * <p>Element mit dem Monat als Zahl (Wertebereich {@code 1 - 12}). </p>
+     */
+    public static final ChronoElement<Integer> MONTH_AS_NUMBER = PlainDate.MONTH_AS_NUMBER;
+
+    private static final Chronology<CalendarMonth> ENGINE =
         Chronology.Builder
-            .setUp(CalendarQuarter.class, new Merger())
+            .setUp(CalendarMonth.class, new Merger())
             .appendElement(YEAR, new YearRule())
-            .appendElement(QUARTER_OF_YEAR, new QuarterRule())
+            .appendElement(MONTH_OF_YEAR, new EnumMonthRule())
+            .appendElement(MONTH_AS_NUMBER, new IntMonthRule())
             .build();
 
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int year;
-    private transient final Quarter quarter;
+    private transient final Month month;
     private transient final Boundary<PlainDate> start;
     private transient final Boundary<PlainDate> end;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private CalendarQuarter(
+    private CalendarMonth(
         int year,
-        Quarter quarter
+        Month month
     ) {
         super();
 
         if ((year < GregorianMath.MIN_YEAR) || (year > GregorianMath.MAX_YEAR)) {
             throw new IllegalArgumentException("Year out of bounds: " + year);
-        } else if (quarter == null) {
-            throw new NullPointerException("Missing quarter of calendar year.");
+        } else if (month == null) {
+            throw new NullPointerException("Missing month of calendar year.");
         }
 
         this.year = year;
-        this.quarter = quarter;
+        this.month = month;
 
-        PlainDate date = PlainDate.of(this.year, 1, 1).with(QUARTER_OF_YEAR, quarter);
-        this.start = Boundary.ofClosed(date);
-        this.end = Boundary.ofClosed(date.with(PlainDate.DAY_OF_QUARTER.maximized()));
+        this.start = Boundary.ofClosed(PlainDate.of(this.year, month, 1));
+        this.end = Boundary.ofClosed(PlainDate.of(year, month, GregorianMath.getLengthOfMonth(year, month.getValue())));
 
     }
 
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a new instance based on given gregorian calendar year and quarter year. </p>
+     * <p>Creates a new instance based on given gregorian calendar year and month. </p>
      *
      * @param   year        gregorian year within range {@code -999,999,999 / +999,999,999}
-     * @param   quarter     quarter year
+     * @param   month       gregorian month in range 1-12
      * @return  new instance
-     * @throws  IllegalArgumentException if given year is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
     /*[deutsch]
-     * <p>Erzeugt eine neue Instanz mit dem angegebenen gregorianischen Kalendarjahr und Quartal. </p>
+     * <p>Erzeugt eine neue Instanz mit dem angegebenen gregorianischen Kalendarjahr und Monat. </p>
      *
      * @param   year        gregorian year within range {@code -999,999,999 / +999,999,999}
-     * @param   quarter     quarter year
+     * @param   month       gregorian month in range 1-12
      * @return  new instance
-     * @throws  IllegalArgumentException if given year is out of range
+     * @throws  IllegalArgumentException if any argument is out of range
      */
-    public static CalendarQuarter of(
+    public static CalendarMonth of(
         int year,
-        Quarter quarter
+        int month
     ) {
 
-        return new CalendarQuarter(year, quarter);
+        return new CalendarMonth(year, Month.valueOf(month));
 
     }
 
     /**
-     * <p>Combines this year with given day of quarter year to a calendar date. </p>
+     * <p>Creates a new instance based on given gregorian calendar year and month. </p>
      *
-     * @param   dayOfQuarter   day of quarter in range 1-92
-     * @return  calendar date
-     * @throws  IllegalArgumentException if the day-of-quarter is out of range
+     * @param   year        gregorian year within range {@code -999,999,999 / +999,999,999}
+     * @param   month       gregorian month
+     * @return  new instance
+     * @throws  IllegalArgumentException if given year is out of range
      */
     /*[deutsch]
-     * <p>Kombiniert dieses Jahr mit dem angegebenen Quartalstag zu einem Kalenderdatum. </p>
+     * <p>Erzeugt eine neue Instanz mit dem angegebenen gregorianischen Kalendarjahr und Monat. </p>
      *
-     * @param   dayOfQuarter   day of quarter in range 1-92
-     * @return  calendar date
-     * @throws  IllegalArgumentException if the day-of-quarter is out of range
+     * @param   year        gregorian year within range {@code -999,999,999 / +999,999,999}
+     * @param   month       gregorian month
+     * @return  new instance
+     * @throws  IllegalArgumentException if given year is out of range
      */
-    public PlainDate atDayOfQuarter(int dayOfQuarter) {
+    public static CalendarMonth of(
+        int year,
+        Month month
+    ) {
 
-        if (dayOfQuarter == 1) {
+        return new CalendarMonth(year, month);
+
+    }
+
+    /**
+     * <p>Combines this year and month with given day of month to a calendar date. </p>
+     *
+     * @param   dayOfMonth      day of month in maximum range 1-31
+     * @return  calendar date
+     * @throws  IllegalArgumentException if the day-of-month is out of range
+     */
+    /*[deutsch]
+     * <p>Kombiniert diese Instanz mit dem angegebenen Tag zu einem Kalenderdatum. </p>
+     *
+     * @param   dayOfMonth      day of month in maximum range 1-31
+     * @return  calendar date
+     * @throws  IllegalArgumentException if the day-of-month is out of range
+     */
+    public PlainDate atDayOfMonth(int dayOfMonth) {
+
+        if (dayOfMonth == 1) {
             return this.start.getTemporal();
         }
 
-        return this.start.getTemporal().with(PlainDate.DAY_OF_QUARTER, dayOfQuarter);
+        return this.start.getTemporal().with(PlainDate.DAY_OF_MONTH, dayOfMonth);
 
     }
 
@@ -238,18 +273,34 @@ public final class CalendarQuarter
     }
 
     /**
-     * <p>Yields the quarter year. </p>
+     * <p>Yields the month as enum. </p>
      *
-     * @return  Quarter
+     * @return  Month
      */
     /*[deutsch]
-     * <p>Liefert das Quartal. </p>
+     * <p>Liefert den Monat als enum-Wert. </p>
      *
-     * @return  Quarter
+     * @return  Month
      */
-    public Quarter getQuarterOfYear() {
+    public Month getMonthOfYear() {
 
-        return this.quarter;
+        return this.month;
+
+    }
+
+    /**
+     * <p>Yields the month as number. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
+     * <p>Liefert den Monat als Zahl. </p>
+     *
+     * @return  int
+     */
+    public int getMonthAsNumber() {
+
+        return this.month.getValue();
 
     }
 
@@ -270,7 +321,7 @@ public final class CalendarQuarter
     @Override
     public boolean contains(PlainDate temporal) {
 
-        return ((temporal.getYear() == this.year) && (temporal.get(QUARTER_OF_YEAR) == this.quarter));
+        return ((temporal.getYear() == this.year) && (temporal.getMonth() == this.month.getValue()));
 
     }
 
@@ -289,124 +340,124 @@ public final class CalendarQuarter
     }
 
     /**
-     * <p>Determines the count of days belonging to this quarter year. </p>
+     * <p>Determines the count of days belonging to this month. </p>
      *
      * @return  int
      */
     /**
-     * <p>Ermittelt die Anzahl der Tage, die zu diesem Kalenderquartal geh&ouml;ren. </p>
+     * <p>Ermittelt die Anzahl der Tage, die zu diesem Kalendermonat geh&ouml;ren. </p>
      *
      * @return  int
      */
     public int length() {
 
-        return this.start.getTemporal().getMaximum(PlainDate.DAY_OF_QUARTER);
+        return GregorianMath.getLengthOfMonth(this.year, this.month.getValue());
 
     }
 
     /**
-     * <p>Adds given years to this quarter year. </p>
+     * <p>Adds given years to this calendar month. </p>
      *
      * @param   years       the count of years to be added
      * @return  result of addition
      */
     /*[deutsch]
-     * <p>Addiert die angegebenen Jahre zu diesem Kalenderquartal. </p>
+     * <p>Addiert die angegebenen Jahre zu diesem Kalendermonat. </p>
      *
      * @param   years       the count of years to be added
      * @return  result of addition
      */
-    public CalendarQuarter plus(Years<CalendarUnit> years) {
+    public CalendarMonth plus(Years<CalendarUnit> years) {
 
         if (years.isEmpty()) {
             return this;
         }
 
-        return CalendarQuarter.of(MathUtils.safeAdd(this.year, years.getAmount()), this.quarter);
+        return CalendarMonth.of(MathUtils.safeAdd(this.year, years.getAmount()), this.month);
 
     }
 
     /**
-     * <p>Adds given quarter years to this quarter year. </p>
+     * <p>Adds given months to this calendar month. </p>
      *
-     * @param   quarters       the count of quarter years to be added
+     * @param   months      the count of months to be added
      * @return  result of addition
      */
     /*[deutsch]
-     * <p>Addiert die angegebenen Quartale zu diesem Kalenderquartal. </p>
+     * <p>Addiert die angegebenen Monate zu diesem Kalendermonat. </p>
      *
-     * @param   quarters       the count of quarter years to be added
+     * @param   months      the count of months to be added
      * @return  result of addition
      */
-    public CalendarQuarter plus(Quarters quarters) {
+    public CalendarMonth plus(Months months) {
 
-        if (quarters.isEmpty()) {
+        if (months.isEmpty()) {
             return this;
         }
 
-        long value = this.year * 4L + this.quarter.getValue() - 1 + quarters.getAmount();
-        int y = MathUtils.safeCast(MathUtils.floorDivide(value, 4));
-        Quarter q = Quarter.valueOf(MathUtils.floorModulo(value, 4) + 1);
-        return CalendarQuarter.of(y, q);
+        long value = this.year * 12L + this.month.getValue() - 1 + months.getAmount();
+        int y = MathUtils.safeCast(MathUtils.floorDivide(value, 12));
+        Month m = Month.valueOf(MathUtils.floorModulo(value, 12) + 1);
+        return CalendarMonth.of(y, m);
 
     }
 
     /**
-     * <p>Subtracts given years from this quarter year. </p>
+     * <p>Subtracts given years from this calendar month. </p>
      *
      * @param   years       the count of years to be subtracted
      * @return  result of subtraction
      */
     /*[deutsch]
-     * <p>Subtrahiert die angegebenen Jahre von diesem Kalenderquartal. </p>
+     * <p>Subtrahiert die angegebenen Jahre von diesem Kalendermonat. </p>
      *
      * @param   years       the count of years to be subtracted
      * @return  result of subtraction
      */
-    public CalendarQuarter minus(Years<CalendarUnit> years) {
+    public CalendarMonth minus(Years<CalendarUnit> years) {
 
         if (years.isEmpty()) {
             return this;
         }
 
-        return CalendarQuarter.of(MathUtils.safeSubtract(this.year, years.getAmount()), this.quarter);
+        return CalendarMonth.of(MathUtils.safeSubtract(this.year, years.getAmount()), this.month);
 
     }
 
     /**
-     * <p>Subtracts given quarter years from this quarter year. </p>
+     * <p>Subtracts given months from this calendar month. </p>
      *
-     * @param   quarters       the count of quarter years to be subtracted
+     * @param   months      the count of months to be subtracted
      * @return  result of subtraction
      */
     /*[deutsch]
-     * <p>Subtrahiert die angegebenen Quartale von diesem Kalenderquartal. </p>
+     * <p>Subtrahiert die angegebenen Monate von diesem Kalendermonat. </p>
      *
-     * @param   quarters       the count of quarter years to be subtracted
+     * @param   months      the count of months to be subtracted
      * @return  result of subtraction
      */
-    public CalendarQuarter minus(Quarters quarters) {
+    public CalendarMonth minus(Months months) {
 
-        if (quarters.isEmpty()) {
+        if (months.isEmpty()) {
             return this;
         }
 
-        long value = this.year * 4L + this.quarter.getValue() - 1 - quarters.getAmount();
-        int y = MathUtils.safeCast(MathUtils.floorDivide(value, 4));
-        Quarter q = Quarter.valueOf(MathUtils.floorModulo(value, 4) + 1);
-        return CalendarQuarter.of(y, q);
+        long value = this.year * 12L + this.month.getValue() - 1 - months.getAmount();
+        int y = MathUtils.safeCast(MathUtils.floorDivide(value, 12));
+        Month m = Month.valueOf(MathUtils.floorModulo(value, 12) + 1);
+        return CalendarMonth.of(y, m);
 
     }
 
     @Override
-    public int compareTo(CalendarQuarter other) {
+    public int compareTo(CalendarMonth other) {
 
         if (this.year < other.year) {
             return -1;
         } else if (this.year > other.year) {
             return 1;
         } else {
-            return this.quarter.compareTo(other.quarter);
+            return this.month.compareTo(other.month);
         }
 
     }
@@ -423,9 +474,9 @@ public final class CalendarQuarter
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof CalendarQuarter) {
-            CalendarQuarter that = (CalendarQuarter) obj;
-            return ((this.year == that.year) && (this.quarter == that.quarter));
+        } else if (obj instanceof CalendarMonth) {
+            CalendarMonth that = (CalendarMonth) obj;
+            return ((this.year == that.year) && (this.month == that.month));
         } else {
             return false;
         }
@@ -435,17 +486,17 @@ public final class CalendarQuarter
     @Override
     public int hashCode() {
 
-        return this.year ^ this.quarter.hashCode();
+        return this.year ^ this.month.hashCode();
 
     }
 
     /**
-     * <p>Outputs this instance as a String in format yyyy-Qn (like &quot;2016-Q1&quot;). </p>
+     * <p>Outputs this instance as a String in ISO-format yyyy-MM (like &quot;2016-10&quot;). </p>
      *
      * @return String
      */
     /*[deutsch]
-     * <p>Gibt diese Instanz als String im Format yyyy-Qn (wie &quot;2016-Q1&quot;) aus. </p>
+     * <p>Gibt diese Instanz als String im ISO-Format yyyy-MM (wie &quot;2016-10&quot;) aus. </p>
      *
      * @return  String
      */
@@ -454,8 +505,12 @@ public final class CalendarQuarter
 
         StringBuilder sb = new StringBuilder();
         formatYear(sb, this.year);
-        sb.append("-Q");
-        sb.append(this.quarter.getValue());
+        sb.append('-');
+        int m = this.month.getValue();
+        if (m < 10) {
+            sb.append('0');
+        }
+        sb.append(m);
         return sb.toString();
 
     }
@@ -470,21 +525,21 @@ public final class CalendarQuarter
      *
      * @return  the underlying rule engine
      */
-    public static Chronology<CalendarQuarter> chronology() {
+    public static Chronology<CalendarMonth> chronology() {
 
         return ENGINE;
 
     }
 
     @Override
-    protected Chronology<CalendarQuarter> getChronology() {
+    protected Chronology<CalendarMonth> getChronology() {
 
         return ENGINE;
 
     }
 
     @Override
-    protected CalendarQuarter getContext() {
+    protected CalendarMonth getContext() {
 
         return this;
 
@@ -494,24 +549,24 @@ public final class CalendarQuarter
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The format
      *              is bit-compressed. The first byte contains in the six
-     *              most significant bits the type-ID {@code 37}. Then the year number
-     *              and the quarter number are written as int-primitives.
+     *              most significant bits the type-ID {@code 38}. Then the year number
+     *              and the month number are written as int-primitives.
      *
      * Schematic algorithm:
      *
      * <pre>
-     *  int header = 37;
+     *  int header = 38;
      *  header &lt;&lt;= 2;
      *  out.writeByte(header);
      *  out.writeInt(getYear());
-     *  out.writeInt(getQuarterOfYear().getValue());
+     *  out.writeInt(getMonthOfYear().getValue());
      * </pre>
      *
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.QUARTER_TYPE);
+        return new SPX(this, SPX.MONTH_TYPE);
 
     }
 
@@ -530,12 +585,12 @@ public final class CalendarQuarter
     //~ Innere Klassen ----------------------------------------------------
 
     private static class Merger
-        implements ChronoMerger<CalendarQuarter> {
+        implements ChronoMerger<CalendarMonth> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public CalendarQuarter createFrom(
+        public CalendarMonth createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
         ) {
@@ -551,12 +606,12 @@ public final class CalendarQuarter
             }
 
             PlainDate date = Moment.from(clock.currentTime()).toZonalTimestamp(zone.getID()).toDate();
-            return CalendarQuarter.of(date.getYear(), date.get(QUARTER_OF_YEAR));
+            return CalendarMonth.of(date.getYear(), Month.valueOf(date.getMonth()));
 
         }
 
         @Override
-        public CalendarQuarter createFrom(
+        public CalendarMonth createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean preparsing
@@ -568,7 +623,7 @@ public final class CalendarQuarter
         }
 
         @Override
-        public CalendarQuarter createFrom(
+        public CalendarMonth createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
             boolean lenient,
@@ -577,12 +632,14 @@ public final class CalendarQuarter
 
             int y = entity.getInt(YEAR);
 
-            if (
-                (y >= GregorianMath.MIN_YEAR)
-                && (y <= GregorianMath.MAX_YEAR)
-                && entity.contains(QUARTER_OF_YEAR)
-            ) {
-                return CalendarQuarter.of(y, entity.get(QUARTER_OF_YEAR));
+            if ((y >= GregorianMath.MIN_YEAR) && (y <= GregorianMath.MAX_YEAR)) {
+                int m = entity.getInt(PlainDate.MONTH_AS_NUMBER); // optimization
+                if ((m == Integer.MIN_VALUE) && entity.contains(MONTH_OF_YEAR)) {
+                    m = entity.get(MONTH_OF_YEAR).getValue();
+                }
+                if (m != Integer.MIN_VALUE) {
+                    return CalendarMonth.of(y, Month.valueOf(m));
+                }
             } else if (y > Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Year out of bounds: " + y);
             }
@@ -593,7 +650,7 @@ public final class CalendarQuarter
 
         @Override
         public ChronoDisplay preformat(
-            CalendarQuarter context,
+            CalendarMonth context,
             AttributeQuery attributes
         ) {
 
@@ -618,20 +675,20 @@ public final class CalendarQuarter
             String key = null;
             switch (style.getStyleValue()) {
                 case DateFormat.FULL:
-                    key = "F_yQQQQ";
+                    key = "F_yMMMM";
                     break;
                 case DateFormat.LONG:
-                    key = "F_yQQQ";
+                    key = "F_yMMM";
                     break;
                 case DateFormat.MEDIUM:
-                    key = "F_yQQ";
+                    key = "F_yMM";
                     break;
                 case DateFormat.SHORT:
-                    key = "F_yQ";
+                    key = "F_yM";
                     break;
             }
             String pattern = getFormatPattern(map, key);
-            return ((pattern == null) ? "uuuu-'Q'Q" : pattern);
+            return ((pattern == null) ? "uuuu-MM" : pattern);
 
         }
 
@@ -651,12 +708,12 @@ public final class CalendarQuarter
                 return map.get(key);
             }
 
-            if (key.equals("F_yQQQQ")) {
-                return getFormatPattern(map, "F_yQQQ");
-            } else if (key.equals("F_yQQQ")) {
-                return getFormatPattern(map, "F_yQQ");
-            } else if (key.equals("F_yQQ")) {
-                return getFormatPattern(map, "F_yQ");
+            if (key.equals("F_yMMMM")) {
+                return getFormatPattern(map, "F_yMMM");
+            } else if (key.equals("F_yMMM")) {
+                return getFormatPattern(map, "F_yMM");
+            } else if (key.equals("F_yMM")) {
+                return getFormatPattern(map, "F_yM");
             } else {
                 return null;
             }
@@ -666,26 +723,26 @@ public final class CalendarQuarter
     }
 
     private static class YearRule
-        implements IntElementRule<CalendarQuarter> {
+        implements IntElementRule<CalendarMonth> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Integer getValue(CalendarQuarter context) {
+        public Integer getValue(CalendarMonth context) {
 
             return Integer.valueOf(context.year);
 
         }
 
         @Override
-        public Integer getMinimum(CalendarQuarter context) {
+        public Integer getMinimum(CalendarMonth context) {
 
             return Integer.valueOf(GregorianMath.MIN_YEAR);
 
         }
 
         @Override
-        public Integer getMaximum(CalendarQuarter context) {
+        public Integer getMaximum(CalendarMonth context) {
 
             return Integer.valueOf(GregorianMath.MAX_YEAR);
 
@@ -693,7 +750,7 @@ public final class CalendarQuarter
 
         @Override
         public boolean isValid(
-            CalendarQuarter context,
+            CalendarMonth context,
             Integer value
         ) {
 
@@ -707,14 +764,14 @@ public final class CalendarQuarter
         }
 
         @Override
-        public CalendarQuarter withValue(
-            CalendarQuarter context,
+        public CalendarMonth withValue(
+            CalendarMonth context,
             Integer value,
             boolean lenient
         ) {
 
             if (this.isValid(context, value)) {
-                return CalendarQuarter.of(value.intValue(), context.quarter);
+                return CalendarMonth.of(value.intValue(), context.month);
             } else {
                 throw new IllegalArgumentException("Not valid: " + value);
             }
@@ -722,21 +779,21 @@ public final class CalendarQuarter
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CalendarQuarter context) {
+        public ChronoElement<?> getChildAtFloor(CalendarMonth context) {
 
-            return QUARTER_OF_YEAR;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(CalendarQuarter context) {
-
-            return QUARTER_OF_YEAR;
+            return MONTH_OF_YEAR;
 
         }
 
         @Override
-        public int getInt(CalendarQuarter context) {
+        public ChronoElement<?> getChildAtCeiling(CalendarMonth context) {
+
+            return MONTH_OF_YEAR;
+
+        }
+
+        @Override
+        public int getInt(CalendarMonth context) {
 
             return context.year;
 
@@ -744,7 +801,7 @@ public final class CalendarQuarter
 
         @Override
         public boolean isValid(
-            CalendarQuarter context,
+            CalendarMonth context,
             int value
         ) {
 
@@ -753,14 +810,14 @@ public final class CalendarQuarter
         }
 
         @Override
-        public CalendarQuarter withValue(
-            CalendarQuarter context,
+        public CalendarMonth withValue(
+            CalendarMonth context,
             int value,
             boolean lenient
         ) {
 
             if (this.isValid(context, value)) {
-                return CalendarQuarter.of(value, context.quarter);
+                return CalendarMonth.of(value, context.month);
             } else {
                 throw new IllegalArgumentException("Not valid: " + value);
             }
@@ -769,36 +826,36 @@ public final class CalendarQuarter
 
     }
 
-    private static class QuarterRule
-        implements ElementRule<CalendarQuarter, Quarter> {
+    private static class EnumMonthRule
+        implements ElementRule<CalendarMonth, Month> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Quarter getValue(CalendarQuarter context) {
+        public Month getValue(CalendarMonth context) {
 
-            return context.quarter;
-
-        }
-
-        @Override
-        public Quarter getMinimum(CalendarQuarter context) {
-
-            return Quarter.Q1;
+            return context.month;
 
         }
 
         @Override
-        public Quarter getMaximum(CalendarQuarter context) {
+        public Month getMinimum(CalendarMonth context) {
 
-            return Quarter.Q4;
+            return Month.JANUARY;
+
+        }
+
+        @Override
+        public Month getMaximum(CalendarMonth context) {
+
+            return Month.DECEMBER;
 
         }
 
         @Override
         public boolean isValid(
-            CalendarQuarter context,
-            Quarter value
+            CalendarMonth context,
+            Month value
         ) {
 
             return (value != null);
@@ -806,14 +863,14 @@ public final class CalendarQuarter
         }
 
         @Override
-        public CalendarQuarter withValue(
-            CalendarQuarter context,
-            Quarter value,
+        public CalendarMonth withValue(
+            CalendarMonth context,
+            Month value,
             boolean lenient
         ) {
 
             if (this.isValid(context, value)) {
-                return CalendarQuarter.of(context.year, value);
+                return CalendarMonth.of(context.year, value);
             } else {
                 throw new IllegalArgumentException("Not valid: " + value);
             }
@@ -821,16 +878,120 @@ public final class CalendarQuarter
         }
 
         @Override
-        public ChronoElement<?> getChildAtFloor(CalendarQuarter context) {
+        public ChronoElement<?> getChildAtFloor(CalendarMonth context) {
 
             return null;
 
         }
 
         @Override
-        public ChronoElement<?> getChildAtCeiling(CalendarQuarter context) {
+        public ChronoElement<?> getChildAtCeiling(CalendarMonth context) {
 
             return null;
+
+        }
+
+    }
+
+    private static class IntMonthRule
+        implements IntElementRule<CalendarMonth> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Integer getValue(CalendarMonth context) {
+
+            return Integer.valueOf(context.month.getValue());
+
+        }
+
+        @Override
+        public Integer getMinimum(CalendarMonth context) {
+
+            return Integer.valueOf(1);
+
+        }
+
+        @Override
+        public Integer getMaximum(CalendarMonth context) {
+
+            return Integer.valueOf(12);
+
+        }
+
+        @Override
+        public boolean isValid(
+            CalendarMonth context,
+            Integer value
+        ) {
+
+            if (value == null) {
+                return false;
+            }
+
+            int v = value.intValue();
+            return ((v >= 1) && (v <= 12));
+
+        }
+
+        @Override
+        public CalendarMonth withValue(
+            CalendarMonth context,
+            Integer value,
+            boolean lenient
+        ) {
+
+            if (this.isValid(context, value)) {
+                return CalendarMonth.of(context.year, value);
+            } else {
+                throw new IllegalArgumentException("Not valid: " + value);
+            }
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(CalendarMonth context) {
+
+            return null;
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(CalendarMonth context) {
+
+            return null;
+
+        }
+
+        @Override
+        public int getInt(CalendarMonth context) {
+
+            return context.month.getValue();
+
+        }
+
+        @Override
+        public boolean isValid(
+            CalendarMonth context,
+            int value
+        ) {
+
+            return ((value >= 1) && (value <= 12));
+
+        }
+
+        @Override
+        public CalendarMonth withValue(
+            CalendarMonth context,
+            int value,
+            boolean lenient
+        ) {
+
+            if (this.isValid(context, value)) {
+                return CalendarMonth.of(context.year, value);
+            } else {
+                throw new IllegalArgumentException("Not valid: " + value);
+            }
 
         }
 
@@ -841,7 +1002,7 @@ public final class CalendarQuarter
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private PlainDate current = CalendarQuarter.this.start.getTemporal();
+        private PlainDate current = CalendarMonth.this.start.getTemporal();
 
         //~ Methoden ------------------------------------------------------
 
@@ -857,7 +1018,7 @@ public final class CalendarQuarter
             } else {
                 PlainDate result = this.current;
                 PlainDate next = result.plus(1, CalendarUnit.DAYS);
-                this.current = ((next.isAfter(CalendarQuarter.this.end.getTemporal())) ? null : next);
+                this.current = ((next.getMonth() == result.getMonth()) ? next : null);
                 return result;
             }
         }

@@ -147,7 +147,7 @@ public class YearsTest {
     public void betweenCalendarYears() {
         CalendarYear y1 = CalendarYear.of(2013);
         CalendarYear y2 = CalendarYear.of(2017);
-        assertThat(Years.between(y1, y2), is(Years.ofGregorian(-4)));
+        assertThat(Years.between(y1, y2), is(Years.ofGregorian(4)));
     }
 
     @Test

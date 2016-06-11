@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.PlainDate;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.TimePoint;
 
@@ -116,6 +117,28 @@ public final class Months
 
         long delta = CalendarUnit.MONTHS.between(t1, t2);
         return Months.of(MathUtils.safeCast(delta));
+
+    }
+
+    /**
+     * <p>Determines the difference in months between given calendar months. </p>
+     *
+     * @param   m1  first calendar month
+     * @param   m2  second calendar month
+     * @return  month difference
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Monatsdifferenz zwischen den angegebenen Kalendermonaten. </p>
+     *
+     * @param   m1  first calendar month
+     * @param   m2  second calendar month
+     * @return  month difference
+     */
+    public static Months between(CalendarMonth m1, CalendarMonth m2) {
+
+        PlainDate d1 = m1.atDayOfMonth(1);
+        PlainDate d2 = m2.atDayOfMonth(1);
+        return Months.between(d1, d2);
 
     }
 

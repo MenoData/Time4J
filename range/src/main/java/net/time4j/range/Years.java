@@ -166,7 +166,71 @@ public final class Years<U extends IsoDateUnit>
      */
     public static Years<CalendarUnit> between(CalendarYear y1, CalendarYear y2) {
 
-        return Years.ofGregorian(y1.getValue() - y2.getValue());
+        return Years.ofGregorian(y2.getValue() - y1.getValue());
+
+    }
+
+    /**
+     * <p>Determines the difference in years between given quarter years. </p>
+     *
+     * @param   q1  first quarter year
+     * @param   q2  second quarter year
+     * @return  year difference
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Jahresdifferenz zwischen den angegebenen Quartalen. </p>
+     *
+     * @param   q1  first quarter year
+     * @param   q2  second quarter year
+     * @return  year difference
+     */
+    public static Years<CalendarUnit> between(CalendarQuarter q1, CalendarQuarter q2) {
+
+        int delta = q2.getYear() - q1.getYear();
+
+        if (delta > 0) {
+            if (q2.getQuarterOfYear().compareTo(q1.getQuarterOfYear()) < 0) {
+                delta--;
+            }
+        } else if (delta < 0) {
+            if (q2.getQuarterOfYear().compareTo(q1.getQuarterOfYear()) > 0) {
+                delta++;
+            }
+        }
+
+        return Years.ofGregorian(delta);
+
+    }
+
+    /**
+     * <p>Determines the difference in years between given calendar months. </p>
+     *
+     * @param   m1  first calendar month
+     * @param   m2  second calendar month
+     * @return  year difference
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Jahresdifferenz zwischen den angegebenen Kalendermonaten. </p>
+     *
+     * @param   m1  first calendar month
+     * @param   m2  second calendar month
+     * @return  year difference
+     */
+    public static Years<CalendarUnit> between(CalendarMonth m1, CalendarMonth m2) {
+
+        int delta = m1.getYear() - m2.getYear();
+
+        if (delta > 0) {
+            if (m2.getMonthOfYear().compareTo(m1.getMonthOfYear()) < 0) {
+                delta--;
+            }
+        } else if (delta < 0) {
+            if (m2.getMonthOfYear().compareTo(m1.getMonthOfYear()) > 0) {
+                delta++;
+            }
+        }
+
+        return Years.ofGregorian(delta);
 
     }
 
