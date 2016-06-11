@@ -259,6 +259,22 @@ public final class CalendarMonth
     }
 
     /**
+     * <p>Yields the date of the end of this calendar month. </p>
+     *
+     * @return  PlainDate
+     */
+    /*[deutsch]
+     * <p>Liefert das Endedatum dieses Kalendermonats. </p>
+     *
+     * @return  PlainDate
+     */
+    public PlainDate atEndOfMonth() {
+
+        return this.end.getTemporal();
+
+    }
+
+    /**
      * <p>Yields the year number. </p>
      *
      * @return int
@@ -277,32 +293,21 @@ public final class CalendarMonth
     /**
      * <p>Yields the month as enum. </p>
      *
+     * <p>User who wish to get the month as integer can use the expression {@code getMonth().getValue()}. </p>
+     *
      * @return  Month
      */
     /*[deutsch]
      * <p>Liefert den Monat als enum-Wert. </p>
      *
+     * <p>Anwender, die den Monat als Zahl erhalten wollen, k&ouml;nnen den Ausdruck
+     * {@code getMonth().getValue()} verwenden. </p>
+     *
      * @return  Month
      */
-    public Month getMonthOfYear() {
+    public Month getMonth() {
 
         return this.month;
-
-    }
-
-    /**
-     * <p>Yields the month as number. </p>
-     *
-     * @return  int
-     */
-    /*[deutsch]
-     * <p>Liefert den Monat als Zahl. </p>
-     *
-     * @return  int
-     */
-    public int getMonthAsNumber() {
-
-        return this.month.getValue();
 
     }
 

@@ -27,8 +27,13 @@ public class CalendarQuarterTest {
     }
 
     @Test
-    public void getQuarterOfYear() {
-        assertThat(CalendarQuarter.of(2011, Quarter.Q3).getQuarterOfYear(), is(Quarter.Q3));
+    public void getQuarter() {
+        assertThat(CalendarQuarter.of(2011, Quarter.Q3).getQuarter(), is(Quarter.Q3));
+    }
+
+    @Test
+    public void atEndOfQuarter() {
+        assertThat(CalendarQuarter.of(2012, Quarter.Q1).atEndOfQuarter(), is(PlainDate.of(2012, 3, 31)));
     }
 
     @Test
@@ -69,7 +74,7 @@ public class CalendarQuarterTest {
         ZonalClock clock = SystemClock.inLocalView();
         CalendarQuarter cq = clock.now(CalendarQuarter.chronology());
         assertThat(cq.getYear(), is(clock.today().getYear()));
-        assertThat(cq.getQuarterOfYear(), is(clock.today().get(PlainDate.QUARTER_OF_YEAR)));
+        assertThat(cq.getQuarter(), is(clock.today().get(PlainDate.QUARTER_OF_YEAR)));
     }
 
     @Test

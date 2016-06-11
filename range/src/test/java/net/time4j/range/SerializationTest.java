@@ -1,6 +1,7 @@
 package net.time4j.range;
 
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -10,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import net.time4j.Quarter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -244,6 +247,27 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         roundtrip(Weeks.of(3));
+    }
+
+    @Test
+    public void roundTripOfCalendarYear()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(CalendarYear.of(2016));
+    }
+
+    @Test
+    public void roundTripOfCalendarQuarter()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(CalendarQuarter.of(2016, Quarter.Q3));
+    }
+
+    @Test
+    public void roundTripOfCalendarMonth()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(CalendarMonth.of(2016, Month.FEBRUARY));
     }
 
     private static Object roundtrip(Object obj)

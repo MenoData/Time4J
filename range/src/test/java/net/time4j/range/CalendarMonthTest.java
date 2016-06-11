@@ -27,13 +27,13 @@ public class CalendarMonthTest {
     }
 
     @Test
-    public void getMonthOfYear() {
-        assertThat(CalendarMonth.of(2011, Month.FEBRUARY).getMonthOfYear(), is(Month.FEBRUARY));
+    public void getMonth() {
+        assertThat(CalendarMonth.of(2011, Month.FEBRUARY).getMonth(), is(Month.FEBRUARY));
     }
 
     @Test
-    public void getMonthAsNumber() {
-        assertThat(CalendarMonth.of(2011, 2).getMonthAsNumber(), is(2));
+    public void atEndOfMonth() {
+        assertThat(CalendarMonth.of(2012, 2).atEndOfMonth(), is(PlainDate.of(2012, 2, 29)));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class CalendarMonthTest {
         ZonalClock clock = SystemClock.inLocalView();
         CalendarMonth cm = clock.now(CalendarMonth.chronology());
         assertThat(cm.getYear(), is(clock.today().getYear()));
-        assertThat(cm.getMonthOfYear(), is(clock.today().get(PlainDate.MONTH_OF_YEAR)));
+        assertThat(cm.getMonth(), is(clock.today().get(PlainDate.MONTH_OF_YEAR)));
     }
 
     @Test
