@@ -23,7 +23,9 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.Quarter;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -144,6 +146,8 @@ public final class CalendarYear
             .appendElement(YEAR, new YearRule())
             .build();
 
+    private static final long serialVersionUID = 2151327270599436439L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int year;
@@ -185,6 +189,62 @@ public final class CalendarYear
     public static CalendarYear of(int year) {
 
         return new CalendarYear(year);
+
+    }
+
+    /**
+     * <p>Combines this year with given quarter year to a calendar quarter. </p>
+     *
+     * @param   quarter     quarter year
+     * @return  calendar quarter
+     */
+    /*[deutsch]
+     * <p>Kombiniert diese Instanz mit dem angegebenen Quartal zu einem Kalenderquartal. </p>
+     *
+     * @param   quarter     quarter year
+     * @return  calendar quarter
+     */
+    public CalendarQuarter at(Quarter quarter) {
+
+        return CalendarQuarter.of(this.year, quarter);
+
+    }
+
+    /**
+     * <p>Combines this year with given month to a calendar month. </p>
+     *
+     * @param   month       gregorian month
+     * @return  calendar month
+     */
+    /*[deutsch]
+     * <p>Kombiniert diese Instanz mit dem angegebenen Monat zu einem Kalendermonat. </p>
+     *
+     * @param   month       gregorian month
+     * @return  calendar month
+     */
+    public CalendarMonth at(Month month) {
+
+        return CalendarMonth.of(this.year, month);
+
+    }
+
+    /**
+     * <p>Combines this year with given month to a calendar month. </p>
+     *
+     * @param   month       gregorian month in range 1-12
+     * @return  calendar month
+     * @throws  IllegalArgumentException if the month is out of range
+     */
+    /*[deutsch]
+     * <p>Kombiniert diese Instanz mit dem angegebenen Monat zu einem Kalendermonat. </p>
+     *
+     * @param   month       gregorian month in range 1-12
+     * @return  calendar month
+     * @throws  IllegalArgumentException if the month is out of range
+     */
+    public CalendarMonth atMonth(int month) {
+
+        return CalendarMonth.of(this.year, month);
 
     }
 
@@ -375,19 +435,21 @@ public final class CalendarYear
     }
 
     /**
-     * <p>Outputs this year number as a String. </p>
+     * <p>Outputs this year number as a String in ISO-format yyyy. </p>
      *
      * @return String
      */
     /*[deutsch]
-     * <p>Gibt diese Jahreszahl als String aus. </p>
+     * <p>Gibt diese Jahreszahl als String im ISO-Format yyyy aus. </p>
      *
      * @return  String
      */
     @Override
     public String toString() {
 
-        return String.valueOf(this.year);
+        StringBuilder sb = new StringBuilder();
+        formatYear(sb, this.year);
+        return sb.toString();
 
     }
 

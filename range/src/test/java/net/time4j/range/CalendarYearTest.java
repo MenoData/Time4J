@@ -1,6 +1,7 @@
 package net.time4j.range;
 
 import net.time4j.PlainDate;
+import net.time4j.Quarter;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
 import net.time4j.format.DisplayMode;
@@ -43,7 +44,7 @@ public class CalendarYearTest {
     }
 
     @Test
-    public void atDay() {
+    public void atDayOfYear() {
         CalendarYear cy = CalendarYear.of(2016);
         assertThat(
             cy.atDayOfYear(1) == cy.getStart().getTemporal(),
@@ -54,9 +55,31 @@ public class CalendarYearTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void atDayOutOfRange() {
+    public void atDayOfYearOutOfRange() {
         CalendarYear cy = CalendarYear.of(2015);
         cy.atDayOfYear(366);
+    }
+
+    @Test
+    public void atQuarter() {
+        CalendarYear cy = CalendarYear.of(2016);
+        assertThat(
+            cy.at(Quarter.Q3),
+            is(CalendarQuarter.of(2016, Quarter.Q3)));
+    }
+
+    @Test
+    public void atMonth() {
+        CalendarYear cy = CalendarYear.of(2016);
+        assertThat(
+            cy.atMonth(1),
+            is(CalendarMonth.of(2016, 1)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void atMonthOutOfRange() {
+        CalendarYear cy = CalendarYear.of(2015);
+        cy.atMonth(13);
     }
 
     @Test
@@ -70,7 +93,7 @@ public class CalendarYearTest {
     public void iterator() {
         int count = 1;
         for (PlainDate date : CalendarYear.of(2016)) {
-            System.out.println(count + " => " + date);
+            // System.out.println(count + " => " + date);
             count++;
         }
         assertThat(count - 1, is(366));

@@ -109,4 +109,35 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
 
     }
 
+    // helper method for toString() in subclasses
+    static void formatYear(
+        StringBuilder sb,
+        int year
+    ) {
+
+        int value = year;
+
+        if (value < 0) {
+            sb.append('-');
+            value = Math.negateExact(year);
+        }
+
+        if (value >= 10000) {
+            if (year > 0) {
+                sb.append('+');
+            }
+        } else if (value < 1000) {
+            sb.append('0');
+            if (value < 100) {
+                sb.append('0');
+                if (value < 10) {
+                    sb.append('0');
+                }
+            }
+        }
+
+        sb.append(value);
+
+    }
+
 }

@@ -112,7 +112,7 @@ public class CalendarQuarterTest {
 
     @Test
     public void isBefore() {
-        assertThat(CalendarQuarter.of(2016, Quarter.Q3).isBefore(PlainDate.of(2017, 10, 1)), is(true));
+        assertThat(CalendarQuarter.of(2016, Quarter.Q3).isBefore(PlainDate.of(2016, 10, 1)), is(true));
         assertThat(CalendarQuarter.of(2016, Quarter.Q3).isBefore(PlainDate.of(2016, 9, 30)), is(false));
 
         assertThat(CalendarQuarter.of(2016, Quarter.Q3).isBefore(CalendarQuarter.of(2016, Quarter.Q4)), is(true));

@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -194,6 +195,11 @@ final class SPX
                     out.writeInt(cq.getYear());
                     out.writeInt(cq.getQuarterOfYear().getValue());
                     break;
+                case MONTH_TYPE:
+                    CalendarMonth cm = (CalendarMonth) this.obj;
+                    out.writeInt(cm.getYear());
+                    out.writeInt(cm.getMonthOfYear().getValue());
+                    break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:
                 case TIMESTAMP_WINDOW_ID:
@@ -255,6 +261,9 @@ final class SPX
                 break;
             case QUARTER_TYPE:
                 this.obj = readCalendarQuarter(in);
+                break;
+            case MONTH_TYPE:
+                this.obj = readCalendarMonth(in);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = readDateWindows(in);
@@ -371,6 +380,15 @@ final class SPX
         int year = in.readInt();
         int quarter = in.readInt();
         return CalendarQuarter.of(year, Quarter.valueOf(quarter));
+
+    }
+
+    private static CalendarMonth readCalendarMonth(ObjectInput in)
+        throws IOException {
+
+        int year = in.readInt();
+        int month = in.readInt();
+        return CalendarMonth.of(year, Month.valueOf(month));
 
     }
 
