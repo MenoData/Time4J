@@ -151,6 +151,8 @@ public final class CalendarMonth
             .appendElement(MONTH_AS_NUMBER, new IntMonthRule())
             .build();
 
+    private static final long serialVersionUID = -6927842989053274517L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int year;

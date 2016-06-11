@@ -140,6 +140,8 @@ public final class CalendarQuarter
             .appendElement(QUARTER_OF_YEAR, new QuarterRule())
             .build();
 
+    private static final long serialVersionUID = -4871348693353897858L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int year;

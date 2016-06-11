@@ -130,6 +130,8 @@ public final class CalendarYear
             .appendElement(YEAR, new YearRule())
             .build();
 
+    private static final long serialVersionUID = 2151327270599436439L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final int year;
