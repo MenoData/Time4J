@@ -191,11 +191,11 @@ public final class Years<U extends IsoDateUnit>
         int delta = q2.getYear() - q1.getYear();
 
         if (delta > 0) {
-            if (q2.getQuarterOfYear().compareTo(q1.getQuarterOfYear()) < 0) {
+            if (q2.getQuarter().compareTo(q1.getQuarter()) < 0) {
                 delta--;
             }
         } else if (delta < 0) {
-            if (q2.getQuarterOfYear().compareTo(q1.getQuarterOfYear()) > 0) {
+            if (q2.getQuarter().compareTo(q1.getQuarter()) > 0) {
                 delta++;
             }
         }
@@ -223,11 +223,11 @@ public final class Years<U extends IsoDateUnit>
         int delta = m1.getYear() - m2.getYear();
 
         if (delta > 0) {
-            if (m2.getMonthOfYear().compareTo(m1.getMonthOfYear()) < 0) {
+            if (m2.getMonth().compareTo(m1.getMonth()) < 0) {
                 delta--;
             }
         } else if (delta < 0) {
-            if (m2.getMonthOfYear().compareTo(m1.getMonthOfYear()) > 0) {
+            if (m2.getMonth().compareTo(m1.getMonth()) > 0) {
                 delta++;
             }
         }

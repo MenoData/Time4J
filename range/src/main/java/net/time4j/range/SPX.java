@@ -193,12 +193,12 @@ final class SPX
                 case QUARTER_TYPE:
                     CalendarQuarter cq = (CalendarQuarter) this.obj;
                     out.writeInt(cq.getYear());
-                    out.writeInt(cq.getQuarterOfYear().getValue());
+                    out.writeInt(cq.getQuarter().getValue());
                     break;
                 case MONTH_TYPE:
                     CalendarMonth cm = (CalendarMonth) this.obj;
                     out.writeInt(cm.getYear());
-                    out.writeInt(cm.getMonthOfYear().getValue());
+                    out.writeInt(cm.getMonth().getValue());
                     break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:

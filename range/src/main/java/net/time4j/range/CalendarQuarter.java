@@ -226,6 +226,22 @@ public final class CalendarQuarter
     }
 
     /**
+     * <p>Yields the date of the end of this quarter year. </p>
+     *
+     * @return  PlainDate
+     */
+    /*[deutsch]
+     * <p>Liefert das Endedatum dieses Kalenderquartals. </p>
+     *
+     * @return  PlainDate
+     */
+    public PlainDate atEndOfQuarter() {
+
+        return this.end.getTemporal();
+
+    }
+
+    /**
      * <p>Yields the year number. </p>
      *
      * @return int
@@ -251,7 +267,7 @@ public final class CalendarQuarter
      *
      * @return  Quarter
      */
-    public Quarter getQuarterOfYear() {
+    public Quarter getQuarter() {
 
         return this.quarter;
 
