@@ -110,6 +110,24 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
 
     }
 
+    /**
+     * <p>Converts this fixed interval to a date interval with flexible boundaries which can participate in
+     * any kind of interval boundary manipulations. </p>
+     *
+     * @return  DateInterval
+     */
+    /*[deutsch]
+     * <p>Konvertiert dieses feste Intervall zu einem Intervall mit flexiblen Grenzen, die
+     * Gegenstand von beliebigen Manipulationen sein k&ouml;nnen. </p>
+     *
+     * @return  DateInterval
+     */
+    public DateInterval toFlexInterval() {
+
+        return new DateInterval(this.getStart(), this.getEnd());
+
+    }
+
     // helper method for toString() in subclasses
     static void formatYear(
         StringBuilder sb,

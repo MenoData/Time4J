@@ -157,6 +157,13 @@ public class CalendarYearTest {
     }
 
     @Test
+    public void toFlexInterval(){
+        assertThat(
+            CalendarYear.of(2016).toFlexInterval(),
+            is(DateInterval.between(PlainDate.of(2016, 1, 1), PlainDate.of(2016, 12, 31))));
+    }
+
+    @Test
     public void plus() {
         assertThat(CalendarYear.of(2012).plus(Years.ofGregorian(4)), is(CalendarYear.of(2016)));
     }
