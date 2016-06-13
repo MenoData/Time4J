@@ -202,14 +202,14 @@ public final class CalendarQuarter
     }
 
     /**
-     * <p>Combines this year with given day of quarter year to a calendar date. </p>
+     * <p>Combines this calendar quarter with given day of quarter year to a calendar date. </p>
      *
      * @param   dayOfQuarter   day of quarter in range 1-92
      * @return  calendar date
      * @throws  IllegalArgumentException if the day-of-quarter is out of range
      */
     /*[deutsch]
-     * <p>Kombiniert dieses Jahr mit dem angegebenen Quartalstag zu einem Kalenderdatum. </p>
+     * <p>Kombiniert dieses Quartal mit dem angegebenen Quartalstag zu einem Kalenderdatum. </p>
      *
      * @param   dayOfQuarter   day of quarter in range 1-92
      * @return  calendar date
