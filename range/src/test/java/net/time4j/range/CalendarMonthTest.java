@@ -174,14 +174,14 @@ public class CalendarMonthTest {
 
     @Test
     public void format() {
-        CalendarMonth cw = CalendarMonth.of(2012, Month.FEBRUARY);
+        CalendarMonth cm = CalendarMonth.of(2012, Month.FEBRUARY);
         assertThat(
             ChronoFormatter.ofPattern(
                 "yyyyMM",
                 PatternType.CLDR,
                 Locale.ROOT,
                 CalendarMonth.chronology()
-            ).format(cw),
+            ).format(cm),
             is("201202"));
     }
 
