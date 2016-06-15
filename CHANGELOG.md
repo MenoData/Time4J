@@ -1,5 +1,6 @@
 ## [v4.17] not yet released
 ### Added
+- Introduce class for year-week-combination [#508]
 - Introduce class for year-month-combination [#503]
 - Introduce class for year-quarter-combination [#504]
 - Model calendar year as date interval [#505]
