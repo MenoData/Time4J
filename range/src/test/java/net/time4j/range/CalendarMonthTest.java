@@ -174,14 +174,14 @@ public class CalendarMonthTest {
 
     @Test
     public void format() {
-        CalendarMonth cq = CalendarMonth.of(2012, Month.FEBRUARY);
+        CalendarMonth cw = CalendarMonth.of(2012, Month.FEBRUARY);
         assertThat(
             ChronoFormatter.ofPattern(
                 "yyyyMM",
                 PatternType.CLDR,
                 Locale.ROOT,
                 CalendarMonth.chronology()
-            ).format(cq),
+            ).format(cw),
             is("201202"));
     }
 
@@ -195,6 +195,17 @@ public class CalendarMonthTest {
                 Locale.ROOT,
                 CalendarMonth.chronology()
             ).parse("201202"),
+            is(expected));
+    }
+
+    @Test
+    public void parseISO() throws ParseException {
+        CalendarMonth expected = CalendarMonth.of(2012, Month.FEBRUARY);
+        assertThat(
+            CalendarMonth.parseISO("2012-02"),
+            is(expected));
+        assertThat(
+            CalendarMonth.parseISO("201202"),
             is(expected));
     }
 

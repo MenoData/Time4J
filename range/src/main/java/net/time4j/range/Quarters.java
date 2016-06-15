@@ -121,7 +121,7 @@ public final class Quarters
     }
 
     /**
-     * <p>Determines the difference in years between given quarter years. </p>
+     * <p>Determines the difference in quarters between given quarter years. </p>
      *
      * @param   q1  first quarter year
      * @param   q2  second quarter year

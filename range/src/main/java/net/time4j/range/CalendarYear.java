@@ -419,12 +419,12 @@ public final class CalendarYear
     }
 
     /**
-     * <p>Outputs this year number as a String in ISO-format yyyy. </p>
+     * <p>Outputs this year number as a String in CLDR-format &quot;uuuu&quot;. </p>
      *
-     * @return String
+     * @return  String
      */
     /*[deutsch]
-     * <p>Gibt diese Jahreszahl als String im ISO-Format yyyy aus. </p>
+     * <p>Gibt diese Jahreszahl als String im CLDR-Format &quot;uuuu&quot; aus. </p>
      *
      * @return  String
      */

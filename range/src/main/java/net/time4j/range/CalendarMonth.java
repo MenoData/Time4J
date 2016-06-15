@@ -45,12 +45,15 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.Timezone;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -151,7 +154,11 @@ public final class CalendarMonth
             .appendElement(MONTH_AS_NUMBER, new IntMonthRule())
             .build();
 
-    private static final long serialVersionUID = -6927842989053274517L;
+    private static final ChronoFormatter<CalendarMonth> PARSER =
+        ChronoFormatter.setUp(CalendarMonth.chronology(), Locale.ROOT)
+            .addPattern("uuuu-MM|uuuuMM", PatternType.CLDR).build();
+
+    private static final long serialVersionUID = -5097347953941448741L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -498,14 +505,16 @@ public final class CalendarMonth
     }
 
     /**
-     * <p>Outputs this instance as a String in ISO-format yyyy-MM (like &quot;2016-10&quot;). </p>
-     *
-     * @return String
-     */
-    /*[deutsch]
-     * <p>Gibt diese Instanz als String im ISO-Format yyyy-MM (wie &quot;2016-10&quot;) aus. </p>
+     * <p>Outputs this instance as a String in CLDR-format &quot;uuuu-MM&quot; (like &quot;2016-10&quot;). </p>
      *
      * @return  String
+     * @see     #parseISO(String)
+     */
+    /*[deutsch]
+     * <p>Gibt diese Instanz als String im CLDR-Format &quot;uuuu-MM&quot; (wie &quot;2016-10&quot;) aus. </p>
+     *
+     * @return  String
+     * @see     #parseISO(String)
      */
     @Override
     public String toString() {
@@ -519,6 +528,34 @@ public final class CalendarMonth
         }
         sb.append(m);
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Interpretes given ISO-conforming text as calendar month. </p>
+     *
+     * <p>The underlying parser uses the CLDR-pattern &quot;uuuu-MM|uuuuMM&quot;. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed calendar month
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws ParseException if the text is not parseable
+     * @see     #toString()
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen ISO-kompatiblen Text als Kalendermonat. </p>
+     *
+     * <p>Der zugrundeliegende Interpretierer verwendet das CLDR-Formatmuster &quot;uuuu-MM|uuuuMM&quot;. </p>
+     *
+     * @param   text        text to be parsed
+     * @return  parsed calendar month
+     * @throws  IndexOutOfBoundsException if given text is empty
+     * @throws  ParseException if the text is not parseable
+     * @see     #toString()
+     */
+    public static CalendarMonth parseISO(String text) throws ParseException {
+
+        return PARSER.parse(text);
 
     }
 

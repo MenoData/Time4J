@@ -458,12 +458,12 @@ public final class CalendarQuarter
     }
 
     /**
-     * <p>Outputs this instance as a String in format yyyy-Qn (like &quot;2016-Q1&quot;). </p>
+     * <p>Outputs this instance as a String in CLDR-format &quot;uuuu-'Q'Q&quot; (like &quot;2016-Q1&quot;). </p>
      *
-     * @return String
+     * @return  String
      */
     /*[deutsch]
-     * <p>Gibt diese Instanz als String im Format yyyy-Qn (wie &quot;2016-Q1&quot;) aus. </p>
+     * <p>Gibt diese Instanz als String im CLDR-Format &quot;uuuu-'Q'Q&quot; (wie &quot;2016-Q1&quot;) aus. </p>
      *
      * @return  String
      */
