@@ -235,6 +235,38 @@ public final class Years<U extends IsoDateUnit>
     }
 
     /**
+     * <p>Determines the difference in years between given calendar weeks. </p>
+     *
+     * @param   w1  first calendar week
+     * @param   w2  second calendar week
+     * @return  year difference
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Jahresdifferenz zwischen den angegebenen Kalenderwochen. </p>
+     *
+     * @param   w1  first calendar week
+     * @param   w2  second calendar week
+     * @return  year difference
+     */
+    public static Years<Weekcycle> between(CalendarWeek w1, CalendarWeek w2) {
+
+        int delta = w2.getYear() - w1.getYear();
+
+        if (delta > 0) {
+            if (w2.getWeek() < w1.getWeek()) {
+                delta--;
+            }
+        } else if (delta < 0) {
+            if (w2.getWeek() > w1.getWeek()) {
+                delta++;
+            }
+        }
+
+        return Years.ofWeekBased(delta);
+
+    }
+
+    /**
      * <p>Parses the canonical ISO-8601-format &quot;PnY&quot; with possible preceding minus-char. </p>
      *
      * @param   period      the formatted string to be parsed
