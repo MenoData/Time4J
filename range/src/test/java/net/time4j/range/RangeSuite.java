@@ -16,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BoundaryTest.class,
         CalendarMonthTest.class,
         CalendarQuarterTest.class,
+        CalendarWeekTest.class,
         CalendarYearTest.class,
         ClockIntervalFormatTest.class,
         ComparatorTest.class,

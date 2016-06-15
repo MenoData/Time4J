@@ -200,6 +200,11 @@ final class SPX
                     out.writeInt(cm.getYear());
                     out.writeInt(cm.getMonth().getValue());
                     break;
+                case WEEK_TYPE:
+                    CalendarWeek cw = (CalendarWeek) this.obj;
+                    out.writeInt(cw.getYear());
+                    out.writeInt(cw.getWeek());
+                    break;
                 case DATE_WINDOW_ID:
                 case CLOCK_WINDOW_ID:
                 case TIMESTAMP_WINDOW_ID:
@@ -264,6 +269,9 @@ final class SPX
                 break;
             case MONTH_TYPE:
                 this.obj = readCalendarMonth(in);
+                break;
+            case WEEK_TYPE:
+                this.obj = readCalendarWeek(in);
                 break;
             case DATE_WINDOW_ID:
                 this.obj = readDateWindows(in);
@@ -389,6 +397,15 @@ final class SPX
         int year = in.readInt();
         int month = in.readInt();
         return CalendarMonth.of(year, Month.valueOf(month));
+
+    }
+
+    private static CalendarWeek readCalendarWeek(ObjectInput in)
+        throws IOException {
+
+        int year = in.readInt();
+        int week = in.readInt();
+        return CalendarWeek.of(year, week);
 
     }
 

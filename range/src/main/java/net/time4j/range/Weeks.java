@@ -22,6 +22,8 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.PlainDate;
+import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.TimePoint;
 
@@ -118,6 +120,28 @@ public final class Weeks
 
         long delta = CalendarUnit.WEEKS.between(t1, t2);
         return Weeks.of(MathUtils.safeCast(delta));
+
+    }
+
+    /**
+     * <p>Determines the difference in weeks between given quarter years. </p>
+     *
+     * @param   w1  first calendar week
+     * @param   w2  second calendar week
+     * @return  difference in weeks
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Differenz zwischen den angegebenen Kalenderwochen. </p>
+     *
+     * @param   w1  first calendar week
+     * @param   w2  second calendar week
+     * @return  difference in weeks
+     */
+    public static Weeks between(CalendarWeek w1, CalendarWeek w2) {
+
+        PlainDate d1 = w1.at(Weekday.MONDAY);
+        PlainDate d2 = w2.at(Weekday.MONDAY);
+        return Weeks.between(d1, d2);
 
     }
 
