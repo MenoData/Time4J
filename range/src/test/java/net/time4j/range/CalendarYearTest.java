@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.Year;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -194,6 +195,12 @@ public class CalendarYearTest {
         assertThat(
             CalendarYear.chronology().getFormatPattern(DisplayMode.FULL, Locale.ROOT),
             is("uuuu"));
+    }
+
+    @Test
+    public void threetenAdapter() {
+        assertThat(CalendarYear.from(Year.of(2016)), is(CalendarYear.of(2016)));
+        assertThat(CalendarYear.of(2016).toTemporalAccessor(), is(Year.of(2016)));
     }
 
 }

@@ -29,7 +29,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
@@ -38,7 +37,6 @@ import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
-import net.time4j.engine.StartOfDay;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -460,12 +458,12 @@ public final class CalendarQuarter
     }
 
     /**
-     * <p>Outputs this instance as a String in format yyyy-Qn (like &quot;2016-Q1&quot;). </p>
+     * <p>Outputs this instance as a String in CLDR-format &quot;uuuu-'Q'Q&quot; (like &quot;2016-Q1&quot;). </p>
      *
-     * @return String
+     * @return  String
      */
     /*[deutsch]
-     * <p>Gibt diese Instanz als String im Format yyyy-Qn (wie &quot;2016-Q1&quot;) aus. </p>
+     * <p>Gibt diese Instanz als String im CLDR-Format &quot;uuuu-'Q'Q&quot; (wie &quot;2016-Q1&quot;) aus. </p>
      *
      * @return  String
      */
@@ -612,23 +610,6 @@ public final class CalendarQuarter
         }
 
         @Override
-        public ChronoDisplay preformat(
-            CalendarQuarter context,
-            AttributeQuery attributes
-        ) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
         public String getFormatPattern(
             DisplayStyle style,
             Locale locale
@@ -652,13 +633,6 @@ public final class CalendarQuarter
             }
             String pattern = getFormatPattern(map, key);
             return ((pattern == null) ? "uuuu-'Q'Q" : pattern);
-
-        }
-
-        @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
 
         }
 

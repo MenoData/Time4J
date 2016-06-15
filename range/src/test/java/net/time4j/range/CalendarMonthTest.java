@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.YearMonth;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -174,14 +175,14 @@ public class CalendarMonthTest {
 
     @Test
     public void format() {
-        CalendarMonth cq = CalendarMonth.of(2012, Month.FEBRUARY);
+        CalendarMonth cm = CalendarMonth.of(2012, Month.FEBRUARY);
         assertThat(
             ChronoFormatter.ofPattern(
                 "yyyyMM",
                 PatternType.CLDR,
                 Locale.ROOT,
                 CalendarMonth.chronology()
-            ).format(cq),
+            ).format(cm),
             is("201202"));
     }
 
@@ -206,6 +207,12 @@ public class CalendarMonthTest {
         assertThat(
             CalendarMonth.chronology().getFormatPattern(DisplayMode.FULL, Locale.ROOT),
             is("uuuu-MM"));
+    }
+
+    @Test
+    public void threetenAdapter() {
+        assertThat(CalendarMonth.from(YearMonth.of(2016, 2)), is(CalendarMonth.of(2016, 2)));
+        assertThat(CalendarMonth.of(2016, 2).toTemporalAccessor(), is(YearMonth.of(2016, 2)));
     }
 
 }

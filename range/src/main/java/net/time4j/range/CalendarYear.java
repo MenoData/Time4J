@@ -30,7 +30,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
@@ -38,7 +37,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
-import net.time4j.engine.StartOfDay;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -50,6 +49,11 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.time.Year;
+import java.time.chrono.IsoChronology;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -91,7 +95,7 @@ import java.util.NoSuchElementException;
 @CalendarType("iso8601")
 public final class CalendarYear
     extends FixedCalendarInterval<CalendarYear>
-    implements LocalizedPatternSupport {
+    implements ThreetenAdapter, LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -356,6 +360,26 @@ public final class CalendarYear
     }
 
     /**
+     * <p>Converts given JSR-310-type to a calendar year. </p>
+     *
+     * @param   year    Threeten-equivalent of this instance
+     * @return  CalendarYear
+     * @see     #toTemporalAccessor()
+     */
+    /*[deutsch]
+     * <p>Konvertiert den angegebenen JSR-310-Typ zu einem Kalenderjahr. </p>
+     *
+     * @param   year    Threeten-equivalent of this instance
+     * @return  CalendarYear
+     * @see     #toTemporalAccessor()
+     */
+    public static CalendarYear from(Year year) {
+
+        return CalendarYear.of(year.getValue());
+
+    }
+
+    /**
      * <p>Adds given years to this year. </p>
      *
      * @param   years       the count of years to be added
@@ -435,12 +459,12 @@ public final class CalendarYear
     }
 
     /**
-     * <p>Outputs this year number as a String in ISO-format yyyy. </p>
+     * <p>Outputs this year number as a String in CLDR-format &quot;uuuu&quot;. </p>
      *
-     * @return String
+     * @return  String
      */
     /*[deutsch]
-     * <p>Gibt diese Jahreszahl als String im ISO-Format yyyy aus. </p>
+     * <p>Gibt diese Jahreszahl als String im CLDR-Format &quot;uuuu&quot; aus. </p>
      *
      * @return  String
      */
@@ -450,6 +474,13 @@ public final class CalendarYear
         StringBuilder sb = new StringBuilder();
         formatYear(sb, this.year);
         return sb.toString();
+
+    }
+
+    @Override
+    public Year toTemporalAccessor() {
+
+        return Year.of(this.year);
 
     }
 
@@ -580,23 +611,6 @@ public final class CalendarYear
         }
 
         @Override
-        public ChronoDisplay preformat(
-            CalendarYear context,
-            AttributeQuery attributes
-        ) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
         public String getFormatPattern(
             DisplayStyle style,
             Locale locale
@@ -609,9 +623,19 @@ public final class CalendarYear
         }
 
         @Override
-        public StartOfDay getDefaultStartOfDay() {
+        public CalendarYear createFrom(
+            TemporalAccessor threeten,
+            AttributeQuery attributes
+        ) {
 
-            return StartOfDay.MIDNIGHT;
+            if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
+                if (threeten.isSupported(ChronoField.YEAR)) {
+                    int year = threeten.get(ChronoField.YEAR);
+                    return CalendarYear.of(year);
+                }
+            }
+
+            return null;
 
         }
 
