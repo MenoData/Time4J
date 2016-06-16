@@ -76,6 +76,17 @@ import java.util.NoSuchElementException;
  *  <li>{@link #MONTH_AS_NUMBER}</li>
  * </ul>
  *
+ * <p>Formatting example for localized styles: </p>
+ *
+ * <pre>
+ *    ChronoFormatter&lt;CalendarMonth&gt; usStyle =
+ *      ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.US, CalendarMonth.chronology());
+ *    ChronoFormatter&lt;CalendarMonth&gt; germanStyle =
+ *      ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.GERMANY, CalendarMonth.chronology());
+ *    System.out.println(&quot;US-format: &quot; + usStyle.format(CalendarMonth.of(2016, 5))); // US-format: 5/2016
+ *    System.out.println(&quot;German: &quot; + germanStyle.format(CalendarMonth.of(2016, 5))); // German: 5.2016
+ * </pre>
+ *
  * <p>Note: The current month of calendar year can be determined by an expression like:
  * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
  *
@@ -94,6 +105,17 @@ import java.util.NoSuchElementException;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_NUMBER}</li>
  * </ul>
+ *
+ * <p>Formatierungsbeispiel f&uuml;r lokalisierte Formatstile: </p>
+ *
+ * <pre>
+ *    ChronoFormatter&lt;CalendarMonth&gt; usStyle =
+ *      ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.US, CalendarMonth.chronology());
+ *    ChronoFormatter&lt;CalendarMonth&gt; germanStyle =
+ *      ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.GERMANY, CalendarMonth.chronology());
+ *    System.out.println(&quot;US-format: &quot; + usStyle.format(CalendarMonth.of(2016, 5))); // US-format: 5/2016
+ *    System.out.println(&quot;German: &quot; + germanStyle.format(CalendarMonth.of(2016, 5))); // German: 5.2016
+ * </pre>
  *
  * <p>Hinweis: Der aktuelle Monat kann mit einem Ausdruck wie folgt bestimmt werden:
  * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
@@ -250,14 +272,14 @@ public final class CalendarMonth
     /**
      * <p>Combines this year and month with given day of month to a calendar date. </p>
      *
-     * @param   dayOfMonth      day of month in maximum range 1-31
+     * @param   dayOfMonth      day of month in range 1-28/29/30/31
      * @return  calendar date
      * @throws  IllegalArgumentException if the day-of-month is out of range
      */
     /*[deutsch]
      * <p>Kombiniert diese Instanz mit dem angegebenen Tag zu einem Kalenderdatum. </p>
      *
-     * @param   dayOfMonth      day of month in maximum range 1-31
+     * @param   dayOfMonth      day of month in range 1-28/29/30/31
      * @return  calendar date
      * @throws  IllegalArgumentException if the day-of-month is out of range
      */
