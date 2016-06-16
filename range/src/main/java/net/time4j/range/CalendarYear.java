@@ -235,14 +235,14 @@ public final class CalendarYear
     /**
      * <p>Combines this year with given day of year to a calendar date. </p>
      *
-     * @param   dayOfYear   day of year in range 1-366
+     * @param   dayOfYear   day of year in range 1-365/366
      * @return  calendar date
      * @throws  IllegalArgumentException if the day-of-year is out of range
      */
     /*[deutsch]
      * <p>Kombiniert dieses Jahr mit dem angegebenen Jahrestag zu einem Kalenderdatum. </p>
      *
-     * @param   dayOfYear   day of year in range 1-366
+     * @param   dayOfYear   day of year in range 1-365/366
      * @return  calendar date
      * @throws  IllegalArgumentException if the day-of-year is out of range
      */

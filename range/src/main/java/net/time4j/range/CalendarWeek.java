@@ -68,7 +68,8 @@ import java.util.NoSuchElementException;
  * </ul>
  *
  * <p>This class does not offer localized formatting. However, a combination of numerical formatting and
- * fixed literals is possible using the root locale. Example: </p>
+ * fixed literals is possible using the root locale. Example for using the German abbreviation KW for
+ * a calendar week: </p>
  *
  * <pre>
  *     ChronoFormatter&lt;CalendarWeek&gt; f =
