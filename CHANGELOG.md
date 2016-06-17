@@ -1,5 +1,6 @@
 ## [v4.17] not yet released
 ### Added
+- Add conversion of net.time4j.Duration to TemporalAmount [#511]
 - Introduce class for year-week-combination [#508]
 - Introduce class for year-month-combination [#503]
 - Introduce class for year-quarter-combination [#504]
@@ -8,6 +9,7 @@
 - Better support for week-based durations and units [#509]
 
 ### Fixed
+- Duration measured in millis only is broken [#513]
 - Zone offset without sign - should be parseable in lax mode [#502]
 
 ## [v4.16] published on 2016-05-07
