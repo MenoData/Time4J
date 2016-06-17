@@ -1414,4 +1414,21 @@ public class DurationBasicsTest {
             is(Duration.ofNegative().years(2).days(15).hours(30).minutes(5).build()));
     }
 
+    @Test
+    public void noMillisbutNanos() {
+        PlainTime t1 = PlainTime.midnightAtStartOfDay().plus(3, ClockUnit.MILLIS);
+        PlainTime t2 = PlainTime.midnightAtStartOfDay().plus(5, ClockUnit.MILLIS);
+        Duration<ClockUnit> duration = Duration.in(ClockUnit.MILLIS).between(t1, t2);
+        System.out.println(duration); // assert-Statement inside toString()
+        assertThat(duration.getPartialAmount(ClockUnit.MILLIS), is(2L));
+        for (Item<ClockUnit> item : duration.getTotalLength()) {
+            if (item.getUnit().equals(ClockUnit.MILLIS)) {
+                fail("Found unexpected duration item in milliseconds.");
+            } else if (item.getUnit().equals(ClockUnit.NANOS)) {
+                return;
+            }
+        }
+        fail("Missing nanoseconds.");
+    }
+
 }

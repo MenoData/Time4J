@@ -1555,6 +1555,8 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Extracts a new duration with all contained calendar units only. </p>
      *
+     * <p>The clock time part will be removed. </p>
+     *
      * @return  new duration with calendar units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
@@ -1563,6 +1565,8 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Extrahiert eine neue Dauer, die nur alle kalendarischen Zeiteinheiten
      * dieser Dauer enth&auml;lt. </p>
+     *
+     * <p>Der Uhrzeitanteil wird entfernt. </p>
      *
      * @return  new duration with calendar units only
      * @since   3.0
@@ -1594,6 +1598,8 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Extracts a new duration with all contained clock units only. </p>
      *
+     * <p>The calendrical part will be removed. </p>
+     *
      * @return  new duration with clock units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
@@ -1602,6 +1608,8 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Extrahiert eine neue Dauer, die nur alle Uhrzeiteinheiten
      * dieser Dauer enth&auml;lt. </p>
+     *
+     * <p>Der kalendarische Teil wird entfernt. </p>
      *
      * @return  new duration with clock units only
      * @since   3.0
@@ -5569,6 +5577,22 @@ public final class Duration<U extends IsoUnit>
         ) {
 
             return new Duration<U>(items, negative);
+
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected TimeSpan.Item<U> resolve(TimeSpan.Item<U> item) {
+
+            IsoUnit unit = item.getUnit();
+
+            if (unit.equals(ClockUnit.MILLIS)) {
+                return Item.of(MathUtils.safeMultiply(item.getAmount(), 1000000L), (U) ClockUnit.NANOS);
+            } else if (unit.equals(ClockUnit.MICROS)) {
+                return Item.of(MathUtils.safeMultiply(item.getAmount(), 1000L), (U) ClockUnit.NANOS);
+            }
+
+            return item;
 
         }
 

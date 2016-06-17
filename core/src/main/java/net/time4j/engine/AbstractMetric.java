@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractMetric.java) is part of project Time4J.
  *
@@ -247,7 +247,7 @@ public abstract class AbstractMetric
                 (this.getLength(engine, unit) < 1.0)
                 && (index < endIndex - 1)
             ) {
-                amount = 0; // Millis oder Mikros vor Nanos nicht berechnen
+                amount = 0; // Millis oder Mikros vor Nanos nicht berechnen (maximal eine fraktionale Einheit)
             } else {
                 // konvertierbare Einheiten zusammenfassen
                 int k = index + 1;
@@ -272,7 +272,7 @@ public abstract class AbstractMetric
                 amount = t1.until(t2, unit);
                 
                 if (amount > 0) {
-                    resultList.add(TimeSpan.Item.of(amount, unit));
+                    resultList.add(this.resolve(TimeSpan.Item.of(amount, unit)));
                 } else if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
@@ -324,6 +324,26 @@ public abstract class AbstractMetric
         List<TimeSpan.Item<U>> items,
         boolean negative
     );
+
+    /**
+     * <p>Hook for adjustments like resolving millis or micros to nanos. </p>
+     *
+     * @param   item        item to be adjusted
+     * @return  adjusted item (usually the same as the argument)
+     * @since   3.21/4.17
+     */
+    /*[deutsch]
+     * <p>Einsprungpunkt f&uuml;r Anpassungen wie die Aufl&ouml;sung von Milli- und Mikrosekunden zu Nanosekunden. </p>
+     *
+     * @param   item        item to be adjusted
+     * @return  adjusted item (usually the same as the argument)
+     * @since   3.21/4.17
+     */
+    protected TimeSpan.Item<U> resolve(TimeSpan.Item<U> item) {
+
+        return item;
+
+    }
 
     private <T extends TimePoint<? super U, T>> void normalize(
         TimeAxis<? super U, T> engine,
