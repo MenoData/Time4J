@@ -1,6 +1,7 @@
 ## [v4.17] not yet released
 ### Added
 - Add conversion of net.time4j.Duration to TemporalAmount [#511]
+- Enhance Temporal-interface by more comparison methods [#510]
 - Introduce class for year-week-combination [#508]
 - Introduce class for year-month-combination [#503]
 - Introduce class for year-quarter-combination [#504]
