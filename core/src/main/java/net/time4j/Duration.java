@@ -1737,6 +1737,8 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Extracts a new duration with all contained calendar units only. </p>
      *
+     * <p>The clock time part will be removed. </p>
+     *
      * @return  new duration with calendar units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
@@ -1745,6 +1747,8 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Extrahiert eine neue Dauer, die nur alle kalendarischen Zeiteinheiten
      * dieser Dauer enth&auml;lt. </p>
+     *
+     * <p>Der Uhrzeitanteil wird entfernt. </p>
      *
      * @return  new duration with calendar units only
      * @since   3.0
@@ -1776,6 +1780,8 @@ public final class Duration<U extends IsoUnit>
     /**
      * <p>Extracts a new duration with all contained clock units only. </p>
      *
+     * <p>The calendrical part will be removed. </p>
+     *
      * @return  new duration with clock units only
      * @since   3.0
      * @see     #compose(Duration, Duration)
@@ -1784,6 +1790,8 @@ public final class Duration<U extends IsoUnit>
     /*[deutsch]
      * <p>Extrahiert eine neue Dauer, die nur alle Uhrzeiteinheiten
      * dieser Dauer enth&auml;lt. </p>
+     *
+     * <p>Der kalendarische Teil wird entfernt. </p>
      *
      * @return  new duration with clock units only
      * @since   3.0
@@ -1811,6 +1819,95 @@ public final class Duration<U extends IsoUnit>
         return new Duration<>(clockItems, this.isNegative());
 
     }
+
+    /**
+     * <p>Converts this duration to a general temporal amount compatible with JSR-310-spec. </p>
+     *
+     * <p>The conversion is possible if and only if following units are part of this duration: </p>
+     *
+     * <ul>
+     *     <li>CalendarUnit.MILLENNIA</li>
+     *     <li>CalendarUnit.CENTURIES</li>
+     *     <li>CalendarUnit.DECADES</li>
+     *     <li>CalendarUnit.YEARS</li>
+     *     <li>CalendarUnit.QUARTERS</li>
+     *     <li>CalendarUnit.MONTHS</li>
+     *     <li>CalendarUnit.WEEKS</li>
+     *     <li>CalendarUnit.DAYS</li>
+     *     <li>ClockUnit.HOURS</li>
+     *     <li>ClockUnit.MINUTES</li>
+     *     <li>ClockUnit.SECONDS</li>
+     *     <li>ClockUnit.MILLIS</li>
+     *     <li>ClockUnit.MICROS</li>
+     *     <li>ClockUnit.NANOS</li>
+     *     <li>CalendarUnit.weekBasedYears()</li>
+     * </ul>
+     *
+     * <p>The resulting temporal amount can only be applied on the <i>local</i> types of JSR-310. The general
+     * mapping using this method looks like: </p>
+     *
+     * <ul>
+     *     <li>{@code Duration<IsoUnit>} can be applied on {@code LocalDateTime}</li>
+     *     <li>{@code Duration<CalendarUnit>} can be applied on {@code LocalDate}</li>
+     *     <li>{@code Duration<ClockUnit>} can be applied on {@code LocalTime}</li>
+     * </ul>
+     *
+     * <p>Other temporal types of JSR-310 are not supported. Note also that using this method cannot be type-safe
+     * due to the design of JSR-310 and includes some performance penalty because of the costs of conversion.
+     * Users should rather use Time4J-types for achieving best results. </p>
+     *
+     * @return  temporal amount applicable on the types {@code LocalDateTime}, {@code LocalDate} or {@code LocalTime}
+     * @throws  UnsupportedOperationException if this duration contains any unit not listed above
+     * @since   4.17
+     */
+    /*[deutsch]
+     * <p>Konvertiert diese Dauer zu einem allgemeinen {@code TemporalAmount} kompatibel mit der Spezifikation
+     * des JSR-310. </p>
+     *
+     * <p>Die Konversion ist genau dann m&ouml;glich, wenn diese Dauer nur Einheiten wie folgt besitzt: </p>
+     *
+     * <ul>
+     *     <li>CalendarUnit.MILLENNIA</li>
+     *     <li>CalendarUnit.CENTURIES</li>
+     *     <li>CalendarUnit.DECADES</li>
+     *     <li>CalendarUnit.YEARS</li>
+     *     <li>CalendarUnit.QUARTERS</li>
+     *     <li>CalendarUnit.MONTHS</li>
+     *     <li>CalendarUnit.WEEKS</li>
+     *     <li>CalendarUnit.DAYS</li>
+     *     <li>ClockUnit.HOURS</li>
+     *     <li>ClockUnit.MINUTES</li>
+     *     <li>ClockUnit.SECONDS</li>
+     *     <li>ClockUnit.MILLIS</li>
+     *     <li>ClockUnit.MICROS</li>
+     *     <li>ClockUnit.NANOS</li>
+     *     <li>CalendarUnit.weekBasedYears()</li>
+     * </ul>
+     *
+     * <p>Der resultierende {@code TemporalAmount} kann nur auf die <i>lokalen</i> Typen des JSR-310
+     * angewandt werden. Das allgemeine Schema unter Verwendung dieser Methode sieht so aus: </p>
+     *
+     * <ul>
+     *     <li>{@code Duration<IsoUnit>} anwendbar auf {@code LocalDateTime}</li>
+     *     <li>{@code Duration<CalendarUnit>} anwendbar auf {@code LocalDate}</li>
+     *     <li>{@code Duration<ClockUnit>} anwendbar auf {@code LocalTime}</li>
+     * </ul>
+     *
+     * <p>Andere temporale Typen des JSR-310 werden nicht unterst&uuml;tzt. Zu beachten: Diese Methode ist weder
+     * typsicher (dem Design des JSR-310 geschuldet) noch besonders schnell, weil die Konversion mit einem
+     * gewissen Aufwand verbunden ist. F&uuml;r beste Ergebnisse ist eher die durchgehende Verwendung von
+     * Time4J-Typen empfohlen. </p>
+     *
+     * @return  temporal amount applicable on the types {@code LocalDateTime}, {@code LocalDate} or {@code LocalTime}
+     * @throws  UnsupportedOperationException if this duration contains any unit not listed above
+     * @since   4.17
+     */
+    public TemporalAmount toTemporalAmount() {
+
+        return new JSR310DurationAdapter(this);
+
+    }
+
 
     /**
      * <p>Normalizes this duration by given normalizer. </p>
@@ -5812,6 +5909,22 @@ public final class Duration<U extends IsoUnit>
         ) {
 
             return new Duration<>(items, negative);
+
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected TimeSpan.Item<U> resolve(TimeSpan.Item<U> item) {
+
+            IsoUnit unit = item.getUnit();
+
+            if (unit.equals(ClockUnit.MILLIS)) {
+                return Item.of(Math.multiplyExact(item.getAmount(), 1_000_000L), (U) ClockUnit.NANOS);
+            } else if (unit.equals(ClockUnit.MICROS)) {
+                return Item.of(Math.multiplyExact(item.getAmount(), 1_000L), (U) ClockUnit.NANOS);
+            }
+
+            return item;
 
         }
 

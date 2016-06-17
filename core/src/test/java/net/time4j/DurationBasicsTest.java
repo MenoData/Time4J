@@ -6,6 +6,11 @@ import net.time4j.engine.TimeSpan;
 import net.time4j.engine.TimeSpan.Item;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.Test;
@@ -1412,6 +1417,52 @@ public class DurationBasicsTest {
         assertThat(
             f.parse("P-2Y-15DT-30H-5M"),
             is(Duration.ofNegative().years(2).days(15).hours(30).minutes(5).build()));
+    }
+
+    @Test
+    public void noMillisbutNanos() {
+        PlainTime t1 = PlainTime.midnightAtStartOfDay().plus(3, ClockUnit.MILLIS);
+        PlainTime t2 = PlainTime.midnightAtStartOfDay().plus(5, ClockUnit.MILLIS);
+        Duration<ClockUnit> duration = Duration.in(ClockUnit.MILLIS).between(t1, t2);
+        System.out.println(duration); // assert-Statement inside toString()
+        assertThat(duration.getPartialAmount(ClockUnit.MILLIS), is(2L));
+        for (Item<ClockUnit> item : duration.getTotalLength()) {
+            if (item.getUnit().equals(ClockUnit.MILLIS)) {
+                fail("Found unexpected duration item in milliseconds.");
+            } else if (item.getUnit().equals(ClockUnit.NANOS)) {
+                return;
+            }
+        }
+        fail("Missing nanoseconds.");
+    }
+
+    @Test
+    public void toTemporalAmount() {
+        TemporalAmount ta1 =
+            Duration.ofPositive().years(1).months(2).days(5).hours(10).millis(450).build().toTemporalAmount();
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).plus(ta1),
+            is(LocalDateTime.of(2018, 3, 6, 3, 0, 0, 450_000_000)));
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).minus(ta1),
+            is(LocalDateTime.of(2015, 10, 26, 6, 59, 59, 550_000_000)));
+        TemporalAmount ta2 =
+            Duration.ofNegative().years(1).months(2).days(5).hours(10).millis(450).build().toTemporalAmount();
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).plus(ta2),
+            is(LocalDateTime.of(2015, 10, 26, 6, 59, 59, 550_000_000)));
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).minus(ta2),
+            is(LocalDateTime.of(2018, 3, 6, 3, 0, 0, 450_000_000)));
+        assertThat(ta1.get(ChronoUnit.MILLIS), is (450L));
+        assertThat(ta2.get(ChronoUnit.MILLIS), is (-450L));
+        List<TemporalUnit> expectedList = new ArrayList<>();
+        expectedList.add(ChronoUnit.YEARS);
+        expectedList.add(ChronoUnit.MONTHS);
+        expectedList.add(ChronoUnit.DAYS);
+        expectedList.add(ChronoUnit.HOURS);
+        expectedList.add(ChronoUnit.NANOS);
+        assertThat(ta1.getUnits(), is(expectedList));
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractMetric.java) is part of project Time4J.
  *
@@ -69,8 +69,7 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @see     AbstractDuration
  */
-public abstract class AbstractMetric
-    <U extends ChronoUnit, P extends AbstractDuration<U>>
+public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDuration<U>>
     implements TimeMetric<U, P>, Comparator<U> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -110,6 +109,7 @@ public abstract class AbstractMetric
      * @throws  IllegalArgumentException if any time unit is given more than
      *          once or if there is no time unit at all
      */
+    @SafeVarargs
     protected AbstractMetric(
         boolean normalizing,
         U... units
@@ -171,7 +171,7 @@ public abstract class AbstractMetric
             throw new IllegalArgumentException("Missing units.");
         }
 
-        List<U> list = new ArrayList<U>(units);
+        List<U> list = new ArrayList<>(units);
         Collections.sort(list, this);
 
         this.sortedUnits = Collections.unmodifiableList(list);
@@ -226,7 +226,7 @@ public abstract class AbstractMetric
             negative = true;
         }
 
-        List<TimeSpan.Item<U>> resultList = new ArrayList<TimeSpan.Item<U>>(10);
+        List<TimeSpan.Item<U>> resultList = new ArrayList<>(10);
         TimeAxis<? super U, T> engine = start.getChronology();
         U unit = null;
         long amount = 0;
@@ -247,7 +247,7 @@ public abstract class AbstractMetric
                 (this.getLength(engine, unit) < 1.0)
                 && (index < endIndex - 1)
             ) {
-                amount = 0; // Millis oder Mikros vor Nanos nicht berechnen
+                amount = 0; // Millis oder Mikros vor Nanos nicht berechnen (maximal eine fraktionale Einheit)
             } else {
                 // konvertierbare Einheiten zusammenfassen
                 int k = index + 1;
@@ -272,7 +272,7 @@ public abstract class AbstractMetric
                 amount = t1.until(t2, unit);
                 
                 if (amount > 0) {
-                    resultList.add(TimeSpan.Item.of(amount, unit));
+                    resultList.add(this.resolve(TimeSpan.Item.of(amount, unit)));
                 } else if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
@@ -324,6 +324,26 @@ public abstract class AbstractMetric
         List<TimeSpan.Item<U>> items,
         boolean negative
     );
+
+    /**
+     * <p>Hook for adjustments like resolving millis or micros to nanos. </p>
+     *
+     * @param   item        item to be adjusted
+     * @return  adjusted item (usually the same as the argument)
+     * @since   3.21/4.17
+     */
+    /*[deutsch]
+     * <p>Einsprungpunkt f&uuml;r Anpassungen wie die Aufl&ouml;sung von Milli- und Mikrosekunden zu Nanosekunden. </p>
+     *
+     * @param   item        item to be adjusted
+     * @return  adjusted item (usually the same as the argument)
+     * @since   3.21/4.17
+     */
+    protected TimeSpan.Item<U> resolve(TimeSpan.Item<U> item) {
+
+        return item;
+
+    }
 
     private <T extends TimePoint<? super U, T>> void normalize(
         TimeAxis<? super U, T> engine,
