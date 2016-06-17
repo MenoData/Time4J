@@ -8,6 +8,7 @@
 - Better support for week-based durations and units [#509]
 
 ### Fixed
+- Duration measured in millis only is broken [#513]
 - Zone offset without sign - should be parseable in lax mode [#502]
 
 ## [v3.20] published on 2016-05-07
