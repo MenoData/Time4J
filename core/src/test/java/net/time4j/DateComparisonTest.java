@@ -151,6 +151,32 @@ public class DateComparisonTest {
             is(d2));
     }
 
+    @Test
+    public void isAfterAll() {
+        PlainDate d1 = PlainDate.of(2014, 4, 21);
+        PlainDate d2 = PlainDate.of(2014, 5, 20);
+        PlainDate d3 = PlainDate.of(2014, 3, 15);
+        assertThat(
+            PlainDate.of(2014, 5, 21).isAfterAll(d1, d2, d3),
+            is(true));
+        assertThat(
+            PlainDate.of(2014, 5, 21).isAfterAll(d1, d2.plus(1, CalendarUnit.DAYS), d3),
+            is(false));
+    }
+
+    @Test
+    public void isBeforeAll() {
+        PlainDate d1 = PlainDate.of(2014, 4, 21);
+        PlainDate d2 = PlainDate.of(2014, 5, 20);
+        PlainDate d3 = PlainDate.of(2014, 3, 15);
+        assertThat(
+            PlainDate.of(2014, 3, 14).isBeforeAll(d1, d2, d3),
+            is(true));
+        assertThat(
+            PlainDate.of(2014, 3, 14).isBeforeAll(d1, d2, d3.minus(1, CalendarUnit.DAYS)),
+            is(false));
+    }
+
 //    @Test
 //    public void minNonCompilable() {
 //        PlainDate d1 = PlainDate.of(2014, 4, 21);

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Temporal.java) is part of project Time4J.
  *
@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+
+import java.util.stream.Stream;
 
 /**
  * <p>Represents an object which can be sorted on a time axis in a
@@ -98,5 +100,45 @@ public interface Temporal<C> {
      *          to {@code temporal} else {@code false}
      */
     boolean isSimultaneous(C temporal);
+
+    /**
+     * <p>Queries if this object is after all given objects on a timeline. </p>
+     *
+     * @param   temporals    array of objects this instance is compared to
+     * @return  {@code true} if this instance is temporally after every object
+     *          in {@code temporals} else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich nach allen angegebenen Argumenten? </p>
+     *
+     * @param   temporals    array of objects this instance is compared to
+     * @return  {@code true} if this instance is temporally after every object
+     *          in {@code temporals} else {@code false}
+     */
+    default boolean isAfterAll(C... temporals) {
+
+        return Stream.of(temporals).allMatch(this::isAfter);
+
+    }
+
+    /**
+     * <p>Queries if this object is before all given objects on a timeline. </p>
+     *
+     * @param   temporals    array of objects this instance is compared to
+     * @return  {@code true} if this instance is temporally before every object
+     *          in {@code temporals} else {@code false}
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich vor allen angegebenen Argumenten? </p>
+     *
+     * @param   temporals    array of objects this instance is compared to
+     * @return  {@code true} if this instance is temporally before every object
+     *          in {@code temporals} else {@code false}
+     */
+    default boolean isBeforeAll(C... temporals) {
+
+        return Stream.of(temporals).allMatch(this::isBefore);
+
+    }
 
 }
