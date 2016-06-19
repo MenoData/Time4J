@@ -215,7 +215,7 @@ public class ParseLog {
     public ChronoEntity<?> getRawValues() {
 
         if (this.rawValues == null) {
-            this.rawValues = new ParsedValues(0);
+            this.rawValues = new ParsedValues(0, false);
         }
 
         return this.rawValues;
