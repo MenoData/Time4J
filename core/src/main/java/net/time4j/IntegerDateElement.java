@@ -58,7 +58,7 @@ final class IntegerDateElement
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final int index;
+    private transient final int ruleIndex;
     private transient final Integer defaultMin;
     private transient final Integer defaultMax;
     private transient final char symbol;
@@ -68,14 +68,14 @@ final class IntegerDateElement
 
     private IntegerDateElement(
         String name,
-        int index,
+        int ruleIndex,
         Integer defaultMin,
         Integer defaultMax,
         char symbol
     ) {
         super(name);
 
-        this.index = index;
+        this.ruleIndex = ruleIndex;
         this.defaultMin = defaultMin;
         this.defaultMax = defaultMax;
         this.symbol = symbol;
@@ -186,9 +186,9 @@ final class IntegerDateElement
      *
      * @return  int
      */
-    int getIndex() {
+    int getRuleIndex() {
 
-        return this.index;
+        return this.ruleIndex;
 
     }
 

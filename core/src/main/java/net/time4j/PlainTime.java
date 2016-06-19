@@ -2512,7 +2512,7 @@ public final class PlainTime
             this.element = element;
 
             if (element instanceof IntegerTimeElement) {
-                this.index = ((IntegerTimeElement) element).getIndex();
+                this.index = ((IntegerTimeElement) element).getRuleIndex();
             } else {
                 this.index = -1;
             }

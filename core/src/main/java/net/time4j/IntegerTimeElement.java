@@ -39,8 +39,7 @@ import java.math.BigDecimal;
  */
 final class IntegerTimeElement
     extends AbstractTimeElement<Integer>
-    implements ProportionalElement<Integer, PlainTime>,
-               NumericalElement<Integer> {
+    implements ProportionalElement<Integer, PlainTime>, NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -75,7 +74,7 @@ final class IntegerTimeElement
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final int index;
+    private transient final int ruleIndex;
     private transient final Integer defaultMin;
     private transient final Integer defaultMax;
     private transient final char symbol;
@@ -85,21 +84,21 @@ final class IntegerTimeElement
 
     private IntegerTimeElement(
         String name,
-        int index,
+        int ruleIndex,
         Integer defaultMin,
         Integer defaultMax,
         char symbol
     ) {
         super(name);
 
-        this.index = index;
+        this.ruleIndex = ruleIndex;
         this.defaultMin = defaultMin;
         this.defaultMax = defaultMax;
         this.symbol = symbol;
 
         boolean extendedRange;
 
-        switch (index) {
+        switch (ruleIndex) {
             case ISO_HOUR:
             case MINUTE_OF_DAY:
             case SECOND_OF_DAY:
@@ -217,9 +216,9 @@ final class IntegerTimeElement
      *
      * @return  int
      */
-    int getIndex() {
+    int getRuleIndex() {
 
-        return this.index;
+        return this.ruleIndex;
 
     }
 

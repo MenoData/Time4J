@@ -513,8 +513,7 @@ public final class PlainDate
      *
      * @see     #MONTH_OF_YEAR
      */
-    public static final
-    ProportionalElement<Integer, PlainDate> MONTH_AS_NUMBER =
+    public static final ProportionalElement<Integer, PlainDate> MONTH_AS_NUMBER =
         IntegerDateElement.create(
             "MONTH_AS_NUMBER",
             IntegerDateElement.MONTH,
@@ -2659,7 +2658,7 @@ public final class PlainDate
         //~ Konstruktoren -------------------------------------------------
 
         IntegerElementRule(ChronoElement<Integer> element) {
-            this(((IntegerDateElement) element).getIndex(), element);
+            this(((IntegerDateElement) element).getRuleIndex(), element);
 
         }
 
