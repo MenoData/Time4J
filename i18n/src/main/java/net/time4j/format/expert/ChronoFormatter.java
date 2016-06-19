@@ -147,6 +147,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final boolean needsExtensions;
     private final int countOfElements;
     private final Leniency leniency;
+    private final boolean indexable;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -176,6 +177,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         boolean nh = false;
         boolean dp = false;
         int co = 0;
+        boolean ix = true;
 
         for (FormatStep step : steps) {
             if ((fp == null) && step.getProcessor() instanceof FractionProcessor) {
@@ -187,6 +189,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             ChronoElement<?> element = step.getProcessor().getElement();
             if (element != null) {
                 co++;
+                if (ix && !ParsedValues.isIndexed(element)) {
+                    ix = false;
+                }
                 if (element instanceof HistorizedElement) {
                     nh = true;
                 } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
@@ -199,6 +204,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.hasOptionals = ho;
         this.needsHistorization = nh;
         this.countOfElements = co;
+        this.indexable = ix;
 
         Class<?> chronoType = chronology.getChronoType();
 
@@ -264,6 +270,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         // update extension elements and historizable elements
         int len = old.steps.size();
         List<FormatStep> copy = new ArrayList<FormatStep>(old.steps);
+        boolean ix = old.indexable;
 
         for (int i = 0; i < len; i++) {
             FormatStep step = copy.get(i);
@@ -284,6 +291,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                             if (e.name().equals(element.name())) {
                                 if (e != element) {
                                     copy.set(i, step.updateElement(e));
+                                    ix = false;
                                 }
                                 break;
                             }
@@ -296,6 +304,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             // update historizable elements
             if (history != null) {
+                ix = false;
                 ChronoElement<?> replacement = null;
                 if (element == PlainDate.YEAR) {
                     replacement = history.yearOfEra();
@@ -315,6 +324,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
         }
 
+        this.indexable = ix;
         this.steps = this.freeze(copy);
 
     }
@@ -352,8 +362,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (replacement == null) {
             map.remove(element);
+            this.indexable = formatter.indexable;
         } else {
             map.put(element, replacement);
+            this.indexable = formatter.indexable && ParsedValues.isIndexed(element);
         }
 
         this.defaults = Collections.unmodifiableMap(map);
@@ -973,7 +985,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     ) {
 
         if (offset >= text.length()) {
-            return new ParsedValues(0);
+            return new ParsedValues(0, false);
         }
 
         ParseLog status = new ParseLog(offset);
@@ -995,7 +1007,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         if ((parsed == null) || status.isError()) {
-            return new ParsedValues(0);
+            return new ParsedValues(0, false);
         }
 
         // Phase 2: Anreicherung mit Default-Werten
@@ -2688,7 +2700,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         int countOfElements
     ) {
 
-        ParsedValues values = new ParsedValues(countOfElements);
+        ParsedValues values = new ParsedValues(countOfElements, this.indexable);
         values.setPosition(status.getPosition());
         Deque<ParsedValues> data = null;
 
@@ -2714,7 +2726,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
                 // Start einer optionalen Sektion: Stack erweitern
                 while (level > previous) {
-                    values = new ParsedValues(countOfElements >>> 1);
+                    values = new ParsedValues(countOfElements >>> 1, this.indexable);
                     values.setPosition(status.getPosition());
                     data.push(values);
                     level--;

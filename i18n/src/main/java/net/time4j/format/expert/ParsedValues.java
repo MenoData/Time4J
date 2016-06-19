@@ -21,6 +21,8 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
@@ -29,7 +31,11 @@ import net.time4j.tz.TZID;
 
 import java.util.AbstractSet;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -49,16 +55,34 @@ class ParsedValues
     private static final float LOAD_FACTOR = 0.75f;
     private static final int INT_PHI = 0x9E3779B9;
 
+    private static final Set<ChronoElement<?>> INDEXED_ELEMENTS;
+
+    static {
+        Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+        set.add(PlainDate.YEAR);
+        set.add(PlainDate.MONTH_AS_NUMBER);
+        set.add(PlainDate.DAY_OF_MONTH);
+        set.add(PlainTime.DIGITAL_HOUR_OF_DAY);
+        set.add(PlainTime.MINUTE_OF_HOUR);
+        set.add(PlainTime.SECOND_OF_MINUTE);
+        set.add(PlainTime.NANO_OF_SECOND);
+        INDEXED_ELEMENTS = Collections.unmodifiableSet(set);
+    }
+
     //~ Instanzvariablen --------------------------------------------------
 
+    // standard mode
     private Object[] keys;
     private Object[] values;
-    private int[] ints;
 
-    private int mask;
-    private int len;
-    private int count;
-    private int threshold;
+    // index mode
+    private Map<ChronoElement<?>, Object> map;
+
+    private int[] ints; // index mode => date elements (year, month, day-of-month)
+    private int len; // index mode => hour-of-day
+    private int mask; // index mode => minute-of-hour
+    private int threshold; // index mode => second-of-minute
+    private int count; // index mode => nano-of-second
 
     private boolean duplicateKeysAllowed = false;
     private int position = -1;
@@ -69,17 +93,36 @@ class ParsedValues
      * Standard-Konstruktor.
      *
      * @param   expectedCountOfElements     How many elements to be expected?
+     * @param   indexable                   Are only indexable elements used?
      */
-    ParsedValues(int expectedCountOfElements) {
+    ParsedValues(
+        int expectedCountOfElements,
+        boolean indexable
+    ) {
         super();
 
-        this.len = arraySize(expectedCountOfElements);
-        this.mask = this.len - 1;
-        this.threshold = maxFill(this.len);
-        this.keys = new Object[this.len];
-        this.values = null;
-        this.ints = new int[this.len];
-        this.count = 0;
+        if (indexable) {
+            this.len = Integer.MIN_VALUE;
+            this.mask = Integer.MIN_VALUE;
+            this.threshold = Integer.MIN_VALUE;
+            this.count = Integer.MIN_VALUE;
+            this.keys = null;
+            this.values = null;
+            this.ints = new int[3];
+            for (int i = 0; i < 3; i++) {
+                this.ints[i] = Integer.MIN_VALUE;
+            }
+        } else {
+            this.len = arraySize(expectedCountOfElements);
+            this.mask = this.len - 1;
+            this.threshold = maxFill(this.len);
+            this.keys = new Object[this.len];
+            this.values = null;
+            this.ints = new int[this.len];
+            this.count = 0;
+        }
+
+        this.map = null;
 
     }
 
@@ -93,6 +136,28 @@ class ParsedValues
         }
 
         Object[] keys = this.keys;
+
+        if (keys == null) {
+            if (element == PlainDate.YEAR) {
+                return (this.ints[0] != Integer.MIN_VALUE);
+            } else if (element == PlainDate.MONTH_AS_NUMBER) {
+                return (this.ints[1] != Integer.MIN_VALUE);
+            } else if (element == PlainDate.DAY_OF_MONTH) {
+                return (this.ints[2] != Integer.MIN_VALUE);
+            } else if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                return (this.len != Integer.MIN_VALUE);
+            } else if (element == PlainTime.MINUTE_OF_HOUR) {
+                return (this.mask != Integer.MIN_VALUE);
+            } else if (element == PlainTime.SECOND_OF_MINUTE) {
+                return (this.threshold != Integer.MIN_VALUE);
+            } else if (element == PlainTime.NANO_OF_SECOND) {
+                return (this.count != Integer.MIN_VALUE);
+            } else {
+                Map<ChronoElement<?>, Object> m = this.map;
+                return ((m != null) && m.containsKey(element));
+            }
+        }
+
         Object current;
         int pos;
 
@@ -131,6 +196,17 @@ class ParsedValues
         }
 
         Object[] keys = this.keys;
+
+        if (keys == null) {
+            Map<ChronoElement<?>, Object> m = this.map;
+
+            if ((m != null) && m.containsKey(element)) {
+                return element.getType().cast(m.get(element));
+            }
+
+            throw new ChronoException("No value found for: " + element.name());
+        }
+
         Object current;
         int pos;
 
@@ -220,11 +296,17 @@ class ParsedValues
             return true;
         } else if (obj instanceof ParsedValues) {
             ParsedValues that = (ParsedValues) obj;
-            return (
-                (this.count == that.count)
-                && Arrays.equals(this.keys, that.keys)
-                && Arrays.equals(this.values, that.values)
-                && Arrays.equals(this.ints, that.ints));
+            Set<ChronoElement<?>> e1 = this.getRegisteredElements();
+            Set<ChronoElement<?>> e2 = that.getRegisteredElements();
+            if (e1.size() != e2.size()) {
+                return false;
+            }
+            for (ChronoElement<?> element : e1) {
+                if (!e2.contains(element) || !this.get(element).equals(that.get(element))) {
+                    return false;
+                }
+            }
+            return true;
         } else {
             return false;
         }
@@ -236,6 +318,10 @@ class ParsedValues
      */
     @Override
     public int hashCode() {
+
+        if (this.keys == null) {
+            return Arrays.hashCode(this.ints) + 3 * this.len + 7 * this.mask + 11 * this.threshold + 31 * this.count;
+        }
 
         return Arrays.hashCode(this.keys);
 
@@ -270,6 +356,35 @@ class ParsedValues
 
     @Override
     public Set<ChronoElement<?>> getRegisteredElements() {
+
+        if (this.keys == null) {
+            Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
+            if (this.ints[0] != Integer.MIN_VALUE) {
+                set.add(PlainDate.YEAR);
+            }
+            if (this.ints[1] != Integer.MIN_VALUE) {
+                set.add(PlainDate.MONTH_AS_NUMBER);
+            }
+            if (this.ints[2] != Integer.MIN_VALUE) {
+                set.add(PlainDate.DAY_OF_MONTH);
+            }
+            if (this.len != Integer.MIN_VALUE) {
+                set.add(PlainTime.DIGITAL_HOUR_OF_DAY);
+            }
+            if (this.mask != Integer.MIN_VALUE) {
+                set.add(PlainTime.MINUTE_OF_HOUR);
+            }
+            if (this.threshold != Integer.MIN_VALUE) {
+                set.add(PlainTime.SECOND_OF_MINUTE);
+            }
+            if (this.count != Integer.MIN_VALUE) {
+                set.add(PlainTime.NANO_OF_SECOND);
+            }
+            if (this.map != null) {
+                set.addAll(this.map.keySet());
+            }
+            return Collections.unmodifiableSet(set);
+        }
 
         return new KeySet();
 
@@ -336,12 +451,93 @@ class ParsedValues
     // gets the count of stored values
     int size() {
 
+        if (this.keys == null) {
+            int total = ((this.len == Integer.MIN_VALUE) ? 0 : 1);
+            if (this.mask != Integer.MIN_VALUE){
+                total++;
+            }
+            if (this.threshold != Integer.MIN_VALUE) {
+                total++;
+            }
+            if (this.count != Integer.MIN_VALUE) {
+                total++;
+            }
+            for (int i = 0; i < 3; i++) {
+                if (this.ints[i] != Integer.MIN_VALUE) {
+                    total++;
+                }
+            }
+            if (this.map != null) {
+                total += this.map.size();
+            }
+            return total;
+        }
+
         return this.count;
 
     }
 
-    // used in ChronoFormatter.parseElements()
+    // used by ChronoFormatter in order to determine the indexable-flag
+    static boolean isIndexed(ChronoElement<?> element) {
+
+        return INDEXED_ELEMENTS.contains(element);
+
+    }
+
+    // only used in ChronoFormatter.parseElements()
     void putAll(ParsedValues other) {
+
+        if (this.keys == null) {
+            int v = other.len;
+            if (v != Integer.MIN_VALUE) {
+                if ((this.len == Integer.MIN_VALUE) || this.duplicateKeysAllowed || (this.len == v)) {
+                    this.len = v;
+                } else {
+                    throw new AmbivalentValueException(PlainTime.DIGITAL_HOUR_OF_DAY);
+                }
+            }
+            v = other.mask;
+            if (v != Integer.MIN_VALUE) {
+                if ((this.mask == Integer.MIN_VALUE) || this.duplicateKeysAllowed || (this.mask == v)) {
+                    this.mask = v;
+                } else {
+                    throw new AmbivalentValueException(PlainTime.MINUTE_OF_HOUR);
+                }
+            }
+            v = other.threshold;
+            if (v != Integer.MIN_VALUE) {
+                if ((this.threshold == Integer.MIN_VALUE) || this.duplicateKeysAllowed || (this.threshold == v)) {
+                    this.threshold = v;
+                } else {
+                    throw new AmbivalentValueException(PlainTime.SECOND_OF_MINUTE);
+                }
+            }
+            v = other.count;
+            if (v != Integer.MIN_VALUE) {
+                if ((this.count == Integer.MIN_VALUE) || this.duplicateKeysAllowed || (this.count == v)) {
+                    this.count = v;
+                } else {
+                    throw new AmbivalentValueException(PlainTime.NANO_OF_SECOND);
+                }
+            }
+            for (int i = 0; i < 3; i++) {
+                v = other.ints[i];
+                if (v != Integer.MIN_VALUE) {
+                    if ((this.ints[i] == Integer.MIN_VALUE) || this.duplicateKeysAllowed || (this.ints[i] == v)) {
+                        this.ints[i] = v;
+                    } else {
+                        throw new AmbivalentValueException(getIndexedElement(i));
+                    }
+                }
+            }
+            Map<ChronoElement<?>, Object> m = other.map;
+            if (m != null) {
+                for (ChronoElement<?> e : m.keySet()) {
+                    this.put(e, m.get(e));
+                }
+            }
+            return;
+        }
 
         Object[] elements = other.keys;
         Object current;
@@ -365,6 +561,66 @@ class ParsedValues
         int pos;
         Object current;
         Object[] keys = this.keys;
+
+        if (keys == null) {
+            if (element == PlainDate.YEAR) {
+                if (this.duplicateKeysAllowed || (this.ints[0] == Integer.MIN_VALUE) || (this.ints[0] == v)) {
+                    this.ints[0] = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainDate.MONTH_AS_NUMBER) {
+                if (this.duplicateKeysAllowed || (this.ints[1] == Integer.MIN_VALUE) || (this.ints[1] == v)) {
+                    this.ints[1] = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainDate.DAY_OF_MONTH) {
+                if (this.duplicateKeysAllowed || (this.ints[2] == Integer.MIN_VALUE) || (this.ints[2] == v)) {
+                    this.ints[2] = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                if (this.duplicateKeysAllowed || (this.len == Integer.MIN_VALUE) || (this.len == v)) {
+                    this.len = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainTime.MINUTE_OF_HOUR) {
+                if (this.duplicateKeysAllowed || (this.mask == Integer.MIN_VALUE) || (this.mask == v)) {
+                    this.mask = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainTime.SECOND_OF_MINUTE) {
+                if (this.duplicateKeysAllowed || (this.threshold == Integer.MIN_VALUE) || (this.threshold == v)) {
+                    this.threshold = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else if (element == PlainTime.NANO_OF_SECOND) {
+                if (this.duplicateKeysAllowed || (this.count == Integer.MIN_VALUE) || (this.count == v)) {
+                    this.count = v;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            } else {
+                Map<ChronoElement<?>, Object> m = this.map;
+                if (m == null) {
+                    m = new HashMap<ChronoElement<?>, Object>();
+                    this.map = m;
+                }
+                Object newValue = Integer.valueOf(v);
+                if (this.duplicateKeysAllowed || !m.containsKey(element) || newValue.equals(m.get(element))) {
+                    m.put(element, newValue);
+                    return;
+                } else {
+                    throw new AmbivalentValueException(element);
+                }
+            }
+            return;
+        }
 
         if (!((current = keys[pos = (mix(element.hashCode()) & this.mask)]) == null)) {
             if (current.equals(element)) {
@@ -411,6 +667,20 @@ class ParsedValues
         Object current;
         Object[] keys = this.keys;
 
+        if (keys == null) {
+            Map<ChronoElement<?>, Object> m = this.map;
+            if (m == null) {
+                m = new HashMap<ChronoElement<?>, Object>();
+                this.map = m;
+            }
+            if (this.duplicateKeysAllowed || !m.containsKey(element) || v.equals(m.get(element))) {
+                m.put(element, v);
+                return;
+            } else {
+                throw new AmbivalentValueException(element);
+            }
+        }
+
         if (this.values == null) {
             this.values = new Object[this.len];
         }
@@ -448,7 +718,19 @@ class ParsedValues
     // called in context of erraneous or-block
     void reset() {
 
-        this.keys = new Object[this.keys.length];
+        if (this.keys == null) {
+            this.len = Integer.MIN_VALUE;
+            this.mask = Integer.MIN_VALUE;
+            this.threshold = Integer.MIN_VALUE;
+            this.count = Integer.MIN_VALUE;
+            for (int i = 0; i < 3; i++) {
+                this.ints[i] = Integer.MIN_VALUE;
+            }
+            this.map = null;
+        } else {
+            this.keys = new Object[this.keys.length];
+        }
+
         this.count = 0;
 
     }
@@ -456,6 +738,33 @@ class ParsedValues
     private int getInt0(ChronoElement<?> element) {
 
         Object[] keys = this.keys;
+
+        if (keys == null) {
+            if (element == PlainDate.YEAR) {
+                return this.ints[0];
+            } else if (element == PlainDate.MONTH_AS_NUMBER) {
+                return this.ints[1];
+            } else if (element == PlainDate.DAY_OF_MONTH) {
+                return this.ints[2];
+            } else if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                return this.len;
+            } else if (element == PlainTime.MINUTE_OF_HOUR) {
+                return this.mask;
+            } else if (element == PlainTime.SECOND_OF_MINUTE) {
+                return this.threshold;
+            } else if (element == PlainTime.NANO_OF_SECOND) {
+                return this.count;
+            }
+
+            Map<ChronoElement<?>, Object> m = this.map;
+
+            if ((m != null) && m.containsKey(element)) {
+                return Integer.class.cast(m.get(element)).intValue();
+            }
+
+            return Integer.MIN_VALUE;
+        }
+
         Object current;
         int pos;
 
@@ -481,6 +790,32 @@ class ParsedValues
     private void remove(Object element) {
 
         Object[] keys = this.keys;
+
+        if (keys == null) {
+            if (element == PlainDate.YEAR) {
+                this.ints[0] = Integer.MIN_VALUE;
+            } else if (element == PlainDate.MONTH_AS_NUMBER) {
+                this.ints[1] = Integer.MIN_VALUE;
+            } else if (element == PlainDate.DAY_OF_MONTH) {
+                this.ints[2] = Integer.MIN_VALUE;
+            } else if (element == PlainTime.DIGITAL_HOUR_OF_DAY) {
+                this.len = Integer.MIN_VALUE;
+            } else if (element == PlainTime.MINUTE_OF_HOUR) {
+                this.mask = Integer.MIN_VALUE;
+            } else if (element == PlainTime.SECOND_OF_MINUTE) {
+                this.threshold = Integer.MIN_VALUE;
+            } else if (element == PlainTime.NANO_OF_SECOND) {
+                this.count = Integer.MIN_VALUE;
+            } else {
+                Map<ChronoElement<?>, Object> m = this.map;
+                if (m != null) {
+                    //noinspection SuspiciousMethodCalls
+                    m.remove(element);
+                }
+            }
+            return;
+        }
+
         Object current;
         int pos;
 
@@ -599,6 +934,28 @@ class ParsedValues
         this.keys = newKeys;
         this.values = newValues;
         this.ints = newInts;
+
+    }
+
+    private static ChronoElement<Integer> getIndexedElement(int index) {
+        switch (index) {
+            case 0:
+                return PlainDate.YEAR;
+            case 1:
+                return PlainDate.MONTH_AS_NUMBER;
+            case 2:
+                return PlainDate.DAY_OF_MONTH;
+            case 3:
+                return PlainTime.DIGITAL_HOUR_OF_DAY;
+            case 4:
+                return PlainTime.MINUTE_OF_HOUR;
+            case 5:
+                return PlainTime.SECOND_OF_MINUTE;
+            case 6:
+                return PlainTime.NANO_OF_SECOND;
+            default:
+                throw new IllegalStateException("No element index: " + index);
+        }
 
     }
 
