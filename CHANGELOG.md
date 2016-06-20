@@ -1,4 +1,6 @@
-## [v4.17] not yet released
+## [v4.18] not yet released
+
+## [v4.17] published on 2016-06-20
 ### Added
 - Add conversion of net.time4j.Duration to TemporalAmount [#511]
 - Enhance Temporal-interface by more comparison methods [#510]
