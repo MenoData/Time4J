@@ -1,4 +1,6 @@
-## [v3.21] not yet released
+## [v3.22] not yet released
+
+## [v3.21] published on 2016-06-20
 ### Added
 - Introduce class for year-week-combination [#508]
 - Introduce class for year-month-combination [#503]
