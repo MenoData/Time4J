@@ -65,7 +65,13 @@ public abstract class AbstractClock
      */
     public ZonalClock inPlatformView() {
 
-        String tzid = "java.util.TimeZone~" + Timezone.ofSystem().getID().canonical();
+        Timezone sys = Timezone.ofSystem();
+
+        if (sys.getHistory() == null) {
+            return new ZonalClock(this, sys);
+        }
+
+        String tzid = "java.util.TimeZone~" + sys.getID().canonical();
         return new ZonalClock(this, tzid);
 
     }
@@ -86,7 +92,7 @@ public abstract class AbstractClock
      */
     public ZonalClock inLocalView() {
 
-        return new ZonalClock(this, Timezone.ofSystem().getID());
+        return new ZonalClock(this, Timezone.ofSystem());
 
     }
 

@@ -273,7 +273,13 @@ public final class SystemClock
      */
     public static ZonalClock inPlatformView() {
 
-        String tzid = "java.util.TimeZone~" + Timezone.ofSystem().getID().canonical();
+        Timezone sys = Timezone.ofSystem();
+
+        if (sys.getHistory() == null) {
+            return new ZonalClock(INSTANCE, sys);
+        }
+
+        String tzid = "java.util.TimeZone~" + sys.getID().canonical();
         return new ZonalClock(INSTANCE, tzid);
 
     }

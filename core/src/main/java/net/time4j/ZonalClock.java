@@ -106,15 +106,7 @@ public final class ZonalClock {
         TimeSource<?> timeSource,
         TZID tzid
     ) {
-
-        if (timeSource == null) {
-            throw new NullPointerException("Missing time source.");
-        } else if (tzid == null) {
-            throw new NullPointerException("Missing timezone id.");
-        }
-
-        this.timeSource = timeSource;
-        this.timezone = Timezone.of(tzid);
+        this(timeSource, Timezone.of(tzid));
 
     }
 
@@ -146,15 +138,49 @@ public final class ZonalClock {
         TimeSource<?> timeSource,
         String tzid
     ) {
+        this(timeSource, Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Constructs a new clock which can yield the current local time in
+     * given timezone. </p>
+     *
+     * <p>Most users have no need to directly call this constructor. It is
+     * mainly designed for being called by dedicated expressions like
+     * {@code SystemClock.inLocalView()} etc. </p>
+     *
+     * @param   timeSource  source for current world time (UTC)
+     * @param   tz          timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Konstruiert eine neue Uhr, die die aktuelle Zeit in einer Zeitzone
+     * ermitteln kann. </p>
+     *
+     * <p>Die meisten Anwender brauchen diesen Konstruktor nicht. Er ist
+     * im wesentlichen f&uuml;r den Aufruf durch spezielle Ausdr&uuml;cke
+     * wie {@code SystemClock.inLocalView()} etc. gedacht. </p>
+     *
+     * @param   timeSource  source for current world time (UTC)
+     * @param   tz          timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @since   3.22/4.18
+     */
+    public ZonalClock(
+        TimeSource<?> timeSource,
+        Timezone tz
+    ) {
 
         if (timeSource == null) {
             throw new NullPointerException("Missing time source.");
-        } else if (tzid.isEmpty()) {
-            throw new NullPointerException("Timezone id is empty.");
+        } else if (tz == null) {
+            throw new NullPointerException("Missing timezone.");
         }
 
         this.timeSource = timeSource;
-        this.timezone = Timezone.of(tzid);
+        this.timezone = tz;
 
     }
 
