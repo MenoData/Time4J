@@ -150,6 +150,14 @@ enum AmPmElement
     }
 
     @Override
+    public String getDisplayName(Locale language) {
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_dayperiod");
+        return ((lname == null) ? this.name() : lname);
+
+    }
+
+    @Override
     public void print(
         ChronoDisplay context,
         Appendable buffer,

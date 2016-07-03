@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoElement.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.engine;
 
 import java.util.Comparator;
+import java.util.Locale;
 
 
 /**
@@ -301,5 +302,37 @@ public interface ChronoElement<V>
      *          ElementRule.withValue(T, V, boolean)
      */
     boolean isLenient();
+
+    /**
+     * <p>Obtains a localized name for display purposes if possible. </p>
+     *
+     * <p>Most elements have no localized names, but in case the i18n-module is loaded then elements
+     * like eras, years, quarters, months, weeks, day-of-month, day-of-week, am/pm, hour, minute and second
+     * do have localization support. The default implementation falls back to the technical element name. </p>
+     *
+     * <p>Note that the displayed name does not need to be unique for different elements. For example
+     * the localized names of {@code PlainDate.DAY_OF_MONTH} and {@code PlainDate.DAY_OF_YEAR} might
+     * be equal. </p>
+     *
+     * @param   language    language setting
+     * @return  localized name or if not available then {@link #name() a technical name} will be chosen
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Ermittelt einen lokalisierten Anzeigenamen wenn m&ouml;glich. </p>
+     *
+     * <p>Die meisten Elemente haben keine lokalisierten Namen, aber falls das i18n-Modul geladen ist,
+     * haben Elemente wie &Auml;ras, Jahre, Quartale, Monate, Wochen, Tag, Wochentag, AM/PM, Stunde,
+     * Minute und Sekunde lokalisierte Namen. Die Standardimplementierung f&auml;llt auf den technischen
+     * Elementnamen zur&uuml;ck. </p>
+     *
+     * <p>Hinweis: Der Anzeigename mu&szlig; nicht eindeutig sein. Zum Beispiel sind die Anzeigenamen
+     * von {@code PlainDate.DAY_OF_MONTH} und {@code PlainDate.DAY_OF_YEAR} in der Regel gleich. </p>
+     *
+     * @param   language    language setting
+     * @return  localized name or if not available then {@link #name() a technical name} will be chosen
+     * @since   3.22/4.18
+     */
+    String getDisplayName(Locale language);
 
 }

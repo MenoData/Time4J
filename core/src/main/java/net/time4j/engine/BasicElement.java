@@ -24,6 +24,7 @@ package net.time4j.engine;
 import net.time4j.base.UnixTime;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
@@ -108,6 +109,13 @@ public abstract class BasicElement<V extends Comparable<V>>
 
     @Override
     public final String name() {
+
+        return this.name;
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
 
         return this.name;
 

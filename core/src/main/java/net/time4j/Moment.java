@@ -2303,6 +2303,13 @@ public final class Moment
         }
 
         @Override
+        public String getDisplayName(Locale language) {
+
+            return this.name();
+
+        }
+
+        @Override
         public Long getValue(Moment context) {
 
             return Long.valueOf(context.getPosixTime());
@@ -2433,6 +2440,13 @@ public final class Moment
         public boolean isLenient() {
 
             return false;
+
+        }
+
+        @Override
+        public String getDisplayName(Locale language) {
+
+            return this.name();
 
         }
 

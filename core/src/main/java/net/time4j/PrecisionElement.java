@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -121,6 +122,13 @@ class PrecisionElement<U extends Comparable<U>>
         } else {
             return u2.compareTo(u1);
         }
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        return this.name();
 
     }
 

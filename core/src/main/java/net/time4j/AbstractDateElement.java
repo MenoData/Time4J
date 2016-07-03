@@ -23,9 +23,12 @@ package net.time4j;
 
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.format.CalendarText;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+
+import java.util.Locale;
 
 
 /**
@@ -143,6 +146,42 @@ abstract class AbstractDateElement<V extends Comparable<V>>
     public ChronoFunction<Moment, V> at(ZonalOffset offset) {
 
         return new ZonalQuery<V>(this, offset);
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        String key;
+
+        switch (this.getSymbol()) {
+            case 'u':
+            case 'Y':
+                key = "L_year";
+                break;
+            case 'Q':
+                key = "L_quarter";
+                break;
+            case 'M':
+                key = "L_month";
+                break;
+            case 'd':
+                key = "L_day";
+                break;
+            case 'E':
+                key = "L_weekday";
+                break;
+            default:
+                String n = this.name();
+                if (n.equals("MONTH_AS_NUMBER")) {
+                    key = "L_month";
+                } else {
+                    return n;
+                }
+        }
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
+        return ((lname == null) ? this.name() : lname);
 
     }
 

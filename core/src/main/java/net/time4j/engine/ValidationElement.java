@@ -22,6 +22,8 @@
 package net.time4j.engine;
 
 
+import java.util.Locale;
+
 /**
  * <p>A specialized element for communicating validation failures
  * during parsing. </p>
@@ -112,6 +114,13 @@ public enum ValidationElement
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        return this.name();
 
     }
 

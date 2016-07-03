@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FractionalElement.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 
 /**
@@ -84,6 +85,11 @@ enum FractionalElement
     @Override
     public boolean isLenient() {
         return false;
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+        return this.name();
     }
 
 }

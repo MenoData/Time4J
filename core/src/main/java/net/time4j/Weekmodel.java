@@ -1078,6 +1078,14 @@ public final class Weekmodel
         }
 
         @Override
+        public String getDisplayName(Locale language) {
+
+            String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_weekday");
+            return ((lname == null) ? this.name() : lname);
+
+        }
+
+        @Override
         public void print(
             ChronoDisplay context,
             Appendable buffer,
@@ -1352,6 +1360,14 @@ public final class Weekmodel
         public boolean isLenient() {
 
             return true;
+
+        }
+
+        @Override
+        public String getDisplayName(Locale language) {
+
+            String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_week");
+            return ((lname == null) ? this.name() : lname);
 
         }
 

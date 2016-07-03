@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EpochDays.java) is part of project Time4J.
  *
@@ -22,6 +22,8 @@
 package net.time4j.engine;
 
 import net.time4j.base.MathUtils;
+
+import java.util.Locale;
 
 
 /**
@@ -316,6 +318,13 @@ public enum EpochDays
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        return this.name();
 
     }
 

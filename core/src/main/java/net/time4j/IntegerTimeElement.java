@@ -24,11 +24,13 @@ package net.time4j;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
+import net.time4j.format.CalendarText;
 import net.time4j.format.NumericalElement;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
 import java.math.BigDecimal;
+import java.util.Locale;
 
 
 /**
@@ -161,6 +163,37 @@ final class IntegerTimeElement
     public int numerical(Integer value) {
 
         return value.intValue();
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        String key;
+
+        switch (this.symbol) {
+            case 'H':
+            case 'h':
+            case 'K':
+            case 'k':
+                key = "L_hour";
+                break;
+            case 'm':
+                key = "L_minute";
+                break;
+            case 's':
+                key = "L_second";
+                break;
+            default:
+                if (this.name().equals("ISO_HOUR")) {
+                    key = "L_hour";
+                } else {
+                    return this.name();
+                }
+        }
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
+        return ((lname == null) ? this.name() : lname);
 
     }
 

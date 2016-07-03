@@ -29,9 +29,11 @@ import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.StdOperator;
+import net.time4j.format.CalendarText;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
+import java.util.Locale;
 
 
 /**
@@ -176,6 +178,31 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
     public ChronoOperator<T> atCeiling() {
 
         return StdOperator.atCeiling(this);
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        String key;
+        String ref = this.name();
+
+        if (ref.equals("YEAR_OF_ERA")) {
+            key = "L_year";
+        } else if (ref.equals("ERA")) {
+            key = "L_era";
+        } else if (ref.equals("MONTH_OF_YEAR")) {
+            key = "L_month";
+        } else if (ref.equals("DAY_OF_MONTH")) {
+            key = "L_day";
+        } else if (ref.equals("DAY_OF_WEEK")) {
+            key = "L_weekday";
+        } else {
+            return ref;
+        }
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
+        return ((lname == null) ? ref : lname);
 
     }
 

@@ -297,6 +297,13 @@ public final class Tabot
         }
 
         @Override
+        public String getDisplayName(Locale language) {
+
+            return (language.getLanguage().equals("am") ? "Tabot" : "Tabot"); // TODO: amharic translation?
+
+        }
+
+        @Override
         public void print(
             ChronoDisplay context,
             Appendable buffer,
