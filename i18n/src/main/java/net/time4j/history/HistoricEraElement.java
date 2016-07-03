@@ -132,6 +132,14 @@ final class HistoricEraElement
     }
 
     @Override
+    public String getDisplayName(Locale language) {
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_era");
+        return ((lname == null) ? this.name() : lname);
+
+    }
+
+    @Override
     public void print(
         ChronoDisplay context,
         Appendable buffer,

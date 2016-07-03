@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneElement.java) is part of project Time4J.
  *
@@ -23,9 +23,12 @@ package net.time4j.format.expert;
 
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.format.CalendarText;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
+
+import java.util.Locale;
 
 
 /**
@@ -132,6 +135,14 @@ enum TimezoneElement
     public boolean isLenient() {
 
         return false;
+
+    }
+
+    @Override
+    public String getDisplayName(Locale language) {
+
+        String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_zone");
+        return ((lname == null) ? this.name() : lname);
 
     }
 
