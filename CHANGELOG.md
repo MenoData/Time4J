@@ -1,4 +1,7 @@
 ## [v3.22] not yet released
+### Added
+- Add localized display names for `ChronoElement` [#515]
+- Support for annual dates [#514]
 
 ## [v3.21] published on 2016-06-20
 ### Added
