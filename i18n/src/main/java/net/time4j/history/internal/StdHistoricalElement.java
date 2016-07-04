@@ -21,13 +21,11 @@
 
 package net.time4j.history.internal;
 
-import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoElement;
-import net.time4j.format.CalendarText;
+import net.time4j.format.DisplayElement;
 import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
-import java.util.Locale;
 
 
 /**
@@ -37,7 +35,7 @@ import java.util.Locale;
  * @since   3.16/4.13
  */
 public class StdHistoricalElement
-    extends BasicElement<Integer>
+    extends DisplayElement<Integer>
     implements NumericalElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -128,39 +126,6 @@ public class StdHistoricalElement
     public int numerical(Integer value) {
 
         return value.intValue();
-
-    }
-
-    @Override
-    public String getDisplayName(Locale language) {
-
-        String key;
-        String ref = this.name();
-
-        if (ref.equals("YEAR_OF_DISPLAY")) {
-            key = "L_year";
-        } else {
-            switch (this.symbol) {
-                case 'y':
-                    key = "L_year";
-                    break;
-                case 'M':
-                    key = "L_month";
-                    break;
-                case 'd':
-                    key = "L_day";
-                    break;
-                default:
-                    key = "";
-            }
-        }
-
-        if (key.isEmpty()) {
-            return ref;
-        }
-
-        String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
-        return ((lname == null) ? ref : lname);
 
     }
 

@@ -32,6 +32,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
+import net.time4j.format.DisplayElement;
 import net.time4j.format.NumericalElement;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
@@ -51,7 +52,7 @@ import java.util.Locale;
  * @since   3.0
  */
 final class HistoricEraElement
-    extends BasicElement<HistoricEra>
+    extends DisplayElement<HistoricEra>
     implements NumericalElement<HistoricEra>, TextElement<HistoricEra> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -128,14 +129,6 @@ final class HistoricEraElement
     public int numerical(HistoricEra value) {
 
         return value.getValue();
-
-    }
-
-    @Override
-    public String getDisplayName(Locale language) {
-
-        String lname = CalendarText.getIsoInstance(language).getTextForms().get("L_era");
-        return ((lname == null) ? this.name() : lname);
 
     }
 

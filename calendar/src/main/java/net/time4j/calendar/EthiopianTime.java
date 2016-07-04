@@ -27,7 +27,6 @@ import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.EthiopianExtension;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -45,6 +44,7 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.DisplayElement;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 
@@ -1179,7 +1179,7 @@ public final class EthiopianTime
     }
 
     private static class EthiopianHour
-        extends BasicElement<Integer> {
+        extends DisplayElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 

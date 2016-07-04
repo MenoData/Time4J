@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Tabot.java) is part of project Time4J.
  *
@@ -299,7 +299,7 @@ public final class Tabot
         @Override
         public String getDisplayName(Locale language) {
 
-            return (language.getLanguage().equals("am") ? "Tabot" : "Tabot"); // TODO: amharic translation?
+            return this.name();
 
         }
 
