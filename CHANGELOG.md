@@ -1,4 +1,7 @@
 ## [v4.18] not yet released
+### Added
+- Add localized display names for `ChronoElement` [#515]
+- Support for annual dates [#514]
 
 ## [v4.17] published on 2016-06-20
 ### Added
