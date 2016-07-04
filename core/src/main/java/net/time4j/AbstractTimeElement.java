@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractTimeElement.java) is part of project Time4J.
  *
@@ -21,8 +21,8 @@
 
 package net.time4j;
 
-import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.format.DisplayElement;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -36,7 +36,7 @@ import net.time4j.tz.ZonalOffset;
  * @author  Meno Hochschild
  */
 abstract class AbstractTimeElement<V extends Comparable<V>>
-    extends BasicElement<V>
+    extends DisplayElement<V>
     implements AdjustableElement<V, PlainTime> {
 
     //~ Instanzvariablen --------------------------------------------------
