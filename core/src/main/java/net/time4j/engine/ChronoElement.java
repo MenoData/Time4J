@@ -310,9 +310,8 @@ public interface ChronoElement<V>
      * like eras, years, quarters, months, weeks, day-of-month, day-of-week, am/pm, hour, minute and second
      * do have localization support. The default implementation falls back to the technical element name. </p>
      *
-     * <p>Note that the displayed name does not need to be unique for different elements. For example
-     * the localized names of {@code PlainDate.DAY_OF_MONTH} and {@code PlainDate.DAY_OF_YEAR} might
-     * be equal. </p>
+     * <p>Note that the displayed name does not need to be unique for different elements. For example the
+     * localized names of {@code PlainDate.MONTH_OF_YEAR} and {@code PlainDate.MONTH_AS_NUMBER} are equal. </p>
      *
      * @param   language    language setting
      * @return  localized name or if not available then {@link #name() a technical name} will be chosen
@@ -327,7 +326,7 @@ public interface ChronoElement<V>
      * Elementnamen zur&uuml;ck. </p>
      *
      * <p>Hinweis: Der Anzeigename mu&szlig; nicht eindeutig sein. Zum Beispiel sind die Anzeigenamen
-     * von {@code PlainDate.DAY_OF_MONTH} und {@code PlainDate.DAY_OF_YEAR} in der Regel gleich. </p>
+     * von {@code PlainDate.MONTH_OF_YEAR} und {@code PlainDate.MONTH_AS_NUMBER} in der Regel gleich. </p>
      *
      * @param   language    language setting
      * @return  localized name or if not available then {@link #name() a technical name} will be chosen
