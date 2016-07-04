@@ -77,7 +77,8 @@ import java.util.Locale;
  * <p>It is built on the base of the <a href="CopticCalendar.html">Coptic calendar</a>
  * but uses two different eras. Another difference to Coptic calendar is the day starting
  * in the morning at 06:00 (usual approximation for sunrise). For more details see
- * <a href="http://ayannanahmias.com/2011/06/15/ethiopian-calendar/">Intro to the Ethiopic Calendar</a>. </p>
+ * <a href="http://ayannanahmias.com/the-nahmias-cipher-report/2011/06/15/ethiopian-calendar/">Intro
+ * to the Ethiopic Calendar</a>. </p>
  *
  * <p>Following elements which are declared as constants are registered by
  * this class: </p>
@@ -116,7 +117,8 @@ import java.util.Locale;
  * <p>Er ist im wesentlichen wie der <a href="CopticCalendar.html">koptische Kalender</a> aufgebaut, verwendet
  * aber zwei andere &Auml;ras. Eine weitere Differenz zum koptischen Kalender ist, da&szlig; der Kalendertag
  * am Morgen um 06:00 beginnt (typische N&auml;herung f&uuml;r den Sonnenaufgang). Mehr Details siehe
- * <a href="http://ayannanahmias.com/2011/06/15/ethiopian-calendar/">Intro to the Ethiopic Calendar</a>. </p>
+ * <a href="http://ayannanahmias.com/the-nahmias-cipher-report/2011/06/15/ethiopian-calendar/">Intro
+ * to the Ethiopic Calendar</a>. </p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
