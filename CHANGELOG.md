@@ -3,6 +3,9 @@
 - Add localized display names for `ChronoElement` [#515]
 - Support for annual dates [#514]
 
+### Changed
+- New leap second at end of year 2016 [#517]
+
 ## [v4.17] published on 2016-06-20
 ### Added
 - Add conversion of net.time4j.Duration to TemporalAmount [#511]
