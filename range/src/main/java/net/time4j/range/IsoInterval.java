@@ -1797,13 +1797,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
-     *
-     * @return  associated {@code TimeLine}
-     */
-    abstract TimeLine<T> getTimeLine();
-
-    /**
      * <p>Liefert die zugeh&ouml;rige Fabrik. </p>
      *
      * @return  IntervalFactory
@@ -1939,5 +1932,11 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  this instance
      */
     abstract I getContext();
+
+    private TimeLine<T> getTimeLine() {
+
+        return this.getFactory().getTimeLine();
+
+    }
 
 }

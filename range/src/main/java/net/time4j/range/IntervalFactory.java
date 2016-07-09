@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalFactory.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Temporal;
+import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ParseLog;
 
 import java.util.Set;
@@ -36,17 +37,12 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @see     2.0
  */
-interface IntervalFactory
-    <T extends Temporal<? super T>, I extends IsoInterval<T, I>> {
+interface IntervalFactory<T extends Temporal<? super T>, I extends IsoInterval<T, I>> {
 
     //~ Methoden ----------------------------------------------------------
 
     /**
      * <p>Creates an interval between given boundaries. </p>
-     *
-     * <p>If given boundaries are calendrical then this method will create
-     * a closed interval else a half-open interval with an open upper
-     * boundary. Note: Infinite intervals always use open boundaries. </p>
      *
      * @param   start   lower boundary
      * @param   end     upper boundary
@@ -57,10 +53,6 @@ interface IntervalFactory
      */
     /*[deutsch]
      * <p>Erzeugt ein Intervall zwischen den angegebenen Intervallgrenzen. </p>
-     *
-     * <p>Sind die angegebenen Grenzen kalendarisch, dann wird ein
-     * geschlossenes Intervall erzeugt, sonst ein rechts-offenes Intervall.
-     * Hinweis: Unendliche Intervalle haben immer offene Grenzen. </p>
      *
      * @param   start   lower boundary
      * @param   end     upper boundary
@@ -124,5 +116,12 @@ interface IntervalFactory
      *          assignable to {@code Calendrical} else {@code false}
      */
     boolean isCalendrical();
+
+    /**
+     * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
+     *
+     * @return  associated {@code TimeLine}
+     */
+    TimeLine<T> getTimeLine();
 
 }
