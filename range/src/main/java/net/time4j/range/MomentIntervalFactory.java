@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentIntervalFactory.java) is part of project Time4J.
  *
@@ -27,6 +27,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.tz.TZID;
@@ -141,6 +142,13 @@ final class MomentIntervalFactory
 
         throw new AssertionError(
             "Timezone must exist if a moment was successfully parsed.");
+
+    }
+
+    @Override
+    public TimeLine<Moment> getTimeLine() {
+
+        return Moment.axis();
 
     }
 

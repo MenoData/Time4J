@@ -28,13 +28,12 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
-import net.time4j.format.expert.SignPolicy;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.SignPolicy;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -45,12 +44,7 @@ import java.text.ParseException;
 import java.util.Comparator;
 import java.util.Locale;
 
-import static net.time4j.PlainDate.DAY_OF_MONTH;
-import static net.time4j.PlainDate.DAY_OF_WEEK;
-import static net.time4j.PlainDate.DAY_OF_YEAR;
-import static net.time4j.PlainDate.MONTH_AS_NUMBER;
-import static net.time4j.PlainDate.YEAR;
-import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
+import static net.time4j.PlainDate.*;
 import static net.time4j.range.IntervalEdge.CLOSED;
 
 
@@ -777,13 +771,6 @@ public final class DateInterval
             '/',
             PlainDate.axis()
         ).parse(text);
-
-    }
-
-    @Override
-    TimeLine<PlainDate> getTimeLine() {
-
-        return PlainDate.axis();
 
     }
 

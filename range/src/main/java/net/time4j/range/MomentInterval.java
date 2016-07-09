@@ -30,13 +30,12 @@ import net.time4j.SI;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.TimeLine;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.expert.SignPolicy;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.SignPolicy;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -51,12 +50,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import static net.time4j.PlainDate.DAY_OF_MONTH;
-import static net.time4j.PlainDate.DAY_OF_WEEK;
-import static net.time4j.PlainDate.DAY_OF_YEAR;
-import static net.time4j.PlainDate.MONTH_AS_NUMBER;
-import static net.time4j.PlainDate.YEAR;
-import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
+import static net.time4j.PlainDate.*;
 import static net.time4j.format.Attributes.PROTECTED_CHARACTERS;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
@@ -917,13 +911,6 @@ public final class MomentInterval
             '/',
             Moment.axis()
         ).parse(text);
-
-    }
-
-    @Override
-    TimeLine<Moment> getTimeLine() {
-
-        return Moment.axis();
 
     }
 

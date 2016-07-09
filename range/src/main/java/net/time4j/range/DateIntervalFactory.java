@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateIntervalFactory.java) is part of project Time4J.
  *
@@ -27,6 +27,7 @@ import net.time4j.Weekmodel;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ParseLog;
 
 import java.text.ParseException;
@@ -132,6 +133,13 @@ final class DateIntervalFactory
     public boolean isCalendrical() {
 
         return true;
+
+    }
+
+    @Override
+    public TimeLine<PlainDate> getTimeLine() {
+
+        return PlainDate.axis();
 
     }
 

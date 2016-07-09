@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockIntervalFactory.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.PlainTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ParseLog;
 
 import java.text.ParseException;
@@ -103,6 +104,13 @@ final class ClockIntervalFactory
     public boolean isCalendrical() {
 
         return false;
+
+    }
+
+    @Override
+    public TimeLine<PlainTime> getTimeLine() {
+
+        return PlainTime.axis();
 
     }
 

@@ -24,7 +24,6 @@ package net.time4j.range;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainTime;
-import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
@@ -521,13 +520,6 @@ public final class ClockInterval
         } else {
             return result;
         }
-
-    }
-
-    @Override
-    TimeLine<PlainTime> getTimeLine() {
-
-        return PlainTime.axis();
 
     }
 
