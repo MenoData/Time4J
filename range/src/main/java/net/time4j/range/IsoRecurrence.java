@@ -100,7 +100,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   start       denotes the start of first interval (inclusive)
      * @param   duration    represents the duration of every repeating interval
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     /*[deutsch]
      * <p>Erzeugt eine Sequenz von wiederkehrenden Intervallen mit der angegebenen Dauer. </p>
@@ -109,7 +109,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   start       denotes the start of first interval (inclusive)
      * @param   duration    represents the duration of every repeating interval
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     public static IsoRecurrence<DateInterval> of(
         int count,
@@ -134,7 +134,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   duration    represents the negative duration of every repeating interval
      * @param   end         denotes the end of first interval (inclusive)
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     /*[deutsch]
      * <p>Erzeugt eine Sequenz von wiederkehrenden r&uuml;ckw&auml;rts laufenden
@@ -144,7 +144,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   duration    represents the negative duration of every repeating interval
      * @param   end         denotes the end of first interval (inclusive)
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     public static IsoRecurrence<DateInterval> of(
         int count,
@@ -170,7 +170,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   start       denotes the start of first interval (inclusive)
      * @param   end         denotes the end of first interval (inclusive)
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
      */
     /*[deutsch]
      * <p>Erzeugt eine Sequenz von wiederkehrenden Intervallen mit der Dauer des ersten Intervalls
@@ -180,7 +180,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * @param   start       denotes the start of first interval (inclusive)
      * @param   end         denotes the end of first interval (inclusive)
      * @return  sequence of recurrent date intervals
-     * @throws  IllegalArgumentException if the count or the duration are not positive
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
      */
     public static IsoRecurrence<DateInterval> of(
         int count,
