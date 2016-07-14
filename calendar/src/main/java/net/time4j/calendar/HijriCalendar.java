@@ -94,9 +94,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <p>Examples of usage: </p>
  *
  * <pre>
+ *     // parse a Hijri-string and convert to a gregorian date
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
@@ -105,6 +106,34 @@ import java.util.concurrent.ConcurrentHashMap;
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
  *     PlainDate date = hijri.transform(PlainDate.class);
  *     System.out.println(date); // 2015-07-16
+ *
+ *     // determine actual Hijri date (two methods)
+ *     HijriCalendar today = // conversion valid at noon (not in the evening when next islamic day starts)
+ *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
+ *     HijriCalendar todayExact = // taking into account the specific start of day for Hijri calendar
+ *       SystemClock.inLocalView().now(
+ *         HijriCalendar.family(),
+ *         HijriCalendar.VARIANT_UMALQURA,
+ *         StartOfDay.EVENING // simple approximation =&gt; 18:00
+ *       ).toDate();
+ * </pre>
+ *
+ * <p>Note that the supported range of this class is limited compared with the gregorian counter-example. Users
+ * can apply following code to determine the exact variant-dependent range: </p>
+ *
+ * <pre>
+ *     CalendarSystem<HijriCalendar> calsys =
+ *       HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
+ *     long min = calsys.getMinimumSinceUTC(); // -32556
+ *     long max = calsys.getMaximumSinceUTC(); // 38671
+ *
+ *     // same minimum and maximum displayed as Hijri calendar dates
+ *     HijriCalendar minHijri = calsys.transform(min); // AH-1300-01-01[islamic-umalqura]
+ *     HijriCalendar maxHijri = calsys.transform(max); // AH-1500-12-30[islamic-umalqura]
+ *
+ *     // same minimum and maximum displayed as gregorian dates
+ *     PlainDate minGregorian = PlainDate.of(min, EpochDays.UTC); // 1882-11-12
+ *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
  * @author  Meno Hochschild
@@ -141,17 +170,47 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <p>Anwendungsbeispiele: </p>
  *
  * <pre>
+ *     // Hijri-Text interpretieren und in ein gregorianisches Datum umwandeln
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
- *       .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
+ *       .with(Attributes.PIVOT_YEAR, 1500); // abgebildet auf den Bereich 1400-1499
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
  *     PlainDate date = hijri.transform(PlainDate.class);
  *     System.out.println(date); // 2015-07-16
+ *
+ *     // aktuelles Hijri-Datum bestimmen (zwei Methoden)
+ *     HijriCalendar today = // Konversion mittags g&uuml;ltig (nicht abends, wenn der n&auml;chste Tag beginnt)
+ *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
+ *     HijriCalendar todayExact = // ber&uuml;cksichtigt den spezifischen Start des islamischen Tags
+ *       SystemClock.inLocalView().now(
+ *         HijriCalendar.family(),
+ *         HijriCalendar.VARIANT_UMALQURA,
+ *         StartOfDay.EVENING // einfache N&auml;herung =&gt; 18:00
+ *       ).toDate();
+ * </pre>
+ *
+ * <p>Hinweis: Der unterst&uuml;tze variantenabh&auml;ngige Wertbereich dieser Klasse ist verglichen mit
+ * dem gregorianischen Standardfall begrenzt. Anwender k&ouml;nnen folgenden Code nutzen, um den genauen
+ * Wertbereich zu bestimmen: </p>
+ *
+ * <pre>
+ *     CalendarSystem<HijriCalendar> calsys =
+ *       HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
+ *     long min = calsys.getMinimumSinceUTC(); // -32556
+ *     long max = calsys.getMaximumSinceUTC(); // 38671
+ *
+ *     // gleiches Minimum und Maximum als islamisches Kalendardatum
+ *     HijriCalendar minHijri = calsys.transform(min); // AH-1300-01-01[islamic-umalqura]
+ *     HijriCalendar maxHijri = calsys.transform(max); // AH-1500-12-30[islamic-umalqura]
+ *
+ *     // gleiches Minimum und Maximum als gregorianisches Kalenderdatum
+ *     PlainDate minGregorian = PlainDate.of(min, EpochDays.UTC); // 1882-11-12
+ *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
  * @author  Meno Hochschild
