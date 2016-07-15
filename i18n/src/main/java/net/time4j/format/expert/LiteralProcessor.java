@@ -194,7 +194,7 @@ final class LiteralProcessor
     ) {
 
         int offset = status.getPosition();
-        boolean error = false;
+        boolean error;
         char c = '\u0000';
         char literal = this.single;
 
@@ -220,20 +220,16 @@ final class LiteralProcessor
                 );
             }
 
-            boolean caseInsensitive = (
-                quickPath
-                    ? this.caseInsensitive
-                    : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+            error = ((c != literal) && (c != alternative));
 
-            if (caseInsensitive) {
-                if (
-                    !charEqualsIgnoreCase(c, literal)
-                    && !charEqualsIgnoreCase(c, alternative)
-                ) {
-                    error = true;
+            if (error) {
+                boolean caseInsensitive = (
+                    quickPath
+                        ? this.caseInsensitive
+                        : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+                if (caseInsensitive && (charEqualsIgnoreCase(c, literal) || charEqualsIgnoreCase(c, alternative))) {
+                    error = false;
                 }
-            } else {
-                error = ((c != literal) && (c != alternative));
             }
         }
 
