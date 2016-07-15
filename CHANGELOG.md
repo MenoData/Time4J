@@ -6,6 +6,7 @@
 
 ### Changed
 - New leap second at end of year 2016 [#517]
+- Make fractional second parser more tolerant [#519]
 
 ## [v4.17] published on 2016-06-20
 ### Added
