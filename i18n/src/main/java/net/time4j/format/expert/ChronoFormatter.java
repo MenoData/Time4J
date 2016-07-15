@@ -3484,15 +3484,15 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * {@code maxDigits} then the sequence of digits will be
          * truncated. In the special case of {@code minDigits == 0}
          * and if the sequence to be formatted has no digits then the
-         * diecimal separator char will be left out. </li>
+         * decimal separator char will be left out. </li>
          *
          * <li>PARSE =&gt; At most {@code maxDigits} chars will be
          * interpreted as digits. If there are less than {@code minDigits}
-         * then the text input will be invalid. Note: If there is just a
-         * lax mode then the parser will always assume {@code minDigits == 0}
-         * and {@code maxDigits = 9} unless a fixed width was implicitly
-         * specified by setting {@code minDigits == maxDigits} and without
-         * decimal separator char (then <i>adjacent digit parsing</i>). </li>
+         * then the text input will be invalid but only in strict mode. Note:
+         * If there is just a lax mode then the parser will always assume
+         * {@code minDigits == 0} and {@code maxDigits = 9} unless a fixed
+         * width was implicitly specified by setting {@code minDigits == maxDigits}
+         * and without decimal separator char (then <i>adjacent digit parsing</i>). </li>
          * </ol>
          *
          * <p>Example: </p>
@@ -3560,9 +3560,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          *
          * <li>PARSE =&gt; Es werden bis zu {@code maxDigits} Zeichen als
          * Ziffern interpretiert. Gibt es aber weniger als {@code minDigits}
-         * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen. Zu
-         * beachten: Ist nur ein laxer Parse-Modus angegeben, dann wird
-         * unabh&auml;ngig von den hier angegebenen Argumenten stets
+         * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen, aber nur
+         * im strikten Modus. Zu beachten: Ist nur ein laxer Parse-Modus angegeben,
+         * dann wird unabh&auml;ngig von den hier angegebenen Argumenten stets
          * {@code minDigits == 0} und {@code maxDigits == 9} angenommen,
          * es sei denn, es wurde implizit eine feste Breite mittels
          * {@code minDigits == maxDigits} und ohne Dezimaltrennzeichen

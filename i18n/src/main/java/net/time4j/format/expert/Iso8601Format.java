@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Iso8601Format.java) is part of project Time4J.
  *
@@ -66,6 +66,12 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
 public class Iso8601Format {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final char ISO_DECIMAL_SEPARATOR = (
+        Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
+            ? '.'
+            : ',' // Empfehlung des ISO-Standards
+    );
 
     private static final NonZeroCondition NON_ZERO_SECOND =
         new NonZeroCondition(PlainTime.SECOND_OF_MINUTE);
@@ -451,7 +457,12 @@ public class Iso8601Format {
 
         builder.addFixedInteger(SECOND_OF_MINUTE, 2);
         builder.startOptionalSection(NON_ZERO_FRACTION);
-        builder.addFraction(NANO_OF_SECOND, 0, 9, true);
+        if (ISO_DECIMAL_SEPARATOR == ',') {
+            builder.addLiteral(',', '.');
+        } else {
+            builder.addLiteral('.', ',');
+        }
+        builder.addFraction(NANO_OF_SECOND, 0, 9, false);
         builder.endSection();
         builder.endSection();
         builder.endSection();
@@ -481,10 +492,7 @@ public class Iso8601Format {
         @Override
         public boolean test(ChronoDisplay context) {
 
-            return (
-                context.contains(this.element)
-                && (context.get(this.element).intValue() != 0)
-            );
+            return (context.getInt(this.element) > 0);
 
         }
 

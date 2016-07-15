@@ -282,7 +282,7 @@ final class FractionProcessor
         int minEndPos = current + effectiveMin;
         int maxEndPos = Math.min(current + effectiveMax, len);
 
-        if (minEndPos > len) {
+        if ((minEndPos > len) && leniency.isStrict()) {
             status.setError(
                 status.getPosition(),
                 "Expected at least " + effectiveMin + " digits.");
@@ -302,7 +302,7 @@ final class FractionProcessor
             if ((digit >= 0) && (digit <= 9)) {
                 total = total * 10 + digit;
                 current++;
-            } else if (current < minEndPos) {
+            } else if ((current < minEndPos) && leniency.isStrict()) {
                 status.setError(
                     status.getPosition(),
                     "Expected at least " + effectiveMin + " digits.");
