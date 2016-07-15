@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DayPeriodTest.class,
         DefaultValueTest.class,
         DuplicateElementTest.class,
+        FractionTest.class,
         Iso8601FormatTest.class,
         MiscellaneousTest.class,
         MomentPatternTest.class,
@@ -21,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OrdinalTest.class,
         ParsingTextOverflowTest.class,
         SkipUnknownTest.class,
+        ThreetenFormatTest.class,
         WhitespaceTest.class
     }
 )
