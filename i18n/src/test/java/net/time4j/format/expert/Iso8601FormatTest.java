@@ -330,7 +330,7 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET
                 .withTimezone(ZonalOffset.ofTotalSeconds(7200)).format(
-                    PlainDate.of(2012, 6, 30)
+                PlainDate.of(2012, 6, 30)
                     .at(PlainTime.of(23, 59, 59))
                     .atUTC()
                     .plus(1, SI.SECONDS)),
@@ -356,9 +356,9 @@ public class Iso8601FormatTest {
                 .withTimezone(ZonalOffset.ofTotalSeconds(-3600 * 5 - 30 * 60))
                 .format(
                     PlainDate.of(2012, 6, 30)
-                    .at(PlainTime.of(23, 59, 59))
-                    .atUTC()
-                    .plus(1, SI.SECONDS)),
+                        .at(PlainTime.of(23, 59, 59))
+                        .atUTC()
+                        .plus(1, SI.SECONDS)),
             is("2012-06-30T18:29:60-05:30"));
     }
 
@@ -383,6 +383,11 @@ public class Iso8601FormatTest {
                         .at(PlainTime.of(23, 59, 59))
                         .atUTC()
                         .plus(1, SI.SECONDS));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseExtendedDateTimeOffsetMissing() throws ParseException {
+        Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse("2012-06-30T18:29:42");
     }
 
     @Test

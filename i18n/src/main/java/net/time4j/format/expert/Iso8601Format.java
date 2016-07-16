@@ -390,7 +390,8 @@ public class Iso8601Format {
             momentFormat(DisplayMode.SHORT, extended)
         );
 
-        return builder.build().withTimezone(ZonalOffset.UTC).with(Leniency.STRICT);
+        // here timezone offset is needed for changing Moment to ZonalDateTime when printing
+        return builder.build().with(Leniency.STRICT).withTimezone(ZonalOffset.UTC);
 
     }
 
@@ -406,12 +407,13 @@ public class Iso8601Format {
         builder.addLiteral('T');
         addWallTime(builder, extended);
 
+        // not optional, offset must be present during parsing
         builder.addTimezoneOffset(
             mode,
             extended,
             Collections.singletonList("Z"));
 
-        return builder.build().withTimezone(ZonalOffset.UTC);
+        return builder.build();
 
     }
 
