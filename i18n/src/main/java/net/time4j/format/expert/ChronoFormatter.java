@@ -757,7 +757,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private Set<ElementPosition> print(
+    // also directly called by CustomizedProcessor
+    Set<ElementPosition> print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,

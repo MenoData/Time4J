@@ -21,6 +21,8 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.Moment;
+import net.time4j.ZonalDateTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -52,6 +54,7 @@ final class CustomizedProcessor<V>
     private final ChronoElement<V> element;
     private final ChronoPrinter<V> printer;
     private final ChronoParser<V> parser;
+    private final boolean passThroughZDT;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -81,6 +84,8 @@ final class CustomizedProcessor<V>
         this.printer = printer;
         this.parser = parser;
 
+        this.passThroughZDT = ((printer instanceof ChronoFormatter) && (element.getType() == Moment.class));
+
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -93,6 +98,13 @@ final class CustomizedProcessor<V>
         Set<ElementPosition> positions, // optional
         boolean quickPath
     ) throws IOException {
+
+        // special optimization avoiding double conversion from Moment to ZonalDateTime
+        if (this.passThroughZDT && (formattable instanceof ZonalDateTime) && (positions == null)) {
+            ChronoFormatter<?> cf = (ChronoFormatter<?>) this.printer;
+            cf.print(formattable, buffer, attributes, false);
+            return;
+        }
 
         V value = formattable.get(this.element);
         StringBuilder collector = new StringBuilder();

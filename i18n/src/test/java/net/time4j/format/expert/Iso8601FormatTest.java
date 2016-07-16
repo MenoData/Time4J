@@ -386,6 +386,11 @@ public class Iso8601FormatTest {
                         .plus(1, SI.SECONDS));
     }
 
+    @Test(expected=ParseException.class)
+    public void parseExtendedDateTimeOffsetMissing() throws ParseException {
+        Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse("2012-06-30T18:29:42");
+    }
+
     @Test
     public void printExtendedDateTime() {
         assertThat(
