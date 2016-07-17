@@ -3,6 +3,7 @@
 - Add localized display names for `ChronoElement` [#515]
 - Support for annual dates [#514]
 - Improved documentation of HijriCalendar [#518]
+- Iso8601Format....WALL_TIME now understands T17:45 [#521]
 
 ### Changed
 - New leap second at end of year 2016 [#517]
