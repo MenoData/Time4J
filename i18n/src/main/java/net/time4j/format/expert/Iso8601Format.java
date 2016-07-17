@@ -361,6 +361,7 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainTime> builder =
             ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
+        builder.skipUnknown(c -> c == 'T', 1);
         addWallTime(builder, extended);
         return builder.build().with(Leniency.STRICT);
 
