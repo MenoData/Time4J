@@ -159,6 +159,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.BASIC_WALL_TIME.parse("235928"),
             is(PlainTime.of(23, 59, 28)));
+        assertThat(
+            Iso8601Format.BASIC_WALL_TIME.parse("T235928"),
+            is(PlainTime.of(23, 59, 28)));
     }
 
     @Test
@@ -173,6 +176,9 @@ public class Iso8601FormatTest {
     public void parseBasicTimeHHMMSSffffff() throws ParseException {
         assertThat(
             Iso8601Format.BASIC_WALL_TIME.parse("235928,123456"),
+            is(PlainTime.of(23, 59, 28, 123456000)));
+        assertThat(
+            Iso8601Format.BASIC_WALL_TIME.parse("T235928,123456"),
             is(PlainTime.of(23, 59, 28, 123456000)));
     }
 
@@ -189,6 +195,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("24:00"),
             is(PlainTime.midnightAtEndOfDay()));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T24:00"),
+            is(PlainTime.midnightAtEndOfDay()));
     }
 
     @Test
@@ -203,6 +212,9 @@ public class Iso8601FormatTest {
     public void parseExtendedTimeHH() throws ParseException {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23"),
+            is(PlainTime.of(23)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23"),
             is(PlainTime.of(23)));
     }
 
@@ -219,6 +231,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59"),
             is(PlainTime.of(23, 59)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59"),
+            is(PlainTime.of(23, 59)));
     }
 
     @Test
@@ -233,6 +248,9 @@ public class Iso8601FormatTest {
     public void parseExtendedTimeHHMMSS() throws ParseException {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28"),
+            is(PlainTime.of(23, 59, 28)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28"),
             is(PlainTime.of(23, 59, 28)));
     }
 
@@ -249,6 +267,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28,12"),
             is(PlainTime.of(23, 59, 28, 120000000)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28,12"),
+            is(PlainTime.of(23, 59, 28, 120000000)));
     }
 
     @Test
@@ -263,6 +284,9 @@ public class Iso8601FormatTest {
     public void parseExtendedTimeHHMMSSfff() throws ParseException {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28,123"),
+            is(PlainTime.of(23, 59, 28, 123000000)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28,123"),
             is(PlainTime.of(23, 59, 28, 123000000)));
     }
 
@@ -279,6 +303,9 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28,123456"),
             is(PlainTime.of(23, 59, 28, 123456000)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28,123456"),
+            is(PlainTime.of(23, 59, 28, 123456000)));
     }
 
     @Test
@@ -293,12 +320,18 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28,123456789"),
             is(PlainTime.of(23, 59, 28, 123456789)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28,123456789"),
+            is(PlainTime.of(23, 59, 28, 123456789)));
     }
 
     @Test
     public void parseExtendedTimeWithDecimalPoint() throws ParseException {
         assertThat(
             Iso8601Format.EXTENDED_WALL_TIME.parse("23:59:28.123456789"),
+            is(PlainTime.of(23, 59, 28, 123456789)));
+        assertThat(
+            Iso8601Format.EXTENDED_WALL_TIME.parse("T23:59:28.123456789"),
             is(PlainTime.of(23, 59, 28, 123456789)));
     }
 

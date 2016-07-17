@@ -79,6 +79,8 @@ public class Iso8601Format {
         new NonZeroCondition(PlainTime.NANO_OF_SECOND);
     private static final ChronoCondition<ChronoDisplay> SECOND_PART =
         NON_ZERO_SECOND.or(NON_ZERO_FRACTION);
+    private static final ChronoCondition<Character> T_CONDITION =
+        new TCondition();
 
     /**
      * <p>Defines the <i>basic</i> ISO-8601-format with year, month and day
@@ -361,6 +363,7 @@ public class Iso8601Format {
 
         ChronoFormatter.Builder<PlainTime> builder =
             ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
+        builder.skipUnknown(T_CONDITION, 1);
         addWallTime(builder, extended);
         return builder.build().with(Leniency.STRICT);
 
@@ -509,6 +512,20 @@ public class Iso8601Format {
                     );
                 }
             };
+
+        }
+
+    }
+
+    private static class TCondition
+        implements ChronoCondition<Character> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean test(Character c) {
+
+            return (c == 'T');
 
         }
 
