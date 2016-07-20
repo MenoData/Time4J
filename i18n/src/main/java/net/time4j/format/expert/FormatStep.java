@@ -21,7 +21,6 @@
 
 package net.time4j.format.expert;
 
-import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
@@ -144,7 +143,7 @@ final class FormatStep {
             return;
         }
 
-        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(null, attributes));
+        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(attributes));
 
         if (
             (this.padLeft == 0)
@@ -262,7 +261,7 @@ final class FormatStep {
         boolean quickPath
     ) {
 
-        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(null, attributes));
+        AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(attributes));
 
         if (
             (this.padLeft == 0)
@@ -406,14 +405,23 @@ final class FormatStep {
      */
     FormatStep quickPath(ChronoFormatter<?> formatter) {
 
-        AttributeQuery attributes = this.getQuery(formatter, null);
+        AttributeSet as = formatter.getAttributes0();
+
+        if (this.sectionalAttrs != null) {
+            Attributes attrs =
+                new Attributes.Builder()
+                    .setAll(as.getAttributes())
+                    .setAll(this.sectionalAttrs.getAttributes())
+                    .build();
+            as = as.withAttributes(attrs);
+        }
 
         return new FormatStep(
-            this.processor.quickPath(attributes, this.reserved),
+            this.processor.quickPath(formatter, as, this.reserved),
             this.level,
             this.section,
             this.sectionalAttrs,
-            attributes,
+            as,
             this.reserved,
             this.padLeft,
             this.padRight,
@@ -661,44 +669,13 @@ final class FormatStep {
 
     }
 
-    private AttributeQuery getQuery(
-        final ChronoFormatter<?> formatter,
-        final AttributeQuery attributes
-    ) {
+    private AttributeQuery getQuery(AttributeQuery attributes) {
 
         if (this.sectionalAttrs == null) {
-            return ((formatter == null) ? attributes : formatter.getAttributes()); // Optimierung
+            return attributes; // Optimierung
         }
 
-        return new AttributeQuery() {
-            @Override
-            public boolean contains(AttributeKey<?> key) {
-                return this.getQuery(key).contains(key);
-            }
-
-            @Override
-            public <A> A get(AttributeKey<A> key) {
-                return this.getQuery(key).get(key);
-            }
-
-            @Override
-            public <A> A get(
-                AttributeKey<A> key,
-                A defaultValue
-            ) {
-                return this.getQuery(key).get(key, defaultValue);
-            }
-
-            private AttributeQuery getQuery(AttributeKey<?> key) {
-                AttributeQuery current = FormatStep.this.sectionalAttrs;
-
-                if ((current == null) || !current.contains(key)) {
-                    current = ((attributes == null) ? formatter.getAttributes() : attributes);
-                }
-
-                return current;
-            }
-        };
+        return new MergedAttributes(this.sectionalAttrs, attributes);
 
     }
 

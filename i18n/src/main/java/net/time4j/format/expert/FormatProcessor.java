@@ -114,11 +114,13 @@ interface FormatProcessor<V> {
      * abfragen, liefern einfach sich selbst zur&uuml;ck (this-pointer). Diese Methode wird nur nach dem
      * <i>build</i> des Formatierers oder bei Attribut&auml;nderungen als finaler Schritt aufgerufen. </p>
      *
+     * @param   formatter       formatter holding global attributes
      * @param   attributes      control attributes including sectional attributes
      * @param   reserved        count of reserved characters (only relevant for numerical processors)
      * @return  copy of this processor maybe modified
      */
     FormatProcessor<V> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     );

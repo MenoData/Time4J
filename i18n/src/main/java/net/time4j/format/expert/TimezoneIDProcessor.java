@@ -214,6 +214,7 @@ enum TimezoneIDProcessor
 
     @Override
     public FormatProcessor<TZID> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

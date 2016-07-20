@@ -266,6 +266,7 @@ final class TextProcessor<V>
 
     @Override
     public FormatProcessor<V> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

@@ -452,6 +452,7 @@ final class LocalizedGMTProcessor
 
     @Override
     public FormatProcessor<TZID> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

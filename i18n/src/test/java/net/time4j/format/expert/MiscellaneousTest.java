@@ -8,8 +8,11 @@ import net.time4j.SI;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
@@ -236,7 +239,6 @@ public class MiscellaneousTest {
         String text = "2014-10-21T15:10:00+02:00";
         cf.parse(text, plog);
         ChronoEntity<?> e1 = plog.getRawValues();
-        e1.with(PlainTimestamp.axis().element(), null);
         ChronoEntity<?> e2 = cf.parseRaw(text);
         assertThat(e1.equals(e2), is(true));
     }
@@ -774,6 +776,48 @@ public class MiscellaneousTest {
         } catch (ParseException pe) {
             assertThat(pe.getMessage(), is("Cannot parse: \"2012-07-01T09:00+0900\" (expected: [ ], found: [T])"));
         }
+    }
+
+    @Test
+    public void embeddedFormatWithHistory() throws ParseException {
+        ChronoFormatter<PlainDate> embedded =
+            ChronoFormatter.ofDatePattern("d. MMMM yyyy", PatternType.CLDR, Locale.GERMANY);
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+                .addCustomized(PlainDate.COMPONENT, embedded)
+                .build()
+                .with(ChronoHistory.ofFirstGregorianReform())
+                .with(Locale.ENGLISH)
+                .withDefault(ChronoHistory.ofFirstGregorianReform().era(), HistoricEra.AD);
+        assertThat(f.format(PlainDate.of(1582, 10, 14)), is("4. October 1582"));
+        assertThat(f.parse("4. October 1582"), is(PlainDate.of(1582, 10, 14)));
+    }
+
+    @Test
+    public void embeddedWithDefaults() throws ParseException {
+        ChronoFormatter<PlainDate> embedded =
+            ChronoFormatter.ofDatePattern("[uuuu-]MM-dd", PatternType.CLDR, Locale.ROOT);
+        ChronoFormatter<PlainTimestamp> f =
+            ChronoFormatter.setUp(PlainTimestamp.axis(), Locale.ROOT)
+                .addCustomized(
+                    PlainDate.COMPONENT,
+                    new ChronoPrinter<PlainDate>() {
+                        @Override
+                        public <R> R print(
+                            PlainDate formattable,
+                            Appendable buffer,
+                            AttributeQuery attributes,
+                            ChronoFunction<ChronoDisplay, R> query
+                        ) throws IOException {
+                            return null;
+                        }
+                    },
+                    embedded)
+                .build()
+                .withDefault(PlainDate.YEAR, 2016)
+                .withDefault(PlainTime.ISO_HOUR, 0);
+        PlainTimestamp tsp = f.parse("02-29");
+        assertThat(tsp, is(PlainTimestamp.of(2016, 2, 29, 0, 0)));
     }
 
     private static ChronoFormatter<PlainDate> getQuarterDateFormatter() {

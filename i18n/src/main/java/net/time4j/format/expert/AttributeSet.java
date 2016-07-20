@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AttributeSet.java) is part of project Time4J.
  *
@@ -405,6 +405,25 @@ final class AttributeSet
         newInternals.put(PLUS_SIGN.name(), plus);
         newInternals.put(MINUS_SIGN.name(), minus);
         return new AttributeSet(builder.build(), locale, this.level, this.section, this.printCondition, newInternals);
+
+    }
+
+    // used to create merged global attributes for a new formatter
+    static AttributeSet merge(
+        AttributeSet outer,
+        AttributeSet inner
+    ) {
+
+        Map<String, Object> internalsNew = new HashMap<String, Object>();
+        internalsNew.putAll(inner.internals);
+        internalsNew.putAll(outer.internals);
+        Attributes attributesNew =
+            new Attributes.Builder()
+                .setAll(inner.attributes)
+                .setAll(outer.attributes)
+                .build();
+        AttributeSet as = new AttributeSet(attributesNew, Locale.ROOT, 0, 0, null, internalsNew);
+        return as.withLocale(outer.locale);
 
     }
 

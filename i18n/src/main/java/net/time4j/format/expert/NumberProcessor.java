@@ -619,6 +619,7 @@ final class NumberProcessor<V>
 
     @Override
     public FormatProcessor<V> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

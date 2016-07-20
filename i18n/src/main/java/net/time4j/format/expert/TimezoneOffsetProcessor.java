@@ -508,6 +508,7 @@ final class TimezoneOffsetProcessor
 
     @Override
     public FormatProcessor<TZID> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

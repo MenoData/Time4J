@@ -404,6 +404,7 @@ final class DecimalProcessor
 
     @Override
     public FormatProcessor<BigDecimal> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {
