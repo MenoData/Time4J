@@ -400,6 +400,7 @@ final class TimezoneNameProcessor
 
     @Override
     public FormatProcessor<TZID> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

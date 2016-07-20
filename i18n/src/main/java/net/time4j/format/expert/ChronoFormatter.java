@@ -334,20 +334,18 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     // Aufruf durch withDefault
     private ChronoFormatter(
         ChronoFormatter<T> formatter,
-        ChronoElement<?> element,
-        Object replacement
+        Map<ChronoElement<?>, Object> defaultMap
     ) {
         super();
-
-        if (element == null) {
-            throw new NullPointerException("Missing element.");
-        }
 
         Chronology<?> overrideCalendar = (
             (formatter.overrideHandler == null)
             ? null
             : formatter.overrideHandler.getCalendarOverride());
-        checkElement(formatter.chronology, overrideCalendar, element);
+
+        for (ChronoElement<?> element : defaultMap.keySet()) {
+            checkElement(formatter.chronology, overrideCalendar, element);
+        }
 
         this.chronology = formatter.chronology;
         this.overrideHandler = formatter.overrideHandler;
@@ -359,21 +357,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.needsExtensions = formatter.needsExtensions;
         this.countOfElements = formatter.countOfElements;
 
-        Map<ChronoElement<?>, Object> map =
-            new NonAmbivalentMap(formatter.defaults);
+        Map<ChronoElement<?>, Object> map = new NonAmbivalentMap(formatter.defaults);
+        boolean ix = formatter.indexable;
 
-        if (replacement == null) {
-            map.remove(element);
-            this.indexable = formatter.indexable;
-        } else {
-            map.put(element, replacement);
-            this.indexable = formatter.indexable && ParsedValues.isIndexed(element);
+        for (ChronoElement<?> element : defaultMap.keySet()) {
+            Object replacement = defaultMap.get(element);
+            if (replacement == null) {
+                map.remove(element);
+            } else {
+                map.put(element, replacement);
+                ix = ix && ParsedValues.isIndexed(element);
+            }
         }
 
         this.defaults = Collections.unmodifiableMap(map);
-
-        List<FormatStep> copy = new ArrayList<>(formatter.steps);
-        this.steps = Collections.unmodifiableList(copy);
+        this.indexable = ix;
+        this.steps = this.freeze(formatter.steps);
 
     }
 
@@ -770,6 +769,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         Set<ElementPosition> positions = null;
+        boolean quickPath = (attributes == this.globalAttributes);
 
         if (withPositions) {
             positions = new LinkedHashSet<>(this.steps.size());
@@ -781,7 +781,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             while (index < len) {
                 FormatStep step = this.steps.get(index);
-                step.print(formattable, buffer, attributes, positions, (attributes == this.globalAttributes));
+                step.print(formattable, buffer, attributes, positions, quickPath);
 
                 if (step.isNewOrBlockStarted()) {
                     index = step.skipTrailingOrBlocks();
@@ -932,10 +932,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         AttributeQuery attrs = attributes;
         Leniency leniency = this.leniency;
+        boolean quickPath = true;
 
         if (attributes != this.globalAttributes) {
-            attrs = new AttributeWrapper(attributes, this.globalAttributes);
+            attrs = new MergedAttributes(attributes, this.globalAttributes);
             leniency = attrs.get(Attributes.LENIENCY, Leniency.SMART);
+            quickPath = false;
         }
 
         T result;
@@ -944,7 +946,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (this.overrideHandler != null) {
             List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
             ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
-            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, leniency, true);
+            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath);
             parsed = status.getRawValues0();
 
             if (status.isError()) {
@@ -982,7 +984,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (preparser != null) {
                 Object intermediate =
-                    parse(this, preparser, preparser.getExtensions(), text, status, attrs, leniency, true);
+                    parse(this, preparser, preparser.getExtensions(), text, status, attrs, leniency, true, quickPath);
                 parsed = status.getRawValues0();
 
                 if (status.isError()) {
@@ -992,8 +994,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     updateSelf(parsed, self, intermediate);
                 }
             } else {
-                return parse(
-                    this, this.chronology, this.chronology.getExtensions(), text, status, attrs, leniency, false);
+                List<ChronoExtension> ext = this.chronology.getExtensions();
+                return parse(this, this.chronology, ext, text, status, attrs, leniency, false, quickPath);
             }
         }
 
@@ -1070,16 +1072,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             return new ParsedValues(0, false);
         }
 
-        ParseLog status = new ParseLog(offset);
-        AttributeQuery attributes = this.globalAttributes;
-
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
+        ParseLog status = new ParseLog(offset);
         ParsedValues parsed = null;
 
         try {
-            parsed =
-                this.parseElements(
-                    text, status, attributes, (attributes == this.globalAttributes), this.countOfElements);
+            parsed = this.parseElements(text, status, this.globalAttributes, true, this.countOfElements);
             parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
@@ -1571,7 +1569,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         V value
     ) {
 
-        return new ChronoFormatter<>(this, element, value);
+        if (element == null) {
+            throw new NullPointerException("Missing element.");
+        }
+
+        Map<ChronoElement<?>, Object> defaultMap = new HashMap<>();
+        defaultMap.put(element, value);
+        return new ChronoFormatter<>(this, defaultMap);
 
     }
 
@@ -1641,7 +1645,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Supplier<V> supplier
     ) {
 
-        return new ChronoFormatter<>(this, element, supplier);
+        if (element == null) {
+            throw new NullPointerException("Missing element.");
+        }
+
+        Map<ChronoElement<?>, Object> defaultMap = new HashMap<>();
+        defaultMap.put(element, supplier);
+        return new ChronoFormatter<>(this, defaultMap);
 
     }
 
@@ -1809,6 +1819,28 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             .setAll(attributes)
             .build();
         return new ChronoFormatter<>(this, newAttrs);
+
+    }
+
+    // used by CustomizedProcessor
+    ChronoFormatter<T> with(
+        Map<ChronoElement<?>, Object> outerDefaults,
+        AttributeSet outerAttrs
+    ) {
+
+        AttributeSet merged = AttributeSet.merge(outerAttrs, this.globalAttributes);
+
+        return new ChronoFormatter<>(
+            new ChronoFormatter<>(this, outerDefaults),
+            merged,
+            merged.get(HistoricAttribute.CALENDAR_HISTORY, null));
+
+    }
+
+    // used by CustomizedProcessor
+    Map<ChronoElement<?>, Object> getDefaults() {
+
+        return this.defaults;
 
     }
 
@@ -2539,6 +2571,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
+    // internal view used by FormatStep
+    AttributeSet getAttributes0() {
+
+        return this.globalAttributes;
+
+    }
+
     private String format0(ChronoDisplay display) {
 
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
@@ -2597,7 +2636,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         ParseLog status,
         AttributeQuery attributes,
         Leniency leniency,
-        boolean preparsing
+        boolean preparsing,
+        boolean quickPath
     ) {
 
         if (status.getPosition() >= text.length()) {
@@ -2607,7 +2647,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         ParsedValues parsed = null;
-        boolean quickPath = (attributes == cf.globalAttributes);
 
         try {
             parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
@@ -2806,7 +2845,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             }
 
             for (ChronoElement<?> e : parsed.getRegisteredElements()) {
-                Object value = parsed.get(e);
+                if ((e == PlainTime.SECOND_OF_MINUTE) && (parsed.getInt(PlainTime.SECOND_OF_MINUTE) == 60)) {
+                    continue;
+                }
+
                 ChronoDisplay test = result;
 
                 if (date != null) {
@@ -2817,24 +2859,38 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     }
                 }
 
-                if (
-                    test.contains(e)
-                    && !test.get(e).equals(value)
-                ) {
-                    StringBuilder reason = new StringBuilder(256);
-                    reason.append("Conflict found: ");
-                    reason.append("Text {");
-                    reason.append(text.toString());
-                    reason.append("} with element ");
-                    reason.append(e.name());
-                    reason.append(" {");
-                    reason.append(value);
-                    reason.append("}, but parsed entity ");
-                    reason.append("has element value {");
-                    reason.append(test.get(e));
-                    reason.append("}.");
-                    status.setError(text.length(), reason.toString());
-                    return null;
+                if (test.contains(e)) {
+                    Object value = null;
+                    boolean ok = true;
+
+                    if (e.getType() == Integer.class) {
+                        ChronoElement<Integer> ie = cast(e);
+                        int v = parsed.getInt(ie);
+                        if (test.getInt(ie) != v) {
+                            value = Integer.valueOf(v);
+                            ok = false;
+                        }
+                    } else {
+                        value = parsed.get(e);
+                        ok = test.get(e).equals(value);
+                    }
+
+                    if (!ok) {
+                        StringBuilder reason = new StringBuilder(256);
+                        reason.append("Conflict found: ");
+                        reason.append("Text {");
+                        reason.append(text.toString());
+                        reason.append("} with element ");
+                        reason.append(e.name());
+                        reason.append(" {");
+                        reason.append(value);
+                        reason.append("}, but parsed entity ");
+                        reason.append("has element value {");
+                        reason.append(test.get(e));
+                        reason.append("}.");
+                        status.setError(text.length(), reason.toString());
+                        return null;
+                    }
                 }
             }
         }
@@ -4673,17 +4729,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a customized format element for given chronological
          * element. </p>
          *
-         * @param   <V> generic type of element values
-         * @param   element         chronological element
-         * @param   formatter       customized formatter object as delegate
-         * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology or its preparser
-         * @see     Chronology#isSupported(ChronoElement)
-         */
-        /*[deutsch]
-         * <p>Definiert ein benutzerdefiniertes Format f&uuml;r das angegebene
-         * chronologische Element. </p>
+         * <p>Equivalent to {@code addCustomized(element, formatter, formatter)}. </p>
          *
          * @param   <V> generic type of element values
          * @param   element         chronological element
@@ -4692,6 +4738,22 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * @throws  IllegalArgumentException if given element is not
          *          supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addCustomized(ChronoElement, ChronoPrinter, ChronoParser)
+         */
+        /*[deutsch]
+         * <p>Definiert ein benutzerdefiniertes Format f&uuml;r das angegebene
+         * chronologische Element. </p>
+         *
+         * <p>&Auml;quivalent zu {@code addCustomized(element, formatter, formatter)}. </p>
+         *
+         * @param   <V> generic type of element values
+         * @param   element         chronological element
+         * @param   formatter       customized formatter object as delegate
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not
+         *          supported by chronology or its preparser
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addCustomized(ChronoElement, ChronoPrinter, ChronoParser)
          */
         public <V extends ChronoEntity<V>> Builder<T> addCustomized(
             ChronoElement<V> element,
@@ -4706,6 +4768,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a customized format element for given chronological
          * element. </p>
          *
+         * <p>If the printer or the parser are of type {@code ChronoFormatter}
+         * then the outer format attributes and default values will be overtaken
+         * by the embedded printer or parser. </p>
+         *
          * @param   <V> generic type of element values
          * @param   element         chronological element
          * @param   printer         customized printer
@@ -4718,6 +4784,11 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /*[deutsch]
          * <p>Definiert ein benutzerdefiniertes Format f&uuml;r das angegebene
          * chronologische Element. </p>
+         *
+         * <p>Wenn der angegebene {@code ChronoPrinter} oder {@code ChronoParser vom Typ
+         * {@code ChronoFormatter} sind, dann werden die &auml;&szlig;eren Formatattribute
+         * und Standardwerte vom &auml;&szlig;eren Formatierer zum eingebetteten Formatierer
+         * transferiert. </p>
          *
          * @param   <V> generic type of element values
          * @param   element         chronological element
@@ -6310,55 +6381,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             return FIELD_MAP.get(element.name());
 
-        }
-
-    }
-
-    private static class AttributeWrapper
-        implements AttributeQuery {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final AttributeQuery attributes;
-        private final AttributeSet globals;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        AttributeWrapper(
-            AttributeQuery attributes,
-            AttributeSet globals
-        ) {
-            super();
-
-            this.attributes = attributes;
-            this.globals = globals;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public boolean contains(AttributeKey<?> key) {
-            return this.attributes.contains(key) || this.globals.contains(key);
-        }
-
-        @Override
-        public <A> A get(AttributeKey<A> key) {
-            if (this.attributes.contains(key)) {
-                return this.attributes.get(key);
-            }
-            return this.globals.get(key);
-        }
-
-        @Override
-        public <A> A get(
-            AttributeKey<A> key,
-            A defaultValue
-        ) {
-            if (this.attributes.contains(key)) {
-                return this.attributes.get(key);
-            }
-            return this.globals.get(key, defaultValue);
         }
 
     }

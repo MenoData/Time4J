@@ -413,6 +413,7 @@ final class OrdinalProcessor
 
     @Override
     public FormatProcessor<Integer> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {

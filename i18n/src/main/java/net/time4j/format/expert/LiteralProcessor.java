@@ -366,6 +366,7 @@ final class LiteralProcessor
 
     @Override
     public FormatProcessor<Void> quickPath(
+        ChronoFormatter<?> formatter,
         AttributeQuery attributes,
         int reserved
     ) {
