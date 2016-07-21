@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionResolver.java) is part of project Time4J.
  *
@@ -146,7 +146,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.getConflictTransition(date, time);
+        ZonalTransition conflict = history.findConflictTransition(date, time);
 
         if (conflict != null) {
             if (conflict.isGap()) {
@@ -210,7 +210,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.getConflictTransition(date, time);
+        ZonalTransition conflict = history.findConflictTransition(date, time);
 
         if (conflict != null) {
             int offset = conflict.getTotalOffset();

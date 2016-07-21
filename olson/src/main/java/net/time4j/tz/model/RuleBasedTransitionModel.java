@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -194,7 +194,7 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getStartTransition(UnixTime ut) {
+    public ZonalTransition findStartTransition(UnixTime ut) {
 
         long preModel = this.initial.getPosixTime();
 
@@ -237,14 +237,14 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
+    public ZonalTransition findNextTransition(UnixTime ut) {
 
         return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
 
     }
 
     @Override
-    public ZonalTransition getConflictTransition(
+    public ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
@@ -438,14 +438,12 @@ final class RuleBasedTransitionModel
     ) {
 
         long preModel = initial.getPosixTime();
-        long start = startInclusive;
-        long end = endExclusive;
 
-        if (start > end) {
+        if (startInclusive > endExclusive) {
             throw new IllegalArgumentException("Start after end.");
         } else if (
-            (end <= preModel)
-            || (start == end)
+            (endExclusive <= preModel)
+            || (startInclusive == endExclusive)
         ) {
             return Collections.emptyList();
         }
@@ -463,7 +461,7 @@ final class RuleBasedTransitionModel
             int shift = getShift(rule, stdOffset, previous.getSavings());
 
             if (i == 0) {
-                year = getYear(rule, Math.max(start, preModel) + shift);
+                year = getYear(rule, Math.max(startInclusive, preModel) + shift);
             } else if ((i % n) == 0) {
                 year++;
             }
@@ -471,10 +469,10 @@ final class RuleBasedTransitionModel
             long tt = getTransitionTime(rule, year, shift);
             i++;
 
-            if (tt >= end) {
+            if (tt >= endExclusive) {
                 break;
             } else if (
-                (tt >= start)
+                (tt >= startInclusive)
                 && (tt > preModel)
             ) {
                 transitions.add(

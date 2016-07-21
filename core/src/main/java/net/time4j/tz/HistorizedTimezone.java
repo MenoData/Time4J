@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistorizedTimezone.java) is part of project Time4J.
  *
@@ -117,7 +117,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getOffset(UnixTime ut) {
 
-        ZonalTransition t = this.history.getStartTransition(ut);
+        ZonalTransition t = this.history.findStartTransition(ut);
 
         return (
             (t == null)
@@ -130,7 +130,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getStandardOffset(UnixTime ut) {
 
-        ZonalTransition t = this.history.getStartTransition(ut);
+        ZonalTransition t = this.history.findStartTransition(ut);
 
         return (
             (t == null)
@@ -143,7 +143,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getDaylightSavingOffset(UnixTime ut){
 
-        ZonalTransition t = this.history.getStartTransition(ut);
+        ZonalTransition t = this.history.findStartTransition(ut);
 
         return (
             (t == null)
@@ -165,8 +165,7 @@ final class HistorizedTimezone
         if (offsets.size() == 1) {
             return offsets.get(0);
         } else {
-            ZonalTransition conflict =
-                this.history.getConflictTransition(localDate, localTime);
+            ZonalTransition conflict = this.history.findConflictTransition(localDate, localTime);
             return ZonalOffset.ofTotalSeconds(conflict.getTotalOffset());
         }
 
@@ -179,7 +178,7 @@ final class HistorizedTimezone
     ) {
 
         ZonalTransition t =
-            this.history.getConflictTransition(localDate, localTime);
+            this.history.findConflictTransition(localDate, localTime);
         return ((t != null) && t.isGap());
 
     }
@@ -187,7 +186,7 @@ final class HistorizedTimezone
     @Override
     public boolean isDaylightSaving(UnixTime ut) {
 
-        ZonalTransition t = this.history.getStartTransition(ut);
+        ZonalTransition t = this.history.findStartTransition(ut);
         return ((t != null) && t.isDaylightSaving());
 
     }

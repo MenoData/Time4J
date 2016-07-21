@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CompositeTransitionModel.java) is part of project Time4J.
  *
@@ -91,24 +91,24 @@ final class CompositeTransitionModel
     }
 
     @Override
-    public ZonalTransition getStartTransition(UnixTime ut) {
+    public ZonalTransition findStartTransition(UnixTime ut) {
 
         if (ut.getPosixTime() < this.last.getPosixTime()) {
-            return this.arrayModel.getStartTransition(ut);
+            return this.arrayModel.findStartTransition(ut);
         } else {
-            ZonalTransition result = this.ruleModel.getStartTransition(ut);
+            ZonalTransition result = this.ruleModel.findStartTransition(ut);
             return ((result == null) ? this.last : result);
         }
 
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
+    public ZonalTransition findNextTransition(UnixTime ut) {
 
-        ZonalTransition result = this.arrayModel.getNextTransition(ut);
+        ZonalTransition result = this.arrayModel.findNextTransition(ut);
 
         if (result == null) {
-            result = this.ruleModel.getNextTransition(ut);
+            result = this.ruleModel.findNextTransition(ut);
         }
 
         return result;
@@ -116,12 +116,12 @@ final class CompositeTransitionModel
     }
 
     @Override
-    public ZonalTransition getConflictTransition(
+    public ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return this.arrayModel.getConflictTransition(
+        return this.arrayModel.findConflictTransition(
             localDate,
             localTime,
             this.ruleModel);

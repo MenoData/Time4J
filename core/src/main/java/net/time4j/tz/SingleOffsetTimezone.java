@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SingleOffsetTimezone.java) is part of project Time4J.
  *
@@ -201,6 +201,37 @@ final class SingleOffsetTimezone
     // optional
     @Override
     public ZonalTransition getNextTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findStartTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findNextTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findPreviousTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
 
         return null;
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EmptyTransitionModel.java) is part of project Time4J.
  *
@@ -91,6 +91,37 @@ final class EmptyTransitionModel
 
     @Override
     public ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findStartTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findNextTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findPreviousTransition(UnixTime ut) {
+
+        return null;
+
+    }
+
+    @Override
+    public ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
