@@ -12,7 +12,7 @@
 - Make fractional second parser more tolerant [#519]
 
 ### Deprecated
-- 3 methods in TransitionHistory deprecated [#523]
+- 3 methods in TransitionHistory deprecated and replaced by new better named methods [#523]
 
 ## [v4.17] published on 2016-06-20
 ### Added
