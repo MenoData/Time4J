@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ArrayTransitionModel.java) is part of project Time4J.
  *
@@ -112,7 +112,7 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition getStartTransition(UnixTime ut) {
+    public ZonalTransition findStartTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
@@ -124,7 +124,7 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
+    public ZonalTransition findNextTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
@@ -136,12 +136,12 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition getConflictTransition(
+    public ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return this.getConflictTransition(localDate, localTime, null);
+        return this.findConflictTransition(localDate, localTime, null);
 
     }
 
@@ -225,7 +225,7 @@ final class ArrayTransitionModel
     }
 
     /**
-     * <p>Wird von {@link #getConflictTransition(GregorianDate, WallTime)}
+     * <p>Wird von {@link #findConflictTransition(GregorianDate, WallTime)}
      * aufgerufen. </p>
      *
      * @param   localDate   local date in timezone
@@ -234,7 +234,7 @@ final class ArrayTransitionModel
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      */
-    ZonalTransition getConflictTransition(
+    ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime,
         RuleBasedTransitionModel ruleModel // from CompositeTransitionModel

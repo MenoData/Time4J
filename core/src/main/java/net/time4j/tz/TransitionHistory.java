@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -82,6 +82,7 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is before first defined transition
+     * @deprecated  Use the equivalent {@link #findStartTransition(UnixTime)}
      */
     /*[deutsch]
      * <p>Ermittelt den letzten &Uuml;bergang, der die zur angegebenen
@@ -90,7 +91,9 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is before first defined transition
+     * @deprecated  Use the equivalent {@link #findStartTransition(UnixTime)}
      */
+    @Deprecated
     ZonalTransition getStartTransition(UnixTime ut);
 
     /**
@@ -99,6 +102,7 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is after any defined transition
+     * @deprecated  Use the equivalent {@link #findNextTransition(UnixTime)}
      */
     /*[deutsch]
      * <p>Ermittelt den n&auml;chsten &Uuml;bergang nach der angegebenen
@@ -107,7 +111,9 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is after any defined transition
+     * @deprecated  Use the equivalent {@link #findNextTransition(UnixTime)}
      */
+    @Deprecated
     ZonalTransition getNextTransition(UnixTime ut);
 
     /**
@@ -125,6 +131,7 @@ public interface TransitionHistory {
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      * @see     #getValidOffsets(GregorianDate,WallTime)
+     * @deprecated  Use the equivalent {@link #findConflictTransition(GregorianDate, WallTime)}
      */
     /*[deutsch]
      * <p>Bestimmt den passenden &Uuml;bergang, wenn die angegebene lokale
@@ -142,7 +149,9 @@ public interface TransitionHistory {
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      * @see     #getValidOffsets(GregorianDate,WallTime)
+     * @deprecated  Use the equivalent {@link #findConflictTransition(GregorianDate, WallTime)}
      */
+    @Deprecated
     ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
@@ -167,7 +176,7 @@ public interface TransitionHistory {
      * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts in full seconds which fits the
      *          given local time
-     * @see     #getConflictTransition(GregorianDate,WallTime)
+     * @see     #findConflictTransition(GregorianDate,WallTime)
      */
     /*[deutsch]
      * <p>Bestimmt die zur angegebenen lokalen Zeit passenden
@@ -190,7 +199,7 @@ public interface TransitionHistory {
      * @param   localTime   local wall time in timezone
      * @return  unmodifiable list of shifts in full seconds which fits the
      *          given local time
-     * @see     #getConflictTransition(GregorianDate,WallTime)
+     * @see     #findConflictTransition(GregorianDate,WallTime)
      */
     List<ZonalOffset> getValidOffsets(
         GregorianDate localDate,
@@ -287,5 +296,107 @@ public interface TransitionHistory {
      * @throws  IOException     in any case of I/O-errors
      */
     void dump(Appendable buffer) throws IOException;
+
+    /**
+     * <p>Queries the last transition which defines the offset
+     * for given global timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is before first defined transition
+     */
+    /*[deutsch]
+     * <p>Ermittelt den letzten &Uuml;bergang, der die zur angegebenen
+     * Referenzzeit zugeh&ouml;rige Verschiebung definiert. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is before first defined transition
+     */
+    default ZonalTransition findStartTransition(UnixTime ut) {
+        return this.getStartTransition(ut);
+    }
+
+    /**
+     * <p>Queries the next transition after given global timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is after any defined transition
+     */
+    /*[deutsch]
+     * <p>Ermittelt den n&auml;chsten &Uuml;bergang nach der angegebenen
+     * Referenzzeit. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is after any defined transition
+     */
+    default ZonalTransition findNextTransition(UnixTime ut) {
+        return this.getNextTransition(ut);
+    }
+
+    /**
+     * <p>Queries the previous transition which defines the offset
+     * for given preceding global timestamp. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is not after any defined transition
+     */
+    /*[deutsch]
+     * <p>Ermittelt den vorherigen &Uuml;bergang, der die unmittelbar vor der angegebenen
+     * Referenzzeit zugeh&ouml;rige Verschiebung definiert. </p>
+     *
+     * @param   ut      unix reference time
+     * @return  {@code ZonalTransition} or {@code null} if given reference time is not after any defined transition
+     */
+    default ZonalTransition findPreviousTransition(final UnixTime ut) {
+        return this.findStartTransition(
+            new UnixTime() {
+                @Override
+                public long getPosixTime() {
+                    return ((ut.getNanosecond() == 0) ? (ut.getPosixTime() - 1) : ut.getPosixTime());
+                }
+                @Override
+                public int getNanosecond() {
+                    return ((ut.getNanosecond() == 0) ? 999_999_999 : (ut.getNanosecond() - 1));
+                }
+            }
+        );
+    }
+
+    /**
+     * <p>Returns the conflict transition where given local timestamp
+     * falls either in a gap or in an overlap on the local timeline. </p>
+     *
+     * <p>Note that only the expression {@code localDate.getYear()} is used
+     * to determine the daylight saving rules to be applied in calculation.
+     * This is particularly important if there is a wall time of 24:00. Here
+     * only the date before merging to next day matters, not the date of the
+     * whole timestamp. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  conflict transition on the local time axis for gaps or overlaps else {@code null}
+     * @see     #getValidOffsets(GregorianDate,WallTime)
+     */
+    /*[deutsch]
+     * <p>Bestimmt den passenden &Uuml;bergang, wenn die angegebene lokale
+     * Zeit in eine L&uuml;cke oder eine &Uuml;berlappung auf dem lokalen
+     * Zeitstrahl f&auml;llt. </p>
+     *
+     * <p>Zu beachten: Nur der Ausdruck {@code localDate.getYear()} wird
+     * in der Ermittlung der passenden DST-Regeln benutzt. Das ist insbesondere
+     * von Bedeutung, wenn die Uhrzeit 24:00 vorliegt. Hier z&auml;hlt nur
+     * das Jahr des angegebenen Datums, nicht das des Zeitstempels, der
+     * wegen der Uhrzeit evtl. im Folgejahr liegt. </p>
+     *
+     * @param   localDate   local date in timezone
+     * @param   localTime   local wall time in timezone
+     * @return  conflict transition on the local time axis for gaps or overlaps else {@code null}
+     * @see     #getValidOffsets(GregorianDate,WallTime)
+     */
+    default ZonalTransition findConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
+        return this.getConflictTransition(localDate, localTime);
+    }
 
 }

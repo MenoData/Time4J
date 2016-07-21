@@ -1695,7 +1695,7 @@ public final class PlainDate
         }
 
         ZonalTransition conflict =
-            history.getConflictTransition(this, PlainTime.MIN);
+            history.findConflictTransition(this, PlainTime.MIN);
 
         if (
             (conflict != null)

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -193,7 +193,7 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getStartTransition(UnixTime ut) {
+    public ZonalTransition findStartTransition(UnixTime ut) {
 
         long preModel = this.initial.getPosixTime();
 
@@ -236,14 +236,14 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
+    public ZonalTransition findNextTransition(UnixTime ut) {
 
         return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
 
     }
 
     @Override
-    public ZonalTransition getConflictTransition(
+    public ZonalTransition findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {

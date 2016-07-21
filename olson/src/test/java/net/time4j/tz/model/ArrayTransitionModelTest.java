@@ -63,63 +63,91 @@ public class ArrayTransitionModelTest {
     @Test
     public void getStartTransition1() {
         assertThat(
-            MODEL.getStartTransition(new UT(-1)),
+            MODEL.findStartTransition(new UT(-1)),
             nullValue());
     }
 
     @Test
     public void getStartTransition2() {
         assertThat(
-            MODEL.getStartTransition(new UT(0)),
+            MODEL.findStartTransition(new UT(0)),
             is(FIRST));
     }
 
     @Test
     public void getStartTransition3() {
         assertThat(
-            MODEL.getStartTransition(new UT(365 * 86400L - 1)),
+            MODEL.findStartTransition(new UT(365 * 86400L - 1)),
             is(FIRST));
     }
 
     @Test
     public void getStartTransition4() {
         assertThat(
-            MODEL.getStartTransition(new UT(365 * 86400L)),
+            MODEL.findStartTransition(new UT(365 * 86400L)),
             is(SECOND));
     }
 
     @Test
     public void getNextTransition1() {
         assertThat(
-            MODEL.getNextTransition(new UT(-1)),
+            MODEL.findNextTransition(new UT(-1)),
             is(FIRST));
     }
 
     @Test
     public void getNextTransition2() {
         assertThat(
-            MODEL.getNextTransition(new UT(0)),
+            MODEL.findNextTransition(new UT(0)),
             is(SECOND));
     }
 
     @Test
     public void getNextTransition3() {
         assertThat(
-            MODEL.getNextTransition(new UT(FOURTH.getPosixTime() - 1)),
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime() - 1)),
             is(FOURTH));
     }
 
     @Test
     public void getNextTransition4() {
         assertThat(
-            MODEL.getNextTransition(new UT(FOURTH.getPosixTime())),
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime())),
             nullValue());
+    }
+
+    @Test
+    public void getPreviousTransition1() {
+        assertThat(
+            MODEL.findPreviousTransition(new UT(0)),
+            nullValue());
+    }
+
+    @Test
+    public void getPreviousTransition2() {
+        assertThat(
+            MODEL.findPreviousTransition(new UT(1)),
+            is(FIRST));
+    }
+
+    @Test
+    public void getPreviousTransition3() {
+        assertThat(
+            MODEL.findPreviousTransition(new UT(365 * 86400L)),
+            is(FIRST));
+    }
+
+    @Test
+    public void getPreviousTransition4() {
+        assertThat(
+            MODEL.findPreviousTransition(new UT(365 * 86400L + 1)),
+            is(SECOND));
     }
 
     @Test
     public void getGapTransition1() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 29, 59)),
             nullValue());
@@ -128,7 +156,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getGapTransition2() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 30)),
             is(FIRST));
@@ -137,7 +165,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getGapTransition3() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(FIRST));
@@ -146,7 +174,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getGapTransition4() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
@@ -155,7 +183,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getOverlapTransition1() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(0, 59, 59)),
             nullValue());
@@ -164,7 +192,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getOverlapTransition2() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 0)),
             is(SECOND));
@@ -173,7 +201,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getOverlapTransition3() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(SECOND));
@@ -182,7 +210,7 @@ public class ArrayTransitionModelTest {
     @Test
     public void getOverlapTransition4() {
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
@@ -200,7 +228,7 @@ public class ArrayTransitionModelTest {
         tsp = tsp.minus(delta, ClockUnit.SECONDS);
 
         assertThat(
-            MODEL.getConflictTransition(
+            MODEL.findConflictTransition(
                 tsp.getCalendarDate(),
                 tsp.getWallTime()),
             is(THIRD));
@@ -316,7 +344,7 @@ public class ArrayTransitionModelTest {
     public void getTransitions2() {
         assertThat(
             MODEL.getTransitions(new UT(1), new UT(2 * 365 * 86400L)),
-            is(Arrays.asList(SECOND)));
+            is(Collections.singletonList(SECOND)));
     }
 
     @Test
