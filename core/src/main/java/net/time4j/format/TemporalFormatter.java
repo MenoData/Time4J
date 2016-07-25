@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalFormatter.java) is part of project Time4J.
  *
@@ -105,7 +105,7 @@ public interface TemporalFormatter<T> {
      * @param   text        text to be parsed
      * @return  parse result
      * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws ParseException if the text is not parseable
+     * @throws  ParseException if the text is not parseable
      * @since   3.0
      */
     /*[deutsch]

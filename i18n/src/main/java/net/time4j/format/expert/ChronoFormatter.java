@@ -787,8 +787,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
@@ -799,8 +798,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of
-     *          text or even behind
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      */
     public T parse(
         CharSequence text,

@@ -493,4 +493,31 @@ public class Iso8601FormatTest {
             is(PlainDate.of(2012, 5, 1)));
     }
 
+    @Test
+    public void methodParseDate() throws ParseException {
+        assertThat(
+            Iso8601Format.parseDate("20160101"),
+            is(PlainDate.of(2016, 1, 1)));
+        assertThat(
+            Iso8601Format.parseDate("2016001"),
+            is(PlainDate.of(2016, 1, 1)));
+        assertThat(
+            Iso8601Format.parseDate("2015W535"),
+            is(PlainDate.of(2016, 1, 1)));
+        assertThat(
+            Iso8601Format.parseDate("2016-01-01"),
+            is(PlainDate.of(2016, 1, 1)));
+        assertThat(
+            Iso8601Format.parseDate("2016-001"),
+            is(PlainDate.of(2016, 1, 1)));
+        assertThat(
+            Iso8601Format.parseDate("2015-W53-5"),
+            is(PlainDate.of(2016, 1, 1)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void methodParseDateTooShort() throws ParseException {
+        Iso8601Format.parseDate("123456");
+    }
+
 }
