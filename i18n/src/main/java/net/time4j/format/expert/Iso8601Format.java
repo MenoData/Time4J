@@ -155,20 +155,28 @@ public class Iso8601Format {
     /**
      * <p>Similar to {@link #BASIC_CALENDAR_DATE} but its parser can also
      * understand ordinal dates or week dates. </p>
+     *
+     * @since   3.22/4.18
      */
     /*[deutsch]
      * <p>&Auml;hnlich wie {@link #BASIC_CALENDAR_DATE}, aber der zugeh&ouml;rige
      * Textinterpretierer kann auch ein Ordinaldatum oder Wochendatum verstehen. </p>
+     *
+     * @since   3.22/4.18
      */
     public static final ChronoFormatter<PlainDate> BASIC_DATE;
 
     /**
      * <p>Similar to {@link #EXTENDED_CALENDAR_DATE} but its parser can also
      * understand ordinal dates or week dates. </p>
+     *
+     * @since   3.22/4.18
      */
     /*[deutsch]
      * <p>&Auml;hnlich wie {@link #EXTENDED_CALENDAR_DATE}, aber der zugeh&ouml;rige
      * Textinterpretierer kann auch ein Ordinaldatum oder Wochendatum verstehen. </p>
+     *
+     * @since   3.22/4.18
      */
     public static final ChronoFormatter<PlainDate> EXTENDED_DATE;
 
