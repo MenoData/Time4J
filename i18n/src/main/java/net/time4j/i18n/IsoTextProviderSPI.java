@@ -162,7 +162,19 @@ public final class IsoTextProviderSPI
         TextWidth tw
     ) {
 
-        return meridiems(locale, tw);
+        return meridiems(locale, tw, OutputContext.FORMAT);
+
+    }
+
+    @Override
+    public String[] meridiems(
+        String calendarType,
+        Locale locale,
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        return meridiems(locale, tw, oc);
 
     }
 
@@ -437,7 +449,8 @@ public final class IsoTextProviderSPI
 
     private static String[] meridiems(
         Locale locale,
-        TextWidth tw
+        TextWidth tw,
+        OutputContext oc
     ) throws MissingResourceException {
 
         ResourceBundle rb = getBundle(locale);
@@ -447,22 +460,25 @@ public final class IsoTextProviderSPI
                 tw = TextWidth.ABBREVIATED;
             }
 
-            String[] names = new String[2];
-            String amKey = meridiemKey("am", tw);
+            String amKey = meridiemKey("am", tw, oc);
+            String pmKey = meridiemKey("pm", tw, oc);
 
-            if (rb.containsKey(amKey)) {
+            if (rb.containsKey(amKey) && rb.containsKey(pmKey)) {
+                String[] names = new String[2];
                 names[0] = rb.getString(amKey);
-                String pmKey = meridiemKey("pm", tw);
-
-                if (rb.containsKey(pmKey)) {
-                    names[1] = rb.getString(pmKey);
-                    return names;
-                }
+                names[1] = rb.getString(pmKey);
+                return names;
             }
 
             // fallback
-            if (tw != TextWidth.ABBREVIATED) {
-                return meridiems(locale, TextWidth.ABBREVIATED);
+            if (oc == OutputContext.STANDALONE) {
+                if (tw == TextWidth.ABBREVIATED) {
+                    return meridiems(locale, tw, OutputContext.FORMAT);
+                } else {
+                    return meridiems(locale, TextWidth.ABBREVIATED, oc);
+                }
+            } else if (tw != TextWidth.ABBREVIATED) {
+                return meridiems(locale, TextWidth.ABBREVIATED, oc);
             }
         }
 
@@ -580,11 +596,14 @@ public final class IsoTextProviderSPI
 
     private static String meridiemKey(
         String meridiem,
-        TextWidth tw
+        TextWidth tw,
+        OutputContext oc
     ) {
 
         char c = tw.name().charAt(0);
-        c = Character.toLowerCase(c);
+        if (oc == OutputContext.FORMAT) {
+            c = Character.toLowerCase(c);
+        }
 
         return "P(" + String.valueOf(c) + ")_" + meridiem;
 

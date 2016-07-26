@@ -233,6 +233,18 @@ public final class GenericTextProviderSPI
     }
 
     @Override
+    public String[] meridiems(
+        String calendarType,
+        Locale locale,
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        return EMPTY_STRINGS;
+
+    }
+
+    @Override
     public ResourceBundle.Control getControl() {
 
         return CONTROL;

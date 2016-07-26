@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextProvider.java) is part of project Time4J.
  *
@@ -208,6 +208,8 @@ public interface TextProvider {
      * @param   locale          language of text output
      * @param   textWidth       text width
      * @return  unmodifiable sorted array of AM/PM-names
+     * @see     #meridiems(String, Locale, TextWidth, OutputContext)
+     * @deprecated  Will be removed in next major release!
      */
     /*[deutsch]
      * <p>Siehe {@link CalendarText#getMeridiems}. </p>
@@ -216,11 +218,38 @@ public interface TextProvider {
      * @param   locale          language of text output
      * @param   textWidth       text width
      * @return  unmodifiable sorted array of AM/PM-names
+     * @see     #meridiems(String, Locale, TextWidth, OutputContext)
+     * @deprecated  Will be removed in next major release!
      */
     String[] meridiems(
         String calendarType,
         Locale locale,
         TextWidth textWidth
+    );
+
+    /**
+     * <p>See {@link CalendarText#getMeridiems}. </p>
+     *
+     * @param   calendarType    calendar type
+     * @param   locale          language of text output
+     * @param   textWidth       text width
+     * @param   outputContext   output context
+     * @return  unmodifiable sorted array of AM/PM-names
+     */
+    /*[deutsch]
+     * <p>Siehe {@link CalendarText#getMeridiems}. </p>
+     *
+     * @param   calendarType    calendar type
+     * @param   locale          language of text output
+     * @param   textWidth       text width
+     * @param   outputContext   output context
+     * @return  unmodifiable sorted array of AM/PM-names
+     */
+    String[] meridiems(
+        String calendarType,
+        Locale locale,
+        TextWidth textWidth,
+        OutputContext outputContext
     );
 
     /**

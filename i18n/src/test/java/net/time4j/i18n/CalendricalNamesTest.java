@@ -357,10 +357,8 @@ public class CalendricalNamesTest {
         OutputContext outputContext = OutputContext.FORMAT;
         CalendarText instance =
            CalendarText.getInstance("iso8601", Locale.ENGLISH);
-        TextWidth textWidth = TextWidth.NARROW;
-        String result =
-            instance.getWeekdays(textWidth, outputContext)
-            .print(Weekday.FRIDAY);
+        TextWidth textWidth;
+        String result;
 
         textWidth = TextWidth.NARROW;
         result =
@@ -483,7 +481,6 @@ public class CalendricalNamesTest {
     public void parseCzechWithMultipleContextInStrictMode1() throws ParseException {
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.ofDatePattern("d. MMMM uuuu", PatternType.CLDR, new Locale("cs")).with(Leniency.STRICT);
-        PlainDate expected = PlainDate.of(2016, 1, 1);
         f.parse("1. leden 2016"); // standalone but parser expects embedded format mode (symbol M)
     }
 
@@ -491,7 +488,6 @@ public class CalendricalNamesTest {
     public void parseCzechWithMultipleContextInStrictMode2() throws ParseException {
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.ofDatePattern("d. LLLL uuuu", PatternType.CLDR, new Locale("cs")).with(Leniency.STRICT);
-        PlainDate expected = PlainDate.of(2016, 1, 1);
         f.parse("1. ledna 2016"); // embedded format but parser expects standalone mode (symbol L)
     }
 
@@ -528,22 +524,23 @@ public class CalendricalNamesTest {
     @Test
     public void printMeridiems() {
         TextWidth textWidth = TextWidth.WIDE;
-        CalendarText instance =
-           CalendarText.getInstance("iso8601", Locale.ENGLISH);
-        String result =
-            instance.getMeridiems(textWidth).print(Meridiem.PM);
-        assertThat(result, is("pm"));
+        CalendarText instance = CalendarText.getInstance("iso8601", Locale.ENGLISH);
+        assertThat(instance.getMeridiems(textWidth, OutputContext.FORMAT).print(Meridiem.PM), is("pm"));
+        assertThat(instance.getMeridiems(textWidth, OutputContext.STANDALONE).print(Meridiem.PM), is("PM"));
     }
 
     @Test
     public void parseMeridiems() {
         TextWidth textWidth = TextWidth.WIDE;
-        CalendarText instance =
-           CalendarText.getInstance("iso8601", Locale.ENGLISH);
-        Meridiem result =
-            instance.getMeridiems(textWidth).parse(
-                "PM", new ParsePosition(0), Meridiem.class);
-        assertThat(result, is(Meridiem.PM));
+        CalendarText instance = CalendarText.getInstance("iso8601", Locale.ENGLISH);
+        Meridiem result1 =
+            instance.getMeridiems(textWidth, OutputContext.FORMAT).parse(
+                "pm", new ParsePosition(0), Meridiem.class, Leniency.STRICT);
+        assertThat(result1, is(Meridiem.PM));
+        Meridiem result2 =
+            instance.getMeridiems(textWidth, OutputContext.STANDALONE).parse(
+                "PM", new ParsePosition(0), Meridiem.class, Leniency.STRICT);
+        assertThat(result2, is(Meridiem.PM));
     }
 
     @Test
@@ -616,12 +613,10 @@ public class CalendricalNamesTest {
         boolean partialCompare
     ) {
 
-        Attributes attrs =
-            new Attributes.Builder()
+        return new Attributes.Builder()
             .set(Attributes.PARSE_CASE_INSENSITIVE, caseInsensitive)
             .set(Attributes.PARSE_PARTIAL_COMPARE, partialCompare)
             .build();
-        return attrs;
 
     }
 

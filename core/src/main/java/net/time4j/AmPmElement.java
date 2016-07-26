@@ -188,7 +188,7 @@ enum AmPmElement
         OutputContext oc
     ) throws IOException, ChronoException {
 
-        buffer.append(this.accessor(language, tw).print(context.get(this)));
+        buffer.append(this.accessor(language, tw, oc).print(context.get(this)));
 
     }
 
@@ -202,7 +202,7 @@ enum AmPmElement
         Leniency leniency
     ) {
 
-        return this.accessor(language, tw).parse(text, status, this.getType(), leniency);
+        return this.accessor(language, tw, oc).parse(text, status, this.getType(), leniency);
 
     }
 
@@ -210,16 +210,18 @@ enum AmPmElement
 
         CalendarText cnames = CalendarText.getIsoInstance(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-        return cnames.getMeridiems(textWidth);
+        OutputContext outputContext = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+        return cnames.getMeridiems(textWidth, outputContext);
 
     }
 
     private TextAccessor accessor(
         Locale language,
-        TextWidth textWidth
+        TextWidth textWidth,
+        OutputContext outputContext
     ) {
 
-        return CalendarText.getIsoInstance(language).getMeridiems(textWidth);
+        return CalendarText.getIsoInstance(language).getMeridiems(textWidth, outputContext);
 
     }
 
