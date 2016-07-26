@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -218,8 +218,8 @@ public final class CalendarText {
     private final Map<TextWidth, Map<OutputContext, TextAccessor>> leapMonths;
     private final Map<TextWidth, Map<OutputContext, TextAccessor>> quarters;
     private final Map<TextWidth, Map<OutputContext, TextAccessor>> weekdays;
+    private final Map<TextWidth, Map<OutputContext, TextAccessor>> meridiems;
     private final Map<TextWidth, TextAccessor> eras;
-    private final Map<TextWidth, TextAccessor> meridiems;
 
     // Allgemeine Textformen spezifisch für eine Chronologie
     private final Map<String, String> textForms;
@@ -295,14 +295,19 @@ public final class CalendarText {
 
         this.eras = Collections.unmodifiableMap(et);
 
-        Map<TextWidth, TextAccessor> mt =
+        Map<TextWidth, Map<OutputContext, TextAccessor>> mt =
             new EnumMap<>(TextWidth.class);
         for (TextWidth tw : TextWidth.values()) {
-            mt.put(
-                tw,
-                new TextAccessor(
-                    p.meridiems(calendarType, locale, tw),
-                    locale));
+            Map<OutputContext, TextAccessor> mo =
+                new EnumMap<>(OutputContext.class);
+            for (OutputContext oc : OutputContext.values()) {
+                mo.put(
+                    oc,
+                    new TextAccessor(
+                        p.meridiems(calendarType, locale, tw, oc),
+                        locale));
+            }
+            mt.put(tw, mo);
         }
 
         this.meridiems = Collections.unmodifiableMap(mt);
@@ -681,7 +686,8 @@ public final class CalendarText {
      *
      * @param   textWidth       text width of displayed AM/PM name
      * @return  accessor for AM/PM names
-     * @see     net.time4j.Meridiem
+     * @see     #getMeridiems(TextWidth, OutputContext)
+     * @deprecated  Use {@code getMeridiems(textWidth, OutputContext.FORMAT)}
      */
     /*[deutsch]
      * <p>Liefert einen {@code Accessor} f&uuml;r alle
@@ -693,11 +699,46 @@ public final class CalendarText {
      *
      * @param   textWidth       text width of displayed AM/PM name
      * @return  accessor for AM/PM names
-     * @see     net.time4j.Meridiem
+     * @see     #getMeridiems(TextWidth, OutputContext)
+     * @deprecated  Use {@code getMeridiems(textWidth, OutputContext.FORMAT)}
      */
+    @Deprecated
     public TextAccessor getMeridiems(TextWidth textWidth) {
 
-        return this.meridiems.get(textWidth);
+        return this.getMeridiems(textWidth, OutputContext.FORMAT);
+
+    }
+
+    /**
+     * <p>Yields an {@code Accessor} for all am/pm-names. </p>
+     *
+     * <p>The underlying list of text forms is sorted in AM-PM-order.
+     * The order of element value enums must be the same. </p>
+     *
+     * @param   textWidth       text width of displayed AM/PM name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for AM/PM names
+     * @see     net.time4j.Meridiem
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * Tagesabschnittsnamen. </p>
+     *
+     * <p>Die Liste ist in AM/PM-Reihenfolge sortiert. Die Reihenfolge der
+     * Elementwert-Enums mu&szlig; mit der Reihenfolge der hier enthaltenen
+     * Textformen &uuml;bereinstimmen. </p>
+     *
+     * @param   textWidth       text width of displayed AM/PM name
+     * @param   outputContext   output context (stand-alone?)
+     * @return  accessor for AM/PM names
+     * @see     net.time4j.Meridiem
+     */
+    public TextAccessor getMeridiems(
+        TextWidth textWidth,
+        OutputContext outputContext
+    ) {
+
+        return this.meridiems.get(textWidth).get(outputContext);
 
     }
 
