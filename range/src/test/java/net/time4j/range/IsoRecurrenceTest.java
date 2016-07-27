@@ -206,11 +206,23 @@ public class IsoRecurrenceTest {
         IsoRecurrence<DateInterval> expected =
             IsoRecurrence.of(87, PlainDate.of(2016, 12, 1), PlainDate.of(2016, 12, 31));
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016336/2016366"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016336/366"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-336/2016-366"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-336/366"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/20161201/20161231"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/20161201/1231"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/2016-12-31"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/12-31"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/31"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016W484/2016W526"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016W484/W526"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-W48-4/2016-W52-6"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-W48-4/W52-6"), is(expected));
     }
 
     @Test(expected=ParseException.class)
@@ -323,6 +335,14 @@ public class IsoRecurrenceTest {
                 PlainTimestamp.of(2016, 7, 2, 16, 45, 0).plus(123, ClockUnit.MILLIS));
         assertThat(IsoRecurrence.parseTimestampIntervals("R87/20160701T101559/20160702T164500.123"), is(expected));
         assertThat(IsoRecurrence.parseTimestampIntervals("R87/2016-07-01T10:15:59/2016-07-02T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R87/2016-07-01T10:15:59/02T16:45:00.123"), is(expected));
+        expected =
+            IsoRecurrence.of(
+                2,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59),
+                PlainTimestamp.of(2016, 7, 1, 16, 45, 0).plus(123, ClockUnit.MILLIS));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/16:45:00.123"), is(expected));
     }
 
 }

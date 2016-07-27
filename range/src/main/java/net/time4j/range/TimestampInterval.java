@@ -73,14 +73,6 @@ public final class TimestampInterval
 
     private static final long serialVersionUID = -3965530927182499606L;
 
-    private static final ChronoFormatter<PlainTimestamp> EXT_O =
-        ordinalFormat(true);
-    private static final ChronoFormatter<PlainTimestamp> EXT_W =
-        weekdateFormat(true);
-    private static final ChronoFormatter<PlainTimestamp> BAS_O =
-        ordinalFormat(false);
-    private static final ChronoFormatter<PlainTimestamp> BAS_W =
-        weekdateFormat(false);
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
         new IntervalComparator<PlainTimestamp>(false, PlainTimestamp.axis());
 
@@ -766,68 +758,72 @@ public final class TimestampInterval
 
         // prescan for format analysis
 		int start = 0;
-		int n = Math.min(text.length(), 71);
+		int n = Math.min(text.length(), 107);
         boolean sameFormat = true;
-        int componentLength = 0;
+        int firstDate = 1; // loop starts one index position later
+        int secondDate = 0;
+        int timeLength = 0;
 
-        for (int i = 1; i < n; i++) {
-            if (text.charAt(i) == '/') {
-                if (text.charAt(0) == 'P') {
+        if (text.charAt(0) == 'P') {
+            for (int i = 1; i < n; i++) {
+                if (text.charAt(i) == '/') {
                     start = i + 1;
-                    componentLength = n - i - 1;
-                } else if (
-                    (i + 1 < n)
-                    && (text.charAt(i + 1) == 'P')
-                ) {
-                    componentLength = i;
-                } else {
-                    sameFormat = (2 * i + 1 == n);
-                    componentLength = i;
+                    break;
                 }
-                break;
             }
         }
 
         int literals = 0;
         boolean ordinalStyle = false;
         boolean weekStyle = false;
-        int timeLength = 0;
+        boolean secondComponent = false;
 
-        for (int i = start; i < n; i++) {
+        for (int i = start + 1; i < n; i++) {
             char c = text.charAt(i);
-            if (c == '/') {
-                break;
-            } else if (c == '-') {
-                literals++;
+            if (secondComponent) {
+                if (c == 'P') {
+                    secondComponent = false;
+                    break;
+                } else if ((c == 'T') || (timeLength > 0)) {
+                    timeLength++;
+                } else {
+                    secondDate++;
+                }
+            } else if (c == '/') {
+                secondComponent = true;
+                timeLength = 0;
             } else if ((c == 'T') || (timeLength > 0)) {
                 timeLength++;
+            } else if (c == '-') {
+                firstDate++;
+                literals++;
             } else if (c == 'W') {
+                firstDate++;
                 weekStyle = true;
+            } else {
+                firstDate++;
             }
         }
 
-        boolean extended = (literals > 0);
-
         if (!weekStyle) {
-            ordinalStyle = (
-                (literals == 1)
-                || (
-                    (literals == 0)
-                    && (componentLength - timeLength == 7)));
+            ordinalStyle = ((literals == 1) || ((literals == 0) && (firstDate == 7)));
+        }
+
+        boolean extended = (literals > 0);
+        boolean hasT = true;
+
+        if (secondComponent) {
+            if (timeLength == 0) { // no T in end component => no date part
+                hasT = false;
+                timeLength = secondDate;
+                secondDate = 0;
+            }
+            sameFormat = (firstDate == secondDate);
         }
 
         // start format
-        ChronoFormatter<PlainTimestamp> startFormat;
-
-        if (ordinalStyle) {
-            startFormat = (extended ? EXT_O : BAS_O);
-        } else if (weekStyle) {
-            startFormat = (extended ? EXT_W : BAS_W);
-        } else if (extended) {
-            startFormat = Iso8601Format.EXTENDED_DATE_TIME;
-        } else {
-            startFormat = Iso8601Format.BASIC_DATE_TIME;
-        }
+        ChronoFormatter<PlainTimestamp> startFormat =
+            extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME;
 
         // end format
         ChronoFormatter<PlainTimestamp> endFormat;
@@ -835,14 +831,7 @@ public final class TimestampInterval
         if (sameFormat) {
             endFormat = startFormat;
         } else {
-            boolean hasT = true;
-            if (n - 1 - componentLength < timeLength) {
-                timeLength--; // end component without date or T-symbol
-                hasT = false;
-            }
-            endFormat =
-                abbreviatedFormat(
-                    extended, weekStyle, ordinalStyle, timeLength, hasT);
+            endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle, timeLength, hasT);
         }
 
         // create interval
@@ -868,63 +857,6 @@ public final class TimestampInterval
     TimestampInterval getContext() {
 
         return this;
-
-    }
-
-    private static ChronoFormatter<PlainTimestamp>
-    ordinalFormat(boolean extended) {
-
-        ChronoFormatter.Builder<PlainTimestamp> builder =
-            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
-        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedInteger(DAY_OF_YEAR, 3).build();
-        builder.addLiteral('T');
-        builder.addCustomized(
-            PlainTime.COMPONENT,
-            extended
-                ? Iso8601Format.EXTENDED_WALL_TIME
-                : Iso8601Format.BASIC_WALL_TIME);
-
-        return builder.build();
-
-    }
-
-    private static ChronoFormatter<PlainTimestamp>
-    weekdateFormat(boolean extended) {
-
-        ChronoFormatter.Builder<PlainTimestamp> builder =
-            ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
-        builder.addInteger(
-                YEAR_OF_WEEKDATE,
-                4,
-                9,
-                SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addLiteral('W');
-        builder.addFixedInteger(Weekmodel.ISO.weekOfYear(), 2);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedNumerical(DAY_OF_WEEK, 1).build();
-        builder.addLiteral('T');
-        builder.addCustomized(
-            PlainTime.COMPONENT,
-            extended
-                ? Iso8601Format.EXTENDED_WALL_TIME
-                : Iso8601Format.BASIC_WALL_TIME);
-
-        return builder.build();
 
     }
 

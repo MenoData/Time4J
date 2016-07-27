@@ -27,14 +27,9 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
-import net.time4j.format.expert.PatternType;
 
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 import static net.time4j.CalendarUnit.*;
@@ -53,7 +48,7 @@ import static net.time4j.ClockUnit.*;
  * @author  Meno Hochschild
  * @since   3.22/4.18
  */
-public class IsoRecurrence<I extends IsoInterval<?, ?>>
+public class IsoRecurrence<I>
     implements Iterable<I> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -63,20 +58,6 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
     private static final int TYPE_START_END = 0;
     private static final int TYPE_START_DURATION = 1;
     private static final int TYPE_DURATION_END = 2;
-
-    private static final Map<String, ChronoFormatter<PlainDate>> DATE_FORMATTERS;
-
-    static {
-        String[] datePatterns = {"YYYY-'W'ww-E", "uuuu-DDD", "uuuu-MM-dd", "YYYY'W'wwE", "uuuuDDD", "uuuuMMdd"};
-        Map<String, ChronoFormatter<PlainDate>> map = new HashMap<String, ChronoFormatter<PlainDate>>();
-        //map.put()
-        for (String datePattern : datePatterns) {
-            map.put(
-                datePattern,
-                ChronoFormatter.ofDatePattern(datePattern, PatternType.CLDR, Locale.ROOT));
-        }
-        DATE_FORMATTERS = Collections.unmodifiableMap(map);
-    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -383,13 +364,6 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    @Override
-    public Iterator<I> iterator() {
-
-        throw new AbstractMethodError();
-
-    }
-
     /**
      * <p>Queries if the resulting interval stream describes a backwards running sequence. </p>
      *
@@ -469,20 +443,17 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
         IsoRecurrence<DateInterval> recurrence;
 
         if (parts[2].charAt(0) == 'P') {
-            String pattern = getDatePattern(parts[1]);
-            PlainDate start = DATE_FORMATTERS.get(pattern).parse(parts[1]);
+            PlainDate start = Iso8601Format.parseDate(parts[1]);
             Duration<? extends IsoDateUnit> duration = Duration.parseCalendarPeriod(parts[2]);
             recurrence = IsoRecurrence.of(count, start, duration);
         } else if (parts[1].charAt(0) == 'P') {
             Duration<? extends IsoDateUnit> duration = Duration.parseCalendarPeriod(parts[1]);
-            String pattern = getDatePattern(parts[2]);
-            PlainDate end = DATE_FORMATTERS.get(pattern).parse(parts[2]);
+            PlainDate end = Iso8601Format.parseDate(parts[2]);
             recurrence = IsoRecurrence.of(count, duration, end);
         } else {
-            String pattern = getDatePattern(parts[1]);
-            ChronoFormatter<PlainDate> f = DATE_FORMATTERS.get(pattern);
-            PlainDate start = f.parse(parts[1]);
-            PlainDate end = f.parse(parts[2]);
+            DateInterval interval = DateInterval.parseISO(iso.substring(getFirstSlash(iso) + 1));
+            PlainDate start = interval.getStart().getTemporal();
+            PlainDate end = interval.getEnd().getTemporal();
             recurrence = IsoRecurrence.of(count, start, end);
         }
 
@@ -534,20 +505,19 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
         IsoRecurrence<TimestampInterval> recurrence;
 
         if (parts[2].charAt(0) == 'P') {
-            String pattern = getDatePattern(parts[1]);
-            PlainTimestamp start = timestampFormatter(pattern).parse(parts[1]);
+            boolean extended = isExtendedFormat(parts[1]);
+            PlainTimestamp start = timestampFormatter(extended).parse(parts[1]);
             Duration<?> duration = Duration.parsePeriod(parts[2]);
             recurrence = IsoRecurrence.of(count, start, duration);
         } else if (parts[1].charAt(0) == 'P') {
             Duration<?> duration = Duration.parsePeriod(parts[1]);
-            String pattern = getDatePattern(parts[2]);
-            PlainTimestamp end = timestampFormatter(pattern).parse(parts[2]);
+            boolean extended = isExtendedFormat(parts[2]);
+            PlainTimestamp end = timestampFormatter(extended).parse(parts[2]);
             recurrence = IsoRecurrence.of(count, duration, end);
         } else {
-            String pattern = getDatePattern(parts[1]);
-            ChronoFormatter<PlainTimestamp> f = timestampFormatter(pattern);
-            PlainTimestamp start = f.parse(parts[1]);
-            PlainTimestamp end = f.parse(parts[2]);
+            TimestampInterval interval = TimestampInterval.parseISO(iso.substring(getFirstSlash(iso) + 1));
+            PlainTimestamp start = interval.getStart().getTemporal();
+            PlainTimestamp end = interval.getEnd().getTemporal();
             recurrence = IsoRecurrence.of(count, start, end);
         }
 
@@ -582,15 +552,22 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    int getType() {
+    @Override
+    public Iterator<I> iterator() {
 
-        return this.type;
+        throw new AbstractMethodError();
 
     }
 
     IsoRecurrence<I> copyWithCount(int count) {
 
         throw new AbstractMethodError();
+
+    }
+
+    int getType() {
+
+        return this.type;
 
     }
 
@@ -629,45 +606,36 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    private static String getDatePattern(String iso) {
-
-        int countOfHyphens = 0;
-        boolean weekbased = false;
+    private static boolean isExtendedFormat(String iso) {
 
         for (int i = 1, n = iso.length(); i < n; i++) {
             char c = iso.charAt(i);
             if (c == 'T') {
                 break;
             } else if (c == '-') {
-                countOfHyphens++;
-            } else if (c == 'W') {
-                weekbased = true;
+                return true;
             }
         }
 
-        if (countOfHyphens > 0) { // extended format
-            if (weekbased) {
-                return "YYYY-'W'ww-E";
-            } else if (countOfHyphens == 1) {
-                return "uuuu-DDD";
-            } else {
-                return "uuuu-MM-dd";
-            }
-        } else { // basic format
-            if (weekbased) {
-                return "YYYY'W'wwE";
-            } else if (iso.length() == 7) {
-                return "uuuuDDD";
-            } else {
-                return "uuuuMMdd";
-            }
-        }
+        return false;
 
     }
 
-    private static ChronoFormatter<PlainTimestamp> timestampFormatter(String datePattern) {
+    private static int getFirstSlash(String iso) {
 
-        return ((datePattern.indexOf('-') == -1) ? Iso8601Format.BASIC_DATE_TIME : Iso8601Format.EXTENDED_DATE_TIME);
+        for (int i = 0, n = iso.length(); i < n; i++) {
+            if (iso.charAt(i) == '/') {
+                return i;
+            }
+        }
+
+        return -1;
+
+    }
+
+    private static ChronoFormatter<PlainTimestamp> timestampFormatter(boolean extended) {
+
+        return (extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
 
     }
 

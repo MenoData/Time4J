@@ -636,8 +636,11 @@ public class Iso8601Format {
             ) {
                 int hyphens = 0;
                 int n = text.length();
+                int start = status.getPosition();
+                int len = n - start;
 
-                for (int i = 4; i < n; i++) {
+LOOP:
+                for (int i = start + 1; i < n; i++) {
                     switch (text.charAt(i)) {
                         case '-': // leading sign is ignored, see start index
                             hyphens++;
@@ -649,7 +652,9 @@ public class Iso8601Format {
                                 return DATE_PARSERS.get(BASIC_WEEK_DATE).parse(text, status);
                             }
                         case 'T':
-                            break;
+                        case '/':
+                            len = i - start;
+                            break LOOP;
                         default:
                             // continue
                     }
@@ -661,7 +666,7 @@ public class Iso8601Format {
                     } else {
                         return DATE_PARSERS.get(EXTENDED_CALENDAR_DATE).parse(text, status);
                     }
-                } else if (n == 7) {
+                } else if (len == 7) {
                     return DATE_PARSERS.get(BASIC_ORDINAL_DATE).parse(text, status);
                 } else {
                     return DATE_PARSERS.get(BASIC_CALENDAR_DATE).parse(text, status);
