@@ -862,7 +862,7 @@ public final class DateInterval
 
         // prescan for format analysis
 		int start = 0;
-		int n = Math.min(text.length(), 33);
+		int n = Math.min(text.length(), 48);
         boolean sameFormat = true;
         int componentLength = 0;
 
@@ -888,7 +888,7 @@ public final class DateInterval
         boolean ordinalStyle = false;
         boolean weekStyle = false;
 
-        for (int i = start; i < n; i++) {
+        for (int i = start + 1; i < n; i++) {
             char c = text.charAt(i);
             if (c == '-') {
                 literals++;

@@ -21,20 +21,19 @@
 
 package net.time4j.range;
 
-import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.IsoDateUnit;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
+import net.time4j.format.expert.Iso8601Format;
 
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
 import java.util.NoSuchElementException;
+
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 
 
 /**
@@ -49,7 +48,7 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @since   3.22/4.18
  */
-public class IsoRecurrence<I extends IsoInterval<?, ?>>
+public class IsoRecurrence<I>
     implements Iterable<I> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -59,19 +58,6 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
     private static final int TYPE_START_END = 0;
     private static final int TYPE_START_DURATION = 1;
     private static final int TYPE_DURATION_END = 2;
-
-    private static final Map<String, ChronoFormatter<PlainDate>> DATE_FORMATTERS;
-
-    static {
-        String[] datePatterns = {"YYYY-'W'ww-E", "uuuu-DDD", "uuuu-MM-dd", "YYYY'W'wwE", "uuuuDDD", "uuuuMMdd"};
-        Map<String, ChronoFormatter<PlainDate>> formatters = new HashMap<>();
-        for (String datePattern : datePatterns) {
-            formatters.put(
-                datePattern,
-                ChronoFormatter.ofDatePattern(datePattern, PatternType.CLDR, Locale.ROOT));
-        }
-        DATE_FORMATTERS = Collections.unmodifiableMap(formatters);
-    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -94,21 +80,21 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a recurrent sequence of intervals having given duration. </p>
+     * <p>Creates a recurrent sequence of date intervals having given duration. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   start       denotes the start of first interval (inclusive)
      * @param   duration    represents the duration of every repeating interval
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     /*[deutsch]
-     * <p>Erzeugt eine Sequenz von wiederkehrenden Intervallen mit der angegebenen Dauer. </p>
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Datumsintervallen mit der angegebenen Dauer. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   start       denotes the start of first interval (inclusive)
      * @param   duration    represents the duration of every repeating interval
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     public static IsoRecurrence<DateInterval> of(
@@ -128,22 +114,22 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
     }
 
     /**
-     * <p>Creates a recurrent backward sequence of intervals having given duration. </p>
+     * <p>Creates a recurrent backward sequence of date intervals having given duration. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   duration    represents the negative duration of every repeating interval
      * @param   end         denotes the end of first interval (inclusive)
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     /*[deutsch]
      * <p>Erzeugt eine Sequenz von wiederkehrenden r&uuml;ckw&auml;rts laufenden
-     * Intervallen mit der angegebenen Dauer. </p>
+     * Datumsintervallen mit der angegebenen Dauer. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   duration    represents the negative duration of every repeating interval
      * @param   end         denotes the end of first interval (inclusive)
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or the duration is not positive
      */
     public static IsoRecurrence<DateInterval> of(
@@ -163,23 +149,23 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
     }
 
     /**
-     * <p>Creates a recurrent sequence of intervals having the duration
+     * <p>Creates a recurrent sequence of date intervals having the duration
      * of first interval in years, months and days. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   start       denotes the start of first interval (inclusive)
      * @param   end         denotes the end of first interval (inclusive)
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or if start is not before end
      */
     /*[deutsch]
-     * <p>Erzeugt eine Sequenz von wiederkehrenden Intervallen mit der Dauer des ersten Intervalls
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Datumsintervallen mit der Dauer des ersten Intervalls
      * in Jahren, Monaten und Tagen. </p>
      *
      * @param   count       the count of repeating intervals ({@code >= 0})
      * @param   start       denotes the start of first interval (inclusive)
      * @param   end         denotes the end of first interval (inclusive)
-     * @return  sequence of recurrent date intervals
+     * @return  sequence of recurrent closed date intervals
      * @throws  IllegalArgumentException if the count is negative or if start is not before end
      */
     public static IsoRecurrence<DateInterval> of(
@@ -198,7 +184,116 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
             count,
             TYPE_START_END,
             start,
-            Duration.inYearsMonthsDays().between(start, end.plus(1, CalendarUnit.DAYS)));
+            Duration.inYearsMonthsDays().between(start, end.plus(1, DAYS)));
+
+    }
+
+    /**
+     * <p>Creates a recurrent sequence of timestamp intervals having given duration. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   duration    represents the duration of every repeating interval
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Zeit-Intervallen mit der angegebenen Dauer. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   duration    represents the duration of every repeating interval
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    public static IsoRecurrence<TimestampInterval> of(
+        int count,
+        PlainTimestamp start,
+        Duration<?> duration
+    ) {
+
+        check(count);
+
+        if (start == null) {
+            throw new NullPointerException("Missing start of recurrent interval.");
+        }
+
+        return new RecurrentTimestampIntervals(count, TYPE_START_DURATION, start, duration);
+
+    }
+
+    /**
+     * <p>Creates a recurrent backward sequence of timestamp intervals having given duration. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   duration    represents the negative duration of every repeating interval
+     * @param   end         denotes the end of first interval (exclusive)
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden r&uuml;ckw&auml;rts laufenden
+     * Zeit-Intervallen mit der angegebenen Dauer. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   duration    represents the negative duration of every repeating interval
+     * @param   end         denotes the end of first interval (exclusive)
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    public static IsoRecurrence<TimestampInterval> of(
+        int count,
+        Duration<?> duration,
+        PlainTimestamp end
+    ) {
+
+        check(count);
+
+        if (end == null) {
+            throw new NullPointerException("Missing end of recurrent interval.");
+        }
+
+        return new RecurrentTimestampIntervals(count, TYPE_DURATION_END, end, duration);
+
+    }
+
+    /**
+     * <p>Creates a recurrent sequence of timestamp intervals having the duration
+     * of first timestamp interval in years, months, days, hours, minutes, seconds and nanoseconds. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   end         denotes the end of first interval (exclusive)
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Zeit-Intervallen mit der Dauer des ersten Intervalls
+     * in Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Nanosekunden. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   end         denotes the end of first interval (exclusive)
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
+     */
+    public static IsoRecurrence<TimestampInterval> of(
+        int count,
+        PlainTimestamp start,
+        PlainTimestamp end
+    ) {
+
+        check(count);
+
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("End is not after start.");
+        }
+
+        return new RecurrentTimestampIntervals(
+            count,
+            TYPE_START_END,
+            start,
+            Duration.in(YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS, NANOS).between(start, end));
 
     }
 
@@ -269,13 +364,6 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    @Override
-    public Iterator<I> iterator() {
-
-        throw new AbstractMethodError();
-
-    }
-
     /**
      * <p>Queries if the resulting interval stream describes a backwards running sequence. </p>
      *
@@ -329,7 +417,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * to a sequence of recurrent date intervals. </p>
      *
      * @param   iso     canonical representation of recurrent date intervals
-     * @return  parsed sequence of recurrent date intervals
+     * @return  parsed sequence of recurrent closed date intervals
      * @throws  ParseException in any case of inconsistencies
      */
     /*[deutsch]
@@ -337,7 +425,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
      * als eine Sequenz von wiederkehrenden Datumsintervallen. </p>
      *
      * @param   iso     canonical representation of recurrent date intervals
-     * @return  parsed sequence of recurrent date intervals
+     * @return  parsed sequence of recurrent closed date intervals
      * @throws  ParseException in any case of inconsistencies
      */
     public static IsoRecurrence<DateInterval> parseDateIntervals(String iso)
@@ -355,20 +443,81 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
         IsoRecurrence<DateInterval> recurrence;
 
         if (parts[2].charAt(0) == 'P') {
-            String pattern = getDatePattern(parts[1]);
-            PlainDate start = DATE_FORMATTERS.get(pattern).parse(parts[1]);
+            PlainDate start = Iso8601Format.parseDate(parts[1]);
             Duration<? extends IsoDateUnit> duration = Duration.parseCalendarPeriod(parts[2]);
             recurrence = IsoRecurrence.of(count, start, duration);
         } else if (parts[1].charAt(0) == 'P') {
             Duration<? extends IsoDateUnit> duration = Duration.parseCalendarPeriod(parts[1]);
-            String pattern = getDatePattern(parts[2]);
-            PlainDate end = DATE_FORMATTERS.get(pattern).parse(parts[2]);
+            PlainDate end = Iso8601Format.parseDate(parts[2]);
             recurrence = IsoRecurrence.of(count, duration, end);
         } else {
-            String pattern = getDatePattern(parts[1]);
-            ChronoFormatter<PlainDate> f = DATE_FORMATTERS.get(pattern);
-            PlainDate start = f.parse(parts[1]);
-            PlainDate end = f.parse(parts[2]);
+            DateInterval interval = DateInterval.parseISO(iso.substring(getFirstSlash(iso) + 1));
+            PlainDate start = interval.getStart().getTemporal();
+            PlainDate end = interval.getEnd().getTemporal();
+            recurrence = IsoRecurrence.of(count, start, end);
+        }
+
+        if (infinite) {
+            recurrence = recurrence.withInfiniteCount();
+        }
+
+        return recurrence;
+
+    }
+
+    /**
+     * <p>Parses a string like &quot;R5/2016-04-01T10:45/2016-04-30T23:59&quot;
+     * to a sequence of recurrent timestamp intervals. </p>
+     *
+     * <p>Supported ISO-formats for timestamp parts are {@link Iso8601Format#BASIC_DATE_TIME}
+     * and {@link Iso8601Format#EXTENDED_DATE_TIME}. A duration component will be parsed
+     * by {@link Duration#parsePeriod(String)}. </p>
+     *
+     * @param   iso     canonical representation of recurrent intervals
+     * @return  parsed sequence of recurrent half-open timestamp intervals
+     * @throws  ParseException in any case of inconsistencies
+     */
+    /*[deutsch]
+     * <p>Interpretiert einen Text wie &quot;R5/2016-04-01T10:45/2016-04-30T23:59&quot;
+     * als eine Sequenz von wiederkehrenden Zeit-Intervallen. </p>
+     *
+     * <p>Unterst&uuml;tzte ISO-Formate f&uuml;r Zeitstempelkomponenten sind
+     * {@link Iso8601Format#BASIC_DATE_TIME} und {@link Iso8601Format#EXTENDED_DATE_TIME}.
+     * Eine Dauerkomponente wird mittels {@link Duration#parsePeriod(String)}
+     * interpretiert. </p>
+     *
+     * @param   iso     canonical representation of recurrent intervals
+     * @return  parsed sequence of recurrent half-open timestamp intervals
+     * @throws  ParseException in any case of inconsistencies
+     */
+    public static IsoRecurrence<TimestampInterval> parseTimestampIntervals(String iso)
+        throws ParseException {
+
+        String[] parts = iso.split("/");
+        int count = parseCount(parts);
+        boolean infinite = false;
+
+        if (count == INFINITE) {
+            count = 0;
+            infinite = true;
+        }
+
+        IsoRecurrence<TimestampInterval> recurrence;
+
+        if (parts[2].charAt(0) == 'P') {
+            boolean extended = isExtendedFormat(parts[1]);
+            PlainTimestamp start = timestampFormatter(extended).parse(parts[1]);
+            Duration<?> duration = Duration.parsePeriod(parts[2]);
+            recurrence = IsoRecurrence.of(count, start, duration);
+        } else if (parts[1].charAt(0) == 'P') {
+            Duration<?> duration = Duration.parsePeriod(parts[1]);
+            boolean extended = isExtendedFormat(parts[2]);
+            PlainTimestamp end = timestampFormatter(extended).parse(parts[2]);
+            recurrence = IsoRecurrence.of(count, duration, end);
+        } else {
+            TimestampInterval interval = TimestampInterval.parseISO(iso.substring(getFirstSlash(iso) + 1));
+            PlainTimestamp start = interval.getStart().getTemporal();
+            PlainTimestamp end = interval.getEnd().getTemporal();
             recurrence = IsoRecurrence.of(count, start, end);
         }
 
@@ -403,15 +552,22 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    int getType() {
+    @Override
+    public Iterator<I> iterator() {
 
-        return this.type;
+        throw new AbstractMethodError();
 
     }
 
     IsoRecurrence<I> copyWithCount(int count) {
 
         throw new AbstractMethodError();
+
+    }
+
+    int getType() {
+
+        return this.type;
 
     }
 
@@ -450,39 +606,36 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
 
     }
 
-    private static String getDatePattern(String iso) {
-
-        int countOfHyphens = 0;
-        boolean weekbased = false;
+    private static boolean isExtendedFormat(String iso) {
 
         for (int i = 1, n = iso.length(); i < n; i++) {
             char c = iso.charAt(i);
             if (c == 'T') {
                 break;
             } else if (c == '-') {
-                countOfHyphens++;
-            } else if (c == 'W') {
-                weekbased = true;
+                return true;
             }
         }
 
-        if (countOfHyphens > 0) { // extended format
-            if (weekbased) {
-                return "YYYY-'W'ww-E";
-            } else if (countOfHyphens == 1) {
-                return "uuuu-DDD";
-            } else {
-                return "uuuu-MM-dd";
-            }
-        } else { // basic format
-            if (weekbased) {
-                return "YYYY'W'wwE";
-            } else if (iso.length() == 7) {
-                return "uuuuDDD";
-            } else {
-                return "uuuuMMdd";
+        return false;
+
+    }
+
+    private static int getFirstSlash(String iso) {
+
+        for (int i = 0, n = iso.length(); i < n; i++) {
+            if (iso.charAt(i) == '/') {
+                return i;
             }
         }
+
+        return -1;
+
+    }
+
+    private static ChronoFormatter<PlainTimestamp> timestampFormatter(boolean extended) {
+
+        return (extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
 
     }
 
@@ -583,12 +736,12 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
                     Boundary<PlainDate> e;
                     if (RecurrentDateIntervals.this.isBackwards()) {
                         next = this.current.minus(RecurrentDateIntervals.this.duration);
-                        s = Boundary.ofClosed(next.plus(1, CalendarUnit.DAYS));
+                        s = Boundary.ofClosed(next.plus(1, DAYS));
                         e = Boundary.ofClosed(this.current);
                     } else {
                         next = this.current.plus(RecurrentDateIntervals.this.duration);
                         s = Boundary.ofClosed(this.current);
-                        e = Boundary.ofClosed(next.minus(1, CalendarUnit.DAYS));
+                        e = Boundary.ofClosed(next.minus(1, DAYS));
                     }
                     this.current = next;
                     return DateIntervalFactory.INSTANCE.between(s, e);
@@ -640,7 +793,7 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
                 case TYPE_START_END:
                     sb.append(this.ref);
                     sb.append('/');
-                    sb.append(this.ref.plus(this.duration).minus(1, CalendarUnit.DAYS));
+                    sb.append(this.ref.plus(this.duration).minus(1, DAYS));
                     break;
             }
 
@@ -652,6 +805,122 @@ public class IsoRecurrence<I extends IsoInterval<?, ?>>
         IsoRecurrence<DateInterval> copyWithCount(int count) {
 
             return new RecurrentDateIntervals(count, this.getType(), this.ref, this.duration);
+
+        }
+
+    }
+
+    private static class RecurrentTimestampIntervals
+        extends IsoRecurrence<TimestampInterval> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final PlainTimestamp ref;
+        private final Duration<?> duration;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private RecurrentTimestampIntervals(
+            int count,
+            int type,
+            PlainTimestamp ref,
+            Duration<?> duration
+        ) {
+            super(count, type);
+
+            this.ref = ref;
+            this.duration = duration;
+
+            if (!duration.isPositive()) {
+                throw new IllegalArgumentException("Duration must be positive: " + duration);
+            }
+
+        }
+
+        //~ Methoden ----------------------------------------------------------
+
+        @Override
+        public Iterator<TimestampInterval> iterator() {
+            return new ReadOnlyIterator<TimestampInterval, RecurrentTimestampIntervals>(this) {
+                private PlainTimestamp current = RecurrentTimestampIntervals.this.ref;
+                @Override
+                protected TimestampInterval nextInterval() {
+                    PlainTimestamp next;
+                    Boundary<PlainTimestamp> s;
+                    Boundary<PlainTimestamp> e;
+                    if (RecurrentTimestampIntervals.this.isBackwards()) {
+                        next = this.current.minus(RecurrentTimestampIntervals.this.duration);
+                        s = Boundary.ofClosed(next);
+                        e = Boundary.ofOpen(this.current);
+                    } else {
+                        next = this.current.plus(RecurrentTimestampIntervals.this.duration);
+                        s = Boundary.ofClosed(this.current);
+                        e = Boundary.ofOpen(next);
+                    }
+                    this.current = next;
+                    return TimestampIntervalFactory.INSTANCE.between(s, e);
+                }
+            };
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (super.equals(obj)) {
+                RecurrentTimestampIntervals that = (RecurrentTimestampIntervals) obj;
+                return (this.ref.equals(that.ref) && this.duration.equals(that.duration));
+            }
+
+            return false;
+
+        }
+
+        @Override
+        public int hashCode() {
+
+            return super.hashCode() + 31 * this.ref.hashCode() + 37 * this.duration.hashCode();
+
+        }
+
+        @Override
+        public String toString() {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append('R');
+            int c = this.getCount();
+            if (c != INFINITE) {
+                sb.append(this.getCount());
+            }
+            sb.append('/');
+
+            switch (this.getType()) {
+                case TYPE_START_DURATION:
+                    sb.append(this.ref);
+                    sb.append('/');
+                    sb.append(this.duration);
+                    break;
+                case TYPE_DURATION_END:
+                    sb.append(this.duration);
+                    sb.append('/');
+                    sb.append(this.ref);
+                    break;
+                case TYPE_START_END:
+                    sb.append(this.ref);
+                    sb.append('/');
+                    sb.append(this.ref.plus(this.duration));
+                    break;
+            }
+
+            return sb.toString();
+
+        }
+
+        @Override
+        IsoRecurrence<TimestampInterval> copyWithCount(int count) {
+
+            return new RecurrentTimestampIntervals(count, this.getType(), this.ref, this.duration);
 
         }
 

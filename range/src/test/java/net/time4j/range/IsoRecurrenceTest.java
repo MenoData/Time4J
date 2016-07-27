@@ -1,9 +1,10 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
-
+import net.time4j.PlainTimestamp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -148,7 +149,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.isInfinite(), is(true));
         assertThat(recurrence.getCount(), is(-1));
         int index = 0;
-        for (DateInterval interval : recurrence) {
+        for (DateInterval ignored : recurrence) {
             index++;
             if (index > 5) { // arbitrary choice
                 break; // prevents infinite loop
@@ -205,16 +206,143 @@ public class IsoRecurrenceTest {
         IsoRecurrence<DateInterval> expected =
             IsoRecurrence.of(87, PlainDate.of(2016, 12, 1), PlainDate.of(2016, 12, 31));
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016336/2016366"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016336/366"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-336/2016-366"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-336/366"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/20161201/20161231"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/20161201/1231"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/2016-12-31"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/12-31"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-12-01/31"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016W484/2016W526"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016W484/W526"), is(expected));
+
         assertThat(IsoRecurrence.parseDateIntervals("R87/2016-W48-4/2016-W52-6"), is(expected));
+        assertThat(IsoRecurrence.parseDateIntervals("R87/2016-W48-4/W52-6"), is(expected));
     }
 
     @Test(expected=ParseException.class)
     public void parseDateIntervalsWithDifferentPatterns() throws ParseException {
         IsoRecurrence.parseDateIntervals("R87/20161201/2016-12-31");
+    }
+
+    @Test
+    public void timestampIntervalsWithStartDuration() {
+        IsoRecurrence<TimestampInterval> recurrence =
+            IsoRecurrence.of(
+                4,
+                PlainTimestamp.of(2016, 7, 1, 10, 0),
+                Duration.ofPositive().days(1).hours(6).build());
+        assertThat(recurrence.isBackwards(), is(false));
+        assertThat(recurrence.isEmpty(), is(false));
+        assertThat(recurrence.isInfinite(), is(false));
+        assertThat(recurrence.getCount(), is(4));
+        assertThat(recurrence.toString(), is("R4/2016-07-01T10/P1DT6H"));
+
+        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        for (TimestampInterval interval : recurrence) {
+            intervals.add(interval);
+        }
+        assertThat(intervals.size(), is(4));
+        assertThat(
+            intervals.get(0),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 1, 10, 0), PlainTimestamp.of(2016, 7, 2, 16, 0))));
+        assertThat(
+            intervals.get(1),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 2, 16, 0), PlainTimestamp.of(2016, 7, 3, 22, 0))));
+        assertThat(
+            intervals.get(2),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 3, 22, 0), PlainTimestamp.of(2016, 7, 5, 4, 0))));
+        assertThat(
+            intervals.get(3),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 5, 4, 0), PlainTimestamp.of(2016, 7, 6, 10, 0))));
+    }
+
+    @Test
+    public void timestampIntervalsWithDurationEnd() {
+        IsoRecurrence<TimestampInterval> recurrence =
+            IsoRecurrence.of(
+                4,
+                Duration.ofPositive().days(1).hours(6).build(),
+                PlainTimestamp.of(2016, 7, 6, 10, 0));
+        assertThat(recurrence.isBackwards(), is(true));
+        assertThat(recurrence.isEmpty(), is(false));
+        assertThat(recurrence.isInfinite(), is(false));
+        assertThat(recurrence.getCount(), is(4));
+        assertThat(recurrence.toString(), is("R4/P1DT6H/2016-07-06T10"));
+
+        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        for (TimestampInterval interval : recurrence) {
+            intervals.add(interval);
+        }
+        assertThat(intervals.size(), is(4));
+        assertThat(
+            intervals.get(3),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 1, 10, 0), PlainTimestamp.of(2016, 7, 2, 16, 0))));
+        assertThat(
+            intervals.get(2),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 2, 16, 0), PlainTimestamp.of(2016, 7, 3, 22, 0))));
+        assertThat(
+            intervals.get(1),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 3, 22, 0), PlainTimestamp.of(2016, 7, 5, 4, 0))));
+        assertThat(
+            intervals.get(0),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 5, 4, 0), PlainTimestamp.of(2016, 7, 6, 10, 0))));
+    }
+
+    @Test
+    public void timestampIntervalsWithStartEnd() {
+        IsoRecurrence<TimestampInterval> recurrence =
+            IsoRecurrence.of(
+                4,
+                PlainTimestamp.of(2016, 7, 1, 10, 0),
+                PlainTimestamp.of(2016, 7, 2, 16, 0));
+        assertThat(recurrence.isBackwards(), is(false));
+        assertThat(recurrence.isEmpty(), is(false));
+        assertThat(recurrence.isInfinite(), is(false));
+        assertThat(recurrence.getCount(), is(4));
+        assertThat(recurrence.toString(), is("R4/2016-07-01T10/2016-07-02T16"));
+
+        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        for (TimestampInterval interval : recurrence) {
+            intervals.add(interval);
+        }
+        assertThat(intervals.size(), is(4));
+        assertThat(
+            intervals.get(0),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 1, 10, 0), PlainTimestamp.of(2016, 7, 2, 16, 0))));
+        assertThat(
+            intervals.get(1),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 2, 16, 0), PlainTimestamp.of(2016, 7, 3, 22, 0))));
+        assertThat(
+            intervals.get(2),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 3, 22, 0), PlainTimestamp.of(2016, 7, 5, 4, 0))));
+        assertThat(
+            intervals.get(3),
+            is(TimestampInterval.between(PlainTimestamp.of(2016, 7, 5, 4, 0), PlainTimestamp.of(2016, 7, 6, 10, 0))));
+    }
+
+    @Test
+    public void parseTimestampIntervals() throws ParseException {
+        IsoRecurrence<TimestampInterval> expected =
+            IsoRecurrence.of(
+                87,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59),
+                PlainTimestamp.of(2016, 7, 2, 16, 45, 0).plus(123, ClockUnit.MILLIS));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R87/20160701T101559/20160702T164500.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R87/2016-07-01T10:15:59/2016-07-02T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R87/2016-07-01T10:15:59/02T16:45:00.123"), is(expected));
+        expected =
+            IsoRecurrence.of(
+                2,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59),
+                PlainTimestamp.of(2016, 7, 1, 16, 45, 0).plus(123, ClockUnit.MILLIS));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/16:45:00.123"), is(expected));
     }
 
 }
