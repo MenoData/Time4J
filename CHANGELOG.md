@@ -8,6 +8,9 @@
 - Embedded formatter should know outer format attributes and defaults [#522]
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 
+### Fixed
+- AM/PM-element not sensible for output context [#529]
+
 ### Changed
 - New leap second at end of year 2016 [#517]
 - Make fractional second parser more tolerant [#519]
