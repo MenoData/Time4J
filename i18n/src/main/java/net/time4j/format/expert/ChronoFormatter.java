@@ -150,6 +150,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     private final int countOfElements;
     private final Leniency leniency;
     private final boolean indexable;
+    private final boolean trailing;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -224,6 +225,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             this.needsExtensions = (count > 0);
         }
 
+        this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
         this.steps = this.freeze(steps);
 
     }
@@ -327,6 +329,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         this.indexable = ix;
+        this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
         this.steps = this.freeze(copy);
 
     }
@@ -356,6 +359,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.needsHistorization = formatter.needsHistorization;
         this.needsExtensions = formatter.needsExtensions;
         this.countOfElements = formatter.countOfElements;
+        this.trailing = formatter.trailing;
 
         Map<ChronoElement<?>, Object> map = new NonAmbivalentMap(formatter.defaults);
         boolean ix = formatter.indexable;
@@ -2638,7 +2642,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         boolean quickPath
     ) {
 
-        if (status.getPosition() >= text.length()) {
+        int len = text.length();
+
+        if (status.getPosition() >= len) {
             throw new IndexOutOfBoundsException(
                 "[" + status.getPosition() + "]: " + text.toString());
         }
@@ -2661,13 +2667,12 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         int index = status.getPosition();
+        boolean trailing = (
+            quickPath
+                ? cf.trailing
+                : attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue());
 
-        if (
-            (index < text.length())
-            && !attributes.get(
-                Attributes.TRAILING_CHARACTERS,
-                Boolean.FALSE).booleanValue()
-        ) {
+        if ((index < len) && !trailing) {
             status.setError(
                 index,
                 "Unparsed trailing characters: " + sub(index, text));
@@ -2691,7 +2696,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 }
             } catch (RuntimeException re) {
                 status.setError(
-                    text.length(),
+                    len,
                     re.getMessage() + getDescription(parsed));
                 return null;
             }
@@ -2704,7 +2709,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             result = merger.createFrom(parsed, attributes, leniency.isLax(), preparsing);
         } catch (RuntimeException re) {
             status.setError(
-                text.length(),
+                len,
                 re.getMessage() + getDescription(parsed));
             return null;
         }
@@ -2721,7 +2726,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (result == null) {
             if (!preparsing) {
                 status.setError(
-                    text.length(),
+                    len,
                     getReason(parsed) + getDescription(parsed));
             }
             return null;
