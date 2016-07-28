@@ -64,6 +64,9 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
  * &quot;net.time4j.format.iso.decimal.dot&quot; is set to &quot;true&quot; then the dot will be used.
  * When parsing, both comma or dot are understood. </p>
  *
+ * <p>Note: Most produced formatters ignore any format attribute change. As exception case, timezone
+ * attributes are recognized by {@code BASIC_DATE_TIME_OFFSET} or {@code EXTENDED_DATE_TIME_OFFSET}. </p>
+ *
  * @author  Meno Hochschild
  */
 /*[deutsch]
@@ -74,6 +77,10 @@ import static net.time4j.PlainTime.SECOND_OF_MINUTE;
  * System-Property &quot;net.time4j.format.iso.decimal.dot&quot; auf den Wert &quot;true&quot; gesetzt
  * ist, dann wird der Punkt als Dezimaltrennzeichen verwendet. Alle Textinterpretierer verstehen
  * sowohl das Komma wie auch den Punkt als Dezimaltrennzeichen. </p>
+ *
+ * <p>Hinweis: Die meisten Formatierer ignorieren Formatattribut&auml;nderungen. Allerdings k&ouml;nnen
+ * die Formatierer {@code BASIC_DATE_TIME_OFFSET} und {@code EXTENDED_DATE_TIME_OFFSET} ausnahmsweise
+ * zeitzonenbezogene Attribute verarbeiten. </p>
  *
  * @author  Meno Hochschild
  */
@@ -437,29 +444,35 @@ public class Iso8601Format {
         CharSequence iso,
         ParseLog plog
     ) {
-
         int hyphens = 0;
         int n = iso.length();
+        int start = plog.getPosition();
+        int len = n - start;
 
-        if (n < 7) {
-            plog.setError(n, "Too short to be compatible with ISO-8601: " + iso);
+        if (len < 7) {
+            plog.setError(n, "Too short to be compatible with ISO-8601: " + iso.subSequence(start, n));
             return null;
         }
 
-        for (int i = 4; i < n; i++) {
+LOOP:
+        for (int i = start + 1; i < n; i++) {
             switch (iso.charAt(i)) {
                 case '-': // leading sign is ignored, see start index
                     hyphens++;
                     break;
                 case 'W':
                     return ((hyphens > 0) ? EXTENDED_WEEK_DATE.parse(iso, plog) : BASIC_WEEK_DATE.parse(iso, plog));
+                case 'T':
+                case '/':
+                    len = i - start;
+                    break LOOP;
                 default:
                     // continue
             }
         }
 
         if (hyphens == 0) {
-            return ((n == 7) ? BASIC_ORDINAL_DATE.parse(iso, plog) : BASIC_CALENDAR_DATE.parse(iso, plog));
+            return ((len == 7) ? BASIC_ORDINAL_DATE.parse(iso, plog) : BASIC_CALENDAR_DATE.parse(iso, plog));
         } else if (hyphens == 1) {
             return EXTENDED_ORDINAL_DATE.parse(iso, plog);
         } else {
@@ -473,6 +486,7 @@ public class Iso8601Format {
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
         if (extended) {
@@ -485,7 +499,7 @@ public class Iso8601Format {
             builder.addLiteral('-');
         }
 
-        return builder.addFixedInteger(DAY_OF_MONTH, 2).build().with(Leniency.STRICT);
+        return builder.addFixedInteger(DAY_OF_MONTH, 2).endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -494,13 +508,14 @@ public class Iso8601Format {
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
         if (extended) {
             builder.addLiteral('-');
         }
 
-        return builder.addFixedInteger(DAY_OF_YEAR, 3).build().with(Leniency.STRICT);
+        return builder.addFixedInteger(DAY_OF_YEAR, 3).endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -509,6 +524,7 @@ public class Iso8601Format {
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(
                     YEAR_OF_WEEKDATE,
                     4,
@@ -526,7 +542,7 @@ public class Iso8601Format {
             builder.addLiteral('-');
         }
 
-        return builder.addFixedNumerical(DAY_OF_WEEK, 1).build().with(Leniency.STRICT);
+        return builder.addFixedNumerical(DAY_OF_WEEK, 1).endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -617,8 +633,8 @@ public class Iso8601Format {
                 AttributeQuery attributes,
                 ChronoFunction<ChronoDisplay, R> query
             ) throws IOException {
-                Object key = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
-                DATE_PARSERS.get(key).formatToBuffer(formattable, buffer);
+                ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
+                f.formatToBuffer(formattable, buffer);
                 return null;
             }
         };
@@ -681,6 +697,7 @@ LOOP:
         boolean extended
     ) {
 
+        builder.startSection(Attributes.ZERO_DIGIT, '0');
         builder.addFixedInteger(ISO_HOUR, 2);
         builder.startOptionalSection();
 
@@ -703,9 +720,10 @@ LOOP:
             builder.addLiteral('.', ',');
         }
         builder.addFraction(NANO_OF_SECOND, 0, 9, false);
-        builder.endSection();
-        builder.endSection();
-        builder.endSection();
+
+        for (int i = 0; i < 4; i++) {
+            builder.endSection();
+        }
 
     }
 

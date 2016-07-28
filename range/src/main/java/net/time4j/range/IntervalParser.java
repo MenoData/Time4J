@@ -678,7 +678,6 @@ final class IntervalParser
         //~ Instanzvariablen ----------------------------------------------
 
         private final AttributeQuery attributes;
-        private final AttributeKey<Boolean> specialKey;
         private final TZID tzid;
 
         //~ Konstruktoren -------------------------------------------------
@@ -695,7 +694,6 @@ final class IntervalParser
             super();
 
             this.attributes = attributes;
-            this.specialKey = Attributes.TRAILING_CHARACTERS;
             this.tzid = tzid;
 
         }
@@ -704,11 +702,11 @@ final class IntervalParser
 
         @Override
         public boolean contains(AttributeKey<?> key) {
-            if (key.equals(this.specialKey)) {
+            if (key == Attributes.TRAILING_CHARACTERS) {
                 return true;
             } else if (
                 (this.tzid != null)
-                && key.equals(Attributes.TIMEZONE_ID)
+                && (key == Attributes.TIMEZONE_ID)
             ) {
                 return true;
             }
@@ -717,11 +715,11 @@ final class IntervalParser
 
         @Override
         public <A> A get(AttributeKey<A> key) {
-            if (key.equals(this.specialKey)) {
+            if (key == Attributes.TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
             } else if (
                 (this.tzid != null)
-                && key.equals(Attributes.TIMEZONE_ID)
+                && (key == Attributes.TIMEZONE_ID)
             ) {
                 return key.type().cast(this.tzid);
             }
@@ -730,11 +728,11 @@ final class IntervalParser
 
         @Override
         public <A> A get(AttributeKey<A> key, A defaultValue) {
-            if (key.equals(this.specialKey)) {
+            if (key == Attributes.TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
             } else if (
                 (this.tzid != null)
-                && key.equals(Attributes.TIMEZONE_ID)
+                && (key == Attributes.TIMEZONE_ID)
             ) {
                 return key.type().cast(this.tzid);
             }
