@@ -926,6 +926,9 @@ public final class TimestampInterval
         if (text.charAt(0) == 'P') {
             for (int i = 1; i < n; i++) {
                 if (text.charAt(i) == '/') {
+                    if (i + 1 == n) {
+                        throw new ParseException("Missing end component.", n);
+                    }
                     start = i + 1;
                     break;
                 }
@@ -933,9 +936,12 @@ public final class TimestampInterval
         }
 
         int literals = 0;
+        int literals2 = 0;
         boolean ordinalStyle = false;
         boolean weekStyle = false;
+        boolean weekStyle2 = false;
         boolean secondComponent = false;
+        int slash = -1;
 
         for (int i = start + 1; i < n; i++) {
             char c = text.charAt(i);
@@ -946,11 +952,21 @@ public final class TimestampInterval
                 } else if ((c == 'T') || (timeLength > 0)) {
                     timeLength++;
                 } else {
+                    if (c == 'W') {
+                        weekStyle2 = true;
+                    } else if ((c == '-') && (i > slash + 1)) {
+                        literals2++;
+                    }
                     secondDate++;
                 }
             } else if (c == '/') {
-                secondComponent = true;
-                timeLength = 0;
+                if (slash == -1) {
+                    slash = i;
+                    secondComponent = true;
+                    timeLength = 0;
+                } else {
+                    throw new ParseException("Interval with two slashes found: " + text, i);
+                }
             } else if ((c == 'T') || (timeLength > 0)) {
                 timeLength++;
             } else if (c == '-') {
@@ -964,8 +980,19 @@ public final class TimestampInterval
             }
         }
 
+        if (secondComponent && (weekStyle != weekStyle2)) {
+            throw new ParseException("Mixed date styles not allowed.", n);
+        }
+
+        char c = text.charAt(start);
+        int componentLength = firstDate - 4;
+
+        if ((c == '+') || (c == '-')) {
+            componentLength -= 2;
+        }
+
         if (!weekStyle) {
-            ordinalStyle = ((literals == 1) || ((literals == 0) && (firstDate == 7)));
+            ordinalStyle = ((literals == 1) || ((literals == 0) && (componentLength == 3)));
         }
 
         boolean extended = (literals > 0);
@@ -977,12 +1004,12 @@ public final class TimestampInterval
                 timeLength = secondDate;
                 secondDate = 0;
             }
-            sameFormat = (firstDate == secondDate);
+            sameFormat = ((firstDate == secondDate) && (literals == literals2));
         }
 
         // start format
         ChronoFormatter<PlainTimestamp> startFormat =
-            extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME;
+            (extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
 
         // end format
         ChronoFormatter<PlainTimestamp> endFormat;

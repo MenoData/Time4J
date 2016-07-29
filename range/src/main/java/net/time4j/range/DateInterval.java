@@ -868,13 +868,12 @@ public final class DateInterval
 
         for (int i = 1; i < n; i++) {
             if (text.charAt(i) == '/') {
-                if (text.charAt(0) == 'P') {
+                if (i + 1 == n) {
+                    throw new ParseException("Missing end component.", n);
+                } else if (text.charAt(0) == 'P') {
                     start = i + 1;
                     componentLength = n - i - 1;
-                } else if (
-                    (i + 1 < n)
-                    && (text.charAt(i + 1) == 'P')
-                ) {
+                } else if (text.charAt(i + 1) == 'P') {
                     componentLength = i;
                 } else {
                     sameFormat = (2 * i + 1 == n);
@@ -901,11 +900,17 @@ public final class DateInterval
         }
 
         boolean extended = (literals > 0);
+        char c = text.charAt(start);
+        componentLength -= 4;
+
+        if ((c == '+') || (c == '-')) {
+            componentLength -= 2;
+        }
 
         if (!weekStyle) {
             ordinalStyle = (
                 (literals == 1)
-                || ((literals == 0) && (componentLength == 7)));
+                || ((literals == 0) && (componentLength == 3)));
         }
 
         // start format

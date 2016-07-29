@@ -647,17 +647,13 @@ public final class ClockInterval
      */
     public static ClockInterval parseISO(String text) throws ParseException {
 
-        ChronoParser<PlainTime> parser = Iso8601Format.BASIC_WALL_TIME;
-        ParseLog plog = new ParseLog();
-
-        if (text.length() > 3 && text.charAt(2) == ':') {
-            parser = Iso8601Format.EXTENDED_WALL_TIME;
-        } else if ((text.charAt(0) == 'P') || (text.charAt(0) == '-')) {
-            int solidus = text.indexOf('/');
-            if (text.length() > solidus + 4 && text.charAt(solidus + 3) == ':') {
-                parser = Iso8601Format.EXTENDED_WALL_TIME;
-            }
+        if (text.isEmpty()) {
+            throw new IndexOutOfBoundsException("Empty text.");
         }
+
+        ChronoParser<PlainTime> parser =
+            ((text.indexOf(':') == -1) ? Iso8601Format.BASIC_WALL_TIME : Iso8601Format.EXTENDED_WALL_TIME);
+        ParseLog plog = new ParseLog();
 
         ClockInterval result =
             IntervalParser.of(
