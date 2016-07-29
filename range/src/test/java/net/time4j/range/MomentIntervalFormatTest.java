@@ -4,6 +4,8 @@ import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -22,7 +24,22 @@ public class MomentIntervalFormatTest {
         MomentInterval expected = MomentInterval.between(start, end);
 
         assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/T16:00:01"),
+            is(expected.withEnd(end.plus(1, TimeUnit.SECONDS))));
+        assertThat(
             MomentInterval.parseISO("2012-04-30T14:15Z/T16:00"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/T16"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/T16Z"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/T16+00:00"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/T16:00:00+00"),
             is(expected));
     }
 
@@ -33,7 +50,22 @@ public class MomentIntervalFormatTest {
         MomentInterval expected = MomentInterval.between(start, end);
 
         assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/16:00:01"),
+            is(expected.withEnd(end.plus(1, TimeUnit.SECONDS))));
+        assertThat(
             MomentInterval.parseISO("2012-04-30T14:15Z/16:00"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/16"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/16Z"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/16+00:00"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-04-30T14:15Z/16:00:00+00"),
             is(expected));
     }
 
@@ -50,12 +82,15 @@ public class MomentIntervalFormatTest {
 
     @Test
     public void parseAbbreviatedExtendedWeekDate() throws ParseException {
-        Moment start = PlainTimestamp.of(2012, 4, 1, 14, 15).atUTC();
-        Moment end = PlainTimestamp.of(2012, 4, 5, 16, 0).atUTC();
+        Moment start = PlainTimestamp.of(2012, 4, 1, 14, 15, 0).atUTC();
+        Moment end = PlainTimestamp.of(2012, 4, 5, 16, 0, 1).atUTC();
         MomentInterval expected = MomentInterval.between(start, end);
 
         assertThat(
-            MomentInterval.parseISO("2012-W13-7T14:15Z/W14-4T16:00"),
+            MomentInterval.parseISO("2012-W13-7T14:15:00Z/W14-4T16:00:01"),
+            is(expected));
+        assertThat(
+            MomentInterval.parseISO("2012-W13-7T14:15Z/W14-4T16:00:01"),
             is(expected));
     }
 

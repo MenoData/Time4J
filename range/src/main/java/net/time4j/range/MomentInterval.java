@@ -76,13 +76,6 @@ public final class MomentInterval
 
     private static final long serialVersionUID = -5403584519478162113L;
 
-    private static final ChronoFormatter<Moment> EXT_C = calendarFormat(true);
-    private static final ChronoFormatter<Moment> EXT_O = ordinalFormat(true);
-    private static final ChronoFormatter<Moment> EXT_W = weekdateFormat(true);
-    private static final ChronoFormatter<Moment> BAS_C = calendarFormat(false);
-    private static final ChronoFormatter<Moment> BAS_O = ordinalFormat(false);
-    private static final ChronoFormatter<Moment> BAS_W = weekdateFormat(false);
-
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
         new IntervalComparator<Moment>(false, Moment.axis());
 
@@ -814,82 +807,101 @@ public final class MomentInterval
             throw new IndexOutOfBoundsException("Empty text.");
         }
 
-        // betrifft nur Endkomponente, wenn kein P
-        boolean hasT = false;
-        int protectedArea = 0;
-
         // prescan for format analysis
-		int start = 0;
-		int n = Math.min(text.length(), 83);
+        int start = 0;
+        int n = Math.min(text.length(), 117);
         boolean sameFormat = true;
-        int componentLength = 0;
+        int firstDate = 1; // loop starts one index position later
+        int secondDate = 0;
+        int timeLength = 0;
 
-        for (int i = 1; i < n; i++) {
-            if (text.charAt(i) == '/') {
-                if (text.charAt(0) == 'P') {
-                    start = i + 1;
-                    componentLength = n - i - 1;
-                    hasT = true;
-                } else if (
-                    (i + 1 < n)
-                    && (text.charAt(i + 1) == 'P')
-                ) {
-                    componentLength = i;
-                    hasT = true;
-                } else {
-                    sameFormat = (2 * i + 1 == n) && hasSameOffsets(text, i, n);
-                    componentLength = i;
-                    protectedArea = n - i - 1;
-                    for (int j = i + 1; j < n; j++) {
-                        if (text.charAt(j) == 'T') {
-                            protectedArea = n - j;
-                            hasT = true;
-                            break;
-                        }
+        if (text.charAt(0) == 'P') {
+            for (int i = 1; i < n; i++) {
+                if (text.charAt(i) == '/') {
+                    if (i + 1 == n) {
+                        throw new ParseException("Missing end component.", n);
                     }
+                    start = i + 1;
+                    break;
                 }
-                break;
             }
         }
 
         int literals = 0;
+        int literals2 = 0;
         boolean ordinalStyle = false;
         boolean weekStyle = false;
-        int timeLength = 0;
+        boolean weekStyle2 = false;
+        boolean secondComponent = false;
+        int slash = -1;
 
-        for (int i = start; i < n; i++) {
+        for (int i = start + 1; i < n; i++) {
             char c = text.charAt(i);
-            if (c == '/') {
-                break;
+            if (secondComponent) {
+                if (c == 'P') {
+                    secondComponent = false;
+                    break;
+                } else if ((c == 'T') || (timeLength > 0)) {
+                    timeLength++;
+                } else {
+                    if (c == 'W') {
+                        weekStyle2 = true;
+                    } else if ((c == '-') && (i > slash + 1)) {
+                        literals2++;
+                    }
+                    secondDate++;
+                }
+            } else if (c == '/') {
+                if (slash == -1) {
+                    slash = i;
+                    secondComponent = true;
+                    timeLength = 0;
+                } else {
+                    throw new ParseException("Interval with two slashes found: " + text, i);
+                }
             } else if ((c == 'T') || (timeLength > 0)) {
                 timeLength++;
             } else if (c == '-') {
+                firstDate++;
                 literals++;
             } else if (c == 'W') {
+                firstDate++;
                 weekStyle = true;
+            } else {
+                firstDate++;
             }
         }
 
-        boolean extended = (literals > 0);
+        if (secondComponent && (weekStyle != weekStyle2)) {
+            throw new ParseException("Mixed date styles not allowed.", n);
+        }
+
+        char c = text.charAt(start);
+        int componentLength = firstDate - 4;
+
+        if ((c == '+') || (c == '-')) {
+            componentLength -= 2;
+        }
 
         if (!weekStyle) {
-            ordinalStyle = (
-                (literals == 1)
-                || (
-                    (literals == 0)
-                    && (componentLength - timeLength == 7)));
+            ordinalStyle = ((literals == 1) || ((literals == 0) && (componentLength == 3)));
+        }
+
+        boolean extended = (literals > 0);
+        boolean hasT = true;
+
+        if (secondComponent) {
+            if (timeLength == 0) { // no T in end component => no date part
+                hasT = false;
+                timeLength = secondDate;
+                secondDate = 0;
+            }
+            sameFormat = ((firstDate == secondDate) && (literals == literals2) && hasSecondOffset(text, n));
         }
 
         // start format
-        ChronoFormatter<Moment> startFormat;
-
-        if (ordinalStyle) {
-            startFormat = (extended ? EXT_O : BAS_O);
-        } else if (weekStyle) {
-            startFormat = (extended ? EXT_W : BAS_W);
-        } else {
-            startFormat = (extended ? EXT_C : BAS_C);
-        }
+        ChronoFormatter<Moment> startFormat =
+            (extended ? Iso8601Format.EXTENDED_DATE_TIME_OFFSET : Iso8601Format.BASIC_DATE_TIME_OFFSET);
 
         // end format
         ChronoFormatter<Moment> endFormat;
@@ -897,9 +909,7 @@ public final class MomentInterval
         if (sameFormat) {
             endFormat = startFormat;
         } else {
-            endFormat =
-                abbreviatedFormat(
-                    extended, weekStyle, ordinalStyle, protectedArea, hasT);
+            endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle, timeLength, hasT);
         }
 
         // create interval
@@ -928,104 +938,25 @@ public final class MomentInterval
 
     }
 
-    private static boolean hasSameOffsets(
+    private static boolean hasSecondOffset(
         String text,
-        int solidus,
         int len
     ) {
 
-        if (text.charAt(solidus - 1) == 'Z') {
-            return (text.charAt(len - 1) == 'Z');
+        if (text.charAt(len - 1) == 'Z') {
+            return true;
         }
 
-        for (int i = solidus - 1; i >= 0; i--) {
+        for (int i = len - 1, n = Math.max(0, len - 6); i >= n; i--) {
             char test = text.charAt(i);
-            if ((test == '+') || (test == '-')) {
-                int index = i + len - solidus;
-                if (index < 0) {
-                    break;
-                } else {
-                    char compare = text.charAt(index);
-                    return ((compare == '+') || (compare == '-'));
-                }
+            if ((test == 'T') || (test == '/') || (test == '.') || (test == ',')) {
+                break;
+            } else if ((test == '+') || (test == '-')) {
+                return true;
             }
         }
 
         return false;
-
-    }
-
-    private static ChronoFormatter<Moment> calendarFormat(boolean extended) {
-
-        ChronoFormatter.Builder<Moment> builder =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
-        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedInteger(MONTH_AS_NUMBER, 2);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedInteger(DAY_OF_MONTH, 2);
-        builder.addLiteral('T');
-        addWallTime(builder, extended);
-        addOffset(builder, extended);
-
-        return builder.build();
-
-    }
-
-    private static ChronoFormatter<Moment> ordinalFormat(boolean extended) {
-
-        ChronoFormatter.Builder<Moment> builder =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
-        builder.addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedInteger(DAY_OF_YEAR, 3).build();
-        builder.addLiteral('T');
-        addWallTime(builder, extended);
-        addOffset(builder, extended);
-
-        return builder.build();
-
-    }
-
-    private static ChronoFormatter<Moment> weekdateFormat(boolean extended) {
-
-        ChronoFormatter.Builder<Moment> builder =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
-        builder.addInteger(
-                YEAR_OF_WEEKDATE,
-                4,
-                9,
-                SignPolicy.SHOW_WHEN_BIG_NUMBER);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addLiteral('W');
-        builder.addFixedInteger(Weekmodel.ISO.weekOfYear(), 2);
-
-        if (extended) {
-            builder.addLiteral('-');
-        }
-
-        builder.addFixedNumerical(DAY_OF_WEEK, 1).build();
-        builder.addLiteral('T');
-        addWallTime(builder, extended);
-        addOffset(builder, extended);
-
-        return builder.build();
 
     }
 

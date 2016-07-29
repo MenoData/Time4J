@@ -457,7 +457,7 @@ public class Iso8601Format {
 LOOP:
         for (int i = start + 1; i < n; i++) {
             switch (iso.charAt(i)) {
-                case '-': // leading sign is ignored, see start index
+                case '-': // leading sign is ignored, see initial loop index
                     hyphens++;
                     break;
                 case 'W':
@@ -472,7 +472,12 @@ LOOP:
         }
 
         if (hyphens == 0) {
-            return ((len == 7) ? BASIC_ORDINAL_DATE.parse(iso, plog) : BASIC_CALENDAR_DATE.parse(iso, plog));
+            len -= 4; // year length is usually 4 digits
+            char c = iso.charAt(start);
+            if ((c == '+') || (c == '-')) {
+                len -= 2; // concerns years with at least 5 digits or more
+            }
+            return ((len == 3) ? BASIC_ORDINAL_DATE.parse(iso, plog) : BASIC_CALENDAR_DATE.parse(iso, plog));
         } else if (hyphens == 1) {
             return EXTENDED_ORDINAL_DATE.parse(iso, plog);
         } else {
@@ -525,11 +530,7 @@ LOOP:
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
                 .startSection(Attributes.ZERO_DIGIT, '0')
-                .addInteger(
-                    YEAR_OF_WEEKDATE,
-                    4,
-                    9,
-                    SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                .addInteger(YEAR_OF_WEEKDATE, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
         if (extended) {
             builder.addLiteral('-');
@@ -658,7 +659,7 @@ LOOP:
 LOOP:
                 for (int i = start + 1; i < n; i++) {
                     switch (text.charAt(i)) {
-                        case '-': // leading sign is ignored, see start index
+                        case '-': // leading sign is ignored, see initial loop index
                             hyphens++;
                             break;
                         case 'W':
@@ -682,10 +683,17 @@ LOOP:
                     } else {
                         return DATE_PARSERS.get(EXTENDED_CALENDAR_DATE).parse(text, status);
                     }
-                } else if (len == 7) {
-                    return DATE_PARSERS.get(BASIC_ORDINAL_DATE).parse(text, status);
                 } else {
-                    return DATE_PARSERS.get(BASIC_CALENDAR_DATE).parse(text, status);
+                    len -= 4; // year length is usually 4 digits
+                    char c = text.charAt(start);
+                    if ((c == '+') || (c == '-')) {
+                        len -= 2; // concerns years with at least 5 digits or more
+                    }
+                    if (len == 3) {
+                        return DATE_PARSERS.get(BASIC_ORDINAL_DATE).parse(text, status);
+                    } else {
+                        return DATE_PARSERS.get(BASIC_CALENDAR_DATE).parse(text, status);
+                    }
                 }
             }
         };
