@@ -9,6 +9,7 @@
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 
 ### Fixed
+- Prescan phase of iso interval parser sometimes incorrect [#530]
 - AM/PM-element not sensible for output context [#529]
 
 ### Changed
