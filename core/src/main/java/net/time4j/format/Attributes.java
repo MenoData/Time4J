@@ -508,7 +508,7 @@ public final class Attributes
     public static final AttributeKey<StartOfDay> START_OF_DAY =
         PredefinedKey.valueOf("START_OF_DAY", StartOfDay.class);
 
-    private static final AttributeQuery EMPTY = new Attributes.Builder().build();
+    private static final Attributes EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -535,7 +535,7 @@ public final class Attributes
      *
      * @return  empty attribute query
      */
-    public static AttributeQuery empty() {
+    public static Attributes empty() {
 
         return EMPTY;
 

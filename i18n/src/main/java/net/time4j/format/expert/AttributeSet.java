@@ -289,6 +289,7 @@ final class AttributeSet
 
     static AttributeSet createDefaults(
         Chronology<?> chronology,
+        Attributes attributes,
         Locale locale
     ) {
 
@@ -297,6 +298,7 @@ final class AttributeSet
         builder.set(Attributes.TEXT_WIDTH, TextWidth.WIDE);
         builder.set(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
         builder.set(Attributes.PAD_CHAR, ' ');
+        builder.setAll(attributes);
         AttributeSet as = new AttributeSet(builder.build(), locale);
         return as.withLocale(locale);
 

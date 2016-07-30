@@ -157,7 +157,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         Chronology<T> chronology,
         Chronology<?> override,
         Locale locale,
-        List<FormatStep> steps
+        List<FormatStep> steps,
+        Map<ChronoElement<?>, Object> defaults,
+        Attributes globals
     ) {
         super();
 
@@ -169,9 +171,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         this.chronology = chronology;
         this.overrideHandler = OverrideHandler.of(override);
-        this.globalAttributes = AttributeSet.createDefaults((override == null) ? chronology : override, locale);
+        this.globalAttributes =
+            AttributeSet.createDefaults((override == null) ? chronology : override, globals, locale);
         this.leniency = this.globalAttributes.get(Attributes.LENIENCY, Leniency.SMART);
-        this.defaults = Collections.emptyMap();
+        this.defaults = Collections.unmodifiableMap(defaults);
 
         FractionProcessor fp = null;
         boolean ho = false;
@@ -359,7 +362,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         this.countOfElements = formatter.countOfElements;
         this.trailing = formatter.trailing;
 
-        Map<ChronoElement<?>, Object> map = new NonAmbivalentMap(formatter.defaults);
+        Map<ChronoElement<?>, Object> map = new HashMap<ChronoElement<?>, Object>(formatter.defaults);
         boolean ix = formatter.indexable;
 
         for (ChronoElement<?> element : defaultMap.keySet()) {
@@ -3003,6 +3006,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         private int reservedIndex;
         private int leftPadWidth;
         private DayPeriod dayPeriod;
+        private Map<ChronoElement<?>, Object> defaultMap;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -3036,6 +3040,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
             this.dayPeriod = null;
+            this.defaultMap = new HashMap<ChronoElement<?>, Object>();
 
         }
 
@@ -5670,18 +5675,76 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         /**
+         * <p>Defines a default value if the parser has not parsed or found a value for given element. </p>
+         *
+         * @param   <V> generic element value type
+         * @param   element     chronological element
+         * @param   value       replacement value, not {@code null}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not supported by the underlying chronology
+         * @since   3.22/4.18
+         */
+        /*[deutsch]
+         * <p>Definiert einen Standardwert, wenn der Interpretierer keinen Wert zum angegebenen Element
+         * gefunden hat. </p>
+         *
+         * @param   <V> generic element value type
+         * @param   element     chronological element
+         * @param   value       replacement value, not {@code null}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not supported by the underlying chronology
+         * @since   3.22/4.18
+         */
+        public <V> Builder<T> setDefault(
+            ChronoElement<V> element,
+            V value
+        ) {
+
+            if (value == null) {
+                throw new NullPointerException("Missing default value.");
+            }
+
+            this.checkElement(element);
+            this.defaultMap.put(element, value);
+            return this;
+
+        }
+
+        /**
          * <p>Finishes the build and creates a new {@code ChronoFormatter}. </p>
          *
-         * @return  new {@code ChronoFormatter}-instance
+         * @return  new {@code ChronoFormatter}-instance with standard global format attributes
          * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
          */
         /*[deutsch]
          * <p>Schlie&szlig;t den Build-Vorgang ab und erstellt ein neues Zeitformat. </p>
          *
-         * @return  new {@code ChronoFormatter}-instance
+         * @return  new {@code ChronoFormatter}-instance with standard global format attributes
          * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
          */
         public ChronoFormatter<T> build() {
+
+            return this.build(Attributes.empty());
+
+        }
+
+        /**
+         * <p>Finishes the build and creates a new {@code ChronoFormatter}. </p>
+         *
+         * @param   attributes  new set of global format attributes
+         * @return  new {@code ChronoFormatter}-instance
+         * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
+         * @since   3.22/4.18
+         */
+        /*[deutsch]
+         * <p>Schlie&szlig;t den Build-Vorgang ab und erstellt ein neues Zeitformat. </p>
+         *
+         * @param   attributes  new set of global format attributes
+         * @return  new {@code ChronoFormatter}-instance
+         * @throws  IllegalStateException if there is no format element at all or none after or-operator in same section
+         * @since   3.22/4.18
+         */
+        public ChronoFormatter<T> build(Attributes attributes) {
 
             Map<Integer, FormatStep> m = null;
 
@@ -5717,7 +5780,9 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     this.chronology,
                     this.override,
                     this.locale,
-                    this.steps
+                    this.steps,
+                    this.defaultMap,
+                    attributes
                 );
 
             if (this.dayPeriod != null) {

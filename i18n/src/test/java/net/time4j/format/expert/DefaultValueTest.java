@@ -20,11 +20,22 @@ import static org.junit.Assert.assertThat;
 public class DefaultValueTest {
 
     @Test
-    public void missingYear() throws ParseException {
+    public void missingYear1() throws ParseException {
         ChronoFormatter<PlainDate> fmt =
             ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
                 .addPattern("MM-dd", PatternType.CLDR).build()
                 .withDefault(PlainDate.YEAR, 2012);
+        PlainDate date = fmt.parse("05-21");
+        assertThat(date, is(PlainDate.of(2012, 5, 21)));
+    }
+
+    @Test
+    public void missingYear2() throws ParseException {
+        ChronoFormatter<PlainDate> fmt =
+            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
+                .addPattern("MM-dd", PatternType.CLDR)
+                .setDefault(PlainDate.YEAR, 2012)
+                .build();
         PlainDate date = fmt.parse("05-21");
         assertThat(date, is(PlainDate.of(2012, 5, 21)));
     }
