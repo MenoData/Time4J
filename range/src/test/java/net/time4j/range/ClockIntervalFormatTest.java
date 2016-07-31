@@ -223,4 +223,9 @@ public class ClockIntervalFormatTest {
             "[{0}/{1})");
     }
 
+    @Test(expected=ParseException.class)
+    public void parseTrailingSpace() throws ParseException {
+        ClockInterval.parseISO("1745/2015 ");
+    }
+
 }

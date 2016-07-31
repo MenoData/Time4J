@@ -28,8 +28,11 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.Weekmodel;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -77,6 +80,11 @@ public final class MomentInterval
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final long serialVersionUID = -5403584519478162113L;
+
+    private static final ChronoFormatter<Moment> EXTENDED_ISO =
+        Iso8601Format.EXTENDED_DATE_TIME_OFFSET.with(Attributes.TRAILING_CHARACTERS, true);
+    private static final ChronoFormatter<Moment> BASIC_ISO =
+        Iso8601Format.BASIC_DATE_TIME_OFFSET.with(Attributes.TRAILING_CHARACTERS, true);
 
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
         new IntervalComparator<>(false, Moment.axis());
@@ -1058,28 +1066,13 @@ public final class MomentInterval
             sameFormat = ((firstDate == secondDate) && (literals == literals2) && hasSecondOffset(text, n));
         }
 
-        // start format
-        ChronoFormatter<Moment> startFormat =
-            (extended ? Iso8601Format.EXTENDED_DATE_TIME_OFFSET : Iso8601Format.BASIC_DATE_TIME_OFFSET);
-
-        // end format
-        ChronoFormatter<Moment> endFormat;
-
-        if (sameFormat) {
-            endFormat = startFormat;
-        } else {
-            endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle, timeLength, hasT);
-        }
+        // prepare component parsers
+        ChronoFormatter<Moment> startFormat = (extended ? EXTENDED_ISO : BASIC_ISO);
+        ChronoFormatter<Moment> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
-        return IntervalParser.of(
-            MomentIntervalFactory.INSTANCE,
-            startFormat,
-            endFormat,
-            BracketPolicy.SHOW_NEVER,
-            '/',
-            Moment.axis()
-        ).parse(text);
+        Parser parser = new Parser(startFormat, endFormat, extended, weekStyle, ordinalStyle, timeLength, hasT);
+        return parser.parse(text);
 
     }
 
@@ -1116,103 +1109,6 @@ public final class MomentInterval
         }
 
         return false;
-
-    }
-
-    private static ChronoFormatter<Moment> abbreviatedFormat(
-        boolean extended,
-        boolean weekStyle,
-        boolean ordinalStyle,
-        int protectedArea,
-        boolean hasT
-    ) {
-
-        ChronoFormatter.Builder<Moment> builder =
-            ChronoFormatter.setUp(Moment.class, Locale.ROOT);
-
-        ChronoElement<Integer> year = (weekStyle ? YEAR_OF_WEEKDATE : YEAR);
-        if (extended) {
-            int p = (ordinalStyle ? 3 : 5) + protectedArea;
-            builder.startSection(PROTECTED_CHARACTERS, p);
-            builder.addCustomized(
-                year,
-                NoopPrinter.NOOP,
-                (weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
-        } else {
-            int p = (ordinalStyle ? 3 : 4) + protectedArea;
-            builder.startSection(PROTECTED_CHARACTERS, p);
-            builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-        }
-        builder.endSection();
-
-        if (weekStyle) {
-            builder.startSection(PROTECTED_CHARACTERS, 1 + protectedArea);
-            builder.addCustomized(
-                Weekmodel.ISO.weekOfYear(),
-                NoopPrinter.NOOP,
-                extended
-                    ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
-                    : FixedNumParser.BASIC_WEEK_OF_YEAR);
-            builder.endSection();
-            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
-            builder.addFixedNumerical(DAY_OF_WEEK, 1);
-            builder.endSection();
-        } else if (ordinalStyle) {
-            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
-            builder.addFixedInteger(DAY_OF_YEAR, 3);
-            builder.endSection();
-        } else {
-            builder.startSection(PROTECTED_CHARACTERS, 2 + protectedArea);
-            if (extended) {
-                builder.addCustomized(
-                    MONTH_AS_NUMBER,
-                    NoopPrinter.NOOP,
-                    FixedNumParser.CALENDAR_MONTH);
-            } else {
-                builder.addFixedInteger(MONTH_AS_NUMBER, 2);
-            }
-            builder.endSection();
-            builder.startSection(PROTECTED_CHARACTERS, protectedArea);
-            builder.addFixedInteger(DAY_OF_MONTH, 2);
-            builder.endSection();
-        }
-
-        if (hasT) {
-            builder.addLiteral('T');
-        }
-
-        addWallTime(builder, extended);
-
-        builder.startOptionalSection();
-        addOffset(builder, extended);
-        builder.endSection();
-
-        return builder.build();
-
-    }
-
-    private static <T extends ChronoEntity<T>> void addWallTime(
-        ChronoFormatter.Builder<T> builder,
-        boolean extended
-    ) {
-
-        builder.addCustomized(
-            PlainTime.COMPONENT,
-            extended
-                ? Iso8601Format.EXTENDED_WALL_TIME
-                : Iso8601Format.BASIC_WALL_TIME);
-
-    }
-
-    private static <T extends ChronoEntity<T>> void addOffset(
-        ChronoFormatter.Builder<T> builder,
-        boolean extended
-    ) {
-
-        builder.addTimezoneOffset(
-            DisplayMode.SHORT,
-            extended,
-            Collections.singletonList("Z"));
 
     }
 
@@ -1265,6 +1161,165 @@ public final class MomentInterval
         throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class Parser
+        extends IntervalParser<Moment, MomentInterval> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final boolean extended;
+        private final boolean weekStyle;
+        private final boolean ordinalStyle;
+        private final int protectedArea;
+        private final boolean hasT;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Parser(
+            ChronoParser<Moment> startFormat,
+            ChronoParser<Moment> endFormat, // optional
+            boolean extended,
+            boolean weekStyle,
+            boolean ordinalStyle,
+            int protectedArea,
+            boolean hasT
+        ) {
+            super(MomentIntervalFactory.INSTANCE, startFormat, endFormat, BracketPolicy.SHOW_NEVER, '/');
+
+            this.extended = extended;
+            this.weekStyle = weekStyle;
+            this.ordinalStyle = ordinalStyle;
+            this.protectedArea = protectedArea;
+            this.hasT = hasT;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        protected Moment parseReducedEnd(
+            CharSequence text,
+            Moment t1,
+            ParseLog lowerLog,
+            ParseLog upperLog,
+            AttributeQuery attrs
+        ) {
+
+            ChronoFormatter<Moment> reducedParser =
+                this.createEndFormat(
+                    Moment.axis().preformat(t1, attrs),
+                    lowerLog.getRawValues());
+            return reducedParser.parse(text, upperLog);
+
+        }
+
+        @Override
+        protected boolean isISO() {
+
+            return true;
+
+        }
+
+        private ChronoFormatter<Moment> createEndFormat(
+            ChronoDisplay defaultSupplier,
+            ChronoEntity<?> rawData
+        ) {
+
+            ChronoFormatter.Builder<Moment> builder =
+                ChronoFormatter.setUp(Moment.class, Locale.ROOT);
+
+            ChronoElement<Integer> year = (this.weekStyle ? YEAR_OF_WEEKDATE : YEAR);
+            if (this.extended) {
+                int p = (this.ordinalStyle ? 3 : 5) + this.protectedArea;
+                builder.startSection(PROTECTED_CHARACTERS, p);
+                builder.addCustomized(
+                    year,
+                    NoopPrinter.NOOP,
+                    (this.weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
+            } else {
+                int p = (this.ordinalStyle ? 3 : 4) + this.protectedArea;
+                builder.startSection(PROTECTED_CHARACTERS, p);
+                builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+            }
+            builder.endSection();
+
+            if (this.weekStyle) {
+                builder.startSection(PROTECTED_CHARACTERS, 1 + this.protectedArea);
+                builder.addCustomized(
+                    Weekmodel.ISO.weekOfYear(),
+                    NoopPrinter.NOOP,
+                    this.extended
+                        ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
+                        : FixedNumParser.BASIC_WEEK_OF_YEAR);
+                builder.endSection();
+                builder.startSection(PROTECTED_CHARACTERS, this.protectedArea);
+                builder.addFixedNumerical(DAY_OF_WEEK, 1);
+                builder.endSection();
+            } else if (this.ordinalStyle) {
+                builder.startSection(PROTECTED_CHARACTERS, this.protectedArea);
+                builder.addFixedInteger(DAY_OF_YEAR, 3);
+                builder.endSection();
+            } else {
+                builder.startSection(PROTECTED_CHARACTERS, 2 + this.protectedArea);
+                if (this.extended) {
+                    builder.addCustomized(
+                        MONTH_AS_NUMBER,
+                        NoopPrinter.NOOP,
+                        FixedNumParser.CALENDAR_MONTH);
+                } else {
+                    builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+                }
+                builder.endSection();
+                builder.startSection(PROTECTED_CHARACTERS, this.protectedArea);
+                builder.addFixedInteger(DAY_OF_MONTH, 2);
+                builder.endSection();
+            }
+
+            if (this.hasT) {
+                builder.addLiteral('T');
+            }
+
+            builder.addCustomized(
+                PlainTime.COMPONENT,
+                this.extended
+                    ? Iso8601Format.EXTENDED_WALL_TIME
+                    : Iso8601Format.BASIC_WALL_TIME);
+
+            builder.startOptionalSection();
+            builder.addTimezoneOffset(
+                DisplayMode.SHORT,
+                this.extended,
+                Collections.singletonList("Z"));
+            builder.endSection();
+
+            for (ChronoElement<?> key : MomentIntervalFactory.INSTANCE.stdElements(rawData)) {
+                setDefault(builder, key, defaultSupplier);
+            }
+
+            Attributes attributes =
+                new Attributes.Builder()
+                    .set(Attributes.TRAILING_CHARACTERS, true)
+                    .setTimezone(rawData.getTimezone())
+                    .build();
+
+            return builder.build(attributes);
+
+        }
+
+        // wilcard capture
+        private static <V> void setDefault(
+            ChronoFormatter.Builder<Moment> builder,
+            ChronoElement<V> element,
+            ChronoDisplay defaultSupplier
+        ) {
+
+            builder.setDefault(element, defaultSupplier.get(element));
+
+        }
 
     }
 
