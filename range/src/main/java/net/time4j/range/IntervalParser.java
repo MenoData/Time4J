@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalParser.java) is part of project Time4J.
  *
@@ -23,16 +23,11 @@ package net.time4j.range;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
-import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
-import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ParseLog;
-import net.time4j.tz.TZID;
 
 import java.text.ParseException;
 
@@ -41,7 +36,7 @@ import static net.time4j.range.IntervalEdge.OPEN;
 
 
 /**
- * <p>Interpretiert Intervalle basierend auf eher technischen Zeitformatierern, die auf die
+ * <p>Interpretiert Intervalle basierend auf Zeitformatierern, die auf die
  * Start- oder Endkomponenten angewandt werden. </p>
  *
  * @author  Meno Hochschild
@@ -49,43 +44,39 @@ import static net.time4j.range.IntervalEdge.OPEN;
  * @param   <I> generic interval type
  * @since   2.0
  */
-final class IntervalParser
-    <T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoParser<I> {
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final IntervalFactory<T, I> factory;
-    private final ChronoParser<T> startFormat;
-    private final ChronoParser<T> endFormat;
-    private final BracketPolicy policy;
-    private final ChronoMerger<?> merger;
+	private final IntervalFactory<T, I> factory;
+	private final ChronoParser<T> startFormat;
+	private final ChronoParser<T> endFormat;
+	private final BracketPolicy policy;
     private final Character separator;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private IntervalParser(
-        IntervalFactory<T, I> factory,
-        ChronoParser<T> startFormat,
-        ChronoParser<T> endFormat,
-        BracketPolicy policy,
-        ChronoMerger<?> merger, // optional
+	IntervalParser(
+		IntervalFactory<T, I> factory,
+		ChronoParser<T> startFormat,
+		ChronoParser<T> endFormat, // optional
+		BracketPolicy policy,
         Character separator // optional
-    ) {
-        super();
+	) {
+		super();
 
-        if (policy == null) {
-            throw new NullPointerException("Missing bracket policy.");
+		if (policy == null) {
+			throw new NullPointerException("Missing bracket policy.");
         }
 
         this.factory = factory;
-        this.startFormat = startFormat;
-        this.endFormat = endFormat;
-        this.policy = policy;
-        this.merger = merger;
+		this.startFormat = startFormat;
+		this.endFormat = endFormat;
+		this.policy = policy;
         this.separator = separator;
 
-    }
+	}
 
     //~ Methoden ----------------------------------------------------------
 
@@ -100,19 +91,19 @@ final class IntervalParser
      * @return  new interval parser
      * @since   2.0
      */
-    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
-        IntervalFactory<T, I> factory,
-        ChronoParser<T> parser,
-        BracketPolicy policy
-    ) {
+	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
+		IntervalFactory<T, I> factory,
+		ChronoParser<T> parser,
+		BracketPolicy policy
+	) {
 
-        if (parser == null) {
-            throw new NullPointerException("Missing boundary parser.");
+		if (parser == null) {
+			throw new NullPointerException("Missing boundary parser.");
         }
 
-        return new IntervalParser<T, I>(factory, parser, parser, policy, null, null);
+		return new IntervalParser<T, I>(factory, parser, parser, policy, null);
 
-    }
+	}
 
     /**
      * <p>General factory method. </p>
@@ -123,7 +114,6 @@ final class IntervalParser
      * @param   startFormat     formatter for lower interval boundary
      * @param   endFormat       formatter for upper interval boundary
      * @param   policy          bracket policy
-     * @param   merger          ISO-merger (optional)
      * @param   separator       separation char  between start and end component
      * @return  new interval parser
      * @since   3.9/4.6
@@ -148,7 +138,6 @@ final class IntervalParser
             startFormat,
             endFormat,
             policy,
-            merger,
             Character.valueOf(separator));
 
     }
@@ -293,7 +282,7 @@ final class IntervalParser
             pos++;
         }
 
-        // end component after solidus
+        // end component after separator char
         if (pos >= len) {
             status.setError(
                 pos,
@@ -336,26 +325,10 @@ final class IntervalParser
             pos += 2;
         } else {
             upperLog = new ParseLog(pos);
-            t2 = this.endFormat.parse(text, upperLog, attrs);
-            if (t2 == null || upperLog.isError()) {
-                if (
-                    (t1 != null) // implies: lowerLog != null
-                    && (this.isoMode())
-                ) {
-                    IntervalFactory<T, I> iif = this.factory;
-                    ChronoParser<T> parser = this.endFormat;
-                    ChronoEntity<?> lowerRaw = lowerLog.getRawValues();
-                    if (lowerRaw.hasTimezone()) {
-                        attrs = new Wrapper(attrs, lowerRaw.getTimezone());
-                    }
-                    ChronoDisplay cv = preformat(t1, this.merger, attrs);
-                    for (ChronoElement<?> key : iif.stdElements(lowerRaw)) {
-                        parser = setDefault(parser, cv, key);
-                    }
-                    upperLog.reset();
-                    upperLog.setPosition(pos);
-                    t2 = parser.parse(text, upperLog, attrs);
-                }
+            if (this.endFormat == null) {
+                t2 = this.parseReducedEnd(text, t1, lowerLog, upperLog, attrs);
+            } else {
+                t2 = this.endFormat.parse(text, upperLog, attrs);
             }
             if (t2 == null || upperLog.isError()) {
                 status.setError(pos, upperLog.getErrorMessage());
@@ -396,7 +369,7 @@ final class IntervalParser
 
         if (
             (pos < len)
-            && !attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
+            && (this.isISO() || !attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue())
         ) {
             String suffix;
 
@@ -501,7 +474,7 @@ final class IntervalParser
         while (i < n) {
             char c = pattern.charAt(i);
 
-            if ((c == '{') && (i + 2 < n) && (pattern.charAt(i + 2) == '}')){
+            if ((c == '{') && (i + 2 < n) && (pattern.charAt(i + 2) == '}')) {
                 char next = pattern.charAt(i + 1);
 
                 if (next == '0') {
@@ -591,6 +564,24 @@ final class IntervalParser
 
     }
 
+    protected T parseReducedEnd(
+        CharSequence text,
+        T t1,
+        ParseLog lowerLog,
+        ParseLog upperLog,
+        AttributeQuery attrs
+    ) {
+
+        return null;
+
+    }
+
+    protected boolean isISO() {
+
+        return false;
+
+    }
+
     private static AttributeQuery wrap(AttributeQuery attributes) {
 
         AttributeQuery attrs = attributes;
@@ -640,61 +631,21 @@ final class IntervalParser
 
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T, V> ChronoParser<T> setDefault(
-        ChronoParser<T> parser,
-        ChronoDisplay cv,
-        ChronoElement<V> key
-    ) {
-
-        ChronoFormatter<?> fmt = ChronoFormatter.class.cast(parser);
-        fmt = fmt.withDefault(key, cv.get(key));
-        return (ChronoParser<T>) fmt;
-
-    }
-
-    private boolean isoMode() {
-
-        return (this.merger != null);
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> ChronoDisplay preformat(
-        Object time,
-        ChronoMerger<T> merger,
-        AttributeQuery attrs
-    ) {
-
-        return merger.preformat((T) time, attrs);
-
-    }
-
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class Wrapper
+    static class Wrapper
         implements AttributeQuery {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final AttributeQuery attributes;
-        private final TZID tzid;
 
         //~ Konstruktoren -------------------------------------------------
 
         Wrapper(AttributeQuery attributes) {
-            this(attributes, null);
-
-        }
-
-        Wrapper(
-            AttributeQuery attributes,
-            TZID tzid
-        ) {
             super();
 
             this.attributes = attributes;
-            this.tzid = tzid;
 
         }
 
@@ -704,11 +655,6 @@ final class IntervalParser
         public boolean contains(AttributeKey<?> key) {
             if (key == Attributes.TRAILING_CHARACTERS) {
                 return true;
-            } else if (
-                (this.tzid != null)
-                && (key == Attributes.TIMEZONE_ID)
-            ) {
-                return true;
             }
             return this.attributes.contains(key);
         }
@@ -717,11 +663,6 @@ final class IntervalParser
         public <A> A get(AttributeKey<A> key) {
             if (key == Attributes.TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
-            } else if (
-                (this.tzid != null)
-                && (key == Attributes.TIMEZONE_ID)
-            ) {
-                return key.type().cast(this.tzid);
             }
             return this.attributes.get(key);
         }
@@ -730,11 +671,6 @@ final class IntervalParser
         public <A> A get(AttributeKey<A> key, A defaultValue) {
             if (key == Attributes.TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
-            } else if (
-                (this.tzid != null)
-                && (key == Attributes.TIMEZONE_ID)
-            ) {
-                return key.type().cast(this.tzid);
             }
             return this.attributes.get(key, defaultValue);
         }

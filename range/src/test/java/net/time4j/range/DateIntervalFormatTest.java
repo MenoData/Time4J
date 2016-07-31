@@ -1,12 +1,6 @@
 package net.time4j.range;
 
 import net.time4j.PlainDate;
-import net.time4j.format.Attributes;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Locale;
-
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
@@ -14,6 +8,10 @@ import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -265,26 +263,9 @@ public class DateIntervalFormatTest {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
         ChronoInterval<PlainDate> interval = DateInterval.between(start, end);
-        ChronoFormatter<PlainDate> formatter =
-            Iso8601Format.BASIC_CALENDAR_DATE;
-        ParseLog plog = new ParseLog();
+        ChronoFormatter<PlainDate> formatter = Iso8601Format.BASIC_CALENDAR_DATE;
         assertThat(
-            IntervalParser.of(
-                DateIntervalFactory.INSTANCE,
-                formatter,
-                ChronoFormatter.setUp(PlainDate.class, Locale.ROOT)
-                    .startSection(Attributes.PROTECTED_CHARACTERS, 5)
-                    .addFixedInteger(PlainDate.YEAR, 4)
-                    .endSection()
-                    .startSection(Attributes.PROTECTED_CHARACTERS, 3)
-                    .addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2)
-                    .endSection()
-                    .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
-                    .build(),
-                BracketPolicy.SHOW_ALWAYS,
-                '/',
-                PlainDate.axis()
-            ).parse("[20140227/0514]", plog, formatter.getAttributes()),
+            DateInterval.parse("20140227 - 20140514", formatter, "{0} - {1}"),
             is(interval));
     }
 
@@ -500,6 +481,16 @@ public class DateIntervalFormatTest {
     @Test(expected=ParseException.class)
     public void parseNoSolidus() throws ParseException {
         DateInterval.parseISO("2012001P775D");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseTrailingSpace1() throws ParseException {
+        DateInterval.parseISO("20120101/20140214 ");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseTrailingSpace2() throws ParseException {
+        DateInterval.parseISO("2012-01-01/2014-02-14 ");
     }
 
     @Test

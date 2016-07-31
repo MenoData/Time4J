@@ -27,7 +27,10 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -758,24 +761,13 @@ public final class DateInterval
             }
         }
 
-        // end format
-        ChronoFormatter<PlainDate> endFormat;
-
-        if (sameFormat) {
-            endFormat = startFormat;
-        } else {
-            endFormat = abbreviatedFormat(extended, weekStyle, ordinalStyle);
-        }
+        // prepare component parsers
+        startFormat = startFormat.with(Attributes.TRAILING_CHARACTERS, true);
+        ChronoFormatter<PlainDate> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
-        return IntervalParser.of(
-            DateIntervalFactory.INSTANCE,
-            startFormat,
-            endFormat,
-            BracketPolicy.SHOW_NEVER,
-            '/',
-            PlainDate.axis()
-        ).parse(text);
+        Parser parser = new Parser(startFormat, endFormat, extended, weekStyle, ordinalStyle);
+        return parser.parse(text);
 
     }
 
@@ -790,60 +782,6 @@ public final class DateInterval
     DateInterval getContext() {
 
         return this;
-
-    }
-
-    private static ChronoFormatter<PlainDate> abbreviatedFormat(
-        boolean extended,
-        boolean weekStyle,
-        boolean ordinalStyle
-    ) {
-
-        ChronoFormatter.Builder<PlainDate> builder =
-            ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
-
-        ChronoElement<Integer> year = (weekStyle ? YEAR_OF_WEEKDATE : YEAR);
-        if (extended) {
-            int p = (ordinalStyle ? 3 : 5);
-            builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
-            builder.addCustomized(
-                year,
-                NoopPrinter.NOOP,
-                (weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
-        } else {
-            int p = (ordinalStyle ? 3 : 4);
-            builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
-            builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
-        }
-        builder.endSection();
-
-        if (weekStyle) {
-            builder.startSection(Attributes.PROTECTED_CHARACTERS, 1);
-            builder.addCustomized(
-                Weekmodel.ISO.weekOfYear(),
-                NoopPrinter.NOOP,
-                extended
-                    ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
-                    : FixedNumParser.BASIC_WEEK_OF_YEAR);
-            builder.endSection();
-            builder.addFixedNumerical(DAY_OF_WEEK, 1);
-        } else if (ordinalStyle) {
-            builder.addFixedInteger(DAY_OF_YEAR, 3);
-        } else {
-            builder.startSection(Attributes.PROTECTED_CHARACTERS, 2);
-            if (extended) {
-                builder.addCustomized(
-                    MONTH_AS_NUMBER,
-                    NoopPrinter.NOOP,
-                    FixedNumParser.CALENDAR_MONTH);
-            } else {
-                builder.addFixedInteger(MONTH_AS_NUMBER, 2);
-            }
-            builder.endSection();
-            builder.addFixedInteger(DAY_OF_MONTH, 2);
-        }
-
-        return builder.build();
 
     }
 
@@ -893,6 +831,132 @@ public final class DateInterval
         throws IOException, ClassNotFoundException {
 
         throw new InvalidObjectException("Serialization proxy required.");
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class Parser
+        extends IntervalParser<PlainDate, DateInterval> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final boolean extended;
+        private final boolean weekStyle;
+        private final boolean ordinalStyle;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Parser(
+            ChronoParser<PlainDate> startFormat,
+            ChronoParser<PlainDate> endFormat, // optional
+            boolean extended,
+            boolean weekStyle,
+            boolean ordinalStyle
+        ) {
+            super(DateIntervalFactory.INSTANCE, startFormat, endFormat, BracketPolicy.SHOW_NEVER, '/');
+
+            this.extended = extended;
+            this.weekStyle = weekStyle;
+            this.ordinalStyle = ordinalStyle;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        protected PlainDate parseReducedEnd(
+            CharSequence text,
+            PlainDate start,
+            ParseLog lowerLog,
+            ParseLog upperLog,
+            AttributeQuery attrs
+        ) {
+
+            ChronoFormatter<PlainDate> reducedParser =
+                this.createEndFormat(
+                    PlainDate.axis().preformat(start, attrs),
+                    lowerLog.getRawValues());
+            return reducedParser.parse(text, upperLog);
+
+        }
+
+        @Override
+        protected boolean isISO() {
+
+            return true;
+
+        }
+
+        private ChronoFormatter<PlainDate> createEndFormat(
+            ChronoDisplay defaultSupplier,
+            ChronoEntity<?> rawData
+        ) {
+
+            ChronoFormatter.Builder<PlainDate> builder =
+                ChronoFormatter.setUp(PlainDate.class, Locale.ROOT);
+
+            ChronoElement<Integer> year = (this.weekStyle ? YEAR_OF_WEEKDATE : YEAR);
+            if (this.extended) {
+                int p = (this.ordinalStyle ? 3 : 5);
+                builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
+                builder.addCustomized(
+                    year,
+                    NoopPrinter.NOOP,
+                    (this.weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
+            } else {
+                int p = (this.ordinalStyle ? 3 : 4);
+                builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
+                builder.addInteger(year, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
+            }
+            builder.endSection();
+
+            if (this.weekStyle) {
+                builder.startSection(Attributes.PROTECTED_CHARACTERS, 1);
+                builder.addCustomized(
+                    Weekmodel.ISO.weekOfYear(),
+                    NoopPrinter.NOOP,
+                    this.extended
+                        ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
+                        : FixedNumParser.BASIC_WEEK_OF_YEAR);
+                builder.endSection();
+                builder.addFixedNumerical(DAY_OF_WEEK, 1);
+            } else if (this.ordinalStyle) {
+                builder.addFixedInteger(DAY_OF_YEAR, 3);
+            } else {
+                builder.startSection(Attributes.PROTECTED_CHARACTERS, 2);
+                if (this.extended) {
+                    builder.addCustomized(
+                        MONTH_AS_NUMBER,
+                        NoopPrinter.NOOP,
+                        FixedNumParser.CALENDAR_MONTH);
+                } else {
+                    builder.addFixedInteger(MONTH_AS_NUMBER, 2);
+                }
+                builder.endSection();
+                builder.addFixedInteger(DAY_OF_MONTH, 2);
+            }
+
+            for (ChronoElement<?> key : DateIntervalFactory.INSTANCE.stdElements(rawData)) {
+                setDefault(builder, key, defaultSupplier);
+            }
+
+            Attributes attributes =
+                new Attributes.Builder().set(Attributes.TRAILING_CHARACTERS, true).build();
+            return builder.build(attributes);
+
+        }
+
+        // wilcard capture
+        private static <V> void setDefault(
+            ChronoFormatter.Builder<PlainDate> builder,
+            ChronoElement<V> element,
+            ChronoDisplay defaultSupplier
+        ) {
+
+            builder.setDefault(element, defaultSupplier.get(element));
+
+        }
 
     }
 
