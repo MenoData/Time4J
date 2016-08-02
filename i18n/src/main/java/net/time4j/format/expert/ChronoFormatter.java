@@ -427,7 +427,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * <p>Returns the global format attributes which are active if they are not
      * overridden by sectional attributes. </p>
      *
-     * <p>These attributes can be adjusted by a suitable
+     * <p>The global attributes can be adjusted by a suitable
      * {@code with()}-method. Following attributes are predefined: </p>
      *
      * <table border="1" style="margin-top:5px;">
@@ -606,40 +606,19 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-
-    /**
-     * <p>Prints given chronological entity as formatted text and writes
-     * the text into given buffer. </p>
-     *
-     * <p>Equivalent to {@code print(formattable, buffer, getAttributes())}. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     */
-    /*[deutsch]
-     * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
-     * den Puffer. </p>
-     *
-     * <p>Entspricht {@code print(formattable, buffer, getAttributes())}. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     */
+    @Override
     public Set<ElementPosition> print(
         T formattable,
-        StringBuilder buffer
+        StringBuilder buffer,
+        AttributeQuery attributes
     ) {
 
-        ChronoDisplay display = this.display(formattable, this.globalAttributes);
+        ChronoDisplay display = this.display(formattable, attributes);
 
         try {
-            return this.print(display, buffer, this.globalAttributes, true);
+            return this.print(display, buffer, attributes, true);
         } catch (IOException ioe) {
-            throw new IllegalStateException(ioe); // cannot happen
+            throw new AssertionError(ioe);
         }
 
     }
@@ -812,17 +791,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     @Override
     public T parse(CharSequence text) throws ParseException {
 
-        ParseLog status = new ParseLog();
-        T result = this.parse(text, status, this.globalAttributes);
-
-        if (result == null) {
-            throw new ParseException(
-                status.getErrorMessage(),
-                status.getErrorIndex()
-            );
-        }
-
-        return result;
+        return ChronoParser.super.parse(text);
 
     }
 
@@ -863,37 +832,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         T result = this.parse(text, plog, this.globalAttributes);
         rawValues.accept(plog.getRawValues());
         return result;
-
-    }
-
-    /**
-     * <p>Interpretes given text as chronological entity starting
-     * at the specified position in parse log. </p>
-     *
-     * <p>Equivalent to {@code parse(text, status, getAttributes())}. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
-     * Log. </p>
-     *
-     * <p>Entspricht {@code parse(text, status, getAttributes())}. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
-    public T parse(
-        CharSequence text,
-        ParseLog status
-    ) {
-
-        return this.parse(text, status, this.globalAttributes);
 
     }
 
@@ -2590,7 +2528,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         try {
             this.print(display, buffer, this.globalAttributes, false);
         } catch (IOException ioe) {
-            throw new IllegalStateException(ioe); // cannot happen
+            throw new AssertionError(ioe);
         }
 
         return buffer.toString();

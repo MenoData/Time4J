@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoPrinter.java) is part of project Time4J.
  *
@@ -24,8 +24,11 @@ package net.time4j.format.expert;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.format.Attributes;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 
 /**
@@ -65,6 +68,9 @@ public interface ChronoPrinter<T> {
      * @return  result of query
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
+     * @deprecated  Beginning with v5.0, this method will be removed. Implementors are asked to override
+     *              {@link #print(Object, StringBuilder, AttributeQuery) print(T, StringBuilder, AttributeQuery}
+     *              as soon as possible in order to simplify the future migration.
      */
     /*[deutsch]
      * <p>Erzeugt eine Textausgabe und schreibt sie in den angegebenen
@@ -86,12 +92,137 @@ public interface ChronoPrinter<T> {
      * @return  result of query
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
+     * @deprecated  Beginning with v5.0, this method will be removed. Implementors are asked to override
+     *              {@link #print(Object, StringBuilder, AttributeQuery) print(T, StringBuilder, AttributeQuery}
+     *              as soon as possible in order to simplify the future migration.
      */
+    @Deprecated
     <R> R print(
         T formattable,
         Appendable buffer,
         AttributeQuery attributes,
         ChronoFunction<ChronoDisplay, R> query
     ) throws IOException;
+
+    /**
+     * <p>Prints given chronological entity as formatted text. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @return  formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Objekt als Text. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @return  formatted text
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    default String format(T formattable) {
+
+        StringBuilder buffer = new StringBuilder();
+        this.print(formattable, buffer, this.getAttributes());
+        return buffer.toString();
+
+    }
+
+    /**
+     * <p>Prints given chronological entity as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>Equivalent to {@code print(formattable, buffer, getAttributes())}. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @return  unmodifiable set of element positions in formatted text, maybe empty
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
+     * den Puffer. </p>
+     *
+     * <p>Entspricht {@code print(formattable, buffer, getAttributes())}. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @return  unmodifiable set of element positions in formatted text, maybe empty
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    default Set<ElementPosition> print(
+        T formattable,
+        StringBuilder buffer
+    ) {
+
+        return this.print(formattable, buffer, this.getAttributes());
+
+    }
+
+    /**
+     * <p>Prints given chronological entity as formatted text and writes
+     * the text into given buffer. </p>
+     *
+     * <p>Starting with v5.0, this method will become the SAM-method of this interface and has to be implemented
+     * in any suitable way. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @param   attributes      format attributes which can control formatting
+     * @return  unmodifiable set of element positions in formatted text, maybe empty
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
+     * den Puffer. </p>
+     *
+     * <p>Beginnend mit v5.0 wird diese Methode die SAM-method dieses Interface sein und mu&szlig; in
+     * einer geeigneten Weise implementiert werden. </p>
+     *
+     * @param   formattable     object to be formatted
+     * @param   buffer          text output buffer
+     * @param   attributes      format attributes which can control formatting
+     * @return  unmodifiable set of element positions in formatted text, maybe empty
+     * @throws  IllegalArgumentException if given object is not formattable
+     * @since   3.22/4.18
+     */
+    default Set<ElementPosition> print( // TODO: remove default-keyword with v5.0
+        T formattable,
+        StringBuilder buffer,
+        AttributeQuery attributes
+    ) {
+
+        try {
+            return this.print(formattable, buffer, attributes, c -> Collections.emptySet());
+        } catch (IOException ioe) {
+            throw new AssertionError(ioe);
+        }
+
+    }
+
+    /**
+     * <p>Returns the global format attributes which are active if they are not
+     * overridden by sectional attributes. </p>
+     *
+     * @return  global control attributes valid for the whole formatter
+     *          (can be overridden by sectional attributes however)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Ermittelt die globalen Standardattribute, welche genau dann wirksam sind,
+     * wenn sie nicht durch sektionale Attribute &uuml;berschrieben werden. </p>
+     *
+     * @return  global control attributes valid for the whole formatter
+     *          (can be overridden by sectional attributes however)
+     * @since   3.22/4.18
+     */
+    default AttributeQuery getAttributes() {
+
+        return Attributes.empty();
+
+    }
 
 }

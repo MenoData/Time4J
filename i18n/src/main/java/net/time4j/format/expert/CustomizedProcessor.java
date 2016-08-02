@@ -133,10 +133,7 @@ final class CustomizedProcessor<V>
         V value = formattable.get(this.element);
         StringBuilder collector = new StringBuilder();
 
-        if (
-            (buffer instanceof CharSequence)
-                && (positions != null)
-            ) {
+        if ((positions != null) && (buffer instanceof CharSequence)) {
             int offset = ((CharSequence) buffer).length();
 
             if (this.printer instanceof ChronoFormatter) {

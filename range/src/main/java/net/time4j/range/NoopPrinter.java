@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NoopPrinter.java) is part of project Time4J.
  *
@@ -25,8 +25,11 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.format.expert.ChronoPrinter;
+import net.time4j.format.expert.ElementPosition;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 
 enum NoopPrinter
@@ -38,7 +41,7 @@ enum NoopPrinter
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
+    @Override // TODO: remove with v5.0
     public <R> R print(
         Integer formattable,
         Appendable buffer,
@@ -47,6 +50,17 @@ enum NoopPrinter
     ) throws IOException {
 
         return null;
+
+    }
+
+    @Override
+    public Set<ElementPosition> print(
+        Integer formattable,
+        StringBuilder buffer,
+        AttributeQuery attributes
+    ) {
+
+        return Collections.emptySet();
 
     }
 

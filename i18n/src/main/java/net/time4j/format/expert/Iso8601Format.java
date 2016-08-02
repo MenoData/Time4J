@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static net.time4j.PlainDate.DAY_OF_MONTH;
 import static net.time4j.PlainDate.DAY_OF_WEEK;
@@ -627,6 +628,16 @@ LOOP:
 
         return new ChronoPrinter<PlainDate>() {
             @Override
+            public Set<ElementPosition> print(
+                PlainDate formattable,
+                StringBuilder buffer,
+                AttributeQuery attributes
+            ) {
+                ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
+                return f.print(formattable, buffer); // attributes are ignored to ensure quick path evaluation
+            }
+            // TODO: remove with v5.0
+            @Override
             public <R> R print(
                 PlainDate formattable,
                 Appendable buffer,
@@ -635,7 +646,7 @@ LOOP:
             ) throws IOException {
                 ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
                 f.formatToBuffer(formattable, buffer);
-                return null;
+                return null; // always ignored
             }
         };
 
