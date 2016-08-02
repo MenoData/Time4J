@@ -8,6 +8,7 @@
 - Embedded formatter should know outer format attributes and defaults [#522]
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 - ChronoFormatter.Builder should define default values and global attributes [#531]
+- Add convenient methods to ChronoPrinter and ChronoParser [#532]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
