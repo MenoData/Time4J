@@ -9,6 +9,7 @@
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 - ChronoFormatter.Builder should define default values and global attributes [#531]
 - Add convenient methods to ChronoPrinter and ChronoParser [#532]
+- Make printing of ISO-formats configurable [#533]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
@@ -21,6 +22,7 @@
 ### Deprecated
 - 1 method in TextProvider deprecated due to missing output context [#529]
 - 3 methods in TransitionHistory deprecated and replaced by new better named methods [#523]
+- 1 method in ChronoPrinter deprecated and replaced by new methods [#532]
 
 ## [v4.17] published on 2016-06-20
 ### Added
