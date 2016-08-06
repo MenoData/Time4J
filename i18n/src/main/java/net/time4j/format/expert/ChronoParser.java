@@ -55,7 +55,7 @@ public interface ChronoParser<T> {
      * @return  parse result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab dem Anfang. </p>
@@ -64,7 +64,7 @@ public interface ChronoParser<T> {
      * @return  parse result
      * @throws  IndexOutOfBoundsException if the text is empty
      * @throws  ParseException if the text is not parseable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default T parse(CharSequence text) throws ParseException {
 
@@ -92,7 +92,7 @@ public interface ChronoParser<T> {
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text ab der im Log angegebenen Position. </p>
@@ -103,7 +103,7 @@ public interface ChronoParser<T> {
      * @param   status      parser information (always as new instance)
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default T parse(
         CharSequence    text,
@@ -156,7 +156,7 @@ public interface ChronoParser<T> {
      *
      * @return  global control attributes valid for the whole formatter
      *          (can be overridden by sectional attributes however)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Ermittelt die globalen Standardattribute, welche genau dann wirksam sind,
@@ -164,7 +164,7 @@ public interface ChronoParser<T> {
      *
      * @return  global control attributes valid for the whole formatter
      *          (can be overridden by sectional attributes however)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default AttributeQuery getAttributes() {
 

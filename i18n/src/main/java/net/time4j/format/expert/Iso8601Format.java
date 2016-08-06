@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -89,11 +90,10 @@ public class Iso8601Format {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final char ISO_DECIMAL_SEPARATOR = (
+    private static final IsoDecimalStyle DEFAULT_ISO_DECIMAL_STYLE = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
-            ? '.'
-            : ',' // Empfehlung des ISO-Standards
-    );
+            ? IsoDecimalStyle.DOT
+            : IsoDecimalStyle.COMMA);
 
     private static final NonZeroCondition NON_ZERO_SECOND = new NonZeroCondition(PlainTime.SECOND_OF_MINUTE);
     private static final NonZeroCondition NON_ZERO_FRACTION = new NonZeroCondition(PlainTime.NANO_OF_SECOND);
@@ -367,14 +367,14 @@ public class Iso8601Format {
         BASIC_DATE = generalDateFormat(false);
         EXTENDED_DATE = generalDateFormat(true);
 
-        BASIC_WALL_TIME = timeFormat(false);
-        EXTENDED_WALL_TIME = timeFormat(true);
+        BASIC_WALL_TIME = timeFormat(false, DEFAULT_ISO_DECIMAL_STYLE);
+        EXTENDED_WALL_TIME = timeFormat(true, DEFAULT_ISO_DECIMAL_STYLE);
 
-        BASIC_DATE_TIME = timestampFormat(false);
-        EXTENDED_DATE_TIME = timestampFormat(true);
+        BASIC_DATE_TIME = timestampFormat(false, DEFAULT_ISO_DECIMAL_STYLE);
+        EXTENDED_DATE_TIME = timestampFormat(true, DEFAULT_ISO_DECIMAL_STYLE);
 
-        BASIC_DATE_TIME_OFFSET = momentFormat(false);
-        EXTENDED_DATE_TIME_OFFSET = momentFormat(true);
+        BASIC_DATE_TIME_OFFSET = momentFormat(false, DEFAULT_ISO_DECIMAL_STYLE);
+        EXTENDED_DATE_TIME_OFFSET = momentFormat(true, DEFAULT_ISO_DECIMAL_STYLE);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -384,6 +384,160 @@ public class Iso8601Format {
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Obtains a printer with given decimal style for printing a clock time
+     * in basic format &quot;HHmm[ss[,SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>It is recommended to store the result in a static final constant for achieving best performance. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code ChronoPrinter} mit dem angegebenen Dezimalstil zur Ausgabe einer Uhrzeit
+     * im <i>basic</i>-Format &quot;HHmm[ss[,SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>Im Interesse einer maximalen Performance wird empfohlen, das Ergebnis dieser Methode in einer
+     * statischen Konstanten zu speichern. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    public static ChronoPrinter<PlainTime> ofBasicTime(
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        ChronoFormatter.Builder<PlainTime> builder =
+            ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
+        addWallTime(builder, false, decimalStyle, precision);
+        return builder.build().with(Leniency.STRICT);
+
+    }
+
+    /**
+     * <p>Obtains a printer with given decimal style for printing a clock time
+     * in extended format &quot;HH:mm[:ss[,SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>It is recommended to store the result in a static final constant for achieving best performance. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code ChronoPrinter} mit dem angegebenen Dezimalstil zur Ausgabe einer Uhrzeit
+     * im <i>extended</i>-Format &quot;HH:mm[:ss[,SSSSSSSSS]]&quot;. </p>
+     *
+     * <p>Im Interesse einer maximalen Performance wird empfohlen, das Ergebnis dieser Methode in einer
+     * statischen Konstanten zu speichern. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    public static ChronoPrinter<PlainTime> ofExtendedTime(
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        ChronoFormatter.Builder<PlainTime> builder =
+            ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
+        addWallTime(builder, true, decimalStyle, precision);
+        return builder.build().with(Leniency.STRICT);
+
+    }
+
+    /**
+     * <p>Obtains a printer with given styles for printing a timestamp. </p>
+     *
+     * <p>It is recommended to store the result in a static final constant for achieving best performance. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code ChronoPrinter} mit den angegebenen Stilen zur Ausgabe eines Zeitstempels. </p>
+     *
+     * <p>Im Interesse einer maximalen Performance wird empfohlen, das Ergebnis dieser Methode in einer
+     * statischen Konstanten zu speichern. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    public static ChronoPrinter<PlainTimestamp> ofTimestamp(
+        IsoDateStyle dateStyle,
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        ChronoFormatter.Builder<PlainTimestamp> builder =
+            ChronoFormatter.setUp(PlainTimestamp.axis(), Locale.ROOT);
+        builder.addCustomized(
+            PlainDate.COMPONENT,
+            Iso8601Format.of(dateStyle),
+            (text, status, attributes) -> null);
+        builder.addLiteral('T');
+        addWallTime(builder, dateStyle.isExtended(), decimalStyle, precision);
+        return builder.build().with(Leniency.STRICT);
+
+    }
+
+    /**
+     * <p>Obtains a printer with given styles for printing a moment. </p>
+     *
+     * <p>It is recommended to store the result in a static final constant for achieving best performance. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code ChronoPrinter} mit den angegebenen Stilen zur Ausgabe eines Moments. </p>
+     *
+     * <p>Im Interesse einer maximalen Performance wird empfohlen, das Ergebnis dieser Methode in einer
+     * statischen Konstanten zu speichern. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  ChronoPrinter as new instance
+     * @since   4.18
+     */
+    public static ChronoPrinter<Moment> ofMoment(
+        IsoDateStyle dateStyle,
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision,
+        ZonalOffset offset
+    ) {
+
+        ChronoFormatter.Builder<Moment> builder =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ROOT);
+        builder.addCustomized(
+            PlainDate.COMPONENT,
+            Iso8601Format.of(dateStyle),
+            (text, status, attributes) -> null);
+        builder.addLiteral('T');
+        addWallTime(builder, dateStyle.isExtended(), decimalStyle, precision);
+        builder.addTimezoneOffset(DisplayMode.MEDIUM, dateStyle.isExtended(), Collections.singletonList("Z"));
+        return builder.build().with(Leniency.STRICT).withTimezone(offset);
+
+    }
 
     /**
      * <p>Parses given ISO-8601-compatible date string in basic or extended format. </p>
@@ -486,6 +640,27 @@ LOOP:
 
     }
 
+    private static ChronoPrinter<PlainDate> of(IsoDateStyle style) {
+
+        switch (style) {
+            case BASIC_CALENDAR_DATE:
+                return Iso8601Format.BASIC_CALENDAR_DATE;
+            case BASIC_ORDINAL_DATE:
+                return Iso8601Format.BASIC_ORDINAL_DATE;
+            case BASIC_WEEK_DATE:
+                return Iso8601Format.BASIC_WEEK_DATE;
+            case EXTENDED_CALENDAR_DATE:
+                return Iso8601Format.EXTENDED_CALENDAR_DATE;
+            case EXTENDED_ORDINAL_DATE:
+                return Iso8601Format.EXTENDED_ORDINAL_DATE;
+            case EXTENDED_WEEK_DATE:
+                return Iso8601Format.EXTENDED_WEEK_DATE;
+            default:
+                throw new UnsupportedOperationException(style.name());
+        }
+
+    }
+
     private static ChronoFormatter<PlainDate> calendarFormat(boolean extended) {
 
         ChronoFormatter.Builder<PlainDate> builder =
@@ -559,17 +734,23 @@ LOOP:
 
     }
 
-    private static ChronoFormatter<PlainTime> timeFormat(boolean extended) {
+    private static ChronoFormatter<PlainTime> timeFormat(
+        boolean extended,
+        IsoDecimalStyle decimalStyle
+    ) {
 
         ChronoFormatter.Builder<PlainTime> builder =
             ChronoFormatter.setUp(PlainTime.class, Locale.ROOT);
         builder.skipUnknown(c -> (c == 'T'), 1);
-        addWallTime(builder, extended);
+        addWallTime(builder, extended, decimalStyle);
         return builder.build().with(Leniency.STRICT);
 
     }
 
-    private static ChronoFormatter<PlainTimestamp> timestampFormat(boolean extended) {
+    private static ChronoFormatter<PlainTimestamp> timestampFormat(
+        boolean extended,
+        IsoDecimalStyle decimalStyle
+    ) {
 
         ChronoFormatter.Builder<PlainTimestamp> builder =
             ChronoFormatter.setUp(PlainTimestamp.class, Locale.ROOT);
@@ -578,20 +759,23 @@ LOOP:
             generalDatePrinter(extended),
             generalDateParser(extended));
         builder.addLiteral('T');
-        addWallTime(builder, extended);
+        addWallTime(builder, extended, decimalStyle);
         return builder.build().with(Leniency.STRICT);
 
     }
 
-    private static ChronoFormatter<Moment> momentFormat(boolean extended) {
+    private static ChronoFormatter<Moment> momentFormat(
+        boolean extended,
+        IsoDecimalStyle decimalStyle
+    ) {
 
         ChronoFormatter.Builder<Moment> builder =
             ChronoFormatter.setUp(Moment.class, Locale.ROOT);
 
         builder.addCustomized(
             Moment.axis().element(),
-            momentFormat(DisplayMode.MEDIUM, extended),
-            momentFormat(DisplayMode.SHORT, extended)
+            momentFormat(DisplayMode.MEDIUM, extended, decimalStyle),
+            momentFormat(DisplayMode.SHORT, extended, decimalStyle)
         );
 
         // here timezone offset is needed for changing Moment to ZonalDateTime when printing
@@ -601,7 +785,9 @@ LOOP:
 
     private static ChronoFormatter<Moment> momentFormat(
         DisplayMode mode,
-        boolean extended
+        boolean extended,
+        IsoDecimalStyle decimalStyle
+
     ) {
 
         ChronoFormatter.Builder<Moment> builder =
@@ -612,7 +798,7 @@ LOOP:
             generalDatePrinter(extended),
             generalDateParser(extended));
         builder.addLiteral('T');
-        addWallTime(builder, extended);
+        addWallTime(builder, extended, decimalStyle);
 
         // not optional, offset must be present during parsing
         builder.addTimezoneOffset(
@@ -620,7 +806,7 @@ LOOP:
             extended,
             Collections.singletonList("Z"));
 
-        return builder.build();
+        return builder.build().with(Leniency.STRICT);
 
     }
 
@@ -705,7 +891,8 @@ LOOP:
 
     private static <T extends ChronoEntity<T>> void addWallTime(
         ChronoFormatter.Builder<T> builder,
-        boolean extended
+        boolean extended,
+        IsoDecimalStyle decimalStyle
     ) {
 
         builder.startSection(Attributes.ZERO_DIGIT, '0');
@@ -725,16 +912,87 @@ LOOP:
 
         builder.addFixedInteger(SECOND_OF_MINUTE, 2);
         builder.startOptionalSection(NON_ZERO_FRACTION);
-        if (ISO_DECIMAL_SEPARATOR == ',') {
-            builder.addLiteral(',', '.');
-        } else {
-            builder.addLiteral('.', ',');
+
+        switch (decimalStyle) {
+            case COMMA:
+                builder.addLiteral(',', '.');
+                break;
+            case DOT:
+                builder.addLiteral('.', ',');
+                break;
+            default:
+                throw new UnsupportedOperationException(decimalStyle.name());
         }
-        builder.addFraction(NANO_OF_SECOND, 0, 9, false);
+
+        builder.addFraction(NANO_OF_SECOND, 1, 9, false);
 
         for (int i = 0; i < 4; i++) {
             builder.endSection();
         }
+
+    }
+
+    private static <T extends ChronoEntity<T>> void addWallTime(
+        ChronoFormatter.Builder<T> builder,
+        boolean extended,
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        if (precision == null) {
+            throw new NullPointerException("Missing precision.");
+        }
+
+        builder.startSection(Attributes.ZERO_DIGIT, '0');
+        builder.addFixedInteger(ISO_HOUR, 2);
+
+        if (precision == ClockUnit.HOURS) {
+            builder.endSection();
+            return;
+        }
+
+        if (extended) {
+            builder.addLiteral(':');
+        }
+
+        builder.addFixedInteger(MINUTE_OF_HOUR, 2);
+
+        if (precision == ClockUnit.MINUTES) {
+            builder.endSection();
+            return;
+        }
+
+        if (extended) {
+            builder.addLiteral(':');
+        }
+
+        builder.addFixedInteger(SECOND_OF_MINUTE, 2);
+
+        if (precision == ClockUnit.SECONDS) {
+            builder.endSection();
+            return;
+        }
+
+        switch (decimalStyle) {
+            case COMMA:
+                builder.addLiteral(',', '.');
+                break;
+            case DOT:
+                builder.addLiteral('.', ',');
+                break;
+            default:
+                throw new UnsupportedOperationException(decimalStyle.name());
+        }
+
+        if (precision == ClockUnit.MILLIS) {
+            builder.addFraction(NANO_OF_SECOND, 3, 3, false);
+        } else if (precision == ClockUnit.MICROS) {
+            builder.addFraction(NANO_OF_SECOND, 6, 6, false);
+        } else if (precision == ClockUnit.NANOS) {
+            builder.addFraction(NANO_OF_SECOND, 9, 9, false);
+        }
+
+        builder.endSection();
 
     }
 

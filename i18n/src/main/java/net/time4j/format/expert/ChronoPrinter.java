@@ -110,7 +110,7 @@ public interface ChronoPrinter<T> {
      * @param   formattable     object to be formatted
      * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Objekt als Text. </p>
@@ -118,7 +118,7 @@ public interface ChronoPrinter<T> {
      * @param   formattable     object to be formatted
      * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default String format(T formattable) {
 
@@ -138,7 +138,7 @@ public interface ChronoPrinter<T> {
      * @param   buffer          text output buffer
      * @return  unmodifiable set of element positions in formatted text, maybe empty
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
@@ -150,7 +150,7 @@ public interface ChronoPrinter<T> {
      * @param   buffer          text output buffer
      * @return  unmodifiable set of element positions in formatted text, maybe empty
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default Set<ElementPosition> print(
         T formattable,
@@ -173,7 +173,7 @@ public interface ChronoPrinter<T> {
      * @param   attributes      format attributes which can control formatting
      * @return  unmodifiable set of element positions in formatted text, maybe empty
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Objekt als Text und schreibt ihn in
@@ -187,7 +187,7 @@ public interface ChronoPrinter<T> {
      * @param   attributes      format attributes which can control formatting
      * @return  unmodifiable set of element positions in formatted text, maybe empty
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default Set<ElementPosition> print( // TODO: remove default-keyword with v5.0
         T formattable,
@@ -209,7 +209,7 @@ public interface ChronoPrinter<T> {
      *
      * @return  global control attributes valid for the whole formatter
      *          (can be overridden by sectional attributes however)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Ermittelt die globalen Standardattribute, welche genau dann wirksam sind,
@@ -217,7 +217,7 @@ public interface ChronoPrinter<T> {
      *
      * @return  global control attributes valid for the whole formatter
      *          (can be overridden by sectional attributes however)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     default AttributeQuery getAttributes() {
 

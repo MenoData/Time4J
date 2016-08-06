@@ -5381,12 +5381,16 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Starts a new optional section where errors in parsing will
          * not cause an exception but just be ignored. </p>
          *
+         * <p>Note: Printing is not optional and will always be enabled. </p>
+         *
          * @return  this instance for method chaining
          */
         /*[deutsch]
          * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
          * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
          * werden. </p>
+         *
+         * <p>Hinweis: Die Textausgabe ist nicht optional, sondern immer aktiv. </p>
          *
          * @return  this instance for method chaining
          */
@@ -5400,6 +5404,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Starts a new optional section where errors in parsing will
          * not cause an exception but just be ignored. </p>
          *
+         * <p>Printing will only happen if given condition is true. </p>
+         *
          * @param   printCondition  optional condition for printing
          * @return  this instance for method chaining
          */
@@ -5407,6 +5413,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Startet einen neuen optionalen Abschnitt, in dem Fehler beim
          * Interpretieren nicht zum Abbruch f&uuml;hren, sondern nur ignoriert
          * werden. </p>
+         *
+         * <p>Die Textausgabe erfolgt nur, wenn die angegebene Bedingung wahr ist. </p>
          *
          * @param   printCondition  optional condition for printing
          * @return  this instance for method chaining

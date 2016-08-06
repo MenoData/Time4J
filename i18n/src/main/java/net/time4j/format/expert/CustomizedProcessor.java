@@ -190,7 +190,7 @@ final class CustomizedProcessor<V>
                 for (ChronoElement<?> e : raw.getRegisteredElements()) {
                     if (e.getType() == Integer.class){
                         @SuppressWarnings("unchecked") // avoids autoboxing
-                            ChronoElement<Integer> ie = (ChronoElement<Integer>) e;
+                        ChronoElement<Integer> ie = (ChronoElement<Integer>) e;
                         parsedResult.put(ie, raw.getInt(ie));
                     } else {
                         parsedResult.put(e, raw.get(e));
