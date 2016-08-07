@@ -37,6 +37,8 @@ import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.TransitionStrategy;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -253,6 +255,41 @@ public final class DateInterval
         }
 
         return new TimestampInterval(b1, b2);
+
+    }
+
+    /**
+     * <p>Converts this instance to a moment interval with date boundaries mapped
+     * to the midnight cycle in given time zone. </p>
+     *
+     * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
+     * the moments of result intervals can deviate from midnight if midnight does not exist
+     * due to daylight saving effects. The exact behaviour can be controlled by a suitable
+     * transition strategy. </p>
+     *
+     * @param   tz      timezone
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     Timezone#with(TransitionStrategy)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Kombiniert dieses Datumsintervall mit der angegebenen
+     * Zeitzone zu einem globalen UTC-Intervall, indem die Momente
+     * den Mitternachtszyklus abbilden. </p>
+     *
+     * <p>Das Ergebnisintervall ist halb-offen, wenn dieses Intervall endlich ist. Hinweis:
+     * Manchmal sind die Momentgrenzen von Mitternacht verschieden, n&auml;mlich dann, wenn
+     * wegen Sommerzeitumstellungen Mitternacht nicht vorhanden ist. Das exakte Verhalten
+     * kann durch eine geeignete {@code TransitionStrategy} gesteuert werden. </p>
+     *
+     * @param   tz      timezone
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     Timezone#with(TransitionStrategy)
+     * @since   3.22/4.18
+     */
+    public MomentInterval in(Timezone tz) {
+
+        return this.toFullDays().in(tz);
 
     }
 
@@ -598,8 +635,7 @@ public final class DateInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
+            separator
         ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
 
     }

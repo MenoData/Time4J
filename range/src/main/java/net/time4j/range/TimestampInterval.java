@@ -660,8 +660,7 @@ public final class TimestampInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
+            separator
         ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
 
     }

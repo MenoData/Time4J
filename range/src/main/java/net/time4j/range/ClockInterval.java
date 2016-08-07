@@ -444,8 +444,7 @@ public final class ClockInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
+            separator
         ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
 
     }

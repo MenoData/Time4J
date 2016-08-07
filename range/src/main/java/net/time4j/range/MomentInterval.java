@@ -709,8 +709,7 @@ public final class MomentInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
+            separator
         ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
 
     }

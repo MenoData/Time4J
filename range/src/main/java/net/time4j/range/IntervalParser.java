@@ -23,7 +23,6 @@ package net.time4j.range;
 
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoParser;
@@ -123,8 +122,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         ChronoParser<T> startFormat,
         ChronoParser<T> endFormat,
         BracketPolicy policy,
-        char separator,
-        ChronoMerger<?> merger
+        char separator
     ) {
 
         if (startFormat == null) {
