@@ -41,7 +41,7 @@ enum NoopPrinter
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override // TODO: remove with v5.0
+    @Override // TODO: remove with v5.0, or use lambda expression instead of the whole enum
     public <R> R print(
         Integer formattable,
         Appendable buffer,

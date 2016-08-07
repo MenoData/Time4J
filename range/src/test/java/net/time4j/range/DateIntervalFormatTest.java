@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.PlainDate;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -497,13 +498,11 @@ public class DateIntervalFormatTest {
     public void parseExtendedOpenCalendardate() throws ParseException {
         PlainDate start = PlainDate.of(2012, 1, 1);
         PlainDate end = PlainDate.of(2014, 2, 14);
-        ParseLog plog = new ParseLog();
 
         DateInterval parsed = DateInterval.parse(
             "(2012-01-01/2014-02-14)",
             Iso8601Format.EXTENDED_CALENDAR_DATE,
-            BracketPolicy.SHOW_ALWAYS,
-            plog);
+            BracketPolicy.SHOW_ALWAYS);
 
         assertThat(
             parsed.getStart(),
@@ -513,15 +512,12 @@ public class DateIntervalFormatTest {
             is(Boundary.ofOpen(end)));
     }
 
-    @Test // open start equals open end
+    @Test(expected=ParseException.class) // open start equals open end
     public void parseInvalidOpenCalendardate() throws ParseException {
-        ParseLog plog = new ParseLog();
         DateInterval.parse(
             "(2012-01-01/2012-01-01)",
             Iso8601Format.EXTENDED_CALENDAR_DATE,
-            BracketPolicy.SHOW_ALWAYS,
-            plog);
-        assertThat(plog.isError(), is(true));
+            BracketPolicy.SHOW_ALWAYS);
     }
 
     @Test
@@ -558,6 +554,106 @@ public class DateIntervalFormatTest {
         DateInterval.parse(
             "July 20 / 2016 – December 31 / 2015",
             ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US));
+    }
+
+    @Test
+    public void formatISO() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.formatISO(IsoDateStyle.BASIC_CALENDAR_DATE),
+            is("20140227/20140514"));
+        assertThat(
+            interval.formatISO(IsoDateStyle.BASIC_ORDINAL_DATE),
+            is("2014058/2014134"));
+        assertThat(
+            interval.formatISO(IsoDateStyle.BASIC_WEEK_DATE),
+            is("2014W094/2014W203"));
+        assertThat(
+            interval.formatISO(IsoDateStyle.EXTENDED_CALENDAR_DATE),
+            is("2014-02-27/2014-05-14"));
+        assertThat(
+            interval.formatISO(IsoDateStyle.EXTENDED_ORDINAL_DATE),
+            is("2014-058/2014-134"));
+        assertThat(
+            interval.formatISO(IsoDateStyle.EXTENDED_WEEK_DATE),
+            is("2014-W09-4/2014-W20-3"));
+    }
+
+    @Test
+    public void formatReduced1() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2015, 5, 14);
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_CALENDAR_DATE),
+            is("20140227/20150514"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_ORDINAL_DATE),
+            is("2014058/2015134"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_WEEK_DATE),
+            is("2014W094/2015W204"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE),
+            is("2014-02-27/2015-05-14"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_ORDINAL_DATE),
+            is("2014-058/2015-134"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_WEEK_DATE),
+            is("2014-W09-4/2015-W20-4"));
+    }
+
+    @Test
+    public void formatReduced2() {
+        PlainDate start = PlainDate.of(2016, 2, 29);
+        PlainDate end = PlainDate.of(2016, 3, 13);
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_CALENDAR_DATE),
+            is("20160229/0313"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_ORDINAL_DATE),
+            is("2016060/073"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_WEEK_DATE),
+            is("2016W091/W107"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE),
+            is("2016-02-29/03-13"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_ORDINAL_DATE),
+            is("2016-060/073"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_WEEK_DATE),
+            is("2016-W09-1/W10-7"));
+    }
+
+    @Test
+    public void formatReduced3() {
+        PlainDate start = PlainDate.of(2016, 2, 22);
+        PlainDate end = PlainDate.of(2016, 2, 28);
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_CALENDAR_DATE),
+            is("20160222/28"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_ORDINAL_DATE),
+            is("2016053/059"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.BASIC_WEEK_DATE),
+            is("2016W081/7"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE),
+            is("2016-02-22/28"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_ORDINAL_DATE),
+            is("2016-053/059"));
+        assertThat(
+            interval.formatReduced(IsoDateStyle.EXTENDED_WEEK_DATE),
+            is("2016-W08-1/7"));
     }
 
 }

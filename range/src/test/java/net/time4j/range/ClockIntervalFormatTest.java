@@ -1,12 +1,15 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.PlainTime;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Locale;
 
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.IsoDecimalStyle;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -21,45 +24,54 @@ import static org.junit.Assert.assertThat;
 public class ClockIntervalFormatTest {
 
     @Test
-    public void printSHOW_NEVER() {
+    public void printSHOW_NEVER() throws IOException {
         PlainTime start = PlainTime.of(12, 0, 0);
         PlainTime end = PlainTime.of(14, 15, 30);
         ClockInterval interval = ClockInterval.between(start, end);
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.EXTENDED_WALL_TIME;
+        StringBuilder buffer = new StringBuilder();
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, buffer);
         assertThat(
-            interval.print(formatter, BracketPolicy.SHOW_NEVER),
+            buffer.toString(),
             is("12:00/14:15:30"));
+        buffer = new StringBuilder();
+        interval.withOpenEnd().print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, buffer);
         assertThat(
-            interval.withOpenEnd().print(formatter, BracketPolicy.SHOW_NEVER),
+            buffer.toString(),
             is("12:00/14:15:30"));
     }
 
     @Test
-    public void printSHOW_WHEN_NON_STANDARD() {
+    public void printSHOW_WHEN_NON_STANDARD() throws IOException {
         PlainTime start = PlainTime.of(12, 20, 0);
         PlainTime end = PlainTime.of(14, 15, 30);
         ClockInterval interval = ClockInterval.between(start, end);
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.BASIC_WALL_TIME;
+        StringBuilder buffer = new StringBuilder();
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, buffer);
         assertThat(
-            interval.print(formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            buffer.toString(),
             is("1220/141530"));
+        buffer = new StringBuilder();
+        interval.withClosedEnd().print(formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, buffer);
         assertThat(
-            interval.withClosedEnd().print(
-                formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            buffer.toString(),
             is("[1220/141530]"));
     }
 
     @Test
-    public void printSHOW_ALWAYS() {
+    public void printSHOW_ALWAYS() throws IOException {
         PlainTime start = PlainTime.of(12, 20, 0);
         PlainTime end = PlainTime.of(14, 15, 30);
         ClockInterval interval = ClockInterval.between(start, end);
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.BASIC_WALL_TIME;
+        StringBuilder buffer = new StringBuilder();
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_ALWAYS, buffer);
         assertThat(
-            interval.print(formatter, BracketPolicy.SHOW_ALWAYS),
+            buffer.toString(),
             is("[1220/141530)"));
     }
 
@@ -155,13 +167,13 @@ public class ClockIntervalFormatTest {
         assertThat(
             ClockInterval.parse(
                 "[1220/141530)",
-                Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
+                Iso8601Format.BASIC_WALL_TIME, '/', Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
             is(interval));
         plog.reset();
         assertThat(
             ClockInterval.parse(
                 "[1220-141530)",
-                Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
+                Iso8601Format.BASIC_WALL_TIME, '-', Iso8601Format.BASIC_WALL_TIME, BracketPolicy.SHOW_ALWAYS, plog),
             is(interval));
         plog.reset();
         assertThat(
@@ -226,6 +238,22 @@ public class ClockIntervalFormatTest {
     @Test(expected=ParseException.class)
     public void parseTrailingSpace() throws ParseException {
         ClockInterval.parseISO("1745/2015 ");
+    }
+
+    @Test
+    public void formatBasicISO() {
+        PlainTime start = PlainTime.of(8, 30, 15).plus(123450, ClockUnit.MICROS);
+        PlainTime end = PlainTime.midnightAtEndOfDay();
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(interval.formatBasicISO(IsoDecimalStyle.DOT, ClockUnit.MICROS), is("083015.123450/240000.000000"));
+    }
+
+    @Test
+    public void formatExtendedISO() {
+        PlainTime start = PlainTime.of(8, 30, 15).plus(123456, ClockUnit.MICROS);
+        PlainTime end = PlainTime.midnightAtEndOfDay();
+        ClockInterval interval = ClockInterval.between(start, end);
+        assertThat(interval.formatExtendedISO(IsoDecimalStyle.DOT, ClockUnit.MILLIS), is("08:30:15.123/24:00:00.000"));
     }
 
 }

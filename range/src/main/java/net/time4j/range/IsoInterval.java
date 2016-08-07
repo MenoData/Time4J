@@ -22,14 +22,13 @@
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
@@ -70,10 +69,6 @@ import java.util.Locale;
  */
 public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoInterval<T> {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT = (context -> null);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -764,39 +759,35 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     ) {
 
         I interval = this.toCanonical();
-        AttributeQuery attrs = extractDefaultAttributes(printer);
+        AttributeQuery attrs = printer.getAttributes();
         StringBuilder sb = new StringBuilder(32);
         int i = 0;
         int n = intervalPattern.length();
 
-        try {
-            while (i < n) {
-                char c = intervalPattern.charAt(i);
-                if ((c == '{') && (i + 2 < n) && (intervalPattern.charAt(i + 2) == '}')) {
-                    char next = intervalPattern.charAt(i + 1);
-                    if (next == '0') {
-                        if (interval.getStart().isInfinite()) {
-                            sb.append("-\u221E");
-                        } else {
-                            printer.print(interval.getStart().getTemporal(), sb, attrs, NO_RESULT);
-                        }
-                        i += 3;
-                        continue;
-                    } else if (next == '1') {
-                        if (interval.getEnd().isInfinite()) {
-                            sb.append("+\u221E");
-                        } else {
-                            printer.print(interval.getEnd().getTemporal(), sb, attrs, NO_RESULT);
-                        }
-                        i += 3;
-                        continue;
+        while (i < n) {
+            char c = intervalPattern.charAt(i);
+            if ((c == '{') && (i + 2 < n) && (intervalPattern.charAt(i + 2) == '}')) {
+                char next = intervalPattern.charAt(i + 1);
+                if (next == '0') {
+                    if (interval.getStart().isInfinite()) {
+                        sb.append("-\u221E");
+                    } else {
+                        printer.print(interval.getStart().getTemporal(), sb, attrs);
                     }
+                    i += 3;
+                    continue;
+                } else if (next == '1') {
+                    if (interval.getEnd().isInfinite()) {
+                        sb.append("+\u221E");
+                    } else {
+                        printer.print(interval.getEnd().getTemporal(), sb, attrs);
+                    }
+                    i += 3;
+                    continue;
                 }
-                sb.append(c);
-                i++;
             }
-        } catch (IOException ioe) {
-            throw new AssertionError(ioe);
+            sb.append(c);
+            i++;
         }
 
         return sb.toString();
@@ -912,30 +903,33 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             interval = this.toCanonical();
         }
 
-        AttributeQuery attrs = extractDefaultAttributes(startFormat);
+        AttributeQuery attrs = startFormat.getAttributes();
         boolean showBoundaries = policy.display(this);
+        StringBuilder sb = new StringBuilder(50);
 
         if (showBoundaries) {
-            buffer.append(interval.getStart().isOpen() ? '(' : '[');
+            sb.append(interval.getStart().isOpen() ? '(' : '[');
         }
 
         if (interval.getStart().isInfinite()) {
-            buffer.append("-\u221E");
+            sb.append("-\u221E");
         } else {
-            startFormat.print(interval.getStart().getTemporal(), buffer, attrs, NO_RESULT);
+            startFormat.print(interval.getStart().getTemporal(), sb, attrs);
         }
 
-        buffer.append(separator);
+        sb.append(separator);
 
         if (interval.getEnd().isInfinite()) {
-            buffer.append("+\u221E");
+            sb.append("+\u221E");
         } else {
-            endFormat.print(interval.getEnd().getTemporal(), buffer, attrs, NO_RESULT);
+            endFormat.print(interval.getEnd().getTemporal(), sb, attrs);
         }
 
         if (showBoundaries) {
-            buffer.append(interval.getEnd().isOpen() ? ')' : ']');
+            sb.append(interval.getEnd().isOpen() ? ')' : ']');
         }
+
+        buffer.append(sb.toString());
 
     }
 
@@ -1890,39 +1884,42 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 */
 
     /**
-     * <p>Bestimmt die Standard-Attribute, wenn das Argument ein
-     * Format-Objekt ist. </p>
+     * <p>Yields the best available format pattern. </p>
      *
-     * @param   obj     object possibly containing format attributes
-     * @return  attribute query
+     * @param   printer     chronological component printer
+     * @return  localized format pattern for intervals
+     * @since   3.9/4.6
      */
-    static AttributeQuery extractDefaultAttributes(Object obj) {
+    static String getIntervalPattern(ChronoPrinter<?> printer) {
 
-        if (obj instanceof ChronoFormatter) {
-            ChronoFormatter<?> fmt = ChronoFormatter.class.cast(obj);
-            return fmt.getAttributes();
-        } else {
-            return Attributes.empty();
+        AttributeQuery attrs = printer.getAttributes();
+
+        if (attrs.contains(Attributes.LANGUAGE)) {
+            Locale locale = attrs.get(Attributes.LANGUAGE);
+            return CalendarText.patternForInterval(locale);
         }
+
+        return "{0}/{1}";
 
     }
 
     /**
      * <p>Yields the best available format pattern. </p>
      *
+     * @param   parser      chronological component parser
      * @return  localized format pattern for intervals
      * @since   3.9/4.6
      */
-    static String getIntervalPattern(Object formatter) {
+    static String getIntervalPattern(ChronoParser<?> parser) {
 
-        String pattern = "{0}/{1}";
+        AttributeQuery attrs = parser.getAttributes();
 
-        if (formatter instanceof ChronoFormatter) {
-            Locale locale = ChronoFormatter.class.cast(formatter).getLocale();
-            pattern = CalendarText.patternForInterval(locale);
+        if (attrs.contains(Attributes.LANGUAGE)) {
+            Locale locale = attrs.get(Attributes.LANGUAGE);
+            return CalendarText.patternForInterval(locale);
         }
 
-        return pattern;
+        return "{0}/{1}";
 
     }
 

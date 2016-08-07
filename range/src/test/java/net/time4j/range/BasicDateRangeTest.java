@@ -2,20 +2,15 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
-
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import net.time4j.format.expert.Iso8601Format;
-import net.time4j.format.expert.ParseLog;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import java.text.ParseException;
+import java.time.LocalDate;
+
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 
@@ -169,8 +164,7 @@ public class BasicDateRangeTest {
             DateInterval.parse(
                 "(2012-01-01/2012-01-01]",
                 Iso8601Format.EXTENDED_CALENDAR_DATE,
-                BracketPolicy.SHOW_ALWAYS,
-                new ParseLog());
+                BracketPolicy.SHOW_ALWAYS);
         assertThat(interval.isEmpty(), is(true));
     }
 

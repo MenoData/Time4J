@@ -386,6 +386,41 @@ public class Iso8601Format {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Obtains a printer with given styles for printing a calendar date. </p>
+     *
+     * @param   style       iso-compatible date style
+     * @return  ChronoPrinter
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code ChronoPrinter} mit den angegebenen Stilen zur Ausgabe eines Kalenderdatums. </p>
+     *
+     * @param   style       iso-compatible date style
+     * @return  ChronoPrinter
+     * @since   4.18
+     */
+    public static ChronoPrinter<PlainDate> ofDate(IsoDateStyle style) {
+
+        switch (style) {
+            case BASIC_CALENDAR_DATE:
+                return Iso8601Format.BASIC_CALENDAR_DATE;
+            case BASIC_ORDINAL_DATE:
+                return Iso8601Format.BASIC_ORDINAL_DATE;
+            case BASIC_WEEK_DATE:
+                return Iso8601Format.BASIC_WEEK_DATE;
+            case EXTENDED_CALENDAR_DATE:
+                return Iso8601Format.EXTENDED_CALENDAR_DATE;
+            case EXTENDED_ORDINAL_DATE:
+                return Iso8601Format.EXTENDED_ORDINAL_DATE;
+            case EXTENDED_WEEK_DATE:
+                return Iso8601Format.EXTENDED_WEEK_DATE;
+            default:
+                throw new UnsupportedOperationException(style.name());
+        }
+
+    }
+
+    /**
      * <p>Obtains a printer with given decimal style for printing a clock time
      * in basic format &quot;HHmm[ss[,SSSSSSSSS]]&quot;. </p>
      *
@@ -488,7 +523,7 @@ public class Iso8601Format {
             ChronoFormatter.setUp(PlainTimestamp.axis(), Locale.ROOT);
         builder.addCustomized(
             PlainDate.COMPONENT,
-            Iso8601Format.of(dateStyle),
+            Iso8601Format.ofDate(dateStyle),
             (text, status, attributes) -> null);
         builder.addLiteral('T');
         addWallTime(builder, dateStyle.isExtended(), decimalStyle, precision);
@@ -530,7 +565,7 @@ public class Iso8601Format {
             ChronoFormatter.setUp(Moment.axis(), Locale.ROOT);
         builder.addCustomized(
             PlainDate.COMPONENT,
-            Iso8601Format.of(dateStyle),
+            Iso8601Format.ofDate(dateStyle),
             (text, status, attributes) -> null);
         builder.addLiteral('T');
         addWallTime(builder, dateStyle.isExtended(), decimalStyle, precision);
@@ -636,27 +671,6 @@ LOOP:
             return EXTENDED_ORDINAL_DATE.parse(iso, plog);
         } else {
             return EXTENDED_CALENDAR_DATE.parse(iso, plog);
-        }
-
-    }
-
-    private static ChronoPrinter<PlainDate> of(IsoDateStyle style) {
-
-        switch (style) {
-            case BASIC_CALENDAR_DATE:
-                return Iso8601Format.BASIC_CALENDAR_DATE;
-            case BASIC_ORDINAL_DATE:
-                return Iso8601Format.BASIC_ORDINAL_DATE;
-            case BASIC_WEEK_DATE:
-                return Iso8601Format.BASIC_WEEK_DATE;
-            case EXTENDED_CALENDAR_DATE:
-                return Iso8601Format.EXTENDED_CALENDAR_DATE;
-            case EXTENDED_ORDINAL_DATE:
-                return Iso8601Format.EXTENDED_ORDINAL_DATE;
-            case EXTENDED_WEEK_DATE:
-                return Iso8601Format.EXTENDED_WEEK_DATE;
-            default:
-                throw new UnsupportedOperationException(style.name());
         }
 
     }

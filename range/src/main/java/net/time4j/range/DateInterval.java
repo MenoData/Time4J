@@ -34,9 +34,14 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.ChronoPrinter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.format.expert.PatternType;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.TransitionStrategy;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -75,6 +80,20 @@ public final class DateInterval
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
         new IntervalComparator<>(true, PlainDate.axis());
+    private static final ChronoPrinter<PlainDate> REDUCED_DD =
+        ChronoFormatter.ofDatePattern("dd", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_MMDD =
+        ChronoFormatter.ofDatePattern("MMdd", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_MM_DD =
+        ChronoFormatter.ofDatePattern("MM-dd", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_E =
+        ChronoFormatter.ofDatePattern("e", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_W_WWE =
+        ChronoFormatter.ofDatePattern("'W'wwe", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_W_WW_E =
+        ChronoFormatter.ofDatePattern("'W'ww-e", PatternType.CLDR, Locale.ROOT);
+    private static final ChronoPrinter<PlainDate> REDUCED_DDD =
+        ChronoFormatter.ofDatePattern("DDD", PatternType.CLDR, Locale.ROOT);
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -438,6 +457,41 @@ public final class DateInterval
     }
 
     /**
+     * <p>Converts this instance to a moment interval with date boundaries mapped
+     * to the midnight cycle in given time zone. </p>
+     *
+     * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
+     * the moments of result intervals can deviate from midnight if midnight does not exist
+     * due to daylight saving effects. The exact behaviour can be controlled by a suitable
+     * transition strategy. </p>
+     *
+     * @param   tz      timezone
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     Timezone#with(TransitionStrategy)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Kombiniert dieses Datumsintervall mit der angegebenen
+     * Zeitzone zu einem globalen UTC-Intervall, indem die Momente
+     * den Mitternachtszyklus abbilden. </p>
+     *
+     * <p>Das Ergebnisintervall ist halb-offen, wenn dieses Intervall endlich ist. Hinweis:
+     * Manchmal sind die Momentgrenzen von Mitternacht verschieden, n&auml;mlich dann, wenn
+     * wegen Sommerzeitumstellungen Mitternacht nicht vorhanden ist. Das exakte Verhalten
+     * kann durch eine geeignete {@code TransitionStrategy} gesteuert werden. </p>
+     *
+     * @param   tz      timezone
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     Timezone#with(TransitionStrategy)
+     * @since   3.22/4.18
+     */
+    public MomentInterval in(Timezone tz) {
+
+        return this.toFullDays().in(tz);
+
+    }
+
+    /**
      * <p>Yields the length of this interval in days. </p>
      *
      * @return  duration in days as long primitive
@@ -601,6 +655,84 @@ public final class DateInterval
     }
 
     /**
+     * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
+     *
+     * @param   style   controlling the format of output
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen ISO-8601-Stil. </p>
+     *
+     * @param   style   controlling the format of output
+     * @return  String
+     * @since   4.18
+     */
+    public String formatISO(IsoDateStyle style) {
+
+        DateInterval interval = this.toCanonical();
+        StringBuilder buffer = new StringBuilder(21);
+        ChronoPrinter<PlainDate> printer = Iso8601Format.ofDate(style);
+        printer.print(interval.getStartAsCalendarDate(), buffer);
+        buffer.append('/');
+        printer.print(interval.getEndAsCalendarDate(), buffer);
+        return buffer.toString();
+
+    }
+
+    /**
+     * <p>Prints the canonical form of this interval in given reduced ISO-8601 style. </p>
+     *
+     * <p>The term &quot;reduced&quot; means that higher-order elements like the year can be
+     * left out in the end component if it is equal to the value of the start component. Example: </p>
+     *
+     * <pre>
+     *     DateInterval interval =
+     *          DateInterval.between(
+     *              PlainDate.of(2016, 2, 29),
+     *              PlainDate.of(2016, 3, 13));
+     *     System.out.println(interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE));
+     *     // Output: 2016-02-29/03-13
+     * </pre>
+     *
+     * @param   style   controlling the format of output
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen reduzierten ISO-8601-Stil. </p>
+     *
+     * <p>Der Begriff &quot;reduziert&quot; bedeutet, da&szlig; h&ouml;herwertige Elemente wie das Jahr
+     * in der Endkomponente weggelassen werden, wenn ihr Wert gleich dem Wert der Startkomponente ist.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *     DateInterval interval =
+     *          DateInterval.between(
+     *              PlainDate.of(2016, 2, 29),
+     *              PlainDate.of(2016, 3, 13));
+     *     System.out.println(interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE));
+     *     // Output: 2016-02-29/03-13
+     * </pre>
+     *
+     * @param   style   controlling the format of output
+     * @return  String
+     * @since   4.18
+     */
+    public String formatReduced(IsoDateStyle style) {
+
+        DateInterval interval = this.toCanonical();
+        PlainDate start = interval.getStartAsCalendarDate();
+        PlainDate end = interval.getEndAsCalendarDate();
+        StringBuilder buffer = new StringBuilder(21);
+        Iso8601Format.ofDate(style).print(start, buffer);
+        buffer.append('/');
+        getEndPrinter(style, start, end).print(end, buffer);
+        return buffer.toString();
+
+    }
+
+    /**
      * <p>Interpretes given text as interval using a localized interval pattern. </p>
      *
      * <p>If given printer does not contain a reference to a locale then the interval pattern
@@ -686,6 +818,56 @@ public final class DateInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
+     * <p>This method can also accept a hyphen as alternative to solidus as separator
+     * between start and end component unless the start component is a period. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen zwischen
+     * Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    public static DateInterval parse(
+        CharSequence text,
+        ChronoParser<PlainDate> parser,
+        BracketPolicy policy
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        DateInterval interval =
+            IntervalParser.of(
+                DateIntervalFactory.INSTANCE,
+                parser,
+                policy
+            ).parse(text, plog, parser.getAttributes());
+
+        if ((interval == null) || plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else {
+            return interval;
+        }
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
      * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
      * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
      * between start and end component unless the start component is a period. </p>
@@ -697,6 +879,7 @@ public final class DateInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -712,7 +895,9 @@ public final class DateInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
+    @Deprecated
     public static DateInterval parse(
         CharSequence text,
         ChronoParser<PlainDate> parser,
@@ -724,7 +909,7 @@ public final class DateInterval
             DateIntervalFactory.INSTANCE,
             parser,
             policy
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
+        ).parse(text, status, parser.getAttributes());
 
     }
 
@@ -774,9 +959,8 @@ public final class DateInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
+            separator
+        ).parse(text, status, startFormat.getAttributes());
 
     }
 
@@ -944,6 +1128,67 @@ public final class DateInterval
         // create interval
         Parser parser = new Parser(startFormat, endFormat, extended, weekStyle, ordinalStyle);
         return parser.parse(text);
+
+    }
+
+    static ChronoPrinter<PlainDate> getEndPrinter(
+        IsoDateStyle style,
+        PlainDate start,
+        PlainDate end
+    ) {
+
+        ChronoPrinter<PlainDate> endPrinter = Iso8601Format.ofDate(style);
+        int year1 = start.getYear();
+        int year2 = end.getYear();
+
+        switch (style) {
+            case BASIC_CALENDAR_DATE:
+                if (year1 == year2) {
+                    endPrinter = ((start.getMonth() == end.getMonth()) ? REDUCED_DD : REDUCED_MMDD);
+                }
+                break;
+            case BASIC_ORDINAL_DATE:
+                if (year1 == year2) {
+                    endPrinter = REDUCED_DDD;
+                }
+                break;
+            case BASIC_WEEK_DATE:
+                year1 = start.getInt(PlainDate.YEAR_OF_WEEKDATE);
+                year2 = end.getInt(PlainDate.YEAR_OF_WEEKDATE);
+                if (year1 == year2) {
+                    if (start.getInt(Weekmodel.ISO.weekOfYear()) == end.getInt(Weekmodel.ISO.weekOfYear())) {
+                        endPrinter = REDUCED_E;
+                    } else {
+                        endPrinter = REDUCED_W_WWE;
+                    }
+                }
+                break;
+            case EXTENDED_CALENDAR_DATE:
+                if (year1 == year2) {
+                    endPrinter = ((start.getMonth() == end.getMonth()) ? REDUCED_DD : REDUCED_MM_DD);
+                }
+                break;
+            case EXTENDED_ORDINAL_DATE:
+                if (year1 == year2) {
+                    endPrinter = REDUCED_DDD;
+                }
+                break;
+            case EXTENDED_WEEK_DATE:
+                year1 = start.getInt(PlainDate.YEAR_OF_WEEKDATE);
+                year2 = end.getInt(PlainDate.YEAR_OF_WEEKDATE);
+                if (year1 == year2) {
+                    if (start.getInt(Weekmodel.ISO.weekOfYear()) == end.getInt(Weekmodel.ISO.weekOfYear())) {
+                        endPrinter = REDUCED_E;
+                    } else {
+                        endPrinter = REDUCED_W_WW_E;
+                    }
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException(style.name());
+        }
+
+        return endPrinter;
 
     }
 

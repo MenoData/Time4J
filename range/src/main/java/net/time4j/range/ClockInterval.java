@@ -27,7 +27,9 @@ import net.time4j.PlainTime;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.ChronoPrinter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.IsoDecimalStyle;
 import net.time4j.format.expert.ParseLog;
 
 import java.io.IOException;
@@ -429,6 +431,68 @@ public final class ClockInterval
     }
 
     /**
+     * <p>Prints the canonical form of this interval in given basic ISO-8601 style. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen <i>basic</i> ISO-8601-Stil. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    public String formatBasicISO(
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        ClockInterval interval = this.toCanonical();
+        StringBuilder buffer = new StringBuilder();
+        ChronoPrinter<PlainTime> printer = Iso8601Format.ofBasicTime(decimalStyle, precision);
+        printer.print(interval.getStartAsClockTime(), buffer);
+        buffer.append('/');
+        printer.print(interval.getEndAsClockTime(), buffer);
+        return buffer.toString();
+
+    }
+
+    /**
+     * <p>Prints the canonical form of this interval in given extended ISO-8601 style. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen <i>extended</i> ISO-8601-Stil. </p>
+     *
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    public String formatExtendedISO(
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        ClockInterval interval = this.toCanonical();
+        StringBuilder buffer = new StringBuilder();
+        ChronoPrinter<PlainTime> printer = Iso8601Format.ofExtendedTime(decimalStyle, precision);
+        printer.print(interval.getStartAsClockTime(), buffer);
+        buffer.append('/');
+        printer.print(interval.getEndAsClockTime(), buffer);
+        return buffer.toString();
+
+    }
+
+    /**
      * <p>Interpretes given text as interval using a localized interval pattern. </p>
      *
      * <p>If given printer does not contain a reference to a locale then the interval pattern
@@ -514,6 +578,56 @@ public final class ClockInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
+     * <p>This method can also accept a hyphen as alternative to solidus as separator
+     * between start and end component unless the start component is a period. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen zwischen
+     * Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    public static ClockInterval parse(
+        CharSequence text,
+        ChronoParser<PlainTime> parser,
+        BracketPolicy policy
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        ClockInterval interval =
+            IntervalParser.of(
+                ClockIntervalFactory.INSTANCE,
+                parser,
+                policy
+            ).parse(text, plog, parser.getAttributes());
+
+        if ((interval == null) || plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else {
+            return interval;
+        }
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
      * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
      * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
      * between start and end component unless the start component is a period. </p>
@@ -525,6 +639,7 @@ public final class ClockInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -540,7 +655,9 @@ public final class ClockInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
+    @Deprecated
     public static ClockInterval parse(
         CharSequence text,
         ChronoParser<PlainTime> parser,
@@ -552,7 +669,7 @@ public final class ClockInterval
             ClockIntervalFactory.INSTANCE,
             parser,
             policy
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
+        ).parse(text, status, parser.getAttributes());
 
     }
 
@@ -602,9 +719,8 @@ public final class ClockInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
+            separator
+        ).parse(text, status, startFormat.getAttributes());
 
     }
 
@@ -668,7 +784,7 @@ public final class ClockInterval
                 parser,
                 BracketPolicy.SHOW_NEVER,
                 '/'
-            ).parse(text, plog, IsoInterval.extractDefaultAttributes(parser));
+            ).parse(text, plog, parser.getAttributes());
 
         if ((result == null) || plog.isError()) {
             throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());

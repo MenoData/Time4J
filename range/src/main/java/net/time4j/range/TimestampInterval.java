@@ -25,6 +25,7 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
 import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
@@ -35,7 +36,10 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
+import net.time4j.format.expert.ChronoPrinter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.expert.IsoDateStyle;
+import net.time4j.format.expert.IsoDecimalStyle;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.SignPolicy;
 import net.time4j.tz.TZID;
@@ -646,6 +650,120 @@ public final class TimestampInterval
     }
 
     /**
+     * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen ISO-8601-Stil. </p>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    public String formatISO(
+        IsoDateStyle dateStyle,
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        TimestampInterval interval = this.toCanonical();
+        StringBuilder buffer = new StringBuilder(50);
+        ChronoPrinter<PlainTimestamp> printer = Iso8601Format.ofTimestamp(dateStyle, decimalStyle, precision);
+        printer.print(interval.getStartAsTimestamp(), buffer);
+        buffer.append('/');
+        printer.print(interval.getEndAsTimestamp(), buffer);
+        return buffer.toString();
+
+    }
+
+    /**
+     * <p>Prints the canonical form of this interval in given reduced ISO-8601 style. </p>
+     *
+     * <p>The term &quot;reduced&quot; means that higher-order elements like the year can be
+     * left out in the end component if it is equal to the value of the start component. Example: </p>
+     *
+     * <pre>
+     *     TimestampInterval interval =
+     *          TimestampInterval.between(
+     *              PlainTimestamp.of(2016, 2, 29, 10, 45, 53),
+     *              PlainTimestamp.of(2016, 2, 29, 16, 30));
+     *     System.out.println(
+     *          interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES));
+     *     // Output: 2016-02-29T10:45/T16:30
+     * </pre>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen reduzierten ISO-8601-Stil. </p>
+     *
+     * <p>Der Begriff &quot;reduziert&quot; bedeutet, da&szlig; h&ouml;herwertige Elemente wie das Jahr
+     * in der Endkomponente weggelassen werden, wenn ihr Wert gleich dem Wert der Startkomponente ist.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *     TimestampInterval interval =
+     *          TimestampInterval.between(
+     *              PlainTimestamp.of(2016, 2, 29, 10, 45, 53),
+     *              PlainTimestamp.of(2016, 2, 29, 16, 30));
+     *     System.out.println(
+     *          interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES));
+     *     // Output: 2016-02-29T10:45/T16:30
+     * </pre>
+     *
+     * @param   dateStyle       iso-compatible date style
+     * @param   decimalStyle    iso-compatible decimal style
+     * @param   precision       controls the precision of output format with constant length
+     * @return  String
+     * @since   4.18
+     */
+    public String formatReduced(
+        IsoDateStyle dateStyle,
+        IsoDecimalStyle decimalStyle,
+        ClockUnit precision
+    ) {
+
+        TimestampInterval interval = this.toCanonical();
+        PlainTimestamp start = interval.getStartAsTimestamp();
+        PlainTimestamp end = interval.getEndAsTimestamp();
+        PlainDate d1 = start.getCalendarDate();
+        PlainDate d2 = end.getCalendarDate();
+
+        StringBuilder buffer = new StringBuilder(50);
+
+        ChronoPrinter<PlainTime> timePrinter = (
+            dateStyle.isExtended()
+                ? Iso8601Format.ofExtendedTime(decimalStyle, precision)
+                : Iso8601Format.ofBasicTime(decimalStyle, precision));
+
+        Iso8601Format.ofDate(dateStyle).print(d1, buffer);
+        buffer.append('T');
+        timePrinter.print(start.getWallTime(), buffer);
+        buffer.append('/');
+
+        if (!d1.equals(d2)) {
+            DateInterval.getEndPrinter(dateStyle, d1, d2).print(d2, buffer);
+        }
+
+        buffer.append('T');
+        timePrinter.print(end.getWallTime(), buffer);
+
+        return buffer.toString();
+
+    }
+
+    /**
      * <p>Interpretes given text as interval using a localized interval pattern. </p>
      *
      * <p>If given printer does not contain a reference to a locale then the interval pattern
@@ -731,6 +849,56 @@ public final class TimestampInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
+     * <p>This method can also accept a hyphen as alternative to solidus as separator
+     * between start and end component unless the start component is a period. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text als Intervall. </p>
+     *
+     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen zwischen
+     * Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      format object for parsing start and end components
+     * @param   policy      strategy for parsing interval boundaries
+     * @return  result
+     * @throws  ParseException if parsing does not work
+     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
+     * @since   4.18
+     */
+    public static TimestampInterval parse(
+        CharSequence text,
+        ChronoParser<PlainTimestamp> parser,
+        BracketPolicy policy
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        TimestampInterval interval =
+            IntervalParser.of(
+                TimestampIntervalFactory.INSTANCE,
+                parser,
+                policy
+            ).parse(text, plog, parser.getAttributes());
+
+        if ((interval == null) || plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else {
+            return interval;
+        }
+
+    }
+
+    /**
+     * <p>Interpretes given text as interval. </p>
+     *
      * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
      * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
      * between start and end component unless the start component is a period. </p>
@@ -742,6 +910,7 @@ public final class TimestampInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
@@ -757,7 +926,9 @@ public final class TimestampInterval
      * @return  result or {@code null} if parsing does not work
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
      * @since   2.0
+     * @deprecated  Use one of other parse methods accepting a bracket policy instead
      */
+    @Deprecated
     public static TimestampInterval parse(
         CharSequence text,
         ChronoParser<PlainTimestamp> parser,
@@ -769,7 +940,7 @@ public final class TimestampInterval
             TimestampIntervalFactory.INSTANCE,
             parser,
             policy
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(parser));
+        ).parse(text, status, parser.getAttributes());
 
     }
 
@@ -819,9 +990,8 @@ public final class TimestampInterval
             startFormat,
             endFormat,
             policy,
-            separator,
-            null
-        ).parse(text, status, IsoInterval.extractDefaultAttributes(startFormat));
+            separator
+        ).parse(text, status, startFormat.getAttributes());
 
     }
 
