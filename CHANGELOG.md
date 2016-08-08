@@ -25,7 +25,7 @@
 - 1 method in TextProvider deprecated due to missing output context [#529]
 - 3 methods in TransitionHistory deprecated and replaced by new better named methods [#523]
 - 1 method in ChronoPrinter deprecated and replaced by new methods [#532]
-- four parse methods in iso-interval classes replaced by new ones without ParseLog-parameter [#534]
+- 1 parse method in each of four iso-interval classes replaced by new one without ParseLog-parameter [#535]
 
 ## [v4.17] published on 2016-06-20
 ### Added
