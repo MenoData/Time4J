@@ -8,6 +8,7 @@
 - Embedded formatter should know outer format attributes and defaults [#522]
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 - ChronoFormatter.Builder should define default values and global attributes [#531]
+- New date-interval-method to convert to a moment interval [#534]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
