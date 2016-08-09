@@ -657,25 +657,38 @@ public final class DateInterval
     /**
      * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
      *
-     * @param   style   controlling the format of output
+     * @param   dateStyle       controlling the date format of output
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
      * @since   4.18
      */
     /*[deutsch]
      * <p>Formatiert die kanonische Form dieses Intervalls im angegebenen ISO-8601-Stil. </p>
      *
-     * @param   style   controlling the format of output
+     * @param   dateStyle       controlling the date format of output
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
      * @since   4.18
      */
-    public String formatISO(IsoDateStyle style) {
+    public String formatISO(
+        IsoDateStyle dateStyle,
+        InfinityStyle infinityStyle
+    ) {
 
         DateInterval interval = this.toCanonical();
         StringBuilder buffer = new StringBuilder(21);
-        ChronoPrinter<PlainDate> printer = Iso8601Format.ofDate(style);
-        printer.print(interval.getStartAsCalendarDate(), buffer);
+        ChronoPrinter<PlainDate> printer = Iso8601Format.ofDate(dateStyle);
+        if (interval.getStart().isInfinite()) {
+            buffer.append(infinityStyle.displayPast(printer, PlainDate.axis()));
+        } else {
+            printer.print(interval.getStartAsCalendarDate(), buffer);
+        }
         buffer.append('/');
-        printer.print(interval.getEndAsCalendarDate(), buffer);
+        if (interval.getEnd().isInfinite()) {
+            buffer.append(infinityStyle.displayFuture(printer, PlainDate.axis()));
+        } else {
+            printer.print(interval.getEndAsCalendarDate(), buffer);
+        }
         return buffer.toString();
 
     }
@@ -695,7 +708,8 @@ public final class DateInterval
      *     // Output: 2016-02-29/03-13
      * </pre>
      *
-     * @param   style   controlling the format of output
+     * @param   dateStyle       controlling the date format of output
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
      * @since   4.18
      */
@@ -715,19 +729,34 @@ public final class DateInterval
      *     // Output: 2016-02-29/03-13
      * </pre>
      *
-     * @param   style   controlling the format of output
+     * @param   dateStyle       controlling the date format of output
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
      * @since   4.18
      */
-    public String formatReduced(IsoDateStyle style) {
+    public String formatReduced(
+        IsoDateStyle dateStyle,
+        InfinityStyle infinityStyle
+    ) {
 
         DateInterval interval = this.toCanonical();
-        PlainDate start = interval.getStartAsCalendarDate();
-        PlainDate end = interval.getEndAsCalendarDate();
         StringBuilder buffer = new StringBuilder(21);
-        Iso8601Format.ofDate(style).print(start, buffer);
+        ChronoPrinter<PlainDate> printer = Iso8601Format.ofDate(dateStyle);
+        PlainDate start = interval.getStartAsCalendarDate();
+        if (interval.getStart().isInfinite()) {
+            buffer.append(infinityStyle.displayPast(printer, PlainDate.axis()));
+        } else {
+            printer.print(start, buffer);
+        }
         buffer.append('/');
-        getEndPrinter(style, start, end).print(end, buffer);
+        PlainDate end = interval.getEndAsCalendarDate();
+        if (interval.isFinite()) {
+            getEndPrinter(dateStyle, start, end).print(end, buffer);
+        } else if (interval.getEnd().isInfinite()) {
+            buffer.append(infinityStyle.displayFuture(printer, PlainDate.axis()));
+        } else {
+            printer.print(end, buffer);
+        }
         return buffer.toString();
 
     }
