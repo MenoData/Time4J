@@ -124,4 +124,16 @@ interface IntervalFactory<T extends Temporal<? super T>, I extends IsoInterval<T
      */
     TimeLine<T> getTimeLine();
 
+    /**
+     * <p>Werden unbegrenzte Intervallgrenzen unterst&uuml;tzt? </p>
+     *
+     * @return  boolean
+     * @since   4.18
+     */
+    default boolean supportsInfinity() {
+
+        return true;
+
+    }
+
 }

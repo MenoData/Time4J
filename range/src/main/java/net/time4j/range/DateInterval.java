@@ -775,6 +775,26 @@ public final class DateInterval
     /**
      * <p>Interpretes given text as interval using given interval pattern. </p>
      *
+     * <p>Starting with version v4.18, it is also possible to use an or-pattern logic. Example: </p>
+     *
+     * <pre>
+     *     String multiPattern = &quot;{0} - {1}|since {0}|until {1}&quot;;
+     *     ChronoParser&lt;PlainDate&gt; parser =
+     *          ChronoFormatter.ofDatePattern(&quot;MMMM d / uuuu&quot;, PatternType.CLDR, Locale.US);
+     *
+     *     DateInterval between =
+     *          DateInterval.parse(&quot;July 20 / 2015 - December 31 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(between); // [2015-07-20/2015-12-31]
+     *
+     *     DateInterval since =
+     *          DateInterval.parse(&quot;since July 20 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(since); // [2015-07-20/+&#x221E;)
+     *
+     *     DateInterval until =
+     *          DateInterval.parse(&quot;until December 31 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(until); // (-&#x221E;/2015-12-31]
+     * </pre>
+     *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
@@ -786,6 +806,27 @@ public final class DateInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
      * Intervallmusters. </p>
+     *
+     * <p>Beginnend mit der Version v4.18 ist es auch m&ouml;glich, eine Oder-Logik im Muster zu verwenden.
+     * Beispiel: </p>
+     *
+     * <pre>
+     *     String multiPattern = &quot;{0} - {1}|since {0}|until {1}&quot;;
+     *     ChronoParser&lt;PlainDate&gt; parser =
+     *          ChronoFormatter.ofDatePattern(&quot;MMMM d / uuuu&quot;, PatternType.CLDR, Locale.US);
+     *
+     *     DateInterval between =
+     *          DateInterval.parse(&quot;July 20 / 2015 - December 31 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(between); // [2015-07-20/2015-12-31]
+     *
+     *     DateInterval since =
+     *          DateInterval.parse(&quot;since July 20 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(since); // [2015-07-20/+&#x221E;)
+     *
+     *     DateInterval until =
+     *          DateInterval.parse(&quot;until December 31 / 2015&quot;, parser, multiPattern);
+     *     System.out.println(until); // (-&#x221E;/2015-12-31]
+     * </pre>
      *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
@@ -801,17 +842,7 @@ public final class DateInterval
         String intervalPattern
     ) throws ParseException {
 
-        ParseLog plog = new ParseLog();
-        DateInterval interval =
-            IntervalParser.parseCustom(text, DateIntervalFactory.INSTANCE, parser, intervalPattern, plog);
-
-        if (plog.isError()) {
-            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
-        } else if (interval == null) {
-            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
-        }
-
-        return interval;
+        return IntervalParser.parsePattern(text, DateIntervalFactory.INSTANCE, parser, intervalPattern);
 
     }
 
@@ -819,7 +850,8 @@ public final class DateInterval
      * <p>Interpretes given text as interval. </p>
      *
      * <p>This method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
+     * between start and end component unless the start component is a period.
+     * Infinity symbols are understood. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      format object for parsing start and end components
@@ -832,8 +864,9 @@ public final class DateInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
-     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen zwischen
-     * Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode. </p>
+     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen
+     * zwischen Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode.
+     * Unendlichkeitssymbole werden verstanden. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      format object for parsing start and end components
@@ -917,7 +950,7 @@ public final class DateInterval
      * <p>Interpretes given text as interval. </p>
      *
      * <p>This method is mainly intended for parsing technical interval formats similar to ISO-8601
-     * which are not localized. </p>
+     * which are not localized. Infinity symbols are understood. </p>
      *
      * @param   text        text to be parsed
      * @param   startFormat format object for parsing start component
@@ -933,7 +966,7 @@ public final class DateInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * <p>Diese Methode ist vor allem f&uuml;r technische nicht-lokalisierte Intervallformate &auml;hnlich
-     * wie in ISO-8601 definiert gedacht. </p>
+     * wie in ISO-8601 definiert gedacht. Unendlichkeitssymbole werden verstanden. </p>
      *
      * @param   text        text to be parsed
      * @param   startFormat format object for parsing start component
@@ -974,7 +1007,12 @@ public final class DateInterval
      * then the end component may exist in an abbreviated form as
      * documented in ISO-8601-paper leaving out higher-order elements
      * like the calendar year (which will be overtaken from the start
-     * component instead). Examples for supported formats: </p>
+     * component instead). </p>
+     *
+     * <p>The infinity symbols &quot;-&quot; (past and future),
+     * &quot;-&#x221E;&quot; (past), &quot;+&#x221E;&quot; (future),
+     * &quot;-999999999-01-01&quot; und &quot;+999999999-12-31&quot;
+     * can also be parsed. Examples for supported formats: </p>
      *
      * <pre>
      *  System.out.println(
@@ -989,6 +1027,9 @@ public final class DateInterval
      *
      *  System.out.println(DateInterval.parseISO(&quot;2012-001/366&quot;));
      *  // output: [2012-01-01/2012-12-31]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-001/+&#x221E;&quot;));
+     *  // output: [2012-01-01/+&#x221E;)
      * </pre>
      *
      * <p>This method dynamically creates an appropriate interval format.
@@ -1013,7 +1054,12 @@ public final class DateInterval
      * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
-     * werden. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     * werden. </p>
+     *
+     * <p>Die Unendlichkeitssymbole &quot;-&quot; (sowohl Vergangenheit als auch Zukunft),
+     * &quot;-&#x221E;&quot; (Vergangenheit), &quot;+&#x221E;&quot; (Zukunft),
+     * &quot;-999999999-01-01&quot; und &quot;+999999999-12-31&quot; werden ebenfalls
+     * interpretiert. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1028,6 +1074,9 @@ public final class DateInterval
      *
      *  System.out.println(DateInterval.parseISO(&quot;2012-001/366&quot;));
      *  // Ausgabe: [2012-01-01/2012-12-31]
+     *
+     *  System.out.println(DateInterval.parseISO(&quot;2012-001/+&#x221E;&quot;));
+     *  // output: [2012-01-01/+&#x221E;)
      * </pre>
      *
      * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
@@ -1057,10 +1106,17 @@ public final class DateInterval
             if (text.charAt(i) == '/') {
                 if (i + 1 == n) {
                     throw new ParseException("Missing end component.", n);
-                } else if (text.charAt(0) == 'P') {
+                } else if (
+                    (text.charAt(0) == 'P')
+                    || ((text.charAt(0) == '-') && (i == 1 || text.charAt(1) == '\u221E'))
+                ) {
                     start = i + 1;
                     componentLength = n - i - 1;
-                } else if (text.charAt(i + 1) == 'P') {
+                } else if (
+                    (text.charAt(i + 1) == 'P')
+                    || ((text.charAt(i + 1) == '-') && (i + 2 == n))
+                    || ((text.charAt(i + 1) == '+') && (i + 2 < n) && (text.charAt(i + 2) == '\u221E'))
+                ) {
                     componentLength = i;
                 } else {
                     sameFormat = (2 * i + 1 == n);
@@ -1306,7 +1362,7 @@ public final class DateInterval
         }
 
         @Override
-        protected boolean isISO() {
+        protected boolean wantsTrailingCheck() {
 
             return true;
 

@@ -5,6 +5,7 @@ import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
 
+import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.IsoDecimalStyle;
 import org.junit.Test;
@@ -248,6 +249,104 @@ public class TimestampIntervalFormatTest {
                 IsoDecimalStyle.DOT,
                 ClockUnit.MINUTES),
             is("2016-02-22T10:45/T16:30"));
+    }
+
+    @Test
+    public void parseInfinity() throws ParseException {
+        PlainTimestamp tsp = PlainTimestamp.of(2015, 1, 1, 8, 45);
+        assertThat(
+            TimestampInterval.parseISO("2015-01-01T08:45/+∞"),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "[2015-01-01T08:45/+∞)", Iso8601Format.EXTENDED_DATE_TIME, BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parseISO("-∞/2015-01-01T08:45"),
+            is(TimestampInterval.until(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "(-∞/2015-01-01T08:45]", Iso8601Format.EXTENDED_DATE_TIME, BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.until(tsp).withClosedEnd())
+        );
+
+        assertThat(
+            TimestampInterval.parseISO("2015-01-01T08:45/-"),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "[2015-01-01T08:45/-)", Iso8601Format.EXTENDED_DATE_TIME, BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parseISO("-/2015-01-01T08:45"),
+            is(TimestampInterval.until(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "(-/2015-01-01T08:45]", Iso8601Format.EXTENDED_DATE_TIME, BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.until(tsp).withClosedEnd())
+        );
+
+        assertThat(
+            TimestampInterval.parseISO("2015-01-01T08:45/+999999999-12-31T23:59:59,999999999"),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "[2015-01-01T08:45/+999999999-12-31T23:59:59,999999999)",
+                Iso8601Format.EXTENDED_DATE_TIME,
+                BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.since(tsp))
+        );
+        assertThat(
+            TimestampInterval.parseISO("-999999999-01-01T00:00/2015-01-01T08:45"),
+            is(TimestampInterval.until(tsp))
+        );
+        assertThat(
+            TimestampInterval.parse(
+                "(-999999999-01-01T00:00/2015-01-01T08:45]",
+                Iso8601Format.EXTENDED_DATE_TIME,
+                BracketPolicy.SHOW_ALWAYS),
+            is(TimestampInterval.until(tsp).withClosedEnd())
+        );
+    }
+
+    @Test
+    public void parseAlways() throws ParseException {
+        TimestampInterval always =
+            TimestampIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
+        assertThat(
+            TimestampInterval.parseISO("-/-"),
+            is(always));
+        assertThat(
+            TimestampInterval.parse(
+                "(-/-)",
+                Iso8601Format.EXTENDED_DATE_TIME,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            TimestampInterval.parseISO("-∞/+∞"),
+            is(always));
+        assertThat(
+            TimestampInterval.parse(
+                "(-∞/+∞)",
+                Iso8601Format.EXTENDED_DATE_TIME,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            TimestampInterval.parseISO("-999999999-01-01T00:00/+999999999-12-31T23:59:59,999999999"),
+            is(always));
+        assertThat(
+            TimestampInterval.parse(
+                "(-999999999-01-01T00:00/+999999999-12-31T23:59:59,999999999)",
+                Iso8601Format.EXTENDED_DATE_TIME,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
     }
 
 }

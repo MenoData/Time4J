@@ -185,7 +185,7 @@ public class ClockIntervalFormatTest {
     }
 
     @Test
-    public void parseHHMM1() throws ParseException {
+    public void parseHHMM1() {
         PlainTime start = PlainTime.of(7, 20);
         PlainTime end = PlainTime.of(24, 0);
         ClockInterval interval = ClockInterval.between(start, end);
@@ -254,6 +254,38 @@ public class ClockIntervalFormatTest {
         PlainTime end = PlainTime.midnightAtEndOfDay();
         ClockInterval interval = ClockInterval.between(start, end);
         assertThat(interval.formatExtendedISO(IsoDecimalStyle.DOT, ClockUnit.MILLIS), is("08:30:15.123/24:00:00.000"));
+    }
+
+    @Test
+    public void parseFullRange() throws ParseException {
+        ClockInterval fullRange =
+            ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.midnightAtEndOfDay());
+        assertThat(
+            ClockInterval.parseISO("00:00/24:00"),
+            is(fullRange)); // open end
+        assertThat(
+            ClockInterval.parse("[00:00/24:00]", Iso8601Format.EXTENDED_WALL_TIME, BracketPolicy.SHOW_ALWAYS),
+            is(fullRange.withClosedEnd()));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseInfinity1() throws ParseException {
+        ClockInterval.parseISO("-/24:00");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseInfinity2() throws ParseException {
+        ClockInterval.parseISO("00:00/-");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseInfinity3() throws ParseException {
+        ClockInterval.parseISO("-\u221E/24:00");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseInfinity4() throws ParseException {
+        ClockInterval.parseISO("00:00/+\u221E");
     }
 
 }

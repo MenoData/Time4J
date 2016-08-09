@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 
 import net.time4j.SI;
+import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.IsoDecimalStyle;
 import net.time4j.tz.OffsetSign;
@@ -414,6 +415,104 @@ public class MomentIntervalFormatTest {
                 ClockUnit.MILLIS,
                 ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4)),
             is("2012-W26-6T12:30:27,120-04:00/T19:59:60,001"));
+    }
+
+    @Test
+    public void parseInfinity() throws ParseException {
+        Moment utc = PlainTimestamp.of(2015, 1, 1, 8, 45).atUTC();
+        assertThat(
+            MomentInterval.parseISO("2015-01-01T08:45Z/+∞"),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "[2015-01-01T08:45Z/+∞)", Iso8601Format.EXTENDED_DATE_TIME_OFFSET, BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parseISO("-∞/2015-01-01T08:45Z"),
+            is(MomentInterval.until(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "(-∞/2015-01-01T08:45Z]", Iso8601Format.EXTENDED_DATE_TIME_OFFSET, BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.until(utc).withClosedEnd())
+        );
+
+        assertThat(
+            MomentInterval.parseISO("2015-01-01T08:45Z/-"),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "[2015-01-01T08:45Z/-)", Iso8601Format.EXTENDED_DATE_TIME_OFFSET, BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parseISO("-/2015-01-01T08:45Z"),
+            is(MomentInterval.until(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "(-/2015-01-01T08:45Z]", Iso8601Format.EXTENDED_DATE_TIME_OFFSET, BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.until(utc).withClosedEnd())
+        );
+
+        assertThat(
+            MomentInterval.parseISO("2015-01-01T08:45Z/+999999999-12-31T23:59:59,999999999Z"),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "[2015-01-01T08:45Z/+999999999-12-31T23:59:59,999999999Z)",
+                Iso8601Format.EXTENDED_DATE_TIME_OFFSET,
+                BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.since(utc))
+        );
+        assertThat(
+            MomentInterval.parseISO("-999999999-01-01T00:00Z/2015-01-01T08:45Z"),
+            is(MomentInterval.until(utc))
+        );
+        assertThat(
+            MomentInterval.parse(
+                "(-999999999-01-01T00:00Z/2015-01-01T08:45Z]",
+                Iso8601Format.EXTENDED_DATE_TIME_OFFSET,
+                BracketPolicy.SHOW_ALWAYS),
+            is(MomentInterval.until(utc).withClosedEnd())
+        );
+    }
+
+    @Test
+    public void parseAlways() throws ParseException {
+        MomentInterval always =
+            MomentIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
+        assertThat(
+            MomentInterval.parseISO("-/-"),
+            is(always));
+        assertThat(
+            MomentInterval.parse(
+                "(-/-)",
+                Iso8601Format.EXTENDED_DATE_TIME_OFFSET,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            MomentInterval.parseISO("-∞/+∞"),
+            is(always));
+        assertThat(
+            MomentInterval.parse(
+                "(-∞/+∞)",
+                Iso8601Format.EXTENDED_DATE_TIME_OFFSET,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            MomentInterval.parseISO("-999999999-01-01T00:00Z/+999999999-12-31T23:59:59,999999999Z"),
+            is(always));
+        assertThat(
+            MomentInterval.parse(
+                "(-999999999-01-01T00:00Z/+999999999-12-31T23:59:59,999999999Z)",
+                Iso8601Format.EXTENDED_DATE_TIME_OFFSET,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
     }
 
 }

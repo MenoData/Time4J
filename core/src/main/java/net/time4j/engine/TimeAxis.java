@@ -1265,6 +1265,20 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         }
 
+        @Override
+        public T getMinimum() {
+
+            return this.min;
+
+        }
+
+        @Override
+        public T getMaximum() {
+
+            return this.max;
+
+        }
+
     }
 
 }

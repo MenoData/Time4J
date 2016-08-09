@@ -24,12 +24,13 @@ package net.time4j.range;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Temporal;
-import net.time4j.format.Attributes;
+import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ParseLog;
 
 import java.text.ParseException;
 
+import static net.time4j.format.Attributes.TRAILING_CHARACTERS;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
@@ -198,6 +199,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         ParseLog lowerLog = null;
         ParseLog upperLog = null;
         String period = null;
+        int symbol = 0;
 
         // starting boundary
         char c = text.charAt(pos);
@@ -208,7 +210,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             if (this.policy == BracketPolicy.SHOW_NEVER) {
                 status.setError(
                     pos,
-                    "Illegal start boundary due to bracket policy: " + c);
+                    "Illegal start boundary due to bracket policy " + this.policy + ": " + c);
             } else if (c == '(') {
                 left = OPEN;
             }
@@ -250,6 +252,19 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         } else if (
             (c == '-')
             && (pos + 1 < len)
+            && this.isExpectedSeparator(text.charAt(pos + 1))
+        ) {
+            if ((left == CLOSED) && leftVisible) {
+                status.setError(pos - 1, "Open boundary expected.");
+                return null;
+            }
+            left = OPEN;
+            lower = Boundary.infinitePast();
+            symbol = 1;
+            pos += 2;
+        } else if (
+            (c == '-')
+            && (pos + 1 < len)
             && (text.charAt(pos + 1) == '\u221E')
         ) {
             if ((left == CLOSED) && leftVisible) {
@@ -263,6 +278,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             if (status.isError()) {
                 return null;
             }
+            symbol = 2;
             pos++;
         } else {
             lowerLog = new ParseLog(pos);
@@ -306,6 +322,18 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             period = text.subSequence(pos, endIndex).toString();
             pos = endIndex;
         } else if (
+            (c == '-')
+            && ((pos + 1 >= len) || (text.charAt(pos + 1) == ')'))
+        ) {
+            if (symbol == 2) {
+                status.setError(pos, "Mixed infinity symbols not allowed.");
+                return null;
+            }
+            right = OPEN;
+            upper = Boundary.infiniteFuture();
+            symbol = 1;
+            pos++;
+        } else if (
             (c == '+')
             && (pos + 1 < len)
             && (text.charAt(pos + 1) == '\u221E')
@@ -317,13 +345,19 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             ) {
                 status.setError(pos + 2, "Open boundary expected.");
                 return null;
+            } else if (symbol == 1) {
+                status.setError(pos, "Mixed infinity symbols not allowed.");
+                return null;
             }
             right = OPEN;
             upper = Boundary.infiniteFuture();
+            symbol = 2;
             pos += 2;
         } else {
             upperLog = new ParseLog(pos);
-            if (this.endFormat == null) {
+            if (lowerLog == null) {
+                t2 = this.startFormat.parse(text, upperLog, attrs);
+            } else if (this.endFormat == null) {
                 t2 = this.parseReducedEnd(text, t1, lowerLog, upperLog, attrs);
             } else {
                 t2 = this.endFormat.parse(text, upperLog, attrs);
@@ -347,7 +381,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
                 if (this.policy == BracketPolicy.SHOW_NEVER) {
                     status.setError(
                         pos,
-                        "Illegal end boundary due to bracket policy: " + c);
+                        "Illegal end boundary due to bracket policy " + this.policy + ": " + c);
                 } else {
                     rightVisible = true;
                     right = ((c == ']') ? CLOSED : OPEN);
@@ -367,7 +401,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
         if (
             (pos < len)
-            && (this.isISO() || !attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue())
+            && (this.wantsTrailingCheck() || !attributes.get(TRAILING_CHARACTERS, Boolean.FALSE).booleanValue())
         ) {
             String suffix;
 
@@ -410,6 +444,11 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             }
         }
 
+        if ((symbol == 0) && this.factory.supportsInfinity()) {
+            lower = this.resolveInfinity(leftVisible, lower);
+            upper = this.resolveInfinity(rightVisible, upper);
+        }
+
         // create and return interval
         try {
             I interval = this.factory.between(lower, upper);
@@ -425,7 +464,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
                     int index = (rightVisible ? pos : start);
                     status.setError(
                         index,
-                        "Standard boundary not allowed due to bracket policy.");
+                        "Standard boundary not allowed due to bracket policy: " + this.policy);
                     return null;
                 }
             }
@@ -440,17 +479,44 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     }
 
     /**
-     * <p>Custom parsing using any kind of interval pattern. </p>
+     * <p>Custom parsing using any kind of interval pattern (possibly with or-logic). </p>
      *
      * @param   text        text to be parsed
      * @param   factory     interval factory
      * @param   parser      parser used for parsing either start or end component
      * @param   pattern     interval pattern containing the placeholders {0} or {1}
-     * @param   plog        collects parser informations and the parsing status
-     * @return  parsed interval or {@code null} if parsing fails
-     * @since   3.9/4.6
+     * @return  parsed interval
+     * @throws  ParseException if parsing fails
+     * @since   4.18
      */
-    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parseCustom(
+    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parsePattern(
+        CharSequence text,
+        IntervalFactory<T, I> factory,
+        ChronoParser<T> parser,
+        String pattern
+    ) throws ParseException {
+
+        ParseLog plog = new ParseLog();
+        String[] components = pattern.split("\\|");
+
+        for (String component : components) {
+            plog.reset();
+            I interval = IntervalParser.parseComponent(text, factory, parser, component, plog);
+
+            if ((interval != null) && !plog.isError()) {
+                return interval;
+            }
+        }
+
+        if (plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else {
+            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
+        }
+
+    }
+
+    private static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parseComponent(
         CharSequence text,
         IntervalFactory<T, I> factory,
         ChronoParser<T> parser,
@@ -533,7 +599,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             pos++;
         }
 
-        if ((pos < len) && !query.get(Attributes.TRAILING_CHARACTERS, false)) {
+        if ((pos < len) && !query.get(TRAILING_CHARACTERS, false)) {
             plog.setError(pos, "Trailing characters found: " + text);
             return null;
         }
@@ -574,20 +640,35 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
     }
 
-    protected boolean isISO() {
+    protected boolean wantsTrailingCheck() {
 
         return false;
+
+    }
+
+    private Boundary<T> resolveInfinity(
+        boolean visible,
+        Boundary<T> boundary
+    ) {
+
+        if (!boundary.isInfinite() && (!visible || boundary.isOpen())) {
+            TimeLine<T> timeLine = this.factory.getTimeLine();
+            T test = boundary.getTemporal();
+            if (test.equals(timeLine.getMinimum())) {
+                return Boundary.infinitePast();
+            } else if (test.equals(timeLine.getMaximum())) {
+                return Boundary.infiniteFuture();
+            }
+        }
+
+        return boundary;
 
     }
 
     private static AttributeQuery wrap(AttributeQuery attributes) {
 
         AttributeQuery attrs = attributes;
-        boolean allowTrailingChars =
-            attributes.get(
-                Attributes.TRAILING_CHARACTERS,
-                Boolean.FALSE
-            ).booleanValue();
+        boolean allowTrailingChars = attributes.get(TRAILING_CHARACTERS, Boolean.FALSE ).booleanValue();
 
         if (!allowTrailingChars) {
             attrs = new Wrapper(attributes);
@@ -611,20 +692,21 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             return;
         }
 
-        char test = text.charAt(pos);
-        boolean ok;
-
-        if (this.separator == null) {
-            ok = ((test == '/') || (test == '-'));
-        } else {
-            ok = (test == this.separator.charValue());
-        }
-
-        if (!ok) {
+        if (!this.isExpectedSeparator(text.charAt(pos))) {
             status.setError(
                 pos,
-                "Missing separation char between start and end boundaries: "
+                "Missing or misplaced separation char between start and end boundaries: "
                 + ((this.separator == null) ? "/ or -" : this.separator.toString()));
+        }
+
+    }
+
+    private boolean isExpectedSeparator(char test) {
+
+        if (this.separator == null) {
+            return ((test == '/') || (test == '-'));
+        } else {
+            return (test == this.separator.charValue());
         }
 
     }
@@ -651,7 +733,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
         @Override
         public boolean contains(AttributeKey<?> key) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
+            if (key == TRAILING_CHARACTERS) {
                 return true;
             }
             return this.attributes.contains(key);
@@ -659,7 +741,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
         @Override
         public <A> A get(AttributeKey<A> key) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
+            if (key == TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
             }
             return this.attributes.get(key);
@@ -667,7 +749,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
         @Override
         public <A> A get(AttributeKey<A> key, A defaultValue) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
+            if (key == TRAILING_CHARACTERS) {
                 return key.type().cast(Boolean.TRUE);
             }
             return this.attributes.get(key, defaultValue);

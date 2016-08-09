@@ -2,6 +2,7 @@ package net.time4j.range;
 
 import net.time4j.PlainDate;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.ParseLog;
@@ -557,6 +558,33 @@ public class DateIntervalFormatTest {
     }
 
     @Test
+    public void parseMultiPattern() throws ParseException {
+        String multiPattern = "{0} - {1}|since {0}|until {1}";
+        ChronoParser<PlainDate> parser = ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US);
+        PlainDate start = PlainDate.of(2015, 7, 20);
+        PlainDate end = PlainDate.of(2015, 12, 31);
+
+        assertThat(
+            DateInterval.parse(
+                "July 20 / 2015 - December 31 / 2015",
+                parser,
+                multiPattern),
+            is(DateInterval.between(start, end)));
+        assertThat(
+            DateInterval.parse(
+                "since July 20 / 2015",
+                parser,
+                multiPattern),
+            is(DateInterval.since(start)));
+        assertThat(
+            DateInterval.parse(
+                "until December 31 / 2015",
+                parser,
+                multiPattern),
+            is(DateInterval.until(end)));
+    }
+
+    @Test
     public void formatISO() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
@@ -654,6 +682,118 @@ public class DateIntervalFormatTest {
         assertThat(
             interval.formatReduced(IsoDateStyle.EXTENDED_WEEK_DATE),
             is("2016-W08-1/7"));
+    }
+
+    @Test
+    public void parseInfinity() throws ParseException {
+        assertThat(
+            DateInterval.parseISO("2015-01-01/+∞"),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse("[2015-01-01/+∞)", Iso8601Format.EXTENDED_CALENDAR_DATE, BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parseISO("-∞/2015-01-01"),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse("(-∞/2015-01-01]", Iso8601Format.EXTENDED_CALENDAR_DATE, BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+
+        assertThat(
+            DateInterval.parseISO("2015001/-"),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse("[2015001/-)", Iso8601Format.BASIC_ORDINAL_DATE, BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parseISO("-/2015001"),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse("(-/2015001]", Iso8601Format.BASIC_ORDINAL_DATE, BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+
+        assertThat(
+            DateInterval.parseISO("2015001/+999999999365"),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse(
+                "[2015001/+999999999365)",
+                Iso8601Format.BASIC_ORDINAL_DATE,
+                BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.since(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parseISO("-9999999990101/20150101"),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+        assertThat(
+            DateInterval.parse(
+                "(-9999999990101/20150101]",
+                Iso8601Format.BASIC_CALENDAR_DATE,
+                BracketPolicy.SHOW_ALWAYS),
+            is(DateInterval.until(PlainDate.of(2015, 1, 1)))
+        );
+    }
+
+    @Test
+    public void parseAlways() throws ParseException {
+        DateInterval always = DateIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
+        assertThat(
+            DateInterval.parseISO("-/-"),
+            is(always));
+        assertThat(
+            DateInterval.parse(
+                "(-/-)",
+                Iso8601Format.EXTENDED_CALENDAR_DATE,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            DateInterval.parseISO("-∞/+∞"),
+            is(always));
+        assertThat(
+            DateInterval.parse(
+                "(-∞/+∞)",
+                Iso8601Format.EXTENDED_CALENDAR_DATE,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+        assertThat(
+            DateInterval.parseISO("-999999999-01-01/+999999999-12-31"),
+            is(always));
+        assertThat(
+            DateInterval.parse(
+                "(-999999999-01-01/+999999999-12-31)",
+                Iso8601Format.EXTENDED_CALENDAR_DATE,
+                BracketPolicy.SHOW_WHEN_NON_STANDARD),
+            is(always));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseInfinityAndPeriod() throws ParseException {
+        DateInterval.parseISO("-∞/P3Y4M45D");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parsePeriodAndInfinity() throws ParseException {
+        DateInterval.parseISO("P3Y4M45D/+∞");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseMixedInfinitySymbols1() throws ParseException {
+        DateInterval.parseISO("-/+∞");
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseMixedInfinitySymbols2() throws ParseException {
+        DateInterval.parseISO("-∞/-");
     }
 
 }

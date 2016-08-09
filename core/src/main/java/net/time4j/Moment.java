@@ -2796,6 +2796,20 @@ public final class Moment
 
         }
 
+        @Override
+        public Moment getMinimum() {
+
+            return MIN;
+
+        }
+
+        @Override
+        public Moment getMaximum() {
+
+            return MAX;
+
+        }
+
         private static boolean useSI(Moment timepoint) {
 
             return (

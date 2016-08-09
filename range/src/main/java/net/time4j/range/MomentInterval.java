@@ -880,6 +880,8 @@ public final class MomentInterval
     /**
      * <p>Interpretes given text as interval using given interval pattern. </p>
      *
+     * <p>About usage see also {@link DateInterval#parse(String, ChronoParser, String)}. </p>
+     *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
@@ -891,6 +893,8 @@ public final class MomentInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
      * Intervallmusters. </p>
+     *
+     * <p>Zur Verwendung siehe auch: {@link DateInterval#parse(String, ChronoParser, String)}. </p>
      *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
@@ -906,17 +910,7 @@ public final class MomentInterval
         String intervalPattern
     ) throws ParseException {
 
-        ParseLog plog = new ParseLog();
-        MomentInterval interval =
-            IntervalParser.parseCustom(text, MomentIntervalFactory.INSTANCE, parser, intervalPattern, plog);
-
-        if (plog.isError()) {
-            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
-        } else if (interval == null) {
-            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
-        }
-
-        return interval;
+        return IntervalParser.parsePattern(text, MomentIntervalFactory.INSTANCE, parser, intervalPattern);
 
     }
 
@@ -924,7 +918,8 @@ public final class MomentInterval
      * <p>Interpretes given text as interval. </p>
      *
      * <p>This method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
+     * between start and end component unless the start component is a period. Infinity
+     * symbols are understood. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      format object for parsing start and end components
@@ -937,8 +932,9 @@ public final class MomentInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
-     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen zwischen
-     * Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode. </p>
+     * <p>Diese Methode kann auch einen Bindestrich als Alternative zum Schr&auml;gstrich als Trennzeichen
+     * zwischen Start- und Endkomponente interpretieren, es sei denn, die Startkomponente ist eine Periode.
+     * Unendlichkeitssymbole werden verstanden. </p>
      *
      * @param   text        text to be parsed
      * @param   parser      format object for parsing start and end components
@@ -1022,7 +1018,7 @@ public final class MomentInterval
      * <p>Interpretes given text as interval. </p>
      *
      * <p>This method is mainly intended for parsing technical interval formats similar to ISO-8601
-     * which are not localized. </p>
+     * which are not localized. Infinity symbols are understood. </p>
      *
      * @param   text        text to be parsed
      * @param   startFormat format object for parsing start component
@@ -1038,7 +1034,7 @@ public final class MomentInterval
      * <p>Interpretiert den angegebenen Text als Intervall. </p>
      *
      * <p>Diese Methode ist vor allem f&uuml;r technische nicht-lokalisierte Intervallformate &auml;hnlich
-     * wie in ISO-8601 definiert gedacht. </p>
+     * wie in ISO-8601 definiert gedacht. Unendlichkeitssymbole werden verstanden. </p>
      *
      * @param   text        text to be parsed
      * @param   startFormat format object for parsing start component
@@ -1080,28 +1076,34 @@ public final class MomentInterval
      * documented in ISO-8601-paper leaving out higher-order elements
      * like the calendar year (which will be overtaken from the start
      * component instead). In latter case, the timezone offset of the
-     * end component is optional, too. Examples for supported formats: </p>
+     * end component is optional, too. Infinity symbols are understood.
+     * Examples for supported formats: </p>
      *
      * <pre>
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/16:00&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z)
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2015-01-01T08:45Z/-&quot;));
+     *  // output: [2015-01-01T08:45:00Z/+&#x221E;)
      * </pre>
      *
      * <p>This method dynamically creates an appropriate interval format.
@@ -1127,28 +1129,34 @@ public final class MomentInterval
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
      * werden. In letzterem Fall ist auch der Offset der Endkomponente
-     * optional. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     * optional. Unendlichkeitssymbole werden verstanden. Beispiele f&uuml;r
+     * unterst&uuml;tzte Formate: </p>
      *
      * <pre>
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/16:00&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z)
+     *
+     *  System.out.println(
+     *      MomentInterval.parseISO(
+     *          &quot;2015-01-01T08:45Z/-&quot;));
+     *  // Ausgabe: [2015-01-01T08:45:00Z/+&#x221E;)
      * </pre>
      *
      * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
@@ -1176,14 +1184,20 @@ public final class MomentInterval
         int firstDate = 1; // loop starts one index position later
         int secondDate = 0;
         int timeLength = 0;
+        boolean startsWithHyphen = (text.charAt(0) == '-');
 
-        if (text.charAt(0) == 'P') {
+        if ((text.charAt(0) == 'P') || startsWithHyphen) {
             for (int i = 1; i < n; i++) {
                 if (text.charAt(i) == '/') {
                     if (i + 1 == n) {
                         throw new ParseException("Missing end component.", n);
+                    } else if (startsWithHyphen) {
+                        if ((text.charAt(1) == '\u221E') || (i == 1)) {
+                            start = i + 1;
+                        }
+                    } else {
+                        start = i + 1;
                     }
-                    start = i + 1;
                     break;
                 }
             }
@@ -1200,7 +1214,11 @@ public final class MomentInterval
         for (int i = start + 1; i < n; i++) {
             char c = text.charAt(i);
             if (secondComponent) {
-                if (c == 'P') {
+                if (
+                    (c == 'P')
+                    || ((c == '-') && (i == n - 1))
+                    || ((c == '+') && (i == n - 2) && (text.charAt(i + 1) == '\u221E'))
+                ) {
                     secondComponent = false;
                     break;
                 } else if ((c == 'T') || (timeLength > 0)) {
@@ -1413,7 +1431,7 @@ public final class MomentInterval
         }
 
         @Override
-        protected boolean isISO() {
+        protected boolean wantsTrailingCheck() {
 
             return true;
 

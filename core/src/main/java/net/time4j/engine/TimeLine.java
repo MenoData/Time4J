@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeLine.java) is part of project Time4J.
  *
@@ -84,5 +84,47 @@ public interface TimeLine<T> {
      * @since   2.0
      */
     T stepBackwards(T timepoint);
+
+    /**
+     * <p>Yields the minimum of this time axis. </p>
+     *
+     * <p>Implementors of this interface are required to override this method otherwise an
+     * {@code UnsupportedOperationException} will happen at runtime. </p>
+     *
+     * @return  earliest possible time point
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Minimum auf der Zeitachse. </p>
+     *
+     * @return  earliest possible time point
+     * @since   4.18
+     */
+    default T getMinimum() {
+
+        throw new UnsupportedOperationException("Not implemented."); // TODO: v5.0 => keine default-Methode
+
+    }
+
+    /**
+     * <p>Yields the maximum of this time axis. </p>
+     *
+     * <p>Implementors of this interface are required to override this method otherwise an
+     * {@code UnsupportedOperationException} will happen at runtime. </p>
+     *
+     * @return  latest possible time point
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Maximum auf der Zeitachse. </p>
+     *
+     * @return  latest possible time point
+     * @since   4.18
+     */
+    default T getMaximum() {
+
+        throw new UnsupportedOperationException("Not implemented."); // TODO: v5.0 => keine default-Methode
+
+    }
 
 }

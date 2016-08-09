@@ -114,4 +114,11 @@ final class ClockIntervalFactory
 
     }
 
+    @Override
+    public boolean supportsInfinity() {
+
+        return false;
+
+    }
+
 }

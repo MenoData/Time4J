@@ -535,6 +535,8 @@ public final class ClockInterval
     /**
      * <p>Interpretes given text as interval using given interval pattern. </p>
      *
+     * <p>About usage see also {@link DateInterval#parse(String, ChronoParser, String)}. </p>
+     *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
@@ -546,6 +548,8 @@ public final class ClockInterval
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
      * Intervallmusters. </p>
+     *
+     * <p>Zur Verwendung siehe auch: {@link DateInterval#parse(String, ChronoParser, String)}. </p>
      *
      * @param   text                text to be parsed
      * @param   parser              format object for parsing start and end components
@@ -561,17 +565,7 @@ public final class ClockInterval
         String intervalPattern
     ) throws ParseException {
 
-        ParseLog plog = new ParseLog();
-        ClockInterval interval =
-            IntervalParser.parseCustom(text, ClockIntervalFactory.INSTANCE, parser, intervalPattern, plog);
-
-        if (plog.isError()) {
-            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
-        } else if (interval == null) {
-            throw new ParseException("Parsing of interval failed: " + text, plog.getPosition());
-        }
-
-        return interval;
+        return IntervalParser.parsePattern(text, ClockIntervalFactory.INSTANCE, parser, intervalPattern);
 
     }
 
