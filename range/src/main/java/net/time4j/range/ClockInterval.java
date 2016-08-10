@@ -436,6 +436,8 @@ public final class ClockInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -444,6 +446,8 @@ public final class ClockInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatBasicISO(
@@ -467,6 +471,8 @@ public final class ClockInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -475,6 +481,8 @@ public final class ClockInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatExtendedISO(

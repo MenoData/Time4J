@@ -655,7 +655,10 @@ public final class TimestampInterval
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -664,21 +667,33 @@ public final class TimestampInterval
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatISO(
         IsoDateStyle dateStyle,
         IsoDecimalStyle decimalStyle,
-        ClockUnit precision
+        ClockUnit precision,
+        InfinityStyle infinityStyle
     ) {
 
         TimestampInterval interval = this.toCanonical();
-        StringBuilder buffer = new StringBuilder(50);
+        StringBuilder buffer = new StringBuilder(60);
         ChronoPrinter<PlainTimestamp> printer = Iso8601Format.ofTimestamp(dateStyle, decimalStyle, precision);
-        printer.print(interval.getStartAsTimestamp(), buffer);
+        if (interval.getStart().isInfinite()) {
+            buffer.append(infinityStyle.displayPast(printer, PlainTimestamp.axis()));
+        } else {
+            printer.print(interval.getStartAsTimestamp(), buffer);
+        }
         buffer.append('/');
-        printer.print(interval.getEndAsTimestamp(), buffer);
+        if (interval.getEnd().isInfinite()) {
+            buffer.append(infinityStyle.displayFuture(printer, PlainTimestamp.axis()));
+        } else {
+            printer.print(interval.getEndAsTimestamp(), buffer);
+        }
         return buffer.toString();
 
     }
@@ -695,14 +710,18 @@ public final class TimestampInterval
      *              PlainTimestamp.of(2016, 2, 29, 10, 45, 53),
      *              PlainTimestamp.of(2016, 2, 29, 16, 30));
      *     System.out.println(
-     *          interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES));
+     *          interval.formatReduced(
+     *              IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL));
      *     // Output: 2016-02-29T10:45/T16:30
      * </pre>
      *
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -718,46 +737,69 @@ public final class TimestampInterval
      *              PlainTimestamp.of(2016, 2, 29, 10, 45, 53),
      *              PlainTimestamp.of(2016, 2, 29, 16, 30));
      *     System.out.println(
-     *          interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES));
+     *          interval.formatReduced(
+     *              IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL));
      *     // Output: 2016-02-29T10:45/T16:30
      * </pre>
      *
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatReduced(
         IsoDateStyle dateStyle,
         IsoDecimalStyle decimalStyle,
-        ClockUnit precision
+        ClockUnit precision,
+        InfinityStyle infinityStyle
     ) {
 
         TimestampInterval interval = this.toCanonical();
         PlainTimestamp start = interval.getStartAsTimestamp();
         PlainTimestamp end = interval.getEndAsTimestamp();
-        PlainDate d1 = start.getCalendarDate();
-        PlainDate d2 = end.getCalendarDate();
 
-        StringBuilder buffer = new StringBuilder(50);
+        StringBuilder buffer = new StringBuilder(60);
 
         ChronoPrinter<PlainTime> timePrinter = (
             dateStyle.isExtended()
                 ? Iso8601Format.ofExtendedTime(decimalStyle, precision)
                 : Iso8601Format.ofBasicTime(decimalStyle, precision));
+        ChronoPrinter<PlainTimestamp> printer = null;
 
-        Iso8601Format.ofDate(dateStyle).print(d1, buffer);
-        buffer.append('T');
-        timePrinter.print(start.getWallTime(), buffer);
-        buffer.append('/');
-
-        if (!d1.equals(d2)) {
-            DateInterval.getEndPrinter(dateStyle, d1, d2).print(d2, buffer);
+        if (interval.getStart().isInfinite()) {
+            printer = Iso8601Format.ofTimestamp(dateStyle, decimalStyle, precision);
+            buffer.append(infinityStyle.displayPast(printer, PlainTimestamp.axis()));
+        } else {
+            Iso8601Format.ofDate(dateStyle).print(start.getCalendarDate(), buffer);
+            buffer.append('T');
+            timePrinter.print(start.getWallTime(), buffer);
         }
 
-        buffer.append('T');
-        timePrinter.print(end.getWallTime(), buffer);
+        buffer.append('/');
+
+        if (interval.isFinite()) {
+            PlainDate d1 = start.getCalendarDate();
+            PlainDate d2 = end.getCalendarDate();
+            if (!d1.equals(d2)) {
+                DateInterval.getEndPrinter(dateStyle, d1, d2).print(d2, buffer);
+            }
+            buffer.append('T');
+            timePrinter.print(end.getWallTime(), buffer);
+        } else if (interval.getEnd().isInfinite()) {
+            if (printer == null) {
+                printer = Iso8601Format.ofTimestamp(dateStyle, decimalStyle, precision);
+            }
+            buffer.append(infinityStyle.displayFuture(printer, PlainTimestamp.axis()));
+        } else {
+            if (printer == null) {
+                printer = Iso8601Format.ofTimestamp(dateStyle, decimalStyle, precision);
+            }
+            printer.print(end, buffer);
+        }
 
         return buffer.toString();
 

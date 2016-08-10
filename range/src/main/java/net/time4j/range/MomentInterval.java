@@ -709,7 +709,10 @@ public final class MomentInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @param   offset          timezone offset
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -719,24 +722,34 @@ public final class MomentInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @param   offset          timezone offset
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatISO(
         IsoDateStyle dateStyle,
         IsoDecimalStyle decimalStyle,
         ClockUnit precision,
-        ZonalOffset offset
+        ZonalOffset offset,
+        InfinityStyle infinityStyle
     ) {
 
         MomentInterval interval = this.toCanonical();
-        Moment start = interval.getStartAsMoment();
-        Moment end = interval.getEndAsMoment();
-        StringBuilder buffer = new StringBuilder(50);
+        StringBuilder buffer = new StringBuilder(65);
         ChronoPrinter<Moment> printer = Iso8601Format.ofMoment(dateStyle, decimalStyle, precision, offset);
-        printer.print(start, buffer);
+        if (interval.getStart().isInfinite()) {
+            buffer.append(infinityStyle.displayPast(printer, Moment.axis()));
+        } else {
+            printer.print(interval.getStartAsMoment(), buffer);
+        }
         buffer.append('/');
-        printer.print(end, buffer);
+        if (interval.getEnd().isInfinite()) {
+            buffer.append(infinityStyle.displayFuture(printer, Moment.axis()));
+        } else {
+            printer.print(interval.getEndAsMoment(), buffer);
+        }
         return buffer.toString();
 
     }
@@ -746,7 +759,7 @@ public final class MomentInterval
      *
      * <p>The term &quot;reduced&quot; means that higher-order elements like the year can be
      * left out in the end component if it is equal to the value of the start component.
-     * And the offset is never printed in the end component. Example: </p>
+     * And the offset is never printed in the end component of finite intervals. Example: </p>
      *
      * <pre>
      *     MomentInterval interval =
@@ -755,7 +768,11 @@ public final class MomentInterval
      *              PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC().plus(1, SI.SECONDS));
      *     System.out.println(
      *          interval.formatReduced(
-     *              IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.SECONDS, ZonalOffset.UTC));
+     *              IsoDateStyle.EXTENDED_CALENDAR_DATE,
+     *              IsoDecimalStyle.DOT,
+     *              ClockUnit.SECONDS,
+     *              ZonalOffset.UTC,
+     *              InfinityStyle.SYMBOL));
      *     // Output: 2016-02-29T10:45:00Z/30T23:59:60
      * </pre>
      *
@@ -763,7 +780,10 @@ public final class MomentInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @param   offset          timezone offset
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -771,7 +791,8 @@ public final class MomentInterval
      *
      * <p>Der Begriff &quot;reduziert&quot; bedeutet, da&szlig; h&ouml;herwertige Elemente wie das Jahr
      * in der Endkomponente weggelassen werden, wenn ihr Wert gleich dem Wert der Startkomponente ist.
-     * Au&szlig;erdem wird in der Endkomponente der Offset immer weggelassen. Beispiel: </p>
+     * Au&szlig;erdem wird in der Endkomponente der Offset f&uuml;r begrenzte Intervalle immer weggelassen.
+     * Beispiel: </p>
      *
      * <pre>
      *     MomentInterval interval =
@@ -780,7 +801,11 @@ public final class MomentInterval
      *              PlainTimestamp.of(2012, 6, 30, 23, 59, 59).atUTC().plus(1, SI.SECONDS));
      *     System.out.println(
      *          interval.formatReduced(
-     *              IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.SECONDS, ZonalOffset.UTC));
+     *              IsoDateStyle.EXTENDED_CALENDAR_DATE,
+     *              IsoDecimalStyle.DOT,
+     *              ClockUnit.SECONDS,
+     *              ZonalOffset.UTC,
+     *              InfinityStyle.SYMBOL));
      *     // Output: 2016-02-29T10:45:00Z/30T23:59:60
      * </pre>
      *
@@ -788,49 +813,73 @@ public final class MomentInterval
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
      * @param   offset          timezone offset
+     * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatReduced(
         IsoDateStyle dateStyle,
         IsoDecimalStyle decimalStyle,
         ClockUnit precision,
-        ZonalOffset offset
+        ZonalOffset offset,
+        InfinityStyle infinityStyle
     ) {
 
         MomentInterval interval = this.toCanonical();
         Moment start = interval.getStartAsMoment();
         Moment end = interval.getEndAsMoment();
 
-        PlainTimestamp tsp2 = end.toZonalTimestamp(offset);
-        PlainDate d1 = start.toZonalTimestamp(offset).getCalendarDate();
-        PlainDate d2 = tsp2.getCalendarDate();
-
-        StringBuilder buffer = new StringBuilder(50);
+        StringBuilder buffer = new StringBuilder(65);
         ChronoPrinter<Moment> printer = Iso8601Format.ofMoment(dateStyle, decimalStyle, precision, offset);
-        printer.print(start, buffer);
-        buffer.append('/');
 
-        if (!d1.equals(d2)) {
-            DateInterval.getEndPrinter(dateStyle, d1, d2).print(d2, buffer);
+        if (interval.getStart().isInfinite()) {
+            ChronoPrinter<Moment> utc = null;
+            if (infinityStyle == InfinityStyle.MIN_MAX) {
+                utc = Iso8601Format.ofMoment(dateStyle, decimalStyle, precision, ZonalOffset.UTC);
+            }
+            buffer.append(infinityStyle.displayPast(utc, Moment.axis()));
+        } else {
+            printer.print(start, buffer);
         }
 
-        buffer.append('T');
+        buffer.append('/');
 
-        ChronoPrinter<PlainTime> timePrinter = (
-            dateStyle.isExtended()
-                ? Iso8601Format.ofExtendedTime(decimalStyle, precision)
-                : Iso8601Format.ofBasicTime(decimalStyle, precision));
+        if (interval.isFinite()) {
+            PlainTimestamp tsp2 = end.toZonalTimestamp(offset);
+            PlainDate d1 = start.toZonalTimestamp(offset).getCalendarDate();
+            PlainDate d2 = tsp2.getCalendarDate();
 
-        Set<ElementPosition> positions = timePrinter.print(tsp2.getWallTime(), buffer);
+            if (!d1.equals(d2)) {
+                DateInterval.getEndPrinter(dateStyle, d1, d2).print(d2, buffer);
+            }
 
-        if (end.isLeapSecond()) {
-            for (ElementPosition position : positions) {
-                if (position.getElement() == PlainTime.SECOND_OF_MINUTE) {
-                    buffer.replace(position.getStartIndex(), position.getEndIndex(), "60");
-                    break;
+            buffer.append('T');
+
+            ChronoPrinter<PlainTime> timePrinter = (
+                dateStyle.isExtended()
+                    ? Iso8601Format.ofExtendedTime(decimalStyle, precision)
+                    : Iso8601Format.ofBasicTime(decimalStyle, precision));
+
+            Set<ElementPosition> positions = timePrinter.print(tsp2.getWallTime(), buffer);
+
+            if (end.isLeapSecond()) {
+                for (ElementPosition position : positions) {
+                    if (position.getElement() == PlainTime.SECOND_OF_MINUTE) {
+                        buffer.replace(position.getStartIndex(), position.getEndIndex(), "60");
+                        break;
+                    }
                 }
             }
+        } else if (interval.getEnd().isInfinite()) {
+            ChronoPrinter<Moment> utc = null;
+            if (infinityStyle == InfinityStyle.MIN_MAX) {
+                utc = Iso8601Format.ofMoment(dateStyle, decimalStyle, precision, ZonalOffset.UTC);
+            }
+            buffer.append(infinityStyle.displayFuture(utc, Moment.axis()));
+        } else {
+            printer.print(end, buffer);
         }
 
         return buffer.toString();

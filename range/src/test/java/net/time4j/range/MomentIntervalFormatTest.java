@@ -357,15 +357,53 @@ public class MomentIntervalFormatTest {
                 IsoDateStyle.BASIC_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2)),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2),
+                InfinityStyle.SYMBOL),
             is("20160222T124553.120+0200/20160222T183027.043+0200"));
         assertThat(
             interval.formatISO(
                 IsoDateStyle.EXTENDED_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2)),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2),
+                InfinityStyle.SYMBOL),
             is("2016-02-22T12:45:53.120+02:00/2016-02-22T18:30:27.043+02:00"));
+    }
+
+    @Test
+    public void formatISOInfinity() {
+        MomentInterval since = MomentInterval.since(PlainTimestamp.of(2016, 2, 28, 13, 20).atUTC());
+        MomentInterval until = MomentInterval.until(PlainTimestamp.of(2016, 2, 28, 13, 20).atUTC());
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.SYMBOL),
+            is("2016-02-28T13:20Z/+∞"));
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.HYPHEN),
+            is("2016-02-28T13:20Z/-"));
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.MIN_MAX),
+            is("2016-02-28T13:20Z/+999999999-12-31T23:59Z"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.SYMBOL),
+            is("-∞/2016-02-28T13:20Z"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.HYPHEN),
+            is("-/2016-02-28T13:20Z"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.MIN_MAX),
+            is("-999999999-01-01T00:00Z/2016-02-28T13:20Z"));
     }
 
     @Test
@@ -378,7 +416,8 @@ public class MomentIntervalFormatTest {
                 IsoDateStyle.EXTENDED_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2)),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2),
+                InfinityStyle.SYMBOL),
             is("2012-07-01T01:59:60.001+02:00/08-02T18:30:27.120"));
     }
 
@@ -392,7 +431,8 @@ public class MomentIntervalFormatTest {
                 IsoDateStyle.EXTENDED_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4)),
+                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4),
+                InfinityStyle.SYMBOL),
             is("2012-06-02T12:30:27.120-04:00/30T19:59:60.001"));
     }
 
@@ -406,15 +446,53 @@ public class MomentIntervalFormatTest {
                 IsoDateStyle.BASIC_WEEK_DATE,
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4)),
+                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4),
+                InfinityStyle.SYMBOL),
             is("2012W266T123027,120-0400/T195960,001"));
         assertThat(
             interval.formatReduced(
                 IsoDateStyle.EXTENDED_WEEK_DATE,
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MILLIS,
-                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4)),
+                ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4),
+                InfinityStyle.SYMBOL),
             is("2012-W26-6T12:30:27,120-04:00/T19:59:60,001"));
+    }
+
+    @Test
+    public void formatReducedInfinity() {
+        MomentInterval since = MomentInterval.since(PlainTimestamp.of(2016, 2, 28, 13, 20).atUTC());
+        MomentInterval until = MomentInterval.until(PlainTimestamp.of(2016, 2, 28, 13, 20).atUTC());
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.SYMBOL),
+            is("2016-02-28T13:20Z/+∞"));
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.HYPHEN),
+            is("2016-02-28T13:20Z/-"));
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.MIN_MAX),
+            is("2016-02-28T13:20Z/+999999999-12-31T23:59Z"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.SYMBOL),
+            is("-∞/2016-02-28T13:20Z"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.HYPHEN),
+            is("-/2016-02-28T13:20Z"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, ZonalOffset.UTC,
+                InfinityStyle.MIN_MAX),
+            is("-999999999-01-01T00:00Z/2016-02-28T13:20Z"));
     }
 
     @Test

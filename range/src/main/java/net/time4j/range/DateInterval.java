@@ -660,6 +660,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -668,6 +670,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatISO(
@@ -711,6 +715,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     /*[deutsch]
@@ -732,6 +738,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
+     * @throws  IllegalStateException if there is no canonical form
+     * @see     #toCanonical()
      * @since   4.18
      */
     public String formatReduced(

@@ -2,15 +2,14 @@ package net.time4j.range;
 
 import net.time4j.ClockUnit;
 import net.time4j.PlainTimestamp;
-
-import java.text.ParseException;
-
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.IsoDecimalStyle;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -212,11 +211,43 @@ public class TimestampIntervalFormatTest {
         PlainTimestamp end = PlainTimestamp.of(2016, 2, 22, 16, 30);
         TimestampInterval interval = TimestampInterval.between(start, end);
         assertThat(
-            interval.formatISO(IsoDateStyle.BASIC_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MILLIS),
+            interval.formatISO(
+                IsoDateStyle.BASIC_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MILLIS, InfinityStyle.SYMBOL),
             is("20160222T104553.120/20160222T163000.000"));
         assertThat(
-            interval.formatISO(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MILLIS),
+            interval.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MILLIS, InfinityStyle.SYMBOL),
             is("2016-02-22T10:45:53.120/2016-02-22T16:30:00.000"));
+    }
+
+    @Test
+    public void formatISOInfinity() {
+        TimestampInterval since = TimestampInterval.since(PlainTimestamp.of(2016, 2, 28, 13, 20));
+        TimestampInterval until = TimestampInterval.until(PlainTimestamp.of(2016, 2, 28, 13, 20));
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
+            is("2016-02-28T13:20/+∞"));
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.HYPHEN),
+            is("2016-02-28T13:20/-"));
+        assertThat(
+            since.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.MIN_MAX),
+            is("2016-02-28T13:20/+999999999-12-31T23:59"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
+            is("-∞/2016-02-28T13:20"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.HYPHEN),
+            is("-/2016-02-28T13:20"));
+        assertThat(
+            until.formatISO(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.MIN_MAX),
+            is("-999999999-01-01T00:00/2016-02-28T13:20"));
     }
 
     @Test
@@ -225,10 +256,12 @@ public class TimestampIntervalFormatTest {
         PlainTimestamp end = PlainTimestamp.of(2016, 2, 29, 16, 30);
         TimestampInterval interval = TimestampInterval.between(start, end);
         assertThat(
-            interval.formatReduced(IsoDateStyle.BASIC_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES),
+            interval.formatReduced(
+                IsoDateStyle.BASIC_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
             is("20160222T1045/29T1630"));
         assertThat(
-            interval.formatReduced(IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES),
+            interval.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
             is("2016-02-22T10:45/29T16:30"));
     }
 
@@ -241,14 +274,46 @@ public class TimestampIntervalFormatTest {
             interval.formatReduced(
                 IsoDateStyle.BASIC_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
-                ClockUnit.MINUTES),
+                ClockUnit.MINUTES,
+                InfinityStyle.SYMBOL),
             is("20160222T1045/T1630"));
         assertThat(
             interval.formatReduced(
                 IsoDateStyle.EXTENDED_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
-                ClockUnit.MINUTES),
+                ClockUnit.MINUTES,
+                InfinityStyle.SYMBOL),
             is("2016-02-22T10:45/T16:30"));
+    }
+
+    @Test
+    public void formatReducedInfinity() {
+        TimestampInterval since = TimestampInterval.since(PlainTimestamp.of(2016, 2, 28, 13, 20));
+        TimestampInterval until = TimestampInterval.until(PlainTimestamp.of(2016, 2, 28, 13, 20));
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
+            is("2016-02-28T13:20/+∞"));
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.HYPHEN),
+            is("2016-02-28T13:20/-"));
+        assertThat(
+            since.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.MIN_MAX),
+            is("2016-02-28T13:20/+999999999-12-31T23:59"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.SYMBOL),
+            is("-∞/2016-02-28T13:20"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.HYPHEN),
+            is("-/2016-02-28T13:20"));
+        assertThat(
+            until.formatReduced(
+                IsoDateStyle.EXTENDED_CALENDAR_DATE, IsoDecimalStyle.DOT, ClockUnit.MINUTES, InfinityStyle.MIN_MAX),
+            is("-999999999-01-01T00:00/2016-02-28T13:20"));
     }
 
     @Test
