@@ -61,6 +61,7 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.AttributeProxy;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
@@ -876,9 +877,14 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attrs = attributes;
         Leniency leniency = this.leniency;
         boolean quickPath = true;
+        boolean trailingChars = this.trailing;
 
-        if (attributes != this.globalAttributes) {
+        if (attributes instanceof AttributeProxy) {
+            trailingChars = attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
+            quickPath = (AttributeProxy.class.cast(attributes).getDelegate() == this.globalAttributes);
+        } else if (attributes != this.globalAttributes) {
             attrs = new MergedAttributes(attributes, this.globalAttributes);
+            trailingChars = attrs.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
             leniency = attrs.get(Attributes.LENIENCY, Leniency.SMART);
             quickPath = false;
         }
@@ -889,7 +895,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         if (this.overrideHandler != null) {
             List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
             ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
-            GeneralTimestamp<?> tsp = parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath);
+            GeneralTimestamp<?> tsp =
+                parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath, trailingChars);
             parsed = status.getRawValues0();
 
             if (status.isError()) {
@@ -927,7 +934,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
             if (preparser != null) {
                 Object intermediate =
-                    parse(this, preparser, preparser.getExtensions(), text, status, attrs, leniency, true, quickPath);
+                    parse(
+                        this,
+                        preparser,
+                        preparser.getExtensions(), text, status, attrs, leniency, true, quickPath, trailingChars);
                 parsed = status.getRawValues0();
 
                 if (status.isError()) {
@@ -937,8 +947,10 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     updateSelf(parsed, self, intermediate);
                 }
             } else {
-                List<ChronoExtension> ext = this.chronology.getExtensions();
-                return parse(this, this.chronology, ext, text, status, attrs, leniency, false, quickPath);
+                return parse(
+                    this,
+                    this.chronology,
+                    this.chronology.getExtensions(), text, status, attrs, leniency, false, quickPath, trailingChars);
             }
         }
 
@@ -2580,7 +2592,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         AttributeQuery attributes,
         Leniency leniency,
         boolean preparsing,
-        boolean quickPath
+        boolean quickPath,
+        boolean trailing
     ) {
 
         int len = text.length();
@@ -2608,10 +2621,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         int index = status.getPosition();
-        boolean trailing = (
-            quickPath
-                ? cf.trailing
-                : attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue());
 
         if ((index < len) && !trailing) {
             status.setError(

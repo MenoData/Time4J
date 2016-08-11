@@ -27,6 +27,7 @@ import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.format.internal.AttributeProxy;
 
 import java.text.ParseException;
 
@@ -714,7 +715,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     //~ Innere Klassen ----------------------------------------------------
 
     static class Wrapper
-        implements AttributeQuery {
+        implements AttributeProxy {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -755,6 +756,10 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             return this.attributes.get(key, defaultValue);
         }
 
+        @Override
+        public AttributeQuery getDelegate() {
+            return this.attributes;
+        }
     }
 
 }
