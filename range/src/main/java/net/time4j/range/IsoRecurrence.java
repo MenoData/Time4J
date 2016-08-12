@@ -34,19 +34,25 @@ import net.time4j.tz.ZonalOffset;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.*;
 
+import static java.util.Spliterator.*;
+
 
 /**
- * <p>Represents a sequence of recurrent intervals as defined by ISO-8601. </p>
+ * <p>Represents a sequence of recurrent finite intervals as defined by ISO-8601. </p>
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert eine Sequenz von wiederkehrenden Intervallen wie in ISO-8601 definiert. </p>
+ * <p>Repr&auml;sentiert eine Sequenz von endlichen wiederkehrenden Intervallen wie in ISO-8601 definiert. </p>
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
@@ -461,7 +467,7 @@ public class IsoRecurrence<I>
      * <p>Creates a copy with an unlimited count of recurrent intervals. </p>
      *
      * <p>This method mainly exists to satisfy the requirements of ISO-8601. However:
-     * <strong>Special care must be taken to avoid infinite loops.</strong></p>
+     * <strong>Special care must be taken to avoid infinite loops or streams.</strong></p>
      *
      * @return  modified copy or this instance if not modified
      */
@@ -753,10 +759,80 @@ public class IsoRecurrence<I>
 
     }
 
+    /**
+     * <p>Yields a representation in extended ISO-format. </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *          IsoRecurrence.of(5, PlainDate.of(2016, 8, 12), Duration.of(3, CalendarUnit.WEEKS));
+     *     // R5/2016-08-12/P3W
+     *     System.out.println(
+     *          IsoRecurrence.of(0, PlainTimestamp.of(2016, 8, 12, 10, 45), PlainTimestamp.of(2016, 8, 12, 12, 0)
+     *          .withInfiniteCount());
+     *     // R/2016-08-12T10:45/2016-08-12T12:00
+     * </pre>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Liefert eine Darstellung im <i>extended</i> ISO-8601-Format. </p>
+     *
+     * <p>Beispiele: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *          IsoRecurrence.of(5, PlainDate.of(2016, 8, 12), Duration.of(3, CalendarUnit.WEEKS));
+     *     // R5/2016-08-12/P3W
+     *     System.out.println(
+     *          IsoRecurrence.of(0, PlainTimestamp.of(2016, 8, 12, 10, 45), PlainTimestamp.of(2016, 8, 12, 12, 0)
+     *          .withInfiniteCount());
+     *     // R/2016-08-12T10:45/2016-08-12T12:00
+     * </pre>
+     *
+     * @return  String
+     */
+    @Override
+    public String toString() {
+
+        throw new AbstractMethodError();
+
+    }
+
     @Override
     public Iterator<I> iterator() {
 
         throw new AbstractMethodError();
+
+    }
+
+    /**
+     * <p>Obtains an ordered stream of recurrent intervals. </p>
+     *
+     * @return  Stream
+     * @see     Spliterator#DISTINCT
+     * @see     Spliterator#NONNULL
+     * @see     Spliterator#ORDERED
+     * @see     Spliterator#SIZED
+     * @see     Spliterator#SUBSIZED
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen geordneten {@code Stream} von wiederkehrenden Intervallen. </p>
+     *
+     * @return  Stream
+     * @see     Spliterator#DISTINCT
+     * @see     Spliterator#NONNULL
+     * @see     Spliterator#ORDERED
+     * @see     Spliterator#SIZED
+     * @see     Spliterator#SUBSIZED
+     */
+    public Stream<I> stream() {
+
+        long size = (this.isInfinite() ? Long.MAX_VALUE : this.getCount());
+        int characteristics = DISTINCT | NONNULL | ORDERED | SIZED;
+        Spliterator<I> spliterator = Spliterators.spliterator(this.iterator(), size, characteristics);
+        return StreamSupport.stream(spliterator, false);
 
     }
 

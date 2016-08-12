@@ -14,6 +14,7 @@ import org.junit.runners.JUnit4;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -375,6 +376,43 @@ public class IsoRecurrenceTest {
                 ZonalOffset.UTC);
         assertThat(IsoRecurrence.parseMomentIntervals("R2/2016-07-01T10:15:59Z/T16:45:00.123"), is(expected));
         assertThat(IsoRecurrence.parseMomentIntervals("R2/2016-07-01T10:15:59Z/16:45:00.123"), is(expected));
+    }
+
+    @Test
+    public void testToString() {
+        IsoRecurrence<DateInterval> dateIntervalIsoRecurrence =
+            IsoRecurrence.of(0, Duration.of(2, CalendarUnit.WEEKS), PlainDate.of(2016, 1, 31)).withInfiniteCount();
+        assertThat(
+            dateIntervalIsoRecurrence.toString(),
+            is("R/P2W/2016-01-31"));
+        IsoRecurrence<TimestampInterval> timestampIntervalIsoRecurrence =
+            IsoRecurrence.of(
+                6,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59),
+                Duration.ofPositive().months(2).days(4).hours(12).build());
+        assertThat(
+            timestampIntervalIsoRecurrence.toString(),
+            is("R6/2016-07-01T10:15:59/P2M4DT12H"));
+        IsoRecurrence<MomentInterval> momentIntervalIsoRecurrence =
+            IsoRecurrence.of(
+                87,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59).atUTC(),
+                PlainTimestamp.of(2016, 7, 2, 16, 45, 0).plus(123, ClockUnit.MILLIS).atUTC(),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2));
+        assertThat(
+            momentIntervalIsoRecurrence.toString(),
+            is("R87/2016-07-01T12:15:59+02:00/2016-07-02T18:45:00,123+02:00"));
+    }
+
+    @Test
+    public void stream() {
+        IsoRecurrence<DateInterval> recurrence =
+            IsoRecurrence.of(4, PlainDate.of(2016, 7, 1), Duration.of(1, CalendarUnit.MONTHS));
+        List<DateInterval> expected = new ArrayList<>();
+        for (DateInterval interval : recurrence) {
+            expected.add(interval);
+        }
+        assertThat(recurrence.stream().collect(Collectors.toList()), is(expected));
     }
 
 }
