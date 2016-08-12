@@ -27,6 +27,7 @@
 - 3 methods in TransitionHistory deprecated and replaced by new better named methods [#523]
 - 1 method in ChronoPrinter deprecated and replaced by new methods [#532]
 - 1 parse method in each of four iso-interval classes replaced by new one without ParseLog-parameter [#535]
+- 1 print method in IsoInterval (replaced by a new one with extra infinity style arg) [#536]
 
 ## [v4.17] published on 2016-06-20
 ### Added
