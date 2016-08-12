@@ -4,6 +4,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
@@ -177,6 +178,29 @@ public class AnnualDateTest {
         AnnualDate ser = (AnnualDate) ois.readObject();
         assertThat(ser, is(ad));
         ois.close();
+    }
+
+    @Test
+    public void asNextExactEvent() {
+        ChronoOperator<PlainDate> op = AnnualDate.of(Month.FEBRUARY, 29).asNextExactEvent();
+        assertThat(PlainDate.of(2015, 2, 28).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2015, 12, 31).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 1, 15).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 2, 28).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 2, 29).with(op), is(PlainDate.of(2020, 2, 29)));
+        assertThat(PlainDate.of(2016, 3, 1).with(op), is(PlainDate.of(2020, 2, 29)));
+    }
+
+    @Test
+    public void asNextRoundedEvent() {
+        ChronoOperator<PlainDate> op = AnnualDate.of(Month.FEBRUARY, 29).asNextRoundedEvent();
+        assertThat(PlainDate.of(2015, 2, 28).with(op), is(PlainDate.of(2015, 3, 1)));
+        assertThat(PlainDate.of(2015, 3, 1).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2015, 12, 31).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 1, 15).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 2, 28).with(op), is(PlainDate.of(2016, 2, 29)));
+        assertThat(PlainDate.of(2016, 2, 29).with(op), is(PlainDate.of(2017, 3, 1)));
+        assertThat(PlainDate.of(2016, 3, 1).with(op), is(PlainDate.of(2017, 3, 1)));
     }
 
 }

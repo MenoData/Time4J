@@ -31,6 +31,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
@@ -434,6 +435,111 @@ public final class AnnualDate
             (year >= GregorianMath.MIN_YEAR) && (year <= GregorianMath.MAX_YEAR)
             && ((this.month != 2) || (this.dayOfMonth != 29) || GregorianMath.isLeapYear(year))
         );
+
+    }
+
+    /**
+     * <p>Determines the next possible exact annual date. </p>
+     *
+     * <p>If this annual date is a leap day then the next date can be some years later. Example: </p>
+     *
+     * <pre>
+     *     System.out.println(PlainDate.of(2015, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2016-02-29
+     *     System.out.println(PlainDate.of(2016, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2016-02-29
+     *     System.out.println(PlainDate.of(2016, 2, 29).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2020-02-29
+     * </pre>
+     *
+     * @return  chronological operator
+     * @see     #asNextRoundedEvent()
+     */
+    /*[deutsch]
+     * <p>Bestimmt den n&auml;chstm&ouml;glichen exakten Jahrestag. </p>
+     *
+     * <p>Wenn dieser Jahrestag ein Schalttag ist, kann das n&auml;chste Ereignis Jahre sp&auml;ter
+     * folgen. Beispiel: </p>
+     *
+     * <pre>
+     *     System.out.println(PlainDate.of(2015, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2016-02-29
+     *     System.out.println(PlainDate.of(2016, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2016-02-29
+     *     System.out.println(PlainDate.of(2016, 2, 29).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2020-02-29
+     * </pre>
+     *
+     * @return  chronological operator
+     * @see     #asNextRoundedEvent()
+     */
+    public ChronoOperator<PlainDate> asNextExactEvent() {
+
+        return new ChronoOperator<PlainDate>() {
+            @Override
+            public PlainDate apply(PlainDate date) {
+                int year = date.getYear();
+                int month = AnnualDate.this.getMonth().getValue();
+                int dom = AnnualDate.this.getDayOfMonth();
+                if ((month < date.getMonth()) || ((month == date.getMonth()) && (dom <= date.getDayOfMonth()))) {
+                    year++;
+                }
+                if ((month == 2) && (dom == 29)) {
+                    while (!GregorianMath.isLeapYear(year)) {
+                        year++;
+                    }
+                }
+                return PlainDate.of(year, month, dom);
+            }
+        };
+
+    }
+
+    /**
+     * <p>Determines the next possible annual date and rounds up to next day if necessary. </p>
+     *
+     * <p>If this annual date is a leap day then the next date can be advanced to begin of March. Example: </p>
+     *
+     * <pre>
+     *     System.out.println(PlainDate.of(2015, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2015-03-01
+     * </pre>
+     *
+     * @return  chronological operator
+     * @see     #asNextExactEvent()
+     */
+    /*[deutsch]
+     * <p>Bestimmt den n&auml;chstm&ouml;glichen Jahrestag und rundet notfalls zum n&auml;chsten Tag. </p>
+     *
+     * <p>Wenn dieser Jahrestag ein Schalttag ist, kann das n&auml;chste Ereignis auf den ersten M&auml;rz
+     * verschoben werden. Beispiel: </p>
+     *
+     * <pre>
+     *     System.out.println(PlainDate.of(2015, 2, 28).with(AnnualDate.of(Month.FEBRUARY, 29).asNextEvent()));
+     *     // 2015-03-01
+     * </pre>
+     *
+     * @return  chronological operator
+     * @see     #asNextExactEvent()
+     */
+    public ChronoOperator<PlainDate> asNextRoundedEvent() {
+
+        return new ChronoOperator<PlainDate>() {
+            @Override
+            public PlainDate apply(PlainDate date) {
+                int year = date.getYear();
+                int month = AnnualDate.this.getMonth().getValue();
+                int dom = AnnualDate.this.getDayOfMonth();
+                if ((month < date.getMonth()) || ((month == date.getMonth()) && (dom <= date.getDayOfMonth()))) {
+                    year++;
+                }
+                if ((month == 2) && (dom == 29) && !GregorianMath.isLeapYear(year)) {
+                    month = 3;
+                    dom = 1;
+                }
+                return PlainDate.of(year, month, dom);
+            }
+        };
 
     }
 
