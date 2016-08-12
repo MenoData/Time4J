@@ -12,6 +12,7 @@
 - Make printing of ISO-formats configurable [#533]
 - New date-interval-method to convert to a moment interval [#534]
 - Implement reduced ISO-formats for intervals [#535]
+- Improve formatting of infinite intervals [#536]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
