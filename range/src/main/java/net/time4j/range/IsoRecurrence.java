@@ -23,10 +23,13 @@ package net.time4j.range;
 
 import net.time4j.Duration;
 import net.time4j.IsoDateUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.ZonalDateTime;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
 import java.util.Iterator;
@@ -298,6 +301,122 @@ public class IsoRecurrence<I>
     }
 
     /**
+     * <p>Creates a recurrent sequence of moment intervals having given duration. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   duration    represents the duration of every repeating interval
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Moment-Intervallen mit der angegebenen Dauer. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   duration    represents the duration of every repeating interval
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    public static IsoRecurrence<MomentInterval> of(
+        int count,
+        Moment start,
+        Duration<?> duration,
+        ZonalOffset offset
+    ) {
+
+        check(count);
+
+        return new RecurrentMomentIntervals(
+            count, TYPE_START_DURATION, start.toZonalTimestamp(offset), offset, duration);
+
+    }
+
+    /**
+     * <p>Creates a recurrent backward sequence of moment intervals having given duration. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   duration    represents the negative duration of every repeating interval
+     * @param   end         denotes the end of first interval (exclusive)
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden r&uuml;ckw&auml;rts laufenden
+     * Moment-Intervallen mit der angegebenen Dauer. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   duration    represents the negative duration of every repeating interval
+     * @param   end         denotes the end of first interval (exclusive)
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open plain timestamp intervals
+     * @throws  IllegalArgumentException if the count is negative or the duration is not positive
+     */
+    public static IsoRecurrence<MomentInterval> of(
+        int count,
+        Duration<?> duration,
+        Moment end,
+        ZonalOffset offset
+    ) {
+
+        check(count);
+
+        return new RecurrentMomentIntervals(
+            count, TYPE_DURATION_END, end.toZonalTimestamp(offset), offset, duration);
+
+    }
+
+    /**
+     * <p>Creates a recurrent sequence of moment intervals having the duration
+     * of first timestamp interval in years, months, days, hours, minutes, seconds and nanoseconds. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   end         denotes the end of first interval (exclusive)
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open moment intervals
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Sequenz von wiederkehrenden Moment-Intervallen mit der Dauer des ersten Intervalls
+     * in Jahren, Monaten, Tagen, Stunden, Minuten, Sekunden und Nanosekunden. </p>
+     *
+     * @param   count       the count of repeating intervals ({@code >= 0})
+     * @param   start       denotes the start of first interval (inclusive)
+     * @param   end         denotes the end of first interval (exclusive)
+     * @param   offset      time zone offset in full minutes
+     * @return  sequence of recurrent half-open moment intervals
+     * @throws  IllegalArgumentException if the count is negative or if start is not before end
+     */
+    public static IsoRecurrence<MomentInterval> of(
+        int count,
+        Moment start,
+        Moment end,
+        ZonalOffset offset
+    ) {
+
+        check(count);
+
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("End is not after start.");
+        }
+
+        PlainTimestamp s = start.toZonalTimestamp(offset);
+        PlainTimestamp e = end.toZonalTimestamp(offset);
+
+        return new RecurrentMomentIntervals(
+            count,
+            TYPE_START_END,
+            s,
+            offset,
+            Duration.in(YEARS, MONTHS, DAYS, HOURS, MINUTES, SECONDS, NANOS).between(s, e));
+
+    }
+
+    /**
      * <p>Obtains the count of recurrent intervals. </p>
      *
      * @return non-negative count of recurrent intervals or {@code -1} if infinite
@@ -529,6 +648,88 @@ public class IsoRecurrence<I>
 
     }
 
+    /**
+     * <p>Parses a string like &quot;R5/2016-04-01T10:45Z/30T23:59&quot;
+     * to a sequence of recurrent moment intervals. </p>
+     *
+     * <p>Supported ISO-formats for moment parts are {@link Iso8601Format#BASIC_DATE_TIME_OFFSET}
+     * and {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}. A duration component will be parsed
+     * by {@link Duration#parsePeriod(String)}. </p>
+     *
+     * @param   iso     canonical representation of recurrent intervals
+     * @return  parsed sequence of recurrent half-open moment intervals
+     * @throws  ParseException in any case of inconsistencies
+     */
+    /*[deutsch]
+     * <p>Interpretiert einen Text wie &quot;R5/2016-04-01T10:45Z/30T23:59&quot;
+     * als eine Sequenz von wiederkehrenden Moment-Intervallen. </p>
+     *
+     * <p>Unterst&uuml;tzte ISO-Formate f&uuml;r Zeitstempelkomponenten sind
+     * {@link Iso8601Format#BASIC_DATE_TIME_OFFSET} und {@link Iso8601Format#EXTENDED_DATE_TIME_OFFSET}.
+     * Eine Dauerkomponente wird mittels {@link Duration#parsePeriod(String)} interpretiert. </p>
+     *
+     * @param   iso     canonical representation of recurrent intervals
+     * @return  parsed sequence of recurrent half-open moment intervals
+     * @throws  ParseException in any case of inconsistencies
+     */
+    public static IsoRecurrence<MomentInterval> parseMomentIntervals(String iso)
+        throws ParseException {
+
+        String[] parts = iso.split("/");
+        int count = parseCount(parts);
+        boolean infinite = false;
+
+        if (count == INFINITE) {
+            count = 0;
+            infinite = true;
+        }
+
+        IsoRecurrence<MomentInterval> recurrence;
+
+        if (parts[2].charAt(0) == 'P') {
+            boolean extended = isExtendedFormat(parts[1]);
+            ZonalDateTime zdt = ZonalDateTime.parse(parts[1], momentFormatter(extended));
+            Duration<?> duration = Duration.parsePeriod(parts[2]);
+            recurrence = IsoRecurrence.of(count, zdt.toMoment(), duration, zdt.getOffset());
+        } else if (parts[1].charAt(0) == 'P') {
+            Duration<?> duration = Duration.parsePeriod(parts[1]);
+            boolean extended = isExtendedFormat(parts[2]);
+            ZonalDateTime zdt = ZonalDateTime.parse(parts[2], momentFormatter(extended));
+            recurrence = IsoRecurrence.of(count, duration, zdt.toMoment(), zdt.getOffset());
+        } else {
+            String remainder = iso.substring(getFirstSlash(iso) + 1);
+            MomentInterval interval = MomentInterval.parseISO(remainder);
+            Moment start = interval.getStart().getTemporal();
+            Moment end = interval.getEnd().getTemporal();
+            ZonalOffset offset = null;
+            int signIndex = -1;
+            for (int i = 1, n = remainder.length(); i < n; i++) {
+                char c = remainder.charAt(i);
+                if (c == 'Z') {
+                    offset = ZonalOffset.UTC;
+                    break;
+                } else if ((c == '-') || (c == '+')) {
+                    signIndex = i;
+                } else if (c == '/') {
+                    remainder = remainder.substring(signIndex, i);
+                    if (remainder.charAt(3) != ':') {
+                        remainder = remainder.substring(0, 3) + ":" + remainder.substring(3);
+                    }
+                    offset = ZonalOffset.parse(remainder);
+                    break;
+                }
+            }
+            recurrence = IsoRecurrence.of(count, start, end, offset);
+        }
+
+        if (infinite) {
+            recurrence = recurrence.withInfiniteCount();
+        }
+
+        return recurrence;
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -574,7 +775,7 @@ public class IsoRecurrence<I>
     private static void check(int count) {
 
         if (count < 0) {
-            throw new IllegalArgumentException("Count of recurrent intervals must not be negative: " + count);
+            throw new IllegalArgumentException("Count of recurrent intervals must be postive or zero: " + count);
         }
 
     }
@@ -636,6 +837,12 @@ public class IsoRecurrence<I>
     private static ChronoFormatter<PlainTimestamp> timestampFormatter(boolean extended) {
 
         return (extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
+
+    }
+
+    private static ChronoFormatter<Moment> momentFormatter(boolean extended) {
+
+        return (extended ? Iso8601Format.EXTENDED_DATE_TIME_OFFSET : Iso8601Format.BASIC_DATE_TIME_OFFSET);
 
     }
 
@@ -921,6 +1128,148 @@ public class IsoRecurrence<I>
         IsoRecurrence<TimestampInterval> copyWithCount(int count) {
 
             return new RecurrentTimestampIntervals(count, this.getType(), this.ref, this.duration);
+
+        }
+
+    }
+
+    private static class RecurrentMomentIntervals
+        extends IsoRecurrence<MomentInterval> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final PlainTimestamp ref;
+        private final ZonalOffset offset;
+        private final Duration<?> duration;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private RecurrentMomentIntervals(
+            int count,
+            int type,
+            PlainTimestamp ref,
+            ZonalOffset offset,
+            Duration<?> duration
+        ) {
+            super(count, type);
+
+            this.ref = ref;
+            this.offset = offset;
+            this.duration = duration;
+
+            if (!duration.isPositive()) {
+                throw new IllegalArgumentException("Duration must be positive: " + duration);
+            } else if ((offset.getIntegralAmount() % 60 != 0) || (offset.getFractionalAmount() != 0)) {
+                throw new IllegalArgumentException("Offset with seconds is invalid in ISO-8601: " + offset);
+            }
+
+        }
+
+        //~ Methoden ----------------------------------------------------------
+
+        @Override
+        public Iterator<MomentInterval> iterator() {
+            return new ReadOnlyIterator<MomentInterval, RecurrentMomentIntervals>(this) {
+                private PlainTimestamp current = RecurrentMomentIntervals.this.ref;
+                private ZonalOffset offset = RecurrentMomentIntervals.this.offset;
+                @Override
+                protected MomentInterval nextInterval() {
+                    PlainTimestamp next;
+                    Boundary<Moment> s;
+                    Boundary<Moment> e;
+                    if (RecurrentMomentIntervals.this.isBackwards()) {
+                        next = this.current.minus(RecurrentMomentIntervals.this.duration);
+                        s = Boundary.ofClosed(next.at(offset));
+                        e = Boundary.ofOpen(this.current.at(offset));
+                    } else {
+                        next = this.current.plus(RecurrentMomentIntervals.this.duration);
+                        s = Boundary.ofClosed(this.current.at(offset));
+                        e = Boundary.ofOpen(next.at(offset));
+                    }
+                    this.current = next;
+                    return MomentIntervalFactory.INSTANCE.between(s, e);
+                }
+            };
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (super.equals(obj)) {
+                RecurrentMomentIntervals that = (RecurrentMomentIntervals) obj;
+                return (
+                    this.ref.equals(that.ref)
+                    && this.duration.equals(that.duration)
+                    && this.offset.equals(that.offset));
+            }
+
+            return false;
+
+        }
+
+        @Override
+        public int hashCode() {
+
+            return super.hashCode()
+                + 7 * this.ref.hashCode()
+                + 31 * this.offset.hashCode()
+                + 37 * this.duration.hashCode();
+
+        }
+
+        @Override
+        public String toString() {
+
+            StringBuilder sb = new StringBuilder();
+            sb.append('R');
+            int c = this.getCount();
+            if (c != INFINITE) {
+                sb.append(this.getCount());
+            }
+            sb.append('/');
+
+            switch (this.getType()) {
+                case TYPE_START_DURATION:
+                    sb.append(this.ref);
+                    sb.append(this.getOffsetAsString());
+                    sb.append('/');
+                    sb.append(this.duration);
+                    break;
+                case TYPE_DURATION_END:
+                    sb.append(this.duration);
+                    sb.append('/');
+                    sb.append(this.ref);
+                    sb.append(this.getOffsetAsString());
+                    break;
+                case TYPE_START_END:
+                    sb.append(this.ref);
+                    sb.append(this.getOffsetAsString());
+                    sb.append('/');
+                    sb.append(this.ref.plus(this.duration));
+                    sb.append(this.getOffsetAsString());
+                    break;
+            }
+
+            return sb.toString();
+
+        }
+
+        @Override
+        IsoRecurrence<MomentInterval> copyWithCount(int count) {
+
+            return new RecurrentMomentIntervals(count, this.getType(), this.ref, this.offset, this.duration);
+
+        }
+
+        private String getOffsetAsString() {
+
+            if ((this.offset.getIntegralAmount() == 0) && (this.offset.getFractionalAmount() == 0)) {
+                return "Z";
+            }
+
+            return this.offset.toString();
 
         }
 

@@ -5,6 +5,8 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.OffsetSign;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -31,7 +33,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/2016-07-01/P1M"));
 
-        List<DateInterval> intervals = new ArrayList<DateInterval>();
+        List<DateInterval> intervals = new ArrayList<>();
         for (DateInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -65,7 +67,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/P1{M-KEEPING_LAST_DATE}/2016-04-30"));
 
-        List<DateInterval> intervals = new ArrayList<DateInterval>();
+        List<DateInterval> intervals = new ArrayList<>();
         for (DateInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -86,7 +88,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/2016-12-01/2016-12-31"));
 
-        List<DateInterval> intervals = new ArrayList<DateInterval>();
+        List<DateInterval> intervals = new ArrayList<>();
         for (DateInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -243,7 +245,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/2016-07-01T10/P1DT6H"));
 
-        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        List<TimestampInterval> intervals = new ArrayList<>();
         for (TimestampInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -275,7 +277,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/P1DT6H/2016-07-06T10"));
 
-        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        List<TimestampInterval> intervals = new ArrayList<>();
         for (TimestampInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -307,7 +309,7 @@ public class IsoRecurrenceTest {
         assertThat(recurrence.getCount(), is(4));
         assertThat(recurrence.toString(), is("R4/2016-07-01T10/2016-07-02T16"));
 
-        List<TimestampInterval> intervals = new ArrayList<TimestampInterval>();
+        List<TimestampInterval> intervals = new ArrayList<>();
         for (TimestampInterval interval : recurrence) {
             intervals.add(interval);
         }
@@ -343,6 +345,36 @@ public class IsoRecurrenceTest {
                 PlainTimestamp.of(2016, 7, 1, 16, 45, 0).plus(123, ClockUnit.MILLIS));
         assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/T16:45:00.123"), is(expected));
         assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/16:45:00.123"), is(expected));
+    }
+
+    @Test
+    public void parseMomentIntervals() throws ParseException {
+        IsoRecurrence<MomentInterval> expected =
+            IsoRecurrence.of(
+                87,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59).atUTC(),
+                PlainTimestamp.of(2016, 7, 2, 16, 45, 0).plus(123, ClockUnit.MILLIS).atUTC(),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2));
+        assertThat(
+            IsoRecurrence.parseMomentIntervals("R87/20160701T121559+0200/20160702T184500.123"), is(expected));
+        assertThat(
+            IsoRecurrence.parseMomentIntervals("R87/2016-07-01T12:15:59+02:00/2016-07-02T16:45:00.123Z"), is(expected));
+        expected =
+            IsoRecurrence.of(
+                87,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59).atUTC(),
+                Duration.ofPositive().days(1).hours(6).minutes(29).seconds(59).millis(123).build(),
+                ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2));
+        assertThat(
+            IsoRecurrence.parseMomentIntervals("R87/2016-07-01T12:15:59+02:00/P1DT6H29M59,123000000S"), is(expected));
+        expected =
+            IsoRecurrence.of(
+                2,
+                PlainTimestamp.of(2016, 7, 1, 10, 15, 59).atUTC(),
+                PlainTimestamp.of(2016, 7, 1, 16, 45, 0).plus(123, ClockUnit.MILLIS).atUTC(),
+                ZonalOffset.UTC);
+        assertThat(IsoRecurrence.parseMomentIntervals("R2/2016-07-01T10:15:59Z/T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseMomentIntervals("R2/2016-07-01T10:15:59Z/16:45:00.123"), is(expected));
     }
 
 }
