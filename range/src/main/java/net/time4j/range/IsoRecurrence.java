@@ -40,13 +40,13 @@ import static net.time4j.ClockUnit.*;
 
 
 /**
- * <p>Represents a sequence of recurrent intervals as defined by ISO-8601. </p>
+ * <p>Represents a sequence of recurrent finite intervals as defined by ISO-8601. </p>
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert eine Sequenz von wiederkehrenden Intervallen wie in ISO-8601 definiert. </p>
+ * <p>Repr&auml;sentiert eine Sequenz von wiederkehrenden endlichen Intervallen wie in ISO-8601 definiert. </p>
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
@@ -750,6 +750,47 @@ public class IsoRecurrence<I>
     public int hashCode() {
 
         return this.count;
+
+    }
+
+    /**
+     * <p>Yields a representation in extended ISO-format. </p>
+     *
+     * <p>Examples: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *          IsoRecurrence.of(5, PlainDate.of(2016, 8, 12), Duration.of(3, CalendarUnit.WEEKS));
+     *     // R5/2016-08-12/P3W
+     *     System.out.println(
+     *          IsoRecurrence.of(0, PlainTimestamp.of(2016, 8, 12, 10, 45), PlainTimestamp.of(2016, 8, 12, 12, 0)
+     *          .withInfiniteCount());
+     *     // R/2016-08-12T10:45/2016-08-12T12:00
+     * </pre>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Liefert eine Darstellung im <i>extended</i> ISO-8601-Format. </p>
+     *
+     * <p>Beispiele: </p>
+     *
+     * <pre>
+     *     System.out.println(
+     *          IsoRecurrence.of(5, PlainDate.of(2016, 8, 12), Duration.of(3, CalendarUnit.WEEKS));
+     *     // R5/2016-08-12/P3W
+     *     System.out.println(
+     *          IsoRecurrence.of(0, PlainTimestamp.of(2016, 8, 12, 10, 45), PlainTimestamp.of(2016, 8, 12, 12, 0)
+     *          .withInfiniteCount());
+     *     // R/2016-08-12T10:45/2016-08-12T12:00
+     * </pre>
+     *
+     * @return  String
+     */
+    @Override
+    public String toString() {
+
+        throw new AbstractMethodError();
 
     }
 
