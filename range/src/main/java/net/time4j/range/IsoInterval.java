@@ -847,7 +847,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         try {
             StringBuilder sb = new StringBuilder(64);
-            this.print(printer, '/', printer, policy, sb);
+            this.print(printer, '/', printer, policy, InfinityStyle.SYMBOL, sb);
             return sb.toString();
         } catch (IOException ioe) {
             throw new AssertionError(ioe);
@@ -870,6 +870,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the canonicalization of this interval fails
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
+     * @deprecated  Use the variant with explicit infinity style argument instead
      */
     /*[deutsch]
      * <p>Formatiert dieses Intervall in einem technischen Format unter Benutzung der angegebenen Formatierer
@@ -887,12 +888,62 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the canonicalization of this interval fails
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
+     * @deprecated  Use the variant with explicit infinity style argument instead
+     */
+    @Deprecated
+    public void print(
+        ChronoPrinter<T> startFormat,
+        char separator,
+        ChronoPrinter<T> endFormat,
+        BracketPolicy policy,
+        Appendable buffer
+    ) throws IOException {
+
+        this.print(startFormat, separator, endFormat, policy, InfinityStyle.SYMBOL, buffer);
+
+    }
+
+    /**
+     * <p>Prints this interval in a technical format using given formatters and separator. </p>
+     *
+     * <p>Note: If given bracket policy is specified as {@code SHOW_NEVER} then the canonical form of this
+     * interval will be printed. </p>
+     *
+     * @param   startFormat     format object for printing start component
+     * @param   separator       char separating start and end component
+     * @param   endFormat       format object for printing end component
+     * @param   policy          strategy for printing interval boundaries
+     * @param   infinityStyle   style to be used for printing infinite interval boundaries
+     * @param   buffer          writing buffer
+     * @throws  IllegalStateException   if the canonicalization of this interval fails
+     *                                  or given infinity style prevents printing infinite intervals
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.9/4.6
+     */
+    /*[deutsch]
+     * <p>Formatiert dieses Intervall in einem technischen Format unter Benutzung der angegebenen Formatierer
+     * und des angegebenen Trennzeichens. </p>
+     *
+     * <p>Hinweis: Wenn die angegebene {@code BracketPolicy} gleich {@code SHOW_NEVER}
+     * ist, dann wird die kanonische Form dieses Intervalls ausgegeben. </p>
+     *
+     * @param   startFormat     format object for printing start component
+     * @param   separator       char separating start and end component
+     * @param   endFormat       format object for printing end component
+     * @param   policy          strategy for printing interval boundaries
+     * @param   infinityStyle   style to be used for printing infinite interval boundaries
+     * @param   buffer          writing buffer
+     * @throws  IllegalStateException   if the canonicalization of this interval fails
+     *                                  or given infinity style prevents printing infinite intervals
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.9/4.6
      */
     public void print(
         ChronoPrinter<T> startFormat,
         char separator,
         ChronoPrinter<T> endFormat,
         BracketPolicy policy,
+        InfinityStyle infinityStyle,
         Appendable buffer
     ) throws IOException {
 
@@ -911,7 +962,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
         if (interval.getStart().isInfinite()) {
-            sb.append("-\u221E");
+            sb.append(infinityStyle.displayPast(startFormat, this.getFactory().getTimeLine()));
         } else {
             startFormat.print(interval.getStart().getTemporal(), sb, attrs);
         }
@@ -919,7 +970,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         sb.append(separator);
 
         if (interval.getEnd().isInfinite()) {
-            sb.append("+\u221E");
+            // intentionally using start format to avoid reduced formats
+            sb.append(infinityStyle.displayFuture(startFormat, this.getFactory().getTimeLine()));
         } else {
             endFormat.print(interval.getEnd().getTemporal(), sb, attrs);
         }

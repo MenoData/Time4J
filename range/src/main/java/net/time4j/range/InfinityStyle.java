@@ -21,6 +21,7 @@
 
 package net.time4j.range;
 
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ChronoPrinter;
 
@@ -40,6 +41,16 @@ import net.time4j.format.expert.ChronoPrinter;
 public enum InfinityStyle {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Printing infinite intervals is not supported by this style
+     * and will throw an {@code IllegalStateException}. </p>
+     */
+    /*[deutsch]
+     * <p>Die Formatierung unendlicher Intervall wird durch diesen Stil
+     * mit Hilfe einer {@code IllegalStateException} verhindert. </p>
+     */
+    ABORT,
 
     /**
      * <p>The mathematical symbols &quot;-&#x221E;&quot; (infinite past)
@@ -94,10 +105,16 @@ public enum InfinityStyle {
     /**
      * <p>The minimum and maximum of the underlying time axis (timeline)
      * are used instead of the infinite boundaries. </p>
+     *
+     * <p>This style is syntactically in agreement with strict ISO-8601 standard
+     * (which does not know infinite intervals at all). </p>
      */
     /*[deutsch]
      * <p>Das Minimum und Maximum der zugrundeliegenden Zeitachse (Zeitstrahl)
      * werden anstelle der unbegrenzten Intervallgrenzen verwendet. </p>
+     *
+     * <p>Dieser Stil ist syntaktisch in &Uuml;bereinstimmung mit dem ISO-8601-Standard,
+     * der selbst keine unendlichen Intervalle kennt. </p>
      */
     MIN_MAX() {
         @Override
@@ -124,6 +141,7 @@ public enum InfinityStyle {
      * @param   printer     used for printing the minimum of timeline
      * @param   timeLine    underlying timeline
      * @return  formatted output
+     * @throws  IllegalStateException if infinite intervals are not supported by this style
      */
     /*[deutsch]
      * <p>Gibt die unbegrenzte Vergangenheit aus. </p>
@@ -131,12 +149,13 @@ public enum InfinityStyle {
      * @param   printer     used for printing the minimum of timeline
      * @param   timeLine    underlying timeline
      * @return  formatted output
+     * @throws  IllegalStateException if infinite intervals are not supported by this style
      */
     <T> String displayPast(
         ChronoPrinter<T> printer,
         TimeLine<T> timeLine
     ) {
-        throw new AbstractMethodError();
+        throw new IllegalStateException("Infinite intervals are not supported.");
     }
 
     /**
@@ -145,6 +164,7 @@ public enum InfinityStyle {
      * @param   printer     used for printing the maximum of timeline
      * @param   timeLine    underlying timeline
      * @return  formatted output
+     * @throws  IllegalStateException if infinite intervals are not supported by this style
      */
     /*[deutsch]
      * <p>Gibt die unbegrenzte Zukunft aus. </p>
@@ -152,12 +172,13 @@ public enum InfinityStyle {
      * @param   printer     used for printing the maximum of timeline
      * @param   timeLine    underlying timeline
      * @return  formatted output
+     * @throws  IllegalStateException if infinite intervals are not supported by this style
      */
     <T> String displayFuture(
         ChronoPrinter<T> printer,
         TimeLine<T> timeLine
     ) {
-        throw new AbstractMethodError();
+        throw new IllegalStateException("Infinite intervals are not supported.");
     }
 
 }

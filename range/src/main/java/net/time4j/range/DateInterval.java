@@ -660,7 +660,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -670,7 +671,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -715,7 +717,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -738,7 +741,8 @@ public final class DateInterval
      * @param   dateStyle       controlling the date format of output
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -1049,7 +1053,9 @@ public final class DateInterval
      * <p>The infinity symbols &quot;-&quot; (past and future),
      * &quot;-&#x221E;&quot; (past), &quot;+&#x221E;&quot; (future),
      * &quot;-999999999-01-01&quot; und &quot;+999999999-12-31&quot;
-     * can also be parsed. Examples for supported formats: </p>
+     * can also be parsed as extension although strictly spoken ISO-8601
+     * does not know or specify infinite intervals. Examples for supported
+     * formats: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1069,9 +1075,8 @@ public final class DateInterval
      *  // output: [2012-01-01/+&#x221E;)
      * </pre>
      *
-     * <p>This method dynamically creates an appropriate interval format.
-     * If performance is more important then a static fixed formatter might
-     * be considered. </p>
+     * <p>This method dynamically creates an appropriate interval format for reduced forms.
+     * If performance is more important then a static fixed formatter might be considered. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
@@ -1096,7 +1101,8 @@ public final class DateInterval
      * <p>Die Unendlichkeitssymbole &quot;-&quot; (sowohl Vergangenheit als auch Zukunft),
      * &quot;-&#x221E;&quot; (Vergangenheit), &quot;+&#x221E;&quot; (Zukunft),
      * &quot;-999999999-01-01&quot; und &quot;+999999999-12-31&quot; werden ebenfalls
-     * interpretiert. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
+     * interpretiert, obwohl ISO-8601 keine unendlichen Intervalle kennt. Beispiele
+     * f&uuml;r unterst&uuml;tzte Formate: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1116,9 +1122,9 @@ public final class DateInterval
      *  // output: [2012-01-01/+&#x221E;)
      * </pre>
      *
-     * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
-     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten
-     * konstanten Format der Vorzug gegeben werden. </p>
+     * <p>Intern wird das notwendige Intervallformat f&uuml;r reduzierte Formen dynamisch ermittelt. Ist
+     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten konstanten Format der
+     * Vorzug gegeben werden. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval

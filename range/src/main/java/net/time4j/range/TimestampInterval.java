@@ -657,7 +657,8 @@ public final class TimestampInterval
      * @param   precision       controls the precision of output format with constant length
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -669,7 +670,8 @@ public final class TimestampInterval
      * @param   precision       controls the precision of output format with constant length
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -720,7 +722,8 @@ public final class TimestampInterval
      * @param   precision       controls the precision of output format with constant length
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -747,7 +750,8 @@ public final class TimestampInterval
      * @param   precision       controls the precision of output format with constant length
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -1043,8 +1047,9 @@ public final class TimestampInterval
      * then the end component may exist in an abbreviated form as
      * documented in ISO-8601-paper leaving out higher-order elements
      * like the calendar year (which will be overtaken from the start
-     * component instead). Infinity symbols are understood. Examples
-     * for supported formats: </p>
+     * component instead). Infinity symbols are understood as extension
+     * although strictly spoken ISO-8601 does not know or specify infinite
+     * intervals. Examples for supported formats: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1073,9 +1078,8 @@ public final class TimestampInterval
      *  // output: [2015-01-01T08:45:00/+&#x221E;)
      * </pre>
      *
-     * <p>This method dynamically creates an appropriate interval format.
-     * If performance is more important then a static fixed formatter might
-     * be considered. </p>
+     * <p>This method dynamically creates an appropriate interval format for reduced forms.
+     * If performance is more important then a static fixed formatter might be considered. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
@@ -1095,8 +1099,8 @@ public final class TimestampInterval
      * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
-     * werden. Unendlichkeitssymbole werden verstanden. Beispiele f&uuml;r
-     * unterst&uuml;tzte Formate: </p>
+     * werden. Unendlichkeitssymbole werden verstanden, obwohl ISO-8601 keine
+     * unendlichen Intervalle kennt. Beispiele f&uuml;r unterst&uuml;tzte Formate: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1125,9 +1129,9 @@ public final class TimestampInterval
      *  // Ausgabe: [2015-01-01T08:45:00/+&#x221E;)
      * </pre>
      *
-     * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
-     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten
-     * konstanten Format der Vorzug gegeben werden. </p>
+     * <p>Intern wird das notwendige Intervallformat f&uuml;r reduzierte Formen dynamisch ermittelt. Ist
+     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten konstanten Format der
+     * Vorzug gegeben werden. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval

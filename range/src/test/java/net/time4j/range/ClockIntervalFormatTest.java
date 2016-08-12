@@ -31,12 +31,12 @@ public class ClockIntervalFormatTest {
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.EXTENDED_WALL_TIME;
         StringBuilder buffer = new StringBuilder();
-        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, buffer);
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, InfinityStyle.ABORT, buffer);
         assertThat(
             buffer.toString(),
             is("12:00/14:15:30"));
         buffer = new StringBuilder();
-        interval.withOpenEnd().print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, buffer);
+        interval.withOpenEnd().print(formatter, '/', formatter, BracketPolicy.SHOW_NEVER, InfinityStyle.ABORT, buffer);
         assertThat(
             buffer.toString(),
             is("12:00/14:15:30"));
@@ -50,12 +50,13 @@ public class ClockIntervalFormatTest {
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.BASIC_WALL_TIME;
         StringBuilder buffer = new StringBuilder();
-        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, buffer);
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, InfinityStyle.ABORT, buffer);
         assertThat(
             buffer.toString(),
             is("1220/141530"));
         buffer = new StringBuilder();
-        interval.withClosedEnd().print(formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, buffer);
+        interval.withClosedEnd().print(
+            formatter, '/', formatter, BracketPolicy.SHOW_WHEN_NON_STANDARD, InfinityStyle.ABORT, buffer);
         assertThat(
             buffer.toString(),
             is("[1220/141530]"));
@@ -69,7 +70,7 @@ public class ClockIntervalFormatTest {
         ChronoFormatter<PlainTime> formatter =
             Iso8601Format.BASIC_WALL_TIME;
         StringBuilder buffer = new StringBuilder();
-        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_ALWAYS, buffer);
+        interval.print(formatter, '/', formatter, BracketPolicy.SHOW_ALWAYS, InfinityStyle.ABORT, buffer);
         assertThat(
             buffer.toString(),
             is("[1220/141530)"));

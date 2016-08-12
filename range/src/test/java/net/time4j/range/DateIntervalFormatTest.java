@@ -23,21 +23,78 @@ import static org.junit.Assert.assertThat;
 public class DateIntervalFormatTest {
 
     @Test
-    public void printCustom1() throws IOException {
+    public void printTechnicalSymbol() throws IOException {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
         DateInterval interval = DateInterval.between(start, end);
         ChronoFormatter<PlainDate> startFormat = Iso8601Format.EXTENDED_CALENDAR_DATE;
         ChronoFormatter<PlainDate> endFormat = ChronoFormatter.ofDatePattern("MM-dd", PatternType.CLDR, Locale.ROOT);
         StringBuilder sb = new StringBuilder();
-        interval.print(startFormat, '/', endFormat, BracketPolicy.SHOW_ALWAYS, sb);
+        interval.print(startFormat, '/', endFormat, BracketPolicy.SHOW_ALWAYS, InfinityStyle.SYMBOL, sb);
         assertThat(
             sb.toString(),
             is("[2014-02-27/05-14]"));
+
+        interval = DateInterval.since(PlainDate.of(2016, 8, 15));
+        sb = new StringBuilder();
+        interval.print(startFormat, '/', endFormat, BracketPolicy.SHOW_ALWAYS, InfinityStyle.SYMBOL, sb);
+        assertThat(
+            sb.toString(),
+            is("[2016-08-15/+\u221E)"));
+
+        interval = DateInterval.until(PlainDate.of(2016, 8, 15));
+        sb = new StringBuilder();
+        interval.print(startFormat, '/', startFormat, BracketPolicy.SHOW_ALWAYS, InfinityStyle.SYMBOL, sb);
+        assertThat(
+            sb.toString(),
+            is("(-\u221E/2016-08-15]"));
     }
 
     @Test
-    public void printCustom2() {
+    public void printTechnicalHyphen() throws IOException {
+        ChronoFormatter<PlainDate> format = Iso8601Format.EXTENDED_CALENDAR_DATE;
+        DateInterval interval = DateInterval.since(PlainDate.of(2016, 8, 15));
+        StringBuilder sb = new StringBuilder();
+        interval.print(format, '/', format, BracketPolicy.SHOW_ALWAYS, InfinityStyle.HYPHEN, sb);
+        assertThat(
+            sb.toString(),
+            is("[2016-08-15/-)"));
+
+        interval = DateInterval.until(PlainDate.of(2016, 8, 15));
+        sb = new StringBuilder();
+        interval.print(format, '/', format, BracketPolicy.SHOW_ALWAYS, InfinityStyle.HYPHEN, sb);
+        assertThat(
+            sb.toString(),
+            is("(-/2016-08-15]"));
+    }
+
+    @Test
+    public void printTechnicalMinMax() throws IOException {
+        ChronoFormatter<PlainDate> format = Iso8601Format.EXTENDED_CALENDAR_DATE;
+        DateInterval interval = DateInterval.since(PlainDate.of(2016, 8, 15));
+        StringBuilder sb = new StringBuilder();
+        interval.print(format, '/', format, BracketPolicy.SHOW_ALWAYS, InfinityStyle.MIN_MAX, sb);
+        assertThat(
+            sb.toString(),
+            is("[2016-08-15/+999999999-12-31)"));
+
+        interval = DateInterval.until(PlainDate.of(2016, 8, 15));
+        sb = new StringBuilder();
+        interval.print(format, '/', format, BracketPolicy.SHOW_ALWAYS, InfinityStyle.MIN_MAX, sb);
+        assertThat(
+            sb.toString(),
+            is("(-999999999-01-01/2016-08-15]"));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void printTechnicalAbort() throws IOException {
+        ChronoFormatter<PlainDate> format = Iso8601Format.EXTENDED_CALENDAR_DATE;
+        DateInterval interval = DateInterval.since(PlainDate.of(2016, 8, 15));
+        interval.print(format, '/', format, BracketPolicy.SHOW_ALWAYS, InfinityStyle.ABORT, new StringBuilder());
+    }
+
+    @Test
+    public void printCustom1() {
         DateInterval interval = DateInterval.since(PlainDate.of(2015, 1, 1));
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("MMM d, yyyy", PatternType.CLDR, Locale.US);
@@ -48,7 +105,7 @@ public class DateIntervalFormatTest {
     }
 
     @Test
-    public void printCustom3() {
+    public void printCustom2() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
         DateInterval interval = DateInterval.between(start, end);

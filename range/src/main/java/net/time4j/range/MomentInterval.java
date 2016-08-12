@@ -711,7 +711,8 @@ public final class MomentInterval
      * @param   offset          timezone offset
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -724,7 +725,8 @@ public final class MomentInterval
      * @param   offset          timezone offset
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -782,7 +784,8 @@ public final class MomentInterval
      * @param   offset          timezone offset
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -815,7 +818,8 @@ public final class MomentInterval
      * @param   offset          timezone offset
      * @param   infinityStyle   controlling the format of infinite boundaries
      * @return  String
-     * @throws  IllegalStateException if there is no canonical form
+     * @throws  IllegalStateException   if there is no canonical form
+     *                                  or given infinity style prevents infinite intervals
      * @see     #toCanonical()
      * @since   4.18
      */
@@ -1125,8 +1129,9 @@ public final class MomentInterval
      * documented in ISO-8601-paper leaving out higher-order elements
      * like the calendar year (which will be overtaken from the start
      * component instead). In latter case, the timezone offset of the
-     * end component is optional, too. Infinity symbols are understood.
-     * Examples for supported formats: </p>
+     * end component is optional, too. Infinity symbols are understood
+     * as extension although strictly spoken ISO-8601 does not know or
+     * specify infinite intervals. Examples for supported formats: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1155,9 +1160,8 @@ public final class MomentInterval
      *  // output: [2015-01-01T08:45:00Z/+&#x221E;)
      * </pre>
      *
-     * <p>This method dynamically creates an appropriate interval format.
-     * If performance is more important then a static fixed formatter might
-     * be considered. </p>
+     * <p>This method dynamically creates an appropriate interval format for reduced forms.
+     * If performance is more important then a static fixed formatter might be considered. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
@@ -1178,8 +1182,9 @@ public final class MomentInterval
      * angegeben werden, in der weniger pr&auml;zise Elemente wie das
      * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
      * werden. In letzterem Fall ist auch der Offset der Endkomponente
-     * optional. Unendlichkeitssymbole werden verstanden. Beispiele f&uuml;r
-     * unterst&uuml;tzte Formate: </p>
+     * optional. Unendlichkeitssymbole werden verstanden, obwohl ISO-8601
+     * keine unendlichen Intervalle kennt. Beispiele f&uuml;r unterst&uuml;tzte
+     * Formate: </p>
      *
      * <pre>
      *  System.out.println(
@@ -1208,9 +1213,9 @@ public final class MomentInterval
      *  // Ausgabe: [2015-01-01T08:45:00Z/+&#x221E;)
      * </pre>
      *
-     * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
-     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten
-     * konstanten Format der Vorzug gegeben werden. </p>
+     * <p>Intern wird das notwendige Intervallformat f&uuml;r reduzierte Formen dynamisch ermittelt. Ist
+     * das Antwortzeitverhalten wichtiger, sollte einem statisch initialisierten konstanten Format der
+     * Vorzug gegeben werden. </p>
      *
      * @param   text        text to be parsed
      * @return  parsed interval
