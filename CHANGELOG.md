@@ -1,5 +1,6 @@
 ## [v4.18] not yet released
 ### Added
+- Recurrent intervals as defined in ISO-8601 [#488]
 - Add localized display names for `ChronoElement` [#515]
 - Support for annual dates [#514]
 - Improved documentation of HijriCalendar [#518]
