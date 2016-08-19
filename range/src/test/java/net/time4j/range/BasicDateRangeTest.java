@@ -346,6 +346,42 @@ public class BasicDateRangeTest {
     }
 
     @Test
+    public void withStartOperator() {
+        PlainDate start = PlainDate.of(2014, 2, 1);
+        PlainDate mid = PlainDate.of(2014, 2, 20);
+        PlainDate end = PlainDate.of(2014, 5, 31);
+
+        DateInterval interval = DateInterval.between(mid, end);
+        assertThat(
+            interval.withStart(PlainDate.DAY_OF_MONTH.minimized()),
+            is(DateInterval.between(start, end)));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void withStartOperatorInfinite() {
+        DateInterval interval = DateInterval.until(PlainDate.of(2014, 2, 20));
+        interval.withStart(PlainDate.DAY_OF_MONTH.minimized());
+    }
+
+    @Test
+    public void withEndOperator() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate mid = PlainDate.of(2014, 5, 20);
+        PlainDate end = PlainDate.of(2014, 5, 31);
+
+        DateInterval interval = DateInterval.between(start, mid);
+        assertThat(
+            interval.withEnd(PlainDate.DAY_OF_MONTH.maximized()),
+            is(DateInterval.between(start, end)));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void withEndOperatorInfinite() {
+        DateInterval interval = DateInterval.since(PlainDate.of(2014, 2, 20));
+        interval.withEnd(PlainDate.DAY_OF_MONTH.maximized());
+    }
+
+    @Test
     public void collapseNormal() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);

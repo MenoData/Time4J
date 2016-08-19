@@ -24,6 +24,7 @@ package net.time4j.range;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
@@ -185,6 +186,90 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         IntervalEdge edge = this.end.getEdge();
         Boundary<T> b = Boundary.of(edge, temporal);
+        return this.getFactory().between(this.start, b);
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given operator applied on start time. </p>
+     *
+     * @param   operator    operator to be applied on the start
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the start boundary is infinite
+     * @throws  IllegalArgumentException if new start is after end
+     * @see     #withEnd(ChronoOperator)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
+     * auf die Startzeit. </p>
+     *
+     * @param   operator    operator to be applied on the start
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the start boundary is infinite
+     * @throws  IllegalArgumentException if new start is after end
+     * @see     #withEnd(ChronoOperator)
+     * @since   3.22/4.18
+     */
+    public I withStart(ChronoOperator<T> operator) {
+
+        if (this.start.isInfinite()) {
+            throw new IllegalStateException("Operator cannot be applied on an infinite interval boundary.");
+        }
+
+        IntervalEdge edge = this.start.getEdge();
+        Boundary<T> b = Boundary.of(edge, operator.apply(this.start.getTemporal()));
+        return this.getFactory().between(b, this.end);
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given operator applied on end time. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     PlainDate start = PlainDate.of(2014, 2, 27);
+     *     PlainDate end = PlainDate.of(2014, 5, 20);
+     *     DateInterval interval = DateInterval.between(start, end).withEnd(PlainDate.DAY_OF_MONTH.maximized());
+     *     System.out.println(interval); // [2014-02-27/2014-05-31]
+     * </pre>
+     *
+     * @param   operator    operator to be applied on the end
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the end boundary is infinite
+     * @throws  IllegalArgumentException if new end is before start
+     * @see     #withStart(ChronoOperator)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
+     * auf die Endzeit. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     PlainDate start = PlainDate.of(2014, 2, 27);
+     *     PlainDate end = PlainDate.of(2014, 5, 20);
+     *     DateInterval interval = DateInterval.between(start, end).withEnd(PlainDate.DAY_OF_MONTH.maximized());
+     *     System.out.println(interval); // [2014-02-27/2014-05-31]
+     * </pre>
+     *
+     * @param   operator    operator to be applied on the end
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the end boundary is infinite
+     * @throws  IllegalArgumentException if new end is before start
+     * @see     #withStart(ChronoOperator)
+     * @since   3.22/4.18
+     */
+    public I withEnd(ChronoOperator<T> operator) {
+
+        if (this.end.isInfinite()) {
+            throw new IllegalStateException("Operator cannot be applied on an infinite interval boundary.");
+        }
+
+        IntervalEdge edge = this.end.getEdge();
+        Boundary<T> b = Boundary.of(edge, operator.apply(this.end.getTemporal()));
         return this.getFactory().between(this.start, b);
 
     }
