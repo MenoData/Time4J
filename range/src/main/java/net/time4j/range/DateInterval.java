@@ -27,10 +27,12 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -51,6 +53,10 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.range.IntervalEdge.CLOSED;
@@ -651,6 +657,63 @@ public final class DateInterval
         }
 
         return new DateInterval(s, e);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date of the canonical form of this interval. </p>
+     *
+     * @return  daily stream
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der &uuml;ber jedes Kalenderdatum der kanonischen Form
+     * dieses Intervalls geht. </p>
+     *
+     * @return  daily stream
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   4.18
+     */
+    public Stream<PlainDate> streamDaily() {
+
+        DateInterval interval = this.toCanonical();
+        PlainDate start = interval.getStartAsCalendarDate();
+        PlainDate end = interval.getEndAsCalendarDate();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        return DateInterval.streamDaily(start, end);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date between given interval boundaries. </p>
+     *
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - inclusive
+     * @return  daily stream
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der &uuml;ber jedes Kalenderdatum zwischen den angegebenen
+     * Intervallgrenzen geht. </p>
+     *
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - inclusive
+     * @return  daily stream
+     * @since   4.18
+     */
+    public static Stream<PlainDate> streamDaily(
+        PlainDate start,
+        PlainDate end
+    ) {
+
+        return StreamSupport.stream(new DailySpliterator(start, end), false);
 
     }
 
@@ -1478,6 +1541,163 @@ public final class DateInterval
         ) {
 
             builder.setDefault(element, defaultSupplier.get(element));
+
+        }
+
+    }
+
+    private static class DailySpliterator
+        implements Spliterator<PlainDate> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private long startEpoch; // always inclusive
+        private final long endEpoch; // closed range
+
+        private PlainDate current;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        DailySpliterator(
+            PlainDate start,
+            PlainDate end
+        ) {
+            this(start, start.getDaysSinceEpochUTC(), end.getDaysSinceEpochUTC());
+
+        }
+
+        private DailySpliterator(
+            PlainDate start,
+            long startEpoch,
+            long endEpoch
+        ) {
+            super();
+
+            this.startEpoch = startEpoch;
+            this.endEpoch = endEpoch;
+
+            this.current = ((startEpoch > endEpoch) ? null : start);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean tryAdvance(Consumer<? super PlainDate> action) {
+
+            if (this.current == null) {
+                return false;
+            }
+
+            action.accept(this.current);
+
+            if (this.startEpoch == this.endEpoch) {
+                this.current = null;
+            } else {
+                this.current = this.current.plus(1, CalendarUnit.DAYS);
+            }
+
+            this.startEpoch++;
+            return true;
+
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super PlainDate> action) {
+
+            if (this.current == null) {
+                return;
+            }
+
+            PlainDate date = this.current;
+
+            for (long index = this.startEpoch, n = this.endEpoch; index <= n; index++) {
+                action.accept(date);
+
+                if (index < n) {
+                    int dom = date.getDayOfMonth();
+                    if (
+                        (dom < 28)
+                        || (dom < GregorianMath.getLengthOfMonth(date.getYear(), date.getMonth()))
+                    ) {
+                        date = PlainDate.of(date.getYear(), date.getMonth(), dom + 1);
+                    } else {
+                        date = date.plus(1, CalendarUnit.DAYS);
+                    }
+                }
+            }
+
+            this.current = null;
+            this.startEpoch = this.endEpoch + 1;
+
+        }
+
+        @Override
+        public Spliterator<PlainDate> trySplit() {
+
+            if (this.current == null) {
+                return null; // end of traversal
+            }
+
+            long sum = (this.endEpoch - this.startEpoch - 3);
+
+            if (sum < 7) {
+                return null; // no split
+            }
+
+            long dateEpoch = (sum >>> 1) + this.startEpoch;
+            PlainDate date = PlainDate.of(dateEpoch, EpochDays.UTC);
+            int year = date.getYear();
+            int month = date.getMonth();
+            final int dom = date.getDayOfMonth();
+            final boolean allowHalfMonths = (this.estimateSize() < 180) && (dom <= 15);
+
+            if (allowHalfMonths) {
+                dateEpoch += (15 - dom); // split at midth of month
+            } else {
+                dateEpoch += (GregorianMath.getLengthOfMonth(year, month) - dom); // split at end of month
+            }
+
+            if (dateEpoch > this.endEpoch - 7) {
+                return null; // no split
+            }
+
+            Spliterator<PlainDate> split = new DailySpliterator(this.current, this.startEpoch, dateEpoch);
+            this.startEpoch = dateEpoch + 1;
+
+            if (allowHalfMonths) {
+                this.current = PlainDate.of(year, month, 16);
+            } else {
+                month++;
+                if (month == 13) {
+                    year++;
+                    month = 1;
+                }
+                this.current = PlainDate.of(year, month, 1);
+            }
+
+            return split;
+
+        }
+
+        @Override
+        public long estimateSize() {
+
+            return (this.endEpoch - this.startEpoch + 1);
+
+        }
+
+        @Override
+        public int characteristics() {
+
+            return DISTINCT | IMMUTABLE | NONNULL | ORDERED | SORTED | SIZED | SUBSIZED;
+
+        }
+
+        @Override
+        public Comparator<? super PlainDate> getComparator() {
+
+            return null;
 
         }
 
