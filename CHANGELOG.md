@@ -10,6 +10,7 @@
 - Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
 - ChronoFormatter.Builder should define default values and global attributes [#531]
 - New date-interval-method to convert to a moment interval [#534]
+- New interval boundary manipulations based on operators [#538]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
