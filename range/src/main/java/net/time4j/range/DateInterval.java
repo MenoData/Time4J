@@ -666,6 +666,7 @@ public final class DateInterval
      * @return  daily stream
      * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @see     #toCanonical()
+     * @see     #streamDaily(PlainDate, PlainDate)
      * @since   4.18
      */
     /*[deutsch]
@@ -675,9 +676,14 @@ public final class DateInterval
      * @return  daily stream
      * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @see     #toCanonical()
+     * @see     #streamDaily(PlainDate, PlainDate)
      * @since   4.18
      */
     public Stream<PlainDate> streamDaily() {
+
+        if (this.isEmpty()) {
+            return Stream.empty();
+        }
 
         DateInterval interval = this.toCanonical();
         PlainDate start = interval.getStartAsCalendarDate();
@@ -687,25 +693,33 @@ public final class DateInterval
             throw new IllegalStateException("Streaming is not supported for infinite intervals.");
         }
 
-        return DateInterval.streamDaily(start, end);
+        return StreamSupport.stream(new DailySpliterator(start, end), false);
 
     }
 
     /**
      * <p>Obtains a stream iterating over every calendar date between given interval boundaries. </p>
      *
+     * <p>This static method avoids the costs of constructing an instance of {@code DateInterval}. </p>
+     *
      * @param   start       start boundary - inclusive
      * @param   end         end boundary - inclusive
+     * @throws  IllegalArgumentException if start is after end
      * @return  daily stream
+     * @see     #streamDaily()
      * @since   4.18
      */
     /*[deutsch]
      * <p>Erzeugt einen {@code Stream}, der &uuml;ber jedes Kalenderdatum zwischen den angegebenen
      * Intervallgrenzen geht. </p>
      *
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. </p>
+     *
      * @param   start       start boundary - inclusive
      * @param   end         end boundary - inclusive
+     * @throws  IllegalArgumentException if start is after end
      * @return  daily stream
+     * @see     #streamDaily()
      * @since   4.18
      */
     public static Stream<PlainDate> streamDaily(
@@ -713,7 +727,14 @@ public final class DateInterval
         PlainDate end
     ) {
 
-        return StreamSupport.stream(new DailySpliterator(start, end), false);
+        long s = start.getDaysSinceEpochUTC();
+        long e = end.getDaysSinceEpochUTC();
+
+        if (s > e) {
+            throw new IllegalArgumentException("Start after end: " + start + "/" + end);
+        }
+
+        return StreamSupport.stream(new DailySpliterator(start, s, e), false);
 
     }
 
@@ -1566,7 +1587,7 @@ public final class DateInterval
 
         }
 
-        private DailySpliterator(
+        DailySpliterator(
             PlainDate start,
             long startEpoch,
             long endEpoch

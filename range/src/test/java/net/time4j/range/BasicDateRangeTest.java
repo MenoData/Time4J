@@ -10,6 +10,7 @@ import org.junit.runners.JUnit4;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -468,6 +469,48 @@ public class BasicDateRangeTest {
         assertThat(dates, is(expected));
         dates = DateInterval.between(start, end).streamDaily().sorted().collect(Collectors.toList());
         assertThat(dates, is(expected));
+    }
+
+    @Test
+    public void streamDailyWithOnlyOneDate() {
+        PlainDate date = PlainDate.of(2014, 2, 27);
+        List<PlainDate> expected = Collections.singletonList(date);
+
+        assertThat(DateInterval.atomic(date).streamDaily().collect(Collectors.toList()), is(expected));
+        assertThat(DateInterval.streamDaily(date, date).collect(Collectors.toList()), is(expected));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void streamDailyWithStartAfterEnd() {
+        PlainDate start = PlainDate.of(2014, 5, 15);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        DateInterval.streamDaily(start, end);
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void streamDailyWhenInfiniteSince() {
+        PlainDate date = PlainDate.of(2014, 5, 15);
+        DateInterval.since(date).streamDaily();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void streamDailyWhenInfiniteUntil() {
+        PlainDate date = PlainDate.of(2014, 5, 15);
+        DateInterval.until(date).streamDaily();
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void streamDailyWhenNotCanonicalizable() {
+        PlainDate date = PlainDate.axis().getMinimum();
+        DateInterval.until(date).withOpenEnd().streamDaily();
+    }
+
+    @Test
+    public void streamDailyWhenEmpty() {
+        PlainDate date = PlainDate.of(2014, 5, 15);
+        assertThat(
+            DateInterval.atomic(date).withOpenEnd().streamDaily().collect(Collectors.toList()).size(),
+            is(0));
     }
 
 }
