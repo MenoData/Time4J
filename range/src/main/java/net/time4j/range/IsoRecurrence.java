@@ -812,6 +812,7 @@ public class IsoRecurrence<I>
      *
      * @return  Stream
      * @see     Spliterator#DISTINCT
+     * @see     Spliterator#IMMUTABLE
      * @see     Spliterator#NONNULL
      * @see     Spliterator#ORDERED
      * @see     Spliterator#SIZED
@@ -822,15 +823,16 @@ public class IsoRecurrence<I>
      *
      * @return  Stream
      * @see     Spliterator#DISTINCT
+     * @see     Spliterator#IMMUTABLE
      * @see     Spliterator#NONNULL
      * @see     Spliterator#ORDERED
      * @see     Spliterator#SIZED
      * @see     Spliterator#SUBSIZED
      */
-    public Stream<I> stream() {
+    public Stream<I> intervalStream() {
 
         long size = (this.isInfinite() ? Long.MAX_VALUE : this.getCount());
-        int characteristics = DISTINCT | NONNULL | ORDERED | SIZED;
+        int characteristics = DISTINCT | IMMUTABLE | NONNULL | ORDERED | SIZED | SUBSIZED;
         Spliterator<I> spliterator = Spliterators.spliterator(this.iterator(), size, characteristics);
         return StreamSupport.stream(spliterator, false);
 
