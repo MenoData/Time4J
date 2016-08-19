@@ -32,6 +32,7 @@ import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.function.UnaryOperator;
 
 
 /**
@@ -173,6 +174,90 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         IntervalEdge edge = this.end.getEdge();
         Boundary<T> b = Boundary.of(edge, temporal);
+        return this.getFactory().between(this.start, b);
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given operator applied on start time. </p>
+     *
+     * @param   operator    operator to be applied on the start
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the start boundary is infinite
+     * @throws  IllegalArgumentException if new start is after end
+     * @see     #withEnd(UnaryOperator)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
+     * auf die Startzeit. </p>
+     *
+     * @param   operator    operator to be applied on the start
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the start boundary is infinite
+     * @throws  IllegalArgumentException if new start is after end
+     * @see     #withEnd(UnaryOperator)
+     * @since   3.22/4.18
+     */
+    public I withStart(UnaryOperator<T> operator) {
+
+        if (this.start.isInfinite()) {
+            throw new IllegalStateException("Operator cannot be applied on an infinite interval boundary.");
+        }
+
+        IntervalEdge edge = this.start.getEdge();
+        Boundary<T> b = Boundary.of(edge, operator.apply(this.start.getTemporal()));
+        return this.getFactory().between(b, this.end);
+
+    }
+
+    /**
+     * <p>Yields a copy of this interval with given operator applied on end time. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     PlainDate start = PlainDate.of(2014, 2, 27);
+     *     PlainDate end = PlainDate.of(2014, 5, 20);
+     *     DateInterval interval = DateInterval.between(start, end).withEnd(PlainDate.DAY_OF_MONTH.maximized());
+     *     System.out.println(interval); // [2014-02-27/2014-05-31]
+     * </pre>
+     *
+     * @param   operator    operator to be applied on the end
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the end boundary is infinite
+     * @throws  IllegalArgumentException if new end is before start
+     * @see     #withStart(UnaryOperator)
+     * @since   3.22/4.18
+     */
+    /*[deutsch]
+     * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
+     * auf die Endzeit. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     PlainDate start = PlainDate.of(2014, 2, 27);
+     *     PlainDate end = PlainDate.of(2014, 5, 20);
+     *     DateInterval interval = DateInterval.between(start, end).withEnd(PlainDate.DAY_OF_MONTH.maximized());
+     *     System.out.println(interval); // [2014-02-27/2014-05-31]
+     * </pre>
+     *
+     * @param   operator    operator to be applied on the end
+     * @return  changed copy of this interval
+     * @throws  IllegalStateException if the end boundary is infinite
+     * @throws  IllegalArgumentException if new end is before start
+     * @see     #withStart(UnaryOperator)
+     * @since   3.22/4.18
+     */
+    public I withEnd(UnaryOperator<T> operator) {
+
+        if (this.end.isInfinite()) {
+            throw new IllegalStateException("Operator cannot be applied on an infinite interval boundary.");
+        }
+
+        IntervalEdge edge = this.end.getEdge();
+        Boundary<T> b = Boundary.of(edge, operator.apply(this.end.getTemporal()));
         return this.getFactory().between(this.start, b);
 
     }

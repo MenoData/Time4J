@@ -9,6 +9,9 @@ import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -251,36 +254,34 @@ public class BasicDateRangeTest {
 
     @Test
     public void testEquals() {
-        PlainDate start1 = PlainDate.of(2014, 2, 27);
+        PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end1 = PlainDate.of(2014, 5, 14);
-        PlainDate start2 = start1;
         PlainDate end2 = PlainDate.of(2014, 5, 15);
         assertThat(
-            DateInterval.between(start1, end1)
-                .equals(DateInterval.between(start2, end2)),
+            DateInterval.between(start, end1)
+                .equals(DateInterval.between(start, end2)),
             is(false));
         assertThat(
-            DateInterval.between(start1, end1)
-                .equals(DateInterval.between(start2, end2).withOpenEnd()),
+            DateInterval.between(start, end1)
+                .equals(DateInterval.between(start, end2).withOpenEnd()),
             is(false));
         assertThat(
-            DateInterval.between(start1, end1)
-                .equals(DateInterval.between(start1, end1)),
+            DateInterval.between(start, end1)
+                .equals(DateInterval.between(start, end1)),
             is(true));
     }
 
     @Test
     public void testHashCode() {
         PlainDate start1 = PlainDate.of(2014, 2, 27);
-        PlainDate end1 = PlainDate.of(2014, 5, 14);
         PlainDate start2 = PlainDate.of(2014, 2, 26);
-        PlainDate end2 = end1;
+        PlainDate end = PlainDate.of(2014, 5, 14);
         assertThat(
-            DateInterval.between(start1, end1).hashCode(),
-            not(DateInterval.between(start2, end2).hashCode()));
+            DateInterval.between(start1, end).hashCode(),
+            not(DateInterval.between(start2, end).hashCode()));
         assertThat(
-            DateInterval.between(start1, end1).hashCode(),
-            is(DateInterval.between(start1, end1).hashCode()));
+            DateInterval.between(start1, end).hashCode(),
+            is(DateInterval.between(start1, end).hashCode()));
     }
 
     @Test
@@ -373,6 +374,42 @@ public class BasicDateRangeTest {
     }
 
     @Test
+    public void withStartOperator() {
+        PlainDate start = PlainDate.of(2014, 2, 1);
+        PlainDate mid = PlainDate.of(2014, 2, 20);
+        PlainDate end = PlainDate.of(2014, 5, 31);
+
+        DateInterval interval = DateInterval.between(mid, end);
+        assertThat(
+            interval.withStart(PlainDate.DAY_OF_MONTH.minimized()),
+            is(DateInterval.between(start, end)));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void withStartOperatorInfinite() {
+        DateInterval interval = DateInterval.until(PlainDate.of(2014, 2, 20));
+        interval.withStart(PlainDate.DAY_OF_MONTH.minimized());
+    }
+
+    @Test
+    public void withEndOperator() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate mid = PlainDate.of(2014, 5, 20);
+        PlainDate end = PlainDate.of(2014, 5, 31);
+
+        DateInterval interval = DateInterval.between(start, mid);
+        assertThat(
+            interval.withEnd(PlainDate.DAY_OF_MONTH.maximized()),
+            is(DateInterval.between(start, end)));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void withEndOperatorInfinite() {
+        DateInterval interval = DateInterval.since(PlainDate.of(2014, 2, 20));
+        interval.withEnd(PlainDate.DAY_OF_MONTH.maximized());
+    }
+
+    @Test
     public void collapseNormal() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
@@ -408,6 +445,29 @@ public class BasicDateRangeTest {
         assertThat(
             interval.move(8, CalendarUnit.MONTHS),
             is(expected));
+    }
+
+    @Test
+    public void streamDaily() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+
+        List<PlainDate> expected = new ArrayList<>();
+        PlainDate date = start;
+        while (!date.isAfter(end)) {
+            expected.add(date);
+            date = date.plus(1, CalendarUnit.DAYS);
+        }
+
+        List<PlainDate> dates;
+        dates = DateInterval.between(start, end).streamDaily().parallel().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+        dates = DateInterval.between(start, end).streamDaily().parallel().sorted().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+        dates = DateInterval.between(start, end).streamDaily().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+        dates = DateInterval.between(start, end).streamDaily().sorted().collect(Collectors.toList());
+        assertThat(dates, is(expected));
     }
 
 }
