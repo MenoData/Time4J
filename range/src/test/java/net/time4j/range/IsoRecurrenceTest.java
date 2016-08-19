@@ -405,14 +405,15 @@ public class IsoRecurrenceTest {
     }
 
     @Test
-    public void stream() {
+    public void intervalStream() {
         IsoRecurrence<DateInterval> recurrence =
             IsoRecurrence.of(4, PlainDate.of(2016, 7, 1), Duration.of(1, CalendarUnit.MONTHS));
         List<DateInterval> expected = new ArrayList<>();
         for (DateInterval interval : recurrence) {
             expected.add(interval);
         }
-        assertThat(recurrence.stream().collect(Collectors.toList()), is(expected));
+        assertThat(recurrence.intervalStream().collect(Collectors.toList()), is(expected));
+        assertThat(recurrence.intervalStream().parallel().collect(Collectors.toList()), is(expected));
     }
 
 }
