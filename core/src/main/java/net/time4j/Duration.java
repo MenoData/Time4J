@@ -3245,11 +3245,12 @@ public final class Duration<U extends IsoUnit>
 
             if (calendrical) {
                 if (typeID == CLOCK_TYPE) {
-                    throw new ParseException(
-                        "Format symbol \'T\' expected: " + period, index);
+                    throw new ParseException("Format symbol \'T\' expected: " + period, index);
                 } else {
                     parse(period, index, period.length(), ((typeID == SUPER_TYPE) ? CALENDAR_TYPE : typeID), items);
                 }
+            } else if ((typeID == CALENDAR_TYPE) || (typeID == WEEK_BASED_TYPE)) {
+                throw new ParseException("Unexpected time component found: " + period, sep);
             } else {
                 boolean alternative = false;
                 if (sep > index) {
@@ -3261,10 +3262,7 @@ public final class Duration<U extends IsoUnit>
                         alternative = parse(period, index, sep, CALENDAR_TYPE, items);
                     }
                 }
-                if (type == CalendarUnit.class) {
-                    throw new ParseException(
-                        "Unexpected time component found: " + period, sep);
-                } else if (alternative) {
+                if (alternative) {
                     parseAlt(period, sep + 1, period.length(), false, items);
                 } else {
                     parse(period, sep + 1, period.length(), CLOCK_TYPE, items);

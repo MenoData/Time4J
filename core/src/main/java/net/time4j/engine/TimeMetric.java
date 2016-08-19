@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeMetric.java) is part of project Time4J.
  *
@@ -26,14 +26,14 @@ package net.time4j.engine;
  * <p>Computes temporal distances on a time axis as time spans. </p>
  *
  * @param   <U> generic type of time unit
- * @param   <P> generic type of duration type
+ * @param   <P> generic type of duration object
  * @author  Meno Hochschild
  */
 /*[deutsch]
  * <p>Berechnet Abst&auml;nde auf einer Zeitachse als Zeitspannen. </p>
  *
  * @param   <U> generic type of time unit
- * @param   <P> generic type of duration type
+ * @param   <P> generic type of duration object
  * @author  Meno Hochschild
  */
 public interface TimeMetric<U, P> {
