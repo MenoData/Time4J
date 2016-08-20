@@ -57,6 +57,7 @@ import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
@@ -945,26 +946,26 @@ public final class PlainDate
      * at the begin of associated day in given timezone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest
-     *          valid time
+     * @return  local timestamp as composition of this date and earliest valid time
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
-     * @since   2.2
      * @see     #atStartOfDay()
+     * @see     #atFirstMoment(TZID)
+     * @since   2.2
      */
     /*[deutsch]
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
      * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest
-     *          valid time
+     * @return  local timestamp as composition of this date and earliest valid time
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
-     * @since   2.2
      * @see     #atStartOfDay()
+     * @see     #atFirstMoment(TZID)
+     * @since   2.2
      */
     public PlainTimestamp atStartOfDay(TZID tzid) {
 
@@ -977,30 +978,91 @@ public final class PlainDate
      * at the begin of associated day in given timezone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest
-     *          valid time
+     * @return  local timestamp as composition of this date and earliest valid time
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
-     * @since   2.2
      * @see     #atStartOfDay()
+     * @see     #atFirstMoment(String)
+     * @since   2.2
      */
     /*[deutsch]
      * <p>Erzeugt einen lokalen Zeitstempel mit diesem Datum zur fr&uuml;hesten
      * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone. </p>
      *
      * @param   tzid        timezone id
-     * @return  local timestamp as composition of this date and earliest
-     *          valid time
+     * @return  local timestamp as composition of this date and earliest valid time
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
      * @since   2.2
      * @see     #atStartOfDay()
+     * @see     #atFirstMoment(String)
+     * @since   2.2
      */
     public PlainTimestamp atStartOfDay(String tzid) {
 
         return this.atStartOfDay(Timezone.of(tzid).getHistory());
+
+    }
+
+    /**
+     * <p>Creates a new moment which corresponds to this date at earliest valid time
+     * at the begin of associated day in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  first valid moment corresponding to start of day in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @see     #atStartOfDay(TZID)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Moment, der diesem Datum zur fr&uuml;hesten
+     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone entspricht. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  first valid moment corresponding to start of day in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @see     #atStartOfDay(TZID)
+     * @since   4.18
+     */
+    public Moment atFirstMoment(TZID tzid) {
+
+        return this.atFirstMoment(Timezone.of(tzid));
+
+    }
+
+    /**
+     * <p>Creates a new moment which corresponds to this date at earliest valid time
+     * at the begin of associated day in given timezone. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  first valid moment corresponding to start of day in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @see     #atStartOfDay(String)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen Moment, der diesem Datum zur fr&uuml;hesten
+     * g&uuml;ltigen Uhrzeit in der angegebenen Zeitzone entspricht. </p>
+     *
+     * @param   tzid        timezone id
+     * @return  first valid moment corresponding to start of day in given timezone
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @throws  UnsupportedOperationException if the underlying timezone
+     *          repository does not expose any public transition history
+     * @see     #atStartOfDay(String)
+     * @since   4.18
+     */
+    public Moment atFirstMoment(String tzid) {
+
+        return this.atFirstMoment(Timezone.of(tzid));
 
     }
 
@@ -1663,10 +1725,7 @@ public final class PlainDate
         ZonalTransition conflict =
             history.findConflictTransition(this, PlainTime.MIN);
 
-        if (
-            (conflict != null)
-            && conflict.isGap()
-        ) {
+        if ((conflict != null) && conflict.isGap()) {
             long localSeconds =
                 conflict.getPosixTime() + conflict.getTotalOffset();
             PlainDate date =
@@ -1683,6 +1742,27 @@ public final class PlainDate
         }
 
         return this.at(PlainTime.MIN);
+
+    }
+
+    private Moment atFirstMoment(Timezone tz) {
+
+        TransitionHistory history = tz.getHistory();
+
+        if (history == null) {
+            throw new UnsupportedOperationException(
+                "Timezone repository does not expose its transition history: "
+                + Timezone.getProviderInfo());
+        }
+
+        ZonalTransition conflict =
+            history.findConflictTransition(this, PlainTime.MIN);
+
+        if ((conflict != null) && conflict.isGap()) {
+            return Moment.of(conflict.getPosixTime(), TimeScale.POSIX);
+        }
+
+        return this.at(PlainTime.MIN).in(tz);
 
     }
 
