@@ -11,6 +11,7 @@
 - ChronoFormatter.Builder should define default values and global attributes [#531]
 - New date-interval-method to convert to a moment interval [#534]
 - New interval boundary manipulations based on operators [#538]
+- Determine first moment for given calendar date in time zone [#539]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
