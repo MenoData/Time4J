@@ -5,6 +5,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
@@ -41,6 +42,7 @@ public class StartOfDayTest {
         PlainDate date = PlainDate.of(2010, 5, 31);
         PlainTimestamp tsp = date.atStartOfDay(tzid);
         assertThat(tsp, is(date.atTime(0, 0)));
+        assertThat(tsp.in(Timezone.of(tzid)), is(date.atFirstMoment(() -> tzid)));
     }
 
     @Test
@@ -49,6 +51,7 @@ public class StartOfDayTest {
         PlainDate date = PlainDate.of(2010, 2, 21);
         PlainTimestamp tsp = date.atStartOfDay(tzid);
         assertThat(tsp, is(date.atTime(0, 0)));
+        assertThat(tsp.in(Timezone.of(tzid)), is(date.atFirstMoment(tzid)));
     }
 
     @Test
@@ -57,6 +60,7 @@ public class StartOfDayTest {
         PlainDate date = PlainDate.of(2010, 10, 17);
         PlainTimestamp tsp = date.atStartOfDay(tzid);
         assertThat(tsp, is(date.atTime(1, 0)));
+        assertThat(tsp.in(Timezone.of(tzid)), is(date.atFirstMoment(tzid)));
     }
 
     private static RuleBasedTransitionModel createModel() {
