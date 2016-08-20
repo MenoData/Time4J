@@ -33,6 +33,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -55,6 +56,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -735,6 +737,152 @@ public final class DateInterval
         }
 
         return StreamSupport.stream(new DailySpliterator(start, s, e), false);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date which is the result of addition of given duration
+     * to start until the end of this interval is reached. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainDate, PlainDate)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils ein Kalenderdatum als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainDate, PlainDate)
+     * @since   4.18
+     */
+    public Stream<PlainDate> stream(Duration<CalendarUnit> duration) {
+
+        if (this.isEmpty()) {
+            return Stream.empty();
+        }
+
+        DateInterval interval = this.toCanonical();
+        PlainDate start = interval.getStartAsCalendarDate();
+        PlainDate end = interval.getEndAsCalendarDate();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        return DateInterval.stream(duration, start, end);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date which is the result of addition of given duration
+     * to start until the end is reached. </p>
+     *
+     * <p>This static method avoids the costs of constructing an instance of {@code DateInterval}. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - inclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils ein Kalenderdatum als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende geht. </p>
+     *
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - inclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    public static Stream<PlainDate> stream(
+        Duration<CalendarUnit> duration,
+        PlainDate start,
+        PlainDate end
+    ) {
+
+        if (!duration.isPositive()) {
+            throw new IllegalArgumentException("Duration must be positive: " + duration);
+        }
+
+        long months = 0;
+        long days = 0;
+
+        for (TimeSpan.Item<CalendarUnit> item : duration.getTotalLength()) {
+            long amount = item.getAmount();
+            switch (item.getUnit()) {
+                case MILLENNIA:
+                    months = Math.addExact(months, Math.multiplyExact(1000 * 12, amount));
+                    break;
+                case CENTURIES:
+                    months = Math.addExact(months, Math.multiplyExact(100 * 12, amount));
+                    break;
+                case DECADES:
+                    months = Math.addExact(months, Math.multiplyExact(10 * 12, amount));
+                    break;
+                case YEARS:
+                    months = Math.addExact(months, Math.multiplyExact(12, amount));
+                    break;
+                case QUARTERS:
+                    months = Math.addExact(months, Math.multiplyExact(3, amount));
+                    break;
+                case MONTHS:
+                    months = Math.addExact(months, amount);
+                    break;
+                case WEEKS:
+                    days = Math.addExact(days, Math.multiplyExact(7, amount));
+                    break;
+                case DAYS:
+                    days = Math.addExact(days, amount);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(item.getUnit().name());
+            }
+        }
+
+        final long eMonths = months;
+        final long eDays = days;
+
+        if ((eMonths == 0) && (eDays == 1)) {
+            return DateInterval.streamDaily(start, end);
+        }
+
+        long s = start.getDaysSinceEpochUTC();
+        long e = end.getDaysSinceEpochUTC();
+
+        if (s > e) {
+            throw new IllegalArgumentException("Start after end: " + start + "/" + end);
+        }
+
+        long n = 1 + ((e - s) / (Math.addExact(Math.multiplyExact(eMonths, 31), eDays))); // first estimate
+        PlainDate date;
+        long size;
+
+        do {
+            size = n;
+            long m = Math.multiplyExact(eMonths, n);
+            long d = Math.multiplyExact(eDays, n);
+            date = start.plus(m, CalendarUnit.MONTHS).plus(d, CalendarUnit.DAYS);
+            n++;
+        } while (!date.isAfter(end));
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return LongStream.range(0, size).mapToObj(
+            index -> start.plus(eMonths * index, CalendarUnit.MONTHS).plus(eDays * index, CalendarUnit.DAYS));
 
     }
 

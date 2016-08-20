@@ -1,6 +1,7 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
+import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.junit.runners.JUnit4;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -511,6 +513,75 @@ public class BasicDateRangeTest {
         assertThat(
             DateInterval.atomic(date).withOpenEnd().streamDaily().collect(Collectors.toList()).size(),
             is(0));
+    }
+
+    @Test
+    public void streamDuration1() {
+        PlainDate start = PlainDate.of(2013, 6, 28);
+        PlainDate end = PlainDate.of(2016, 10, 1);
+        Duration<CalendarUnit> duration = Duration.ofCalendarUnits(1, 2, 5);
+
+        List<PlainDate> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(start.plus(14, CalendarUnit.MONTHS).plus(5, CalendarUnit.DAYS));
+        expected.add(start.plus(28, CalendarUnit.MONTHS).plus(10, CalendarUnit.DAYS));
+
+        List<PlainDate> dates = DateInterval.stream(duration, start, end).parallel().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+        dates = DateInterval.between(start, end).stream(duration).parallel().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+    }
+
+    @Test
+    public void streamDuration2() {
+        PlainDate start = PlainDate.of(2013, 1, 31);
+        PlainDate end = PlainDate.of(2013, 5, 31);
+        Duration<CalendarUnit> duration = Duration.of(1, CalendarUnit.MONTHS);
+
+        List<PlainDate> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(PlainDate.of(2013, 2, 28));
+        expected.add(PlainDate.of(2013, 3, 31));
+        expected.add(PlainDate.of(2013, 4, 30));
+        expected.add(PlainDate.of(2013, 5, 31));
+
+        List<PlainDate> dates = DateInterval.stream(duration, start, end).sorted().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+        dates = DateInterval.between(start, end).stream(duration).sorted().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+    }
+
+    @Test
+    public void streamDuration3() {
+        PlainDate start = PlainDate.of(2013, 1, 31);
+        Duration<CalendarUnit> duration = Duration.of(1, CalendarUnit.MONTHS);
+
+        // some edge cases
+        assertThat(
+            DateInterval.stream(duration, start, start).collect(Collectors.toList()),
+            is(Collections.singletonList(start)));
+        assertThat(
+            DateInterval.between(start, start).stream(duration).collect(Collectors.toList()),
+            is(Collections.singletonList(start)));
+
+        assertThat(
+            DateInterval.between(start, start).withOpenEnd().stream(duration).collect(Collectors.toList()),
+            is(Collections.emptyList()));
+
+        assertThat(
+            DateInterval.stream(duration, start, start.plus(27, CalendarUnit.DAYS)).collect(Collectors.toList()),
+            is(Collections.singletonList(start)));
+        assertThat(
+            DateInterval.stream(duration, start, start.plus(28, CalendarUnit.DAYS)).collect(Collectors.toList()),
+            is(Arrays.asList(start, PlainDate.of(2013, 2, 28))));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void streamDurationWithStartAfterEnd() {
+        PlainDate start = PlainDate.of(2014, 5, 15);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+        Duration<CalendarUnit> duration = Duration.of(1, CalendarUnit.MONTHS);
+        DateInterval.stream(duration, start, end);
     }
 
 }
