@@ -15,6 +15,7 @@
 - Implement reduced ISO-formats for intervals [#535]
 - Improve formatting of infinite intervals [#536]
 - New interval boundary manipulations based on operators [#538]
+- Determine first moment for given calendar date in time zone [#539]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
