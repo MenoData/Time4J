@@ -26,6 +26,7 @@ import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.Weekcycle;
 import net.time4j.Weekmodel;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.AttributeQuery;
@@ -764,7 +765,7 @@ public final class DateInterval
      */
     public Stream<PlainDate> stream(Duration<CalendarUnit> duration) {
 
-        if (this.isEmpty()) {
+        if (this.isEmpty() && duration.isPositive()) {
             return Stream.empty();
         }
 
@@ -883,6 +884,91 @@ public final class DateInterval
 
         return LongStream.range(0, size).mapToObj(
             index -> start.plus(eMonths * index, CalendarUnit.MONTHS).plus(eDays * index, CalendarUnit.DAYS));
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date which is the result of addition of given duration
+     * in week-based units to start until the end of this interval is reached. </p>
+     *
+     * @param   weekBasedYears      duration component of week-based years
+     * @param   isoWeeks            duration component of calendar weeks (from Monday to Sunday)
+     * @param   days                duration component of ordinary calendar days
+     * @throws  IllegalStateException       if this interval is infinite or if there is no canonical form
+     * @throws  IllegalArgumentException    if there is any negative duration component or if there is
+     *                                      no positive duration component at all
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils ein Kalenderdatum als Vielfaches der Dauer in
+     * wochenbasierten Zeiteinheiten angewandt auf den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * @param   weekBasedYears      duration component of week-based years
+     * @param   isoWeeks            duration component of calendar weeks (from Monday to Sunday)
+     * @param   days                duration component of ordinary calendar days
+     * @throws  IllegalStateException       if this interval is infinite or if there is no canonical form
+     * @throws  IllegalArgumentException    if there is any negative duration component or if there is
+     *                                      no positive duration component at all
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @since   4.18
+     */
+    public Stream<PlainDate> streamWeekBased(
+        int weekBasedYears,
+        int isoWeeks,
+        int days
+    ) {
+
+        if ((weekBasedYears < 0) || (isoWeeks < 0) || (days < 0)) {
+            throw new IllegalArgumentException("Found illegal negative duration component.");
+        }
+
+        final long effYears = weekBasedYears;
+        final long effDays = 7L * isoWeeks + days;
+
+        if ((weekBasedYears == 0) && (effDays == 0)) {
+            throw new IllegalArgumentException("Cannot create stream with empty duration.");
+        }
+
+        if (this.isEmpty()) {
+            return Stream.empty();
+        }
+
+        DateInterval interval = this.toCanonical();
+        PlainDate start = interval.getStartAsCalendarDate();
+        PlainDate end = interval.getEndAsCalendarDate();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        if ((effYears == 0) && (effDays == 1)) {
+            return DateInterval.streamDaily(start, end);
+        }
+
+        long s = start.getDaysSinceEpochUTC();
+        long e = end.getDaysSinceEpochUTC();
+
+        long n = 1 + ((e - s) / (Math.addExact(Math.multiplyExact(effYears, 371), effDays))); // first estimate
+        PlainDate date;
+        long size;
+
+        do {
+            size = n;
+            long y = Math.multiplyExact(effYears, n);
+            long d = Math.multiplyExact(effDays, n);
+            date = start.plus(y, Weekcycle.YEARS).plus(d, CalendarUnit.DAYS);
+            n++;
+        } while (!date.isAfter(end));
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return LongStream.range(0, size).mapToObj(
+            index -> start.plus(effYears * index, Weekcycle.YEARS).plus(effDays * index, CalendarUnit.DAYS));
 
     }
 

@@ -584,4 +584,20 @@ public class BasicDateRangeTest {
         DateInterval.stream(duration, start, end);
     }
 
+    @Test
+    public void streamWeekBased() {
+        PlainDate start = PlainDate.of(2013, 1, 1); // Tuesday
+        PlainDate end = PlainDate.of(2017, 1, 1); // Sunday
+
+        List<PlainDate> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(PlainDate.of(2013, 12, 31).plus(17, CalendarUnit.DAYS));
+        expected.add(PlainDate.of(2014, 12, 30).plus(34, CalendarUnit.DAYS));
+        expected.add(PlainDate.of(2016, 1, 5).plus(51, CalendarUnit.DAYS));
+
+        List<PlainDate> dates =
+            DateInterval.between(start, end).streamWeekBased(1, 2, 3).parallel().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+    }
+
 }
