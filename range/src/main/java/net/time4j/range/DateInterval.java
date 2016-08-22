@@ -899,6 +899,7 @@ public final class DateInterval
      *                                      no positive duration component at all
      * @return  stream consisting of distinct dates which are the result of adding the duration to the start
      * @see     #toCanonical()
+     * @see     Weekcycle#YEARS
      * @since   4.18
      */
     /*[deutsch]
@@ -913,6 +914,7 @@ public final class DateInterval
      *                                      no positive duration component at all
      * @return  stream consisting of distinct dates which are the result of adding the duration to the start
      * @see     #toCanonical()
+     * @see     Weekcycle#YEARS
      * @since   4.18
      */
     public Stream<PlainDate> streamWeekBased(
