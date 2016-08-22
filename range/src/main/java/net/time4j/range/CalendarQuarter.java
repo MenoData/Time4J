@@ -429,6 +429,16 @@ public final class CalendarQuarter
 
     }
 
+    /**
+     * <p>Iterates over all days of this calendar quarter year. </p>
+     *
+     * @return  Iterator
+     */
+    /*[deutsch]
+     * <p>Iteratiert &uuml;ber alle Tage dieses Kalenderquartals. </p>
+     *
+     * @return  Iterator
+     */
     @Override
     public Iterator<PlainDate> iterator() {
 

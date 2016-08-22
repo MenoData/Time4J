@@ -524,6 +524,16 @@ public final class CalendarMonth
 
     }
 
+    /**
+     * <p>Iterates over all days of this calendar month. </p>
+     *
+     * @return  Iterator
+     */
+    /*[deutsch]
+     * <p>Iteratiert &uuml;ber alle Tage dieses Kalendermonats. </p>
+     *
+     * @return  Iterator
+     */
     @Override
     public Iterator<PlainDate> iterator() {
 

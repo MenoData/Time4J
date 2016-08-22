@@ -519,6 +519,16 @@ public final class CalendarWeek
 
     }
 
+    /**
+     * <p>Iterates over all seven days from Monday to Sunday. </p>
+     *
+     * @return  Iterator
+     */
+    /*[deutsch]
+     * <p>Iteratiert &uuml;ber alle sieben Tage von Montag bis Sonntag. </p>
+     *
+     * @return  Iterator
+     */
     @Override
     public Iterator<PlainDate> iterator() {
 

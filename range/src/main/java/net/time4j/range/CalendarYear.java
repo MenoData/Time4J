@@ -430,6 +430,16 @@ public final class CalendarYear
 
     }
 
+    /**
+     * <p>Iterates over all days of this year. </p>
+     *
+     * @return  Iterator
+     */
+    /*[deutsch]
+     * <p>Iteratiert &uuml;ber alle Tage dieses Jahres. </p>
+     *
+     * @return  Iterator
+     */
     @Override
     public Iterator<PlainDate> iterator() {
 
